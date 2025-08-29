@@ -1,0 +1,137 @@
+:root {
+  --bg: #0b0d10;
+  --panel: #12161b;
+  --muted: #7b8894;
+  --accent: #5eead4;
+  /* teal */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: var(--bg);
+  color: #e6edf3;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  height: 100vh;
+  padding: 14px;
+}
+
+.header {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid #1f2832;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.sidebar {
+  overflow: auto;
+}
+
+.viewer {
+  position: relative;
+  overflow: auto;
+}
+
+.canvas-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+#pdfCanvas,
+#overlayCanvas {
+  display: block;
+}
+
+#overlayCanvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* drawing layer is controlled via transparent hitbox */
+}
+
+.hitbox {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.input {
+  background: #0f141a;
+  border: 1px solid #223042;
+  color: inherit;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.btn {
+  background: #0f141a;
+  border: 1px solid #223042;
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.json {
+  white-space: pre;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #0f141a;
+  border: 1px solid #223042;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #1f2832;
+  margin: 12px 0;
+}

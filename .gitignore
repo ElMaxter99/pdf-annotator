@@ -1,0 +1,40 @@
+# Compilación Angular / Vite
+dist/
+dist-ssr/
+browser/
+server/
+
+# Archivos temporales Angular
+.angular/
+.angular/cache/
+.angular/server/
+
+# Dependencias
+node_modules/
+
+# Archivos de log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Archivos de entorno (no subir secretos)
+.env
+.env.*.local
+
+# IDEs y editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Otros
+*.tgz

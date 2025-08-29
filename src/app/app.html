@@ -1,0 +1,42 @@
+<div class="app">
+  <div class="header">
+    <div class="badge">PDF Click Annotator</div>
+    <input class="input" type="file" accept="application/pdf" (change)="onFileSelected($event)" />
+
+    <div class="controls">
+      <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex() === 1">◀ Prev</button>
+      <div class="badge">Page {{ pageIndex() }} / {{ pageCount || 0 }}</div>
+      <button class="btn" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex() === pageCount">Next ▶</button>
+
+      <button class="btn" (click)="zoomOut()" [disabled]="!pdfDoc">−</button>
+      <div class="badge">Zoom {{ scale() | number:'1.0-2' }}×</div>
+      <button class="btn" (click)="zoomIn()" [disabled]="!pdfDoc">+</button>
+
+      <input type="text" [value]="valueText()" (input)="valueText.set($event.target.value)" />
+
+      <button class="btn" (click)="clearAll()" [disabled]="!coords().length">Clear</button>
+      <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">Copy JSON</button>
+      <button class="btn" (click)="downloadJSON()" [disabled]="!coords().length">Download JSON</button>
+    </div>
+  </div>
+
+  <div class="panel sidebar">
+    <div class="small">Coordenadas (PDF pts, origen abajo-izquierda)</div>
+    <hr />
+    <pre class="json">{{ coords() | json }}</pre>
+  </div>
+
+  <div class="panel viewer" *ngIf="pdfDoc as _">
+    <div class="canvas-wrap">
+      <canvas #pdfCanvas id="pdfCanvas"></canvas>
+      <canvas #overlayCanvas id="overlayCanvas"></canvas>
+      <!-- Transparent click layer; we use it to capture clicks -->
+      <div #hitbox class="hitbox" (click)="onHitboxClick($event)"></div>
+    </div>
+  </div>
+
+  <div class="panel viewer" *ngIf="!pdfDoc">
+    <p class="small">Sube un PDF para empezar. Haz click donde quieras “pintar”; verás las coordenadas a la izquierda.
+      El texto opcional se muestra como vista previa.</p>
+  </div>
+</div>
