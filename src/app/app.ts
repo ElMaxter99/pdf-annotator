@@ -1,29 +1,37 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist';
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc =
-  new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
-type Coord = { page: number; x: number; y: number; value?: string };
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
+
+type Coord = {
+  page: number;
+  x: number;
+  y: number;
+  value: string;
+  size: number;
+  color: string;
+};
 
 @Component({
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
-  imports: [CommonModule],
-  styleUrl: './app.scss'
+  imports: [CommonModule, FormsModule],
+  styleUrl: './app.scss',
 })
 export class App {
-  title = signal('pdf-annotator');
-
   pdfDoc: PDFDocumentProxy | null = null;
-  pageIndex = signal(1); // 1-based
+  pageIndex = signal(1);
   scale = signal(1.5);
 
-  // Default test to print in PDF
-  valueText = signal('X');
   coords = signal<Coord[]>([]);
+  preview = signal<Coord | null>(null);
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -83,20 +91,38 @@ export class App {
     return { x: +pdfX.toFixed(2), y: +pdfY.toFixed(2) };
   }
 
-  async onHitboxClick(evt: MouseEvent) {
+  onHitboxClick(evt: MouseEvent) {
+    // si el click viene de la preview → ignorar
+    const target = evt.target as HTMLElement;
+    if (target.closest('.preview')) return;
+
     if (!this.pdfDoc) return;
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
 
-    const entry: Coord = {
+    this.preview.set({
       page: this.pageIndex(),
       x: pt.x,
       y: pt.y,
-      value: this.valueText()?.trim() || undefined
-    };
+      value: '',
+      size: 14,
+      color: '#000000',
+    });
+  }
 
-    this.coords.update(arr => [...arr, entry]);
-    this.drawMarker(entry);
+  confirmPreview() {
+    const entry = this.preview();
+    if (!entry || !entry.value.trim()) {
+      this.preview.set(null);
+      return;
+    }
+    this.coords.update((arr) => [...arr, entry]);
+    this.preview.set(null);
+    this.redrawAllForPage();
+  }
+
+  cancelPreview() {
+    this.preview.set(null);
   }
 
   drawMarker(c: Coord) {
@@ -110,18 +136,9 @@ export class App {
     const y = overlay.height - c.y * scale;
 
     ctx.save();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = '#5eead4';
-    ctx.beginPath();
-    ctx.moveTo(x - 6, y); ctx.lineTo(x + 6, y);
-    ctx.moveTo(x, y - 6); ctx.lineTo(x, y + 6);
-    ctx.stroke();
-
-    if (c.value) {
-      ctx.font = '12px sans-serif';
-      ctx.fillStyle = 'white';
-      ctx.fillText(c.value, x + 4, y - 4);
-    }
+    ctx.font = `${c.size}px sans-serif`;
+    ctx.fillStyle = c.color;
+    ctx.fillText(c.value, x, y);
     ctx.restore();
   }
 
@@ -131,12 +148,14 @@ export class App {
     if (!overlay || !ctx) return;
 
     ctx.clearRect(0, 0, overlay.width, overlay.height);
-    this.coords().filter(c => c.page === this.pageIndex()).forEach(c => this.drawMarker(c));
+    this.coords()
+      .filter((c) => c.page === this.pageIndex())
+      .forEach((c) => this.drawMarker(c));
   }
 
   async prevPage() {
     if (this.pageIndex() > 1) {
-      this.pageIndex.update(v => v - 1);
+      this.pageIndex.update((v) => v - 1);
       await this.render();
       this.redrawAllForPage();
     }
@@ -144,20 +163,20 @@ export class App {
 
   async nextPage() {
     if (this.pdfDoc && this.pageIndex() < this.pdfDoc.numPages) {
-      this.pageIndex.update(v => v + 1);
+      this.pageIndex.update((v) => v + 1);
       await this.render();
       this.redrawAllForPage();
     }
   }
 
   async zoomIn() {
-    this.scale.update(s => +(s + 0.25).toFixed(2));
+    this.scale.update((s) => +(s + 0.25).toFixed(2));
     await this.render();
     this.redrawAllForPage();
   }
 
   async zoomOut() {
-    this.scale.update(s => Math.max(0.25, +(s - 0.25).toFixed(2)));
+    this.scale.update((s) => Math.max(0.25, +(s - 0.25).toFixed(2)));
     await this.render();
     this.redrawAllForPage();
   }
@@ -176,8 +195,9 @@ export class App {
     const blob = new Blob([JSON.stringify(this.coords(), null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'coords.json'; a.click();
+    a.href = url;
+    a.download = 'coords.json';
+    a.click();
     URL.revokeObjectURL(url);
   }
-
 }
