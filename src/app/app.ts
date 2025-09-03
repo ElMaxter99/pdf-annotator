@@ -2,12 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
-import * as pdfjsLib from 'pdfjs-dist';
-
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url
-).toString();
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
 type Coord = {
   page: number;
@@ -18,12 +13,14 @@ type Coord = {
   color: string;
 };
 
+type EditState = { index: number; coord: Coord } | null;
+
 @Component({
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
   imports: [CommonModule, FormsModule],
-  styleUrl: './app.scss',
+  styleUrls: ['./app.scss'],
 })
 export class App {
   pdfDoc: PDFDocumentProxy | null = null;
@@ -32,10 +29,16 @@ export class App {
 
   coords = signal<Coord[]>([]);
   preview = signal<Coord | null>(null);
+  editing = signal<EditState>(null);
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('annotationsLayer', { static: false }) annotationsLayerRef?: ElementRef<HTMLDivElement>;
+
+  constructor() {
+    // Indicar la ruta local del worker
+    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/js/pdfjs/pdf.worker.min.mjs';
+  }
 
   get pageCount() {
     return this.pdfDoc?.numPages ?? 0;
@@ -95,9 +98,6 @@ export class App {
   }
 
   onHitboxClick(evt: MouseEvent) {
-    const target = evt.target as HTMLElement;
-    if (target.closest('.preview')) return;
-
     if (!this.pdfDoc) return;
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
@@ -127,7 +127,24 @@ export class App {
     this.preview.set(null);
   }
 
-  /** Dibujar anotaciones como elementos HTML interactivos */
+  startEditing(idx: number, c: Coord) {
+    this.editing.set({ index: idx, coord: { ...c } });
+  }
+
+  confirmEdit() {
+    const edit = this.editing();
+    if (!edit) return;
+    this.coords.update(arr =>
+      arr.map((a, i) => i === edit.index ? edit.coord : a)
+    );
+    this.editing.set(null);
+    this.redrawAllForPage();
+  }
+
+  cancelEdit() {
+    this.editing.set(null);
+  }
+
   redrawAllForPage() {
     const overlay = this.overlayCanvasRef?.nativeElement;
     const ctx = overlay?.getContext('2d');
@@ -155,23 +172,11 @@ export class App {
         el.style.fontSize = c.size + 'px';
         el.style.color = c.color;
         el.style.cursor = 'pointer';
-        el.style.pointerEvents = 'auto'; // ✅ para que reciba clics
+        el.style.pointerEvents = 'auto';
 
         el.onclick = (evt) => {
           evt.stopPropagation();
-          const choice = confirm("¿Quieres borrar esta anotación?\n(Cancelar = editar)");
-          if (choice) {
-            this.coords.update(arr => arr.filter((_, i) => i !== idx));
-            this.redrawAllForPage();
-          } else {
-            const newText = prompt("Editar texto:", c.value);
-            if (newText !== null) {
-              this.coords.update(arr =>
-                arr.map((a, i) => i === idx ? { ...a, value: newText } : a)
-              );
-              this.redrawAllForPage();
-            }
-          }
+          this.startEditing(idx, c);
         };
 
         layer.appendChild(el);
