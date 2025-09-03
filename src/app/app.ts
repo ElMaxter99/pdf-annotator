@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, signal, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
@@ -14,7 +14,7 @@ type EditState = { index: number; coord: Coord } | null;
   imports: [CommonModule, FormsModule],
   styleUrls: ['./app.scss'],
 })
-export class App {
+export class App implements AfterViewChecked {
   pdfDoc: PDFDocumentProxy | null = null;
   pageIndex = signal(1);
   scale = signal(1.5);
@@ -27,9 +27,24 @@ export class App {
   @ViewChild('annotationsLayer', { static: false })
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
 
+  // NUEVO: referencia al editor de preview para auto-focus
+  @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
+
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/js/pdfjs/pdf.worker.min.mjs';
   }
+
+  ngAfterViewChecked() {
+    // Auto-focus en el input cuando se crea una nueva anotación
+    const previewEl = this.previewEditorRef?.nativeElement;
+    if (previewEl) {
+      const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement;
+      if (input) {
+        input.focus();
+      }
+    }
+  }
+
   get pageCount() {
     return this.pdfDoc?.numPages ?? 0;
   }
@@ -88,6 +103,7 @@ export class App {
 
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
+
     this.preview.set({
       page: this.pageIndex(),
       x: pt.x,
@@ -117,6 +133,7 @@ export class App {
     this.editing.set({ index: idx, coord: { ...c } });
     this.preview.set(null);
   }
+
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
@@ -124,8 +141,17 @@ export class App {
     this.editing.set(null);
     this.redrawAllForPage();
   }
+
   cancelEdit() {
     this.editing.set(null);
+  }
+
+  deleteAnnotation() {
+    const e = this.editing();
+    if (!e) return;
+    this.coords.update((arr) => arr.filter((_, i) => i !== e.index));
+    this.editing.set(null);
+    this.redrawAllForPage();
   }
 
   redrawAllForPage() {
@@ -196,13 +222,5 @@ export class App {
     a.download = 'coords.json';
     a.click();
     URL.revokeObjectURL(url);
-  }
-  deleteAnnotation() {
-    const e = this.editing();
-    if (!e) return;
-    // Elimina la anotación del array
-    this.coords.update((arr) => arr.filter((_, i) => i !== e.index));
-    this.editing.set(null);
-    this.redrawAllForPage();
   }
 }

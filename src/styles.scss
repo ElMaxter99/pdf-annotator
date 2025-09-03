@@ -1,8 +1,10 @@
 :root {
-  --bg: #0b0d10;
-  --panel: #12161b;
-  --muted: #7b8894;
+  --bg: #1e1e2f;
+  --panel: #2a2a3d;
   --accent: #5eead4;
+  --danger: #ff4d4d;
+  --text: #f5f5f5;
+  --muted: #b0b0b0;
 }
 
 * {
@@ -11,54 +13,120 @@
 
 html,
 body {
-  height: 100%;
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif;
-  color: #e6edf3;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
+  height: 100%;
+  font-family: 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: var(--bg);
 }
 
 .app {
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar viewer";
+  grid-template-columns: 320px 1fr;
   grid-template-rows: auto 1fr;
-  gap: 12px;
   height: 100vh;
-  padding: 14px;
+  gap: 12px;
+  padding: 12px;
 }
 
-.header {
-  grid-column: 1/-1;
+header.header {
+  grid-area: header;
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
+}
+
+header .logo {
+  font-weight: bold;
+  font-size: 1.3rem;
+  color: var(--accent);
+}
+
+.input-file {
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   align-items: center;
 }
 
-.panel {
+.btn {
   background: var(--panel);
-  border: 1px solid #1f2832;
-  border-radius: 14px;
-  padding: 14px;
+  color: var(--text);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.btn.danger {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+}
+
+.btn.danger:hover {
+  opacity: 0.8;
+}
+
+.page-indicator {
+  padding: 2px 6px;
+  background: #333;
+  border-radius: 6px;
+  font-size: .9rem;
 }
 
 .sidebar {
+  grid-area: sidebar;
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 12px;
   overflow: auto;
+
+  h4 {
+    margin-top: 0;
+    color: var(--accent);
+  }
+
+  .json {
+    font-family: monospace;
+    font-size: .85rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text);
+  }
 }
 
 .viewer {
-  position: relative;
+  grid-area: viewer;
+  background: var(--panel);
+  border-radius: 12px;
   overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px;
 }
 
-.canvas-wrap {
+.canvas-container {
   position: relative;
-  display: inline-block;
 }
 
 #pdfCanvas,
@@ -85,97 +153,77 @@ textarea {
   inset: 0;
   cursor: crosshair;
   z-index: 5;
-  background-color: transparent;
 }
 
 .annotation {
   position: absolute;
-  cursor: text;
   pointer-events: auto;
-  white-space: nowrap;
+  cursor: text;
+  background: rgba(255, 255, 255, 0.15);
   padding: 2px 4px;
   border-radius: 4px;
-  z-index: 15;
-  background-color: rgba(255, 255, 255, 0.1);
-  transition: background 0.2s, border 0.2s;
+  white-space: nowrap;
+  transition: .2s;
 }
 
 .annotation:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background: rgba(94, 234, 212, 0.25);
   border: 1px dashed var(--accent);
 }
 
-.preview {
+.annotation-editor {
   position: absolute;
   z-index: 20;
   background: #fffbe0;
   padding: 6px;
   border: 1px solid #f0c040;
-  border-radius: 4px;
-}
-
-.controls {
+  border-radius: 6px;
   display: flex;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: wrap;
-}
 
-.input {
-  background: #0f141a;
-  border: 1px solid #223042;
-  color: inherit;
-  padding: 8px 10px;
-  border-radius: 10px;
-}
+  input[type="text"],
+  input[type="number"],
+  input[type="color"] {
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 2px 4px;
+  }
 
-.btn {
-  background: #0f141a;
-  border: 1px solid #223042;
-  color: inherit;
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-}
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 6px;
+  }
 
-.btn:hover {
-  border-color: var(--accent);
-}
-
-.small {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.json {
-  white-space: pre;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 12px;
-}
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #0f141a;
-  border: 1px solid #223042;
-}
-
-hr {
-  border: none;
-  border-top: 1px solid #1f2832;
-  margin: 12px 0;
+  &.editing {
+    background: #fff0e0;
+    border: 1px solid #f0a040;
+  }
 }
 
 .btn-delete {
-  background: #ff4d4d;
-  border: none;
-  color: white;
+  background: var(--danger);
+  color: #fff;
   padding: 4px 8px;
-  margin-left: 4px;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .btn-delete:hover {
-  background: #ff1a1a;
+  opacity: 0.8;
+}
+
+.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-text {
+  color: var(--muted);
+  font-size: 1rem;
+  text-align: center;
+  max-width: 400px;
 }
