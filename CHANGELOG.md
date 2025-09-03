@@ -1,3 +1,8 @@
+## [0.2.1] - 2025-09-03
+###✨ Added
+- Auto-focus en el input de texto al crear una nueva anotación, permitiendo empezar a escribir inmediatamente.
+- Mejoras en la UI
+
 ## [0.2.0] - 2025-09-03
 ### ✨ Added
 - Capacidad de crear anotaciones al hacer click en el PDF mediante hitbox.
@@ -14,6 +19,7 @@
 - Bug donde hacer click en el PDF no creaba nuevas anotaciones correctamente debido a conflicto de capas.
 - Bug donde el cursor no indicaba que se estaba sobre una anotación editable.
 - Bug en el cálculo de coordenadas al hacer click sobre el PDF con zoom aplicado.
+
 ## [0.1.0] - 2025-08-28
 ### ✨ Added
 - Configuración inicial de proyecto Angular 20 con Vite.
