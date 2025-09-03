@@ -29,7 +29,11 @@
       <canvas #pdfCanvas id="pdfCanvas"></canvas>
       <canvas #overlayCanvas id="overlayCanvas" style="position:absolute; inset:0; pointer-events:none;"></canvas>
 
-      <!-- Hitbox solo capta clicks en el PDF, no en la preview -->
+      <!-- capa de anotaciones interactivas (no bloquea clics del hitbox) -->
+      <div #annotationsLayer class="annotations-layer"
+        style="position:absolute; inset:0; z-index:6; pointer-events:none;"></div>
+
+      <!-- Hitbox para clicks en PDF -->
       <div class="hitbox" (click)="onHitboxClick($event)"
         style="position:absolute; inset:0; z-index:5; cursor:crosshair;">
       </div>
@@ -49,7 +53,7 @@
   </div>
 
   <div class="panel viewer" *ngIf="!pdfDoc">
-    <p class="small">Sube un PDF y haz click donde quieras añadir texto. Edita el contenido en la vista previa antes de
-      confirmar ✅.</p>
+    <p class="small">Sube un PDF y haz click donde quieras añadir texto. Haz clic en un texto ya anotado para
+      editarlo o borrarlo.</p>
   </div>
 </div>

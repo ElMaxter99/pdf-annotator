@@ -35,6 +35,7 @@ export class App {
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('annotationsLayer', { static: false }) annotationsLayerRef?: ElementRef<HTMLDivElement>;
 
   get pageCount() {
     return this.pdfDoc?.numPages ?? 0;
@@ -74,6 +75,8 @@ export class App {
       overlay.height = canvas.height;
       overlay.getContext('2d')?.clearRect(0, 0, overlay.width, overlay.height);
     }
+
+    this.redrawAllForPage();
   }
 
   private domToPdfCoords(evt: MouseEvent) {
@@ -92,7 +95,6 @@ export class App {
   }
 
   onHitboxClick(evt: MouseEvent) {
-    // si el click viene de la preview → ignorar
     const target = evt.target as HTMLElement;
     if (target.closest('.preview')) return;
 
@@ -125,39 +127,61 @@ export class App {
     this.preview.set(null);
   }
 
-  drawMarker(c: Coord) {
-    const overlay = this.overlayCanvasRef?.nativeElement;
-    if (!overlay) return;
-    const ctx = overlay.getContext('2d');
-    if (!ctx) return;
-
-    const scale = this.scale();
-    const x = c.x * scale;
-    const y = overlay.height - c.y * scale;
-
-    ctx.save();
-    ctx.font = `${c.size}px sans-serif`;
-    ctx.fillStyle = c.color;
-    ctx.fillText(c.value, x, y);
-    ctx.restore();
-  }
-
+  /** Dibujar anotaciones como elementos HTML interactivos */
   redrawAllForPage() {
     const overlay = this.overlayCanvasRef?.nativeElement;
     const ctx = overlay?.getContext('2d');
-    if (!overlay || !ctx) return;
+    if (overlay && ctx) ctx.clearRect(0, 0, overlay.width, overlay.height);
 
-    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    const layer = this.annotationsLayerRef?.nativeElement;
+    if (layer) layer.innerHTML = '';
+
+    const scale = this.scale();
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!pdfCanvas || !layer) return;
+
     this.coords()
       .filter((c) => c.page === this.pageIndex())
-      .forEach((c) => this.drawMarker(c));
+      .forEach((c, idx) => {
+        const left = c.x * scale;
+        const top = pdfCanvas.height - c.y * scale;
+
+        const el = document.createElement('div');
+        el.className = 'annotation';
+        el.textContent = c.value;
+        el.style.position = 'absolute';
+        el.style.left = left + 'px';
+        el.style.top = top - c.size + 'px';
+        el.style.fontSize = c.size + 'px';
+        el.style.color = c.color;
+        el.style.cursor = 'pointer';
+        el.style.pointerEvents = 'auto'; // ✅ para que reciba clics
+
+        el.onclick = (evt) => {
+          evt.stopPropagation();
+          const choice = confirm("¿Quieres borrar esta anotación?\n(Cancelar = editar)");
+          if (choice) {
+            this.coords.update(arr => arr.filter((_, i) => i !== idx));
+            this.redrawAllForPage();
+          } else {
+            const newText = prompt("Editar texto:", c.value);
+            if (newText !== null) {
+              this.coords.update(arr =>
+                arr.map((a, i) => i === idx ? { ...a, value: newText } : a)
+              );
+              this.redrawAllForPage();
+            }
+          }
+        };
+
+        layer.appendChild(el);
+      });
   }
 
   async prevPage() {
     if (this.pageIndex() > 1) {
       this.pageIndex.update((v) => v - 1);
       await this.render();
-      this.redrawAllForPage();
     }
   }
 
@@ -165,20 +189,17 @@ export class App {
     if (this.pdfDoc && this.pageIndex() < this.pdfDoc.numPages) {
       this.pageIndex.update((v) => v + 1);
       await this.render();
-      this.redrawAllForPage();
     }
   }
 
   async zoomIn() {
     this.scale.update((s) => +(s + 0.25).toFixed(2));
     await this.render();
-    this.redrawAllForPage();
   }
 
   async zoomOut() {
     this.scale.update((s) => Math.max(0.25, +(s - 0.25).toFixed(2)));
     await this.render();
-    this.redrawAllForPage();
   }
 
   clearAll() {
