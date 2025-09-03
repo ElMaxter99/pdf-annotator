@@ -27,7 +27,6 @@ export class App implements AfterViewChecked {
   @ViewChild('annotationsLayer', { static: false })
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
 
-  // NUEVO: referencia al editor de preview para auto-focus
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
 
   constructor() {
@@ -35,7 +34,6 @@ export class App implements AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    // Auto-focus en el input cuando se crea una nueva anotación
     const previewEl = this.previewEditorRef?.nativeElement;
     if (previewEl) {
       const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement;
