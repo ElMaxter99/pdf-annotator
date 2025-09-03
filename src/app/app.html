@@ -34,7 +34,7 @@
       <div class="hitbox" (click)="onHitboxClick($event)"></div>
 
       <!-- NUEVA ANOTACIÓN -->
-      <div *ngIf="preview() as p" class="annotation-editor" [style.left.px]="p.x*scale()"
+      <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.x*scale()"
         [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()">
         <input type="text" [(ngModel)]="p.value" placeholder="Texto..." />
         <input type="number" [(ngModel)]="p.size" min="8" max="72" />
