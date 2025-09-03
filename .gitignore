@@ -38,3 +38,6 @@ Thumbs.db
 
 # Otros
 *.tgz
+
+# Archivo de bloqueo de paquetes
+package-lock.json

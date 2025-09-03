@@ -1,3 +1,19 @@
+## [0.2.0] - 2025-09-03
+### ✨ Added
+- Capacidad de crear anotaciones al hacer click en el PDF mediante hitbox.
+- Panel de edición flotante para editar anotaciones existentes.
+- Botón de borrar anotación individual directamente desde el panel de edición.
+- Hover sobre anotaciones con cursor text y tooltip que indica “Click para editar”.
+- Renderizado de anotaciones sobre `<canvas>` en capa separada (annotations-layer) para evitar conflictos con la creación de nuevas anotaciones.
+- Funcionalidad de zoom in/out manteniendo las anotaciones correctamente escaladas.
+- Navegación entre páginas del PDF con botones prev/next.
+- Exportación de anotaciones en JSON mediante copia al portapapeles o descarga de archivo.
+- Limpieza de todas las anotaciones con botón Clear.
+- Mejora en la gestión de prioridad de click para que crear nuevas anotaciones no interfiera con la edición de existentes.
+### 🐛 Fixed
+- Bug donde hacer click en el PDF no creaba nuevas anotaciones correctamente debido a conflicto de capas.
+- Bug donde el cursor no indicaba que se estaba sobre una anotación editable.
+- Bug en el cálculo de coordenadas al hacer click sobre el PDF con zoom aplicado.
 ## [0.1.0] - 2025-08-28
 ### ✨ Added
 - Configuración inicial de proyecto Angular 20 con Vite.

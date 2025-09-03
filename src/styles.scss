@@ -3,7 +3,6 @@
   --panel: #12161b;
   --muted: #7b8894;
   --accent: #5eead4;
-  /* teal */
 }
 
 * {
@@ -13,12 +12,8 @@
 html,
 body {
   height: 100%;
-}
-
-body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  background: var(--bg);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif;
   color: #e6edf3;
 }
 
@@ -39,7 +34,7 @@ textarea {
 }
 
 .header {
-  grid-column: 1 / -1;
+  grid-column: 1/-1;
   display: flex;
   gap: 12px;
   align-items: center;
@@ -75,13 +70,48 @@ textarea {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* drawing layer is controlled via transparent hitbox */
+  z-index: 1;
+}
+
+.annotations-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
 }
 
 .hitbox {
   position: absolute;
   inset: 0;
   cursor: crosshair;
+  z-index: 5;
+  background-color: transparent;
+}
+
+.annotation {
+  position: absolute;
+  cursor: text;
+  pointer-events: auto;
+  white-space: nowrap;
+  padding: 2px 4px;
+  border-radius: 4px;
+  z-index: 15;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background 0.2s, border 0.2s;
+}
+
+.annotation:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  border: 1px dashed var(--accent);
+}
+
+.preview {
+  position: absolute;
+  z-index: 20;
+  background: #fffbe0;
+  padding: 6px;
+  border: 1px solid #f0c040;
+  border-radius: 4px;
 }
 
 .controls {
@@ -134,4 +164,18 @@ hr {
   border: none;
   border-top: 1px solid #1f2832;
   margin: 12px 0;
+}
+
+.btn-delete {
+  background: #ff4d4d;
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  margin-left: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background: #ff1a1a;
 }
