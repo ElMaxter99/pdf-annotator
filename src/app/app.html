@@ -25,20 +25,19 @@
   </div>
 
   <div class="panel viewer" *ngIf="pdfDoc as _">
-    <div class="canvas-wrap" style="position:relative;">
-      <canvas #pdfCanvas id="pdfCanvas"></canvas>
-      <canvas #overlayCanvas id="overlayCanvas" style="position:absolute; inset:0; pointer-events:none;"></canvas>
-      <div #annotationsLayer style="position:absolute; inset:0; z-index:5;"></div>
+    <div class="canvas-wrap">
+      <canvas #pdfCanvas></canvas>
+      <canvas #overlayCanvas></canvas>
+
+      <!-- Layer de anotaciones -->
+      <div #annotationsLayer class="annotations-layer"></div>
 
       <!-- Hitbox para crear anotaciones -->
-      <div class="hitbox" (click)="onHitboxClick($event)"
-        style="position:absolute; inset:0; z-index:10; cursor:crosshair;">
-      </div>
+      <div class="hitbox" (click)="onHitboxClick($event)"></div>
 
       <!-- Preview flotante -->
       <div *ngIf="preview() as p" class="preview" [style.left.px]="p.x * scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y * scale()"
-        style="position:absolute; z-index:20; background:white; padding:6px; border:1px solid #ccc; border-radius:4px;">
+        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y * scale()">
         <input type="text" [(ngModel)]="p.value" placeholder="Texto..." />
         <input type="number" [(ngModel)]="p.size" min="8" max="72" />
         <input type="color" [(ngModel)]="p.color" />
@@ -48,8 +47,7 @@
 
       <!-- Edit flotante -->
       <div *ngIf="editing() as e" class="preview" [style.left.px]="e.coord.x * scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y * scale()"
-        style="position:absolute; z-index:20; background:#fffbe0; padding:6px; border:1px solid #f0c040; border-radius:4px;">
+        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y * scale()">
         <input type="text" [(ngModel)]="e.coord.value" placeholder="Texto..." />
         <input type="number" [(ngModel)]="e.coord.size" min="8" max="72" />
         <input type="color" [(ngModel)]="e.coord.color" />
