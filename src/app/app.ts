@@ -3,9 +3,8 @@ import { Component, ElementRef, ViewChild, signal, AfterViewChecked } from '@ang
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker?url';
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfjsWorker;
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
 
 type Coord = { page: number; x: number; y: number; value: string; size: number; color: string };
 type EditState = { index: number; coord: Coord } | null;
