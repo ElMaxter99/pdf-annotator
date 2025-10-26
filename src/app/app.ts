@@ -227,13 +227,15 @@ export class App implements AfterViewChecked {
   }
 
   async downloadAnnotatedPDF() {
-    if (!this.originalPdfData || !this.pdfDoc) return;
+    if (!this.originalPdfData) return;
 
     const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
     const pdf = await PDFDocument.load(this.originalPdfData);
+    const font = await pdf.embedFont(StandardFonts.Helvetica);
 
     for (const c of this.coords()) {
       const page = pdf.getPage(c.page - 1);
+
       const hex = c.color.replace('#', '');
       const r = parseInt(hex.substring(0, 2), 16) / 255;
       const g = parseInt(hex.substring(2, 4), 16) / 255;
@@ -241,14 +243,15 @@ export class App implements AfterViewChecked {
 
       page.drawText(c.value, {
         x: c.x,
-        y: c.y - c.size,
+        y: c.y,
         size: c.size,
         color: rgb(r, g, b),
+        font,
       });
     }
 
     const pdfBytes = await pdf.save();
-    const blob = new Blob([pdfBytes.slice().buffer], { type: 'application/pdf' });
+    const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
