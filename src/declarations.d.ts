@@ -1,4 +1,3 @@
-// Permite importar workers como URLs
 declare module '*.worker?url' {
   const workerUrl: string;
   export default workerUrl;
