@@ -33,7 +33,7 @@
     "@angular/ssr": "^20.2.1",
     "@vercel/analytics": "^1.5.0",
     "express": "^5.1.0",
-    "pdfjs-dist": "^5.4.149",
+    "pdfjs-dist": "5.4.296",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
