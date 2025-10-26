@@ -32,9 +32,7 @@ export class App implements AfterViewChecked {
 
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
 
-  constructor() {
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/js/pdfjs/pdf.worker.min.mjs';
-  }
+  constructor() {}
 
   ngAfterViewChecked() {
     const previewEl = this.previewEditorRef?.nativeElement;
