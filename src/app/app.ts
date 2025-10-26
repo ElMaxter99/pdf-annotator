@@ -3,7 +3,6 @@ import { Component, ElementRef, ViewChild, signal, AfterViewChecked } from '@ang
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
-import { PDFDocument, rgb } from 'pdf-lib';
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
 
@@ -230,6 +229,7 @@ export class App implements AfterViewChecked {
   async downloadAnnotatedPDF() {
     if (!this.originalPdfData || !this.pdfDoc) return;
 
+    const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
     const pdf = await PDFDocument.load(this.originalPdfData);
 
     for (const c of this.coords()) {
