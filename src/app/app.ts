@@ -5,6 +5,8 @@ import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import { PDFDocument, rgb } from 'pdf-lib';
 
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
+
 type Coord = { page: number; x: number; y: number; value: string; size: number; color: string };
 type EditState = { index: number; coord: Coord } | null;
 
@@ -31,7 +33,7 @@ export class App implements AfterViewChecked {
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
 
   constructor() {
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/js/pdfjs/pdf.worker.min.mjs';
+    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
   }
 
   ngAfterViewChecked() {
