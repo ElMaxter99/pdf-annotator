@@ -16,6 +16,8 @@
       <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">Clear</button>
       <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">Copy JSON</button>
       <button class="btn" (click)="downloadJSON()" [disabled]="!coords().length">Download JSON</button>
+      <button class="btn" (click)="downloadAnnotatedPDF()" [disabled]="!coords().length || !pdfDoc">DownloadPDF</button>
+
     </div>
   </header>
 

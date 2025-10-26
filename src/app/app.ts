@@ -3,6 +3,7 @@ import { Component, ElementRef, ViewChild, signal, AfterViewChecked } from '@ang
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import { PDFDocument, rgb } from 'pdf-lib';
 
 type Coord = { page: number; x: number; y: number; value: string; size: number; color: string };
 type EditState = { index: number; coord: Coord } | null;
@@ -21,12 +22,12 @@ export class App implements AfterViewChecked {
   coords = signal<Coord[]>([]);
   preview = signal<Coord | null>(null);
   editing = signal<EditState>(null);
+  private originalPdfData?: ArrayBuffer;
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('annotationsLayer', { static: false })
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
-
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
 
   constructor() {
@@ -37,9 +38,7 @@ export class App implements AfterViewChecked {
     const previewEl = this.previewEditorRef?.nativeElement;
     if (previewEl) {
       const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement;
-      if (input) {
-        input.focus();
-      }
+      if (input) input.focus();
     }
   }
 
@@ -53,6 +52,8 @@ export class App implements AfterViewChecked {
     if (!file) return;
 
     const buf = await file.arrayBuffer();
+    this.originalPdfData = buf.slice(0);
+
     const loadingTask = pdfjsLib.getDocument({ data: buf });
     this.pdfDoc = await loadingTask.promise;
 
@@ -96,9 +97,6 @@ export class App implements AfterViewChecked {
 
   onHitboxClick(evt: MouseEvent) {
     if (!this.pdfDoc || this.editing()) return;
-    const target = evt.target as HTMLElement;
-    if (target.classList.contains('annotation')) return;
-
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
 
@@ -190,16 +188,19 @@ export class App implements AfterViewChecked {
       await this.render();
     }
   }
+
   async nextPage() {
     if (this.pdfDoc && this.pageIndex() < this.pdfDoc.numPages) {
       this.pageIndex.update((v) => v + 1);
       await this.render();
     }
   }
+
   async zoomIn() {
     this.scale.update((s) => +(s + 0.25).toFixed(2));
     await this.render();
   }
+
   async zoomOut() {
     this.scale.update((s) => Math.max(0.25, +(this.scale() - 0.25).toFixed(2)));
     await this.render();
@@ -209,15 +210,47 @@ export class App implements AfterViewChecked {
     this.coords.set([]);
     this.redrawAllForPage();
   }
+
   copyJSON() {
     navigator.clipboard.writeText(JSON.stringify(this.coords(), null, 2)).catch(() => {});
   }
+
   downloadJSON() {
     const blob = new Blob([JSON.stringify(this.coords(), null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'coords.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async downloadAnnotatedPDF() {
+    if (!this.originalPdfData || !this.pdfDoc) return;
+
+    const pdf = await PDFDocument.load(this.originalPdfData);
+
+    for (const c of this.coords()) {
+      const page = pdf.getPage(c.page - 1);
+      const hex = c.color.replace('#', '');
+      const r = parseInt(hex.substring(0, 2), 16) / 255;
+      const g = parseInt(hex.substring(2, 4), 16) / 255;
+      const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+      page.drawText(c.value, {
+        x: c.x,
+        y: c.y - c.size,
+        size: c.size,
+        color: rgb(r, g, b),
+      });
+    }
+
+    const pdfBytes = await pdf.save();
+    const blob = new Blob([pdfBytes.slice().buffer], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'annotated.pdf';
     a.click();
     URL.revokeObjectURL(url);
   }
