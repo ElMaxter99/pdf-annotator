@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, signal, AfterViewChecked } from '@angular/core';
+import { Component, ElementRef, ViewChild, signal, AfterViewChecked, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
@@ -46,18 +46,54 @@ export class App implements AfterViewChecked {
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
 
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
   }
 
   ngAfterViewChecked() {
-    const previewEl = this.previewEditorRef?.nativeElement;
-    if (previewEl) {
-      const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement;
-      if (input) {
-        input.focus();
+    if (this.preview()) {
+      const previewEl = this.previewEditorRef?.nativeElement;
+      if (previewEl) {
+        const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement | null;
+        input?.focus();
       }
+      return;
+    }
+
+    if (this.editing()) {
+      const editEl = this.editEditorRef?.nativeElement;
+      if (editEl) {
+        const input = editEl.querySelector('input[type="text"]') as HTMLInputElement | null;
+        input?.focus();
+      }
+    }
+  }
+
+  onEditorKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
+    const triggerAction = (action: 'confirm' | 'cancel') => {
+      event.preventDefault();
+      this.invokeEditorAction(mode, action);
+    };
+
+    switch (event.key) {
+      case 'Enter':
+        triggerAction('confirm');
+        break;
+      case 'Escape':
+        triggerAction('cancel');
+        break;
+      default:
+        break;
+    }
+  }
+
+  private invokeEditorAction(mode: 'preview' | 'edit', action: 'confirm' | 'cancel') {
+    if (mode === 'preview') {
+      action === 'confirm' ? this.confirmPreview() : this.cancelPreview();
+    } else {
+      action === 'confirm' ? this.confirmEdit() : this.cancelEdit();
     }
   }
 
@@ -326,6 +362,22 @@ export class App implements AfterViewChecked {
 
   cancelEdit() {
     this.editing.set(null);
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  onDocumentMouseDown(event: MouseEvent) {
+    const editState = this.editing();
+    if (!editState) return;
+
+    const modal = this.editEditorRef?.nativeElement;
+    if (!modal) return;
+
+    const target = event.target as Node | null;
+    if (target && modal.contains(target)) {
+      return;
+    }
+
+    this.cancelEdit();
   }
 
   deleteAnnotation() {

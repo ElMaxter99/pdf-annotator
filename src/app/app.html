@@ -35,8 +35,8 @@
 
       <!-- NUEVA ANOTACIÓN -->
       <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.x*scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()" (keydown.enter)="confirmPreview()"
-        (keydown.escape)="cancelPreview()">
+        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()"
+        (keydown)="onEditorKeydown($event, 'preview')">
         <label class="field">
           <span class="field-label">Texto</span>
           <input type="text" [(ngModel)]="p.value" placeholder="Texto..." />
@@ -66,9 +66,9 @@
       </div>
 
       <!-- EDITAR ANOTACIÓN -->
-      <div *ngIf="editing() as e" class="annotation-editor editing" [style.left.px]="e.coord.x*scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()" (keydown.enter)="confirmEdit()"
-        (keydown.escape)="cancelEdit()">
+      <div *ngIf="editing() as e" class="annotation-editor editing" #editEditor [style.left.px]="e.coord.x*scale()"
+        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()"
+        (keydown)="onEditorKeydown($event, 'edit')">
         <span class="editor-badge">Editando</span>
         <label class="field">
           <span class="field-label">Texto</span>
