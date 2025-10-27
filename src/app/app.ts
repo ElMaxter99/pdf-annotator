@@ -60,12 +60,12 @@ export class App implements AfterViewChecked {
     moved: boolean;
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
+  private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('annotationsLayer', { static: false })
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
-
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
 
@@ -140,9 +140,32 @@ export class App implements AfterViewChecked {
     const file = input.files?.[0];
     if (!file) return;
 
+    this.pdfByteSources.clear();
     const buf = await file.arrayBuffer();
-    const loadingTask = pdfjsLib.getDocument({ data: buf });
-    this.pdfDoc = await loadingTask.promise;
+    const typed = new Uint8Array(buf);
+    this.rememberPdfBytes(typed, 0);
+
+    const loadingTask = pdfjsLib.getDocument({ data: typed });
+    const loadedPdf = await loadingTask.promise;
+    this.pdfDoc = loadedPdf;
+
+    try {
+      const canonicalData = await loadedPdf.getData();
+      this.rememberPdfBytes(canonicalData, 1);
+    } catch (error) {
+      console.warn('No se pudo obtener una copia canonizada del PDF cargado.', error);
+    }
+
+    if (typeof loadedPdf.saveDocument === 'function') {
+      try {
+        const sanitizedData = await loadedPdf.saveDocument();
+        const typedSanitized =
+          sanitizedData instanceof Uint8Array ? sanitizedData : new Uint8Array(sanitizedData);
+        this.rememberPdfBytes(typedSanitized, 2);
+      } catch (error) {
+        console.warn('No se pudo sanear el PDF cargado.', error);
+      }
+    }
 
     this.pageIndex.set(1);
     this.clearAll();
@@ -152,27 +175,27 @@ export class App implements AfterViewChecked {
   }
 
   async render() {
-    if (!this.pdfDoc) return;
+    if (!this.pdfDoc) {
+      return;
+    }
+
     const page: PDFPageProxy = await this.pdfDoc.getPage(this.pageIndex());
     const viewport = page.getViewport({ scale: this.scale() });
 
     const canvas = this.pdfCanvasRef?.nativeElement;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
+
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
 
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
+
     await page.render({ canvasContext: ctx, canvas, viewport }).promise;
-
-    const overlay = this.overlayCanvasRef?.nativeElement;
-    if (overlay) {
-      overlay.width = canvas.width;
-      overlay.height = canvas.height;
-      overlay.getContext('2d')?.clearRect(0, 0, overlay.width, overlay.height);
-    }
-
-    this.redrawAllForPage();
   }
 
   private domToPdfCoords(evt: MouseEvent) {
@@ -187,9 +210,6 @@ export class App implements AfterViewChecked {
 
   onHitboxClick(evt: MouseEvent) {
     if (!this.pdfDoc || this.editing()) return;
-    const target = evt.target as HTMLElement;
-    if (target.classList.contains('annotation')) return;
-
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
 
@@ -207,13 +227,16 @@ export class App implements AfterViewChecked {
 
   private normalizeColor(color: string) {
     if (color.startsWith('#')) {
-      const hex = color.length === 4
-        ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
-        : color;
+      const hex =
+        color.length === 4
+          ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+          : color;
       return hex.toLowerCase();
     }
 
-    const match = color.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(\d*\.?\d+))?\)$/i);
+    const match = color.match(
+      /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(\d*\.?\d+))?\)$/i
+    );
     if (!match) return color;
 
     const [, r, g, b] = match;
@@ -338,9 +361,7 @@ export class App implements AfterViewChecked {
     this.editHexInput.set(value);
     const normalized = this.normalizeHexInput(value);
     if (!normalized) return;
-    this.editing.update((e) =>
-      e ? { ...e, coord: { ...e.coord, color: normalized } } : e,
-    );
+    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: normalized } } : e));
     this.updateEditingColorState(normalized);
   }
 
@@ -349,16 +370,12 @@ export class App implements AfterViewChecked {
     const rgb = this.parseRgbText(value);
     if (!rgb) return;
     const hex = this.rgbToHex(rgb);
-    this.editing.update((e) =>
-      e ? { ...e, coord: { ...e.coord, color: hex } } : e,
-    );
+    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: hex } } : e));
     this.updateEditingColorState(hex);
   }
 
   onEditColorPicker(value: string) {
-    this.editing.update((e) =>
-      e ? { ...e, coord: { ...e.coord, color: value } } : e,
-    );
+    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: value } } : e));
     this.updateEditingColorState(value);
   }
 
@@ -449,10 +466,11 @@ export class App implements AfterViewChecked {
         el.className = 'annotation';
         el.textContent = coord.value;
         el.style.left = `${left}px`;
-        el.style.top = `${top - fontSize}px`;
-        el.style.fontSize = `${fontSize}px`;
+        el.style.top = `${top - coord.size * scale}px`;
+        el.style.fontSize = `${coord.size * scale}px`;
         el.style.color = coord.color;
-        el.style.fontFamily = 'Helvetica';
+        el.style.fontFamily = 'Helvetica, Arial, sans-serif';
+
         el.onpointerdown = (evt) => this.handleAnnotationPointerDown(evt, index);
         layer.appendChild(el);
       });
@@ -544,7 +562,12 @@ export class App implements AfterViewChecked {
     }
   };
 
-  private updateAnnotationPosition(index: number, leftPx: number, topPx: number, fontSizePx: number) {
+  private updateAnnotationPosition(
+    index: number,
+    leftPx: number,
+    topPx: number,
+    fontSizePx: number
+  ) {
     const pdfCanvas = this.pdfCanvasRef?.nativeElement;
     if (!pdfCanvas) return;
     const scale = this.scale();
@@ -562,19 +585,24 @@ export class App implements AfterViewChecked {
     if (this.pageIndex() > 1) {
       this.pageIndex.update((v) => v - 1);
       await this.render();
+      this.redrawAllForPage();
     }
   }
+
   async nextPage() {
     if (this.pdfDoc && this.pageIndex() < this.pdfDoc.numPages) {
       this.pageIndex.update((v) => v + 1);
       await this.render();
+      this.redrawAllForPage();
     }
   }
+
   async zoomIn() {
     this.scale.update((s) => +(s + 0.25).toFixed(2));
     await this.render();
     this.redrawAllForPage();
   }
+
   async zoomOut() {
     this.scale.update((s) => Math.max(0.25, +(this.scale() - 0.25).toFixed(2)));
     await this.render();
@@ -585,9 +613,11 @@ export class App implements AfterViewChecked {
     this.coords.set([]);
     this.redrawAllForPage();
   }
+
   copyJSON() {
     navigator.clipboard.writeText(JSON.stringify(this.coords(), null, 2)).catch(() => {});
   }
+
   downloadJSON() {
     const blob = new Blob([JSON.stringify(this.coords(), null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -596,5 +626,126 @@ export class App implements AfterViewChecked {
     a.download = 'coords.json';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async downloadAnnotatedPDF() {
+    if (!this.pdfDoc) return;
+
+    try {
+      const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
+      const loadOptions = {
+        ignoreEncryption: true,
+        updateMetadata: false,
+        throwOnInvalidObject: false,
+      } as const;
+
+      const candidates = await this.getPdfByteCandidates();
+      if (!candidates.length) {
+        throw new Error('No se encontraron bytes de PDF para procesar.');
+      }
+
+      let pdf: any = null;
+      let usedBytes: Uint8Array | null = null;
+      const loadErrors: unknown[] = [];
+
+      for (const candidate of candidates) {
+        try {
+          pdf = await PDFDocument.load(candidate, loadOptions);
+          usedBytes = candidate;
+          break;
+        } catch (error) {
+          loadErrors.push(error);
+        }
+      }
+
+      if (!pdf || !usedBytes) {
+        throw new Error(
+          `No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`
+        );
+      }
+
+      this.rememberPdfBytes(usedBytes, 3);
+      const font = await pdf.embedFont(StandardFonts.Helvetica);
+
+      for (const c of this.coords()) {
+        const page = pdf.getPage(c.page - 1);
+
+        const hex = c.color.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16) / 255;
+        const g = parseInt(hex.substring(2, 4), 16) / 255;
+        const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+        page.drawText(c.value, {
+          x: c.x,
+          y: c.y,
+          size: c.size,
+          color: rgb(r, g, b),
+          font,
+        });
+      }
+
+      const pdfBytes = await pdf.save({ useObjectStreams: false });
+      const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'annotated.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('No se pudo generar el PDF anotado.', error);
+      alert(
+        'No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.'
+      );
+    }
+  }
+
+  private async getPdfByteCandidates(): Promise<Uint8Array[]> {
+    if (this.pdfDoc) {
+      if (typeof this.pdfDoc.saveDocument === 'function') {
+        try {
+          const sanitized = await this.pdfDoc.saveDocument();
+          this.rememberPdfBytes(sanitized, 2);
+        } catch (error) {
+          console.warn('No se pudo obtener una versión saneada del PDF para exportar.', error);
+        }
+      }
+
+      try {
+        const rawData = await this.pdfDoc.getData();
+        this.rememberPdfBytes(rawData, 1);
+      } catch (error) {
+        console.warn('No se pudo obtener los bytes originales del PDF para exportar.', error);
+      }
+    }
+
+    if (this.pdfByteSources.size === 0) {
+      return [];
+    }
+
+    return Array.from(this.pdfByteSources.values())
+      .sort((a, b) => b.weight - a.weight)
+      .map((entry) => entry.bytes.slice());
+  }
+
+  private toArrayBuffer(data: Uint8Array<ArrayBufferLike> | ArrayBuffer): ArrayBuffer {
+    if (data instanceof Uint8Array) {
+      const copy = new Uint8Array(data.byteLength);
+      copy.set(data);
+      return copy.buffer;
+    }
+    return data;
+  }
+
+  private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
+    if (!data) return;
+    const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
+    if (!typed.length) return;
+    const head = Array.from(typed.slice(0, 16)).join(',');
+    const key = `${typed.length}:${head}`;
+    const existing = this.pdfByteSources.get(key);
+    if (!existing || weight >= existing.weight) {
+      this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
+    }
   }
 }
