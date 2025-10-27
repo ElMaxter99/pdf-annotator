@@ -46,6 +46,26 @@ header .logo {
   color: var(--accent);
 }
 
+.language-selector {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.language-selector label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.language-selector select {
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 8px;
+  border: 1px solid #444;
+  padding: 6px 10px;
+}
+
 .input-file {
   background: var(--panel);
   color: var(--text);
