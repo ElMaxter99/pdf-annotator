@@ -67,6 +67,19 @@ export class App implements AfterViewChecked {
       console.warn('No se pudo obtener una copia canonizada del PDF cargado.', error);
     }
 
+    if (typeof loadedPdf.saveDocument === 'function') {
+      try {
+        const sanitizedData = await loadedPdf.saveDocument();
+        const typedSanitized =
+          sanitizedData instanceof Uint8Array ? sanitizedData : new Uint8Array(sanitizedData);
+        if (typedSanitized.length > 0) {
+          this.originalPdfData = typedSanitized;
+        }
+      } catch (error) {
+        console.warn('No se pudo sanear el PDF cargado.', error);
+      }
+    }
+
     this.pageIndex.set(1);
     await this.render();
   }
@@ -248,15 +261,36 @@ export class App implements AfterViewChecked {
 
     try {
       const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
-      const sourceData = this.originalPdfData
-        ? this.originalPdfData.slice()
-        : new Uint8Array(await this.pdfDoc.getData());
-
-      const pdf = await PDFDocument.load(sourceData, {
+      const loadOptions = {
         ignoreEncryption: true,
         updateMetadata: false,
         throwOnInvalidObject: false,
-      });
+      } as const;
+
+      const candidates = await this.getPdfByteCandidates();
+      if (!candidates.length) {
+        throw new Error('No se encontraron bytes de PDF para procesar.');
+      }
+
+      let pdf: any = null;
+      let usedBytes: Uint8Array | null = null;
+      const loadErrors: unknown[] = [];
+
+      for (const candidate of candidates) {
+        try {
+          pdf = await PDFDocument.load(candidate, loadOptions);
+          usedBytes = candidate;
+          break;
+        } catch (error) {
+          loadErrors.push(error);
+        }
+      }
+
+      if (!pdf || !usedBytes) {
+        throw new Error(`No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`);
+      }
+
+      this.originalPdfData = usedBytes.slice();
       const font = await pdf.embedFont(StandardFonts.Helvetica);
 
       for (const c of this.coords()) {
@@ -288,6 +322,43 @@ export class App implements AfterViewChecked {
       console.error('No se pudo generar el PDF anotado.', error);
       alert('No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.');
     }
+  }
+
+  private async getPdfByteCandidates(): Promise<Uint8Array[]> {
+    const deduped = new Map<string, Uint8Array>();
+
+    const pushCandidate = (data?: Uint8Array | ArrayBuffer | null) => {
+      if (!data) return;
+      const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
+      if (!typed.length) return;
+      const head = Array.from(typed.slice(0, 16)).join(',');
+      const key = `${typed.length}:${head}`;
+      if (!deduped.has(key)) {
+        deduped.set(key, typed.slice());
+      }
+    };
+
+    pushCandidate(this.originalPdfData);
+
+    if (this.pdfDoc) {
+      if (typeof this.pdfDoc.saveDocument === 'function') {
+        try {
+          const sanitized = await this.pdfDoc.saveDocument();
+          pushCandidate(sanitized);
+        } catch (error) {
+          console.warn('No se pudo obtener una versión saneada del PDF para exportar.', error);
+        }
+      }
+
+      try {
+        const rawData = await this.pdfDoc.getData();
+        pushCandidate(rawData);
+      } catch (error) {
+        console.warn('No se pudo obtener los bytes originales del PDF para exportar.', error);
+      }
+    }
+
+    return Array.from(deduped.values());
   }
 
   private toArrayBuffer(data: Uint8Array<ArrayBufferLike> | ArrayBuffer): ArrayBuffer {
