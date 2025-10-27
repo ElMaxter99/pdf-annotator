@@ -69,6 +69,7 @@
       <div *ngIf="editing() as e" class="annotation-editor editing" [style.left.px]="e.coord.x*scale()"
         [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()" (keydown.enter)="confirmEdit()"
         (keydown.escape)="cancelEdit()">
+        <span class="editor-badge">Editando</span>
         <label class="field">
           <span class="field-label">Texto</span>
           <input type="text" [(ngModel)]="e.coord.value" placeholder="Texto..." />
