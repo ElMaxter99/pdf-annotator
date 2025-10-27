@@ -1,8 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, signal, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  signal,
+  AfterViewChecked,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import { Meta, Title } from '@angular/platform-browser';
+import { TranslationPipe } from './i18n/translation.pipe';
+import { Language, TranslationService } from './i18n/translation.service';
+import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
 
@@ -13,7 +25,7 @@ type EditState = { index: number; coord: Coord } | null;
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslationPipe],
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked {
@@ -23,6 +35,31 @@ export class App implements AfterViewChecked {
   coords = signal<Coord[]>([]);
   preview = signal<Coord | null>(null);
   editing = signal<EditState>(null);
+  previewHexInput = signal('#000000');
+  previewRgbInput = signal('rgb(0, 0, 0)');
+  editHexInput = signal('#000000');
+  editRgbInput = signal('rgb(0, 0, 0)');
+  readonly version = APP_VERSION;
+  readonly appName = APP_NAME;
+  readonly appAuthor = APP_AUTHOR;
+  readonly currentYear = new Date().getFullYear();
+  private readonly translationService = inject(TranslationService);
+  private readonly title = inject(Title);
+  private readonly meta = inject(Meta);
+  readonly languages: readonly Language[] = this.translationService.supportedLanguages;
+  languageModel: Language = this.translationService.getCurrentLanguage();
+
+  private dragInfo: {
+    index: number;
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startLeft: number;
+    startTop: number;
+    fontSize: number;
+    moved: boolean;
+  } | null = null;
+  private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -30,16 +67,67 @@ export class App implements AfterViewChecked {
   @ViewChild('annotationsLayer', { static: false })
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
+    this.setDocumentMetadata();
+  }
+
+  onLanguageChange(language: string) {
+    this.translationService.setLanguage(language as Language);
+    this.languageModel = this.translationService.getCurrentLanguage();
+  }
+
+  private setDocumentMetadata() {
+    const appTitle = APP_NAME;
+    this.title.setTitle(appTitle);
+    this.meta.updateTag({ property: 'og:title', content: appTitle });
+    this.meta.updateTag({ name: 'twitter:title', content: appTitle });
   }
 
   ngAfterViewChecked() {
-    const previewEl = this.previewEditorRef?.nativeElement;
-    if (previewEl) {
-      const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement;
-      if (input) input.focus();
+    if (this.preview()) {
+      const previewEl = this.previewEditorRef?.nativeElement;
+      if (previewEl) {
+        const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement | null;
+        input?.focus();
+      }
+      return;
+    }
+
+    if (this.editing()) {
+      const editEl = this.editEditorRef?.nativeElement;
+      if (editEl) {
+        const input = editEl.querySelector('input[type="text"]') as HTMLInputElement | null;
+        input?.focus();
+      }
+    }
+  }
+
+  onEditorKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
+    const triggerAction = (action: 'confirm' | 'cancel') => {
+      event.preventDefault();
+      this.invokeEditorAction(mode, action);
+    };
+
+    switch (event.key) {
+      case 'Enter':
+        triggerAction('confirm');
+        break;
+      case 'Escape':
+        triggerAction('cancel');
+        break;
+      default:
+        break;
+    }
+  }
+
+  private invokeEditorAction(mode: 'preview' | 'edit', action: 'confirm' | 'cancel') {
+    if (mode === 'preview') {
+      action === 'confirm' ? this.confirmPreview() : this.cancelPreview();
+    } else {
+      action === 'confirm' ? this.confirmEdit() : this.cancelEdit();
     }
   }
 
@@ -80,6 +168,9 @@ export class App implements AfterViewChecked {
     }
 
     this.pageIndex.set(1);
+    this.clearAll();
+    this.preview.set(null);
+    this.editing.set(null);
     await this.render();
   }
 
@@ -122,14 +213,170 @@ export class App implements AfterViewChecked {
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
 
+    const defaultColor = '#000000';
     this.preview.set({
       page: this.pageIndex(),
       x: pt.x,
       y: pt.y,
       value: '',
       size: 14,
-      color: '#000000',
+      color: defaultColor,
     });
+    this.updatePreviewColorState(defaultColor);
+  }
+
+  private normalizeColor(color: string) {
+    if (color.startsWith('#')) {
+      const hex =
+        color.length === 4
+          ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+          : color;
+      return hex.toLowerCase();
+    }
+
+    const match = color.match(
+      /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(\d*\.?\d+))?\)$/i
+    );
+    if (!match) return color;
+
+    const [, r, g, b] = match;
+    const toHex = (value: string) => {
+      const num = Math.max(0, Math.min(255, parseInt(value, 10)));
+      return num.toString(16).padStart(2, '0');
+    };
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  private normalizeHexInput(value: string) {
+    const trimmed = value.trim();
+    const match = trimmed.match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i);
+    if (!match) return null;
+    let hex = match[1];
+    if (hex.length === 3) {
+      hex = hex
+        .split('')
+        .map((ch) => ch + ch)
+        .join('');
+    }
+    return `#${hex.toLowerCase()}`;
+  }
+
+  private parseRgbText(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const rgbMatch = trimmed.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i);
+    const fallbackMatch = trimmed.match(/^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/);
+    const match = rgbMatch ?? fallbackMatch;
+    if (!match) return null;
+    const [, r, g, b] = match;
+    const clamp = (num: number) => Math.max(0, Math.min(255, num));
+    return {
+      r: clamp(parseInt(r, 10)),
+      g: clamp(parseInt(g, 10)),
+      b: clamp(parseInt(b, 10)),
+    };
+  }
+
+  private rgbToHex(rgb: { r: number; g: number; b: number }) {
+    const toHex = (num: number) => num.toString(16).padStart(2, '0');
+    return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
+  }
+
+  private parseColorComponents(color: string) {
+    const hex = this.normalizeHexInput(color);
+    if (hex) {
+      return {
+        r: parseInt(hex.slice(1, 3), 16),
+        g: parseInt(hex.slice(3, 5), 16),
+        b: parseInt(hex.slice(5, 7), 16),
+      };
+    }
+
+    const match = color.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i);
+    if (!match) return null;
+    return {
+      r: Math.max(0, Math.min(255, parseInt(match[1], 10))),
+      g: Math.max(0, Math.min(255, parseInt(match[2], 10))),
+      b: Math.max(0, Math.min(255, parseInt(match[3], 10))),
+    };
+  }
+
+  private toRgbString(color: string) {
+    const comps = this.parseColorComponents(color);
+    if (!comps) return '';
+    return `rgb(${comps.r}, ${comps.g}, ${comps.b})`;
+  }
+
+  private ensureHex(color: string) {
+    const normalized = this.normalizeColor(color);
+    return normalized.startsWith('#') ? normalized : null;
+  }
+
+  private updatePreviewColorState(color: string) {
+    const hex = this.ensureHex(color);
+    if (hex) {
+      this.previewHexInput.set(hex);
+      this.previewRgbInput.set(this.toRgbString(hex));
+    } else {
+      this.previewHexInput.set(color.trim());
+      this.previewRgbInput.set(this.toRgbString(color));
+    }
+  }
+
+  private updateEditingColorState(color: string) {
+    const hex = this.ensureHex(color);
+    if (hex) {
+      this.editHexInput.set(hex);
+      this.editRgbInput.set(this.toRgbString(hex));
+    } else {
+      this.editHexInput.set(color.trim());
+      this.editRgbInput.set(this.toRgbString(color));
+    }
+  }
+
+  setPreviewColorFromHex(value: string) {
+    this.previewHexInput.set(value);
+    const normalized = this.normalizeHexInput(value);
+    if (!normalized) return;
+    this.preview.update((p) => (p ? { ...p, color: normalized } : p));
+    this.updatePreviewColorState(normalized);
+  }
+
+  setPreviewColorFromRgb(value: string) {
+    this.previewRgbInput.set(value);
+    const rgb = this.parseRgbText(value);
+    if (!rgb) return;
+    const hex = this.rgbToHex(rgb);
+    this.preview.update((p) => (p ? { ...p, color: hex } : p));
+    this.updatePreviewColorState(hex);
+  }
+
+  onPreviewColorPicker(value: string) {
+    this.preview.update((p) => (p ? { ...p, color: value } : p));
+    this.updatePreviewColorState(value);
+  }
+
+  setEditColorFromHex(value: string) {
+    this.editHexInput.set(value);
+    const normalized = this.normalizeHexInput(value);
+    if (!normalized) return;
+    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: normalized } } : e));
+    this.updateEditingColorState(normalized);
+  }
+
+  setEditColorFromRgb(value: string) {
+    this.editRgbInput.set(value);
+    const rgb = this.parseRgbText(value);
+    if (!rgb) return;
+    const hex = this.rgbToHex(rgb);
+    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: hex } } : e));
+    this.updateEditingColorState(hex);
+  }
+
+  onEditColorPicker(value: string) {
+    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: value } } : e));
+    this.updateEditingColorState(value);
   }
 
   confirmPreview() {
@@ -138,7 +385,8 @@ export class App implements AfterViewChecked {
       this.preview.set(null);
       return;
     }
-    this.coords.update((arr) => [...arr, p]);
+    const normalized: Coord = { ...p, color: this.normalizeColor(p.color) };
+    this.coords.update((arr) => [...arr, normalized]);
     this.preview.set(null);
     this.redrawAllForPage();
   }
@@ -148,20 +396,42 @@ export class App implements AfterViewChecked {
   }
 
   startEditing(idx: number, c: Coord) {
-    this.editing.set({ index: idx, coord: { ...c } });
+    const normalized: Coord = { ...c, color: this.normalizeColor(c.color) };
+    if (normalized.color !== c.color) {
+      this.coords.update((arr) => arr.map((item, i) => (i === idx ? normalized : item)));
+    }
+    this.editing.set({ index: idx, coord: { ...normalized } });
+    this.updateEditingColorState(normalized.color);
     this.preview.set(null);
   }
 
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
-    this.coords.update((arr) => arr.map((a, i) => (i === e.index ? e.coord : a)));
+    const normalized: Coord = { ...e.coord, color: this.normalizeColor(e.coord.color) };
+    this.coords.update((arr) => arr.map((a, i) => (i === e.index ? normalized : a)));
     this.editing.set(null);
     this.redrawAllForPage();
   }
 
   cancelEdit() {
     this.editing.set(null);
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  onDocumentMouseDown(event: MouseEvent) {
+    const editState = this.editing();
+    if (!editState) return;
+
+    const modal = this.editEditorRef?.nativeElement;
+    if (!modal) return;
+
+    const target = event.target as Node | null;
+    if (target && modal.contains(target)) {
+      return;
+    }
+
+    this.cancelEdit();
   }
 
   deleteAnnotation() {
@@ -185,27 +455,133 @@ export class App implements AfterViewChecked {
     if (!pdfCanvas) return;
 
     this.coords()
-      .filter((c) => c.page === this.pageIndex())
-      .forEach((c, idx) => {
-        const left = c.x * scale;
-        const top = pdfCanvas.height - c.y * scale;
+      .map((coord, index) => ({ coord, index }))
+      .filter(({ coord }) => coord.page === this.pageIndex())
+      .forEach(({ coord, index }) => {
+        const left = coord.x * scale;
+        const top = pdfCanvas.height - coord.y * scale;
+        const fontSize = coord.size * scale;
 
         const el = document.createElement('div');
         el.className = 'annotation';
-        el.textContent = c.value;
+        el.textContent = coord.value;
         el.style.left = `${left}px`;
-        el.style.top = `${top - c.size * scale}px`; // ajusta vertical según zoom
-        el.style.fontSize = `${c.size * scale}px`; // tamaño proporcional al zoom
-        el.style.color = c.color;
-        el.style.fontFamily = 'Helvetica, Arial, sans-serif'; // igual que PDF
+        el.style.top = `${top - coord.size * scale}px`;
+        el.style.fontSize = `${coord.size * scale}px`;
+        el.style.color = coord.color;
+        el.style.fontFamily = 'Helvetica, Arial, sans-serif';
 
         el.onclick = (evt) => {
           evt.stopPropagation();
-          this.startEditing(idx, c);
+          this.startEditing(index, coord);
         };
-
         layer.appendChild(el);
       });
+  }
+
+  private handleAnnotationPointerDown(evt: PointerEvent, index: number) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    const el = evt.currentTarget as HTMLDivElement | null;
+    if (!el) return;
+
+    const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');
+    this.dragInfo = {
+      index,
+      pointerId: evt.pointerId,
+      startX: evt.clientX,
+      startY: evt.clientY,
+      startLeft: parseFloat(el.style.left || '0'),
+      startTop: parseFloat(el.style.top || '0'),
+      fontSize: computedFontSize,
+      moved: false,
+    };
+
+    this.draggingElement = el;
+    el.setPointerCapture(evt.pointerId);
+    el.classList.add('dragging');
+    el.onpointermove = this.handleAnnotationPointerMove;
+    el.onpointerup = this.handleAnnotationPointerUp;
+    el.onpointercancel = this.handleAnnotationPointerUp;
+  }
+
+  private handleAnnotationPointerMove = (evt: PointerEvent) => {
+    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
+    const el = this.draggingElement;
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!el || !pdfCanvas) return;
+
+    evt.preventDefault();
+    const dx = evt.clientX - this.dragInfo.startX;
+    const dy = evt.clientY - this.dragInfo.startY;
+    const shouldMove = this.dragInfo.moved || Math.abs(dx) > 2 || Math.abs(dy) > 2;
+    if (!shouldMove) return;
+
+    this.dragInfo.moved = true;
+
+    const tentativeLeft = this.dragInfo.startLeft + dx;
+    const tentativeTop = this.dragInfo.startTop + dy;
+
+    const minTop = -this.dragInfo.fontSize;
+    const maxTop = pdfCanvas.height - this.dragInfo.fontSize;
+    const maxLeft = Math.max(pdfCanvas.width - el.offsetWidth, 0);
+    const clampedLeft = Math.min(Math.max(tentativeLeft, 0), maxLeft);
+    const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
+
+    el.style.left = `${clampedLeft}px`;
+    el.style.top = `${clampedTop}px`;
+  };
+
+  private handleAnnotationPointerUp = (evt: PointerEvent) => {
+    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
+    const el = this.draggingElement;
+    if (!el) {
+      this.dragInfo = null;
+      return;
+    }
+
+    evt.preventDefault();
+    evt.stopPropagation();
+    el.releasePointerCapture(evt.pointerId);
+    el.classList.remove('dragging');
+    el.onpointermove = null;
+    el.onpointerup = null;
+    el.onpointercancel = null;
+
+    const drag = this.dragInfo;
+    this.dragInfo = null;
+    this.draggingElement = null;
+
+    if (drag.moved) {
+      const left = parseFloat(el.style.left || '0');
+      const top = parseFloat(el.style.top || '0');
+      this.updateAnnotationPosition(drag.index, left, top, drag.fontSize);
+      this.redrawAllForPage();
+    } else if (evt.type !== 'pointercancel') {
+      const coord = this.coords()[drag.index];
+      if (coord) {
+        this.startEditing(drag.index, coord);
+      }
+    }
+  };
+
+  private updateAnnotationPosition(
+    index: number,
+    leftPx: number,
+    topPx: number,
+    fontSizePx: number
+  ) {
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!pdfCanvas) return;
+    const scale = this.scale();
+    const boundedLeft = Math.min(Math.max(leftPx, 0), pdfCanvas.width);
+    const boundedTop = Math.min(Math.max(topPx, -fontSizePx), pdfCanvas.height - fontSizePx);
+    const newX = +(boundedLeft / scale).toFixed(2);
+    const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
+
+    this.coords.update((arr) =>
+      arr.map((coord, i) => (i === index ? { ...coord, x: newX, y: newY } : coord))
+    );
   }
 
   async prevPage() {
@@ -286,7 +662,9 @@ export class App implements AfterViewChecked {
       }
 
       if (!pdf || !usedBytes) {
-        throw new Error(`No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`);
+        throw new Error(
+          `No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`
+        );
       }
 
       this.rememberPdfBytes(usedBytes, 3);
@@ -319,7 +697,9 @@ export class App implements AfterViewChecked {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('No se pudo generar el PDF anotado.', error);
-      alert('No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.');
+      alert(
+        'No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.'
+      );
     }
   }
 

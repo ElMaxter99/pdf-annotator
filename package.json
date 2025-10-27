@@ -1,13 +1,15 @@
 {
-  "name": "pdf-annotator",
+  "name": "Pdf Annotator",
   "version": "0.0.0",
+  "author": "AAmoros",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "npm run i18n:check && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:pdf-annotator": "node dist/pdf-annotator/server/server.mjs"
+    "serve:ssr:pdf-annotator": "node dist/pdf-annotator/server/server.mjs",
+    "i18n:check": "node scripts/check-translations.mjs"
   },
   "prettier": {
     "printWidth": 100,
