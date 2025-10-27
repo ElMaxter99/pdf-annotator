@@ -471,10 +471,7 @@ export class App implements AfterViewChecked {
         el.style.color = coord.color;
         el.style.fontFamily = 'Helvetica, Arial, sans-serif';
 
-        el.onclick = (evt) => {
-          evt.stopPropagation();
-          this.startEditing(index, coord);
-        };
+        el.onpointerdown = (evt) => this.handleAnnotationPointerDown(evt, index);
         layer.appendChild(el);
       });
   }
