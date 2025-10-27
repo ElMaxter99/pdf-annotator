@@ -63,27 +63,27 @@ export class App implements AfterViewChecked {
   }
 
   async render() {
-    if (!this.pdfDoc) return;
+    if (!this.pdfDoc) {
+      return;
+    }
+
     const page: PDFPageProxy = await this.pdfDoc.getPage(this.pageIndex());
     const viewport = page.getViewport({ scale: this.scale() });
 
     const canvas = this.pdfCanvasRef?.nativeElement;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
+
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
 
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
+
     await page.render({ canvasContext: ctx, canvas, viewport }).promise;
-
-    const overlay = this.overlayCanvasRef?.nativeElement;
-    if (overlay) {
-      overlay.width = canvas.width;
-      overlay.height = canvas.height;
-      overlay.getContext('2d')?.clearRect(0, 0, overlay.width, overlay.height);
-    }
-
-    this.redrawAllForPage();
   }
 
   private domToPdfCoords(evt: MouseEvent) {
@@ -168,17 +168,21 @@ export class App implements AfterViewChecked {
       .forEach((c, idx) => {
         const left = c.x * scale;
         const top = pdfCanvas.height - c.y * scale;
+
         const el = document.createElement('div');
         el.className = 'annotation';
         el.textContent = c.value;
-        el.style.left = left + 'px';
-        el.style.top = top - c.size + 'px';
-        el.style.fontSize = c.size + 'px';
+        el.style.left = `${left}px`;
+        el.style.top = `${top - c.size * scale}px`; // ajusta vertical según zoom
+        el.style.fontSize = `${c.size * scale}px`; // tamaño proporcional al zoom
         el.style.color = c.color;
+        el.style.fontFamily = 'Helvetica, Arial, sans-serif'; // igual que PDF
+
         el.onclick = (evt) => {
           evt.stopPropagation();
           this.startEditing(idx, c);
         };
+
         layer.appendChild(el);
       });
   }
@@ -227,7 +231,7 @@ export class App implements AfterViewChecked {
   }
 
   async downloadAnnotatedPDF() {
-    if (!this.originalPdfData) return;
+    if (!this.originalPdfData || !this.pdfDoc) return;
 
     const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
     const pdf = await PDFDocument.load(this.originalPdfData);
@@ -235,6 +239,7 @@ export class App implements AfterViewChecked {
 
     for (const c of this.coords()) {
       const page = pdf.getPage(c.page - 1);
+      const { height: pageHeight } = page.getSize();
 
       const hex = c.color.replace('#', '');
       const r = parseInt(hex.substring(0, 2), 16) / 255;
