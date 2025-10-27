@@ -171,13 +171,16 @@ export class App implements AfterViewChecked {
       .forEach((c, idx) => {
         const left = c.x * scale;
         const top = pdfCanvas.height - c.y * scale;
+        const fontSize = c.size * scale;
+
         const el = document.createElement('div');
         el.className = 'annotation';
         el.textContent = c.value;
-        el.style.left = left + 'px';
-        el.style.top = top - c.size + 'px';
-        el.style.fontSize = c.size + 'px';
+        el.style.left = `${left}px`;
+        el.style.top = `${top - fontSize}px`;
+        el.style.fontSize = `${fontSize}px`;
         el.style.color = c.color;
+        el.style.fontFamily = 'Helvetica';
         el.onclick = (evt) => {
           evt.stopPropagation();
           this.startEditing(idx, c);
@@ -201,10 +204,12 @@ export class App implements AfterViewChecked {
   async zoomIn() {
     this.scale.update((s) => +(s + 0.25).toFixed(2));
     await this.render();
+    this.redrawAllForPage();
   }
   async zoomOut() {
     this.scale.update((s) => Math.max(0.25, +(this.scale() - 0.25).toFixed(2)));
     await this.render();
+    this.redrawAllForPage();
   }
 
   clearAll() {
