@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, signal, AfterViewChecked } from '@angular/core';
+import { Component, ElementRef, ViewChild, signal, AfterViewChecked, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
@@ -362,6 +362,22 @@ export class App implements AfterViewChecked {
 
   cancelEdit() {
     this.editing.set(null);
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  onDocumentMouseDown(event: MouseEvent) {
+    const editState = this.editing();
+    if (!editState) return;
+
+    const modal = this.editEditorRef?.nativeElement;
+    if (!modal) return;
+
+    const target = event.target as Node | null;
+    if (target && modal.contains(target)) {
+      return;
+    }
+
+    this.cancelEdit();
   }
 
   deleteAnnotation() {
