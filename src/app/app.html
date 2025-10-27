@@ -112,4 +112,18 @@
   <main class="viewer empty" *ngIf="!pdfDoc">
     <p class="empty-text">{{ 'viewer.emptyMessage' | t }}</p>
   </main>
+
+  <footer class="footer">
+    <div class="footer__brand">
+      <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
+      <div class="footer__brand-text">
+        <span class="footer__app-name">{{ appName }}</span>
+        <span class="footer__version">v{{ version }}</span>
+      </div>
+    </div>
+    <div class="footer__details">
+      <span>© {{ currentYear }} {{ appName }}</span>
+      <span>Desarrollado por {{ appAuthor }}</span>
+    </div>
+  </footer>
 </div>
