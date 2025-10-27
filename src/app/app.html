@@ -1,7 +1,19 @@
 <div class="app">
   <!-- HEADER -->
   <header class="header">
-    <div class="logo">{{ 'app.title' | t }}</div>
+    <div class="header__row">
+      <div class="logo">{{ 'app.title' | t }}</div>
+      <button
+        type="button"
+        class="btn sidebar-toggle"
+        (click)="toggleSidebar()"
+        [attr.aria-expanded]="sidebarOpen()"
+        aria-controls="sidebar-panel"
+      >
+        <span aria-hidden="true">☰</span>
+        <span>{{ sidebarOpen() ? ('sidebar.close' | t) : ('sidebar.open' | t) }}</span>
+      </button>
+    </div>
     <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="input-file" />
 
     <div class="controls">
@@ -42,8 +54,14 @@
   </header>
 
   <!-- LATERAL SIDEBAR -->
-  <aside class="sidebar">
-    <h4>{{ 'sidebar.title' | t }}</h4>
+  <aside class="sidebar" id="sidebar-panel" [class.open]="sidebarOpen()">
+    <div class="sidebar__header">
+      <h4>{{ 'sidebar.title' | t }}</h4>
+      <button type="button" class="sidebar__close" (click)="closeSidebar()">
+        <span aria-hidden="true">×</span>
+        <span class="sr-only">{{ 'sidebar.close' | t }}</span>
+      </button>
+    </div>
     <div class="sidebar-actions">
       <button type="button" class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">
         {{ 'sidebar.importJsonFile' | t }}
@@ -60,6 +78,12 @@
     ></textarea>
     <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
   </aside>
+  <div
+    class="sidebar-backdrop"
+    *ngIf="sidebarOpen()"
+    (click)="closeSidebar()"
+    aria-hidden="true"
+  ></div>
 
   <!-- VISOR PDF -->
   <main class="viewer" *ngIf="pdfDoc as _">

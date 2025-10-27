@@ -22,6 +22,8 @@
   },
   "sidebar": {
     "title": "Annotations (JSON)",
+    "open": "Open panel",
+    "close": "Close panel",
     "importJsonFile": "Import from file",
     "applyJson": "Apply JSON",
     "jsonPlaceholder": "Paste or edit annotation coordinates here...",

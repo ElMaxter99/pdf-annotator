@@ -50,6 +50,7 @@ export class App implements AfterViewChecked {
   previewRgbInput = signal('rgb(0, 0, 0)');
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
+  sidebarOpen = signal(false);
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
@@ -87,6 +88,14 @@ export class App implements AfterViewChecked {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
+  }
+
+  toggleSidebar() {
+    this.sidebarOpen.update((value) => !value);
+  }
+
+  closeSidebar() {
+    this.sidebarOpen.set(false);
   }
 
   onLanguageChange(language: string) {

@@ -22,6 +22,8 @@
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
+    "open": "Obrir panell",
+    "close": "Tancar panell",
     "importJsonFile": "Importa des d'un fitxer",
     "applyJson": "Aplica el JSON",
     "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
