@@ -1,13 +1,15 @@
 {
-  "name": "pdf-annotator",
-  "version": "0.0.0",
+  "name": "Pdf Annotator",
+  "version": "1.0.0",
+  "author": "AAmoros",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "npm run i18n:check && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:pdf-annotator": "node dist/pdf-annotator/server/server.mjs"
+    "serve:ssr:pdf-annotator": "node dist/pdf-annotator/server/server.mjs",
+    "i18n:check": "node scripts/check-translations.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -31,8 +33,10 @@
     "@angular/platform-server": "^20.2.0",
     "@angular/router": "^20.2.0",
     "@angular/ssr": "^20.2.1",
+    "@vercel/analytics": "^1.5.0",
     "express": "^5.1.0",
-    "pdfjs-dist": "^5.4.149",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "5.4.296",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

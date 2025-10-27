@@ -1,0 +1,54 @@
+{
+  "app": {
+    "title": "PDF Annotator",
+    "languageLabel": "Idioma",
+    "languageAriaLabel": "Selecciona l'idioma de l'aplicació",
+    "languages": {
+      "es-ES": "Espanyol",
+      "en": "Anglès",
+      "ca": "Català"
+    }
+  },
+  "controls": {
+    "prev": "Anterior",
+    "next": "Següent",
+    "pageIndicator": "Pàgina {{current}} / {{total}}",
+    "zoomLabel": "Zoom",
+    "clear": "Esborrar",
+    "copyJson": "Copiar JSON",
+    "importJson": "Importar JSON",
+    "downloadJson": "Descarregar JSON",
+    "downloadPdf": "Descarregar PDF"
+  },
+  "sidebar": {
+    "title": "Anotacions (JSON)",
+    "importJsonFile": "Importa des d'un fitxer",
+    "applyJson": "Aplica el JSON",
+    "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
+    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
+  },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
+      },
+      "size": {
+        "label": "Mida"
+      },
+      "color": {
+        "label": "Color"
+      }
+    },
+    "color": {
+      "hintPreview": "Selecciona un color, escriu un HEX o un RGB. El JSON sempre exportarà el color en HEX.",
+      "hintEdit": "Pots enganxar un HEX o un RGB existent per reutilitzar colors exactes.",
+      "hexPlaceholder": "#5eead4",
+      "rgbPlaceholder": "rgb(94, 234, 212)"
+    },
+    "editingBadge": "Editant"
+  },
+  "viewer": {
+    "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."
+  }
+}

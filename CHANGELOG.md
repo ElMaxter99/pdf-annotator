@@ -1,3 +1,17 @@
+## [v1.0.0] - 2025-10-27
+### Added
+- Add @vercel/analytics integration to enhance tracking capabilities
+- Add keyboard shortcuts to confirm, cancel or delete annotation editors
+- Add draggable annotations to the PDF viewer
+- Add hex color support for annotations
+- Refactor appropriate tsconfig.json
+- Add i18n support with translation guard
+- Clear annotations when loading a new PDF
+- Add footer with app details
+- Add social media sharing metadata
+- Add Download PDF with anotations
+- Migrate coordinate JSON format
+
 ## [0.2.1] - 2025-09-03
 ###✨ Added
 - Auto-focus en el input de texto al crear una nueva anotación, permitiendo empezar a escribir inmediatamente.

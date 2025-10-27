@@ -1,0 +1,54 @@
+{
+  "app": {
+    "title": "PDF Annotator",
+    "languageLabel": "Language",
+    "languageAriaLabel": "Select the application language",
+    "languages": {
+      "es-ES": "Spanish",
+      "en": "English",
+      "ca": "Catalan"
+    }
+  },
+  "controls": {
+    "prev": "Prev",
+    "next": "Next",
+    "pageIndicator": "Page {{current}} / {{total}}",
+    "zoomLabel": "Zoom",
+    "clear": "Clear",
+    "copyJson": "Copy JSON",
+    "importJson": "Import JSON",
+    "downloadJson": "Download JSON",
+    "downloadPdf": "Download PDF"
+  },
+  "sidebar": {
+    "title": "Annotations (JSON)",
+    "importJsonFile": "Import from file",
+    "applyJson": "Apply JSON",
+    "jsonPlaceholder": "Paste or edit annotation coordinates here...",
+    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
+  },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
+      },
+      "size": {
+        "label": "Size"
+      },
+      "color": {
+        "label": "Color"
+      }
+    },
+    "color": {
+      "hintPreview": "Pick a color, type a HEX or an RGB value. The JSON will always export the color in HEX.",
+      "hintEdit": "Paste an existing HEX or RGB value to reuse exact colors.",
+      "hexPlaceholder": "#5eead4",
+      "rgbPlaceholder": "rgb(94, 234, 212)"
+    },
+    "editingBadge": "Editing"
+  },
+  "viewer": {
+    "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
+  }
+}
