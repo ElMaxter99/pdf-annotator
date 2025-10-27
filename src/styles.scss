@@ -158,17 +158,22 @@ header .logo {
 .annotation {
   position: absolute;
   pointer-events: auto;
-  cursor: text;
+  cursor: grab;
   background: rgba(255, 255, 255, 0.15);
   padding: 2px 4px;
   border-radius: 4px;
   white-space: nowrap;
   transition: .2s;
+  user-select: none;
 }
 
 .annotation:hover {
   background: rgba(94, 234, 212, 0.25);
   border: 1px dashed var(--accent);
+}
+
+.annotation.dragging {
+  cursor: grabbing;
 }
 
 .annotation-editor {
