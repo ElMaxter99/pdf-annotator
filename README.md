@@ -14,8 +14,8 @@ Ideal para preparar procesos de anotación de coordenadas y probar posiciones an
 
 ## 🚀 Requisitos
 
-- Node.js 20+  
-- Angular CLI 20+  
+- Node.js v22.12.0  
+- Angular CLI v20.2.0
 
 ---
 
