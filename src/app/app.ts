@@ -191,6 +191,7 @@ export class App implements AfterViewChecked {
     if (this.pageIndex() > 1) {
       this.pageIndex.update((v) => v - 1);
       await this.render();
+      this.redrawAllForPage();
     }
   }
 
@@ -198,6 +199,7 @@ export class App implements AfterViewChecked {
     if (this.pdfDoc && this.pageIndex() < this.pdfDoc.numPages) {
       this.pageIndex.update((v) => v + 1);
       await this.render();
+      this.redrawAllForPage();
     }
   }
 
