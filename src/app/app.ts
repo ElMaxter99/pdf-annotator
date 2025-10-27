@@ -71,6 +71,15 @@ export class App implements AfterViewChecked {
     }
   }
 
+  private isTextEntryElement(element: Element | null): boolean {
+    if (!element) return false;
+    if (element instanceof HTMLInputElement) return true;
+    if (element instanceof HTMLTextAreaElement) return true;
+    if (element instanceof HTMLSelectElement) return true;
+    const htmlEl = element as HTMLElement;
+    return Boolean(htmlEl?.isContentEditable);
+  }
+
   onEditorKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -86,6 +95,13 @@ export class App implements AfterViewChecked {
       } else {
         this.cancelEdit();
       }
+    } else if (
+      mode === 'edit' &&
+      (event.key === 'Delete' || event.key === 'Backspace') &&
+      !this.isTextEntryElement(document.activeElement)
+    ) {
+      event.preventDefault();
+      this.deleteAnnotation();
     }
   }
 
