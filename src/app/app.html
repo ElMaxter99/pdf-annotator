@@ -1,27 +1,39 @@
 <div class="app">
   <!-- HEADER -->
   <header class="header">
-    <div class="logo">PDF Annotator</div>
+    <div class="logo">{{ 'header.title' | translate }}</div>
     <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="input-file" />
 
     <div class="controls">
-      <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">◀ Prev</button>
-      <span class="page-indicator">Page {{ pageIndex() }} / {{ pageCount || 0 }}</span>
-      <button class="btn" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">Next ▶</button>
+      <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">
+        <span aria-hidden="true" class="btn-icon">◀</span>
+        {{ 'header.actions.prev' | translate }}
+      </button>
+      <span class="page-indicator">{{ 'header.pageIndicator' | translate: { index: pageIndex(), count: pageCount || 0 } }}</span>
+      <button class="btn" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">
+        {{ 'header.actions.next' | translate }}
+        <span aria-hidden="true" class="btn-icon">▶</span>
+      </button>
 
       <button class="btn" (click)="zoomOut()" [disabled]="!pdfDoc">−</button>
-      <span class="page-indicator">Zoom {{ scale() | number:'1.0-2' }}×</span>
+      <span class="page-indicator">{{ 'header.zoomIndicator' | translate: { value: (scale() | number:'1.0-2') } }}</span>
       <button class="btn" (click)="zoomIn()" [disabled]="!pdfDoc">+</button>
 
-      <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">Clear</button>
-      <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">Copy JSON</button>
-      <button class="btn" (click)="downloadJSON()" [disabled]="!coords().length">Download JSON</button>
+      <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">{{ 'actions.clear' | translate }}</button>
+      <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'actions.copy' | translate }}</button>
+      <button class="btn" (click)="downloadJSON()" [disabled]="!coords().length">{{ 'actions.download' | translate }}</button>
+    </div>
+    <div class="language-picker">
+      <label class="visually-hidden" for="language-select">{{ 'header.languageLabel' | translate }}</label>
+      <select id="language-select" class="lang-select" [value]="activeLang()" (change)="switchLanguage($any($event.target).value)">
+        <option *ngFor="let lang of languageOptions" [value]="lang.code">{{ ('lang.' + lang.code) | translate }}</option>
+      </select>
     </div>
   </header>
 
   <!-- LATERAL SIDEBAR -->
   <aside class="sidebar">
-    <h4>Anotaciones (JSON)</h4>
+    <h4>{{ 'sidebar.title' | translate }}</h4>
     <pre class="json">{{ coords() | json }}</pre>
   </aside>
 
@@ -37,7 +49,7 @@
       <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.x*scale()"
         [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()" (keydown.enter)="confirmPreview()"
         (keydown.escape)="cancelPreview()">
-        <input type="text" [(ngModel)]="p.value" placeholder="Texto..." />
+        <input type="text" [(ngModel)]="p.value" [placeholder]="'annotation.placeholder' | translate" />
         <input type="number" [(ngModel)]="p.size" min="8" max="72" />
         <input type="color" [(ngModel)]="p.color" />
         <button (click)="confirmPreview()">✅</button>
@@ -48,7 +60,7 @@
       <div *ngIf="editing() as e" class="annotation-editor editing" [style.left.px]="e.coord.x*scale()"
         [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()" (keydown.enter)="confirmEdit()"
         (keydown.escape)="cancelEdit()">
-        <input type="text" [(ngModel)]="e.coord.value" placeholder="Texto..." />
+        <input type="text" [(ngModel)]="e.coord.value" [placeholder]="'annotation.placeholder' | translate" />
         <input type="number" [(ngModel)]="e.coord.size" min="8" max="72" />
         <input type="color" [(ngModel)]="e.coord.color" />
         <button (click)="confirmEdit()">✅</button>
@@ -59,7 +71,6 @@
   </main>
 
   <main class="viewer empty" *ngIf="!pdfDoc">
-    <p class="empty-text">Sube un PDF y haz click donde quieras añadir anotaciones. Edítalas en la vista previa antes de
-      confirmar ✅.</p>
+    <p class="empty-text">{{ 'viewer.empty' | translate }}</p>
   </main>
 </div>

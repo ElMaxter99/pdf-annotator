@@ -17,7 +17,11 @@ describe('App', () => {
   it('should render title', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
+    const component = fixture.componentInstance;
+    component.switchLanguage('es');
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, pdf-annotator');
+    const logoText = compiled.querySelector('.logo')?.textContent?.trim();
+    expect(logoText).toBe('Anotador de PDF');
   });
 });

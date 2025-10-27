@@ -3,6 +3,8 @@ import { Component, ElementRef, ViewChild, signal, AfterViewChecked } from '@ang
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import { TranslatePipe } from './translate.pipe';
+import { I18nService, LanguageCode, LanguageOption } from './i18n.service';
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
 
@@ -13,7 +15,7 @@ type EditState = { index: number; coord: Coord } | null;
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked {
@@ -23,6 +25,8 @@ export class App implements AfterViewChecked {
   coords = signal<Coord[]>([]);
   preview = signal<Coord | null>(null);
   editing = signal<EditState>(null);
+  readonly languageOptions: LanguageOption[];
+  activeLang = signal<LanguageCode>('es');
 
   private dragInfo: {
     index: number;
@@ -43,8 +47,17 @@ export class App implements AfterViewChecked {
 
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
 
-  constructor() {
+  constructor(public readonly i18n: I18nService) {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
+    this.languageOptions = this.i18n.languageOptions;
+    const supportedLangs: LanguageCode[] = this.languageOptions.map((opt) => opt.code);
+    const rawLang = typeof navigator !== 'undefined' ? navigator.language : undefined;
+    const browserLang = rawLang ? rawLang.split('-')[0].toLowerCase() : undefined;
+    const initialLang = (browserLang
+      ? supportedLangs.find((code) => code === browserLang)
+      : undefined) ?? 'es';
+    this.i18n.setLanguage(initialLang);
+    this.activeLang.set(initialLang);
   }
 
   ngAfterViewChecked() {
@@ -55,6 +68,15 @@ export class App implements AfterViewChecked {
         input.focus();
       }
     }
+  }
+
+  switchLanguage(lang: string) {
+    const normalized = lang.toLowerCase() as LanguageCode;
+    if (!this.languageOptions.some((opt) => opt.code === normalized)) {
+      return;
+    }
+    this.i18n.setLanguage(normalized);
+    this.activeLang.set(normalized);
   }
 
   get pageCount() {
@@ -334,7 +356,8 @@ export class App implements AfterViewChecked {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'coords.json';
+    const fileName = this.i18n.translate('actions.downloadFilename');
+    a.download = fileName || 'coords.json';
     a.click();
     URL.revokeObjectURL(url);
   }
