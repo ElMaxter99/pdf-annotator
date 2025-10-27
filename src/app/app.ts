@@ -24,6 +24,18 @@ export class App implements AfterViewChecked {
   preview = signal<Coord | null>(null);
   editing = signal<EditState>(null);
 
+  private dragInfo: {
+    index: number;
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startLeft: number;
+    startTop: number;
+    fontSize: number;
+    moved: boolean;
+  } | null = null;
+  private draggingElement: HTMLDivElement | null = null;
+
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('annotationsLayer', { static: false })
@@ -167,26 +179,124 @@ export class App implements AfterViewChecked {
     if (!pdfCanvas) return;
 
     this.coords()
-      .filter((c) => c.page === this.pageIndex())
-      .forEach((c, idx) => {
-        const left = c.x * scale;
-        const top = pdfCanvas.height - c.y * scale;
-        const fontSize = c.size * scale;
+      .map((coord, index) => ({ coord, index }))
+      .filter(({ coord }) => coord.page === this.pageIndex())
+      .forEach(({ coord, index }) => {
+        const left = coord.x * scale;
+        const top = pdfCanvas.height - coord.y * scale;
+        const fontSize = coord.size * scale;
 
         const el = document.createElement('div');
         el.className = 'annotation';
-        el.textContent = c.value;
+        el.textContent = coord.value;
         el.style.left = `${left}px`;
         el.style.top = `${top - fontSize}px`;
         el.style.fontSize = `${fontSize}px`;
-        el.style.color = c.color;
+        el.style.color = coord.color;
         el.style.fontFamily = 'Helvetica';
-        el.onclick = (evt) => {
-          evt.stopPropagation();
-          this.startEditing(idx, c);
-        };
+        el.onpointerdown = (evt) => this.handleAnnotationPointerDown(evt, index);
         layer.appendChild(el);
       });
+  }
+
+  private handleAnnotationPointerDown(evt: PointerEvent, index: number) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    const el = evt.currentTarget as HTMLDivElement | null;
+    if (!el) return;
+
+    const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');
+    this.dragInfo = {
+      index,
+      pointerId: evt.pointerId,
+      startX: evt.clientX,
+      startY: evt.clientY,
+      startLeft: parseFloat(el.style.left || '0'),
+      startTop: parseFloat(el.style.top || '0'),
+      fontSize: computedFontSize,
+      moved: false,
+    };
+
+    this.draggingElement = el;
+    el.setPointerCapture(evt.pointerId);
+    el.classList.add('dragging');
+    el.onpointermove = this.handleAnnotationPointerMove;
+    el.onpointerup = this.handleAnnotationPointerUp;
+    el.onpointercancel = this.handleAnnotationPointerUp;
+  }
+
+  private handleAnnotationPointerMove = (evt: PointerEvent) => {
+    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
+    const el = this.draggingElement;
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!el || !pdfCanvas) return;
+
+    evt.preventDefault();
+    const dx = evt.clientX - this.dragInfo.startX;
+    const dy = evt.clientY - this.dragInfo.startY;
+    const shouldMove = this.dragInfo.moved || Math.abs(dx) > 2 || Math.abs(dy) > 2;
+    if (!shouldMove) return;
+
+    this.dragInfo.moved = true;
+
+    const tentativeLeft = this.dragInfo.startLeft + dx;
+    const tentativeTop = this.dragInfo.startTop + dy;
+
+    const minTop = -this.dragInfo.fontSize;
+    const maxTop = pdfCanvas.height - this.dragInfo.fontSize;
+    const maxLeft = Math.max(pdfCanvas.width - el.offsetWidth, 0);
+    const clampedLeft = Math.min(Math.max(tentativeLeft, 0), maxLeft);
+    const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
+
+    el.style.left = `${clampedLeft}px`;
+    el.style.top = `${clampedTop}px`;
+  };
+
+  private handleAnnotationPointerUp = (evt: PointerEvent) => {
+    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
+    const el = this.draggingElement;
+    if (!el) {
+      this.dragInfo = null;
+      return;
+    }
+
+    evt.preventDefault();
+    evt.stopPropagation();
+    el.releasePointerCapture(evt.pointerId);
+    el.classList.remove('dragging');
+    el.onpointermove = null;
+    el.onpointerup = null;
+    el.onpointercancel = null;
+
+    const drag = this.dragInfo;
+    this.dragInfo = null;
+    this.draggingElement = null;
+
+    if (drag.moved) {
+      const left = parseFloat(el.style.left || '0');
+      const top = parseFloat(el.style.top || '0');
+      this.updateAnnotationPosition(drag.index, left, top, drag.fontSize);
+      this.redrawAllForPage();
+    } else if (evt.type !== 'pointercancel') {
+      const coord = this.coords()[drag.index];
+      if (coord) {
+        this.startEditing(drag.index, coord);
+      }
+    }
+  };
+
+  private updateAnnotationPosition(index: number, leftPx: number, topPx: number, fontSizePx: number) {
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!pdfCanvas) return;
+    const scale = this.scale();
+    const boundedLeft = Math.min(Math.max(leftPx, 0), pdfCanvas.width);
+    const boundedTop = Math.min(Math.max(topPx, -fontSizePx), pdfCanvas.height - fontSizePx);
+    const newX = +(boundedLeft / scale).toFixed(2);
+    const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
+
+    this.coords.update((arr) =>
+      arr.map((coord, i) => (i === index ? { ...coord, x: newX, y: newY } : coord))
+    );
   }
 
   async prevPage() {
