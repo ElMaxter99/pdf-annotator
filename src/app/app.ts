@@ -5,6 +5,7 @@ import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import { TranslationPipe } from './i18n/translation.pipe';
 import { Language, TranslationService } from './i18n/translation.service';
+import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
 
@@ -29,6 +30,10 @@ export class App implements AfterViewChecked {
   previewRgbInput = signal('rgb(0, 0, 0)');
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
+  readonly version = APP_VERSION;
+  readonly appName = APP_NAME;
+  readonly appAuthor = APP_AUTHOR;
+  readonly currentYear = new Date().getFullYear();
   private readonly translationService = inject(TranslationService);
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();

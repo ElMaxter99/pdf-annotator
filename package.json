@@ -1,6 +1,7 @@
 {
   "name": "pdf-annotator",
   "version": "0.0.0",
+  "author": "AAmoros",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
