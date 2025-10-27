@@ -1,8 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, signal, AfterViewChecked, HostListener, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  signal,
+  AfterViewChecked,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import { Meta, Title } from '@angular/platform-browser';
 import { TranslationPipe } from './i18n/translation.pipe';
 import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
@@ -35,6 +44,8 @@ export class App implements AfterViewChecked {
   readonly appAuthor = APP_AUTHOR;
   readonly currentYear = new Date().getFullYear();
   private readonly translationService = inject(TranslationService);
+  private readonly title = inject(Title);
+  private readonly meta = inject(Meta);
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
 
@@ -60,11 +71,19 @@ export class App implements AfterViewChecked {
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
+    this.setDocumentMetadata();
   }
 
   onLanguageChange(language: string) {
     this.translationService.setLanguage(language as Language);
     this.languageModel = this.translationService.getCurrentLanguage();
+  }
+
+  private setDocumentMetadata() {
+    const appTitle = APP_NAME;
+    this.title.setTitle(appTitle);
+    this.meta.updateTag({ property: 'og:title', content: appTitle });
+    this.meta.updateTag({ name: 'twitter:title', content: appTitle });
   }
 
   ngAfterViewChecked() {
