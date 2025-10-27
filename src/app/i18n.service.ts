@@ -1,6 +1,9 @@
 import { Injectable, Signal, signal } from '@angular/core';
+import { caTranslations } from './translations/ca';
+import { enTranslations } from './translations/en';
+import { esTranslations } from './translations/es';
 
-export type LanguageCode = 'es' | 'en';
+export type LanguageCode = 'es' | 'en' | 'ca';
 export type TranslationParams = Record<string, unknown>;
 
 export interface LanguageOption {
@@ -11,67 +14,13 @@ export interface LanguageOption {
 const LANGUAGE_LABELS: Record<LanguageCode, string> = {
   es: 'Español',
   en: 'English',
+  ca: 'Català',
 };
 
 const TRANSLATIONS: Record<LanguageCode, Record<string, unknown>> = {
-  en: {
-    header: {
-      title: 'PDF Annotator',
-      actions: { prev: 'Prev', next: 'Next' },
-      pageIndicator: 'Page {{index}} / {{count}}',
-      zoomIndicator: 'Zoom {{ value }}×',
-      languageLabel: 'Select language',
-    },
-    actions: {
-      clear: 'Clear',
-      copy: 'Copy JSON',
-      download: 'Download JSON',
-      downloadFilename: 'annotations.json',
-    },
-    lang: {
-      es: 'Español',
-      en: 'English',
-    },
-    sidebar: {
-      title: 'Annotations (JSON)',
-    },
-    annotation: {
-      placeholder: 'Text...',
-    },
-    viewer: {
-      empty:
-        'Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅.',
-    },
-  },
-  es: {
-    header: {
-      title: 'Anotador de PDF',
-      actions: { prev: 'Anterior', next: 'Siguiente' },
-      pageIndicator: 'Página {{index}} / {{count}}',
-      zoomIndicator: 'Zoom {{ value }}×',
-      languageLabel: 'Seleccionar idioma',
-    },
-    actions: {
-      clear: 'Limpiar',
-      copy: 'Copiar JSON',
-      download: 'Descargar JSON',
-      downloadFilename: 'anotaciones.json',
-    },
-    lang: {
-      es: 'Español',
-      en: 'Inglés',
-    },
-    sidebar: {
-      title: 'Anotaciones (JSON)',
-    },
-    annotation: {
-      placeholder: 'Texto...',
-    },
-    viewer: {
-      empty:
-        'Sube un PDF y haz clic donde quieras añadir anotaciones. Edítalas en la vista previa antes de confirmar ✅.',
-    },
-  },
+  en: enTranslations,
+  es: esTranslations,
+  ca: caTranslations,
 };
 
 const FALLBACK_LANG: LanguageCode = 'en';
