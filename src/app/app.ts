@@ -121,6 +121,9 @@ export class App implements AfterViewChecked {
     this.pdfDoc = await loadingTask.promise;
 
     this.pageIndex.set(1);
+    this.clearAll();
+    this.preview.set(null);
+    this.editing.set(null);
     await this.render();
   }
 
