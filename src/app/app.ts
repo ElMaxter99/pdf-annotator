@@ -23,7 +23,7 @@ export class App implements AfterViewChecked {
   coords = signal<Coord[]>([]);
   preview = signal<Coord | null>(null);
   editing = signal<EditState>(null);
-  private originalPdfData?: ArrayBuffer;
+  private originalPdfData?: Uint8Array;
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -53,9 +53,10 @@ export class App implements AfterViewChecked {
     if (!file) return;
 
     const buf = await file.arrayBuffer();
-    this.originalPdfData = buf.slice(0);
+    const typed = new Uint8Array(buf);
+    this.originalPdfData = typed.slice();
 
-    const loadingTask = pdfjsLib.getDocument({ data: buf });
+    const loadingTask = pdfjsLib.getDocument({ data: typed });
     this.pdfDoc = await loadingTask.promise;
 
     this.pageIndex.set(1);
@@ -243,7 +244,6 @@ export class App implements AfterViewChecked {
 
     for (const c of this.coords()) {
       const page = pdf.getPage(c.page - 1);
-      const { height: pageHeight } = page.getSize();
 
       const hex = c.color.replace('#', '');
       const r = parseInt(hex.substring(0, 2), 16) / 255;
@@ -259,8 +259,8 @@ export class App implements AfterViewChecked {
       });
     }
 
-    const pdfBytes = await pdf.save();
-    const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
+    const pdfBytes = await pdf.save({ useObjectStreams: false });
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
