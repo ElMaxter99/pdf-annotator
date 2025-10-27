@@ -931,13 +931,110 @@ export class App implements AfterViewChecked {
     try {
       return JSON.parse(text);
     } catch {
+      const sanitized = this.escapeMultilineStrings(text);
       try {
         // eslint-disable-next-line no-new-func
-        return Function('"use strict";return (' + text + ')')();
+        return Function('"use strict";return (' + sanitized + ')')();
       } catch (looseError) {
         throw looseError;
       }
     }
+  }
+
+  private escapeMultilineStrings(text: string): string {
+    let sanitized = '';
+    let mode: 'none' | 'single' | 'double' | 'template' = 'none';
+    let escapeNext = false;
+
+    for (let i = 0; i < text.length; i += 1) {
+      const char = text[i];
+
+      if (escapeNext) {
+        sanitized += char;
+        escapeNext = false;
+        continue;
+      }
+
+      if (mode === 'single') {
+        if (char === '\\') {
+          sanitized += char;
+          escapeNext = true;
+          continue;
+        }
+
+        if (char === '\n') {
+          sanitized += '\\n';
+          continue;
+        }
+
+        if (char === '\r') {
+          continue;
+        }
+
+        sanitized += char;
+
+        if (char === "'") {
+          mode = 'none';
+        }
+        continue;
+      }
+
+      if (mode === 'double') {
+        if (char === '\\') {
+          sanitized += char;
+          escapeNext = true;
+          continue;
+        }
+
+        if (char === '\n') {
+          sanitized += '\\n';
+          continue;
+        }
+
+        if (char === '\r') {
+          continue;
+        }
+
+        sanitized += char;
+
+        if (char === '"') {
+          mode = 'none';
+        }
+        continue;
+      }
+
+      if (mode === 'template') {
+        sanitized += char;
+
+        if (char === '\\') {
+          escapeNext = true;
+          continue;
+        }
+
+        if (char === '`') {
+          mode = 'none';
+        }
+        continue;
+      }
+
+      sanitized += char;
+
+      if (char === "'") {
+        mode = 'single';
+        continue;
+      }
+
+      if (char === '"') {
+        mode = 'double';
+        continue;
+      }
+
+      if (char === '`') {
+        mode = 'template';
+      }
+    }
+
+    return sanitized;
   }
 
   private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {
@@ -953,8 +1050,8 @@ export class App implements AfterViewChecked {
         continue;
       }
 
-      const pageNum = Number((rawPage as { num?: unknown }).num);
-      if (!Number.isInteger(pageNum) || pageNum < 1) {
+      const pageNum = this.toFiniteNumber((rawPage as { num?: unknown }).num);
+      if (!pageNum || !Number.isInteger(pageNum) || pageNum < 1) {
         continue;
       }
 
@@ -970,35 +1067,30 @@ export class App implements AfterViewChecked {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color } = rawField as {
-          x?: unknown;
-          y?: unknown;
-          mapField?: unknown;
-          fontSize?: unknown;
-          color?: unknown;
-        };
+        const { x, y, mapField, fontSize, color, value } = rawField as Record<string, unknown>;
 
-        if (
-          typeof mapField !== 'string' ||
-          !mapField.trim() ||
-          typeof color !== 'string' ||
-          typeof x !== 'number' ||
-          typeof y !== 'number' ||
-          typeof fontSize !== 'number' ||
-          !Number.isFinite(x) ||
-          !Number.isFinite(y) ||
-          !Number.isFinite(fontSize) ||
-          fontSize <= 0
-        ) {
+        const normalizedMapField =
+          this.normalizeFieldText(mapField) ?? this.normalizeFieldText(value);
+        const normalizedX = this.toFiniteNumber(x);
+        const normalizedY = this.toFiniteNumber(y);
+
+        if (normalizedMapField === null || normalizedX === null || normalizedY === null) {
           continue;
         }
 
+        const normalizedFontSize = this.toFiniteNumber(fontSize);
+        const normalizedColor =
+          typeof color === 'string' && color.trim() ? color.trim() : '#000000';
+
         const normalizedField: PageField = {
-          x: Math.round(x * 100) / 100,
-          y: Math.round(y * 100) / 100,
-          mapField: mapField.trim(),
-          fontSize: Math.round(fontSize * 100) / 100,
-          color: this.normalizeColor(color),
+          x: Math.round(normalizedX * 100) / 100,
+          y: Math.round(normalizedY * 100) / 100,
+          mapField: normalizedMapField,
+          fontSize:
+            normalizedFontSize && normalizedFontSize > 0
+              ? Math.round(normalizedFontSize * 100) / 100
+              : 14,
+          color: this.normalizeColor(normalizedColor),
         };
 
         fields.push(normalizedField);
@@ -1026,5 +1118,54 @@ export class App implements AfterViewChecked {
     }
 
     return null;
+  }
+
+  private toFiniteNumber(value: unknown): number | null {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null;
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return null;
+      }
+      const parsed = Number(trimmed);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+  }
+
+  private normalizeFieldText(value: unknown): string | null {
+    let source: string | null = null;
+
+    if (typeof value === 'string') {
+      source = value;
+    } else if (typeof value === 'number' && Number.isFinite(value)) {
+      source = String(value);
+    } else if (typeof value === 'boolean') {
+      source = value ? 'true' : 'false';
+    }
+
+    if (!source) {
+      return null;
+    }
+
+    const collapsed = source
+      .replace(/\r\n?/g, '\n')
+      .replace(/\n+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!collapsed) {
+      return null;
+    }
+
+    if (/[\.\[\]]/.test(collapsed)) {
+      return collapsed.replace(/\s*([\.\[\]])\s*/g, '$1');
+    }
+
+    return collapsed;
   }
 }
