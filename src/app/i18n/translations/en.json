@@ -21,7 +21,11 @@
     "downloadPdf": "Download PDF"
   },
   "sidebar": {
-    "title": "Annotations (JSON)"
+    "title": "Annotations (JSON)",
+    "importJsonFile": "Import from file",
+    "applyJson": "Apply JSON",
+    "jsonPlaceholder": "Paste or edit annotation coordinates here...",
+    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
   },
   "annotation": {
     "fields": {

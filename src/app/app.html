@@ -25,7 +25,6 @@
 
       <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">{{ 'controls.clear' | t }}</button>
       <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
-      <button class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">{{ 'controls.importJson' | t }}</button>
       <button class="btn" (click)="downloadJSON()"
         [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
       <button class="btn" (click)="downloadAnnotatedPDF()"
@@ -45,7 +44,21 @@
   <!-- LATERAL SIDEBAR -->
   <aside class="sidebar">
     <h4>{{ 'sidebar.title' | t }}</h4>
-    <pre class="json">{{ coords() | json }}</pre>
+    <div class="sidebar-actions">
+      <button type="button" class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">
+        {{ 'sidebar.importJsonFile' | t }}
+      </button>
+      <button type="button" class="btn" (click)="applyCoordsText()">
+        {{ 'sidebar.applyJson' | t }}
+      </button>
+    </div>
+    <textarea
+      class="json-editor"
+      [(ngModel)]="coordsTextModel"
+      [placeholder]="'sidebar.jsonPlaceholder' | t"
+      spellcheck="false"
+    ></textarea>
+    <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
   </aside>
 
   <!-- VISOR PDF -->

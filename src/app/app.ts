@@ -50,6 +50,7 @@ export class App implements AfterViewChecked {
   previewRgbInput = signal('rgb(0, 0, 0)');
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
+  coordsTextModel = '[]';
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
@@ -85,6 +86,7 @@ export class App implements AfterViewChecked {
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     this.setDocumentMetadata();
+    this.syncCoordsTextModel();
   }
 
   onLanguageChange(language: string) {
@@ -407,6 +409,7 @@ export class App implements AfterViewChecked {
       color: this.normalizeColor(p.field.color),
     };
     this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
+    this.syncCoordsTextModel();
     this.preview.set(null);
     this.redrawAllForPage();
   }
@@ -421,6 +424,7 @@ export class App implements AfterViewChecked {
       this.coords.update((pages) =>
         this.updateFieldInPages(pageIndex, fieldIndex, normalized, pages)
       );
+      this.syncCoordsTextModel();
     }
     this.editing.set({ pageIndex, fieldIndex, field: { ...normalized } });
     this.updateEditingColorState(normalized.color);
@@ -437,6 +441,7 @@ export class App implements AfterViewChecked {
     this.coords.update((pages) =>
       this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
     );
+    this.syncCoordsTextModel();
     this.editing.set(null);
     this.redrawAllForPage();
   }
@@ -465,6 +470,7 @@ export class App implements AfterViewChecked {
     const e = this.editing();
     if (!e) return;
     this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages));
+    this.syncCoordsTextModel();
     this.editing.set(null);
     this.redrawAllForPage();
   }
@@ -675,6 +681,7 @@ export class App implements AfterViewChecked {
         return { ...page, fields: updatedFields };
       })
     );
+    this.syncCoordsTextModel();
   }
 
   async prevPage() {
@@ -707,11 +714,43 @@ export class App implements AfterViewChecked {
 
   clearAll() {
     this.coords.set([]);
+    this.syncCoordsTextModel();
     this.redrawAllForPage();
   }
 
   copyJSON() {
-    navigator.clipboard.writeText(JSON.stringify(this.coords(), null, 2)).catch(() => {});
+    navigator.clipboard.writeText(this.coordsTextModel).catch(() => {});
+  }
+
+  applyCoordsText() {
+    const text = this.coordsTextModel.trim();
+
+    if (!text) {
+      this.coords.set([]);
+      this.syncCoordsTextModel();
+      this.preview.set(null);
+      this.editing.set(null);
+      this.redrawAllForPage();
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(text);
+      const normalized = this.normalizeImportedCoordinates(parsed);
+
+      if (normalized === null) {
+        throw new Error('Formato no válido');
+      }
+
+      this.coords.set(normalized);
+      this.syncCoordsTextModel();
+      this.preview.set(null);
+      this.editing.set(null);
+      this.redrawAllForPage();
+    } catch (error) {
+      console.error('No se pudo importar el JSON de anotaciones.', error);
+      alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+    }
   }
 
   triggerImportCoords() {
@@ -738,6 +777,7 @@ export class App implements AfterViewChecked {
       }
 
       this.coords.set(normalized);
+      this.syncCoordsTextModel();
       this.preview.set(null);
       this.editing.set(null);
       this.redrawAllForPage();
@@ -879,6 +919,10 @@ export class App implements AfterViewChecked {
     if (!existing || weight >= existing.weight) {
       this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
     }
+  }
+
+  private syncCoordsTextModel() {
+    this.coordsTextModel = JSON.stringify(this.coords(), null, 2);
   }
 
   private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {
