@@ -204,11 +204,13 @@ export class App implements AfterViewChecked {
   async zoomIn() {
     this.scale.update((s) => +(s + 0.25).toFixed(2));
     await this.render();
+    this.redrawAllForPage();
   }
 
   async zoomOut() {
     this.scale.update((s) => Math.max(0.25, +(this.scale() - 0.25).toFixed(2)));
     await this.render();
+    this.redrawAllForPage();
   }
 
   clearAll() {
