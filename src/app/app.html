@@ -37,23 +37,64 @@
       <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.x*scale()"
         [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()" (keydown.enter)="confirmPreview()"
         (keydown.escape)="cancelPreview()">
-        <input type="text" [(ngModel)]="p.value" placeholder="Texto..." />
-        <input type="number" [(ngModel)]="p.size" min="8" max="72" />
-        <input type="color" [(ngModel)]="p.color" />
-        <button (click)="confirmPreview()">✅</button>
-        <button (click)="cancelPreview()">❌</button>
+        <label class="field">
+          <span class="field-label">Texto</span>
+          <input type="text" [(ngModel)]="p.value" placeholder="Texto..." />
+        </label>
+        <label class="field field-small">
+          <span class="field-label">Tamaño</span>
+          <input type="number" [(ngModel)]="p.size" min="8" max="72" />
+        </label>
+        <div class="color-section">
+          <span class="field-label">Color</span>
+          <div class="color-row">
+            <input type="color" [(ngModel)]="p.color" (ngModelChange)="onPreviewColorPicker($event)" />
+            <div class="color-inputs">
+              <input type="text" [ngModel]="previewHexInput()" (ngModelChange)="setPreviewColorFromHex($event)"
+                [ngModelOptions]="{ standalone: true }" placeholder="#5eead4" />
+              <input type="text" [ngModel]="previewRgbInput()" (ngModelChange)="setPreviewColorFromRgb($event)"
+                [ngModelOptions]="{ standalone: true }" placeholder="rgb(94, 234, 212)" />
+            </div>
+          </div>
+          <small class="color-hint">Selecciona un color, escribe un HEX o un RGB. El JSON siempre exportará el color en
+            HEX.</small>
+        </div>
+        <div class="editor-actions">
+          <button (click)="confirmPreview()">✅</button>
+          <button (click)="cancelPreview()">❌</button>
+        </div>
       </div>
 
       <!-- EDITAR ANOTACIÓN -->
       <div *ngIf="editing() as e" class="annotation-editor editing" [style.left.px]="e.coord.x*scale()"
         [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()" (keydown.enter)="confirmEdit()"
         (keydown.escape)="cancelEdit()">
-        <input type="text" [(ngModel)]="e.coord.value" placeholder="Texto..." />
-        <input type="number" [(ngModel)]="e.coord.size" min="8" max="72" />
-        <input type="color" [(ngModel)]="e.coord.color" />
-        <button (click)="confirmEdit()">✅</button>
-        <button (click)="cancelEdit()">❌</button>
-        <button class="btn-delete" (click)="deleteAnnotation()">🗑️</button>
+        <label class="field">
+          <span class="field-label">Texto</span>
+          <input type="text" [(ngModel)]="e.coord.value" placeholder="Texto..." />
+        </label>
+        <label class="field field-small">
+          <span class="field-label">Tamaño</span>
+          <input type="number" [(ngModel)]="e.coord.size" min="8" max="72" />
+        </label>
+        <div class="color-section">
+          <span class="field-label">Color</span>
+          <div class="color-row">
+            <input type="color" [(ngModel)]="e.coord.color" (ngModelChange)="onEditColorPicker($event)" />
+            <div class="color-inputs">
+              <input type="text" [ngModel]="editHexInput()" (ngModelChange)="setEditColorFromHex($event)"
+                [ngModelOptions]="{ standalone: true }" placeholder="#5eead4" />
+              <input type="text" [ngModel]="editRgbInput()" (ngModelChange)="setEditColorFromRgb($event)"
+                [ngModelOptions]="{ standalone: true }" placeholder="rgb(94, 234, 212)" />
+            </div>
+          </div>
+          <small class="color-hint">Puedes pegar un HEX o un RGB existente para reutilizar colores exactos.</small>
+        </div>
+        <div class="editor-actions">
+          <button (click)="confirmEdit()">✅</button>
+          <button (click)="cancelEdit()">❌</button>
+          <button class="btn-delete" (click)="deleteAnnotation()">🗑️</button>
+        </div>
       </div>
     </div>
   </main>

@@ -23,6 +23,10 @@ export class App implements AfterViewChecked {
   coords = signal<Coord[]>([]);
   preview = signal<Coord | null>(null);
   editing = signal<EditState>(null);
+  previewHexInput = signal('#000000');
+  previewRgbInput = signal('rgb(0, 0, 0)');
+  editHexInput = signal('#000000');
+  editRgbInput = signal('rgb(0, 0, 0)');
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -104,14 +108,16 @@ export class App implements AfterViewChecked {
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
 
+    const defaultColor = '#000000';
     this.preview.set({
       page: this.pageIndex(),
       x: pt.x,
       y: pt.y,
       value: '',
       size: 14,
-      color: '#000000',
+      color: defaultColor,
     });
+    this.updatePreviewColorState(defaultColor);
   }
 
   private normalizeColor(color: string) {
@@ -132,6 +138,143 @@ export class App implements AfterViewChecked {
     };
 
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  private normalizeHexInput(value: string) {
+    const trimmed = value.trim();
+    const match = trimmed.match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i);
+    if (!match) return null;
+    let hex = match[1];
+    if (hex.length === 3) {
+      hex = hex
+        .split('')
+        .map((ch) => ch + ch)
+        .join('');
+    }
+    return `#${hex.toLowerCase()}`;
+  }
+
+  private parseRgbText(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const rgbMatch = trimmed.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i);
+    const fallbackMatch = trimmed.match(/^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/);
+    const match = rgbMatch ?? fallbackMatch;
+    if (!match) return null;
+    const [, r, g, b] = match;
+    const clamp = (num: number) => Math.max(0, Math.min(255, num));
+    return {
+      r: clamp(parseInt(r, 10)),
+      g: clamp(parseInt(g, 10)),
+      b: clamp(parseInt(b, 10)),
+    };
+  }
+
+  private rgbToHex(rgb: { r: number; g: number; b: number }) {
+    const toHex = (num: number) => num.toString(16).padStart(2, '0');
+    return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
+  }
+
+  private parseColorComponents(color: string) {
+    const hex = this.normalizeHexInput(color);
+    if (hex) {
+      return {
+        r: parseInt(hex.slice(1, 3), 16),
+        g: parseInt(hex.slice(3, 5), 16),
+        b: parseInt(hex.slice(5, 7), 16),
+      };
+    }
+
+    const match = color.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i);
+    if (!match) return null;
+    return {
+      r: Math.max(0, Math.min(255, parseInt(match[1], 10))),
+      g: Math.max(0, Math.min(255, parseInt(match[2], 10))),
+      b: Math.max(0, Math.min(255, parseInt(match[3], 10))),
+    };
+  }
+
+  private toRgbString(color: string) {
+    const comps = this.parseColorComponents(color);
+    if (!comps) return '';
+    return `rgb(${comps.r}, ${comps.g}, ${comps.b})`;
+  }
+
+  private ensureHex(color: string) {
+    const normalized = this.normalizeColor(color);
+    return normalized.startsWith('#') ? normalized : null;
+  }
+
+  private updatePreviewColorState(color: string) {
+    const hex = this.ensureHex(color);
+    if (hex) {
+      this.previewHexInput.set(hex);
+      this.previewRgbInput.set(this.toRgbString(hex));
+    } else {
+      this.previewHexInput.set(color.trim());
+      this.previewRgbInput.set(this.toRgbString(color));
+    }
+  }
+
+  private updateEditingColorState(color: string) {
+    const hex = this.ensureHex(color);
+    if (hex) {
+      this.editHexInput.set(hex);
+      this.editRgbInput.set(this.toRgbString(hex));
+    } else {
+      this.editHexInput.set(color.trim());
+      this.editRgbInput.set(this.toRgbString(color));
+    }
+  }
+
+  setPreviewColorFromHex(value: string) {
+    this.previewHexInput.set(value);
+    const normalized = this.normalizeHexInput(value);
+    if (!normalized) return;
+    this.preview.update((p) => (p ? { ...p, color: normalized } : p));
+    this.updatePreviewColorState(normalized);
+  }
+
+  setPreviewColorFromRgb(value: string) {
+    this.previewRgbInput.set(value);
+    const rgb = this.parseRgbText(value);
+    if (!rgb) return;
+    const hex = this.rgbToHex(rgb);
+    this.preview.update((p) => (p ? { ...p, color: hex } : p));
+    this.updatePreviewColorState(hex);
+  }
+
+  onPreviewColorPicker(value: string) {
+    this.preview.update((p) => (p ? { ...p, color: value } : p));
+    this.updatePreviewColorState(value);
+  }
+
+  setEditColorFromHex(value: string) {
+    this.editHexInput.set(value);
+    const normalized = this.normalizeHexInput(value);
+    if (!normalized) return;
+    this.editing.update((e) =>
+      e ? { ...e, coord: { ...e.coord, color: normalized } } : e,
+    );
+    this.updateEditingColorState(normalized);
+  }
+
+  setEditColorFromRgb(value: string) {
+    this.editRgbInput.set(value);
+    const rgb = this.parseRgbText(value);
+    if (!rgb) return;
+    const hex = this.rgbToHex(rgb);
+    this.editing.update((e) =>
+      e ? { ...e, coord: { ...e.coord, color: hex } } : e,
+    );
+    this.updateEditingColorState(hex);
+  }
+
+  onEditColorPicker(value: string) {
+    this.editing.update((e) =>
+      e ? { ...e, coord: { ...e.coord, color: value } } : e,
+    );
+    this.updateEditingColorState(value);
   }
 
   confirmPreview() {
@@ -156,6 +299,7 @@ export class App implements AfterViewChecked {
       this.coords.update((arr) => arr.map((item, i) => (i === idx ? normalized : item)));
     }
     this.editing.set({ index: idx, coord: { ...normalized } });
+    this.updateEditingColorState(normalized.color);
     this.preview.set(null);
   }
 
