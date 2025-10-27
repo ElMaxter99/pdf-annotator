@@ -50,7 +50,7 @@ export class App implements AfterViewChecked {
   previewRgbInput = signal('rgb(0, 0, 0)');
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
-  coordsTextModel = '[]';
+  coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
@@ -735,7 +735,7 @@ export class App implements AfterViewChecked {
     }
 
     try {
-      const parsed = JSON.parse(text);
+      const parsed = this.parseLooseJson(text);
       const normalized = this.normalizeImportedCoordinates(parsed);
 
       if (normalized === null) {
@@ -770,7 +770,7 @@ export class App implements AfterViewChecked {
 
     try {
       const text = await file.text();
-      const parsed = JSON.parse(text);
+      const parsed = this.parseLooseJson(text);
       const normalized = this.normalizeImportedCoordinates(parsed);
       if (normalized === null) {
         throw new Error('Formato no válido');
@@ -790,7 +790,9 @@ export class App implements AfterViewChecked {
   }
 
   downloadJSON() {
-    const blob = new Blob([JSON.stringify(this.coords(), null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ pages: this.coords() }, null, 2)], {
+      type: 'application/json',
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -922,17 +924,31 @@ export class App implements AfterViewChecked {
   }
 
   private syncCoordsTextModel() {
-    this.coordsTextModel = JSON.stringify(this.coords(), null, 2);
+    this.coordsTextModel = JSON.stringify({ pages: this.coords() }, null, 2);
+  }
+
+  private parseLooseJson(text: string): unknown {
+    try {
+      return JSON.parse(text);
+    } catch {
+      try {
+        // eslint-disable-next-line no-new-func
+        return Function('"use strict";return (' + text + ')')();
+      } catch (looseError) {
+        throw looseError;
+      }
+    }
   }
 
   private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {
-    if (!Array.isArray(data)) {
+    const pagesData = this.extractPagesCollection(data);
+    if (!Array.isArray(pagesData)) {
       return null;
     }
 
     const normalized: PageAnnotations[] = [];
 
-    for (const rawPage of data) {
+    for (const rawPage of pagesData) {
       if (!rawPage || typeof rawPage !== 'object') {
         continue;
       }
@@ -995,5 +1011,20 @@ export class App implements AfterViewChecked {
 
     normalized.sort((a, b) => a.num - b.num);
     return normalized;
+  }
+
+  private extractPagesCollection(data: unknown): unknown {
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (data && typeof data === 'object') {
+      const maybePages = (data as { pages?: unknown }).pages;
+      if (Array.isArray(maybePages)) {
+        return maybePages;
+      }
+    }
+
+    return null;
   }
 }
