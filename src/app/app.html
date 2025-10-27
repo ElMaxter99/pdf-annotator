@@ -35,7 +35,8 @@
 
       <!-- NUEVA ANOTACIÓN -->
       <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.x*scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()">
+        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()" (keydown.enter)="confirmPreview()"
+        (keydown.escape)="cancelPreview()">
         <input type="text" [(ngModel)]="p.value" placeholder="Texto..." />
         <input type="number" [(ngModel)]="p.size" min="8" max="72" />
         <input type="color" [(ngModel)]="p.color" />
@@ -45,7 +46,8 @@
 
       <!-- EDITAR ANOTACIÓN -->
       <div *ngIf="editing() as e" class="annotation-editor editing" [style.left.px]="e.coord.x*scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()">
+        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()" (keydown.enter)="confirmEdit()"
+        (keydown.escape)="cancelEdit()">
         <input type="text" [(ngModel)]="e.coord.value" placeholder="Texto..." />
         <input type="number" [(ngModel)]="e.coord.size" min="8" max="72" />
         <input type="color" [(ngModel)]="e.coord.color" />
