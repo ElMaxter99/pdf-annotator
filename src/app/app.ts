@@ -11,10 +11,40 @@ import {
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import type { PDFFont } from 'pdf-lib';
 import { Meta, Title } from '@angular/platform-browser';
 import { TranslationPipe } from './i18n/translation.pipe';
 import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
+
+const FONT_OPTIONS = [
+  {
+    id: 'sans',
+    labelKey: 'annotation.fields.font.options.sans',
+    cssDeclaration: 'font-family: Helvetica, Arial, sans-serif;',
+    fontFamilyValue: 'Helvetica, Arial, sans-serif',
+    pdf: 'Helvetica',
+  },
+  {
+    id: 'serif',
+    labelKey: 'annotation.fields.font.options.serif',
+    cssDeclaration: 'font-family: "Times New Roman", Times, serif;',
+    fontFamilyValue: '"Times New Roman", Times, serif',
+    pdf: 'TimesRoman',
+  },
+  {
+    id: 'mono',
+    labelKey: 'annotation.fields.font.options.mono',
+    cssDeclaration: 'font-family: "Courier New", Courier, monospace;',
+    fontFamilyValue: '"Courier New", Courier, monospace',
+    pdf: 'Courier',
+  },
+] as const;
+
+type FontOption = (typeof FONT_OPTIONS)[number];
+type PdfFontKey = FontOption['pdf'];
+
+const DEFAULT_FONT_OPTION = FONT_OPTIONS[0];
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
 
@@ -24,6 +54,7 @@ type PageField = {
   mapField: string;
   fontSize: number;
   color: string;
+  fontType: string;
 };
 
 type PageAnnotations = { num: number; fields: PageField[] };
@@ -55,6 +86,8 @@ export class App implements AfterViewChecked {
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
   readonly currentYear = new Date().getFullYear();
+  readonly fontOptions = FONT_OPTIONS;
+  private readonly defaultFontType = DEFAULT_FONT_OPTION.cssDeclaration;
   private readonly translationService = inject(TranslationService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
@@ -223,6 +256,83 @@ export class App implements AfterViewChecked {
     return { x: +(xPx / scale).toFixed(2), y: +((canvas.height - yPx) / scale).toFixed(2) };
   }
 
+  private sanitizeFontFamily(value: string) {
+    let sanitized = value.trim();
+    if (!sanitized) {
+      return '';
+    }
+
+    if (sanitized.toLowerCase().startsWith('font-family')) {
+      sanitized = sanitized.replace(/^font-family\s*:\s*/i, '');
+    }
+
+    sanitized = sanitized.replace(/;+\s*$/, '').trim();
+
+    if (
+      (sanitized.startsWith("'") && sanitized.endsWith("'")) ||
+      (sanitized.startsWith('"') && sanitized.endsWith('"'))
+    ) {
+      sanitized = sanitized.slice(1, -1).trim();
+    }
+
+    return sanitized;
+  }
+
+  private normalizeFontFamilyForComparison(value: string) {
+    return value
+      .split(',')
+      .map((part) => part.replace(/['"]/g, '').trim())
+      .filter((part) => part.length > 0)
+      .join(',')
+      .toLowerCase();
+  }
+
+  private normalizeFontType(value: unknown): string {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return this.defaultFontType;
+      }
+
+      const directMatch = FONT_OPTIONS.find(
+        (option) => option.cssDeclaration.toLowerCase() === trimmed.toLowerCase()
+      );
+      if (directMatch) {
+        return directMatch.cssDeclaration;
+      }
+
+      const sanitizedFamily = this.sanitizeFontFamily(trimmed);
+      if (sanitizedFamily) {
+        const normalizedCandidate = this.normalizeFontFamilyForComparison(sanitizedFamily);
+        const familyMatch = FONT_OPTIONS.find(
+          (option) =>
+            this.normalizeFontFamilyForComparison(option.fontFamilyValue) === normalizedCandidate
+        );
+        if (familyMatch) {
+          return familyMatch.cssDeclaration;
+        }
+      }
+
+      const idMatch = FONT_OPTIONS.find((option) => option.id === trimmed.toLowerCase());
+      if (idMatch) {
+        return idMatch.cssDeclaration;
+      }
+    }
+
+    return this.defaultFontType;
+  }
+
+  private resolveFontOption(fontType: string | undefined): FontOption {
+    const normalized = this.normalizeFontType(fontType);
+    return (
+      FONT_OPTIONS.find((option) => option.cssDeclaration === normalized) ?? DEFAULT_FONT_OPTION
+    );
+  }
+
+  private getFontFamilyValue(fontType: string | undefined) {
+    return this.resolveFontOption(fontType).fontFamilyValue;
+  }
+
   onHitboxClick(evt: MouseEvent) {
     if (!this.pdfDoc || this.editing()) return;
     const pt = this.domToPdfCoords(evt);
@@ -237,6 +347,7 @@ export class App implements AfterViewChecked {
         mapField: '',
         fontSize: 14,
         color: defaultColor,
+        fontType: this.defaultFontType,
       },
     });
     this.updatePreviewColorState(defaultColor);
@@ -407,6 +518,7 @@ export class App implements AfterViewChecked {
     const normalizedField: PageField = {
       ...p.field,
       color: this.normalizeColor(p.field.color),
+      fontType: this.normalizeFontType(p.field.fontType),
     };
     this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
     this.syncCoordsTextModel();
@@ -419,8 +531,14 @@ export class App implements AfterViewChecked {
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
-    const normalized: PageField = { ...field, color: this.normalizeColor(field.color) };
-    if (normalized.color !== field.color) {
+    const normalized: PageField = {
+      ...field,
+      color: this.normalizeColor(field.color),
+      fontType: this.normalizeFontType(field.fontType),
+    };
+    const colorChanged = normalized.color !== field.color;
+    const fontChanged = normalized.fontType !== field.fontType;
+    if (colorChanged || fontChanged) {
       this.coords.update((pages) =>
         this.updateFieldInPages(pageIndex, fieldIndex, normalized, pages)
       );
@@ -437,6 +555,7 @@ export class App implements AfterViewChecked {
     const normalized: PageField = {
       ...e.field,
       color: this.normalizeColor(e.field.color),
+      fontType: this.normalizeFontType(e.field.fontType),
     };
     this.coords.update((pages) =>
       this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
@@ -555,7 +674,7 @@ export class App implements AfterViewChecked {
           el.style.top = `${top - field.fontSize * scale}px`;
           el.style.fontSize = `${field.fontSize * scale}px`;
           el.style.color = field.color;
-          el.style.fontFamily = 'Helvetica, Arial, sans-serif';
+          el.style.fontFamily = this.getFontFamilyValue(field.fontType);
 
           el.onpointerdown = (evt) =>
             this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
@@ -838,7 +957,14 @@ export class App implements AfterViewChecked {
       }
 
       this.rememberPdfBytes(usedBytes, 3);
-      const font = await pdf.embedFont(StandardFonts.Helvetica);
+      const fontCache = new Map<PdfFontKey, PDFFont>();
+      const loadFont = async (fontKey: PdfFontKey) => {
+        if (!fontCache.has(fontKey)) {
+          const embedded = await pdf.embedFont(StandardFonts[fontKey]);
+          fontCache.set(fontKey, embedded);
+        }
+        return fontCache.get(fontKey)!;
+      };
 
       for (const pageAnnotations of this.coords()) {
         const page = pdf.getPage(pageAnnotations.num - 1);
@@ -847,6 +973,9 @@ export class App implements AfterViewChecked {
           const r = parseInt(hex.substring(0, 2), 16) / 255;
           const g = parseInt(hex.substring(2, 4), 16) / 255;
           const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+          const fontOption = this.resolveFontOption(field.fontType);
+          const font = await loadFont(fontOption.pdf);
 
           page.drawText(field.mapField, {
             x: field.x,
@@ -1067,7 +1196,10 @@ export class App implements AfterViewChecked {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color, value } = rawField as Record<string, unknown>;
+        const { x, y, mapField, fontSize, color, value, fontType } = rawField as Record<
+          string,
+          unknown
+        >;
 
         const normalizedMapField =
           this.normalizeFieldText(mapField) ?? this.normalizeFieldText(value);
@@ -1091,6 +1223,7 @@ export class App implements AfterViewChecked {
               ? Math.round(normalizedFontSize * 100) / 100
               : 14,
           color: this.normalizeColor(normalizedColor),
+          fontType: this.normalizeFontType(fontType),
         };
 
         fields.push(normalizedField);

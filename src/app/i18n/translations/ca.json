@@ -36,6 +36,14 @@
       "size": {
         "label": "Mida"
       },
+      "font": {
+        "label": "Tipus de lletra",
+        "options": {
+          "sans": "Sans-serif (Helvetica / Arial)",
+          "serif": "Serif (Times New Roman)",
+          "mono": "Monoespaiada (Courier New)"
+        }
+      },
       "color": {
         "label": "Color"
       }

@@ -36,6 +36,14 @@
       "size": {
         "label": "Size"
       },
+      "font": {
+        "label": "Font",
+        "options": {
+          "sans": "Sans-serif (Helvetica / Arial)",
+          "serif": "Serif (Times New Roman)",
+          "mono": "Monospace (Courier New)"
+        }
+      },
       "color": {
         "label": "Color"
       }

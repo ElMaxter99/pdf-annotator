@@ -36,6 +36,14 @@
       "size": {
         "label": "Tamaño"
       },
+      "font": {
+        "label": "Fuente",
+        "options": {
+          "sans": "Sans-serif (Helvetica / Arial)",
+          "serif": "Serif (Times New Roman)",
+          "mono": "Monoespaciada (Courier New)"
+        }
+      },
       "color": {
         "label": "Color"
       }
