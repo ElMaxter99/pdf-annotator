@@ -114,13 +114,34 @@ export class App implements AfterViewChecked {
     });
   }
 
+  private normalizeColor(color: string) {
+    if (color.startsWith('#')) {
+      const hex = color.length === 4
+        ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+        : color;
+      return hex.toLowerCase();
+    }
+
+    const match = color.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(\d*\.?\d+))?\)$/i);
+    if (!match) return color;
+
+    const [, r, g, b] = match;
+    const toHex = (value: string) => {
+      const num = Math.max(0, Math.min(255, parseInt(value, 10)));
+      return num.toString(16).padStart(2, '0');
+    };
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
   confirmPreview() {
     const p = this.preview();
     if (!p || !p.value.trim()) {
       this.preview.set(null);
       return;
     }
-    this.coords.update((arr) => [...arr, p]);
+    const normalized: Coord = { ...p, color: this.normalizeColor(p.color) };
+    this.coords.update((arr) => [...arr, normalized]);
     this.preview.set(null);
     this.redrawAllForPage();
   }
@@ -130,14 +151,19 @@ export class App implements AfterViewChecked {
   }
 
   startEditing(idx: number, c: Coord) {
-    this.editing.set({ index: idx, coord: { ...c } });
+    const normalized: Coord = { ...c, color: this.normalizeColor(c.color) };
+    if (normalized.color !== c.color) {
+      this.coords.update((arr) => arr.map((item, i) => (i === idx ? normalized : item)));
+    }
+    this.editing.set({ index: idx, coord: { ...normalized } });
     this.preview.set(null);
   }
 
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
-    this.coords.update((arr) => arr.map((a, i) => (i === e.index ? e.coord : a)));
+    const normalized: Coord = { ...e.coord, color: this.normalizeColor(e.coord.color) };
+    this.coords.update((arr) => arr.map((a, i) => (i === e.index ? normalized : a)));
     this.editing.set(null);
     this.redrawAllForPage();
   }
