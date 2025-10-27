@@ -16,7 +16,8 @@
     "zoomLabel": "Zoom",
     "clear": "Esborrar",
     "copyJson": "Copiar JSON",
-    "downloadJson": "Descarregar JSON"
+    "downloadJson": "Descarregar JSON",
+    "downloadPdf": "Descarregar PDF"
   },
   "sidebar": {
     "title": "Anotacions (JSON)"

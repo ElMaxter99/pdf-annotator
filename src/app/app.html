@@ -20,7 +20,8 @@
       <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
       <button class="btn" (click)="downloadJSON()"
         [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
-      <button class="btn" (click)="downloadAnnotatedPDF()" [disabled]="!coords().length || !pdfDoc">DownloadPDF</button>
+      <button class="btn" (click)="downloadAnnotatedPDF()"
+        [disabled]="!coords().length || !pdfDoc">{{ 'controls.downloadPdf' | t }}</button>
     </div>
 
     <div class="language-selector">
