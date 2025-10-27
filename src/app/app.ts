@@ -23,7 +23,7 @@ export class App implements AfterViewChecked {
   coords = signal<Coord[]>([]);
   preview = signal<Coord | null>(null);
   editing = signal<EditState>(null);
-  private originalPdfData?: Uint8Array;
+  private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -52,9 +52,10 @@ export class App implements AfterViewChecked {
     const file = input.files?.[0];
     if (!file) return;
 
+    this.pdfByteSources.clear();
     const buf = await file.arrayBuffer();
     const typed = new Uint8Array(buf);
-    this.originalPdfData = typed.slice();
+    this.rememberPdfBytes(typed, 0);
 
     const loadingTask = pdfjsLib.getDocument({ data: typed });
     const loadedPdf = await loadingTask.promise;
@@ -62,7 +63,7 @@ export class App implements AfterViewChecked {
 
     try {
       const canonicalData = await loadedPdf.getData();
-      this.originalPdfData = canonicalData instanceof Uint8Array ? canonicalData.slice() : new Uint8Array(canonicalData);
+      this.rememberPdfBytes(canonicalData, 1);
     } catch (error) {
       console.warn('No se pudo obtener una copia canonizada del PDF cargado.', error);
     }
@@ -72,9 +73,7 @@ export class App implements AfterViewChecked {
         const sanitizedData = await loadedPdf.saveDocument();
         const typedSanitized =
           sanitizedData instanceof Uint8Array ? sanitizedData : new Uint8Array(sanitizedData);
-        if (typedSanitized.length > 0) {
-          this.originalPdfData = typedSanitized;
-        }
+        this.rememberPdfBytes(typedSanitized, 2);
       } catch (error) {
         console.warn('No se pudo sanear el PDF cargado.', error);
       }
@@ -290,7 +289,7 @@ export class App implements AfterViewChecked {
         throw new Error(`No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`);
       }
 
-      this.originalPdfData = usedBytes.slice();
+      this.rememberPdfBytes(usedBytes, 3);
       const font = await pdf.embedFont(StandardFonts.Helvetica);
 
       for (const c of this.coords()) {
@@ -325,26 +324,11 @@ export class App implements AfterViewChecked {
   }
 
   private async getPdfByteCandidates(): Promise<Uint8Array[]> {
-    const deduped = new Map<string, Uint8Array>();
-
-    const pushCandidate = (data?: Uint8Array | ArrayBuffer | null) => {
-      if (!data) return;
-      const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
-      if (!typed.length) return;
-      const head = Array.from(typed.slice(0, 16)).join(',');
-      const key = `${typed.length}:${head}`;
-      if (!deduped.has(key)) {
-        deduped.set(key, typed.slice());
-      }
-    };
-
-    pushCandidate(this.originalPdfData);
-
     if (this.pdfDoc) {
       if (typeof this.pdfDoc.saveDocument === 'function') {
         try {
           const sanitized = await this.pdfDoc.saveDocument();
-          pushCandidate(sanitized);
+          this.rememberPdfBytes(sanitized, 2);
         } catch (error) {
           console.warn('No se pudo obtener una versión saneada del PDF para exportar.', error);
         }
@@ -352,13 +336,19 @@ export class App implements AfterViewChecked {
 
       try {
         const rawData = await this.pdfDoc.getData();
-        pushCandidate(rawData);
+        this.rememberPdfBytes(rawData, 1);
       } catch (error) {
         console.warn('No se pudo obtener los bytes originales del PDF para exportar.', error);
       }
     }
 
-    return Array.from(deduped.values());
+    if (this.pdfByteSources.size === 0) {
+      return [];
+    }
+
+    return Array.from(this.pdfByteSources.values())
+      .sort((a, b) => b.weight - a.weight)
+      .map((entry) => entry.bytes.slice());
   }
 
   private toArrayBuffer(data: Uint8Array<ArrayBufferLike> | ArrayBuffer): ArrayBuffer {
@@ -368,5 +358,17 @@ export class App implements AfterViewChecked {
       return copy.buffer;
     }
     return data;
+  }
+
+  private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
+    if (!data) return;
+    const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
+    if (!typed.length) return;
+    const head = Array.from(typed.slice(0, 16)).join(',');
+    const key = `${typed.length}:${head}`;
+    const existing = this.pdfByteSources.get(key);
+    if (!existing || weight >= existing.weight) {
+      this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
+    }
   }
 }
