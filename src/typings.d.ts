@@ -7,3 +7,5 @@ declare module 'pdfjs-dist/legacy/build/pdf.worker.entry' {
   const pdfWorker: any;
   export default pdfWorker;
 }
+
+declare module 'pdf-lib';

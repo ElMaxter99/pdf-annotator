@@ -57,7 +57,15 @@ export class App implements AfterViewChecked {
     this.originalPdfData = typed.slice();
 
     const loadingTask = pdfjsLib.getDocument({ data: typed });
-    this.pdfDoc = await loadingTask.promise;
+    const loadedPdf = await loadingTask.promise;
+    this.pdfDoc = loadedPdf;
+
+    try {
+      const canonicalData = await loadedPdf.getData();
+      this.originalPdfData = canonicalData instanceof Uint8Array ? canonicalData.slice() : new Uint8Array(canonicalData);
+    } catch (error) {
+      console.warn('No se pudo obtener una copia canonizada del PDF cargado.', error);
+    }
 
     this.pageIndex.set(1);
     await this.render();
@@ -236,37 +244,50 @@ export class App implements AfterViewChecked {
   }
 
   async downloadAnnotatedPDF() {
-    if (!this.originalPdfData || !this.pdfDoc) return;
+    if (!this.pdfDoc) return;
 
-    const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
-    const pdf = await PDFDocument.load(this.originalPdfData);
-    const font = await pdf.embedFont(StandardFonts.Helvetica);
+    try {
+      const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
+      const sourceData = this.originalPdfData
+        ? this.originalPdfData.slice()
+        : new Uint8Array(await this.pdfDoc.getData());
 
-    for (const c of this.coords()) {
-      const page = pdf.getPage(c.page - 1);
-
-      const hex = c.color.replace('#', '');
-      const r = parseInt(hex.substring(0, 2), 16) / 255;
-      const g = parseInt(hex.substring(2, 4), 16) / 255;
-      const b = parseInt(hex.substring(4, 6), 16) / 255;
-
-      page.drawText(c.value, {
-        x: c.x,
-        y: c.y,
-        size: c.size,
-        color: rgb(r, g, b),
-        font,
+      const pdf = await PDFDocument.load(sourceData, {
+        ignoreEncryption: true,
+        updateMetadata: false,
+        throwOnInvalidObject: false,
       });
-    }
+      const font = await pdf.embedFont(StandardFonts.Helvetica);
 
-    const pdfBytes = await pdf.save({ useObjectStreams: false });
-    const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'annotated.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
+      for (const c of this.coords()) {
+        const page = pdf.getPage(c.page - 1);
+
+        const hex = c.color.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16) / 255;
+        const g = parseInt(hex.substring(2, 4), 16) / 255;
+        const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+        page.drawText(c.value, {
+          x: c.x,
+          y: c.y,
+          size: c.size,
+          color: rgb(r, g, b),
+          font,
+        });
+      }
+
+      const pdfBytes = await pdf.save({ useObjectStreams: false });
+      const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'annotated.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('No se pudo generar el PDF anotado.', error);
+      alert('No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.');
+    }
   }
 
   private toArrayBuffer(data: Uint8Array<ArrayBufferLike> | ArrayBuffer): ArrayBuffer {
