@@ -18,8 +18,19 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
 
-type Coord = { page: number; x: number; y: number; value: string; size: number; color: string };
-type EditState = { index: number; coord: Coord } | null;
+type PageField = {
+  x: number;
+  y: number;
+  mapField: string;
+  fontSize: number;
+  color: string;
+};
+
+type PageAnnotations = { num: number; fields: PageField[] };
+
+type PreviewState = { page: number; field: PageField } | null;
+
+type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
 
 @Component({
   selector: 'app-root',
@@ -32,8 +43,8 @@ export class App implements AfterViewChecked {
   pdfDoc: PDFDocumentProxy | null = null;
   pageIndex = signal(1);
   scale = signal(1.5);
-  coords = signal<Coord[]>([]);
-  preview = signal<Coord | null>(null);
+  coords = signal<PageAnnotations[]>([]);
+  preview = signal<PreviewState>(null);
   editing = signal<EditState>(null);
   previewHexInput = signal('#000000');
   previewRgbInput = signal('rgb(0, 0, 0)');
@@ -50,7 +61,8 @@ export class App implements AfterViewChecked {
   languageModel: Language = this.translationService.getCurrentLanguage();
 
   private dragInfo: {
-    index: number;
+    pageIndex: number;
+    fieldIndex: number;
     pointerId: number;
     startX: number;
     startY: number;
@@ -216,11 +228,13 @@ export class App implements AfterViewChecked {
     const defaultColor = '#000000';
     this.preview.set({
       page: this.pageIndex(),
-      x: pt.x,
-      y: pt.y,
-      value: '',
-      size: 14,
-      color: defaultColor,
+      field: {
+        x: pt.x,
+        y: pt.y,
+        mapField: '',
+        fontSize: 14,
+        color: defaultColor,
+      },
     });
     this.updatePreviewColorState(defaultColor);
   }
@@ -339,7 +353,9 @@ export class App implements AfterViewChecked {
     this.previewHexInput.set(value);
     const normalized = this.normalizeHexInput(value);
     if (!normalized) return;
-    this.preview.update((p) => (p ? { ...p, color: normalized } : p));
+    this.preview.update((p) =>
+      p ? { ...p, field: { ...p.field, color: normalized } } : p
+    );
     this.updatePreviewColorState(normalized);
   }
 
@@ -348,12 +364,12 @@ export class App implements AfterViewChecked {
     const rgb = this.parseRgbText(value);
     if (!rgb) return;
     const hex = this.rgbToHex(rgb);
-    this.preview.update((p) => (p ? { ...p, color: hex } : p));
+    this.preview.update((p) => (p ? { ...p, field: { ...p.field, color: hex } } : p));
     this.updatePreviewColorState(hex);
   }
 
   onPreviewColorPicker(value: string) {
-    this.preview.update((p) => (p ? { ...p, color: value } : p));
+    this.preview.update((p) => (p ? { ...p, field: { ...p.field, color: value } } : p));
     this.updatePreviewColorState(value);
   }
 
@@ -361,7 +377,7 @@ export class App implements AfterViewChecked {
     this.editHexInput.set(value);
     const normalized = this.normalizeHexInput(value);
     if (!normalized) return;
-    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: normalized } } : e));
+    this.editing.update((e) => (e ? { ...e, field: { ...e.field, color: normalized } } : e));
     this.updateEditingColorState(normalized);
   }
 
@@ -370,23 +386,26 @@ export class App implements AfterViewChecked {
     const rgb = this.parseRgbText(value);
     if (!rgb) return;
     const hex = this.rgbToHex(rgb);
-    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: hex } } : e));
+    this.editing.update((e) => (e ? { ...e, field: { ...e.field, color: hex } } : e));
     this.updateEditingColorState(hex);
   }
 
   onEditColorPicker(value: string) {
-    this.editing.update((e) => (e ? { ...e, coord: { ...e.coord, color: value } } : e));
+    this.editing.update((e) => (e ? { ...e, field: { ...e.field, color: value } } : e));
     this.updateEditingColorState(value);
   }
 
   confirmPreview() {
     const p = this.preview();
-    if (!p || !p.value.trim()) {
+    if (!p || !p.field.mapField.trim()) {
       this.preview.set(null);
       return;
     }
-    const normalized: Coord = { ...p, color: this.normalizeColor(p.color) };
-    this.coords.update((arr) => [...arr, normalized]);
+    const normalizedField: PageField = {
+      ...p.field,
+      color: this.normalizeColor(p.field.color),
+    };
+    this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
     this.preview.set(null);
     this.redrawAllForPage();
   }
@@ -395,12 +414,14 @@ export class App implements AfterViewChecked {
     this.preview.set(null);
   }
 
-  startEditing(idx: number, c: Coord) {
-    const normalized: Coord = { ...c, color: this.normalizeColor(c.color) };
-    if (normalized.color !== c.color) {
-      this.coords.update((arr) => arr.map((item, i) => (i === idx ? normalized : item)));
+  startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
+    const normalized: PageField = { ...field, color: this.normalizeColor(field.color) };
+    if (normalized.color !== field.color) {
+      this.coords.update((pages) =>
+        this.updateFieldInPages(pageIndex, fieldIndex, normalized, pages)
+      );
     }
-    this.editing.set({ index: idx, coord: { ...normalized } });
+    this.editing.set({ pageIndex, fieldIndex, field: { ...normalized } });
     this.updateEditingColorState(normalized.color);
     this.preview.set(null);
   }
@@ -408,8 +429,13 @@ export class App implements AfterViewChecked {
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
-    const normalized: Coord = { ...e.coord, color: this.normalizeColor(e.coord.color) };
-    this.coords.update((arr) => arr.map((a, i) => (i === e.index ? normalized : a)));
+    const normalized: PageField = {
+      ...e.field,
+      color: this.normalizeColor(e.field.color),
+    };
+    this.coords.update((pages) =>
+      this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
+    );
     this.editing.set(null);
     this.redrawAllForPage();
   }
@@ -437,9 +463,62 @@ export class App implements AfterViewChecked {
   deleteAnnotation() {
     const e = this.editing();
     if (!e) return;
-    this.coords.update((arr) => arr.filter((_, i) => i !== e.index));
+    this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages));
     this.editing.set(null);
     this.redrawAllForPage();
+  }
+
+  private addFieldToPages(
+    pageNum: number,
+    field: PageField,
+    pages: PageAnnotations[]
+  ): PageAnnotations[] {
+    const pageIndex = pages.findIndex((page) => page.num === pageNum);
+    if (pageIndex >= 0) {
+      return pages.map((page, idx) =>
+        idx === pageIndex ? { ...page, fields: [...page.fields, field] } : page
+      );
+    }
+    return [...pages, { num: pageNum, fields: [field] }].sort((a, b) => a.num - b.num);
+  }
+
+  private updateFieldInPages(
+    pageIndex: number,
+    fieldIndex: number,
+    field: PageField,
+    pages: PageAnnotations[]
+  ): PageAnnotations[] {
+    return pages.map((page, idx) => {
+      if (idx !== pageIndex) {
+        return page;
+      }
+      if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
+        return page;
+      }
+      const updatedFields = page.fields.map((item, itemIdx) =>
+        itemIdx === fieldIndex ? { ...field } : item
+      );
+      return { ...page, fields: updatedFields };
+    });
+  }
+
+  private removeFieldFromPages(
+    pageIndex: number,
+    fieldIndex: number,
+    pages: PageAnnotations[]
+  ): PageAnnotations[] {
+    return pages
+      .map((page, idx) => {
+        if (idx !== pageIndex) {
+          return page;
+        }
+        if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
+          return page;
+        }
+        const updatedFields = page.fields.filter((_, i) => i !== fieldIndex);
+        return { ...page, fields: updatedFields };
+      })
+      .filter((page) => page.fields.length > 0);
   }
 
   redrawAllForPage() {
@@ -455,28 +534,30 @@ export class App implements AfterViewChecked {
     if (!pdfCanvas) return;
 
     this.coords()
-      .map((coord, index) => ({ coord, index }))
-      .filter(({ coord }) => coord.page === this.pageIndex())
-      .forEach(({ coord, index }) => {
-        const left = coord.x * scale;
-        const top = pdfCanvas.height - coord.y * scale;
-        const fontSize = coord.size * scale;
+      .map((page, pageIndex) => ({ page, pageIndex }))
+      .filter(({ page }) => page.num === this.pageIndex())
+      .forEach(({ page, pageIndex }) => {
+        page.fields.forEach((field, fieldIndex) => {
+          const left = field.x * scale;
+          const top = pdfCanvas.height - field.y * scale;
 
-        const el = document.createElement('div');
-        el.className = 'annotation';
-        el.textContent = coord.value;
-        el.style.left = `${left}px`;
-        el.style.top = `${top - coord.size * scale}px`;
-        el.style.fontSize = `${coord.size * scale}px`;
-        el.style.color = coord.color;
-        el.style.fontFamily = 'Helvetica, Arial, sans-serif';
+          const el = document.createElement('div');
+          el.className = 'annotation';
+          el.textContent = field.mapField;
+          el.style.left = `${left}px`;
+          el.style.top = `${top - field.fontSize * scale}px`;
+          el.style.fontSize = `${field.fontSize * scale}px`;
+          el.style.color = field.color;
+          el.style.fontFamily = 'Helvetica, Arial, sans-serif';
 
-        el.onpointerdown = (evt) => this.handleAnnotationPointerDown(evt, index);
-        layer.appendChild(el);
+          el.onpointerdown = (evt) =>
+            this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
+          layer.appendChild(el);
+        });
       });
   }
 
-  private handleAnnotationPointerDown(evt: PointerEvent, index: number) {
+  private handleAnnotationPointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number) {
     evt.preventDefault();
     evt.stopPropagation();
     const el = evt.currentTarget as HTMLDivElement | null;
@@ -484,7 +565,8 @@ export class App implements AfterViewChecked {
 
     const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');
     this.dragInfo = {
-      index,
+      pageIndex,
+      fieldIndex,
       pointerId: evt.pointerId,
       startX: evt.clientX,
       startY: evt.clientY,
@@ -552,18 +634,20 @@ export class App implements AfterViewChecked {
     if (drag.moved) {
       const left = parseFloat(el.style.left || '0');
       const top = parseFloat(el.style.top || '0');
-      this.updateAnnotationPosition(drag.index, left, top, drag.fontSize);
+      this.updateAnnotationPosition(drag.pageIndex, drag.fieldIndex, left, top, drag.fontSize);
       this.redrawAllForPage();
     } else if (evt.type !== 'pointercancel') {
-      const coord = this.coords()[drag.index];
-      if (coord) {
-        this.startEditing(drag.index, coord);
+      const page = this.coords()[drag.pageIndex];
+      const field = page?.fields[drag.fieldIndex];
+      if (field) {
+        this.startEditing(drag.pageIndex, drag.fieldIndex, field);
       }
     }
   };
 
   private updateAnnotationPosition(
-    index: number,
+    pageIndex: number,
+    fieldIndex: number,
     leftPx: number,
     topPx: number,
     fontSizePx: number
@@ -576,8 +660,19 @@ export class App implements AfterViewChecked {
     const newX = +(boundedLeft / scale).toFixed(2);
     const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
 
-    this.coords.update((arr) =>
-      arr.map((coord, i) => (i === index ? { ...coord, x: newX, y: newY } : coord))
+    this.coords.update((pages) =>
+      pages.map((page, idx) => {
+        if (idx !== pageIndex) {
+          return page;
+        }
+        if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
+          return page;
+        }
+        const updatedFields = page.fields.map((field, fIdx) =>
+          fIdx === fieldIndex ? { ...field, x: newX, y: newY } : field
+        );
+        return { ...page, fields: updatedFields };
+      })
     );
   }
 
@@ -667,21 +762,22 @@ export class App implements AfterViewChecked {
       this.rememberPdfBytes(usedBytes, 3);
       const font = await pdf.embedFont(StandardFonts.Helvetica);
 
-      for (const c of this.coords()) {
-        const page = pdf.getPage(c.page - 1);
+      for (const pageAnnotations of this.coords()) {
+        const page = pdf.getPage(pageAnnotations.num - 1);
+        for (const field of pageAnnotations.fields) {
+          const hex = field.color.replace('#', '');
+          const r = parseInt(hex.substring(0, 2), 16) / 255;
+          const g = parseInt(hex.substring(2, 4), 16) / 255;
+          const b = parseInt(hex.substring(4, 6), 16) / 255;
 
-        const hex = c.color.replace('#', '');
-        const r = parseInt(hex.substring(0, 2), 16) / 255;
-        const g = parseInt(hex.substring(2, 4), 16) / 255;
-        const b = parseInt(hex.substring(4, 6), 16) / 255;
-
-        page.drawText(c.value, {
-          x: c.x,
-          y: c.y,
-          size: c.size,
-          color: rgb(r, g, b),
-          font,
-        });
+          page.drawText(field.mapField, {
+            x: field.x,
+            y: field.y,
+            size: field.fontSize,
+            color: rgb(r, g, b),
+            font,
+          });
+        }
       }
 
       const pdfBytes = await pdf.save({ useObjectStreams: false });

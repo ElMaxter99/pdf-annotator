@@ -49,21 +49,22 @@
       <div class="hitbox" (click)="onHitboxClick($event)"></div>
 
       <!-- NUEVA ANOTACIÓN -->
-      <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.x*scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()"
+      <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.field.x*scale()"
+        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.field.y*scale()"
         (keydown)="onEditorKeydown($event, 'preview')">
         <label class="field">
           <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
-          <input type="text" [(ngModel)]="p.value" [placeholder]="'annotation.fields.text.placeholder' | t" />
+          <input type="text" [(ngModel)]="p.field.mapField"
+            [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
-          <input type="number" [(ngModel)]="p.size" min="8" max="72" />
+          <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
         </label>
         <div class="color-section">
           <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
           <div class="color-row">
-            <input type="color" [(ngModel)]="p.color" (ngModelChange)="onPreviewColorPicker($event)" />
+            <input type="color" [(ngModel)]="p.field.color" (ngModelChange)="onPreviewColorPicker($event)" />
             <div class="color-inputs">
               <input type="text" [ngModel]="previewHexInput()" (ngModelChange)="setPreviewColorFromHex($event)"
                 [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
@@ -80,22 +81,23 @@
       </div>
 
       <!-- EDITAR ANOTACIÓN -->
-      <div *ngIf="editing() as e" class="annotation-editor editing" #editEditor [style.left.px]="e.coord.x*scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()"
+      <div *ngIf="editing() as e" class="annotation-editor editing" #editEditor [style.left.px]="e.field.x*scale()"
+        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.field.y*scale()"
         (keydown)="onEditorKeydown($event, 'edit')">
         <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
         <label class="field">
           <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
-          <input type="text" [(ngModel)]="e.coord.value" [placeholder]="'annotation.fields.text.placeholder' | t" />
+          <input type="text" [(ngModel)]="e.field.mapField"
+            [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
-          <input type="number" [(ngModel)]="e.coord.size" min="8" max="72" />
+          <input type="number" [(ngModel)]="e.field.fontSize" min="8" max="72" />
         </label>
         <div class="color-section">
           <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
           <div class="color-row">
-            <input type="color" [(ngModel)]="e.coord.color" (ngModelChange)="onEditColorPicker($event)" />
+            <input type="color" [(ngModel)]="e.field.color" (ngModelChange)="onEditColorPicker($event)" />
             <div class="color-inputs">
               <input type="text" [ngModel]="editHexInput()" (ngModelChange)="setEditColorFromHex($event)"
                 [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
