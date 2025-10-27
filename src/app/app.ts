@@ -23,7 +23,7 @@ export class App implements AfterViewChecked {
   coords = signal<Coord[]>([]);
   preview = signal<Coord | null>(null);
   editing = signal<EditState>(null);
-  private originalPdfData?: Uint8Array;
+  private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -52,12 +52,32 @@ export class App implements AfterViewChecked {
     const file = input.files?.[0];
     if (!file) return;
 
+    this.pdfByteSources.clear();
     const buf = await file.arrayBuffer();
     const typed = new Uint8Array(buf);
-    this.originalPdfData = typed.slice();
+    this.rememberPdfBytes(typed, 0);
 
     const loadingTask = pdfjsLib.getDocument({ data: typed });
-    this.pdfDoc = await loadingTask.promise;
+    const loadedPdf = await loadingTask.promise;
+    this.pdfDoc = loadedPdf;
+
+    try {
+      const canonicalData = await loadedPdf.getData();
+      this.rememberPdfBytes(canonicalData, 1);
+    } catch (error) {
+      console.warn('No se pudo obtener una copia canonizada del PDF cargado.', error);
+    }
+
+    if (typeof loadedPdf.saveDocument === 'function') {
+      try {
+        const sanitizedData = await loadedPdf.saveDocument();
+        const typedSanitized =
+          sanitizedData instanceof Uint8Array ? sanitizedData : new Uint8Array(sanitizedData);
+        this.rememberPdfBytes(typedSanitized, 2);
+      } catch (error) {
+        console.warn('No se pudo sanear el PDF cargado.', error);
+      }
+    }
 
     this.pageIndex.set(1);
     await this.render();
@@ -236,37 +256,99 @@ export class App implements AfterViewChecked {
   }
 
   async downloadAnnotatedPDF() {
-    if (!this.originalPdfData || !this.pdfDoc) return;
+    if (!this.pdfDoc) return;
 
-    const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
-    const pdf = await PDFDocument.load(this.originalPdfData);
-    const font = await pdf.embedFont(StandardFonts.Helvetica);
+    try {
+      const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
+      const loadOptions = {
+        ignoreEncryption: true,
+        updateMetadata: false,
+        throwOnInvalidObject: false,
+      } as const;
 
-    for (const c of this.coords()) {
-      const page = pdf.getPage(c.page - 1);
+      const candidates = await this.getPdfByteCandidates();
+      if (!candidates.length) {
+        throw new Error('No se encontraron bytes de PDF para procesar.');
+      }
 
-      const hex = c.color.replace('#', '');
-      const r = parseInt(hex.substring(0, 2), 16) / 255;
-      const g = parseInt(hex.substring(2, 4), 16) / 255;
-      const b = parseInt(hex.substring(4, 6), 16) / 255;
+      let pdf: any = null;
+      let usedBytes: Uint8Array | null = null;
+      const loadErrors: unknown[] = [];
 
-      page.drawText(c.value, {
-        x: c.x,
-        y: c.y,
-        size: c.size,
-        color: rgb(r, g, b),
-        font,
-      });
+      for (const candidate of candidates) {
+        try {
+          pdf = await PDFDocument.load(candidate, loadOptions);
+          usedBytes = candidate;
+          break;
+        } catch (error) {
+          loadErrors.push(error);
+        }
+      }
+
+      if (!pdf || !usedBytes) {
+        throw new Error(`No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`);
+      }
+
+      this.rememberPdfBytes(usedBytes, 3);
+      const font = await pdf.embedFont(StandardFonts.Helvetica);
+
+      for (const c of this.coords()) {
+        const page = pdf.getPage(c.page - 1);
+
+        const hex = c.color.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16) / 255;
+        const g = parseInt(hex.substring(2, 4), 16) / 255;
+        const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+        page.drawText(c.value, {
+          x: c.x,
+          y: c.y,
+          size: c.size,
+          color: rgb(r, g, b),
+          font,
+        });
+      }
+
+      const pdfBytes = await pdf.save({ useObjectStreams: false });
+      const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'annotated.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('No se pudo generar el PDF anotado.', error);
+      alert('No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.');
+    }
+  }
+
+  private async getPdfByteCandidates(): Promise<Uint8Array[]> {
+    if (this.pdfDoc) {
+      if (typeof this.pdfDoc.saveDocument === 'function') {
+        try {
+          const sanitized = await this.pdfDoc.saveDocument();
+          this.rememberPdfBytes(sanitized, 2);
+        } catch (error) {
+          console.warn('No se pudo obtener una versión saneada del PDF para exportar.', error);
+        }
+      }
+
+      try {
+        const rawData = await this.pdfDoc.getData();
+        this.rememberPdfBytes(rawData, 1);
+      } catch (error) {
+        console.warn('No se pudo obtener los bytes originales del PDF para exportar.', error);
+      }
     }
 
-    const pdfBytes = await pdf.save({ useObjectStreams: false });
-    const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'annotated.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
+    if (this.pdfByteSources.size === 0) {
+      return [];
+    }
+
+    return Array.from(this.pdfByteSources.values())
+      .sort((a, b) => b.weight - a.weight)
+      .map((entry) => entry.bytes.slice());
   }
 
   private toArrayBuffer(data: Uint8Array<ArrayBufferLike> | ArrayBuffer): ArrayBuffer {
@@ -276,5 +358,17 @@ export class App implements AfterViewChecked {
       return copy.buffer;
     }
     return data;
+  }
+
+  private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
+    if (!data) return;
+    const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
+    if (!typed.length) return;
+    const head = Array.from(typed.slice(0, 16)).join(',');
+    const key = `${typed.length}:${head}`;
+    const existing = this.pdfByteSources.get(key);
+    if (!existing || weight >= existing.weight) {
+      this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
+    }
   }
 }
