@@ -16,11 +16,16 @@
     "zoomLabel": "Zoom",
     "clear": "Limpiar",
     "copyJson": "Copiar JSON",
+    "importJson": "Importar JSON",
     "downloadJson": "Descargar JSON",
     "downloadPdf": "Descargar PDF"
   },
   "sidebar": {
-    "title": "Anotaciones (JSON)"
+    "title": "Anotaciones (JSON)",
+    "importJsonFile": "Importar desde archivo",
+    "applyJson": "Aplicar JSON",
+    "jsonPlaceholder": "Pega o edita aquí las coordenadas de anotaciones...",
+    "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
   },
   "annotation": {
     "fields": {

@@ -50,6 +50,7 @@ export class App implements AfterViewChecked {
   previewRgbInput = signal('rgb(0, 0, 0)');
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
+  coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
@@ -80,10 +81,12 @@ export class App implements AfterViewChecked {
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     this.setDocumentMetadata();
+    this.syncCoordsTextModel();
   }
 
   onLanguageChange(language: string) {
@@ -406,6 +409,7 @@ export class App implements AfterViewChecked {
       color: this.normalizeColor(p.field.color),
     };
     this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
+    this.syncCoordsTextModel();
     this.preview.set(null);
     this.redrawAllForPage();
   }
@@ -420,6 +424,7 @@ export class App implements AfterViewChecked {
       this.coords.update((pages) =>
         this.updateFieldInPages(pageIndex, fieldIndex, normalized, pages)
       );
+      this.syncCoordsTextModel();
     }
     this.editing.set({ pageIndex, fieldIndex, field: { ...normalized } });
     this.updateEditingColorState(normalized.color);
@@ -436,6 +441,7 @@ export class App implements AfterViewChecked {
     this.coords.update((pages) =>
       this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
     );
+    this.syncCoordsTextModel();
     this.editing.set(null);
     this.redrawAllForPage();
   }
@@ -464,6 +470,7 @@ export class App implements AfterViewChecked {
     const e = this.editing();
     if (!e) return;
     this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages));
+    this.syncCoordsTextModel();
     this.editing.set(null);
     this.redrawAllForPage();
   }
@@ -674,6 +681,7 @@ export class App implements AfterViewChecked {
         return { ...page, fields: updatedFields };
       })
     );
+    this.syncCoordsTextModel();
   }
 
   async prevPage() {
@@ -706,15 +714,85 @@ export class App implements AfterViewChecked {
 
   clearAll() {
     this.coords.set([]);
+    this.syncCoordsTextModel();
     this.redrawAllForPage();
   }
 
   copyJSON() {
-    navigator.clipboard.writeText(JSON.stringify(this.coords(), null, 2)).catch(() => {});
+    navigator.clipboard.writeText(this.coordsTextModel).catch(() => {});
+  }
+
+  applyCoordsText() {
+    const text = this.coordsTextModel.trim();
+
+    if (!text) {
+      this.coords.set([]);
+      this.syncCoordsTextModel();
+      this.preview.set(null);
+      this.editing.set(null);
+      this.redrawAllForPage();
+      return;
+    }
+
+    try {
+      const parsed = this.parseLooseJson(text);
+      const normalized = this.normalizeImportedCoordinates(parsed);
+
+      if (normalized === null) {
+        throw new Error('Formato no válido');
+      }
+
+      this.coords.set(normalized);
+      this.syncCoordsTextModel();
+      this.preview.set(null);
+      this.editing.set(null);
+      this.redrawAllForPage();
+    } catch (error) {
+      console.error('No se pudo importar el JSON de anotaciones.', error);
+      alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+    }
+  }
+
+  triggerImportCoords() {
+    const input = this.coordsFileInputRef?.nativeElement;
+    if (input) {
+      input.value = '';
+      input.click();
+    }
+  }
+
+  async onCoordsFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const parsed = this.parseLooseJson(text);
+      const normalized = this.normalizeImportedCoordinates(parsed);
+      if (normalized === null) {
+        throw new Error('Formato no válido');
+      }
+
+      this.coords.set(normalized);
+      this.syncCoordsTextModel();
+      this.preview.set(null);
+      this.editing.set(null);
+      this.redrawAllForPage();
+    } catch (error) {
+      console.error('No se pudo importar el JSON de anotaciones.', error);
+      alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+    } finally {
+      input.value = '';
+    }
   }
 
   downloadJSON() {
-    const blob = new Blob([JSON.stringify(this.coords(), null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ pages: this.coords() }, null, 2)], {
+      type: 'application/json',
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -843,5 +921,251 @@ export class App implements AfterViewChecked {
     if (!existing || weight >= existing.weight) {
       this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
     }
+  }
+
+  private syncCoordsTextModel() {
+    this.coordsTextModel = JSON.stringify({ pages: this.coords() }, null, 2);
+  }
+
+  private parseLooseJson(text: string): unknown {
+    try {
+      return JSON.parse(text);
+    } catch {
+      const sanitized = this.escapeMultilineStrings(text);
+      try {
+        // eslint-disable-next-line no-new-func
+        return Function('"use strict";return (' + sanitized + ')')();
+      } catch (looseError) {
+        throw looseError;
+      }
+    }
+  }
+
+  private escapeMultilineStrings(text: string): string {
+    let sanitized = '';
+    let mode: 'none' | 'single' | 'double' | 'template' = 'none';
+    let escapeNext = false;
+
+    for (let i = 0; i < text.length; i += 1) {
+      const char = text[i];
+
+      if (escapeNext) {
+        sanitized += char;
+        escapeNext = false;
+        continue;
+      }
+
+      if (mode === 'single') {
+        if (char === '\\') {
+          sanitized += char;
+          escapeNext = true;
+          continue;
+        }
+
+        if (char === '\n') {
+          sanitized += '\\n';
+          continue;
+        }
+
+        if (char === '\r') {
+          continue;
+        }
+
+        sanitized += char;
+
+        if (char === "'") {
+          mode = 'none';
+        }
+        continue;
+      }
+
+      if (mode === 'double') {
+        if (char === '\\') {
+          sanitized += char;
+          escapeNext = true;
+          continue;
+        }
+
+        if (char === '\n') {
+          sanitized += '\\n';
+          continue;
+        }
+
+        if (char === '\r') {
+          continue;
+        }
+
+        sanitized += char;
+
+        if (char === '"') {
+          mode = 'none';
+        }
+        continue;
+      }
+
+      if (mode === 'template') {
+        sanitized += char;
+
+        if (char === '\\') {
+          escapeNext = true;
+          continue;
+        }
+
+        if (char === '`') {
+          mode = 'none';
+        }
+        continue;
+      }
+
+      sanitized += char;
+
+      if (char === "'") {
+        mode = 'single';
+        continue;
+      }
+
+      if (char === '"') {
+        mode = 'double';
+        continue;
+      }
+
+      if (char === '`') {
+        mode = 'template';
+      }
+    }
+
+    return sanitized;
+  }
+
+  private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {
+    const pagesData = this.extractPagesCollection(data);
+    if (!Array.isArray(pagesData)) {
+      return null;
+    }
+
+    const normalized: PageAnnotations[] = [];
+
+    for (const rawPage of pagesData) {
+      if (!rawPage || typeof rawPage !== 'object') {
+        continue;
+      }
+
+      const pageNum = this.toFiniteNumber((rawPage as { num?: unknown }).num);
+      if (!pageNum || !Number.isInteger(pageNum) || pageNum < 1) {
+        continue;
+      }
+
+      const rawFields = (rawPage as { fields?: unknown }).fields;
+      if (!Array.isArray(rawFields)) {
+        continue;
+      }
+
+      const fields: PageField[] = [];
+
+      for (const rawField of rawFields) {
+        if (!rawField || typeof rawField !== 'object') {
+          continue;
+        }
+
+        const { x, y, mapField, fontSize, color, value } = rawField as Record<string, unknown>;
+
+        const normalizedMapField =
+          this.normalizeFieldText(mapField) ?? this.normalizeFieldText(value);
+        const normalizedX = this.toFiniteNumber(x);
+        const normalizedY = this.toFiniteNumber(y);
+
+        if (normalizedMapField === null || normalizedX === null || normalizedY === null) {
+          continue;
+        }
+
+        const normalizedFontSize = this.toFiniteNumber(fontSize);
+        const normalizedColor =
+          typeof color === 'string' && color.trim() ? color.trim() : '#000000';
+
+        const normalizedField: PageField = {
+          x: Math.round(normalizedX * 100) / 100,
+          y: Math.round(normalizedY * 100) / 100,
+          mapField: normalizedMapField,
+          fontSize:
+            normalizedFontSize && normalizedFontSize > 0
+              ? Math.round(normalizedFontSize * 100) / 100
+              : 14,
+          color: this.normalizeColor(normalizedColor),
+        };
+
+        fields.push(normalizedField);
+      }
+
+      if (fields.length) {
+        normalized.push({ num: pageNum, fields });
+      }
+    }
+
+    normalized.sort((a, b) => a.num - b.num);
+    return normalized;
+  }
+
+  private extractPagesCollection(data: unknown): unknown {
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (data && typeof data === 'object') {
+      const maybePages = (data as { pages?: unknown }).pages;
+      if (Array.isArray(maybePages)) {
+        return maybePages;
+      }
+    }
+
+    return null;
+  }
+
+  private toFiniteNumber(value: unknown): number | null {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null;
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return null;
+      }
+      const parsed = Number(trimmed);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+  }
+
+  private normalizeFieldText(value: unknown): string | null {
+    let source: string | null = null;
+
+    if (typeof value === 'string') {
+      source = value;
+    } else if (typeof value === 'number' && Number.isFinite(value)) {
+      source = String(value);
+    } else if (typeof value === 'boolean') {
+      source = value ? 'true' : 'false';
+    }
+
+    if (!source) {
+      return null;
+    }
+
+    const collapsed = source
+      .replace(/\r\n?/g, '\n')
+      .replace(/\n+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!collapsed) {
+      return null;
+    }
+
+    if (/[\.\[\]]/.test(collapsed)) {
+      return collapsed.replace(/\s*([\.\[\]])\s*/g, '$1');
+    }
+
+    return collapsed;
   }
 }

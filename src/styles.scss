@@ -126,12 +126,38 @@ header .logo {
     color: var(--accent);
   }
 
-  .json {
-    font-family: monospace;
-    font-size: .85rem;
-    white-space: pre-wrap;
-    word-break: break-word;
+  .sidebar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .json-editor {
+    width: 100%;
+    min-height: 220px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #1d1d2a;
     color: var(--text);
+    padding: 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    resize: vertical;
+  }
+
+  .json-editor:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
+  }
+
+  .sidebar-hint {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.4;
   }
 }
 

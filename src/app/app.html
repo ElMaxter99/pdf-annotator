@@ -5,6 +5,13 @@
     <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="input-file" />
 
     <div class="controls">
+      <input
+        #coordsFileInput
+        type="file"
+        accept="application/json"
+        (change)="onCoordsFileSelected($event)"
+        hidden
+      />
       <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">◀
         {{ 'controls.prev' | t }}</button>
       <span
@@ -37,7 +44,21 @@
   <!-- LATERAL SIDEBAR -->
   <aside class="sidebar">
     <h4>{{ 'sidebar.title' | t }}</h4>
-    <pre class="json">{{ coords() | json }}</pre>
+    <div class="sidebar-actions">
+      <button type="button" class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">
+        {{ 'sidebar.importJsonFile' | t }}
+      </button>
+      <button type="button" class="btn" (click)="applyCoordsText()">
+        {{ 'sidebar.applyJson' | t }}
+      </button>
+    </div>
+    <textarea
+      class="json-editor"
+      [(ngModel)]="coordsTextModel"
+      [placeholder]="'sidebar.jsonPlaceholder' | t"
+      spellcheck="false"
+    ></textarea>
+    <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
   </aside>
 
   <!-- VISOR PDF -->
