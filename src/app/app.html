@@ -1,27 +1,37 @@
 <div class="app">
   <!-- HEADER -->
   <header class="header">
-    <div class="logo">PDF Annotator</div>
+    <div class="logo">{{ 'app.title' | t }}</div>
     <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="input-file" />
 
     <div class="controls">
-      <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">◀ Prev</button>
-      <span class="page-indicator">Page {{ pageIndex() }} / {{ pageCount || 0 }}</span>
-      <button class="btn" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">Next ▶</button>
+      <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">◀ {{ 'controls.prev' | t }}</button>
+      <span class="page-indicator">{{ 'controls.pageIndicator' | t : { current: pageIndex(), total: pageCount || 0 } }}</span>
+      <button class="btn" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">{{ 'controls.next' | t }} ▶</button>
 
       <button class="btn" (click)="zoomOut()" [disabled]="!pdfDoc">−</button>
-      <span class="page-indicator">Zoom {{ scale() | number:'1.0-2' }}×</span>
+      <span class="page-indicator">{{ 'controls.zoomLabel' | t }} {{ scale() | number:'1.0-2' }}×</span>
       <button class="btn" (click)="zoomIn()" [disabled]="!pdfDoc">+</button>
 
-      <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">Clear</button>
-      <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">Copy JSON</button>
-      <button class="btn" (click)="downloadJSON()" [disabled]="!coords().length">Download JSON</button>
+      <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">{{ 'controls.clear' | t }}</button>
+      <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
+      <button class="btn" (click)="downloadJSON()" [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
+    </div>
+
+    <div class="language-selector">
+      <label for="language-select">{{ 'app.languageLabel' | t }}</label>
+      <select id="language-select"
+        [(ngModel)]="languageModel"
+        (ngModelChange)="onLanguageChange($event)"
+        [attr.aria-label]="'app.languageAriaLabel' | t">
+        <option *ngFor="let lang of languages" [value]="lang">{{ ('app.languages.' + lang) | t }}</option>
+      </select>
     </div>
   </header>
 
   <!-- LATERAL SIDEBAR -->
   <aside class="sidebar">
-    <h4>Anotaciones (JSON)</h4>
+    <h4>{{ 'sidebar.title' | t }}</h4>
     <pre class="json">{{ coords() | json }}</pre>
   </aside>
 
@@ -38,26 +48,25 @@
         [style.top.px]="pdfCanvasRef!.nativeElement.height - p.y*scale()"
         (keydown)="onEditorKeydown($event, 'preview')">
         <label class="field">
-          <span class="field-label">Texto</span>
-          <input type="text" [(ngModel)]="p.value" placeholder="Texto..." />
+          <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+          <input type="text" [(ngModel)]="p.value" [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
         <label class="field field-small">
-          <span class="field-label">Tamaño</span>
+          <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
           <input type="number" [(ngModel)]="p.size" min="8" max="72" />
         </label>
         <div class="color-section">
-          <span class="field-label">Color</span>
+          <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
           <div class="color-row">
             <input type="color" [(ngModel)]="p.color" (ngModelChange)="onPreviewColorPicker($event)" />
             <div class="color-inputs">
               <input type="text" [ngModel]="previewHexInput()" (ngModelChange)="setPreviewColorFromHex($event)"
-                [ngModelOptions]="{ standalone: true }" placeholder="#5eead4" />
+                [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
               <input type="text" [ngModel]="previewRgbInput()" (ngModelChange)="setPreviewColorFromRgb($event)"
-                [ngModelOptions]="{ standalone: true }" placeholder="rgb(94, 234, 212)" />
+                [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
             </div>
           </div>
-          <small class="color-hint">Selecciona un color, escribe un HEX o un RGB. El JSON siempre exportará el color en
-            HEX.</small>
+          <small class="color-hint">{{ 'annotation.color.hintPreview' | t }}</small>
         </div>
         <div class="editor-actions">
           <button (click)="confirmPreview()">✅</button>
@@ -69,27 +78,27 @@
       <div *ngIf="editing() as e" class="annotation-editor editing" #editEditor [style.left.px]="e.coord.x*scale()"
         [style.top.px]="pdfCanvasRef!.nativeElement.height - e.coord.y*scale()"
         (keydown)="onEditorKeydown($event, 'edit')">
-        <span class="editor-badge">Editando</span>
+        <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
         <label class="field">
-          <span class="field-label">Texto</span>
-          <input type="text" [(ngModel)]="e.coord.value" placeholder="Texto..." />
+          <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+          <input type="text" [(ngModel)]="e.coord.value" [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
         <label class="field field-small">
-          <span class="field-label">Tamaño</span>
+          <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
           <input type="number" [(ngModel)]="e.coord.size" min="8" max="72" />
         </label>
         <div class="color-section">
-          <span class="field-label">Color</span>
+          <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
           <div class="color-row">
             <input type="color" [(ngModel)]="e.coord.color" (ngModelChange)="onEditColorPicker($event)" />
             <div class="color-inputs">
               <input type="text" [ngModel]="editHexInput()" (ngModelChange)="setEditColorFromHex($event)"
-                [ngModelOptions]="{ standalone: true }" placeholder="#5eead4" />
+                [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
               <input type="text" [ngModel]="editRgbInput()" (ngModelChange)="setEditColorFromRgb($event)"
-                [ngModelOptions]="{ standalone: true }" placeholder="rgb(94, 234, 212)" />
+                [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
             </div>
           </div>
-          <small class="color-hint">Puedes pegar un HEX o un RGB existente para reutilizar colores exactos.</small>
+          <small class="color-hint">{{ 'annotation.color.hintEdit' | t }}</small>
         </div>
         <div class="editor-actions">
           <button (click)="confirmEdit()">✅</button>
@@ -101,7 +110,6 @@
   </main>
 
   <main class="viewer empty" *ngIf="!pdfDoc">
-    <p class="empty-text">Sube un PDF y haz click donde quieras añadir anotaciones. Edítalas en la vista previa antes de
-      confirmar ✅.</p>
+    <p class="empty-text">{{ 'viewer.emptyMessage' | t }}</p>
   </main>
 </div>

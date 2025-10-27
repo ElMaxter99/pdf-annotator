@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, signal, AfterViewChecked, HostListener } from '@angular/core';
+import { Component, ElementRef, ViewChild, signal, AfterViewChecked, HostListener, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import { TranslationPipe } from './i18n/translation.pipe';
+import { Language, TranslationService } from './i18n/translation.service';
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
 
@@ -13,7 +15,7 @@ type EditState = { index: number; coord: Coord } | null;
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslationPipe],
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked {
@@ -27,6 +29,9 @@ export class App implements AfterViewChecked {
   previewRgbInput = signal('rgb(0, 0, 0)');
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
+  private readonly translationService = inject(TranslationService);
+  readonly languages: readonly Language[] = this.translationService.supportedLanguages;
+  languageModel: Language = this.translationService.getCurrentLanguage();
 
   private dragInfo: {
     index: number;
@@ -50,6 +55,11 @@ export class App implements AfterViewChecked {
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
+  }
+
+  onLanguageChange(language: string) {
+    this.translationService.setLanguage(language as Language);
+    this.languageModel = this.translationService.getCurrentLanguage();
   }
 
   ngAfterViewChecked() {
