@@ -72,20 +72,28 @@ export class App implements AfterViewChecked {
   }
 
   onEditorKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
-    if (event.key === 'Enter') {
+    const triggerAction = (action: 'confirm' | 'cancel') => {
       event.preventDefault();
-      if (mode === 'preview') {
-        this.confirmPreview();
-      } else {
-        this.confirmEdit();
-      }
-    } else if (event.key === 'Escape') {
-      event.preventDefault();
-      if (mode === 'preview') {
-        this.cancelPreview();
-      } else {
-        this.cancelEdit();
-      }
+      this.invokeEditorAction(mode, action);
+    };
+
+    switch (event.key) {
+      case 'Enter':
+        triggerAction('confirm');
+        break;
+      case 'Escape':
+        triggerAction('cancel');
+        break;
+      default:
+        break;
+    }
+  }
+
+  private invokeEditorAction(mode: 'preview' | 'edit', action: 'confirm' | 'cancel') {
+    if (mode === 'preview') {
+      action === 'confirm' ? this.confirmPreview() : this.cancelPreview();
+    } else {
+      action === 'confirm' ? this.confirmEdit() : this.cancelEdit();
     }
   }
 
