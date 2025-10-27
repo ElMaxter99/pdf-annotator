@@ -46,17 +46,45 @@ export class App implements AfterViewChecked {
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
 
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
   }
 
   ngAfterViewChecked() {
-    const previewEl = this.previewEditorRef?.nativeElement;
-    if (previewEl) {
-      const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement;
-      if (input) {
-        input.focus();
+    if (this.preview()) {
+      const previewEl = this.previewEditorRef?.nativeElement;
+      if (previewEl) {
+        const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement | null;
+        input?.focus();
+      }
+      return;
+    }
+
+    if (this.editing()) {
+      const editEl = this.editEditorRef?.nativeElement;
+      if (editEl) {
+        const input = editEl.querySelector('input[type="text"]') as HTMLInputElement | null;
+        input?.focus();
+      }
+    }
+  }
+
+  onEditorKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      if (mode === 'preview') {
+        this.confirmPreview();
+      } else {
+        this.confirmEdit();
+      }
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      if (mode === 'preview') {
+        this.cancelPreview();
+      } else {
+        this.cancelEdit();
       }
     }
   }
