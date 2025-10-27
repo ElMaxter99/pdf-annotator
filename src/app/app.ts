@@ -260,12 +260,21 @@ export class App implements AfterViewChecked {
     }
 
     const pdfBytes = await pdf.save({ useObjectStreams: false });
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'annotated.pdf';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  private toArrayBuffer(data: Uint8Array<ArrayBufferLike> | ArrayBuffer): ArrayBuffer {
+    if (data instanceof Uint8Array) {
+      const copy = new Uint8Array(data.byteLength);
+      copy.set(data);
+      return copy.buffer;
+    }
+    return data;
   }
 }
