@@ -11,7 +11,6 @@ import {
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
-import type { PDFFont } from 'pdf-lib';
 import { Meta, Title } from '@angular/platform-browser';
 import { TranslationPipe } from './i18n/translation.pipe';
 import { Language, TranslationService } from './i18n/translation.service';
@@ -957,7 +956,7 @@ export class App implements AfterViewChecked {
       }
 
       this.rememberPdfBytes(usedBytes, 3);
-      const fontCache = new Map<PdfFontKey, PDFFont>();
+      const fontCache = new Map<PdfFontKey, unknown>();
       const loadFont = async (fontKey: PdfFontKey) => {
         if (!fontCache.has(fontKey)) {
           const embedded = await pdf.embedFont(StandardFonts[fontKey]);
