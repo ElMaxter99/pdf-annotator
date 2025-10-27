@@ -16,6 +16,7 @@
     "zoomLabel": "Zoom",
     "clear": "Clear",
     "copyJson": "Copy JSON",
+    "importJson": "Import JSON",
     "downloadJson": "Download JSON",
     "downloadPdf": "Download PDF"
   },

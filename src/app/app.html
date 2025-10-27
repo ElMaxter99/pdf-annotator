@@ -5,6 +5,13 @@
     <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="input-file" />
 
     <div class="controls">
+      <input
+        #coordsFileInput
+        type="file"
+        accept="application/json"
+        (change)="onCoordsFileSelected($event)"
+        hidden
+      />
       <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">◀
         {{ 'controls.prev' | t }}</button>
       <span
@@ -18,6 +25,7 @@
 
       <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">{{ 'controls.clear' | t }}</button>
       <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
+      <button class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">{{ 'controls.importJson' | t }}</button>
       <button class="btn" (click)="downloadJSON()"
         [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
       <button class="btn" (click)="downloadAnnotatedPDF()"

@@ -80,6 +80,7 @@ export class App implements AfterViewChecked {
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
@@ -713,6 +714,41 @@ export class App implements AfterViewChecked {
     navigator.clipboard.writeText(JSON.stringify(this.coords(), null, 2)).catch(() => {});
   }
 
+  triggerImportCoords() {
+    const input = this.coordsFileInputRef?.nativeElement;
+    if (input) {
+      input.value = '';
+      input.click();
+    }
+  }
+
+  async onCoordsFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const normalized = this.normalizeImportedCoordinates(parsed);
+      if (normalized === null) {
+        throw new Error('Formato no válido');
+      }
+
+      this.coords.set(normalized);
+      this.preview.set(null);
+      this.editing.set(null);
+      this.redrawAllForPage();
+    } catch (error) {
+      console.error('No se pudo importar el JSON de anotaciones.', error);
+      alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+    } finally {
+      input.value = '';
+    }
+  }
+
   downloadJSON() {
     const blob = new Blob([JSON.stringify(this.coords(), null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -843,5 +879,77 @@ export class App implements AfterViewChecked {
     if (!existing || weight >= existing.weight) {
       this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
     }
+  }
+
+  private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {
+    if (!Array.isArray(data)) {
+      return null;
+    }
+
+    const normalized: PageAnnotations[] = [];
+
+    for (const rawPage of data) {
+      if (!rawPage || typeof rawPage !== 'object') {
+        continue;
+      }
+
+      const pageNum = Number((rawPage as { num?: unknown }).num);
+      if (!Number.isInteger(pageNum) || pageNum < 1) {
+        continue;
+      }
+
+      const rawFields = (rawPage as { fields?: unknown }).fields;
+      if (!Array.isArray(rawFields)) {
+        continue;
+      }
+
+      const fields: PageField[] = [];
+
+      for (const rawField of rawFields) {
+        if (!rawField || typeof rawField !== 'object') {
+          continue;
+        }
+
+        const { x, y, mapField, fontSize, color } = rawField as {
+          x?: unknown;
+          y?: unknown;
+          mapField?: unknown;
+          fontSize?: unknown;
+          color?: unknown;
+        };
+
+        if (
+          typeof mapField !== 'string' ||
+          !mapField.trim() ||
+          typeof color !== 'string' ||
+          typeof x !== 'number' ||
+          typeof y !== 'number' ||
+          typeof fontSize !== 'number' ||
+          !Number.isFinite(x) ||
+          !Number.isFinite(y) ||
+          !Number.isFinite(fontSize) ||
+          fontSize <= 0
+        ) {
+          continue;
+        }
+
+        const normalizedField: PageField = {
+          x: Math.round(x * 100) / 100,
+          y: Math.round(y * 100) / 100,
+          mapField: mapField.trim(),
+          fontSize: Math.round(fontSize * 100) / 100,
+          color: this.normalizeColor(color),
+        };
+
+        fields.push(normalizedField);
+      }
+
+      if (fields.length) {
+        normalized.push({ num: pageNum, fields });
+      }
+    }
+
+    normalized.sort((a, b) => a.num - b.num);
+    return normalized;
   }
 }
