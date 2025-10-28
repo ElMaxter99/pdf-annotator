@@ -10,4 +10,5 @@ public/fonts/poppins/Poppins-Regular.woff2
 public/fonts/poppins/Poppins-Regular.woff
 ```
 
-Add or update entries in `FONT_OPTIONS` to expose new fonts in the UI.
+Add or update entries in `FONT_ASSETS` to expose new fonts in the UI. Each entry's `files`
+array must match the filenames you place inside the corresponding folder.

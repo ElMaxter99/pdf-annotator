@@ -375,7 +375,9 @@ export function createFontStyleSheet(): string {
       }
     }
 
-    css.push(`.annotation[data-font='${option.id}'] { font-family: ${option.family}; }`);
+    css.push(
+      `.annotation[data-font='${option.id}'] { --annotation-font-family: ${option.family}; font-family: ${option.family}; }`
+    );
   }
 
   return css.join('\n');

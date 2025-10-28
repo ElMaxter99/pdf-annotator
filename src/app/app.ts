@@ -20,7 +20,6 @@ import {
   FONT_OPTIONS,
   FontOption,
   ensureFontStyles,
-  getFontFamily,
   normalizeFontType as normalizeFontTypeOption,
   resolveFontOption as resolveFontOptionOption,
   shouldPersistFontType,
@@ -693,7 +692,6 @@ export class App implements AfterViewChecked {
           const left = field.x * scale;
           const top = pdfCanvas.height - field.y * scale;
           const normalizedFontType = normalizeFontTypeOption(field.fontType);
-          const fontFamily = getFontFamily(normalizedFontType);
 
           const el = document.createElement('div');
           el.className = 'annotation';
@@ -702,8 +700,7 @@ export class App implements AfterViewChecked {
           el.style.top = `${top - field.fontSize * scale}px`;
           el.style.fontSize = `${field.fontSize * scale}px`;
           el.style.color = field.color;
-          el.style.fontFamily = fontFamily;
-          el.dataset['font'] = normalizedFontType;
+          el.setAttribute('data-font', normalizedFontType);
 
           el.onpointerdown = (evt) =>
             this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);

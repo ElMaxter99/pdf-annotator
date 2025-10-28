@@ -259,7 +259,7 @@ header .logo {
   border-radius: 4px;
   white-space: nowrap;
   transition: .2s;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--annotation-font-family, Helvetica, Arial, sans-serif);
   font-weight: normal;
   letter-spacing: 0;
   line-height: 1;
