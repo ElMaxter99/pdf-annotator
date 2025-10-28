@@ -615,7 +615,7 @@ export class App implements AfterViewChecked {
           el.style.fontSize = `${field.fontSize * scale}px`;
           el.style.color = field.color;
           el.style.fontFamily = fontFamily;
-          el.dataset.font = normalizedFontType;
+          el.dataset['font'] = normalizedFontType;
 
           el.onpointerdown = (evt) =>
             this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
