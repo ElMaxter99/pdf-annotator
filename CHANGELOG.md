@@ -1,3 +1,11 @@
+## [v1.0.1] - 2025-10-28
+### Added
+- Improving Open Graph
+- Expand README usage guide
+
+### Fix
+- Fix PDF.js worker selection for older Chrome (Issue in Chrome 113)
+
 ## [v1.0.0] - 2025-10-27
 ### Added
 - Add @vercel/analytics integration to enhance tracking capabilities

@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">PDF Annotator – Crea coordenadas precisas en segundos</title>
+  <desc id="desc">Composición que muestra un documento PDF con áreas resaltadas y una barra lateral que explica los pasos para anotar y exportar coordenadas.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#101637" />
+      <stop offset="55%" stop-color="#1a2758" />
+      <stop offset="100%" stop-color="#080b1a" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff7a18" />
+      <stop offset="100%" stop-color="#af002d" />
+    </linearGradient>
+    <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#68d8ff" />
+      <stop offset="100%" stop-color="#36a9ff" />
+    </linearGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9c6dff" />
+      <stop offset="100%" stop-color="#5a3cff" />
+    </linearGradient>
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.35" />
+    </filter>
+    <pattern id="grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M20 0H0V20" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect width="1200" height="630" fill="url(#grid)" />
+
+  <g transform="translate(120 90)" filter="url(#soft-shadow)">
+    <rect width="640" height="450" rx="28" ry="28" fill="#f7f9ff" />
+    <rect x="48" y="68" width="544" height="320" rx="22" ry="22" fill="#ffffff" stroke="#d6deff" stroke-width="3" />
+    <g fill="none" stroke="url(#accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="18 18">
+      <rect x="116" y="132" width="160" height="96" rx="22" ry="22" />
+      <rect x="328" y="214" width="178" height="98" rx="22" ry="22" />
+    </g>
+    <g opacity="0.72" fill="#1a2758">
+      <rect x="116" y="102" width="210" height="14" rx="7" />
+      <rect x="116" y="250" width="140" height="12" rx="6" />
+      <rect x="328" y="184" width="190" height="14" rx="7" />
+      <rect x="328" y="330" width="160" height="12" rx="6" />
+      <rect x="180" y="312" width="210" height="12" rx="6" />
+    </g>
+    <g transform="translate(470 80)">
+      <rect x="0" y="0" width="90" height="34" rx="17" ry="17" fill="#101637" opacity="0.12" />
+      <circle cx="24" cy="17" r="6" fill="#ff8976" />
+      <circle cx="44" cy="17" r="6" fill="#ffc85c" />
+      <circle cx="64" cy="17" r="6" fill="#8fe388" />
+    </g>
+    <g transform="translate(80 392)">
+      <rect width="160" height="14" rx="7" fill="#d6deff" />
+      <rect x="190" width="110" height="14" rx="7" fill="#d6deff" opacity="0.6" />
+      <rect x="320" width="90" height="14" rx="7" fill="#d6deff" opacity="0.3" />
+    </g>
+  </g>
+
+  <g transform="translate(820 120)">
+    <rect width="260" height="80" rx="18" ry="18" fill="#141f45" stroke="rgba(255,255,255,0.1)" />
+    <text x="30" y="48" fill="#7cd7ff" font-size="30" font-family="'Inter', 'Segoe UI', sans-serif" letter-spacing="0.18em">PDF ANNOTATOR</text>
+  </g>
+
+  <g transform="translate(820 230)">
+    <text x="0" y="0" fill="#ffffff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="58" font-weight="700">Anota PDFs en</text>
+    <text x="0" y="70" fill="#ffffff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="58" font-weight="700">modo visual</text>
+  </g>
+
+  <g transform="translate(820 360)">
+    <text x="0" y="0" fill="#dbe6ff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="26" font-weight="400">
+      Define regiones, lee coordenadas y
+    </text>
+    <text x="0" y="40" fill="#dbe6ff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="26" font-weight="400">
+      exporta datos listos para automatizar.
+    </text>
+  </g>
+
+  <g transform="translate(820 450)" font-family="'Inter', 'Segoe UI', sans-serif" font-size="22" fill="#f7f9ff" letter-spacing="0.03em">
+    <g transform="translate(0 0)">
+      <circle cx="20" cy="20" r="20" fill="url(#aqua)" />
+      <text x="20" y="28" text-anchor="middle" font-weight="700">1</text>
+      <text x="60" y="18" font-weight="600">Carga tu PDF</text>
+      <text x="60" y="45" opacity="0.7">Ve cada página al instante.</text>
+    </g>
+    <g transform="translate(0 90)">
+      <circle cx="20" cy="20" r="20" fill="url(#purple)" />
+      <text x="20" y="28" text-anchor="middle" font-weight="700">2</text>
+      <text x="60" y="18" font-weight="600">Traza regiones</text>
+      <text x="60" y="45" opacity="0.7">Arrastra y ajusta con precisión.</text>
+    </g>
+    <g transform="translate(0 180)">
+      <circle cx="20" cy="20" r="20" fill="url(#accent)" />
+      <text x="20" y="28" text-anchor="middle" font-weight="700">3</text>
+      <text x="60" y="18" font-weight="600">Exporta coordenadas</text>
+      <text x="60" y="45" opacity="0.7">Genera datos listos para tu pipeline.</text>
+    </g>
+  </g>
+</svg>
