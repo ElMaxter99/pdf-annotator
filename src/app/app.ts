@@ -15,67 +15,50 @@ import { Meta, Title } from '@angular/platform-browser';
 import { TranslationPipe } from './i18n/translation.pipe';
 import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
+import './promise-with-resolvers.polyfill';
 
-const PDF_WORKER_CLASSIC_SRC = '/assets/pdfjs/pdf.worker.min.js';
-const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.min.mjs';
-const PDF_WORKER_TYPE_CLASSIC = 'classic';
+const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
 
-function detectModuleWorkerWithResolversSupport(): Promise<boolean> {
+function supportsModuleWorkers(): boolean {
   if (
     typeof Worker === 'undefined' ||
     typeof Blob === 'undefined' ||
     typeof URL === 'undefined' ||
     typeof URL.createObjectURL !== 'function'
   ) {
-    return Promise.resolve(false);
+    return false;
   }
 
-  const promiseConstructor = Promise as PromiseConstructor & {
-    withResolvers?: unknown;
-  };
-
-  if (typeof promiseConstructor.withResolvers !== 'function') {
-    return Promise.resolve(false);
-  }
+  let url: string | null = null;
 
   try {
-    const workerScript = `self.postMessage(typeof Promise.withResolvers === 'function');`;
-    const blob = new Blob([workerScript], { type: 'application/javascript' });
-    const url = URL.createObjectURL(blob);
-
-    return new Promise((resolve) => {
-      const tester = new Worker(url, { type: 'module' });
-
-      const cleanup = () => {
-        tester.terminate();
-        URL.revokeObjectURL(url);
-      };
-
-      tester.onmessage = (event) => {
-        cleanup();
-        resolve(Boolean(event.data));
-      };
-
-      tester.onerror = () => {
-        cleanup();
-        resolve(false);
-      };
-    });
+    const blob = new Blob([''], { type: 'application/javascript' });
+    url = URL.createObjectURL(blob);
+    const tester = new Worker(url, { type: 'module' });
+    tester.terminate();
+    return true;
   } catch {
-    return Promise.resolve(false);
+    return false;
+  } finally {
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
   }
 }
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = PDF_WORKER_CLASSIC_SRC;
-(pdfjsLib as any).GlobalWorkerOptions.workerType = PDF_WORKER_TYPE_CLASSIC;
+const workerOptions = (pdfjsLib as any).GlobalWorkerOptions as {
+  workerSrc?: string;
+  workerType?: string;
+};
 
-void detectModuleWorkerWithResolversSupport().then((supported) => {
-  if (supported) {
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = PDF_WORKER_MODULE_SRC;
-    (pdfjsLib as any).GlobalWorkerOptions.workerType = PDF_WORKER_TYPE_MODULE;
-  }
-});
+if (supportsModuleWorkers()) {
+  workerOptions.workerSrc = PDF_WORKER_MODULE_SRC;
+  workerOptions.workerType = PDF_WORKER_TYPE_MODULE;
+} else {
+  workerOptions.workerSrc = undefined;
+  workerOptions.workerType = undefined;
+}
 
 type PageField = {
   x: number;
