@@ -33,6 +33,11 @@
         "label": "Text",
         "placeholder": "Text..."
       },
+      "font": {
+        "label": "Tipus de lletra",
+        "searchPlaceholder": "Cerca fonts...",
+        "noResults": "No s'han trobat fonts"
+      },
       "size": {
         "label": "Mida"
       },

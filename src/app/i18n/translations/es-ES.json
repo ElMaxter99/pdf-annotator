@@ -33,6 +33,11 @@
         "label": "Texto",
         "placeholder": "Texto..."
       },
+      "font": {
+        "label": "Fuente",
+        "searchPlaceholder": "Buscar fuentes...",
+        "noResults": "No se encontraron fuentes"
+      },
       "size": {
         "label": "Tamaño"
       },
