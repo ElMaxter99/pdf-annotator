@@ -11,12 +11,17 @@ export interface FontFaceConfig {
   readonly sources: readonly FontSource[];
 }
 
+export interface FontRemoteConfig {
+  readonly stylesheet: string;
+}
+
 export interface FontOption {
   readonly id: string;
   readonly label: string;
   readonly family: string;
   readonly searchTerms: readonly string[];
   readonly face?: FontFaceConfig;
+  readonly remote?: FontRemoteConfig;
 }
 
 export interface FontAsset {
@@ -316,6 +321,7 @@ function createSearchTerms(asset: FontAsset): string[] {
 
 function createFontOption(asset: FontAsset): FontOption {
   const sources = createFontSources(asset);
+  const remote = createRemoteConfig(asset);
   return {
     id: asset.folder,
     label: asset.name,
@@ -326,6 +332,7 @@ function createFontOption(asset: FontAsset): FontOption {
       display: 'swap',
       sources,
     },
+    remote,
   };
 }
 
@@ -420,4 +427,53 @@ export function ensureFontStyles(doc: Document | null = typeof document !== 'und
   styleEl.id = STYLE_ELEMENT_ID;
   styleEl.textContent = createFontStyleSheet(doc);
   doc.head.appendChild(styleEl);
+}
+
+const REMOTE_LINK_ID = 'annotation-fonts-remote';
+
+function encodeGoogleFamily(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/g)
+    .filter(Boolean)
+    .map((part) => part.replace(/[^A-Za-z0-9]/g, '').trim())
+    .filter(Boolean)
+    .join('+');
+}
+
+function createRemoteConfig(asset: FontAsset): FontRemoteConfig | undefined {
+  const family = encodeGoogleFamily(asset.name);
+  if (!family) {
+    return undefined;
+  }
+  return {
+    stylesheet: `https://fonts.googleapis.com/css2?family=${family}:wght@400&display=swap`,
+  };
+}
+
+const REMOTE_STYLESHEET_URL = (() => {
+  const families = FONT_ASSETS.map((asset) => encodeGoogleFamily(asset.name)).filter(Boolean);
+  if (!families.length) {
+    return null;
+  }
+  const unique = Array.from(new Set(families));
+  const query = unique.map((family) => `family=${family}:wght@400`).join('&');
+  return `https://fonts.googleapis.com/css2?${query}&display=swap`;
+})();
+
+export function ensureRemoteFontStyles(
+  doc: Document | null = typeof document !== 'undefined' ? document : null
+) {
+  if (!doc || !REMOTE_STYLESHEET_URL) {
+    return;
+  }
+  if (doc.getElementById(REMOTE_LINK_ID)) {
+    return;
+  }
+  const linkEl = doc.createElement('link');
+  linkEl.id = REMOTE_LINK_ID;
+  linkEl.rel = 'stylesheet';
+  linkEl.href = REMOTE_STYLESHEET_URL;
+  linkEl.crossOrigin = 'anonymous';
+  doc.head.appendChild(linkEl);
 }

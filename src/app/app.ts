@@ -20,6 +20,7 @@ import {
   FONT_OPTIONS,
   FontOption,
   ensureFontStyles,
+  ensureRemoteFontStyles,
   normalizeFontType as normalizeFontTypeOption,
   resolveFontOption as resolveFontOptionOption,
   shouldPersistFontType,
@@ -103,6 +104,7 @@ export class App implements AfterViewChecked {
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
   private fontDataCache = new Map<string, Uint8Array | null>();
+  private fontRemoteSourceCache = new Map<string, readonly string[]>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -119,6 +121,7 @@ export class App implements AfterViewChecked {
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     ensureFontStyles();
+    ensureRemoteFontStyles();
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
   }
@@ -1099,12 +1102,66 @@ export class App implements AfterViewChecked {
       }
     }
 
+    const remoteSources = await this.getRemoteFontUrls(option);
+    for (const url of remoteSources) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          continue;
+        }
+        const buffer = await response.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        this.fontDataCache.set(option.id, bytes);
+        return bytes;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
     if (lastError) {
       console.warn(`No se pudo cargar la fuente personalizada "${option.id}".`, lastError);
     }
 
     this.fontDataCache.set(option.id, null);
     return null;
+  }
+
+  private async getRemoteFontUrls(option: FontOption): Promise<readonly string[]> {
+    if (!option.remote?.stylesheet) {
+      return [];
+    }
+
+    if (this.fontRemoteSourceCache.has(option.id)) {
+      return this.fontRemoteSourceCache.get(option.id) ?? [];
+    }
+
+    try {
+      const response = await fetch(option.remote.stylesheet);
+      if (!response.ok) {
+        this.fontRemoteSourceCache.set(option.id, []);
+        return [];
+      }
+      const css = await response.text();
+      const urls = new Set<string>();
+      const regex = /src:\s*url\(([^)]+)\)\s*format\(['"]woff2['"]\)/gi;
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(css))) {
+        let candidate = match[1].trim();
+        if ((candidate.startsWith('"') && candidate.endsWith('"')) || (candidate.startsWith("'") && candidate.endsWith("'"))) {
+          candidate = candidate.slice(1, -1);
+        }
+        if (candidate) {
+          urls.add(candidate);
+        }
+      }
+      const result = Array.from(urls);
+      this.fontRemoteSourceCache.set(option.id, result);
+      return result;
+    } catch (error) {
+      console.warn(`No se pudo resolver la hoja remota para la fuente "${option.id}".`, error);
+      this.fontRemoteSourceCache.set(option.id, []);
+      return [];
+    }
   }
 
   private async getPdfByteCandidates(): Promise<Uint8Array[]> {
