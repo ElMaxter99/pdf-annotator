@@ -3,24 +3,24 @@
 Aplicación web en **Angular 20** para preparar anotaciones sobre PDFs sin modificar el documento original. Permite cargar archivos, obtener coordenadas exactas, ajustar estilos visuales y exportar los resultados como JSON o como un PDF renderizado con las marcas.
 
 ## 📚 Tabla de contenidos
-- [Requisitos](#-requisitos)
-- [Instalación](#-instalación)
-- [Scripts disponibles](#-scripts-disponibles)
-- [Uso paso a paso](#-uso-paso-a-paso)
-  - [1. Inicia el servidor de desarrollo](#1-inicia-el-servidor-de-desarrollo)
-  - [2. Carga un PDF](#2-carga-un-pdf)
-  - [3. Navega y ajusta el zoom](#3-navega-y-ajusta-el-zoom)
-  - [4. Crea una anotación](#4-crea-una-anotación)
-  - [5. Edita o mueve anotaciones](#5-edita-o-mueve-anotaciones)
-  - [6. Controla el color y la tipografía](#6-controla-el-color-y-la-tipografía)
-  - [7. Gestiona las anotaciones en JSON](#7-gestiona-las-anotaciones-en-json)
-  - [8. Exporta un PDF anotado](#8-exporta-un-pdf-anotado)
-  - [9. Atajos de teclado](#9-atajos-de-teclado)
-  - [10. Formato de las coordenadas](#10-formato-de-las-coordenadas)
-- [Captura de pantalla](#-captura-de-pantalla)
-- [Solución de problemas](#-solución-de-problemas)
-- [Build de producción](#-build-de-producción)
-- [Licencia](#-licencia)
+- [📑 PDF Annotator](#-pdf-annotator)
+  - [📚 Tabla de contenidos](#-tabla-de-contenidos)
+  - [🛠 Requisitos](#-requisitos)
+  - [⚙ Instalación](#-instalación)
+  - [▶ Uso paso a paso](#-uso-paso-a-paso)
+    - [1. Inicia el servidor de desarrollo](#1-inicia-el-servidor-de-desarrollo)
+    - [2. Carga un PDF](#2-carga-un-pdf)
+    - [3. Navega y ajusta el zoom](#3-navega-y-ajusta-el-zoom)
+    - [4. Crea una anotación](#4-crea-una-anotación)
+    - [5. Edita o mueve anotaciones](#5-edita-o-mueve-anotaciones)
+    - [6. Controla el color y la tipografía](#6-controla-el-color-y-la-tipografía)
+    - [7. Gestiona las anotaciones en JSON](#7-gestiona-las-anotaciones-en-json)
+    - [8. Exporta un PDF anotado](#8-exporta-un-pdf-anotado)
+    - [9. Atajos de teclado](#9-atajos-de-teclado)
+    - [10. Formato de las coordenadas](#10-formato-de-las-coordenadas)
+  - [📸 Captura de pantalla](#-captura-de-pantalla)
+  - [🧰 Solución de problemas](#-solución-de-problemas)
+  - [📝 Licencia](#-licencia)
 
 ## 🛠 Requisitos
 - Node.js **v22.12.0** (o compatible con Angular 20).
@@ -36,14 +36,6 @@ cd pdf-annotator
 # Instala las dependencias
 npm install
 ```
-> El proyecto ya incluye `pdf-lib` y `pdfjs-dist`, por lo que no necesitas instalar dependencias adicionales para exportar PDFs.
-
-## 🧾 Scripts disponibles
-| Comando | Descripción |
-|---------|-------------|
-| `npm start` | Levanta la aplicación en modo desarrollo. Puedes pasar banderas adicionales como `-- --host 0.0.0.0 --port 4200` para exponerla en tu red. |
-| `npm run build` | Ejecuta una verificación de traducciones y genera los artefactos en `dist/pdf-annotator/browser`. |
-| `npm test` | Ejecuta las pruebas unitarias con Karma y Jasmine. |
 
 ## ▶ Uso paso a paso
 ### 1. Inicia el servidor de desarrollo
@@ -115,19 +107,14 @@ Cada anotación se almacena como:
 - `color` acepta hexadecimales (`#RRGGBB`).
 
 ## 📸 Captura de pantalla
-![Demostración de PDF Annotator](browser:/invocations/thbhafwe/artifacts/artifacts/pdf-annotator-demo.png)
+![Vista principal](./screenshots/main.png)
+![Ejemplo de uso](./screenshots/example_use.png)
 
 ## 🧰 Solución de problemas
 - **El PDF no se renderiza**: revisa que el archivo no esté protegido y que el servidor de desarrollo muestre el log sin errores.
 - **No puedo mover una anotación**: asegúrate de arrastrar desde el cuerpo de la tarjeta (no solo desde los campos de texto).
 - **Error al importar JSON**: confirma que el archivo contenga la estructura indicada y que los valores numéricos sean válidos.
 - **El PDF exportado no abre**: prueba con otra copia del PDF original; la app intenta tres variantes (original, canónica y saneada) para asegurar compatibilidad.
-
-## 🏗 Build de producción
-```bash
-npm run build
-```
-Los artefactos estáticos quedarán en `dist/pdf-annotator/browser` y pueden desplegarse en cualquier servidor web.
 
 ## 📝 Licencia
 MIT © 2025 AlvaroMaxter
