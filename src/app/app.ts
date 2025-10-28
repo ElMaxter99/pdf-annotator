@@ -130,7 +130,7 @@ export class App implements AfterViewChecked {
   ngAfterViewChecked() {
     if (this.preview()) {
       const previewEl = this.previewEditorRef?.nativeElement;
-      if (previewEl) {
+      if (previewEl && !previewEl.contains(document.activeElement)) {
         const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement | null;
         input?.focus();
       }
@@ -139,7 +139,7 @@ export class App implements AfterViewChecked {
 
     if (this.editing()) {
       const editEl = this.editEditorRef?.nativeElement;
-      if (editEl) {
+      if (editEl && !editEl.contains(document.activeElement)) {
         const input = editEl.querySelector('input[type="text"]') as HTMLInputElement | null;
         input?.focus();
       }
