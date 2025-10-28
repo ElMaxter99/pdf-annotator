@@ -21,6 +21,7 @@ import {
   FontOption,
   ensureFontStyles,
   ensureRemoteFontStyles,
+  REMOTE_FONT_STYLESHEET_URL,
   normalizeFontType as normalizeFontTypeOption,
   resolveFontOption as resolveFontOptionOption,
   shouldPersistFontType,
@@ -105,6 +106,7 @@ export class App implements AfterViewChecked {
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
   private fontDataCache = new Map<string, Uint8Array | null>();
   private fontRemoteSourceCache = new Map<string, readonly string[]>();
+  private remoteStylesheetCache = new Map<string, string | null>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -1127,7 +1129,7 @@ export class App implements AfterViewChecked {
   }
 
   private async getRemoteFontUrls(option: FontOption): Promise<readonly string[]> {
-    if (!option.remote?.stylesheet) {
+    if (!option.face) {
       return [];
     }
 
@@ -1135,33 +1137,104 @@ export class App implements AfterViewChecked {
       return this.fontRemoteSourceCache.get(option.id) ?? [];
     }
 
+    const candidateStylesheets = new Set<string>();
+    if (REMOTE_FONT_STYLESHEET_URL) {
+      candidateStylesheets.add(REMOTE_FONT_STYLESHEET_URL);
+    }
+    if (option.remote?.stylesheet) {
+      candidateStylesheets.add(option.remote.stylesheet);
+    }
+
+    const collected = new Map<string, number>();
+
+    for (const stylesheetUrl of candidateStylesheets) {
+      const css = await this.fetchRemoteStylesheet(stylesheetUrl);
+      if (!css) {
+        continue;
+      }
+
+      const sources = this.extractRemoteFontSources(css, option);
+      for (const source of sources) {
+        const currentPriority = collected.get(source.url);
+        if (currentPriority === undefined || source.priority < currentPriority) {
+          collected.set(source.url, source.priority);
+        }
+      }
+    }
+
+    const result = Array.from(collected.entries())
+      .sort((a, b) => a[1] - b[1])
+      .map(([url]) => url);
+
+    this.fontRemoteSourceCache.set(option.id, result);
+    return result;
+  }
+
+  private async fetchRemoteStylesheet(url: string): Promise<string | null> {
+    if (this.remoteStylesheetCache.has(url)) {
+      return this.remoteStylesheetCache.get(url) ?? null;
+    }
+
     try {
-      const response = await fetch(option.remote.stylesheet);
+      const response = await fetch(url, { mode: 'cors' });
       if (!response.ok) {
-        this.fontRemoteSourceCache.set(option.id, []);
-        return [];
+        this.remoteStylesheetCache.set(url, null);
+        return null;
       }
       const css = await response.text();
-      const urls = new Set<string>();
-      const regex = /src:\s*url\(([^)]+)\)\s*format\(['"]woff2['"]\)/gi;
-      let match: RegExpExecArray | null;
-      while ((match = regex.exec(css))) {
-        let candidate = match[1].trim();
+      this.remoteStylesheetCache.set(url, css);
+      return css;
+    } catch (error) {
+      console.warn(`No se pudo descargar la hoja de estilos remota "${url}".`, error);
+      this.remoteStylesheetCache.set(url, null);
+      return null;
+    }
+  }
+
+  private extractRemoteFontSources(css: string, option: FontOption): { url: string; priority: number }[] {
+    const family = option.face?.family ?? option.label;
+    const normalizedFamily = family.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
+    const sources: { url: string; priority: number }[] = [];
+    const blockRegex = /@font-face\s*{[^}]*}/gi;
+    const formatPriority: Record<string, number> = { woff2: 0, woff: 1, truetype: 2, opentype: 3 };
+    let blockMatch: RegExpExecArray | null;
+
+    while ((blockMatch = blockRegex.exec(css))) {
+      const block = blockMatch[0];
+      const familyMatch = block.match(/font-family:\s*['"]?([^;'"\n]+)['"]?/i);
+      if (!familyMatch) {
+        continue;
+      }
+      const remoteFamily = familyMatch[1].trim().toLowerCase();
+      if (remoteFamily !== normalizedFamily) {
+        continue;
+      }
+
+      const urlRegex = /url\(([^)]+)\)\s*format\(['"]([^'"\)]+)['"]\)/gi;
+      let urlMatch: RegExpExecArray | null;
+      while ((urlMatch = urlRegex.exec(block))) {
+        let candidate = urlMatch[1].trim();
+        const format = urlMatch[2].trim().toLowerCase();
         if ((candidate.startsWith('"') && candidate.endsWith('"')) || (candidate.startsWith("'") && candidate.endsWith("'"))) {
           candidate = candidate.slice(1, -1);
         }
-        if (candidate) {
-          urls.add(candidate);
+        if ((candidate.startsWith('url(') && candidate.endsWith(')'))) {
+          candidate = candidate.slice(4, -1);
         }
+        if (!candidate) {
+          continue;
+        }
+
+        const priority = formatPriority[format];
+        if (priority === undefined) {
+          continue;
+        }
+
+        sources.push({ url: candidate, priority });
       }
-      const result = Array.from(urls);
-      this.fontRemoteSourceCache.set(option.id, result);
-      return result;
-    } catch (error) {
-      console.warn(`No se pudo resolver la hoja remota para la fuente "${option.id}".`, error);
-      this.fontRemoteSourceCache.set(option.id, []);
-      return [];
     }
+
+    return sources;
   }
 
   private async getPdfByteCandidates(): Promise<Uint8Array[]> {

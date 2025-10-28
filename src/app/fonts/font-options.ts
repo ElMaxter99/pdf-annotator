@@ -461,6 +461,8 @@ const REMOTE_STYLESHEET_URL = (() => {
   return `https://fonts.googleapis.com/css2?${query}&display=swap`;
 })();
 
+export const REMOTE_FONT_STYLESHEET_URL = REMOTE_STYLESHEET_URL;
+
 export function ensureRemoteFontStyles(
   doc: Document | null = typeof document !== 'undefined' ? document : null
 ) {
