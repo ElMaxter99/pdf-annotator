@@ -29,6 +29,13 @@ function supportsModuleWorkers(): boolean {
     return false;
   }
 
+  const promiseConstructor = Promise as PromiseConstructor & {
+    withResolvers?: unknown;
+  };
+  if (typeof promiseConstructor.withResolvers !== 'function') {
+    return false;
+  }
+
   try {
     const tester = new Worker(
       URL.createObjectURL(new Blob(['export {};'], { type: 'application/javascript' })),
