@@ -54,6 +54,13 @@ type PreviewState = { page: number; field: PageField } | null;
 
 type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
 
+type RemoteFontSourceScore = {
+  formatPriority: number;
+  stylePriority: number;
+  weightPriority: number;
+  order: number;
+};
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -1107,7 +1114,7 @@ export class App implements AfterViewChecked {
     const remoteSources = await this.getRemoteFontUrls(option);
     for (const url of remoteSources) {
       try {
-        const response = await fetch(url);
+        const response = await fetch(url, { mode: 'cors' });
         if (!response.ok) {
           continue;
         }
@@ -1145,7 +1152,8 @@ export class App implements AfterViewChecked {
       candidateStylesheets.add(option.remote.stylesheet);
     }
 
-    const collected = new Map<string, number>();
+    const collected = new Map<string, RemoteFontSourceScore>();
+    let order = 0;
 
     for (const stylesheetUrl of candidateStylesheets) {
       const css = await this.fetchRemoteStylesheet(stylesheetUrl);
@@ -1155,15 +1163,22 @@ export class App implements AfterViewChecked {
 
       const sources = this.extractRemoteFontSources(css, option);
       for (const source of sources) {
-        const currentPriority = collected.get(source.url);
-        if (currentPriority === undefined || source.priority < currentPriority) {
-          collected.set(source.url, source.priority);
+        const score: RemoteFontSourceScore = {
+          formatPriority: source.formatPriority,
+          stylePriority: source.stylePriority,
+          weightPriority: source.weightPriority,
+          order,
+        };
+        const existing = collected.get(source.url);
+        if (!existing || this.isBetterRemoteSource(score, existing)) {
+          collected.set(source.url, score);
         }
+        order += 1;
       }
     }
 
     const result = Array.from(collected.entries())
-      .sort((a, b) => a[1] - b[1])
+      .sort((a, b) => this.compareRemoteSourceScore(a[1], b[1]))
       .map(([url]) => url);
 
     this.fontRemoteSourceCache.set(option.id, result);
@@ -1191,10 +1206,23 @@ export class App implements AfterViewChecked {
     }
   }
 
-  private extractRemoteFontSources(css: string, option: FontOption): { url: string; priority: number }[] {
+  private extractRemoteFontSources(
+    css: string,
+    option: FontOption
+  ): {
+    url: string;
+    formatPriority: number;
+    stylePriority: number;
+    weightPriority: number;
+  }[] {
     const family = option.face?.family ?? option.label;
     const normalizedFamily = family.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
-    const sources: { url: string; priority: number }[] = [];
+    const sources: {
+      url: string;
+      formatPriority: number;
+      stylePriority: number;
+      weightPriority: number;
+    }[] = [];
     const blockRegex = /@font-face\s*{[^}]*}/gi;
     const formatPriority: Record<string, number> = { woff2: 0, woff: 1, truetype: 2, opentype: 3 };
     let blockMatch: RegExpExecArray | null;
@@ -1210,11 +1238,20 @@ export class App implements AfterViewChecked {
         continue;
       }
 
-      const urlRegex = /url\(([^)]+)\)\s*format\(['"]([^'"\)]+)['"]\)/gi;
+      const styleMatch = block.match(/font-style:\s*([^;]+)/i);
+      const style = styleMatch ? styleMatch[1].trim().toLowerCase() : 'normal';
+      const stylePriority = style === 'italic' ? 1 : 0;
+
+      const weightMatch = block.match(/font-weight:\s*([^;]+)/i);
+      const weightDescriptor = weightMatch ? weightMatch[1].trim() : '';
+      const weightValue = this.parseRemoteFontWeight(weightDescriptor);
+      const weightPriority = Math.abs(weightValue - 400);
+
+      const urlRegex = /url\(([^)]+)\)(?:\s*format\(['"]([^'"\)]+)['"]\))?/gi;
       let urlMatch: RegExpExecArray | null;
       while ((urlMatch = urlRegex.exec(block))) {
         let candidate = urlMatch[1].trim();
-        const format = urlMatch[2].trim().toLowerCase();
+        const format = (urlMatch[2] ?? '').trim().toLowerCase();
         if ((candidate.startsWith('"') && candidate.endsWith('"')) || (candidate.startsWith("'") && candidate.endsWith("'"))) {
           candidate = candidate.slice(1, -1);
         }
@@ -1225,16 +1262,86 @@ export class App implements AfterViewChecked {
           continue;
         }
 
-        const priority = formatPriority[format];
-        if (priority === undefined) {
-          continue;
-        }
+        const priority = formatPriority[format] ?? 99;
 
-        sources.push({ url: candidate, priority });
+        sources.push({
+          url: candidate,
+          formatPriority: priority,
+          stylePriority,
+          weightPriority,
+        });
       }
     }
 
     return sources;
+  }
+
+  private parseRemoteFontWeight(descriptor: string): number {
+    const trimmed = descriptor.trim().toLowerCase();
+    if (!trimmed) {
+      return 400;
+    }
+
+    const rawMatches = trimmed.match(/\d+/g);
+    const numericMatches = rawMatches
+      ? rawMatches
+          .map((value) => Number(value))
+          .filter((value) => Number.isFinite(value))
+      : [];
+
+    if (numericMatches.length >= 2) {
+      const min = Math.min(...numericMatches);
+      const max = Math.max(...numericMatches);
+      if (min <= 400 && 400 <= max) {
+        return 400;
+      }
+      return Math.abs(min - 400) <= Math.abs(max - 400) ? min : max;
+    }
+
+    if (numericMatches.length === 1) {
+      return numericMatches[0];
+    }
+
+    if (trimmed.includes('thin')) return 100;
+    if (trimmed.includes('extralight') || trimmed.includes('ultralight')) return 200;
+    if (trimmed.includes('light')) return 300;
+    if (trimmed.includes('regular') || trimmed.includes('normal')) return 400;
+    if (trimmed.includes('medium')) return 500;
+    if (trimmed.includes('semibold') || trimmed.includes('demibold')) return 600;
+    if (trimmed.includes('bold')) return 700;
+    if (trimmed.includes('extrabold') || trimmed.includes('ultrabold')) return 800;
+    if (trimmed.includes('black') || trimmed.includes('heavy')) return 900;
+
+    return 400;
+  }
+
+  private isBetterRemoteSource(
+    candidate: RemoteFontSourceScore,
+    current: RemoteFontSourceScore
+  ): boolean {
+    if (candidate.formatPriority !== current.formatPriority) {
+      return candidate.formatPriority < current.formatPriority;
+    }
+    if (candidate.stylePriority !== current.stylePriority) {
+      return candidate.stylePriority < current.stylePriority;
+    }
+    if (candidate.weightPriority !== current.weightPriority) {
+      return candidate.weightPriority < current.weightPriority;
+    }
+    return candidate.order < current.order;
+  }
+
+  private compareRemoteSourceScore(a: RemoteFontSourceScore, b: RemoteFontSourceScore): number {
+    if (a.formatPriority !== b.formatPriority) {
+      return a.formatPriority - b.formatPriority;
+    }
+    if (a.stylePriority !== b.stylePriority) {
+      return a.stylePriority - b.stylePriority;
+    }
+    if (a.weightPriority !== b.weightPriority) {
+      return a.weightPriority - b.weightPriority;
+    }
+    return a.order - b.order;
   }
 
   private async getPdfByteCandidates(): Promise<Uint8Array[]> {
