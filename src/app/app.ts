@@ -22,6 +22,7 @@ import {
   ensureFontStyles,
   getFontFamily,
   normalizeFontType as normalizeFontTypeOption,
+  resolveFontOption as resolveFontOptionOption,
   shouldPersistFontType,
 } from './fonts/font-options';
 
@@ -73,7 +74,10 @@ export class App implements AfterViewChecked {
   readonly fontOptions: readonly FontOption[] = FONT_OPTIONS;
   previewFontFilter = '';
   editFontFilter = '';
+  previewFontPickerOpen = false;
+  editFontPickerOpen = false;
   readonly normalizeFontType = normalizeFontTypeOption;
+  readonly resolveFontOption = resolveFontOptionOption;
   readonly defaultFontType = DEFAULT_FONT_TYPE;
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
@@ -107,6 +111,10 @@ export class App implements AfterViewChecked {
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('previewFontPicker') previewFontPickerRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('editFontPicker') editFontPickerRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('previewFontSearch') previewFontSearchRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('editFontSearch') editFontSearchRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
@@ -439,11 +447,13 @@ export class App implements AfterViewChecked {
   setPreviewFont(fontId: string) {
     const normalized = normalizeFontTypeOption(fontId);
     this.preview.update((p) => (p ? { ...p, field: { ...p.field, fontType: normalized } } : p));
+    this.closePreviewFontPicker(true);
   }
 
   setEditFont(fontId: string) {
     const normalized = normalizeFontTypeOption(fontId);
     this.editing.update((e) => (e ? { ...e, field: { ...e.field, fontType: normalized } } : e));
+    this.closeEditFontPicker(true);
   }
 
   confirmPreview() {
@@ -459,13 +469,14 @@ export class App implements AfterViewChecked {
     };
     this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
     this.syncCoordsTextModel();
+    this.closePreviewFontPicker(true);
     this.preview.set(null);
     this.redrawAllForPage();
   }
 
   cancelPreview() {
     this.preview.set(null);
-    this.previewFontFilter = '';
+    this.closePreviewFontPicker(true);
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
@@ -482,6 +493,8 @@ export class App implements AfterViewChecked {
     }
     this.editing.set({ pageIndex, fieldIndex, field: { ...normalized } });
     this.editFontFilter = '';
+    this.editFontPickerOpen = false;
+    this.previewFontPickerOpen = false;
     this.updateEditingColorState(normalized.color);
     this.preview.set(null);
   }
@@ -498,24 +511,27 @@ export class App implements AfterViewChecked {
       this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
     );
     this.syncCoordsTextModel();
+    this.closeEditFontPicker(true);
     this.editing.set(null);
     this.redrawAllForPage();
   }
 
   cancelEdit() {
     this.editing.set(null);
-    this.editFontFilter = '';
+    this.closeEditFontPicker(true);
   }
 
   @HostListener('document:mousedown', ['$event'])
   onDocumentMouseDown(event: MouseEvent) {
+    const target = event.target as Node | null;
+    this.handleFontPickerBlur(target);
+
     const editState = this.editing();
     if (!editState) return;
 
     const modal = this.editEditorRef?.nativeElement;
     if (!modal) return;
 
-    const target = event.target as Node | null;
     if (target && modal.contains(target)) {
       return;
     }
@@ -523,11 +539,83 @@ export class App implements AfterViewChecked {
     this.cancelEdit();
   }
 
+  private handleFontPickerBlur(target: Node | null) {
+    if (this.previewFontPickerOpen) {
+      const container = this.previewFontPickerRef?.nativeElement;
+      if (!container || !target || !container.contains(target)) {
+        this.closePreviewFontPicker();
+      }
+    }
+
+    if (this.editFontPickerOpen) {
+      const container = this.editFontPickerRef?.nativeElement;
+      if (!container || !target || !container.contains(target)) {
+        this.closeEditFontPicker();
+      }
+    }
+  }
+
+  togglePreviewFontPicker() {
+    if (this.previewFontPickerOpen) {
+      this.closePreviewFontPicker();
+      return;
+    }
+
+    this.previewFontPickerOpen = true;
+    this.editFontPickerOpen = false;
+    setTimeout(() => {
+      const input = this.previewFontSearchRef?.nativeElement;
+      input?.focus();
+      input?.select();
+    });
+  }
+
+  toggleEditFontPicker() {
+    if (this.editFontPickerOpen) {
+      this.closeEditFontPicker();
+      return;
+    }
+
+    this.editFontPickerOpen = true;
+    this.previewFontPickerOpen = false;
+    setTimeout(() => {
+      const input = this.editFontSearchRef?.nativeElement;
+      input?.focus();
+      input?.select();
+    });
+  }
+
+  private closePreviewFontPicker(clearFilter = false) {
+    this.previewFontPickerOpen = false;
+    if (clearFilter) {
+      this.previewFontFilter = '';
+    }
+  }
+
+  private closeEditFontPicker(clearFilter = false) {
+    this.editFontPickerOpen = false;
+    if (clearFilter) {
+      this.editFontFilter = '';
+    }
+  }
+
+  onFontSearchKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (mode === 'preview') {
+        this.closePreviewFontPicker();
+      } else {
+        this.closeEditFontPicker();
+      }
+    }
+  }
+
   deleteAnnotation() {
     const e = this.editing();
     if (!e) return;
     this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages));
     this.syncCoordsTextModel();
+    this.closeEditFontPicker(true);
     this.editing.set(null);
     this.redrawAllForPage();
   }

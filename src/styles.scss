@@ -295,38 +295,111 @@ header .logo {
     gap: 6px;
   }
 
-  .font-search {
+  .font-picker {
+    position: relative;
+  }
+
+  .font-picker__toggle {
     width: 100%;
-  }
-
-  .font-options {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-height: 140px;
-    overflow-y: auto;
-  }
-
-  .font-option {
-    background: rgba(94, 234, 212, 0.15);
-    border: 1px solid transparent;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(94, 234, 212, 0.1);
+    border: 1px solid rgba(94, 234, 212, 0.25);
     border-radius: 6px;
-    padding: 6px 10px;
+    padding: 8px 10px;
     color: var(--text);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    cursor: pointer;
     transition: border-color .15s ease, background-color .15s ease;
   }
 
-  .font-option:hover {
+  .font-picker__toggle:hover,
+  .font-picker.open .font-picker__toggle {
+    border-color: rgba(94, 234, 212, 0.6);
+    background: rgba(94, 234, 212, 0.2);
+  }
+
+  .font-picker__current {
+    flex: 1;
+    text-align: left;
+  }
+
+  .font-picker__chevron {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  .font-picker__panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 30;
+    background: rgba(24, 24, 40, 0.98);
+    border: 1px solid rgba(94, 234, 212, 0.25);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .font-picker__search {
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid rgba(94, 234, 212, 0.25);
+    padding: 6px 8px;
+    background: rgba(30, 30, 47, 0.9);
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+
+  .font-picker__options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .font-picker__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    background: rgba(94, 234, 212, 0.15);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-size: 0.85rem;
+    text-align: left;
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .font-picker__option:hover {
     border-color: rgba(94, 234, 212, 0.7);
   }
 
-  .font-option.active {
+  .font-picker__option.active {
     border-color: var(--accent);
     background: rgba(94, 234, 212, 0.3);
   }
 
-  .font-empty {
+  .font-picker__option-label {
+    flex: 1;
+  }
+
+  .font-picker__option-preview {
+    font-size: 1rem;
+    opacity: 0.75;
+  }
+
+  .font-picker__empty {
     margin: 0;
     font-size: 0.8rem;
     color: var(--muted);

@@ -1,0 +1,304 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 64,
+          "y": 780,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000"
+        },
+        {
+          "x": 64,
+          "y": 754,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "roboto"
+        },
+        {
+          "x": 64,
+          "y": 728,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "poppins"
+        },
+        {
+          "x": 64,
+          "y": 702,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "inter"
+        },
+        {
+          "x": 64,
+          "y": 676,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "montserrat"
+        },
+        {
+          "x": 64,
+          "y": 650,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "lato"
+        },
+        {
+          "x": 64,
+          "y": 624,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "nunito"
+        },
+        {
+          "x": 64,
+          "y": 598,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "open-sans"
+        },
+        {
+          "x": 64,
+          "y": 572,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "manrope"
+        },
+        {
+          "x": 64,
+          "y": 546,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "fira-code"
+        },
+        {
+          "x": 64,
+          "y": 520,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "jetbrains-mono"
+        },
+        {
+          "x": 64,
+          "y": 494,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "playfair-display"
+        },
+        {
+          "x": 64,
+          "y": 468,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "merriweather"
+        },
+        {
+          "x": 64,
+          "y": 442,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "source-serif-4"
+        },
+        {
+          "x": 64,
+          "y": 416,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "raleway"
+        },
+        {
+          "x": 64,
+          "y": 390,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "oswald"
+        },
+        {
+          "x": 64,
+          "y": 364,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "work-sans"
+        },
+        {
+          "x": 64,
+          "y": 338,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "dm-sans"
+        },
+        {
+          "x": 64,
+          "y": 312,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "dm-serif-display"
+        },
+        {
+          "x": 320,
+          "y": 780,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "noto-sans-jp"
+        },
+        {
+          "x": 320,
+          "y": 754,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "noto-serif-display"
+        },
+        {
+          "x": 320,
+          "y": 728,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "cabin"
+        },
+        {
+          "x": 320,
+          "y": 702,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "karla"
+        },
+        {
+          "x": 320,
+          "y": 676,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "space-grotesk"
+        },
+        {
+          "x": 320,
+          "y": 650,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "sora"
+        },
+        {
+          "x": 320,
+          "y": 624,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "bitter"
+        },
+        {
+          "x": 320,
+          "y": 598,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "archivo"
+        },
+        {
+          "x": 320,
+          "y": 572,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "heebo"
+        },
+        {
+          "x": 320,
+          "y": 546,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "crimson-pro"
+        },
+        {
+          "x": 320,
+          "y": 520,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "ibm-plex-sans"
+        },
+        {
+          "x": 320,
+          "y": 494,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "ibm-plex-serif"
+        },
+        {
+          "x": 320,
+          "y": 468,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "ibm-plex-mono"
+        },
+        {
+          "x": 320,
+          "y": 442,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "urbanist"
+        },
+        {
+          "x": 320,
+          "y": 416,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "sofia-sans"
+        },
+        {
+          "x": 320,
+          "y": 390,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "asap"
+        },
+        {
+          "x": 320,
+          "y": 364,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "quicksand"
+        },
+        {
+          "x": 320,
+          "y": 338,
+          "mapField": "Fuente de prueba ABC 123 ñÑ",
+          "fontSize": 14,
+          "color": "#000000",
+          "fontType": "zilla-slab"
+        }
+      ]
+    }
+  ]
+}

@@ -80,27 +80,49 @@
         </label>
         <div class="font-section">
           <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
-          <input
-            type="text"
-            class="font-search"
-            [(ngModel)]="previewFontFilter"
-            [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
-          />
-          <div class="font-options" *ngIf="filterFontOptions(previewFontFilter).length; else previewFontEmpty">
-            <button
-              type="button"
-              class="font-option"
-              *ngFor="let font of filterFontOptions(previewFontFilter)"
-              (click)="setPreviewFont(font.id)"
-              [class.active]="normalizeFontType(p.field.fontType)===font.id"
-              [style.font-family]="font.family"
-            >
-              {{ font.label }}
-            </button>
+          <div class="font-picker" #previewFontPicker [class.open]="previewFontPickerOpen">
+            <ng-container *ngIf="resolveFontOption(p.field.fontType) as previewFont">
+              <button
+                type="button"
+                class="font-picker__toggle"
+                (click)="togglePreviewFontPicker()"
+                [attr.aria-expanded]="previewFontPickerOpen"
+                [attr.aria-label]="'annotation.fields.font.label' | t"
+                [style.font-family]="previewFont.family"
+              >
+                <span class="font-picker__current">{{ previewFont.label }}</span>
+                <span class="font-picker__chevron" aria-hidden="true">▾</span>
+              </button>
+              <div class="font-picker__panel" *ngIf="previewFontPickerOpen">
+                <input
+                  #previewFontSearch
+                  type="search"
+                  class="font-picker__search"
+                  [(ngModel)]="previewFontFilter"
+                  [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
+                  (keydown)="onFontSearchKeydown($event, 'preview')"
+                />
+                <ng-container *ngIf="filterFontOptions(previewFontFilter) as previewFonts">
+                  <div class="font-picker__options" *ngIf="previewFonts.length; else previewFontEmpty">
+                    <button
+                      type="button"
+                      class="font-picker__option"
+                      *ngFor="let font of previewFonts"
+                      (click)="setPreviewFont(font.id)"
+                      [class.active]="normalizeFontType(p.field.fontType)===font.id"
+                      [style.font-family]="font.family"
+                    >
+                      <span class="font-picker__option-label">{{ font.label }}</span>
+                      <span class="font-picker__option-preview">Aa</span>
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-template #previewFontEmpty>
+                  <p class="font-picker__empty">{{ 'annotation.fields.font.noResults' | t }}</p>
+                </ng-template>
+              </div>
+            </ng-container>
           </div>
-          <ng-template #previewFontEmpty>
-            <p class="font-empty">{{ 'annotation.fields.font.noResults' | t }}</p>
-          </ng-template>
         </div>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
@@ -137,27 +159,49 @@
         </label>
         <div class="font-section">
           <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
-          <input
-            type="text"
-            class="font-search"
-            [(ngModel)]="editFontFilter"
-            [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
-          />
-          <div class="font-options" *ngIf="filterFontOptions(editFontFilter).length; else editFontEmpty">
-            <button
-              type="button"
-              class="font-option"
-              *ngFor="let font of filterFontOptions(editFontFilter)"
-              (click)="setEditFont(font.id)"
-              [class.active]="normalizeFontType(e.field.fontType)===font.id"
-              [style.font-family]="font.family"
-            >
-              {{ font.label }}
-            </button>
+          <div class="font-picker" #editFontPicker [class.open]="editFontPickerOpen">
+            <ng-container *ngIf="resolveFontOption(e.field.fontType) as editFont">
+              <button
+                type="button"
+                class="font-picker__toggle"
+                (click)="toggleEditFontPicker()"
+                [attr.aria-expanded]="editFontPickerOpen"
+                [attr.aria-label]="'annotation.fields.font.label' | t"
+                [style.font-family]="editFont.family"
+              >
+                <span class="font-picker__current">{{ editFont.label }}</span>
+                <span class="font-picker__chevron" aria-hidden="true">▾</span>
+              </button>
+              <div class="font-picker__panel" *ngIf="editFontPickerOpen">
+                <input
+                  #editFontSearch
+                  type="search"
+                  class="font-picker__search"
+                  [(ngModel)]="editFontFilter"
+                  [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
+                  (keydown)="onFontSearchKeydown($event, 'edit')"
+                />
+                <ng-container *ngIf="filterFontOptions(editFontFilter) as editFonts">
+                  <div class="font-picker__options" *ngIf="editFonts.length; else editFontEmpty">
+                    <button
+                      type="button"
+                      class="font-picker__option"
+                      *ngFor="let font of editFonts"
+                      (click)="setEditFont(font.id)"
+                      [class.active]="normalizeFontType(e.field.fontType)===font.id"
+                      [style.font-family]="font.family"
+                    >
+                      <span class="font-picker__option-label">{{ font.label }}</span>
+                      <span class="font-picker__option-preview">Aa</span>
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-template #editFontEmpty>
+                  <p class="font-picker__empty">{{ 'annotation.fields.font.noResults' | t }}</p>
+                </ng-template>
+              </div>
+            </ng-container>
           </div>
-          <ng-template #editFontEmpty>
-            <p class="font-empty">{{ 'annotation.fields.font.noResults' | t }}</p>
-          </ng-template>
         </div>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
