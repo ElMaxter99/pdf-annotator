@@ -19,38 +19,59 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 const PDF_WORKER_CLASSIC_SRC = '/assets/pdfjs/pdf.worker.min.js';
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.min.mjs';
 
-function supportsModuleWorkers(): boolean {
+function detectModuleWorkerWithResolversSupport(): Promise<boolean> {
   if (
     typeof Worker === 'undefined' ||
     typeof Blob === 'undefined' ||
     typeof URL === 'undefined' ||
     typeof URL.createObjectURL !== 'function'
   ) {
-    return false;
+    return Promise.resolve(false);
   }
 
   const promiseConstructor = Promise as PromiseConstructor & {
     withResolvers?: unknown;
   };
+
   if (typeof promiseConstructor.withResolvers !== 'function') {
-    return false;
+    return Promise.resolve(false);
   }
 
   try {
-    const tester = new Worker(
-      URL.createObjectURL(new Blob(['export {};'], { type: 'application/javascript' })),
-      { type: 'module' }
-    );
-    tester.terminate();
-    return true;
+    const workerScript = `self.postMessage(typeof Promise.withResolvers === 'function');`;
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+
+    return new Promise((resolve) => {
+      const tester = new Worker(url, { type: 'module' });
+
+      const cleanup = () => {
+        tester.terminate();
+        URL.revokeObjectURL(url);
+      };
+
+      tester.onmessage = (event) => {
+        cleanup();
+        resolve(Boolean(event.data));
+      };
+
+      tester.onerror = () => {
+        cleanup();
+        resolve(false);
+      };
+    });
   } catch {
-    return false;
+    return Promise.resolve(false);
   }
 }
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = supportsModuleWorkers()
-  ? PDF_WORKER_MODULE_SRC
-  : PDF_WORKER_CLASSIC_SRC;
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = PDF_WORKER_CLASSIC_SRC;
+
+void detectModuleWorkerWithResolversSupport().then((supported) => {
+  if (supported) {
+    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = PDF_WORKER_MODULE_SRC;
+  }
+});
 
 type PageField = {
   x: number;
