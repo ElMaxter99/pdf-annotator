@@ -16,7 +16,34 @@ import { TranslationPipe } from './i18n/translation.pipe';
 import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
+const PDF_WORKER_CLASSIC_SRC = '/assets/pdfjs/pdf.worker.min.js';
+const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.min.mjs';
+
+function supportsModuleWorkers(): boolean {
+  if (
+    typeof Worker === 'undefined' ||
+    typeof Blob === 'undefined' ||
+    typeof URL === 'undefined' ||
+    typeof URL.createObjectURL !== 'function'
+  ) {
+    return false;
+  }
+
+  try {
+    const tester = new Worker(
+      URL.createObjectURL(new Blob(['export {};'], { type: 'application/javascript' })),
+      { type: 'module' }
+    );
+    tester.terminate();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = supportsModuleWorkers()
+  ? PDF_WORKER_MODULE_SRC
+  : PDF_WORKER_CLASSIC_SRC;
 
 type PageField = {
   x: number;
@@ -84,7 +111,6 @@ export class App implements AfterViewChecked {
   @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
   }
