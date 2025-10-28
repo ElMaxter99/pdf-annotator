@@ -1,8 +1,20 @@
-if (typeof ArrayBuffer !== 'undefined') {
-  const { prototype } = ArrayBuffer;
-  const isFiniteNumber = Number.isFinite || ((num) => isFinite(num));
+export {};
 
-  const toValidLength = (value, fallback) => {
+declare global {
+  interface ArrayBuffer {
+    transfer?(newLength?: number): ArrayBuffer;
+    transferToFixedLength?(newLength?: number): ArrayBuffer;
+  }
+}
+
+const arrayBufferConstructor = typeof ArrayBuffer !== 'undefined' ? ArrayBuffer : null;
+
+if (arrayBufferConstructor) {
+  const { prototype } = arrayBufferConstructor;
+
+  const isFiniteNumber = Number.isFinite ?? ((num: number) => isFinite(num));
+
+  const toValidLength = (value: number | undefined, fallback: number) => {
     if (value === undefined) {
       return fallback;
     }
@@ -19,9 +31,9 @@ if (typeof ArrayBuffer !== 'undefined') {
     Object.defineProperty(prototype, 'transferToFixedLength', {
       configurable: true,
       writable: true,
-      value(newLength) {
+      value(this: ArrayBuffer, newLength?: number) {
         const targetLength = toValidLength(newLength, this.byteLength);
-        const targetBuffer = new ArrayBuffer(targetLength);
+        const targetBuffer = new arrayBufferConstructor(targetLength);
         const sourceView = new Uint8Array(this);
         const targetView = new Uint8Array(targetBuffer);
         const copyLength = Math.min(targetLength, sourceView.byteLength);
@@ -35,30 +47,15 @@ if (typeof ArrayBuffer !== 'undefined') {
     Object.defineProperty(prototype, 'transfer', {
       configurable: true,
       writable: true,
-      value(newLength) {
+      value(this: ArrayBuffer, newLength?: number) {
         const targetLength = toValidLength(newLength, this.byteLength);
-        return prototype.transferToFixedLength.call(this, targetLength);
+        const transferToFixedLength = prototype.transferToFixedLength as (
+          this: ArrayBuffer,
+          newLength?: number,
+        ) => ArrayBuffer;
+        return transferToFixedLength.call(this, targetLength);
       },
     });
   }
 }
 
-if (typeof Promise.withResolvers !== 'function') {
-  Promise.withResolvers = function () {
-    let resolve;
-    let reject;
-
-    const promise = new Promise((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
-
-    return {
-      promise,
-      resolve,
-      reject,
-    };
-  };
-}
-
-import './pdf.worker.min.mjs';

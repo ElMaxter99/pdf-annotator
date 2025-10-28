@@ -16,6 +16,7 @@ import { TranslationPipe } from './i18n/translation.pipe';
 import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
+import './array-buffer-transfer.polyfill';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
