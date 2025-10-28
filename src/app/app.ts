@@ -18,6 +18,8 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 
 const PDF_WORKER_CLASSIC_SRC = '/assets/pdfjs/pdf.worker.min.js';
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.min.mjs';
+const PDF_WORKER_TYPE_CLASSIC = 'classic';
+const PDF_WORKER_TYPE_MODULE = 'module';
 
 function detectModuleWorkerWithResolversSupport(): Promise<boolean> {
   if (
@@ -66,10 +68,12 @@ function detectModuleWorkerWithResolversSupport(): Promise<boolean> {
 }
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = PDF_WORKER_CLASSIC_SRC;
+(pdfjsLib as any).GlobalWorkerOptions.workerType = PDF_WORKER_TYPE_CLASSIC;
 
 void detectModuleWorkerWithResolversSupport().then((supported) => {
   if (supported) {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = PDF_WORKER_MODULE_SRC;
+    (pdfjsLib as any).GlobalWorkerOptions.workerType = PDF_WORKER_TYPE_MODULE;
   }
 });
 
