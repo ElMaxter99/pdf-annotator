@@ -269,12 +269,37 @@ function createFontSources(asset: FontAsset): FontSource[] {
     const weight = inferFontWeight(tokens);
 
     return {
-      path: `/fonts/${asset.folder}/${file}`,
+      path: `fonts/${asset.folder}/${file}`,
       format,
       style,
       weight,
     };
   });
+}
+
+function resolveBaseUrl(doc?: Document | null): string {
+  if (doc?.baseURI) {
+    return doc.baseURI;
+  }
+
+  if (typeof document !== 'undefined' && document.baseURI) {
+    return document.baseURI;
+  }
+
+  if (typeof window !== 'undefined' && window.location?.href) {
+    return window.location.href;
+  }
+
+  return '/';
+}
+
+export function resolveFontSourceUrl(path: string, doc?: Document | null): string {
+  try {
+    const base = resolveBaseUrl(doc);
+    return new URL(path, base).toString();
+  } catch {
+    return path;
+  }
 }
 
 function createSearchTerms(asset: FontAsset): string[] {
@@ -338,7 +363,7 @@ export function shouldPersistFontType(fontType: unknown): boolean {
   return normalizeFontType(fontType) !== DEFAULT_FONT_TYPE;
 }
 
-export function createFontStyleSheet(): string {
+export function createFontStyleSheet(doc?: Document | null): string {
   const css: string[] = [];
 
   for (const option of FONT_OPTIONS) {
@@ -357,8 +382,9 @@ export function createFontStyleSheet(): string {
         const [style, weight] = key.split('|');
         const src = sources
           .map((item) => {
+            const url = resolveFontSourceUrl(item.path, doc);
             const format = item.format ? ` format('${item.format}')` : '';
-            return `url('${item.path}')${format}`;
+            return `url(${JSON.stringify(url)})${format}`;
           })
           .join(', ');
         css.push(
@@ -392,6 +418,6 @@ export function ensureFontStyles(doc: Document | null = typeof document !== 'und
   }
   const styleEl = doc.createElement('style');
   styleEl.id = STYLE_ELEMENT_ID;
-  styleEl.textContent = createFontStyleSheet();
+  styleEl.textContent = createFontStyleSheet(doc);
   doc.head.appendChild(styleEl);
 }

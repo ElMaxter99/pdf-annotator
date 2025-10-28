@@ -23,6 +23,7 @@ import {
   normalizeFontType as normalizeFontTypeOption,
   resolveFontOption as resolveFontOptionOption,
   shouldPersistFontType,
+  resolveFontSourceUrl,
 } from './fonts/font-options';
 
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
@@ -691,8 +692,6 @@ export class App implements AfterViewChecked {
         page.fields.forEach((field, fieldIndex) => {
           const left = field.x * scale;
           const top = pdfCanvas.height - field.y * scale;
-          const normalizedFontType = normalizeFontTypeOption(field.fontType);
-
           const el = document.createElement('div');
           el.className = 'annotation';
           el.textContent = field.mapField;
@@ -700,13 +699,21 @@ export class App implements AfterViewChecked {
           el.style.top = `${top - field.fontSize * scale}px`;
           el.style.fontSize = `${field.fontSize * scale}px`;
           el.style.color = field.color;
-          el.setAttribute('data-font', normalizedFontType);
+          this.applyFontToAnnotation(el, field.fontType);
 
           el.onpointerdown = (evt) =>
             this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
           layer.appendChild(el);
         });
       });
+  }
+
+  private applyFontToAnnotation(el: HTMLDivElement, fontType: unknown) {
+    const normalized = normalizeFontTypeOption(fontType);
+    el.setAttribute('data-font', normalized);
+    const option = resolveFontOptionOption(normalized);
+    el.style.setProperty('--annotation-font-family', option.family);
+    el.style.fontFamily = option.family;
   }
 
   private handleAnnotationPointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number) {
@@ -1078,7 +1085,8 @@ export class App implements AfterViewChecked {
 
     for (const source of option.face.sources) {
       try {
-        const response = await fetch(source.path);
+        const url = resolveFontSourceUrl(source.path);
+        const response = await fetch(url);
         if (!response.ok) {
           continue;
         }
