@@ -78,6 +78,30 @@
           <input type="text" [(ngModel)]="p.field.mapField"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
+        <div class="font-section">
+          <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
+          <input
+            type="text"
+            class="font-search"
+            [(ngModel)]="previewFontFilter"
+            [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
+          />
+          <div class="font-options" *ngIf="filterFontOptions(previewFontFilter).length; else previewFontEmpty">
+            <button
+              type="button"
+              class="font-option"
+              *ngFor="let font of filterFontOptions(previewFontFilter)"
+              (click)="setPreviewFont(font.id)"
+              [class.active]="normalizeFontType(p.field.fontType)===font.id"
+              [style.font-family]="font.family"
+            >
+              {{ font.labelKey | t }}
+            </button>
+          </div>
+          <ng-template #previewFontEmpty>
+            <p class="font-empty">{{ 'annotation.fields.font.noResults' | t }}</p>
+          </ng-template>
+        </div>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
           <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
@@ -111,6 +135,30 @@
           <input type="text" [(ngModel)]="e.field.mapField"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
+        <div class="font-section">
+          <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
+          <input
+            type="text"
+            class="font-search"
+            [(ngModel)]="editFontFilter"
+            [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
+          />
+          <div class="font-options" *ngIf="filterFontOptions(editFontFilter).length; else editFontEmpty">
+            <button
+              type="button"
+              class="font-option"
+              *ngFor="let font of filterFontOptions(editFontFilter)"
+              (click)="setEditFont(font.id)"
+              [class.active]="normalizeFontType(e.field.fontType)===font.id"
+              [style.font-family]="font.family"
+            >
+              {{ font.labelKey | t }}
+            </button>
+          </div>
+          <ng-template #editFontEmpty>
+            <p class="font-empty">{{ 'annotation.fields.font.noResults' | t }}</p>
+          </ng-template>
+        </div>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
           <input type="number" [(ngModel)]="e.field.fontSize" min="8" max="72" />

@@ -33,6 +33,16 @@
         "label": "Text",
         "placeholder": "Text..."
       },
+      "font": {
+        "label": "Font",
+        "searchPlaceholder": "Search fonts...",
+        "noResults": "No fonts found",
+        "options": {
+          "default": "Default (Helvetica)",
+          "roboto": "Roboto",
+          "poppins": "Poppins"
+        }
+      },
       "size": {
         "label": "Size"
       },

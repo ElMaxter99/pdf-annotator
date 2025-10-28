@@ -259,7 +259,7 @@ header .logo {
   border-radius: 4px;
   white-space: nowrap;
   transition: .2s;
-  font-family: 'Helvetica, Arial, sans-serif';
+  font-family: Helvetica, Arial, sans-serif;
   font-weight: normal;
   letter-spacing: 0;
   line-height: 1;
@@ -288,6 +288,49 @@ header .logo {
   min-width: 260px;
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(10px);
+
+  .font-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .font-search {
+    width: 100%;
+  }
+
+  .font-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+
+  .font-option {
+    background: rgba(94, 234, 212, 0.15);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-size: 0.85rem;
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .font-option:hover {
+    border-color: rgba(94, 234, 212, 0.7);
+  }
+
+  .font-option.active {
+    border-color: var(--accent);
+    background: rgba(94, 234, 212, 0.3);
+  }
+
+  .font-empty {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
 
   input[type="text"],
   input[type="number"] {

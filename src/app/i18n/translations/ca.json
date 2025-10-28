@@ -33,6 +33,16 @@
         "label": "Text",
         "placeholder": "Text..."
       },
+      "font": {
+        "label": "Tipus de lletra",
+        "searchPlaceholder": "Cerca fonts...",
+        "noResults": "No s'han trobat fonts",
+        "options": {
+          "default": "Per defecte (Helvetica)",
+          "roboto": "Roboto",
+          "poppins": "Poppins"
+        }
+      },
       "size": {
         "label": "Mida"
       },
