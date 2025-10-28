@@ -44,6 +44,187 @@
   <!-- LATERAL SIDEBAR -->
   <aside class="sidebar">
     <h4>{{ 'sidebar.title' | t }}</h4>
+    <section class="json-configurator">
+      <label class="json-configurator__select">
+        <span>{{ 'jsonConfig.selectLabel' | t }}</span>
+        <select
+          [ngModel]="selectedConfigId()"
+          (ngModelChange)="onJsonConfigChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [attr.aria-label]="'jsonConfig.selectAriaLabel' | t"
+        >
+          <option *ngFor="let config of jsonConfigs()" [value]="config.id">
+            {{ config.name }}<ng-container *ngIf="config.version"> · {{ config.version }}</ng-container>
+          </option>
+        </select>
+      </label>
+
+      <div class="json-configurator__actions">
+        <button type="button" class="btn" (click)="createJsonConfigFromCurrent()">
+          {{ 'jsonConfig.actions.duplicate' | t }}
+        </button>
+        <button
+          type="button"
+          class="btn danger"
+          (click)="deleteSelectedJsonConfig()"
+          [disabled]="isDefaultConfigSelected()"
+        >
+          {{ 'jsonConfig.actions.delete' | t }}
+        </button>
+        <button type="button" class="btn" (click)="exportSelectedJsonConfig()">
+          {{ 'jsonConfig.actions.export' | t }}
+        </button>
+        <button type="button" class="btn" (click)="triggerImportConfig()">
+          {{ 'jsonConfig.actions.import' | t }}
+        </button>
+        <input
+          #configFileInput
+          type="file"
+          accept="application/json"
+          (change)="onConfigFileSelected($event)"
+          hidden
+        />
+      </div>
+
+      <ng-container *ngIf="editingConfig(); else defaultConfigNotice">
+        <div class="json-configurator__editor">
+          <div class="json-configurator__row">
+            <label>
+              <span>{{ 'jsonConfig.edit.name' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.name || ''"
+                (ngModelChange)="updateEditingConfigField('name', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+            <label>
+              <span>{{ 'jsonConfig.edit.version' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.version || ''"
+                (ngModelChange)="updateEditingConfigField('version', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+          </div>
+
+          <div class="json-configurator__row">
+            <label>
+              <span>{{ 'jsonConfig.edit.root' | t }}</span>
+              <select
+                [ngModel]="editingConfig()?.root || 'object'"
+                (ngModelChange)="updateEditingConfigField('root', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                <option value="object">{{ 'jsonConfig.edit.rootOptions.object' | t }}</option>
+                <option value="array">{{ 'jsonConfig.edit.rootOptions.array' | t }}</option>
+              </select>
+            </label>
+            <label>
+              <span>{{ 'jsonConfig.edit.pagesKey' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.pagesKey || ''"
+                (ngModelChange)="updateEditingConfigField('pagesKey', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+          </div>
+
+          <div class="json-configurator__row">
+            <label>
+              <span>{{ 'jsonConfig.edit.pageNumberKey' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.pageNumberKey || ''"
+                (ngModelChange)="updateEditingConfigField('pageNumberKey', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+            <label>
+              <span>{{ 'jsonConfig.edit.fieldsKey' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.fieldsKey || ''"
+                (ngModelChange)="updateEditingConfigField('fieldsKey', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+          </div>
+
+          <div class="json-configurator__grid">
+            <label>
+              <span>{{ 'jsonConfig.edit.fieldKeys.mapField' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.fieldKeys?.mapField || ''"
+                (ngModelChange)="updateEditingConfigField('fieldKeys.mapField', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+            <label>
+              <span>{{ 'jsonConfig.edit.fieldKeys.x' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.fieldKeys?.x || ''"
+                (ngModelChange)="updateEditingConfigField('fieldKeys.x', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+            <label>
+              <span>{{ 'jsonConfig.edit.fieldKeys.y' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.fieldKeys?.y || ''"
+                (ngModelChange)="updateEditingConfigField('fieldKeys.y', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+            <label>
+              <span>{{ 'jsonConfig.edit.fieldKeys.fontSize' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.fieldKeys?.fontSize || ''"
+                (ngModelChange)="updateEditingConfigField('fieldKeys.fontSize', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+            <label>
+              <span>{{ 'jsonConfig.edit.fieldKeys.color' | t }}</span>
+              <input
+                type="text"
+                [ngModel]="editingConfig()?.fieldKeys?.color || ''"
+                (ngModelChange)="updateEditingConfigField('fieldKeys.color', $event)"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </label>
+          </div>
+
+          <div class="json-configurator__editor-actions">
+            <button
+              type="button"
+              class="btn"
+              (click)="saveEditingConfig()"
+              [disabled]="!editingConfigDirty()"
+            >
+              {{ 'jsonConfig.edit.save' | t }}
+            </button>
+            <button
+              type="button"
+              class="btn"
+              (click)="resetEditingConfig()"
+              [disabled]="!editingConfigDirty()"
+            >
+              {{ 'jsonConfig.edit.reset' | t }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #defaultConfigNotice>
+        <p class="json-configurator__info">{{ 'jsonConfig.defaultInfo' | t }}</p>
+      </ng-template>
+    </section>
     <div class="sidebar-actions">
       <button type="button" class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">
         {{ 'sidebar.importJsonFile' | t }}

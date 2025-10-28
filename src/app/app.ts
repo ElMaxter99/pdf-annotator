@@ -32,6 +32,25 @@ type PreviewState = { page: number; field: PageField } | null;
 
 type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
 
+type JsonFieldKeys = {
+  mapField: string;
+  x: string;
+  y: string;
+  fontSize: string;
+  color: string;
+};
+
+type JsonConfig = {
+  id: string;
+  name: string;
+  version: string;
+  root: 'object' | 'array';
+  pagesKey: string;
+  pageNumberKey: string;
+  fieldsKey: string;
+  fieldKeys: JsonFieldKeys;
+};
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -40,6 +59,27 @@ type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | n
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked {
+  private static readonly DEFAULT_JSON_CONFIG: JsonConfig = {
+    id: 'default-v1',
+    name: 'Predeterminada V1',
+    version: 'V1',
+    root: 'object',
+    pagesKey: 'pages',
+    pageNumberKey: 'num',
+    fieldsKey: 'fields',
+    fieldKeys: {
+      mapField: 'mapField',
+      x: 'x',
+      y: 'y',
+      fontSize: 'fontSize',
+      color: 'color',
+    },
+  };
+  private static readonly CONFIG_STORAGE_KEY = 'pdf-annotator.json-configs';
+  private static readonly CONFIG_SELECTION_STORAGE_KEY =
+    'pdf-annotator.selected-json-config';
+  private static readonly FALLBACK_CUSTOM_NAME = 'Configuración personalizada';
+
   pdfDoc: PDFDocumentProxy | null = null;
   pageIndex = signal(1);
   scale = signal(1.5);
@@ -51,6 +91,10 @@ export class App implements AfterViewChecked {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
+  readonly jsonConfigs = signal<JsonConfig[]>([App.DEFAULT_JSON_CONFIG]);
+  selectedConfigId = signal<string>(App.DEFAULT_JSON_CONFIG.id);
+  editingConfig = signal<JsonConfig | null>(null);
+  editingConfigDirty = signal(false);
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
@@ -82,16 +126,250 @@ export class App implements AfterViewChecked {
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('configFileInput', { static: false })
+  configFileInputRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     this.setDocumentMetadata();
+    this.loadJsonConfigurations();
+    this.restoreSelectedJsonConfig();
+    this.prepareEditingConfig();
     this.syncCoordsTextModel();
+  }
+
+  private loadJsonConfigurations() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const stored = window.localStorage.getItem(App.CONFIG_STORAGE_KEY);
+      if (!stored) {
+        return;
+      }
+
+      const parsed = JSON.parse(stored);
+      const configs = Array.isArray(parsed) ? parsed : [];
+      const sanitized = configs
+        .map((candidate) => {
+          const candidateId =
+            candidate && typeof candidate === 'object'
+              ? (candidate as Record<string, unknown>)['id']
+              : null;
+          const normalizedId = this.normalizeConfigString(candidateId);
+          return this.sanitizeConfigCandidate(candidate, normalizedId);
+        })
+        .filter((config): config is JsonConfig => Boolean(config));
+
+      if (sanitized.length) {
+        this.jsonConfigs.set([App.DEFAULT_JSON_CONFIG, ...sanitized]);
+      }
+    } catch (error) {
+      console.warn('No se pudieron cargar las configuraciones personalizadas.', error);
+    }
+  }
+
+  private restoreSelectedJsonConfig() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const storedId = window.localStorage.getItem(App.CONFIG_SELECTION_STORAGE_KEY);
+      if (!storedId) {
+        return;
+      }
+
+      const exists = this.jsonConfigs().some((config) => config.id === storedId);
+      if (exists) {
+        this.selectedConfigId.set(storedId);
+      }
+    } catch (error) {
+      console.warn('No se pudo restaurar la configuración seleccionada.', error);
+    }
+  }
+
+  private prepareEditingConfig() {
+    if (this.isDefaultConfigSelected()) {
+      this.editingConfig.set(null);
+      this.editingConfigDirty.set(false);
+      return;
+    }
+
+    const current = this.getCurrentJsonConfig();
+    this.editingConfig.set(this.cloneConfig(current));
+    this.editingConfigDirty.set(false);
+  }
+
+  private getCurrentJsonConfig(): JsonConfig {
+    const configs = this.jsonConfigs();
+    const current = configs.find((config) => config.id === this.selectedConfigId());
+    return current ?? App.DEFAULT_JSON_CONFIG;
+  }
+
+  isDefaultConfigSelected() {
+    return this.selectedConfigId() === App.DEFAULT_JSON_CONFIG.id;
   }
 
   onLanguageChange(language: string) {
     this.translationService.setLanguage(language as Language);
     this.languageModel = this.translationService.getCurrentLanguage();
+  }
+
+  onJsonConfigChange(configId: string) {
+    this.selectedConfigId.set(configId);
+    this.persistSelectedJsonConfig(configId);
+    this.prepareEditingConfig();
+    this.syncCoordsTextModel();
+  }
+
+  createJsonConfigFromCurrent() {
+    const base = this.cloneConfig(this.getCurrentJsonConfig());
+    base.id = this.generateConfigId();
+    const localizedName = this.translationService.translate('jsonConfig.newName');
+    const fallback = App.FALLBACK_CUSTOM_NAME;
+    const nextName =
+      localizedName && localizedName !== 'jsonConfig.newName' ? localizedName : fallback;
+    base.name = this.ensureUniqueConfigName(nextName);
+    base.version = base.version || 'V1';
+
+    this.jsonConfigs.update((configs) => [...configs, base]);
+    this.selectedConfigId.set(base.id);
+    this.persistJsonConfigurations();
+    this.persistSelectedJsonConfig(base.id);
+    this.prepareEditingConfig();
+    this.syncCoordsTextModel();
+  }
+
+  deleteSelectedJsonConfig() {
+    if (this.isDefaultConfigSelected()) {
+      return;
+    }
+
+    const config = this.getCurrentJsonConfig();
+    const message = this.translationService.translate('jsonConfig.deleteConfirm', {
+      name: config.name,
+    });
+    const shouldDelete = typeof window === 'undefined' ? true : window.confirm(message);
+    if (!shouldDelete) {
+      return;
+    }
+
+    const idToDelete = config.id;
+    this.jsonConfigs.update((configs) =>
+      configs.filter((existing) => existing.id !== idToDelete)
+    );
+    this.persistJsonConfigurations();
+    this.selectedConfigId.set(App.DEFAULT_JSON_CONFIG.id);
+    this.persistSelectedJsonConfig(App.DEFAULT_JSON_CONFIG.id);
+    this.prepareEditingConfig();
+    this.syncCoordsTextModel();
+  }
+
+  exportSelectedJsonConfig() {
+    const config = this.getCurrentJsonConfig();
+    const payload = JSON.stringify(this.serializeConfig(config), null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${this.slugifyConfigName(config.name)}-config.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  triggerImportConfig() {
+    const input = this.configFileInputRef?.nativeElement;
+    if (input) {
+      input.value = '';
+      input.click();
+    }
+  }
+
+  async onConfigFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const imported = this.importConfigPayload(parsed);
+      if (!imported.length) {
+        throw new Error('Formato no válido');
+      }
+
+      const last = imported[imported.length - 1];
+      this.jsonConfigs.update((configs) => [...configs, ...imported]);
+      this.persistJsonConfigurations();
+      this.selectedConfigId.set(last.id);
+      this.persistSelectedJsonConfig(last.id);
+      this.prepareEditingConfig();
+      this.syncCoordsTextModel();
+
+      const successMessage = this.translationService.translate('jsonConfig.importSuccess', {
+        name: last.name,
+      });
+      alert(successMessage);
+    } catch (error) {
+      console.error('No se pudo importar la configuración JSON.', error);
+      alert(this.translationService.translate('jsonConfig.importError'));
+    } finally {
+      input.value = '';
+    }
+  }
+
+  updateEditingConfigField(path: string, value: string) {
+    const editing = this.editingConfig();
+    if (!editing) {
+      return;
+    }
+
+    const clone = this.cloneConfig(editing);
+    const segments = path.split('.');
+    let target: Record<string, unknown> = clone as unknown as Record<string, unknown>;
+    for (let i = 0; i < segments.length - 1; i += 1) {
+      const segment = segments[i];
+      const current = target[segment];
+      if (!current || typeof current !== 'object') {
+        target[segment] = {};
+      }
+      target = target[segment] as Record<string, unknown>;
+    }
+    target[segments[segments.length - 1]] = value;
+
+    this.editingConfig.set(clone);
+    this.editingConfigDirty.set(true);
+  }
+
+  saveEditingConfig() {
+    const editing = this.editingConfig();
+    if (!editing) {
+      return;
+    }
+
+    const sanitized = this.sanitizeConfigCandidate(editing, editing.id);
+    if (!sanitized) {
+      alert(this.translationService.translate('jsonConfig.validationError'));
+      return;
+    }
+
+    sanitized.name = this.ensureUniqueConfigName(sanitized.name, sanitized.id);
+
+    this.jsonConfigs.update((configs) =>
+      configs.map((config) => (config.id === sanitized.id ? sanitized : config))
+    );
+    this.editingConfig.set(this.cloneConfig(sanitized));
+    this.editingConfigDirty.set(false);
+    this.persistJsonConfigurations();
+    this.syncCoordsTextModel();
+  }
+
+  resetEditingConfig() {
+    this.prepareEditingConfig();
   }
 
   private setDocumentMetadata() {
@@ -736,7 +1014,10 @@ export class App implements AfterViewChecked {
 
     try {
       const parsed = this.parseLooseJson(text);
-      const normalized = this.normalizeImportedCoordinates(parsed);
+      const normalized = this.normalizeImportedCoordinates(
+        parsed,
+        this.getCurrentJsonConfig()
+      );
 
       if (normalized === null) {
         throw new Error('Formato no válido');
@@ -771,7 +1052,10 @@ export class App implements AfterViewChecked {
     try {
       const text = await file.text();
       const parsed = this.parseLooseJson(text);
-      const normalized = this.normalizeImportedCoordinates(parsed);
+      const normalized = this.normalizeImportedCoordinates(
+        parsed,
+        this.getCurrentJsonConfig()
+      );
       if (normalized === null) {
         throw new Error('Formato no válido');
       }
@@ -790,13 +1074,16 @@ export class App implements AfterViewChecked {
   }
 
   downloadJSON() {
-    const blob = new Blob([JSON.stringify({ pages: this.coords() }, null, 2)], {
+    const config = this.getCurrentJsonConfig();
+    const payload = this.buildExportPayload(config, this.coords());
+    const json = JSON.stringify(payload, null, 2);
+    const blob = new Blob([json], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'coords.json';
+    a.download = `${this.slugifyConfigName(config.name)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -923,8 +1210,44 @@ export class App implements AfterViewChecked {
     }
   }
 
+  private buildExportPayload(config: JsonConfig, coords: PageAnnotations[]): unknown {
+    const pages = coords.map((page) => {
+      const fields = page.fields.map((field) => ({
+        [config.fieldKeys.mapField]: field.mapField,
+        [config.fieldKeys.x]: field.x,
+        [config.fieldKeys.y]: field.y,
+        [config.fieldKeys.fontSize]: field.fontSize,
+        [config.fieldKeys.color]: field.color,
+      }));
+
+      return {
+        [config.pageNumberKey]: page.num,
+        [config.fieldsKey]: fields,
+      };
+    });
+
+    if (config.root === 'array') {
+      return pages;
+    }
+
+    return {
+      [config.pagesKey]: pages,
+    };
+  }
+
+  private slugifyConfigName(name: string) {
+    const base = name && typeof name === 'string' ? name : 'coords';
+    const slug = base
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\-\s_]+/g, '')
+      .replace(/[\s_]+/g, '-');
+    return slug || 'coords';
+  }
+
   private syncCoordsTextModel() {
-    this.coordsTextModel = JSON.stringify({ pages: this.coords() }, null, 2);
+    const payload = this.buildExportPayload(this.getCurrentJsonConfig(), this.coords());
+    this.coordsTextModel = JSON.stringify(payload, null, 2);
   }
 
   private parseLooseJson(text: string): unknown {
@@ -1037,8 +1360,11 @@ export class App implements AfterViewChecked {
     return sanitized;
   }
 
-  private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {
-    const pagesData = this.extractPagesCollection(data);
+  private normalizeImportedCoordinates(
+    data: unknown,
+    config: JsonConfig
+  ): PageAnnotations[] | null {
+    const pagesData = this.extractPagesCollection(data, config);
     if (!Array.isArray(pagesData)) {
       return null;
     }
@@ -1050,12 +1376,14 @@ export class App implements AfterViewChecked {
         continue;
       }
 
-      const pageNum = this.toFiniteNumber((rawPage as { num?: unknown }).num);
+      const pageNum = this.toFiniteNumber(
+        (rawPage as Record<string, unknown>)[config.pageNumberKey]
+      );
       if (!pageNum || !Number.isInteger(pageNum) || pageNum < 1) {
         continue;
       }
 
-      const rawFields = (rawPage as { fields?: unknown }).fields;
+      const rawFields = (rawPage as Record<string, unknown>)[config.fieldsKey];
       if (!Array.isArray(rawFields)) {
         continue;
       }
@@ -1067,20 +1395,24 @@ export class App implements AfterViewChecked {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color, value } = rawField as Record<string, unknown>;
-
+        const { mapField, x, y, fontSize, color } = config.fieldKeys;
+        const fieldRecord = rawField as Record<string, unknown>;
         const normalizedMapField =
-          this.normalizeFieldText(mapField) ?? this.normalizeFieldText(value);
-        const normalizedX = this.toFiniteNumber(x);
-        const normalizedY = this.toFiniteNumber(y);
+          this.normalizeFieldText(fieldRecord[mapField]) ??
+          this.normalizeFieldText(fieldRecord['value']);
+        const normalizedX = this.toFiniteNumber(fieldRecord[x]);
+        const normalizedY = this.toFiniteNumber(fieldRecord[y]);
 
         if (normalizedMapField === null || normalizedX === null || normalizedY === null) {
           continue;
         }
 
-        const normalizedFontSize = this.toFiniteNumber(fontSize);
+        const normalizedFontSize = this.toFiniteNumber(fieldRecord[fontSize]);
+        const colorCandidate = fieldRecord[color];
         const normalizedColor =
-          typeof color === 'string' && color.trim() ? color.trim() : '#000000';
+          typeof colorCandidate === 'string' && colorCandidate.trim()
+            ? colorCandidate.trim()
+            : '#000000';
 
         const normalizedField: PageField = {
           x: Math.round(normalizedX * 100) / 100,
@@ -1105,13 +1437,22 @@ export class App implements AfterViewChecked {
     return normalized;
   }
 
-  private extractPagesCollection(data: unknown): unknown {
-    if (Array.isArray(data)) {
-      return data;
+  private extractPagesCollection(data: unknown, config: JsonConfig): unknown {
+    if (config.root === 'array') {
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data && typeof data === 'object') {
+        const maybePages = (data as Record<string, unknown>)[config.pagesKey];
+        if (Array.isArray(maybePages)) {
+          return maybePages;
+        }
+      }
+      return null;
     }
 
     if (data && typeof data === 'object') {
-      const maybePages = (data as { pages?: unknown }).pages;
+      const maybePages = (data as Record<string, unknown>)[config.pagesKey];
       if (Array.isArray(maybePages)) {
         return maybePages;
       }
@@ -1168,4 +1509,205 @@ export class App implements AfterViewChecked {
 
     return collapsed;
   }
+  private importConfigPayload(data: unknown): JsonConfig[] {
+    const items = Array.isArray(data) ? data : [data];
+    const imported: JsonConfig[] = [];
+    const additionalNames: string[] = [];
+
+    for (const item of items) {
+      const sanitized = this.sanitizeConfigCandidate(item, undefined, {
+        ignoreIncomingId: true,
+      });
+      if (!sanitized) {
+        continue;
+      }
+
+      sanitized.name = this.ensureUniqueConfigName(
+        sanitized.name,
+        undefined,
+        additionalNames
+      );
+      additionalNames.push(sanitized.name);
+      imported.push(sanitized);
+    }
+
+    return imported;
+  }
+
+  private serializeConfig(config: JsonConfig, includeId = false) {
+    const base = {
+      name: config.name,
+      version: config.version,
+      root: config.root,
+      pagesKey: config.pagesKey,
+      pageNumberKey: config.pageNumberKey,
+      fieldsKey: config.fieldsKey,
+      fieldKeys: { ...config.fieldKeys },
+    };
+
+    if (includeId) {
+      return { ...base, id: config.id };
+    }
+
+    return base;
+  }
+
+  private persistJsonConfigurations() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const payload = this.jsonConfigs()
+        .filter((config) => config.id !== App.DEFAULT_JSON_CONFIG.id)
+        .map((config) => this.serializeConfig(config, true));
+      window.localStorage.setItem(App.CONFIG_STORAGE_KEY, JSON.stringify(payload));
+    } catch (error) {
+      console.warn('No se pudieron guardar las configuraciones personalizadas.', error);
+    }
+  }
+
+  private persistSelectedJsonConfig(id: string) {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(App.CONFIG_SELECTION_STORAGE_KEY, id);
+    } catch (error) {
+      console.warn('No se pudo guardar la selección de configuración.', error);
+    }
+  }
+
+  private cloneConfig(config: JsonConfig): JsonConfig {
+    return JSON.parse(JSON.stringify(config)) as JsonConfig;
+  }
+
+  private ensureUniqueConfigName(
+    name: string,
+    excludeId?: string,
+    additionalNames: string[] = []
+  ): string {
+    const trimmed = name.trim() || App.FALLBACK_CUSTOM_NAME;
+    const existingNames = new Set(
+      this.jsonConfigs()
+        .filter((config) => config.id !== excludeId)
+        .map((config) => config.name.toLowerCase())
+    );
+
+    for (const extra of additionalNames) {
+      existingNames.add(extra.toLowerCase());
+    }
+
+    if (!existingNames.has(trimmed.toLowerCase())) {
+      return trimmed;
+    }
+
+    let counter = 2;
+    let candidate = `${trimmed} (${counter})`;
+    while (existingNames.has(candidate.toLowerCase())) {
+      counter += 1;
+      candidate = `${trimmed} (${counter})`;
+    }
+    return candidate;
+  }
+
+  private generateConfigId() {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      try {
+        return crypto.randomUUID();
+      } catch (error) {
+        console.warn('No se pudo generar un UUID nativo.', error);
+      }
+    }
+
+    return `cfg-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  }
+
+  private sanitizeConfigCandidate(
+    candidate: unknown,
+    existingId?: string | null,
+    options?: { ignoreIncomingId?: boolean }
+  ): JsonConfig | null {
+    if (!candidate || typeof candidate !== 'object') {
+      return null;
+    }
+
+    const record = candidate as Record<string, unknown>;
+
+    const name = this.normalizeConfigString(record['name']) ?? App.FALLBACK_CUSTOM_NAME;
+    const version = this.normalizeOptionalConfigString(record['version']);
+    const root = record['root'] === 'array' ? 'array' : 'object';
+
+    const pagesKeyRaw = this.normalizeConfigString(record['pagesKey']);
+    if (root === 'object' && !pagesKeyRaw) {
+      return null;
+    }
+    const pagesKey = pagesKeyRaw ?? 'pages';
+
+    const pageNumberKey = this.normalizeConfigString(record['pageNumberKey']);
+    const fieldsKey = this.normalizeConfigString(record['fieldsKey']);
+    if (!pageNumberKey || !fieldsKey) {
+      return null;
+    }
+
+    const fieldKeysRecord = record['fieldKeys'];
+    if (!fieldKeysRecord || typeof fieldKeysRecord !== 'object') {
+      return null;
+    }
+
+    const mapFieldKey = this.normalizeConfigString(
+      (fieldKeysRecord as Record<string, unknown>)['mapField']
+    );
+    const xKey = this.normalizeConfigString((fieldKeysRecord as Record<string, unknown>)['x']);
+    const yKey = this.normalizeConfigString((fieldKeysRecord as Record<string, unknown>)['y']);
+    const fontSizeKey = this.normalizeConfigString(
+      (fieldKeysRecord as Record<string, unknown>)['fontSize']
+    );
+    const colorKey = this.normalizeConfigString(
+      (fieldKeysRecord as Record<string, unknown>)['color']
+    );
+
+    if (!mapFieldKey || !xKey || !yKey || !fontSizeKey || !colorKey) {
+      return null;
+    }
+
+    const incomingId = options?.ignoreIncomingId
+      ? null
+      : this.normalizeConfigString(record['id']);
+    const normalizedExistingId = existingId ? this.normalizeConfigString(existingId) : null;
+    const id = normalizedExistingId ?? incomingId ?? this.generateConfigId();
+
+    return {
+      id,
+      name,
+      version,
+      root,
+      pagesKey,
+      pageNumberKey,
+      fieldsKey,
+      fieldKeys: {
+        mapField: mapFieldKey,
+        x: xKey,
+        y: yKey,
+        fontSize: fontSizeKey,
+        color: colorKey,
+      },
+    };
+  }
+
+  private normalizeConfigString(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
+
+  private normalizeOptionalConfigString(value: unknown): string {
+    const normalized = this.normalizeConfigString(value);
+    return normalized ?? '';
+  }
+
 }
+

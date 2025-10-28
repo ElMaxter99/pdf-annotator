@@ -27,6 +27,43 @@
     "jsonPlaceholder": "Pega o edita aquí las coordenadas de anotaciones...",
     "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
   },
+  "jsonConfig": {
+    "selectLabel": "Formato de JSON",
+    "selectAriaLabel": "Selecciona la plantilla de exportación de JSON",
+    "actions": {
+      "duplicate": "Duplicar configuración",
+      "delete": "Eliminar",
+      "export": "Exportar configuración",
+      "import": "Importar configuración"
+    },
+    "edit": {
+      "name": "Nombre visible",
+      "version": "Etiqueta de versión",
+      "root": "Tipo de raíz",
+      "rootOptions": {
+        "object": "Objeto con colección",
+        "array": "Array de páginas"
+      },
+      "pagesKey": "Clave de la colección de páginas",
+      "pageNumberKey": "Clave del número de página",
+      "fieldsKey": "Clave de los campos",
+      "fieldKeys": {
+        "mapField": "Clave del nombre del campo",
+        "x": "Clave de la coordenada X",
+        "y": "Clave de la coordenada Y",
+        "fontSize": "Clave del tamaño de fuente",
+        "color": "Clave del color"
+      },
+      "save": "Guardar configuración",
+      "reset": "Descartar cambios"
+    },
+    "defaultInfo": "La configuración «Predeterminada V1» mantiene el formato original del JSON.",
+    "newName": "Configuración personalizada",
+    "importSuccess": "Se importó la configuración «{{ name }}».",
+    "importError": "No se pudo importar la configuración JSON. Revisa el formato.",
+    "validationError": "Revisa que todos los campos de la configuración tengan un valor válido.",
+    "deleteConfirm": "¿Seguro que deseas eliminar la configuración «{{ name }}»?"
+  },
   "annotation": {
     "fields": {
       "text": {

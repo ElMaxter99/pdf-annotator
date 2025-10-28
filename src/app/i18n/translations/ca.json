@@ -27,6 +27,43 @@
     "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
     "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
   },
+  "jsonConfig": {
+    "selectLabel": "Format JSON",
+    "selectAriaLabel": "Selecciona la plantilla d'exportació JSON",
+    "actions": {
+      "duplicate": "Duplicar configuració",
+      "delete": "Suprimeix",
+      "export": "Exporta la configuració",
+      "import": "Importa la configuració"
+    },
+    "edit": {
+      "name": "Nom visible",
+      "version": "Etiqueta de versió",
+      "root": "Tipus d'arrel",
+      "rootOptions": {
+        "object": "Objecte amb col·lecció",
+        "array": "Array de pàgines"
+      },
+      "pagesKey": "Clau de la col·lecció de pàgines",
+      "pageNumberKey": "Clau del número de pàgina",
+      "fieldsKey": "Clau dels camps",
+      "fieldKeys": {
+        "mapField": "Clau del nom del camp",
+        "x": "Clau de la coordenada X",
+        "y": "Clau de la coordenada Y",
+        "fontSize": "Clau de la mida de lletra",
+        "color": "Clau del color"
+      },
+      "save": "Desa la configuració",
+      "reset": "Descarta els canvis"
+    },
+    "defaultInfo": "La configuració «Predeterminada V1» manté el format original del JSON.",
+    "newName": "Configuració personalitzada",
+    "importSuccess": "S'ha importat la configuració «{{ name }}».",
+    "importError": "No s'ha pogut importar la configuració JSON. Revisa el format.",
+    "validationError": "Comprova que tots els camps de la configuració tinguin un valor vàlid.",
+    "deleteConfirm": "Segur que vols eliminar la configuració «{{ name }}»?"
+  },
   "annotation": {
     "fields": {
       "text": {

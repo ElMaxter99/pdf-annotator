@@ -133,6 +133,107 @@ header .logo {
     margin-bottom: 8px;
   }
 
+  .json-configurator {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(94, 234, 212, 0.15);
+    background: rgba(17, 17, 28, 0.65);
+
+    &__select {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: var(--muted);
+
+      select {
+        background: #1d1d2a;
+        color: var(--text);
+        border: 1px solid #3c3c52;
+        border-radius: 6px;
+        padding: 6px 10px;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    &__editor {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    &__row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      label {
+        flex: 1 1 160px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.75rem;
+        color: var(--muted);
+
+        input,
+        select {
+          background: #1d1d2a;
+          border: 1px solid #3c3c52;
+          border-radius: 6px;
+          padding: 6px 10px;
+          color: var(--text);
+          font-size: 0.85rem;
+        }
+      }
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.75rem;
+        color: var(--muted);
+
+        input {
+          background: #1d1d2a;
+          border: 1px solid #3c3c52;
+          border-radius: 6px;
+          padding: 6px 10px;
+          color: var(--text);
+          font-size: 0.85rem;
+        }
+      }
+    }
+
+    &__editor-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    &__info {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  }
+
   .json-editor {
     width: 100%;
     min-height: 220px;

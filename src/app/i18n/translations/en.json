@@ -27,6 +27,43 @@
     "jsonPlaceholder": "Paste or edit annotation coordinates here...",
     "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
   },
+  "jsonConfig": {
+    "selectLabel": "JSON format",
+    "selectAriaLabel": "Select the JSON export template",
+    "actions": {
+      "duplicate": "Duplicate configuration",
+      "delete": "Delete",
+      "export": "Export configuration",
+      "import": "Import configuration"
+    },
+    "edit": {
+      "name": "Display name",
+      "version": "Version label",
+      "root": "Root type",
+      "rootOptions": {
+        "object": "Object with collection",
+        "array": "Array of pages"
+      },
+      "pagesKey": "Pages collection key",
+      "pageNumberKey": "Page number key",
+      "fieldsKey": "Fields key",
+      "fieldKeys": {
+        "mapField": "Field name key",
+        "x": "X coordinate key",
+        "y": "Y coordinate key",
+        "fontSize": "Font size key",
+        "color": "Color key"
+      },
+      "save": "Save configuration",
+      "reset": "Discard changes"
+    },
+    "defaultInfo": "The “Predeterminada V1” configuration keeps the original JSON format.",
+    "newName": "Custom configuration",
+    "importSuccess": "Configuration “{{ name }}” imported successfully.",
+    "importError": "The JSON configuration could not be imported. Check the format.",
+    "validationError": "Make sure every configuration field has a valid value.",
+    "deleteConfirm": "Are you sure you want to delete the configuration “{{ name }}”?"
+  },
   "annotation": {
     "fields": {
       "text": {
