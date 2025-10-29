@@ -149,10 +149,11 @@ export class App implements AfterViewChecked {
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
-  private fontDataCache = new Map<string, Uint8Array | null>();
+  private fontDataCache = new Map<string, { bytes: Uint8Array; sourceUrl: string } | null>();
   private fontRemoteSourceCache = new Map<string, readonly string[]>();
   private remoteStylesheetCache = new Map<string, string | null>();
   private remoteFontsEnsured = false;
+  private fontFailedSources = new Map<string, Set<string>>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -1120,21 +1121,34 @@ export class App implements AfterViewChecked {
             return defaultFont;
           }
 
-          const bytes = await this.loadFontBytes(option);
-          if (!bytes) {
-            embeddedFonts.set(normalized, defaultFont);
-            return defaultFont;
+          let lastError: unknown = null;
+
+          while (true) {
+            const fontData = await this.loadFontBytes(option);
+            if (!fontData) {
+              break;
+            }
+
+            try {
+              const customFont = await pdf.embedFont(fontData.bytes, { subset: true });
+              embeddedFonts.set(normalized, customFont);
+              return customFont;
+            } catch (error) {
+              lastError = error;
+              this.markFontSourceAsFailed(option.id, fontData.sourceUrl);
+              this.fontDataCache.delete(option.id);
+            }
           }
 
-          try {
-            const customFont = await pdf.embedFont(bytes, { subset: true });
-            embeddedFonts.set(normalized, customFont);
-            return customFont;
-          } catch (error) {
-            console.warn(`No se pudo incrustar la fuente personalizada "${option.id}".`, error);
-            embeddedFonts.set(normalized, defaultFont);
-            return defaultFont;
+          if (lastError) {
+            console.warn(
+              `No se pudo incrustar la fuente personalizada "${option.id}".`,
+              lastError
+            );
           }
+
+          embeddedFonts.set(normalized, defaultFont);
+          return defaultFont;
         };
 
         for (const pageAnnotations of this.coords()) {
@@ -1174,7 +1188,9 @@ export class App implements AfterViewChecked {
   }
 
 
-  private async loadFontBytes(option: FontOption): Promise<Uint8Array | null> {
+  private async loadFontBytes(
+    option: FontOption
+  ): Promise<{ bytes: Uint8Array; sourceUrl: string } | null> {
     if (!option.remote) {
       return null;
     }
@@ -1189,7 +1205,14 @@ export class App implements AfterViewChecked {
     if (remoteSources.length) {
       this.ensureRemoteFonts();
     }
+
+    const failedSources = this.fontFailedSources.get(option.id);
+
     for (const url of remoteSources) {
+      if (failedSources?.has(url)) {
+        continue;
+      }
+
       try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -1197,8 +1220,9 @@ export class App implements AfterViewChecked {
         }
         const buffer = await response.arrayBuffer();
         const bytes = new Uint8Array(buffer);
-        this.fontDataCache.set(option.id, bytes);
-        return bytes;
+        const payload = { bytes, sourceUrl: url } as const;
+        this.fontDataCache.set(option.id, payload);
+        return payload;
       } catch (error) {
         lastError = error;
       }
@@ -1286,7 +1310,12 @@ export class App implements AfterViewChecked {
       .toLowerCase();
     const sources: { url: string; priority: number }[] = [];
     const blockRegex = /@font-face\s*{[^}]*}/gi;
-    const formatPriority: Record<string, number> = { woff2: 0, woff: 1, truetype: 2, opentype: 3 };
+    const formatPriority: Record<string, number> = {
+      truetype: 0,
+      opentype: 1,
+      woff: 2,
+      woff2: 3,
+    };
     let blockMatch: RegExpExecArray | null;
 
     while ((blockMatch = blockRegex.exec(css))) {
@@ -1328,6 +1357,15 @@ export class App implements AfterViewChecked {
     }
 
     return sources;
+  }
+
+  private markFontSourceAsFailed(fontId: string, sourceUrl: string | undefined) {
+    if (!sourceUrl) {
+      return;
+    }
+    const existing = this.fontFailedSources.get(fontId) ?? new Set<string>();
+    existing.add(sourceUrl);
+    this.fontFailedSources.set(fontId, existing);
   }
 
   private ensureRemoteFonts() {
