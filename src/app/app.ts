@@ -20,13 +20,13 @@ import {
   FONT_OPTIONS,
   FontOption,
   ensureFontStyles,
+  ensureLocalFontFaces,
   ensureRemoteFontStyles,
   REMOTE_FONT_STYLESHEET_URL,
   normalizeFontType as normalizeFontTypeOption,
   resolveFontOption as resolveFontOptionOption,
   shouldPersistFontType,
-  resolveFontSourceUrl,
-} from './fonts/font-options';
+} from './config/fonts/font-options';
 import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
 
@@ -116,6 +116,8 @@ export class App implements AfterViewChecked {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
+  busy = signal(false);
+  busyMessageKey = signal<string | null>(null);
   readonly fontOptions: readonly FontOption[] = FONT_OPTIONS;
   previewFontFilter = '';
   editFontFilter = '';
@@ -148,9 +150,11 @@ export class App implements AfterViewChecked {
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
-  private fontDataCache = new Map<string, Uint8Array | null>();
+  private fontDataCache = new Map<string, { bytes: Uint8Array; sourceUrl: string } | null>();
   private fontRemoteSourceCache = new Map<string, readonly string[]>();
   private remoteStylesheetCache = new Map<string, string | null>();
+  private remoteFontsEnsured = false;
+  private fontFailedSources = new Map<string, Set<string>>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -166,8 +170,9 @@ export class App implements AfterViewChecked {
   @ViewChild('editFontSearch') editFontSearchRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
-    ensureFontStyles();
-    ensureRemoteFontStyles();
+    ensureFontStyles(this.document as Document | null);
+    ensureLocalFontFaces(this.document as Document | null);
+    this.ensureRemoteFonts();
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
   }
@@ -258,43 +263,56 @@ export class App implements AfterViewChecked {
     return this.pdfDoc?.numPages ?? 0;
   }
 
+  private async withLoader<T>(messageKey: string, task: () => Promise<T>): Promise<T> {
+    this.busyMessageKey.set(messageKey);
+    this.busy.set(true);
+    try {
+      return await task();
+    } finally {
+      this.busy.set(false);
+      this.busyMessageKey.set(null);
+    }
+  }
+
   async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
-    this.pdfByteSources.clear();
-    const buf = await file.arrayBuffer();
-    const typed = new Uint8Array(buf);
-    this.rememberPdfBytes(typed, 0);
+    await this.withLoader('status.loadingPdf', async () => {
+      this.pdfByteSources.clear();
+      const buf = await file.arrayBuffer();
+      const typed = new Uint8Array(buf);
+      this.rememberPdfBytes(typed, 0);
 
-    const loadingTask = pdfjsLib.getDocument({ data: typed });
-    const loadedPdf = await loadingTask.promise;
-    this.pdfDoc = loadedPdf;
+      const loadingTask = pdfjsLib.getDocument({ data: typed });
+      const loadedPdf = await loadingTask.promise;
+      this.pdfDoc = loadedPdf;
 
-    try {
-      const canonicalData = await loadedPdf.getData();
-      this.rememberPdfBytes(canonicalData, 1);
-    } catch (error) {
-      console.warn('No se pudo obtener una copia canonizada del PDF cargado.', error);
-    }
-
-    if (typeof loadedPdf.saveDocument === 'function') {
       try {
-        const sanitizedData = await loadedPdf.saveDocument();
-        const typedSanitized =
-          sanitizedData instanceof Uint8Array ? sanitizedData : new Uint8Array(sanitizedData);
-        this.rememberPdfBytes(typedSanitized, 2);
+        const canonicalData = await loadedPdf.getData();
+        this.rememberPdfBytes(canonicalData, 1);
       } catch (error) {
-        console.warn('No se pudo sanear el PDF cargado.', error);
+        console.warn('No se pudo obtener una copia canonizada del PDF cargado.', error);
       }
-    }
 
-    this.pageIndex.set(1);
-    this.clearAll();
-    this.preview.set(null);
-    this.editing.set(null);
-    await this.render();
+      if (typeof loadedPdf.saveDocument === 'function') {
+        try {
+          const sanitizedData = await loadedPdf.saveDocument();
+          const typedSanitized =
+            sanitizedData instanceof Uint8Array ? sanitizedData : new Uint8Array(sanitizedData);
+          this.rememberPdfBytes(typedSanitized, 2);
+        } catch (error) {
+          console.warn('No se pudo sanear el PDF cargado.', error);
+        }
+      }
+
+      this.pageIndex.set(1);
+      this.clearAll();
+      this.preview.set(null);
+      this.editing.set(null);
+      await this.render();
+    });
   }
 
   async render() {
@@ -782,9 +800,13 @@ export class App implements AfterViewChecked {
   private applyFontToAnnotation(el: HTMLDivElement, fontType: unknown) {
     const normalized = normalizeFontTypeOption(fontType);
     el.setAttribute('data-font', normalized);
-    const option = resolveFontOptionOption(normalized);
+    const option = this.resolveFontOption(normalized);
+    if (option.remote) {
+      this.ensureRemoteFonts();
+    }
     el.style.setProperty('--annotation-font-family', option.family);
     el.style.fontFamily = option.family;
+    this.ensureFontForPreview(option);
   }
 
   private handleAnnotationPointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number) {
@@ -992,18 +1014,20 @@ export class App implements AfterViewChecked {
     }
 
     try {
-      const text = await file.text();
-      const parsed = this.parseLooseJson(text);
-      const normalized = this.normalizeImportedCoordinates(parsed);
-      if (normalized === null) {
-        throw new Error('Formato no válido');
-      }
+      await this.withLoader('status.importingAnnotations', async () => {
+        const text = await file.text();
+        const parsed = this.parseLooseJson(text);
+        const normalized = this.normalizeImportedCoordinates(parsed);
+        if (normalized === null) {
+          throw new Error('Formato no válido');
+        }
 
-      this.coords.set(normalized);
-      this.syncCoordsTextModel();
-      this.preview.set(null);
-      this.editing.set(null);
-      this.redrawAllForPage();
+        this.coords.set(normalized);
+        this.syncCoordsTextModel();
+        this.preview.set(null);
+        this.editing.set(null);
+        this.redrawAllForPage();
+      });
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
@@ -1030,122 +1054,206 @@ export class App implements AfterViewChecked {
   async downloadAnnotatedPDF() {
     if (!this.pdfDoc) return;
 
-    try {
-      const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
-      const loadOptions = {
-        ignoreEncryption: true,
-        updateMetadata: false,
-        throwOnInvalidObject: false,
-      } as const;
+    await this.withLoader('status.generatingPdf', async () => {
+      try {
+        const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
+        const loadOptions = {
+          ignoreEncryption: true,
+          updateMetadata: false,
+          throwOnInvalidObject: false,
+        } as const;
 
-      const candidates = await this.getPdfByteCandidates();
-      if (!candidates.length) {
-        throw new Error('No se encontraron bytes de PDF para procesar.');
-      }
-
-      let pdf: any = null;
-      let usedBytes: Uint8Array | null = null;
-      const loadErrors: unknown[] = [];
-
-      for (const candidate of candidates) {
-        try {
-          pdf = await PDFDocument.load(candidate, loadOptions);
-          usedBytes = candidate;
-          break;
-        } catch (error) {
-          loadErrors.push(error);
+        const candidates = await this.getPdfByteCandidates();
+        if (!candidates.length) {
+          throw new Error('No se encontraron bytes de PDF para procesar.');
         }
-      }
 
-      if (!pdf || !usedBytes) {
-        throw new Error(
-          `No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`
+        let pdf: any = null;
+        let usedBytes: Uint8Array | null = null;
+        const loadErrors: unknown[] = [];
+
+        for (const candidate of candidates) {
+          try {
+            pdf = await PDFDocument.load(candidate, loadOptions);
+            usedBytes = candidate;
+            break;
+          } catch (error) {
+            loadErrors.push(error);
+          }
+        }
+
+        if (!pdf || !usedBytes) {
+          throw new Error(
+            `No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`
+          );
+        }
+
+        this.rememberPdfBytes(usedBytes, 3);
+
+        const hasCustomFonts = this.coords().some((page) =>
+          page.fields.some((field) => shouldPersistFontType(field.fontType))
+        );
+
+        if (hasCustomFonts) {
+          const fontkitModule = await import('@pdf-lib/fontkit');
+          const fontkit = (fontkitModule as { default?: unknown }).default ?? fontkitModule;
+          if (typeof pdf.registerFontkit === 'function') {
+            pdf.registerFontkit(fontkit);
+          }
+        }
+
+        const embeddedFonts = new Map<string, any>();
+        const defaultFont = await pdf.embedFont(StandardFonts.Helvetica);
+        embeddedFonts.set(DEFAULT_FONT_TYPE, defaultFont);
+
+        const getEmbeddedFont = async (fontType: string | undefined) => {
+          const normalized = normalizeFontTypeOption(fontType);
+          if (embeddedFonts.has(normalized)) {
+            return embeddedFonts.get(normalized);
+          }
+
+          if (!hasCustomFonts) {
+            return defaultFont;
+          }
+
+          const option =
+            this.fontOptions.find((item) => item.id === normalized) ?? this.fontOptions[0];
+          if (!option.remote) {
+            embeddedFonts.set(normalized, defaultFont);
+            return defaultFont;
+          }
+
+          let lastError: unknown = null;
+
+          while (true) {
+            const fontData = await this.loadFontBytes(option);
+            if (!fontData) {
+              break;
+            }
+
+            try {
+              const customFont = await pdf.embedFont(fontData.bytes, { subset: true });
+              embeddedFonts.set(normalized, customFont);
+              return customFont;
+            } catch (error) {
+              lastError = error;
+              this.markFontSourceAsFailed(option.id, fontData.sourceUrl);
+              this.fontDataCache.delete(option.id);
+            }
+          }
+
+          if (lastError) {
+            console.warn(`No se pudo incrustar la fuente personalizada "${option.id}".`, lastError);
+          }
+
+          embeddedFonts.set(normalized, defaultFont);
+          return defaultFont;
+        };
+
+        for (const pageAnnotations of this.coords()) {
+          const page = pdf.getPage(pageAnnotations.num - 1);
+          for (const field of pageAnnotations.fields) {
+            const hex = field.color.replace('#', '');
+            const r = parseInt(hex.substring(0, 2), 16) / 255;
+            const g = parseInt(hex.substring(2, 4), 16) / 255;
+            const b = parseInt(hex.substring(4, 6), 16) / 255;
+            const normalizedFontType = normalizeFontTypeOption(field.fontType);
+            const font = await getEmbeddedFont(normalizedFontType);
+
+            try {
+              page.drawText(field.mapField, {
+                x: field.x,
+                y: field.y,
+                size: field.fontSize,
+                color: rgb(r, g, b),
+                font,
+              });
+            } catch (error) {
+              if (font !== defaultFont) {
+                try {
+                  page.drawText(field.mapField, {
+                    x: field.x,
+                    y: field.y,
+                    size: field.fontSize,
+                    color: rgb(r, g, b),
+                    font: defaultFont,
+                  });
+                  console.warn(
+                    `No se pudo dibujar el texto con la fuente "${normalizedFontType}". Se usó la fuente predeterminada en su lugar.`,
+                    error
+                  );
+                } catch (fallbackError) {
+                  console.error(
+                    `No se pudo dibujar el texto de la anotación con la fuente predeterminada tras fallar la fuente "${normalizedFontType}".`,
+                    fallbackError
+                  );
+                }
+              } else {
+                console.error(
+                  'No se pudo dibujar el texto de la anotación con la fuente predeterminada.',
+                  error
+                );
+              }
+            }
+          }
+        }
+
+        const pdfBytes = await pdf.save({ useObjectStreams: false });
+        const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'annotated.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('No se pudo generar el PDF anotado.', error);
+        alert(
+          'No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.'
         );
       }
+    });
+  }
 
-      this.rememberPdfBytes(usedBytes, 3);
+  private resolveFontSourceUrl(url: string): string {
+    const trimmed = typeof url === 'string' ? url.trim() : '';
+    if (!trimmed) {
+      return '';
+    }
 
-      const hasCustomFonts = this.coords().some((page) =>
-        page.fields.some((field) => shouldPersistFontType(field.fontType))
-      );
-
-      if (hasCustomFonts) {
-        const fontkitModule = await import('@pdf-lib/fontkit');
-        const fontkit = (fontkitModule as { default?: unknown }).default ?? fontkitModule;
-        if (typeof pdf.registerFontkit === 'function') {
-          pdf.registerFontkit(fontkit);
-        }
+    if (/^(?:https?:)?\/\//i.test(trimmed)) {
+      if (trimmed.startsWith('//')) {
+        const docProtocol = (this.document as Document | null)?.location?.protocol;
+        const winProtocol = typeof window !== 'undefined' ? window.location?.protocol : undefined;
+        const protocol = docProtocol ?? winProtocol ?? 'https:';
+        return `${protocol}${trimmed}`;
       }
+      return trimmed;
+    }
 
-      const embeddedFonts = new Map<string, any>();
-      const defaultFont = await pdf.embedFont(StandardFonts.Helvetica);
-      embeddedFonts.set(DEFAULT_FONT_TYPE, defaultFont);
+    if (trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+      return trimmed;
+    }
 
-      const getEmbeddedFont = async (fontType: string | undefined) => {
-        const normalized = normalizeFontTypeOption(fontType);
-        if (embeddedFonts.has(normalized)) {
-          return embeddedFonts.get(normalized);
-        }
+    const base =
+      (this.document as Document | null)?.baseURI ??
+      (typeof window !== 'undefined' ? window.location?.origin ?? '' : '');
 
-        if (!hasCustomFonts) {
-          return defaultFont;
-        }
+    if (!base) {
+      return trimmed;
+    }
 
-        const option =
-          this.fontOptions.find((item) => item.id === normalized) ?? this.fontOptions[0];
-        if (!option.face) {
-          embeddedFonts.set(normalized, defaultFont);
-          return defaultFont;
-        }
-
-        const bytes = await this.loadFontBytes(option);
-        if (!bytes) {
-          embeddedFonts.set(normalized, defaultFont);
-          return defaultFont;
-        }
-
-        const customFont = await pdf.embedFont(bytes, { subset: true });
-        embeddedFonts.set(normalized, customFont);
-        return customFont;
-      };
-
-      for (const pageAnnotations of this.coords()) {
-        const page = pdf.getPage(pageAnnotations.num - 1);
-        for (const field of pageAnnotations.fields) {
-          const hex = field.color.replace('#', '');
-          const r = parseInt(hex.substring(0, 2), 16) / 255;
-          const g = parseInt(hex.substring(2, 4), 16) / 255;
-          const b = parseInt(hex.substring(4, 6), 16) / 255;
-          const font = await getEmbeddedFont(field.fontType);
-
-          page.drawText(field.mapField, {
-            x: field.x,
-            y: field.y,
-            size: field.fontSize,
-            color: rgb(r, g, b),
-            font,
-          });
-        }
-      }
-
-      const pdfBytes = await pdf.save({ useObjectStreams: false });
-      const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'annotated.pdf';
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('No se pudo generar el PDF anotado.', error);
-      alert(
-        'No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.'
-      );
+    try {
+      return new URL(trimmed, base).toString();
+    } catch {
+      return trimmed;
     }
   }
 
-  private async loadFontBytes(option: FontOption): Promise<Uint8Array | null> {
-    if (!option.face) {
+  private async loadFontBytes(
+    option: FontOption
+  ): Promise<{ bytes: Uint8Array; sourceUrl: string } | null> {
+    if (!option.remote) {
       return null;
     }
 
@@ -1155,35 +1263,37 @@ export class App implements AfterViewChecked {
 
     let lastError: unknown = null;
 
-    for (const source of option.face.sources) {
-      try {
-        const url = resolveFontSourceUrl(source.path);
-        const response = await fetch(url);
-        if (!response.ok) {
-          continue;
-        }
-        const buffer = await response.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-        this.fontDataCache.set(option.id, bytes);
-        return bytes;
-      } catch (error) {
-        lastError = error;
-      }
+    const remoteSources = await this.getRemoteFontUrls(option);
+    if (remoteSources.length) {
+      this.ensureRemoteFonts();
     }
 
-    const remoteSources = await this.getRemoteFontUrls(option);
+    const failedSources = this.fontFailedSources.get(option.id);
+
     for (const url of remoteSources) {
+      const resolvedUrl = this.resolveFontSourceUrl(url);
+      if (!resolvedUrl) {
+        continue;
+      }
+
+      if (failedSources?.has(resolvedUrl)) {
+        continue;
+      }
+
       try {
-        const response = await fetch(url);
+        const response = await fetch(resolvedUrl);
         if (!response.ok) {
+          this.markFontSourceAsFailed(option.id, resolvedUrl);
           continue;
         }
         const buffer = await response.arrayBuffer();
         const bytes = new Uint8Array(buffer);
-        this.fontDataCache.set(option.id, bytes);
-        return bytes;
+        const payload = { bytes, sourceUrl: resolvedUrl } as const;
+        this.fontDataCache.set(option.id, payload);
+        return payload;
       } catch (error) {
         lastError = error;
+        this.markFontSourceAsFailed(option.id, resolvedUrl);
       }
     }
 
@@ -1196,12 +1306,27 @@ export class App implements AfterViewChecked {
   }
 
   private async getRemoteFontUrls(option: FontOption): Promise<readonly string[]> {
-    if (!option.face) {
+    if (!option.face?.family) {
       return [];
     }
 
     if (this.fontRemoteSourceCache.has(option.id)) {
       return this.fontRemoteSourceCache.get(option.id) ?? [];
+    }
+
+    const collected = new Map<string, number>();
+    const directSources = option.remote?.pdfSources ?? [];
+
+    for (let index = 0; index < directSources.length; index += 1) {
+      const url = directSources[index];
+      if (typeof url !== 'string') {
+        continue;
+      }
+      const trimmed = url.trim();
+      if (!trimmed) {
+        continue;
+      }
+      collected.set(trimmed, index);
     }
 
     const candidateStylesheets = new Set<string>();
@@ -1212,7 +1337,7 @@ export class App implements AfterViewChecked {
       candidateStylesheets.add(option.remote.stylesheet);
     }
 
-    const collected = new Map<string, number>();
+    const basePriority = collected.size;
 
     for (const stylesheetUrl of candidateStylesheets) {
       const css = await this.fetchRemoteStylesheet(stylesheetUrl);
@@ -1222,9 +1347,10 @@ export class App implements AfterViewChecked {
 
       const sources = this.extractRemoteFontSources(css, option);
       for (const source of sources) {
+        const priority = basePriority + source.priority;
         const currentPriority = collected.get(source.url);
-        if (currentPriority === undefined || source.priority < currentPriority) {
-          collected.set(source.url, source.priority);
+        if (currentPriority === undefined || priority < currentPriority) {
+          collected.set(source.url, priority);
         }
       }
     }
@@ -1269,7 +1395,12 @@ export class App implements AfterViewChecked {
       .toLowerCase();
     const sources: { url: string; priority: number }[] = [];
     const blockRegex = /@font-face\s*{[^}]*}/gi;
-    const formatPriority: Record<string, number> = { woff2: 0, woff: 1, truetype: 2, opentype: 3 };
+    const formatPriority: Record<string, number> = {
+      truetype: 0,
+      opentype: 1,
+      woff: 2,
+      woff2: 3,
+    };
     let blockMatch: RegExpExecArray | null;
 
     while ((blockMatch = blockRegex.exec(css))) {
@@ -1311,6 +1442,33 @@ export class App implements AfterViewChecked {
     }
 
     return sources;
+  }
+
+  private markFontSourceAsFailed(fontId: string, sourceUrl: string | undefined) {
+    const trimmed = typeof sourceUrl === 'string' ? sourceUrl.trim() : '';
+    if (!trimmed) {
+      return;
+    }
+    const existing = this.fontFailedSources.get(fontId) ?? new Set<string>();
+    existing.add(trimmed);
+    this.fontFailedSources.set(fontId, existing);
+  }
+
+  private ensureRemoteFonts() {
+    if (this.remoteFontsEnsured) {
+      return;
+    }
+    ensureRemoteFontStyles(this.document as Document | null);
+    this.remoteFontsEnsured = true;
+  }
+
+  private ensureFontForPreview(option: FontOption) {
+    if (option.assets?.length) {
+      ensureLocalFontFaces(this.document as Document | null);
+    }
+    if (option.remote) {
+      this.ensureRemoteFonts();
+    }
   }
 
   private async getPdfByteCandidates(): Promise<Uint8Array[]> {

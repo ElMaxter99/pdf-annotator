@@ -55,5 +55,10 @@
   },
   "viewer": {
     "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
+  },
+  "status": {
+    "loadingPdf": "Loading PDF…",
+    "importingAnnotations": "Importing annotations…",
+    "generatingPdf": "Generating annotated PDF…"
   }
 }

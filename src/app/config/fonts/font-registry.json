@@ -1,0 +1,290 @@
+[
+  {
+    "id": "roboto",
+    "label": "Roboto",
+    "pdf": [
+      "/fonts/roboto/Roboto-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf"
+    ]
+  },
+  {
+    "id": "poppins",
+    "label": "Poppins",
+    "pdf": [
+      "/fonts/poppins/Poppins-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/poppins/static/Poppins-Regular.ttf"
+    ]
+  },
+  {
+    "id": "inter",
+    "label": "Inter",
+    "pdf": [
+      "/fonts/inter/Inter-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/static/Inter-Regular.ttf"
+    ]
+  },
+  {
+    "id": "montserrat",
+    "label": "Montserrat",
+    "pdf": [
+      "/fonts/montserrat/Montserrat-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/montserrat/static/Montserrat-Regular.ttf"
+    ]
+  },
+  {
+    "id": "lato",
+    "label": "Lato",
+    "pdf": [
+      "/fonts/lato/Lato-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/lato/static/Lato-Regular.ttf"
+    ]
+  },
+  {
+    "id": "nunito",
+    "label": "Nunito",
+    "pdf": [
+      "/fonts/nunito/Nunito-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/nunito/static/Nunito-Regular.ttf"
+    ]
+  },
+  {
+    "id": "open-sans",
+    "label": "Open Sans",
+    "pdf": [
+      "/fonts/open-sans/OpenSans-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/opensans/static/OpenSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "manrope",
+    "label": "Manrope",
+    "pdf": [
+      "/fonts/manrope/Manrope-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/manrope/static/Manrope-Regular.ttf"
+    ]
+  },
+  {
+    "id": "fira-code",
+    "label": "Fira Code",
+    "pdf": [
+      "/fonts/fira-code/FiraCode-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/firacode/static/FiraCode-Regular.ttf"
+    ]
+  },
+  {
+    "id": "jetbrains-mono",
+    "label": "JetBrains Mono",
+    "pdf": [
+      "/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/jetbrainsmono/static/JetBrainsMono-Regular.ttf"
+    ]
+  },
+  {
+    "id": "playfair-display",
+    "label": "Playfair Display",
+    "pdf": [
+      "/fonts/playfair-display/PlayfairDisplay-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/playfairdisplay/static/PlayfairDisplay-Regular.ttf"
+    ]
+  },
+  {
+    "id": "merriweather",
+    "label": "Merriweather",
+    "pdf": [
+      "/fonts/merriweather/Merriweather-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/merriweather/static/Merriweather-Regular.ttf"
+    ]
+  },
+  {
+    "id": "source-serif-4",
+    "label": "Source Serif 4",
+    "pdf": [
+      "/fonts/source-serif-4/SourceSerif4-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sourceserif4/static/SourceSerif4-Regular.ttf"
+    ]
+  },
+  {
+    "id": "raleway",
+    "label": "Raleway",
+    "pdf": [
+      "/fonts/raleway/Raleway-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/raleway/static/Raleway-Regular.ttf"
+    ]
+  },
+  {
+    "id": "oswald",
+    "label": "Oswald",
+    "pdf": [
+      "/fonts/oswald/Oswald-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/oswald/static/Oswald-Regular.ttf"
+    ]
+  },
+  {
+    "id": "work-sans",
+    "label": "Work Sans",
+    "pdf": [
+      "/fonts/work-sans/WorkSans-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/worksans/static/WorkSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "dm-sans",
+    "label": "DM Sans",
+    "pdf": [
+      "/fonts/dm-sans/DMSans-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/dmsans/static/DMSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "dm-serif-display",
+    "label": "DM Serif Display",
+    "pdf": [
+      "/fonts/dm-serif-display/DMSerifDisplay-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/dmserifdisplay/static/DMSerifDisplay-Regular.ttf"
+    ]
+  },
+  {
+    "id": "noto-sans-jp",
+    "label": "Noto Sans JP",
+    "pdf": [
+      "/fonts/noto-sans-jp/NotoSansJP-Regular.otf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosansjp/NotoSansJP-Regular.otf"
+    ]
+  },
+  {
+    "id": "noto-serif-display",
+    "label": "Noto Serif Display",
+    "pdf": [
+      "/fonts/noto-serif-display/NotoSerifDisplay-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notoserifdisplay/static/NotoSerifDisplay-Regular.ttf"
+    ]
+  },
+  {
+    "id": "cabin",
+    "label": "Cabin",
+    "pdf": [
+      "/fonts/cabin/Cabin-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/cabin/static/Cabin-Regular.ttf"
+    ]
+  },
+  {
+    "id": "karla",
+    "label": "Karla",
+    "pdf": [
+      "/fonts/karla/Karla-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/karla/static/Karla-Regular.ttf"
+    ]
+  },
+  {
+    "id": "space-grotesk",
+    "label": "Space Grotesk",
+    "pdf": [
+      "/fonts/space-grotesk/SpaceGrotesk-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/spacegrotesk/static/SpaceGrotesk-Regular.ttf"
+    ]
+  },
+  {
+    "id": "sora",
+    "label": "Sora",
+    "pdf": [
+      "/fonts/sora/Sora-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sora/static/Sora-Regular.ttf"
+    ]
+  },
+  {
+    "id": "bitter",
+    "label": "Bitter",
+    "pdf": [
+      "/fonts/bitter/Bitter-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/bitter/static/Bitter-Regular.ttf"
+    ]
+  },
+  {
+    "id": "archivo",
+    "label": "Archivo",
+    "pdf": [
+      "/fonts/archivo/Archivo-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/archivo/static/Archivo-Regular.ttf"
+    ]
+  },
+  {
+    "id": "heebo",
+    "label": "Heebo",
+    "pdf": [
+      "/fonts/heebo/Heebo-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/static/Heebo-Regular.ttf"
+    ]
+  },
+  {
+    "id": "crimson-pro",
+    "label": "Crimson Pro",
+    "pdf": [
+      "/fonts/crimson-pro/CrimsonPro-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/crimsonpro/static/CrimsonPro-Regular.ttf"
+    ]
+  },
+  {
+    "id": "ibm-plex-sans",
+    "label": "IBM Plex Sans",
+    "pdf": [
+      "/fonts/ibm-plex-sans/IBMPlexSans-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexsans/static/IBMPlexSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "ibm-plex-serif",
+    "label": "IBM Plex Serif",
+    "pdf": [
+      "/fonts/ibm-plex-serif/IBMPlexSerif-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexserif/static/IBMPlexSerif-Regular.ttf"
+    ]
+  },
+  {
+    "id": "ibm-plex-mono",
+    "label": "IBM Plex Mono",
+    "pdf": [
+      "/fonts/ibm-plex-mono/IBMPlexMono-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexmono/static/IBMPlexMono-Regular.ttf"
+    ]
+  },
+  {
+    "id": "urbanist",
+    "label": "Urbanist",
+    "pdf": [
+      "/fonts/urbanist/Urbanist-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/urbanist/static/Urbanist-Regular.ttf"
+    ]
+  },
+  {
+    "id": "sofia-sans",
+    "label": "Sofia Sans",
+    "pdf": [
+      "/fonts/sofia-sans/SofiaSans-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sofiasans/static/SofiaSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "asap",
+    "label": "Asap",
+    "pdf": [
+      "/fonts/asap/Asap-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/asap/static/Asap-Regular.ttf"
+    ]
+  },
+  {
+    "id": "quicksand",
+    "label": "Quicksand",
+    "pdf": [
+      "/fonts/quicksand/Quicksand-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/quicksand/static/Quicksand-Regular.ttf"
+    ]
+  },
+  {
+    "id": "zilla-slab",
+    "label": "Zilla Slab",
+    "pdf": [
+      "/fonts/zilla-slab/ZillaSlab-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/zillaslab/static/ZillaSlab-Regular.ttf"
+    ]
+  }
+]

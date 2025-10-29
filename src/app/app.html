@@ -1,34 +1,34 @@
-<div class="app">
+<div class="app" [attr.aria-busy]="busy()">
   <!-- HEADER -->
   <header class="header">
     <div class="logo">{{ 'app.title' | t }}</div>
-    <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="input-file" />
+    <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="input-file" [disabled]="busy()" />
 
     <div class="controls">
       <input
         #coordsFileInput
         type="file"
-        accept="application/json"
+        accept="application/json" [disabled]="busy()"
         (change)="onCoordsFileSelected($event)"
         hidden
       />
-      <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">◀
+      <button class="btn" (click)="prevPage()" [disabled]="busy() || !pdfDoc || pageIndex()===1">◀
         {{ 'controls.prev' | t }}</button>
       <span
         class="page-indicator">{{ 'controls.pageIndicator' | t : { current: pageIndex(), total: pageCount || 0 } }}</span>
-      <button class="btn" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">{{ 'controls.next' | t }}
+      <button class="btn" (click)="nextPage()" [disabled]="busy() || !pdfDoc || pageIndex()===pageCount">{{ 'controls.next' | t }}
         ▶</button>
 
-      <button class="btn" (click)="zoomOut()" [disabled]="!pdfDoc">−</button>
+      <button class="btn" (click)="zoomOut()" [disabled]="busy() || !pdfDoc">−</button>
       <span class="page-indicator">{{ 'controls.zoomLabel' | t }} {{ scale() | number:'1.0-2' }}×</span>
-      <button class="btn" (click)="zoomIn()" [disabled]="!pdfDoc">+</button>
+      <button class="btn" (click)="zoomIn()" [disabled]="busy() || !pdfDoc">+</button>
 
-      <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">{{ 'controls.clear' | t }}</button>
-      <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
+      <button class="btn danger" (click)="clearAll()" [disabled]="busy() || !coords().length">{{ 'controls.clear' | t }}</button>
+      <button class="btn" (click)="copyJSON()" [disabled]="busy() || !coords().length">{{ 'controls.copyJson' | t }}</button>
       <button class="btn" (click)="downloadJSON()"
-        [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
+        [disabled]="busy() || !coords().length">{{ 'controls.downloadJson' | t }}</button>
       <button class="btn" (click)="downloadAnnotatedPDF()"
-        [disabled]="!coords().length || !pdfDoc">{{ 'controls.downloadPdf' | t }}</button>
+        [disabled]="busy() || !coords().length || !pdfDoc">{{ 'controls.downloadPdf' | t }}</button>
     </div>
 
     <div class="language-selector">
@@ -45,10 +45,10 @@
   <aside class="sidebar">
     <h4>{{ 'sidebar.title' | t }}</h4>
     <div class="sidebar-actions">
-      <button type="button" class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">
+      <button type="button" class="btn" (click)="triggerImportCoords()" [disabled]="busy() || !pdfDoc">
         {{ 'sidebar.importJsonFile' | t }}
       </button>
-      <button type="button" class="btn" (click)="applyCoordsText()">
+      <button type="button" class="btn" (click)="applyCoordsText()" [disabled]="busy()">
         {{ 'sidebar.applyJson' | t }}
       </button>
     </div>
@@ -246,4 +246,11 @@
       <span>Desarrollado por {{ appAuthor }}</span>
     </div>
   </footer>
+  <div class="global-loader" *ngIf="busy()">
+    <div class="global-loader__backdrop" aria-hidden="true"></div>
+    <div class="global-loader__content" role="status" aria-live="polite">
+      <div class="global-loader__spinner" aria-hidden="true"></div>
+      <p *ngIf="busyMessageKey() as key">{{ key | t }}</p>
+    </div>
+  </div>
 </div>
