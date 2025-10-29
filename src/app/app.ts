@@ -1158,15 +1158,44 @@ export class App implements AfterViewChecked {
             const r = parseInt(hex.substring(0, 2), 16) / 255;
             const g = parseInt(hex.substring(2, 4), 16) / 255;
             const b = parseInt(hex.substring(4, 6), 16) / 255;
-            const font = await getEmbeddedFont(field.fontType);
+            const normalizedFontType = normalizeFontTypeOption(field.fontType);
+            const font = await getEmbeddedFont(normalizedFontType);
 
-            page.drawText(field.mapField, {
-              x: field.x,
-              y: field.y,
-              size: field.fontSize,
-              color: rgb(r, g, b),
-              font,
-            });
+            try {
+              page.drawText(field.mapField, {
+                x: field.x,
+                y: field.y,
+                size: field.fontSize,
+                color: rgb(r, g, b),
+                font,
+              });
+            } catch (error) {
+              if (font !== defaultFont) {
+                try {
+                  page.drawText(field.mapField, {
+                    x: field.x,
+                    y: field.y,
+                    size: field.fontSize,
+                    color: rgb(r, g, b),
+                    font: defaultFont,
+                  });
+                  console.warn(
+                    `No se pudo dibujar el texto con la fuente "${normalizedFontType}". Se usó la fuente predeterminada en su lugar.`,
+                    error
+                  );
+                } catch (fallbackError) {
+                  console.error(
+                    `No se pudo dibujar el texto de la anotación con la fuente predeterminada tras fallar la fuente "${normalizedFontType}".`,
+                    fallbackError
+                  );
+                }
+              } else {
+                console.error(
+                  'No se pudo dibujar el texto de la anotación con la fuente predeterminada.',
+                  error
+                );
+              }
+            }
           }
         }
 

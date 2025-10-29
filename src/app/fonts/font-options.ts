@@ -113,6 +113,46 @@ export const FONT_OPTIONS: readonly FontOption[] = [
 
 const FONT_LOOKUP = new Map<string, FontOption>(FONT_OPTIONS.map((option) => [option.id, option]));
 
+function findFontId(candidate: string): string | null {
+  const trimmed = candidate.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (FONT_LOOKUP.has(trimmed)) {
+    return trimmed;
+  }
+
+  const normalized = trimmed.toLowerCase();
+
+  for (const option of FONT_OPTIONS) {
+    if (option.id.toLowerCase() === normalized) {
+      return option.id;
+    }
+
+    const normalizedLabel = option.label.trim().toLowerCase();
+    if (normalizedLabel && normalizedLabel === normalized) {
+      return option.id;
+    }
+
+    const primaryFamily = option.family
+      .split(',')[0]
+      ?.replace(/^['"]|['"]$/g, '')
+      .trim()
+      .toLowerCase();
+    if (primaryFamily && primaryFamily === normalized) {
+      return option.id;
+    }
+
+    const faceFamily = option.face?.family?.trim().toLowerCase();
+    if (faceFamily && faceFamily === normalized) {
+      return option.id;
+    }
+  }
+
+  return null;
+}
+
 function extractFontTypeId(input: unknown): string | null {
   if (typeof input === 'string') {
     return input;
@@ -140,7 +180,23 @@ export function normalizeFontType(fontType: unknown): string {
     return DEFAULT_FONT_TYPE;
   }
 
-  return FONT_LOOKUP.has(candidate) ? candidate : DEFAULT_FONT_TYPE;
+  const matched = findFontId(candidate);
+  if (matched) {
+    return matched;
+  }
+
+  if (fontType && typeof fontType === 'object') {
+    for (const value of Object.values(fontType as Record<string, unknown>)) {
+      if (typeof value === 'string') {
+        const fallback = findFontId(value);
+        if (fallback) {
+          return fallback;
+        }
+      }
+    }
+  }
+
+  return DEFAULT_FONT_TYPE;
 }
 
 export function resolveFontOption(fontType: unknown): FontOption {
