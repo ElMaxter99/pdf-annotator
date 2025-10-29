@@ -451,12 +451,23 @@ export class App implements AfterViewChecked {
 
   filterFontOptions(term: string): readonly FontOption[] {
     const normalized = term?.trim().toLowerCase() ?? '';
-    if (!normalized) {
-      return this.fontOptions;
+    const options = !normalized
+      ? this.fontOptions
+      : this.fontOptions.filter((option) =>
+          option.searchTerms.some((keyword) => keyword.includes(normalized))
+        );
+
+    this.ensureFontsForOptions(options);
+    return options;
+  }
+
+  private ensureFontsForOptions(options: readonly FontOption[]) {
+    for (const option of options) {
+      if (option.id === DEFAULT_FONT_TYPE) {
+        continue;
+      }
+      this.ensureFontAvailability(option.id);
     }
-    return this.fontOptions.filter((option) =>
-      option.searchTerms.some((keyword) => keyword.includes(normalized))
-    );
   }
 
   private ensureFontsForAnnotations(pages: PageAnnotations[]) {
