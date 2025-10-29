@@ -161,6 +161,11 @@ export class App implements AfterViewChecked {
     effect(() => {
       this.primeFontOptions(this.editFontResults());
     });
+    effect(() => {
+      const pages = this.coords();
+      const fonts = this.collectFontTypesFromPages(pages);
+      void this.ensureFontsForTypes(fonts);
+    });
   }
 
   onLanguageChange(language: string) {
@@ -352,7 +357,7 @@ export class App implements AfterViewChecked {
     });
     this.previewFontQuery.set('');
     this.shouldFocusPreviewInput = true;
-    this.ensureFontForType(DEFAULT_FONT_TYPE);
+    void this.ensureFontForType(DEFAULT_FONT_TYPE);
     this.updatePreviewColorState(defaultColor);
   }
 
@@ -533,7 +538,7 @@ export class App implements AfterViewChecked {
           }
         : p
     );
-    this.ensureFontForType(normalized);
+    void this.ensureFontForType(normalized);
   }
 
   selectEditFont(fontType: string) {
@@ -549,7 +554,7 @@ export class App implements AfterViewChecked {
           }
         : e
     );
-    this.ensureFontForType(normalized);
+    void this.ensureFontForType(normalized);
   }
 
   confirmPreview() {
@@ -563,7 +568,7 @@ export class App implements AfterViewChecked {
       color: this.normalizeColor(p.field.color),
       fontType: normalizeFontType(p.field.fontType),
     };
-    this.ensureFontForType(normalizedField.fontType);
+    void this.ensureFontForType(normalizedField.fontType);
     this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
     this.syncCoordsTextModel();
     this.preview.set(null);
@@ -593,7 +598,7 @@ export class App implements AfterViewChecked {
     this.editing.set({ pageIndex, fieldIndex, field: { ...normalized } });
     this.editFontQuery.set('');
     this.shouldFocusEditInput = true;
-    this.ensureFontForType(normalized.fontType);
+    void this.ensureFontForType(normalized.fontType);
     this.updateEditingColorState(normalized.color);
     this.preview.set(null);
   }
@@ -606,7 +611,7 @@ export class App implements AfterViewChecked {
       color: this.normalizeColor(e.field.color),
       fontType: normalizeFontType(e.field.fontType),
     };
-    this.ensureFontForType(normalized.fontType);
+    void this.ensureFontForType(normalized.fontType);
     this.coords.update((pages) =>
       this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
     );
@@ -733,7 +738,7 @@ export class App implements AfterViewChecked {
           el.dataset['font'] = fontOption.id;
           el.style.setProperty('--annotation-font-family', fontOption.family);
           el.style.fontFamily = fontOption.family;
-          this.ensureFontForType(fontOption.id);
+          void this.ensureFontForType(fontOption.id);
 
           el.onpointerdown = (evt) =>
             this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
@@ -1026,6 +1031,8 @@ export class App implements AfterViewChecked {
         }
       }
 
+      await this.ensureFontsForTypes(uniqueFontTypes);
+
       for (const fontType of uniqueFontTypes) {
         if (fontType === DEFAULT_FONT_TYPE) {
           continue;
@@ -1131,15 +1138,33 @@ export class App implements AfterViewChecked {
     }
   }
 
-  private ensureFontForType(fontType: unknown) {
+  private ensureFontForType(fontType: unknown): Promise<void> {
     const option = resolveFontOption(fontType);
-    ensureFontFaceLoaded(option, this.document).catch(() => {});
+    return ensureFontFaceLoaded(option, this.document).catch(() => {});
   }
 
   private primeFontOptions(options: readonly { id: string }[]) {
     for (const option of options) {
-      this.ensureFontForType(option.id);
+      void this.ensureFontForType(option.id);
     }
+  }
+
+  private collectFontTypesFromPages(pages: readonly PageAnnotations[]): string[] {
+    const fontTypes = new Set<string>();
+    for (const page of pages) {
+      for (const field of page.fields) {
+        fontTypes.add(normalizeFontType(field.fontType));
+      }
+    }
+    return Array.from(fontTypes);
+  }
+
+  private ensureFontsForTypes(fontTypes: Iterable<string>): Promise<void> {
+    const promises: Promise<void>[] = [];
+    for (const fontType of fontTypes) {
+      promises.push(this.ensureFontForType(fontType));
+    }
+    return Promise.all(promises).then(() => undefined);
   }
 
   private getSerializableCoords(): SerializableAnnotations[] {
