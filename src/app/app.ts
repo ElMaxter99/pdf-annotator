@@ -733,6 +733,7 @@ export class App implements AfterViewChecked {
           const fontType = normalizeFontType(field.fontType);
           const fontOption = resolveFontOption(fontType);
           el.dataset['font'] = fontOption.id;
+          el.style.setProperty('--annotation-font-family', fontOption.family);
           el.style.fontFamily = fontOption.family;
           this.ensureFontForType(fontOption.id);
 

@@ -388,10 +388,15 @@ export function createFontStyleSheet(): string {
       }
     }
 
-    css.push(`.annotation[data-font='${option.id}'] { font-family: ${option.family}; }`);
+    css.push(
+      [
+        `.annotation[data-font='${option.id}'] {`,
+        `  --annotation-font-family: ${option.family};`,
+        `  font-family: ${option.family};`,
+        `}`,
+      ].join('\n')
+    );
   }
-
-  css.push(`.annotation { font-family: ${DEFAULT_FONT_FAMILY}; }`);
 
   return css.join('\n');
 }
@@ -455,12 +460,17 @@ async function tryLoadFontFace(
 
   for (const source of sorted) {
     try {
-      const fontFace = new view.FontFace(family, `url(${source.path})`, toFontFaceDescriptors(source));
+      const descriptors = toFontFaceDescriptors(source);
+      const fontFace = new view.FontFace(family, `url(${source.path})`, descriptors);
       const loaded = await fontFace.load();
       view.document.fonts.add(loaded);
       if (typeof view.document.fonts.load === 'function') {
         try {
-          await view.document.fonts.load(`1em ${JSON.stringify(family)}`);
+          const weight = descriptors.weight ?? '400';
+          const style = descriptors.style ?? 'normal';
+          await view.document.fonts.load(
+            `${style} ${weight} 1em ${JSON.stringify(family)}`.replace(/\s+/g, ' ')
+          );
         } catch {
           // Ignore loading hint failures; the face is already registered.
         }
