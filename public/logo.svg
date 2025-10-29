@@ -1,22 +1,7 @@
-<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">PDF Annotator Logo</title>
-  <desc id="desc">Icono circular con iniciales P y A y una anotación resaltada</desc>
-  <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff6b6b" />
-      <stop offset="100%" stop-color="#845ef7" />
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#1f1b2e" flood-opacity="0.35" />
-    </filter>
-  </defs>
-  <g filter="url(#shadow)">
-    <circle cx="100" cy="100" r="88" fill="url(#gradient)" />
-    <path d="M60 70 h36 a24 24 0 1 1 0 48 H60 Z" fill="#ffffff" opacity="0.92" />
-    <path d="M106 92 h24" stroke="#ff922b" stroke-width="10" stroke-linecap="round" />
-    <path d="M112 108 l24 24" stroke="#ffd43b" stroke-width="12" stroke-linecap="round" />
-    <path d="M120 132 l32 -12" stroke="#7048e8" stroke-width="12" stroke-linecap="round" />
-    <path d="M76 84 v44" stroke="#1c1c1e" stroke-width="12" stroke-linecap="round" />
-    <path d="M84 84 v44" stroke="#1c1c1e" stroke-width="12" stroke-linecap="round" />
-  </g>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="12" fill="#2A2A3D"/>
+  <path d="M18 16H36L46 26V48C46 50.2091 44.2091 52 42 52H18C15.7909 52 14 50.2091 14 48V20C14 17.7909 15.7909 16 18 16Z" fill="#5EEAD4"/>
+  <path d="M36 16V26H46" fill="#2A2A3D"/>
+  <path d="M22 32H38" stroke="#1E1E2F" stroke-width="3" stroke-linecap="round"/>
+  <path d="M22 40H34" stroke="#1E1E2F" stroke-width="3" stroke-linecap="round"/>
 </svg>
