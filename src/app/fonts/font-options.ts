@@ -113,11 +113,34 @@ export const FONT_OPTIONS: readonly FontOption[] = [
 
 const FONT_LOOKUP = new Map<string, FontOption>(FONT_OPTIONS.map((option) => [option.id, option]));
 
+function extractFontTypeId(input: unknown): string | null {
+  if (typeof input === 'string') {
+    return input;
+  }
+
+  if (!input || typeof input !== 'object') {
+    return null;
+  }
+
+  const candidates = ['id', 'value', 'font', 'fontType'] as const;
+  const bag = input as Record<string, unknown>;
+  for (const key of candidates) {
+    const value = bag[key];
+    if (typeof value === 'string') {
+      return value;
+    }
+  }
+
+  return null;
+}
+
 export function normalizeFontType(fontType: unknown): string {
-  if (typeof fontType !== 'string') {
+  const candidate = extractFontTypeId(fontType);
+  if (!candidate) {
     return DEFAULT_FONT_TYPE;
   }
-  return FONT_LOOKUP.has(fontType) ? fontType : DEFAULT_FONT_TYPE;
+
+  return FONT_LOOKUP.has(candidate) ? candidate : DEFAULT_FONT_TYPE;
 }
 
 export function resolveFontOption(fontType: unknown): FontOption {
