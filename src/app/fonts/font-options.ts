@@ -10,6 +10,11 @@ export interface FontRemoteConfig {
   readonly pdfSources?: readonly string[];
 }
 
+export interface FontAssetSource {
+  readonly url: string;
+  readonly format?: 'auto' | 'woff2' | 'woff' | 'truetype' | 'opentype';
+}
+
 export interface FontOption {
   readonly id: string;
   readonly label: string;
@@ -17,6 +22,7 @@ export interface FontOption {
   readonly searchTerms: readonly string[];
   readonly face?: FontFaceConfig;
   readonly remote?: FontRemoteConfig;
+  readonly assets?: readonly FontAssetSource[];
 }
 
 interface FontDefinition {
@@ -91,6 +97,41 @@ function normalizePdfSources(input: FontDefinition['pdf']): readonly string[] | 
   return undefined;
 }
 
+function detectFontFormat(url: string): FontAssetSource['format'] {
+  const lower = url.split('?')[0]?.toLowerCase() ?? '';
+  if (lower.endsWith('.woff2')) {
+    return 'woff2';
+  }
+  if (lower.endsWith('.woff')) {
+    return 'woff';
+  }
+  if (lower.endsWith('.otf')) {
+    return 'opentype';
+  }
+  if (lower.endsWith('.ttf')) {
+    return 'truetype';
+  }
+  return 'auto';
+}
+
+function isRemoteUrl(url: string): boolean {
+  return /^(?:https?:)?\/\//i.test(url) || url.startsWith('data:') || url.startsWith('blob:');
+}
+
+function createFontAssets(definition: FontDefinition): FontAssetSource[] | undefined {
+  const pdfSources = normalizePdfSources(definition.pdf);
+  if (!pdfSources?.length) {
+    return undefined;
+  }
+
+  const assets = pdfSources
+    .map((source) => source.trim())
+    .filter((source) => source.length > 0 && !isRemoteUrl(source))
+    .map((source) => ({ url: source, format: detectFontFormat(source) } as const));
+
+  return assets.length ? assets : undefined;
+}
+
 function createRemoteConfig(definition: FontDefinition): FontRemoteConfig | undefined {
   const family = encodeGoogleFamily(definition.googleFamily ?? definition.family ?? definition.label);
   if (!family) {
@@ -108,6 +149,7 @@ function createRemoteConfig(definition: FontDefinition): FontRemoteConfig | unde
 function createFontOption(definition: FontDefinition): FontOption {
   const familyName = definition.family ?? definition.label;
   const remote = createRemoteConfig(definition);
+  const assets = createFontAssets(definition);
 
   return {
     id: definition.id,
@@ -121,6 +163,7 @@ function createFontOption(definition: FontDefinition): FontOption {
         }
       : undefined,
     remote,
+    assets,
   };
 }
 
@@ -297,4 +340,57 @@ export function ensureRemoteFontStyles(
   linkEl.href = REMOTE_STYLESHEET_URL;
   linkEl.crossOrigin = 'anonymous';
   doc.head.appendChild(linkEl);
+}
+
+const LOCAL_FONT_STYLE_ID = 'annotation-fonts-local';
+
+export function createLocalFontFaceSheet(): string {
+  const rules: string[] = [];
+
+  for (const option of FONT_OPTIONS) {
+    if (!option.assets?.length || !option.face?.family) {
+      continue;
+    }
+
+    const familyName = option.face.family.replace(/'/g, "\\'");
+    const display = option.face.display ?? 'swap';
+    const sources = option.assets
+      .map((asset) => {
+        const sanitizedUrl = asset.url.replace(/'/g, "\\'");
+        const format = asset.format && asset.format !== 'auto' ? ` format('${asset.format}')` : '';
+        return `url('${sanitizedUrl}')${format}`;
+      })
+      .join(', ');
+
+    if (!sources) {
+      continue;
+    }
+
+    rules.push(
+      `@font-face { font-family: '${familyName}'; font-style: normal; font-weight: 400; font-display: ${display}; src: ${sources}; }`
+    );
+  }
+
+  return rules.join('\n');
+}
+
+export function ensureLocalFontFaces(
+  doc: Document | null = typeof document !== 'undefined' ? document : null
+) {
+  if (!doc) {
+    return;
+  }
+  if (doc.getElementById(LOCAL_FONT_STYLE_ID)) {
+    return;
+  }
+
+  const css = createLocalFontFaceSheet();
+  if (!css) {
+    return;
+  }
+
+  const styleEl = doc.createElement('style');
+  styleEl.id = LOCAL_FONT_STYLE_ID;
+  styleEl.textContent = css;
+  doc.head.appendChild(styleEl);
 }

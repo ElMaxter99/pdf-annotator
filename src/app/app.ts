@@ -20,6 +20,7 @@ import {
   FONT_OPTIONS,
   FontOption,
   ensureFontStyles,
+  ensureLocalFontFaces,
   ensureRemoteFontStyles,
   REMOTE_FONT_STYLESHEET_URL,
   normalizeFontType as normalizeFontTypeOption,
@@ -170,6 +171,7 @@ export class App implements AfterViewChecked {
 
   constructor() {
     ensureFontStyles(this.document as Document | null);
+    ensureLocalFontFaces(this.document as Document | null);
     this.ensureRemoteFonts();
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
@@ -1217,6 +1219,42 @@ export class App implements AfterViewChecked {
   }
 
 
+  private resolveFontSourceUrl(url: string): string {
+    const trimmed = typeof url === 'string' ? url.trim() : '';
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(?:https?:)?\/\//i.test(trimmed)) {
+      if (trimmed.startsWith('//')) {
+        const docProtocol = (this.document as Document | null)?.location?.protocol;
+        const winProtocol = typeof window !== 'undefined' ? window.location?.protocol : undefined;
+        const protocol = docProtocol ?? winProtocol ?? 'https:';
+        return `${protocol}${trimmed}`;
+      }
+      return trimmed;
+    }
+
+    if (trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+      return trimmed;
+    }
+
+    const base =
+      (this.document as Document | null)?.baseURI ??
+      (typeof window !== 'undefined' ? window.location?.origin ?? '' : '');
+
+    if (!base) {
+      return trimmed;
+    }
+
+    try {
+      return new URL(trimmed, base).toString();
+    } catch {
+      return trimmed;
+    }
+  }
+
+
   private async loadFontBytes(
     option: FontOption
   ): Promise<{ bytes: Uint8Array; sourceUrl: string } | null> {
@@ -1238,22 +1276,29 @@ export class App implements AfterViewChecked {
     const failedSources = this.fontFailedSources.get(option.id);
 
     for (const url of remoteSources) {
-      if (failedSources?.has(url)) {
+      const resolvedUrl = this.resolveFontSourceUrl(url);
+      if (!resolvedUrl) {
+        continue;
+      }
+
+      if (failedSources?.has(resolvedUrl)) {
         continue;
       }
 
       try {
-        const response = await fetch(url);
+        const response = await fetch(resolvedUrl);
         if (!response.ok) {
+          this.markFontSourceAsFailed(option.id, resolvedUrl);
           continue;
         }
         const buffer = await response.arrayBuffer();
         const bytes = new Uint8Array(buffer);
-        const payload = { bytes, sourceUrl: url } as const;
+        const payload = { bytes, sourceUrl: resolvedUrl } as const;
         this.fontDataCache.set(option.id, payload);
         return payload;
       } catch (error) {
         lastError = error;
+        this.markFontSourceAsFailed(option.id, resolvedUrl);
       }
     }
 
@@ -1405,11 +1450,12 @@ export class App implements AfterViewChecked {
   }
 
   private markFontSourceAsFailed(fontId: string, sourceUrl: string | undefined) {
-    if (!sourceUrl) {
+    const trimmed = typeof sourceUrl === 'string' ? sourceUrl.trim() : '';
+    if (!trimmed) {
       return;
     }
     const existing = this.fontFailedSources.get(fontId) ?? new Set<string>();
-    existing.add(sourceUrl);
+    existing.add(trimmed);
     this.fontFailedSources.set(fontId, existing);
   }
 
@@ -1422,6 +1468,9 @@ export class App implements AfterViewChecked {
   }
 
   private ensureFontForPreview(option: FontOption) {
+    if (option.assets?.length) {
+      ensureLocalFontFaces(this.document as Document | null);
+    }
     if (option.remote) {
       this.ensureRemoteFonts();
     }
