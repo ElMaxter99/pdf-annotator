@@ -9,7 +9,6 @@
 </p>
 
 <p align="center">
-  <a href="#-demo-en-vivo"><img src="https://img.shields.io/badge/Demo-GitHub%20Pages-845ef7?style=for-the-badge&logo=github" alt="Ver demo" /></a>
   <a href="#-caracteristicas-destacadas"><img src="https://img.shields.io/badge/Highlights-Descubre%20funciones-ff6b6b?style=for-the-badge" alt="Características" /></a>
   <a href="https://github.com/ElMaxter99/pdf-annotator/issues/new/choose"><img src="https://img.shields.io/badge/Issues-Bienvenido%20feedback-00b894?style=for-the-badge&logo=github" alt="Reportar issue" /></a>
 </p>
@@ -20,7 +19,6 @@
 - [📚 Tabla de contenidos](#-tabla-de-contenidos)
 - [✨ Características destacadas](#-características-destacadas)
 - [🧰 Stack tecnológico](#-stack-tecnológico)
-- [🚀 Demo en vivo](#-demo-en-vivo)
 - [🛠 Requisitos](#-requisitos)
 - [⚙ Instalación](#-instalación)
 - [▶ Uso paso a paso](#-uso-paso-a-paso)
@@ -52,11 +50,6 @@
 | Angular 20 · RxJS · Angular Material | pdf-lib · pdfjs-dist | TypeScript · Sass · Vite dev server |
 
 > El repositorio incluye scripts para validar traducciones (`npm run i18n:check`) antes de construir la aplicación.
-
-## 🚀 Demo en vivo
-Aún no se publica una demo estática, pero puedes generarla rápidamente:
-
-Preview -> `https://elmaxter99.github.io/pdf-annotator/`.
 
 ## 🛠 Requisitos
 - Node.js **v22.12.0** (o compatible con Angular 20).
