@@ -36,6 +36,11 @@
       "size": {
         "label": "Size"
       },
+      "font": {
+        "label": "Font",
+        "searchPlaceholder": "Search fonts...",
+        "noResults": "No matching fonts"
+      },
       "color": {
         "label": "Color"
       }

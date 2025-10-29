@@ -259,7 +259,7 @@ header .logo {
   border-radius: 4px;
   white-space: nowrap;
   transition: .2s;
-  font-family: 'Helvetica, Arial, sans-serif';
+  font-family: Helvetica, Arial, sans-serif;
   font-weight: normal;
   letter-spacing: 0;
   line-height: 1;
@@ -290,7 +290,8 @@ header .logo {
   backdrop-filter: blur(10px);
 
   input[type="text"],
-  input[type="number"] {
+  input[type="number"],
+  input[type="search"] {
     border-radius: 4px;
     border: 1px solid rgba(94, 234, 212, 0.25);
     padding: 6px;
@@ -313,7 +314,7 @@ header .logo {
     cursor: pointer;
   }
 
-  button {
+  .editor-actions button {
     cursor: pointer;
     border: none;
     border-radius: 6px;
@@ -324,7 +325,7 @@ header .logo {
     transition: transform .1s ease;
   }
 
-  button:hover {
+  .editor-actions button:hover {
     transform: translateY(-1px);
   }
 
@@ -366,6 +367,62 @@ header .logo {
     text-transform: uppercase;
     letter-spacing: .05em;
     color: var(--accent);
+  }
+
+  .font-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .font-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .font-picker__list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 180px;
+    overflow-y: auto;
+    border: 1px solid rgba(94, 234, 212, 0.2);
+    border-radius: 6px;
+    padding: 6px;
+    background: rgba(20, 20, 34, 0.9);
+  }
+
+  .font-picker__option {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background .15s ease, transform .1s ease;
+  }
+
+  .font-picker__option:hover,
+  .font-picker__option:focus-visible {
+    background: rgba(94, 234, 212, 0.18);
+    outline: none;
+  }
+
+  .font-picker__option.selected {
+    background: rgba(94, 234, 212, 0.35);
+    color: #061111;
+  }
+
+  .font-picker__empty {
+    font-size: .8rem;
+    color: var(--muted);
+    border: 1px dashed rgba(94, 234, 212, 0.25);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
   }
 
   .color-section {

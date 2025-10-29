@@ -75,13 +75,45 @@
         (keydown)="onEditorKeydown($event, 'preview')">
         <label class="field">
           <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
-          <input type="text" [(ngModel)]="p.field.mapField"
+          <input
+            type="text"
+            [(ngModel)]="p.field.mapField"
+            [style.font-family]="getFontFamilyRef(p.field.fontType)"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
           <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
         </label>
+        <div class="font-section">
+          <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
+          <div class="font-picker">
+            <input
+              type="search"
+              [value]="previewFontQuery()"
+              (input)="onPreviewFontSearch($any($event.target).value)"
+              [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
+            />
+            <ng-container *ngIf="previewFontResults().length; else previewFontEmpty">
+              <div class="font-picker__list" role="listbox">
+                <button
+                  type="button"
+                  class="font-picker__option"
+                  *ngFor="let option of previewFontResults()"
+                  [class.selected]="p.field.fontType === option.id"
+                  (click)="selectPreviewFont(option.id)"
+                  [attr.aria-selected]="p.field.fontType === option.id"
+                  [style.font-family]="option.family"
+                >
+                  {{ option.label }}
+                </button>
+              </div>
+            </ng-container>
+            <ng-template #previewFontEmpty>
+              <div class="font-picker__empty">{{ 'annotation.fields.font.noResults' | t }}</div>
+            </ng-template>
+          </div>
+        </div>
         <div class="color-section">
           <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
           <div class="color-row">
@@ -108,13 +140,45 @@
         <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
         <label class="field">
           <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
-          <input type="text" [(ngModel)]="e.field.mapField"
+          <input
+            type="text"
+            [(ngModel)]="e.field.mapField"
+            [style.font-family]="getFontFamilyRef(e.field.fontType)"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
           <input type="number" [(ngModel)]="e.field.fontSize" min="8" max="72" />
         </label>
+        <div class="font-section">
+          <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
+          <div class="font-picker">
+            <input
+              type="search"
+              [value]="editFontQuery()"
+              (input)="onEditFontSearch($any($event.target).value)"
+              [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
+            />
+            <ng-container *ngIf="editFontResults().length; else editFontEmpty">
+              <div class="font-picker__list" role="listbox">
+                <button
+                  type="button"
+                  class="font-picker__option"
+                  *ngFor="let option of editFontResults()"
+                  [class.selected]="e.field.fontType === option.id"
+                  (click)="selectEditFont(option.id)"
+                  [attr.aria-selected]="e.field.fontType === option.id"
+                  [style.font-family]="option.family"
+                >
+                  {{ option.label }}
+                </button>
+              </div>
+            </ng-container>
+            <ng-template #editFontEmpty>
+              <div class="font-picker__empty">{{ 'annotation.fields.font.noResults' | t }}</div>
+            </ng-template>
+          </div>
+        </div>
         <div class="color-section">
           <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
           <div class="color-row">

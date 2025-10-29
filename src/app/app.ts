@@ -4,6 +4,7 @@ import {
   ElementRef,
   ViewChild,
   signal,
+  computed,
   AfterViewChecked,
   HostListener,
   inject,
@@ -17,6 +18,18 @@ import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
+import {
+  DEFAULT_FONT_TYPE,
+  FONT_OPTIONS,
+  ensureFontFaceLoaded,
+  ensureFontStyles,
+  getFontFamily,
+  loadFontData,
+  matchFontOptions,
+  normalizeFontType,
+  resolveFontOption,
+  shouldPersistFontType,
+} from './fonts/font-options';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -67,9 +80,13 @@ type PageField = {
   mapField: string;
   fontSize: number;
   color: string;
+  fontType: string;
 };
 
 type PageAnnotations = { num: number; fields: PageField[] };
+
+type SerializableField = Omit<PageField, 'fontType'> & { fontType?: string };
+type SerializableAnnotations = { num: number; fields: SerializableField[] };
 
 type PreviewState = { page: number; field: PageField } | null;
 
@@ -94,6 +111,12 @@ export class App implements AfterViewChecked {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
+  readonly fontOptions = FONT_OPTIONS;
+  readonly getFontFamilyRef = getFontFamily;
+  previewFontQuery = signal('');
+  editFontQuery = signal('');
+  readonly previewFontResults = computed(() => matchFontOptions(this.previewFontQuery()));
+  readonly editFontResults = computed(() => matchFontOptions(this.editFontQuery()));
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
@@ -118,6 +141,8 @@ export class App implements AfterViewChecked {
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
+  private shouldFocusPreviewInput = false;
+  private shouldFocusEditInput = false;
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -128,6 +153,7 @@ export class App implements AfterViewChecked {
   @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
+    ensureFontStyles(this.document);
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
   }
@@ -170,21 +196,32 @@ export class App implements AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    if (this.preview()) {
+    const previewState = this.preview();
+    if (previewState && this.shouldFocusPreviewInput) {
       const previewEl = this.previewEditorRef?.nativeElement;
-      if (previewEl) {
-        const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement | null;
-        input?.focus();
+      const input = previewEl?.querySelector('input[type="text"]') as HTMLInputElement | null;
+      if (input && this.document.activeElement !== input) {
+        input.focus();
       }
-      return;
+      this.shouldFocusPreviewInput = false;
     }
 
-    if (this.editing()) {
+    if (!previewState) {
+      this.shouldFocusPreviewInput = false;
+    }
+
+    const editState = this.editing();
+    if (editState && this.shouldFocusEditInput) {
       const editEl = this.editEditorRef?.nativeElement;
-      if (editEl) {
-        const input = editEl.querySelector('input[type="text"]') as HTMLInputElement | null;
-        input?.focus();
+      const input = editEl?.querySelector('input[type="text"]') as HTMLInputElement | null;
+      if (input && this.document.activeElement !== input) {
+        input.focus();
       }
+      this.shouldFocusEditInput = false;
+    }
+
+    if (!editState) {
+      this.shouldFocusEditInput = false;
     }
   }
 
@@ -305,8 +342,12 @@ export class App implements AfterViewChecked {
         mapField: '',
         fontSize: 14,
         color: defaultColor,
+        fontType: DEFAULT_FONT_TYPE,
       },
     });
+    this.previewFontQuery.set('');
+    this.shouldFocusPreviewInput = true;
+    this.ensureFontForType(DEFAULT_FONT_TYPE);
     this.updatePreviewColorState(defaultColor);
   }
 
@@ -466,6 +507,46 @@ export class App implements AfterViewChecked {
     this.updateEditingColorState(value);
   }
 
+  onPreviewFontSearch(value: string) {
+    this.previewFontQuery.set(value);
+  }
+
+  onEditFontSearch(value: string) {
+    this.editFontQuery.set(value);
+  }
+
+  selectPreviewFont(fontType: string) {
+    const normalized = normalizeFontType(fontType);
+    this.preview.update((p) =>
+      p
+        ? {
+            ...p,
+            field: {
+              ...p.field,
+              fontType: normalized,
+            },
+          }
+        : p
+    );
+    this.ensureFontForType(normalized);
+  }
+
+  selectEditFont(fontType: string) {
+    const normalized = normalizeFontType(fontType);
+    this.editing.update((e) =>
+      e
+        ? {
+            ...e,
+            field: {
+              ...e.field,
+              fontType: normalized,
+            },
+          }
+        : e
+    );
+    this.ensureFontForType(normalized);
+  }
+
   confirmPreview() {
     const p = this.preview();
     if (!p || !p.field.mapField.trim()) {
@@ -475,19 +556,29 @@ export class App implements AfterViewChecked {
     const normalizedField: PageField = {
       ...p.field,
       color: this.normalizeColor(p.field.color),
+      fontType: normalizeFontType(p.field.fontType),
     };
+    this.ensureFontForType(normalizedField.fontType);
     this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
     this.syncCoordsTextModel();
     this.preview.set(null);
+    this.shouldFocusPreviewInput = false;
+    this.previewFontQuery.set('');
     this.redrawAllForPage();
   }
 
   cancelPreview() {
     this.preview.set(null);
+    this.previewFontQuery.set('');
+    this.shouldFocusPreviewInput = false;
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
-    const normalized: PageField = { ...field, color: this.normalizeColor(field.color) };
+    const normalized: PageField = {
+      ...field,
+      color: this.normalizeColor(field.color),
+      fontType: normalizeFontType(field.fontType),
+    };
     if (normalized.color !== field.color) {
       this.coords.update((pages) =>
         this.updateFieldInPages(pageIndex, fieldIndex, normalized, pages)
@@ -495,6 +586,9 @@ export class App implements AfterViewChecked {
       this.syncCoordsTextModel();
     }
     this.editing.set({ pageIndex, fieldIndex, field: { ...normalized } });
+    this.editFontQuery.set('');
+    this.shouldFocusEditInput = true;
+    this.ensureFontForType(normalized.fontType);
     this.updateEditingColorState(normalized.color);
     this.preview.set(null);
   }
@@ -505,17 +599,23 @@ export class App implements AfterViewChecked {
     const normalized: PageField = {
       ...e.field,
       color: this.normalizeColor(e.field.color),
+      fontType: normalizeFontType(e.field.fontType),
     };
+    this.ensureFontForType(normalized.fontType);
     this.coords.update((pages) =>
       this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
     );
     this.syncCoordsTextModel();
     this.editing.set(null);
+    this.editFontQuery.set('');
+    this.shouldFocusEditInput = false;
     this.redrawAllForPage();
   }
 
   cancelEdit() {
     this.editing.set(null);
+    this.editFontQuery.set('');
+    this.shouldFocusEditInput = false;
   }
 
   @HostListener('document:mousedown', ['$event'])
@@ -623,7 +723,11 @@ export class App implements AfterViewChecked {
           el.style.top = `${top - field.fontSize * scale}px`;
           el.style.fontSize = `${field.fontSize * scale}px`;
           el.style.color = field.color;
-          el.style.fontFamily = 'Helvetica, Arial, sans-serif';
+          const fontType = normalizeFontType(field.fontType);
+          const fontOption = resolveFontOption(fontType);
+          el.dataset['font'] = fontOption.id;
+          el.style.fontFamily = fontOption.family;
+          this.ensureFontForType(fontOption.id);
 
           el.onpointerdown = (evt) =>
             this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
@@ -858,7 +962,7 @@ export class App implements AfterViewChecked {
   }
 
   downloadJSON() {
-    const blob = new Blob([JSON.stringify({ pages: this.coords() }, null, 2)], {
+    const blob = new Blob([JSON.stringify({ pages: this.getSerializableCoords() }, null, 2)], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
@@ -906,7 +1010,35 @@ export class App implements AfterViewChecked {
       }
 
       this.rememberPdfBytes(usedBytes, 3);
-      const font = await pdf.embedFont(StandardFonts.Helvetica);
+      const defaultFont = await pdf.embedFont(StandardFonts.Helvetica);
+      const embeddedFonts = new Map<string, any>([[DEFAULT_FONT_TYPE, defaultFont]]);
+
+      const uniqueFontTypes = new Set<string>();
+      for (const pageAnnotations of this.coords()) {
+        for (const field of pageAnnotations.fields) {
+          uniqueFontTypes.add(normalizeFontType(field.fontType));
+        }
+      }
+
+      for (const fontType of uniqueFontTypes) {
+        if (fontType === DEFAULT_FONT_TYPE) {
+          continue;
+        }
+
+        const option = resolveFontOption(fontType);
+        try {
+          const fontData = await loadFontData(option);
+          if (fontData) {
+            const embedded = await pdf.embedFont(fontData, { subset: true });
+            embeddedFonts.set(fontType, embedded);
+          } else {
+            embeddedFonts.set(fontType, defaultFont);
+          }
+        } catch (error) {
+          console.warn(`No se pudo cargar la fuente "${option.label}" para el PDF.`, error);
+          embeddedFonts.set(fontType, defaultFont);
+        }
+      }
 
       for (const pageAnnotations of this.coords()) {
         const page = pdf.getPage(pageAnnotations.num - 1);
@@ -915,6 +1047,8 @@ export class App implements AfterViewChecked {
           const r = parseInt(hex.substring(0, 2), 16) / 255;
           const g = parseInt(hex.substring(2, 4), 16) / 255;
           const b = parseInt(hex.substring(4, 6), 16) / 255;
+          const fontType = normalizeFontType(field.fontType);
+          const font = embeddedFonts.get(fontType) ?? defaultFont;
 
           page.drawText(field.mapField, {
             x: field.x,
@@ -991,8 +1125,33 @@ export class App implements AfterViewChecked {
     }
   }
 
+  private ensureFontForType(fontType: unknown) {
+    const option = resolveFontOption(fontType);
+    ensureFontFaceLoaded(option, this.document).catch(() => {});
+  }
+
+  private getSerializableCoords(): SerializableAnnotations[] {
+    return this.coords().map((page) => ({
+      num: page.num,
+      fields: page.fields.map((field) => {
+        const normalizedFontType = normalizeFontType(field.fontType);
+        const serialized: SerializableField = {
+          x: field.x,
+          y: field.y,
+          mapField: field.mapField,
+          fontSize: field.fontSize,
+          color: field.color,
+        };
+        if (shouldPersistFontType(normalizedFontType)) {
+          serialized.fontType = normalizedFontType;
+        }
+        return serialized;
+      }),
+    }));
+  }
+
   private syncCoordsTextModel() {
-    this.coordsTextModel = JSON.stringify({ pages: this.coords() }, null, 2);
+    this.coordsTextModel = JSON.stringify({ pages: this.getSerializableCoords() }, null, 2);
   }
 
   private parseLooseJson(text: string): unknown {
@@ -1159,6 +1318,7 @@ export class App implements AfterViewChecked {
               ? Math.round(normalizedFontSize * 100) / 100
               : 14,
           color: this.normalizeColor(normalizedColor),
+          fontType: normalizeFontType((rawField as { fontType?: unknown }).fontType),
         };
 
         fields.push(normalizedField);

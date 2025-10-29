@@ -36,6 +36,11 @@
       "size": {
         "label": "Mida"
       },
+      "font": {
+        "label": "Tipus de lletra",
+        "searchPlaceholder": "Cerca tipografies...",
+        "noResults": "No hi ha tipografies coincidents"
+      },
       "color": {
         "label": "Color"
       }

@@ -1,0 +1,72 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 72,
+          "y": 720,
+          "mapField": "Texto de ejemplo - Sistema",
+          "fontSize": 24,
+          "color": "#000000"
+        },
+        {
+          "x": 72,
+          "y": 680,
+          "mapField": "Texto de ejemplo - Roboto",
+          "fontSize": 24,
+          "color": "#000000",
+          "fontType": "roboto"
+        },
+        {
+          "x": 72,
+          "y": 640,
+          "mapField": "Texto de ejemplo - Poppins",
+          "fontSize": 24,
+          "color": "#000000",
+          "fontType": "poppins"
+        },
+        {
+          "x": 72,
+          "y": 600,
+          "mapField": "Texto de ejemplo - Inter",
+          "fontSize": 24,
+          "color": "#000000",
+          "fontType": "inter"
+        },
+        {
+          "x": 72,
+          "y": 560,
+          "mapField": "Texto de ejemplo - Playfair Display",
+          "fontSize": 24,
+          "color": "#000000",
+          "fontType": "playfair-display"
+        },
+        {
+          "x": 72,
+          "y": 520,
+          "mapField": "Texto de ejemplo - IBM Plex Mono",
+          "fontSize": 24,
+          "color": "#000000",
+          "fontType": "ibm-plex-mono"
+        },
+        {
+          "x": 72,
+          "y": 480,
+          "mapField": "Texto de ejemplo - Manrope",
+          "fontSize": 24,
+          "color": "#000000",
+          "fontType": "manrope"
+        },
+        {
+          "x": 72,
+          "y": 440,
+          "mapField": "Texto de ejemplo - Crimson Pro",
+          "fontSize": 24,
+          "color": "#000000",
+          "fontType": "crimson-pro"
+        }
+      ]
+    }
+  ]
+}

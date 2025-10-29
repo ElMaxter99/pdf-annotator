@@ -36,6 +36,11 @@
       "size": {
         "label": "Tamaño"
       },
+      "font": {
+        "label": "Fuente",
+        "searchPlaceholder": "Buscar fuente...",
+        "noResults": "No hay fuentes que coincidan"
+      },
       "color": {
         "label": "Color"
       }
