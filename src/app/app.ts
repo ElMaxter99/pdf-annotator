@@ -485,35 +485,20 @@ export class App implements AfterViewChecked {
       return;
     }
 
-    if (typeof document === 'undefined' || !(document as Document).fonts) {
+    if (typeof document === 'undefined') {
+      this.enableRemoteFontStyles();
       return;
     }
 
-    const fontSet = (document as Document).fonts;
-    if (typeof fontSet.load !== 'function') {
+    const doc = document as Document;
+    if (!doc.fonts || typeof doc.fonts.add !== 'function' || typeof FontFace === 'undefined') {
+      this.enableRemoteFontStyles();
       return;
     }
 
-    const variants = this.collectFontVariants(option.face.sources);
-    const family = option.face.family;
-
-    void Promise.all(
-      variants.map(({ style, weight }) => {
-        const styleToken = style === 'italic' ? 'italic' : 'normal';
-        const numericWeight =
-          typeof weight === 'number' && Number.isFinite(weight)
-            ? weight
-            : Number(weight);
-        const weightToken = Number.isFinite(numericWeight) ? numericWeight : 400;
-        const descriptor = `${styleToken} ${weightToken} 1em ${JSON.stringify(family)}`;
-        return fontSet
-          .load(descriptor)
-          .then((faces) => faces.length > 0)
-          .catch(() => false);
-      })
-    )
-      .then((results) => {
-        if (results.some((loaded) => !loaded)) {
+    void this.preloadLocalFontSources(option)
+      .then((loaded) => {
+        if (!loaded) {
           this.enableRemoteFontStyles();
         }
       })
@@ -522,21 +507,120 @@ export class App implements AfterViewChecked {
       });
   }
 
-  private collectFontVariants(
-    sources: readonly FontSource[]
-  ): { style: 'normal' | 'italic'; weight: number | string }[] {
-    const variants = new Map<string, { style: 'normal' | 'italic'; weight: number | string }>();
+  private async preloadLocalFontSources(option: FontOption): Promise<boolean> {
+    if (!option.face) {
+      return false;
+    }
+
+    const doc = document as Document;
+    const sources = this.sortFontSourcesForPreference(option.face.sources);
+    let lastError: unknown = null;
 
     for (const source of sources) {
-      const style = (source.style ?? 'normal') as 'normal' | 'italic';
-      const weight = source.weight ?? 400;
-      const key = `${style}|${weight}`;
-      if (!variants.has(key)) {
-        variants.set(key, { style, weight });
+      const loaded = await this.tryLoadLocalFontSource(option.face.family, source, doc).catch(
+        (error) => {
+          lastError = error;
+          return false;
+        }
+      );
+
+      if (loaded) {
+        return true;
       }
     }
 
-    return Array.from(variants.values());
+    if (lastError) {
+      console.warn(`No se pudieron precargar las variantes locales de la fuente "${option.id}".`, lastError);
+    }
+
+    return false;
+  }
+
+  private sortFontSourcesForPreference(sources: readonly FontSource[]): FontSource[] {
+    const formatPriority: Record<string, number> = { woff2: 0, woff: 1, truetype: 2, opentype: 3 };
+
+    return [...sources].sort((a, b) => {
+      const aScore = this.getFontSourceScore(a, formatPriority);
+      const bScore = this.getFontSourceScore(b, formatPriority);
+
+      if (aScore.stylePriority !== bScore.stylePriority) {
+        return aScore.stylePriority - bScore.stylePriority;
+      }
+
+      if (aScore.weightPriority !== bScore.weightPriority) {
+        return aScore.weightPriority - bScore.weightPriority;
+      }
+
+      if (aScore.formatPriority !== bScore.formatPriority) {
+        return aScore.formatPriority - bScore.formatPriority;
+      }
+
+      return 0;
+    });
+  }
+
+  private getFontSourceScore(
+    source: FontSource,
+    formatPriority: Record<string, number>
+  ): { stylePriority: number; weightPriority: number; formatPriority: number } {
+    const stylePriority = source.style === 'italic' ? 1 : 0;
+    const weightPriority = Math.abs(this.toNumericWeight(source.weight) - 400);
+    const formatKey = source.format ?? '';
+    const formatValue = formatPriority[formatKey] ?? Number.MAX_SAFE_INTEGER;
+
+    return {
+      stylePriority,
+      weightPriority,
+      formatPriority: formatValue,
+    };
+  }
+
+  private toNumericWeight(weight: number | string | undefined): number {
+    if (typeof weight === 'number' && Number.isFinite(weight)) {
+      return weight;
+    }
+
+    if (typeof weight === 'string') {
+      const parsed = Number.parseInt(weight, 10);
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
+    }
+
+    return 400;
+  }
+
+  private async tryLoadLocalFontSource(
+    family: string,
+    source: FontSource,
+    doc: Document
+  ): Promise<boolean> {
+    try {
+      const url = resolveFontSourceUrl(source.path, doc);
+      const format = source.format ? ` format('${source.format}')` : '';
+      const descriptors: FontFaceDescriptors = {
+        style: source.style ?? 'normal',
+        weight: this.describeFontWeight(source.weight),
+      };
+      const fontFace = new FontFace(family, `url(${url})${format}`, descriptors);
+      const loaded = await fontFace.load();
+      doc.fonts.add(loaded);
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private describeFontWeight(weight: number | string | undefined): string {
+    if (typeof weight === 'number' && Number.isFinite(weight)) {
+      return String(weight);
+    }
+
+    if (typeof weight === 'string' && weight.trim()) {
+      return weight.trim();
+    }
+
+    return '400';
   }
 
   private enableRemoteFontStyles() {
@@ -1232,7 +1316,8 @@ export class App implements AfterViewChecked {
     let lastError: unknown = null;
 
     if (!preferRemote) {
-      for (const source of option.face.sources) {
+      const localSources = this.sortFontSourcesForPreference(option.face.sources);
+      for (const source of localSources) {
         try {
           const url = resolveFontSourceUrl(source.path);
           const response = await fetch(url);
