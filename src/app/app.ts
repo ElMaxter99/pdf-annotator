@@ -19,6 +19,7 @@ import {
   DEFAULT_FONT_TYPE,
   FONT_OPTIONS,
   FontOption,
+  FontSource,
   ensureFontStyles,
   ensureRemoteFontStyles,
   REMOTE_FONT_STYLESHEET_URL,
@@ -151,6 +152,8 @@ export class App implements AfterViewChecked {
   private fontDataCache = new Map<string, Uint8Array | null>();
   private fontRemoteSourceCache = new Map<string, readonly string[]>();
   private remoteStylesheetCache = new Map<string, string | null>();
+  private remoteFontsEnsured = false;
+  private localFontChecks = new Map<string, Promise<boolean>>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -166,8 +169,7 @@ export class App implements AfterViewChecked {
   @ViewChild('editFontSearch') editFontSearchRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
-    ensureFontStyles();
-    ensureRemoteFontStyles();
+    ensureFontStyles(this.document as Document | null);
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
   }
@@ -782,9 +784,10 @@ export class App implements AfterViewChecked {
   private applyFontToAnnotation(el: HTMLDivElement, fontType: unknown) {
     const normalized = normalizeFontTypeOption(fontType);
     el.setAttribute('data-font', normalized);
-    const option = resolveFontOptionOption(normalized);
+    const option = this.resolveFontOption(normalized);
     el.style.setProperty('--annotation-font-family', option.family);
     el.style.fontFamily = option.family;
+    this.ensureFontForPreview(option);
   }
 
   private handleAnnotationPointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number) {
@@ -1104,9 +1107,15 @@ export class App implements AfterViewChecked {
           return defaultFont;
         }
 
-        const customFont = await pdf.embedFont(bytes, { subset: true });
-        embeddedFonts.set(normalized, customFont);
-        return customFont;
+        try {
+          const customFont = await pdf.embedFont(bytes, { subset: true });
+          embeddedFonts.set(normalized, customFont);
+          return customFont;
+        } catch (error) {
+          console.warn(`No se pudo incrustar la fuente personalizada "${option.id}".`, error);
+          embeddedFonts.set(normalized, defaultFont);
+          return defaultFont;
+        }
       };
 
       for (const pageAnnotations of this.coords()) {
@@ -1155,7 +1164,9 @@ export class App implements AfterViewChecked {
 
     let lastError: unknown = null;
 
-    for (const source of option.face.sources) {
+    const orderedSources = this.orderFontSourcesForEmbedding(option.face.sources);
+
+    for (const source of orderedSources) {
       try {
         const url = resolveFontSourceUrl(source.path);
         const response = await fetch(url);
@@ -1172,6 +1183,9 @@ export class App implements AfterViewChecked {
     }
 
     const remoteSources = await this.getRemoteFontUrls(option);
+    if (remoteSources.length) {
+      this.ensureRemoteFonts();
+    }
     for (const url of remoteSources) {
       try {
         const response = await fetch(url);
@@ -1311,6 +1325,76 @@ export class App implements AfterViewChecked {
     }
 
     return sources;
+  }
+
+  private orderFontSourcesForEmbedding(sources: readonly FontSource[]): FontSource[] {
+    return [...sources].sort(
+      (a, b) => this.getFontSourcePriority(a.format) - this.getFontSourcePriority(b.format)
+    );
+  }
+
+  private getFontSourcePriority(format: FontSource['format'] | undefined): number {
+    switch (format) {
+      case 'truetype':
+        return 0;
+      case 'opentype':
+        return 1;
+      case 'woff2':
+        return 2;
+      case 'woff':
+        return 3;
+      default:
+        return 4;
+    }
+  }
+
+  private ensureRemoteFonts() {
+    if (this.remoteFontsEnsured) {
+      return;
+    }
+    ensureRemoteFontStyles(this.document as Document | null);
+    this.remoteFontsEnsured = true;
+  }
+
+  private ensureFontForPreview(option: FontOption) {
+    if (!option.face) {
+      return;
+    }
+
+    const doc = this.document as Document | null;
+    const fontSet = doc?.fonts;
+
+    if (!fontSet || typeof fontSet.load !== 'function') {
+      this.ensureRemoteFonts();
+      return;
+    }
+
+    const cached = this.localFontChecks.get(option.id);
+    if (cached) {
+      cached.then((loaded) => {
+        if (!loaded) {
+          this.ensureRemoteFonts();
+        }
+      });
+      return;
+    }
+
+    const descriptor = `400 1em ${JSON.stringify(option.face.family)}`;
+    const checkPromise = fontSet
+      .load(descriptor)
+      .then((faces) => faces.length > 0)
+      .catch((error) => {
+        console.warn(`No se pudo cargar la fuente local "${option.id}".`, error);
+        return false;
+      });
+
+    checkPromise.then((loaded) => {
+      if (!loaded) {
+        this.ensureRemoteFonts();
+      }
+    });
+
+    this.localFontChecks.set(option.id, checkPromise);
   }
 
   private async getPdfByteCandidates(): Promise<Uint8Array[]> {
