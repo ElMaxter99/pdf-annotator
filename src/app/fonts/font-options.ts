@@ -7,6 +7,7 @@ export interface FontFaceConfig {
 
 export interface FontRemoteConfig {
   readonly stylesheet: string;
+  readonly pdfSources?: readonly string[];
 }
 
 export interface FontOption {
@@ -24,6 +25,7 @@ interface FontDefinition {
   readonly family?: string;
   readonly keywords?: readonly string[];
   readonly googleFamily?: string;
+  readonly pdf?: readonly string[] | string;
 }
 
 export const DEFAULT_FONT_FAMILY = 'Helvetica, Arial, sans-serif';
@@ -69,14 +71,37 @@ function encodeGoogleFamily(name: string): string {
     .join('+');
 }
 
+function normalizePdfSources(input: FontDefinition['pdf']): readonly string[] | undefined {
+  if (!input) {
+    return undefined;
+  }
+
+  if (Array.isArray(input)) {
+    const filtered = input
+      .map((item) => (typeof item === 'string' ? item.trim() : ''))
+      .filter((item) => item.length > 0);
+    return filtered.length ? filtered : undefined;
+  }
+
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    return trimmed ? [trimmed] : undefined;
+  }
+
+  return undefined;
+}
+
 function createRemoteConfig(definition: FontDefinition): FontRemoteConfig | undefined {
   const family = encodeGoogleFamily(definition.googleFamily ?? definition.family ?? definition.label);
   if (!family) {
     return undefined;
   }
 
+  const pdfSources = normalizePdfSources(definition.pdf);
+
   return {
     stylesheet: `https://fonts.googleapis.com/css2?family=${family}:wght@400&display=swap`,
+    pdfSources,
   };
 }
 

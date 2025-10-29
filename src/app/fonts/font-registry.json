@@ -1,38 +1,254 @@
 [
-  { "id": "roboto", "label": "Roboto" },
-  { "id": "poppins", "label": "Poppins" },
-  { "id": "inter", "label": "Inter" },
-  { "id": "montserrat", "label": "Montserrat" },
-  { "id": "lato", "label": "Lato" },
-  { "id": "nunito", "label": "Nunito" },
-  { "id": "open-sans", "label": "Open Sans" },
-  { "id": "manrope", "label": "Manrope" },
-  { "id": "fira-code", "label": "Fira Code" },
-  { "id": "jetbrains-mono", "label": "JetBrains Mono" },
-  { "id": "playfair-display", "label": "Playfair Display" },
-  { "id": "merriweather", "label": "Merriweather" },
-  { "id": "source-serif-4", "label": "Source Serif 4" },
-  { "id": "raleway", "label": "Raleway" },
-  { "id": "oswald", "label": "Oswald" },
-  { "id": "work-sans", "label": "Work Sans" },
-  { "id": "dm-sans", "label": "DM Sans" },
-  { "id": "dm-serif-display", "label": "DM Serif Display" },
-  { "id": "noto-sans-jp", "label": "Noto Sans JP" },
-  { "id": "noto-serif-display", "label": "Noto Serif Display" },
-  { "id": "cabin", "label": "Cabin" },
-  { "id": "karla", "label": "Karla" },
-  { "id": "space-grotesk", "label": "Space Grotesk" },
-  { "id": "sora", "label": "Sora" },
-  { "id": "bitter", "label": "Bitter" },
-  { "id": "archivo", "label": "Archivo" },
-  { "id": "heebo", "label": "Heebo" },
-  { "id": "crimson-pro", "label": "Crimson Pro" },
-  { "id": "ibm-plex-sans", "label": "IBM Plex Sans" },
-  { "id": "ibm-plex-serif", "label": "IBM Plex Serif" },
-  { "id": "ibm-plex-mono", "label": "IBM Plex Mono" },
-  { "id": "urbanist", "label": "Urbanist" },
-  { "id": "sofia-sans", "label": "Sofia Sans" },
-  { "id": "asap", "label": "Asap" },
-  { "id": "quicksand", "label": "Quicksand" },
-  { "id": "zilla-slab", "label": "Zilla Slab" }
+  {
+    "id": "roboto",
+    "label": "Roboto",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf"
+    ]
+  },
+  {
+    "id": "poppins",
+    "label": "Poppins",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/poppins/static/Poppins-Regular.ttf"
+    ]
+  },
+  {
+    "id": "inter",
+    "label": "Inter",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/static/Inter-Regular.ttf"
+    ]
+  },
+  {
+    "id": "montserrat",
+    "label": "Montserrat",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/montserrat/static/Montserrat-Regular.ttf"
+    ]
+  },
+  {
+    "id": "lato",
+    "label": "Lato",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/lato/static/Lato-Regular.ttf"
+    ]
+  },
+  {
+    "id": "nunito",
+    "label": "Nunito",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/nunito/static/Nunito-Regular.ttf"
+    ]
+  },
+  {
+    "id": "open-sans",
+    "label": "Open Sans",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/opensans/static/OpenSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "manrope",
+    "label": "Manrope",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/manrope/static/Manrope-Regular.ttf"
+    ]
+  },
+  {
+    "id": "fira-code",
+    "label": "Fira Code",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/firacode/static/FiraCode-Regular.ttf"
+    ]
+  },
+  {
+    "id": "jetbrains-mono",
+    "label": "JetBrains Mono",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/jetbrainsmono/static/JetBrainsMono-Regular.ttf"
+    ]
+  },
+  {
+    "id": "playfair-display",
+    "label": "Playfair Display",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/playfairdisplay/static/PlayfairDisplay-Regular.ttf"
+    ]
+  },
+  {
+    "id": "merriweather",
+    "label": "Merriweather",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/merriweather/static/Merriweather-Regular.ttf"
+    ]
+  },
+  {
+    "id": "source-serif-4",
+    "label": "Source Serif 4",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sourceserif4/static/SourceSerif4-Regular.ttf"
+    ]
+  },
+  {
+    "id": "raleway",
+    "label": "Raleway",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/raleway/static/Raleway-Regular.ttf"
+    ]
+  },
+  {
+    "id": "oswald",
+    "label": "Oswald",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/oswald/static/Oswald-Regular.ttf"
+    ]
+  },
+  {
+    "id": "work-sans",
+    "label": "Work Sans",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/worksans/static/WorkSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "dm-sans",
+    "label": "DM Sans",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/dmsans/static/DMSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "dm-serif-display",
+    "label": "DM Serif Display",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/dmserifdisplay/static/DMSerifDisplay-Regular.ttf"
+    ]
+  },
+  {
+    "id": "noto-sans-jp",
+    "label": "Noto Sans JP",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosansjp/NotoSansJP-Regular.otf"
+    ]
+  },
+  {
+    "id": "noto-serif-display",
+    "label": "Noto Serif Display",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notoserifdisplay/static/NotoSerifDisplay-Regular.ttf"
+    ]
+  },
+  {
+    "id": "cabin",
+    "label": "Cabin",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/cabin/static/Cabin-Regular.ttf"
+    ]
+  },
+  {
+    "id": "karla",
+    "label": "Karla",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/karla/static/Karla-Regular.ttf"
+    ]
+  },
+  {
+    "id": "space-grotesk",
+    "label": "Space Grotesk",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/spacegrotesk/static/SpaceGrotesk-Regular.ttf"
+    ]
+  },
+  {
+    "id": "sora",
+    "label": "Sora",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sora/static/Sora-Regular.ttf"
+    ]
+  },
+  {
+    "id": "bitter",
+    "label": "Bitter",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/bitter/static/Bitter-Regular.ttf"
+    ]
+  },
+  {
+    "id": "archivo",
+    "label": "Archivo",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/archivo/static/Archivo-Regular.ttf"
+    ]
+  },
+  {
+    "id": "heebo",
+    "label": "Heebo",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/static/Heebo-Regular.ttf"
+    ]
+  },
+  {
+    "id": "crimson-pro",
+    "label": "Crimson Pro",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/crimsonpro/static/CrimsonPro-Regular.ttf"
+    ]
+  },
+  {
+    "id": "ibm-plex-sans",
+    "label": "IBM Plex Sans",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexsans/static/IBMPlexSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "ibm-plex-serif",
+    "label": "IBM Plex Serif",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexserif/static/IBMPlexSerif-Regular.ttf"
+    ]
+  },
+  {
+    "id": "ibm-plex-mono",
+    "label": "IBM Plex Mono",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexmono/static/IBMPlexMono-Regular.ttf"
+    ]
+  },
+  {
+    "id": "urbanist",
+    "label": "Urbanist",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/urbanist/static/Urbanist-Regular.ttf"
+    ]
+  },
+  {
+    "id": "sofia-sans",
+    "label": "Sofia Sans",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sofiasans/static/SofiaSans-Regular.ttf"
+    ]
+  },
+  {
+    "id": "asap",
+    "label": "Asap",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/asap/static/Asap-Regular.ttf"
+    ]
+  },
+  {
+    "id": "quicksand",
+    "label": "Quicksand",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/quicksand/static/Quicksand-Regular.ttf"
+    ]
+  },
+  {
+    "id": "zilla-slab",
+    "label": "Zilla Slab",
+    "pdf": [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/zillaslab/static/ZillaSlab-Regular.ttf"
+    ]
+  }
 ]

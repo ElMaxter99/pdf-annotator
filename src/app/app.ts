@@ -1274,6 +1274,21 @@ export class App implements AfterViewChecked {
       return this.fontRemoteSourceCache.get(option.id) ?? [];
     }
 
+    const collected = new Map<string, number>();
+    const directSources = option.remote?.pdfSources ?? [];
+
+    for (let index = 0; index < directSources.length; index += 1) {
+      const url = directSources[index];
+      if (typeof url !== 'string') {
+        continue;
+      }
+      const trimmed = url.trim();
+      if (!trimmed) {
+        continue;
+      }
+      collected.set(trimmed, index);
+    }
+
     const candidateStylesheets = new Set<string>();
     if (REMOTE_FONT_STYLESHEET_URL) {
       candidateStylesheets.add(REMOTE_FONT_STYLESHEET_URL);
@@ -1282,7 +1297,7 @@ export class App implements AfterViewChecked {
       candidateStylesheets.add(option.remote.stylesheet);
     }
 
-    const collected = new Map<string, number>();
+    const basePriority = collected.size;
 
     for (const stylesheetUrl of candidateStylesheets) {
       const css = await this.fetchRemoteStylesheet(stylesheetUrl);
@@ -1292,9 +1307,10 @@ export class App implements AfterViewChecked {
 
       const sources = this.extractRemoteFontSources(css, option);
       for (const source of sources) {
+        const priority = basePriority + source.priority;
         const currentPriority = collected.get(source.url);
-        if (currentPriority === undefined || source.priority < currentPriority) {
-          collected.set(source.url, source.priority);
+        if (currentPriority === undefined || priority < currentPriority) {
+          collected.set(source.url, priority);
         }
       }
     }
