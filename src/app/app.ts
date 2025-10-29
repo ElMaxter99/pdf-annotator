@@ -24,7 +24,6 @@ import {
   FONT_OPTIONS,
   ensureFontFaceLoaded,
   ensureFontStyles,
-  getFontFamily,
   loadFontData,
   matchFontOptions,
   normalizeFontType,
@@ -113,7 +112,6 @@ export class App implements AfterViewChecked {
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
   readonly fontOptions = FONT_OPTIONS;
-  readonly getFontFamilyRef = getFontFamily;
   previewFontQuery = signal('');
   editFontQuery = signal('');
   readonly previewFontResults = computed(() => matchFontOptions(this.previewFontQuery()));

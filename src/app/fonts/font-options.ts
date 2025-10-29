@@ -390,7 +390,7 @@ export function createFontStyleSheet(): string {
 
     css.push(
       [
-        `.annotation[data-font='${option.id}'] {`,
+        `[data-font='${option.id}'] {`,
         `  --annotation-font-family: ${option.family};`,
         `  font-family: ${option.family};`,
         `}`,
@@ -412,6 +412,37 @@ export function ensureFontStyles(doc: Document | null = typeof document !== 'und
   styleEl.id = STYLE_ELEMENT_ID;
   styleEl.textContent = createFontStyleSheet();
   doc.head.appendChild(styleEl);
+}
+
+const FORMAT_TO_MIME: Record<NonNullable<FontSource['format']>, string> = {
+  woff2: 'font/woff2',
+  woff: 'font/woff',
+  truetype: 'font/ttf',
+  opentype: 'font/otf',
+};
+
+const PRELOADED_FONT_SOURCES = new Set<string>();
+
+function ensureFontPreload(doc: Document, source: FontSource) {
+  const head = doc.head;
+  if (!head) {
+    return;
+  }
+  const key = `${source.path}|${source.format ?? ''}`;
+  if (PRELOADED_FONT_SOURCES.has(key)) {
+    return;
+  }
+  PRELOADED_FONT_SOURCES.add(key);
+  const link = doc.createElement('link');
+  link.rel = 'preload';
+  link.as = 'font';
+  link.href = source.path;
+  link.crossOrigin = 'anonymous';
+  const mime = source.format ? FORMAT_TO_MIME[source.format] : undefined;
+  if (mime) {
+    link.type = mime;
+  }
+  head.appendChild(link);
 }
 
 function getWindowFromDocument(doc: Document): (typeof window) | null {
@@ -461,20 +492,19 @@ async function tryLoadFontFace(
   for (const source of sorted) {
     try {
       const descriptors = toFontFaceDescriptors(source);
-      const fontFace = new view.FontFace(family, `url(${source.path})`, descriptors);
+      const binary = await fetchFontBinary(source.path);
+      let faceSource: string | ArrayBuffer = `url(${source.path})`;
+      if (binary && binary.byteLength) {
+        const buffer = binary.buffer.slice(
+          binary.byteOffset,
+          binary.byteOffset + binary.byteLength
+        ) as ArrayBuffer;
+        faceSource = buffer;
+      }
+      const fontFace = new view.FontFace(family, faceSource, descriptors);
       const loaded = await fontFace.load();
       view.document.fonts.add(loaded);
-      if (typeof view.document.fonts.load === 'function') {
-        try {
-          const weight = descriptors.weight ?? '400';
-          const style = descriptors.style ?? 'normal';
-          await view.document.fonts.load(
-            `${style} ${weight} 1em ${JSON.stringify(family)}`.replace(/\s+/g, ' ')
-          );
-        } catch {
-          // Ignore loading hint failures; the face is already registered.
-        }
-      }
+      await warmFontSet(view.document.fonts, family, descriptors);
       return true;
     } catch (error) {
       lastError = error;
@@ -486,6 +516,23 @@ async function tryLoadFontFace(
   }
 
   return false;
+}
+
+async function warmFontSet(
+  fonts: FontFaceSet,
+  family: string,
+  descriptors: FontFaceDescriptors
+) {
+  if (typeof fonts.load !== 'function') {
+    return;
+  }
+  try {
+    const weight = descriptors.weight ?? '400';
+    const style = descriptors.style ?? 'normal';
+    await fonts.load(`${style} ${weight} 1em ${JSON.stringify(family)}`.replace(/\s+/g, ' '));
+  } catch {
+    // Ignore loading hint failures; the face is already registered.
+  }
 }
 
 const FONT_FACE_PROMISES = new Map<string, Promise<void>>();
@@ -512,12 +559,18 @@ export function ensureFontFaceLoaded(
     }
 
     const face = option.face!;
+    for (const source of face.sources) {
+      ensureFontPreload(doc, source);
+    }
     const localLoaded = await tryLoadFontFace(face.family, face.sources, view).catch(() => false);
     if (localLoaded) {
       return;
     }
 
     const googleSources = await fetchGoogleFontSources(option).catch(() => []);
+    for (const source of googleSources) {
+      ensureFontPreload(doc, source);
+    }
     if (googleSources.length === 0) {
       return;
     }

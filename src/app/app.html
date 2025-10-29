@@ -78,7 +78,7 @@
           <input
             type="text"
             [(ngModel)]="p.field.mapField"
-            [style.font-family]="getFontFamilyRef(p.field.fontType)"
+            [attr.data-font]="p.field.fontType"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
         <label class="field field-small">
@@ -103,7 +103,7 @@
                   [class.selected]="p.field.fontType === option.id"
                   (click)="selectPreviewFont(option.id)"
                   [attr.aria-selected]="p.field.fontType === option.id"
-                  [style.font-family]="option.family"
+                  [attr.data-font]="option.id"
                 >
                   {{ option.label }}
                 </button>
@@ -143,7 +143,7 @@
           <input
             type="text"
             [(ngModel)]="e.field.mapField"
-            [style.font-family]="getFontFamilyRef(e.field.fontType)"
+            [attr.data-font]="e.field.fontType"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
         <label class="field field-small">
@@ -168,7 +168,7 @@
                   [class.selected]="e.field.fontType === option.id"
                   (click)="selectEditFont(option.id)"
                   [attr.aria-selected]="e.field.fontType === option.id"
-                  [style.font-family]="option.family"
+                  [attr.data-font]="option.id"
                 >
                   {{ option.label }}
                 </button>

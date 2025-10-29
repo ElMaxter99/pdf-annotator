@@ -300,6 +300,12 @@ header .logo {
     font-size: .9rem;
   }
 
+  input[type="text"][data-font],
+  input[type="search"][data-font],
+  textarea[data-font] {
+    font-family: var(--annotation-font-family, Helvetica, Arial, sans-serif);
+  }
+
   input[type="number"] {
     width: 100%;
   }
@@ -403,6 +409,7 @@ header .logo {
     border-radius: 4px;
     cursor: pointer;
     transition: background .15s ease, transform .1s ease;
+    font-family: var(--annotation-font-family, Helvetica, Arial, sans-serif);
   }
 
   .font-picker__option:hover,
