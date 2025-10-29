@@ -112,12 +112,9 @@ export class App implements AfterViewChecked {
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
-  private fontDataCache = new Map<string, Uint8Array | null>();
-  private fontDataOrigin = new Map<string, 'local' | 'remote'>();
+  private fontBytesCache = new Map<string, { bytes: Uint8Array; origin: 'local' | 'remote' }>();
   private fontRemoteSourceCache = new Map<string, readonly string[]>();
   private remoteStylesheetCache = new Map<string, string | null>();
-  private ensuredFontAvailability = new Set<string>();
-  private remoteFontStylesEnabled = false;
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -134,6 +131,7 @@ export class App implements AfterViewChecked {
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     ensureFontStyles();
+    ensureRemoteFontStyles();
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
   }
@@ -485,66 +483,25 @@ export class App implements AfterViewChecked {
   }
 
   private ensureFontAvailability(fontType: string | undefined) {
-    const normalized = normalizeFontTypeOption(fontType);
-    if (normalized === DEFAULT_FONT_TYPE || this.ensuredFontAvailability.has(normalized)) {
-      return;
-    }
-
-    this.ensuredFontAvailability.add(normalized);
-    const option = this.resolveFontOption(normalized);
-    if (!option.face) {
-      return;
-    }
-
     if (typeof document === 'undefined') {
-      this.enableRemoteFontStyles();
       return;
     }
 
-    const doc = document as Document;
-    if (!doc.fonts || typeof doc.fonts.add !== 'function' || typeof FontFace === 'undefined') {
-      this.enableRemoteFontStyles();
+    const normalized = normalizeFontTypeOption(fontType);
+    if (normalized === DEFAULT_FONT_TYPE) {
       return;
     }
 
-    void this.preloadLocalFontSources(option)
-      .then((loaded) => {
-        if (!loaded) {
-          this.enableRemoteFontStyles();
-        }
-      })
-      .catch(() => {
-        this.enableRemoteFontStyles();
-      });
-  }
-
-  private async preloadLocalFontSources(option: FontOption): Promise<boolean> {
-    if (!option.face) {
-      return false;
+    const option = this.resolveFontOption(normalized);
+    const family = option.face?.family;
+    if (!family) {
+      return;
     }
 
-    const doc = document as Document;
-    const sources = this.sortFontSourcesForPreference(option.face.sources);
-    let lastError: unknown = null;
-
-    for (const source of sources) {
-      const loaded = await this.tryLoadLocalFontSource(option.face.family, source, doc).catch(
-        (error) => {
-          lastError = error;
-          return false;
-        }
-      );
-
-      if (loaded) {
-        return true;
-      }
+    const fontSet = document.fonts;
+    if (fontSet && typeof fontSet.load === 'function') {
+      void fontSet.load(`1em ${JSON.stringify(family)}`).catch(() => {});
     }
-
-    if (lastError) {
-      console.warn(`No se pudieron precargar las variantes locales de la fuente "${option.id}".`, lastError);
-    }
-
-    return false;
   }
 
   private sortFontSourcesForPreference(sources: readonly FontSource[]): FontSource[] {
@@ -599,47 +556,6 @@ export class App implements AfterViewChecked {
     }
 
     return 400;
-  }
-
-  private async tryLoadLocalFontSource(
-    family: string,
-    source: FontSource,
-    doc: Document
-  ): Promise<boolean> {
-    try {
-      const url = resolveFontSourceUrl(source.path, doc);
-      const format = source.format ? ` format('${source.format}')` : '';
-      const descriptors: FontFaceDescriptors = {
-        style: source.style ?? 'normal',
-        weight: this.describeFontWeight(source.weight),
-      };
-      const fontFace = new FontFace(family, `url(${url})${format}`, descriptors);
-      const loaded = await fontFace.load();
-      doc.fonts.add(loaded);
-      return true;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  private describeFontWeight(weight: number | string | undefined): string {
-    if (typeof weight === 'number' && Number.isFinite(weight)) {
-      return String(weight);
-    }
-
-    if (typeof weight === 'string' && weight.trim()) {
-      return weight.trim();
-    }
-
-    return '400';
-  }
-
-  private enableRemoteFontStyles() {
-    if (this.remoteFontStylesEnabled) {
-      return;
-    }
-    ensureRemoteFontStyles();
-    this.remoteFontStylesEnabled = true;
   }
 
   setPreviewFont(fontId: string) {
@@ -1242,10 +1158,9 @@ export class App implements AfterViewChecked {
           return customFont;
         } catch (error) {
           console.warn(`No se pudo incrustar la fuente "${option.id}" desde los archivos locales.`, error);
-          const origin = this.fontDataOrigin.get(option.id);
-          if (origin !== 'remote') {
-            this.fontDataCache.delete(option.id);
-            this.fontDataOrigin.delete(option.id);
+          const cached = this.fontBytesCache.get(option.id);
+          if (!cached || cached.origin !== 'remote') {
+            this.fontBytesCache.delete(option.id);
             bytes = await this.loadFontBytes(option, true);
             if (bytes) {
               try {
@@ -1309,18 +1224,13 @@ export class App implements AfterViewChecked {
       return null;
     }
 
-    if (!preferRemote && this.fontDataCache.has(option.id)) {
-      return this.fontDataCache.get(option.id) ?? null;
-    }
-
-    if (preferRemote) {
-      const origin = this.fontDataOrigin.get(option.id);
-      if (origin === 'remote' && this.fontDataCache.has(option.id)) {
-        return this.fontDataCache.get(option.id) ?? null;
+    const cached = this.fontBytesCache.get(option.id);
+    if (cached) {
+      if (!preferRemote || cached.origin === 'remote') {
+        return cached.bytes;
       }
-      if (origin === 'local') {
-        this.fontDataCache.delete(option.id);
-        this.fontDataOrigin.delete(option.id);
+      if (preferRemote && cached.origin === 'local') {
+        this.fontBytesCache.delete(option.id);
       }
     }
 
@@ -1337,8 +1247,7 @@ export class App implements AfterViewChecked {
           }
           const buffer = await response.arrayBuffer();
           const bytes = new Uint8Array(buffer);
-          this.fontDataCache.set(option.id, bytes);
-          this.fontDataOrigin.set(option.id, 'local');
+          this.fontBytesCache.set(option.id, { bytes, origin: 'local' });
           return bytes;
         } catch (error) {
           lastError = error;
@@ -1355,8 +1264,7 @@ export class App implements AfterViewChecked {
         }
         const buffer = await response.arrayBuffer();
         const bytes = new Uint8Array(buffer);
-        this.fontDataCache.set(option.id, bytes);
-        this.fontDataOrigin.set(option.id, 'remote');
+        this.fontBytesCache.set(option.id, { bytes, origin: 'remote' });
         return bytes;
       } catch (error) {
         lastError = error;
@@ -1367,8 +1275,7 @@ export class App implements AfterViewChecked {
       console.warn(`No se pudo cargar la fuente personalizada "${option.id}".`, lastError);
     }
 
-    this.fontDataCache.set(option.id, null);
-    this.fontDataOrigin.delete(option.id);
+    this.fontBytesCache.delete(option.id);
     return null;
   }
 
