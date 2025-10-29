@@ -17,18 +17,27 @@
 ---
 
 ## 📚 Tabla de contenidos
-- [📑 PDF Annotator](#-pdf-annotator)
-  - [📚 Tabla de contenidos](#-tabla-de-contenidos)
-  - [✨ Características destacadas](#-caracteristicas-destacadas)
-  - [🧰 Stack tecnológico](#-stack-tecnologico)
-  - [🚀 Demo en vivo](#-demo-en-vivo)
-  - [🛠 Requisitos](#-requisitos)
-  - [⚙ Instalación](#-instalacion)
-  - [▶ Uso paso a paso](#-uso-paso-a-paso)
-  - [📸 Galería](#-galeria)
-  - [🧰 Solución de problemas](#-solucion-de-problemas)
-  - [🧱 Plantillas para contribuir](#-plantillas-para-contribuir)
-  - [📝 Licencia](#-licencia)
+- [📚 Tabla de contenidos](#-tabla-de-contenidos)
+- [✨ Características destacadas](#-características-destacadas)
+- [🧰 Stack tecnológico](#-stack-tecnológico)
+- [🚀 Demo en vivo](#-demo-en-vivo)
+- [🛠 Requisitos](#-requisitos)
+- [⚙ Instalación](#-instalación)
+- [▶ Uso paso a paso](#-uso-paso-a-paso)
+  - [1. Inicia el servidor de desarrollo](#1-inicia-el-servidor-de-desarrollo)
+  - [2. Carga un PDF](#2-carga-un-pdf)
+  - [3. Navega y ajusta el zoom](#3-navega-y-ajusta-el-zoom)
+  - [4. Crea una anotación](#4-crea-una-anotación)
+  - [5. Edita o mueve anotaciones](#5-edita-o-mueve-anotaciones)
+  - [6. Controla el color y la tipografía](#6-controla-el-color-y-la-tipografía)
+  - [7. Gestiona las anotaciones en JSON](#7-gestiona-las-anotaciones-en-json)
+  - [8. Exporta un PDF anotado](#8-exporta-un-pdf-anotado)
+  - [9. Atajos de teclado](#9-atajos-de-teclado)
+  - [10. Formato de las coordenadas](#10-formato-de-las-coordenadas)
+- [📸 Galería](#-galería)
+- [🧰 Solución de problemas](#-solución-de-problemas)
+- [🧱 Plantillas para contribuir](#-plantillas-para-contribuir)
+- [📝 Licencia](#-licencia)
 
 ## ✨ Características destacadas
 - 🎯 **Anotaciones precisas**: define posición, color y tipografía sobre un lienzo sincronizado con cada página.
@@ -47,12 +56,7 @@
 ## 🚀 Demo en vivo
 Aún no se publica una demo estática, pero puedes generarla rápidamente:
 
-```bash
-npm run build -- --output-path docs --base-href /pdf-annotator/
-git add docs
-```
-
-Luego habilita **GitHub Pages** desde la pestaña **Settings → Pages** seleccionando la carpeta `docs/`. El badge superior quedará enlazado a `https://tuusuario.github.io/pdf-annotator/`.
+Preview -> `https://elmaxter99.github.io/pdf-annotator/`.
 
 ## 🛠 Requisitos
 - Node.js **v22.12.0** (o compatible con Angular 20).
