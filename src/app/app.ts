@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -27,8 +27,51 @@ import {
   shouldPersistFontType,
   resolveFontSourceUrl,
 } from './fonts/font-options';
+import './promise-with-resolvers.polyfill';
+import './array-buffer-transfer.polyfill';
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
+const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
+const PDF_WORKER_TYPE_MODULE = 'module';
+
+function supportsModuleWorkers(): boolean {
+  if (
+    typeof Worker === 'undefined' ||
+    typeof Blob === 'undefined' ||
+    typeof URL === 'undefined' ||
+    typeof URL.createObjectURL !== 'function'
+  ) {
+    return false;
+  }
+
+  let url: string | null = null;
+
+  try {
+    const blob = new Blob([''], { type: 'application/javascript' });
+    url = URL.createObjectURL(blob);
+    const tester = new Worker(url, { type: 'module' });
+    tester.terminate();
+    return true;
+  } catch {
+    return false;
+  } finally {
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+  }
+}
+
+const workerOptions = (pdfjsLib as any).GlobalWorkerOptions as {
+  workerSrc?: string;
+  workerType?: string;
+};
+
+if (supportsModuleWorkers()) {
+  workerOptions.workerSrc = PDF_WORKER_MODULE_SRC;
+  workerOptions.workerType = PDF_WORKER_TYPE_MODULE;
+} else {
+  workerOptions.workerSrc = undefined;
+  workerOptions.workerType = undefined;
+}
 
 type PageField = {
   x: number;
@@ -88,6 +131,7 @@ export class App implements AfterViewChecked {
   private readonly translationService = inject(TranslationService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
+  private readonly document = inject(DOCUMENT);
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
 
@@ -114,14 +158,14 @@ export class App implements AfterViewChecked {
   annotationsLayerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
-  @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('coordsFileInput', { static: false })
+  coordsFileInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('previewFontPicker') previewFontPickerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editFontPicker') editFontPickerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewFontSearch') previewFontSearchRef?: ElementRef<HTMLInputElement>;
   @ViewChild('editFontSearch') editFontSearchRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     ensureFontStyles();
     ensureRemoteFontStyles();
     this.setDocumentMetadata();
@@ -134,10 +178,35 @@ export class App implements AfterViewChecked {
   }
 
   private setDocumentMetadata() {
-    const appTitle = APP_NAME;
+    const appTitle = 'PDF Annotator | Diseña anotaciones precisas para tus PDFs';
+    const description =
+      'Carga un PDF, marca regiones clave y exporta coordenadas listas para integrarlas en tus flujos de trabajo.';
+    const fallbackOrigin = 'https://pdf-annotator-rho.vercel.app';
+    const documentLocation = this.document?.location;
+    const baseUrl = (documentLocation?.origin ?? fallbackOrigin).replace(/\/$/, '');
+    const imageUrl = `${baseUrl}/og-image.svg`;
     this.title.setTitle(appTitle);
+    this.meta.updateTag({ name: 'description', content: description });
     this.meta.updateTag({ property: 'og:title', content: appTitle });
+    this.meta.updateTag({ property: 'og:description', content: description });
+    this.meta.updateTag({ property: 'og:site_name', content: 'PDF Annotator' });
+    this.meta.updateTag({ property: 'og:url', content: baseUrl });
+    this.meta.updateTag({ property: 'og:image', content: imageUrl });
+    this.meta.updateTag({
+      property: 'og:image:alt',
+      content: 'Vista previa de anotaciones en PDF con coordenadas resaltadas',
+    });
+    this.meta.updateTag({ property: 'og:image:width', content: '1200' });
+    this.meta.updateTag({ property: 'og:image:height', content: '630' });
+    this.meta.updateTag({ property: 'og:type', content: 'website' });
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
     this.meta.updateTag({ name: 'twitter:title', content: appTitle });
+    this.meta.updateTag({ name: 'twitter:description', content: description });
+    this.meta.updateTag({ name: 'twitter:image', content: imageUrl });
+    this.meta.updateTag({
+      name: 'twitter:image:alt',
+      content: 'Vista previa de anotaciones en PDF con coordenadas resaltadas',
+    });
   }
 
   ngAfterViewChecked() {
@@ -397,9 +466,7 @@ export class App implements AfterViewChecked {
     this.previewHexInput.set(value);
     const normalized = this.normalizeHexInput(value);
     if (!normalized) return;
-    this.preview.update((p) =>
-      p ? { ...p, field: { ...p.field, color: normalized } } : p
-    );
+    this.preview.update((p) => (p ? { ...p, field: { ...p.field, color: normalized } } : p));
     this.updatePreviewColorState(normalized);
   }
 
@@ -706,8 +773,7 @@ export class App implements AfterViewChecked {
           el.style.color = field.color;
           this.applyFontToAnnotation(el, field.fontType);
 
-          el.onpointerdown = (evt) =>
-            this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
+          el.onpointerdown = (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
           layer.appendChild(el);
         });
       });
@@ -1025,7 +1091,8 @@ export class App implements AfterViewChecked {
           return defaultFont;
         }
 
-        const option = this.fontOptions.find((item) => item.id === normalized) ?? this.fontOptions[0];
+        const option =
+          this.fontOptions.find((item) => item.id === normalized) ?? this.fontOptions[0];
         if (!option.face) {
           embeddedFonts.set(normalized, defaultFont);
           return defaultFont;
@@ -1191,9 +1258,15 @@ export class App implements AfterViewChecked {
     }
   }
 
-  private extractRemoteFontSources(css: string, option: FontOption): { url: string; priority: number }[] {
+  private extractRemoteFontSources(
+    css: string,
+    option: FontOption
+  ): { url: string; priority: number }[] {
     const family = option.face?.family ?? option.label;
-    const normalizedFamily = family.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
+    const normalizedFamily = family
+      .trim()
+      .replace(/^['"]|['"]$/g, '')
+      .toLowerCase();
     const sources: { url: string; priority: number }[] = [];
     const blockRegex = /@font-face\s*{[^}]*}/gi;
     const formatPriority: Record<string, number> = { woff2: 0, woff: 1, truetype: 2, opentype: 3 };
@@ -1215,10 +1288,13 @@ export class App implements AfterViewChecked {
       while ((urlMatch = urlRegex.exec(block))) {
         let candidate = urlMatch[1].trim();
         const format = urlMatch[2].trim().toLowerCase();
-        if ((candidate.startsWith('"') && candidate.endsWith('"')) || (candidate.startsWith("'") && candidate.endsWith("'"))) {
+        if (
+          (candidate.startsWith('"') && candidate.endsWith('"')) ||
+          (candidate.startsWith("'") && candidate.endsWith("'"))
+        ) {
           candidate = candidate.slice(1, -1);
         }
-        if ((candidate.startsWith('url(') && candidate.endsWith(')'))) {
+        if (candidate.startsWith('url(') && candidate.endsWith(')')) {
           candidate = candidate.slice(4, -1);
         }
         if (!candidate) {
@@ -1457,8 +1533,10 @@ export class App implements AfterViewChecked {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color, value, fontType } =
-          rawField as Record<string, unknown>;
+        const { x, y, mapField, fontSize, color, value, fontType } = rawField as Record<
+          string,
+          unknown
+        >;
 
         const normalizedMapField =
           this.normalizeFieldText(mapField) ?? this.normalizeFieldText(value);
