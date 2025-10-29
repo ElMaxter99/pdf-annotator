@@ -115,6 +115,9 @@ export class App implements AfterViewChecked {
   private fontBytesCache = new Map<string, { bytes: Uint8Array; origin: 'local' | 'remote' }>();
   private fontRemoteSourceCache = new Map<string, readonly string[]>();
   private remoteStylesheetCache = new Map<string, string | null>();
+  private fontLoadState = new Map<string, 'local' | 'remote' | 'missing'>();
+  private fontLoadTasks = new Map<string, Promise<void>>();
+  private remoteLinkCache = new Set<string>();
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -131,7 +134,6 @@ export class App implements AfterViewChecked {
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     ensureFontStyles();
-    ensureRemoteFontStyles();
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
   }
@@ -493,15 +495,176 @@ export class App implements AfterViewChecked {
     }
 
     const option = this.resolveFontOption(normalized);
-    const family = option.face?.family;
-    if (!family) {
+    if (!option.face) {
       return;
     }
 
-    const fontSet = document.fonts;
-    if (fontSet && typeof fontSet.load === 'function') {
-      void fontSet.load(`1em ${JSON.stringify(family)}`).catch(() => {});
+    if (this.fontLoadState.get(option.id) === 'local' || this.fontLoadState.get(option.id) === 'remote') {
+      return;
     }
+
+    if (this.fontLoadTasks.has(option.id)) {
+      return;
+    }
+
+    const task = this.prepareFont(option)
+      .catch((error) => {
+        console.warn(`No se pudo preparar la fuente "${option.id}".`, error);
+      })
+      .finally(() => {
+        this.fontLoadTasks.delete(option.id);
+      });
+
+    this.fontLoadTasks.set(option.id, task);
+  }
+
+  private async prepareFont(option: FontOption): Promise<void> {
+    if (!option.face || typeof document === 'undefined') {
+      return;
+    }
+
+    const descriptor = this.buildFontDescriptor(option.face.family);
+    const fontSet = document.fonts;
+
+    if (fontSet?.check?.(descriptor)) {
+      this.fontLoadState.set(option.id, 'local');
+      return;
+    }
+
+    const localLoaded = await this.tryLoadLocalFont(option, descriptor);
+    if (localLoaded) {
+      this.fontLoadState.set(option.id, 'local');
+      return;
+    }
+
+    this.ensureRemoteFontStylesForOption(option);
+    const remoteLoaded = await this.ensureFontLoaded(option.face.family);
+    if (remoteLoaded) {
+      this.fontLoadState.set(option.id, 'remote');
+      return;
+    }
+
+    this.fontLoadState.set(option.id, 'missing');
+  }
+
+  private buildFontDescriptor(family: string): string {
+    const trimmed = family.trim();
+    const token = JSON.stringify(trimmed);
+    return `1em ${token}`;
+  }
+
+  private async tryLoadLocalFont(option: FontOption, descriptor: string): Promise<boolean> {
+    if (!option.face || typeof document === 'undefined') {
+      return false;
+    }
+
+    const fontSet = document.fonts;
+    const FontFaceCtor = (globalThis as { FontFace?: typeof FontFace }).FontFace;
+
+    if (!fontSet || typeof fontSet.check !== 'function') {
+      return false;
+    }
+
+    const sources = this.sortFontSourcesForPreference(option.face.sources);
+
+    if (typeof FontFaceCtor === 'function' && typeof fontSet.add === 'function') {
+      let lastError: unknown = null;
+      for (const source of sources) {
+        const url = resolveFontSourceUrl(source.path);
+        const format = source.format ? ` format('${source.format}')` : '';
+        const weight = String(this.toNumericWeight(source.weight));
+        const style = source.style ?? 'normal';
+        try {
+          const fontFace = new FontFaceCtor(option.face.family, `url(${JSON.stringify(url)})${format}`, {
+            style,
+            weight,
+          });
+          const loaded = await fontFace.load();
+          fontSet.add(loaded);
+          if (fontSet.check(descriptor)) {
+            return true;
+          }
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      if (!fontSet.check(descriptor) && lastError) {
+        console.warn(`No se pudo cargar la fuente local "${option.id}".`, lastError);
+      }
+      return fontSet.check(descriptor);
+    }
+
+    let lastFetchError: unknown = null;
+    for (const source of sources) {
+      const url = resolveFontSourceUrl(source.path);
+      try {
+        const response = await fetch(url, { method: 'GET' });
+        if (!response.ok) {
+          continue;
+        }
+        await this.ensureFontLoaded(option.face.family);
+        if (!fontSet.check(descriptor)) {
+          continue;
+        }
+        return true;
+      } catch (error) {
+        lastFetchError = error;
+      }
+    }
+
+    if (!fontSet.check(descriptor) && lastFetchError) {
+      console.warn(`No se pudo comprobar la fuente local "${option.id}".`, lastFetchError);
+    }
+
+    return fontSet.check(descriptor);
+  }
+
+  private ensureRemoteFontStylesForOption(option: FontOption) {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const remoteUrl = option.remote?.stylesheet;
+    if (remoteUrl) {
+      if (this.remoteLinkCache.has(remoteUrl)) {
+        return;
+      }
+      const linkId = `annotation-font-remote-${option.id}`;
+      if (document.getElementById(linkId)) {
+        this.remoteLinkCache.add(remoteUrl);
+        return;
+      }
+      const link = document.createElement('link');
+      link.id = linkId;
+      link.rel = 'stylesheet';
+      link.href = remoteUrl;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+      this.remoteLinkCache.add(remoteUrl);
+      return;
+    }
+
+    ensureRemoteFontStyles();
+  }
+
+  private async ensureFontLoaded(family: string): Promise<boolean> {
+    if (typeof document === 'undefined') {
+      return false;
+    }
+    const fontSet = document.fonts;
+    if (!fontSet || typeof fontSet.load !== 'function') {
+      return false;
+    }
+    const descriptor = this.buildFontDescriptor(family);
+    try {
+      await fontSet.load(descriptor);
+    } catch {
+      // ignore
+    }
+    if (typeof fontSet.check === 'function') {
+      return fontSet.check(descriptor);
+    }
+    return false;
   }
 
   private sortFontSourcesForPreference(sources: readonly FontSource[]): FontSource[] {
