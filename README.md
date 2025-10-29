@@ -153,6 +153,7 @@ Cada anotación se almacena como:
 - **No puedo mover una anotación**: asegúrate de arrastrar desde el cuerpo de la tarjeta (no solo desde los campos de texto).
 - **Error al importar JSON**: confirma que el archivo contenga la estructura indicada y que los valores numéricos sean válidos.
 - **El PDF exportado no abre**: prueba con otra copia del PDF original; la app intenta tres variantes (original, canónica y saneada) para asegurar compatibilidad.
+- **Las fuentes no se aplican**: sigue la [guía de depuración de fuentes](docs/font-debugging.md) para validar atributos, estilos dinámicos, cargas de archivos y registros en `document.fonts`.
 
 ## 🧱 Plantillas para contribuir
 El repositorio incluye plantillas en `.github/`:
