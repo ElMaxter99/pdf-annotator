@@ -19,6 +19,7 @@ import {
   DEFAULT_FONT_TYPE,
   FONT_OPTIONS,
   FontOption,
+  FontSource,
   ensureFontStyles,
   ensureRemoteFontStyles,
   REMOTE_FONT_STYLESHEET_URL,
@@ -112,8 +113,11 @@ export class App implements AfterViewChecked {
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
   private fontDataCache = new Map<string, Uint8Array | null>();
+  private fontDataOrigin = new Map<string, 'local' | 'remote'>();
   private fontRemoteSourceCache = new Map<string, readonly string[]>();
   private remoteStylesheetCache = new Map<string, string | null>();
+  private ensuredFontAvailability = new Set<string>();
+  private remoteFontStylesEnabled = false;
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -130,7 +134,6 @@ export class App implements AfterViewChecked {
   constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
     ensureFontStyles();
-    ensureRemoteFontStyles();
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
   }
@@ -456,15 +459,105 @@ export class App implements AfterViewChecked {
     );
   }
 
+  private ensureFontsForAnnotations(pages: PageAnnotations[]) {
+    const seen = new Set<string>();
+    for (const page of pages) {
+      for (const field of page.fields) {
+        const normalized = normalizeFontTypeOption(field.fontType);
+        if (normalized === DEFAULT_FONT_TYPE || seen.has(normalized)) {
+          continue;
+        }
+        seen.add(normalized);
+        this.ensureFontAvailability(normalized);
+      }
+    }
+  }
+
+  private ensureFontAvailability(fontType: string | undefined) {
+    const normalized = normalizeFontTypeOption(fontType);
+    if (normalized === DEFAULT_FONT_TYPE || this.ensuredFontAvailability.has(normalized)) {
+      return;
+    }
+
+    this.ensuredFontAvailability.add(normalized);
+    const option = this.resolveFontOption(normalized);
+    if (!option.face) {
+      return;
+    }
+
+    if (typeof document === 'undefined' || !(document as Document).fonts) {
+      return;
+    }
+
+    const fontSet = (document as Document).fonts;
+    if (typeof fontSet.load !== 'function') {
+      return;
+    }
+
+    const variants = this.collectFontVariants(option.face.sources);
+    const family = option.face.family;
+
+    void Promise.all(
+      variants.map(({ style, weight }) => {
+        const styleToken = style === 'italic' ? 'italic' : 'normal';
+        const numericWeight =
+          typeof weight === 'number' && Number.isFinite(weight)
+            ? weight
+            : Number(weight);
+        const weightToken = Number.isFinite(numericWeight) ? numericWeight : 400;
+        const descriptor = `${styleToken} ${weightToken} 1em ${JSON.stringify(family)}`;
+        return fontSet
+          .load(descriptor)
+          .then((faces) => faces.length > 0)
+          .catch(() => false);
+      })
+    )
+      .then((results) => {
+        if (results.some((loaded) => !loaded)) {
+          this.enableRemoteFontStyles();
+        }
+      })
+      .catch(() => {
+        this.enableRemoteFontStyles();
+      });
+  }
+
+  private collectFontVariants(
+    sources: readonly FontSource[]
+  ): { style: 'normal' | 'italic'; weight: number | string }[] {
+    const variants = new Map<string, { style: 'normal' | 'italic'; weight: number | string }>();
+
+    for (const source of sources) {
+      const style = (source.style ?? 'normal') as 'normal' | 'italic';
+      const weight = source.weight ?? 400;
+      const key = `${style}|${weight}`;
+      if (!variants.has(key)) {
+        variants.set(key, { style, weight });
+      }
+    }
+
+    return Array.from(variants.values());
+  }
+
+  private enableRemoteFontStyles() {
+    if (this.remoteFontStylesEnabled) {
+      return;
+    }
+    ensureRemoteFontStyles();
+    this.remoteFontStylesEnabled = true;
+  }
+
   setPreviewFont(fontId: string) {
     const normalized = normalizeFontTypeOption(fontId);
     this.preview.update((p) => (p ? { ...p, field: { ...p.field, fontType: normalized } } : p));
+    this.ensureFontAvailability(normalized);
     this.closePreviewFontPicker(true);
   }
 
   setEditFont(fontId: string) {
     const normalized = normalizeFontTypeOption(fontId);
     this.editing.update((e) => (e ? { ...e, field: { ...e.field, fontType: normalized } } : e));
+    this.ensureFontAvailability(normalized);
     this.closeEditFontPicker(true);
   }
 
@@ -480,6 +573,7 @@ export class App implements AfterViewChecked {
       fontType: normalizeFontTypeOption(p.field.fontType),
     };
     this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
+    this.ensureFontAvailability(normalizedField.fontType);
     this.syncCoordsTextModel();
     this.closePreviewFontPicker(true);
     this.preview.set(null);
@@ -522,6 +616,7 @@ export class App implements AfterViewChecked {
     this.coords.update((pages) =>
       this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
     );
+    this.ensureFontAvailability(normalized.fontType);
     this.syncCoordsTextModel();
     this.closeEditFontPicker(true);
     this.editing.set(null);
@@ -907,6 +1002,7 @@ export class App implements AfterViewChecked {
       }
 
       this.coords.set(normalized);
+      this.ensureFontsForAnnotations(normalized);
       this.syncCoordsTextModel();
       this.preview.set(null);
       this.editing.set(null);
@@ -941,6 +1037,7 @@ export class App implements AfterViewChecked {
       }
 
       this.coords.set(normalized);
+      this.ensureFontsForAnnotations(normalized);
       this.syncCoordsTextModel();
       this.preview.set(null);
       this.editing.set(null);
@@ -1038,15 +1135,40 @@ export class App implements AfterViewChecked {
           return defaultFont;
         }
 
-        const bytes = await this.loadFontBytes(option);
+        let bytes = await this.loadFontBytes(option);
         if (!bytes) {
           embeddedFonts.set(normalized, defaultFont);
           return defaultFont;
         }
 
-        const customFont = await pdf.embedFont(bytes, { subset: true });
-        embeddedFonts.set(normalized, customFont);
-        return customFont;
+        try {
+          const customFont = await pdf.embedFont(bytes, { subset: true });
+          embeddedFonts.set(normalized, customFont);
+          return customFont;
+        } catch (error) {
+          console.warn(`No se pudo incrustar la fuente "${option.id}" desde los archivos locales.`, error);
+          const origin = this.fontDataOrigin.get(option.id);
+          if (origin !== 'remote') {
+            this.fontDataCache.delete(option.id);
+            this.fontDataOrigin.delete(option.id);
+            bytes = await this.loadFontBytes(option, true);
+            if (bytes) {
+              try {
+                const remoteFont = await pdf.embedFont(bytes, { subset: true });
+                embeddedFonts.set(normalized, remoteFont);
+                return remoteFont;
+              } catch (remoteError) {
+                console.warn(
+                  `No se pudo incrustar la fuente "${option.id}" desde Google Fonts.`,
+                  remoteError
+                );
+              }
+            }
+          }
+
+          embeddedFonts.set(normalized, defaultFont);
+          return defaultFont;
+        }
       };
 
       for (const pageAnnotations of this.coords()) {
@@ -1084,30 +1206,47 @@ export class App implements AfterViewChecked {
     }
   }
 
-  private async loadFontBytes(option: FontOption): Promise<Uint8Array | null> {
+  private async loadFontBytes(
+    option: FontOption,
+    preferRemote = false
+  ): Promise<Uint8Array | null> {
     if (!option.face) {
       return null;
     }
 
-    if (this.fontDataCache.has(option.id)) {
+    if (!preferRemote && this.fontDataCache.has(option.id)) {
       return this.fontDataCache.get(option.id) ?? null;
+    }
+
+    if (preferRemote) {
+      const origin = this.fontDataOrigin.get(option.id);
+      if (origin === 'remote' && this.fontDataCache.has(option.id)) {
+        return this.fontDataCache.get(option.id) ?? null;
+      }
+      if (origin === 'local') {
+        this.fontDataCache.delete(option.id);
+        this.fontDataOrigin.delete(option.id);
+      }
     }
 
     let lastError: unknown = null;
 
-    for (const source of option.face.sources) {
-      try {
-        const url = resolveFontSourceUrl(source.path);
-        const response = await fetch(url);
-        if (!response.ok) {
-          continue;
+    if (!preferRemote) {
+      for (const source of option.face.sources) {
+        try {
+          const url = resolveFontSourceUrl(source.path);
+          const response = await fetch(url);
+          if (!response.ok) {
+            continue;
+          }
+          const buffer = await response.arrayBuffer();
+          const bytes = new Uint8Array(buffer);
+          this.fontDataCache.set(option.id, bytes);
+          this.fontDataOrigin.set(option.id, 'local');
+          return bytes;
+        } catch (error) {
+          lastError = error;
         }
-        const buffer = await response.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-        this.fontDataCache.set(option.id, bytes);
-        return bytes;
-      } catch (error) {
-        lastError = error;
       }
     }
 
@@ -1121,6 +1260,7 @@ export class App implements AfterViewChecked {
         const buffer = await response.arrayBuffer();
         const bytes = new Uint8Array(buffer);
         this.fontDataCache.set(option.id, bytes);
+        this.fontDataOrigin.set(option.id, 'remote');
         return bytes;
       } catch (error) {
         lastError = error;
@@ -1132,6 +1272,7 @@ export class App implements AfterViewChecked {
     }
 
     this.fontDataCache.set(option.id, null);
+    this.fontDataOrigin.delete(option.id);
     return null;
   }
 
