@@ -8,6 +8,7 @@ import {
   AfterViewChecked,
   HostListener,
   inject,
+  effect,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
@@ -156,6 +157,12 @@ export class App implements AfterViewChecked {
     ensureFontStyles(this.document);
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
+    effect(() => {
+      this.primeFontOptions(this.previewFontResults());
+    });
+    effect(() => {
+      this.primeFontOptions(this.editFontResults());
+    });
   }
 
   onLanguageChange(language: string) {
@@ -1128,6 +1135,12 @@ export class App implements AfterViewChecked {
   private ensureFontForType(fontType: unknown) {
     const option = resolveFontOption(fontType);
     ensureFontFaceLoaded(option, this.document).catch(() => {});
+  }
+
+  private primeFontOptions(options: readonly { id: string }[]) {
+    for (const option of options) {
+      this.ensureFontForType(option.id);
+    }
   }
 
   private getSerializableCoords(): SerializableAnnotations[] {

@@ -458,6 +458,13 @@ async function tryLoadFontFace(
       const fontFace = new view.FontFace(family, `url(${source.path})`, toFontFaceDescriptors(source));
       const loaded = await fontFace.load();
       view.document.fonts.add(loaded);
+      if (typeof view.document.fonts.load === 'function') {
+        try {
+          await view.document.fonts.load(`1em ${JSON.stringify(family)}`);
+        } catch {
+          // Ignore loading hint failures; the face is already registered.
+        }
+      }
       return true;
     } catch (error) {
       lastError = error;
