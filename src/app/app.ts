@@ -26,7 +26,7 @@ import {
   normalizeFontType as normalizeFontTypeOption,
   resolveFontOption as resolveFontOptionOption,
   shouldPersistFontType,
-} from './fonts/font-options';
+} from './config/fonts/font-options';
 import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
 
@@ -1143,10 +1143,7 @@ export class App implements AfterViewChecked {
           }
 
           if (lastError) {
-            console.warn(
-              `No se pudo incrustar la fuente personalizada "${option.id}".`,
-              lastError
-            );
+            console.warn(`No se pudo incrustar la fuente personalizada "${option.id}".`, lastError);
           }
 
           embeddedFonts.set(normalized, defaultFont);
@@ -1218,7 +1215,6 @@ export class App implements AfterViewChecked {
     });
   }
 
-
   private resolveFontSourceUrl(url: string): string {
     const trimmed = typeof url === 'string' ? url.trim() : '';
     if (!trimmed) {
@@ -1253,7 +1249,6 @@ export class App implements AfterViewChecked {
       return trimmed;
     }
   }
-
 
   private async loadFontBytes(
     option: FontOption

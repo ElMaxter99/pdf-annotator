@@ -31,12 +31,12 @@
               {
                 "glob": "**/*",
                 "input": "public",
-                "output": "/"
+                "output": ""
               },
               {
                 "glob": "**/*",
                 "input": "node_modules/pdfjs-dist/build",
-                "output": "/assets/pdfjs/"
+                "output": "assets/pdfjs/"
               }
             ],
             "styles": [
@@ -107,13 +107,6 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public",
-                "output": "/"
-              }
-            ],
             "styles": [
               "src/styles.scss"
             ]

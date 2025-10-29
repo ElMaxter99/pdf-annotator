@@ -133,7 +133,9 @@ function createFontAssets(definition: FontDefinition): FontAssetSource[] | undef
 }
 
 function createRemoteConfig(definition: FontDefinition): FontRemoteConfig | undefined {
-  const family = encodeGoogleFamily(definition.googleFamily ?? definition.family ?? definition.label);
+  const family = encodeGoogleFamily(
+    definition.googleFamily ?? definition.family ?? definition.label
+  );
   if (!family) {
     return undefined;
   }
@@ -294,7 +296,9 @@ export function createFontStyleSheet(): string {
   return css.join('\n');
 }
 
-export function ensureFontStyles(doc: Document | null = typeof document !== 'undefined' ? document : null) {
+export function ensureFontStyles(
+  doc: Document | null = typeof document !== 'undefined' ? document : null
+) {
   if (!doc) {
     return;
   }
