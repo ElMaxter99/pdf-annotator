@@ -55,5 +55,10 @@
   },
   "viewer": {
     "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."
+  },
+  "status": {
+    "loadingPdf": "Carregant PDF…",
+    "importingAnnotations": "Important anotacions…",
+    "generatingPdf": "Generant PDF anotat…"
   }
 }

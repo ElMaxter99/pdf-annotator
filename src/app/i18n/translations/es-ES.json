@@ -55,5 +55,10 @@
   },
   "viewer": {
     "emptyMessage": "Sube un PDF y haz click donde quieras añadir anotaciones. Edítalas en la vista previa antes de confirmar ✅."
+  },
+  "status": {
+    "loadingPdf": "Cargando PDF…",
+    "importingAnnotations": "Importando anotaciones…",
+    "generatingPdf": "Generando PDF anotado…"
   }
 }
