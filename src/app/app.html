@@ -119,7 +119,7 @@
           <small class="color-hint">{{ 'annotation.color.hintPreview' | t }}</small>
         </div>
         <div class="editor-actions">
-          <button (click)="confirmPreview()">✅</button>
+          <button class="action-primary" (click)="confirmPreview()">✅</button>
           <button (click)="cancelPreview()">❌</button>
         </div>
       </div>
@@ -175,9 +175,12 @@
           <small class="color-hint">{{ 'annotation.color.hintEdit' | t }}</small>
         </div>
         <div class="editor-actions">
-          <button (click)="confirmEdit()">✅</button>
-          <button (click)="cancelEdit()">❌</button>
+          <button type="button" (click)="duplicateAnnotation()"
+            [title]="'annotation.actions.duplicate' | t"
+            [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
           <button class="btn-delete" (click)="deleteAnnotation()">🗑️</button>
+          <button class="action-primary" (click)="confirmEdit()">✅</button>
+          <button (click)="cancelEdit()">❌</button>
         </div>
       </div>
     </div>

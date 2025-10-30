@@ -431,7 +431,11 @@ header .logo {
   .editor-actions {
     display: flex;
     gap: 6px;
-    justify-content: flex-end;
+    justify-content: flex-start;
+
+    .action-primary {
+      margin-left: auto;
+    }
   }
 }
 
