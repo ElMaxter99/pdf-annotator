@@ -1,3 +1,20 @@
+## [v1.1.0] - 2025-10-30
+### Added
+- docs: Improve branding and add issue templates #40
+- Add Vercel speed insights integration and update dependencies #38
+- Add annotation type controls and value overrides #47
+- Add local annotation templates with auto-restore #52
+- Add copy and paste duplication for annotations #57
+- Add undo/redo support for annotation history #51
+- Add Docker configuration for container deployment #50
+- docs: clarify local and docker workflows #63
+
+### Fix
+- fix: replace deprecated json import assert #43
+- fix: keep annotation editor focus when interacting with fields #47
+- Close annotation modals when clicking outside the PDF viewer #56
+- Handle annotations targeting non-existent PDF pages on download #58
+
 ## [v1.0.1] - 2025-10-28
 ### Added
 - Improving Open Graph

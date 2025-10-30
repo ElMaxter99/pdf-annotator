@@ -1,10 +1,12 @@
 {
   "name": "Pdf Annotator",
-  "version": "1.0.1",
-  "author": "AlvaroMaxter",
+  "version": "1.1.0",
+  "author": "AAmoros",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:local": "node scripts/start-local.mjs",
+    "start:docker": "bash scripts/docker-up.sh",
     "build": "npm run i18n:check && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
