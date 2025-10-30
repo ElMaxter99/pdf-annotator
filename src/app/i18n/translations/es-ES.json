@@ -10,7 +10,7 @@
     },
     "landing": {
       "badge": "Empieza a anotar",
-      "title": "Organiza cualquier PDF en segundos",
+      "title": "Maqueta coordenadas de cualquier PDF en segundos",
       "description": "Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.",
       "cta": "Seleccionar PDF"
     },
@@ -21,10 +21,8 @@
       "invalidFormat": "Solo se admiten archivos PDF."
     },
     "workspaceUpload": {
-      "badge": "Nuevo comienzo",
       "title": "¿Quieres empezar de cero?",
       "subtitle": "Arrastra otro PDF o haz clic para sustituir el documento actual.",
-      "cta": "Subir otro PDF",
       "ariaLabel": "Subir un nuevo PDF para reiniciar el espacio de trabajo"
     }
   },
@@ -65,40 +63,40 @@
     "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
   },
   "annotation": {
-  "fields": {
-    "text": {
-      "label": "Texto",
-      "placeholder": "Texto..."
-    },
-    "size": {
-      "label": "Tamaño"
-    },
-    "color": {
-      "label": "Color"
-    },
-    "type": {
-      "label": "Tipo",
-      "options": {
-        "text": "Texto",
-        "check": "Casilla",
-        "radio": "Botón de opción",
-        "number": "Número"
-      }
-    },
-    "value": {
-      "label": "Valor fijo",
-      "placeholder": "Valor opcional..."
-    },
-    "number": {
-      "decimals": {
-        "label": "Decimales"
+    "fields": {
+      "text": {
+        "label": "Texto",
+        "placeholder": "Texto..."
       },
-      "appender": {
-        "label": "Sufijo",
-        "placeholder": "Ej.: %"
+      "size": {
+        "label": "Tamaño"
+      },
+      "color": {
+        "label": "Color"
+      },
+      "type": {
+        "label": "Tipo",
+        "options": {
+          "text": "Texto",
+          "check": "Casilla",
+          "radio": "Botón de opción",
+          "number": "Número"
+        }
+      },
+      "value": {
+        "label": "Valor fijo",
+        "placeholder": "Valor opcional..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Decimales"
+        },
+        "appender": {
+          "label": "Sufijo",
+          "placeholder": "Ej.: %"
+        }
       }
-    }
-  },
+    },
     "color": {
       "hintPreview": "Selecciona un color, escribe un HEX o un RGB. El JSON siempre exportará el color en HEX.",
       "hintEdit": "Puedes pegar un HEX o un RGB existente para reutilizar colores exactos.",
