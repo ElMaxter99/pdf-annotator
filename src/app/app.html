@@ -1,6 +1,14 @@
 <div class="app" [class.app--landing]="!pdfDoc">
   <ng-container *ngIf="!pdfDoc; else workspace">
     <section class="landing">
+      <div class="landing__language">
+        <app-language-selector
+          [languages]="languages"
+          [selectedLanguage]="languageModel"
+          (languageChange)="onLanguageChange($event)"
+          variant="compact"
+        ></app-language-selector>
+      </div>
       <div class="landing__hero">
         <span class="landing__badge">{{ 'app.landing.badge' | t }}</span>
         <h1 class="landing__title">{{ 'app.landing.title' | t }}</h1>
@@ -52,8 +60,17 @@
   <ng-template #workspace>
     <!-- HEADER -->
     <header class="header">
-      <div class="header__left">
-        <div class="logo">{{ 'app.title' | t }}</div>
+      <div class="header__top">
+        <div class="header__left">
+          <div class="logo">{{ 'app.title' | t }}</div>
+        </div>
+        <app-language-selector
+          class="header__language-selector"
+          [languages]="languages"
+          [selectedLanguage]="languageModel"
+          (languageChange)="onLanguageChange($event)"
+          variant="compact"
+        ></app-language-selector>
       </div>
 
     <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
@@ -115,13 +132,6 @@
       </div>
     </div>
 
-    <div class="language-selector">
-      <label class="language-selector__label" for="language-select">{{ 'app.languageLabel' | t }}</label>
-      <select id="language-select" [(ngModel)]="languageModel" (ngModelChange)="onLanguageChange($event)"
-        [attr.aria-label]="'app.languageAriaLabel' | t">
-        <option *ngFor="let lang of languages" [value]="lang">{{ ('app.languages.' + lang) | t }}</option>
-      </select>
-    </div>
   </header>
 
   <!-- LATERAL SIDEBAR -->

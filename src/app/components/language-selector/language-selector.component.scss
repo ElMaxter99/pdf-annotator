@@ -1,0 +1,116 @@
+:host {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(44, 44, 68, 0.9), rgba(30, 30, 46, 0.9));
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  box-shadow: 0 14px 28px rgba(5, 5, 17, 0.35);
+  min-width: 220px;
+}
+
+.language-selector__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.language-selector__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(94, 234, 212, 0.18);
+  font-size: 1.4rem;
+}
+
+.language-selector__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.language-selector__label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.language-selector__current {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.language-selector__control {
+  position: relative;
+}
+
+select {
+  appearance: none;
+  width: 100%;
+  padding: 12px 42px 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 234, 212, 0.25);
+  background: rgba(24, 24, 38, 0.9);
+  color: var(--text);
+  font-weight: 600;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.25);
+}
+
+.language-selector__chevron {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted);
+}
+
+:host(.language-selector--compact) {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  min-width: 0;
+}
+
+:host(.language-selector--compact) .language-selector__icon {
+  width: 32px;
+  height: 32px;
+  font-size: 1.1rem;
+}
+
+:host(.language-selector--compact) .language-selector__label {
+  font-size: 0.7rem;
+}
+
+:host(.language-selector--compact) .language-selector__current {
+  font-size: 0.9rem;
+}
+
+:host(.language-selector--compact) select {
+  padding-block: 10px;
+  padding-inline: 12px 36px;
+}
+
+:host(.language-selector--compact) .language-selector__header {
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  :host {
+    width: 100%;
+  }
+}

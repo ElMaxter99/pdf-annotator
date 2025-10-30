@@ -1,0 +1,26 @@
+<div class="language-selector__header">
+  <div class="language-selector__icon" aria-hidden="true">{{ getFlag(selectedLanguage) }}</div>
+  <div class="language-selector__meta">
+    <label class="language-selector__label" [attr.for]="selectId">
+      {{ labelTranslationKey | t }}
+    </label>
+    <span class="language-selector__current">
+      {{ getFlag(selectedLanguage) }}
+      {{ ('app.languages.' + selectedLanguage) | t }}
+    </span>
+  </div>
+</div>
+
+<div class="language-selector__control">
+  <select
+    [id]="selectId"
+    [attr.aria-label]="ariaLabelTranslationKey | t"
+    [ngModel]="selectedLanguage"
+    (ngModelChange)="onLanguageChange($event)"
+  >
+    <option *ngFor="let lang of languages" [value]="lang">
+      {{ getFlag(lang) }} {{ ('app.languages.' + lang) | t }}
+    </option>
+  </select>
+  <span class="language-selector__chevron" aria-hidden="true">▾</span>
+</div>
