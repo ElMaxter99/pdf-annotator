@@ -131,9 +131,17 @@ export class App implements AfterViewChecked, OnDestroy {
     this.setDocumentMetadata();
     const storedTemplates = this.templatesService.getTemplates();
     this.templates.set(storedTemplates);
-    this.selectedTemplateId =
-      storedTemplates[0]?.id ?? this.templatesService.defaultTemplateId;
-    if (!this.restoreLastCoords()) {
+
+    const initialTemplate =
+      storedTemplates.find(
+        (template) => template.id === this.templatesService.defaultTemplateId
+      ) ?? storedTemplates[0] ?? null;
+
+    this.selectedTemplateId = initialTemplate?.id ?? null;
+
+    if (initialTemplate) {
+      this.applyTemplate(initialTemplate);
+    } else {
       this.syncCoordsTextModel();
     }
   }
@@ -1243,19 +1251,6 @@ export class App implements AfterViewChecked, OnDestroy {
     if (!existing || weight >= existing.weight) {
       this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
     }
-  }
-
-  private restoreLastCoords(): boolean {
-    const restored = this.templatesService.loadLastCoords();
-    if (!restored || restored.length === 0) {
-      return false;
-    }
-
-    this.coords.set(restored);
-    this.preview.set(null);
-    this.editing.set(null);
-    this.syncCoordsTextModel();
-    return true;
   }
 
   private syncCoordsTextModel(persist = true) {
