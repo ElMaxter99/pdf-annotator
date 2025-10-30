@@ -6,6 +6,7 @@ import {
   signal,
   AfterViewChecked,
   HostListener,
+  OnDestroy,
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +18,8 @@ import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
+import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
+import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -61,22 +64,6 @@ if (supportsModuleWorkers()) {
   workerOptions.workerType = undefined;
 }
 
-type FieldType = 'text' | 'check' | 'radio' | 'number';
-
-type PageField = {
-  x: number;
-  y: number;
-  mapField: string;
-  fontSize: number;
-  color: string;
-  type: FieldType;
-  value?: string;
-  appender?: string;
-  decimals?: number | null;
-};
-
-type PageAnnotations = { num: number; fields: PageField[] };
-
 type PreviewState = { page: number; field: PageField } | null;
 
 type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
@@ -88,7 +75,7 @@ type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | n
   imports: [CommonModule, FormsModule, TranslationPipe],
   styleUrls: ['./app.scss'],
 })
-export class App implements AfterViewChecked {
+export class App implements AfterViewChecked, OnDestroy {
   pdfDoc: PDFDocumentProxy | null = null;
   pageIndex = signal(1);
   scale = signal(1.5);
@@ -100,16 +87,23 @@ export class App implements AfterViewChecked {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
-  readonly version = APP_VERSION;
-  readonly appName = APP_NAME;
-  readonly appAuthor = APP_AUTHOR;
-  readonly currentYear = new Date().getFullYear();
   private readonly translationService = inject(TranslationService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
   private readonly document = inject(DOCUMENT);
+  private readonly templatesService = inject(AnnotationTemplatesService);
+  readonly templates = signal<AnnotationTemplate[]>([]);
+  readonly defaultTemplateId = this.templatesService.defaultTemplateId;
+  templateNameModel = '';
+  selectedTemplateId: string | null = null;
+  readonly version = APP_VERSION;
+  readonly appName = APP_NAME;
+  readonly appAuthor = APP_AUTHOR;
+  readonly currentYear = new Date().getFullYear();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
+  private readonly coordsFileInputChangeHandler = (event: Event) => this.onCoordsFileSelected(event);
+  private coordsFileInputFallback: HTMLInputElement | null = null;
 
   private dragInfo: {
     pageIndex: number;
@@ -135,7 +129,37 @@ export class App implements AfterViewChecked {
 
   constructor() {
     this.setDocumentMetadata();
-    this.syncCoordsTextModel();
+    const storedTemplates = this.templatesService.getTemplates();
+    this.templates.set(storedTemplates);
+
+    const initialTemplate =
+      storedTemplates.find(
+        (template) => template.id === this.templatesService.defaultTemplateId
+      ) ?? storedTemplates[0] ?? null;
+
+    this.selectedTemplateId = initialTemplate?.id ?? null;
+
+    if (initialTemplate) {
+      this.applyTemplate(initialTemplate);
+    } else {
+      this.syncCoordsTextModel();
+    }
+  }
+
+  ngOnDestroy() {
+    if (!this.document) {
+      return;
+    }
+    if (this.coordsFileInputFallback) {
+      this.coordsFileInputFallback.removeEventListener(
+        'change',
+        this.coordsFileInputChangeHandler
+      );
+      if (this.coordsFileInputFallback.parentElement) {
+        this.coordsFileInputFallback.parentElement.removeChild(this.coordsFileInputFallback);
+      }
+      this.coordsFileInputFallback = null;
+    }
   }
 
   onLanguageChange(language: string) {
@@ -977,11 +1001,14 @@ export class App implements AfterViewChecked {
   }
 
   triggerImportCoords() {
-    const input = this.coordsFileInputRef?.nativeElement;
-    if (input) {
-      input.value = '';
-      input.click();
+    const input = this.coordsFileInputRef?.nativeElement ?? this.ensureCoordsFileInput();
+    if (!input) {
+      console.warn('No se pudo abrir el selector de archivos para importar anotaciones.');
+      return;
     }
+
+    input.value = '';
+    input.click();
   }
 
   async onCoordsFileSelected(event: Event) {
@@ -1022,6 +1049,86 @@ export class App implements AfterViewChecked {
     a.download = 'coords.json';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  saveCurrentAsTemplate() {
+    const name = this.templateNameModel.trim();
+    if (!name || !this.coords().length) {
+      return;
+    }
+
+    const savedTemplate = this.templatesService.saveTemplate(name, this.coords());
+    if (!savedTemplate) {
+      console.warn('El navegador no soporta almacenamiento local para plantillas.');
+      return;
+    }
+
+    this.templates.set(this.templatesService.getTemplates());
+    this.templateNameModel = '';
+    this.selectedTemplateId = savedTemplate.id;
+  }
+
+  loadSelectedTemplate() {
+    if (!this.selectedTemplateId) {
+      return;
+    }
+
+    const template = this.templates().find((item) => item.id === this.selectedTemplateId);
+    if (!template) {
+      return;
+    }
+
+    this.applyTemplate(template);
+  }
+
+  deleteSelectedTemplate() {
+    if (!this.selectedTemplateId || this.selectedTemplateId === this.defaultTemplateId) {
+      return;
+    }
+
+    const templateId = this.selectedTemplateId;
+    this.templatesService.deleteTemplate(templateId);
+    const nextTemplates = this.templatesService.getTemplates();
+    this.templates.set(nextTemplates);
+    if (!nextTemplates.some((template) => template.id === templateId)) {
+      this.selectedTemplateId =
+        nextTemplates[0]?.id ?? this.templatesService.defaultTemplateId;
+    }
+  }
+
+  private applyTemplate(template: AnnotationTemplate) {
+    const clonedPages = this.clonePages(template.pages);
+    this.coords.set(clonedPages);
+    this.syncCoordsTextModel();
+    this.preview.set(null);
+    this.editing.set(null);
+    this.redrawAllForPage();
+  }
+
+  private clonePages(pages: readonly PageAnnotations[]): PageAnnotations[] {
+    return pages.map((page) => ({
+      num: page.num,
+      fields: page.fields.map((field) => ({ ...field })),
+    }));
+  }
+
+  private ensureCoordsFileInput(): HTMLInputElement | null {
+    if (this.coordsFileInputFallback) {
+      return this.coordsFileInputFallback;
+    }
+
+    if (!this.document?.body) {
+      return null;
+    }
+
+    const input = this.document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.style.display = 'none';
+    input.addEventListener('change', this.coordsFileInputChangeHandler);
+    this.document.body.appendChild(input);
+    this.coordsFileInputFallback = input;
+    return input;
   }
 
   async downloadAnnotatedPDF() {
@@ -1146,8 +1253,12 @@ export class App implements AfterViewChecked {
     }
   }
 
-  private syncCoordsTextModel() {
-    this.coordsTextModel = JSON.stringify({ pages: this.coords() }, null, 2);
+  private syncCoordsTextModel(persist = true) {
+    const currentCoords = this.coords();
+    this.coordsTextModel = JSON.stringify({ pages: currentCoords }, null, 2);
+    if (persist) {
+      this.templatesService.storeLastCoords(currentCoords);
+    }
   }
 
   private parseLooseJson(text: string): unknown {
