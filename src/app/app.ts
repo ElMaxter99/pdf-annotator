@@ -1322,10 +1322,25 @@ export class App implements AfterViewChecked, OnDestroy {
 
       this.rememberPdfBytes(usedBytes, 3);
       const font = await pdf.embedFont(StandardFonts.Helvetica);
+      const pdfPageCount = pdf.getPageCount();
 
       for (const pageAnnotations of this.coords()) {
-        const page = pdf.getPage(pageAnnotations.num - 1);
-        for (const field of pageAnnotations.fields) {
+        const targetIndex = Math.trunc(pageAnnotations.num) - 1;
+        if (
+          !Number.isFinite(targetIndex) ||
+          targetIndex < 0 ||
+          targetIndex >= pdfPageCount
+        ) {
+          console.warn(
+            `Se ignoraron anotaciones para la página ${pageAnnotations.num} porque el PDF solo tiene ${pdfPageCount} páginas.`
+          );
+          continue;
+        }
+
+        const page = pdf.getPage(targetIndex);
+        const fields = pageAnnotations.fields ?? [];
+
+        for (const field of fields) {
           const hex = field.color.replace('#', '');
           const r = parseInt(hex.substring(0, 2), 16) / 255;
           const g = parseInt(hex.substring(2, 4), 16) / 255;
