@@ -122,6 +122,7 @@ export class App implements AfterViewChecked {
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
   guidesFeatureEnabled = signal(false);
+  advancedOptionsOpen = signal(false);
   guideSettings = signal<GuideSettings>({
     showGrid: true,
     gridSize: 10,
@@ -185,7 +186,11 @@ export class App implements AfterViewChecked {
 
   toggleGuidesFeature(enabled: boolean) {
     this.guidesFeatureEnabled.set(enabled);
+    if (enabled) {
+      this.advancedOptionsOpen.set(true);
+    }
     if (!enabled) {
+      this.advancedOptionsOpen.set(false);
       this.overlayDragRect = null;
       this.overlayGuides = [];
       this.refreshOverlay(null, []);
@@ -193,6 +198,10 @@ export class App implements AfterViewChecked {
     }
 
     this.refreshOverlay();
+  }
+
+  toggleAdvancedOptions(open: boolean) {
+    this.advancedOptionsOpen.set(open);
   }
 
   toggleGuideSetting(
