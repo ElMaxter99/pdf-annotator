@@ -8,6 +8,7 @@
     "build": "npm run i18n:check && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "e2e": "playwright test",
     "serve:ssr:pdf-annotator": "node dist/pdf-annotator/server/server.mjs",
     "i18n:check": "node scripts/check-translations.mjs"
   },
@@ -46,6 +47,7 @@
     "@angular/build": "^20.2.1",
     "@angular/cli": "^20.2.1",
     "@angular/compiler-cli": "^20.2.0",
+    "@playwright/test": "^1.48.2",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.17.19",

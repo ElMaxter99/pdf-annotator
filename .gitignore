@@ -38,6 +38,8 @@ Thumbs.db
 
 # Otros
 *.tgz
+playwright-report/
+test-results/
 
 # Archivo de bloqueo de paquetes
 package-lock.json
