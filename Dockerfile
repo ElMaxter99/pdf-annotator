@@ -21,6 +21,9 @@ FROM nginx:1.27-alpine AS runner
 # Remove the default nginx static assets
 RUN rm -rf /usr/share/nginx/html/*
 
+# Ensure nginx serves modern JavaScript modules (.mjs) with the correct MIME type
+RUN sed -i 's/application\/javascript\(.*\)js;/application\/javascript\1js mjs;/' /etc/nginx/mime.types
+
 # Copy custom nginx configuration for SPA routing
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
