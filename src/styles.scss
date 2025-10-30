@@ -40,6 +40,7 @@ body {
   justify-content: center;
   gap: 48px;
   padding: 72px 16px;
+  position: relative;
 }
 
 .landing {
@@ -49,6 +50,18 @@ body {
   text-align: center;
   gap: 32px;
   max-width: 720px;
+}
+
+.landing__language {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.landing__language app-language-selector {
+  max-width: 260px;
 }
 
 .landing__hero {
@@ -168,6 +181,11 @@ body {
 }
 
 @media (max-width: 720px) {
+  .app--landing .landing__language {
+    top: 16px;
+    right: 16px;
+  }
+
   .landing__dropzone {
     padding: 28px 20px;
   }
@@ -191,6 +209,19 @@ header.header {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.header__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header__language-selector {
+  display: inline-flex;
+  margin-left: auto;
+}
+
 header .logo {
   font-weight: bold;
   font-size: 1.3rem;
@@ -208,6 +239,7 @@ header .logo {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+  width: 100%;
 }
 
 .toolbar__group {
@@ -283,48 +315,14 @@ header .logo {
   background: rgba(255, 77, 77, 0.25);
 }
 
-.language-selector {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-self: flex-start;
-}
-
-.language-selector__label {
-  font-size: 0.75rem;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.language-selector select {
-  background: rgba(29, 29, 46, 0.9);
-  color: var(--text);
-  border-radius: 12px;
-  border: 1px solid rgba(94, 234, 212, 0.15);
-  padding: 10px 14px;
-  font-weight: 600;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.language-selector select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.25);
-}
-
 @media (min-width: 960px) {
   header.header {
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
+    grid-template-columns: 1fr;
+    align-items: stretch;
   }
 
-  .header__left {
+  .header__top {
     flex-wrap: nowrap;
-  }
-
-  .language-selector {
-    align-self: center;
   }
 }
 
