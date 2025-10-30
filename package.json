@@ -6,7 +6,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:local": "ng serve --host 0.0.0.0 --port 4200",
+    "start:local": "node scripts/start-local.mjs",
     "start:docker": "sh scripts/docker-up.sh",
     "build": "npm run i18n:check && ng build",
     "watch": "ng build --watch --configuration development",
