@@ -6,6 +6,7 @@ import {
   signal,
   AfterViewChecked,
   HostListener,
+  OnDestroy,
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +18,8 @@ import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
+import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
+import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -61,16 +64,6 @@ if (supportsModuleWorkers()) {
   workerOptions.workerType = undefined;
 }
 
-type PageField = {
-  x: number;
-  y: number;
-  mapField: string;
-  fontSize: number;
-  color: string;
-};
-
-type PageAnnotations = { num: number; fields: PageField[] };
-
 type PreviewState = { page: number; field: PageField } | null;
 
 type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
@@ -82,11 +75,13 @@ type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | n
   imports: [CommonModule, FormsModule, TranslationPipe],
   styleUrls: ['./app.scss'],
 })
-export class App implements AfterViewChecked {
+export class App implements AfterViewChecked, OnDestroy {
   pdfDoc: PDFDocumentProxy | null = null;
   pageIndex = signal(1);
   scale = signal(1.5);
   coords = signal<PageAnnotations[]>([]);
+  private readonly undoStack = signal<PageAnnotations[][]>([]);
+  private readonly redoStack = signal<PageAnnotations[][]>([]);
   preview = signal<PreviewState>(null);
   editing = signal<EditState>(null);
   previewHexInput = signal('#000000');
@@ -94,16 +89,23 @@ export class App implements AfterViewChecked {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
-  readonly version = APP_VERSION;
-  readonly appName = APP_NAME;
-  readonly appAuthor = APP_AUTHOR;
-  readonly currentYear = new Date().getFullYear();
   private readonly translationService = inject(TranslationService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
   private readonly document = inject(DOCUMENT);
+  private readonly templatesService = inject(AnnotationTemplatesService);
+  readonly templates = signal<AnnotationTemplate[]>([]);
+  readonly defaultTemplateId = this.templatesService.defaultTemplateId;
+  templateNameModel = '';
+  selectedTemplateId: string | null = null;
+  readonly version = APP_VERSION;
+  readonly appName = APP_NAME;
+  readonly appAuthor = APP_AUTHOR;
+  readonly currentYear = new Date().getFullYear();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
+  private readonly coordsFileInputChangeHandler = (event: Event) => this.onCoordsFileSelected(event);
+  private coordsFileInputFallback: HTMLInputElement | null = null;
 
   private dragInfo: {
     pageIndex: number;
@@ -118,18 +120,96 @@ export class App implements AfterViewChecked {
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
+  private clipboard: PageField | null = null;
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('annotationsLayer', { static: false })
-  annotationsLayerRef?: ElementRef<HTMLDivElement>;
+    annotationsLayerRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('pdfViewer', { static: false }) pdfViewerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
     this.setDocumentMetadata();
+    const storedTemplates = this.templatesService.getTemplates();
+    this.templates.set(storedTemplates);
+
+    const initialTemplate =
+      storedTemplates.find(
+        (template) => template.id === this.templatesService.defaultTemplateId
+      ) ?? storedTemplates[0] ?? null;
+
+    this.selectedTemplateId = initialTemplate?.id ?? null;
+
+    if (initialTemplate) {
+      this.applyTemplate(initialTemplate);
+    } else {
+      this.syncCoordsTextModel();
+    }
+  }
+
+  ngOnDestroy() {
+    if (!this.document) {
+      return;
+    }
+    if (this.coordsFileInputFallback) {
+      this.coordsFileInputFallback.removeEventListener(
+        'change',
+        this.coordsFileInputChangeHandler
+      );
+      if (this.coordsFileInputFallback.parentElement) {
+        this.coordsFileInputFallback.parentElement.removeChild(this.coordsFileInputFallback);
+      }
+      this.coordsFileInputFallback = null;
+    }
+  }
+
+  canUndo() {
+    return this.undoStack().length > 0;
+  }
+
+  canRedo() {
+    return this.redoStack().length > 0;
+  }
+
+  undo() {
+    const undoStates = this.undoStack();
+    if (!undoStates.length) {
+      return;
+    }
+
+    const previous = undoStates[undoStates.length - 1];
+    const currentSnapshot = this.snapshotCoords();
+
+    this.undoStack.update((stack) => stack.slice(0, -1));
+    this.redoStack.update((stack) => [...stack, currentSnapshot]);
+
+    this.coords.set(this.snapshotCoords(previous));
+    this.preview.set(null);
+    this.editing.set(null);
     this.syncCoordsTextModel();
+    this.redrawAllForPage();
+  }
+
+  redo() {
+    const redoStates = this.redoStack();
+    if (!redoStates.length) {
+      return;
+    }
+
+    const next = redoStates[redoStates.length - 1];
+    const currentSnapshot = this.snapshotCoords();
+
+    this.redoStack.update((stack) => stack.slice(0, -1));
+    this.undoStack.update((stack) => [...stack, currentSnapshot]);
+
+    this.coords.set(this.snapshotCoords(next));
+    this.preview.set(null);
+    this.editing.set(null);
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
   }
 
   onLanguageChange(language: string) {
@@ -171,21 +251,27 @@ export class App implements AfterViewChecked {
 
   ngAfterViewChecked() {
     if (this.preview()) {
-      const previewEl = this.previewEditorRef?.nativeElement;
-      if (previewEl) {
-        const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement | null;
-        input?.focus();
-      }
+      this.focusEditorIfNeeded(this.previewEditorRef?.nativeElement ?? null);
       return;
     }
 
     if (this.editing()) {
-      const editEl = this.editEditorRef?.nativeElement;
-      if (editEl) {
-        const input = editEl.querySelector('input[type="text"]') as HTMLInputElement | null;
-        input?.focus();
-      }
+      this.focusEditorIfNeeded(this.editEditorRef?.nativeElement ?? null);
     }
+  }
+
+  private focusEditorIfNeeded(editorEl: HTMLElement | null) {
+    if (!editorEl) {
+      return;
+    }
+
+    const activeElement = this.document?.activeElement as HTMLElement | null;
+    if (activeElement && editorEl.contains(activeElement)) {
+      return;
+    }
+
+    const focusTarget = editorEl.querySelector<HTMLElement>('input, select, textarea, button');
+    focusTarget?.focus();
   }
 
   onEditorKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
@@ -251,9 +337,8 @@ export class App implements AfterViewChecked {
     }
 
     this.pageIndex.set(1);
-    this.clearAll();
-    this.preview.set(null);
-    this.editing.set(null);
+    this.resetHistory();
+    this.clearAll({ skipHistory: true });
     await this.render();
   }
 
@@ -305,6 +390,10 @@ export class App implements AfterViewChecked {
         mapField: '',
         fontSize: 14,
         color: defaultColor,
+        type: 'text',
+        value: '',
+        appender: '',
+        decimals: null,
       },
     });
     this.updatePreviewColorState(defaultColor);
@@ -468,18 +557,18 @@ export class App implements AfterViewChecked {
 
   confirmPreview() {
     const p = this.preview();
-    if (!p || !p.field.mapField.trim()) {
+    if (!p || !this.fieldHasRenderableContent(p.field)) {
       this.preview.set(null);
       return;
     }
-    const normalizedField: PageField = {
-      ...p.field,
-      color: this.normalizeColor(p.field.color),
-    };
-    this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
-    this.syncCoordsTextModel();
+    const normalizedField = this.prepareFieldForStorage(p.field);
+    if (this.applyCoordsChange(() =>
+      this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages))
+    )) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
     this.preview.set(null);
-    this.redrawAllForPage();
   }
 
   cancelPreview() {
@@ -487,31 +576,40 @@ export class App implements AfterViewChecked {
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
-    const normalized: PageField = { ...field, color: this.normalizeColor(field.color) };
-    if (normalized.color !== field.color) {
-      this.coords.update((pages) =>
-        this.updateFieldInPages(pageIndex, fieldIndex, normalized, pages)
-      );
-      this.syncCoordsTextModel();
+    const sanitized = this.prepareFieldForStorage(field);
+    if (this.fieldRequiresStorageUpdate(field, sanitized)) {
+      if (this.applyCoordsChange(() =>
+        this.coords.update((pages) =>
+          this.updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
+        )
+      )) {
+        this.syncCoordsTextModel();
+        this.redrawAllForPage();
+      }
     }
-    this.editing.set({ pageIndex, fieldIndex, field: { ...normalized } });
-    this.updateEditingColorState(normalized.color);
+    const formField = this.prepareFieldForForm(sanitized);
+    this.editing.set({ pageIndex, fieldIndex, field: formField });
+    this.updateEditingColorState(formField.color);
     this.preview.set(null);
   }
 
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
-    const normalized: PageField = {
-      ...e.field,
-      color: this.normalizeColor(e.field.color),
-    };
-    this.coords.update((pages) =>
-      this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
-    );
-    this.syncCoordsTextModel();
+    if (!this.fieldHasRenderableContent(e.field)) {
+      this.editing.set(null);
+      return;
+    }
+    const normalized = this.prepareFieldForStorage(e.field);
+    if (this.applyCoordsChange(() =>
+      this.coords.update((pages) =>
+        this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
+      )
+    )) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
     this.editing.set(null);
-    this.redrawAllForPage();
   }
 
   cancelEdit() {
@@ -534,13 +632,259 @@ export class App implements AfterViewChecked {
     this.cancelEdit();
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.preview() && !this.editing()) {
+      return;
+    }
+
+    const viewer = this.pdfViewerRef?.nativeElement;
+    const target = event.target as Node | null;
+
+    if (!viewer || !target) {
+      return;
+    }
+
+    if (viewer.contains(target)) {
+      return;
+    }
+
+    if (this.preview()) {
+      this.cancelPreview();
+    }
+
+    if (this.editing()) {
+      this.cancelEdit();
+    }
+  }
+
   deleteAnnotation() {
     const e = this.editing();
     if (!e) return;
-    this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages));
-    this.syncCoordsTextModel();
+    if (this.applyCoordsChange(() =>
+      this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages))
+    )) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
     this.editing.set(null);
+  }
+
+  copyAnnotation(): boolean {
+    const editState = this.editing();
+    if (!editState) {
+      return false;
+    }
+
+    const sanitized = this.prepareFieldForStorage(editState.field);
+    this.clipboard = { ...sanitized };
+    return true;
+  }
+
+  pasteAnnotation(targetPageNum?: number): boolean {
+    if (!this.clipboard || !this.pdfDoc) {
+      return false;
+    }
+
+    const pageNum = targetPageNum ?? this.pageIndex();
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement ?? null;
+    const newField: PageField = { ...this.clipboard };
+
+    if (pdfCanvas) {
+      const scale = this.scale();
+      const offset = this.roundToTwo(8 / scale);
+      const maxX = this.roundToTwo(pdfCanvas.width / scale);
+      const maxY = this.roundToTwo(pdfCanvas.height / scale);
+      newField.x = this.roundToTwo(this.clamp(newField.x + offset, 0, maxX));
+      newField.y = this.roundToTwo(this.clamp(newField.y + offset, 0, maxY));
+    }
+
+    let insertedFieldIndex = -1;
+    let insertedPageIndex = -1;
+
+    const changed = this.applyCoordsChange(() => {
+      this.coords.update((pages) => {
+        const updated = this.addFieldToPages(pageNum, newField, pages);
+        insertedPageIndex = updated.findIndex((page) => page.num === pageNum);
+        if (insertedPageIndex >= 0) {
+          insertedFieldIndex = updated[insertedPageIndex].fields.length - 1;
+        }
+        return updated;
+      });
+    });
+
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
     this.redrawAllForPage();
+
+    if (insertedPageIndex >= 0 && insertedFieldIndex >= 0) {
+      const pages = this.coords();
+      const page = pages[insertedPageIndex];
+      const field = page?.fields[insertedFieldIndex];
+      if (field) {
+        this.startEditing(insertedPageIndex, insertedFieldIndex, field);
+      }
+    }
+
+    return true;
+  }
+
+  duplicateAnnotation() {
+    const editState = this.editing();
+    if (!editState) {
+      return;
+    }
+
+    const pages = this.coords();
+    const pageNum = pages[editState.pageIndex]?.num ?? this.pageIndex();
+    if (!this.copyAnnotation()) {
+      return;
+    }
+
+    this.pasteAnnotation(pageNum);
+  }
+
+  private fieldHasRenderableContent(field: PageField): boolean {
+    const valueText = typeof field.value === 'string' ? field.value.trim() : '';
+    if (valueText) {
+      return true;
+    }
+
+    const type = this.normalizeFieldType(field.type);
+    if (type === 'check' || type === 'radio') {
+      return true;
+    }
+
+    return field.mapField.trim().length > 0;
+  }
+
+  private fieldRequiresStorageUpdate(original: PageField, sanitized: PageField): boolean {
+    const originalValue = (original as { value?: unknown }).value;
+    const originalAppender = (original as { appender?: unknown }).appender;
+    const originalDecimals = (original as { decimals?: unknown }).decimals;
+    const originalType = (original as { type?: unknown }).type;
+
+    return (
+      original.x !== sanitized.x ||
+      original.y !== sanitized.y ||
+      original.mapField !== sanitized.mapField ||
+      original.fontSize !== sanitized.fontSize ||
+      original.color !== sanitized.color ||
+      originalType !== sanitized.type ||
+      originalValue !== sanitized.value ||
+      originalAppender !== sanitized.appender ||
+      originalDecimals !== sanitized.decimals
+    );
+  }
+
+  private prepareFieldForStorage(field: PageField): PageField {
+    const type = this.normalizeFieldType(field.type);
+    const base: PageField = {
+      x: field.x,
+      y: field.y,
+      mapField: typeof field.mapField === 'string' ? field.mapField : '',
+      fontSize: field.fontSize,
+      color: this.normalizeColor(field.color),
+      type,
+    };
+
+    const value = this.sanitizeTextPreservingSpacing(field.value);
+    if (value !== undefined) {
+      base.value = value;
+    }
+
+    if (type === 'number') {
+      const decimals = this.normalizeFieldDecimals(field.decimals);
+      if (decimals !== undefined) {
+        base.decimals = decimals;
+      }
+      const appender = this.sanitizeOptionalAppender(field.appender);
+      if (appender !== undefined) {
+        base.appender = appender;
+      }
+    }
+
+    return base;
+  }
+
+  private prepareFieldForForm(field: PageField): PageField {
+    const decimals =
+      typeof field.decimals === 'number' && Number.isFinite(field.decimals)
+        ? Math.max(0, Math.round(field.decimals))
+        : null;
+
+    return {
+      ...field,
+      value: typeof field.value === 'string' ? field.value : '',
+      appender: typeof field.appender === 'string' ? field.appender : '',
+      decimals,
+    };
+  }
+
+  private normalizeFieldType(value: unknown): FieldType {
+    if (typeof value === 'string') {
+      const normalized = value.toLowerCase();
+      if (normalized === 'check' || normalized === 'radio' || normalized === 'number' || normalized === 'text') {
+        return normalized as FieldType;
+      }
+    }
+    return 'text';
+  }
+
+  private sanitizeTextPreservingSpacing(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    return value.trim() ? value : undefined;
+  }
+
+  private sanitizeOptionalAppender(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    return value.trim() ? value : undefined;
+  }
+
+  private normalizeFieldDecimals(value: unknown): number | undefined {
+    if (value === null || value === undefined || value === '') {
+      return undefined;
+    }
+    const parsed = this.toFiniteNumber(value);
+    if (parsed === null || parsed < 0) {
+      return undefined;
+    }
+    return Math.round(parsed);
+  }
+
+  private getFieldRenderValue(field: PageField): string {
+    const override =
+      typeof field.value === 'string' && field.value.trim() ? field.value : undefined;
+    if (override !== undefined) {
+      return override;
+    }
+
+    const type = this.normalizeFieldType(field.type);
+    if (type === 'check' || type === 'radio') {
+      return 'X';
+    }
+
+    const baseText = typeof field.mapField === 'string' ? field.mapField : '';
+
+    if (type === 'number') {
+      const numeric = this.toFiniteNumber(baseText);
+      if (numeric !== null) {
+        const decimals = this.normalizeFieldDecimals(field.decimals);
+        const formatted =
+          decimals !== undefined
+            ? this.formatNumberWithTruncation(numeric, decimals)
+            : baseText;
+        const appender = this.sanitizeOptionalAppender(field.appender) ?? '';
+        return `${formatted}${appender}`;
+      }
+    }
+
+    return baseText;
   }
 
   private addFieldToPages(
@@ -618,7 +962,7 @@ export class App implements AfterViewChecked {
 
           const el = document.createElement('div');
           el.className = 'annotation';
-          el.textContent = field.mapField;
+          el.textContent = this.getFieldRenderValue(field);
           el.style.left = `${left}px`;
           el.style.top = `${top - field.fontSize * scale}px`;
           el.style.fontSize = `${field.fontSize * scale}px`;
@@ -710,7 +1054,6 @@ export class App implements AfterViewChecked {
       const left = parseFloat(el.style.left || '0');
       const top = parseFloat(el.style.top || '0');
       this.updateAnnotationPosition(drag.pageIndex, drag.fieldIndex, left, top, drag.fontSize);
-      this.redrawAllForPage();
     } else if (evt.type !== 'pointercancel') {
       const page = this.coords()[drag.pageIndex];
       const field = page?.fields[drag.fieldIndex];
@@ -735,21 +1078,28 @@ export class App implements AfterViewChecked {
     const newX = +(boundedLeft / scale).toFixed(2);
     const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
 
-    this.coords.update((pages) =>
-      pages.map((page, idx) => {
-        if (idx !== pageIndex) {
-          return page;
-        }
-        if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
-          return page;
-        }
-        const updatedFields = page.fields.map((field, fIdx) =>
-          fIdx === fieldIndex ? { ...field, x: newX, y: newY } : field
-        );
-        return { ...page, fields: updatedFields };
-      })
+    const changed = this.applyCoordsChange(() =>
+      this.coords.update((pages) =>
+        pages.map((page, idx) => {
+          if (idx !== pageIndex) {
+            return page;
+          }
+          if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
+            return page;
+          }
+          const updatedFields = page.fields.map((field, fIdx) =>
+            fIdx === fieldIndex ? { ...field, x: newX, y: newY } : field
+          );
+          return { ...page, fields: updatedFields };
+        })
+      )
     );
-    this.syncCoordsTextModel();
+
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
+
+    this.redrawAllForPage();
   }
 
   async prevPage() {
@@ -780,10 +1130,8 @@ export class App implements AfterViewChecked {
     this.redrawAllForPage();
   }
 
-  clearAll() {
-    this.coords.set([]);
-    this.syncCoordsTextModel();
-    this.redrawAllForPage();
+  clearAll(options?: { skipHistory?: boolean }) {
+    this.replaceCoords([], options);
   }
 
   copyJSON() {
@@ -794,11 +1142,7 @@ export class App implements AfterViewChecked {
     const text = this.coordsTextModel.trim();
 
     if (!text) {
-      this.coords.set([]);
-      this.syncCoordsTextModel();
-      this.preview.set(null);
-      this.editing.set(null);
-      this.redrawAllForPage();
+      this.clearAll();
       return;
     }
 
@@ -810,11 +1154,7 @@ export class App implements AfterViewChecked {
         throw new Error('Formato no válido');
       }
 
-      this.coords.set(normalized);
-      this.syncCoordsTextModel();
-      this.preview.set(null);
-      this.editing.set(null);
-      this.redrawAllForPage();
+      this.replaceCoords(normalized);
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
@@ -822,11 +1162,14 @@ export class App implements AfterViewChecked {
   }
 
   triggerImportCoords() {
-    const input = this.coordsFileInputRef?.nativeElement;
-    if (input) {
-      input.value = '';
-      input.click();
+    const input = this.coordsFileInputRef?.nativeElement ?? this.ensureCoordsFileInput();
+    if (!input) {
+      console.warn('No se pudo abrir el selector de archivos para importar anotaciones.');
+      return;
     }
+
+    input.value = '';
+    input.click();
   }
 
   async onCoordsFileSelected(event: Event) {
@@ -844,11 +1187,7 @@ export class App implements AfterViewChecked {
         throw new Error('Formato no válido');
       }
 
-      this.coords.set(normalized);
-      this.syncCoordsTextModel();
-      this.preview.set(null);
-      this.editing.set(null);
-      this.redrawAllForPage();
+      this.replaceCoords(normalized);
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
@@ -867,6 +1206,86 @@ export class App implements AfterViewChecked {
     a.download = 'coords.json';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  saveCurrentAsTemplate() {
+    const name = this.templateNameModel.trim();
+    if (!name || !this.coords().length) {
+      return;
+    }
+
+    const savedTemplate = this.templatesService.saveTemplate(name, this.coords());
+    if (!savedTemplate) {
+      console.warn('El navegador no soporta almacenamiento local para plantillas.');
+      return;
+    }
+
+    this.templates.set(this.templatesService.getTemplates());
+    this.templateNameModel = '';
+    this.selectedTemplateId = savedTemplate.id;
+  }
+
+  loadSelectedTemplate() {
+    if (!this.selectedTemplateId) {
+      return;
+    }
+
+    const template = this.templates().find((item) => item.id === this.selectedTemplateId);
+    if (!template) {
+      return;
+    }
+
+    this.applyTemplate(template);
+  }
+
+  deleteSelectedTemplate() {
+    if (!this.selectedTemplateId || this.selectedTemplateId === this.defaultTemplateId) {
+      return;
+    }
+
+    const templateId = this.selectedTemplateId;
+    this.templatesService.deleteTemplate(templateId);
+    const nextTemplates = this.templatesService.getTemplates();
+    this.templates.set(nextTemplates);
+    if (!nextTemplates.some((template) => template.id === templateId)) {
+      this.selectedTemplateId =
+        nextTemplates[0]?.id ?? this.templatesService.defaultTemplateId;
+    }
+  }
+
+  private applyTemplate(template: AnnotationTemplate) {
+    const clonedPages = this.clonePages(template.pages);
+    this.coords.set(clonedPages);
+    this.syncCoordsTextModel();
+    this.preview.set(null);
+    this.editing.set(null);
+    this.redrawAllForPage();
+  }
+
+  private clonePages(pages: readonly PageAnnotations[]): PageAnnotations[] {
+    return pages.map((page) => ({
+      num: page.num,
+      fields: page.fields.map((field) => ({ ...field })),
+    }));
+  }
+
+  private ensureCoordsFileInput(): HTMLInputElement | null {
+    if (this.coordsFileInputFallback) {
+      return this.coordsFileInputFallback;
+    }
+
+    if (!this.document?.body) {
+      return null;
+    }
+
+    const input = this.document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.style.display = 'none';
+    input.addEventListener('change', this.coordsFileInputChangeHandler);
+    this.document.body.appendChild(input);
+    this.coordsFileInputFallback = input;
+    return input;
   }
 
   async downloadAnnotatedPDF() {
@@ -907,16 +1326,31 @@ export class App implements AfterViewChecked {
 
       this.rememberPdfBytes(usedBytes, 3);
       const font = await pdf.embedFont(StandardFonts.Helvetica);
+      const pdfPageCount = pdf.getPageCount();
 
       for (const pageAnnotations of this.coords()) {
-        const page = pdf.getPage(pageAnnotations.num - 1);
-        for (const field of pageAnnotations.fields) {
+        const targetIndex = Math.trunc(pageAnnotations.num) - 1;
+        if (
+          !Number.isFinite(targetIndex) ||
+          targetIndex < 0 ||
+          targetIndex >= pdfPageCount
+        ) {
+          console.warn(
+            `Se ignoraron anotaciones para la página ${pageAnnotations.num} porque el PDF solo tiene ${pdfPageCount} páginas.`
+          );
+          continue;
+        }
+
+        const page = pdf.getPage(targetIndex);
+        const fields = pageAnnotations.fields ?? [];
+
+        for (const field of fields) {
           const hex = field.color.replace('#', '');
           const r = parseInt(hex.substring(0, 2), 16) / 255;
           const g = parseInt(hex.substring(2, 4), 16) / 255;
           const b = parseInt(hex.substring(4, 6), 16) / 255;
 
-          page.drawText(field.mapField, {
+          page.drawText(this.getFieldRenderValue(field), {
             x: field.x,
             y: field.y,
             size: field.fontSize,
@@ -991,8 +1425,90 @@ export class App implements AfterViewChecked {
     }
   }
 
-  private syncCoordsTextModel() {
-    this.coordsTextModel = JSON.stringify({ pages: this.coords() }, null, 2);
+  private syncCoordsTextModel(persist = true) {
+    const currentCoords = this.coords();
+    this.coordsTextModel = JSON.stringify({ pages: currentCoords }, null, 2);
+    if (persist) {
+      this.templatesService.storeLastCoords(currentCoords);
+    }
+  }
+
+  private snapshotCoords(pages: PageAnnotations[] = this.coords()): PageAnnotations[] {
+    return pages.map((page) => ({
+      num: page.num,
+      fields: page.fields.map((field) => ({ ...field })),
+    }));
+  }
+
+  private applyCoordsChange(mutator: () => void): boolean {
+    const previous = this.snapshotCoords();
+    mutator();
+    const changed = !this.areCoordsEqual(previous, this.coords());
+    if (changed) {
+      this.undoStack.update((stack) => [...stack, previous]);
+      this.redoStack.set([]);
+    }
+    return changed;
+  }
+
+  private replaceCoords(newCoords: PageAnnotations[], options?: { skipHistory?: boolean }) {
+    const snapshot = this.snapshotCoords(newCoords);
+    if (options?.skipHistory) {
+      this.coords.set(snapshot);
+    } else {
+      this.applyCoordsChange(() => this.coords.set(snapshot));
+    }
+    this.preview.set(null);
+    this.editing.set(null);
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
+  }
+
+  private resetHistory() {
+    this.undoStack.set([]);
+    this.redoStack.set([]);
+  }
+
+  private areCoordsEqual(a: PageAnnotations[], b: PageAnnotations[]): boolean {
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    for (let i = 0; i < a.length; i += 1) {
+      const pageA = a[i];
+      const pageB = b[i];
+      if (!pageB || pageA.num !== pageB.num) {
+        return false;
+      }
+
+      if (pageA.fields.length !== pageB.fields.length) {
+        return false;
+      }
+
+      for (let j = 0; j < pageA.fields.length; j += 1) {
+        const fieldA = pageA.fields[j];
+        const fieldB = pageB.fields[j];
+        if (!fieldB || !this.areFieldsEqual(fieldA, fieldB)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  private areFieldsEqual(a: PageField, b: PageField): boolean {
+    return (
+      a.x === b.x &&
+      a.y === b.y &&
+      a.mapField === b.mapField &&
+      a.fontSize === b.fontSize &&
+      a.color === b.color &&
+      a.type === b.type &&
+      (a.value ?? undefined) === (b.value ?? undefined) &&
+      (a.appender ?? undefined) === (b.appender ?? undefined) &&
+      (a.decimals ?? undefined) === (b.decimals ?? undefined)
+    );
   }
 
   private parseLooseJson(text: string): unknown {
@@ -1135,14 +1651,35 @@ export class App implements AfterViewChecked {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color, value } = rawField as Record<string, unknown>;
+        const {
+          x,
+          y,
+          mapField,
+          fontSize,
+          color,
+          value,
+          type,
+          decimals,
+          appender,
+        } = rawField as Record<string, unknown>;
 
+        const normalizedType = this.normalizeFieldType(type);
+        const normalizedValue = this.normalizeFieldText(value);
         const normalizedMapField =
-          this.normalizeFieldText(mapField) ?? this.normalizeFieldText(value);
+          this.normalizeFieldText(mapField) ?? normalizedValue;
         const normalizedX = this.toFiniteNumber(x);
         const normalizedY = this.toFiniteNumber(y);
 
-        if (normalizedMapField === null || normalizedX === null || normalizedY === null) {
+        if (normalizedX === null || normalizedY === null) {
+          continue;
+        }
+
+        if (
+          normalizedMapField === null &&
+          normalizedValue === null &&
+          normalizedType !== 'check' &&
+          normalizedType !== 'radio'
+        ) {
           continue;
         }
 
@@ -1153,13 +1690,29 @@ export class App implements AfterViewChecked {
         const normalizedField: PageField = {
           x: Math.round(normalizedX * 100) / 100,
           y: Math.round(normalizedY * 100) / 100,
-          mapField: normalizedMapField,
+          mapField: normalizedMapField ?? '',
           fontSize:
             normalizedFontSize && normalizedFontSize > 0
               ? Math.round(normalizedFontSize * 100) / 100
               : 14,
           color: this.normalizeColor(normalizedColor),
+          type: normalizedType,
         };
+
+        if (normalizedValue !== null) {
+          normalizedField.value = normalizedValue;
+        }
+
+        if (normalizedType === 'number') {
+          const normalizedDecimals = this.normalizeFieldDecimals(decimals);
+          if (normalizedDecimals !== undefined) {
+            normalizedField.decimals = normalizedDecimals;
+          }
+          const normalizedAppender = this.sanitizeOptionalAppender(appender);
+          if (normalizedAppender !== undefined) {
+            normalizedField.appender = normalizedAppender;
+          }
+        }
 
         fields.push(normalizedField);
       }
@@ -1205,7 +1758,23 @@ export class App implements AfterViewChecked {
     return null;
   }
 
+  private formatNumberWithTruncation(value: number, decimals: number): string {
+    const factor = 10 ** decimals;
+    const truncated = Math.trunc(value * factor) / factor;
+    return truncated.toFixed(decimals);
+  }
+
   private normalizeFieldText(value: unknown): string | null {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const normalized = this.normalizeFieldText(item);
+        if (normalized !== null) {
+          return normalized;
+        }
+      }
+      return null;
+    }
+
     let source: string | null = null;
 
     if (typeof value === 'string') {
@@ -1235,5 +1804,38 @@ export class App implements AfterViewChecked {
     }
 
     return collapsed;
+  }
+
+  private isEditableElement(target: EventTarget | null): boolean {
+    const el = target as HTMLElement | null;
+    if (!el) {
+      return false;
+    }
+
+    if (el.isContentEditable) {
+      return true;
+    }
+
+    const tag = el.tagName?.toLowerCase();
+    if (tag === 'textarea' || tag === 'select') {
+      return true;
+    }
+
+    if (tag === 'input') {
+      const input = el as HTMLInputElement;
+      const type = input.type?.toLowerCase();
+      const nonEditableTypes = new Set(['button', 'checkbox', 'radio', 'range', 'color', 'submit', 'reset']);
+      return !nonEditableTypes.has(type);
+    }
+
+    return false;
+  }
+
+  private roundToTwo(value: number): number {
+    return Math.round(value * 100) / 100;
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
   }
 }
