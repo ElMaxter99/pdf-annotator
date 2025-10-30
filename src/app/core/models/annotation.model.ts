@@ -1,4 +1,4 @@
-export type FieldType = 'text' | 'check' | 'radio' | 'number' | 'barcode' | 'signature';
+export type FieldType = 'text' | 'check' | 'radio' | 'number';
 
 export interface PageField {
   x: number;

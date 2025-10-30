@@ -97,7 +97,9 @@
     "actions": {
       "confirm": "Confirmar",
       "cancel": "Cancelar",
-      "update": "Actualizar"
+      "update": "Actualizar",
+      "duplicate": "Duplicar",
+      "delete": "Eliminar"
     }
   },
   "viewer": {

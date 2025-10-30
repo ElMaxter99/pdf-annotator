@@ -116,6 +116,8 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy, OnI
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
   private readonly coordsFileInputChangeHandler = (event: Event) => this.onCoordsFileSelected(event);
+  private readonly pdfFileInputChangeHandler = (event: Event) => this.onFileSelected(event);
+  private pdfFileInputFallback: HTMLInputElement | null = null;
   private coordsFileInputFallback: HTMLInputElement | null = null;
 
   private dragInfo: {
@@ -171,6 +173,13 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy, OnI
   ngOnDestroy() {
     if (!this.document) {
       return;
+    }
+    if (this.pdfFileInputFallback) {
+      this.pdfFileInputFallback.removeEventListener('change', this.pdfFileInputChangeHandler);
+      if (this.pdfFileInputFallback.parentElement) {
+        this.pdfFileInputFallback.parentElement.removeChild(this.pdfFileInputFallback);
+      }
+      this.pdfFileInputFallback = null;
     }
     if (this.coordsFileInputFallback) {
       this.coordsFileInputFallback.removeEventListener(
@@ -341,6 +350,12 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy, OnI
     if (this.sidebarComponent) {
       this.sidebarComponent.openFilePicker();
       return;
+    }
+
+    const fallback = this.ensurePdfFileInput();
+    if (fallback) {
+      fallback.value = '';
+      fallback.click();
     }
   }
 
@@ -1389,6 +1404,25 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy, OnI
     input.addEventListener('change', this.coordsFileInputChangeHandler);
     this.document.body.appendChild(input);
     this.coordsFileInputFallback = input;
+    return input;
+  }
+
+  private ensurePdfFileInput(): HTMLInputElement | null {
+    if (this.pdfFileInputFallback) {
+      return this.pdfFileInputFallback;
+    }
+
+    if (!this.document?.body) {
+      return null;
+    }
+
+    const input = this.document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/pdf';
+    input.style.display = 'none';
+    input.addEventListener('change', this.pdfFileInputChangeHandler);
+    this.document.body.appendChild(input);
+    this.pdfFileInputFallback = input;
     return input;
   }
 
