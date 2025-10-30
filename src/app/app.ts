@@ -686,7 +686,10 @@ export class App implements AfterViewChecked {
       const numeric = this.toFiniteNumber(baseText);
       if (numeric !== null) {
         const decimals = this.normalizeFieldDecimals(field.decimals);
-        const formatted = decimals !== undefined ? numeric.toFixed(decimals) : baseText;
+        const formatted =
+          decimals !== undefined
+            ? this.formatNumberWithTruncation(numeric, decimals)
+            : baseText;
         const appender = this.sanitizeOptionalAppender(field.appender) ?? '';
         return `${formatted}${appender}`;
       }
@@ -1392,6 +1395,12 @@ export class App implements AfterViewChecked {
     }
 
     return null;
+  }
+
+  private formatNumberWithTruncation(value: number, decimals: number): string {
+    const factor = 10 ** decimals;
+    const truncated = Math.trunc(value * factor) / factor;
+    return truncated.toFixed(decimals);
   }
 
   private normalizeFieldText(value: unknown): string | null {
