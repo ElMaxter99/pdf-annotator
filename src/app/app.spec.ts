@@ -1,25 +1,19 @@
 import { TestBed } from '@angular/core/testing';
-import { App } from './app';
-import { TranslationService } from './i18n/translation.service';
+import { RouterTestingModule } from '@angular/router/testing';
 
-describe('App', () => {
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [RouterTestingModule],
+      declarations: [AppComponent],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
+  it('should create the root component', () => {
+    const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
-  });
-
-  it('should render the localized title', () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    const translation = TestBed.inject(TranslationService);
-    expect(compiled.querySelector('.logo')?.textContent?.trim()).toBe(translation.translate('app.title'));
   });
 });

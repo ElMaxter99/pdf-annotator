@@ -1,0 +1,106 @@
+<aside class="sidebar">
+  <section
+    class="sidebar-upload"
+    role="button"
+    tabindex="0"
+    (click)="openPdfPicker.emit()"
+    (keydown)="fileUploadKeydown.emit($event)"
+    (dragover)="fileDragOver.emit($event)"
+    (dragleave)="fileDragLeave.emit($event)"
+    (drop)="fileDrop.emit($event)"
+    [class.sidebar-upload--active]="fileDropActive"
+    [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t"
+  >
+    <ng-content select="[pdf-file-input]"></ng-content>
+
+    <div class="sidebar-upload__body">
+      <div class="sidebar-upload__icon" aria-hidden="true">🗂️</div>
+      <div class="sidebar-upload__copy">
+        <span class="sidebar-upload__title">{{ 'app.workspaceUpload.title' | t }}</span>
+        <span class="sidebar-upload__subtitle">{{ 'app.workspaceUpload.subtitle' | t }}</span>
+      </div>
+    </div>
+    <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
+  </section>
+
+  <h4>{{ 'sidebar.title' | t }}</h4>
+
+  <div class="sidebar-actions">
+    <button type="button" class="btn" (click)="requestImportCoords.emit()">
+      {{ 'sidebar.importJsonFile' | t }}
+    </button>
+    <button type="button" class="btn" (click)="applyCoordsText.emit()">
+      {{ 'sidebar.applyJson' | t }}
+    </button>
+  </div>
+
+  <section class="templates">
+    <h5>{{ 'sidebar.templates.title' | t }}</h5>
+    <div class="templates__save">
+      <input
+        type="text"
+        [ngModel]="templateNameModel"
+        (ngModelChange)="onTemplateNameChange($event)"
+        [ngModelOptions]="{ standalone: true }"
+        [placeholder]="'sidebar.templates.placeholder' | t"
+      />
+      <button
+        type="button"
+        class="btn"
+        (click)="saveTemplate.emit()"
+        [disabled]="!hasCoords || !templateNameModel.trim()"
+      >
+        {{ 'sidebar.templates.saveButton' | t }}
+      </button>
+    </div>
+
+    <ng-container *ngIf="templates.length; else emptyTemplates">
+      <div class="templates__select">
+        <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
+        <div class="templates__controls">
+          <select
+            [ngModel]="selectedTemplateId"
+            (ngModelChange)="onTemplateSelectionChange($event)"
+            [ngModelOptions]="{ standalone: true }"
+          >
+            <option *ngFor="let template of templates" [value]="template.id">
+              {{ template.name }}
+            </option>
+          </select>
+          <button type="button" class="btn" (click)="loadTemplate.emit()" [disabled]="!selectedTemplateId">
+            {{ 'sidebar.templates.loadButton' | t }}
+          </button>
+          <button
+            type="button"
+            class="btn templates__delete"
+            (click)="deleteTemplate.emit()"
+            [disabled]="!selectedTemplateId || selectedTemplateId === defaultTemplateId"
+          >
+            {{ 'sidebar.templates.deleteButton' | t }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #emptyTemplates>
+      <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
+    </ng-template>
+  </section>
+
+  <textarea
+    class="json-editor"
+    [ngModel]="coordsTextModel"
+    (ngModelChange)="onCoordsTextChange($event)"
+    [placeholder]="'sidebar.jsonPlaceholder' | t"
+    spellcheck="false"
+  ></textarea>
+
+  <div class="json-toolbar">
+    <button class="btn" (click)="copyJson.emit()" [disabled]="!hasCoords">
+      {{ 'controls.copyJson' | t }}
+    </button>
+    <button class="btn" (click)="downloadJson.emit()" [disabled]="!hasCoords">
+      {{ 'controls.downloadJson' | t }}
+    </button>
+  </div>
+  <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
+</aside>

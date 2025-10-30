@@ -1,0 +1,9 @@
+<div class="language-selector__control">
+  <select [id]="selectId" [attr.aria-label]="ariaLabelTranslationKey | t" [ngModel]="selectedLanguage"
+    (ngModelChange)="onLanguageChange($event)">
+    <option *ngFor="let lang of languages" [value]="lang">
+      {{ getFlag(lang) }} {{ ('app.languages.' + lang) | t }}
+    </option>
+  </select>
+  <span class="language-selector__chevron" aria-hidden="true">▾</span>
+</div>

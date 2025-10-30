@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  grid-area: viewer;
+}
+
+.viewer {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  background: #1a1a1a;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+}
