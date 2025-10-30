@@ -2,37 +2,19 @@
   <ng-container *ngIf="!pdfDoc; else workspace">
     <section class="landing">
       <div class="landing__language">
-        <app-language-selector
-          [languages]="languages"
-          [selectedLanguage]="languageModel"
-          (languageChange)="onLanguageChange($event)"
-          variant="compact"
-        ></app-language-selector>
+        <app-language-selector [languages]="languages" [selectedLanguage]="languageModel"
+          (languageChange)="onLanguageChange($event)" variant="compact"></app-language-selector>
       </div>
       <div class="landing__hero">
         <span class="landing__badge">{{ 'app.landing.badge' | t }}</span>
         <h1 class="landing__title">{{ 'app.landing.title' | t }}</h1>
         <p class="landing__description">{{ 'app.landing.description' | t }}</p>
       </div>
-      <div
-        class="landing__dropzone"
-        role="button"
-        tabindex="0"
-        (click)="openPdfFilePicker()"
-        (keydown)="onFileUploadKeydown($event)"
-        (dragover)="onFileDragOver($event)"
-        (dragleave)="onFileDragLeave($event)"
-        (drop)="onFileDrop($event)"
-        [class.landing__dropzone--active]="fileDropActive()"
-        [attr.aria-label]="'app.upload.title' | t"
-      >
-        <input
-          #pdfFileInput
-          type="file"
-          accept="application/pdf"
-          (change)="onFileSelected($event)"
-          hidden
-        />
+      <div class="landing__dropzone" role="button" tabindex="0" (click)="openPdfFilePicker()"
+        (keydown)="onFileUploadKeydown($event)" (dragover)="onFileDragOver($event)"
+        (dragleave)="onFileDragLeave($event)" (drop)="onFileDrop($event)"
+        [class.landing__dropzone--active]="fileDropActive()" [attr.aria-label]="'app.upload.title' | t">
+        <input #pdfFileInput type="file" accept="application/pdf" (change)="onFileSelected($event)" hidden />
         <div class="landing__icon" aria-hidden="true">📄</div>
         <div class="landing__text">
           <span class="landing__headline">{{ 'app.upload.title' | t }}</span>
@@ -60,328 +42,274 @@
   <ng-template #workspace>
     <!-- HEADER -->
     <header class="header">
-      <div class="header__top">
+      <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
         <div class="header__left">
           <div class="logo">{{ 'app.title' | t }}</div>
         </div>
-        <app-language-selector
-          class="header__language-selector"
-          [languages]="languages"
-          [selectedLanguage]="languageModel"
-          (languageChange)="onLanguageChange($event)"
-          variant="compact"
-        ></app-language-selector>
-      </div>
+        <input #coordsFileInput type="file" accept="application/json" (change)="onCoordsFileSelected($event)" hidden />
 
-    <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
-      <input
-        #coordsFileInput
-        type="file"
-        accept="application/json"
-        (change)="onCoordsFileSelected($event)"
-        hidden
-      />
-
-      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
-        <button class="btn btn--icon" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">
-          <span class="btn__icon" aria-hidden="true">⟨</span>
-          <span class="btn__label">{{ 'controls.prev' | t }}</span>
-        </button>
-        <span class="toolbar__badge">
-          {{ 'controls.pageIndicator' | t : { current: pageIndex(), total: pageCount || 0 } }}
-        </span>
-        <button class="btn btn--icon" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">
-          <span class="btn__label">{{ 'controls.next' | t }}</span>
-          <span class="btn__icon" aria-hidden="true">⟩</span>
-        </button>
-      </div>
-
-      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
-        <button class="btn btn--icon" (click)="zoomOut()" [disabled]="!pdfDoc">
-          <span class="btn__icon" aria-hidden="true">−</span>
-          <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
-        </button>
-        <span class="toolbar__badge">{{ 'controls.zoomLabel' | t }} {{ scale() | number:'1.0-2' }}×</span>
-        <button class="btn btn--icon" (click)="zoomIn()" [disabled]="!pdfDoc">
-          <span class="btn__label">{{ 'controls.zoomIn' | t }}</span>
-          <span class="btn__icon" aria-hidden="true">＋</span>
-        </button>
-      </div>
-
-      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
-        <button class="btn btn--icon" (click)="undo()" [disabled]="!canUndo()">
-          <span class="btn__icon" aria-hidden="true">↺</span>
-          <span class="btn__label">{{ 'controls.undo' | t }}</span>
-        </button>
-        <button class="btn btn--icon" (click)="redo()" [disabled]="!canRedo()">
-          <span class="btn__icon" aria-hidden="true">↻</span>
-          <span class="btn__label">{{ 'controls.redo' | t }}</span>
-        </button>
-        <button class="btn btn--icon btn--danger" (click)="clearAll()" [disabled]="!coords().length">
-          <span class="btn__icon" aria-hidden="true">🧹</span>
-          <span class="btn__label">{{ 'controls.clear' | t }}</span>
-        </button>
-      </div>
-
-      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
-        <button class="btn btn--icon" (click)="downloadAnnotatedPDF()"
-          [disabled]="!coords().length || !pdfDoc">
-          <span class="btn__icon" aria-hidden="true">⬇</span>
-          <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
-        </button>
-      </div>
-    </div>
-
-  </header>
-
-  <!-- LATERAL SIDEBAR -->
-  <aside class="sidebar">
-    <section
-      class="sidebar-upload"
-      role="button"
-      tabindex="0"
-      (click)="openPdfFilePicker()"
-      (keydown)="onFileUploadKeydown($event)"
-      (dragover)="onFileDragOver($event)"
-      (dragleave)="onFileDragLeave($event)"
-      (drop)="onFileDrop($event)"
-      [class.sidebar-upload--active]="fileDropActive()"
-      [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t"
-    >
-      <input
-        #pdfFileInput
-        type="file"
-        accept="application/pdf"
-        (change)="onFileSelected($event)"
-        hidden
-      />
-      <div class="sidebar-upload__header">
-        <span class="sidebar-upload__badge">{{ 'app.workspaceUpload.badge' | t }}</span>
-        <span class="sidebar-upload__cta">{{ 'app.workspaceUpload.cta' | t }}</span>
-      </div>
-      <div class="sidebar-upload__body">
-        <div class="sidebar-upload__icon" aria-hidden="true">🗂️</div>
-        <div class="sidebar-upload__copy">
-          <span class="sidebar-upload__title">{{ 'app.workspaceUpload.title' | t }}</span>
-          <span class="sidebar-upload__subtitle">{{ 'app.workspaceUpload.subtitle' | t }}</span>
+        <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
+          <button class="btn btn--icon" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">
+            <span class="btn__icon" aria-hidden="true">⟨</span>
+            <span class="btn__label">{{ 'controls.prev' | t }}</span>
+          </button>
+          <span class="toolbar__badge">
+            {{ 'controls.pageIndicator' | t : { current: pageIndex(), total: pageCount || 0 } }}
+          </span>
+          <button class="btn btn--icon" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">
+            <span class="btn__label">{{ 'controls.next' | t }}</span>
+            <span class="btn__icon" aria-hidden="true">⟩</span>
+          </button>
         </div>
+
+        <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
+          <button class="btn btn--icon" (click)="zoomOut()" [disabled]="!pdfDoc">
+            <span class="btn__icon" aria-hidden="true">−</span>
+            <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
+          </button>
+          <span class="toolbar__badge">{{ 'controls.zoomLabel' | t }} {{ scale() | number:'1.0-2' }}×</span>
+          <button class="btn btn--icon" (click)="zoomIn()" [disabled]="!pdfDoc">
+            <span class="btn__label">{{ 'controls.zoomIn' | t }}</span>
+            <span class="btn__icon" aria-hidden="true">＋</span>
+          </button>
+        </div>
+
+        <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
+          <button class="btn btn--icon" (click)="undo()" [disabled]="!canUndo()">
+            <span class="btn__icon" aria-hidden="true">↺</span>
+            <span class="btn__label">{{ 'controls.undo' | t }}</span>
+          </button>
+          <button class="btn btn--icon" (click)="redo()" [disabled]="!canRedo()">
+            <span class="btn__icon" aria-hidden="true">↻</span>
+            <span class="btn__label">{{ 'controls.redo' | t }}</span>
+          </button>
+          <button class="btn btn--icon btn--danger" (click)="clearAll()" [disabled]="!coords().length">
+            <span class="btn__icon" aria-hidden="true">🧹</span>
+            <span class="btn__label">{{ 'controls.clear' | t }}</span>
+          </button>
+        </div>
+
+        <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
+          <button class="btn btn--icon" (click)="downloadAnnotatedPDF()" [disabled]="!coords().length || !pdfDoc">
+            <span class="btn__icon" aria-hidden="true">⬇</span>
+            <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
+          </button>
+        </div>
+
+        <app-language-selector class="header__language-selector" [languages]="languages"
+          [selectedLanguage]="languageModel" (languageChange)="onLanguageChange($event)" variant="compact">
+        </app-language-selector>
       </div>
-      <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
-    </section>
-    <h4>{{ 'sidebar.title' | t }}</h4>
-    <div class="sidebar-actions">
-      <button type="button" class="btn" (click)="triggerImportCoords()">
-        {{ 'sidebar.importJsonFile' | t }}
-      </button>
-      <button type="button" class="btn" (click)="applyCoordsText()">
-        {{ 'sidebar.applyJson' | t }}
-      </button>
-    </div>
-    <section class="templates">
-      <h5>{{ 'sidebar.templates.title' | t }}</h5>
-      <div class="templates__save">
-        <input
-          type="text"
-          [(ngModel)]="templateNameModel"
-          [ngModelOptions]="{ standalone: true }"
-          [placeholder]="'sidebar.templates.placeholder' | t"
-        />
-        <button
-          type="button"
-          class="btn"
-          (click)="saveCurrentAsTemplate()"
-          [disabled]="!coords().length || !templateNameModel.trim()"
-        >
-          {{ 'sidebar.templates.saveButton' | t }}
+
+    </header>
+
+    <!-- LATERAL SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-upload" role="button" tabindex="0" (click)="openPdfFilePicker()"
+        (keydown)="onFileUploadKeydown($event)" (dragover)="onFileDragOver($event)"
+        (dragleave)="onFileDragLeave($event)" (drop)="onFileDrop($event)"
+        [class.sidebar-upload--active]="fileDropActive()" [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t">
+        <input #pdfFileInput type="file" accept="application/pdf" (change)="onFileSelected($event)" hidden />
+        <div class="sidebar-upload__header">
+          <span class="sidebar-upload__badge">{{ 'app.workspaceUpload.badge' | t }}</span>
+          <span class="sidebar-upload__cta">{{ 'app.workspaceUpload.cta' | t }}</span>
+        </div>
+        <div class="sidebar-upload__body">
+          <div class="sidebar-upload__icon" aria-hidden="true">🗂️</div>
+          <div class="sidebar-upload__copy">
+            <span class="sidebar-upload__title">{{ 'app.workspaceUpload.title' | t }}</span>
+            <span class="sidebar-upload__subtitle">{{ 'app.workspaceUpload.subtitle' | t }}</span>
+          </div>
+        </div>
+        <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
+      </section>
+      <h4>{{ 'sidebar.title' | t }}</h4>
+      <div class="sidebar-actions">
+        <button type="button" class="btn" (click)="triggerImportCoords()">
+          {{ 'sidebar.importJsonFile' | t }}
+        </button>
+        <button type="button" class="btn" (click)="applyCoordsText()">
+          {{ 'sidebar.applyJson' | t }}
         </button>
       </div>
-      <ng-container *ngIf="templates().length; else emptyTemplates">
-        <div class="templates__select">
-          <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
-          <div class="templates__controls">
-            <select
-              [(ngModel)]="selectedTemplateId"
-              [ngModelOptions]="{ standalone: true }"
-            >
-              <option *ngFor="let template of templates()" [value]="template.id">
-                {{ template.name }}
-              </option>
-            </select>
-            <button
-              type="button"
-              class="btn"
-              (click)="loadSelectedTemplate()"
-              [disabled]="!selectedTemplateId"
-            >
-              {{ 'sidebar.templates.loadButton' | t }}
-            </button>
-            <button
-              type="button"
-              class="btn templates__delete"
-              (click)="deleteSelectedTemplate()"
-              [disabled]="
+      <section class="templates">
+        <h5>{{ 'sidebar.templates.title' | t }}</h5>
+        <div class="templates__save">
+          <input type="text" [(ngModel)]="templateNameModel" [ngModelOptions]="{ standalone: true }"
+            [placeholder]="'sidebar.templates.placeholder' | t" />
+          <button type="button" class="btn" (click)="saveCurrentAsTemplate()"
+            [disabled]="!coords().length || !templateNameModel.trim()">
+            {{ 'sidebar.templates.saveButton' | t }}
+          </button>
+        </div>
+        <ng-container *ngIf="templates().length; else emptyTemplates">
+          <div class="templates__select">
+            <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
+            <div class="templates__controls">
+              <select [(ngModel)]="selectedTemplateId" [ngModelOptions]="{ standalone: true }">
+                <option *ngFor="let template of templates()" [value]="template.id">
+                  {{ template.name }}
+                </option>
+              </select>
+              <button type="button" class="btn" (click)="loadSelectedTemplate()" [disabled]="!selectedTemplateId">
+                {{ 'sidebar.templates.loadButton' | t }}
+              </button>
+              <button type="button" class="btn templates__delete" (click)="deleteSelectedTemplate()" [disabled]="
                 !selectedTemplateId || selectedTemplateId === defaultTemplateId
-              "
-            >
-              {{ 'sidebar.templates.deleteButton' | t }}
-            </button>
-          </div>
-        </div>
-      </ng-container>
-      <ng-template #emptyTemplates>
-        <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
-      </ng-template>
-    </section>
-    <textarea
-      class="json-editor"
-      [(ngModel)]="coordsTextModel"
-      [placeholder]="'sidebar.jsonPlaceholder' | t"
-      spellcheck="false"
-    ></textarea>
-    <div class="json-toolbar">
-      <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
-      <button class="btn" (click)="downloadJSON()" [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
-    </div>
-    <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
-  </aside>
-
-  <!-- VISOR PDF -->
-  <main class="viewer" *ngIf="pdfDoc as _">
-    <div class="canvas-container" #pdfViewer>
-      <canvas #pdfCanvas></canvas>
-      <canvas #overlayCanvas></canvas>
-      <div #annotationsLayer class="annotations-layer"></div>
-      <div class="hitbox" (click)="onHitboxClick($event)"></div>
-
-      <!-- NUEVA ANOTACIÓN -->
-      <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.field.x*scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - p.field.y*scale()"
-        (keydown)="onEditorKeydown($event, 'preview')">
-        <label class="field">
-          <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
-          <input type="text" [(ngModel)]="p.field.mapField"
-            [placeholder]="'annotation.fields.text.placeholder' | t" />
-        </label>
-        <label class="field">
-          <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
-          <select [(ngModel)]="p.field.type">
-            <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
-            <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
-            <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
-            <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
-          </select>
-        </label>
-        <label class="field">
-          <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
-          <input type="text" [(ngModel)]="p.field.value"
-            [placeholder]="'annotation.fields.value.placeholder' | t" />
-        </label>
-        <label class="field field-small" *ngIf="p.field.type === 'number'">
-          <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
-          <input type="number" [(ngModel)]="p.field.decimals" min="0" />
-        </label>
-        <label class="field field-small" *ngIf="p.field.type === 'number'">
-          <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
-          <input type="text" [(ngModel)]="p.field.appender"
-            [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
-        </label>
-        <label class="field field-small">
-          <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
-          <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
-        </label>
-        <div class="color-section">
-          <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
-          <div class="color-row">
-            <input type="color" [(ngModel)]="p.field.color" (ngModelChange)="onPreviewColorPicker($event)" />
-            <div class="color-inputs">
-              <input type="text" [ngModel]="previewHexInput()" (ngModelChange)="setPreviewColorFromHex($event)"
-                [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
-              <input type="text" [ngModel]="previewRgbInput()" (ngModelChange)="setPreviewColorFromRgb($event)"
-                [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
+              ">
+                {{ 'sidebar.templates.deleteButton' | t }}
+              </button>
             </div>
           </div>
-          <small class="color-hint">{{ 'annotation.color.hintPreview' | t }}</small>
-        </div>
-        <div class="editor-actions">
-          <button class="action-primary" (click)="confirmPreview()">✅</button>
-          <button (click)="cancelPreview()">❌</button>
-        </div>
+        </ng-container>
+        <ng-template #emptyTemplates>
+          <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
+        </ng-template>
+      </section>
+      <textarea class="json-editor" [(ngModel)]="coordsTextModel" [placeholder]="'sidebar.jsonPlaceholder' | t"
+        spellcheck="false"></textarea>
+      <div class="json-toolbar">
+        <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
+        <button class="btn" (click)="downloadJSON()"
+          [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
       </div>
+      <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
+    </aside>
 
-      <!-- EDITAR ANOTACIÓN -->
-      <div *ngIf="editing() as e" class="annotation-editor editing" #editEditor [style.left.px]="e.field.x*scale()"
-        [style.top.px]="pdfCanvasRef!.nativeElement.height - e.field.y*scale()"
-        (keydown)="onEditorKeydown($event, 'edit')">
-        <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
-        <label class="field">
-          <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
-          <input type="text" [(ngModel)]="e.field.mapField"
-            [placeholder]="'annotation.fields.text.placeholder' | t" />
-        </label>
-        <label class="field">
-          <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
-          <select [(ngModel)]="e.field.type">
-            <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
-            <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
-            <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
-            <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
-          </select>
-        </label>
-        <label class="field">
-          <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
-          <input type="text" [(ngModel)]="e.field.value"
-            [placeholder]="'annotation.fields.value.placeholder' | t" />
-        </label>
-        <label class="field field-small" *ngIf="e.field.type === 'number'">
-          <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
-          <input type="number" [(ngModel)]="e.field.decimals" min="0" />
-        </label>
-        <label class="field field-small" *ngIf="e.field.type === 'number'">
-          <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
-          <input type="text" [(ngModel)]="e.field.appender"
-            [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
-        </label>
-        <label class="field field-small">
-          <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
-          <input type="number" [(ngModel)]="e.field.fontSize" min="8" max="72" />
-        </label>
-        <div class="color-section">
-          <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
-          <div class="color-row">
-            <input type="color" [(ngModel)]="e.field.color" (ngModelChange)="onEditColorPicker($event)" />
-            <div class="color-inputs">
-              <input type="text" [ngModel]="editHexInput()" (ngModelChange)="setEditColorFromHex($event)"
-                [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
-              <input type="text" [ngModel]="editRgbInput()" (ngModelChange)="setEditColorFromRgb($event)"
-                [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
+    <!-- VISOR PDF -->
+    <main class="viewer" *ngIf="pdfDoc as _">
+      <div class="canvas-container" #pdfViewer>
+        <canvas #pdfCanvas></canvas>
+        <canvas #overlayCanvas></canvas>
+        <div #annotationsLayer class="annotations-layer"></div>
+        <div class="hitbox" (click)="onHitboxClick($event)"></div>
+
+        <!-- NUEVA ANOTACIÓN -->
+        <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.field.x*scale()"
+          [style.top.px]="pdfCanvasRef!.nativeElement.height - p.field.y*scale()"
+          (keydown)="onEditorKeydown($event, 'preview')">
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+            <input type="text" [(ngModel)]="p.field.mapField"
+              [placeholder]="'annotation.fields.text.placeholder' | t" />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+            <select [(ngModel)]="p.field.type">
+              <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+              <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+              <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+              <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+            <input type="text" [(ngModel)]="p.field.value" [placeholder]="'annotation.fields.value.placeholder' | t" />
+          </label>
+          <label class="field field-small" *ngIf="p.field.type === 'number'">
+            <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+            <input type="number" [(ngModel)]="p.field.decimals" min="0" />
+          </label>
+          <label class="field field-small" *ngIf="p.field.type === 'number'">
+            <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+            <input type="text" [(ngModel)]="p.field.appender"
+              [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
+          </label>
+          <label class="field field-small">
+            <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
+            <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
+          </label>
+          <div class="color-section">
+            <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
+            <div class="color-row">
+              <input type="color" [(ngModel)]="p.field.color" (ngModelChange)="onPreviewColorPicker($event)" />
+              <div class="color-inputs">
+                <input type="text" [ngModel]="previewHexInput()" (ngModelChange)="setPreviewColorFromHex($event)"
+                  [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
+                <input type="text" [ngModel]="previewRgbInput()" (ngModelChange)="setPreviewColorFromRgb($event)"
+                  [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
+              </div>
             </div>
+            <small class="color-hint">{{ 'annotation.color.hintPreview' | t }}</small>
           </div>
-          <small class="color-hint">{{ 'annotation.color.hintEdit' | t }}</small>
+          <div class="editor-actions">
+            <button class="action-primary" (click)="confirmPreview()">✅</button>
+            <button (click)="cancelPreview()">❌</button>
+          </div>
         </div>
-        <div class="editor-actions">
-          <button type="button" (click)="duplicateAnnotation()"
-            [title]="'annotation.actions.duplicate' | t"
-            [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
-          <button class="btn-delete" (click)="deleteAnnotation()">🗑️</button>
-          <button class="action-primary" (click)="confirmEdit()">✅</button>
-          <button (click)="cancelEdit()">❌</button>
-        </div>
-      </div>
-    </div>
-  </main>
 
-  <footer class="footer">
-    <div class="footer__brand">
-      <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
-      <div class="footer__brand-text">
-        <span class="footer__app-name">{{ appName }}</span>
-        <span class="footer__version">v{{ version }}</span>
+        <!-- EDITAR ANOTACIÓN -->
+        <div *ngIf="editing() as e" class="annotation-editor editing" #editEditor [style.left.px]="e.field.x*scale()"
+          [style.top.px]="pdfCanvasRef!.nativeElement.height - e.field.y*scale()"
+          (keydown)="onEditorKeydown($event, 'edit')">
+          <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+            <input type="text" [(ngModel)]="e.field.mapField"
+              [placeholder]="'annotation.fields.text.placeholder' | t" />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+            <select [(ngModel)]="e.field.type">
+              <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+              <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+              <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+              <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+            <input type="text" [(ngModel)]="e.field.value" [placeholder]="'annotation.fields.value.placeholder' | t" />
+          </label>
+          <label class="field field-small" *ngIf="e.field.type === 'number'">
+            <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+            <input type="number" [(ngModel)]="e.field.decimals" min="0" />
+          </label>
+          <label class="field field-small" *ngIf="e.field.type === 'number'">
+            <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+            <input type="text" [(ngModel)]="e.field.appender"
+              [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
+          </label>
+          <label class="field field-small">
+            <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
+            <input type="number" [(ngModel)]="e.field.fontSize" min="8" max="72" />
+          </label>
+          <div class="color-section">
+            <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
+            <div class="color-row">
+              <input type="color" [(ngModel)]="e.field.color" (ngModelChange)="onEditColorPicker($event)" />
+              <div class="color-inputs">
+                <input type="text" [ngModel]="editHexInput()" (ngModelChange)="setEditColorFromHex($event)"
+                  [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
+                <input type="text" [ngModel]="editRgbInput()" (ngModelChange)="setEditColorFromRgb($event)"
+                  [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
+              </div>
+            </div>
+            <small class="color-hint">{{ 'annotation.color.hintEdit' | t }}</small>
+          </div>
+          <div class="editor-actions">
+            <button type="button" (click)="duplicateAnnotation()" [title]="'annotation.actions.duplicate' | t"
+              [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
+            <button class="btn-delete" (click)="deleteAnnotation()">🗑️</button>
+            <button class="action-primary" (click)="confirmEdit()">✅</button>
+            <button (click)="cancelEdit()">❌</button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="footer__details">
-      <span>© {{ currentYear }} {{ appName }}</span>
-      <span>Desarrollado por {{ appAuthor }}</span>
-    </div>
-  </footer>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__brand">
+        <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
+        <div class="footer__brand-text">
+          <span class="footer__app-name">{{ appName }}</span>
+          <span class="footer__version">v{{ version }}</span>
+        </div>
+      </div>
+      <div class="footer__details">
+        <span>© {{ currentYear }} {{ appName }}</span>
+        <span>Desarrollado por {{ appAuthor }}</span>
+      </div>
+    </footer>
   </ng-template>
 </div>
