@@ -1,0 +1,48 @@
+:host {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.language-selector__label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.language-selector__control {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+}
+
+.language-selector__select {
+  appearance: none;
+  width: 100%;
+  min-width: 160px;
+  padding: 8px 32px 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(36, 36, 58, 0.85);
+  color: var(--text);
+  font-weight: 600;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.language-selector__select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.25);
+}
+
+.language-selector__chevron {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted);
+  font-size: 0.8rem;
+}

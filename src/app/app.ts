@@ -20,6 +20,7 @@ import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
 import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
+import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -72,7 +73,7 @@ type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | n
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
-  imports: [CommonModule, FormsModule, TranslationPipe],
+  imports: [CommonModule, FormsModule, TranslationPipe, LanguageSelectorComponent],
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked, OnDestroy {
@@ -214,8 +215,8 @@ export class App implements AfterViewChecked, OnDestroy {
     this.redrawAllForPage();
   }
 
-  onLanguageChange(language: string) {
-    this.translationService.setLanguage(language as Language);
+  onLanguageChange(language: Language) {
+    this.translationService.setLanguage(language);
     this.languageModel = this.translationService.getCurrentLanguage();
   }
 
