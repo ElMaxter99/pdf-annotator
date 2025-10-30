@@ -152,6 +152,13 @@ header .logo {
     box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
   }
 
+  .json-toolbar {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
   .sidebar-hint {
     display: block;
     margin-top: 8px;
