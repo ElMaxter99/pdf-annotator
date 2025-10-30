@@ -177,21 +177,27 @@ export class App implements AfterViewChecked {
 
   ngAfterViewChecked() {
     if (this.preview()) {
-      const previewEl = this.previewEditorRef?.nativeElement;
-      if (previewEl) {
-        const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement | null;
-        input?.focus();
-      }
+      this.focusEditorIfNeeded(this.previewEditorRef?.nativeElement ?? null);
       return;
     }
 
     if (this.editing()) {
-      const editEl = this.editEditorRef?.nativeElement;
-      if (editEl) {
-        const input = editEl.querySelector('input[type="text"]') as HTMLInputElement | null;
-        input?.focus();
-      }
+      this.focusEditorIfNeeded(this.editEditorRef?.nativeElement ?? null);
     }
+  }
+
+  private focusEditorIfNeeded(editorEl: HTMLElement | null) {
+    if (!editorEl) {
+      return;
+    }
+
+    const activeElement = this.document?.activeElement as HTMLElement | null;
+    if (activeElement && editorEl.contains(activeElement)) {
+      return;
+    }
+
+    const focusTarget = editorEl.querySelector<HTMLElement>('input, select, textarea, button');
+    focusTarget?.focus();
   }
 
   onEditorKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
