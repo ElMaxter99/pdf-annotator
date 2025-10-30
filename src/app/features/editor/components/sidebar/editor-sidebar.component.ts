@@ -11,6 +11,7 @@ import { AnnotationTemplate } from '../../../../core/services/annotation-templat
 
 @Component({
   selector: 'app-editor-sidebar',
+  standalone: false,
   templateUrl: './editor-sidebar.component.html',
   styleUrls: ['./editor-sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,6 +1,5 @@
 import { importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
 import { inject } from '@vercel/analytics';
 import { injectSpeedInsights } from '@vercel/speed-insights';
@@ -11,7 +10,7 @@ import { CoreModule } from './app/core/core.module';
 // Bootstraps the standalone shell while still reusing the provider graph defined in feature modules.
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(BrowserModule, BrowserAnimationsModule, CoreModule, AppRoutingModule),
+    importProvidersFrom(BrowserModule, CoreModule, AppRoutingModule),
   ],
 }).catch((err: unknown) => console.error(err));
 

@@ -3,6 +3,7 @@ import { Language } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-editor-toolbar',
+  standalone: false,
   templateUrl: './editor-toolbar.component.html',
   styleUrls: ['./editor-toolbar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

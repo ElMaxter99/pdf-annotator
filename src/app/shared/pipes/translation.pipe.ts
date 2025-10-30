@@ -5,6 +5,7 @@ import { TranslationService } from '../../core/services/translation.service';
 @Pipe({
   name: 't',
   pure: false,
+  standalone: false,
 })
 export class TranslationPipe implements PipeTransform {
   constructor(private readonly translation: TranslationService) {}

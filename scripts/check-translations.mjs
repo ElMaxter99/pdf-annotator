@@ -5,7 +5,10 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const translationsDir = path.resolve(__dirname, '../src/app/i18n/translations');
+const translationDirCandidates = [
+  path.resolve(__dirname, '../src/app/i18n/translations'),
+  path.resolve(__dirname, '../src/app/core/i18n/translations'),
+];
 const baseLanguage = 'es-ES';
 
 async function readJson(filePath) {
@@ -35,8 +38,25 @@ function collectStringKeys(dictionary, prefix = '') {
   });
 }
 
+async function resolveTranslationsDir() {
+  for (const candidate of translationDirCandidates) {
+    try {
+      const files = await readdir(candidate);
+      return { dir: candidate, files };
+    } catch (error) {
+      if (error?.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error(
+    `No translation directory found. Checked: ${translationDirCandidates.join(', ')}`,
+  );
+}
+
 async function main() {
-  const files = await readdir(translationsDir);
+  const { dir: translationsDir, files } = await resolveTranslationsDir();
   const languages = files
     .filter((file) => file.endsWith('.json'))
     .map((file) => path.basename(file, '.json'))

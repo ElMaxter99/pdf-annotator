@@ -5,6 +5,7 @@ import { Language, TranslationService } from '../../../../core/services/translat
 
 @Component({
   selector: 'app-landing-home-page',
+  standalone: false,
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

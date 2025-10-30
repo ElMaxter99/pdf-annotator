@@ -73,6 +73,7 @@ type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | n
 
 @Component({
   selector: 'app-editor-home-page',
+  standalone: false,
   templateUrl: './editor-home.page.html',
   styleUrls: ['./editor-home.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -604,6 +605,16 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy {
     this.updatePreviewColorState(hex);
   }
 
+  /** @deprecated Retained for template compatibility until two-way binding is refactored. */
+  syncPreviewColorFromHex() {
+    this.setPreviewColorFromHex(this.previewHexInput());
+  }
+
+  /** @deprecated Retained for template compatibility until two-way binding is refactored. */
+  syncPreviewColorFromRgb() {
+    this.setPreviewColorFromRgb(this.previewRgbInput());
+  }
+
   onPreviewColorPicker(value: string) {
     this.preview.update((p) => (p ? { ...p, field: { ...p.field, color: value } } : p));
     this.updatePreviewColorState(value);
@@ -624,6 +635,16 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy {
     const hex = this.rgbToHex(rgb);
     this.editing.update((e) => (e ? { ...e, field: { ...e.field, color: hex } } : e));
     this.updateEditingColorState(hex);
+  }
+
+  /** @deprecated Retained for template compatibility until two-way binding is refactored. */
+  syncEditColorFromHex() {
+    this.setEditColorFromHex(this.editHexInput());
+  }
+
+  /** @deprecated Retained for template compatibility until two-way binding is refactored. */
+  syncEditColorFromRgb() {
+    this.setEditColorFromRgb(this.editRgbInput());
   }
 
   onEditColorPicker(value: string) {

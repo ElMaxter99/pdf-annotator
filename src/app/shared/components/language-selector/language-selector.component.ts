@@ -15,6 +15,7 @@ function getLanguageFlag(language: Language): string {
 
 @Component({
   selector: 'app-language-selector',
+  standalone: false,
   templateUrl: './language-selector.component.html',
   styleUrls: ['./language-selector.component.scss'],
   host: {
