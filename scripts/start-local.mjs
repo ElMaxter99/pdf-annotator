@@ -10,7 +10,7 @@ const angularBuilderPkg = join(projectRoot, 'node_modules', '@angular', 'build',
 
 if (!existsSync(angularCliEntrypoint) || !existsSync(angularBuilderPkg)) {
   console.error(
-    '\n❌ No se encontraron las dependencias de Angular necesarias (por ejemplo @angular/cli o @angular/build). ' +
+    '\nERROR ~ No se encontraron las dependencias de Angular necesarias (por ejemplo @angular/cli o @angular/build). ' +
       'Ejecuta "npm install" en la raíz del proyecto y vuelve a lanzar "npm run start:local".'
   );
   process.exit(1);

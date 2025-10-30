@@ -1,7 +1,6 @@
 {
   "name": "Pdf Annotator",
-  "version": "1.0.2",
-  "description": "Ejecuta en local con 'npm run start:local' o usa 'npm run start:docker' para servir vía Docker en el puerto 4444 cuando tu entorno no soporte la versión requerida de Node o Angular.",
+  "version": "1.0.1",
   "author": "AlvaroMaxter",
   "scripts": {
     "ng": "ng",
