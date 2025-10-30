@@ -1,0 +1,167 @@
+<div class="app">
+  <app-editor-toolbar [appName]="appName" [version]="version" [pageIndex]="pageIndex()"
+    [pageCount]="pageCount" [scale]="scale()" [hasPdf]="!!pdfDoc" [canUndo]="canUndo()" [canRedo]="canRedo()"
+    [hasCoords]="coords().length > 0" [languages]="languages" [selectedLanguage]="languageModel"
+    (previous)="prevPage()" (next)="nextPage()" (zoomIn)="zoomIn()" (zoomOut)="zoomOut()" (undo)="undo()"
+    (redo)="redo()" (clearAll)="clearAll()" (downloadPdf)="downloadAnnotatedPDF()"
+    (languageChange)="onLanguageChange($event)"></app-editor-toolbar>
+
+  <input #coordsFileInput type="file" accept="application/json" (change)="onCoordsFileSelected($event)" hidden />
+  <input #pdfFileInput type="file" accept="application/pdf" (change)="onFileSelected($event)" hidden />
+
+  <app-editor-sidebar [fileDropActive]="fileDropActive()" [templateName]="templateNameModel"
+    [templates]="templates()" [selectedTemplateId]="selectedTemplateId" [defaultTemplateId]="defaultTemplateId"
+    [coordsText]="coordsTextModel" [hasCoords]="coords().length > 0" (requestPdfPicker)="openPdfFilePicker()"
+    (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
+    (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)" (importCoords)="triggerImportCoords()"
+    (applyCoords)="applyCoordsText()" (templateNameChange)="templateNameModel = $event"
+    (selectedTemplateIdChange)="selectedTemplateId = $event"
+    (saveTemplate)="saveCurrentAsTemplate()" (loadTemplate)="loadSelectedTemplate()"
+    (deleteTemplate)="deleteSelectedTemplate()" (coordsTextChange)="coordsTextModel = $event"
+    (copyJson)="copyJSON()" (downloadJson)="downloadJSON()"></app-editor-sidebar>
+
+  <app-editor-viewer>
+    <ng-container *ngIf="pdfDoc; else emptyViewer">
+      <main class="viewer">
+        <div class="canvas-container" #pdfViewer>
+          <canvas #pdfCanvas></canvas>
+          <canvas #overlayCanvas></canvas>
+          <div #annotationsLayer class="annotations-layer"></div>
+          <div class="hitbox" (click)="onHitboxClick($event)"></div>
+
+          <div *ngIf="preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.field.x*scale()"
+            [style.top.px]="pdfCanvasRef!.nativeElement.height - p.field.y*scale()"
+            (keydown)="onEditorKeydown($event, 'preview')">
+            <label class="field">
+              <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+              <input type="text" [(ngModel)]="p.field.mapField"
+                [placeholder]="'annotation.fields.text.placeholder' | t" />
+            </label>
+            <label class="field">
+              <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+              <select [(ngModel)]="p.field.type">
+                <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+                <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+                <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+                <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+              <input type="text" [(ngModel)]="p.field.value"
+                [placeholder]="'annotation.fields.value.placeholder' | t" />
+            </label>
+            <label class="field field-small" *ngIf="p.field.type === 'number'">
+              <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+              <input type="number" [(ngModel)]="p.field.decimals" min="0" />
+            </label>
+            <label class="field field-small" *ngIf="p.field.type === 'number'">
+              <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+              <input type="text" [(ngModel)]="p.field.appender"
+                [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
+            </label>
+            <label class="field field-small">
+              <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
+              <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
+            </label>
+            <div class="color-section">
+              <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
+              <div class="color-row">
+                <input type="color" [(ngModel)]="p.field.color" (ngModelChange)="onPreviewColorPicker($event)" />
+                <div class="color-inputs">
+                  <input type="text" [ngModel]="previewHexInput()" (ngModelChange)="setPreviewColorFromHex($event)"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
+                  <input type="text" [ngModel]="previewRgbInput()" (ngModelChange)="setPreviewColorFromRgb($event)"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
+                </div>
+              </div>
+              <small class="color-hint">{{ 'annotation.color.hintPreview' | t }}</small>
+            </div>
+            <div class="editor-actions">
+              <button class="action-primary" (click)="confirmPreview()">✅</button>
+              <button (click)="cancelPreview()">❌</button>
+            </div>
+          </div>
+
+          <div *ngIf="editing() as e" class="annotation-editor editing" #editEditor [style.left.px]="e.field.x*scale()"
+            [style.top.px]="pdfCanvasRef!.nativeElement.height - e.field.y*scale()"
+            (keydown)="onEditorKeydown($event, 'edit')">
+            <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
+            <label class="field">
+              <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+              <input type="text" [(ngModel)]="e.field.mapField"
+                [placeholder]="'annotation.fields.text.placeholder' | t" />
+            </label>
+            <label class="field">
+              <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+              <select [(ngModel)]="e.field.type">
+                <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+                <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+                <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+                <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+              <input type="text" [(ngModel)]="e.field.value"
+                [placeholder]="'annotation.fields.value.placeholder' | t" />
+            </label>
+            <label class="field field-small" *ngIf="e.field.type === 'number'">
+              <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+              <input type="number" [(ngModel)]="e.field.decimals" min="0" />
+            </label>
+            <label class="field field-small" *ngIf="e.field.type === 'number'">
+              <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+              <input type="text" [(ngModel)]="e.field.appender"
+                [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
+            </label>
+            <label class="field field-small">
+              <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
+              <input type="number" [(ngModel)]="e.field.fontSize" min="8" max="72" />
+            </label>
+            <div class="color-section">
+              <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
+              <div class="color-row">
+                <input type="color" [(ngModel)]="e.field.color" (ngModelChange)="onEditColorPicker($event)" />
+                <div class="color-inputs">
+                  <input type="text" [ngModel]="editHexInput()" (ngModelChange)="setEditColorFromHex($event)"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
+                  <input type="text" [ngModel]="editRgbInput()" (ngModelChange)="setEditColorFromRgb($event)"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
+                </div>
+              </div>
+              <small class="color-hint">{{ 'annotation.color.hintEdit' | t }}</small>
+            </div>
+            <div class="editor-actions">
+              <button type="button" (click)="duplicateAnnotation()" [title]="'annotation.actions.duplicate' | t"
+                [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
+              <button class="btn-delete" (click)="deleteAnnotation()">🗑️</button>
+              <button class="action-primary" (click)="confirmEdit()">✅</button>
+              <button (click)="cancelEdit()">❌</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </ng-container>
+    <ng-template #emptyViewer>
+      <section class="viewer-empty">
+        <h2>{{ 'app.upload.title' | t }}</h2>
+        <p>{{ 'app.upload.subtitle' | t }}</p>
+      </section>
+    </ng-template>
+  </app-editor-viewer>
+
+  <footer class="footer">
+    <div class="footer__brand">
+      <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
+      <div class="footer__brand-text">
+        <span class="footer__app-name">{{ appName }}</span>
+        <span class="footer__version">v{{ version }}</span>
+      </div>
+    </div>
+    <div class="footer__details">
+      <span>© {{ currentYear }} {{ appName }}</span>
+      <span>Desarrollado por {{ appAuthor }}</span>
+    </div>
+  </footer>
+</div>

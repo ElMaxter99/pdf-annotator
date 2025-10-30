@@ -1,0 +1,18 @@
+.preview {
+  position: absolute;
+  transform: translate(-50%, -120%);
+  pointer-events: auto;
+}
+
+.preview span {
+  pointer-events: none;
+}
+
+.viewer-empty {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  text-align: center;
+  gap: 12px;
+  color: var(--muted);
+}

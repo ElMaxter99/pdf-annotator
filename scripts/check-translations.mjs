@@ -5,7 +5,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const translationsDir = path.resolve(__dirname, '../src/app/i18n/translations');
+const translationsDir = path.resolve(__dirname, '../src/app/core/i18n/translations');
 const baseLanguage = 'es-ES';
 
 async function readJson(filePath) {
