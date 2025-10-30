@@ -118,7 +118,7 @@
 
   <!-- VISOR PDF -->
   <main class="viewer" *ngIf="pdfDoc as _">
-    <div class="canvas-container">
+    <div class="canvas-container" #pdfViewer>
       <canvas #pdfCanvas></canvas>
       <canvas #overlayCanvas></canvas>
       <div #annotationsLayer class="annotations-layer"></div>
