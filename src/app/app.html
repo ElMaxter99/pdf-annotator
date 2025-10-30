@@ -45,7 +45,7 @@
   <aside class="sidebar">
     <h4>{{ 'sidebar.title' | t }}</h4>
     <div class="sidebar-actions">
-      <button type="button" class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">
+      <button type="button" class="btn" (click)="triggerImportCoords()">
         {{ 'sidebar.importJsonFile' | t }}
       </button>
       <button type="button" class="btn" (click)="applyCoordsText()">
@@ -94,7 +94,9 @@
               type="button"
               class="btn templates__delete"
               (click)="deleteSelectedTemplate()"
-              [disabled]="!selectedTemplateId"
+              [disabled]="
+                !selectedTemplateId || selectedTemplateId === defaultTemplateId
+              "
             >
               {{ 'sidebar.templates.deleteButton' | t }}
             </button>

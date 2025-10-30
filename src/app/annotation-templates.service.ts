@@ -12,9 +12,12 @@ export interface AnnotationTemplate {
 export class AnnotationTemplatesService {
   private readonly templatesKey = 'pdf-annotator.templates';
   private readonly lastCoordsKey = 'pdf-annotator.last-coords';
+  readonly defaultTemplateId = '__default-template__';
+  private readonly defaultTemplateName = 'Predeterminada';
 
   getTemplates(): AnnotationTemplate[] {
-    return this.readFromStorage<AnnotationTemplate[]>(this.templatesKey, []);
+    const stored = this.getStoredTemplates();
+    return [this.createDefaultTemplate(), ...stored];
   }
 
   saveTemplate(name: string, pages: readonly PageAnnotations[]): AnnotationTemplate | null {
@@ -24,7 +27,7 @@ export class AnnotationTemplatesService {
     }
 
     const sanitizedPages = this.clonePages(pages);
-    const templates = this.getTemplates();
+    const templates = this.getStoredTemplates();
     const normalizedName = name.trim();
     const now = Date.now();
     const existingIndex = templates.findIndex(
@@ -40,7 +43,7 @@ export class AnnotationTemplatesService {
       };
       templates.splice(existingIndex, 1, updatedTemplate);
       this.writeToStorage(this.templatesKey, templates);
-      return updatedTemplate;
+      return { ...updatedTemplate, pages: this.clonePages(updatedTemplate.pages) };
     }
 
     const template: AnnotationTemplate = {
@@ -51,12 +54,15 @@ export class AnnotationTemplatesService {
     };
 
     this.writeToStorage(this.templatesKey, [template, ...templates]);
-    return template;
+    return { ...template, pages: this.clonePages(template.pages) };
   }
 
   deleteTemplate(id: string) {
-    const templates = this.getTemplates();
-    const nextTemplates = templates.filter((template) => template.id !== id);
+    if (id === this.defaultTemplateId) {
+      return;
+    }
+    const storedTemplates = this.getStoredTemplates();
+    const nextTemplates = storedTemplates.filter((template) => template.id !== id);
     this.writeToStorage(this.templatesKey, nextTemplates);
   }
 
@@ -74,6 +80,22 @@ export class AnnotationTemplatesService {
       num: page.num,
       fields: page.fields.map((field): PageField => ({ ...field })),
     }));
+  }
+
+  private getStoredTemplates(): AnnotationTemplate[] {
+    return this.readFromStorage<AnnotationTemplate[]>(this.templatesKey, []).map((template) => ({
+      ...template,
+      pages: this.clonePages(template.pages),
+    }));
+  }
+
+  private createDefaultTemplate(): AnnotationTemplate {
+    return {
+      id: this.defaultTemplateId,
+      name: this.defaultTemplateName,
+      createdAt: 0,
+      pages: [],
+    };
   }
 
   private createId() {
