@@ -27,6 +27,15 @@
     "importJsonFile": "Importar desde archivo",
     "applyJson": "Aplicar JSON",
     "jsonPlaceholder": "Pega o edita aquí las coordenadas de anotaciones...",
+    "templates": {
+      "title": "Plantillas reutilizables",
+      "placeholder": "Nombre de la plantilla",
+      "saveButton": "Guardar plantilla",
+      "selectLabel": "Plantillas guardadas",
+      "loadButton": "Cargar",
+      "deleteButton": "Eliminar",
+      "empty": "Aún no tienes plantillas guardadas."
+    },
     "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
   },
   "annotation": {
@@ -69,6 +78,9 @@
       "hintEdit": "Puedes pegar un HEX o un RGB existente para reutilizar colores exactos.",
       "hexPlaceholder": "#5eead4",
       "rgbPlaceholder": "rgb(94, 234, 212)"
+    },
+    "actions": {
+      "duplicate": "Duplicar anotación"
     },
     "editingBadge": "Editando"
   },
