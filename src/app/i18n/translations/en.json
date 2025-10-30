@@ -10,7 +10,7 @@
     },
     "landing": {
       "badge": "Annotate smarter",
-      "title": "Bring structure to any PDF in seconds",
+      "title": "Lay out coordinates on any PDF in seconds",
       "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
       "cta": "Select PDF"
     },
@@ -21,10 +21,8 @@
       "invalidFormat": "Only PDF files are supported."
     },
     "workspaceUpload": {
-      "badge": "Start over",
       "title": "Need to reset this project?",
       "subtitle": "Drop a different PDF or click to replace the current document.",
-      "cta": "Upload another PDF",
       "ariaLabel": "Upload a new PDF to restart the annotation workspace"
     }
   },
@@ -65,40 +63,40 @@
     "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
   },
   "annotation": {
-  "fields": {
-    "text": {
-      "label": "Text",
-      "placeholder": "Text..."
-    },
-    "size": {
-      "label": "Size"
-    },
-    "color": {
-      "label": "Color"
-    },
-    "type": {
-      "label": "Type",
-      "options": {
-        "text": "Text",
-        "check": "Checkbox",
-        "radio": "Radio button",
-        "number": "Number"
-      }
-    },
-    "value": {
-      "label": "Value override",
-      "placeholder": "Optional fixed value..."
-    },
-    "number": {
-      "decimals": {
-        "label": "Decimals"
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
       },
-      "appender": {
-        "label": "Suffix",
-        "placeholder": "E.g. %"
+      "size": {
+        "label": "Size"
+      },
+      "color": {
+        "label": "Color"
+      },
+      "type": {
+        "label": "Type",
+        "options": {
+          "text": "Text",
+          "check": "Checkbox",
+          "radio": "Radio button",
+          "number": "Number"
+        }
+      },
+      "value": {
+        "label": "Value override",
+        "placeholder": "Optional fixed value..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Decimals"
+        },
+        "appender": {
+          "label": "Suffix",
+          "placeholder": "E.g. %"
+        }
       }
-    }
-  },
+    },
     "color": {
       "hintPreview": "Pick a color, type a HEX or an RGB value. The JSON will always export the color in HEX.",
       "hintEdit": "Paste an existing HEX or RGB value to reuse exact colors.",

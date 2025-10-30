@@ -10,7 +10,7 @@
     },
     "landing": {
       "badge": "Comença a anotar",
-      "title": "Organitza qualsevol PDF en segons",
+      "title": "Maqueta coordenades de qualsevol PDF en segons",
       "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
       "cta": "Selecciona PDF"
     },
@@ -21,10 +21,8 @@
       "invalidFormat": "Només s'admeten fitxers PDF."
     },
     "workspaceUpload": {
-      "badge": "Nou inici",
       "title": "Vols començar de zero?",
       "subtitle": "Arrossega un altre PDF o fes clic per substituir el document actual.",
-      "cta": "Puja un altre PDF",
       "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
     }
   },
@@ -65,40 +63,40 @@
     "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
   },
   "annotation": {
-  "fields": {
-    "text": {
-      "label": "Text",
-      "placeholder": "Text..."
-    },
-    "size": {
-      "label": "Mida"
-    },
-    "color": {
-      "label": "Color"
-    },
-    "type": {
-      "label": "Tipus",
-      "options": {
-        "text": "Text",
-        "check": "Casella",
-        "radio": "Botó d'opció",
-        "number": "Nombre"
-      }
-    },
-    "value": {
-      "label": "Valor fix",
-      "placeholder": "Valor opcional..."
-    },
-    "number": {
-      "decimals": {
-        "label": "Decimals"
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
       },
-      "appender": {
-        "label": "Sufix",
-        "placeholder": "Ex.: %"
+      "size": {
+        "label": "Mida"
+      },
+      "color": {
+        "label": "Color"
+      },
+      "type": {
+        "label": "Tipus",
+        "options": {
+          "text": "Text",
+          "check": "Casella",
+          "radio": "Botó d'opció",
+          "number": "Nombre"
+        }
+      },
+      "value": {
+        "label": "Valor fix",
+        "placeholder": "Valor opcional..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Decimals"
+        },
+        "appender": {
+          "label": "Sufix",
+          "placeholder": "Ex.: %"
+        }
       }
-    }
-  },
+    },
     "color": {
       "hintPreview": "Selecciona un color, escriu un HEX o un RGB. El JSON sempre exportarà el color en HEX.",
       "hintEdit": "Pots enganxar un HEX o un RGB existent per reutilitzar colors exactes.",
