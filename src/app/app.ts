@@ -93,6 +93,8 @@ export class App implements AfterViewChecked {
   pageIndex = signal(1);
   scale = signal(1.5);
   coords = signal<PageAnnotations[]>([]);
+  private readonly undoStack = signal<PageAnnotations[][]>([]);
+  private readonly redoStack = signal<PageAnnotations[][]>([]);
   preview = signal<PreviewState>(null);
   editing = signal<EditState>(null);
   previewHexInput = signal('#000000');
@@ -136,6 +138,52 @@ export class App implements AfterViewChecked {
   constructor() {
     this.setDocumentMetadata();
     this.syncCoordsTextModel();
+  }
+
+  canUndo() {
+    return this.undoStack().length > 0;
+  }
+
+  canRedo() {
+    return this.redoStack().length > 0;
+  }
+
+  undo() {
+    const undoStates = this.undoStack();
+    if (!undoStates.length) {
+      return;
+    }
+
+    const previous = undoStates[undoStates.length - 1];
+    const currentSnapshot = this.snapshotCoords();
+
+    this.undoStack.update((stack) => stack.slice(0, -1));
+    this.redoStack.update((stack) => [...stack, currentSnapshot]);
+
+    this.coords.set(this.snapshotCoords(previous));
+    this.preview.set(null);
+    this.editing.set(null);
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
+  }
+
+  redo() {
+    const redoStates = this.redoStack();
+    if (!redoStates.length) {
+      return;
+    }
+
+    const next = redoStates[redoStates.length - 1];
+    const currentSnapshot = this.snapshotCoords();
+
+    this.redoStack.update((stack) => stack.slice(0, -1));
+    this.undoStack.update((stack) => [...stack, currentSnapshot]);
+
+    this.coords.set(this.snapshotCoords(next));
+    this.preview.set(null);
+    this.editing.set(null);
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
   }
 
   onLanguageChange(language: string) {
@@ -263,9 +311,8 @@ export class App implements AfterViewChecked {
     }
 
     this.pageIndex.set(1);
-    this.clearAll();
-    this.preview.set(null);
-    this.editing.set(null);
+    this.resetHistory();
+    this.clearAll({ skipHistory: true });
     await this.render();
   }
 
@@ -489,10 +536,13 @@ export class App implements AfterViewChecked {
       return;
     }
     const normalizedField = this.prepareFieldForStorage(p.field);
-    this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
-    this.syncCoordsTextModel();
+    if (this.applyCoordsChange(() =>
+      this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages))
+    )) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
     this.preview.set(null);
-    this.redrawAllForPage();
   }
 
   cancelPreview() {
@@ -502,10 +552,14 @@ export class App implements AfterViewChecked {
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
     const sanitized = this.prepareFieldForStorage(field);
     if (this.fieldRequiresStorageUpdate(field, sanitized)) {
-      this.coords.update((pages) =>
-        this.updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
-      );
-      this.syncCoordsTextModel();
+      if (this.applyCoordsChange(() =>
+        this.coords.update((pages) =>
+          this.updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
+        )
+      )) {
+        this.syncCoordsTextModel();
+        this.redrawAllForPage();
+      }
     }
     const formField = this.prepareFieldForForm(sanitized);
     this.editing.set({ pageIndex, fieldIndex, field: formField });
@@ -521,10 +575,15 @@ export class App implements AfterViewChecked {
       return;
     }
     const normalized = this.prepareFieldForStorage(e.field);
-    this.coords.update((pages) => this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages));
-    this.syncCoordsTextModel();
+    if (this.applyCoordsChange(() =>
+      this.coords.update((pages) =>
+        this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
+      )
+    )) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
     this.editing.set(null);
-    this.redrawAllForPage();
   }
 
   cancelEdit() {
@@ -550,10 +609,13 @@ export class App implements AfterViewChecked {
   deleteAnnotation() {
     const e = this.editing();
     if (!e) return;
-    this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages));
-    this.syncCoordsTextModel();
+    if (this.applyCoordsChange(() =>
+      this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages))
+    )) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
     this.editing.set(null);
-    this.redrawAllForPage();
   }
 
   private fieldHasRenderableContent(field: PageField): boolean {
@@ -865,7 +927,6 @@ export class App implements AfterViewChecked {
       const left = parseFloat(el.style.left || '0');
       const top = parseFloat(el.style.top || '0');
       this.updateAnnotationPosition(drag.pageIndex, drag.fieldIndex, left, top, drag.fontSize);
-      this.redrawAllForPage();
     } else if (evt.type !== 'pointercancel') {
       const page = this.coords()[drag.pageIndex];
       const field = page?.fields[drag.fieldIndex];
@@ -890,21 +951,25 @@ export class App implements AfterViewChecked {
     const newX = +(boundedLeft / scale).toFixed(2);
     const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
 
-    this.coords.update((pages) =>
-      pages.map((page, idx) => {
-        if (idx !== pageIndex) {
-          return page;
-        }
-        if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
-          return page;
-        }
-        const updatedFields = page.fields.map((field, fIdx) =>
-          fIdx === fieldIndex ? { ...field, x: newX, y: newY } : field
-        );
-        return { ...page, fields: updatedFields };
-      })
-    );
-    this.syncCoordsTextModel();
+    if (this.applyCoordsChange(() =>
+      this.coords.update((pages) =>
+        pages.map((page, idx) => {
+          if (idx !== pageIndex) {
+            return page;
+          }
+          if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
+            return page;
+          }
+          const updatedFields = page.fields.map((field, fIdx) =>
+            fIdx === fieldIndex ? { ...field, x: newX, y: newY } : field
+          );
+          return { ...page, fields: updatedFields };
+        })
+      )
+    )) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
   }
 
   async prevPage() {
@@ -935,10 +1000,8 @@ export class App implements AfterViewChecked {
     this.redrawAllForPage();
   }
 
-  clearAll() {
-    this.coords.set([]);
-    this.syncCoordsTextModel();
-    this.redrawAllForPage();
+  clearAll(options?: { skipHistory?: boolean }) {
+    this.replaceCoords([], options);
   }
 
   copyJSON() {
@@ -949,11 +1012,7 @@ export class App implements AfterViewChecked {
     const text = this.coordsTextModel.trim();
 
     if (!text) {
-      this.coords.set([]);
-      this.syncCoordsTextModel();
-      this.preview.set(null);
-      this.editing.set(null);
-      this.redrawAllForPage();
+      this.clearAll();
       return;
     }
 
@@ -965,11 +1024,7 @@ export class App implements AfterViewChecked {
         throw new Error('Formato no válido');
       }
 
-      this.coords.set(normalized);
-      this.syncCoordsTextModel();
-      this.preview.set(null);
-      this.editing.set(null);
-      this.redrawAllForPage();
+      this.replaceCoords(normalized);
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
@@ -999,11 +1054,7 @@ export class App implements AfterViewChecked {
         throw new Error('Formato no válido');
       }
 
-      this.coords.set(normalized);
-      this.syncCoordsTextModel();
-      this.preview.set(null);
-      this.editing.set(null);
-      this.redrawAllForPage();
+      this.replaceCoords(normalized);
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
@@ -1148,6 +1199,84 @@ export class App implements AfterViewChecked {
 
   private syncCoordsTextModel() {
     this.coordsTextModel = JSON.stringify({ pages: this.coords() }, null, 2);
+  }
+
+  private snapshotCoords(pages: PageAnnotations[] = this.coords()): PageAnnotations[] {
+    return pages.map((page) => ({
+      num: page.num,
+      fields: page.fields.map((field) => ({ ...field })),
+    }));
+  }
+
+  private applyCoordsChange(mutator: () => void): boolean {
+    const previous = this.snapshotCoords();
+    mutator();
+    const changed = !this.areCoordsEqual(previous, this.coords());
+    if (changed) {
+      this.undoStack.update((stack) => [...stack, previous]);
+      this.redoStack.set([]);
+    }
+    return changed;
+  }
+
+  private replaceCoords(newCoords: PageAnnotations[], options?: { skipHistory?: boolean }) {
+    const snapshot = this.snapshotCoords(newCoords);
+    if (options?.skipHistory) {
+      this.coords.set(snapshot);
+    } else {
+      this.applyCoordsChange(() => this.coords.set(snapshot));
+    }
+    this.preview.set(null);
+    this.editing.set(null);
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
+  }
+
+  private resetHistory() {
+    this.undoStack.set([]);
+    this.redoStack.set([]);
+  }
+
+  private areCoordsEqual(a: PageAnnotations[], b: PageAnnotations[]): boolean {
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    for (let i = 0; i < a.length; i += 1) {
+      const pageA = a[i];
+      const pageB = b[i];
+      if (!pageB || pageA.num !== pageB.num) {
+        return false;
+      }
+
+      if (pageA.fields.length !== pageB.fields.length) {
+        return false;
+      }
+
+      for (let j = 0; j < pageA.fields.length; j += 1) {
+        const fieldA = pageA.fields[j];
+        const fieldB = pageB.fields[j];
+        if (!fieldB || !this.areFieldsEqual(fieldA, fieldB)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  private areFieldsEqual(a: PageField, b: PageField): boolean {
+    return (
+      a.x === b.x &&
+      a.y === b.y &&
+      a.mapField === b.mapField &&
+      a.fontSize === b.fontSize &&
+      a.color === b.color &&
+      a.type === b.type &&
+      (a.value ?? undefined) === (b.value ?? undefined) &&
+      (a.appender ?? undefined) === (b.appender ?? undefined) &&
+      (a.decimals ?? undefined) === (b.decimals ?? undefined)
+    );
   }
 
   private parseLooseJson(text: string): unknown {

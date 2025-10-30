@@ -14,6 +14,8 @@
     "next": "Siguiente",
     "pageIndicator": "Página {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
     "clear": "Limpiar",
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
