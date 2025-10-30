@@ -2,6 +2,7 @@
 set -euo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+host_port=4444
 cd "$project_root"
 
 compose_cmd=""
@@ -36,4 +37,7 @@ ensure_daemon() {
 ensure_daemon
 
 "${compose_cmd[@]}" down "$@"
+
+echo "Contenedores detenidos."
+echo "La aplicación ya no está disponible en http://localhost:${host_port}."
 

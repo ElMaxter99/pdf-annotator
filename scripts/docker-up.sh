@@ -2,6 +2,7 @@
 set -euo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+host_port=4444
 cd "$project_root"
 
 compose_cmd=""
@@ -36,4 +37,8 @@ ensure_daemon() {
 ensure_daemon
 
 "${compose_cmd[@]}" up --build -d "$@"
+
+echo "Stack levantado correctamente."
+echo "La aplicación está disponible en http://localhost:${host_port}."
+echo "Para detener los contenedores, ejecuta scripts/docker-down.sh."
 
