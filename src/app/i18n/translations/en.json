@@ -25,9 +25,12 @@
     "importJsonFile": "Import from file",
     "applyJson": "Apply JSON",
     "jsonPlaceholder": "Paste or edit annotation coordinates here...",
-    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
+    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data.",
+    "advancedTitle": "Advanced options",
+    "advancedHint": "Toggle guides and snapping helpers when you need extra precision."
   },
   "guides": {
+    "enableFeature": "Enable guides & snapping",
     "title": "Guides & snapping",
     "showGrid": "Show grid",
     "showRulers": "Show rulers",

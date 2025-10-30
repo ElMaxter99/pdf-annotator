@@ -62,7 +62,20 @@
 
     <div class="sidebar-divider"></div>
 
-    <section class="guides-panel" *ngIf="guideSettings() as guides">
+    <section class="advanced-panel">
+      <h5>{{ 'sidebar.advancedTitle' | t }}</h5>
+      <label>
+        <input
+          type="checkbox"
+          [checked]="guidesFeatureEnabled()"
+          (change)="toggleGuidesFeature($event.target.checked)"
+        />
+        <span>{{ 'guides.enableFeature' | t }}</span>
+      </label>
+      <small class="advanced-hint">{{ 'sidebar.advancedHint' | t }}</small>
+    </section>
+
+    <section class="guides-panel" *ngIf="guidesFeatureEnabled() && guideSettings() as guides">
       <h5>{{ 'guides.title' | t }}</h5>
       <div class="guides-toggles">
         <label>

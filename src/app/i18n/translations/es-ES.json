@@ -25,9 +25,12 @@
     "importJsonFile": "Importar desde archivo",
     "applyJson": "Aplicar JSON",
     "jsonPlaceholder": "Pega o edita aquí las coordenadas de anotaciones...",
-    "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
+    "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado.",
+    "advancedTitle": "Opciones avanzadas",
+    "advancedHint": "Activa las guías y el snapping solo cuando necesites más precisión."
   },
   "guides": {
+    "enableFeature": "Activar guías y snapping",
     "title": "Guías y snapping",
     "showGrid": "Mostrar rejilla",
     "showRulers": "Mostrar reglas",

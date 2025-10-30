@@ -165,6 +165,36 @@ header .logo {
     border-top: 1px solid rgba(94, 234, 212, 0.15);
   }
 
+  .advanced-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    h5 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    input[type='checkbox'] {
+      accent-color: var(--accent);
+    }
+
+    .advanced-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  }
+
   .guides-panel {
     display: flex;
     flex-direction: column;

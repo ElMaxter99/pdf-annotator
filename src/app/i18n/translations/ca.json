@@ -25,9 +25,12 @@
     "importJsonFile": "Importa des d'un fitxer",
     "applyJson": "Aplica el JSON",
     "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
-    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
+    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat.",
+    "advancedTitle": "Opcions avançades",
+    "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió."
   },
   "guides": {
+    "enableFeature": "Activa les guies i el snapping",
     "title": "Guies i ajustos",
     "showGrid": "Mostrar la graella",
     "showRulers": "Mostrar regles",

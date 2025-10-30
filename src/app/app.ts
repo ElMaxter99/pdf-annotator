@@ -121,6 +121,7 @@ export class App implements AfterViewChecked {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
+  guidesFeatureEnabled = signal(false);
   guideSettings = signal<GuideSettings>({
     showGrid: true,
     gridSize: 10,
@@ -180,6 +181,18 @@ export class App implements AfterViewChecked {
   onLanguageChange(language: string) {
     this.translationService.setLanguage(language as Language);
     this.languageModel = this.translationService.getCurrentLanguage();
+  }
+
+  toggleGuidesFeature(enabled: boolean) {
+    this.guidesFeatureEnabled.set(enabled);
+    if (!enabled) {
+      this.overlayDragRect = null;
+      this.overlayGuides = [];
+      this.refreshOverlay(null, []);
+      return;
+    }
+
+    this.refreshOverlay();
   }
 
   toggleGuideSetting(
@@ -290,6 +303,10 @@ export class App implements AfterViewChecked {
     }
 
     ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+    if (!this.guidesFeatureEnabled()) {
+      return;
+    }
 
     const settings = this.guideSettings();
     const scale = this.scale();
@@ -533,6 +550,10 @@ export class App implements AfterViewChecked {
     el: HTMLDivElement,
     pdfCanvas: HTMLCanvasElement
   ): { left: number; top: number; guides: OverlayGuide[] } {
+    if (!this.guidesFeatureEnabled()) {
+      return { left: baseLeft, top: baseTop, guides: [] };
+    }
+
     const settings = this.guideSettings();
     const tolerance = Math.max(settings.snapTolerance, 0);
     const scale = this.scale();
@@ -1298,15 +1319,19 @@ export class App implements AfterViewChecked {
     el.onpointerup = this.handleAnnotationPointerUp;
     el.onpointercancel = this.handleAnnotationPointerUp;
 
-    this.refreshOverlay(
-      {
-        left: parseFloat(el.style.left || '0'),
-        top: parseFloat(el.style.top || '0'),
-        width: el.offsetWidth,
-        height: el.offsetHeight,
-      },
-      []
-    );
+    if (this.guidesFeatureEnabled()) {
+      this.refreshOverlay(
+        {
+          left: parseFloat(el.style.left || '0'),
+          top: parseFloat(el.style.top || '0'),
+          width: el.offsetWidth,
+          height: el.offsetHeight,
+        },
+        []
+      );
+    } else {
+      this.refreshOverlay(null, []);
+    }
   }
 
   private handleAnnotationPointerMove = (evt: PointerEvent) => {
@@ -1331,6 +1356,13 @@ export class App implements AfterViewChecked {
     const maxLeft = Math.max(pdfCanvas.width - el.offsetWidth, 0);
     const clampedLeft = Math.min(Math.max(tentativeLeft, 0), maxLeft);
     const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
+
+    if (!this.guidesFeatureEnabled()) {
+      el.style.left = `${clampedLeft}px`;
+      el.style.top = `${clampedTop}px`;
+      this.refreshOverlay(null, []);
+      return;
+    }
 
     const snapResult = this.applySnapping(
       clampedLeft,
