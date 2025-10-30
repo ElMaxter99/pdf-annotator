@@ -19,6 +19,13 @@
       "subtitle": "Drag & drop the file here or click to browse",
       "hint": "PDF only",
       "invalidFormat": "Only PDF files are supported."
+    },
+    "workspaceUpload": {
+      "badge": "Start over",
+      "title": "Need to reset this project?",
+      "subtitle": "Drop a different PDF or click to replace the current document.",
+      "cta": "Upload another PDF",
+      "ariaLabel": "Upload a new PDF to restart the annotation workspace"
     }
   },
   "controls": {

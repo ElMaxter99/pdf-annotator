@@ -19,6 +19,13 @@
       "subtitle": "Arrastra y suelta el archivo aquí o haz clic para buscar",
       "hint": "Solo PDF",
       "invalidFormat": "Solo se admiten archivos PDF."
+    },
+    "workspaceUpload": {
+      "badge": "Nuevo comienzo",
+      "title": "¿Quieres empezar de cero?",
+      "subtitle": "Arrastra otro PDF o haz clic para sustituir el documento actual.",
+      "cta": "Subir otro PDF",
+      "ariaLabel": "Subir un nuevo PDF para reiniciar el espacio de trabajo"
     }
   },
   "controls": {

@@ -19,6 +19,13 @@
       "subtitle": "Arrossega i deixa anar el fitxer aquí o fes clic per cercar",
       "hint": "Només PDF",
       "invalidFormat": "Només s'admeten fitxers PDF."
+    },
+    "workspaceUpload": {
+      "badge": "Nou inici",
+      "title": "Vols començar de zero?",
+      "subtitle": "Arrossega un altre PDF o fes clic per substituir el document actual.",
+      "cta": "Puja un altre PDF",
+      "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
     }
   },
   "controls": {

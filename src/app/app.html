@@ -54,33 +54,7 @@
     <header class="header">
       <div class="header__left">
         <div class="logo">{{ 'app.title' | t }}</div>
-        <div
-          class="file-upload"
-          role="button"
-          tabindex="0"
-          (click)="openPdfFilePicker()"
-          (keydown)="onFileUploadKeydown($event)"
-          (dragover)="onFileDragOver($event)"
-          (dragleave)="onFileDragLeave($event)"
-          (drop)="onFileDrop($event)"
-          [class.file-upload--active]="fileDropActive()"
-          [attr.aria-label]="'app.upload.title' | t"
-        >
-        <input
-          #pdfFileInput
-          type="file"
-          accept="application/pdf"
-          (change)="onFileSelected($event)"
-          hidden
-        />
-        <div class="file-upload__icon" aria-hidden="true">📄</div>
-        <div class="file-upload__content">
-          <span class="file-upload__title">{{ 'app.upload.title' | t }}</span>
-          <span class="file-upload__subtitle">{{ 'app.upload.subtitle' | t }}</span>
-        </div>
-        <span class="file-upload__hint">{{ 'app.upload.hint' | t }}</span>
       </div>
-    </div>
 
     <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
       <input
@@ -152,6 +126,38 @@
 
   <!-- LATERAL SIDEBAR -->
   <aside class="sidebar">
+    <section
+      class="sidebar-upload"
+      role="button"
+      tabindex="0"
+      (click)="openPdfFilePicker()"
+      (keydown)="onFileUploadKeydown($event)"
+      (dragover)="onFileDragOver($event)"
+      (dragleave)="onFileDragLeave($event)"
+      (drop)="onFileDrop($event)"
+      [class.sidebar-upload--active]="fileDropActive()"
+      [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t"
+    >
+      <input
+        #pdfFileInput
+        type="file"
+        accept="application/pdf"
+        (change)="onFileSelected($event)"
+        hidden
+      />
+      <div class="sidebar-upload__header">
+        <span class="sidebar-upload__badge">{{ 'app.workspaceUpload.badge' | t }}</span>
+        <span class="sidebar-upload__cta">{{ 'app.workspaceUpload.cta' | t }}</span>
+      </div>
+      <div class="sidebar-upload__body">
+        <div class="sidebar-upload__icon" aria-hidden="true">🗂️</div>
+        <div class="sidebar-upload__copy">
+          <span class="sidebar-upload__title">{{ 'app.workspaceUpload.title' | t }}</span>
+          <span class="sidebar-upload__subtitle">{{ 'app.workspaceUpload.subtitle' | t }}</span>
+        </div>
+      </div>
+      <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
+    </section>
     <h4>{{ 'sidebar.title' | t }}</h4>
     <div class="sidebar-actions">
       <button type="button" class="btn" (click)="triggerImportCoords()">
