@@ -1,7 +1,16 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../../../app-version';
 import { Language, TranslationService } from '../../../../core/services/translation.service';
+import { PendingPdfService } from '../../../../core/services/pending-pdf.service';
 
 @Component({
   selector: 'app-landing-home-page',
@@ -16,6 +25,7 @@ import { Language, TranslationService } from '../../../../core/services/translat
 export class LandingHomePageComponent {
   private readonly router = inject(Router);
   private readonly translationService = inject(TranslationService);
+  private readonly pendingPdfService = inject(PendingPdfService);
 
   readonly appName = APP_NAME;
   readonly version = APP_VERSION;
@@ -25,13 +35,16 @@ export class LandingHomePageComponent {
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly fileDropActive = signal(false);
 
+  @ViewChild('fileInput', { static: true }) fileInputRef?: ElementRef<HTMLInputElement>;
+
   onLanguageChange(language: Language) {
     this.translationService.setLanguage(language);
     this.languageModel = this.translationService.getCurrentLanguage();
   }
 
-  navigateToEditor() {
-    this.router.navigate(['/editor']);
+  openFilePicker() {
+    this.fileDropActive.set(false);
+    this.fileInputRef?.nativeElement.click();
   }
 
   onDropZoneKeydown(event: KeyboardEvent) {
@@ -40,7 +53,7 @@ export class LandingHomePageComponent {
     }
 
     event.preventDefault();
-    this.navigateToEditor();
+    this.openFilePicker();
   }
 
   onFileDragOver(event: DragEvent) {
@@ -60,7 +73,30 @@ export class LandingHomePageComponent {
   onFileDrop(event: DragEvent) {
     event.preventDefault();
     this.fileDropActive.set(false);
-    this.navigateToEditor();
+
+    const file = event.dataTransfer?.files?.[0] ?? null;
+    this.handleSelectedFile(file);
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.handleSelectedFile(file);
+    input.value = '';
+  }
+
+  private handleSelectedFile(file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    if (!this.pendingPdfService.isPdfFile(file)) {
+      alert(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
+
+    this.pendingPdfService.setPendingFile(file);
+    this.router.navigate(['/editor']);
   }
 
   @HostListener('document:dragend')

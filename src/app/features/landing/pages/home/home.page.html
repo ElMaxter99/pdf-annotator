@@ -1,4 +1,11 @@
 <section class="landing">
+  <input
+    #fileInput
+    class="landing__file-input"
+    type="file"
+    accept="application/pdf"
+    (change)="onFileSelected($event)"
+  />
   <div class="landing__language">
     <app-language-selector
       [languages]="languages"
@@ -18,7 +25,7 @@
     class="landing__dropzone"
     role="button"
     tabindex="0"
-    (click)="navigateToEditor()"
+    (click)="openFilePicker()"
     (keydown)="onDropZoneKeydown($event)"
     (dragover)="onFileDragOver($event)"
     (dragleave)="onFileDragLeave($event)"

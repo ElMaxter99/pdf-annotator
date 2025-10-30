@@ -7,6 +7,7 @@ import {
   AfterViewChecked,
   HostListener,
   OnDestroy,
+  OnInit,
   inject,
   ChangeDetectionStrategy,
 } from '@angular/core';
@@ -22,6 +23,7 @@ import {
   AnnotationTemplatesService,
   AnnotationTemplate,
 } from '../../../../core/services/annotation-templates.service';
+import { PendingPdfService } from '../../../../core/services/pending-pdf.service';
 import { EditorSidebarComponent } from '../../components/sidebar/editor-sidebar.component';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
@@ -82,7 +84,7 @@ type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | n
  * Smart container that orchestrates PDF rendering, annotation state management and communication with
  * toolbar/sidebar presentation components.
  */
-export class EditorHomePageComponent implements AfterViewChecked, OnDestroy {
+export class EditorHomePageComponent implements AfterViewChecked, OnDestroy, OnInit {
   pdfDoc: PDFDocumentProxy | null = null;
   pageIndex = signal(1);
   scale = signal(1.5);
@@ -102,6 +104,7 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy {
   private readonly meta = inject(Meta);
   private readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
+  private readonly pendingPdfService = inject(PendingPdfService);
   readonly templates = signal<AnnotationTemplate[]>([]);
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
   templateNameModel = '';
@@ -155,6 +158,13 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy {
       this.applyTemplate(initialTemplate);
     } else {
       this.syncCoordsTextModel();
+    }
+  }
+
+  ngOnInit() {
+    const pendingFile = this.pendingPdfService.consumePendingFile();
+    if (pendingFile) {
+      void this.loadPdfFile(pendingFile);
     }
   }
 
@@ -372,7 +382,7 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy {
   }
 
   private async loadPdfFile(file: File) {
-    if (!this.isPdfFile(file)) {
+    if (!this.pendingPdfService.isPdfFile(file)) {
       alert(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
@@ -409,14 +419,6 @@ export class EditorHomePageComponent implements AfterViewChecked, OnDestroy {
     this.clearAll({ skipHistory: true });
     await this.render();
     this.fileDropActive.set(false);
-  }
-
-  private isPdfFile(file: File) {
-    if (!file.type) {
-      return file.name.toLowerCase().endsWith('.pdf');
-    }
-
-    return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
   }
 
   async render() {

@@ -18,6 +18,14 @@
   position: relative;
 }
 
+.landing__file-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
 .landing__language {
   position: absolute;
   top: 0;
