@@ -21,6 +21,7 @@
 - [🧰 Stack tecnológico](#-stack-tecnológico)
 - [🛠 Requisitos](#-requisitos)
 - [⚙ Instalación](#-instalación)
+- [🚀 Despliegue con Docker](#-despliegue-con-docker)
 - [▶ Uso paso a paso](#-uso-paso-a-paso)
   - [1. Inicia el servidor de desarrollo](#1-inicia-el-servidor-de-desarrollo)
   - [2. Carga un PDF](#2-carga-un-pdf)
@@ -65,6 +66,23 @@ cd pdf-annotator
 # Instala las dependencias
 npm install
 ```
+
+## 🚀 Despliegue con Docker
+> Requiere Docker Desktop, Docker Engine o una instalación compatible con Docker Compose.
+
+```bash
+sh scripts/docker-up.sh
+```
+
+El script compila la aplicación con Node.js 22.12.0, construye la imagen `pdf-annotator:latest` y levanta el servicio detrás de NGINX. Una vez completado, la SPA queda disponible en `http://localhost:4444`.
+
+Para detener y limpiar los contenedores:
+
+```bash
+sh scripts/docker-down.sh
+```
+
+Al finalizar, la aplicación dejará de estar disponible en `http://localhost:4444`.
 
 ## ▶ Uso paso a paso
 ### 1. Inicia el servidor de desarrollo
