@@ -23,6 +23,8 @@
       <span class="page-indicator">{{ 'controls.zoomLabel' | t }} {{ scale() | number:'1.0-2' }}×</span>
       <button class="btn" (click)="zoomIn()" [disabled]="!pdfDoc">+</button>
 
+      <button class="btn" (click)="undo()" [disabled]="!canUndo()">{{ 'controls.undo' | t }}</button>
+      <button class="btn" (click)="redo()" [disabled]="!canRedo()">{{ 'controls.redo' | t }}</button>
       <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">{{ 'controls.clear' | t }}</button>
       <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
       <button class="btn" (click)="downloadJSON()"
@@ -45,13 +47,68 @@
   <aside class="sidebar">
     <h4>{{ 'sidebar.title' | t }}</h4>
     <div class="sidebar-actions">
-      <button type="button" class="btn" (click)="triggerImportCoords()" [disabled]="!pdfDoc">
+      <button type="button" class="btn" (click)="triggerImportCoords()">
         {{ 'sidebar.importJsonFile' | t }}
       </button>
       <button type="button" class="btn" (click)="applyCoordsText()">
         {{ 'sidebar.applyJson' | t }}
       </button>
     </div>
+    <section class="templates">
+      <h5>{{ 'sidebar.templates.title' | t }}</h5>
+      <div class="templates__save">
+        <input
+          type="text"
+          [(ngModel)]="templateNameModel"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'sidebar.templates.placeholder' | t"
+        />
+        <button
+          type="button"
+          class="btn"
+          (click)="saveCurrentAsTemplate()"
+          [disabled]="!coords().length || !templateNameModel.trim()"
+        >
+          {{ 'sidebar.templates.saveButton' | t }}
+        </button>
+      </div>
+      <ng-container *ngIf="templates().length; else emptyTemplates">
+        <div class="templates__select">
+          <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
+          <div class="templates__controls">
+            <select
+              [(ngModel)]="selectedTemplateId"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option *ngFor="let template of templates()" [value]="template.id">
+                {{ template.name }}
+              </option>
+            </select>
+            <button
+              type="button"
+              class="btn"
+              (click)="loadSelectedTemplate()"
+              [disabled]="!selectedTemplateId"
+            >
+              {{ 'sidebar.templates.loadButton' | t }}
+            </button>
+            <button
+              type="button"
+              class="btn templates__delete"
+              (click)="deleteSelectedTemplate()"
+              [disabled]="
+                !selectedTemplateId || selectedTemplateId === defaultTemplateId
+              "
+            >
+              {{ 'sidebar.templates.deleteButton' | t }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #emptyTemplates>
+        <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
+      </ng-template>
+    </section>
     <textarea
       class="json-editor"
       [(ngModel)]="coordsTextModel"
@@ -63,7 +120,7 @@
 
   <!-- VISOR PDF -->
   <main class="viewer" *ngIf="pdfDoc as _">
-    <div class="canvas-container">
+    <div class="canvas-container" #pdfViewer>
       <canvas #pdfCanvas></canvas>
       <canvas #overlayCanvas></canvas>
       <div #annotationsLayer class="annotations-layer"></div>
@@ -77,6 +134,29 @@
           <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
           <input type="text" [(ngModel)]="p.field.mapField"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
+        </label>
+        <label class="field">
+          <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+          <select [(ngModel)]="p.field.type">
+            <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+            <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+            <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+            <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+          <input type="text" [(ngModel)]="p.field.value"
+            [placeholder]="'annotation.fields.value.placeholder' | t" />
+        </label>
+        <label class="field field-small" *ngIf="p.field.type === 'number'">
+          <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+          <input type="number" [(ngModel)]="p.field.decimals" min="0" />
+        </label>
+        <label class="field field-small" *ngIf="p.field.type === 'number'">
+          <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+          <input type="text" [(ngModel)]="p.field.appender"
+            [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
         </label>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
@@ -96,7 +176,7 @@
           <small class="color-hint">{{ 'annotation.color.hintPreview' | t }}</small>
         </div>
         <div class="editor-actions">
-          <button (click)="confirmPreview()">✅</button>
+          <button class="action-primary" (click)="confirmPreview()">✅</button>
           <button (click)="cancelPreview()">❌</button>
         </div>
       </div>
@@ -110,6 +190,29 @@
           <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
           <input type="text" [(ngModel)]="e.field.mapField"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
+        </label>
+        <label class="field">
+          <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+          <select [(ngModel)]="e.field.type">
+            <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+            <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+            <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+            <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+          <input type="text" [(ngModel)]="e.field.value"
+            [placeholder]="'annotation.fields.value.placeholder' | t" />
+        </label>
+        <label class="field field-small" *ngIf="e.field.type === 'number'">
+          <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+          <input type="number" [(ngModel)]="e.field.decimals" min="0" />
+        </label>
+        <label class="field field-small" *ngIf="e.field.type === 'number'">
+          <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+          <input type="text" [(ngModel)]="e.field.appender"
+            [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
         </label>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
@@ -129,9 +232,12 @@
           <small class="color-hint">{{ 'annotation.color.hintEdit' | t }}</small>
         </div>
         <div class="editor-actions">
-          <button (click)="confirmEdit()">✅</button>
-          <button (click)="cancelEdit()">❌</button>
+          <button type="button" (click)="duplicateAnnotation()"
+            [title]="'annotation.actions.duplicate' | t"
+            [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
           <button class="btn-delete" (click)="deleteAnnotation()">🗑️</button>
+          <button class="action-primary" (click)="confirmEdit()">✅</button>
+          <button (click)="cancelEdit()">❌</button>
         </div>
       </div>
     </div>

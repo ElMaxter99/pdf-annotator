@@ -14,6 +14,8 @@
     "next": "Següent",
     "pageIndicator": "Pàgina {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "undo": "Desfer",
+    "redo": "Refer",
     "clear": "Esborrar",
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
@@ -25,26 +27,60 @@
     "importJsonFile": "Importa des d'un fitxer",
     "applyJson": "Aplica el JSON",
     "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
+    "templates": {
+      "title": "Plantilles reutilitzables",
+      "placeholder": "Nom de la plantilla",
+      "saveButton": "Desa la plantilla",
+      "selectLabel": "Plantilles desades",
+      "loadButton": "Carrega",
+      "deleteButton": "Elimina",
+      "empty": "Encara no tens cap plantilla desada."
+    },
     "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
   },
   "annotation": {
-    "fields": {
-      "text": {
-        "label": "Text",
-        "placeholder": "Text..."
-      },
-      "size": {
-        "label": "Mida"
-      },
-      "color": {
-        "label": "Color"
+  "fields": {
+    "text": {
+      "label": "Text",
+      "placeholder": "Text..."
+    },
+    "size": {
+      "label": "Mida"
+    },
+    "color": {
+      "label": "Color"
+    },
+    "type": {
+      "label": "Tipus",
+      "options": {
+        "text": "Text",
+        "check": "Casella",
+        "radio": "Botó d'opció",
+        "number": "Nombre"
       }
     },
+    "value": {
+      "label": "Valor fix",
+      "placeholder": "Valor opcional..."
+    },
+    "number": {
+      "decimals": {
+        "label": "Decimals"
+      },
+      "appender": {
+        "label": "Sufix",
+        "placeholder": "Ex.: %"
+      }
+    }
+  },
     "color": {
       "hintPreview": "Selecciona un color, escriu un HEX o un RGB. El JSON sempre exportarà el color en HEX.",
       "hintEdit": "Pots enganxar un HEX o un RGB existent per reutilitzar colors exactes.",
       "hexPlaceholder": "#5eead4",
       "rgbPlaceholder": "rgb(94, 234, 212)"
+    },
+    "actions": {
+      "duplicate": "Duplicar anotació"
     },
     "editingBadge": "Editant"
   },

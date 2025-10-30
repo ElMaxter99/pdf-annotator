@@ -1,26 +1,56 @@
-# 📑 PDF Annotator
+<p align="center">
+  <img src="./public/logo.svg" alt="PDF Annotator logo" width="140" />
+</p>
 
-Aplicación web en **Angular 20** para preparar anotaciones sobre PDFs sin modificar el documento original. Permite cargar archivos, obtener coordenadas exactas, ajustar estilos visuales y exportar los resultados como JSON o como un PDF renderizado con las marcas.
+<h1 align="center">📑 PDF Annotator</h1>
+
+<p align="center">
+  Herramienta web en <strong>Angular 20</strong> para crear, editar y exportar anotaciones sobre cualquier PDF sin alterar el archivo original.
+</p>
+
+<p align="center">
+  <a href="#-caracteristicas-destacadas"><img src="https://img.shields.io/badge/Highlights-Descubre%20funciones-ff6b6b?style=for-the-badge" alt="Características" /></a>
+  <a href="https://github.com/ElMaxter99/pdf-annotator/issues/new/choose"><img src="https://img.shields.io/badge/Issues-Bienvenido%20feedback-00b894?style=for-the-badge&logo=github" alt="Reportar issue" /></a>
+</p>
+
+---
 
 ## 📚 Tabla de contenidos
-- [📑 PDF Annotator](#-pdf-annotator)
-  - [📚 Tabla de contenidos](#-tabla-de-contenidos)
-  - [🛠 Requisitos](#-requisitos)
-  - [⚙ Instalación](#-instalación)
-  - [▶ Uso paso a paso](#-uso-paso-a-paso)
-    - [1. Inicia el servidor de desarrollo](#1-inicia-el-servidor-de-desarrollo)
-    - [2. Carga un PDF](#2-carga-un-pdf)
-    - [3. Navega y ajusta el zoom](#3-navega-y-ajusta-el-zoom)
-    - [4. Crea una anotación](#4-crea-una-anotación)
-    - [5. Edita o mueve anotaciones](#5-edita-o-mueve-anotaciones)
-    - [6. Controla el color y la tipografía](#6-controla-el-color-y-la-tipografía)
-    - [7. Gestiona las anotaciones en JSON](#7-gestiona-las-anotaciones-en-json)
-    - [8. Exporta un PDF anotado](#8-exporta-un-pdf-anotado)
-    - [9. Atajos de teclado](#9-atajos-de-teclado)
-    - [10. Formato de las coordenadas](#10-formato-de-las-coordenadas)
-  - [📸 Captura de pantalla](#-captura-de-pantalla)
-  - [🧰 Solución de problemas](#-solución-de-problemas)
-  - [📝 Licencia](#-licencia)
+- [📚 Tabla de contenidos](#-tabla-de-contenidos)
+- [✨ Características destacadas](#-características-destacadas)
+- [🧰 Stack tecnológico](#-stack-tecnológico)
+- [🛠 Requisitos](#-requisitos)
+- [⚙ Instalación](#-instalación)
+- [🚀 Despliegue con Docker](#-despliegue-con-docker)
+- [▶ Uso paso a paso](#-uso-paso-a-paso)
+  - [1. Inicia el servidor de desarrollo](#1-inicia-el-servidor-de-desarrollo)
+  - [2. Carga un PDF](#2-carga-un-pdf)
+  - [3. Navega y ajusta el zoom](#3-navega-y-ajusta-el-zoom)
+  - [4. Crea una anotación](#4-crea-una-anotación)
+  - [5. Edita o mueve anotaciones](#5-edita-o-mueve-anotaciones)
+  - [6. Controla el color y la tipografía](#6-controla-el-color-y-la-tipografía)
+  - [7. Gestiona las anotaciones en JSON](#7-gestiona-las-anotaciones-en-json)
+  - [8. Exporta un PDF anotado](#8-exporta-un-pdf-anotado)
+  - [9. Atajos de teclado](#9-atajos-de-teclado)
+  - [10. Formato de las coordenadas](#10-formato-de-las-coordenadas)
+- [📸 Galería](#-galería)
+- [🧰 Solución de problemas](#-solución-de-problemas)
+- [🧱 Plantillas para contribuir](#-plantillas-para-contribuir)
+- [📝 Licencia](#-licencia)
+
+## ✨ Características destacadas
+- 🎯 **Anotaciones precisas**: define posición, color y tipografía sobre un lienzo sincronizado con cada página.
+- 🔁 **Edición en vivo**: arrastra tarjetas, actualiza el texto y visualiza los cambios sin refrescar el PDF.
+- 💾 **Gestión de datos**: importa/exporta anotaciones en JSON normalizado o descarga un PDF con las marcas aplicadas.
+- ⚡ **Experiencia fluida**: atajos de teclado, zoom incremental y feedback instantáneo en el panel lateral.
+- 🧪 **Flujos listos para QA**: reproduce escenarios con JSON compartible para validar diseños y firmas.
+
+## 🧰 Stack tecnológico
+| Frontend | Renderizado PDF | Utilidades |
+| --- | --- | --- |
+| Angular 20 · RxJS · Angular Material | pdf-lib · pdfjs-dist | TypeScript · Sass · Vite dev server |
+
+> El repositorio incluye scripts para validar traducciones (`npm run i18n:check`) antes de construir la aplicación.
 
 ## 🛠 Requisitos
 - Node.js **v22.12.0** (o compatible con Angular 20).
@@ -37,10 +67,45 @@ cd pdf-annotator
 npm install
 ```
 
+### ▶️ Ejecuta la app en tu máquina (Node 22)
+
+```bash
+npm run start:local
+```
+
+El servidor de desarrollo queda disponible en `http://localhost:4200` con soporte para hot-reload. Si faltan dependencias críticas de Angular (por ejemplo `@angular/build`), el script se detiene con un aviso para que ejecutes `npm install` manualmente antes de volver a lanzar `ng serve`; así evitas el error `Could not find the '@angular/build:dev-server' builder's node package.` típico de los entornos recién clonados.
+
+> ¿Tu equipo no puede instalar Node.js 22 o Angular 20? Ejecuta la versión en contenedor.
+
+### 🐳 Ejecuta la app con Docker (alternativa)
+
+```bash
+npm run start:docker
+```
+
+El comando delega en `scripts/docker-up.sh` para construir la imagen y exponer la SPA en `http://localhost:4444`.
+
+## 🚀 Despliegue con Docker
+> Requiere Docker Desktop, Docker Engine o una instalación compatible con Docker Compose.
+
+```bash
+npm run start:docker
+```
+
+El script compila la aplicación con Node.js 22.12.0, construye la imagen `pdf-annotator:latest` y levanta el servicio detrás de NGINX. Una vez completado, la SPA queda disponible en `http://localhost:4444`.
+
+Para detener y limpiar los contenedores:
+
+```bash
+sh scripts/docker-down.sh
+```
+
+Al finalizar, la aplicación dejará de estar disponible en `http://localhost:4444`.
+
 ## ▶ Uso paso a paso
 ### 1. Inicia el servidor de desarrollo
 ```bash
-npm start -- --host 0.0.0.0 --port 4200
+npm run start:local
 ```
 Abre `http://localhost:4200` en tu navegador (o la IP indicada si usaste otro host).
 
@@ -106,9 +171,11 @@ Cada anotación se almacena como:
 - `fontSize` se almacena en puntos; si no se indica, la app usa 14.
 - `color` acepta hexadecimales (`#RRGGBB`).
 
-## 📸 Captura de pantalla
-![Vista principal](./screenshots/main.png)
-![Ejemplo de uso](./screenshots/example_use.png)
+## 📸 Galería
+<p align="center">
+  <img src="./screenshots/main.png" alt="Vista principal" width="49%" />
+  <img src="./screenshots/example_use.png" alt="Ejemplo de uso" width="49%" />
+</p>
 
 ## 🧰 Solución de problemas
 - **El PDF no se renderiza**: revisa que el archivo no esté protegido y que el servidor de desarrollo muestre el log sin errores.
@@ -116,5 +183,15 @@ Cada anotación se almacena como:
 - **Error al importar JSON**: confirma que el archivo contenga la estructura indicada y que los valores numéricos sean válidos.
 - **El PDF exportado no abre**: prueba con otra copia del PDF original; la app intenta tres variantes (original, canónica y saneada) para asegurar compatibilidad.
 
+## 🧱 Plantillas para contribuir
+El repositorio incluye plantillas en `.github/`:
+
+- `ISSUE_TEMPLATE/bug_report.md`: guía para reportar errores con pasos reproducibles.
+- `ISSUE_TEMPLATE/feature_request.md`: estructura sugerencias de mejora con contexto y alcance.
+- `PULL_REQUEST_TEMPLATE.md`: checklist para documentar pruebas y evidencia de los cambios.
+
+Además, en la pestaña **About** del repositorio puedes añadir etiquetas (Angular, PDF, annotations) y la URL de la demo para mejorar la visibilidad.
+
 ## 📝 Licencia
 MIT © 2025 AlvaroMaxter
+# redeploy
