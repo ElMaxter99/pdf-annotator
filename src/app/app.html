@@ -43,9 +43,14 @@
     <!-- HEADER -->
     <header class="header">
       <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
-        <div class="header__left">
-          <div class="logo">{{ 'app.title' | t }}</div>
+        <div class="footer__brand">
+          <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
+          <div class="footer__brand-text">
+            <span class="footer__app-name">{{ appName }}</span>
+            <span class="footer__version">v{{ version }}</span>
+          </div>
         </div>
+
         <input #coordsFileInput type="file" accept="application/json" (change)="onCoordsFileSelected($event)" hidden />
 
         <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
@@ -100,7 +105,6 @@
           [selectedLanguage]="languageModel" (languageChange)="onLanguageChange($event)" variant="compact">
         </app-language-selector>
       </div>
-
     </header>
 
     <!-- LATERAL SIDEBAR -->
@@ -110,10 +114,7 @@
         (dragleave)="onFileDragLeave($event)" (drop)="onFileDrop($event)"
         [class.sidebar-upload--active]="fileDropActive()" [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t">
         <input #pdfFileInput type="file" accept="application/pdf" (change)="onFileSelected($event)" hidden />
-        <div class="sidebar-upload__header">
-          <span class="sidebar-upload__badge">{{ 'app.workspaceUpload.badge' | t }}</span>
-          <span class="sidebar-upload__cta">{{ 'app.workspaceUpload.cta' | t }}</span>
-        </div>
+
         <div class="sidebar-upload__body">
           <div class="sidebar-upload__icon" aria-hidden="true">🗂️</div>
           <div class="sidebar-upload__copy">
