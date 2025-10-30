@@ -28,18 +28,40 @@
     "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
   },
   "annotation": {
-    "fields": {
-      "text": {
-        "label": "Texto",
-        "placeholder": "Texto..."
-      },
-      "size": {
-        "label": "Tamaño"
-      },
-      "color": {
-        "label": "Color"
+  "fields": {
+    "text": {
+      "label": "Texto",
+      "placeholder": "Texto..."
+    },
+    "size": {
+      "label": "Tamaño"
+    },
+    "color": {
+      "label": "Color"
+    },
+    "type": {
+      "label": "Tipo",
+      "options": {
+        "text": "Texto",
+        "check": "Casilla",
+        "radio": "Botón de opción",
+        "number": "Número"
       }
     },
+    "value": {
+      "label": "Valor fijo",
+      "placeholder": "Valor opcional..."
+    },
+    "number": {
+      "decimals": {
+        "label": "Decimales"
+      },
+      "appender": {
+        "label": "Sufijo",
+        "placeholder": "Ej.: %"
+      }
+    }
+  },
     "color": {
       "hintPreview": "Selecciona un color, escribe un HEX o un RGB. El JSON siempre exportará el color en HEX.",
       "hintEdit": "Puedes pegar un HEX o un RGB existente para reutilizar colores exactos.",

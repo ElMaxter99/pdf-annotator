@@ -61,12 +61,18 @@ if (supportsModuleWorkers()) {
   workerOptions.workerType = undefined;
 }
 
+type FieldType = 'text' | 'check' | 'radio' | 'number';
+
 type PageField = {
   x: number;
   y: number;
   mapField: string;
   fontSize: number;
   color: string;
+  type: FieldType;
+  value?: string;
+  appender?: string;
+  decimals?: number | null;
 };
 
 type PageAnnotations = { num: number; fields: PageField[] };
@@ -171,21 +177,27 @@ export class App implements AfterViewChecked {
 
   ngAfterViewChecked() {
     if (this.preview()) {
-      const previewEl = this.previewEditorRef?.nativeElement;
-      if (previewEl) {
-        const input = previewEl.querySelector('input[type="text"]') as HTMLInputElement | null;
-        input?.focus();
-      }
+      this.focusEditorIfNeeded(this.previewEditorRef?.nativeElement ?? null);
       return;
     }
 
     if (this.editing()) {
-      const editEl = this.editEditorRef?.nativeElement;
-      if (editEl) {
-        const input = editEl.querySelector('input[type="text"]') as HTMLInputElement | null;
-        input?.focus();
-      }
+      this.focusEditorIfNeeded(this.editEditorRef?.nativeElement ?? null);
     }
+  }
+
+  private focusEditorIfNeeded(editorEl: HTMLElement | null) {
+    if (!editorEl) {
+      return;
+    }
+
+    const activeElement = this.document?.activeElement as HTMLElement | null;
+    if (activeElement && editorEl.contains(activeElement)) {
+      return;
+    }
+
+    const focusTarget = editorEl.querySelector<HTMLElement>('input, select, textarea, button');
+    focusTarget?.focus();
   }
 
   onEditorKeydown(event: KeyboardEvent, mode: 'preview' | 'edit') {
@@ -305,6 +317,10 @@ export class App implements AfterViewChecked {
         mapField: '',
         fontSize: 14,
         color: defaultColor,
+        type: 'text',
+        value: '',
+        appender: '',
+        decimals: null,
       },
     });
     this.updatePreviewColorState(defaultColor);
@@ -468,14 +484,11 @@ export class App implements AfterViewChecked {
 
   confirmPreview() {
     const p = this.preview();
-    if (!p || !p.field.mapField.trim()) {
+    if (!p || !this.fieldHasRenderableContent(p.field)) {
       this.preview.set(null);
       return;
     }
-    const normalizedField: PageField = {
-      ...p.field,
-      color: this.normalizeColor(p.field.color),
-    };
+    const normalizedField = this.prepareFieldForStorage(p.field);
     this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages));
     this.syncCoordsTextModel();
     this.preview.set(null);
@@ -487,28 +500,28 @@ export class App implements AfterViewChecked {
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
-    const normalized: PageField = { ...field, color: this.normalizeColor(field.color) };
-    if (normalized.color !== field.color) {
+    const sanitized = this.prepareFieldForStorage(field);
+    if (this.fieldRequiresStorageUpdate(field, sanitized)) {
       this.coords.update((pages) =>
-        this.updateFieldInPages(pageIndex, fieldIndex, normalized, pages)
+        this.updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
       );
       this.syncCoordsTextModel();
     }
-    this.editing.set({ pageIndex, fieldIndex, field: { ...normalized } });
-    this.updateEditingColorState(normalized.color);
+    const formField = this.prepareFieldForForm(sanitized);
+    this.editing.set({ pageIndex, fieldIndex, field: formField });
+    this.updateEditingColorState(formField.color);
     this.preview.set(null);
   }
 
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
-    const normalized: PageField = {
-      ...e.field,
-      color: this.normalizeColor(e.field.color),
-    };
-    this.coords.update((pages) =>
-      this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
-    );
+    if (!this.fieldHasRenderableContent(e.field)) {
+      this.editing.set(null);
+      return;
+    }
+    const normalized = this.prepareFieldForStorage(e.field);
+    this.coords.update((pages) => this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages));
     this.syncCoordsTextModel();
     this.editing.set(null);
     this.redrawAllForPage();
@@ -541,6 +554,148 @@ export class App implements AfterViewChecked {
     this.syncCoordsTextModel();
     this.editing.set(null);
     this.redrawAllForPage();
+  }
+
+  private fieldHasRenderableContent(field: PageField): boolean {
+    const valueText = typeof field.value === 'string' ? field.value.trim() : '';
+    if (valueText) {
+      return true;
+    }
+
+    const type = this.normalizeFieldType(field.type);
+    if (type === 'check' || type === 'radio') {
+      return true;
+    }
+
+    return field.mapField.trim().length > 0;
+  }
+
+  private fieldRequiresStorageUpdate(original: PageField, sanitized: PageField): boolean {
+    const originalValue = (original as { value?: unknown }).value;
+    const originalAppender = (original as { appender?: unknown }).appender;
+    const originalDecimals = (original as { decimals?: unknown }).decimals;
+    const originalType = (original as { type?: unknown }).type;
+
+    return (
+      original.x !== sanitized.x ||
+      original.y !== sanitized.y ||
+      original.mapField !== sanitized.mapField ||
+      original.fontSize !== sanitized.fontSize ||
+      original.color !== sanitized.color ||
+      originalType !== sanitized.type ||
+      originalValue !== sanitized.value ||
+      originalAppender !== sanitized.appender ||
+      originalDecimals !== sanitized.decimals
+    );
+  }
+
+  private prepareFieldForStorage(field: PageField): PageField {
+    const type = this.normalizeFieldType(field.type);
+    const base: PageField = {
+      x: field.x,
+      y: field.y,
+      mapField: typeof field.mapField === 'string' ? field.mapField : '',
+      fontSize: field.fontSize,
+      color: this.normalizeColor(field.color),
+      type,
+    };
+
+    const value = this.sanitizeTextPreservingSpacing(field.value);
+    if (value !== undefined) {
+      base.value = value;
+    }
+
+    if (type === 'number') {
+      const decimals = this.normalizeFieldDecimals(field.decimals);
+      if (decimals !== undefined) {
+        base.decimals = decimals;
+      }
+      const appender = this.sanitizeOptionalAppender(field.appender);
+      if (appender !== undefined) {
+        base.appender = appender;
+      }
+    }
+
+    return base;
+  }
+
+  private prepareFieldForForm(field: PageField): PageField {
+    const decimals =
+      typeof field.decimals === 'number' && Number.isFinite(field.decimals)
+        ? Math.max(0, Math.round(field.decimals))
+        : null;
+
+    return {
+      ...field,
+      value: typeof field.value === 'string' ? field.value : '',
+      appender: typeof field.appender === 'string' ? field.appender : '',
+      decimals,
+    };
+  }
+
+  private normalizeFieldType(value: unknown): FieldType {
+    if (typeof value === 'string') {
+      const normalized = value.toLowerCase();
+      if (normalized === 'check' || normalized === 'radio' || normalized === 'number' || normalized === 'text') {
+        return normalized as FieldType;
+      }
+    }
+    return 'text';
+  }
+
+  private sanitizeTextPreservingSpacing(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    return value.trim() ? value : undefined;
+  }
+
+  private sanitizeOptionalAppender(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    return value.trim() ? value : undefined;
+  }
+
+  private normalizeFieldDecimals(value: unknown): number | undefined {
+    if (value === null || value === undefined || value === '') {
+      return undefined;
+    }
+    const parsed = this.toFiniteNumber(value);
+    if (parsed === null || parsed < 0) {
+      return undefined;
+    }
+    return Math.round(parsed);
+  }
+
+  private getFieldRenderValue(field: PageField): string {
+    const override =
+      typeof field.value === 'string' && field.value.trim() ? field.value : undefined;
+    if (override !== undefined) {
+      return override;
+    }
+
+    const type = this.normalizeFieldType(field.type);
+    if (type === 'check' || type === 'radio') {
+      return 'X';
+    }
+
+    const baseText = typeof field.mapField === 'string' ? field.mapField : '';
+
+    if (type === 'number') {
+      const numeric = this.toFiniteNumber(baseText);
+      if (numeric !== null) {
+        const decimals = this.normalizeFieldDecimals(field.decimals);
+        const formatted =
+          decimals !== undefined
+            ? this.formatNumberWithTruncation(numeric, decimals)
+            : baseText;
+        const appender = this.sanitizeOptionalAppender(field.appender) ?? '';
+        return `${formatted}${appender}`;
+      }
+    }
+
+    return baseText;
   }
 
   private addFieldToPages(
@@ -618,7 +773,7 @@ export class App implements AfterViewChecked {
 
           const el = document.createElement('div');
           el.className = 'annotation';
-          el.textContent = field.mapField;
+          el.textContent = this.getFieldRenderValue(field);
           el.style.left = `${left}px`;
           el.style.top = `${top - field.fontSize * scale}px`;
           el.style.fontSize = `${field.fontSize * scale}px`;
@@ -916,7 +1071,7 @@ export class App implements AfterViewChecked {
           const g = parseInt(hex.substring(2, 4), 16) / 255;
           const b = parseInt(hex.substring(4, 6), 16) / 255;
 
-          page.drawText(field.mapField, {
+          page.drawText(this.getFieldRenderValue(field), {
             x: field.x,
             y: field.y,
             size: field.fontSize,
@@ -1135,14 +1290,35 @@ export class App implements AfterViewChecked {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color, value } = rawField as Record<string, unknown>;
+        const {
+          x,
+          y,
+          mapField,
+          fontSize,
+          color,
+          value,
+          type,
+          decimals,
+          appender,
+        } = rawField as Record<string, unknown>;
 
+        const normalizedType = this.normalizeFieldType(type);
+        const normalizedValue = this.normalizeFieldText(value);
         const normalizedMapField =
-          this.normalizeFieldText(mapField) ?? this.normalizeFieldText(value);
+          this.normalizeFieldText(mapField) ?? normalizedValue;
         const normalizedX = this.toFiniteNumber(x);
         const normalizedY = this.toFiniteNumber(y);
 
-        if (normalizedMapField === null || normalizedX === null || normalizedY === null) {
+        if (normalizedX === null || normalizedY === null) {
+          continue;
+        }
+
+        if (
+          normalizedMapField === null &&
+          normalizedValue === null &&
+          normalizedType !== 'check' &&
+          normalizedType !== 'radio'
+        ) {
           continue;
         }
 
@@ -1153,13 +1329,29 @@ export class App implements AfterViewChecked {
         const normalizedField: PageField = {
           x: Math.round(normalizedX * 100) / 100,
           y: Math.round(normalizedY * 100) / 100,
-          mapField: normalizedMapField,
+          mapField: normalizedMapField ?? '',
           fontSize:
             normalizedFontSize && normalizedFontSize > 0
               ? Math.round(normalizedFontSize * 100) / 100
               : 14,
           color: this.normalizeColor(normalizedColor),
+          type: normalizedType,
         };
+
+        if (normalizedValue !== null) {
+          normalizedField.value = normalizedValue;
+        }
+
+        if (normalizedType === 'number') {
+          const normalizedDecimals = this.normalizeFieldDecimals(decimals);
+          if (normalizedDecimals !== undefined) {
+            normalizedField.decimals = normalizedDecimals;
+          }
+          const normalizedAppender = this.sanitizeOptionalAppender(appender);
+          if (normalizedAppender !== undefined) {
+            normalizedField.appender = normalizedAppender;
+          }
+        }
 
         fields.push(normalizedField);
       }
@@ -1205,7 +1397,23 @@ export class App implements AfterViewChecked {
     return null;
   }
 
+  private formatNumberWithTruncation(value: number, decimals: number): string {
+    const factor = 10 ** decimals;
+    const truncated = Math.trunc(value * factor) / factor;
+    return truncated.toFixed(decimals);
+  }
+
   private normalizeFieldText(value: unknown): string | null {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const normalized = this.normalizeFieldText(item);
+        if (normalized !== null) {
+          return normalized;
+        }
+      }
+      return null;
+    }
+
     let source: string | null = null;
 
     if (typeof value === 'string') {
