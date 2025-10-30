@@ -23,6 +23,8 @@
       <span class="page-indicator">{{ 'controls.zoomLabel' | t }} {{ scale() | number:'1.0-2' }}×</span>
       <button class="btn" (click)="zoomIn()" [disabled]="!pdfDoc">+</button>
 
+      <button class="btn" (click)="undo()" [disabled]="!canUndo()">{{ 'controls.undo' | t }}</button>
+      <button class="btn" (click)="redo()" [disabled]="!canRedo()">{{ 'controls.redo' | t }}</button>
       <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">{{ 'controls.clear' | t }}</button>
       <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
       <button class="btn" (click)="downloadJSON()"
