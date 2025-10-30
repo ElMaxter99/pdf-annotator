@@ -42,20 +42,22 @@ class QuotaExceededStorage extends MockStorage {
 }
 
 describe('AnnotationTemplatesService', () => {
-  const originalLocalStorageDescriptor = Object.getOwnPropertyDescriptor(window, 'localStorage');
+  const originalLocalStorage = window.localStorage;
   let service: AnnotationTemplatesService;
   let storage: MockStorage;
+  let localStorageGetterSpy!: jasmine.Spy<() => Storage>;
 
-  function overrideLocalStorage(value: Storage | undefined) {
-    Object.defineProperty(window, 'localStorage', {
-      configurable: true,
-      value,
-    });
+  function stubLocalStorage(value: Storage | undefined) {
+    localStorageGetterSpy.and.callFake(() => value as unknown as Storage);
   }
+
+  beforeAll(() => {
+    localStorageGetterSpy = spyOnProperty(window, 'localStorage', 'get');
+  });
 
   beforeEach(() => {
     storage = new MockStorage();
-    overrideLocalStorage(storage);
+    stubLocalStorage(storage);
 
     TestBed.configureTestingModule({
       providers: [AnnotationTemplatesService],
@@ -65,11 +67,11 @@ describe('AnnotationTemplatesService', () => {
   });
 
   afterEach(() => {
-    if (originalLocalStorageDescriptor) {
-      Object.defineProperty(window, 'localStorage', originalLocalStorageDescriptor);
-    } else {
-      overrideLocalStorage(undefined);
-    }
+    stubLocalStorage(originalLocalStorage);
+  });
+
+  afterAll(() => {
+    localStorageGetterSpy.and.callThrough();
   });
 
   function createTemplate(id: string, name: string): AnnotationTemplate {
@@ -114,7 +116,7 @@ describe('AnnotationTemplatesService', () => {
   });
 
   it('should return null when saving without localStorage support', () => {
-    overrideLocalStorage(undefined);
+    stubLocalStorage(undefined);
 
     const result = service.saveTemplate('Sin almacenamiento', []);
 
@@ -123,7 +125,7 @@ describe('AnnotationTemplatesService', () => {
 
   it('should handle quota exceeded errors without throwing', () => {
     const quotaStorage = new QuotaExceededStorage();
-    overrideLocalStorage(quotaStorage);
+    stubLocalStorage(quotaStorage);
     const warnSpy = spyOn(console, 'warn');
 
     const result = service.saveTemplate('Quota', []);
