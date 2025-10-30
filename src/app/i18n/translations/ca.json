@@ -68,6 +68,9 @@
       "hexPlaceholder": "#5eead4",
       "rgbPlaceholder": "rgb(94, 234, 212)"
     },
+    "actions": {
+      "duplicate": "Duplicar anotació"
+    },
     "editingBadge": "Editant"
   },
   "viewer": {

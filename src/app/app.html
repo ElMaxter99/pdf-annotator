@@ -177,6 +177,9 @@
         <div class="editor-actions">
           <button (click)="confirmEdit()">✅</button>
           <button (click)="cancelEdit()">❌</button>
+          <button type="button" class="btn-duplicate" (click)="duplicateAnnotation()"
+            [title]="'annotation.actions.duplicate' | t"
+            [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
           <button class="btn-delete" (click)="deleteAnnotation()">🗑️</button>
         </div>
       </div>
