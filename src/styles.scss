@@ -290,7 +290,8 @@ header .logo {
   backdrop-filter: blur(10px);
 
   input[type="text"],
-  input[type="number"] {
+  input[type="number"],
+  select {
     border-radius: 4px;
     border: 1px solid rgba(94, 234, 212, 0.25);
     padding: 6px;
@@ -300,6 +301,10 @@ header .logo {
   }
 
   input[type="number"] {
+    width: 100%;
+  }
+
+  select {
     width: 100%;
   }
 

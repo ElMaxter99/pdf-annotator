@@ -78,6 +78,29 @@
           <input type="text" [(ngModel)]="p.field.mapField"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
         </label>
+        <label class="field">
+          <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+          <select [(ngModel)]="p.field.type">
+            <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+            <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+            <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+            <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+          <input type="text" [(ngModel)]="p.field.value"
+            [placeholder]="'annotation.fields.value.placeholder' | t" />
+        </label>
+        <label class="field field-small" *ngIf="p.field.type === 'number'">
+          <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+          <input type="number" [(ngModel)]="p.field.decimals" min="0" />
+        </label>
+        <label class="field field-small" *ngIf="p.field.type === 'number'">
+          <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+          <input type="text" [(ngModel)]="p.field.appender"
+            [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
+        </label>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
           <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
@@ -110,6 +133,29 @@
           <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
           <input type="text" [(ngModel)]="e.field.mapField"
             [placeholder]="'annotation.fields.text.placeholder' | t" />
+        </label>
+        <label class="field">
+          <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+          <select [(ngModel)]="e.field.type">
+            <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+            <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+            <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+            <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+          <input type="text" [(ngModel)]="e.field.value"
+            [placeholder]="'annotation.fields.value.placeholder' | t" />
+        </label>
+        <label class="field field-small" *ngIf="e.field.type === 'number'">
+          <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+          <input type="number" [(ngModel)]="e.field.decimals" min="0" />
+        </label>
+        <label class="field field-small" *ngIf="e.field.type === 'number'">
+          <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+          <input type="text" [(ngModel)]="e.field.appender"
+            [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
         </label>
         <label class="field field-small">
           <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
