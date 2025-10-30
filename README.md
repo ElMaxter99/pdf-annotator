@@ -82,8 +82,6 @@ Para detener y limpiar los contenedores:
 sh scripts/docker-down.sh
 ```
 
-Al finalizar, la aplicación dejará de estar disponible en `http://localhost:4444`.
-
 ## ▶ Uso paso a paso
 ### 1. Inicia el servidor de desarrollo
 ```bash
