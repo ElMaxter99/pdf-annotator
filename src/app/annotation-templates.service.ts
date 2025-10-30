@@ -117,11 +117,30 @@ export class AnnotationTemplatesService {
       return;
     }
 
-    if (value === null || (Array.isArray(value) && value.length === 0)) {
-      storage.removeItem(key);
-      return;
+    try {
+      if (value === null || (Array.isArray(value) && value.length === 0)) {
+        storage.removeItem(key);
+        return;
+      }
+
+      storage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      if (this.isQuotaExceededError(error)) {
+        console.warn('Storage quota exceeded, persistence disabled for key:', key);
+      }
+    }
+  }
+
+  private isQuotaExceededError(error: unknown): boolean {
+    if (typeof DOMException === 'undefined') {
+      return false;
     }
 
-    storage.setItem(key, JSON.stringify(value));
+    return (
+      error instanceof DOMException &&
+      (error.name === 'QuotaExceededError' ||
+        error.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+        error.code === 22)
+    );
   }
 }
