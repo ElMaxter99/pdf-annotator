@@ -103,12 +103,13 @@ describe('AnnotationTemplatesService', () => {
     expect(updated).not.toBeNull();
     expect(updated!.id).toBe(created!.id);
     expect(updated!.pages).toEqual(updatedPages);
+    expect(updated!.name).toBe('plantilla personalizada');
 
     const storedRaw = storage.getItem(TEMPLATES_KEY);
     expect(storedRaw).toBeTruthy();
     const storedTemplates = JSON.parse(storedRaw!) as AnnotationTemplate[];
     expect(storedTemplates.length).toBe(1);
-    expect(storedTemplates[0].name).toBe('Plantilla Personalizada');
+    expect(storedTemplates[0].name).toBe('plantilla personalizada');
     expect(storedTemplates[0].pages).toEqual(updatedPages);
   });
 
