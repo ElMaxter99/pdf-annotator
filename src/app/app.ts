@@ -118,6 +118,7 @@ export class App implements AfterViewChecked, OnDestroy {
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
+  private clipboard: PageField | null = null;
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -605,6 +606,77 @@ export class App implements AfterViewChecked, OnDestroy {
     this.syncCoordsTextModel();
     this.editing.set(null);
     this.redrawAllForPage();
+  }
+
+  copyAnnotation(): boolean {
+    const editState = this.editing();
+    if (!editState) {
+      return false;
+    }
+
+    const sanitized = this.prepareFieldForStorage(editState.field);
+    this.clipboard = { ...sanitized };
+    return true;
+  }
+
+  pasteAnnotation(targetPageNum?: number): boolean {
+    if (!this.clipboard || !this.pdfDoc) {
+      return false;
+    }
+
+    const pageNum = targetPageNum ?? this.pageIndex();
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement ?? null;
+    const newField: PageField = { ...this.clipboard };
+
+    if (pdfCanvas) {
+      const scale = this.scale();
+      const offset = this.roundToTwo(8 / scale);
+      const maxX = this.roundToTwo(pdfCanvas.width / scale);
+      const maxY = this.roundToTwo(pdfCanvas.height / scale);
+      newField.x = this.roundToTwo(this.clamp(newField.x + offset, 0, maxX));
+      newField.y = this.roundToTwo(this.clamp(newField.y + offset, 0, maxY));
+    }
+
+    let insertedFieldIndex = -1;
+    let insertedPageIndex = -1;
+
+    this.coords.update((pages) => {
+      const updated = this.addFieldToPages(pageNum, newField, pages);
+      insertedPageIndex = updated.findIndex((page) => page.num === pageNum);
+      if (insertedPageIndex >= 0) {
+        insertedFieldIndex = updated[insertedPageIndex].fields.length - 1;
+      }
+      return updated;
+    });
+
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
+
+    if (insertedPageIndex >= 0 && insertedFieldIndex >= 0) {
+      const pages = this.coords();
+      const page = pages[insertedPageIndex];
+      const field = page?.fields[insertedFieldIndex];
+      if (field) {
+        this.startEditing(insertedPageIndex, insertedFieldIndex, field);
+      }
+    }
+
+    return true;
+  }
+
+  duplicateAnnotation() {
+    const editState = this.editing();
+    if (!editState) {
+      return;
+    }
+
+    const pages = this.coords();
+    const pageNum = pages[editState.pageIndex]?.num ?? this.pageIndex();
+    if (!this.copyAnnotation()) {
+      return;
+    }
+
+    this.pasteAnnotation(pageNum);
   }
 
   private fieldHasRenderableContent(field: PageField): boolean {
@@ -1581,5 +1653,38 @@ export class App implements AfterViewChecked, OnDestroy {
     }
 
     return collapsed;
+  }
+
+  private isEditableElement(target: EventTarget | null): boolean {
+    const el = target as HTMLElement | null;
+    if (!el) {
+      return false;
+    }
+
+    if (el.isContentEditable) {
+      return true;
+    }
+
+    const tag = el.tagName?.toLowerCase();
+    if (tag === 'textarea' || tag === 'select') {
+      return true;
+    }
+
+    if (tag === 'input') {
+      const input = el as HTMLInputElement;
+      const type = input.type?.toLowerCase();
+      const nonEditableTypes = new Set(['button', 'checkbox', 'radio', 'range', 'color', 'submit', 'reset']);
+      return !nonEditableTypes.has(type);
+    }
+
+    return false;
+  }
+
+  private roundToTwo(value: number): number {
+    return Math.round(value * 100) / 100;
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
   }
 }
