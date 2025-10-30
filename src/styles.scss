@@ -159,6 +159,89 @@ header .logo {
     color: var(--muted);
     line-height: 1.4;
   }
+
+  .templates {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #3a3a4f;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    h5 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    &__save {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      input {
+        flex: 1;
+        min-width: 0;
+        background: #1d1d2a;
+        color: var(--text);
+        border-radius: 8px;
+        border: 1px solid #444;
+        padding: 6px 10px;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
+      }
+    }
+
+    &__select label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    &__controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      select {
+        flex: 1;
+        min-width: 0;
+        background: #1d1d2a;
+        color: var(--text);
+        border-radius: 8px;
+        border: 1px solid #444;
+        padding: 6px 10px;
+      }
+
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
+      }
+    }
+
+    &__empty {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  }
+}
+
+.templates__delete {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: transparent;
+}
+
+.templates__delete:hover {
+  background: rgba(255, 77, 77, 0.15);
+  border-color: var(--danger);
 }
 
 .viewer {
