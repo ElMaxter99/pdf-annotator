@@ -951,7 +951,7 @@ export class App implements AfterViewChecked {
     const newX = +(boundedLeft / scale).toFixed(2);
     const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
 
-    if (this.applyCoordsChange(() =>
+    const changed = this.applyCoordsChange(() =>
       this.coords.update((pages) =>
         pages.map((page, idx) => {
           if (idx !== pageIndex) {
@@ -966,10 +966,13 @@ export class App implements AfterViewChecked {
           return { ...page, fields: updatedFields };
         })
       )
-    )) {
+    );
+
+    if (changed) {
       this.syncCoordsTextModel();
-      this.redrawAllForPage();
     }
+
+    this.redrawAllForPage();
   }
 
   async prevPage() {
