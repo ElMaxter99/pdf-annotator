@@ -1,0 +1,17 @@
+<footer class="landing-footer">
+  <div class="landing-footer__brand">
+    <img
+      class="landing-footer__logo"
+      src="/logo.svg"
+      [attr.alt]="'Logotipo de ' + appName"
+    />
+    <div class="landing-footer__brand-text">
+      <span class="landing-footer__app-name">{{ appName }}</span>
+      <span class="landing-footer__version">v{{ version }}</span>
+    </div>
+  </div>
+  <div class="landing-footer__details">
+    <span>© {{ currentYear }} {{ appName }}</span>
+    <span>Desarrollado por {{ appAuthor }}</span>
+  </div>
+</footer>

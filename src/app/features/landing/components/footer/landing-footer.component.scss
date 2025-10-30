@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.landing-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 24px 32px;
+  border-radius: 24px;
+  background: rgba(26, 26, 40, 0.75);
+}
+
+.landing-footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing-footer__logo {
+  width: 40px;
+  height: 40px;
+}
+
+.landing-footer__brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-footer__app-name {
+  font-weight: 600;
+}
+
+.landing-footer__version {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.landing-footer__details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .landing-footer {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+}

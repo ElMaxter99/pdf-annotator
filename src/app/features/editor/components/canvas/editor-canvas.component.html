@@ -1,0 +1,45 @@
+<main class="viewer" *ngIf="pdfLoaded">
+  <div class="canvas-container" #pdfViewer>
+    <canvas #pdfCanvas></canvas>
+    <canvas #overlayCanvas></canvas>
+    <div #annotationsLayer class="annotations-layer"></div>
+    <div class="hitbox" (click)="hitboxClick.emit($event)"></div>
+
+    <app-annotation-form
+      *ngIf="preview as p"
+      [mode]="'preview'"
+      [field]="p.field"
+      [scale]="scale"
+      [canvasHeight]="canvasHeight"
+      [hexValue]="previewHex"
+      [rgbValue]="previewRgb"
+      (keydown)="previewKeydown.emit($event)"
+      (confirm)="confirmPreview.emit()"
+      (cancel)="cancelPreview.emit()"
+      (colorPickerChange)="previewColorPicker.emit($event)"
+      (colorHexChange)="previewColorHexChange.emit($event)"
+      (colorRgbChange)="previewColorRgbChange.emit($event)"
+    ></app-annotation-form>
+
+    <app-annotation-form
+      *ngIf="editing as e"
+      [mode]="'edit'"
+      [field]="e.field"
+      [scale]="scale"
+      [canvasHeight]="canvasHeight"
+      [hexValue]="editHex"
+      [rgbValue]="editRgb"
+      (keydown)="editKeydown.emit($event)"
+      (confirm)="confirmEdit.emit()"
+      (cancel)="cancelEdit.emit()"
+      (duplicate)="duplicateAnnotation.emit()"
+      (delete)="deleteAnnotation.emit()"
+      (colorPickerChange)="editColorPicker.emit($event)"
+      (colorHexChange)="editColorHexChange.emit($event)"
+      (colorRgbChange)="editColorRgbChange.emit($event)"
+    ></app-annotation-form>
+  </div>
+</main>
+<div class="viewer-empty" *ngIf="!pdfLoaded">
+  <p>{{ 'app.viewer.emptyState' | t }}</p>
+</div>

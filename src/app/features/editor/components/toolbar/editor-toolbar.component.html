@@ -1,0 +1,71 @@
+<header class="header">
+  <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
+    <div class="toolbar__brand">
+      <img class="toolbar__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
+      <div class="toolbar__brand-text">
+        <span class="toolbar__app-name">{{ appName }}</span>
+        <span class="toolbar__version">v{{ version }}</span>
+      </div>
+    </div>
+
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
+      <button class="btn btn--icon" (click)="prev.emit()" [disabled]="!pdfLoaded || pageIndex === 1">
+        <span class="btn__icon" aria-hidden="true">⟨</span>
+        <span class="btn__label">{{ 'controls.prev' | t }}</span>
+      </button>
+      <span class="toolbar__badge">
+        {{ 'controls.pageIndicator' | t : { current: pageIndex, total: pageCount } }}
+      </span>
+      <button class="btn btn--icon" (click)="next.emit()" [disabled]="!pdfLoaded || pageIndex === pageCount">
+        <span class="btn__label">{{ 'controls.next' | t }}</span>
+        <span class="btn__icon" aria-hidden="true">⟩</span>
+      </button>
+    </div>
+
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
+      <button class="btn btn--icon" (click)="zoomOut.emit()" [disabled]="!pdfLoaded">
+        <span class="btn__icon" aria-hidden="true">−</span>
+        <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
+      </button>
+      <span class="toolbar__badge">{{ 'controls.zoomLabel' | t }} {{ scale | number: '1.0-2' }}×</span>
+      <button class="btn btn--icon" (click)="zoomIn.emit()" [disabled]="!pdfLoaded">
+        <span class="btn__label">{{ 'controls.zoomIn' | t }}</span>
+        <span class="btn__icon" aria-hidden="true">＋</span>
+      </button>
+    </div>
+
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
+      <button class="btn btn--icon" (click)="undo.emit()" [disabled]="!canUndo">
+        <span class="btn__icon" aria-hidden="true">↺</span>
+        <span class="btn__label">{{ 'controls.undo' | t }}</span>
+      </button>
+      <button class="btn btn--icon" (click)="redo.emit()" [disabled]="!canRedo">
+        <span class="btn__icon" aria-hidden="true">↻</span>
+        <span class="btn__label">{{ 'controls.redo' | t }}</span>
+      </button>
+      <button class="btn btn--icon btn--danger" (click)="clear.emit()" [disabled]="!hasAnnotations">
+        <span class="btn__icon" aria-hidden="true">🧹</span>
+        <span class="btn__label">{{ 'controls.clear' | t }}</span>
+      </button>
+    </div>
+
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
+      <button
+        class="btn btn--icon"
+        (click)="download.emit()"
+        [disabled]="!pdfLoaded || !hasAnnotations"
+      >
+        <span class="btn__icon" aria-hidden="true">⬇</span>
+        <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
+      </button>
+    </div>
+
+    <app-language-selector
+      class="header__language-selector"
+      [languages]="languages"
+      [selectedLanguage]="selectedLanguage"
+      (languageChange)="languageChange.emit($event)"
+      variant="compact"
+    ></app-language-selector>
+  </div>
+</header>

@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 12px;
+}
+
+.editor {
+  display: grid;
+  grid-template-areas:
+    'header header'
+    'sidebar viewer'
+    'footer footer';
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  min-height: calc(100vh - 24px);
+}
+
+.editor--empty {
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .editor {
+    grid-template-areas:
+      'header'
+      'viewer'
+      'sidebar'
+      'footer';
+    grid-template-columns: 1fr;
+  }
+}

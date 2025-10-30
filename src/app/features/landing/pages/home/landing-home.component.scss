@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 72px 16px;
+}
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 32px;
+  max-width: 720px;
+  width: 100%;
+}
+
+.landing__language {
+  align-self: flex-end;
+}
+
+@media (max-width: 768px) {
+  :host {
+    padding: 48px 16px;
+  }
+
+  .landing {
+    gap: 24px;
+  }
+
+  .landing__language {
+    align-self: center;
+  }
+}

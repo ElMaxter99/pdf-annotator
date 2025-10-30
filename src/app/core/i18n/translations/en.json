@@ -1,0 +1,140 @@
+{
+  "app": {
+    "title": "PDF Annotator",
+    "languageLabel": "Language",
+    "languageAriaLabel": "Select the application language",
+    "languages": {
+      "es-ES": "Spanish",
+      "en": "English",
+      "ca": "Catalan"
+    },
+    "landing": {
+      "badge": "Annotate smarter",
+      "title": "Lay out coordinates on any PDF in seconds",
+      "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
+      "cta": "Select PDF"
+    },
+    "about": {
+      "badge": "Why this tool",
+      "title": "Built for annotation-heavy PDF workflows",
+      "description": "Coordinate complex documents faster with reusable templates, collaborative-friendly exports and pixel-perfect previews.",
+      "features": {
+        "templates": {
+          "title": "Reusable templates",
+          "copy": "Save your annotation layouts and reuse them in future projects without rebuilding everything from scratch."
+        },
+        "preview": {
+          "title": "Live preview",
+          "copy": "Inspect each annotation before confirming it to guarantee that coordinates, colors and values match the document."
+        },
+        "export": {
+          "title": "Ready for hand-off",
+          "copy": "Export JSON or PDFs including your annotations so your team can consume them immediately."
+        }
+      },
+      "actions": {
+        "start": "Open the editor",
+        "back": "Back to landing"
+      }
+    },
+    "upload": {
+      "title": "Upload your PDF",
+      "subtitle": "Drag & drop the file here or click to browse",
+      "hint": "PDF only",
+      "invalidFormat": "Only PDF files are supported."
+    },
+    "workspaceUpload": {
+      "title": "Need to reset this project?",
+      "subtitle": "Drop a different PDF or click to replace the current document.",
+      "ariaLabel": "Upload a new PDF to restart the annotation workspace"
+    },
+    "viewer": {
+      "emptyState": "Upload a PDF to start placing annotations."
+    }
+  },
+  "controls": {
+    "prev": "Prev",
+    "next": "Next",
+    "pageIndicator": "Page {{current}} / {{total}}",
+    "zoomLabel": "Zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "undo": "Undo",
+    "redo": "Redo",
+    "clear": "Clear",
+    "copyJson": "Copy JSON",
+    "importJson": "Import JSON",
+    "downloadJson": "Download JSON",
+    "downloadPdf": "Download PDF",
+    "toolbarAriaLabel": "PDF actions",
+    "navigationGroup": "Page navigation",
+    "zoomGroup": "Zoom controls",
+    "historyGroup": "History actions",
+    "exportGroup": "Export options"
+  },
+  "sidebar": {
+    "title": "Annotations (JSON)",
+    "importJsonFile": "Import from file",
+    "applyJson": "Apply JSON",
+    "jsonPlaceholder": "Paste or edit annotation coordinates here...",
+    "templates": {
+      "title": "Reusable templates",
+      "placeholder": "Template name",
+      "saveButton": "Save template",
+      "selectLabel": "Saved templates",
+      "loadButton": "Load",
+      "deleteButton": "Delete",
+      "empty": "You haven't saved any templates yet."
+    },
+    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
+  },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
+      },
+      "size": {
+        "label": "Size"
+      },
+      "color": {
+        "label": "Color"
+      },
+      "type": {
+        "label": "Type",
+        "options": {
+          "text": "Text",
+          "check": "Checkbox",
+          "radio": "Radio button",
+          "number": "Number"
+        }
+      },
+      "value": {
+        "label": "Value override",
+        "placeholder": "Optional fixed value..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Decimals"
+        },
+        "appender": {
+          "label": "Suffix",
+          "placeholder": "E.g. %"
+        }
+      }
+    },
+    "color": {
+      "hintPreview": "Pick a color, type a HEX or an RGB value. The JSON will always export the color in HEX.",
+      "hintEdit": "Paste an existing HEX or RGB value to reuse exact colors.",
+      "hexPlaceholder": "#5eead4",
+      "rgbPlaceholder": "rgb(94, 234, 212)"
+    },
+    "actions": {
+      "duplicate": "Duplicate annotation"
+    },
+    "editingBadge": "Editing"
+  },
+  "viewer": {
+    "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
+  }
+}

@@ -1,0 +1,29 @@
+<section class="landing-about" aria-labelledby="about-title">
+  <span class="landing-about__badge">{{ 'app.about.badge' | t }}</span>
+  <h1 id="about-title" class="landing-about__title">{{ 'app.about.title' | t }}</h1>
+  <p class="landing-about__description">{{ 'app.about.description' | t }}</p>
+
+  <ul class="landing-about__features">
+    <li>
+      <h2>{{ 'app.about.features.templates.title' | t }}</h2>
+      <p>{{ 'app.about.features.templates.copy' | t }}</p>
+    </li>
+    <li>
+      <h2>{{ 'app.about.features.preview.title' | t }}</h2>
+      <p>{{ 'app.about.features.preview.copy' | t }}</p>
+    </li>
+    <li>
+      <h2>{{ 'app.about.features.export.title' | t }}</h2>
+      <p>{{ 'app.about.features.export.copy' | t }}</p>
+    </li>
+  </ul>
+
+  <div class="landing-about__actions">
+    <a routerLink="/editor" class="landing-about__cta landing-about__cta--primary">
+      {{ 'app.about.actions.start' | t }}
+    </a>
+    <a routerLink="/landing" class="landing-about__cta landing-about__cta--secondary">
+      {{ 'app.about.actions.back' | t }}
+    </a>
+  </div>
+</section>

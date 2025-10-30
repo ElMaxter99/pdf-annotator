@@ -1,0 +1,57 @@
+.viewer {
+  grid-area: viewer;
+  position: relative;
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 24px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  box-shadow: 0 18px 32px rgba(5, 5, 17, 0.45);
+}
+
+.viewer-empty {
+  grid-area: viewer;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.7);
+  color: var(--muted);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.canvas-container {
+  position: relative;
+  max-width: 100%;
+  overflow: auto;
+}
+
+canvas {
+  display: block;
+}
+
+#overlayCanvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.annotations-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hitbox {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+}
+
+@media (max-width: 1024px) {
+  .viewer {
+    order: 1;
+  }
+}

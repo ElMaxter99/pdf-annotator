@@ -1,0 +1,99 @@
+<div
+  #formRoot
+  class="annotation-editor"
+  [class.annotation-editor--editing]="mode === 'edit'"
+  [style.left.px]="positionLeft"
+  [style.top.px]="positionTop"
+  (keydown)="onKeydown($event)"
+>
+  <span class="editor-badge" *ngIf="mode === 'edit'">{{ 'annotation.editingBadge' | t }}</span>
+  <label class="field">
+    <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+    <input
+      type="text"
+      [(ngModel)]="field.mapField"
+      [placeholder]="'annotation.fields.text.placeholder' | t"
+    />
+  </label>
+  <label class="field">
+    <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+    <select [(ngModel)]="field.type">
+      <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+      <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+      <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+      <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+    </select>
+  </label>
+  <label class="field">
+    <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+    <input
+      type="text"
+      [(ngModel)]="field.value"
+      [placeholder]="'annotation.fields.value.placeholder' | t"
+    />
+  </label>
+  <label class="field field-small" *ngIf="isNumberType">
+    <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+    <input type="number" [(ngModel)]="field.decimals" min="0" />
+  </label>
+  <label class="field field-small" *ngIf="isNumberType">
+    <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+    <input
+      type="text"
+      [(ngModel)]="field.appender"
+      [placeholder]="'annotation.fields.number.appender.placeholder' | t"
+    />
+  </label>
+  <label class="field field-small">
+    <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
+    <input type="number" [(ngModel)]="field.fontSize" min="8" max="72" />
+  </label>
+  <div class="color-section">
+    <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
+    <div class="color-row">
+      <input type="color" [ngModel]="field.color" (ngModelChange)="colorPickerChange.emit($event)" />
+      <div class="color-inputs">
+        <input
+          type="text"
+          [ngModel]="hexValue"
+          (ngModelChange)="colorHexChange.emit($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'annotation.color.hexPlaceholder' | t"
+        />
+        <input
+          type="text"
+          [ngModel]="rgbValue"
+          (ngModelChange)="colorRgbChange.emit($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'annotation.color.rgbPlaceholder' | t"
+        />
+      </div>
+    </div>
+    <small class="color-hint">
+      {{ mode === 'preview' ? ('annotation.color.hintPreview' | t) : ('annotation.color.hintEdit' | t) }}
+    </small>
+  </div>
+  <div class="editor-actions">
+    <button
+      type="button"
+      class="action-secondary"
+      *ngIf="mode === 'edit'"
+      (click)="duplicate.emit()"
+      [attr.aria-label]="'annotation.actions.duplicate' | t"
+      [title]="'annotation.actions.duplicate' | t"
+    >
+      ⧉
+    </button>
+    <button
+      type="button"
+      class="btn-delete"
+      *ngIf="mode === 'edit'"
+      (click)="delete.emit()"
+      [attr.aria-label]="'annotation.actions.delete' | t"
+    >
+      🗑️
+    </button>
+    <button type="button" class="action-primary" (click)="confirm.emit()">✅</button>
+    <button type="button" (click)="cancel.emit()">❌</button>
+  </div>
+</div>

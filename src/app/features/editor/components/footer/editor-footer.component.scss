@@ -1,0 +1,52 @@
+.footer {
+  grid-area: footer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-radius: 24px;
+  background: rgba(26, 26, 40, 0.9);
+  box-shadow: 0 12px 32px rgba(5, 5, 17, 0.4);
+  margin-top: 12px;
+}
+
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer__logo {
+  width: 40px;
+  height: 40px;
+}
+
+.footer__brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__app-name {
+  font-weight: 600;
+}
+
+.footer__version {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.footer__details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+}

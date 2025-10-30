@@ -1,0 +1,21 @@
+<div class="landing">
+  <div class="landing__language">
+    <app-language-selector
+      [languages]="languages"
+      [selectedLanguage]="languageModel"
+      (languageChange)="onLanguageChange($event)"
+      variant="compact"
+    ></app-language-selector>
+  </div>
+
+  <app-landing-hero></app-landing-hero>
+
+  <app-landing-dropzone (fileSelected)="onFileReceived($event)"></app-landing-dropzone>
+
+  <app-landing-footer
+    [appName]="appName"
+    [version]="version"
+    [currentYear]="currentYear"
+    [appAuthor]="appAuthor"
+  ></app-landing-footer>
+</div>
