@@ -405,6 +405,7 @@ export class App implements AfterViewChecked, OnDestroy {
     this.resetHistory();
     this.clearAll({ skipHistory: true });
     await this.render();
+    this.fileDropActive.set(false);
   }
 
   private isPdfFile(file: File) {

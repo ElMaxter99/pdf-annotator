@@ -8,6 +8,12 @@
       "en": "Anglès",
       "ca": "Català"
     },
+    "landing": {
+      "badge": "Comença a anotar",
+      "title": "Organitza qualsevol PDF en segons",
+      "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
+      "cta": "Selecciona PDF"
+    },
     "upload": {
       "title": "Carrega el teu PDF",
       "subtitle": "Arrossega i deixa anar el fitxer aquí o fes clic per cercar",

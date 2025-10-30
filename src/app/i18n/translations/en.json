@@ -8,6 +8,12 @@
       "en": "English",
       "ca": "Catalan"
     },
+    "landing": {
+      "badge": "Annotate smarter",
+      "title": "Bring structure to any PDF in seconds",
+      "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
+      "cta": "Select PDF"
+    },
     "upload": {
       "title": "Upload your PDF",
       "subtitle": "Drag & drop the file here or click to browse",

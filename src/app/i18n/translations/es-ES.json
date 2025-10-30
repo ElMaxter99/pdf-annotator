@@ -8,6 +8,12 @@
       "en": "Inglés",
       "ca": "Catalán"
     },
+    "landing": {
+      "badge": "Empieza a anotar",
+      "title": "Organiza cualquier PDF en segundos",
+      "description": "Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.",
+      "cta": "Seleccionar PDF"
+    },
     "upload": {
       "title": "Carga tu PDF",
       "subtitle": "Arrastra y suelta el archivo aquí o haz clic para buscar",
