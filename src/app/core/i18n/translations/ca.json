@@ -1,0 +1,106 @@
+{
+  "app": {
+    "title": "PDF Annotator",
+    "languageLabel": "Idioma",
+    "languageAriaLabel": "Selecciona l'idioma de l'aplicació",
+    "languages": {
+      "es-ES": "Espanyol",
+      "en": "Anglès",
+      "ca": "Català"
+    },
+    "landing": {
+      "badge": "Comença a anotar",
+      "title": "Maqueta coordenades de qualsevol PDF en segons",
+      "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
+      "cta": "Selecciona PDF"
+    },
+    "upload": {
+      "title": "Carrega el teu PDF",
+      "subtitle": "Arrossega i deixa anar el fitxer aquí o fes clic per cercar",
+      "hint": "Només PDF",
+      "invalidFormat": "Només s'admeten fitxers PDF."
+    },
+    "workspaceUpload": {
+      "title": "Vols començar de zero?",
+      "subtitle": "Arrossega un altre PDF o fes clic per substituir el document actual.",
+      "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
+    },
+    "emptyState": {
+      "title": "Inicia un projecte nou",
+      "description": "Obre l'editor per pujar el teu PDF, crear anotacions i exportar les coordenades en JSON.",
+      "cta": "Obrir l'editor"
+    }
+  },
+  "controls": {
+    "prev": "Anterior",
+    "next": "Següent",
+    "pageIndicator": "Pàgina {{current}} / {{total}}",
+    "zoomLabel": "Zoom",
+    "zoomIn": "Apropa",
+    "zoomOut": "Allunya",
+    "undo": "Desfer",
+    "redo": "Refer",
+    "clear": "Esborrar",
+    "copyJson": "Copiar JSON",
+    "importJson": "Importar JSON",
+    "downloadJson": "Descarregar JSON",
+    "downloadPdf": "Descarregar PDF",
+    "toolbarAriaLabel": "Accions del PDF",
+    "navigationGroup": "Navegació de pàgines",
+    "zoomGroup": "Controls de zoom",
+    "historyGroup": "Accions d'historial",
+    "exportGroup": "Opcions d'exportació"
+  },
+  "sidebar": {
+    "title": "Anotacions (JSON)",
+    "importJsonFile": "Importa des d'un fitxer",
+    "applyJson": "Aplica el JSON",
+    "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
+    "templates": {
+      "title": "Plantilles reutilitzables",
+      "placeholder": "Nom de la plantilla",
+      "saveButton": "Desa la plantilla",
+      "selectLabel": "Plantilles desades",
+      "loadButton": "Carrega",
+      "deleteButton": "Elimina",
+      "empty": "Encara no tens cap plantilla desada."
+    },
+    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
+  },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
+      },
+      "type": {
+        "label": "Tipus",
+        "options": {
+          "text": "Text",
+          "check": "Casella",
+          "radio": "Botó d'opció",
+          "number": "Nombre",
+          "barcode": "Codi de barres",
+          "signature": "Signatura"
+        }
+      },
+      "fontSize": {
+        "label": "Mida"
+      },
+      "fontColor": {
+        "label": "Color (HEX)"
+      },
+      "fontColorRgb": {
+        "label": "Color (RGB)"
+      }
+    },
+    "actions": {
+      "confirm": "Confirmar",
+      "cancel": "Cancel·lar",
+      "update": "Actualitzar"
+    }
+  },
+  "viewer": {
+    "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."
+  }
+}

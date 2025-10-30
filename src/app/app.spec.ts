@@ -1,25 +1,24 @@
 import { TestBed } from '@angular/core/testing';
-import { App } from './app';
-import { TranslationService } from './i18n/translation.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AppComponent } from './app.component';
 
-describe('App', () => {
+describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [RouterTestingModule, AppComponent],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
+  it('should create the app shell', () => {
+    const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
 
-  it('should render the localized title', () => {
-    const fixture = TestBed.createComponent(App);
+  it('should render a router outlet', () => {
+    const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    const translation = TestBed.inject(TranslationService);
-    expect(compiled.querySelector('.logo')?.textContent?.trim()).toBe(translation.translate('app.title'));
+    expect(compiled.querySelector('router-outlet')).not.toBeNull();
   });
 });

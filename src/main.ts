@@ -1,12 +1,19 @@
+import { importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { App } from './app/app';
-
-//Vercel imports
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
 import { inject } from '@vercel/analytics';
 import { injectSpeedInsights } from '@vercel/speed-insights';
+import { AppRoutingModule } from './app/app-routing.module';
+import { AppComponent } from './app/app.component';
+import { CoreModule } from './app/core/core.module';
 
-bootstrapApplication(App, appConfig).catch((err) => console.error(err));
+// Bootstraps the standalone shell while still reusing the provider graph defined in feature modules.
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(BrowserModule, BrowserAnimationsModule, CoreModule, AppRoutingModule),
+  ],
+}).catch((err: unknown) => console.error(err));
 
-inject(); // Vercel analytics pkg
-injectSpeedInsights(); // Vercel speed insights pkg
+inject();
+injectSpeedInsights();

@@ -1,0 +1,171 @@
+<div class="app">
+  <app-editor-toolbar
+    class="app__toolbar"
+    [appName]="appName"
+    [version]="version"
+    [pageIndex]="pageIndex()"
+    [pageCount]="pageCount"
+    [scale]="scale()"
+    [canUndo]="canUndo()"
+    [canRedo]="canRedo()"
+    [hasPdf]="!!pdfDoc"
+    [hasAnnotations]="!!coords().length"
+    [languages]="languages"
+    [selectedLanguage]="languageModel"
+    (prevPage)="prevPage()"
+    (nextPage)="nextPage()"
+    (zoomIn)="zoomIn()"
+    (zoomOut)="zoomOut()"
+    (undo)="undo()"
+    (redo)="redo()"
+    (clearAll)="clearAll()"
+    (downloadAnnotated)="downloadAnnotatedPDF()"
+    (languageChange)="onLanguageChange($event)"
+  ></app-editor-toolbar>
+
+  <div class="workspace" *ngIf="pdfDoc; else emptyState">
+    <app-editor-sidebar
+      class="workspace__sidebar"
+      [fileDropActive]="fileDropActive()"
+      [coordsText]="coordsTextModel"
+      [templates]="templates()"
+      [templateName]="templateNameModel"
+      [selectedTemplateId]="selectedTemplateId"
+      [defaultTemplateId]="defaultTemplateId"
+      [hasAnnotations]="!!coords().length"
+      (requestPdfUpload)="openPdfFilePicker()"
+      (uploadKeydown)="onFileUploadKeydown($event)"
+      (fileDragOver)="onFileDragOver($event)"
+      (fileDragLeave)="onFileDragLeave($event)"
+      (fileDrop)="onFileDrop($event)"
+      (pdfSelected)="onFileSelected($event)"
+      (coordsTextChange)="coordsTextModel = $event"
+      (applyCoordsText)="applyCoordsText()"
+      (triggerImportCoords)="triggerImportCoords()"
+      (coordsFileSelected)="onCoordsFileSelected($event)"
+      (saveTemplate)="saveCurrentAsTemplate()"
+      (loadTemplate)="loadSelectedTemplate()"
+      (deleteTemplate)="deleteSelectedTemplate()"
+      (templateNameChange)="templateNameModel = $event"
+      (selectedTemplateChange)="selectedTemplateId = $event"
+      (copyJson)="copyJSON()"
+      (downloadJson)="downloadJSON()"
+    ></app-editor-sidebar>
+
+    <main class="viewer">
+      <div class="canvas-container" #pdfViewer>
+        <canvas #pdfCanvas></canvas>
+        <canvas #overlayCanvas></canvas>
+        <div #annotationsLayer class="annotations-layer"></div>
+        <div class="hitbox" (click)="onHitboxClick($event)"></div>
+
+        <!-- NUEVA ANOTACIÓN -->
+        <div
+          *ngIf="preview() as p"
+          class="annotation-editor"
+          #previewEditor
+          [style.left.px]="p.field.x * scale()"
+          [style.top.px]="pdfCanvasRef!.nativeElement.height - p.field.y * scale()"
+          (keydown)="onEditorKeydown($event, 'preview')"
+        >
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+            <input
+              type="text"
+              [(ngModel)]="p.field.mapField"
+              [placeholder]="'annotation.fields.text.placeholder' | t"
+            />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+            <select [(ngModel)]="p.field.type">
+              <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+              <option value="barcode">{{ 'annotation.fields.type.options.barcode' | t }}</option>
+              <option value="signature">{{ 'annotation.fields.type.options.signature' | t }}</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.fontSize.label' | t }}</span>
+            <input type="number" [(ngModel)]="p.field.fontSize" min="6" max="72" />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.fontColor.label' | t }}</span>
+            <input type="color" [(ngModel)]="previewHexInput" (input)="syncPreviewColorFromHex()" />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.fontColorRgb.label' | t }}</span>
+            <input type="text" [(ngModel)]="previewRgbInput" (change)="syncPreviewColorFromRgb()" />
+          </label>
+          <div class="editor-actions">
+            <button class="btn" type="button" (click)="confirmPreview()">
+              {{ 'annotation.actions.confirm' | t }}
+            </button>
+            <button class="btn btn--ghost" type="button" (click)="cancelPreview()">
+              {{ 'annotation.actions.cancel' | t }}
+            </button>
+          </div>
+        </div>
+
+        <!-- ANOTACIÓN EN EDICIÓN -->
+        <div
+          *ngIf="editing() as e"
+          class="annotation-editor annotation-editor--editing"
+          #editEditor
+          [style.left.px]="e.field.x * scale()"
+          [style.top.px]="pdfCanvasRef!.nativeElement.height - e.field.y * scale()"
+          (keydown)="onEditorKeydown($event, 'edit')"
+        >
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+            <input
+              type="text"
+              [(ngModel)]="e.field.mapField"
+              [placeholder]="'annotation.fields.text.placeholder' | t"
+            />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+            <select [(ngModel)]="e.field.type">
+              <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+              <option value="barcode">{{ 'annotation.fields.type.options.barcode' | t }}</option>
+              <option value="signature">{{ 'annotation.fields.type.options.signature' | t }}</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.fontSize.label' | t }}</span>
+            <input type="number" [(ngModel)]="e.field.fontSize" min="6" max="72" />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.fontColor.label' | t }}</span>
+            <input type="color" [(ngModel)]="editHexInput" (input)="syncEditColorFromHex()" />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.fontColorRgb.label' | t }}</span>
+            <input type="text" [(ngModel)]="editRgbInput" (change)="syncEditColorFromRgb()" />
+          </label>
+          <div class="editor-actions">
+            <button class="btn" type="button" (click)="confirmEdit()">
+              {{ 'annotation.actions.update' | t }}
+            </button>
+            <button class="btn btn--ghost" type="button" (click)="cancelEdit()">
+              {{ 'annotation.actions.cancel' | t }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <ng-template #emptyState>
+    <section class="empty-state">
+      <div class="empty-state__content">
+        <img class="empty-state__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
+        <h2 class="empty-state__title">{{ 'app.emptyState.title' | t }}</h2>
+        <p class="empty-state__description">{{ 'app.emptyState.description' | t }}</p>
+        <button type="button" class="btn btn--primary" (click)="openPdfFilePicker()">
+          {{ 'app.emptyState.cta' | t }}
+        </button>
+      </div>
+    </section>
+  </ng-template>
+</div>
