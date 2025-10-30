@@ -81,6 +81,27 @@ type PreviewState = { page: number; field: PageField } | null;
 
 type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
 
+type GuideSettings = {
+  showGrid: boolean;
+  gridSize: number;
+  showRulers: boolean;
+  showAlignment: boolean;
+  snapToGrid: boolean;
+  snapToMargins: boolean;
+  snapToCenters: boolean;
+  snapToCustom: boolean;
+  marginSize: number;
+  snapTolerance: number;
+  snapPointsX: readonly number[];
+  snapPointsY: readonly number[];
+};
+
+type OverlayGuide = {
+  orientation: 'horizontal' | 'vertical';
+  position: number;
+  highlighted?: boolean;
+};
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -100,6 +121,22 @@ export class App implements AfterViewChecked {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
+  guideSettings = signal<GuideSettings>({
+    showGrid: true,
+    gridSize: 10,
+    showRulers: true,
+    showAlignment: true,
+    snapToGrid: true,
+    snapToMargins: true,
+    snapToCenters: true,
+    snapToCustom: false,
+    marginSize: 18,
+    snapTolerance: 8,
+    snapPointsX: [],
+    snapPointsY: [],
+  });
+  snapPointsXText = signal('');
+  snapPointsYText = signal('');
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
@@ -124,6 +161,8 @@ export class App implements AfterViewChecked {
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
+  private overlayDragRect: { left: number; top: number; width: number; height: number } | null = null;
+  private overlayGuides: OverlayGuide[] = [];
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -141,6 +180,46 @@ export class App implements AfterViewChecked {
   onLanguageChange(language: string) {
     this.translationService.setLanguage(language as Language);
     this.languageModel = this.translationService.getCurrentLanguage();
+  }
+
+  toggleGuideSetting(
+    key:
+      | 'showGrid'
+      | 'showRulers'
+      | 'showAlignment'
+      | 'snapToGrid'
+      | 'snapToMargins'
+      | 'snapToCenters'
+      | 'snapToCustom',
+    checked: boolean
+  ) {
+    this.guideSettings.update((settings) => ({ ...settings, [key]: checked }));
+    this.refreshOverlay();
+  }
+
+  updateGuideNumber(
+    key: 'gridSize' | 'marginSize' | 'snapTolerance',
+    rawValue: string | number
+  ) {
+    const numeric = this.toFiniteNumber(rawValue);
+    if (numeric === null) {
+      return;
+    }
+    const sanitized = key === 'snapTolerance' ? Math.max(0, Math.round(numeric)) : Math.max(0.1, numeric);
+    this.guideSettings.update((settings) => ({ ...settings, [key]: sanitized }));
+    this.refreshOverlay();
+  }
+
+  onSnapPointsInput(axis: 'x' | 'y', rawValue: string) {
+    const parsed = this.parseNumericList(rawValue);
+    if (axis === 'x') {
+      this.snapPointsXText.set(rawValue);
+      this.guideSettings.update((settings) => ({ ...settings, snapPointsX: parsed }));
+    } else {
+      this.snapPointsYText.set(rawValue);
+      this.guideSettings.update((settings) => ({ ...settings, snapPointsY: parsed }));
+    }
+    this.refreshOverlay();
   }
 
   private setDocumentMetadata() {
@@ -173,6 +252,412 @@ export class App implements AfterViewChecked {
       name: 'twitter:image:alt',
       content: 'Vista previa de anotaciones en PDF con coordenadas resaltadas',
     });
+  }
+
+  private parseNumericList(value: string): number[] {
+    return value
+      .split(/[\s,;]+/)
+      .map((token) => this.toFiniteNumber(token))
+      .filter((num): num is number => num !== null && num >= 0)
+      .map((num) => +(num.toFixed(2)))
+      .filter((num, index, arr) => arr.indexOf(num) === index)
+      .sort((a, b) => a - b);
+  }
+
+  private refreshOverlay(
+    activeRect?: { left: number; top: number; width: number; height: number } | null,
+    guides?: OverlayGuide[]
+  ) {
+    if (activeRect !== undefined) {
+      this.overlayDragRect = activeRect;
+    }
+    if (guides !== undefined) {
+      this.overlayGuides = guides ?? [];
+    }
+
+    const overlay = this.overlayCanvasRef?.nativeElement;
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!overlay || !pdfCanvas) {
+      return;
+    }
+
+    overlay.width = pdfCanvas.width;
+    overlay.height = pdfCanvas.height;
+
+    const ctx = overlay.getContext('2d');
+    if (!ctx) {
+      return;
+    }
+
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+    const settings = this.guideSettings();
+    const scale = this.scale();
+
+    this.drawGrid(ctx, settings, overlay.width, overlay.height, scale);
+    this.drawRulers(ctx, settings, overlay.width, overlay.height, scale);
+    this.drawStaticGuides(ctx, settings, overlay.width, overlay.height, scale);
+
+    if (this.overlayDragRect) {
+      this.drawActiveGuides(ctx, overlay.width, overlay.height, settings.showAlignment);
+    }
+  }
+
+  private drawGrid(
+    ctx: CanvasRenderingContext2D,
+    settings: GuideSettings,
+    width: number,
+    height: number,
+    scale: number
+  ) {
+    if (!settings.showGrid) {
+      return;
+    }
+
+    const spacingPx = Math.max(settings.gridSize, 0.1) * scale;
+    if (spacingPx < 4) {
+      return;
+    }
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(94, 234, 212, 0.09)';
+    ctx.lineWidth = 1;
+
+    for (let x = spacingPx; x < width; x += spacingPx) {
+      ctx.beginPath();
+      ctx.moveTo(Math.round(x) + 0.5, 0);
+      ctx.lineTo(Math.round(x) + 0.5, height);
+      ctx.stroke();
+    }
+
+    for (let y = spacingPx; y < height; y += spacingPx) {
+      ctx.beginPath();
+      ctx.moveTo(0, Math.round(y) + 0.5);
+      ctx.lineTo(width, Math.round(y) + 0.5);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  private drawRulers(
+    ctx: CanvasRenderingContext2D,
+    settings: GuideSettings,
+    width: number,
+    height: number,
+    scale: number
+  ) {
+    if (!settings.showRulers) {
+      return;
+    }
+
+    const rulerSize = 22;
+    const majorStep = Math.max(50 * scale, 40);
+    const minorStep = Math.max(10 * scale, 8);
+
+    ctx.save();
+
+    ctx.fillStyle = 'rgba(10, 10, 18, 0.55)';
+    ctx.fillRect(0, 0, width, rulerSize);
+    ctx.fillRect(0, 0, rulerSize, height);
+
+    ctx.strokeStyle = 'rgba(94, 234, 212, 0.35)';
+    ctx.lineWidth = 1;
+
+    for (let x = 0; x <= width; x += minorStep) {
+      const isMajor = Math.abs(x % majorStep) < 1e-6;
+      const tickHeight = isMajor ? rulerSize : rulerSize * 0.6;
+      ctx.beginPath();
+      ctx.moveTo(Math.round(x) + 0.5, 0);
+      ctx.lineTo(Math.round(x) + 0.5, tickHeight);
+      ctx.stroke();
+    }
+
+    for (let y = 0; y <= height; y += minorStep) {
+      const isMajor = Math.abs(y % majorStep) < 1e-6;
+      const tickWidth = isMajor ? rulerSize : rulerSize * 0.6;
+      ctx.beginPath();
+      ctx.moveTo(0, Math.round(y) + 0.5);
+      ctx.lineTo(tickWidth, Math.round(y) + 0.5);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(245, 245, 245, 0.7)';
+    ctx.font = '10px "Segoe UI", sans-serif';
+    ctx.textBaseline = 'top';
+
+    for (let x = majorStep; x < width; x += majorStep) {
+      const value = Math.round((x / scale) * 10) / 10;
+      ctx.fillText(value.toString(), x + 4, 4);
+    }
+
+    ctx.save();
+    ctx.rotate(-Math.PI / 2);
+    for (let y = majorStep; y < height; y += majorStep) {
+      const value = Math.round((y / scale) * 10) / 10;
+      ctx.fillText(value.toString(), -y - 24, 4);
+    }
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  private drawStaticGuides(
+    ctx: CanvasRenderingContext2D,
+    settings: GuideSettings,
+    width: number,
+    height: number,
+    scale: number
+  ) {
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6, 6]);
+    ctx.strokeStyle = 'rgba(94, 234, 212, 0.25)';
+
+    if (settings.snapToMargins) {
+      const marginPx = Math.max(settings.marginSize, 0) * scale;
+      if (marginPx > 0 && marginPx < width) {
+        ctx.beginPath();
+        ctx.moveTo(Math.round(marginPx) + 0.5, 0);
+        ctx.lineTo(Math.round(marginPx) + 0.5, height);
+        ctx.moveTo(Math.round(width - marginPx) + 0.5, 0);
+        ctx.lineTo(Math.round(width - marginPx) + 0.5, height);
+        ctx.stroke();
+      }
+
+      if (marginPx > 0 && marginPx < height) {
+        ctx.beginPath();
+        ctx.moveTo(0, Math.round(marginPx) + 0.5);
+        ctx.lineTo(width, Math.round(marginPx) + 0.5);
+        ctx.moveTo(0, Math.round(height - marginPx) + 0.5);
+        ctx.lineTo(width, Math.round(height - marginPx) + 0.5);
+        ctx.stroke();
+      }
+    }
+
+    if (settings.snapToCenters) {
+      const centerX = width / 2;
+      const centerY = height / 2;
+      ctx.beginPath();
+      ctx.moveTo(Math.round(centerX) + 0.5, 0);
+      ctx.lineTo(Math.round(centerX) + 0.5, height);
+      ctx.moveTo(0, Math.round(centerY) + 0.5);
+      ctx.lineTo(width, Math.round(centerY) + 0.5);
+      ctx.stroke();
+    }
+
+    if (settings.snapToCustom) {
+      settings.snapPointsX.forEach((point) => {
+        const linePx = point * scale;
+        if (linePx >= 0 && linePx <= width) {
+          ctx.beginPath();
+          ctx.moveTo(Math.round(linePx) + 0.5, 0);
+          ctx.lineTo(Math.round(linePx) + 0.5, height);
+          ctx.stroke();
+        }
+      });
+
+      settings.snapPointsY.forEach((point) => {
+        const linePx = point * scale;
+        if (linePx >= 0 && linePx <= height) {
+          ctx.beginPath();
+          ctx.moveTo(0, Math.round(linePx) + 0.5);
+          ctx.lineTo(width, Math.round(linePx) + 0.5);
+          ctx.stroke();
+        }
+      });
+    }
+
+    ctx.restore();
+  }
+
+  private drawActiveGuides(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    showAlignment: boolean
+  ) {
+    const rect = this.overlayDragRect;
+    if (!rect) {
+      return;
+    }
+
+    const guides = this.overlayGuides;
+
+    ctx.save();
+    ctx.lineWidth = 1;
+
+    guides.forEach((guide) => {
+      if (!showAlignment && !guide.highlighted) {
+        return;
+      }
+      const color = guide.highlighted
+        ? 'rgba(94, 234, 212, 0.85)'
+        : 'rgba(94, 234, 212, 0.35)';
+      ctx.strokeStyle = color;
+      ctx.setLineDash(guide.highlighted ? [4, 4] : [8, 6]);
+      if (guide.orientation === 'vertical') {
+        const x = Math.min(Math.max(guide.position, 0), width);
+        ctx.beginPath();
+        ctx.moveTo(Math.round(x) + 0.5, 0);
+        ctx.lineTo(Math.round(x) + 0.5, height);
+        ctx.stroke();
+      } else {
+        const y = Math.min(Math.max(guide.position, 0), height);
+        ctx.beginPath();
+        ctx.moveTo(0, Math.round(y) + 0.5);
+        ctx.lineTo(width, Math.round(y) + 0.5);
+        ctx.stroke();
+      }
+    });
+
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(94, 234, 212, 0.75)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(
+      Math.round(rect.left) + 0.5,
+      Math.round(rect.top) + 0.5,
+      rect.width,
+      rect.height
+    );
+    ctx.restore();
+  }
+
+  private applySnapping(
+    baseLeft: number,
+    baseTop: number,
+    bounds: { maxLeft: number; minTop: number; maxTop: number },
+    el: HTMLDivElement,
+    pdfCanvas: HTMLCanvasElement
+  ): { left: number; top: number; guides: OverlayGuide[] } {
+    const settings = this.guideSettings();
+    const tolerance = Math.max(settings.snapTolerance, 0);
+    const scale = this.scale();
+    const width = pdfCanvas.width;
+    const height = pdfCanvas.height;
+    const elementWidth = el.offsetWidth;
+    const elementHeight = el.offsetHeight;
+
+    type Candidate = { candidate: number; line: number; delta: number };
+
+    const verticalCandidates: Candidate[] = [];
+    const horizontalCandidates: Candidate[] = [];
+
+    const pushVertical = (candidate: number, line: number) => {
+      if (!Number.isFinite(candidate) || !Number.isFinite(line)) {
+        return;
+      }
+      const clampedCandidate = Math.min(Math.max(candidate, 0), bounds.maxLeft);
+      const clampedLine = Math.min(Math.max(line, 0), width);
+      verticalCandidates.push({
+        candidate: clampedCandidate,
+        line: clampedLine,
+        delta: Math.abs(clampedCandidate - baseLeft),
+      });
+    };
+
+    const pushHorizontal = (candidate: number, line: number) => {
+      if (!Number.isFinite(candidate) || !Number.isFinite(line)) {
+        return;
+      }
+      const clampedCandidate = Math.min(Math.max(candidate, bounds.minTop), bounds.maxTop);
+      const clampedLine = Math.min(Math.max(line, 0), height);
+      horizontalCandidates.push({
+        candidate: clampedCandidate,
+        line: clampedLine,
+        delta: Math.abs(clampedCandidate - baseTop),
+      });
+    };
+
+    if (settings.snapToMargins) {
+      const marginPx = Math.max(settings.marginSize, 0) * scale;
+      if (marginPx > 0) {
+        pushVertical(marginPx, marginPx);
+        pushVertical(width - marginPx - elementWidth, width - marginPx);
+        pushHorizontal(marginPx, marginPx);
+        pushHorizontal(height - marginPx - elementHeight, height - marginPx);
+      }
+    }
+
+    if (settings.snapToCenters) {
+      const centerX = width / 2;
+      const centerY = height / 2;
+      pushVertical(centerX - elementWidth / 2, centerX);
+      pushHorizontal(centerY - elementHeight / 2, centerY);
+    }
+
+    if (settings.snapToGrid) {
+      const spacingPx = Math.max(settings.gridSize, 0.1) * scale;
+      if (spacingPx >= 2) {
+        const snappedLeft = Math.round(baseLeft / spacingPx) * spacingPx;
+        const snappedTop = Math.round(baseTop / spacingPx) * spacingPx;
+        pushVertical(snappedLeft, snappedLeft);
+        pushHorizontal(snappedTop, snappedTop);
+      }
+    }
+
+    if (settings.snapToCustom) {
+      settings.snapPointsX.forEach((point) => {
+        const linePx = point * scale;
+        pushVertical(linePx, linePx);
+      });
+      settings.snapPointsY.forEach((point) => {
+        const linePx = point * scale;
+        pushHorizontal(linePx, linePx);
+      });
+    }
+
+    let snappedLeft = Math.min(Math.max(baseLeft, 0), bounds.maxLeft);
+    let snappedTop = Math.min(Math.max(baseTop, bounds.minTop), bounds.maxTop);
+
+    const bestVertical = verticalCandidates
+      .filter((cand) => cand.delta <= tolerance)
+      .sort((a, b) => a.delta - b.delta)[0];
+    if (bestVertical) {
+      snappedLeft = bestVertical.candidate;
+    }
+
+    const bestHorizontal = horizontalCandidates
+      .filter((cand) => cand.delta <= tolerance)
+      .sort((a, b) => a.delta - b.delta)[0];
+    if (bestHorizontal) {
+      snappedTop = bestHorizontal.candidate;
+    }
+
+    const guideMap = new Map<string, OverlayGuide>();
+    const includeGuide = (orientation: 'vertical' | 'horizontal', cand: Candidate, highlighted: boolean) => {
+      const key = `${orientation}-${cand.line.toFixed(2)}`;
+      const existing = guideMap.get(key);
+      if (existing && existing.highlighted) {
+        return;
+      }
+      if (!highlighted && !settings.showAlignment) {
+        return;
+      }
+      if (!highlighted && cand.delta > tolerance * 1.5) {
+        return;
+      }
+      guideMap.set(key, {
+        orientation,
+        position: cand.line,
+        highlighted,
+      });
+    };
+
+    verticalCandidates.forEach((cand) => {
+      const highlighted = !!bestVertical && Math.abs(cand.candidate - bestVertical.candidate) < 0.5;
+      includeGuide('vertical', cand, highlighted);
+    });
+
+    horizontalCandidates.forEach((cand) => {
+      const highlighted = !!bestHorizontal && Math.abs(cand.candidate - bestHorizontal.candidate) < 0.5;
+      includeGuide('horizontal', cand, highlighted);
+    });
+
+    return { left: snappedLeft, top: snappedTop, guides: Array.from(guideMap.values()) };
   }
 
   ngAfterViewChecked() {
@@ -291,6 +776,7 @@ export class App implements AfterViewChecked {
     canvas.height = Math.floor(viewport.height);
 
     await page.render({ canvasContext: ctx, canvas, viewport }).promise;
+    this.refreshOverlay();
   }
 
   private domToPdfCoords(evt: MouseEvent) {
@@ -752,9 +1238,6 @@ export class App implements AfterViewChecked {
   }
 
   redrawAllForPage() {
-    const overlay = this.overlayCanvasRef?.nativeElement;
-    overlay?.getContext('2d')?.clearRect(0, 0, overlay!.width, overlay!.height);
-
     const layer = this.annotationsLayerRef?.nativeElement;
     if (!layer) return;
     layer.innerHTML = '';
@@ -785,6 +1268,8 @@ export class App implements AfterViewChecked {
           layer.appendChild(el);
         });
       });
+
+    this.refreshOverlay();
   }
 
   private handleAnnotationPointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number) {
@@ -812,6 +1297,16 @@ export class App implements AfterViewChecked {
     el.onpointermove = this.handleAnnotationPointerMove;
     el.onpointerup = this.handleAnnotationPointerUp;
     el.onpointercancel = this.handleAnnotationPointerUp;
+
+    this.refreshOverlay(
+      {
+        left: parseFloat(el.style.left || '0'),
+        top: parseFloat(el.style.top || '0'),
+        width: el.offsetWidth,
+        height: el.offsetHeight,
+      },
+      []
+    );
   }
 
   private handleAnnotationPointerMove = (evt: PointerEvent) => {
@@ -837,8 +1332,26 @@ export class App implements AfterViewChecked {
     const clampedLeft = Math.min(Math.max(tentativeLeft, 0), maxLeft);
     const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
 
-    el.style.left = `${clampedLeft}px`;
-    el.style.top = `${clampedTop}px`;
+    const snapResult = this.applySnapping(
+      clampedLeft,
+      clampedTop,
+      { maxLeft, minTop, maxTop },
+      el,
+      pdfCanvas
+    );
+
+    el.style.left = `${snapResult.left}px`;
+    el.style.top = `${snapResult.top}px`;
+
+    this.refreshOverlay(
+      {
+        left: snapResult.left,
+        top: snapResult.top,
+        width: el.offsetWidth,
+        height: el.offsetHeight,
+      },
+      snapResult.guides
+    );
   };
 
   private handleAnnotationPointerUp = (evt: PointerEvent) => {
@@ -846,6 +1359,7 @@ export class App implements AfterViewChecked {
     const el = this.draggingElement;
     if (!el) {
       this.dragInfo = null;
+      this.refreshOverlay(null, []);
       return;
     }
 
@@ -860,6 +1374,8 @@ export class App implements AfterViewChecked {
     const drag = this.dragInfo;
     this.dragInfo = null;
     this.draggingElement = null;
+
+    this.refreshOverlay(null, []);
 
     if (drag.moved) {
       const left = parseFloat(el.style.left || '0');

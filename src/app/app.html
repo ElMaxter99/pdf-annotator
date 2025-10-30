@@ -59,6 +59,130 @@
       spellcheck="false"
     ></textarea>
     <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
+
+    <div class="sidebar-divider"></div>
+
+    <section class="guides-panel" *ngIf="guideSettings() as guides">
+      <h5>{{ 'guides.title' | t }}</h5>
+      <div class="guides-toggles">
+        <label>
+          <input
+            type="checkbox"
+            [checked]="guides.showGrid"
+            (change)="toggleGuideSetting('showGrid', $event.target.checked)"
+          />
+          <span>{{ 'guides.showGrid' | t }}</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="guides.showRulers"
+            (change)="toggleGuideSetting('showRulers', $event.target.checked)"
+          />
+          <span>{{ 'guides.showRulers' | t }}</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="guides.showAlignment"
+            (change)="toggleGuideSetting('showAlignment', $event.target.checked)"
+          />
+          <span>{{ 'guides.showAlignment' | t }}</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="guides.snapToGrid"
+            (change)="toggleGuideSetting('snapToGrid', $event.target.checked)"
+          />
+          <span>{{ 'guides.snapGrid' | t }}</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="guides.snapToMargins"
+            (change)="toggleGuideSetting('snapToMargins', $event.target.checked)"
+          />
+          <span>{{ 'guides.snapMargins' | t }}</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="guides.snapToCenters"
+            (change)="toggleGuideSetting('snapToCenters', $event.target.checked)"
+          />
+          <span>{{ 'guides.snapCenters' | t }}</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="guides.snapToCustom"
+            (change)="toggleGuideSetting('snapToCustom', $event.target.checked)"
+          />
+          <span>{{ 'guides.snapCustom' | t }}</span>
+        </label>
+      </div>
+
+      <div class="guides-inputs">
+        <label>
+          <span>{{ 'guides.gridSize' | t }}</span>
+          <input
+            type="number"
+            min="0.5"
+            step="0.5"
+            [ngModel]="guides.gridSize"
+            (ngModelChange)="updateGuideNumber('gridSize', $event)"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </label>
+        <label>
+          <span>{{ 'guides.marginSize' | t }}</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            [ngModel]="guides.marginSize"
+            (ngModelChange)="updateGuideNumber('marginSize', $event)"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </label>
+        <label>
+          <span>{{ 'guides.tolerance' | t }}</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            [ngModel]="guides.snapTolerance"
+            (ngModelChange)="updateGuideNumber('snapTolerance', $event)"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </label>
+      </div>
+
+      <div class="guides-custom">
+        <label>
+          <span>{{ 'guides.customX' | t }}</span>
+          <input
+            type="text"
+            [ngModel]="snapPointsXText()"
+            (ngModelChange)="onSnapPointsInput('x', $event)"
+            [ngModelOptions]="{ standalone: true }"
+            [placeholder]="'guides.customPlaceholder' | t"
+          />
+        </label>
+        <label>
+          <span>{{ 'guides.customY' | t }}</span>
+          <input
+            type="text"
+            [ngModel]="snapPointsYText()"
+            (ngModelChange)="onSnapPointsInput('y', $event)"
+            [ngModelOptions]="{ standalone: true }"
+            [placeholder]="'guides.customPlaceholder' | t"
+          />
+        </label>
+        <small class="guides-hint">{{ 'guides.customHint' | t }}</small>
+      </div>
+    </section>
   </aside>
 
   <!-- VISOR PDF -->

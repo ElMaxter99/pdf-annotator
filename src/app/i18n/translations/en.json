@@ -27,6 +27,23 @@
     "jsonPlaceholder": "Paste or edit annotation coordinates here...",
     "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
   },
+  "guides": {
+    "title": "Guides & snapping",
+    "showGrid": "Show grid",
+    "showRulers": "Show rulers",
+    "showAlignment": "Highlight active alignments",
+    "snapGrid": "Snap to grid",
+    "snapMargins": "Snap to margins",
+    "snapCenters": "Snap to center axes",
+    "snapCustom": "Snap to custom coordinates",
+    "gridSize": "Grid spacing (pt)",
+    "marginSize": "Margin (pt)",
+    "tolerance": "Tolerance (px)",
+    "customX": "X coordinates (pt)",
+    "customY": "Y coordinates (pt from top edge)",
+    "customPlaceholder": "e.g. 24, 48, 120",
+    "customHint": "Enter point values separated by commas or spaces. Y values are measured from the top edge of the PDF."
+  },
   "annotation": {
   "fields": {
     "text": {

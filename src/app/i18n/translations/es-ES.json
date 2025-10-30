@@ -27,6 +27,23 @@
     "jsonPlaceholder": "Pega o edita aquí las coordenadas de anotaciones...",
     "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
   },
+  "guides": {
+    "title": "Guías y snapping",
+    "showGrid": "Mostrar rejilla",
+    "showRulers": "Mostrar reglas",
+    "showAlignment": "Resaltar alineaciones activas",
+    "snapGrid": "Ajustar a rejilla",
+    "snapMargins": "Ajustar a márgenes",
+    "snapCenters": "Ajustar a ejes centrales",
+    "snapCustom": "Ajustar a coordenadas personalizadas",
+    "gridSize": "Rejilla (pt)",
+    "marginSize": "Margen (pt)",
+    "tolerance": "Tolerancia (px)",
+    "customX": "Coordenadas X (pt)",
+    "customY": "Coordenadas Y (pt desde el borde superior)",
+    "customPlaceholder": "Ej.: 24, 48, 120",
+    "customHint": "Introduce valores en puntos (pt) separados por comas o espacios. Las Y se miden desde el borde superior del PDF."
+  },
   "annotation": {
   "fields": {
     "text": {

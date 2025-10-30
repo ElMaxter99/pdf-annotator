@@ -27,6 +27,23 @@
     "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
     "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
   },
+  "guides": {
+    "title": "Guies i ajustos",
+    "showGrid": "Mostrar la graella",
+    "showRulers": "Mostrar regles",
+    "showAlignment": "Ressaltar alineacions actives",
+    "snapGrid": "Ajustar a la graella",
+    "snapMargins": "Ajustar als marges",
+    "snapCenters": "Ajustar als eixos centrals",
+    "snapCustom": "Ajustar a coordenades personalitzades",
+    "gridSize": "Graella (pt)",
+    "marginSize": "Marge (pt)",
+    "tolerance": "Tolerància (px)",
+    "customX": "Coordenades X (pt)",
+    "customY": "Coordenades Y (pt des de la vora superior)",
+    "customPlaceholder": "Ex.: 24, 48, 120",
+    "customHint": "Introdueix valors en punts (pt) separats per comes o espais. Les Y es mesuren des de la vora superior del PDF."
+  },
   "annotation": {
   "fields": {
     "text": {
