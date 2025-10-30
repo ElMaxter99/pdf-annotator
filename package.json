@@ -10,7 +10,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:pdf-annotator": "node dist/pdf-annotator/server/server.mjs",
-    "i18n:check": "node scripts/check-translations.mjs"
+    "i18n:check": "node scripts/check-translations.mjs",
+    "fonts:download": "node scripts/download-fonts.mjs"
   },
   "prettier": {
     "printWidth": 100,
