@@ -7,6 +7,25 @@
       "es-ES": "Espanyol",
       "en": "Anglès",
       "ca": "Català"
+    },
+    "landing": {
+      "badge": "Comença a anotar",
+      "title": "Organitza qualsevol PDF en segons",
+      "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
+      "cta": "Selecciona PDF"
+    },
+    "upload": {
+      "title": "Carrega el teu PDF",
+      "subtitle": "Arrossega i deixa anar el fitxer aquí o fes clic per cercar",
+      "hint": "Només PDF",
+      "invalidFormat": "Només s'admeten fitxers PDF."
+    },
+    "workspaceUpload": {
+      "badge": "Nou inici",
+      "title": "Vols començar de zero?",
+      "subtitle": "Arrossega un altre PDF o fes clic per substituir el document actual.",
+      "cta": "Puja un altre PDF",
+      "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
     }
   },
   "controls": {
@@ -14,13 +33,20 @@
     "next": "Següent",
     "pageIndicator": "Pàgina {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "zoomIn": "Apropa",
+    "zoomOut": "Allunya",
     "undo": "Desfer",
     "redo": "Refer",
     "clear": "Esborrar",
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
     "downloadJson": "Descarregar JSON",
-    "downloadPdf": "Descarregar PDF"
+    "downloadPdf": "Descarregar PDF",
+    "toolbarAriaLabel": "Accions del PDF",
+    "navigationGroup": "Navegació de pàgines",
+    "zoomGroup": "Controls de zoom",
+    "historyGroup": "Accions d'historial",
+    "exportGroup": "Opcions d'exportació"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",

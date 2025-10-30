@@ -21,6 +21,7 @@
 - [🧰 Stack tecnológico](#-stack-tecnológico)
 - [🛠 Requisitos](#-requisitos)
 - [⚙ Instalación](#-instalación)
+- [🚀 Despliegue con Docker](#-despliegue-con-docker)
 - [▶ Uso paso a paso](#-uso-paso-a-paso)
   - [1. Inicia el servidor de desarrollo](#1-inicia-el-servidor-de-desarrollo)
   - [2. Carga un PDF](#2-carga-un-pdf)
@@ -66,10 +67,45 @@ cd pdf-annotator
 npm install
 ```
 
+### ▶️ Ejecuta la app en tu máquina (Node 22)
+
+```bash
+npm run start:local
+```
+
+El servidor de desarrollo queda disponible en `http://localhost:4200` con soporte para hot-reload. Si faltan dependencias críticas de Angular (por ejemplo `@angular/build`), el script se detiene con un aviso para que ejecutes `npm install` manualmente antes de volver a lanzar `ng serve`; así evitas el error `Could not find the '@angular/build:dev-server' builder's node package.` típico de los entornos recién clonados.
+
+> ¿Tu equipo no puede instalar Node.js 22 o Angular 20? Ejecuta la versión en contenedor.
+
+### 🐳 Ejecuta la app con Docker (alternativa)
+
+```bash
+npm run start:docker
+```
+
+El comando delega en `scripts/docker-up.sh` para construir la imagen y exponer la SPA en `http://localhost:4444`.
+
+## 🚀 Despliegue con Docker
+> Requiere Docker Desktop, Docker Engine o una instalación compatible con Docker Compose.
+
+```bash
+npm run start:docker
+```
+
+El script compila la aplicación con Node.js 22.12.0, construye la imagen `pdf-annotator:latest` y levanta el servicio detrás de NGINX. Una vez completado, la SPA queda disponible en `http://localhost:4444`.
+
+Para detener y limpiar los contenedores:
+
+```bash
+sh scripts/docker-down.sh
+```
+
+Al finalizar, la aplicación dejará de estar disponible en `http://localhost:4444`.
+
 ## ▶ Uso paso a paso
 ### 1. Inicia el servidor de desarrollo
 ```bash
-npm start -- --host 0.0.0.0 --port 4200
+npm run start:local
 ```
 Abre `http://localhost:4200` en tu navegador (o la IP indicada si usaste otro host).
 

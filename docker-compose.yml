@@ -1,0 +1,8 @@
+services:
+  pdf-annotator:
+    image: pdf-annotator:latest
+    build:
+      context: .
+    ports:
+      - "4444:80"
+    restart: unless-stopped
