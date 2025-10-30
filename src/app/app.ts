@@ -122,7 +122,8 @@ export class App implements AfterViewChecked, OnDestroy {
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('annotationsLayer', { static: false })
-  annotationsLayerRef?: ElementRef<HTMLDivElement>;
+    annotationsLayerRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('pdfViewer', { static: false }) pdfViewerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
@@ -569,6 +570,32 @@ export class App implements AfterViewChecked, OnDestroy {
     }
 
     this.cancelEdit();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.preview() && !this.editing()) {
+      return;
+    }
+
+    const viewer = this.pdfViewerRef?.nativeElement;
+    const target = event.target as Node | null;
+
+    if (!viewer || !target) {
+      return;
+    }
+
+    if (viewer.contains(target)) {
+      return;
+    }
+
+    if (this.preview()) {
+      this.cancelPreview();
+    }
+
+    if (this.editing()) {
+      this.cancelEdit();
+    }
   }
 
   deleteAnnotation() {
