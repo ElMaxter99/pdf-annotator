@@ -702,16 +702,20 @@ export class App implements AfterViewChecked, OnDestroy {
     let insertedFieldIndex = -1;
     let insertedPageIndex = -1;
 
-    this.coords.update((pages) => {
-      const updated = this.addFieldToPages(pageNum, newField, pages);
-      insertedPageIndex = updated.findIndex((page) => page.num === pageNum);
-      if (insertedPageIndex >= 0) {
-        insertedFieldIndex = updated[insertedPageIndex].fields.length - 1;
-      }
-      return updated;
+    const changed = this.applyCoordsChange(() => {
+      this.coords.update((pages) => {
+        const updated = this.addFieldToPages(pageNum, newField, pages);
+        insertedPageIndex = updated.findIndex((page) => page.num === pageNum);
+        if (insertedPageIndex >= 0) {
+          insertedFieldIndex = updated[insertedPageIndex].fields.length - 1;
+        }
+        return updated;
+      });
     });
 
-    this.syncCoordsTextModel();
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
     this.redrawAllForPage();
 
     if (insertedPageIndex >= 0 && insertedFieldIndex >= 0) {
