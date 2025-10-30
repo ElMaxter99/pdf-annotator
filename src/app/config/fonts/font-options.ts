@@ -1,4 +1,5 @@
 import fontRegistry from './font-registry.json';
+import remoteFallbackRegistry from './font-remote-fallbacks.json';
 
 export interface FontFaceConfig {
   readonly family: string;
@@ -38,6 +39,21 @@ export const DEFAULT_FONT_FAMILY = 'Helvetica, Arial, sans-serif';
 export const DEFAULT_FONT_TYPE = 'system-default';
 
 const FONT_DEFINITIONS = fontRegistry as readonly FontDefinition[];
+
+type RemoteFallbackEntry =
+  | string
+  | {
+      readonly url?: string | null;
+      readonly path?: string | null;
+      readonly baseUrl?: string | null;
+    };
+
+interface RemoteFallbackManifest {
+  readonly baseUrl?: string | null;
+  readonly fonts?: Record<string, readonly RemoteFallbackEntry[] | undefined>;
+}
+
+const REMOTE_FONT_FALLBACK_MANIFEST = remoteFallbackRegistry as RemoteFallbackManifest;
 
 function sanitizeSearchTerm(term: string): string[] {
   return term
@@ -97,6 +113,130 @@ function normalizePdfSources(input: FontDefinition['pdf']): readonly string[] | 
   return undefined;
 }
 
+function isAbsoluteUrl(url: string): boolean {
+  return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(url);
+}
+
+function joinBaseUrl(baseUrl: string | null | undefined, path: string): string {
+  if (!baseUrl) {
+    return path;
+  }
+
+  const trimmedBase = baseUrl.trim();
+  if (!trimmedBase) {
+    return path;
+  }
+
+  const sanitizedBase = trimmedBase.endsWith('/') ? trimmedBase : `${trimmedBase}/`;
+  const sanitizedPath = path.replace(/^\/+/, '');
+
+  try {
+    return new URL(sanitizedPath, sanitizedBase).toString();
+  } catch {
+    return `${sanitizedBase}${sanitizedPath}`;
+  }
+}
+
+function resolveFallbackEntry(
+  entry: RemoteFallbackEntry,
+  manifest: RemoteFallbackManifest
+): string | null {
+  if (typeof entry === 'string') {
+    const trimmed = entry.trim();
+    if (!trimmed) {
+      return null;
+    }
+    if (isAbsoluteUrl(trimmed)) {
+      return trimmed;
+    }
+    return joinBaseUrl(manifest.baseUrl ?? null, trimmed);
+  }
+
+  if (!entry) {
+    return null;
+  }
+
+  const candidateBase = entry.baseUrl ?? manifest.baseUrl ?? null;
+
+  const fromUrl = typeof entry.url === 'string' ? entry.url.trim() : '';
+  if (fromUrl) {
+    if (isAbsoluteUrl(fromUrl)) {
+      return fromUrl;
+    }
+    return joinBaseUrl(candidateBase, fromUrl);
+  }
+
+  const fromPath = typeof entry.path === 'string' ? entry.path.trim() : '';
+  if (!fromPath) {
+    return null;
+  }
+  if (isAbsoluteUrl(fromPath)) {
+    return fromPath;
+  }
+  return joinBaseUrl(candidateBase, fromPath);
+}
+
+function getRemoteFallbackSources(
+  definition: FontDefinition
+): readonly string[] | undefined {
+  const manifest = REMOTE_FONT_FALLBACK_MANIFEST;
+  const fallback = manifest.fonts?.[definition.id];
+  if (!fallback?.length) {
+    return undefined;
+  }
+
+  const seen = new Set<string>();
+  const sanitized: string[] = [];
+
+  for (const raw of fallback) {
+    if (!raw) {
+      continue;
+    }
+
+    const resolved = resolveFallbackEntry(raw, manifest);
+    const trimmed = resolved?.trim() ?? '';
+    if (!trimmed || seen.has(trimmed)) {
+      continue;
+    }
+    sanitized.push(trimmed);
+    seen.add(trimmed);
+  }
+
+  return sanitized.length ? sanitized : undefined;
+}
+
+function mergePdfSources(
+  primary: readonly string[] | undefined,
+  secondary: readonly string[] | undefined
+): readonly string[] | undefined {
+  const seen = new Set<string>();
+  const merged: string[] = [];
+
+  if (primary?.length) {
+    for (const raw of primary) {
+      const trimmed = typeof raw === 'string' ? raw.trim() : '';
+      if (!trimmed || seen.has(trimmed)) {
+        continue;
+      }
+      merged.push(trimmed);
+      seen.add(trimmed);
+    }
+  }
+
+  if (secondary?.length) {
+    for (const raw of secondary) {
+      const trimmed = typeof raw === 'string' ? raw.trim() : '';
+      if (!trimmed || seen.has(trimmed)) {
+        continue;
+      }
+      merged.push(trimmed);
+      seen.add(trimmed);
+    }
+  }
+
+  return merged.length ? merged : undefined;
+}
+
 function detectFontFormat(url: string): FontAssetSource['format'] {
   const lower = url.split('?')[0]?.toLowerCase() ?? '';
   if (lower.endsWith('.woff2')) {
@@ -141,10 +281,12 @@ function createRemoteConfig(definition: FontDefinition): FontRemoteConfig | unde
   }
 
   const pdfSources = normalizePdfSources(definition.pdf);
+  const fallbackSources = getRemoteFallbackSources(definition);
+  const remoteSources = mergePdfSources(pdfSources, fallbackSources);
 
   return {
     stylesheet: `https://fonts.googleapis.com/css2?family=${family}:wght@400&display=swap`,
-    pdfSources,
+    pdfSources: remoteSources,
   };
 }
 
