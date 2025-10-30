@@ -17,6 +17,8 @@ import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
+import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
+import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -61,22 +63,6 @@ if (supportsModuleWorkers()) {
   workerOptions.workerType = undefined;
 }
 
-type FieldType = 'text' | 'check' | 'radio' | 'number';
-
-type PageField = {
-  x: number;
-  y: number;
-  mapField: string;
-  fontSize: number;
-  color: string;
-  type: FieldType;
-  value?: string;
-  appender?: string;
-  decimals?: number | null;
-};
-
-type PageAnnotations = { num: number; fields: PageField[] };
-
 type PreviewState = { page: number; field: PageField } | null;
 
 type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
@@ -100,6 +86,9 @@ export class App implements AfterViewChecked {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
+  readonly templates = signal<AnnotationTemplate[]>([]);
+  templateNameModel = '';
+  selectedTemplateId: string | null = null;
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
@@ -108,6 +97,7 @@ export class App implements AfterViewChecked {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
   private readonly document = inject(DOCUMENT);
+  private readonly templatesService = inject(AnnotationTemplatesService);
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
 
@@ -135,7 +125,12 @@ export class App implements AfterViewChecked {
 
   constructor() {
     this.setDocumentMetadata();
-    this.syncCoordsTextModel();
+    const storedTemplates = this.templatesService.getTemplates();
+    this.templates.set(storedTemplates);
+    this.selectedTemplateId = storedTemplates[0]?.id ?? null;
+    if (!this.restoreLastCoords()) {
+      this.syncCoordsTextModel();
+    }
   }
 
   onLanguageChange(language: string) {
@@ -1024,6 +1019,66 @@ export class App implements AfterViewChecked {
     URL.revokeObjectURL(url);
   }
 
+  saveCurrentAsTemplate() {
+    const name = this.templateNameModel.trim();
+    if (!name || !this.coords().length) {
+      return;
+    }
+
+    const savedTemplate = this.templatesService.saveTemplate(name, this.coords());
+    if (!savedTemplate) {
+      console.warn('El navegador no soporta almacenamiento local para plantillas.');
+      return;
+    }
+
+    this.templates.set(this.templatesService.getTemplates());
+    this.templateNameModel = '';
+    this.selectedTemplateId = savedTemplate.id;
+  }
+
+  loadSelectedTemplate() {
+    if (!this.selectedTemplateId) {
+      return;
+    }
+
+    const template = this.templates().find((item) => item.id === this.selectedTemplateId);
+    if (!template) {
+      return;
+    }
+
+    this.applyTemplate(template);
+  }
+
+  deleteSelectedTemplate() {
+    if (!this.selectedTemplateId) {
+      return;
+    }
+
+    const templateId = this.selectedTemplateId;
+    this.templatesService.deleteTemplate(templateId);
+    const nextTemplates = this.templatesService.getTemplates();
+    this.templates.set(nextTemplates);
+    if (!nextTemplates.some((template) => template.id === templateId)) {
+      this.selectedTemplateId = nextTemplates[0]?.id ?? null;
+    }
+  }
+
+  private applyTemplate(template: AnnotationTemplate) {
+    const clonedPages = this.clonePages(template.pages);
+    this.coords.set(clonedPages);
+    this.syncCoordsTextModel();
+    this.preview.set(null);
+    this.editing.set(null);
+    this.redrawAllForPage();
+  }
+
+  private clonePages(pages: readonly PageAnnotations[]): PageAnnotations[] {
+    return pages.map((page) => ({
+      num: page.num,
+      fields: page.fields.map((field) => ({ ...field })),
+    }));
+  }
+
   async downloadAnnotatedPDF() {
     if (!this.pdfDoc) return;
 
@@ -1146,8 +1201,25 @@ export class App implements AfterViewChecked {
     }
   }
 
-  private syncCoordsTextModel() {
-    this.coordsTextModel = JSON.stringify({ pages: this.coords() }, null, 2);
+  private restoreLastCoords(): boolean {
+    const restored = this.templatesService.loadLastCoords();
+    if (!restored || restored.length === 0) {
+      return false;
+    }
+
+    this.coords.set(restored);
+    this.preview.set(null);
+    this.editing.set(null);
+    this.syncCoordsTextModel();
+    return true;
+  }
+
+  private syncCoordsTextModel(persist = true) {
+    const currentCoords = this.coords();
+    this.coordsTextModel = JSON.stringify({ pages: currentCoords }, null, 2);
+    if (persist) {
+      this.templatesService.storeLastCoords(currentCoords);
+    }
   }
 
   private parseLooseJson(text: string): unknown {

@@ -52,6 +52,59 @@
         {{ 'sidebar.applyJson' | t }}
       </button>
     </div>
+    <section class="templates">
+      <h5>{{ 'sidebar.templates.title' | t }}</h5>
+      <div class="templates__save">
+        <input
+          type="text"
+          [(ngModel)]="templateNameModel"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'sidebar.templates.placeholder' | t"
+        />
+        <button
+          type="button"
+          class="btn"
+          (click)="saveCurrentAsTemplate()"
+          [disabled]="!coords().length || !templateNameModel.trim()"
+        >
+          {{ 'sidebar.templates.saveButton' | t }}
+        </button>
+      </div>
+      <ng-container *ngIf="templates().length; else emptyTemplates">
+        <div class="templates__select">
+          <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
+          <div class="templates__controls">
+            <select
+              [(ngModel)]="selectedTemplateId"
+              [ngModelOptions]="{ standalone: true }"
+            >
+              <option *ngFor="let template of templates()" [value]="template.id">
+                {{ template.name }}
+              </option>
+            </select>
+            <button
+              type="button"
+              class="btn"
+              (click)="loadSelectedTemplate()"
+              [disabled]="!selectedTemplateId"
+            >
+              {{ 'sidebar.templates.loadButton' | t }}
+            </button>
+            <button
+              type="button"
+              class="btn templates__delete"
+              (click)="deleteSelectedTemplate()"
+              [disabled]="!selectedTemplateId"
+            >
+              {{ 'sidebar.templates.deleteButton' | t }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #emptyTemplates>
+        <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
+      </ng-template>
+    </section>
     <textarea
       class="json-editor"
       [(ngModel)]="coordsTextModel"

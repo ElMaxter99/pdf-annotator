@@ -25,6 +25,15 @@
     "importJsonFile": "Import from file",
     "applyJson": "Apply JSON",
     "jsonPlaceholder": "Paste or edit annotation coordinates here...",
+    "templates": {
+      "title": "Reusable templates",
+      "placeholder": "Template name",
+      "saveButton": "Save template",
+      "selectLabel": "Saved templates",
+      "loadButton": "Load",
+      "deleteButton": "Delete",
+      "empty": "You haven't saved any templates yet."
+    },
     "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
   },
   "annotation": {
