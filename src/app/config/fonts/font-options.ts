@@ -1,4 +1,5 @@
 import fontRegistry from './font-registry.json';
+import remoteFallbackRegistry from './font-remote-fallbacks.json';
 
 export interface FontFaceConfig {
   readonly family: string;
@@ -38,6 +39,10 @@ export const DEFAULT_FONT_FAMILY = 'Helvetica, Arial, sans-serif';
 export const DEFAULT_FONT_TYPE = 'system-default';
 
 const FONT_DEFINITIONS = fontRegistry as readonly FontDefinition[];
+
+const REMOTE_FONT_FALLBACKS = remoteFallbackRegistry as Readonly<
+  Record<string, readonly string[]>
+>;
 
 function sanitizeSearchTerm(term: string): string[] {
   return term
@@ -97,6 +102,61 @@ function normalizePdfSources(input: FontDefinition['pdf']): readonly string[] | 
   return undefined;
 }
 
+function getRemoteFallbackSources(
+  definition: FontDefinition
+): readonly string[] | undefined {
+  const fallback = REMOTE_FONT_FALLBACKS[definition.id];
+  if (!fallback?.length) {
+    return undefined;
+  }
+
+  const seen = new Set<string>();
+  const sanitized: string[] = [];
+
+  for (const raw of fallback) {
+    const trimmed = typeof raw === 'string' ? raw.trim() : '';
+    if (!trimmed || seen.has(trimmed)) {
+      continue;
+    }
+    sanitized.push(trimmed);
+    seen.add(trimmed);
+  }
+
+  return sanitized.length ? sanitized : undefined;
+}
+
+function mergePdfSources(
+  primary: readonly string[] | undefined,
+  secondary: readonly string[] | undefined
+): readonly string[] | undefined {
+  const seen = new Set<string>();
+  const merged: string[] = [];
+
+  if (primary?.length) {
+    for (const raw of primary) {
+      const trimmed = typeof raw === 'string' ? raw.trim() : '';
+      if (!trimmed || seen.has(trimmed)) {
+        continue;
+      }
+      merged.push(trimmed);
+      seen.add(trimmed);
+    }
+  }
+
+  if (secondary?.length) {
+    for (const raw of secondary) {
+      const trimmed = typeof raw === 'string' ? raw.trim() : '';
+      if (!trimmed || seen.has(trimmed)) {
+        continue;
+      }
+      merged.push(trimmed);
+      seen.add(trimmed);
+    }
+  }
+
+  return merged.length ? merged : undefined;
+}
+
 function detectFontFormat(url: string): FontAssetSource['format'] {
   const lower = url.split('?')[0]?.toLowerCase() ?? '';
   if (lower.endsWith('.woff2')) {
@@ -141,10 +201,12 @@ function createRemoteConfig(definition: FontDefinition): FontRemoteConfig | unde
   }
 
   const pdfSources = normalizePdfSources(definition.pdf);
+  const fallbackSources = getRemoteFallbackSources(definition);
+  const remoteSources = mergePdfSources(pdfSources, fallbackSources);
 
   return {
     stylesheet: `https://fonts.googleapis.com/css2?family=${family}:wght@400&display=swap`,
-    pdfSources,
+    pdfSources: remoteSources,
   };
 }
 

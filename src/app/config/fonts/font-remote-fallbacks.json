@@ -1,0 +1,110 @@
+{
+  "roboto": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf"
+  ],
+  "poppins": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/poppins/static/Poppins-Regular.ttf"
+  ],
+  "inter": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/static/Inter-Regular.ttf"
+  ],
+  "montserrat": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/montserrat/static/Montserrat-Regular.ttf"
+  ],
+  "lato": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/lato/static/Lato-Regular.ttf"
+  ],
+  "nunito": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/nunito/static/Nunito-Regular.ttf"
+  ],
+  "open-sans": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/opensans/static/OpenSans-Regular.ttf"
+  ],
+  "manrope": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/manrope/static/Manrope-Regular.ttf"
+  ],
+  "fira-code": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/firacode/static/FiraCode-Regular.ttf"
+  ],
+  "jetbrains-mono": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/jetbrainsmono/static/JetBrainsMono-Regular.ttf"
+  ],
+  "playfair-display": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/playfairdisplay/static/PlayfairDisplay-Regular.ttf"
+  ],
+  "merriweather": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/merriweather/static/Merriweather-Regular.ttf"
+  ],
+  "source-serif-4": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sourceserif4/static/SourceSerif4-Regular.ttf"
+  ],
+  "raleway": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/raleway/static/Raleway-Regular.ttf"
+  ],
+  "oswald": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/oswald/static/Oswald-Regular.ttf"
+  ],
+  "work-sans": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/worksans/static/WorkSans-Regular.ttf"
+  ],
+  "dm-sans": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/dmsans/static/DMSans-Regular.ttf"
+  ],
+  "dm-serif-display": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/dmserifdisplay/static/DMSerifDisplay-Regular.ttf"
+  ],
+  "noto-sans-jp": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosansjp/NotoSansJP-Regular.otf"
+  ],
+  "noto-serif-display": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notoserifdisplay/static/NotoSerifDisplay-Regular.ttf"
+  ],
+  "cabin": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/cabin/static/Cabin-Regular.ttf"
+  ],
+  "karla": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/karla/static/Karla-Regular.ttf"
+  ],
+  "space-grotesk": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/spacegrotesk/static/SpaceGrotesk-Regular.ttf"
+  ],
+  "sora": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sora/static/Sora-Regular.ttf"
+  ],
+  "bitter": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/bitter/static/Bitter-Regular.ttf"
+  ],
+  "archivo": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/archivo/static/Archivo-Regular.ttf"
+  ],
+  "heebo": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/static/Heebo-Regular.ttf"
+  ],
+  "crimson-pro": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/crimsonpro/static/CrimsonPro-Regular.ttf"
+  ],
+  "ibm-plex-sans": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexsans/static/IBMPlexSans-Regular.ttf"
+  ],
+  "ibm-plex-serif": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexserif/static/IBMPlexSerif-Regular.ttf"
+  ],
+  "ibm-plex-mono": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexmono/static/IBMPlexMono-Regular.ttf"
+  ],
+  "urbanist": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/urbanist/static/Urbanist-Regular.ttf"
+  ],
+  "sofia-sans": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sofiasans/static/SofiaSans-Regular.ttf"
+  ],
+  "asap": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/asap/static/Asap-Regular.ttf"
+  ],
+  "quicksand": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/quicksand/static/Quicksand-Regular.ttf"
+  ],
+  "zilla-slab": [
+    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/zillaslab/static/ZillaSlab-Regular.ttf"
+  ]
+}
