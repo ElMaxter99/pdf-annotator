@@ -1,7 +1,7 @@
 {
   "name": "Pdf Annotator",
   "version": "1.1.0",
-  "author": "AlvaroMaxter",
+  "author": "AAmoros",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
