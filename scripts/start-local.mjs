@@ -2,23 +2,18 @@
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 
 const projectRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const angularBuilderPath = join(projectRoot, 'node_modules', '@angular', 'build', 'package.json');
 
 if (!existsSync(angularBuilderPath)) {
-  console.log('Dependencias de Angular no encontradas. Ejecutando "npm install" antes del arranque...');
-  const installResult = spawnSync(npmCmd, ['install'], {
-    cwd: projectRoot,
-    stdio: 'inherit'
-  });
-
-  if (installResult.status !== 0) {
-    console.error('\nError: "npm install" falló. Revisa los mensajes anteriores para más detalles.');
-    process.exit(installResult.status ?? 1);
-  }
+  console.error(
+    '\n❌ No se encontraron las dependencias de Angular necesarias (por ejemplo @angular/build). ' +
+      'Ejecuta "npm install" en la raíz del proyecto y vuelve a lanzar "npm run start:local".'
+  );
+  process.exit(1);
 }
 
 const serve = spawn(

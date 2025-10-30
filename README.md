@@ -73,7 +73,7 @@ npm install
 npm run start:local
 ```
 
-El servidor de desarrollo queda disponible en `http://localhost:4200` con soporte para hot-reload. El script comprueba si faltan las dependencias de Angular (por ejemplo `@angular/build`) y ejecuta `npm install` automáticamente antes de lanzar `ng serve`, evitando el error `Could not find the '@angular/build:dev-server' builder's node package.` en entornos recién clonados.
+El servidor de desarrollo queda disponible en `http://localhost:4200` con soporte para hot-reload. Si faltan dependencias críticas de Angular (por ejemplo `@angular/build`), el script se detiene con un aviso para que ejecutes `npm install` manualmente antes de volver a lanzar `ng serve`; así evitas el error `Could not find the '@angular/build:dev-server' builder's node package.` típico de los entornos recién clonados.
 
 > ¿Tu equipo no puede instalar Node.js 22 o Angular 20? Ejecuta la versión en contenedor.
 
