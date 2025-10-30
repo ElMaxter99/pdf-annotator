@@ -7,6 +7,12 @@
       "es-ES": "Spanish",
       "en": "English",
       "ca": "Catalan"
+    },
+    "upload": {
+      "title": "Upload your PDF",
+      "subtitle": "Drag & drop the file here or click to browse",
+      "hint": "PDF only",
+      "invalidFormat": "Only PDF files are supported."
     }
   },
   "controls": {
@@ -14,13 +20,20 @@
     "next": "Next",
     "pageIndicator": "Page {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
     "undo": "Undo",
     "redo": "Redo",
     "clear": "Clear",
     "copyJson": "Copy JSON",
     "importJson": "Import JSON",
     "downloadJson": "Download JSON",
-    "downloadPdf": "Download PDF"
+    "downloadPdf": "Download PDF",
+    "toolbarAriaLabel": "PDF actions",
+    "navigationGroup": "Page navigation",
+    "zoomGroup": "Zoom controls",
+    "historyGroup": "History actions",
+    "exportGroup": "Export options"
   },
   "sidebar": {
     "title": "Annotations (JSON)",

@@ -7,6 +7,12 @@
       "es-ES": "Español",
       "en": "Inglés",
       "ca": "Catalán"
+    },
+    "upload": {
+      "title": "Carga tu PDF",
+      "subtitle": "Arrastra y suelta el archivo aquí o haz clic para buscar",
+      "hint": "Solo PDF",
+      "invalidFormat": "Solo se admiten archivos PDF."
     }
   },
   "controls": {
@@ -14,13 +20,20 @@
     "next": "Siguiente",
     "pageIndicator": "Página {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
     "undo": "Deshacer",
     "redo": "Rehacer",
     "clear": "Limpiar",
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
     "downloadJson": "Descargar JSON",
-    "downloadPdf": "Descargar PDF"
+    "downloadPdf": "Descargar PDF",
+    "toolbarAriaLabel": "Acciones del PDF",
+    "navigationGroup": "Navegación de páginas",
+    "zoomGroup": "Controles de zoom",
+    "historyGroup": "Acciones de historial",
+    "exportGroup": "Opciones de exportación"
   },
   "sidebar": {
     "title": "Anotaciones (JSON)",

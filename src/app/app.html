@@ -1,10 +1,37 @@
 <div class="app">
   <!-- HEADER -->
   <header class="header">
-    <div class="logo">{{ 'app.title' | t }}</div>
-    <input type="file" accept="application/pdf" (change)="onFileSelected($event)" class="input-file" />
+    <div class="header__left">
+      <div class="logo">{{ 'app.title' | t }}</div>
+      <div
+        class="file-upload"
+        role="button"
+        tabindex="0"
+        (click)="openPdfFilePicker()"
+        (keydown)="onFileUploadKeydown($event)"
+        (dragover)="onFileDragOver($event)"
+        (dragleave)="onFileDragLeave($event)"
+        (drop)="onFileDrop($event)"
+        [class.file-upload--active]="fileDropActive()"
+        [attr.aria-label]="'app.upload.title' | t"
+      >
+        <input
+          #pdfFileInput
+          type="file"
+          accept="application/pdf"
+          (change)="onFileSelected($event)"
+          hidden
+        />
+        <div class="file-upload__icon" aria-hidden="true">📄</div>
+        <div class="file-upload__content">
+          <span class="file-upload__title">{{ 'app.upload.title' | t }}</span>
+          <span class="file-upload__subtitle">{{ 'app.upload.subtitle' | t }}</span>
+        </div>
+        <span class="file-upload__hint">{{ 'app.upload.hint' | t }}</span>
+      </div>
+    </div>
 
-    <div class="controls">
+    <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
       <input
         #coordsFileInput
         type="file"
@@ -12,31 +39,63 @@
         (change)="onCoordsFileSelected($event)"
         hidden
       />
-      <button class="btn" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">◀
-        {{ 'controls.prev' | t }}</button>
-      <span
-        class="page-indicator">{{ 'controls.pageIndicator' | t : { current: pageIndex(), total: pageCount || 0 } }}</span>
-      <button class="btn" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">{{ 'controls.next' | t }}
-        ▶</button>
 
-      <button class="btn" (click)="zoomOut()" [disabled]="!pdfDoc">−</button>
-      <span class="page-indicator">{{ 'controls.zoomLabel' | t }} {{ scale() | number:'1.0-2' }}×</span>
-      <button class="btn" (click)="zoomIn()" [disabled]="!pdfDoc">+</button>
+      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
+        <button class="btn btn--icon" (click)="prevPage()" [disabled]="!pdfDoc || pageIndex()===1">
+          <span class="btn__icon" aria-hidden="true">⟨</span>
+          <span class="btn__label">{{ 'controls.prev' | t }}</span>
+        </button>
+        <span class="toolbar__badge">
+          {{ 'controls.pageIndicator' | t : { current: pageIndex(), total: pageCount || 0 } }}
+        </span>
+        <button class="btn btn--icon" (click)="nextPage()" [disabled]="!pdfDoc || pageIndex()===pageCount">
+          <span class="btn__label">{{ 'controls.next' | t }}</span>
+          <span class="btn__icon" aria-hidden="true">⟩</span>
+        </button>
+      </div>
 
-      <button class="btn" (click)="undo()" [disabled]="!canUndo()">{{ 'controls.undo' | t }}</button>
-      <button class="btn" (click)="redo()" [disabled]="!canRedo()">{{ 'controls.redo' | t }}</button>
-      <button class="btn danger" (click)="clearAll()" [disabled]="!coords().length">{{ 'controls.clear' | t }}</button>
-      <button class="btn" (click)="downloadAnnotatedPDF()"
-        [disabled]="!coords().length || !pdfDoc">{{ 'controls.downloadPdf' | t }}</button>
+      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
+        <button class="btn btn--icon" (click)="zoomOut()" [disabled]="!pdfDoc">
+          <span class="btn__icon" aria-hidden="true">−</span>
+          <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
+        </button>
+        <span class="toolbar__badge">{{ 'controls.zoomLabel' | t }} {{ scale() | number:'1.0-2' }}×</span>
+        <button class="btn btn--icon" (click)="zoomIn()" [disabled]="!pdfDoc">
+          <span class="btn__label">{{ 'controls.zoomIn' | t }}</span>
+          <span class="btn__icon" aria-hidden="true">＋</span>
+        </button>
+      </div>
+
+      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
+        <button class="btn btn--icon" (click)="undo()" [disabled]="!canUndo()">
+          <span class="btn__icon" aria-hidden="true">↺</span>
+          <span class="btn__label">{{ 'controls.undo' | t }}</span>
+        </button>
+        <button class="btn btn--icon" (click)="redo()" [disabled]="!canRedo()">
+          <span class="btn__icon" aria-hidden="true">↻</span>
+          <span class="btn__label">{{ 'controls.redo' | t }}</span>
+        </button>
+        <button class="btn btn--icon btn--danger" (click)="clearAll()" [disabled]="!coords().length">
+          <span class="btn__icon" aria-hidden="true">🧹</span>
+          <span class="btn__label">{{ 'controls.clear' | t }}</span>
+        </button>
+      </div>
+
+      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
+        <button class="btn btn--icon" (click)="downloadAnnotatedPDF()"
+          [disabled]="!coords().length || !pdfDoc">
+          <span class="btn__icon" aria-hidden="true">⬇</span>
+          <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
+        </button>
+      </div>
     </div>
 
     <div class="language-selector">
-      <label for="language-select">{{ 'app.languageLabel' | t }}</label>
+      <label class="language-selector__label" for="language-select">{{ 'app.languageLabel' | t }}</label>
       <select id="language-select" [(ngModel)]="languageModel" (ngModelChange)="onLanguageChange($event)"
         [attr.aria-label]="'app.languageAriaLabel' | t">
         <option *ngFor="let lang of languages" [value]="lang">{{ ('app.languages.' + lang) | t }}</option>
       </select>
-
     </div>
   </header>
 

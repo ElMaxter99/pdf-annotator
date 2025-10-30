@@ -7,6 +7,12 @@
       "es-ES": "Espanyol",
       "en": "Anglès",
       "ca": "Català"
+    },
+    "upload": {
+      "title": "Carrega el teu PDF",
+      "subtitle": "Arrossega i deixa anar el fitxer aquí o fes clic per cercar",
+      "hint": "Només PDF",
+      "invalidFormat": "Només s'admeten fitxers PDF."
     }
   },
   "controls": {
@@ -14,13 +20,20 @@
     "next": "Següent",
     "pageIndicator": "Pàgina {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "zoomIn": "Apropa",
+    "zoomOut": "Allunya",
     "undo": "Desfer",
     "redo": "Refer",
     "clear": "Esborrar",
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
     "downloadJson": "Descarregar JSON",
-    "downloadPdf": "Descarregar PDF"
+    "downloadPdf": "Descarregar PDF",
+    "toolbarAriaLabel": "Accions del PDF",
+    "navigationGroup": "Navegació de pàgines",
+    "zoomGroup": "Controls de zoom",
+    "historyGroup": "Accions d'historial",
+    "exportGroup": "Opcions d'exportació"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
