@@ -214,7 +214,11 @@
   </aside>
 
   <!-- VISOR PDF -->
-  <main class="viewer" *ngIf="pdfDoc as _">
+  <main
+    class="viewer"
+    *ngIf="pdfDoc as _"
+    [class.viewer--guides-enabled]="guidesFeatureEnabled()"
+  >
     <div class="canvas-container">
       <canvas #pdfCanvas></canvas>
       <canvas #overlayCanvas></canvas>

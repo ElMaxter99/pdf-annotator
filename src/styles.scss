@@ -328,6 +328,20 @@ header .logo {
   padding: 12px;
 }
 
+.viewer .canvas-container {
+  margin: 0 auto;
+  transition: margin 0.2s ease;
+}
+
+.viewer.viewer--guides-enabled {
+  justify-content: flex-start;
+}
+
+.viewer.viewer--guides-enabled .canvas-container {
+  margin-left: 0;
+  margin-right: auto;
+}
+
 .footer {
   grid-area: footer;
   background: var(--panel);
