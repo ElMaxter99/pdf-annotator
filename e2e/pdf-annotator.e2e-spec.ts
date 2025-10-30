@@ -1,5 +1,6 @@
 import { expect, test, type Download } from '@playwright/test';
 import { promises as fs } from 'node:fs';
+import { join } from 'node:path';
 import { Readable } from 'node:stream';
 
 async function streamToBuffer(stream: Readable): Promise<Buffer> {
@@ -31,7 +32,15 @@ test.describe('PDF annotation end-to-end', () => {
     const fileInput = page.locator('input.input-file[type="file"]');
     await expect(fileInput).toBeVisible();
 
-    await fileInput.setInputFiles('public/assets/test-documents/sample.pdf');
+    const samplePdfPath = join(
+      process.cwd(),
+      'public',
+      'assets',
+      'test-documents',
+      'sample.pdf'
+    );
+
+    await fileInput.setInputFiles(samplePdfPath);
 
     const viewer = page.locator('main.viewer');
     await expect(viewer).toBeVisible();
