@@ -1,5 +1,5 @@
 # Stage 1: Build the Angular application
-FROM node:20-alpine AS build
+FROM node:22.12.0-alpine AS build
 
 # Install system dependencies required for Node.js native extensions
 RUN apk add --no-cache python3 make g++
