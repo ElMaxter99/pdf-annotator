@@ -89,6 +89,7 @@ export class App implements AfterViewChecked, OnDestroy {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
+  fileDropActive = signal(false);
   private readonly translationService = inject(TranslationService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
@@ -129,6 +130,7 @@ export class App implements AfterViewChecked, OnDestroy {
   @ViewChild('pdfViewer', { static: false }) pdfViewerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('pdfFileInput', { static: false }) pdfFileInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('coordsFileInput', { static: false }) coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
@@ -307,7 +309,70 @@ export class App implements AfterViewChecked, OnDestroy {
   async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
+
+    try {
+      await this.loadPdfFile(file);
+    } finally {
+      input.value = '';
+    }
+  }
+
+  openPdfFilePicker() {
+    this.fileDropActive.set(false);
+    const input = this.pdfFileInputRef?.nativeElement;
+    if (!input) {
+      return;
+    }
+
+    input.value = '';
+    input.click();
+  }
+
+  onFileUploadKeydown(event: KeyboardEvent) {
+    if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Space') {
+      return;
+    }
+    event.preventDefault();
+    this.openPdfFilePicker();
+  }
+
+  onFileDragOver(event: DragEvent) {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+    this.fileDropActive.set(true);
+  }
+
+  onFileDragLeave(event: DragEvent) {
+    if (event.currentTarget instanceof HTMLElement && event.relatedTarget instanceof Node) {
+      if (event.currentTarget.contains(event.relatedTarget)) {
+        return;
+      }
+    }
+    this.fileDropActive.set(false);
+  }
+
+  async onFileDrop(event: DragEvent) {
+    event.preventDefault();
+    this.fileDropActive.set(false);
+
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    await this.loadPdfFile(file);
+  }
+
+  private async loadPdfFile(file: File) {
+    if (!this.isPdfFile(file)) {
+      alert(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
 
     this.pdfByteSources.clear();
     const buf = await file.arrayBuffer();
@@ -340,6 +405,15 @@ export class App implements AfterViewChecked, OnDestroy {
     this.resetHistory();
     this.clearAll({ skipHistory: true });
     await this.render();
+    this.fileDropActive.set(false);
+  }
+
+  private isPdfFile(file: File) {
+    if (!file.type) {
+      return file.name.toLowerCase().endsWith('.pdf');
+    }
+
+    return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
   }
 
   async render() {

@@ -7,6 +7,25 @@
       "es-ES": "Spanish",
       "en": "English",
       "ca": "Catalan"
+    },
+    "landing": {
+      "badge": "Annotate smarter",
+      "title": "Bring structure to any PDF in seconds",
+      "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
+      "cta": "Select PDF"
+    },
+    "upload": {
+      "title": "Upload your PDF",
+      "subtitle": "Drag & drop the file here or click to browse",
+      "hint": "PDF only",
+      "invalidFormat": "Only PDF files are supported."
+    },
+    "workspaceUpload": {
+      "badge": "Start over",
+      "title": "Need to reset this project?",
+      "subtitle": "Drop a different PDF or click to replace the current document.",
+      "cta": "Upload another PDF",
+      "ariaLabel": "Upload a new PDF to restart the annotation workspace"
     }
   },
   "controls": {
@@ -14,13 +33,20 @@
     "next": "Next",
     "pageIndicator": "Page {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
     "undo": "Undo",
     "redo": "Redo",
     "clear": "Clear",
     "copyJson": "Copy JSON",
     "importJson": "Import JSON",
     "downloadJson": "Download JSON",
-    "downloadPdf": "Download PDF"
+    "downloadPdf": "Download PDF",
+    "toolbarAriaLabel": "PDF actions",
+    "navigationGroup": "Page navigation",
+    "zoomGroup": "Zoom controls",
+    "historyGroup": "History actions",
+    "exportGroup": "Export options"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
