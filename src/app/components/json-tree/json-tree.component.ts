@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   Input,
   OnChanges,
   SimpleChanges,
@@ -35,6 +36,9 @@ export class JsonTreeComponent implements OnChanges {
   protected rootNode: JsonTreeNode | null = null;
 
   private readonly collapsedPaths = signal<Set<string>>(new Set());
+  private readonly focusedPath = signal<string | null>(null);
+
+  constructor(private readonly host: ElementRef<HTMLElement>) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if ('value' in changes || 'label' in changes) {
@@ -86,6 +90,10 @@ export class JsonTreeComponent implements OnChanges {
     return this.collapsedPaths().has(node.path);
   }
 
+  protected isFocused(node: JsonTreeNode): boolean {
+    return this.focusedPath() === node.path;
+  }
+
   protected trackByPath(_index: number, node: JsonTreeNode): string {
     return node.path;
   }
@@ -100,6 +108,32 @@ export class JsonTreeComponent implements OnChanges {
     }
 
     return String(value);
+  }
+
+  focusPath(path: string, options?: { smooth?: boolean }) {
+    if (!path) {
+      this.focusedPath.set(null);
+      return;
+    }
+
+    this.expandPath(path);
+    this.focusedPath.set(path);
+
+    this.runAfterRender(() => {
+      const target = this.findNodeElement(path);
+      if (!target) {
+        return;
+      }
+
+      const behavior = options?.smooth ? 'smooth' : 'auto';
+      if (typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView({ block: 'center', behavior });
+      }
+    });
+  }
+
+  clearFocus() {
+    this.focusedPath.set(null);
   }
 
   private buildNode(
@@ -210,5 +244,50 @@ export class JsonTreeComponent implements OnChanges {
     for (const child of node.children) {
       this.populateCollapsedPaths(child, target, interactive);
     }
+  }
+
+  private expandPath(path: string) {
+    if (!path) {
+      return;
+    }
+
+    const ancestors = this.collectAncestorPaths(path);
+    if (!ancestors.length) {
+      return;
+    }
+
+    this.collapsedPaths.update((paths) => {
+      const next = new Set(paths);
+      for (const ancestor of ancestors) {
+        next.delete(ancestor);
+      }
+      return next;
+    });
+  }
+
+  private collectAncestorPaths(path: string): string[] {
+    const segments = path.split('/');
+    const ancestors: string[] = [];
+    for (let i = 1; i <= segments.length; i += 1) {
+      const candidate = segments.slice(0, i).join('/');
+      if (candidate) {
+        ancestors.push(candidate);
+      }
+    }
+    return ancestors;
+  }
+
+  private findNodeElement(path: string): HTMLElement | null {
+    const hostElement = this.host.nativeElement;
+    return hostElement.querySelector<HTMLElement>(`[data-json-path="${path}"]`);
+  }
+
+  private runAfterRender(callback: () => void) {
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => callback());
+      return;
+    }
+
+    setTimeout(callback, 0);
   }
 }

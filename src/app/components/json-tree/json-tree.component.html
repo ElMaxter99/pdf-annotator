@@ -8,7 +8,11 @@
     role="treeitem"
     [attr.aria-expanded]="node.children?.length ? !isCollapsed(node) : null"
   >
-    <div class="json-tree__row">
+    <div
+      class="json-tree__row"
+      [class.json-tree__row--focused]="isFocused(node)"
+      [attr.data-json-path]="node.path"
+    >
       <button
         *ngIf="node.children?.length"
         type="button"

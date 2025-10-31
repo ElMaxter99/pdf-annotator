@@ -168,12 +168,13 @@
         </ng-template>
       </section>
       <ng-container *ngIf="jsonViewMode() === 'text'; else jsonTreeView">
-        <textarea class="json-editor" [ngModel]="coordsTextModel" (ngModelChange)="onCoordsTextChange($event)"
-          [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
+        <textarea #jsonEditor class="json-editor" [ngModel]="coordsTextModel"
+          (ngModelChange)="onCoordsTextChange($event)" [placeholder]="'sidebar.jsonPlaceholder' | t"
+          spellcheck="false"></textarea>
       </ng-container>
       <ng-template #jsonTreeView>
         <div *ngIf="jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
-          <app-json-tree [value]="jsonTreePreview.value"></app-json-tree>
+          <app-json-tree #jsonTree [value]="jsonTreePreview.value"></app-json-tree>
         </div>
         <ng-template #jsonTreePlaceholder>
           <div class="json-tree-placeholder">

@@ -225,6 +225,8 @@ export class App implements AfterViewChecked, OnDestroy {
   coordsFileInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('customFontInput', { static: false })
   customFontInputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('jsonEditor', { static: false }) jsonEditorRef?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('jsonTree', { static: false }) jsonTreeComponent?: JsonTreeComponent;
 
   constructor() {
     this.setDocumentMetadata();
@@ -1459,6 +1461,7 @@ export class App implements AfterViewChecked, OnDestroy {
     this.editing.set({ pageIndex, fieldIndex, field: formField });
     this.updateEditingColorState(formField.color);
     this.preview.set(null);
+    this.focusJsonOnSelection(pageIndex, fieldIndex);
   }
 
   confirmEdit() {
@@ -2061,6 +2064,220 @@ export class App implements AfterViewChecked, OnDestroy {
     }
   }
 
+  private focusJsonOnSelection(pageIndex: number, fieldIndex: number) {
+    if (pageIndex < 0 || fieldIndex < 0) {
+      return;
+    }
+
+    this.runAfterRender(() => {
+      if (this.jsonViewMode() === 'tree') {
+        this.focusJsonTreeNode(pageIndex, fieldIndex);
+      } else {
+        this.focusJsonTextRange(pageIndex, fieldIndex);
+      }
+    });
+  }
+
+  private focusJsonTreeNode(pageIndex: number, fieldIndex: number) {
+    if (this.jsonTreePreview.status !== 'ready') {
+      return;
+    }
+
+    const component = this.jsonTreeComponent;
+    if (!component) {
+      return;
+    }
+
+    const pages = this.coords();
+    if (pageIndex < 0 || pageIndex >= pages.length) {
+      return;
+    }
+
+    const fields = pages[pageIndex]?.fields ?? [];
+    if (fieldIndex < 0 || fieldIndex >= fields.length) {
+      return;
+    }
+
+    component.focusPath(this.buildJsonTreePath(pageIndex, fieldIndex), { smooth: true });
+  }
+
+  private buildJsonTreePath(pageIndex: number, fieldIndex: number): string {
+    return `root/pages/${pageIndex}/fields/${fieldIndex}`;
+  }
+
+  private focusJsonTextRange(pageIndex: number, fieldIndex: number) {
+    const textarea = this.jsonEditorRef?.nativeElement;
+    if (!textarea) {
+      return;
+    }
+
+    const pages = this.coords();
+    if (pageIndex < 0 || pageIndex >= pages.length) {
+      return;
+    }
+
+    const fields = pages[pageIndex]?.fields ?? [];
+    if (fieldIndex < 0 || fieldIndex >= fields.length) {
+      return;
+    }
+
+    const range = this.locateJsonFieldRange(pageIndex, fieldIndex, textarea.value);
+    if (!range) {
+      return;
+    }
+
+    this.highlightTextareaRange(textarea, range);
+  }
+
+  private locateJsonFieldRange(
+    pageIndex: number,
+    fieldIndex: number,
+    text: string
+  ): { start: number; end: number } | null {
+    if (!text) {
+      return null;
+    }
+
+    const pages = this.coords();
+    if (pageIndex < 0 || pageIndex >= pages.length) {
+      return null;
+    }
+
+    const targetPage = pages[pageIndex];
+    if (!targetPage.fields.length || fieldIndex < 0 || fieldIndex >= targetPage.fields.length) {
+      return null;
+    }
+
+    let searchFrom = 0;
+
+    for (let i = 0; i < pages.length; i += 1) {
+      const pageBlock = this.buildPageJsonBlock(pages[i]);
+      const pagePos = text.indexOf(pageBlock, searchFrom);
+      if (pagePos === -1) {
+        return null;
+      }
+
+      if (i === pageIndex) {
+        let fieldSearchFrom = pagePos;
+        for (let j = 0; j < targetPage.fields.length; j += 1) {
+          const fieldBlock = this.buildFieldJsonBlock(targetPage.fields[j]);
+          const fieldPos = text.indexOf(fieldBlock, fieldSearchFrom);
+          if (fieldPos === -1) {
+            return null;
+          }
+
+          if (j === fieldIndex) {
+            return { start: fieldPos, end: fieldPos + fieldBlock.length };
+          }
+
+          fieldSearchFrom = fieldPos + fieldBlock.length;
+        }
+
+        return null;
+      }
+
+      searchFrom = pagePos + pageBlock.length;
+    }
+
+    return null;
+  }
+
+  private buildPageJsonBlock(page: PageAnnotations): string {
+    return JSON.stringify(page, null, 2)
+      .split('\n')
+      .map((line) => `    ${line}`)
+      .join('\n');
+  }
+
+  private buildFieldJsonBlock(field: PageField): string {
+    return JSON.stringify(field, null, 2)
+      .split('\n')
+      .map((line) => `        ${line}`)
+      .join('\n');
+  }
+
+  private highlightTextareaRange(
+    textarea: HTMLTextAreaElement,
+    range: { start: number; end: number }
+  ) {
+    const { start, end } = range;
+    if (start < 0 || end <= start) {
+      return;
+    }
+
+    const activeElement = (this.document?.activeElement ?? null) as HTMLElement | null;
+    const hadFocus = activeElement === textarea;
+
+    if (!hadFocus) {
+      try {
+        textarea.focus({ preventScroll: true } as FocusOptions);
+      } catch {
+        textarea.focus();
+      }
+    }
+
+    try {
+      textarea.setSelectionRange(start, end);
+    } catch {
+      // Ignore selection errors in unsupported environments.
+    }
+
+    const lineHeight = this.getTextareaLineHeight(textarea);
+    const precedingText = textarea.value.slice(0, start);
+    const lineIndex = this.countLineBreaks(precedingText);
+    const top = Math.max(lineIndex - 2, 0) * lineHeight;
+
+    if (typeof textarea.scrollTo === 'function') {
+      textarea.scrollTo({ top, behavior: 'smooth' });
+    } else {
+      textarea.scrollTop = top;
+    }
+
+    if (!hadFocus && activeElement && activeElement !== textarea) {
+      this.runAfterRender(() => {
+        try {
+          activeElement.focus({ preventScroll: true } as FocusOptions);
+        } catch {
+          activeElement.focus();
+        }
+      });
+    }
+  }
+
+  private getTextareaLineHeight(textarea: HTMLTextAreaElement): number {
+    if (typeof window === 'undefined' || typeof getComputedStyle !== 'function') {
+      return 20;
+    }
+
+    const computed = getComputedStyle(textarea);
+    const rawLineHeight = parseFloat(computed.lineHeight);
+    if (Number.isFinite(rawLineHeight) && rawLineHeight > 0) {
+      return rawLineHeight;
+    }
+
+    const fontSize = parseFloat(computed.fontSize);
+    if (Number.isFinite(fontSize) && fontSize > 0) {
+      return fontSize * 1.4;
+    }
+
+    return 20;
+  }
+
+  private countLineBreaks(value: string): number {
+    if (!value) {
+      return 0;
+    }
+
+    let count = 0;
+    for (let i = 0; i < value.length; i += 1) {
+      if (value.charCodeAt(i) === 10) {
+        count += 1;
+      }
+    }
+
+    return count;
+  }
+
   private updateAnnotationLeft(el: HTMLDivElement, field: PageField, scale: number) {
     const width = el.offsetWidth;
     const left = field.x * scale;
@@ -2462,6 +2679,11 @@ export class App implements AfterViewChecked, OnDestroy {
     }
 
     this.jsonViewMode.set(mode);
+
+    const editState = this.editing();
+    if (editState) {
+      this.focusJsonOnSelection(editState.pageIndex, editState.fieldIndex);
+    }
   }
 
   applyCoordsText() {
