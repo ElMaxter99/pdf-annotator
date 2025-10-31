@@ -802,12 +802,11 @@ header .logo {
   position: relative;
 }
 
-#pdfCanvas,
-#overlayCanvas {
+.canvas-container .canvas {
   display: block;
 }
 
-#overlayCanvas {
+.canvas--overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
