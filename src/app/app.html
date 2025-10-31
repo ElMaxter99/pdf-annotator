@@ -234,6 +234,23 @@
                 </label>
               </div>
 
+              <div class="guides-mode" role="radiogroup"
+                [attr.aria-label]="'guides.coordinateMode.label' | t">
+                <span class="guides-mode__label">{{ 'guides.coordinateMode.label' | t }}</span>
+                <div class="guides-mode__options">
+                  <label>
+                    <input type="radio" name="coordinateMode" [checked]="!guides.usePdfCoordinates"
+                      (change)="setCoordinateMode('canvas')" />
+                    <span>{{ 'guides.coordinateMode.canvas' | t }}</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="coordinateMode" [checked]="guides.usePdfCoordinates"
+                      (change)="setCoordinateMode('pdf')" />
+                    <span>{{ 'guides.coordinateMode.pdf' | t }}</span>
+                  </label>
+                </div>
+              </div>
+
               <div class="guides-inputs">
                 <label>
                   <span>{{ 'guides.gridSize' | t }}</span>
@@ -260,11 +277,11 @@
                     [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
                 </label>
                 <label>
-                  <span>{{ 'guides.customY' | t }}</span>
+                  <span>{{ (guides.usePdfCoordinates ? 'guides.customY.pdf' : 'guides.customY.canvas') | t }}</span>
                   <input type="text" [ngModel]="snapPointsYText()" (ngModelChange)="onSnapPointsInput('y', $event)"
                     [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
                 </label>
-                <small class="guides-hint">{{ 'guides.customHint' | t }}</small>
+                <small class="guides-hint">{{ (guides.usePdfCoordinates ? 'guides.customHint.pdf' : 'guides.customHint.canvas') | t }}</small>
               </div>
             </section>
           </div>

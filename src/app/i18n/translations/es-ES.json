@@ -78,9 +78,20 @@
     "marginSize": "Margen (pt)",
     "tolerance": "Tolerancia (px)",
     "customX": "Coordenadas X (pt)",
-    "customY": "Coordenadas Y (pt desde el borde superior)",
+    "customY": {
+      "canvas": "Coordenadas Y (pt desde el borde superior)",
+      "pdf": "Coordenadas Y (pt desde el borde inferior)"
+    },
     "customPlaceholder": "Ej.: 24, 48, 120",
-    "customHint": "Introduce valores en puntos (pt) separados por comas o espacios. Las Y se miden desde el borde superior del PDF."
+    "customHint": {
+      "canvas": "Introduce valores en puntos (pt) separados por comas o espacios. Las Y se miden desde el borde superior del PDF.",
+      "pdf": "Introduce valores en puntos (pt) separados por comas o espacios. Las Y se miden desde el borde inferior del PDF."
+    },
+    "coordinateMode": {
+      "label": "Origen de coordenadas",
+      "canvas": "Esquina superior izquierda (Canvas)",
+      "pdf": "Esquina inferior izquierda (PDF)"
+    }
   },
   "annotation": {
     "fields": {

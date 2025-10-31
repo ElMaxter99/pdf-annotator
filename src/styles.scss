@@ -740,6 +740,69 @@ header .logo {
   accent-color: var(--accent);
 }
 
+.advanced-panel .guides-panel .guides-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.28);
+  border: 1px solid rgba(94, 234, 212, 0.12);
+}
+
+.advanced-panel .guides-panel .guides-mode__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.advanced-panel .guides-panel .guides-mode__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.advanced-panel .guides-panel .guides-mode__options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.advanced-panel .guides-panel .guides-mode__options label input[type='radio'] {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.advanced-panel .guides-panel .guides-mode__options label span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  background: rgba(29, 29, 42, 0.85);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.advanced-panel .guides-panel .guides-mode__options label input[type='radio']:checked + span {
+  border-color: var(--accent);
+  background: rgba(94, 234, 212, 0.18);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.15);
+}
+
+.advanced-panel .guides-panel .guides-mode__options label:hover span,
+.advanced-panel .guides-panel .guides-mode__options label:focus-within span {
+  border-color: rgba(94, 234, 212, 0.35);
+  box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.15);
+}
+
 .advanced-panel .guides-panel .guides-inputs {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));

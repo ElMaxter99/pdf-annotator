@@ -78,9 +78,20 @@
     "marginSize": "Marge (pt)",
     "tolerance": "Tolerància (px)",
     "customX": "Coordenades X (pt)",
-    "customY": "Coordenades Y (pt des de la vora superior)",
+    "customY": {
+      "canvas": "Coordenades Y (pt des de la vora superior)",
+      "pdf": "Coordenades Y (pt des de la vora inferior)"
+    },
     "customPlaceholder": "Ex.: 24, 48, 120",
-    "customHint": "Introdueix valors en punts (pt) separats per comes o espais. Les Y es mesuren des de la vora superior del PDF."
+    "customHint": {
+      "canvas": "Introdueix valors en punts (pt) separats per comes o espais. Les Y es mesuren des de la vora superior del PDF.",
+      "pdf": "Introdueix valors en punts (pt) separats per comes o espais. Les Y es mesuren des de la vora inferior del PDF."
+    },
+    "coordinateMode": {
+      "label": "Origen de coordenades",
+      "canvas": "Cantonada superior esquerra (Canvas)",
+      "pdf": "Cantonada inferior esquerra (PDF)"
+    }
   },
   "annotation": {
     "fields": {
