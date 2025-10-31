@@ -424,7 +424,7 @@
               </button>
               <div class="font-dropdown__panel" *ngIf="fontDropdownOpen('preview')" role="listbox"
                 [attr.aria-labelledby]="'preview-font-label'">
-                <input type="search" class="font-dropdown__search"
+                <input #previewFontSearch type="search" class="font-dropdown__search"
                   [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
                   [value]="fontSearchQuery('preview')"
                   (input)="onFontSearch('preview', $any($event.target).value)"
@@ -540,7 +540,7 @@
               </button>
               <div class="font-dropdown__panel" *ngIf="fontDropdownOpen('edit')" role="listbox"
                 [attr.aria-labelledby]="'edit-font-label'">
-                <input type="search" class="font-dropdown__search"
+                <input #editFontSearch type="search" class="font-dropdown__search"
                   [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
                   [value]="fontSearchQuery('edit')"
                   (input)="onFontSearch('edit', $any($event.target).value)"

@@ -220,6 +220,10 @@ export class App implements AfterViewChecked, OnDestroy {
   previewFontDropdownRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editFontDropdown', { static: false })
   editFontDropdownRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('previewFontSearch', { static: false })
+  previewFontSearchRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('editFontSearch', { static: false })
+  editFontSearchRef?: ElementRef<HTMLInputElement>;
   @ViewChild('pdfFileInput', { static: false }) pdfFileInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('coordsFileInput', { static: false })
   coordsFileInputRef?: ElementRef<HTMLInputElement>;
@@ -273,8 +277,10 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   toggleFontDropdown(mode: EditorMode) {
+    let opened = false;
     this.fontDropdownState.update((state) => {
       const nextOpen = !state[mode].open;
+      opened = nextOpen;
       const nextState: Record<EditorMode, FontDropdownUiState> = {
         ...state,
         [mode]: { open: nextOpen, query: nextOpen ? '' : '' },
@@ -288,6 +294,25 @@ export class App implements AfterViewChecked, OnDestroy {
       }
 
       return nextState;
+    });
+
+    if (opened) {
+      this.focusFontSearch(mode);
+    }
+  }
+
+  private focusFontSearch(mode: EditorMode) {
+    this.runAfterRender(() => {
+      const ref = mode === 'preview' ? this.previewFontSearchRef : this.editFontSearchRef;
+      const input = ref?.nativeElement;
+      if (input) {
+        try {
+          input.focus({ preventScroll: true });
+        } catch {
+          input.focus();
+        }
+        input.select();
+      }
     });
   }
 
@@ -1801,50 +1826,146 @@ export class App implements AfterViewChecked, OnDestroy {
     return DEFAULT_FONT_ID;
   }
 
-  private resolveImportedFontFamily(primary: unknown, secondary: unknown): string | undefined {
-    const attempt = (value: unknown): string | undefined => {
-      if (typeof value !== 'string') {
-        return undefined;
+  private collectFontFamilyCandidates(rawField: Record<string, unknown>): unknown[] {
+    const candidates: unknown[] = [];
+    const push = (value: unknown) => {
+      if (value !== undefined && value !== null) {
+        candidates.push(value);
       }
+    };
 
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return undefined;
+    const directKeys = [
+      'fontFamily',
+      'fontfamily',
+      'font_family',
+      'fontFamilyName',
+      'font_family_name',
+      'font',
+      'fontName',
+      'font_name',
+      'familyName',
+      'fontId',
+      'font_id',
+      'fontFamilyId',
+      'font_family_id',
+      'fontFace',
+      'font_face',
+      'fontType',
+      'font_type',
+      'typeface',
+    ];
+
+    for (const key of directKeys) {
+      if (key in rawField) {
+        push(rawField[key]);
       }
+    }
 
-      const options = this.fontOptions();
-      const direct = options.find((option) => option.id === trimmed);
-      if (direct) {
-        return direct.id;
+    const style = rawField['style'];
+    if (style && typeof style === 'object') {
+      const styleRecord = style as Record<string, unknown>;
+      push(styleRecord['fontFamily']);
+      push(styleRecord['fontfamily']);
+      push(styleRecord['font']);
+      push(styleRecord['fontName']);
+      push(styleRecord['font_name']);
+    }
+
+    const font = rawField['font'];
+    if (font && typeof font === 'object') {
+      const fontRecord = font as Record<string, unknown>;
+      push(font);
+      push(fontRecord['id']);
+      push(fontRecord['name']);
+      push(fontRecord['family']);
+      push(fontRecord['value']);
+      push(fontRecord['fontFamily']);
+      push(fontRecord['font_name']);
+    }
+
+    const typography = (rawField as { typography?: unknown }).typography;
+    if (typography && typeof typography === 'object') {
+      const typographyRecord = typography as Record<string, unknown>;
+      push(typographyRecord['fontFamily']);
+      push(typographyRecord['font']);
+      push(typographyRecord['name']);
+    }
+
+    const meta = (rawField as { meta?: unknown }).meta;
+    if (meta && typeof meta === 'object') {
+      const metaRecord = meta as Record<string, unknown>;
+      const metaFont = metaRecord['font'];
+      if (metaFont && typeof metaFont === 'object') {
+        const metaFontRecord = metaFont as Record<string, unknown>;
+        push(metaFontRecord['id']);
+        push(metaFontRecord['name']);
+        push(metaFontRecord['family']);
+        push(metaFontRecord['fontFamily']);
       }
+    }
 
-      const normalized = trimmed.toLowerCase();
-      const simplified = normalized.replace(/[^a-z0-9]/g, '');
+    return candidates;
+  }
+
+  private resolveImportedFontFamily(...candidates: unknown[]): string | undefined {
+    if (!candidates.length) {
+      return undefined;
+    }
+
+    const options = this.fontOptions();
+    if (!options.length) {
+      return undefined;
+    }
+
+    const sanitize = (value: string) => value.toLowerCase();
+    const canonical = (value: string) => sanitize(value).replace(/[^a-z0-9]/g, '');
+    const visited = new Set<string>();
+
+    const tryMatchOption = (input: string): string | undefined => {
+      const normalized = sanitize(input);
+      const simplified = canonical(input);
 
       for (const option of options) {
-        if (option.id.toLowerCase() === normalized) {
+        if (option.id === input) {
           return option.id;
         }
 
-        const labelNormalized = option.label.toLowerCase();
-        if (labelNormalized === normalized) {
+        const optionIdNormalized = sanitize(option.id);
+        if (optionIdNormalized === normalized || canonical(option.id) === simplified) {
           return option.id;
         }
 
-        const labelSimplified = labelNormalized.replace(/[^a-z0-9]/g, '');
-        if (labelSimplified === simplified) {
+        const labelNormalized = sanitize(option.label);
+        if (labelNormalized === normalized || canonical(option.label) === simplified) {
           return option.id;
         }
 
         if (option.type === 'standard') {
           const baseId = option.id.replace(/^standard:/, '');
-          const baseNormalized = baseId.toLowerCase();
-          if (baseId === trimmed || baseNormalized === normalized) {
+          const baseNormalized = sanitize(baseId);
+          const baseCanonical = canonical(baseId);
+          if (
+            baseId === input ||
+            baseNormalized === normalized ||
+            baseCanonical === simplified ||
+            (baseCanonical.length >= 3 && simplified.includes(baseCanonical))
+          ) {
             return option.id;
           }
+        }
 
-          const baseSimplified = baseNormalized.replace(/[^a-z0-9]/g, '');
-          if (baseSimplified === simplified) {
+        const labelCanonical = canonical(option.label);
+        if (labelCanonical.length >= 3 && simplified.includes(labelCanonical)) {
+          return option.id;
+        }
+
+        const cssParts = option.cssFamily
+          .split(',')
+          .map((part) => part.trim().replace(/^["'`]+|["'`]+$/g, ''))
+          .filter(Boolean);
+        for (const cssPart of cssParts) {
+          const cssNormalized = sanitize(cssPart);
+          if (cssNormalized === normalized || canonical(cssPart) === simplified) {
             return option.id;
           }
         }
@@ -1853,7 +1974,127 @@ export class App implements AfterViewChecked, OnDestroy {
       return undefined;
     };
 
-    return attempt(primary) ?? attempt(secondary);
+    const attemptString = (value: string): string | undefined => {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return undefined;
+      }
+
+      if (visited.has(trimmed)) {
+        return undefined;
+      }
+      visited.add(trimmed);
+
+      const direct = tryMatchOption(trimmed);
+      if (direct) {
+        return direct;
+      }
+
+      if (trimmed.includes(',')) {
+        for (const part of trimmed.split(',')) {
+          const result = attemptString(part.replace(/^["'`]+|["'`]+$/g, ''));
+          if (result) {
+            return result;
+          }
+        }
+      }
+
+      const unquoted = trimmed.replace(/^["'`]+|["'`]+$/g, '');
+      if (unquoted !== trimmed) {
+        const result = attemptString(unquoted);
+        if (result) {
+          return result;
+        }
+      }
+
+      return undefined;
+    };
+
+    const attempt = (value: unknown): string | undefined => {
+      if (value === null || value === undefined) {
+        return undefined;
+      }
+
+      if (typeof value === 'string') {
+        return attemptString(value);
+      }
+
+      if (typeof value === 'number' || typeof value === 'boolean') {
+        return attemptString(String(value));
+      }
+
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          const result = attempt(item);
+          if (result) {
+            return result;
+          }
+        }
+        return undefined;
+      }
+
+      if (typeof value === 'object') {
+        const record = value as Record<string, unknown>;
+        const objectCandidates: unknown[] = [];
+
+        const candidateKeys = [
+          'id',
+          'value',
+          'name',
+          'label',
+          'family',
+          'font',
+          'fontFamily',
+          'fontFamilyId',
+          'fontId',
+          'font_id',
+          'font_name',
+          'fontFace',
+          'css',
+          'cssFamily',
+        ];
+
+        for (const key of candidateKeys) {
+          if (key in record) {
+            objectCandidates.push(record[key]);
+          }
+        }
+
+        const recordType = record['type'];
+        const recordName = record['name'];
+        if (typeof recordType === 'string' && typeof recordName === 'string') {
+          objectCandidates.push(`${recordType}:${recordName}`);
+        }
+
+        const recordKind = record['kind'];
+        if (typeof recordKind === 'string' && typeof recordName === 'string') {
+          objectCandidates.push(`${recordKind}:${recordName}`);
+        }
+
+        const recordAliases = record['aliases'];
+        if (Array.isArray(recordAliases)) {
+          objectCandidates.push(...recordAliases);
+        }
+
+        for (const candidate of objectCandidates) {
+          const result = attempt(candidate);
+          if (result) {
+            return result;
+          }
+        }
+      }
+
+      return undefined;
+    };
+
+    for (const candidate of candidates) {
+      const result = attempt(candidate);
+      if (result) {
+        return result;
+      }
+    }
+
+    return undefined;
   }
 
   private normalizeOpacityValue(value: unknown): number | undefined {
@@ -3379,14 +3620,13 @@ export class App implements AfterViewChecked, OnDestroy {
           }
         }
 
-        const rawFontFamily = (rawField as { fontFamily?: unknown }).fontFamily;
-        const rawFontType = (rawField as { fontType?: unknown }).fontType;
         const rawOpacity = (rawField as { opacity?: unknown }).opacity;
         const rawBackground = (rawField as { backgroundColor?: unknown }).backgroundColor;
+        const fontCandidates = this.collectFontFamilyCandidates(rawField as Record<string, unknown>);
 
         const styledField = this.prepareFieldForStorage({
           ...normalizedField,
-          fontFamily: this.resolveImportedFontFamily(rawFontFamily, rawFontType),
+          fontFamily: this.resolveImportedFontFamily(...fontCandidates),
           opacity: rawOpacity as number | string | undefined,
           backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,
         } as PageField);
