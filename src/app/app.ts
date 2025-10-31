@@ -14,7 +14,6 @@ import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import { Meta, Title } from '@angular/platform-browser';
-import { TranslationPipe } from './i18n/translation.pipe';
 import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
@@ -27,8 +26,8 @@ import {
   cloneGuideSettings,
   differsFromDefaultGuideSettings,
 } from './models/guide-settings.model';
-import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
-import { JsonTreeComponent } from './components/json-tree/json-tree.component';
+import { LandingComponent } from './components/landing/landing.component';
+import { WorkspaceComponent } from './components/workspace/workspace.component';
 import {
   STANDARD_FONT_FAMILIES,
   StandardFontFamilyDefinition,
@@ -135,14 +134,14 @@ const DEFAULT_OPACITY = 1;
   imports: [
     CommonModule,
     FormsModule,
-    TranslationPipe,
-    LanguageSelectorComponent,
-    JsonTreeComponent,
+    LandingComponent,
+    WorkspaceComponent,
   ],
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked, OnDestroy {
   pdfDoc: PDFDocumentProxy | null = null;
+  readonly vm: App;
   pageIndex = signal(1);
   scale = signal(1.5);
   coords = signal<PageAnnotations[]>([]);
@@ -209,30 +208,72 @@ export class App implements AfterViewChecked, OnDestroy {
   private overlayGuides: OverlayGuide[] = [];
   private clipboard: PageField | null = null;
 
-  @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('annotationsLayer', { static: false })
-  annotationsLayerRef?: ElementRef<HTMLDivElement>;
-  @ViewChild('pdfViewer', { static: false }) pdfViewerRef?: ElementRef<HTMLDivElement>;
-  @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
-  @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
-  @ViewChild('previewFontDropdown', { static: false })
-  previewFontDropdownRef?: ElementRef<HTMLDivElement>;
-  @ViewChild('editFontDropdown', { static: false })
-  editFontDropdownRef?: ElementRef<HTMLDivElement>;
-  @ViewChild('previewFontSearch', { static: false })
-  previewFontSearchRef?: ElementRef<HTMLInputElement>;
-  @ViewChild('editFontSearch', { static: false })
-  editFontSearchRef?: ElementRef<HTMLInputElement>;
-  @ViewChild('pdfFileInput', { static: false }) pdfFileInputRef?: ElementRef<HTMLInputElement>;
-  @ViewChild('coordsFileInput', { static: false })
-  coordsFileInputRef?: ElementRef<HTMLInputElement>;
-  @ViewChild('customFontInput', { static: false })
-  customFontInputRef?: ElementRef<HTMLInputElement>;
-  @ViewChild('jsonEditor', { static: false }) jsonEditorRef?: ElementRef<HTMLTextAreaElement>;
-  @ViewChild('jsonTree', { static: false }) jsonTreeComponent?: JsonTreeComponent;
+  @ViewChild(LandingComponent) private landingComponent?: LandingComponent;
+  @ViewChild(WorkspaceComponent) private workspaceComponent?: WorkspaceComponent;
+
+  get pdfCanvasRef(): ElementRef<HTMLCanvasElement> | undefined {
+    return this.workspaceComponent?.pdfCanvasRef;
+  }
+
+  get overlayCanvasRef(): ElementRef<HTMLCanvasElement> | undefined {
+    return this.workspaceComponent?.overlayCanvasRef;
+  }
+
+  get annotationsLayerRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.workspaceComponent?.annotationsLayerRef;
+  }
+
+  get pdfViewerRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.workspaceComponent?.pdfViewerRef;
+  }
+
+  get previewEditorRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.workspaceComponent?.previewEditorRef;
+  }
+
+  get editEditorRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.workspaceComponent?.editEditorRef;
+  }
+
+  get previewFontDropdownRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.workspaceComponent?.previewFontDropdownRef;
+  }
+
+  get editFontDropdownRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.workspaceComponent?.editFontDropdownRef;
+  }
+
+  get previewFontSearchRef(): ElementRef<HTMLInputElement> | undefined {
+    return this.workspaceComponent?.previewFontSearchRef;
+  }
+
+  get editFontSearchRef(): ElementRef<HTMLInputElement> | undefined {
+    return this.workspaceComponent?.editFontSearchRef;
+  }
+
+  get pdfFileInputRef(): ElementRef<HTMLInputElement> | undefined {
+    return this.workspaceComponent?.pdfFileInputRef ?? this.landingComponent?.pdfFileInputRef;
+  }
+
+  get coordsFileInputRef(): ElementRef<HTMLInputElement> | undefined {
+    return this.workspaceComponent?.coordsFileInputRef;
+  }
+
+  get customFontInputRef(): ElementRef<HTMLInputElement> | undefined {
+    return this.workspaceComponent?.customFontInputRef;
+  }
+
+  get jsonEditorRef(): ElementRef<HTMLTextAreaElement> | undefined {
+    return this.workspaceComponent?.jsonEditorRef;
+  }
+
+  get jsonTreeComponent() {
+    return this.workspaceComponent?.jsonTreeComponent;
+  }
+
 
   constructor() {
+    this.vm = this;
     this.setDocumentMetadata();
     const storedTemplates = this.templatesService.getTemplates();
     this.templates.set(storedTemplates);

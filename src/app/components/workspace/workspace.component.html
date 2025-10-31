@@ -1,0 +1,570 @@
+<!-- HEADER -->
+    <header class="header">
+      <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
+        <div class="footer__brand">
+          <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
+          <div class="footer__brand-text">
+            <span class="footer__app-name">{{ vm.appName }}</span>
+            <span class="footer__version">v{{ vm.version }}</span>
+          </div>
+        </div>
+
+        <input #coordsFileInput type="file" accept="application/json" (change)="vm.onCoordsFileSelected($event)" hidden />
+
+        <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
+          <button class="btn btn--icon" (click)="vm.prevPage()" [disabled]="!vm.pdfDoc || vm.pageIndex()===1">
+            <span class="btn__icon" aria-hidden="true">⟨</span>
+            <span class="btn__label">{{ 'controls.prev' | t }}</span>
+          </button>
+          <span class="toolbar__badge">
+            {{ 'controls.pageIndicator' | t : { current: vm.pageIndex(), total: vm.pageCount || 0 } }}
+          </span>
+          <button class="btn btn--icon" (click)="vm.nextPage()" [disabled]="!vm.pdfDoc || vm.pageIndex()===vm.pageCount">
+            <span class="btn__label">{{ 'controls.next' | t }}</span>
+            <span class="btn__icon" aria-hidden="true">⟩</span>
+          </button>
+        </div>
+
+        <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
+          <button class="btn btn--icon" (click)="vm.zoomOut()" [disabled]="!vm.pdfDoc">
+            <span class="btn__icon" aria-hidden="true">−</span>
+            <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
+          </button>
+          <span class="toolbar__badge">{{ 'controls.zoomLabel' | t }} {{ vm.scale() | number:'1.0-2' }}×</span>
+          <button class="btn btn--icon" (click)="vm.zoomIn()" [disabled]="!vm.pdfDoc">
+            <span class="btn__label">{{ 'controls.zoomIn' | t }}</span>
+            <span class="btn__icon" aria-hidden="true">＋</span>
+          </button>
+        </div>
+
+        <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
+          <button class="btn btn--icon" (click)="vm.undo()" [disabled]="!vm.canUndo()">
+            <span class="btn__icon" aria-hidden="true">↺</span>
+            <span class="btn__label">{{ 'controls.undo' | t }}</span>
+          </button>
+          <button class="btn btn--icon" (click)="vm.redo()" [disabled]="!vm.canRedo()">
+            <span class="btn__icon" aria-hidden="true">↻</span>
+            <span class="btn__label">{{ 'controls.redo' | t }}</span>
+          </button>
+          <button class="btn btn--icon btn--danger" (click)="vm.clearAll()" [disabled]="!vm.coords().length">
+            <span class="btn__icon" aria-hidden="true">🧹</span>
+            <span class="btn__label">{{ 'controls.clear' | t }}</span>
+          </button>
+        </div>
+
+        <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
+          <button class="btn btn--icon" (click)="vm.downloadAnnotatedPDF()" [disabled]="!vm.coords().length || !vm.pdfDoc">
+            <span class="btn__icon" aria-hidden="true">⬇</span>
+            <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
+          </button>
+        </div>
+
+        <app-language-selector class="header__language-selector" [languages]="vm.languages"
+          [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
+        </app-language-selector>
+      </div>
+    </header>
+
+    <!-- LATERAL SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-upload" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
+        (keydown)="vm.onFileUploadKeydown($event)" (dragover)="vm.onFileDragOver($event)"
+        (dragleave)="vm.onFileDragLeave($event)" (drop)="vm.onFileDrop($event)"
+        [class.sidebar-upload--active]="vm.fileDropActive()" [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t">
+        <input #pdfFileInput type="file" accept="application/pdf" (change)="vm.onFileSelected($event)" hidden />
+
+        <div class="sidebar-upload__body">
+          <div class="sidebar-upload__icon" aria-hidden="true">🗂️</div>
+          <div class="sidebar-upload__copy">
+            <span class="sidebar-upload__title">{{ 'app.workspaceUpload.title' | t }}</span>
+            <span class="sidebar-upload__subtitle">{{ 'app.workspaceUpload.subtitle' | t }}</span>
+          </div>
+        </div>
+        <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
+      </section>
+      <h4>{{ 'sidebar.title' | t }}</h4>
+      <div class="sidebar-actions">
+        <button type="button" class="btn" (click)="vm.triggerImportCoords()">
+          {{ 'sidebar.importJsonFile' | t }}
+        </button>
+        <button type="button" class="btn" (click)="vm.applyCoordsText()">
+          {{ 'sidebar.applyJson' | t }}
+        </button>
+      </div>
+      <section class="templates">
+        <h5>{{ 'sidebar.templates.title' | t }}</h5>
+        <div class="templates__save">
+          <input type="text" [(ngModel)]="vm.templateNameModel" [ngModelOptions]="{ standalone: true }"
+            [placeholder]="'sidebar.templates.placeholder' | t" />
+          <button type="button" class="btn" (click)="vm.saveCurrentAsTemplate()"
+            [disabled]="!vm.coords().length || !vm.templateNameModel.trim()">
+            {{ 'sidebar.templates.saveButton' | t }}
+          </button>
+        </div>
+        <ng-container *ngIf="vm.templates().length; else emptyTemplates">
+          <div class="templates__select">
+            <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
+            <div class="templates__controls">
+              <select [(ngModel)]="vm.selectedTemplateId" [ngModelOptions]="{ standalone: true }">
+                <option *ngFor="let template of vm.templates()" [value]="template.id">
+                  {{ template.name }}
+                </option>
+              </select>
+              <button type="button" class="btn" (click)="vm.loadSelectedTemplate()" [disabled]="!vm.selectedTemplateId">
+                {{ 'sidebar.templates.loadButton' | t }}
+              </button>
+              <button type="button" class="btn templates__delete" (click)="vm.deleteSelectedTemplate()" [disabled]="
+                !vm.selectedTemplateId || vm.selectedTemplateId === vm.defaultTemplateId
+              ">
+                {{ 'sidebar.templates.deleteButton' | t }}
+              </button>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #emptyTemplates>
+          <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
+        </ng-template>
+      </section>
+      <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
+        <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel"
+          (ngModelChange)="vm.onCoordsTextChange($event)" [placeholder]="'sidebar.jsonPlaceholder' | t"
+          spellcheck="false"></textarea>
+      </ng-container>
+      <ng-template #jsonTreeView>
+        <div *ngIf="vm.jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
+          <app-json-tree #jsonTree [value]="vm.jsonTreePreview.value"></app-json-tree>
+        </div>
+        <ng-template #jsonTreePlaceholder>
+          <div class="json-tree-placeholder">
+            <p *ngIf="vm.jsonTreePreview.status === 'empty'">{{ 'sidebar.jsonTree.empty' | t }}</p>
+            <p *ngIf="vm.jsonTreePreview.status === 'error'">{{ 'sidebar.jsonTree.invalid' | t }}</p>
+          </div>
+        </ng-template>
+      </ng-template>
+      <div class="json-toolbar">
+        <div class="json-toolbar__view-toggle-group" role="group"
+          [attr.aria-label]="'controls.jsonViewModeToggle' | t">
+          <button type="button" class="json-toolbar__view-toggle-option"
+            [class.json-toolbar__view-toggle-option--active]="vm.jsonViewMode() === 'text'"
+            (click)="vm.setJsonViewMode('text')" [attr.aria-pressed]="vm.jsonViewMode() === 'text'">
+            <span class="json-toolbar__view-toggle-icon" aria-hidden="true">📝</span>
+            <span>{{ 'controls.viewJsonText' | t }}</span>
+          </button>
+          <button type="button" class="json-toolbar__view-toggle-option"
+            [class.json-toolbar__view-toggle-option--active]="vm.jsonViewMode() === 'tree'"
+            (click)="vm.setJsonViewMode('tree')" [attr.aria-pressed]="vm.jsonViewMode() === 'tree'">
+            <span class="json-toolbar__view-toggle-icon" aria-hidden="true">🌳</span>
+            <span>{{ 'controls.viewJsonTree' | t }}</span>
+          </button>
+        </div>
+        <button type="button" class="btn" (click)="vm.copyJSON()"
+          [disabled]="!vm.coords().length">{{ 'controls.copyJson' | t }}</button>
+        <button type="button" class="btn" (click)="vm.downloadJSON()"
+          [disabled]="!vm.coords().length">{{ 'controls.downloadJson' | t }}</button>
+      </div>
+      <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
+
+      <section class="advanced-panel" [class.open]="vm.advancedOptionsOpen()"
+        [class.active]="vm.guidesFeatureEnabled() || vm.customFontsFeatureEnabled()">
+        <button type="button" class="advanced-toggle" (click)="vm.toggleAdvancedOptions(!vm.advancedOptionsOpen())"
+          [attr.aria-expanded]="vm.advancedOptionsOpen()">
+          <span>{{ 'sidebar.advancedTitle' | t }}</span>
+          <span class="advanced-icon" aria-hidden="true">▾</span>
+        </button>
+
+        <ng-container *ngIf="vm.advancedOptionsOpen()">
+          <div class="advanced-content">
+            <div class="sidebar-divider"></div>
+
+            <label class="advanced-checkbox">
+              <input type="checkbox" [checked]="vm.customFontsFeatureEnabled()"
+                (change)="vm.toggleCustomFontsFeature($event.target.checked)" />
+              <span>{{ 'fonts.custom.enableFeature' | t }}</span>
+            </label>
+            <small class="advanced-hint">{{ 'fonts.custom.hint' | t }}</small>
+
+            <section class="custom-fonts-panel" *ngIf="vm.customFontsFeatureEnabled()">
+              <h5>{{ 'fonts.custom.title' | t }}</h5>
+              <p class="custom-fonts-panel__hint">{{ 'fonts.custom.description' | t }}</p>
+              <div class="custom-fonts-panel__actions">
+                <button type="button" class="btn" (click)="vm.triggerCustomFontPicker()">
+                  {{ 'fonts.custom.add' | t }}
+                </button>
+                <input #customFontInput type="file" accept=".ttf,.otf,.woff,.woff2" multiple hidden
+                  (change)="vm.onCustomFontSelected($event)" />
+              </div>
+              <ul class="custom-fonts-panel__list" *ngIf="vm.customFonts().length; else customFontsEmpty">
+                <li class="custom-fonts-panel__item" *ngFor="let font of vm.customFonts()">
+                  <span class="custom-fonts-panel__name">{{ font.name }}</span>
+                  <button type="button" class="btn btn--icon" (click)="vm.removeCustomFont(font.id)"
+                    [title]="'fonts.custom.remove' | t">
+                    ✕
+                  </button>
+                </li>
+              </ul>
+              <ng-template #customFontsEmpty>
+                <p class="custom-fonts-panel__empty">{{ 'fonts.custom.empty' | t }}</p>
+              </ng-template>
+            </section>
+
+            <div class="sidebar-divider"></div>
+
+            <label class="advanced-checkbox">
+              <input type="checkbox" [checked]="vm.guidesFeatureEnabled()"
+                (change)="vm.toggleGuidesFeature($event.target.checked)" />
+              <span>{{ 'guides.enableFeature' | t }}</span>
+            </label>
+            <small class="advanced-hint">{{ 'sidebar.advancedHint' | t }}</small>
+
+            <section class="guides-panel" *ngIf="vm.guidesFeatureEnabled() && vm.guideSettings() as guides">
+              <h5>{{ 'guides.title' | t }}</h5>
+              <div class="guides-toggles">
+                <label>
+                  <input type="checkbox" [checked]="guides.showGrid"
+                    (change)="vm.toggleGuideSetting('showGrid', $event.target.checked)" />
+                  <span>{{ 'guides.showGrid' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.showRulers"
+                    (change)="vm.toggleGuideSetting('showRulers', $event.target.checked)" />
+                  <span>{{ 'guides.showRulers' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.showAlignment"
+                    (change)="vm.toggleGuideSetting('showAlignment', $event.target.checked)" />
+                  <span>{{ 'guides.showAlignment' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.snapToGrid"
+                    (change)="vm.toggleGuideSetting('snapToGrid', $event.target.checked)" />
+                  <span>{{ 'guides.snapGrid' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.snapToMargins"
+                    (change)="vm.toggleGuideSetting('snapToMargins', $event.target.checked)" />
+                  <span>{{ 'guides.snapMargins' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.snapToCenters"
+                    (change)="vm.toggleGuideSetting('snapToCenters', $event.target.checked)" />
+                  <span>{{ 'guides.snapCenters' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.snapToCustom"
+                    (change)="vm.toggleGuideSetting('snapToCustom', $event.target.checked)" />
+                  <span>{{ 'guides.snapCustom' | t }}</span>
+                </label>
+              </div>
+
+              <div class="guides-mode" role="radiogroup"
+                [attr.aria-label]="'guides.coordinateMode.label' | t">
+                <span class="guides-mode__label">{{ 'guides.coordinateMode.label' | t }}</span>
+                <div class="guides-mode__options">
+                  <label>
+                    <input type="radio" name="coordinateMode" [checked]="!guides.usePdfCoordinates"
+                      (change)="vm.setCoordinateMode('canvas')" />
+                    <span>{{ 'guides.coordinateMode.canvas' | t }}</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="coordinateMode" [checked]="guides.usePdfCoordinates"
+                      (change)="vm.setCoordinateMode('pdf')" />
+                    <span>{{ 'guides.coordinateMode.pdf' | t }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="guides-inputs">
+                <label>
+                  <span>{{ 'guides.gridSize' | t }}</span>
+                  <input type="number" min="0.5" step="0.5" [ngModel]="guides.gridSize"
+                    (ngModelChange)="vm.updateGuideNumber('gridSize', $event)" [ngModelOptions]="{ standalone: true }" />
+                </label>
+                <label>
+                  <span>{{ 'guides.marginSize' | t }}</span>
+                  <input type="number" min="0" step="1" [ngModel]="guides.marginSize"
+                    (ngModelChange)="vm.updateGuideNumber('marginSize', $event)" [ngModelOptions]="{ standalone: true }" />
+                </label>
+                <label>
+                  <span>{{ 'guides.tolerance' | t }}</span>
+                  <input type="number" min="0" step="1" [ngModel]="guides.snapTolerance"
+                    (ngModelChange)="vm.updateGuideNumber('snapTolerance', $event)"
+                    [ngModelOptions]="{ standalone: true }" />
+                </label>
+              </div>
+
+              <div class="guides-custom">
+                <label>
+                  <span>{{ 'guides.customX' | t }}</span>
+                  <input type="text" [ngModel]="vm.snapPointsXText()" (ngModelChange)="vm.onSnapPointsInput('x', $event)"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
+                </label>
+                <label>
+                  <span>{{ (guides.usePdfCoordinates ? 'guides.customY.pdf' : 'guides.customY.canvas') | t }}</span>
+                  <input type="text" [ngModel]="vm.snapPointsYText()" (ngModelChange)="vm.onSnapPointsInput('y', $event)"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
+                </label>
+                <small class="guides-hint">{{ (guides.usePdfCoordinates ? 'guides.customHint.pdf' : 'guides.customHint.canvas') | t }}</small>
+              </div>
+            </section>
+          </div>
+        </ng-container>
+      </section>
+    </aside>
+
+    <!-- VISOR PDF -->
+    <main class="viewer" *ngIf="vm.pdfDoc as _">
+      <div class="canvas-container">
+        <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
+        <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
+        <div #annotationsLayer class="annotations-layer"></div>
+        <div class="hitbox" (click)="vm.onHitboxClick($event)"></div>
+
+        <!-- NUEVA ANOTACIÓN -->
+        <div *ngIf="vm.preview() as p" class="annotation-editor" #previewEditor [style.left.px]="p.field.x*vm.scale()"
+          [style.top.px]="vm.pdfCanvasRef!.nativeElement.height - p.field.y*vm.scale()"
+          (keydown)="vm.onEditorKeydown($event, 'preview')">
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+            <input type="text" [(ngModel)]="p.field.mapField"
+              [placeholder]="'annotation.fields.text.placeholder' | t" />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+            <select [(ngModel)]="p.field.type">
+              <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+              <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+              <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+              <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+            <input type="text" [(ngModel)]="p.field.value" [placeholder]="'annotation.fields.value.placeholder' | t" />
+          </label>
+          <label class="field field-small" *ngIf="p.field.type === 'number'">
+            <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+            <input type="number" [(ngModel)]="p.field.decimals" min="0" />
+          </label>
+          <label class="field field-small" *ngIf="p.field.type === 'number'">
+            <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+            <input type="text" [(ngModel)]="p.field.appender"
+              [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
+          </label>
+          <div class="field-row field-row--metrics">
+            <label class="field field-small field-size">
+              <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
+              <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
+            </label>
+            <label class="field field-inline opacity-field field-opacity">
+              <span class="field-label">{{ 'annotation.fields.opacity.label' | t }}</span>
+              <div class="opacity-controls">
+                <input type="range" min="0.1" max="1" step="0.05"
+                  [ngModel]="p.field.opacity ?? 1" (ngModelChange)="vm.setFieldOpacity('preview', $event)" />
+                <input type="number" min="0.1" max="1" step="0.05"
+                  [ngModel]="p.field.opacity ?? 1" (ngModelChange)="vm.setFieldOpacity('preview', $event)" />
+              </div>
+            </label>
+          </div>
+          <div class="field field-small font-field">
+            <span class="field-label" id="preview-font-label">{{ 'annotation.fields.font.label' | t }}</span>
+            <div class="font-dropdown" #previewFontDropdown
+              [class.font-dropdown--open]="vm.fontDropdownOpen('preview')">
+              <button type="button" class="font-dropdown__trigger" (click)="vm.toggleFontDropdown('preview')"
+                aria-haspopup="listbox" [attr.aria-expanded]="vm.fontDropdownOpen('preview')"
+                [attr.aria-labelledby]="'preview-font-label'">
+                <ng-container *ngIf="vm.fontSummaryOption(p.field.fontFamily) as selectedFont">
+                  <span class="font-dropdown__value">{{ selectedFont.label }}</span>
+                  <span class="font-dropdown__tag" *ngIf="selectedFont.type === 'custom'">
+                    {{ 'annotation.fields.font.customTag' | t }}
+                  </span>
+                </ng-container>
+                <span class="font-dropdown__icon" aria-hidden="true">▾</span>
+              </button>
+              <div class="font-dropdown__panel" *ngIf="vm.fontDropdownOpen('preview')" role="listbox"
+                [attr.aria-labelledby]="'preview-font-label'">
+                <input #previewFontSearch type="search" class="font-dropdown__search"
+                  [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
+                  [value]="vm.fontSearchQuery('preview')"
+                  (input)="vm.onFontSearch('preview', $any($event.target).value)"
+                  (keydown.escape)="vm.closeFontDropdown('preview')" />
+                <ng-container *ngIf="vm.filteredFontOptions('preview') as options">
+                  <div class="font-dropdown__list" *ngIf="options.length; else previewFontEmpty">
+                    <button type="button" class="font-dropdown__option" *ngFor="let option of options"
+                      (click)="vm.chooseFontOption('preview', option.id)" role="option"
+                      [attr.aria-selected]="option.id === (p.field.fontFamily ?? vm.defaultFontId)">
+                      <span class="font-dropdown__option-label">{{ option.label }}</span>
+                      <span class="font-dropdown__tag" *ngIf="option.type === 'custom'">
+                        {{ 'annotation.fields.font.customTag' | t }}
+                      </span>
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-template #previewFontEmpty>
+                  <div class="font-dropdown__empty">{{ 'annotation.fields.font.noResults' | t }}</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="background-section">
+            <span class="field-label">{{ 'annotation.fields.background.label' | t }}</span>
+            <div class="background-row">
+              <input type="color" [value]="p.field.backgroundColor ?? '#ffffff'"
+                (input)="vm.setFieldBackground('preview', $any($event.target).value)" />
+              <button type="button" class="background-clear" (click)="vm.clearFieldBackground('preview')">
+                {{ 'annotation.fields.background.clear' | t }}
+              </button>
+            </div>
+          </div>
+          <div class="color-section">
+            <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
+            <div class="color-row">
+              <input type="color" [(ngModel)]="p.field.color" (ngModelChange)="vm.onPreviewColorPicker($event)" />
+              <div class="color-inputs">
+                <input type="text" [ngModel]="vm.previewHexInput()" (ngModelChange)="vm.setPreviewColorFromHex($event)"
+                  [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
+                <input type="text" [ngModel]="vm.previewRgbInput()" (ngModelChange)="vm.setPreviewColorFromRgb($event)"
+                  [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
+              </div>
+            </div>
+            <small class="color-hint">{{ 'annotation.color.hintPreview' | t }}</small>
+          </div>
+          <div class="editor-actions">
+            <button class="action-primary" (click)="vm.confirmPreview()">✅</button>
+            <button (click)="vm.cancelPreview()">❌</button>
+          </div>
+        </div>
+
+        <!-- EDITAR ANOTACIÓN -->
+        <div *ngIf="vm.editing() as e" class="annotation-editor editing" #editEditor [style.left.px]="e.field.x*vm.scale()"
+          [style.top.px]="vm.pdfCanvasRef!.nativeElement.height - e.field.y*vm.scale()"
+          (keydown)="vm.onEditorKeydown($event, 'edit')">
+          <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+            <input type="text" [(ngModel)]="e.field.mapField"
+              [placeholder]="'annotation.fields.text.placeholder' | t" />
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+            <select [(ngModel)]="e.field.type">
+              <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+              <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+              <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+              <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+            <input type="text" [(ngModel)]="e.field.value" [placeholder]="'annotation.fields.value.placeholder' | t" />
+          </label>
+          <label class="field field-small" *ngIf="e.field.type === 'number'">
+            <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+            <input type="number" [(ngModel)]="e.field.decimals" min="0" />
+          </label>
+          <label class="field field-small" *ngIf="e.field.type === 'number'">
+            <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+            <input type="text" [(ngModel)]="e.field.appender"
+              [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
+          </label>
+          <div class="field-row field-row--metrics">
+            <label class="field field-small field-size">
+              <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
+              <input type="number" [(ngModel)]="e.field.fontSize" min="8" max="72" />
+            </label>
+            <label class="field field-inline opacity-field field-opacity">
+              <span class="field-label">{{ 'annotation.fields.opacity.label' | t }}</span>
+              <div class="opacity-controls">
+                <input type="range" min="0.1" max="1" step="0.05"
+                  [ngModel]="e.field.opacity ?? 1" (ngModelChange)="vm.setFieldOpacity('edit', $event)" />
+                <input type="number" min="0.1" max="1" step="0.05"
+                  [ngModel]="e.field.opacity ?? 1" (ngModelChange)="vm.setFieldOpacity('edit', $event)" />
+              </div>
+            </label>
+          </div>
+          <div class="field field-small font-field">
+            <span class="field-label" id="edit-font-label">{{ 'annotation.fields.font.label' | t }}</span>
+            <div class="font-dropdown" #editFontDropdown
+              [class.font-dropdown--open]="vm.fontDropdownOpen('edit')">
+              <button type="button" class="font-dropdown__trigger" (click)="vm.toggleFontDropdown('edit')"
+                aria-haspopup="listbox" [attr.aria-expanded]="vm.fontDropdownOpen('edit')"
+                [attr.aria-labelledby]="'edit-font-label'">
+                <ng-container *ngIf="vm.fontSummaryOption(e.field.fontFamily) as selectedFont">
+                  <span class="font-dropdown__value">{{ selectedFont.label }}</span>
+                  <span class="font-dropdown__tag" *ngIf="selectedFont.type === 'custom'">
+                    {{ 'annotation.fields.font.customTag' | t }}
+                  </span>
+                </ng-container>
+                <span class="font-dropdown__icon" aria-hidden="true">▾</span>
+              </button>
+              <div class="font-dropdown__panel" *ngIf="vm.fontDropdownOpen('edit')" role="listbox"
+                [attr.aria-labelledby]="'edit-font-label'">
+                <input #editFontSearch type="search" class="font-dropdown__search"
+                  [placeholder]="'annotation.fields.font.searchPlaceholder' | t"
+                  [value]="vm.fontSearchQuery('edit')"
+                  (input)="vm.onFontSearch('edit', $any($event.target).value)"
+                  (keydown.escape)="vm.closeFontDropdown('edit')" />
+                <ng-container *ngIf="vm.filteredFontOptions('edit') as options">
+                  <div class="font-dropdown__list" *ngIf="options.length; else editFontEmpty">
+                    <button type="button" class="font-dropdown__option" *ngFor="let option of options"
+                      (click)="vm.chooseFontOption('edit', option.id)" role="option"
+                      [attr.aria-selected]="option.id === (e.field.fontFamily ?? vm.defaultFontId)">
+                      <span class="font-dropdown__option-label">{{ option.label }}</span>
+                      <span class="font-dropdown__tag" *ngIf="option.type === 'custom'">
+                        {{ 'annotation.fields.font.customTag' | t }}
+                      </span>
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-template #editFontEmpty>
+                  <div class="font-dropdown__empty">{{ 'annotation.fields.font.noResults' | t }}</div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="background-section">
+            <span class="field-label">{{ 'annotation.fields.background.label' | t }}</span>
+            <div class="background-row">
+              <input type="color" [value]="e.field.backgroundColor ?? '#ffffff'"
+                (input)="vm.setFieldBackground('edit', $any($event.target).value)" />
+              <button type="button" class="background-clear" (click)="vm.clearFieldBackground('edit')">
+                {{ 'annotation.fields.background.clear' | t }}
+              </button>
+            </div>
+          </div>
+          <div class="color-section">
+            <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
+            <div class="color-row">
+              <input type="color" [(ngModel)]="e.field.color" (ngModelChange)="vm.onEditColorPicker($event)" />
+              <div class="color-inputs">
+                <input type="text" [ngModel]="vm.editHexInput()" (ngModelChange)="vm.setEditColorFromHex($event)"
+                  [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t" />
+                <input type="text" [ngModel]="vm.editRgbInput()" (ngModelChange)="vm.setEditColorFromRgb($event)"
+                  [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t" />
+              </div>
+            </div>
+            <small class="color-hint">{{ 'annotation.color.hintEdit' | t }}</small>
+          </div>
+          <div class="editor-actions">
+            <button type="button" (click)="vm.duplicateAnnotation()" [title]="'annotation.actions.duplicate' | t"
+              [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
+            <button class="btn-delete" (click)="vm.deleteAnnotation()">🗑️</button>
+            <button class="action-primary" (click)="vm.confirmEdit()">✅</button>
+            <button (click)="vm.cancelEdit()">❌</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__brand">
+        <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
+        <div class="footer__brand-text">
+          <span class="footer__app-name">{{ vm.appName }}</span>
+          <span class="footer__version">v{{ vm.version }}</span>
+        </div>
+      </div>
+      <div class="footer__details">
+        <span>© {{ vm.currentYear }} {{ vm.appName }}</span>
+        <span>Desarrollado por {{ vm.appAuthor }}</span>
+      </div>
+    </footer>
