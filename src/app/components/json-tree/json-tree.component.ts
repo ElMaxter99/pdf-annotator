@@ -38,14 +38,30 @@ export class JsonTreeComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if ('value' in changes || 'label' in changes) {
+      const previousRoot = this.rootNode;
+      const previousCollapsed = new Set(this.collapsedPaths());
+      const previouslyExpanded = new Set<string>();
+
+      if (previousRoot) {
+        this.collectExpandedPaths(previousRoot, previousCollapsed, previouslyExpanded);
+      }
+
       this.rootNode = this.buildNode(this.value, {
         label: this.label,
         path: 'root',
       });
       const collapsed = new Set<string>();
+      const interactivePaths = new Set<string>();
       if (this.rootNode) {
-        this.populateCollapsedPaths(this.rootNode, collapsed);
+        this.populateCollapsedPaths(this.rootNode, collapsed, interactivePaths);
       }
+
+      for (const path of previouslyExpanded) {
+        if (interactivePaths.has(path)) {
+          collapsed.delete(path);
+        }
+      }
+
       this.collapsedPaths.set(collapsed);
     }
   }
@@ -161,12 +177,38 @@ export class JsonTreeComponent implements OnChanges {
     return encodeURIComponent(value);
   }
 
-  private populateCollapsedPaths(node: JsonTreeNode, target: Set<string>) {
-    if (node.children?.length) {
+  private collectExpandedPaths(
+    node: JsonTreeNode,
+    collapsed: Set<string>,
+    target: Set<string>
+  ) {
+    if (!node.children?.length) {
+      return;
+    }
+
+    if (!collapsed.has(node.path)) {
       target.add(node.path);
-      for (const child of node.children) {
-        this.populateCollapsedPaths(child, target);
-      }
+    }
+
+    for (const child of node.children) {
+      this.collectExpandedPaths(child, collapsed, target);
+    }
+  }
+
+  private populateCollapsedPaths(
+    node: JsonTreeNode,
+    target: Set<string>,
+    interactive: Set<string>
+  ) {
+    if (!node.children?.length) {
+      return;
+    }
+
+    target.add(node.path);
+    interactive.add(node.path);
+
+    for (const child of node.children) {
+      this.populateCollapsedPaths(child, target, interactive);
     }
   }
 }

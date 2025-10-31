@@ -41,6 +41,7 @@
     "downloadJson": "Descarregar JSON",
     "viewJsonTree": "Veure com arbre",
     "viewJsonText": "Veure editor JSON",
+    "jsonViewModeToggle": "Mode de visualització del JSON",
     "downloadPdf": "Descarregar PDF",
     "toolbarAriaLabel": "Accions del PDF",
     "navigationGroup": "Navegació de pàgines",

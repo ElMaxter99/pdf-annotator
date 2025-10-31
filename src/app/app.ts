@@ -1230,12 +1230,16 @@ export class App implements AfterViewChecked, OnDestroy {
     this.refreshJsonPreview();
   }
 
-  toggleJsonView() {
-    const nextMode: JsonViewMode = this.jsonViewMode() === 'text' ? 'tree' : 'text';
-    if (nextMode === 'tree') {
+  setJsonViewMode(mode: JsonViewMode) {
+    if (this.jsonViewMode() === mode) {
+      return;
+    }
+
+    if (mode === 'tree') {
       this.refreshJsonPreview();
     }
-    this.jsonViewMode.set(nextMode);
+
+    this.jsonViewMode.set(mode);
   }
 
   applyCoordsText() {

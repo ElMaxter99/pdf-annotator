@@ -183,10 +183,21 @@
         </ng-template>
       </ng-template>
       <div class="json-toolbar">
-        <button type="button" class="btn btn--ghost json-toolbar__view-toggle" (click)="toggleJsonView()"
-          [attr.aria-pressed]="jsonViewMode() === 'tree'">
-          {{ jsonViewMode() === 'tree' ? ('controls.viewJsonText' | t) : ('controls.viewJsonTree' | t) }}
-        </button>
+        <div class="json-toolbar__view-toggle-group" role="group"
+          [attr.aria-label]="'controls.jsonViewModeToggle' | t">
+          <button type="button" class="json-toolbar__view-toggle-option"
+            [class.json-toolbar__view-toggle-option--active]="jsonViewMode() === 'text'"
+            (click)="setJsonViewMode('text')" [attr.aria-pressed]="jsonViewMode() === 'text'">
+            <span class="json-toolbar__view-toggle-icon" aria-hidden="true">📝</span>
+            <span>{{ 'controls.viewJsonText' | t }}</span>
+          </button>
+          <button type="button" class="json-toolbar__view-toggle-option"
+            [class.json-toolbar__view-toggle-option--active]="jsonViewMode() === 'tree'"
+            (click)="setJsonViewMode('tree')" [attr.aria-pressed]="jsonViewMode() === 'tree'">
+            <span class="json-toolbar__view-toggle-icon" aria-hidden="true">🌳</span>
+            <span>{{ 'controls.viewJsonTree' | t }}</span>
+          </button>
+        </div>
         <button type="button" class="btn" (click)="copyJSON()"
           [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
         <button type="button" class="btn" (click)="downloadJSON()"

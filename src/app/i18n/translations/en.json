@@ -41,6 +41,7 @@
     "downloadJson": "Download JSON",
     "viewJsonTree": "View tree",
     "viewJsonText": "View JSON editor",
+    "jsonViewModeToggle": "JSON view mode",
     "downloadPdf": "Download PDF",
     "toolbarAriaLabel": "PDF actions",
     "navigationGroup": "Page navigation",
