@@ -74,6 +74,37 @@
       "color": {
         "label": "Color"
       },
+      "font": {
+        "label": "Tipus de lletra"
+      },
+      "weight": {
+        "label": "Pes",
+        "options": {
+          "300": "Lleugera",
+          "400": "Regular",
+          "500": "Mitjana",
+          "600": "Seminegreta",
+          "700": "Negreta",
+          "800": "Extra negreta",
+          "900": "Ultra negreta"
+        }
+      },
+      "align": {
+        "label": "Alineació",
+        "options": {
+          "left": "Esquerra",
+          "center": "Centre",
+          "right": "Dreta"
+        }
+      },
+      "opacity": {
+        "label": "Opacitat"
+      },
+      "background": {
+        "color": "Color de fons",
+        "opacity": "Opacitat del fons",
+        "clear": "Eliminar fons"
+      },
       "type": {
         "label": "Tipus",
         "options": {
@@ -107,6 +138,18 @@
       "duplicate": "Duplicar anotació"
     },
     "editingBadge": "Editant"
+  },
+  "fonts": {
+    "custom": {
+      "title": "Fonts personalitzades",
+      "name": "Nom de la família",
+      "namePlaceholder": "Ex.: Corporate Sans",
+      "weight": "Pes",
+      "file": "Fitxer de font",
+      "add": "Afegir font",
+      "remove": "Eliminar",
+      "empty": "Encara no hi ha fonts personalitzades carregades."
+    }
   },
   "viewer": {
     "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."

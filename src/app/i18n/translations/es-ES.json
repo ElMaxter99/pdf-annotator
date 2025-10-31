@@ -74,6 +74,37 @@
       "color": {
         "label": "Color"
       },
+      "font": {
+        "label": "Fuente"
+      },
+      "weight": {
+        "label": "Peso",
+        "options": {
+          "300": "Ligera",
+          "400": "Normal",
+          "500": "Medio",
+          "600": "Seminegrita",
+          "700": "Negrita",
+          "800": "Extra negrita",
+          "900": "Ultra negrita"
+        }
+      },
+      "align": {
+        "label": "Alineación",
+        "options": {
+          "left": "Izquierda",
+          "center": "Centro",
+          "right": "Derecha"
+        }
+      },
+      "opacity": {
+        "label": "Opacidad"
+      },
+      "background": {
+        "color": "Color de fondo",
+        "opacity": "Opacidad de fondo",
+        "clear": "Quitar fondo"
+      },
       "type": {
         "label": "Tipo",
         "options": {
@@ -107,6 +138,18 @@
       "duplicate": "Duplicar anotación"
     },
     "editingBadge": "Editando"
+  },
+  "fonts": {
+    "custom": {
+      "title": "Fuentes personalizadas",
+      "name": "Nombre de la familia",
+      "namePlaceholder": "Ej.: Corporate Sans",
+      "weight": "Peso",
+      "file": "Archivo de fuente",
+      "add": "Añadir fuente",
+      "remove": "Eliminar",
+      "empty": "No hay fuentes personalizadas cargadas."
+    }
   },
   "viewer": {
     "emptyMessage": "Sube un PDF y haz click donde quieras añadir anotaciones. Edítalas en la vista previa antes de confirmar ✅."

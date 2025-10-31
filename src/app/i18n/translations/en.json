@@ -74,6 +74,37 @@
       "color": {
         "label": "Color"
       },
+      "font": {
+        "label": "Font"
+      },
+      "weight": {
+        "label": "Weight",
+        "options": {
+          "300": "Light",
+          "400": "Regular",
+          "500": "Medium",
+          "600": "Semi bold",
+          "700": "Bold",
+          "800": "Extra bold",
+          "900": "Black"
+        }
+      },
+      "align": {
+        "label": "Alignment",
+        "options": {
+          "left": "Left",
+          "center": "Center",
+          "right": "Right"
+        }
+      },
+      "opacity": {
+        "label": "Opacity"
+      },
+      "background": {
+        "color": "Background color",
+        "opacity": "Background opacity",
+        "clear": "Remove background"
+      },
       "type": {
         "label": "Type",
         "options": {
@@ -107,6 +138,18 @@
       "duplicate": "Duplicate annotation"
     },
     "editingBadge": "Editing"
+  },
+  "fonts": {
+    "custom": {
+      "title": "Custom fonts",
+      "name": "Family name",
+      "namePlaceholder": "e.g. Corporate Sans",
+      "weight": "Weight",
+      "file": "Font file",
+      "add": "Add font",
+      "remove": "Remove",
+      "empty": "No custom fonts loaded yet."
+    }
   },
   "viewer": {
     "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
