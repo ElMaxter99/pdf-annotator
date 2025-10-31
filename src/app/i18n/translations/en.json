@@ -67,7 +67,38 @@
       "deleteButton": "Delete",
       "empty": "You haven't saved any templates yet."
     },
-    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
+    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data.",
+    "advancedTitle": "Advanced options",
+    "advancedHint": "Toggle guides and snapping helpers when you need extra precision."
+  },
+  "guides": {
+    "enableFeature": "Enable guides & snapping",
+    "title": "Guides & snapping",
+    "showGrid": "Show grid",
+    "showRulers": "Show rulers",
+    "showAlignment": "Highlight active alignments",
+    "snapGrid": "Snap to grid",
+    "snapMargins": "Snap to margins",
+    "snapCenters": "Snap to center axes",
+    "snapCustom": "Snap to custom coordinates",
+    "gridSize": "Grid spacing (pt)",
+    "marginSize": "Margin (pt)",
+    "tolerance": "Tolerance (px)",
+    "customX": "X coordinates (pt)",
+    "customY": {
+      "canvas": "Y coordinates (pt from top edge)",
+      "pdf": "Y coordinates (pt from bottom edge)"
+    },
+    "customPlaceholder": "e.g. 24, 48, 120",
+    "customHint": {
+      "canvas": "Enter point values separated by commas or spaces. Y values are measured from the top edge of the PDF.",
+      "pdf": "Enter point values separated by commas or spaces. Y values are measured from the bottom edge of the PDF."
+    },
+    "coordinateMode": {
+      "label": "Coordinate origin",
+      "canvas": "Top-left (Canvas)",
+      "pdf": "Bottom-left (PDF)"
+    }
   },
   "annotation": {
     "fields": {

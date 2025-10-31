@@ -67,7 +67,38 @@
       "deleteButton": "Elimina",
       "empty": "Encara no tens cap plantilla desada."
     },
-    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
+    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat.",
+    "advancedTitle": "Opcions avançades",
+    "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió."
+  },
+  "guides": {
+    "enableFeature": "Activa les guies i el snapping",
+    "title": "Guies i ajustos",
+    "showGrid": "Mostrar la graella",
+    "showRulers": "Mostrar regles",
+    "showAlignment": "Ressaltar alineacions actives",
+    "snapGrid": "Ajustar a la graella",
+    "snapMargins": "Ajustar als marges",
+    "snapCenters": "Ajustar als eixos centrals",
+    "snapCustom": "Ajustar a coordenades personalitzades",
+    "gridSize": "Graella (pt)",
+    "marginSize": "Marge (pt)",
+    "tolerance": "Tolerància (px)",
+    "customX": "Coordenades X (pt)",
+    "customY": {
+      "canvas": "Coordenades Y (pt des de la vora superior)",
+      "pdf": "Coordenades Y (pt des de la vora inferior)"
+    },
+    "customPlaceholder": "Ex.: 24, 48, 120",
+    "customHint": {
+      "canvas": "Introdueix valors en punts (pt) separats per comes o espais. Les Y es mesuren des de la vora superior del PDF.",
+      "pdf": "Introdueix valors en punts (pt) separats per comes o espais. Les Y es mesuren des de la vora inferior del PDF."
+    },
+    "coordinateMode": {
+      "label": "Origen de coordenades",
+      "canvas": "Cantonada superior esquerra (Canvas)",
+      "pdf": "Cantonada inferior esquerra (PDF)"
+    }
   },
   "annotation": {
     "fields": {

@@ -204,13 +204,125 @@
           [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
       </div>
       <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
+
+      <section class="advanced-panel" [class.open]="advancedOptionsOpen()" [class.active]="guidesFeatureEnabled()">
+        <button type="button" class="advanced-toggle" (click)="toggleAdvancedOptions(!advancedOptionsOpen())"
+          [attr.aria-expanded]="advancedOptionsOpen()">
+          <span>{{ 'sidebar.advancedTitle' | t }}</span>
+          <span class="advanced-icon" aria-hidden="true">▾</span>
+        </button>
+
+        <ng-container *ngIf="advancedOptionsOpen()">
+          <div class="advanced-content">
+            <div class="sidebar-divider"></div>
+
+            <label class="advanced-checkbox">
+              <input type="checkbox" [checked]="guidesFeatureEnabled()"
+                (change)="toggleGuidesFeature($event.target.checked)" />
+              <span>{{ 'guides.enableFeature' | t }}</span>
+            </label>
+            <small class="advanced-hint">{{ 'sidebar.advancedHint' | t }}</small>
+
+            <section class="guides-panel" *ngIf="guidesFeatureEnabled() && guideSettings() as guides">
+              <h5>{{ 'guides.title' | t }}</h5>
+              <div class="guides-toggles">
+                <label>
+                  <input type="checkbox" [checked]="guides.showGrid"
+                    (change)="toggleGuideSetting('showGrid', $event.target.checked)" />
+                  <span>{{ 'guides.showGrid' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.showRulers"
+                    (change)="toggleGuideSetting('showRulers', $event.target.checked)" />
+                  <span>{{ 'guides.showRulers' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.showAlignment"
+                    (change)="toggleGuideSetting('showAlignment', $event.target.checked)" />
+                  <span>{{ 'guides.showAlignment' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.snapToGrid"
+                    (change)="toggleGuideSetting('snapToGrid', $event.target.checked)" />
+                  <span>{{ 'guides.snapGrid' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.snapToMargins"
+                    (change)="toggleGuideSetting('snapToMargins', $event.target.checked)" />
+                  <span>{{ 'guides.snapMargins' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.snapToCenters"
+                    (change)="toggleGuideSetting('snapToCenters', $event.target.checked)" />
+                  <span>{{ 'guides.snapCenters' | t }}</span>
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="guides.snapToCustom"
+                    (change)="toggleGuideSetting('snapToCustom', $event.target.checked)" />
+                  <span>{{ 'guides.snapCustom' | t }}</span>
+                </label>
+              </div>
+
+              <div class="guides-mode" role="radiogroup"
+                [attr.aria-label]="'guides.coordinateMode.label' | t">
+                <span class="guides-mode__label">{{ 'guides.coordinateMode.label' | t }}</span>
+                <div class="guides-mode__options">
+                  <label>
+                    <input type="radio" name="coordinateMode" [checked]="!guides.usePdfCoordinates"
+                      (change)="setCoordinateMode('canvas')" />
+                    <span>{{ 'guides.coordinateMode.canvas' | t }}</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="coordinateMode" [checked]="guides.usePdfCoordinates"
+                      (change)="setCoordinateMode('pdf')" />
+                    <span>{{ 'guides.coordinateMode.pdf' | t }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="guides-inputs">
+                <label>
+                  <span>{{ 'guides.gridSize' | t }}</span>
+                  <input type="number" min="0.5" step="0.5" [ngModel]="guides.gridSize"
+                    (ngModelChange)="updateGuideNumber('gridSize', $event)" [ngModelOptions]="{ standalone: true }" />
+                </label>
+                <label>
+                  <span>{{ 'guides.marginSize' | t }}</span>
+                  <input type="number" min="0" step="1" [ngModel]="guides.marginSize"
+                    (ngModelChange)="updateGuideNumber('marginSize', $event)" [ngModelOptions]="{ standalone: true }" />
+                </label>
+                <label>
+                  <span>{{ 'guides.tolerance' | t }}</span>
+                  <input type="number" min="0" step="1" [ngModel]="guides.snapTolerance"
+                    (ngModelChange)="updateGuideNumber('snapTolerance', $event)"
+                    [ngModelOptions]="{ standalone: true }" />
+                </label>
+              </div>
+
+              <div class="guides-custom">
+                <label>
+                  <span>{{ 'guides.customX' | t }}</span>
+                  <input type="text" [ngModel]="snapPointsXText()" (ngModelChange)="onSnapPointsInput('x', $event)"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
+                </label>
+                <label>
+                  <span>{{ (guides.usePdfCoordinates ? 'guides.customY.pdf' : 'guides.customY.canvas') | t }}</span>
+                  <input type="text" [ngModel]="snapPointsYText()" (ngModelChange)="onSnapPointsInput('y', $event)"
+                    [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
+                </label>
+                <small class="guides-hint">{{ (guides.usePdfCoordinates ? 'guides.customHint.pdf' : 'guides.customHint.canvas') | t }}</small>
+              </div>
+            </section>
+          </div>
+        </ng-container>
+      </section>
     </aside>
 
     <!-- VISOR PDF -->
     <main class="viewer" *ngIf="pdfDoc as _">
-      <div class="canvas-container" #pdfViewer>
-        <canvas #pdfCanvas></canvas>
-        <canvas #overlayCanvas></canvas>
+      <div class="canvas-container">
+        <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
+        <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
         <div #annotationsLayer class="annotations-layer"></div>
         <div class="hitbox" (click)="onHitboxClick($event)"></div>
 

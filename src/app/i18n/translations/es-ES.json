@@ -67,7 +67,38 @@
       "deleteButton": "Eliminar",
       "empty": "Aún no tienes plantillas guardadas."
     },
-    "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
+    "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado.",
+    "advancedTitle": "Opciones avanzadas",
+    "advancedHint": "Activa las guías y el snapping solo cuando necesites más precisión."
+  },
+  "guides": {
+    "enableFeature": "Activar guías y snapping",
+    "title": "Guías y snapping",
+    "showGrid": "Mostrar rejilla",
+    "showRulers": "Mostrar reglas",
+    "showAlignment": "Resaltar alineaciones activas",
+    "snapGrid": "Ajustar a rejilla",
+    "snapMargins": "Ajustar a márgenes",
+    "snapCenters": "Ajustar a ejes centrales",
+    "snapCustom": "Ajustar a coordenadas personalizadas",
+    "gridSize": "Rejilla (pt)",
+    "marginSize": "Margen (pt)",
+    "tolerance": "Tolerancia (px)",
+    "customX": "Coordenadas X (pt)",
+    "customY": {
+      "canvas": "Coordenadas Y (pt desde el borde superior)",
+      "pdf": "Coordenadas Y (pt desde el borde inferior)"
+    },
+    "customPlaceholder": "Ej.: 24, 48, 120",
+    "customHint": {
+      "canvas": "Introduce valores en puntos (pt) separados por comas o espacios. Las Y se miden desde el borde superior del PDF.",
+      "pdf": "Introduce valores en puntos (pt) separados por comas o espacios. Las Y se miden desde el borde inferior del PDF."
+    },
+    "coordinateMode": {
+      "label": "Origen de coordenadas",
+      "canvas": "Esquina superior izquierda (Canvas)",
+      "pdf": "Esquina inferior izquierda (PDF)"
+    }
   },
   "annotation": {
     "fields": {
