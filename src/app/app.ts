@@ -22,6 +22,7 @@ import './array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField, TextAlign } from './models/annotation.model';
 import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
+import { STANDARD_FONT_FAMILIES, StandardFontDefinition } from './fonts/standard-fonts';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -71,18 +72,6 @@ type PreviewState = { page: number; field: PageField } | null;
 type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
 
 type FontVariantSource = 'standard' | 'custom';
-
-interface StandardFontVariant {
-  weight: number;
-  pdfName: string;
-}
-
-interface StandardFontDefinition {
-  id: string;
-  label: string;
-  cssStack: string;
-  variants: StandardFontVariant[];
-}
 
 interface CustomFontResource {
   id: string;
@@ -139,35 +128,7 @@ export class App implements AfterViewChecked, OnDestroy {
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
   templateNameModel = '';
   selectedTemplateId: string | null = null;
-  private readonly standardFontFamilies: StandardFontDefinition[] = [
-    {
-      id: 'Helvetica',
-      label: 'Helvetica',
-      cssStack: 'Helvetica, Arial, sans-serif',
-      variants: [
-        { weight: 400, pdfName: 'Helvetica' },
-        { weight: 700, pdfName: 'HelveticaBold' },
-      ],
-    },
-    {
-      id: 'TimesRoman',
-      label: 'Times New Roman',
-      cssStack: '"Times New Roman", Times, serif',
-      variants: [
-        { weight: 400, pdfName: 'TimesRoman' },
-        { weight: 700, pdfName: 'TimesBold' },
-      ],
-    },
-    {
-      id: 'Courier',
-      label: 'Courier',
-      cssStack: '"Courier New", Courier, monospace',
-      variants: [
-        { weight: 400, pdfName: 'Courier' },
-        { weight: 700, pdfName: 'CourierBold' },
-      ],
-    },
-  ];
+  private readonly standardFontFamilies: StandardFontDefinition[] = STANDARD_FONT_FAMILIES;
   private readonly customFontStore = new Map<string, CustomFontResource>();
   private readonly loadedFontFaces = new Set<string>();
   readonly customFonts = signal<CustomFontResource[]>([]);
