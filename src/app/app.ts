@@ -305,7 +305,7 @@ export class App implements AfterViewChecked, OnDestroy {
       return;
     }
 
-    let nextSnapPointsY = currentSettings.snapPointsY;
+    let nextSnapPointsY = [...currentSettings.snapPointsY];
     let nextSnapText = this.snapPointsYText();
     const canvas = this.pdfCanvasRef?.nativeElement;
     if (canvas && canvas.height > 0) {
