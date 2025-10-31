@@ -2225,7 +2225,9 @@ export class App implements AfterViewChecked, OnDestroy {
     const lineHeight = this.getTextareaLineHeight(textarea);
     const precedingText = textarea.value.slice(0, start);
     const lineIndex = this.countLineBreaks(precedingText);
-    const top = Math.max(lineIndex - 2, 0) * lineHeight;
+    const desiredTop = Math.max(lineIndex - 2, 0) * lineHeight;
+    const maxScrollTop = Math.max(textarea.scrollHeight - textarea.clientHeight, 0);
+    const top = Math.min(desiredTop, maxScrollTop);
 
     if (typeof textarea.scrollTo === 'function') {
       textarea.scrollTo({ top, behavior: 'smooth' });
@@ -2255,12 +2257,50 @@ export class App implements AfterViewChecked, OnDestroy {
       return rawLineHeight;
     }
 
+    const measured = this.measureLineHeightFromElement(computed);
+    if (measured !== null) {
+      return measured;
+    }
+
     const fontSize = parseFloat(computed.fontSize);
     if (Number.isFinite(fontSize) && fontSize > 0) {
       return fontSize * 1.4;
     }
 
     return 20;
+  }
+
+  private measureLineHeightFromElement(computed: CSSStyleDeclaration): number | null {
+    const doc = this.document as Document | null;
+    if (!doc) {
+      return null;
+    }
+
+    const body = doc.body ?? null;
+    if (!body) {
+      return null;
+    }
+
+    const probe = doc.createElement('span');
+    probe.textContent = 'M';
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    probe.style.whiteSpace = 'pre';
+    probe.style.fontFamily = computed.fontFamily;
+    probe.style.fontSize = computed.fontSize;
+    probe.style.fontWeight = computed.fontWeight;
+    probe.style.fontStyle = computed.fontStyle;
+    probe.style.letterSpacing = computed.letterSpacing;
+    probe.style.padding = '0';
+    probe.style.margin = '0';
+    probe.style.border = '0';
+    probe.style.lineHeight = computed.lineHeight;
+
+    body.appendChild(probe);
+    const height = probe.getBoundingClientRect().height;
+    body.removeChild(probe);
+
+    return Number.isFinite(height) && height > 0 ? height : null;
   }
 
   private countLineBreaks(value: string): number {
