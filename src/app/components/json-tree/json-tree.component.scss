@@ -21,6 +21,14 @@
   align-items: center;
   gap: 6px;
   line-height: 1.6;
+  padding: 0 4px;
+  border-radius: 6px;
+  scroll-margin: 16px 0;
+  transition: background 0.2s ease;
+}
+
+.json-tree__row--focused {
+  background: rgba(94, 234, 212, 0.16);
 }
 
 .json-tree__toggle {
