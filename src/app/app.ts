@@ -684,7 +684,8 @@ export class App implements AfterViewChecked, OnDestroy {
     baseTop: number,
     bounds: { maxLeft: number; minTop: number; maxTop: number },
     el: HTMLDivElement,
-    pdfCanvas: HTMLCanvasElement
+    pdfCanvas: HTMLCanvasElement,
+    fontSizePx: number
   ): { left: number; top: number; guides: OverlayGuide[] } {
     if (!this.guidesFeatureEnabled()) {
       return { left: baseLeft, top: baseTop, guides: [] };
@@ -698,7 +699,8 @@ export class App implements AfterViewChecked, OnDestroy {
     const elementWidth = el.offsetWidth;
     const elementHeight = el.offsetHeight;
     const usePdfCoordinates = settings.usePdfCoordinates;
-    const pdfBaselineOffset = usePdfCoordinates ? elementHeight : 0;
+    const baselineOffset = Number.isFinite(fontSizePx) ? fontSizePx : 0;
+    const pdfBaselineOffset = usePdfCoordinates ? baselineOffset : 0;
 
     type Candidate = { candidate: number; line: number; delta: number };
 
@@ -1708,7 +1710,8 @@ export class App implements AfterViewChecked, OnDestroy {
       clampedTop,
       { maxLeft, minTop, maxTop },
       el,
-      pdfCanvas
+      pdfCanvas,
+      this.dragInfo.fontSize
     );
 
     el.style.left = `${snapResult.left}px`;
