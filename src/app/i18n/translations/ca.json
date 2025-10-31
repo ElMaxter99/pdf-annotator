@@ -111,7 +111,9 @@
       },
       "font": {
         "label": "Font",
-        "customTag": "Personalitzada"
+        "customTag": "Personalitzada",
+        "searchPlaceholder": "Cerca tipografies...",
+        "noResults": "Cap tipografia coincideix amb la cerca."
       },
       "opacity": {
         "label": "Opacitat"

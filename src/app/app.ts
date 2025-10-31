@@ -130,6 +130,11 @@ interface CustomFontEntry {
   readonly data: Uint8Array;
 }
 
+interface FontDropdownUiState {
+  readonly open: boolean;
+  readonly query: string;
+}
+
 const DEFAULT_FONT_ID = 'standard:helvetica';
 const DEFAULT_OPACITY = 1;
 
@@ -165,6 +170,10 @@ export class App implements AfterViewChecked, OnDestroy {
   advancedOptionsOpen = signal(false);
   customFontsFeatureEnabled = signal(false);
   customFonts = signal<CustomFontEntry[]>([]);
+  private readonly fontDropdownState = signal<Record<EditorMode, FontDropdownUiState>>({
+    preview: { open: false, query: '' },
+    edit: { open: false, query: '' },
+  });
   readonly fontOptions = computed<readonly FontOption[]>(() => this.buildFontOptions());
   guideSettings = signal<GuideSettings>({
     showGrid: true,
@@ -231,6 +240,10 @@ export class App implements AfterViewChecked, OnDestroy {
   @ViewChild('pdfViewer', { static: false }) pdfViewerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor') previewEditorRef?: ElementRef<HTMLDivElement>;
   @ViewChild('editEditor') editEditorRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('previewFontDropdown', { static: false })
+  previewFontDropdownRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('editFontDropdown', { static: false })
+  editFontDropdownRef?: ElementRef<HTMLDivElement>;
   @ViewChild('pdfFileInput', { static: false }) pdfFileInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('coordsFileInput', { static: false })
   coordsFileInputRef?: ElementRef<HTMLInputElement>;
@@ -274,6 +287,72 @@ export class App implements AfterViewChecked, OnDestroy {
     const normalized = this.normalizeFontFamily(fontId);
     this.updateWorkingField(mode, (field) => this.ensureFieldStyle({ ...field, fontFamily: normalized }));
     this.redrawAllForPage();
+  }
+
+  fontDropdownOpen(mode: EditorMode): boolean {
+    return this.fontDropdownState()[mode].open;
+  }
+
+  toggleFontDropdown(mode: EditorMode) {
+    this.fontDropdownState.update((state) => {
+      const nextOpen = !state[mode].open;
+      const nextState: Record<EditorMode, FontDropdownUiState> = {
+        ...state,
+        [mode]: { open: nextOpen, query: nextOpen ? '' : '' },
+      };
+
+      if (nextOpen) {
+        const other: EditorMode = mode === 'preview' ? 'edit' : 'preview';
+        if (state[other].open) {
+          nextState[other] = { open: false, query: '' };
+        }
+      }
+
+      return nextState;
+    });
+  }
+
+  closeFontDropdown(mode: EditorMode) {
+    this.fontDropdownState.update((state) => {
+      if (!state[mode].open && !state[mode].query) {
+        return state;
+      }
+
+      return {
+        ...state,
+        [mode]: { open: false, query: '' },
+      };
+    });
+  }
+
+  fontSearchQuery(mode: EditorMode): string {
+    return this.fontDropdownState()[mode].query;
+  }
+
+  onFontSearch(mode: EditorMode, value: string) {
+    const query = typeof value === 'string' ? value : '';
+    this.fontDropdownState.update((state) => ({
+      ...state,
+      [mode]: { ...state[mode], query },
+    }));
+  }
+
+  filteredFontOptions(mode: EditorMode): FontOption[] {
+    const query = this.fontDropdownState()[mode].query.trim().toLowerCase();
+    const options = this.fontOptions();
+    if (!query) {
+      return [...options];
+    }
+    return options.filter((option) => option.label.toLowerCase().includes(query));
+  }
+
+  chooseFontOption(mode: EditorMode, fontId: string) {
+    this.setFieldFont(mode, fontId);
+    this.closeFontDropdown(mode);
+  }
+
+  fontSummaryOption(fontId: string | null | undefined): FontOption {
+    return this.getFontOptionById(this.normalizeFontFamily(fontId));
   }
 
   setFieldOpacity(mode: EditorMode, value: string | number) {
@@ -1363,6 +1442,7 @@ export class App implements AfterViewChecked, OnDestroy {
     const p = this.preview();
     if (!p || !this.fieldHasRenderableContent(p.field)) {
       this.preview.set(null);
+      this.closeFontDropdown('preview');
       return;
     }
     const normalizedField = this.prepareFieldForStorage(p.field);
@@ -1375,10 +1455,12 @@ export class App implements AfterViewChecked, OnDestroy {
       this.redrawAllForPage();
     }
     this.preview.set(null);
+    this.closeFontDropdown('preview');
   }
 
   cancelPreview() {
     this.preview.set(null);
+    this.closeFontDropdown('preview');
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
@@ -1406,6 +1488,7 @@ export class App implements AfterViewChecked, OnDestroy {
     if (!e) return;
     if (!this.fieldHasRenderableContent(e.field)) {
       this.editing.set(null);
+      this.closeFontDropdown('edit');
       return;
     }
     const normalized = this.prepareFieldForStorage(e.field);
@@ -1420,10 +1503,12 @@ export class App implements AfterViewChecked, OnDestroy {
       this.redrawAllForPage();
     }
     this.editing.set(null);
+    this.closeFontDropdown('edit');
   }
 
   cancelEdit() {
     this.editing.set(null);
+    this.closeFontDropdown('edit');
   }
 
   @HostListener('document:mousedown', ['$event'])
@@ -1444,12 +1529,16 @@ export class App implements AfterViewChecked, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
+    const target = event.target as Node | null;
+    if (target) {
+      this.handleFontDropdownOutsideClick(target);
+    }
+
     if (!this.preview() && !this.editing()) {
       return;
     }
 
     const viewer = this.pdfViewerRef?.nativeElement;
-    const target = event.target as Node | null;
 
     if (!viewer || !target) {
       return;
@@ -1815,6 +1904,22 @@ export class App implements AfterViewChecked, OnDestroy {
     }
   }
 
+  private handleFontDropdownOutsideClick(target: Node) {
+    if (this.fontDropdownOpen('preview')) {
+      const dropdown = this.previewFontDropdownRef?.nativeElement;
+      if (!dropdown || !dropdown.contains(target)) {
+        this.closeFontDropdown('preview');
+      }
+    }
+
+    if (this.fontDropdownOpen('edit')) {
+      const dropdown = this.editFontDropdownRef?.nativeElement;
+      if (!dropdown || !dropdown.contains(target)) {
+        this.closeFontDropdown('edit');
+      }
+    }
+  }
+
   private handleRemovedFontOptions(optionIds: readonly string[]) {
     if (!optionIds.length) {
       return;
@@ -1890,6 +1995,8 @@ export class App implements AfterViewChecked, OnDestroy {
     if (this.editing()) {
       this.editing.set(null);
     }
+    this.closeFontDropdown('preview');
+    this.closeFontDropdown('edit');
   }
 
   private createRuntimeId(prefix: string): string {

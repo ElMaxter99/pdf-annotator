@@ -111,7 +111,9 @@
       },
       "font": {
         "label": "Font",
-        "customTag": "Custom"
+        "customTag": "Custom",
+        "searchPlaceholder": "Search fonts...",
+        "noResults": "No fonts match your search."
       },
       "opacity": {
         "label": "Opacity"

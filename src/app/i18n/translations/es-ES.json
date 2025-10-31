@@ -111,7 +111,9 @@
       },
       "font": {
         "label": "Fuente",
-        "customTag": "Personalizada"
+        "customTag": "Personalizada",
+        "searchPlaceholder": "Buscar fuentes...",
+        "noResults": "No hay fuentes que coincidan con la búsqueda."
       },
       "opacity": {
         "label": "Opacidad"
