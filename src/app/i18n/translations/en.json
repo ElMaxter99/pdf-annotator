@@ -39,6 +39,9 @@
     "copyJson": "Copy JSON",
     "importJson": "Import JSON",
     "downloadJson": "Download JSON",
+    "viewJsonTree": "View tree",
+    "viewJsonText": "View JSON editor",
+    "jsonViewModeToggle": "JSON view mode",
     "downloadPdf": "Download PDF",
     "toolbarAriaLabel": "PDF actions",
     "navigationGroup": "Page navigation",
@@ -51,6 +54,10 @@
     "importJsonFile": "Import from file",
     "applyJson": "Apply JSON",
     "jsonPlaceholder": "Paste or edit annotation coordinates here...",
+    "jsonTree": {
+      "empty": "The JSON editor is empty.",
+      "invalid": "The content is not valid JSON. Fix the errors to view the tree."
+    },
     "templates": {
       "title": "Reusable templates",
       "placeholder": "Template name",

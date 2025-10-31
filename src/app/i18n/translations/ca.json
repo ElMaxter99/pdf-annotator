@@ -39,6 +39,9 @@
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
     "downloadJson": "Descarregar JSON",
+    "viewJsonTree": "Veure com arbre",
+    "viewJsonText": "Veure editor JSON",
+    "jsonViewModeToggle": "Mode de visualització del JSON",
     "downloadPdf": "Descarregar PDF",
     "toolbarAriaLabel": "Accions del PDF",
     "navigationGroup": "Navegació de pàgines",
@@ -51,6 +54,10 @@
     "importJsonFile": "Importa des d'un fitxer",
     "applyJson": "Aplica el JSON",
     "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
+    "jsonTree": {
+      "empty": "L'editor JSON és buit.",
+      "invalid": "El contingut no és un JSON vàlid. Corregeix els errors per veure l'arbre."
+    },
     "templates": {
       "title": "Plantilles reutilitzables",
       "placeholder": "Nom de la plantilla",
