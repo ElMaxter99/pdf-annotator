@@ -140,7 +140,7 @@ const DEFAULT_OPACITY = 1;
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked, OnDestroy {
-  private static fontkitRegistered = false;
+  private static fontkitPromise: Promise<any> | null = null;
   pdfDoc: PDFDocumentProxy | null = null;
   readonly vm: App;
   pageIndex = signal(1);
@@ -164,6 +164,7 @@ export class App implements AfterViewChecked, OnDestroy {
     preview: { open: false, query: '' },
     edit: { open: false, query: '' },
   });
+  private pendingFontSearchFocus: EditorMode | null = null;
   readonly fontOptions = computed<readonly FontOption[]>(() => this.buildFontOptions());
   guideSettings = signal<GuideSettings>(cloneGuideSettings(DEFAULT_GUIDE_SETTINGS));
   snapPointsXText = signal('');
@@ -272,6 +273,19 @@ export class App implements AfterViewChecked, OnDestroy {
     return this.workspaceComponent?.jsonTreeComponent;
   }
 
+  private static async loadFontkit(): Promise<any> {
+    if (!App.fontkitPromise) {
+      App.fontkitPromise = import('@pdf-lib/fontkit')
+        .then((module) => (module as { default?: unknown }).default ?? module)
+        .catch((error) => {
+          App.fontkitPromise = null;
+          throw error;
+        });
+    }
+
+    return App.fontkitPromise;
+  }
+
 
   constructor() {
     this.vm = this;
@@ -339,23 +353,49 @@ export class App implements AfterViewChecked, OnDestroy {
     });
 
     if (opened) {
-      this.focusFontSearch(mode);
+      this.scheduleFontSearchFocus(mode);
+    } else if (this.pendingFontSearchFocus === mode) {
+      this.pendingFontSearchFocus = null;
     }
   }
 
-  private focusFontSearch(mode: EditorMode) {
+  private scheduleFontSearchFocus(mode: EditorMode) {
+    this.pendingFontSearchFocus = mode;
+    if (this.focusFontSearch(mode)) {
+      this.pendingFontSearchFocus = null;
+      return;
+    }
+
     this.runAfterRender(() => {
-      const ref = mode === 'preview' ? this.previewFontSearchRef : this.editFontSearchRef;
-      const input = ref?.nativeElement;
-      if (input) {
-        try {
-          input.focus({ preventScroll: true });
-        } catch {
-          input.focus();
-        }
-        input.select();
+      if (this.pendingFontSearchFocus === mode && this.focusFontSearch(mode)) {
+        this.pendingFontSearchFocus = null;
       }
     });
+  }
+
+  private focusFontSearch(mode: EditorMode): boolean {
+    const ref = mode === 'preview' ? this.previewFontSearchRef : this.editFontSearchRef;
+    const input = ref?.nativeElement ?? null;
+
+    if (!input) {
+      return false;
+    }
+
+    const activeElement = this.document?.activeElement as Element | null;
+    if (activeElement !== input) {
+      try {
+        input.focus({ preventScroll: true });
+      } catch {
+        input.focus();
+      }
+    }
+
+    if (typeof input.setSelectionRange === 'function') {
+      const length = input.value.length;
+      input.setSelectionRange(length, length);
+    }
+
+    return this.document?.activeElement === input;
   }
 
   closeFontDropdown(mode: EditorMode) {
@@ -369,6 +409,10 @@ export class App implements AfterViewChecked, OnDestroy {
         [mode]: { open: false, query: '' },
       };
     });
+
+    if (this.pendingFontSearchFocus === mode) {
+      this.pendingFontSearchFocus = null;
+    }
   }
 
   fontSearchQuery(mode: EditorMode): string {
@@ -1104,6 +1148,12 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   ngAfterViewChecked() {
+    if (this.pendingFontSearchFocus) {
+      if (this.focusFontSearch(this.pendingFontSearchFocus)) {
+        this.pendingFontSearchFocus = null;
+      }
+    }
+
     if (this.preview()) {
       this.focusEditorIfNeeded(this.previewEditorRef?.nativeElement ?? null);
       return;
@@ -3176,14 +3226,8 @@ export class App implements AfterViewChecked, OnDestroy {
     if (!this.pdfDoc) return;
 
     try {
-      const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
-
-      if (!App.fontkitRegistered) {
-        const fontkitModule = await import('@pdf-lib/fontkit');
-        const fontkitInstance = (fontkitModule as { default?: any }).default ?? fontkitModule;
-        PDFDocument.registerFontkit(fontkitInstance);
-        App.fontkitRegistered = true;
-      }
+      const pdfLib = await import('pdf-lib');
+      const { PDFDocument: PdfLibDocument, rgb, StandardFonts } = pdfLib;
       const loadOptions = {
         ignoreEncryption: true,
         updateMetadata: false,
@@ -3195,13 +3239,13 @@ export class App implements AfterViewChecked, OnDestroy {
         throw new Error('No se encontraron bytes de PDF para procesar.');
       }
 
-      let pdf: any = null;
+      let pdf: InstanceType<typeof PdfLibDocument> | null = null;
       let usedBytes: Uint8Array | null = null;
       const loadErrors: unknown[] = [];
 
       for (const candidate of candidates) {
         try {
-          pdf = await PDFDocument.load(candidate, loadOptions);
+          pdf = await PdfLibDocument.load(candidate, loadOptions);
           usedBytes = candidate;
           break;
         } catch (error) {
@@ -3219,6 +3263,22 @@ export class App implements AfterViewChecked, OnDestroy {
       const fontCache = new Map<string, any>();
       const customFontMap = new Map<string, CustomFontEntry>();
       this.customFonts().forEach((fontEntry) => customFontMap.set(fontEntry.id, fontEntry));
+      const needsFontkit = customFontMap.size > 0;
+      if (needsFontkit) {
+        try {
+          const fontkit = await App.loadFontkit();
+          if (typeof pdf.registerFontkit === 'function') {
+            pdf.registerFontkit(fontkit);
+          } else {
+            console.warn('La instancia de PDFDocument no soporta registerFontkit.');
+          }
+        } catch (error) {
+          console.error('No se pudo registrar fontkit para fuentes personalizadas.', error);
+          throw error instanceof Error
+            ? error
+            : new Error('No se pudo inicializar fontkit para fuentes personalizadas.');
+        }
+      }
       const defaultFontOption = this.getFontOptionById(DEFAULT_FONT_ID);
       const defaultVariant = defaultFontOption.descriptor;
       const pdfPageCount = pdf.getPageCount();
