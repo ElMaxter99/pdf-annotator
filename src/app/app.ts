@@ -285,9 +285,7 @@ export class App implements AfterViewChecked, OnDestroy {
     this.guidesFeatureEnabled.set(enabled);
     if (enabled) {
       this.advancedOptionsOpen.set(true);
-    }
-    if (!enabled) {
-      this.advancedOptionsOpen.set(false);
+    } else {
       this.overlayDragRect = null;
       this.overlayGuides = [];
       this.refreshOverlay(null, []);
