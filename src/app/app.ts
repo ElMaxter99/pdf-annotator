@@ -140,6 +140,7 @@ const DEFAULT_OPACITY = 1;
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked, OnDestroy {
+  private static fontkitRegistered = false;
   pdfDoc: PDFDocumentProxy | null = null;
   readonly vm: App;
   pageIndex = signal(1);
@@ -3176,6 +3177,13 @@ export class App implements AfterViewChecked, OnDestroy {
 
     try {
       const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
+
+      if (!App.fontkitRegistered) {
+        const fontkitModule = await import('@pdf-lib/fontkit');
+        const fontkitInstance = (fontkitModule as { default?: any }).default ?? fontkitModule;
+        PDFDocument.registerFontkit(fontkitInstance);
+        App.fontkitRegistered = true;
+      }
       const loadOptions = {
         ignoreEncryption: true,
         updateMetadata: false,
