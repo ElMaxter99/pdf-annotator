@@ -141,6 +141,10 @@ const DEFAULT_OPACITY = 1;
 })
 export class App implements AfterViewChecked, OnDestroy {
   private static fontkitPromise: Promise<any> | null = null;
+  private static fontkitScriptElement: HTMLScriptElement | null = null;
+
+  private static readonly fontkitCdnUrl =
+    'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js';
   pdfDoc: PDFDocumentProxy | null = null;
   readonly vm: App;
   pageIndex = signal(1);
@@ -274,13 +278,54 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   private static async loadFontkit(): Promise<any> {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      throw new Error('fontkit solo puede cargarse en el navegador.');
+    }
+
+    const globalWindow = window as Window & { fontkit?: unknown };
+    if (globalWindow.fontkit) {
+      return globalWindow.fontkit;
+    }
+
     if (!App.fontkitPromise) {
-      App.fontkitPromise = import('@pdf-lib/fontkit')
-        .then((module) => (module as { default?: unknown }).default ?? module)
-        .catch((error) => {
-          App.fontkitPromise = null;
-          throw error;
-        });
+      App.fontkitPromise = new Promise((resolve, reject) => {
+        const resolveWithFontkit = () => {
+          if (globalWindow.fontkit) {
+            resolve(globalWindow.fontkit);
+            return;
+          }
+          reject(new Error('El script de fontkit se cargó pero no expuso la instancia esperada.'));
+        };
+
+        const handleError = (event: Event | string) => {
+          App.fontkitScriptElement?.remove();
+          App.fontkitScriptElement = null;
+          const reason =
+            typeof event === 'string'
+              ? event
+              : 'No se pudo cargar fontkit desde la CDN configurada.';
+          reject(new Error(reason));
+        };
+
+        if (App.fontkitScriptElement) {
+          App.fontkitScriptElement.addEventListener('load', resolveWithFontkit, { once: true });
+          App.fontkitScriptElement.addEventListener('error', handleError, { once: true });
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.async = true;
+        script.defer = true;
+        script.src = App.fontkitCdnUrl;
+        script.dataset['fontkitLoader'] = 'true';
+        script.addEventListener('load', resolveWithFontkit, { once: true });
+        script.addEventListener('error', handleError, { once: true });
+        App.fontkitScriptElement = script;
+        document.head.appendChild(script);
+      }).catch((error) => {
+        App.fontkitPromise = null;
+        throw error;
+      });
     }
 
     return App.fontkitPromise;

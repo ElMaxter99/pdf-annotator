@@ -1,1 +1,7 @@
-declare module '@pdf-lib/fontkit';
+export {};
+
+declare global {
+  interface Window {
+    fontkit?: unknown;
+  }
+}
