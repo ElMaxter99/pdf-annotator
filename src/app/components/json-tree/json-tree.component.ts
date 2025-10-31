@@ -42,7 +42,11 @@ export class JsonTreeComponent implements OnChanges {
         label: this.label,
         path: 'root',
       });
-      this.collapsedPaths.set(new Set());
+      const collapsed = new Set<string>();
+      if (this.rootNode) {
+        this.populateCollapsedPaths(this.rootNode, collapsed);
+      }
+      this.collapsedPaths.set(collapsed);
     }
   }
 
@@ -155,5 +159,14 @@ export class JsonTreeComponent implements OnChanges {
 
   private escapePathSegment(value: string): string {
     return encodeURIComponent(value);
+  }
+
+  private populateCollapsedPaths(node: JsonTreeNode, target: Set<string>) {
+    if (node.children?.length) {
+      target.add(node.path);
+      for (const child of node.children) {
+        this.populateCollapsedPaths(child, target);
+      }
+    }
   }
 }
