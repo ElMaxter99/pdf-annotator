@@ -697,6 +697,8 @@ export class App implements AfterViewChecked, OnDestroy {
     const height = pdfCanvas.height;
     const elementWidth = el.offsetWidth;
     const elementHeight = el.offsetHeight;
+    const usePdfCoordinates = settings.usePdfCoordinates;
+    const pdfBaselineOffset = usePdfCoordinates ? elementHeight : 0;
 
     type Candidate = { candidate: number; line: number; delta: number };
 
@@ -762,8 +764,9 @@ export class App implements AfterViewChecked, OnDestroy {
         pushVertical(linePx, linePx);
       });
       settings.snapPointsY.forEach((point) => {
-        const linePx = this.projectYPoint(point, height, scale, settings.usePdfCoordinates);
-        pushHorizontal(linePx, linePx);
+        const linePx = this.projectYPoint(point, height, scale, usePdfCoordinates);
+        const candidateTop = linePx - pdfBaselineOffset;
+        pushHorizontal(candidateTop, linePx);
       });
     }
 
