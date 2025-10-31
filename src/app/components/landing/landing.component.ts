@@ -16,6 +16,7 @@ import { LanguageSelectorComponent } from '../language-selector/language-selecto
   selector: 'app-landing',
   standalone: true,
   templateUrl: './landing.component.html',
+  styleUrls: ['./landing.component.scss'],
   imports: [CommonModule, FormsModule, TranslationPipe, LanguageSelectorComponent],
 })
 export class LandingComponent {

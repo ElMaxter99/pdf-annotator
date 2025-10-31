@@ -10,6 +10,7 @@ import { JsonTreeComponent } from '../json-tree/json-tree.component';
   selector: 'app-workspace',
   standalone: true,
   templateUrl: './workspace.component.html',
+  styleUrls: ['./workspace.component.scss'],
   imports: [CommonModule, FormsModule, TranslationPipe, LanguageSelectorComponent, JsonTreeComponent],
 })
 export class WorkspaceComponent {
