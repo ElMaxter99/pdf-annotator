@@ -21,6 +21,7 @@ import './array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
 import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
+import { JsonTreeComponent } from './components/json-tree/json-tree.component';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -69,6 +70,15 @@ type PreviewState = { page: number; field: PageField } | null;
 
 type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
 
+type JsonViewMode = 'text' | 'tree';
+
+type JsonTreePreviewStatus = 'empty' | 'ready' | 'error';
+
+interface JsonTreePreview {
+  status: JsonTreePreviewStatus;
+  value: unknown | null;
+}
+
 type GuideSettings = {
   showGrid: boolean;
   gridSize: number;
@@ -95,7 +105,13 @@ type OverlayGuide = {
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
-  imports: [CommonModule, FormsModule, TranslationPipe, LanguageSelectorComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslationPipe,
+    LanguageSelectorComponent,
+    JsonTreeComponent,
+  ],
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked, OnDestroy {
@@ -112,6 +128,7 @@ export class App implements AfterViewChecked, OnDestroy {
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
+  jsonTreePreview: JsonTreePreview = this.buildJsonTreePreview(this.coordsTextModel);
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
   guideSettings = signal<GuideSettings>({
@@ -132,6 +149,7 @@ export class App implements AfterViewChecked, OnDestroy {
   snapPointsXText = signal('');
   snapPointsYText = signal('');
   fileDropActive = signal(false);
+  readonly jsonViewMode = signal<JsonViewMode>('text');
   private readonly translationService = inject(TranslationService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
@@ -439,12 +457,7 @@ export class App implements AfterViewChecked, OnDestroy {
     }
   }
 
-  private projectYPoint(
-    point: number,
-    height: number,
-    scale: number,
-    usePdfCoordinates: boolean
-  ) {
+  private projectYPoint(point: number, height: number, scale: number, usePdfCoordinates: boolean) {
     const pdfHeight = height / scale;
     const clamped = Math.max(0, Math.min(point, pdfHeight));
     if (usePdfCoordinates) {
@@ -1839,6 +1852,23 @@ export class App implements AfterViewChecked, OnDestroy {
     navigator.clipboard.writeText(this.coordsTextModel).catch(() => {});
   }
 
+  onCoordsTextChange(value: string) {
+    this.coordsTextModel = value;
+    this.refreshJsonPreview();
+  }
+
+  setJsonViewMode(mode: JsonViewMode) {
+    if (this.jsonViewMode() === mode) {
+      return;
+    }
+
+    if (mode === 'tree') {
+      this.refreshJsonPreview();
+    }
+
+    this.jsonViewMode.set(mode);
+  }
+
   applyCoordsText() {
     const text = this.coordsTextModel.trim();
 
@@ -2124,6 +2154,7 @@ export class App implements AfterViewChecked, OnDestroy {
   private syncCoordsTextModel(persist = true) {
     const currentCoords = this.coords();
     this.coordsTextModel = JSON.stringify({ pages: currentCoords }, null, 2);
+    this.refreshJsonPreview();
     if (persist) {
       this.templatesService.storeLastCoords(currentCoords);
     }
@@ -2205,6 +2236,25 @@ export class App implements AfterViewChecked, OnDestroy {
       (a.appender ?? undefined) === (b.appender ?? undefined) &&
       (a.decimals ?? undefined) === (b.decimals ?? undefined)
     );
+  }
+
+  private refreshJsonPreview() {
+    this.jsonTreePreview = this.buildJsonTreePreview(this.coordsTextModel);
+  }
+
+  private buildJsonTreePreview(text: string): JsonTreePreview {
+    const trimmed = text.trim();
+
+    if (!trimmed) {
+      return { status: 'empty', value: null };
+    }
+
+    try {
+      const parsed = this.parseLooseJson(trimmed);
+      return { status: 'ready', value: parsed };
+    } catch {
+      return { status: 'error', value: null };
+    }
   }
 
   private parseLooseJson(text: string): unknown {
