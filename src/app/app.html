@@ -216,6 +216,30 @@
           <div class="advanced-content">
             <div class="sidebar-divider"></div>
 
+            <section class="custom-fonts-panel">
+              <h5>{{ 'fonts.custom.title' | t }}</h5>
+              <p class="custom-fonts-panel__hint">{{ 'fonts.custom.description' | t }}</p>
+              <div class="custom-fonts-panel__actions">
+                <button type="button" class="btn" (click)="triggerCustomFontPicker()">
+                  {{ 'fonts.custom.add' | t }}
+                </button>
+                <input #customFontInput type="file" accept=".ttf,.otf,.woff,.woff2" multiple hidden
+                  (change)="onCustomFontSelected($event)" />
+              </div>
+              <ul class="custom-fonts-panel__list" *ngIf="customFonts().length; else customFontsEmpty">
+                <li class="custom-fonts-panel__item" *ngFor="let font of customFonts()">
+                  <span class="custom-fonts-panel__name">{{ font.name }}</span>
+                  <button type="button" class="btn btn--icon" (click)="removeCustomFont(font.id)"
+                    [title]="'fonts.custom.remove' | t">
+                    ✕
+                  </button>
+                </li>
+              </ul>
+              <ng-template #customFontsEmpty>
+                <p class="custom-fonts-panel__empty">{{ 'fonts.custom.empty' | t }}</p>
+              </ng-template>
+            </section>
+
             <label class="advanced-checkbox">
               <input type="checkbox" [checked]="guidesFeatureEnabled()"
                 (change)="toggleGuidesFeature($event.target.checked)" />
@@ -361,6 +385,70 @@
             <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
             <input type="number" [(ngModel)]="p.field.fontSize" min="8" max="72" />
           </label>
+          <div class="font-section">
+            <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
+            <div class="font-selector">
+              <input type="search" class="font-selector__search" [ngModel]="previewFontSearch()"
+                (ngModelChange)="updateFontSearch('preview', $event)"
+                [placeholder]="'annotation.fields.font.searchPlaceholder' | t" />
+              <div class="font-selector__results" role="listbox"
+                [attr.aria-label]="'annotation.fields.font.ariaLabel' | t">
+                <button type="button" class="font-selector__option"
+                  *ngFor="let option of filteredFontOptions(previewFontSearch())"
+                  [class.font-selector__option--selected]="p.field.fontFamily === option.id"
+                  (click)="setFieldFont('preview', option.id)" role="option">
+                  <span class="font-selector__option-label">{{ option.label }}</span>
+                  <span class="font-selector__tag" *ngIf="option.type === 'custom'">{{
+                    'annotation.fields.font.customTag' | t
+                  }}</span>
+                </button>
+                <p class="font-selector__empty" *ngIf="!filteredFontOptions(previewFontSearch()).length">
+                  {{ 'annotation.fields.font.empty' | t }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="style-controls">
+            <label class="field field-inline">
+              <span class="field-label">{{ 'annotation.fields.weight.label' | t }}</span>
+              <select [ngModel]="p.field.fontWeight ?? 'normal'"
+                (ngModelChange)="setFieldFontWeight('preview', $event)">
+                <option value="normal">{{ 'annotation.fields.weight.options.normal' | t }}</option>
+                <option value="bold"
+                  [disabled]="!fontSupportsWeight(p.field.fontFamily ?? defaultFontId, 'bold')">
+                  {{ 'annotation.fields.weight.options.bold' | t }}
+                </option>
+              </select>
+            </label>
+            <label class="field field-inline">
+              <span class="field-label">{{ 'annotation.fields.align.label' | t }}</span>
+              <select [ngModel]="p.field.textAlign ?? 'left'"
+                (ngModelChange)="setFieldTextAlign('preview', $event)">
+                <option value="left">{{ 'annotation.fields.align.options.left' | t }}</option>
+                <option value="center">{{ 'annotation.fields.align.options.center' | t }}</option>
+                <option value="right">{{ 'annotation.fields.align.options.right' | t }}</option>
+              </select>
+            </label>
+            <label class="field field-inline opacity-field">
+              <span class="field-label">{{ 'annotation.fields.opacity.label' | t }}</span>
+              <div class="opacity-controls">
+                <input type="range" min="0.1" max="1" step="0.05"
+                  [ngModel]="p.field.opacity ?? 1" (ngModelChange)="setFieldOpacity('preview', $event)" />
+                <input type="number" min="0.1" max="1" step="0.05"
+                  [ngModel]="p.field.opacity ?? 1" (ngModelChange)="setFieldOpacity('preview', $event)" />
+              </div>
+            </label>
+          </div>
+          <div class="background-section">
+            <span class="field-label">{{ 'annotation.fields.background.label' | t }}</span>
+            <div class="background-row">
+              <input type="color" [value]="p.field.backgroundColor ?? '#ffffff'"
+                (input)="setFieldBackground('preview', $any($event.target).value)" />
+              <button type="button" class="background-clear" (click)="clearFieldBackground('preview')">
+                {{ 'annotation.fields.background.clear' | t }}
+              </button>
+            </div>
+          </div>
           <div class="color-section">
             <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
             <div class="color-row">
@@ -416,6 +504,70 @@
             <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
             <input type="number" [(ngModel)]="e.field.fontSize" min="8" max="72" />
           </label>
+          <div class="font-section">
+            <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
+            <div class="font-selector">
+              <input type="search" class="font-selector__search" [ngModel]="editFontSearch()"
+                (ngModelChange)="updateFontSearch('edit', $event)"
+                [placeholder]="'annotation.fields.font.searchPlaceholder' | t" />
+              <div class="font-selector__results" role="listbox"
+                [attr.aria-label]="'annotation.fields.font.ariaLabel' | t">
+                <button type="button" class="font-selector__option"
+                  *ngFor="let option of filteredFontOptions(editFontSearch())"
+                  [class.font-selector__option--selected]="e.field.fontFamily === option.id"
+                  (click)="setFieldFont('edit', option.id)" role="option">
+                  <span class="font-selector__option-label">{{ option.label }}</span>
+                  <span class="font-selector__tag" *ngIf="option.type === 'custom'">{{
+                    'annotation.fields.font.customTag' | t
+                  }}</span>
+                </button>
+                <p class="font-selector__empty" *ngIf="!filteredFontOptions(editFontSearch()).length">
+                  {{ 'annotation.fields.font.empty' | t }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="style-controls">
+            <label class="field field-inline">
+              <span class="field-label">{{ 'annotation.fields.weight.label' | t }}</span>
+              <select [ngModel]="e.field.fontWeight ?? 'normal'"
+                (ngModelChange)="setFieldFontWeight('edit', $event)">
+                <option value="normal">{{ 'annotation.fields.weight.options.normal' | t }}</option>
+                <option value="bold"
+                  [disabled]="!fontSupportsWeight(e.field.fontFamily ?? defaultFontId, 'bold')">
+                  {{ 'annotation.fields.weight.options.bold' | t }}
+                </option>
+              </select>
+            </label>
+            <label class="field field-inline">
+              <span class="field-label">{{ 'annotation.fields.align.label' | t }}</span>
+              <select [ngModel]="e.field.textAlign ?? 'left'"
+                (ngModelChange)="setFieldTextAlign('edit', $event)">
+                <option value="left">{{ 'annotation.fields.align.options.left' | t }}</option>
+                <option value="center">{{ 'annotation.fields.align.options.center' | t }}</option>
+                <option value="right">{{ 'annotation.fields.align.options.right' | t }}</option>
+              </select>
+            </label>
+            <label class="field field-inline opacity-field">
+              <span class="field-label">{{ 'annotation.fields.opacity.label' | t }}</span>
+              <div class="opacity-controls">
+                <input type="range" min="0.1" max="1" step="0.05"
+                  [ngModel]="e.field.opacity ?? 1" (ngModelChange)="setFieldOpacity('edit', $event)" />
+                <input type="number" min="0.1" max="1" step="0.05"
+                  [ngModel]="e.field.opacity ?? 1" (ngModelChange)="setFieldOpacity('edit', $event)" />
+              </div>
+            </label>
+          </div>
+          <div class="background-section">
+            <span class="field-label">{{ 'annotation.fields.background.label' | t }}</span>
+            <div class="background-row">
+              <input type="color" [value]="e.field.backgroundColor ?? '#ffffff'"
+                (input)="setFieldBackground('edit', $any($event.target).value)" />
+              <button type="button" class="background-clear" (click)="clearFieldBackground('edit')">
+                {{ 'annotation.fields.background.clear' | t }}
+              </button>
+            </div>
+          </div>
           <div class="color-section">
             <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
             <div class="color-row">

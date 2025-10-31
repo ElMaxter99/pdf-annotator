@@ -4,6 +4,7 @@ import {
   ElementRef,
   ViewChild,
   signal,
+  computed,
   AfterViewChecked,
   HostListener,
   OnDestroy,
@@ -18,10 +19,21 @@ import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
-import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
+import {
+  FieldType,
+  FontWeightOption,
+  PageAnnotations,
+  PageField,
+  TextAlignOption,
+} from './models/annotation.model';
 import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 import { JsonTreeComponent } from './components/json-tree/json-tree.component';
+import {
+  STANDARD_FONT_FAMILIES,
+  StandardFontFamilyDefinition,
+  StandardFontName,
+} from './fonts/standard-font-families';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -72,6 +84,8 @@ type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | n
 
 type JsonViewMode = 'text' | 'tree';
 
+type EditorMode = 'preview' | 'edit';
+
 type JsonTreePreviewStatus = 'empty' | 'ready' | 'error';
 
 interface JsonTreePreview {
@@ -101,6 +115,35 @@ type OverlayGuide = {
   highlighted?: boolean;
 };
 
+type FontVariantDescriptor =
+  | { kind: 'standard'; name: StandardFontName }
+  | { kind: 'custom'; fontId: string };
+
+type FontOptionType = 'standard' | 'custom';
+
+interface FontOption {
+  readonly id: string;
+  readonly label: string;
+  readonly type: FontOptionType;
+  readonly cssFamily: string;
+  readonly weights: {
+    readonly normal: FontVariantDescriptor;
+    readonly bold?: FontVariantDescriptor;
+  };
+}
+
+interface CustomFontEntry {
+  readonly id: string;
+  readonly name: string;
+  readonly cssName: string;
+  readonly data: Uint8Array;
+}
+
+const DEFAULT_FONT_ID = 'standard:helvetica';
+const DEFAULT_FONT_WEIGHT: FontWeightOption = 'normal';
+const DEFAULT_TEXT_ALIGN: TextAlignOption = 'left';
+const DEFAULT_OPACITY = 1;
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -127,10 +170,14 @@ export class App implements AfterViewChecked, OnDestroy {
   previewRgbInput = signal('rgb(0, 0, 0)');
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
+  previewFontSearch = signal('');
+  editFontSearch = signal('');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
   jsonTreePreview: JsonTreePreview = this.buildJsonTreePreview(this.coordsTextModel);
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
+  customFonts = signal<CustomFontEntry[]>([]);
+  readonly fontOptions = computed<readonly FontOption[]>(() => this.buildFontOptions());
   guideSettings = signal<GuideSettings>({
     showGrid: true,
     gridSize: 10,
@@ -165,6 +212,7 @@ export class App implements AfterViewChecked, OnDestroy {
   readonly currentYear = new Date().getFullYear();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
+  readonly defaultFontId = DEFAULT_FONT_ID;
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
   private coordsFileInputFallback: HTMLInputElement | null = null;
@@ -178,6 +226,8 @@ export class App implements AfterViewChecked, OnDestroy {
     startLeft: number;
     startTop: number;
     fontSize: number;
+    width: number;
+    align: TextAlignOption;
     moved: boolean;
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
@@ -197,6 +247,8 @@ export class App implements AfterViewChecked, OnDestroy {
   @ViewChild('pdfFileInput', { static: false }) pdfFileInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('coordsFileInput', { static: false })
   coordsFileInputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('customFontInput', { static: false })
+  customFontInputRef?: ElementRef<HTMLInputElement>;
 
   constructor() {
     this.setDocumentMetadata();
@@ -215,6 +267,10 @@ export class App implements AfterViewChecked, OnDestroy {
     } else {
       this.syncCoordsTextModel();
     }
+
+    const defaultLabel = this.getFontLabel(DEFAULT_FONT_ID);
+    this.previewFontSearch.set(defaultLabel);
+    this.editFontSearch.set(defaultLabel);
   }
 
   ngOnDestroy() {
@@ -228,6 +284,178 @@ export class App implements AfterViewChecked, OnDestroy {
       }
       this.coordsFileInputFallback = null;
     }
+  }
+
+  filteredFontOptions(search: string): FontOption[] {
+    const query = typeof search === 'string' ? search.trim().toLocaleLowerCase() : '';
+    const options = this.fontOptions();
+    if (!query) {
+      return [...options];
+    }
+    return options.filter((option) => option.label.toLocaleLowerCase().includes(query));
+  }
+
+  updateFontSearch(mode: EditorMode, value: string) {
+    const target = mode === 'preview' ? this.previewFontSearch : this.editFontSearch;
+    target.set(value);
+  }
+
+  fontSupportsWeight(fontId: string, weight: FontWeightOption): boolean {
+    if (weight === 'normal') {
+      return true;
+    }
+    const option = this.getFontOptionById(fontId);
+    return !!option.weights.bold;
+  }
+
+  setFieldFont(mode: EditorMode, fontId: string) {
+    const normalized = this.normalizeFontFamily(fontId);
+    this.updateWorkingField(mode, (field) => this.ensureFieldStyle({ ...field, fontFamily: normalized }));
+    this.updateFontSearchForMode(mode, normalized);
+    this.redrawAllForPage();
+  }
+
+  setFieldFontWeight(mode: EditorMode, weight: string) {
+    const normalized: FontWeightOption = weight === 'bold' ? 'bold' : 'normal';
+    this.updateWorkingField(mode, (field) => {
+      const fontOption = this.getFontOptionById(field.fontFamily ?? DEFAULT_FONT_ID);
+      const safeWeight = this.normalizeFontWeight(normalized, fontOption);
+      return this.ensureFieldStyle({ ...field, fontWeight: safeWeight });
+    });
+    this.redrawAllForPage();
+  }
+
+  setFieldTextAlign(mode: EditorMode, align: string) {
+    const normalized = this.normalizeTextAlign(align);
+    this.updateWorkingField(mode, (field) => this.ensureFieldStyle({ ...field, textAlign: normalized }));
+    this.redrawAllForPage();
+  }
+
+  setFieldOpacity(mode: EditorMode, value: string | number) {
+    const normalized = this.normalizeOpacityValue(value);
+    this.updateWorkingField(mode, (field) =>
+      this.ensureFieldStyle({
+        ...field,
+        opacity:
+          normalized ?? (typeof field.opacity === 'number' ? field.opacity : DEFAULT_OPACITY),
+      })
+    );
+    this.redrawAllForPage();
+  }
+
+  setFieldBackground(mode: EditorMode, value: string) {
+    const normalized = this.normalizeBackgroundColor(value);
+    if (!normalized) {
+      this.clearFieldBackground(mode);
+      return;
+    }
+    this.updateWorkingField(mode, (field) => this.ensureFieldStyle({ ...field, backgroundColor: normalized }));
+    this.redrawAllForPage();
+  }
+
+  clearFieldBackground(mode: EditorMode) {
+    this.updateWorkingField(mode, (field) => this.ensureFieldStyle({ ...field, backgroundColor: null }));
+    this.redrawAllForPage();
+  }
+
+  triggerCustomFontPicker() {
+    if (typeof FontFace === 'undefined') {
+      alert(this.translationService.translate('fonts.custom.unsupported'));
+      return;
+    }
+    const input = this.customFontInputRef?.nativeElement;
+    if (input) {
+      input.click();
+    }
+  }
+
+  async onCustomFontSelected(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    const files = Array.from(input?.files ?? []);
+    if (!files.length) {
+      return;
+    }
+
+    for (const file of files) {
+      await this.registerCustomFont(file);
+    }
+
+    if (input) {
+      input.value = '';
+    }
+
+    this.redrawAllForPage();
+  }
+
+  removeCustomFont(id: string) {
+    const optionId = this.toCustomFontOptionId(id);
+    const previousFonts = this.customFonts();
+    if (!previousFonts.some((font) => font.id === id)) {
+      return;
+    }
+
+    this.customFonts.set(previousFonts.filter((font) => font.id !== id));
+
+    const fallbackId = DEFAULT_FONT_ID;
+    const fallbackLabel = this.getFontLabel(fallbackId);
+
+    this.preview.update((state) => {
+      if (!state) {
+        return state;
+      }
+      if (state.field.fontFamily === optionId) {
+        const updatedField = this.ensureFieldStyle({
+          ...state.field,
+          fontFamily: fallbackId,
+          fontWeight: DEFAULT_FONT_WEIGHT,
+        });
+        this.previewFontSearch.set(fallbackLabel);
+        return { ...state, field: updatedField };
+      }
+      return this.ensureFieldStyle(state.field) === state.field ? state : { ...state, field: this.ensureFieldStyle(state.field) };
+    });
+
+    this.editing.update((state) => {
+      if (!state) {
+        return state;
+      }
+      if (state.field.fontFamily === optionId) {
+        const updatedField = this.ensureFieldStyle({
+          ...state.field,
+          fontFamily: fallbackId,
+          fontWeight: DEFAULT_FONT_WEIGHT,
+        });
+        this.editFontSearch.set(fallbackLabel);
+        return { ...state, field: updatedField };
+      }
+      const styledField = this.ensureFieldStyle(state.field);
+      return styledField === state.field ? state : { ...state, field: styledField };
+    });
+
+    const changed = this.applyCoordsChange(() =>
+      this.coords.update((pages) =>
+        pages.map((page) => ({
+          ...page,
+          fields: page.fields.map((field) => {
+            if (field.fontFamily === optionId) {
+              return this.ensureFieldStyle({
+                ...field,
+                fontFamily: fallbackId,
+                fontWeight: DEFAULT_FONT_WEIGHT,
+              });
+            }
+            const styledField = this.ensureFieldStyle(field);
+            return styledField;
+          }),
+        }))
+      )
+    );
+
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
+
+    this.redrawAllForPage();
   }
 
   canUndo() {
@@ -693,7 +921,7 @@ export class App implements AfterViewChecked, OnDestroy {
   private applySnapping(
     baseLeft: number,
     baseTop: number,
-    bounds: { maxLeft: number; minTop: number; maxTop: number },
+    bounds: { minLeft: number; maxLeft: number; minTop: number; maxTop: number },
     el: HTMLDivElement,
     pdfCanvas: HTMLCanvasElement,
     fontSizePx: number
@@ -722,7 +950,10 @@ export class App implements AfterViewChecked, OnDestroy {
       if (!Number.isFinite(candidate) || !Number.isFinite(line)) {
         return;
       }
-      const clampedCandidate = Math.min(Math.max(candidate, 0), bounds.maxLeft);
+      const clampedCandidate = Math.min(
+        Math.max(candidate, bounds.minLeft),
+        bounds.maxLeft
+      );
       const clampedLine = Math.min(Math.max(line, 0), width);
       verticalCandidates.push({
         candidate: clampedCandidate,
@@ -783,7 +1014,7 @@ export class App implements AfterViewChecked, OnDestroy {
       });
     }
 
-    let snappedLeft = Math.min(Math.max(baseLeft, 0), bounds.maxLeft);
+    let snappedLeft = Math.min(Math.max(baseLeft, bounds.minLeft), bounds.maxLeft);
     let snappedTop = Math.min(Math.max(baseTop, bounds.minTop), bounds.maxTop);
 
     const bestVertical = verticalCandidates
@@ -1044,20 +1275,28 @@ export class App implements AfterViewChecked, OnDestroy {
     if (!pt) return;
 
     const defaultColor = '#000000';
+    const baseField: PageField = {
+      x: pt.x,
+      y: pt.y,
+      mapField: '',
+      fontSize: 14,
+      color: defaultColor,
+      type: 'text',
+      value: '',
+      appender: '',
+      decimals: null,
+      fontFamily: DEFAULT_FONT_ID,
+      fontWeight: DEFAULT_FONT_WEIGHT,
+      textAlign: DEFAULT_TEXT_ALIGN,
+      opacity: DEFAULT_OPACITY,
+      backgroundColor: null,
+    };
+    const styledField = this.ensureFieldStyle(baseField);
     this.preview.set({
       page: this.pageIndex(),
-      field: {
-        x: pt.x,
-        y: pt.y,
-        mapField: '',
-        fontSize: 14,
-        color: defaultColor,
-        type: 'text',
-        value: '',
-        appender: '',
-        decimals: null,
-      },
+      field: styledField,
     });
+    this.previewFontSearch.set(this.getFontLabel(styledField.fontFamily ?? DEFAULT_FONT_ID));
     this.updatePreviewColorState(defaultColor);
   }
 
@@ -1253,6 +1492,7 @@ export class App implements AfterViewChecked, OnDestroy {
     }
     const formField = this.prepareFieldForForm(sanitized);
     this.editing.set({ pageIndex, fieldIndex, field: formField });
+    this.editFontSearch.set(this.getFontLabel(formField.fontFamily ?? DEFAULT_FONT_ID));
     this.updateEditingColorState(formField.color);
     this.preview.set(null);
   }
@@ -1428,46 +1668,37 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   private fieldRequiresStorageUpdate(original: PageField, sanitized: PageField): boolean {
-    const originalValue = (original as { value?: unknown }).value;
-    const originalAppender = (original as { appender?: unknown }).appender;
-    const originalDecimals = (original as { decimals?: unknown }).decimals;
-    const originalType = (original as { type?: unknown }).type;
-
-    return (
-      original.x !== sanitized.x ||
-      original.y !== sanitized.y ||
-      original.mapField !== sanitized.mapField ||
-      original.fontSize !== sanitized.fontSize ||
-      original.color !== sanitized.color ||
-      originalType !== sanitized.type ||
-      originalValue !== sanitized.value ||
-      originalAppender !== sanitized.appender ||
-      originalDecimals !== sanitized.decimals
-    );
+    return !this.areFieldsEqual(original, sanitized);
   }
 
   private prepareFieldForStorage(field: PageField): PageField {
-    const type = this.normalizeFieldType(field.type);
+    const styled = this.ensureFieldStyle(field);
+    const type = this.normalizeFieldType(styled.type);
     const base: PageField = {
-      x: field.x,
-      y: field.y,
-      mapField: typeof field.mapField === 'string' ? field.mapField : '',
-      fontSize: field.fontSize,
-      color: this.normalizeColor(field.color),
+      x: styled.x,
+      y: styled.y,
+      mapField: typeof styled.mapField === 'string' ? styled.mapField : '',
+      fontSize: styled.fontSize,
+      color: this.normalizeColor(styled.color),
       type,
+      fontFamily: styled.fontFamily ?? DEFAULT_FONT_ID,
+      fontWeight: styled.fontWeight ?? DEFAULT_FONT_WEIGHT,
+      textAlign: styled.textAlign ?? DEFAULT_TEXT_ALIGN,
+      opacity: styled.opacity ?? DEFAULT_OPACITY,
+      backgroundColor: styled.backgroundColor ?? null,
     };
 
-    const value = this.sanitizeTextPreservingSpacing(field.value);
+    const value = this.sanitizeTextPreservingSpacing(styled.value);
     if (value !== undefined) {
       base.value = value;
     }
 
     if (type === 'number') {
-      const decimals = this.normalizeFieldDecimals(field.decimals);
+      const decimals = this.normalizeFieldDecimals(styled.decimals);
       if (decimals !== undefined) {
         base.decimals = decimals;
       }
-      const appender = this.sanitizeOptionalAppender(field.appender);
+      const appender = this.sanitizeOptionalAppender(styled.appender);
       if (appender !== undefined) {
         base.appender = appender;
       }
@@ -1477,15 +1708,16 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   private prepareFieldForForm(field: PageField): PageField {
+    const styled = this.ensureFieldStyle(field);
     const decimals =
-      typeof field.decimals === 'number' && Number.isFinite(field.decimals)
-        ? Math.max(0, Math.round(field.decimals))
+      typeof styled.decimals === 'number' && Number.isFinite(styled.decimals)
+        ? Math.max(0, Math.round(styled.decimals))
         : null;
 
     return {
-      ...field,
-      value: typeof field.value === 'string' ? field.value : '',
-      appender: typeof field.appender === 'string' ? field.appender : '',
+      ...styled,
+      value: typeof styled.value === 'string' ? styled.value : '',
+      appender: typeof styled.appender === 'string' ? styled.appender : '',
       decimals,
     };
   }
@@ -1517,6 +1749,270 @@ export class App implements AfterViewChecked, OnDestroy {
       return undefined;
     }
     return value.trim() ? value : undefined;
+  }
+
+  private updateWorkingField(mode: EditorMode, mutator: (field: PageField) => PageField) {
+    if (mode === 'preview') {
+      this.preview.update((state) => {
+        if (!state) {
+          return state;
+        }
+        const nextField = mutator(state.field);
+        return nextField === state.field ? state : { ...state, field: nextField };
+      });
+      return;
+    }
+
+    this.editing.update((state) => {
+      if (!state) {
+        return state;
+      }
+      const nextField = mutator(state.field);
+      return nextField === state.field ? state : { ...state, field: nextField };
+    });
+  }
+
+  private updateFontSearchForMode(mode: EditorMode, fontId: string) {
+    const label = this.getFontLabel(fontId);
+    if (mode === 'preview') {
+      this.previewFontSearch.set(label);
+    } else {
+      this.editFontSearch.set(label);
+    }
+  }
+
+  private getFontLabel(fontId: string): string {
+    const normalized = this.normalizeFontFamily(fontId);
+    const option = this.fontOptions().find((item) => item.id === normalized);
+    if (option) {
+      return option.label;
+    }
+    const fallback = this.fontOptions().find((item) => item.id === DEFAULT_FONT_ID);
+    return fallback?.label ?? normalized;
+  }
+
+  private buildFontOptions(): FontOption[] {
+    const standardOptions = STANDARD_FONT_FAMILIES.map((family): FontOption => ({
+      id: `standard:${family.id}`,
+      label: family.label,
+      type: 'standard',
+      cssFamily: family.cssFamily,
+      weights: {
+        normal: { kind: 'standard', name: family.weights.normal },
+        bold: family.weights.bold ? { kind: 'standard', name: family.weights.bold } : undefined,
+      },
+    }));
+
+    const customOptions = this.customFonts().map((font): FontOption => ({
+      id: this.toCustomFontOptionId(font.id),
+      label: font.name,
+      type: 'custom',
+      cssFamily: `"${font.cssName}"`,
+      weights: {
+        normal: { kind: 'custom', fontId: font.id },
+      },
+    }));
+
+    return [...standardOptions, ...customOptions];
+  }
+
+  private toCustomFontOptionId(fontId: string): string {
+    return `custom:${fontId}`;
+  }
+
+  private getFontOptionById(fontId: string): FontOption {
+    const normalized = this.normalizeFontFamily(fontId);
+    const option = this.fontOptions().find((item) => item.id === normalized);
+    if (option) {
+      return option;
+    }
+    const fallback = this.fontOptions().find((item) => item.id === DEFAULT_FONT_ID);
+    if (!fallback) {
+      throw new Error('Default font option is not available.');
+    }
+    return fallback;
+  }
+
+  private normalizeFontFamily(value: unknown): string {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed) {
+        const options = this.fontOptions();
+        if (options.some((option) => option.id === trimmed)) {
+          return trimmed;
+        }
+      }
+    }
+    return DEFAULT_FONT_ID;
+  }
+
+  private normalizeFontWeight(value: unknown, option: FontOption): FontWeightOption {
+    if (value === 'bold' && option.weights.bold) {
+      return 'bold';
+    }
+    return DEFAULT_FONT_WEIGHT;
+  }
+
+  private normalizeTextAlign(value: unknown): TextAlignOption {
+    if (value === 'center' || value === 'right') {
+      return value;
+    }
+    return DEFAULT_TEXT_ALIGN;
+  }
+
+  private normalizeOpacityValue(value: unknown): number | undefined {
+    const numeric = this.toFiniteNumber(value);
+    if (numeric === null) {
+      return undefined;
+    }
+    const clamped = Math.min(Math.max(numeric, 0), 1);
+    return Math.round(clamped * 100) / 100;
+  }
+
+  private normalizeBackgroundColor(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    const trimmed = value.trim();
+    if (!trimmed || trimmed.toLowerCase() === 'transparent') {
+      return undefined;
+    }
+    return this.normalizeColor(trimmed);
+  }
+
+  private ensureFieldStyle(field: PageField): PageField {
+    const fontFamily = this.normalizeFontFamily(field.fontFamily);
+    const fontOption = this.getFontOptionById(fontFamily);
+    const fontWeight = this.normalizeFontWeight(field.fontWeight, fontOption);
+    const textAlign = this.normalizeTextAlign(field.textAlign);
+    const opacity = this.normalizeOpacityValue(field.opacity) ?? DEFAULT_OPACITY;
+    const background = this.normalizeBackgroundColor(field.backgroundColor) ?? null;
+
+    if (
+      field.fontFamily === fontFamily &&
+      (field.fontWeight ?? DEFAULT_FONT_WEIGHT) === fontWeight &&
+      (field.textAlign ?? DEFAULT_TEXT_ALIGN) === textAlign &&
+      (field.opacity ?? DEFAULT_OPACITY) === opacity &&
+      (field.backgroundColor ?? null) === background
+    ) {
+      return field;
+    }
+
+    return {
+      ...field,
+      fontFamily,
+      fontWeight,
+      textAlign,
+      opacity,
+      backgroundColor: background,
+    };
+  }
+
+  private resolveCssFontFamily(fontId: string): string {
+    const option = this.getFontOptionById(fontId);
+    return option.cssFamily;
+  }
+
+  private async registerCustomFont(file: File) {
+    if (typeof FontFace === 'undefined') {
+      alert(this.translationService.translate('fonts.custom.unsupported'));
+      return;
+    }
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const fontId = this.createRuntimeId('font');
+      const baseName = file.name.replace(/\.[^.]+$/, '') || file.name;
+      const safeName = baseName.replace(/[^a-zA-Z0-9_-]+/g, '-');
+      const cssName = `${safeName}-${fontId}`;
+      const fontFace = new FontFace(cssName, buffer);
+      await fontFace.load();
+      if (this.document?.fonts) {
+        this.document.fonts.add(fontFace);
+      }
+
+      const entry: CustomFontEntry = {
+        id: fontId,
+        name: baseName,
+        cssName,
+        data: new Uint8Array(buffer),
+      };
+
+      this.customFonts.update((fonts) => [entry, ...fonts.filter((font) => font.id !== entry.id)]);
+    } catch (error) {
+      console.error('No se pudo cargar la fuente personalizada.', error);
+      alert(this.translationService.translate('fonts.custom.error'));
+    }
+  }
+
+  private createRuntimeId(prefix: string): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return `${prefix}-${crypto.randomUUID()}`;
+    }
+    return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  private computeHorizontalBounds(
+    width: number,
+    canvasWidth: number,
+    align: TextAlignOption
+  ): { minLeft: number; maxLeft: number } {
+    const elementWidth = Math.max(width, 0);
+    const clamp = (min: number, max: number) => ({ minLeft: min, maxLeft: max < min ? min : max });
+
+    switch (align) {
+      case 'center': {
+        const min = -elementWidth / 2;
+        const max = canvasWidth - elementWidth / 2;
+        return clamp(min, max);
+      }
+      case 'right': {
+        const min = -elementWidth;
+        const max = canvasWidth - elementWidth;
+        return clamp(min, max);
+      }
+      default: {
+        const min = 0;
+        const max = Math.max(canvasWidth - elementWidth, 0);
+        return clamp(min, max);
+      }
+    }
+  }
+
+  private runAfterRender(callback: () => void) {
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => callback());
+    } else {
+      setTimeout(callback, 0);
+    }
+  }
+
+  private updateAnnotationLeft(el: HTMLDivElement, field: PageField, scale: number) {
+    const align = this.normalizeTextAlign(field.textAlign);
+    const width = el.offsetWidth;
+    let left = field.x * scale;
+    if (align === 'center') {
+      left -= width / 2;
+    } else if (align === 'right') {
+      left -= width;
+    }
+    el.style.left = `${left}px`;
+    el.style.width = `${width}px`;
+  }
+
+  private hexToRgbComponents(color: string): { r: number; g: number; b: number } | null {
+    const normalized = this.normalizeColor(color);
+    const hex = normalized.replace('#', '');
+    if (hex.length !== 6) {
+      return null;
+    }
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    if ([r, g, b].some((value) => Number.isNaN(value))) {
+      return null;
+    }
+    return { r, g, b };
   }
 
   private normalizeFieldDecimals(value: unknown): number | undefined {
@@ -1625,20 +2121,30 @@ export class App implements AfterViewChecked, OnDestroy {
       .filter(({ page }) => page.num === this.pageIndex())
       .forEach(({ page, pageIndex }) => {
         page.fields.forEach((field, fieldIndex) => {
-          const left = field.x * scale;
-          const top = pdfCanvas.height - field.y * scale;
+          const styledField = this.ensureFieldStyle(field);
+          const left = styledField.x * scale;
+          const top = pdfCanvas.height - styledField.y * scale;
 
           const el = document.createElement('div');
           el.className = 'annotation';
-          el.textContent = this.getFieldRenderValue(field);
+          el.textContent = this.getFieldRenderValue(styledField);
           el.style.left = `${left}px`;
-          el.style.top = `${top - field.fontSize * scale}px`;
-          el.style.fontSize = `${field.fontSize * scale}px`;
-          el.style.color = field.color;
-          el.style.fontFamily = 'Helvetica, Arial, sans-serif';
+          el.style.top = `${top - styledField.fontSize * scale}px`;
+          el.style.fontSize = `${styledField.fontSize * scale}px`;
+          el.style.color = styledField.color;
+          el.style.fontFamily = this.resolveCssFontFamily(
+            styledField.fontFamily ?? DEFAULT_FONT_ID
+          );
+          el.style.fontWeight = styledField.fontWeight ?? DEFAULT_FONT_WEIGHT;
+          el.style.opacity = `${styledField.opacity ?? DEFAULT_OPACITY}`;
+          el.style.backgroundColor = styledField.backgroundColor ?? 'transparent';
+          el.style.textAlign = styledField.textAlign ?? DEFAULT_TEXT_ALIGN;
+          el.style.width = 'auto';
 
           el.onpointerdown = (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
           layer.appendChild(el);
+
+          this.runAfterRender(() => this.updateAnnotationLeft(el, styledField, scale));
         });
       });
 
@@ -1652,6 +2158,10 @@ export class App implements AfterViewChecked, OnDestroy {
     if (!el) return;
 
     const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');
+    const page = this.coords()[pageIndex];
+    const field = page?.fields[fieldIndex];
+    const styledField = field ? this.ensureFieldStyle(field) : null;
+    const align = styledField?.textAlign ?? DEFAULT_TEXT_ALIGN;
     this.dragInfo = {
       pageIndex,
       fieldIndex,
@@ -1661,6 +2171,8 @@ export class App implements AfterViewChecked, OnDestroy {
       startLeft: parseFloat(el.style.left || '0'),
       startTop: parseFloat(el.style.top || '0'),
       fontSize: computedFontSize,
+      width: el.offsetWidth,
+      align,
       moved: false,
     };
 
@@ -1705,9 +2217,19 @@ export class App implements AfterViewChecked, OnDestroy {
 
     const minTop = -this.dragInfo.fontSize;
     const maxTop = pdfCanvas.height - this.dragInfo.fontSize;
-    const maxLeft = Math.max(pdfCanvas.width - el.offsetWidth, 0);
-    const clampedLeft = Math.min(Math.max(tentativeLeft, 0), maxLeft);
+    const elementWidth = this.dragInfo.width || el.offsetWidth;
+    const horizontalBounds = this.computeHorizontalBounds(
+      elementWidth,
+      pdfCanvas.width,
+      this.dragInfo.align
+    );
+    const clampedLeft = Math.min(
+      Math.max(tentativeLeft, horizontalBounds.minLeft),
+      horizontalBounds.maxLeft
+    );
     const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
+
+    this.dragInfo.width = el.offsetWidth;
 
     if (!this.guidesFeatureEnabled()) {
       el.style.left = `${clampedLeft}px`;
@@ -1719,7 +2241,7 @@ export class App implements AfterViewChecked, OnDestroy {
     const snapResult = this.applySnapping(
       clampedLeft,
       clampedTop,
-      { maxLeft, minTop, maxTop },
+      { minLeft: horizontalBounds.minLeft, maxLeft: horizontalBounds.maxLeft, minTop, maxTop },
       el,
       pdfCanvas,
       this.dragInfo.fontSize
@@ -1765,7 +2287,14 @@ export class App implements AfterViewChecked, OnDestroy {
     if (drag.moved) {
       const left = parseFloat(el.style.left || '0');
       const top = parseFloat(el.style.top || '0');
-      this.updateAnnotationPosition(drag.pageIndex, drag.fieldIndex, left, top, drag.fontSize);
+      this.updateAnnotationPosition(
+        drag.pageIndex,
+        drag.fieldIndex,
+        left,
+        top,
+        drag.fontSize,
+        drag.width || el.offsetWidth
+      );
     } else if (evt.type !== 'pointercancel') {
       const page = this.coords()[drag.pageIndex];
       const field = page?.fields[drag.fieldIndex];
@@ -1780,14 +2309,27 @@ export class App implements AfterViewChecked, OnDestroy {
     fieldIndex: number,
     leftPx: number,
     topPx: number,
-    fontSizePx: number
+    fontSizePx: number,
+    widthPx: number
   ) {
     const pdfCanvas = this.pdfCanvasRef?.nativeElement;
     if (!pdfCanvas) return;
     const scale = this.scale();
-    const boundedLeft = Math.min(Math.max(leftPx, 0), pdfCanvas.width);
+    const page = this.coords()[pageIndex];
+    const field = page?.fields[fieldIndex];
+    const styledField = field ? this.ensureFieldStyle(field) : null;
+    const align = styledField?.textAlign ?? DEFAULT_TEXT_ALIGN;
+    const bounds = this.computeHorizontalBounds(widthPx, pdfCanvas.width, align);
+    const boundedLeft = Math.min(Math.max(leftPx, bounds.minLeft), bounds.maxLeft);
     const boundedTop = Math.min(Math.max(topPx, -fontSizePx), pdfCanvas.height - fontSizePx);
-    const newX = +(boundedLeft / scale).toFixed(2);
+    const width = Math.max(widthPx, 0) / scale;
+    let anchorX = boundedLeft / scale;
+    if (align === 'center') {
+      anchorX += width / 2;
+    } else if (align === 'right') {
+      anchorX += width;
+    }
+    const newX = +anchorX.toFixed(2);
     const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
 
     const changed = this.applyCoordsChange(() =>
@@ -1799,8 +2341,10 @@ export class App implements AfterViewChecked, OnDestroy {
           if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
             return page;
           }
-          const updatedFields = page.fields.map((field, fIdx) =>
-            fIdx === fieldIndex ? { ...field, x: newX, y: newY } : field
+          const updatedFields = page.fields.map((currentField, fIdx) =>
+            fIdx === fieldIndex
+              ? this.ensureFieldStyle({ ...currentField, x: newX, y: newY })
+              : currentField
           );
           return { ...page, fields: updatedFields };
         })
@@ -2053,8 +2597,33 @@ export class App implements AfterViewChecked, OnDestroy {
       }
 
       this.rememberPdfBytes(usedBytes, 3);
-      const font = await pdf.embedFont(StandardFonts.Helvetica);
+      const fontCache = new Map<string, any>();
+      const customFontMap = new Map<string, CustomFontEntry>();
+      this.customFonts().forEach((fontEntry) => customFontMap.set(fontEntry.id, fontEntry));
+      const defaultFontOption = this.getFontOptionById(DEFAULT_FONT_ID);
+      const defaultVariant = defaultFontOption.weights.normal;
       const pdfPageCount = pdf.getPageCount();
+
+      const getFontFromDescriptor = async (descriptor: FontVariantDescriptor): Promise<any> => {
+        if (descriptor.kind === 'standard') {
+          const cacheKey = `standard:${descriptor.name}`;
+          if (!fontCache.has(cacheKey)) {
+            fontCache.set(cacheKey, await pdf.embedFont(StandardFonts[descriptor.name]));
+          }
+          return fontCache.get(cacheKey);
+        }
+
+        const custom = customFontMap.get(descriptor.fontId);
+        if (!custom) {
+          return getFontFromDescriptor(defaultVariant);
+        }
+
+        const cacheKey = `custom:${descriptor.fontId}`;
+        if (!fontCache.has(cacheKey)) {
+          fontCache.set(cacheKey, await pdf.embedFont(custom.data, { subset: true }));
+        }
+        return fontCache.get(cacheKey);
+      };
 
       for (const pageAnnotations of this.coords()) {
         const targetIndex = Math.trunc(pageAnnotations.num) - 1;
@@ -2069,18 +2638,54 @@ export class App implements AfterViewChecked, OnDestroy {
         const fields = pageAnnotations.fields ?? [];
 
         for (const field of fields) {
-          const hex = field.color.replace('#', '');
-          const r = parseInt(hex.substring(0, 2), 16) / 255;
-          const g = parseInt(hex.substring(2, 4), 16) / 255;
-          const b = parseInt(hex.substring(4, 6), 16) / 255;
+          const styledField = this.ensureFieldStyle(field);
+          const text = this.getFieldRenderValue(styledField);
+          const fontOption = this.getFontOptionById(styledField.fontFamily ?? DEFAULT_FONT_ID);
+          const variant =
+            styledField.fontWeight === 'bold' && fontOption.weights.bold
+              ? fontOption.weights.bold
+              : fontOption.weights.normal;
+          const embeddedFont = await getFontFromDescriptor(variant);
+          const textColor = this.hexToRgbComponents(styledField.color) ?? { r: 0, g: 0, b: 0 };
+          const opacity = styledField.opacity ?? DEFAULT_OPACITY;
 
-          page.drawText(this.getFieldRenderValue(field), {
-            x: field.x,
-            y: field.y,
-            size: field.fontSize,
-            color: rgb(r, g, b),
-            font,
-          });
+          let drawX = styledField.x;
+          const textWidth = embeddedFont.widthOfTextAtSize(text, styledField.fontSize);
+          if (styledField.textAlign === 'center') {
+            drawX -= textWidth / 2;
+          } else if (styledField.textAlign === 'right') {
+            drawX -= textWidth;
+          }
+
+          if (styledField.backgroundColor) {
+            const bg = this.hexToRgbComponents(styledField.backgroundColor);
+            if (bg) {
+              const totalHeight = embeddedFont.heightAtSize(styledField.fontSize);
+              const ascent = embeddedFont.heightAtSize(styledField.fontSize, { descender: false });
+              const descent = totalHeight - ascent;
+              if (textWidth > 0 && totalHeight > 0) {
+                page.drawRectangle({
+                  x: drawX,
+                  y: styledField.y - descent,
+                  width: textWidth,
+                  height: totalHeight,
+                  color: rgb(bg.r / 255, bg.g / 255, bg.b / 255),
+                  opacity,
+                });
+              }
+            }
+          }
+
+          if (text) {
+            page.drawText(text, {
+              x: drawX,
+              y: styledField.y,
+              size: styledField.fontSize,
+              color: rgb(textColor.r / 255, textColor.g / 255, textColor.b / 255),
+              font: embeddedFont,
+              opacity,
+            });
+          }
         }
       }
 
@@ -2223,16 +2828,27 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   private areFieldsEqual(a: PageField, b: PageField): boolean {
+    const sanitizedA = this.prepareFieldForStorage(a);
+    const sanitizedB = this.prepareFieldForStorage(b);
+
     return (
-      a.x === b.x &&
-      a.y === b.y &&
-      a.mapField === b.mapField &&
-      a.fontSize === b.fontSize &&
-      a.color === b.color &&
-      a.type === b.type &&
-      (a.value ?? undefined) === (b.value ?? undefined) &&
-      (a.appender ?? undefined) === (b.appender ?? undefined) &&
-      (a.decimals ?? undefined) === (b.decimals ?? undefined)
+      sanitizedA.x === sanitizedB.x &&
+      sanitizedA.y === sanitizedB.y &&
+      sanitizedA.mapField === sanitizedB.mapField &&
+      sanitizedA.fontSize === sanitizedB.fontSize &&
+      sanitizedA.color === sanitizedB.color &&
+      sanitizedA.type === sanitizedB.type &&
+      (sanitizedA.value ?? undefined) === (sanitizedB.value ?? undefined) &&
+      (sanitizedA.appender ?? undefined) === (sanitizedB.appender ?? undefined) &&
+      (sanitizedA.decimals ?? undefined) === (sanitizedB.decimals ?? undefined) &&
+      (sanitizedA.fontFamily ?? DEFAULT_FONT_ID) ===
+        (sanitizedB.fontFamily ?? DEFAULT_FONT_ID) &&
+      (sanitizedA.fontWeight ?? DEFAULT_FONT_WEIGHT) ===
+        (sanitizedB.fontWeight ?? DEFAULT_FONT_WEIGHT) &&
+      (sanitizedA.textAlign ?? DEFAULT_TEXT_ALIGN) ===
+        (sanitizedB.textAlign ?? DEFAULT_TEXT_ALIGN) &&
+      (sanitizedA.opacity ?? DEFAULT_OPACITY) === (sanitizedB.opacity ?? DEFAULT_OPACITY) &&
+      (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null)
     );
   }
 
@@ -2448,7 +3064,22 @@ export class App implements AfterViewChecked, OnDestroy {
           }
         }
 
-        fields.push(normalizedField);
+        const rawFontFamily = (rawField as { fontFamily?: unknown }).fontFamily;
+        const rawFontWeight = (rawField as { fontWeight?: unknown }).fontWeight;
+        const rawTextAlign = (rawField as { textAlign?: unknown }).textAlign;
+        const rawOpacity = (rawField as { opacity?: unknown }).opacity;
+        const rawBackground = (rawField as { backgroundColor?: unknown }).backgroundColor;
+
+        const styledField = this.prepareFieldForStorage({
+          ...normalizedField,
+          fontFamily: typeof rawFontFamily === 'string' ? rawFontFamily : undefined,
+          fontWeight: rawFontWeight as FontWeightOption | undefined,
+          textAlign: rawTextAlign as TextAlignOption | undefined,
+          opacity: rawOpacity as number | string | undefined,
+          backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,
+        } as PageField);
+
+        fields.push(styledField);
       }
 
       if (fields.length) {
