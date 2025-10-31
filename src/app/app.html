@@ -273,8 +273,8 @@
     <!-- VISOR PDF -->
     <main class="viewer" *ngIf="pdfDoc as _">
       <div class="canvas-container">
-        <canvas #pdfCanvas></canvas>
-        <canvas #overlayCanvas></canvas>
+        <canvas #pdfCanvas id="pdfCanvas"></canvas>
+        <canvas #overlayCanvas id="overlayCanvas"></canvas>
         <div #annotationsLayer class="annotations-layer"></div>
         <div class="hitbox" (click)="onHitboxClick($event)"></div>
 
