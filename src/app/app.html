@@ -205,7 +205,8 @@
       </div>
       <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
 
-      <section class="advanced-panel" [class.open]="advancedOptionsOpen()" [class.active]="guidesFeatureEnabled()">
+      <section class="advanced-panel" [class.open]="advancedOptionsOpen()"
+        [class.active]="guidesFeatureEnabled() || customFontsFeatureEnabled()">
         <button type="button" class="advanced-toggle" (click)="toggleAdvancedOptions(!advancedOptionsOpen())"
           [attr.aria-expanded]="advancedOptionsOpen()">
           <span>{{ 'sidebar.advancedTitle' | t }}</span>
@@ -216,7 +217,14 @@
           <div class="advanced-content">
             <div class="sidebar-divider"></div>
 
-            <section class="custom-fonts-panel">
+            <label class="advanced-checkbox">
+              <input type="checkbox" [checked]="customFontsFeatureEnabled()"
+                (change)="toggleCustomFontsFeature($event.target.checked)" />
+              <span>{{ 'fonts.custom.enableFeature' | t }}</span>
+            </label>
+            <small class="advanced-hint">{{ 'fonts.custom.hint' | t }}</small>
+
+            <section class="custom-fonts-panel" *ngIf="customFontsFeatureEnabled()">
               <h5>{{ 'fonts.custom.title' | t }}</h5>
               <p class="custom-fonts-panel__hint">{{ 'fonts.custom.description' | t }}</p>
               <div class="custom-fonts-panel__actions">
@@ -239,6 +247,8 @@
                 <p class="custom-fonts-panel__empty">{{ 'fonts.custom.empty' | t }}</p>
               </ng-template>
             </section>
+
+            <div class="sidebar-divider"></div>
 
             <label class="advanced-checkbox">
               <input type="checkbox" [checked]="guidesFeatureEnabled()"
@@ -387,12 +397,17 @@
           </label>
           <div class="font-section">
             <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
-            <div class="font-selector">
-              <input type="search" class="font-selector__search" [ngModel]="previewFontSearch()"
-                (ngModelChange)="updateFontSearch('preview', $event)"
-                [placeholder]="'annotation.fields.font.searchPlaceholder' | t" />
-              <div class="font-selector__results" role="listbox"
-                [attr.aria-label]="'annotation.fields.font.ariaLabel' | t">
+          <div class="font-selector">
+            <div class="font-selector__summary" aria-live="polite">
+              <span class="font-selector__summary-label" [title]="previewSelectedFontLabel()">
+                {{ previewSelectedFontLabel() }}
+              </span>
+            </div>
+            <input type="search" class="font-selector__search" [ngModel]="previewFontSearch()"
+              (ngModelChange)="updateFontSearch('preview', $event)"
+              [placeholder]="'annotation.fields.font.searchPlaceholder' | t" />
+            <div class="font-selector__results" role="listbox"
+              [attr.aria-label]="'annotation.fields.font.ariaLabel' | t">
                 <button type="button" class="font-selector__option"
                   *ngFor="let option of filteredFontOptions(previewFontSearch())"
                   [class.font-selector__option--selected]="p.field.fontFamily === option.id"
@@ -506,12 +521,17 @@
           </label>
           <div class="font-section">
             <span class="field-label">{{ 'annotation.fields.font.label' | t }}</span>
-            <div class="font-selector">
-              <input type="search" class="font-selector__search" [ngModel]="editFontSearch()"
-                (ngModelChange)="updateFontSearch('edit', $event)"
-                [placeholder]="'annotation.fields.font.searchPlaceholder' | t" />
-              <div class="font-selector__results" role="listbox"
-                [attr.aria-label]="'annotation.fields.font.ariaLabel' | t">
+          <div class="font-selector">
+            <div class="font-selector__summary" aria-live="polite">
+              <span class="font-selector__summary-label" [title]="editSelectedFontLabel()">
+                {{ editSelectedFontLabel() }}
+              </span>
+            </div>
+            <input type="search" class="font-selector__search" [ngModel]="editFontSearch()"
+              (ngModelChange)="updateFontSearch('edit', $event)"
+              [placeholder]="'annotation.fields.font.searchPlaceholder' | t" />
+            <div class="font-selector__results" role="listbox"
+              [attr.aria-label]="'annotation.fields.font.ariaLabel' | t">
                 <button type="button" class="font-selector__option"
                   *ngFor="let option of filteredFontOptions(editFontSearch())"
                   [class.font-selector__option--selected]="e.field.fontFamily === option.id"

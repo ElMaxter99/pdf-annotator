@@ -177,6 +177,8 @@
   },
   "fonts": {
     "custom": {
+      "enableFeature": "Activar fuentes personalizadas",
+      "hint": "Activa esta opción para cargar tus archivos de fuente desde el panel avanzado.",
       "title": "Fuentes personalizadas",
       "description": "Carga archivos .ttf, .otf, .woff o .woff2 para usarlos en tus anotaciones.",
       "add": "Agregar fuente",

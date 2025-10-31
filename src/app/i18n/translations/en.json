@@ -177,6 +177,8 @@
   },
   "fonts": {
     "custom": {
+      "enableFeature": "Enable custom fonts",
+      "hint": "Toggle this option to load your own font files from the advanced menu.",
       "title": "Custom fonts",
       "description": "Upload .ttf, .otf, .woff or .woff2 files to reuse them in your annotations.",
       "add": "Add font",

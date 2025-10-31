@@ -177,6 +177,8 @@
   },
   "fonts": {
     "custom": {
+      "enableFeature": "Activa les fonts personalitzades",
+      "hint": "Activa aquesta opció per carregar els teus fitxers de font des del panell avançat.",
       "title": "Fonts personalitzades",
       "description": "Puja fitxers .ttf, .otf, .woff o .woff2 per utilitzar-los a les anotacions.",
       "add": "Afegir font",

@@ -176,8 +176,15 @@ export class App implements AfterViewChecked, OnDestroy {
   jsonTreePreview: JsonTreePreview = this.buildJsonTreePreview(this.coordsTextModel);
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
+  customFontsFeatureEnabled = signal(false);
   customFonts = signal<CustomFontEntry[]>([]);
   readonly fontOptions = computed<readonly FontOption[]>(() => this.buildFontOptions());
+  readonly previewSelectedFontLabel = computed(() =>
+    this.getFontLabel(this.preview()?.field.fontFamily ?? DEFAULT_FONT_ID)
+  );
+  readonly editSelectedFontLabel = computed(() =>
+    this.getFontLabel(this.editing()?.field.fontFamily ?? DEFAULT_FONT_ID)
+  );
   guideSettings = signal<GuideSettings>({
     showGrid: true,
     gridSize: 10,
@@ -268,9 +275,6 @@ export class App implements AfterViewChecked, OnDestroy {
       this.syncCoordsTextModel();
     }
 
-    const defaultLabel = this.getFontLabel(DEFAULT_FONT_ID);
-    this.previewFontSearch.set(defaultLabel);
-    this.editFontSearch.set(defaultLabel);
   }
 
   ngOnDestroy() {
@@ -395,67 +399,7 @@ export class App implements AfterViewChecked, OnDestroy {
     }
 
     this.customFonts.set(previousFonts.filter((font) => font.id !== id));
-
-    const fallbackId = DEFAULT_FONT_ID;
-    const fallbackLabel = this.getFontLabel(fallbackId);
-
-    this.preview.update((state) => {
-      if (!state) {
-        return state;
-      }
-      if (state.field.fontFamily === optionId) {
-        const updatedField = this.ensureFieldStyle({
-          ...state.field,
-          fontFamily: fallbackId,
-          fontWeight: DEFAULT_FONT_WEIGHT,
-        });
-        this.previewFontSearch.set(fallbackLabel);
-        return { ...state, field: updatedField };
-      }
-      return this.ensureFieldStyle(state.field) === state.field ? state : { ...state, field: this.ensureFieldStyle(state.field) };
-    });
-
-    this.editing.update((state) => {
-      if (!state) {
-        return state;
-      }
-      if (state.field.fontFamily === optionId) {
-        const updatedField = this.ensureFieldStyle({
-          ...state.field,
-          fontFamily: fallbackId,
-          fontWeight: DEFAULT_FONT_WEIGHT,
-        });
-        this.editFontSearch.set(fallbackLabel);
-        return { ...state, field: updatedField };
-      }
-      const styledField = this.ensureFieldStyle(state.field);
-      return styledField === state.field ? state : { ...state, field: styledField };
-    });
-
-    const changed = this.applyCoordsChange(() =>
-      this.coords.update((pages) =>
-        pages.map((page) => ({
-          ...page,
-          fields: page.fields.map((field) => {
-            if (field.fontFamily === optionId) {
-              return this.ensureFieldStyle({
-                ...field,
-                fontFamily: fallbackId,
-                fontWeight: DEFAULT_FONT_WEIGHT,
-              });
-            }
-            const styledField = this.ensureFieldStyle(field);
-            return styledField;
-          }),
-        }))
-      )
-    );
-
-    if (changed) {
-      this.syncCoordsTextModel();
-    }
-
-    this.redrawAllForPage();
+    this.handleRemovedFontOptions([optionId]);
   }
 
   canUndo() {
@@ -510,21 +454,45 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   toggleGuidesFeature(enabled: boolean) {
-    this.guidesFeatureEnabled.set(enabled);
     if (enabled) {
+      this.dismissEditors();
+      this.guidesFeatureEnabled.set(true);
       this.advancedOptionsOpen.set(true);
-    } else {
-      this.overlayDragRect = null;
-      this.overlayGuides = [];
-      this.refreshOverlay(null, []);
+      this.refreshOverlay();
       return;
     }
 
-    this.refreshOverlay();
+    this.guidesFeatureEnabled.set(false);
+    this.overlayDragRect = null;
+    this.overlayGuides = [];
+    this.refreshOverlay(null, []);
   }
 
   toggleAdvancedOptions(open: boolean) {
+    if (open) {
+      this.dismissEditors();
+    }
     this.advancedOptionsOpen.set(open);
+  }
+
+  toggleCustomFontsFeature(enabled: boolean) {
+    if (enabled) {
+      this.dismissEditors();
+      this.customFontsFeatureEnabled.set(true);
+      this.advancedOptionsOpen.set(true);
+      return;
+    }
+
+    const removedFonts = this.customFonts();
+    const removedOptionIds = removedFonts.map((font) => this.toCustomFontOptionId(font.id));
+    this.customFontsFeatureEnabled.set(false);
+    if (removedOptionIds.length) {
+      this.handleRemovedFontOptions(removedOptionIds);
+      this.customFonts.set([]);
+    } else {
+      this.resetFontSearches();
+      this.redrawAllForPage();
+    }
   }
 
   toggleGuideSetting(
@@ -1296,7 +1264,7 @@ export class App implements AfterViewChecked, OnDestroy {
       page: this.pageIndex(),
       field: styledField,
     });
-    this.previewFontSearch.set(this.getFontLabel(styledField.fontFamily ?? DEFAULT_FONT_ID));
+    this.previewFontSearch.set('');
     this.updatePreviewColorState(defaultColor);
   }
 
@@ -1492,7 +1460,7 @@ export class App implements AfterViewChecked, OnDestroy {
     }
     const formField = this.prepareFieldForForm(sanitized);
     this.editing.set({ pageIndex, fieldIndex, field: formField });
-    this.editFontSearch.set(this.getFontLabel(formField.fontFamily ?? DEFAULT_FONT_ID));
+    this.editFontSearch.set('');
     this.updateEditingColorState(formField.color);
     this.preview.set(null);
   }
@@ -1772,12 +1740,11 @@ export class App implements AfterViewChecked, OnDestroy {
     });
   }
 
-  private updateFontSearchForMode(mode: EditorMode, fontId: string) {
-    const label = this.getFontLabel(fontId);
+  private updateFontSearchForMode(mode: EditorMode, _fontId: string) {
     if (mode === 'preview') {
-      this.previewFontSearch.set(label);
+      this.previewFontSearch.set('');
     } else {
-      this.editFontSearch.set(label);
+      this.editFontSearch.set('');
     }
   }
 
@@ -1803,15 +1770,18 @@ export class App implements AfterViewChecked, OnDestroy {
       },
     }));
 
-    const customOptions = this.customFonts().map((font): FontOption => ({
-      id: this.toCustomFontOptionId(font.id),
-      label: font.name,
-      type: 'custom',
-      cssFamily: `"${font.cssName}"`,
-      weights: {
-        normal: { kind: 'custom', fontId: font.id },
-      },
-    }));
+    const customEnabled = this.customFontsFeatureEnabled();
+    const customOptions = customEnabled
+      ? this.customFonts().map((font): FontOption => ({
+          id: this.toCustomFontOptionId(font.id),
+          label: font.name,
+          type: 'custom',
+          cssFamily: `"${font.cssName}"`,
+          weights: {
+            normal: { kind: 'custom', fontId: font.id },
+          },
+        }))
+      : [];
 
     return [...standardOptions, ...customOptions];
   }
@@ -1943,6 +1913,91 @@ export class App implements AfterViewChecked, OnDestroy {
       console.error('No se pudo cargar la fuente personalizada.', error);
       alert(this.translationService.translate('fonts.custom.error'));
     }
+  }
+
+  private handleRemovedFontOptions(optionIds: readonly string[]) {
+    if (!optionIds.length) {
+      return;
+    }
+
+    const removedSet = new Set(optionIds);
+    const fallbackId = DEFAULT_FONT_ID;
+
+    const applyFallback = (field: PageField): PageField =>
+      this.ensureFieldStyle({
+        ...field,
+        fontFamily: fallbackId,
+        fontWeight: DEFAULT_FONT_WEIGHT,
+      });
+
+    this.preview.update((state) => {
+      if (!state) {
+        return state;
+      }
+      const currentFamily = state.field.fontFamily;
+      if (currentFamily && removedSet.has(currentFamily)) {
+        const nextField = applyFallback(state.field);
+        return { ...state, field: nextField };
+      }
+      const styledField = this.ensureFieldStyle(state.field);
+      return styledField === state.field ? state : { ...state, field: styledField };
+    });
+
+    this.editing.update((state) => {
+      if (!state) {
+        return state;
+      }
+      const currentFamily = state.field.fontFamily;
+      if (currentFamily && removedSet.has(currentFamily)) {
+        const nextField = applyFallback(state.field);
+        return { ...state, field: nextField };
+      }
+      const styledField = this.ensureFieldStyle(state.field);
+      return styledField === state.field ? state : { ...state, field: styledField };
+    });
+
+    const changed = this.applyCoordsChange(() =>
+      this.coords.update((pages) =>
+        pages.map((page) => {
+          let pageChanged = false;
+          const nextFields = page.fields.map((field) => {
+            const currentFamily = field.fontFamily;
+            if (currentFamily && removedSet.has(currentFamily)) {
+              pageChanged = true;
+              return applyFallback(field);
+            }
+            const styledField = this.ensureFieldStyle(field);
+            if (styledField !== field) {
+              pageChanged = true;
+            }
+            return styledField;
+          });
+          return pageChanged ? { ...page, fields: nextFields } : page;
+        })
+      )
+    );
+
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
+
+    this.resetFontSearches();
+    this.redrawAllForPage();
+  }
+
+  private resetFontSearches() {
+    this.previewFontSearch.set('');
+    this.editFontSearch.set('');
+  }
+
+  private dismissEditors() {
+    if (this.preview()) {
+      this.preview.set(null);
+    }
+    if (this.editing()) {
+      this.editing.set(null);
+    }
+    this.resetFontSearches();
   }
 
   private createRuntimeId(prefix: string): string {
