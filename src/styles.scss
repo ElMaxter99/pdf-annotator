@@ -465,7 +465,7 @@ header .logo {
 
   .json-editor {
     width: 100%;
-    min-height: 220px;
+    min-height: clamp(280px, 45vh, 560px);
     border-radius: 8px;
     border: 1px solid #444;
     background: #1d1d2a;
@@ -485,7 +485,7 @@ header .logo {
   .json-tree-container,
   .json-tree-placeholder {
     width: 100%;
-    min-height: 220px;
+    min-height: clamp(280px, 45vh, 560px);
     border-radius: 8px;
     border: 1px solid #444;
     background: #1d1d2a;
