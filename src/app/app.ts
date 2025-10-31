@@ -20,6 +20,11 @@ import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
 import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
+import {
+  DEFAULT_GUIDE_SETTINGS,
+  GuideSettings,
+  cloneGuideSettings,
+} from './models/guide-settings.model';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 import { JsonTreeComponent } from './components/json-tree/json-tree.component';
 
@@ -79,22 +84,6 @@ interface JsonTreePreview {
   value: unknown | null;
 }
 
-type GuideSettings = {
-  showGrid: boolean;
-  gridSize: number;
-  showRulers: boolean;
-  showAlignment: boolean;
-  snapToGrid: boolean;
-  snapToMargins: boolean;
-  snapToCenters: boolean;
-  snapToCustom: boolean;
-  marginSize: number;
-  snapTolerance: number;
-  snapPointsX: readonly number[];
-  snapPointsY: readonly number[];
-  usePdfCoordinates: boolean;
-};
-
 type OverlayGuide = {
   orientation: 'horizontal' | 'vertical';
   position: number;
@@ -131,21 +120,7 @@ export class App implements AfterViewChecked, OnDestroy {
   jsonTreePreview: JsonTreePreview = this.buildJsonTreePreview(this.coordsTextModel);
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
-  guideSettings = signal<GuideSettings>({
-    showGrid: true,
-    gridSize: 10,
-    showRulers: true,
-    showAlignment: true,
-    snapToGrid: true,
-    snapToMargins: true,
-    snapToCenters: true,
-    snapToCustom: false,
-    marginSize: 18,
-    snapTolerance: 8,
-    snapPointsX: [],
-    snapPointsY: [],
-    usePdfCoordinates: false,
-  });
+  guideSettings = signal<GuideSettings>(cloneGuideSettings(DEFAULT_GUIDE_SETTINGS));
   snapPointsXText = signal('');
   snapPointsYText = signal('');
   fileDropActive = signal(false);
@@ -1943,7 +1918,11 @@ export class App implements AfterViewChecked, OnDestroy {
       return;
     }
 
-    const savedTemplate = this.templatesService.saveTemplate(name, this.coords());
+    const savedTemplate = this.templatesService.saveTemplate(name, {
+      pages: this.coords(),
+      guideSettings: this.guideSettings(),
+      guidesEnabled: this.guidesFeatureEnabled(),
+    });
     if (!savedTemplate) {
       console.warn('El navegador no soporta almacenamiento local para plantillas.');
       return;
@@ -1983,10 +1962,17 @@ export class App implements AfterViewChecked, OnDestroy {
 
   private applyTemplate(template: AnnotationTemplate) {
     const clonedPages = this.clonePages(template.pages);
+    const nextGuideSettings = cloneGuideSettings(template.guideSettings);
+
     this.coords.set(clonedPages);
+    this.guideSettings.set(nextGuideSettings);
+    this.snapPointsXText.set(nextGuideSettings.snapPointsX.join(', '));
+    this.snapPointsYText.set(nextGuideSettings.snapPointsY.join(', '));
+    this.guidesFeatureEnabled.set(template.guidesEnabled);
     this.syncCoordsTextModel();
     this.preview.set(null);
     this.editing.set(null);
+    this.refreshOverlay();
     this.redrawAllForPage();
   }
 
