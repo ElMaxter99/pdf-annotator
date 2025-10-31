@@ -21,6 +21,12 @@ import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
 import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
+import {
+  DEFAULT_GUIDE_SETTINGS,
+  GuideSettings,
+  cloneGuideSettings,
+  differsFromDefaultGuideSettings,
+} from './models/guide-settings.model';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 import { JsonTreeComponent } from './components/json-tree/json-tree.component';
 import {
@@ -86,22 +92,6 @@ interface JsonTreePreview {
   status: JsonTreePreviewStatus;
   value: unknown | null;
 }
-
-type GuideSettings = {
-  showGrid: boolean;
-  gridSize: number;
-  showRulers: boolean;
-  showAlignment: boolean;
-  snapToGrid: boolean;
-  snapToMargins: boolean;
-  snapToCenters: boolean;
-  snapToCustom: boolean;
-  marginSize: number;
-  snapTolerance: number;
-  snapPointsX: readonly number[];
-  snapPointsY: readonly number[];
-  usePdfCoordinates: boolean;
-};
 
 type OverlayGuide = {
   orientation: 'horizontal' | 'vertical';
@@ -175,21 +165,7 @@ export class App implements AfterViewChecked, OnDestroy {
     edit: { open: false, query: '' },
   });
   readonly fontOptions = computed<readonly FontOption[]>(() => this.buildFontOptions());
-  guideSettings = signal<GuideSettings>({
-    showGrid: true,
-    gridSize: 10,
-    showRulers: true,
-    showAlignment: true,
-    snapToGrid: true,
-    snapToMargins: true,
-    snapToCenters: true,
-    snapToCustom: false,
-    marginSize: 18,
-    snapTolerance: 8,
-    snapPointsX: [],
-    snapPointsY: [],
-    usePdfCoordinates: false,
-  });
+  guideSettings = signal<GuideSettings>(cloneGuideSettings(DEFAULT_GUIDE_SETTINGS));
   snapPointsXText = signal('');
   snapPointsYText = signal('');
   fileDropActive = signal(false);
@@ -267,7 +243,6 @@ export class App implements AfterViewChecked, OnDestroy {
     } else {
       this.syncCoordsTextModel();
     }
-
   }
 
   ngOnDestroy() {
@@ -285,7 +260,9 @@ export class App implements AfterViewChecked, OnDestroy {
 
   setFieldFont(mode: EditorMode, fontId: string) {
     const normalized = this.normalizeFontFamily(fontId);
-    this.updateWorkingField(mode, (field) => this.ensureFieldStyle({ ...field, fontFamily: normalized }));
+    this.updateWorkingField(mode, (field) =>
+      this.ensureFieldStyle({ ...field, fontFamily: normalized })
+    );
     this.redrawAllForPage();
   }
 
@@ -373,12 +350,16 @@ export class App implements AfterViewChecked, OnDestroy {
       this.clearFieldBackground(mode);
       return;
     }
-    this.updateWorkingField(mode, (field) => this.ensureFieldStyle({ ...field, backgroundColor: normalized }));
+    this.updateWorkingField(mode, (field) =>
+      this.ensureFieldStyle({ ...field, backgroundColor: normalized })
+    );
     this.redrawAllForPage();
   }
 
   clearFieldBackground(mode: EditorMode) {
-    this.updateWorkingField(mode, (field) => this.ensureFieldStyle({ ...field, backgroundColor: null }));
+    this.updateWorkingField(mode, (field) =>
+      this.ensureFieldStyle({ ...field, backgroundColor: null })
+    );
     this.redrawAllForPage();
   }
 
@@ -937,10 +918,7 @@ export class App implements AfterViewChecked, OnDestroy {
       if (!Number.isFinite(candidate) || !Number.isFinite(line)) {
         return;
       }
-      const clampedCandidate = Math.min(
-        Math.max(candidate, bounds.minLeft),
-        bounds.maxLeft
-      );
+      const clampedCandidate = Math.min(Math.max(candidate, bounds.minLeft), bounds.maxLeft);
       const clampedLine = Math.min(Math.max(line, 0), width);
       verticalCandidates.push({
         candidate: clampedCandidate,
@@ -1764,23 +1742,27 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   private buildFontOptions(): FontOption[] {
-    const standardOptions = STANDARD_FONT_FAMILIES.map((family): FontOption => ({
-      id: `standard:${family.id}`,
-      label: family.label,
-      type: 'standard',
-      cssFamily: family.cssFamily,
-      descriptor: { kind: 'standard', name: family.pdfName },
-    }));
+    const standardOptions = STANDARD_FONT_FAMILIES.map(
+      (family): FontOption => ({
+        id: `standard:${family.id}`,
+        label: family.label,
+        type: 'standard',
+        cssFamily: family.cssFamily,
+        descriptor: { kind: 'standard', name: family.pdfName },
+      })
+    );
 
     const customEnabled = this.customFontsFeatureEnabled();
     const customOptions = customEnabled
-      ? this.customFonts().map((font): FontOption => ({
-          id: this.toCustomFontOptionId(font.id),
-          label: font.name,
-          type: 'custom',
-          cssFamily: `"${font.cssName}"`,
-          descriptor: { kind: 'custom', fontId: font.id },
-        }))
+      ? this.customFonts().map(
+          (font): FontOption => ({
+            id: this.toCustomFontOptionId(font.id),
+            label: font.name,
+            type: 'custom',
+            cssFamily: `"${font.cssName}"`,
+            descriptor: { kind: 'custom', fontId: font.id },
+          })
+        )
       : [];
 
     return [...standardOptions, ...customOptions];
@@ -1816,10 +1798,7 @@ export class App implements AfterViewChecked, OnDestroy {
     return DEFAULT_FONT_ID;
   }
 
-  private resolveImportedFontFamily(
-    primary: unknown,
-    secondary: unknown
-  ): string | undefined {
+  private resolveImportedFontFamily(primary: unknown, secondary: unknown): string | undefined {
     const attempt = (value: unknown): string | undefined => {
       if (typeof value !== 'string') {
         return undefined;
@@ -2561,7 +2540,11 @@ export class App implements AfterViewChecked, OnDestroy {
       return;
     }
 
-    const savedTemplate = this.templatesService.saveTemplate(name, this.coords());
+    const savedTemplate = this.templatesService.saveTemplate(name, {
+      pages: this.coords(),
+      guideSettings: this.guideSettings(),
+      guidesEnabled: this.guidesFeatureEnabled(),
+    });
     if (!savedTemplate) {
       console.warn('El navegador no soporta almacenamiento local para plantillas.');
       return;
@@ -2601,10 +2584,20 @@ export class App implements AfterViewChecked, OnDestroy {
 
   private applyTemplate(template: AnnotationTemplate) {
     const clonedPages = this.clonePages(template.pages);
+    const nextGuideSettings = cloneGuideSettings(template.guideSettings);
+
     this.coords.set(clonedPages);
+    this.guideSettings.set(nextGuideSettings);
+    this.snapPointsXText.set(nextGuideSettings.snapPointsX.join(', '));
+    this.snapPointsYText.set(nextGuideSettings.snapPointsY.join(', '));
+    this.guidesFeatureEnabled.set(template.guidesEnabled);
+    if (template.guidesEnabled || differsFromDefaultGuideSettings(nextGuideSettings)) {
+      this.advancedOptionsOpen.set(true);
+    }
     this.syncCoordsTextModel();
     this.preview.set(null);
     this.editing.set(null);
+    this.refreshOverlay();
     this.redrawAllForPage();
   }
 
@@ -2906,8 +2899,7 @@ export class App implements AfterViewChecked, OnDestroy {
       (sanitizedA.value ?? undefined) === (sanitizedB.value ?? undefined) &&
       (sanitizedA.appender ?? undefined) === (sanitizedB.appender ?? undefined) &&
       (sanitizedA.decimals ?? undefined) === (sanitizedB.decimals ?? undefined) &&
-      (sanitizedA.fontFamily ?? DEFAULT_FONT_ID) ===
-        (sanitizedB.fontFamily ?? DEFAULT_FONT_ID) &&
+      (sanitizedA.fontFamily ?? DEFAULT_FONT_ID) === (sanitizedB.fontFamily ?? DEFAULT_FONT_ID) &&
       (sanitizedA.opacity ?? DEFAULT_OPACITY) === (sanitizedB.opacity ?? DEFAULT_OPACITY) &&
       (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null)
     );

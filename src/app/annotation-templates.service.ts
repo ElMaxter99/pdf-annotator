@@ -1,12 +1,28 @@
 import { Injectable } from '@angular/core';
 import { PageAnnotations, PageField } from './models/annotation.model';
+import {
+  DEFAULT_GUIDE_SETTINGS,
+  GuideSettings,
+  cloneGuideSettings,
+} from './models/guide-settings.model';
 
 export interface AnnotationTemplate {
   id: string;
   name: string;
   createdAt: number;
   pages: PageAnnotations[];
+  guidesEnabled: boolean;
+  guideSettings: GuideSettings;
 }
+
+type StoredAnnotationTemplate = {
+  id: string;
+  name: string;
+  createdAt: number;
+  pages?: PageAnnotations[];
+  guidesEnabled?: boolean;
+  guideSettings?: Partial<GuideSettings> | null;
+};
 
 @Injectable({ providedIn: 'root' })
 export class AnnotationTemplatesService {
@@ -20,13 +36,21 @@ export class AnnotationTemplatesService {
     return [this.createDefaultTemplate(), ...stored];
   }
 
-  saveTemplate(name: string, pages: readonly PageAnnotations[]): AnnotationTemplate | null {
+  saveTemplate(
+    name: string,
+    data: {
+      pages: readonly PageAnnotations[];
+      guidesEnabled: boolean;
+      guideSettings: GuideSettings;
+    }
+  ): AnnotationTemplate | null {
     const storage = this.getStorage();
     if (!storage) {
       return null;
     }
 
-    const sanitizedPages = this.clonePages(pages);
+    const sanitizedPages = this.clonePages(data.pages);
+    const sanitizedGuideSettings = cloneGuideSettings(data.guideSettings);
     const templates = this.getStoredTemplates();
     const normalizedName = name.trim();
     const now = Date.now();
@@ -40,10 +64,12 @@ export class AnnotationTemplatesService {
         name: normalizedName,
         createdAt: now,
         pages: sanitizedPages,
+        guidesEnabled: data.guidesEnabled,
+        guideSettings: sanitizedGuideSettings,
       };
       templates.splice(existingIndex, 1, updatedTemplate);
-      this.writeToStorage(this.templatesKey, templates);
-      return { ...updatedTemplate, pages: this.clonePages(updatedTemplate.pages) };
+      this.persistTemplates(templates);
+      return this.cloneTemplate(updatedTemplate);
     }
 
     const template: AnnotationTemplate = {
@@ -51,10 +77,12 @@ export class AnnotationTemplatesService {
       name: normalizedName,
       createdAt: now,
       pages: sanitizedPages,
+      guidesEnabled: data.guidesEnabled,
+      guideSettings: sanitizedGuideSettings,
     };
 
-    this.writeToStorage(this.templatesKey, [template, ...templates]);
-    return { ...template, pages: this.clonePages(template.pages) };
+    this.persistTemplates([template, ...templates]);
+    return this.cloneTemplate(template);
   }
 
   deleteTemplate(id: string) {
@@ -63,7 +91,7 @@ export class AnnotationTemplatesService {
     }
     const storedTemplates = this.getStoredTemplates();
     const nextTemplates = storedTemplates.filter((template) => template.id !== id);
-    this.writeToStorage(this.templatesKey, nextTemplates);
+    this.persistTemplates(nextTemplates);
   }
 
   storeLastCoords(pages: readonly PageAnnotations[]) {
@@ -75,6 +103,42 @@ export class AnnotationTemplatesService {
     return stored ? this.clonePages(stored) : null;
   }
 
+  private persistTemplates(templates: readonly AnnotationTemplate[]) {
+    this.writeToStorage(
+      this.templatesKey,
+      templates.map((template) => this.cloneTemplate(template))
+    );
+  }
+
+  private normalizeGuideSettings(
+    settings: Partial<GuideSettings> | null | undefined
+  ): GuideSettings {
+    if (!settings) {
+      return cloneGuideSettings(DEFAULT_GUIDE_SETTINGS);
+    }
+
+    const merged: GuideSettings = {
+      ...DEFAULT_GUIDE_SETTINGS,
+      ...settings,
+      snapPointsX: Array.isArray(settings.snapPointsX)
+        ? settings.snapPointsX
+        : DEFAULT_GUIDE_SETTINGS.snapPointsX,
+      snapPointsY: Array.isArray(settings.snapPointsY)
+        ? settings.snapPointsY
+        : DEFAULT_GUIDE_SETTINGS.snapPointsY,
+    };
+
+    return cloneGuideSettings(merged);
+  }
+
+  private cloneTemplate(template: AnnotationTemplate): AnnotationTemplate {
+    return {
+      ...template,
+      pages: this.clonePages(template.pages),
+      guideSettings: cloneGuideSettings(template.guideSettings),
+    };
+  }
+
   private clonePages(pages: readonly PageAnnotations[]): PageAnnotations[] {
     return pages.map((page) => ({
       num: page.num,
@@ -83,9 +147,14 @@ export class AnnotationTemplatesService {
   }
 
   private getStoredTemplates(): AnnotationTemplate[] {
-    return this.readFromStorage<AnnotationTemplate[]>(this.templatesKey, []).map((template) => ({
-      ...template,
-      pages: this.clonePages(template.pages),
+    const stored = this.readFromStorage<StoredAnnotationTemplate[]>(this.templatesKey, []);
+    return stored.map((template) => ({
+      id: template.id,
+      name: template.name,
+      createdAt: template.createdAt,
+      pages: this.clonePages(template.pages ?? []),
+      guidesEnabled: template.guidesEnabled ?? false,
+      guideSettings: this.normalizeGuideSettings(template.guideSettings),
     }));
   }
 
@@ -95,6 +164,8 @@ export class AnnotationTemplatesService {
       name: this.defaultTemplateName,
       createdAt: 0,
       pages: [],
+      guidesEnabled: false,
+      guideSettings: cloneGuideSettings(DEFAULT_GUIDE_SETTINGS),
     };
   }
 
