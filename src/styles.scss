@@ -26,7 +26,7 @@ body {
     "header header"
     "sidebar viewer"
     "footer footer";
-  grid-template-columns: 400px 1fr;
+  grid-template-columns: minmax(360px, 33%) minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
   gap: 12px;
