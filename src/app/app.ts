@@ -24,6 +24,7 @@ import {
   DEFAULT_GUIDE_SETTINGS,
   GuideSettings,
   cloneGuideSettings,
+  differsFromDefaultGuideSettings,
 } from './models/guide-settings.model';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 import { JsonTreeComponent } from './components/json-tree/json-tree.component';
@@ -1969,6 +1970,9 @@ export class App implements AfterViewChecked, OnDestroy {
     this.snapPointsXText.set(nextGuideSettings.snapPointsX.join(', '));
     this.snapPointsYText.set(nextGuideSettings.snapPointsY.join(', '));
     this.guidesFeatureEnabled.set(template.guidesEnabled);
+    if (template.guidesEnabled || differsFromDefaultGuideSettings(nextGuideSettings)) {
+      this.advancedOptionsOpen.set(true);
+    }
     this.syncCoordsTextModel();
     this.preview.set(null);
     this.editing.set(null);

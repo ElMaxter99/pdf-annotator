@@ -37,3 +37,31 @@ export function cloneGuideSettings(settings: GuideSettings): GuideSettings {
     snapPointsY: [...settings.snapPointsY],
   };
 }
+
+function arraysEqual(a: readonly number[], b: readonly number[]): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  return a.every((value, index) => value === b[index]);
+}
+
+export function differsFromDefaultGuideSettings(settings: GuideSettings): boolean {
+  const defaults = DEFAULT_GUIDE_SETTINGS;
+
+  return (
+    settings.showGrid !== defaults.showGrid ||
+    settings.gridSize !== defaults.gridSize ||
+    settings.showRulers !== defaults.showRulers ||
+    settings.showAlignment !== defaults.showAlignment ||
+    settings.snapToGrid !== defaults.snapToGrid ||
+    settings.snapToMargins !== defaults.snapToMargins ||
+    settings.snapToCenters !== defaults.snapToCenters ||
+    settings.snapToCustom !== defaults.snapToCustom ||
+    settings.marginSize !== defaults.marginSize ||
+    settings.snapTolerance !== defaults.snapTolerance ||
+    settings.usePdfCoordinates !== defaults.usePdfCoordinates ||
+    !arraysEqual(settings.snapPointsX, defaults.snapPointsX) ||
+    !arraysEqual(settings.snapPointsY, defaults.snapPointsY)
+  );
+}
