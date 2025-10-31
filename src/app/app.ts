@@ -82,6 +82,7 @@ type GuideSettings = {
   snapTolerance: number;
   snapPointsX: readonly number[];
   snapPointsY: readonly number[];
+  usePdfCoordinates: boolean;
 };
 
 type OverlayGuide = {
@@ -126,6 +127,7 @@ export class App implements AfterViewChecked, OnDestroy {
     snapTolerance: 8,
     snapPointsX: [],
     snapPointsY: [],
+    usePdfCoordinates: false,
   });
   snapPointsXText = signal('');
   snapPointsYText = signal('');
@@ -296,6 +298,39 @@ export class App implements AfterViewChecked, OnDestroy {
     this.refreshOverlay();
   }
 
+  setCoordinateMode(mode: 'canvas' | 'pdf') {
+    const usePdfCoordinates = mode === 'pdf';
+    const currentSettings = this.guideSettings();
+    if (currentSettings.usePdfCoordinates === usePdfCoordinates) {
+      return;
+    }
+
+    let nextSnapPointsY = [...currentSettings.snapPointsY];
+    let nextSnapText = this.snapPointsYText();
+    const canvas = this.pdfCanvasRef?.nativeElement;
+    if (canvas && canvas.height > 0) {
+      const scale = this.scale();
+      const pdfHeight = canvas.height / scale;
+      if (pdfHeight > 0) {
+        nextSnapPointsY = currentSettings.snapPointsY.map((value) => {
+          const clamped = Math.max(0, Math.min(value, pdfHeight));
+          const converted = pdfHeight - clamped;
+          return +converted.toFixed(2);
+        });
+        nextSnapPointsY.sort((a, b) => a - b);
+        nextSnapText = nextSnapPointsY.join(', ');
+      }
+    }
+
+    this.guideSettings.update((settings) => ({
+      ...settings,
+      usePdfCoordinates,
+      snapPointsY: nextSnapPointsY,
+    }));
+    this.snapPointsYText.set(nextSnapText);
+    this.refreshOverlay();
+  }
+
   updateGuideNumber(key: 'gridSize' | 'marginSize' | 'snapTolerance', rawValue: string | number) {
     const numeric = this.toFiniteNumber(rawValue);
     if (numeric === null) {
@@ -404,6 +439,20 @@ export class App implements AfterViewChecked, OnDestroy {
     }
   }
 
+  private projectYPoint(
+    point: number,
+    height: number,
+    scale: number,
+    usePdfCoordinates: boolean
+  ) {
+    const pdfHeight = height / scale;
+    const clamped = Math.max(0, Math.min(point, pdfHeight));
+    if (usePdfCoordinates) {
+      return height - clamped * scale;
+    }
+    return clamped * scale;
+  }
+
   private drawGrid(
     ctx: CanvasRenderingContext2D,
     settings: GuideSettings,
@@ -455,6 +504,9 @@ export class App implements AfterViewChecked, OnDestroy {
     const rulerSize = 22;
     const majorStep = Math.max(50 * scale, 40);
     const minorStep = Math.max(10 * scale, 8);
+    const usePdfCoordinates = settings.usePdfCoordinates;
+    const pdfHeight = height / scale;
+    const formatValue = (value: number) => (Math.round(value * 10) / 10).toString();
 
     ctx.save();
 
@@ -488,16 +540,18 @@ export class App implements AfterViewChecked, OnDestroy {
     ctx.textBaseline = 'top';
 
     for (let x = majorStep; x < width; x += majorStep) {
-      const value = Math.round((x / scale) * 10) / 10;
-      ctx.fillText(value.toString(), x + 4, 4);
+      const value = x / scale;
+      ctx.fillText(formatValue(value), x + 4, 4);
     }
 
     ctx.save();
     ctx.rotate(-Math.PI / 2);
     for (let y = majorStep; y < height; y += majorStep) {
-      const value = Math.round((y / scale) * 10) / 10;
-      ctx.fillText(value.toString(), -y - 24, 4);
+      const rawUnits = usePdfCoordinates ? (height - y) / scale : y / scale;
+      ctx.fillText(formatValue(rawUnits), -y - 24, 4);
     }
+    ctx.fillText(formatValue(usePdfCoordinates ? pdfHeight : 0), -24, 4);
+    ctx.fillText(formatValue(usePdfCoordinates ? 0 : pdfHeight), -height - 24, 4);
     ctx.restore();
 
     ctx.restore();
@@ -559,7 +613,7 @@ export class App implements AfterViewChecked, OnDestroy {
       });
 
       settings.snapPointsY.forEach((point) => {
-        const linePx = point * scale;
+        const linePx = this.projectYPoint(point, height, scale, settings.usePdfCoordinates);
         if (linePx >= 0 && linePx <= height) {
           ctx.beginPath();
           ctx.moveTo(0, Math.round(linePx) + 0.5);
@@ -630,7 +684,8 @@ export class App implements AfterViewChecked, OnDestroy {
     baseTop: number,
     bounds: { maxLeft: number; minTop: number; maxTop: number },
     el: HTMLDivElement,
-    pdfCanvas: HTMLCanvasElement
+    pdfCanvas: HTMLCanvasElement,
+    fontSizePx: number
   ): { left: number; top: number; guides: OverlayGuide[] } {
     if (!this.guidesFeatureEnabled()) {
       return { left: baseLeft, top: baseTop, guides: [] };
@@ -643,6 +698,9 @@ export class App implements AfterViewChecked, OnDestroy {
     const height = pdfCanvas.height;
     const elementWidth = el.offsetWidth;
     const elementHeight = el.offsetHeight;
+    const usePdfCoordinates = settings.usePdfCoordinates;
+    const baselineOffset = Number.isFinite(fontSizePx) ? fontSizePx : 0;
+    const pdfBaselineOffset = usePdfCoordinates ? baselineOffset : 0;
 
     type Candidate = { candidate: number; line: number; delta: number };
 
@@ -708,8 +766,9 @@ export class App implements AfterViewChecked, OnDestroy {
         pushVertical(linePx, linePx);
       });
       settings.snapPointsY.forEach((point) => {
-        const linePx = point * scale;
-        pushHorizontal(linePx, linePx);
+        const linePx = this.projectYPoint(point, height, scale, usePdfCoordinates);
+        const candidateTop = linePx - pdfBaselineOffset;
+        pushHorizontal(candidateTop, linePx);
       });
     }
 
@@ -1651,7 +1710,8 @@ export class App implements AfterViewChecked, OnDestroy {
       clampedTop,
       { maxLeft, minTop, maxTop },
       el,
-      pdfCanvas
+      pdfCanvas,
+      this.dragInfo.fontSize
     );
 
     el.style.left = `${snapResult.left}px`;

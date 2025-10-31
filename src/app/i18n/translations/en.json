@@ -78,9 +78,20 @@
     "marginSize": "Margin (pt)",
     "tolerance": "Tolerance (px)",
     "customX": "X coordinates (pt)",
-    "customY": "Y coordinates (pt from top edge)",
+    "customY": {
+      "canvas": "Y coordinates (pt from top edge)",
+      "pdf": "Y coordinates (pt from bottom edge)"
+    },
     "customPlaceholder": "e.g. 24, 48, 120",
-    "customHint": "Enter point values separated by commas or spaces. Y values are measured from the top edge of the PDF."
+    "customHint": {
+      "canvas": "Enter point values separated by commas or spaces. Y values are measured from the top edge of the PDF.",
+      "pdf": "Enter point values separated by commas or spaces. Y values are measured from the bottom edge of the PDF."
+    },
+    "coordinateMode": {
+      "label": "Coordinate origin",
+      "canvas": "Top-left (Canvas)",
+      "pdf": "Bottom-left (PDF)"
+    }
   },
   "annotation": {
     "fields": {

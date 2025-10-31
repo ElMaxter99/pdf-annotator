@@ -567,162 +567,286 @@ header .logo {
 .templates__delete:hover {
   background: rgba(255, 77, 77, 0.15);
   border-color: var(--danger);
+}
 
-  .sidebar-divider {
-    margin: 16px 0;
-    border-top: 1px solid rgba(94, 234, 212, 0.15);
+.sidebar-divider {
+  width: 100%;
+  display: block;
+  margin: 16px 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.45), transparent);
+  border-radius: 999px;
+}
+
+@keyframes advanced-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
   }
 
-  .advanced-panel {
-    margin-top: 12px;
-
-    .advanced-toggle {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: transparent;
-      border: 1px solid rgba(94, 234, 212, 0.25);
-      border-radius: 8px;
-      padding: 8px 10px;
-      color: var(--accent);
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: border-color 0.2s ease, background 0.2s ease;
-    }
-
-    .advanced-toggle:hover,
-    &.open .advanced-toggle,
-    &.active .advanced-toggle {
-      border-color: var(--accent);
-      background: rgba(94, 234, 212, 0.12);
-    }
-
-    .advanced-icon {
-      font-size: 0.9rem;
-      transform: rotate(-90deg);
-      transition: transform 0.2s ease;
-    }
-
-    &.open .advanced-icon {
-      transform: rotate(0deg);
-    }
-
-    .advanced-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      color: var(--text);
-      margin: 12px 0 4px;
-    }
-
-    input[type='checkbox'] {
-      accent-color: var(--accent);
-    }
-
-    .advanced-hint {
-      font-size: 0.75rem;
-      color: var(--muted);
-      line-height: 1.4;
-      margin-bottom: 12px;
-      display: block;
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
 
-  .guides-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.advanced-panel {
+  position: relative;
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(140deg, rgba(29, 29, 42, 0.95), rgba(35, 35, 52, 0.92));
+  border: 1px solid rgba(94, 234, 212, 0.15);
+  box-shadow: 0 18px 36px -28px rgba(15, 23, 42, 0.95);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+  overflow: hidden;
+}
 
-    h5 {
-      margin: 0;
-      font-size: 1rem;
-      color: var(--accent);
-    }
+.advanced-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at top right, rgba(94, 234, 212, 0.12), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
 
-    .guides-toggles {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 8px;
+.advanced-panel.active {
+  border-color: rgba(94, 234, 212, 0.5);
+  box-shadow: 0 24px 44px -28px rgba(94, 234, 212, 0.28);
+}
 
-      label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.85rem;
-        color: var(--text);
-      }
+.advanced-panel.active::before {
+  opacity: 1;
+}
 
-      input[type='checkbox'] {
-        accent-color: var(--accent);
-      }
-    }
+.advanced-panel.open {
+  transform: translateY(-2px);
+}
 
-    .guides-inputs {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px;
+.advanced-panel .advanced-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
 
-      label {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        font-size: 0.8rem;
-        color: var(--muted);
-      }
+.advanced-panel .advanced-toggle:hover,
+.advanced-panel .advanced-toggle:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(94, 234, 212, 0.18);
+  color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.18);
+}
 
-      input[type='number'] {
-        width: 100%;
-        border-radius: 6px;
-        border: 1px solid rgba(94, 234, 212, 0.25);
-        background: rgba(29, 29, 42, 0.9);
-        color: var(--text);
-        padding: 6px 8px;
-      }
+.advanced-panel.active .advanced-toggle {
+  color: var(--accent);
+  border-color: rgba(94, 234, 212, 0.45);
+}
 
-      input[type='number']:focus {
-        outline: none;
-        border-color: var(--accent);
-        box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
-      }
-    }
+.advanced-panel .advanced-icon {
+  font-size: 0.9rem;
+  transform: rotate(-90deg);
+  transition: transform 0.2s ease;
+}
 
-    .guides-custom {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+.advanced-panel.open .advanced-icon {
+  transform: rotate(0deg);
+}
 
-      label {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        font-size: 0.8rem;
-        color: var(--muted);
-      }
+.advanced-panel .advanced-content {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: advanced-fade-in 0.25s ease;
+  position: relative;
+  z-index: 1;
+}
 
-      input[type='text'] {
-        border-radius: 6px;
-        border: 1px solid rgba(94, 234, 212, 0.25);
-        background: rgba(29, 29, 42, 0.9);
-        color: var(--text);
-        padding: 6px 8px;
-      }
+.advanced-panel .advanced-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 500;
+}
 
-      input[type='text']:focus {
-        outline: none;
-        border-color: var(--accent);
-        box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.12);
-      }
+.advanced-panel .advanced-checkbox input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
 
-      .guides-hint {
-        font-size: 0.75rem;
-        color: var(--muted);
-        line-height: 1.4;
-      }
-    }
-  }
+.advanced-panel .advanced-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.advanced-panel .guides-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(94, 234, 212, 0.12);
+}
+
+.advanced-panel .guides-panel h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.advanced-panel .guides-panel .guides-toggles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.advanced-panel .guides-panel .guides-toggles label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.advanced-panel .guides-panel .guides-toggles input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.advanced-panel .guides-panel .guides-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.28);
+  border: 1px solid rgba(94, 234, 212, 0.12);
+}
+
+.advanced-panel .guides-panel .guides-mode__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.advanced-panel .guides-panel .guides-mode__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.advanced-panel .guides-panel .guides-mode__options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.advanced-panel .guides-panel .guides-mode__options label input[type='radio'] {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.advanced-panel .guides-panel .guides-mode__options label span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  background: rgba(29, 29, 42, 0.85);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.advanced-panel .guides-panel .guides-mode__options label input[type='radio']:checked + span {
+  border-color: var(--accent);
+  background: rgba(94, 234, 212, 0.18);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.15);
+}
+
+.advanced-panel .guides-panel .guides-mode__options label:hover span,
+.advanced-panel .guides-panel .guides-mode__options label:focus-within span {
+  border-color: rgba(94, 234, 212, 0.35);
+  box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.15);
+}
+
+.advanced-panel .guides-panel .guides-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.advanced-panel .guides-panel .guides-inputs label,
+.advanced-panel .guides-panel .guides-custom label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.advanced-panel .guides-panel .guides-inputs input[type='number'],
+.advanced-panel .guides-panel .guides-custom input[type='text'] {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(94, 234, 212, 0.25);
+  background: rgba(29, 29, 42, 0.9);
+  color: var(--text);
+  padding: 8px 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.advanced-panel .guides-panel .guides-inputs input[type='number']:focus,
+.advanced-panel .guides-panel .guides-custom input[type='text']:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
+}
+
+.advanced-panel .guides-panel .guides-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.advanced-panel .guides-panel .guides-custom .guides-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 .viewer {
@@ -802,12 +926,11 @@ header .logo {
   position: relative;
 }
 
-#pdfCanvas,
-#overlayCanvas {
+.canvas-container .canvas {
   display: block;
 }
 
-#overlayCanvas {
+.canvas--overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
