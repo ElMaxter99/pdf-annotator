@@ -1816,6 +1816,64 @@ export class App implements AfterViewChecked, OnDestroy {
     return DEFAULT_FONT_ID;
   }
 
+  private resolveImportedFontFamily(
+    primary: unknown,
+    secondary: unknown
+  ): string | undefined {
+    const attempt = (value: unknown): string | undefined => {
+      if (typeof value !== 'string') {
+        return undefined;
+      }
+
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return undefined;
+      }
+
+      const options = this.fontOptions();
+      const direct = options.find((option) => option.id === trimmed);
+      if (direct) {
+        return direct.id;
+      }
+
+      const normalized = trimmed.toLowerCase();
+      const simplified = normalized.replace(/[^a-z0-9]/g, '');
+
+      for (const option of options) {
+        if (option.id.toLowerCase() === normalized) {
+          return option.id;
+        }
+
+        const labelNormalized = option.label.toLowerCase();
+        if (labelNormalized === normalized) {
+          return option.id;
+        }
+
+        const labelSimplified = labelNormalized.replace(/[^a-z0-9]/g, '');
+        if (labelSimplified === simplified) {
+          return option.id;
+        }
+
+        if (option.type === 'standard') {
+          const baseId = option.id.replace(/^standard:/, '');
+          const baseNormalized = baseId.toLowerCase();
+          if (baseId === trimmed || baseNormalized === normalized) {
+            return option.id;
+          }
+
+          const baseSimplified = baseNormalized.replace(/[^a-z0-9]/g, '');
+          if (baseSimplified === simplified) {
+            return option.id;
+          }
+        }
+      }
+
+      return undefined;
+    };
+
+    return attempt(primary) ?? attempt(secondary);
+  }
+
   private normalizeOpacityValue(value: unknown): number | undefined {
     const numeric = this.toFiniteNumber(value);
     if (numeric === null) {
@@ -3068,12 +3126,13 @@ export class App implements AfterViewChecked, OnDestroy {
         }
 
         const rawFontFamily = (rawField as { fontFamily?: unknown }).fontFamily;
+        const rawFontType = (rawField as { fontType?: unknown }).fontType;
         const rawOpacity = (rawField as { opacity?: unknown }).opacity;
         const rawBackground = (rawField as { backgroundColor?: unknown }).backgroundColor;
 
         const styledField = this.prepareFieldForStorage({
           ...normalizedField,
-          fontFamily: typeof rawFontFamily === 'string' ? rawFontFamily : undefined,
+          fontFamily: this.resolveImportedFontFamily(rawFontFamily, rawFontType),
           opacity: rawOpacity as number | string | undefined,
           backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,
         } as PageField);
