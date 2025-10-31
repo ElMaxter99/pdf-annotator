@@ -111,25 +111,7 @@
       },
       "font": {
         "label": "Font",
-        "searchPlaceholder": "Cerca una font...",
-        "ariaLabel": "Opcions de font",
-        "customTag": "Personalitzada",
-        "empty": "Sense coincidències"
-      },
-      "weight": {
-        "label": "Pes",
-        "options": {
-          "normal": "Normal",
-          "bold": "Negreta"
-        }
-      },
-      "align": {
-        "label": "Alineació",
-        "options": {
-          "left": "Esquerra",
-          "center": "Centre",
-          "right": "Dreta"
-        }
+        "customTag": "Personalitzada"
       },
       "opacity": {
         "label": "Opacitat"

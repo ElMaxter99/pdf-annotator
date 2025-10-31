@@ -111,25 +111,7 @@
       },
       "font": {
         "label": "Font",
-        "searchPlaceholder": "Search a font...",
-        "ariaLabel": "Font options",
-        "customTag": "Custom",
-        "empty": "No matches"
-      },
-      "weight": {
-        "label": "Weight",
-        "options": {
-          "normal": "Regular",
-          "bold": "Bold"
-        }
-      },
-      "align": {
-        "label": "Alignment",
-        "options": {
-          "left": "Left",
-          "center": "Center",
-          "right": "Right"
-        }
+        "customTag": "Custom"
       },
       "opacity": {
         "label": "Opacity"

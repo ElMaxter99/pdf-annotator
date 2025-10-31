@@ -111,25 +111,7 @@
       },
       "font": {
         "label": "Fuente",
-        "searchPlaceholder": "Busca una fuente...",
-        "ariaLabel": "Opciones de fuente",
-        "customTag": "Personalizada",
-        "empty": "Sin coincidencias"
-      },
-      "weight": {
-        "label": "Peso",
-        "options": {
-          "normal": "Normal",
-          "bold": "Negrita"
-        }
-      },
-      "align": {
-        "label": "Alineación",
-        "options": {
-          "left": "Izquierda",
-          "center": "Centro",
-          "right": "Derecha"
-        }
+        "customTag": "Personalizada"
       },
       "opacity": {
         "label": "Opacidad"

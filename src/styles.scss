@@ -1213,7 +1213,7 @@ header .logo {
   }
 
   .field-small {
-    max-width: 120px;
+    max-width: 220px;
   }
 
   .field-inline {
@@ -1226,102 +1226,6 @@ header .logo {
     text-transform: uppercase;
     letter-spacing: .05em;
     color: var(--accent);
-  }
-
-  .font-section {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .font-selector {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .font-selector__summary {
-    display: flex;
-    align-items: center;
-    padding: 6px 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(94, 234, 212, 0.2);
-    background: rgba(30, 30, 47, 0.4);
-    font-size: .85rem;
-  }
-
-  .font-selector__summary-label {
-    flex: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .font-selector__search {
-    width: 100%;
-  }
-
-  .font-selector__results {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-height: 150px;
-    overflow-y: auto;
-    padding: 6px;
-    border: 1px solid rgba(94, 234, 212, 0.2);
-    border-radius: 6px;
-    background: rgba(30, 30, 47, 0.65);
-  }
-
-  .font-selector__option {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    font-size: .85rem;
-    text-align: left;
-  }
-
-  .font-selector__option-label {
-    flex: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .font-selector__option:hover {
-    border-color: rgba(94, 234, 212, 0.35);
-    background: rgba(94, 234, 212, 0.1);
-  }
-
-  .font-selector__option--selected {
-    border-color: var(--accent);
-    background: rgba(94, 234, 212, 0.18);
-  }
-
-  .font-selector__tag {
-    font-size: .65rem;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    color: var(--accent);
-  }
-
-  .font-selector__empty {
-    margin: 0;
-    font-size: .8rem;
-    color: var(--muted);
-  }
-
-  .style-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
   }
 
   .opacity-controls {
