@@ -125,6 +125,18 @@
         "label": "Value override",
         "placeholder": "Optional fixed value..."
       },
+      "preset": {
+        "label": "Preset",
+        "custom": "Custom"
+      },
+      "mask": {
+        "label": "Mask",
+        "placeholder": "e.g. ###-### or RegExp pattern"
+      },
+      "helperText": {
+        "label": "Helper text",
+        "placeholder": "Guidance shown across your integrations..."
+      },
       "number": {
         "decimals": {
           "label": "Decimals"
@@ -145,6 +157,60 @@
       "duplicate": "Duplicate annotation"
     },
     "editingBadge": "Editing"
+  },
+  "presets": {
+    "text": {
+      "basic": {
+        "label": "Free text",
+        "description": "Plain field without constraints. Perfect for notes or labels."
+      },
+      "email": {
+        "label": "Email",
+        "description": "Applies a mask that matches email addresses.",
+        "helper": "Valid sample: user@example.com"
+      },
+      "phone": {
+        "label": "Phone number",
+        "description": "Prepares the field for international phone formats.",
+        "helper": "Suggested format: +1 555 000 0000"
+      }
+    },
+    "check": {
+      "basic": {
+        "label": "Checked box",
+        "description": "Checkbox with a mark for completed steps.",
+        "helper": "Use it for confirmed checklist items."
+      },
+      "empty": {
+        "label": "Empty box",
+        "description": "Blank checkbox ready for reusable lists.",
+        "helper": "Great when you need pending checklist slots."
+      }
+    },
+    "radio": {
+      "basic": {
+        "label": "Selected option",
+        "description": "Radio button rendered as active.",
+        "helper": "Highlights the default choice in single-select groups."
+      },
+      "empty": {
+        "label": "Unselected option",
+        "description": "Radio button without a mark.",
+        "helper": "Use when options start unchecked."
+      }
+    },
+    "number": {
+      "integer": {
+        "label": "Integer",
+        "description": "Restricts the field to whole numbers only.",
+        "helper": "Enter positive or negative integers without decimals."
+      },
+      "currency": {
+        "label": "Currency amount",
+        "description": "Two decimals and a currency suffix for amounts.",
+        "helper": "Adjust the symbol if you need a different currency."
+      }
+    }
   },
   "viewer": {
     "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."

@@ -19,6 +19,13 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
 import './array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from './models/annotation.model';
+import {
+  FieldPreset,
+  findFieldPreset,
+  getDefaultFieldPreset,
+  getFieldPresets,
+  hasPresetsForType,
+} from './models/field-presets';
 import { AnnotationTemplatesService, AnnotationTemplate } from './annotation-templates.service';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 import { JsonTreeComponent } from './components/json-tree/json-tree.component';
@@ -1043,22 +1050,110 @@ export class App implements AfterViewChecked, OnDestroy {
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
 
-    const defaultColor = '#000000';
+    const defaultType: FieldType = 'text';
+    const baseField: PageField = {
+      x: pt.x,
+      y: pt.y,
+      mapField: '',
+      fontSize: 14,
+      color: '#000000',
+      type: defaultType,
+      value: '',
+      appender: '',
+      decimals: null,
+      mask: '',
+      helperText: '',
+      presetId: null,
+    };
+
+    const defaultPreset = getDefaultFieldPreset(defaultType);
+    const fieldWithPreset = defaultPreset
+      ? this.applyFieldPreset(baseField, defaultPreset)
+      : this.prepareFieldForForm(baseField);
+
     this.preview.set({
       page: this.pageIndex(),
-      field: {
-        x: pt.x,
-        y: pt.y,
-        mapField: '',
-        fontSize: 14,
-        color: defaultColor,
-        type: 'text',
-        value: '',
-        appender: '',
-        decimals: null,
-      },
+      field: fieldWithPreset,
     });
-    this.updatePreviewColorState(defaultColor);
+    this.updatePreviewColorState(fieldWithPreset.color);
+  }
+
+  getPresetsForType(type: FieldType) {
+    return getFieldPresets(this.normalizeFieldType(type));
+  }
+
+  showPresetSelector(type: FieldType) {
+    return hasPresetsForType(this.normalizeFieldType(type));
+  }
+
+  getPresetDescriptionKey(type: FieldType, presetId: string | null | undefined) {
+    const preset = findFieldPreset(this.normalizeFieldType(type), presetId);
+    return preset?.descriptionKey ?? null;
+  }
+
+  onFieldTypeChange(mode: 'preview' | 'edit', newType: FieldType) {
+    const normalized = this.normalizeFieldType(newType);
+    const defaultPreset = getDefaultFieldPreset(normalized);
+
+    if (mode === 'preview') {
+      this.preview.update((state) => {
+        if (!state) {
+          return state;
+        }
+        const field = defaultPreset
+          ? this.applyFieldPreset({ ...state.field, type: normalized }, defaultPreset)
+          : this.prepareFieldForForm({ ...state.field, type: normalized, presetId: null });
+        this.updatePreviewColorState(field.color);
+        return { ...state, field };
+      });
+      return;
+    }
+
+    this.editing.update((state) => {
+      if (!state) {
+        return state;
+      }
+      const field = defaultPreset
+        ? this.applyFieldPreset({ ...state.field, type: normalized }, defaultPreset)
+        : this.prepareFieldForForm({ ...state.field, type: normalized, presetId: null });
+      this.updateEditingColorState(field.color);
+      return { ...state, field };
+    });
+  }
+
+  onPresetChange(mode: 'preview' | 'edit', presetId: string | null) {
+    if (mode === 'preview') {
+      this.preview.update((state) => {
+        if (!state) {
+          return state;
+        }
+        const type = this.normalizeFieldType(state.field.type);
+        const preset = findFieldPreset(type, presetId);
+        if (!preset) {
+          const cleared = this.prepareFieldForForm({ ...state.field, presetId: null });
+          return { ...state, field: cleared };
+        }
+        const field = this.applyFieldPreset(state.field, preset);
+        this.updatePreviewColorState(field.color);
+        return { ...state, field };
+      });
+      return;
+    }
+
+    this.editing.update((state) => {
+      if (!state) {
+        return state;
+      }
+      const type = this.normalizeFieldType(state.field.type);
+      const preset = findFieldPreset(type, presetId);
+      if (!preset) {
+        const cleared = this.prepareFieldForForm({ ...state.field, presetId: null });
+        return { ...state, field: cleared };
+      }
+      const field = this.applyFieldPreset(state.field, preset);
+      this.updateEditingColorState(field.color);
+      return { ...state, field };
+    });
   }
 
   private normalizeColor(color: string) {
@@ -1413,6 +1508,46 @@ export class App implements AfterViewChecked, OnDestroy {
     this.pasteAnnotation(pageNum);
   }
 
+  private applyFieldPreset(field: PageField, preset: FieldPreset): PageField {
+    const normalizedType = this.normalizeFieldType(preset.type);
+    const merged: PageField = {
+      ...field,
+      type: normalizedType,
+      presetId: preset.id,
+    };
+
+    const mergedRecord = merged as unknown as Record<string, unknown>;
+
+    for (const [key, value] of Object.entries(preset.defaults)) {
+      if (value === undefined) {
+        continue;
+      }
+      mergedRecord[key] = value === null ? null : value;
+    }
+
+    const helperTextKey = preset.helperTextKey;
+    const prepared = this.prepareFieldForForm(merged);
+
+    if (helperTextKey) {
+      prepared.helperText = this.translationService.translate(helperTextKey);
+    } else {
+      prepared.helperText = '';
+    }
+
+    prepared.presetId = preset.id;
+
+    if (typeof prepared.mask !== 'string') {
+      prepared.mask = '';
+    }
+
+    if (normalizedType !== 'number') {
+      prepared.decimals = null;
+      prepared.appender = '';
+    }
+
+    return prepared;
+  }
+
   private fieldHasRenderableContent(field: PageField): boolean {
     const valueText = typeof field.value === 'string' ? field.value.trim() : '';
     if (valueText) {
@@ -1432,6 +1567,9 @@ export class App implements AfterViewChecked, OnDestroy {
     const originalAppender = (original as { appender?: unknown }).appender;
     const originalDecimals = (original as { decimals?: unknown }).decimals;
     const originalType = (original as { type?: unknown }).type;
+    const originalMask = (original as { mask?: unknown }).mask ?? null;
+    const originalHelper = (original as { helperText?: unknown }).helperText ?? null;
+    const originalPresetId = (original as { presetId?: unknown }).presetId ?? null;
 
     return (
       original.x !== sanitized.x ||
@@ -1442,7 +1580,10 @@ export class App implements AfterViewChecked, OnDestroy {
       originalType !== sanitized.type ||
       originalValue !== sanitized.value ||
       originalAppender !== sanitized.appender ||
-      originalDecimals !== sanitized.decimals
+      originalDecimals !== sanitized.decimals ||
+      originalMask !== ((sanitized as { mask?: unknown }).mask ?? null) ||
+      originalHelper !== ((sanitized as { helperText?: unknown }).helperText ?? null) ||
+      originalPresetId !== ((sanitized as { presetId?: unknown }).presetId ?? null)
     );
   }
 
@@ -1473,20 +1614,41 @@ export class App implements AfterViewChecked, OnDestroy {
       }
     }
 
+    const mask = this.sanitizeOptionalString(field.mask);
+    if (mask !== undefined) {
+      base.mask = mask;
+    }
+
+    const helperText = this.sanitizeOptionalString(field.helperText);
+    if (helperText !== undefined) {
+      base.helperText = helperText;
+    }
+
+    const presetId = this.sanitizePresetId(field.presetId);
+    if (presetId !== undefined) {
+      base.presetId = presetId;
+    }
+
     return base;
   }
 
   private prepareFieldForForm(field: PageField): PageField {
+    const normalizedType = this.normalizeFieldType(field.type);
     const decimals =
-      typeof field.decimals === 'number' && Number.isFinite(field.decimals)
+      normalizedType === 'number' && typeof field.decimals === 'number' && Number.isFinite(field.decimals)
         ? Math.max(0, Math.round(field.decimals))
-        : null;
+        : normalizedType === 'number'
+          ? field.decimals ?? null
+          : null;
 
     return {
       ...field,
       value: typeof field.value === 'string' ? field.value : '',
-      appender: typeof field.appender === 'string' ? field.appender : '',
+      appender: normalizedType === 'number' && typeof field.appender === 'string' ? field.appender : '',
       decimals,
+      mask: typeof field.mask === 'string' ? field.mask : '',
+      helperText: typeof field.helperText === 'string' ? field.helperText : '',
+      presetId: typeof field.presetId === 'string' ? field.presetId : null,
     };
   }
 
@@ -1517,6 +1679,22 @@ export class App implements AfterViewChecked, OnDestroy {
       return undefined;
     }
     return value.trim() ? value : undefined;
+  }
+
+  private sanitizeOptionalString(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
+  }
+
+  private sanitizePresetId(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
   }
 
   private normalizeFieldDecimals(value: unknown): number | undefined {
@@ -2232,7 +2410,10 @@ export class App implements AfterViewChecked, OnDestroy {
       a.type === b.type &&
       (a.value ?? undefined) === (b.value ?? undefined) &&
       (a.appender ?? undefined) === (b.appender ?? undefined) &&
-      (a.decimals ?? undefined) === (b.decimals ?? undefined)
+      (a.decimals ?? undefined) === (b.decimals ?? undefined) &&
+      (a.mask ?? undefined) === (b.mask ?? undefined) &&
+      (a.helperText ?? undefined) === (b.helperText ?? undefined) &&
+      (a.presetId ?? undefined) === (b.presetId ?? undefined)
     );
   }
 
@@ -2395,7 +2576,20 @@ export class App implements AfterViewChecked, OnDestroy {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color, value, type, decimals, appender } =
+        const {
+          x,
+          y,
+          mapField,
+          fontSize,
+          color,
+          value,
+          type,
+          decimals,
+          appender,
+          mask,
+          helperText,
+          presetId,
+        } = rawField as Record<string, unknown>;
           rawField as Record<string, unknown>;
 
         const normalizedType = this.normalizeFieldType(type);
@@ -2446,6 +2640,21 @@ export class App implements AfterViewChecked, OnDestroy {
           if (normalizedAppender !== undefined) {
             normalizedField.appender = normalizedAppender;
           }
+        }
+
+        const normalizedMask = this.normalizeOptionalText(mask);
+        if (normalizedMask !== null) {
+          normalizedField.mask = normalizedMask;
+        }
+
+        const normalizedHelper = this.normalizeOptionalText(helperText);
+        if (normalizedHelper !== null) {
+          normalizedField.helperText = normalizedHelper;
+        }
+
+        const normalizedPresetId = this.normalizePresetId(presetId);
+        if (normalizedPresetId) {
+          normalizedField.presetId = normalizedPresetId;
         }
 
         fields.push(normalizedField);
@@ -2538,6 +2747,22 @@ export class App implements AfterViewChecked, OnDestroy {
     }
 
     return collapsed;
+  }
+
+  private normalizeOptionalText(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
+
+  private normalizePresetId(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
   }
 
   private isEditableElement(target: EventTarget | null): boolean {

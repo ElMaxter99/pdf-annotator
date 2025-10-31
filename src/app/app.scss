@@ -7,3 +7,10 @@
 .preview span {
   pointer-events: none;
 }
+
+.field-hint {
+  display: block;
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.75rem;
+  color: #4b5563;
+}

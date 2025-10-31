@@ -125,6 +125,18 @@
         "label": "Valor fix",
         "placeholder": "Valor opcional..."
       },
+      "preset": {
+        "label": "Preset",
+        "custom": "Personalitzat"
+      },
+      "mask": {
+        "label": "Màscara",
+        "placeholder": "Ex.: ###-### o patró RegExp"
+      },
+      "helperText": {
+        "label": "Text d'ajuda",
+        "placeholder": "Instruccions visibles a les teves integracions..."
+      },
       "number": {
         "decimals": {
           "label": "Decimals"
@@ -145,6 +157,60 @@
       "duplicate": "Duplicar anotació"
     },
     "editingBadge": "Editant"
+  },
+  "presets": {
+    "text": {
+      "basic": {
+        "label": "Text lliure",
+        "description": "Camp sense restriccions. Ideal per a etiquetes o anotacions genèriques."
+      },
+      "email": {
+        "label": "Correu electrònic",
+        "description": "Aplica una màscara compatible amb adreces de correu.",
+        "helper": "Exemple vàlid: usuari@domini.com"
+      },
+      "phone": {
+        "label": "Telèfon",
+        "description": "Reserva espai per números internacionals amb prefix.",
+        "helper": "Format recomanat: +34 600 000 000"
+      }
+    },
+    "check": {
+      "basic": {
+        "label": "Casella marcada",
+        "description": "Casella amb marca per a passos completats.",
+        "helper": "Fes-la servir per checklists confirmats."
+      },
+      "empty": {
+        "label": "Casella buida",
+        "description": "Casella sense marcar, llesta per reutilitzar.",
+        "helper": "Perfecta per plantilles repetibles."
+      }
+    },
+    "radio": {
+      "basic": {
+        "label": "Opció seleccionada",
+        "description": "Botó d'opció marcat per respostes actives.",
+        "helper": "Indica l'opció predeterminada del grup."
+      },
+      "empty": {
+        "label": "Opció sense seleccionar",
+        "description": "Botó d'opció buit per eleccions pendents.",
+        "helper": "Per grups de radio sense resposta."
+      }
+    },
+    "number": {
+      "integer": {
+        "label": "Nombre enter",
+        "description": "Restringeix el camp a valors sense decimals.",
+        "helper": "Introdueix només enters positius o negatius."
+      },
+      "currency": {
+        "label": "Import monetari",
+        "description": "Dos decimals i sufix de moneda preparats per imports.",
+        "helper": "Canvia el símbol si necessites una altra divisa."
+      }
+    }
   },
   "viewer": {
     "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."

@@ -125,6 +125,18 @@
         "label": "Valor fijo",
         "placeholder": "Valor opcional..."
       },
+      "preset": {
+        "label": "Preset",
+        "custom": "Personalizado"
+      },
+      "mask": {
+        "label": "Máscara",
+        "placeholder": "Ej.: ###-### o patrón RegExp"
+      },
+      "helperText": {
+        "label": "Texto auxiliar",
+        "placeholder": "Instrucciones visibles en tus integraciones..."
+      },
       "number": {
         "decimals": {
           "label": "Decimales"
@@ -145,6 +157,60 @@
       "duplicate": "Duplicar anotación"
     },
     "editingBadge": "Editando"
+  },
+  "presets": {
+    "text": {
+      "basic": {
+        "label": "Texto libre",
+        "description": "Campo sin restricciones. Ideal para etiquetas o anotaciones genéricas."
+      },
+      "email": {
+        "label": "Correo electrónico",
+        "description": "Normaliza el campo con el patrón típico de email.",
+        "helper": "Ejemplo válido: usuario@dominio.com"
+      },
+      "phone": {
+        "label": "Teléfono",
+        "description": "Reserva espacio para teléfonos internacionales con prefijo.",
+        "helper": "Formato recomendado: +34 600 000 000"
+      }
+    },
+    "check": {
+      "basic": {
+        "label": "Casilla marcada",
+        "description": "Casilla con marca para listas de verificación confirmadas.",
+        "helper": "Úsala para pasos completados o estados activos."
+      },
+      "empty": {
+        "label": "Casilla vacía",
+        "description": "Casilla sin marcar, lista para checklists.",
+        "helper": "Perfecta para plantillas reutilizables."
+      }
+    },
+    "radio": {
+      "basic": {
+        "label": "Opción seleccionada",
+        "description": "Botón de opción marcado para respuestas activas.",
+        "helper": "Indica la opción preseleccionada en formularios."
+      },
+      "empty": {
+        "label": "Opción sin seleccionar",
+        "description": "Botón de opción vacío para listas de elección única.",
+        "helper": "Útil para grupos de radio pendientes de respuesta."
+      }
+    },
+    "number": {
+      "integer": {
+        "label": "Número entero",
+        "description": "Limita el campo a valores sin decimales.",
+        "helper": "Introduce solo enteros positivos o negativos."
+      },
+      "currency": {
+        "label": "Importe monetario",
+        "description": "Dos decimales y sufijo de moneda listos para importes.",
+        "helper": "Cambia el símbolo si necesitas otra divisa."
+      }
+    }
   },
   "viewer": {
     "emptyMessage": "Sube un PDF y haz click donde quieras añadir anotaciones. Edítalas en la vista previa antes de confirmar ✅."
