@@ -39,6 +39,8 @@
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
     "downloadJson": "Descargar JSON",
+    "viewJsonTree": "Ver modo árbol",
+    "viewJsonText": "Volver al editor",
     "downloadPdf": "Descargar PDF",
     "toolbarAriaLabel": "Acciones del PDF",
     "navigationGroup": "Navegación de páginas",
@@ -51,6 +53,10 @@
     "importJsonFile": "Importar desde archivo",
     "applyJson": "Aplicar JSON",
     "jsonPlaceholder": "Pega o edita aquí las coordenadas de anotaciones...",
+    "jsonTree": {
+      "empty": "El editor JSON está vacío.",
+      "invalid": "El contenido no es un JSON válido. Corrige los errores para ver el árbol."
+    },
     "templates": {
       "title": "Plantillas reutilizables",
       "placeholder": "Nombre de la plantilla",

@@ -167,11 +167,29 @@
           <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
         </ng-template>
       </section>
-      <textarea class="json-editor" [(ngModel)]="coordsTextModel" [placeholder]="'sidebar.jsonPlaceholder' | t"
-        spellcheck="false"></textarea>
+      <ng-container *ngIf="jsonViewMode() === 'text'; else jsonTreeView">
+        <textarea class="json-editor" [ngModel]="coordsTextModel" (ngModelChange)="onCoordsTextChange($event)"
+          [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
+      </ng-container>
+      <ng-template #jsonTreeView>
+        <div *ngIf="jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
+          <app-json-tree [value]="jsonTreePreview.value"></app-json-tree>
+        </div>
+        <ng-template #jsonTreePlaceholder>
+          <div class="json-tree-placeholder">
+            <p *ngIf="jsonTreePreview.status === 'empty'">{{ 'sidebar.jsonTree.empty' | t }}</p>
+            <p *ngIf="jsonTreePreview.status === 'error'">{{ 'sidebar.jsonTree.invalid' | t }}</p>
+          </div>
+        </ng-template>
+      </ng-template>
       <div class="json-toolbar">
-        <button class="btn" (click)="copyJSON()" [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
-        <button class="btn" (click)="downloadJSON()"
+        <button type="button" class="btn btn--ghost json-toolbar__view-toggle" (click)="toggleJsonView()"
+          [attr.aria-pressed]="jsonViewMode() === 'tree'">
+          {{ jsonViewMode() === 'tree' ? ('controls.viewJsonText' | t) : ('controls.viewJsonTree' | t) }}
+        </button>
+        <button type="button" class="btn" (click)="copyJSON()"
+          [disabled]="!coords().length">{{ 'controls.copyJson' | t }}</button>
+        <button type="button" class="btn" (click)="downloadJSON()"
           [disabled]="!coords().length">{{ 'controls.downloadJson' | t }}</button>
       </div>
       <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>

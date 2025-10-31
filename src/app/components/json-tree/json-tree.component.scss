@@ -1,0 +1,118 @@
+:host {
+  display: block;
+  color: var(--text);
+}
+
+.json-tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85rem;
+}
+
+.json-tree__node {
+  margin: 0;
+  padding: 0;
+}
+
+.json-tree__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.6;
+}
+
+.json-tree__toggle {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.json-tree__toggle:hover,
+.json-tree__toggle:focus-visible {
+  background: rgba(94, 234, 212, 0.15);
+  outline: none;
+}
+
+.json-tree__toggle-placeholder {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.json-tree__chevron {
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.json-tree__chevron--collapsed {
+  transform: rotate(-45deg);
+}
+
+.json-tree__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+}
+
+.json-tree__colon {
+  color: var(--muted);
+}
+
+.json-tree__brackets {
+  color: var(--muted);
+}
+
+.json-tree__meta {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.json-tree__value {
+  font-family: inherit;
+}
+
+.json-tree__value--string {
+  color: #9cdcfe;
+}
+
+.json-tree__value--number {
+  color: #b5cea8;
+}
+
+.json-tree__value--boolean {
+  color: #569cd6;
+}
+
+.json-tree__value--null {
+  color: #c586c0;
+}
+
+.json-tree__value--unknown {
+  color: var(--muted);
+}
+
+.json-tree__children {
+  list-style: none;
+  margin: 4px 0 4px 24px;
+  padding: 0 0 0 12px;
+  border-left: 1px solid rgba(94, 234, 212, 0.12);
+}
+
+.json-tree__closing {
+  margin-left: 32px;
+  color: var(--muted);
+}

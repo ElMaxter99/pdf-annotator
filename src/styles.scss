@@ -315,6 +315,18 @@ header .logo {
   background: rgba(255, 77, 77, 0.25);
 }
 
+.btn--ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  border-color: transparent;
+  background: rgba(94, 234, 212, 0.12);
+  color: var(--accent);
+}
+
 @media (min-width: 960px) {
   header.header {
     grid-template-columns: 1fr;
@@ -470,11 +482,45 @@ header .logo {
     box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
   }
 
+  .json-tree-container,
+  .json-tree-placeholder {
+    width: 100%;
+    min-height: 220px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #1d1d2a;
+    padding: 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+  }
+
+  .json-tree-container {
+    overflow: auto;
+  }
+
+  .json-tree-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-align: center;
+
+    p {
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
   .json-toolbar {
     margin-top: 8px;
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
+  }
+
+  .json-toolbar__view-toggle {
+    margin-right: auto;
   }
 
   .sidebar-hint {
