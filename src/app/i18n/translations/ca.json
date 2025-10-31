@@ -109,8 +109,21 @@
       "size": {
         "label": "Mida"
       },
+      "font": {
+        "label": "Font",
+        "customTag": "Personalitzada",
+        "searchPlaceholder": "Cerca tipografies...",
+        "noResults": "Cap tipografia coincideix amb la cerca."
+      },
+      "opacity": {
+        "label": "Opacitat"
+      },
       "color": {
         "label": "Color"
+      },
+      "background": {
+        "label": "Fons",
+        "clear": "Sense fons"
       },
       "type": {
         "label": "Tipus",
@@ -145,6 +158,19 @@
       "duplicate": "Duplicar anotació"
     },
     "editingBadge": "Editant"
+  },
+  "fonts": {
+    "custom": {
+      "enableFeature": "Activa les fonts personalitzades",
+      "hint": "Activa aquesta opció per carregar els teus fitxers de font des del panell avançat.",
+      "title": "Fonts personalitzades",
+      "description": "Puja fitxers .ttf, .otf, .woff o .woff2 per utilitzar-los a les anotacions.",
+      "add": "Afegir font",
+      "remove": "Eliminar",
+      "empty": "Encara no has afegit fonts personalitzades.",
+      "unsupported": "El teu navegador no permet carregar fonts personalitzades.",
+      "error": "No s'ha pogut carregar la font seleccionada. Prova amb un altre fitxer."
+    }
   },
   "viewer": {
     "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."

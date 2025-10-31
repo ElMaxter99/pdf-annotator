@@ -109,8 +109,21 @@
       "size": {
         "label": "Tamaño"
       },
+      "font": {
+        "label": "Fuente",
+        "customTag": "Personalizada",
+        "searchPlaceholder": "Buscar fuentes...",
+        "noResults": "No hay fuentes que coincidan con la búsqueda."
+      },
+      "opacity": {
+        "label": "Opacidad"
+      },
       "color": {
         "label": "Color"
+      },
+      "background": {
+        "label": "Fondo",
+        "clear": "Sin fondo"
       },
       "type": {
         "label": "Tipo",
@@ -145,6 +158,19 @@
       "duplicate": "Duplicar anotación"
     },
     "editingBadge": "Editando"
+  },
+  "fonts": {
+    "custom": {
+      "enableFeature": "Activar fuentes personalizadas",
+      "hint": "Activa esta opción para cargar tus archivos de fuente desde el panel avanzado.",
+      "title": "Fuentes personalizadas",
+      "description": "Carga archivos .ttf, .otf, .woff o .woff2 para usarlos en tus anotaciones.",
+      "add": "Agregar fuente",
+      "remove": "Quitar",
+      "empty": "Aún no agregaste fuentes personalizadas.",
+      "unsupported": "Tu navegador no soporta la carga de fuentes personalizadas.",
+      "error": "No se pudo cargar la fuente seleccionada. Intenta con otro archivo."
+    }
   },
   "viewer": {
     "emptyMessage": "Sube un PDF y haz click donde quieras añadir anotaciones. Edítalas en la vista previa antes de confirmar ✅."

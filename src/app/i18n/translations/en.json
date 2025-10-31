@@ -109,8 +109,21 @@
       "size": {
         "label": "Size"
       },
+      "font": {
+        "label": "Font",
+        "customTag": "Custom",
+        "searchPlaceholder": "Search fonts...",
+        "noResults": "No fonts match your search."
+      },
+      "opacity": {
+        "label": "Opacity"
+      },
       "color": {
         "label": "Color"
+      },
+      "background": {
+        "label": "Background",
+        "clear": "Clear background"
       },
       "type": {
         "label": "Type",
@@ -145,6 +158,19 @@
       "duplicate": "Duplicate annotation"
     },
     "editingBadge": "Editing"
+  },
+  "fonts": {
+    "custom": {
+      "enableFeature": "Enable custom fonts",
+      "hint": "Toggle this option to load your own font files from the advanced menu.",
+      "title": "Custom fonts",
+      "description": "Upload .ttf, .otf, .woff or .woff2 files to reuse them in your annotations.",
+      "add": "Add font",
+      "remove": "Remove",
+      "empty": "You haven't added custom fonts yet.",
+      "unsupported": "Your browser does not support loading custom fonts.",
+      "error": "We couldn't load that font file. Try with a different one."
+    }
   },
   "viewer": {
     "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
