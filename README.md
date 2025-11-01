@@ -172,10 +172,12 @@ Cada anotación se almacena como:
 - `color` acepta hexadecimales (`#RRGGBB`).
 
 ## 📸 Galería
-<p align="center">
-  <img src="./screenshots/main.png" alt="Vista principal" width="49%" />
-  <img src="./screenshots/example_use.png" alt="Ejemplo de uso" width="49%" />
+<p align="center" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+  <img src="./screenshots/main.png" alt="Vista principal" style="width: 32%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px;" />
+  <img src="./screenshots/workspace.png" alt="Espacio de trabajo" style="width: 32%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px;" />
+  <img src="./screenshots/example_use.png" alt="Ejemplo de uso" style="width: 32%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px;" />
 </p>
+
 
 ## 🧰 Solución de problemas
 - **El PDF no se renderiza**: revisa que el archivo no esté protegido y que el servidor de desarrollo muestre el log sin errores.
