@@ -7,6 +7,23 @@
       "es-ES": "Espanyol",
       "en": "Anglès",
       "ca": "Català"
+    },
+    "landing": {
+      "badge": "Comença a anotar",
+      "title": "Maqueta coordenades de qualsevol PDF en segons",
+      "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
+      "cta": "Selecciona PDF"
+    },
+    "upload": {
+      "title": "Carrega el teu PDF",
+      "subtitle": "Arrossega i deixa anar el fitxer aquí o fes clic per cercar",
+      "hint": "Només PDF",
+      "invalidFormat": "Només s'admeten fitxers PDF."
+    },
+    "workspaceUpload": {
+      "title": "Vols començar de zero?",
+      "subtitle": "Arrossega un altre PDF o fes clic per substituir el document actual.",
+      "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
     }
   },
   "controls": {
@@ -14,19 +31,33 @@
     "next": "Següent",
     "pageIndicator": "Pàgina {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "zoomIn": "Apropa",
+    "zoomOut": "Allunya",
     "undo": "Desfer",
     "redo": "Refer",
     "clear": "Esborrar",
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
     "downloadJson": "Descarregar JSON",
-    "downloadPdf": "Descarregar PDF"
+    "viewJsonTree": "Veure com arbre",
+    "viewJsonText": "Veure editor JSON",
+    "jsonViewModeToggle": "Mode de visualització del JSON",
+    "downloadPdf": "Descarregar PDF",
+    "toolbarAriaLabel": "Accions del PDF",
+    "navigationGroup": "Navegació de pàgines",
+    "zoomGroup": "Controls de zoom",
+    "historyGroup": "Accions d'historial",
+    "exportGroup": "Opcions d'exportació"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
     "importJsonFile": "Importa des d'un fitxer",
     "applyJson": "Aplica el JSON",
     "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
+    "jsonTree": {
+      "empty": "L'editor JSON és buit.",
+      "invalid": "El contingut no és un JSON vàlid. Corregeix els errors per veure l'arbre."
+    },
     "templates": {
       "title": "Plantilles reutilitzables",
       "placeholder": "Nom de la plantilla",
@@ -36,43 +67,87 @@
       "deleteButton": "Elimina",
       "empty": "Encara no tens cap plantilla desada."
     },
-    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat."
+    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat.",
+    "advancedTitle": "Opcions avançades",
+    "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió."
   },
-  "annotation": {
-  "fields": {
-    "text": {
-      "label": "Text",
-      "placeholder": "Text..."
+  "guides": {
+    "enableFeature": "Activa les guies i el snapping",
+    "title": "Guies i ajustos",
+    "showGrid": "Mostrar la graella",
+    "showRulers": "Mostrar regles",
+    "showAlignment": "Ressaltar alineacions actives",
+    "snapGrid": "Ajustar a la graella",
+    "snapMargins": "Ajustar als marges",
+    "snapCenters": "Ajustar als eixos centrals",
+    "snapCustom": "Ajustar a coordenades personalitzades",
+    "gridSize": "Graella (pt)",
+    "marginSize": "Marge (pt)",
+    "tolerance": "Tolerància (px)",
+    "customX": "Coordenades X (pt)",
+    "customY": {
+      "canvas": "Coordenades Y (pt des de la vora superior)",
+      "pdf": "Coordenades Y (pt des de la vora inferior)"
     },
-    "size": {
-      "label": "Mida"
+    "customPlaceholder": "Ex.: 24, 48, 120",
+    "customHint": {
+      "canvas": "Introdueix valors en punts (pt) separats per comes o espais. Les Y es mesuren des de la vora superior del PDF.",
+      "pdf": "Introdueix valors en punts (pt) separats per comes o espais. Les Y es mesuren des de la vora inferior del PDF."
     },
-    "color": {
-      "label": "Color"
-    },
-    "type": {
-      "label": "Tipus",
-      "options": {
-        "text": "Text",
-        "check": "Casella",
-        "radio": "Botó d'opció",
-        "number": "Nombre"
-      }
-    },
-    "value": {
-      "label": "Valor fix",
-      "placeholder": "Valor opcional..."
-    },
-    "number": {
-      "decimals": {
-        "label": "Decimals"
-      },
-      "appender": {
-        "label": "Sufix",
-        "placeholder": "Ex.: %"
-      }
+    "coordinateMode": {
+      "label": "Origen de coordenades",
+      "canvas": "Cantonada superior esquerra (Canvas)",
+      "pdf": "Cantonada inferior esquerra (PDF)"
     }
   },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
+      },
+      "size": {
+        "label": "Mida"
+      },
+      "font": {
+        "label": "Font",
+        "customTag": "Personalitzada",
+        "searchPlaceholder": "Cerca tipografies...",
+        "noResults": "Cap tipografia coincideix amb la cerca."
+      },
+      "opacity": {
+        "label": "Opacitat"
+      },
+      "color": {
+        "label": "Color"
+      },
+      "background": {
+        "label": "Fons",
+        "clear": "Sense fons"
+      },
+      "type": {
+        "label": "Tipus",
+        "options": {
+          "text": "Text",
+          "check": "Casella",
+          "radio": "Botó d'opció",
+          "number": "Nombre"
+        }
+      },
+      "value": {
+        "label": "Valor fix",
+        "placeholder": "Valor opcional..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Decimals"
+        },
+        "appender": {
+          "label": "Sufix",
+          "placeholder": "Ex.: %"
+        }
+      }
+    },
     "color": {
       "hintPreview": "Selecciona un color, escriu un HEX o un RGB. El JSON sempre exportarà el color en HEX.",
       "hintEdit": "Pots enganxar un HEX o un RGB existent per reutilitzar colors exactes.",
@@ -83,6 +158,19 @@
       "duplicate": "Duplicar anotació"
     },
     "editingBadge": "Editant"
+  },
+  "fonts": {
+    "custom": {
+      "enableFeature": "Activa les fonts personalitzades",
+      "hint": "Activa aquesta opció per carregar els teus fitxers de font des del panell avançat.",
+      "title": "Fonts personalitzades",
+      "description": "Puja fitxers .ttf, .otf, .woff o .woff2 per utilitzar-los a les anotacions.",
+      "add": "Afegir font",
+      "remove": "Eliminar",
+      "empty": "Encara no has afegit fonts personalitzades.",
+      "unsupported": "El teu navegador no permet carregar fonts personalitzades.",
+      "error": "No s'ha pogut carregar la font seleccionada. Prova amb un altre fitxer."
+    }
   },
   "viewer": {
     "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."
