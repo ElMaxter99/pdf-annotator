@@ -34,6 +34,7 @@ import {
   StandardFontFamilyDefinition,
   StandardFontName,
 } from './fonts/standard-font-families';
+import { ThemeVariant } from './models/theme.model';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -188,6 +189,8 @@ export class App implements AfterViewChecked, OnDestroy {
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly defaultFontId = DEFAULT_FONT_ID;
+  readonly theme = signal<ThemeVariant>('night');
+  private readonly themeStorageKey = 'pdf-annotator:theme';
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
   private coordsFileInputFallback: HTMLInputElement | null = null;
@@ -294,6 +297,7 @@ export class App implements AfterViewChecked, OnDestroy {
 
   constructor() {
     this.vm = this;
+    this.initializeTheme();
     this.setDocumentMetadata();
     const storedTemplates = this.templatesService.getTemplates();
     this.templates.set(storedTemplates);
@@ -316,12 +320,74 @@ export class App implements AfterViewChecked, OnDestroy {
     if (!this.document) {
       return;
     }
+
+    this.document.body.classList.remove('theme--day', 'theme--night');
+
     if (this.coordsFileInputFallback) {
       this.coordsFileInputFallback.removeEventListener('change', this.coordsFileInputChangeHandler);
       if (this.coordsFileInputFallback.parentElement) {
         this.coordsFileInputFallback.parentElement.removeChild(this.coordsFileInputFallback);
       }
       this.coordsFileInputFallback = null;
+    }
+  }
+
+  toggleTheme() {
+    const nextTheme: ThemeVariant = this.theme() === 'night' ? 'day' : 'night';
+    this.setTheme(nextTheme);
+  }
+
+  setTheme(theme: ThemeVariant) {
+    if (this.theme() === theme) {
+      return;
+    }
+
+    this.theme.set(theme);
+    this.applyTheme(theme);
+    this.persistTheme(theme);
+  }
+
+  private initializeTheme() {
+    const storedTheme = this.readStoredTheme();
+    if (storedTheme) {
+      this.theme.set(storedTheme);
+    }
+
+    this.applyTheme(this.theme());
+  }
+
+  private applyTheme(theme: ThemeVariant) {
+    const body = this.document?.body ?? null;
+    if (!body) {
+      return;
+    }
+
+    body.classList.remove('theme--day', 'theme--night');
+    body.classList.add(`theme--${theme}`);
+  }
+
+  private readStoredTheme(): ThemeVariant | null {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) {
+        return null;
+      }
+
+      const stored = window.localStorage.getItem(this.themeStorageKey);
+      return stored === 'day' || stored === 'night' ? stored : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private persistTheme(theme: ThemeVariant) {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) {
+        return;
+      }
+
+      window.localStorage.setItem(this.themeStorageKey, theme);
+    } catch {
+      // Ignore persistence errors (e.g., private mode)
     }
   }
 

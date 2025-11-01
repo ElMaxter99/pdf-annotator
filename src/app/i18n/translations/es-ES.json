@@ -49,6 +49,11 @@
     "historyGroup": "Acciones de historial",
     "exportGroup": "Opciones de exportación"
   },
+  "theme": {
+    "switchToDay": "Cambiar a versión día",
+    "switchToNight": "Cambiar a versión noche",
+    "toggleAriaLabel": "Alternar entre versión día y noche"
+  },
   "sidebar": {
     "title": "Anotaciones (JSON)",
     "importJsonFile": "Importar desde archivo",
