@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import { Meta, Title } from '@angular/platform-browser';
+import type { PdfLibFontkit } from '@pdf-lib/fontkit';
 import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
@@ -140,11 +141,7 @@ const DEFAULT_OPACITY = 1;
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked, OnDestroy {
-  private static fontkitPromise: Promise<any> | null = null;
-  private static fontkitScriptElement: HTMLScriptElement | null = null;
-
-  private static readonly fontkitCdnUrl =
-    'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js';
+  private static fontkitPromise: Promise<PdfLibFontkit> | null = null;
   pdfDoc: PDFDocumentProxy | null = null;
   readonly vm: App;
   pageIndex = signal(1);
@@ -277,55 +274,18 @@ export class App implements AfterViewChecked, OnDestroy {
     return this.workspaceComponent?.jsonTreeComponent;
   }
 
-  private static async loadFontkit(): Promise<any> {
+  private static async loadFontkit(): Promise<PdfLibFontkit> {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
       throw new Error('fontkit solo puede cargarse en el navegador.');
     }
 
-    const globalWindow = window as Window & { fontkit?: unknown };
-    if (globalWindow.fontkit) {
-      return globalWindow.fontkit;
-    }
-
     if (!App.fontkitPromise) {
-      App.fontkitPromise = new Promise((resolve, reject) => {
-        const resolveWithFontkit = () => {
-          if (globalWindow.fontkit) {
-            resolve(globalWindow.fontkit);
-            return;
-          }
-          reject(new Error('El script de fontkit se cargó pero no expuso la instancia esperada.'));
-        };
-
-        const handleError = (event: Event | string) => {
-          App.fontkitScriptElement?.remove();
-          App.fontkitScriptElement = null;
-          const reason =
-            typeof event === 'string'
-              ? event
-              : 'No se pudo cargar fontkit desde la CDN configurada.';
-          reject(new Error(reason));
-        };
-
-        if (App.fontkitScriptElement) {
-          App.fontkitScriptElement.addEventListener('load', resolveWithFontkit, { once: true });
-          App.fontkitScriptElement.addEventListener('error', handleError, { once: true });
-          return;
-        }
-
-        const script = document.createElement('script');
-        script.async = true;
-        script.defer = true;
-        script.src = App.fontkitCdnUrl;
-        script.dataset['fontkitLoader'] = 'true';
-        script.addEventListener('load', resolveWithFontkit, { once: true });
-        script.addEventListener('error', handleError, { once: true });
-        App.fontkitScriptElement = script;
-        document.head.appendChild(script);
-      }).catch((error) => {
-        App.fontkitPromise = null;
-        throw error;
-      });
+      App.fontkitPromise = import('@pdf-lib/fontkit')
+        .then((module) => (module.default ?? module) as PdfLibFontkit)
+        .catch((error) => {
+          App.fontkitPromise = null;
+          throw error;
+        });
     }
 
     return App.fontkitPromise;
