@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import { Meta, Title } from '@angular/platform-browser';
+import type { PdfLibFontkit } from '@pdf-lib/fontkit';
 import { Language, TranslationService } from './i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from './app-version';
 import './promise-with-resolvers.polyfill';
@@ -140,7 +141,7 @@ const DEFAULT_OPACITY = 1;
   styleUrls: ['./app.scss'],
 })
 export class App implements AfterViewChecked, OnDestroy {
-  private static fontkitPromise: Promise<any> | null = null;
+  private static fontkitPromise: Promise<PdfLibFontkit> | null = null;
   pdfDoc: PDFDocumentProxy | null = null;
   readonly vm: App;
   pageIndex = signal(1);
@@ -273,10 +274,14 @@ export class App implements AfterViewChecked, OnDestroy {
     return this.workspaceComponent?.jsonTreeComponent;
   }
 
-  private static async loadFontkit(): Promise<any> {
+  private static async loadFontkit(): Promise<PdfLibFontkit> {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      throw new Error('fontkit solo puede cargarse en el navegador.');
+    }
+
     if (!App.fontkitPromise) {
       App.fontkitPromise = import('@pdf-lib/fontkit')
-        .then((module) => (module as { default?: unknown }).default ?? module)
+        .then((module) => (module.default ?? module) as PdfLibFontkit)
         .catch((error) => {
           App.fontkitPromise = null;
           throw error;
