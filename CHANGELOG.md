@@ -1,3 +1,17 @@
+## [v1.2.0] - 2025-11-01
+### Added
+- Move JSON actions into sidebar panel #64
+- Feat: refresh toolbar ui and pdf upload #65
+- Persist selected language in local storage #74
+- Add tree view option to JSON annotation menu #79
+- Add overlay guides and configurable snapping controls #53
+- Persist guide profiles with templates #84
+- Feat: add advanced typography controls #82
+- Feat: auto scroll JSON selection #85
+
+### Dev
+- Split landing and workspace into dedicated components #87
+
 ## [v1.1.0] - 2025-10-30
 ### Added
 - docs: Improve branding and add issue templates #40

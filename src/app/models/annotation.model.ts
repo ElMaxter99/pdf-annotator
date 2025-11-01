@@ -10,6 +10,9 @@ export interface PageField {
   value?: string;
   appender?: string;
   decimals?: number | null;
+  fontFamily?: string;
+  opacity?: number;
+  backgroundColor?: string | null;
 }
 
 export interface PageAnnotations {

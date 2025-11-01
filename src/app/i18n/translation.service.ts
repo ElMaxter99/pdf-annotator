@@ -1,4 +1,6 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 
 import ca from './translations/ca.json';
 import en from './translations/en.json';
@@ -15,9 +17,19 @@ const TRANSLATIONS: Record<Language, TranslationRecord> = {
   ca,
 };
 
+const LANGUAGE_STORAGE_KEY = 'pdf-annotator.language';
+
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
+  private readonly platformId = inject(PLATFORM_ID);
   private readonly languageSignal = signal<Language>('es-ES');
+
+  constructor() {
+    const storedLanguage = this.readStoredLanguage();
+    if (storedLanguage) {
+      this.languageSignal.set(storedLanguage);
+    }
+  }
 
   readonly language = computed(() => this.languageSignal());
   readonly supportedLanguages: readonly Language[] = LANGUAGES;
@@ -43,6 +55,7 @@ export class TranslationService {
       throw new Error(`Unsupported language: ${language}`);
     }
     this.languageSignal.set(language);
+    this.persistLanguage(language);
   }
 
   getCurrentLanguage(): Language {
@@ -56,5 +69,46 @@ export class TranslationService {
       }
       return undefined;
     }, dictionary);
+  }
+
+  private readStoredLanguage(): Language | null {
+    const storage = this.getLocalStorage();
+    if (!storage) {
+      return null;
+    }
+
+    const storedValue = storage.getItem(LANGUAGE_STORAGE_KEY);
+    if (!storedValue) {
+      return null;
+    }
+
+    return LANGUAGES.includes(storedValue as Language)
+      ? (storedValue as Language)
+      : null;
+  }
+
+  private persistLanguage(language: Language) {
+    const storage = this.getLocalStorage();
+    if (!storage) {
+      return;
+    }
+
+    try {
+      storage.setItem(LANGUAGE_STORAGE_KEY, language);
+    } catch {
+      // Ignore persistence errors (e.g. storage disabled)
+    }
+  }
+
+  private getLocalStorage(): Storage | null {
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
+    }
+
+    try {
+      return window.localStorage ?? null;
+    } catch {
+      return null;
+    }
   }
 }

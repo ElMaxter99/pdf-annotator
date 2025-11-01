@@ -7,6 +7,23 @@
       "es-ES": "Spanish",
       "en": "English",
       "ca": "Catalan"
+    },
+    "landing": {
+      "badge": "Annotate smarter",
+      "title": "Lay out coordinates on any PDF in seconds",
+      "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
+      "cta": "Select PDF"
+    },
+    "upload": {
+      "title": "Upload your PDF",
+      "subtitle": "Drag & drop the file here or click to browse",
+      "hint": "PDF only",
+      "invalidFormat": "Only PDF files are supported."
+    },
+    "workspaceUpload": {
+      "title": "Need to reset this project?",
+      "subtitle": "Drop a different PDF or click to replace the current document.",
+      "ariaLabel": "Upload a new PDF to restart the annotation workspace"
     }
   },
   "controls": {
@@ -14,19 +31,33 @@
     "next": "Next",
     "pageIndicator": "Page {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
     "undo": "Undo",
     "redo": "Redo",
     "clear": "Clear",
     "copyJson": "Copy JSON",
     "importJson": "Import JSON",
     "downloadJson": "Download JSON",
-    "downloadPdf": "Download PDF"
+    "viewJsonTree": "View tree",
+    "viewJsonText": "View JSON editor",
+    "jsonViewModeToggle": "JSON view mode",
+    "downloadPdf": "Download PDF",
+    "toolbarAriaLabel": "PDF actions",
+    "navigationGroup": "Page navigation",
+    "zoomGroup": "Zoom controls",
+    "historyGroup": "History actions",
+    "exportGroup": "Export options"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
     "importJsonFile": "Import from file",
     "applyJson": "Apply JSON",
     "jsonPlaceholder": "Paste or edit annotation coordinates here...",
+    "jsonTree": {
+      "empty": "The JSON editor is empty.",
+      "invalid": "The content is not valid JSON. Fix the errors to view the tree."
+    },
     "templates": {
       "title": "Reusable templates",
       "placeholder": "Template name",
@@ -36,43 +67,87 @@
       "deleteButton": "Delete",
       "empty": "You haven't saved any templates yet."
     },
-    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data."
+    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data.",
+    "advancedTitle": "Advanced options",
+    "advancedHint": "Toggle guides and snapping helpers when you need extra precision."
   },
-  "annotation": {
-  "fields": {
-    "text": {
-      "label": "Text",
-      "placeholder": "Text..."
+  "guides": {
+    "enableFeature": "Enable guides & snapping",
+    "title": "Guides & snapping",
+    "showGrid": "Show grid",
+    "showRulers": "Show rulers",
+    "showAlignment": "Highlight active alignments",
+    "snapGrid": "Snap to grid",
+    "snapMargins": "Snap to margins",
+    "snapCenters": "Snap to center axes",
+    "snapCustom": "Snap to custom coordinates",
+    "gridSize": "Grid spacing (pt)",
+    "marginSize": "Margin (pt)",
+    "tolerance": "Tolerance (px)",
+    "customX": "X coordinates (pt)",
+    "customY": {
+      "canvas": "Y coordinates (pt from top edge)",
+      "pdf": "Y coordinates (pt from bottom edge)"
     },
-    "size": {
-      "label": "Size"
+    "customPlaceholder": "e.g. 24, 48, 120",
+    "customHint": {
+      "canvas": "Enter point values separated by commas or spaces. Y values are measured from the top edge of the PDF.",
+      "pdf": "Enter point values separated by commas or spaces. Y values are measured from the bottom edge of the PDF."
     },
-    "color": {
-      "label": "Color"
-    },
-    "type": {
-      "label": "Type",
-      "options": {
-        "text": "Text",
-        "check": "Checkbox",
-        "radio": "Radio button",
-        "number": "Number"
-      }
-    },
-    "value": {
-      "label": "Value override",
-      "placeholder": "Optional fixed value..."
-    },
-    "number": {
-      "decimals": {
-        "label": "Decimals"
-      },
-      "appender": {
-        "label": "Suffix",
-        "placeholder": "E.g. %"
-      }
+    "coordinateMode": {
+      "label": "Coordinate origin",
+      "canvas": "Top-left (Canvas)",
+      "pdf": "Bottom-left (PDF)"
     }
   },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
+      },
+      "size": {
+        "label": "Size"
+      },
+      "font": {
+        "label": "Font",
+        "customTag": "Custom",
+        "searchPlaceholder": "Search fonts...",
+        "noResults": "No fonts match your search."
+      },
+      "opacity": {
+        "label": "Opacity"
+      },
+      "color": {
+        "label": "Color"
+      },
+      "background": {
+        "label": "Background",
+        "clear": "Clear background"
+      },
+      "type": {
+        "label": "Type",
+        "options": {
+          "text": "Text",
+          "check": "Checkbox",
+          "radio": "Radio button",
+          "number": "Number"
+        }
+      },
+      "value": {
+        "label": "Value override",
+        "placeholder": "Optional fixed value..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Decimals"
+        },
+        "appender": {
+          "label": "Suffix",
+          "placeholder": "E.g. %"
+        }
+      }
+    },
     "color": {
       "hintPreview": "Pick a color, type a HEX or an RGB value. The JSON will always export the color in HEX.",
       "hintEdit": "Paste an existing HEX or RGB value to reuse exact colors.",
@@ -83,6 +158,19 @@
       "duplicate": "Duplicate annotation"
     },
     "editingBadge": "Editing"
+  },
+  "fonts": {
+    "custom": {
+      "enableFeature": "Enable custom fonts",
+      "hint": "Toggle this option to load your own font files from the advanced menu.",
+      "title": "Custom fonts",
+      "description": "Upload .ttf, .otf, .woff or .woff2 files to reuse them in your annotations.",
+      "add": "Add font",
+      "remove": "Remove",
+      "empty": "You haven't added custom fonts yet.",
+      "unsupported": "Your browser does not support loading custom fonts.",
+      "error": "We couldn't load that font file. Try with a different one."
+    }
   },
   "viewer": {
     "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."

@@ -7,6 +7,23 @@
       "es-ES": "Español",
       "en": "Inglés",
       "ca": "Catalán"
+    },
+    "landing": {
+      "badge": "Empieza a anotar",
+      "title": "Maqueta coordenadas de cualquier PDF en segundos",
+      "description": "Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.",
+      "cta": "Seleccionar PDF"
+    },
+    "upload": {
+      "title": "Carga tu PDF",
+      "subtitle": "Arrastra y suelta el archivo aquí o haz clic para buscar",
+      "hint": "Solo PDF",
+      "invalidFormat": "Solo se admiten archivos PDF."
+    },
+    "workspaceUpload": {
+      "title": "¿Quieres empezar de cero?",
+      "subtitle": "Arrastra otro PDF o haz clic para sustituir el documento actual.",
+      "ariaLabel": "Subir un nuevo PDF para reiniciar el espacio de trabajo"
     }
   },
   "controls": {
@@ -14,19 +31,33 @@
     "next": "Siguiente",
     "pageIndicator": "Página {{current}} / {{total}}",
     "zoomLabel": "Zoom",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
     "undo": "Deshacer",
     "redo": "Rehacer",
     "clear": "Limpiar",
     "copyJson": "Copiar JSON",
     "importJson": "Importar JSON",
     "downloadJson": "Descargar JSON",
-    "downloadPdf": "Descargar PDF"
+    "viewJsonTree": "Ver modo árbol",
+    "viewJsonText": "Volver al editor",
+    "jsonViewModeToggle": "Modo de visualización del JSON",
+    "downloadPdf": "Descargar PDF",
+    "toolbarAriaLabel": "Acciones del PDF",
+    "navigationGroup": "Navegación de páginas",
+    "zoomGroup": "Controles de zoom",
+    "historyGroup": "Acciones de historial",
+    "exportGroup": "Opciones de exportación"
   },
   "sidebar": {
     "title": "Anotaciones (JSON)",
     "importJsonFile": "Importar desde archivo",
     "applyJson": "Aplicar JSON",
     "jsonPlaceholder": "Pega o edita aquí las coordenadas de anotaciones...",
+    "jsonTree": {
+      "empty": "El editor JSON está vacío.",
+      "invalid": "El contenido no es un JSON válido. Corrige los errores para ver el árbol."
+    },
     "templates": {
       "title": "Plantillas reutilizables",
       "placeholder": "Nombre de la plantilla",
@@ -36,43 +67,87 @@
       "deleteButton": "Eliminar",
       "empty": "Aún no tienes plantillas guardadas."
     },
-    "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado."
+    "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado.",
+    "advancedTitle": "Opciones avanzadas",
+    "advancedHint": "Activa las guías y el snapping solo cuando necesites más precisión."
   },
-  "annotation": {
-  "fields": {
-    "text": {
-      "label": "Texto",
-      "placeholder": "Texto..."
+  "guides": {
+    "enableFeature": "Activar guías y snapping",
+    "title": "Guías y snapping",
+    "showGrid": "Mostrar rejilla",
+    "showRulers": "Mostrar reglas",
+    "showAlignment": "Resaltar alineaciones activas",
+    "snapGrid": "Ajustar a rejilla",
+    "snapMargins": "Ajustar a márgenes",
+    "snapCenters": "Ajustar a ejes centrales",
+    "snapCustom": "Ajustar a coordenadas personalizadas",
+    "gridSize": "Rejilla (pt)",
+    "marginSize": "Margen (pt)",
+    "tolerance": "Tolerancia (px)",
+    "customX": "Coordenadas X (pt)",
+    "customY": {
+      "canvas": "Coordenadas Y (pt desde el borde superior)",
+      "pdf": "Coordenadas Y (pt desde el borde inferior)"
     },
-    "size": {
-      "label": "Tamaño"
+    "customPlaceholder": "Ej.: 24, 48, 120",
+    "customHint": {
+      "canvas": "Introduce valores en puntos (pt) separados por comas o espacios. Las Y se miden desde el borde superior del PDF.",
+      "pdf": "Introduce valores en puntos (pt) separados por comas o espacios. Las Y se miden desde el borde inferior del PDF."
     },
-    "color": {
-      "label": "Color"
-    },
-    "type": {
-      "label": "Tipo",
-      "options": {
-        "text": "Texto",
-        "check": "Casilla",
-        "radio": "Botón de opción",
-        "number": "Número"
-      }
-    },
-    "value": {
-      "label": "Valor fijo",
-      "placeholder": "Valor opcional..."
-    },
-    "number": {
-      "decimals": {
-        "label": "Decimales"
-      },
-      "appender": {
-        "label": "Sufijo",
-        "placeholder": "Ej.: %"
-      }
+    "coordinateMode": {
+      "label": "Origen de coordenadas",
+      "canvas": "Esquina superior izquierda (Canvas)",
+      "pdf": "Esquina inferior izquierda (PDF)"
     }
   },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Texto",
+        "placeholder": "Texto..."
+      },
+      "size": {
+        "label": "Tamaño"
+      },
+      "font": {
+        "label": "Fuente",
+        "customTag": "Personalizada",
+        "searchPlaceholder": "Buscar fuentes...",
+        "noResults": "No hay fuentes que coincidan con la búsqueda."
+      },
+      "opacity": {
+        "label": "Opacidad"
+      },
+      "color": {
+        "label": "Color"
+      },
+      "background": {
+        "label": "Fondo",
+        "clear": "Sin fondo"
+      },
+      "type": {
+        "label": "Tipo",
+        "options": {
+          "text": "Texto",
+          "check": "Casilla",
+          "radio": "Botón de opción",
+          "number": "Número"
+        }
+      },
+      "value": {
+        "label": "Valor fijo",
+        "placeholder": "Valor opcional..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Decimales"
+        },
+        "appender": {
+          "label": "Sufijo",
+          "placeholder": "Ej.: %"
+        }
+      }
+    },
     "color": {
       "hintPreview": "Selecciona un color, escribe un HEX o un RGB. El JSON siempre exportará el color en HEX.",
       "hintEdit": "Puedes pegar un HEX o un RGB existente para reutilizar colores exactos.",
@@ -83,6 +158,19 @@
       "duplicate": "Duplicar anotación"
     },
     "editingBadge": "Editando"
+  },
+  "fonts": {
+    "custom": {
+      "enableFeature": "Activar fuentes personalizadas",
+      "hint": "Activa esta opción para cargar tus archivos de fuente desde el panel avanzado.",
+      "title": "Fuentes personalizadas",
+      "description": "Carga archivos .ttf, .otf, .woff o .woff2 para usarlos en tus anotaciones.",
+      "add": "Agregar fuente",
+      "remove": "Quitar",
+      "empty": "Aún no agregaste fuentes personalizadas.",
+      "unsupported": "Tu navegador no soporta la carga de fuentes personalizadas.",
+      "error": "No se pudo cargar la fuente seleccionada. Intenta con otro archivo."
+    }
   },
   "viewer": {
     "emptyMessage": "Sube un PDF y haz click donde quieras añadir anotaciones. Edítalas en la vista previa antes de confirmar ✅."

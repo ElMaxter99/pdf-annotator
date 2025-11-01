@@ -1,0 +1,63 @@
+<ul *ngIf="rootNode as root" class="json-tree" role="tree">
+  <ng-container *ngTemplateOutlet="nodeTemplate; context: { node: root }"></ng-container>
+</ul>
+
+<ng-template #nodeTemplate let-node="node">
+  <li
+    class="json-tree__node"
+    role="treeitem"
+    [attr.aria-expanded]="node.children?.length ? !isCollapsed(node) : null"
+  >
+    <div
+      class="json-tree__row"
+      [class.json-tree__row--focused]="isFocused(node)"
+      [attr.data-json-path]="node.path"
+    >
+      <button
+        *ngIf="node.children?.length"
+        type="button"
+        class="json-tree__toggle"
+        (click)="toggleNode(node)"
+        [attr.aria-label]="'Toggle node'"
+        [attr.aria-expanded]="!isCollapsed(node)"
+      >
+        <span class="json-tree__chevron" [class.json-tree__chevron--collapsed]="isCollapsed(node)"></span>
+      </button>
+      <span *ngIf="!node.children?.length" class="json-tree__toggle-placeholder"></span>
+      <span *ngIf="node.label !== undefined" class="json-tree__label">
+        <ng-container *ngIf="node.isIndex; else objectLabel">
+          {{ node.label }}
+        </ng-container>
+        <ng-template #objectLabel>"{{ node.label }}"</ng-template>
+        <span class="json-tree__colon">:</span>
+      </span>
+      <ng-container [ngSwitch]="node.kind">
+        <span
+          *ngSwitchCase="'value'"
+          class="json-tree__value"
+          [ngClass]="'json-tree__value--' + (node.valueType ?? 'unknown')"
+        >
+          {{ formatValue(node.value, node.valueType ?? 'unknown') }}
+        </span>
+        <ng-container *ngSwitchDefault>
+          <span class="json-tree__brackets">
+            {{ node.kind === 'array' ? '[' : '{' }}
+            <ng-container *ngIf="isCollapsed(node)">…{{ node.kind === 'array' ? ']' : '}' }}</ng-container>
+            <ng-container *ngIf="!node.children?.length">{{ node.kind === 'array' ? ']' : '}' }}</ng-container>
+          </span>
+          <span class="json-tree__meta" *ngIf="node.children">
+            ({{ node.children.length }})
+          </span>
+        </ng-container>
+      </ng-container>
+    </div>
+    <ul *ngIf="node.children?.length && !isCollapsed(node)" class="json-tree__children" role="group">
+      <ng-container *ngFor="let child of node.children; trackBy: trackByPath">
+        <ng-container *ngTemplateOutlet="nodeTemplate; context: { node: child }"></ng-container>
+      </ng-container>
+    </ul>
+    <div *ngIf="node.children?.length && !isCollapsed(node)" class="json-tree__closing">
+      {{ node.kind === 'array' ? ']' : '}' }}
+    </div>
+  </li>
+</ng-template>
