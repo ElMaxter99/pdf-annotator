@@ -191,6 +191,7 @@ export class App implements AfterViewChecked, OnDestroy {
   readonly defaultFontId = DEFAULT_FONT_ID;
   readonly theme = signal<ThemeVariant>('night');
   private readonly themeStorageKey = 'pdf-annotator:theme';
+  private accentRgb = '94, 234, 212';
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
   private coordsFileInputFallback: HTMLInputElement | null = null;
@@ -364,6 +365,14 @@ export class App implements AfterViewChecked, OnDestroy {
 
     body.classList.remove('theme--day', 'theme--night');
     body.classList.add(`theme--${theme}`);
+
+    if (typeof window !== 'undefined') {
+      const computedStyles = window.getComputedStyle(body);
+      const accentRgb = computedStyles.getPropertyValue('--accent-rgb').trim();
+      if (accentRgb) {
+        this.accentRgb = accentRgb;
+      }
+    }
   }
 
   private readStoredTheme(): ThemeVariant | null {
@@ -835,6 +844,10 @@ export class App implements AfterViewChecked, OnDestroy {
     }
   }
 
+  private accentColor(alpha: number): string {
+    return `rgba(${this.accentRgb}, ${alpha})`;
+  }
+
   private projectYPoint(point: number, height: number, scale: number, usePdfCoordinates: boolean) {
     const pdfHeight = height / scale;
     const clamped = Math.max(0, Math.min(point, pdfHeight));
@@ -861,7 +874,7 @@ export class App implements AfterViewChecked, OnDestroy {
     }
 
     ctx.save();
-    ctx.strokeStyle = 'rgba(94, 234, 212, 0.09)';
+    ctx.strokeStyle = this.accentColor(0.09);
     ctx.lineWidth = 1;
 
     for (let x = spacingPx; x < width; x += spacingPx) {
@@ -901,11 +914,12 @@ export class App implements AfterViewChecked, OnDestroy {
 
     ctx.save();
 
-    ctx.fillStyle = 'rgba(10, 10, 18, 0.55)';
+    const nightTheme = this.theme() === 'night';
+    ctx.fillStyle = nightTheme ? 'rgba(10, 10, 18, 0.55)' : 'rgba(241, 245, 249, 0.9)';
     ctx.fillRect(0, 0, width, rulerSize);
     ctx.fillRect(0, 0, rulerSize, height);
 
-    ctx.strokeStyle = 'rgba(94, 234, 212, 0.35)';
+    ctx.strokeStyle = this.accentColor(0.35);
     ctx.lineWidth = 1;
 
     for (let x = 0; x <= width; x += minorStep) {
@@ -926,7 +940,7 @@ export class App implements AfterViewChecked, OnDestroy {
       ctx.stroke();
     }
 
-    ctx.fillStyle = 'rgba(245, 245, 245, 0.7)';
+    ctx.fillStyle = nightTheme ? 'rgba(245, 245, 245, 0.7)' : 'rgba(30, 41, 59, 0.78)';
     ctx.font = '10px "Segoe UI", sans-serif';
     ctx.textBaseline = 'top';
 
@@ -958,7 +972,7 @@ export class App implements AfterViewChecked, OnDestroy {
     ctx.save();
     ctx.lineWidth = 1;
     ctx.setLineDash([6, 6]);
-    ctx.strokeStyle = 'rgba(94, 234, 212, 0.25)';
+    ctx.strokeStyle = this.accentColor(0.25);
 
     if (settings.snapToMargins) {
       const marginPx = Math.max(settings.marginSize, 0) * scale;
@@ -1037,7 +1051,7 @@ export class App implements AfterViewChecked, OnDestroy {
       if (!showAlignment && !guide.highlighted) {
         return;
       }
-      const color = guide.highlighted ? 'rgba(94, 234, 212, 0.85)' : 'rgba(94, 234, 212, 0.35)';
+      const color = this.accentColor(guide.highlighted ? 0.85 : 0.35);
       ctx.strokeStyle = color;
       ctx.setLineDash(guide.highlighted ? [4, 4] : [8, 6]);
       if (guide.orientation === 'vertical') {
@@ -1058,7 +1072,7 @@ export class App implements AfterViewChecked, OnDestroy {
     ctx.restore();
 
     ctx.save();
-    ctx.strokeStyle = 'rgba(94, 234, 212, 0.75)';
+    ctx.strokeStyle = this.accentColor(0.75);
     ctx.lineWidth = 1;
     ctx.setLineDash([6, 4]);
     ctx.strokeRect(
