@@ -22,10 +22,10 @@
   --btn-border: rgba(var(--accent-rgb), 0.2);
   --btn-hover-bg: rgba(52, 52, 80, 0.95);
   --btn-text: var(--text);
-  --btn-danger-bg: rgba(255, 77, 77, 0.15);
-  --btn-danger-border: rgba(255, 77, 77, 0.4);
-  --btn-danger-hover-bg: rgba(255, 77, 77, 0.25);
-  --btn-danger-hover-border: rgba(255, 77, 77, 0.6);
+  --btn-danger-bg: rgba(var(--danger-rgb), 0.15);
+  --btn-danger-border: rgba(var(--danger-rgb), 0.4);
+  --btn-danger-hover-bg: rgba(var(--danger-rgb), 0.25);
+  --btn-danger-hover-border: rgba(var(--danger-rgb), 0.6);
   --btn-danger-text: #ffe5e5;
   --danger-contrast: #ffe5e5;
   --sidebar-upload-bg: rgba(32, 32, 48, 0.85);
@@ -35,6 +35,9 @@
   --sidebar-upload-shadow: rgba(5, 5, 17, 0.35);
   --json-editor-bg: #1d1d2a;
   --json-editor-border: #444;
+  --sidebar-section-divider: #3a3a4f;
+  --sidebar-input-bg: #1d1d2a;
+  --sidebar-input-border: #444;
   --advanced-panel-gradient-start: rgba(29, 29, 42, 0.95);
   --advanced-panel-gradient-end: rgba(35, 35, 52, 0.92);
   --advanced-panel-border: rgba(var(--accent-rgb), 0.15);
@@ -76,6 +79,10 @@
   --language-selector-select-bg: rgba(24, 24, 38, 0.9);
   --language-selector-select-border: rgba(var(--accent-rgb), 0.25);
   --language-selector-select-focus: rgba(var(--accent-rgb), 0.25);
+  --custom-fonts-panel-bg: rgba(30, 30, 47, 0.6);
+  --custom-fonts-panel-border: rgba(var(--accent-rgb), 0.18);
+  --danger-rgb: 255, 77, 77;
+  --footer-border: rgba(var(--accent-rgb), 0.12);
 }
 
 body.theme--night {
@@ -83,7 +90,7 @@ body.theme--night {
 }
 
 body.theme--day {
-  --bg: #e9eef6;
+  --bg: #e6f0ff;
   --panel: #ffffff;
   --accent: #0ea5e9;
   --accent-rgb: 14, 165, 233;
@@ -91,20 +98,20 @@ body.theme--day {
   --text: #0f172a;
   --muted: #5b6b7f;
   --danger: #dc2626;
-  --header-gradient-start: rgba(250, 253, 255, 0.95);
-  --header-gradient-end: rgba(224, 242, 254, 0.95);
-  --header-border: rgba(148, 163, 184, 0.28);
-  --header-shadow: rgba(100, 116, 139, 0.25);
-  --dropzone-border: rgba(var(--accent-rgb), 0.28);
-  --dropzone-bg: rgba(248, 250, 252, 0.9);
-  --dropzone-hover-bg: rgba(224, 242, 254, 0.92);
-  --dropzone-active-bg: rgba(191, 219, 254, 0.88);
-  --dropzone-shadow: rgba(148, 163, 184, 0.22);
-  --toolbar-group-bg: rgba(255, 255, 255, 0.86);
-  --toolbar-group-border: rgba(148, 163, 184, 0.32);
-  --btn-bg: rgba(255, 255, 255, 0.9);
-  --btn-border: rgba(148, 163, 184, 0.32);
-  --btn-hover-bg: rgba(226, 232, 240, 0.85);
+  --header-gradient-start: rgba(224, 242, 254, 0.97);
+  --header-gradient-end: rgba(186, 230, 253, 0.95);
+  --header-border: rgba(148, 163, 184, 0.32);
+  --header-shadow: rgba(59, 130, 246, 0.15);
+  --dropzone-border: rgba(var(--accent-rgb), 0.32);
+  --dropzone-bg: rgba(236, 244, 255, 0.94);
+  --dropzone-hover-bg: rgba(219, 234, 254, 0.94);
+  --dropzone-active-bg: rgba(191, 219, 254, 0.9);
+  --dropzone-shadow: rgba(148, 163, 184, 0.24);
+  --toolbar-group-bg: rgba(255, 255, 255, 0.9);
+  --toolbar-group-border: rgba(148, 163, 184, 0.35);
+  --btn-bg: rgba(255, 255, 255, 0.92);
+  --btn-border: rgba(148, 163, 184, 0.35);
+  --btn-hover-bg: rgba(226, 232, 240, 0.88);
   --btn-text: #0f172a;
   --btn-danger-bg: rgba(252, 165, 165, 0.18);
   --btn-danger-border: rgba(248, 113, 113, 0.4);
@@ -119,6 +126,9 @@ body.theme--day {
   --sidebar-upload-shadow: rgba(100, 116, 139, 0.2);
   --json-editor-bg: #ffffff;
   --json-editor-border: rgba(203, 213, 225, 0.8);
+  --sidebar-section-divider: rgba(148, 163, 184, 0.35);
+  --sidebar-input-bg: rgba(248, 250, 252, 0.94);
+  --sidebar-input-border: rgba(148, 163, 184, 0.45);
   --advanced-panel-gradient-start: rgba(255, 255, 255, 0.97);
   --advanced-panel-gradient-end: rgba(224, 242, 254, 0.94);
   --advanced-panel-border: rgba(148, 163, 184, 0.3);
@@ -160,6 +170,10 @@ body.theme--day {
   --language-selector-select-bg: rgba(255, 255, 255, 0.92);
   --language-selector-select-border: rgba(148, 163, 184, 0.35);
   --language-selector-select-focus: rgba(var(--accent-rgb), 0.28);
+  --custom-fonts-panel-bg: rgba(241, 245, 249, 0.86);
+  --custom-fonts-panel-border: rgba(148, 163, 184, 0.35);
+  --danger-rgb: 220, 38, 38;
+  --footer-border: rgba(148, 163, 184, 0.32);
   color-scheme: light;
 }
 
@@ -723,7 +737,7 @@ header .logo {
   .templates {
     margin-top: 16px;
     padding-top: 12px;
-    border-top: 1px solid #3a3a4f;
+    border-top: 1px solid var(--sidebar-section-divider);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -742,17 +756,17 @@ header .logo {
       input {
         flex: 1;
         min-width: 0;
-        background: #1d1d2a;
+        background: var(--sidebar-input-bg);
         color: var(--text);
         border-radius: 8px;
-        border: 1px solid #444;
+        border: 1px solid var(--sidebar-input-border);
         padding: 6px 10px;
       }
 
       input:focus {
         outline: none;
-        border-color: var(--accent);
-        box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15);
+        border-color: var(--annotation-input-border-strong);
+        box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18);
       }
     }
 
@@ -771,17 +785,17 @@ header .logo {
       select {
         flex: 1;
         min-width: 0;
-        background: #1d1d2a;
+        background: var(--sidebar-input-bg);
         color: var(--text);
         border-radius: 8px;
-        border: 1px solid #444;
+        border: 1px solid var(--sidebar-input-border);
         padding: 6px 10px;
       }
 
       select:focus {
         outline: none;
-        border-color: var(--accent);
-        box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15);
+        border-color: var(--annotation-input-border-strong);
+        box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18);
       }
     }
 
@@ -800,7 +814,7 @@ header .logo {
 }
 
 .templates__delete:hover {
-  background: rgba(255, 77, 77, 0.15);
+  background: rgba(var(--danger-rgb), 0.15);
   border-color: var(--danger);
 }
 
@@ -941,8 +955,8 @@ header .logo {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: rgba(30, 30, 47, 0.6);
-  border: 1px solid rgba(var(--accent-rgb), 0.18);
+  background: var(--custom-fonts-panel-bg);
+  border: 1px solid var(--custom-fonts-panel-border);
   border-radius: 10px;
   padding: 12px;
 }
@@ -1170,6 +1184,8 @@ header .logo {
   background: var(--panel);
   border-radius: 12px;
   padding: 12px 16px;
+  border: 1px solid var(--footer-border);
+  box-shadow: 0 12px 28px var(--header-shadow);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
