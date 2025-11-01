@@ -49,6 +49,11 @@
     "historyGroup": "History actions",
     "exportGroup": "Export options"
   },
+  "theme": {
+    "switchToDay": "Switch to day theme",
+    "switchToNight": "Switch to night theme",
+    "toggleAriaLabel": "Toggle between day and night themes"
+  },
   "sidebar": {
     "title": "Annotations (JSON)",
     "importJsonFile": "Import from file",
