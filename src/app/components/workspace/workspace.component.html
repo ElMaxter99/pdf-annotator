@@ -2,7 +2,7 @@
     <header class="header">
       <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
         <div class="footer__brand">
-          <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
+          <app-logo class="footer__logo" [alt]="'Logotipo de ' + vm.appName"></app-logo>
           <div class="footer__brand-text">
             <span class="footer__app-name">{{ vm.appName }}</span>
             <span class="footer__version">v{{ vm.version }}</span>
@@ -56,6 +56,15 @@
           <button class="btn btn--icon" (click)="vm.downloadAnnotatedPDF()" [disabled]="!vm.coords().length || !vm.pdfDoc">
             <span class="btn__icon" aria-hidden="true">⬇</span>
             <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
+          </button>
+        </div>
+
+        <div class="toolbar__group toolbar__group--theme" role="group" [attr.aria-label]="'theme.toggleAriaLabel' | t">
+          <button class="btn btn--icon" type="button" (click)="vm.toggleTheme()">
+            <span class="btn__icon" aria-hidden="true">{{ vm.theme() === 'night' ? '🌞' : '🌙' }}</span>
+            <span class="btn__label">
+              {{ vm.theme() === 'night' ? ('theme.switchToDay' | t) : ('theme.switchToNight' | t) }}
+            </span>
           </button>
         </div>
 
@@ -557,7 +566,7 @@
 
     <footer class="footer">
       <div class="footer__brand">
-        <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
+        <app-logo class="footer__logo" [alt]="'Logotipo de ' + vm.appName"></app-logo>
         <div class="footer__brand-text">
           <span class="footer__app-name">{{ vm.appName }}</span>
           <span class="footer__version">v{{ vm.version }}</span>

@@ -49,6 +49,11 @@
     "historyGroup": "Accions d'historial",
     "exportGroup": "Opcions d'exportació"
   },
+  "theme": {
+    "switchToDay": "Canvia a la versió dia",
+    "switchToNight": "Canvia a la versió nit",
+    "toggleAriaLabel": "Alterna entre la versió dia i nit"
+  },
   "sidebar": {
     "title": "Anotacions (JSON)",
     "importJsonFile": "Importa des d'un fitxer",

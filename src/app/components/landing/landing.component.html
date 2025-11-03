@@ -1,7 +1,17 @@
 <section class="landing">
-  <div class="landing__language">
-    <app-language-selector [languages]="languages" [selectedLanguage]="selectedLanguage"
-      (languageChange)="languageChange.emit($event)" variant="compact"></app-language-selector>
+  <div class="landing__controls">
+    <button type="button" class="landing__theme-toggle"
+      (click)="toggleTheme.emit()"
+      [attr.aria-label]="theme === 'night' ? ('theme.switchToDay' | t) : ('theme.switchToNight' | t)">
+      <span class="landing__theme-icon" aria-hidden="true">{{ theme === 'night' ? '🌞' : '🌙' }}</span>
+      <span class="landing__theme-label">
+        {{ theme === 'night' ? ('theme.switchToDay' | t) : ('theme.switchToNight' | t) }}
+      </span>
+    </button>
+    <div class="landing__language">
+      <app-language-selector [languages]="languages" [selectedLanguage]="selectedLanguage"
+        (languageChange)="languageChange.emit($event)" variant="compact"></app-language-selector>
+    </div>
   </div>
   <div class="landing__hero">
     <span class="landing__badge">{{ 'app.landing.badge' | t }}</span>
@@ -24,7 +34,7 @@
 </section>
 <footer class="footer landing__footer">
   <div class="footer__brand">
-    <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
+    <app-logo class="footer__logo" [alt]="'Logotipo de ' + appName"></app-logo>
     <div class="footer__brand-text">
       <span class="footer__app-name">{{ appName }}</span>
       <span class="footer__version">v{{ version }}</span>

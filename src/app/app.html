@@ -1,11 +1,12 @@
 <div class="app" [class.app--landing]="!pdfDoc">
   <ng-container *ngIf="!pdfDoc; else workspace">
     <app-landing [languages]="languages" [selectedLanguage]="languageModel" [appName]="appName"
-      [version]="version" [currentYear]="currentYear" [appAuthor]="appAuthor"
+      [version]="version" [currentYear]="currentYear" [appAuthor]="appAuthor" [theme]="theme()"
       [fileDropActive]="fileDropActive()" (languageChange)="onLanguageChange($event)"
       (fileSelected)="onFileSelected($event)" (fileUploadKeydown)="onFileUploadKeydown($event)"
       (fileDragOver)="onFileDragOver($event)" (fileDragLeave)="onFileDragLeave($event)"
-      (fileDrop)="onFileDrop($event)" (openFilePicker)="openPdfFilePicker()"></app-landing>
+      (fileDrop)="onFileDrop($event)" (openFilePicker)="openPdfFilePicker()" (toggleTheme)="toggleTheme()">
+    </app-landing>
   </ng-container>
 
   <ng-template #workspace>
