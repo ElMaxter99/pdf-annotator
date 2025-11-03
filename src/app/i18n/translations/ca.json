@@ -136,12 +136,17 @@
       },
       "value": {
         "label": "Valor fix",
-        "placeholder": "Valor opcional..."
-      },
-      "number": {
-        "decimals": {
-          "label": "Decimals"
-        },
+    "placeholder": "Valor opcional..."
+  },
+  "behavior": {
+    "label": "Comportament",
+    "hidden": "Amaga al llenç",
+    "locked": "Bloqueja l'anotació"
+  },
+  "number": {
+    "decimals": {
+      "label": "Decimals"
+    },
         "appender": {
           "label": "Sufix",
           "placeholder": "Ex.: %"

@@ -1125,6 +1125,16 @@ header .logo {
   cursor: grabbing;
 }
 
+.annotation--locked {
+  cursor: not-allowed;
+  outline: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+.annotation--locked:hover {
+  outline-style: solid;
+  background: rgba(148, 163, 184, 0.18);
+}
+
 .annotation-editor {
   position: absolute;
   z-index: 20;
@@ -1249,6 +1259,29 @@ header .logo {
     text-transform: uppercase;
     letter-spacing: .05em;
     color: var(--accent);
+  }
+
+  .field-toggle-group {
+    gap: 6px;
+  }
+
+  .field-toggle-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .field-toggle-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+  }
+
+  .field-toggle-option input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
   }
 
   .font-dropdown {

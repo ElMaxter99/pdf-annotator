@@ -136,12 +136,17 @@
       },
       "value": {
         "label": "Value override",
-        "placeholder": "Optional fixed value..."
-      },
-      "number": {
-        "decimals": {
-          "label": "Decimals"
-        },
+    "placeholder": "Optional fixed value..."
+  },
+  "behavior": {
+    "label": "Behavior",
+    "hidden": "Hide on canvas",
+    "locked": "Lock annotation"
+  },
+  "number": {
+    "decimals": {
+      "label": "Decimals"
+    },
         "appender": {
           "label": "Suffix",
           "placeholder": "E.g. %"

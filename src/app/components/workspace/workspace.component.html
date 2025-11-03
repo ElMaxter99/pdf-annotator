@@ -350,6 +350,19 @@
             <input type="text" [(ngModel)]="p.field.appender"
               [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
           </label>
+          <div class="field field-toggle-group">
+            <span class="field-label">{{ 'annotation.fields.behavior.label' | t }}</span>
+            <div class="field-toggle-options">
+              <label class="field-toggle-option">
+                <input type="checkbox" [(ngModel)]="p.field.hidden" />
+                <span>{{ 'annotation.fields.behavior.hidden' | t }}</span>
+              </label>
+              <label class="field-toggle-option">
+                <input type="checkbox" [(ngModel)]="p.field.locked" />
+                <span>{{ 'annotation.fields.behavior.locked' | t }}</span>
+              </label>
+            </div>
+          </div>
           <div class="field-row field-row--metrics">
             <label class="field field-small field-size">
               <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
@@ -466,6 +479,19 @@
             <input type="text" [(ngModel)]="e.field.appender"
               [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
           </label>
+          <div class="field field-toggle-group">
+            <span class="field-label">{{ 'annotation.fields.behavior.label' | t }}</span>
+            <div class="field-toggle-options">
+              <label class="field-toggle-option">
+                <input type="checkbox" [(ngModel)]="e.field.hidden" />
+                <span>{{ 'annotation.fields.behavior.hidden' | t }}</span>
+              </label>
+              <label class="field-toggle-option">
+                <input type="checkbox" [(ngModel)]="e.field.locked" />
+                <span>{{ 'annotation.fields.behavior.locked' | t }}</span>
+              </label>
+            </div>
+          </div>
           <div class="field-row field-row--metrics">
             <label class="field field-small field-size">
               <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>

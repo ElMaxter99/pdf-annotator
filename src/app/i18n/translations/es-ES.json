@@ -136,12 +136,17 @@
       },
       "value": {
         "label": "Valor fijo",
-        "placeholder": "Valor opcional..."
-      },
-      "number": {
-        "decimals": {
-          "label": "Decimales"
-        },
+    "placeholder": "Valor opcional..."
+  },
+  "behavior": {
+    "label": "Comportamiento",
+    "hidden": "Ocultar en el lienzo",
+    "locked": "Bloquear anotación"
+  },
+  "number": {
+    "decimals": {
+      "label": "Decimales"
+    },
         "appender": {
           "label": "Sufijo",
           "placeholder": "Ej.: %"

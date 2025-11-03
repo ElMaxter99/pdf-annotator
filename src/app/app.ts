@@ -203,6 +203,7 @@ export class App implements AfterViewChecked, OnDestroy {
     fontSize: number;
     width: number;
     moved: boolean;
+    locked: boolean;
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
@@ -1377,6 +1378,8 @@ export class App implements AfterViewChecked, OnDestroy {
       fontFamily: DEFAULT_FONT_ID,
       opacity: DEFAULT_OPACITY,
       backgroundColor: null,
+      locked: false,
+      hidden: false,
     };
     const styledField = this.ensureFieldStyle(baseField);
     this.preview.set({
@@ -1770,6 +1773,8 @@ export class App implements AfterViewChecked, OnDestroy {
   private prepareFieldForStorage(field: PageField): PageField {
     const styled = this.ensureFieldStyle(field);
     const type = this.normalizeFieldType(styled.type);
+    const locked = this.normalizeBooleanFlag(styled.locked, false);
+    const hidden = this.normalizeBooleanFlag(styled.hidden, false);
     const base: PageField = {
       x: styled.x,
       y: styled.y,
@@ -1780,6 +1785,8 @@ export class App implements AfterViewChecked, OnDestroy {
       fontFamily: styled.fontFamily ?? DEFAULT_FONT_ID,
       opacity: styled.opacity ?? DEFAULT_OPACITY,
       backgroundColor: styled.backgroundColor ?? null,
+      locked,
+      hidden,
     };
 
     const value = this.sanitizeTextPreservingSpacing(styled.value);
@@ -1813,6 +1820,8 @@ export class App implements AfterViewChecked, OnDestroy {
       value: typeof styled.value === 'string' ? styled.value : '',
       appender: typeof styled.appender === 'string' ? styled.appender : '',
       decimals,
+      locked: this.normalizeBooleanFlag(styled.locked, false),
+      hidden: this.normalizeBooleanFlag(styled.hidden, false),
     };
   }
 
@@ -2214,10 +2223,40 @@ export class App implements AfterViewChecked, OnDestroy {
     return this.normalizeColor(trimmed);
   }
 
+  private normalizeBooleanFlag(value: unknown, defaultValue = false): boolean {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'number') {
+      if (!Number.isFinite(value)) {
+        return defaultValue;
+      }
+      return value !== 0;
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (!normalized) {
+        return defaultValue;
+      }
+      if (['1', 'true', 'yes', 'y', 'locked', 'on'].includes(normalized)) {
+        return true;
+      }
+      if (['0', 'false', 'no', 'n', 'off'].includes(normalized)) {
+        return false;
+      }
+    }
+
+    return defaultValue;
+  }
+
   private ensureFieldStyle(field: PageField): PageField {
     const fontFamily = this.normalizeFontFamily(field.fontFamily);
     const opacity = this.normalizeOpacityValue(field.opacity) ?? DEFAULT_OPACITY;
     const background = this.normalizeBackgroundColor(field.backgroundColor) ?? null;
+    const locked = this.normalizeBooleanFlag(field.locked, false);
+    const hidden = this.normalizeBooleanFlag(field.hidden, false);
     const legacyField = field as PageField & {
       fontWeight?: unknown;
       textAlign?: unknown;
@@ -2229,6 +2268,8 @@ export class App implements AfterViewChecked, OnDestroy {
       field.fontFamily === fontFamily &&
       (field.opacity ?? DEFAULT_OPACITY) === opacity &&
       (field.backgroundColor ?? null) === background &&
+      (field.locked ?? false) === locked &&
+      (field.hidden ?? false) === hidden &&
       !hasLegacyWeight &&
       !hasLegacyAlign
     ) {
@@ -2242,6 +2283,8 @@ export class App implements AfterViewChecked, OnDestroy {
       fontFamily,
       opacity,
       backgroundColor: background,
+      locked,
+      hidden,
     };
   }
 
@@ -2785,11 +2828,18 @@ export class App implements AfterViewChecked, OnDestroy {
       .forEach(({ page, pageIndex }) => {
         page.fields.forEach((field, fieldIndex) => {
           const styledField = this.ensureFieldStyle(field);
+          if (styledField.hidden) {
+            return;
+          }
           const left = styledField.x * scale;
           const top = pdfCanvas.height - styledField.y * scale;
 
           const el = document.createElement('div');
-          el.className = 'annotation';
+          const classNames = ['annotation'];
+          if (styledField.locked) {
+            classNames.push('annotation--locked');
+          }
+          el.className = classNames.join(' ');
           el.textContent = this.getFieldRenderValue(styledField);
           el.style.left = `${left}px`;
           el.style.top = `${top - styledField.fontSize * scale}px`;
@@ -2822,6 +2872,9 @@ export class App implements AfterViewChecked, OnDestroy {
     const page = this.coords()[pageIndex];
     const field = page?.fields[fieldIndex];
     const styledField = field ? this.ensureFieldStyle(field) : null;
+    if (!styledField || styledField.locked) {
+      return;
+    }
     this.dragInfo = {
       pageIndex,
       fieldIndex,
@@ -2833,6 +2886,7 @@ export class App implements AfterViewChecked, OnDestroy {
       fontSize: computedFontSize,
       width: el.offsetWidth,
       moved: false,
+      locked: styledField.locked ?? false,
     };
 
     this.draggingElement = el;
@@ -2858,7 +2912,8 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   private handleAnnotationPointerMove = (evt: PointerEvent) => {
-    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
+    if (!this.dragInfo || this.dragInfo.locked || evt.pointerId !== this.dragInfo.pointerId)
+      return;
     const el = this.draggingElement;
     const pdfCanvas = this.pdfCanvasRef?.nativeElement;
     if (!el || !pdfCanvas) return;
@@ -2917,7 +2972,8 @@ export class App implements AfterViewChecked, OnDestroy {
   };
 
   private handleAnnotationPointerUp = (evt: PointerEvent) => {
-    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
+    if (!this.dragInfo || this.dragInfo.locked || evt.pointerId !== this.dragInfo.pointerId)
+      return;
     const el = this.draggingElement;
     if (!el) {
       this.dragInfo = null;
@@ -2954,7 +3010,10 @@ export class App implements AfterViewChecked, OnDestroy {
       const page = this.coords()[drag.pageIndex];
       const field = page?.fields[drag.fieldIndex];
       if (field) {
-        this.startEditing(drag.pageIndex, drag.fieldIndex, field);
+        const styled = this.ensureFieldStyle(field);
+        if (!styled.locked) {
+          this.startEditing(drag.pageIndex, drag.fieldIndex, field);
+        }
       }
     }
   };
@@ -2973,6 +3032,9 @@ export class App implements AfterViewChecked, OnDestroy {
     const page = this.coords()[pageIndex];
     const field = page?.fields[fieldIndex];
     const styledField = field ? this.ensureFieldStyle(field) : null;
+    if (!styledField || styledField.locked) {
+      return;
+    }
     const bounds = this.computeHorizontalBounds(widthPx, pdfCanvas.width);
     const boundedLeft = Math.min(Math.max(leftPx, bounds.minLeft), bounds.maxLeft);
     const boundedTop = Math.min(Math.max(topPx, -fontSizePx), pdfCanvas.height - fontSizePx);
@@ -3681,7 +3743,7 @@ export class App implements AfterViewChecked, OnDestroy {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color, value, type, decimals, appender } =
+        const { x, y, mapField, fontSize, color, value, type, decimals, appender, locked, hidden } =
           rawField as Record<string, unknown>;
 
         const normalizedType = this.normalizeFieldType(type);
@@ -3743,6 +3805,8 @@ export class App implements AfterViewChecked, OnDestroy {
           fontFamily: this.resolveImportedFontFamily(...fontCandidates),
           opacity: rawOpacity as number | string | undefined,
           backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,
+          locked,
+          hidden,
         } as PageField);
 
         fields.push(styledField);
