@@ -1,0 +1,25 @@
+<div class="thumbnails" role="list">
+  <button
+    type="button"
+    class="thumbnails__item"
+    *ngFor="let thumbnail of thumbnails"
+    (click)="onSelect(thumbnail.pageNumber)"
+    [class.thumbnails__item--active]="thumbnail.pageNumber === activePage"
+    [attr.aria-current]="thumbnail.pageNumber === activePage ? 'page' : null"
+    [attr.aria-label]="'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber }"
+    role="listitem"
+  >
+    <img
+      class="thumbnails__image"
+      [src]="thumbnail.imageUrl"
+      [attr.alt]="'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber }"
+      [attr.width]="thumbnail.width"
+      [attr.height]="thumbnail.height"
+      loading="lazy"
+      decoding="async"
+    />
+    <span class="thumbnails__label">
+      {{ 'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber } }}
+    </span>
+  </button>
+</div>

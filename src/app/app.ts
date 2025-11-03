@@ -29,6 +29,7 @@ import {
 } from './models/guide-settings.model';
 import { LandingComponent } from './components/landing/landing.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
+import { PageThumbnail } from './models/page-thumbnail.model';
 import {
   STANDARD_FONT_FAMILIES,
   StandardFontFamilyDefinition,
@@ -149,6 +150,9 @@ export class App implements AfterViewChecked, OnDestroy {
   coords = signal<PageAnnotations[]>([]);
   private readonly undoStack = signal<PageAnnotations[][]>([]);
   private readonly redoStack = signal<PageAnnotations[][]>([]);
+  readonly pageThumbnails = signal<readonly PageThumbnail[]>([]);
+  private thumbnailObjectUrls: string[] = [];
+  private thumbnailGenerationToken = 0;
   preview = signal<PreviewState>(null);
   editing = signal<EditState>(null);
   previewHexInput = signal('#000000');
@@ -313,6 +317,7 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.revokeThumbnailUrls();
     if (!this.document) {
       return;
     }
@@ -1312,6 +1317,9 @@ export class App implements AfterViewChecked, OnDestroy {
     this.resetHistory();
     this.clearAll({ skipHistory: true });
     await this.render();
+    this.generatePageThumbnails().catch((error) =>
+      console.error('No se pudieron generar las miniaturas del documento.', error)
+    );
     this.fileDropActive.set(false);
   }
 
@@ -1346,6 +1354,102 @@ export class App implements AfterViewChecked, OnDestroy {
 
     await page.render({ canvasContext: ctx, canvas, viewport }).promise;
     this.refreshOverlay();
+  }
+
+  private revokeThumbnailUrls() {
+    for (const url of this.thumbnailObjectUrls) {
+      URL.revokeObjectURL(url);
+    }
+    this.thumbnailObjectUrls = [];
+  }
+
+  private computeThumbnailScale(pageWidth: number) {
+    if (!Number.isFinite(pageWidth) || pageWidth <= 0) {
+      return 0.25;
+    }
+
+    const targetWidth = 160;
+    const rawScale = targetWidth / pageWidth;
+    return Math.min(1, Math.max(rawScale, 0.15));
+  }
+
+  private async generatePageThumbnails() {
+    const doc = this.pdfDoc;
+    this.thumbnailGenerationToken += 1;
+    const generationToken = this.thumbnailGenerationToken;
+
+    this.pageThumbnails.set([]);
+    this.revokeThumbnailUrls();
+
+    if (!doc) {
+      return;
+    }
+
+    if (typeof OffscreenCanvas === 'undefined') {
+      console.warn('OffscreenCanvas no está disponible; se omite la generación de miniaturas.');
+      return;
+    }
+
+    const thumbnails: PageThumbnail[] = [];
+    const objectUrls: string[] = [];
+
+    try {
+      for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber += 1) {
+        if (generationToken !== this.thumbnailGenerationToken) {
+          objectUrls.forEach((url) => URL.revokeObjectURL(url));
+          return;
+        }
+
+        const page = await doc.getPage(pageNumber);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const viewport = page.getViewport({ scale: this.computeThumbnailScale(baseViewport.width) });
+        const width = Math.max(1, Math.round(viewport.width));
+        const height = Math.max(1, Math.round(viewport.height));
+
+        const canvas = new OffscreenCanvas(width, height);
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        if (!ctx) {
+          if (typeof page.cleanup === 'function') {
+            page.cleanup();
+          }
+          continue;
+        }
+
+        ctx.clearRect(0, 0, width, height);
+
+        await page.render({
+          canvasContext: ctx as unknown as CanvasRenderingContext2D,
+          viewport,
+        }).promise;
+
+        const blob = await canvas.convertToBlob({ type: 'image/png' });
+        const url = URL.createObjectURL(blob);
+
+        objectUrls.push(url);
+        thumbnails.push({
+          pageNumber,
+          imageUrl: url,
+          width,
+          height,
+        });
+
+        if (typeof page.cleanup === 'function') {
+          page.cleanup();
+        }
+      }
+    } catch (error) {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      throw error;
+    }
+
+    if (generationToken !== this.thumbnailGenerationToken) {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      return;
+    }
+
+    this.thumbnailObjectUrls = objectUrls;
+    this.pageThumbnails.set(thumbnails);
   }
 
   private domToPdfCoords(evt: MouseEvent) {
@@ -3006,20 +3110,31 @@ export class App implements AfterViewChecked, OnDestroy {
     this.redrawAllForPage();
   }
 
-  async prevPage() {
-    if (this.pageIndex() > 1) {
-      this.pageIndex.update((v) => v - 1);
-      await this.render();
-      this.redrawAllForPage();
+  async setPageIndex(pageNumber: number) {
+    if (!this.pdfDoc) {
+      return;
     }
+
+    const clamped = Math.min(
+      this.pdfDoc.numPages,
+      Math.max(1, Math.round(pageNumber))
+    );
+
+    if (clamped === this.pageIndex()) {
+      return;
+    }
+
+    this.pageIndex.set(clamped);
+    await this.render();
+    this.redrawAllForPage();
+  }
+
+  async prevPage() {
+    await this.setPageIndex(this.pageIndex() - 1);
   }
 
   async nextPage() {
-    if (this.pdfDoc && this.pageIndex() < this.pdfDoc.numPages) {
-      this.pageIndex.update((v) => v + 1);
-      await this.render();
-      this.redrawAllForPage();
-    }
+    await this.setPageIndex(this.pageIndex() + 1);
   }
 
   async zoomIn() {

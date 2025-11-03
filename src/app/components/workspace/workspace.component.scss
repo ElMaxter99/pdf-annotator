@@ -1,3 +1,34 @@
 :host {
   display: contents;
 }
+
+.sidebar-thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.sidebar-thumbnails__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.sidebar-thumbnails__list {
+  max-height: clamp(200px, 35vh, 420px);
+  overflow-y: auto;
+  padding-right: 4px;
+  scroll-behavior: smooth;
+}
+
+.sidebar-thumbnails__list app-page-thumbnails {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-thumbnails__list {
+    max-height: clamp(160px, 30vh, 360px);
+  }
+}
