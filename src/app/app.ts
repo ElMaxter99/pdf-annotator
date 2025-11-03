@@ -1418,10 +1418,13 @@ export class App implements AfterViewChecked, OnDestroy {
 
         ctx.clearRect(0, 0, width, height);
 
-        await page.render({
-          canvasContext: ctx as unknown as CanvasRenderingContext2D,
-          viewport,
-        }).promise;
+        await page
+          .render({
+            canvasContext: ctx as unknown as CanvasRenderingContext2D,
+            canvas: null,
+            viewport,
+          })
+          .promise;
 
         const blob = await canvas.convertToBlob({ type: 'image/png' });
         const url = URL.createObjectURL(blob);
