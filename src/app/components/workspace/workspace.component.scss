@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
+  margin: 18px 0;
 }
 
 .sidebar-thumbnails__title {
@@ -17,9 +17,12 @@
 }
 
 .sidebar-thumbnails__list {
-  max-height: clamp(200px, 35vh, 420px);
+  max-height: clamp(180px, 32vh, 360px);
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 6px 4px 6px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 234, 212, 0.12);
+  background: rgba(11, 15, 24, 0.65);
   scroll-behavior: smooth;
 }
 
@@ -29,6 +32,6 @@
 
 @media (max-width: 1024px) {
   .sidebar-thumbnails__list {
-    max-height: clamp(160px, 30vh, 360px);
+    max-height: clamp(140px, 28vh, 300px);
   }
 }

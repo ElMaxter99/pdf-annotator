@@ -1368,7 +1368,7 @@ export class App implements AfterViewChecked, OnDestroy {
       return 0.25;
     }
 
-    const targetWidth = 160;
+    const targetWidth = 120;
     const rawScale = targetWidth / pageWidth;
     return Math.min(1, Math.max(rawScale, 0.15));
   }

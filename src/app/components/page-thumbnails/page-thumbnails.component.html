@@ -7,8 +7,10 @@
     [class.thumbnails__item--active]="thumbnail.pageNumber === activePage"
     [attr.aria-current]="thumbnail.pageNumber === activePage ? 'page' : null"
     [attr.aria-label]="'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber }"
+    [attr.title]="'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber }"
     role="listitem"
   >
+    <span class="thumbnails__badge" aria-hidden="true">{{ thumbnail.pageNumber }}</span>
     <img
       class="thumbnails__image"
       [src]="thumbnail.imageUrl"
@@ -18,8 +20,5 @@
       loading="lazy"
       decoding="async"
     />
-    <span class="thumbnails__label">
-      {{ 'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber } }}
-    </span>
   </button>
 </div>
