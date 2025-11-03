@@ -131,7 +131,9 @@
           "text": "Text",
           "check": "Casella",
           "radio": "Botó d'opció",
-          "number": "Nombre"
+          "number": "Nombre",
+          "highlight": "Ressaltat",
+          "underline": "Subratllat"
         }
       },
       "value": {
@@ -145,6 +147,21 @@
         "appender": {
           "label": "Sufix",
           "placeholder": "Ex.: %"
+        }
+      },
+      "shape": {
+        "width": {
+          "label": "Amplada (pt)"
+        }
+      },
+      "highlight": {
+        "opacity": {
+          "label": "Opacitat del fons"
+        }
+      },
+      "underline": {
+        "thickness": {
+          "label": "Gruix de línia (pt)"
         }
       }
     },

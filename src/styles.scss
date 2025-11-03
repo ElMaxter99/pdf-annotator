@@ -1116,6 +1116,16 @@ header .logo {
   outline: 1px solid transparent;
 }
 
+.annotation--highlight {
+  border-radius: 2px;
+}
+
+.annotation--underline {
+  border-radius: 0;
+  padding: 0;
+  background: transparent !important;
+}
+
 .annotation:hover {
   outline: 1px dashed var(--accent);
   background: rgba(94, 234, 212, 0.15);

@@ -127,6 +127,9 @@ interface FontDropdownUiState {
 
 const DEFAULT_FONT_ID = 'standard:helvetica';
 const DEFAULT_OPACITY = 1;
+const DEFAULT_BACKGROUND_OPACITY = 0.35;
+const DEFAULT_STROKE_WIDTH = 2;
+const DEFAULT_SHAPE_WIDTH = 120;
 
 @Component({
   selector: 'app-root',
@@ -188,6 +191,9 @@ export class App implements AfterViewChecked, OnDestroy {
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly defaultFontId = DEFAULT_FONT_ID;
+  readonly defaultHighlightOpacity = DEFAULT_BACKGROUND_OPACITY;
+  readonly defaultStrokeWidth = DEFAULT_STROKE_WIDTH;
+  readonly defaultShapeWidth = DEFAULT_SHAPE_WIDTH;
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
   private coordsFileInputFallback: HTMLInputElement | null = null;
@@ -478,6 +484,94 @@ export class App implements AfterViewChecked, OnDestroy {
     this.updateWorkingField(mode, (field) =>
       this.ensureFieldStyle({ ...field, backgroundColor: null })
     );
+    this.redrawAllForPage();
+  }
+
+  setFieldBackgroundOpacity(mode: EditorMode, value: string | number) {
+    this.updateWorkingField(mode, (field) => {
+      if (this.normalizeFieldType(field.type) !== 'highlight') {
+        return field;
+      }
+
+      const normalized = this.normalizeBackgroundOpacityValue(value);
+      return this.ensureFieldStyle({
+        ...field,
+        backgroundOpacity:
+          normalized ??
+          (typeof field.backgroundOpacity === 'number'
+            ? field.backgroundOpacity
+            : DEFAULT_BACKGROUND_OPACITY),
+      });
+    });
+    this.redrawAllForPage();
+  }
+
+  setFieldStrokeWidth(mode: EditorMode, value: string | number) {
+    this.updateWorkingField(mode, (field) => {
+      if (this.normalizeFieldType(field.type) !== 'underline') {
+        return field;
+      }
+
+      const normalized = this.normalizeStrokeWidthValue(value);
+      return this.ensureFieldStyle({
+        ...field,
+        strokeWidth:
+          normalized ??
+          (typeof field.strokeWidth === 'number' ? field.strokeWidth : DEFAULT_STROKE_WIDTH),
+      });
+    });
+    this.redrawAllForPage();
+  }
+
+  setFieldWidth(mode: EditorMode, value: string | number) {
+    this.updateWorkingField(mode, (field) => {
+      const type = this.normalizeFieldType(field.type);
+      if (type !== 'highlight' && type !== 'underline') {
+        return field;
+      }
+
+      const normalized = this.normalizeShapeWidthValue(value);
+      return this.ensureFieldStyle({
+        ...field,
+        width:
+          normalized ??
+          (typeof field.width === 'number' ? field.width : DEFAULT_SHAPE_WIDTH),
+      });
+    });
+    this.redrawAllForPage();
+  }
+
+  onFieldTypeChange(mode: EditorMode, rawType: FieldType) {
+    this.updateWorkingField(mode, (field) => {
+      const nextType = this.normalizeFieldType(rawType);
+      const base = this.ensureFieldStyle({ ...field, type: nextType });
+
+      if (nextType === 'highlight') {
+        const backgroundColor =
+          base.backgroundColor ?? this.normalizeBackgroundColor('#fff59d') ?? '#fff59d';
+        return this.ensureFieldStyle({
+          ...base,
+          backgroundColor,
+          backgroundOpacity: base.backgroundOpacity ?? DEFAULT_BACKGROUND_OPACITY,
+          width: base.width ?? DEFAULT_SHAPE_WIDTH,
+        });
+      }
+
+      if (nextType === 'underline') {
+        return this.ensureFieldStyle({
+          ...base,
+          strokeWidth: base.strokeWidth ?? DEFAULT_STROKE_WIDTH,
+          width: base.width ?? DEFAULT_SHAPE_WIDTH,
+        });
+      }
+
+      return this.ensureFieldStyle({
+        ...base,
+        backgroundOpacity: undefined,
+        strokeWidth: undefined,
+        width: undefined,
+      });
+    });
     this.redrawAllForPage();
   }
 
@@ -1760,6 +1854,10 @@ export class App implements AfterViewChecked, OnDestroy {
       return true;
     }
 
+    if (type === 'highlight' || type === 'underline') {
+      return true;
+    }
+
     return field.mapField.trim().length > 0;
   }
 
@@ -1781,6 +1879,14 @@ export class App implements AfterViewChecked, OnDestroy {
       opacity: styled.opacity ?? DEFAULT_OPACITY,
       backgroundColor: styled.backgroundColor ?? null,
     };
+
+    if (type === 'highlight') {
+      base.backgroundOpacity = styled.backgroundOpacity ?? DEFAULT_BACKGROUND_OPACITY;
+      base.width = styled.width ?? DEFAULT_SHAPE_WIDTH;
+    } else if (type === 'underline') {
+      base.strokeWidth = styled.strokeWidth ?? DEFAULT_STROKE_WIDTH;
+      base.width = styled.width ?? DEFAULT_SHAPE_WIDTH;
+    }
 
     const value = this.sanitizeTextPreservingSpacing(styled.value);
     if (value !== undefined) {
@@ -1823,7 +1929,9 @@ export class App implements AfterViewChecked, OnDestroy {
         normalized === 'check' ||
         normalized === 'radio' ||
         normalized === 'number' ||
-        normalized === 'text'
+        normalized === 'text' ||
+        normalized === 'highlight' ||
+        normalized === 'underline'
       ) {
         return normalized as FieldType;
       }
@@ -2214,10 +2322,82 @@ export class App implements AfterViewChecked, OnDestroy {
     return this.normalizeColor(trimmed);
   }
 
+  private normalizeBackgroundOpacityValue(value: unknown): number | undefined {
+    const numeric = this.toFiniteNumber(value);
+    if (numeric === null) {
+      return undefined;
+    }
+    const clamped = Math.min(Math.max(numeric, 0), 1);
+    return Math.round(clamped * 100) / 100;
+  }
+
+  private normalizeStrokeWidthValue(value: unknown): number | undefined {
+    const numeric = this.toFiniteNumber(value);
+    if (numeric === null) {
+      return undefined;
+    }
+    const clamped = Math.min(Math.max(numeric, 0.25), 36);
+    return Math.round(clamped * 100) / 100;
+  }
+
+  private normalizeShapeWidthValue(value: unknown): number | undefined {
+    const numeric = this.toFiniteNumber(value);
+    if (numeric === null) {
+      return undefined;
+    }
+    const clamped = Math.min(Math.max(numeric, 4), 2000);
+    return Math.round(clamped * 100) / 100;
+  }
+
+  private resolveAnnotationWidth(field: PageField, measuredWidth: number): number {
+    const type = this.normalizeFieldType(field.type);
+    if (type === 'highlight' || type === 'underline') {
+      const sanitized = this.normalizeShapeWidthValue(field.width);
+      if (sanitized !== undefined) {
+        return sanitized;
+      }
+      if (typeof field.width === 'number' && Number.isFinite(field.width)) {
+        return Math.max(field.width, 0);
+      }
+      if (measuredWidth > 0) {
+        return measuredWidth;
+      }
+      return DEFAULT_SHAPE_WIDTH;
+    }
+
+    return measuredWidth;
+  }
+
   private ensureFieldStyle(field: PageField): PageField {
     const fontFamily = this.normalizeFontFamily(field.fontFamily);
     const opacity = this.normalizeOpacityValue(field.opacity) ?? DEFAULT_OPACITY;
-    const background = this.normalizeBackgroundColor(field.backgroundColor) ?? null;
+    const normalizedType = this.normalizeFieldType(field.type);
+    const baseBackground = this.normalizeBackgroundColor(field.backgroundColor) ?? null;
+    const backgroundColor =
+      normalizedType === 'highlight'
+        ? baseBackground ?? this.normalizeBackgroundColor('#fff59d') ?? '#fff59d'
+        : baseBackground;
+
+    const highlightOpacity =
+      normalizedType === 'highlight'
+        ? this.normalizeBackgroundOpacityValue(field.backgroundOpacity) ??
+          (typeof field.backgroundOpacity === 'number'
+            ? field.backgroundOpacity
+            : DEFAULT_BACKGROUND_OPACITY)
+        : undefined;
+
+    const underlineThickness =
+      normalizedType === 'underline'
+        ? this.normalizeStrokeWidthValue(field.strokeWidth) ??
+          (typeof field.strokeWidth === 'number' ? field.strokeWidth : DEFAULT_STROKE_WIDTH)
+        : undefined;
+
+    const shapeWidth =
+      normalizedType === 'highlight' || normalizedType === 'underline'
+        ? this.normalizeShapeWidthValue(field.width) ??
+          (typeof field.width === 'number' ? field.width : DEFAULT_SHAPE_WIDTH)
+        : undefined;
+
     const legacyField = field as PageField & {
       fontWeight?: unknown;
       textAlign?: unknown;
@@ -2228,7 +2408,15 @@ export class App implements AfterViewChecked, OnDestroy {
     if (
       field.fontFamily === fontFamily &&
       (field.opacity ?? DEFAULT_OPACITY) === opacity &&
-      (field.backgroundColor ?? null) === background &&
+      (field.backgroundColor ?? null) === backgroundColor &&
+      (normalizedType !== 'highlight' ||
+        (field.backgroundOpacity ?? DEFAULT_BACKGROUND_OPACITY) ===
+          (highlightOpacity ?? DEFAULT_BACKGROUND_OPACITY)) &&
+      (normalizedType !== 'underline' ||
+        (field.strokeWidth ?? DEFAULT_STROKE_WIDTH) ===
+          (underlineThickness ?? DEFAULT_STROKE_WIDTH)) &&
+      ((normalizedType !== 'highlight' && normalizedType !== 'underline') ||
+        (field.width ?? DEFAULT_SHAPE_WIDTH) === (shapeWidth ?? DEFAULT_SHAPE_WIDTH)) &&
       !hasLegacyWeight &&
       !hasLegacyAlign
     ) {
@@ -2237,12 +2425,28 @@ export class App implements AfterViewChecked, OnDestroy {
 
     const { fontWeight: _legacyWeight, textAlign: _legacyAlign, ...rest } = legacyField;
 
-    return {
+    const sanitized: PageField = {
       ...rest,
       fontFamily,
       opacity,
-      backgroundColor: background,
+      backgroundColor,
     };
+
+    if (normalizedType === 'highlight') {
+      sanitized.backgroundOpacity = highlightOpacity ?? DEFAULT_BACKGROUND_OPACITY;
+      sanitized.strokeWidth = undefined;
+      sanitized.width = shapeWidth ?? DEFAULT_SHAPE_WIDTH;
+    } else if (normalizedType === 'underline') {
+      sanitized.strokeWidth = underlineThickness ?? DEFAULT_STROKE_WIDTH;
+      sanitized.backgroundOpacity = undefined;
+      sanitized.width = shapeWidth ?? DEFAULT_SHAPE_WIDTH;
+    } else {
+      sanitized.backgroundOpacity = undefined;
+      sanitized.strokeWidth = undefined;
+      sanitized.width = undefined;
+    }
+
+    return sanitized;
   }
 
   private resolveCssFontFamily(fontId: string): string {
@@ -2657,7 +2861,11 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   private updateAnnotationLeft(el: HTMLDivElement, field: PageField, scale: number) {
-    const width = el.offsetWidth;
+    const type = this.normalizeFieldType(field.type);
+    const width =
+      type === 'highlight' || type === 'underline'
+        ? Math.max((field.width ?? DEFAULT_SHAPE_WIDTH) * scale, 1)
+        : el.offsetWidth;
     const left = field.x * scale;
     el.style.left = `${left}px`;
     el.style.width = `${width}px`;
@@ -2690,13 +2898,17 @@ export class App implements AfterViewChecked, OnDestroy {
   }
 
   private getFieldRenderValue(field: PageField): string {
+    const type = this.normalizeFieldType(field.type);
+    if (type === 'highlight' || type === 'underline') {
+      return '';
+    }
+
     const override =
       typeof field.value === 'string' && field.value.trim() ? field.value : undefined;
     if (override !== undefined) {
       return override;
     }
 
-    const type = this.normalizeFieldType(field.type);
     if (type === 'check' || type === 'radio') {
       return 'X';
     }
@@ -2789,18 +3001,47 @@ export class App implements AfterViewChecked, OnDestroy {
           const top = pdfCanvas.height - styledField.y * scale;
 
           const el = document.createElement('div');
-          el.className = 'annotation';
-          el.textContent = this.getFieldRenderValue(styledField);
+          const type = this.normalizeFieldType(styledField.type);
+          el.className = `annotation${
+            type === 'highlight' || type === 'underline' ? ` annotation--${type}` : ''
+          }`;
           el.style.left = `${left}px`;
-          el.style.top = `${top - styledField.fontSize * scale}px`;
-          el.style.fontSize = `${styledField.fontSize * scale}px`;
-          el.style.color = styledField.color;
-          el.style.fontFamily = this.resolveCssFontFamily(
-            styledField.fontFamily ?? DEFAULT_FONT_ID
-          );
           el.style.opacity = `${styledField.opacity ?? DEFAULT_OPACITY}`;
-          el.style.backgroundColor = styledField.backgroundColor ?? 'transparent';
-          el.style.width = 'auto';
+
+          if (type === 'highlight') {
+            const heightPx = Math.max(styledField.fontSize * scale, 1);
+            const widthPx = Math.max((styledField.width ?? DEFAULT_SHAPE_WIDTH) * scale, 1);
+            const bgHex = styledField.backgroundColor ?? '#fff59d';
+            const bgRgb = this.hexToRgbComponents(bgHex) ?? { r: 255, g: 245, b: 157 };
+            const bgOpacity = styledField.backgroundOpacity ?? DEFAULT_BACKGROUND_OPACITY;
+            el.style.top = `${top - heightPx}px`;
+            el.style.width = `${widthPx}px`;
+            el.style.height = `${heightPx}px`;
+            el.style.backgroundColor = `rgba(${bgRgb.r}, ${bgRgb.g}, ${bgRgb.b}, ${bgOpacity})`;
+            el.textContent = '';
+          } else if (type === 'underline') {
+            const thicknessPx = Math.max(
+              (styledField.strokeWidth ?? DEFAULT_STROKE_WIDTH) * scale,
+              1
+            );
+            const widthPx = Math.max((styledField.width ?? DEFAULT_SHAPE_WIDTH) * scale, 1);
+            el.style.top = `${top - thicknessPx}px`;
+            el.style.width = `${widthPx}px`;
+            el.style.height = `${thicknessPx}px`;
+            el.style.backgroundColor = 'transparent';
+            el.style.borderBottom = `${thicknessPx}px solid ${styledField.color}`;
+            el.textContent = '';
+          } else {
+            el.textContent = this.getFieldRenderValue(styledField);
+            el.style.top = `${top - styledField.fontSize * scale}px`;
+            el.style.fontSize = `${styledField.fontSize * scale}px`;
+            el.style.color = styledField.color;
+            el.style.fontFamily = this.resolveCssFontFamily(
+              styledField.fontFamily ?? DEFAULT_FONT_ID
+            );
+            el.style.backgroundColor = styledField.backgroundColor ?? 'transparent';
+            el.style.width = 'auto';
+          }
 
           el.onpointerdown = (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
           layer.appendChild(el);
@@ -2818,10 +3059,16 @@ export class App implements AfterViewChecked, OnDestroy {
     const el = evt.currentTarget as HTMLDivElement | null;
     if (!el) return;
 
-    const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');
     const page = this.coords()[pageIndex];
     const field = page?.fields[fieldIndex];
     const styledField = field ? this.ensureFieldStyle(field) : null;
+    const type = styledField ? this.normalizeFieldType(styledField.type) : 'text';
+    const computedFontSize =
+      type === 'highlight'
+        ? (styledField?.fontSize ?? 0) * this.scale()
+        : type === 'underline'
+        ? (styledField?.strokeWidth ?? DEFAULT_STROKE_WIDTH) * this.scale()
+        : parseFloat(getComputedStyle(el).fontSize || '0');
     this.dragInfo = {
       pageIndex,
       fieldIndex,
@@ -3323,6 +3570,7 @@ export class App implements AfterViewChecked, OnDestroy {
 
         for (const field of fields) {
           const styledField = this.ensureFieldStyle(field);
+          const type = this.normalizeFieldType(styledField.type);
           const text = this.getFieldRenderValue(styledField);
           const fontOption = this.getFontOptionById(styledField.fontFamily ?? DEFAULT_FONT_ID);
           const embeddedFont = await getFontFromDescriptor(fontOption.descriptor);
@@ -3330,7 +3578,51 @@ export class App implements AfterViewChecked, OnDestroy {
           const opacity = styledField.opacity ?? DEFAULT_OPACITY;
 
           const drawX = styledField.x;
-          const textWidth = embeddedFont.widthOfTextAtSize(text, styledField.fontSize);
+          const measurementText =
+            type === 'highlight' || type === 'underline'
+              ? text ||
+                (typeof styledField.value === 'string' ? styledField.value.trim() : '') ||
+                (typeof styledField.mapField === 'string' ? styledField.mapField : '')
+              : text;
+          const measuredWidth = embeddedFont.widthOfTextAtSize(
+            measurementText,
+            styledField.fontSize
+          );
+          const drawWidth = this.resolveAnnotationWidth(styledField, measuredWidth);
+
+          if (type === 'highlight') {
+            const bg = this.hexToRgbComponents(styledField.backgroundColor ?? '#fff59d');
+            if (bg && drawWidth > 0) {
+              const totalHeight = embeddedFont.heightAtSize(styledField.fontSize);
+              const ascent = embeddedFont.heightAtSize(styledField.fontSize, { descender: false });
+              const descent = totalHeight - ascent;
+              if (totalHeight > 0) {
+                page.drawRectangle({
+                  x: drawX,
+                  y: styledField.y - descent,
+                  width: drawWidth,
+                  height: totalHeight,
+                  color: rgb(bg.r / 255, bg.g / 255, bg.b / 255),
+                  opacity: styledField.backgroundOpacity ?? DEFAULT_BACKGROUND_OPACITY,
+                });
+              }
+            }
+            continue;
+          }
+
+          if (type === 'underline') {
+            if (drawWidth > 0) {
+              const thickness = styledField.strokeWidth ?? DEFAULT_STROKE_WIDTH;
+              page.drawLine({
+                start: { x: drawX, y: styledField.y - thickness / 2 },
+                end: { x: drawX + drawWidth, y: styledField.y - thickness / 2 },
+                thickness,
+                opacity,
+                color: rgb(textColor.r / 255, textColor.g / 255, textColor.b / 255),
+              });
+            }
+            continue;
+          }
 
           if (styledField.backgroundColor) {
             const bg = this.hexToRgbComponents(styledField.backgroundColor);
@@ -3338,11 +3630,11 @@ export class App implements AfterViewChecked, OnDestroy {
               const totalHeight = embeddedFont.heightAtSize(styledField.fontSize);
               const ascent = embeddedFont.heightAtSize(styledField.fontSize, { descender: false });
               const descent = totalHeight - ascent;
-              if (textWidth > 0 && totalHeight > 0) {
+              if (drawWidth > 0 && totalHeight > 0) {
                 page.drawRectangle({
                   x: drawX,
                   y: styledField.y - descent,
-                  width: textWidth,
+                  width: drawWidth,
                   height: totalHeight,
                   color: rgb(bg.r / 255, bg.g / 255, bg.b / 255),
                   opacity,
@@ -3518,7 +3810,11 @@ export class App implements AfterViewChecked, OnDestroy {
       (sanitizedA.decimals ?? undefined) === (sanitizedB.decimals ?? undefined) &&
       (sanitizedA.fontFamily ?? DEFAULT_FONT_ID) === (sanitizedB.fontFamily ?? DEFAULT_FONT_ID) &&
       (sanitizedA.opacity ?? DEFAULT_OPACITY) === (sanitizedB.opacity ?? DEFAULT_OPACITY) &&
-      (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null)
+      (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null) &&
+      (sanitizedA.backgroundOpacity ?? undefined) ===
+        (sanitizedB.backgroundOpacity ?? undefined) &&
+      (sanitizedA.strokeWidth ?? undefined) === (sanitizedB.strokeWidth ?? undefined) &&
+      (sanitizedA.width ?? undefined) === (sanitizedB.width ?? undefined)
     );
   }
 
@@ -3736,6 +4032,9 @@ export class App implements AfterViewChecked, OnDestroy {
 
         const rawOpacity = (rawField as { opacity?: unknown }).opacity;
         const rawBackground = (rawField as { backgroundColor?: unknown }).backgroundColor;
+        const rawBackgroundOpacity = (rawField as { backgroundOpacity?: unknown }).backgroundOpacity;
+        const rawStrokeWidth = (rawField as { strokeWidth?: unknown }).strokeWidth;
+        const rawWidth = (rawField as { width?: unknown }).width;
         const fontCandidates = this.collectFontFamilyCandidates(rawField as Record<string, unknown>);
 
         const styledField = this.prepareFieldForStorage({
@@ -3743,6 +4042,9 @@ export class App implements AfterViewChecked, OnDestroy {
           fontFamily: this.resolveImportedFontFamily(...fontCandidates),
           opacity: rawOpacity as number | string | undefined,
           backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,
+          backgroundOpacity: rawBackgroundOpacity as number | string | undefined,
+          strokeWidth: rawStrokeWidth as number | string | undefined,
+          width: rawWidth as number | string | undefined,
         } as PageField);
 
         fields.push(styledField);

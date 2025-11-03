@@ -131,7 +131,9 @@
           "text": "Texto",
           "check": "Casilla",
           "radio": "Botón de opción",
-          "number": "Número"
+          "number": "Número",
+          "highlight": "Resaltado",
+          "underline": "Subrayado"
         }
       },
       "value": {
@@ -145,6 +147,21 @@
         "appender": {
           "label": "Sufijo",
           "placeholder": "Ej.: %"
+        }
+      },
+      "shape": {
+        "width": {
+          "label": "Ancho (pt)"
+        }
+      },
+      "highlight": {
+        "opacity": {
+          "label": "Opacidad del fondo"
+        }
+      },
+      "underline": {
+        "thickness": {
+          "label": "Grosor de línea (pt)"
         }
       }
     },

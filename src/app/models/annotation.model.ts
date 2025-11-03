@@ -1,4 +1,4 @@
-export type FieldType = 'text' | 'check' | 'radio' | 'number';
+export type FieldType = 'text' | 'check' | 'radio' | 'number' | 'highlight' | 'underline';
 
 export interface PageField {
   x: number;
@@ -13,6 +13,9 @@ export interface PageField {
   fontFamily?: string;
   opacity?: number;
   backgroundColor?: string | null;
+  backgroundOpacity?: number;
+  strokeWidth?: number;
+  width?: number;
 }
 
 export interface PageAnnotations {

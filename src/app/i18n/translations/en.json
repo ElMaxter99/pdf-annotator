@@ -131,7 +131,9 @@
           "text": "Text",
           "check": "Checkbox",
           "radio": "Radio button",
-          "number": "Number"
+          "number": "Number",
+          "highlight": "Highlight",
+          "underline": "Underline"
         }
       },
       "value": {
@@ -145,6 +147,21 @@
         "appender": {
           "label": "Suffix",
           "placeholder": "E.g. %"
+        }
+      },
+      "shape": {
+        "width": {
+          "label": "Width (pt)"
+        }
+      },
+      "highlight": {
+        "opacity": {
+          "label": "Background opacity"
+        }
+      },
+      "underline": {
+        "thickness": {
+          "label": "Line thickness (pt)"
         }
       }
     },
