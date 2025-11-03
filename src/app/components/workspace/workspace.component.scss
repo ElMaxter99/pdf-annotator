@@ -1,3 +1,37 @@
 :host {
   display: contents;
 }
+
+.sidebar-thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.sidebar-thumbnails__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.sidebar-thumbnails__list {
+  max-height: clamp(180px, 32vh, 360px);
+  overflow-y: auto;
+  padding: 6px 4px 6px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 234, 212, 0.12);
+  background: rgba(11, 15, 24, 0.65);
+  scroll-behavior: smooth;
+}
+
+.sidebar-thumbnails__list app-page-thumbnails {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-thumbnails__list {
+    max-height: clamp(140px, 28vh, 300px);
+  }
+}

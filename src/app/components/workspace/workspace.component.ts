@@ -5,13 +5,21 @@ import type { App } from '../../app';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
 import { JsonTreeComponent } from '../json-tree/json-tree.component';
+import { PageThumbnailsComponent } from '../page-thumbnails/page-thumbnails.component';
 
 @Component({
   selector: 'app-workspace',
   standalone: true,
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],
-  imports: [CommonModule, FormsModule, TranslationPipe, LanguageSelectorComponent, JsonTreeComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslationPipe,
+    LanguageSelectorComponent,
+    JsonTreeComponent,
+    PageThumbnailsComponent,
+  ],
 })
 export class WorkspaceComponent {
   @Input({ required: true }) vm!: App;

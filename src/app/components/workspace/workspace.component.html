@@ -91,6 +91,16 @@
           {{ 'sidebar.applyJson' | t }}
         </button>
       </div>
+      <section class="sidebar-thumbnails" *ngIf="vm.pageThumbnails().length">
+        <h5 class="sidebar-thumbnails__title">{{ 'sidebar.thumbnails.title' | t }}</h5>
+        <div class="sidebar-thumbnails__list">
+          <app-page-thumbnails
+            [thumbnails]="vm.pageThumbnails()"
+            [activePage]="vm.pageIndex()"
+            (pageSelected)="vm.setPageIndex($event)"
+          ></app-page-thumbnails>
+        </div>
+      </section>
       <section class="templates">
         <h5>{{ 'sidebar.templates.title' | t }}</h5>
         <div class="templates__save">
