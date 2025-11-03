@@ -12,13 +12,14 @@ import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language } from '../../i18n/translation.service';
 import { ThemeVariant } from '../../models/theme.model';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
-  imports: [CommonModule, FormsModule, TranslationPipe, LanguageSelectorComponent],
+  imports: [CommonModule, FormsModule, TranslationPipe, LanguageSelectorComponent, LogoComponent],
 })
 export class LandingComponent {
   @Input({ required: true }) languages: readonly Language[] = [];

@@ -81,6 +81,10 @@
   --language-selector-select-focus: rgba(var(--accent-rgb), 0.25);
   --custom-fonts-panel-bg: rgba(30, 30, 47, 0.6);
   --custom-fonts-panel-border: rgba(var(--accent-rgb), 0.18);
+  --logo-background: #2a2a3d;
+  --logo-document: #5eead4;
+  --logo-fold: #2a2a3d;
+  --logo-rule: #f5f5f5;
   --danger-rgb: 255, 77, 77;
   --footer-border: rgba(var(--accent-rgb), 0.12);
 }
@@ -172,6 +176,10 @@ body.theme--day {
   --language-selector-select-focus: rgba(var(--accent-rgb), 0.28);
   --custom-fonts-panel-bg: rgba(241, 245, 249, 0.86);
   --custom-fonts-panel-border: rgba(148, 163, 184, 0.35);
+  --logo-background: rgba(var(--accent-rgb), 0.22);
+  --logo-document: #ffffff;
+  --logo-fold: rgba(148, 163, 184, 0.45);
+  --logo-rule: #1e3a8a;
   --danger-rgb: 220, 38, 38;
   --footer-border: rgba(148, 163, 184, 0.32);
   color-scheme: light;

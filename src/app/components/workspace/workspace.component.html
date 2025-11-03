@@ -2,7 +2,7 @@
     <header class="header">
       <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
         <div class="footer__brand">
-          <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
+          <app-logo class="footer__logo" [alt]="'Logotipo de ' + vm.appName"></app-logo>
           <div class="footer__brand-text">
             <span class="footer__app-name">{{ vm.appName }}</span>
             <span class="footer__version">v{{ vm.version }}</span>
@@ -566,7 +566,7 @@
 
     <footer class="footer">
       <div class="footer__brand">
-        <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
+        <app-logo class="footer__logo" [alt]="'Logotipo de ' + vm.appName"></app-logo>
         <div class="footer__brand-text">
           <span class="footer__app-name">{{ vm.appName }}</span>
           <span class="footer__version">v{{ vm.version }}</span>

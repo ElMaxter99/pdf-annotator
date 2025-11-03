@@ -34,7 +34,7 @@
 </section>
 <footer class="footer landing__footer">
   <div class="footer__brand">
-    <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + appName" />
+    <app-logo class="footer__logo" [alt]="'Logotipo de ' + appName"></app-logo>
     <div class="footer__brand-text">
       <span class="footer__app-name">{{ appName }}</span>
       <span class="footer__version">v{{ version }}</span>
