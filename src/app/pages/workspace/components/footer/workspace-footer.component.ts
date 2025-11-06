@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import type { WorkspacePageComponent } from '../../../pages/workspace/workspace.page';
+import type { WorkspacePageComponent } from '../../workspace.page';
 
 @Component({
   selector: 'app-workspace-footer',

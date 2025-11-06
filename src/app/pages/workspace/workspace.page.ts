@@ -27,10 +27,10 @@ import {
   cloneGuideSettings,
   differsFromDefaultGuideSettings,
 } from '../../models/guide-settings.model';
-import { WorkspaceHeaderComponent } from '../../components/workspace/header/workspace-header.component';
-import { WorkspaceSidebarComponent } from '../../components/workspace/sidebar/workspace-sidebar.component';
-import { WorkspaceViewerComponent } from '../../components/workspace/viewer/workspace-viewer.component';
-import { WorkspaceFooterComponent } from '../../components/workspace/footer/workspace-footer.component';
+import { WorkspaceHeaderComponent } from './components/header/workspace-header.component';
+import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sidebar.component';
+import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
+import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnail } from '../../models/page-thumbnail.model';
 import {
   STANDARD_FONT_FAMILIES,

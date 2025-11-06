@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import type { WorkspacePageComponent } from '../../../pages/workspace/workspace.page';
-import { TranslationPipe } from '../../../i18n/translation.pipe';
+import type { WorkspacePageComponent } from '../../workspace.page';
+import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
 @Component({
   selector: 'app-workspace-viewer',

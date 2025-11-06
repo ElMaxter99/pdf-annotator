@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import type { WorkspacePageComponent } from '../../../pages/workspace/workspace.page';
-import { TranslationPipe } from '../../../i18n/translation.pipe';
-import { LanguageSelectorComponent } from '../../language-selector/language-selector.component';
+import type { WorkspacePageComponent } from '../../workspace.page';
+import { TranslationPipe } from '../../../../i18n/translation.pipe';
+import { LanguageSelectorComponent } from '../../../../components/language-selector/language-selector.component';
 
 @Component({
   selector: 'app-workspace-header',
