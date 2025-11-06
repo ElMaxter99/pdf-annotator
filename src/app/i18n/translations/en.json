@@ -150,6 +150,14 @@
           "label": "Suffix",
           "placeholder": "E.g. %"
         }
+      },
+      "locked": {
+        "label": "Lock annotation",
+        "toggle": "Prevent edits and dragging"
+      },
+      "hidden": {
+        "label": "Hidden",
+        "toggle": "Hide when exporting"
       }
     },
     "color": {
