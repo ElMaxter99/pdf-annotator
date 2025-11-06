@@ -12,7 +12,13 @@
       "badge": "Annotate smarter",
       "title": "Lay out coordinates on any PDF in seconds",
       "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
-      "cta": "Select PDF"
+      "cta": "Select PDF",
+      "storeMap": {
+        "title": "Featured local businesses",
+        "description": "Click a list item or its map marker to open the location in Google Maps.",
+        "bubbleHint": "Open in Google Maps",
+        "listAriaLabel": "Store list"
+      }
     },
     "upload": {
       "title": "Upload your PDF",

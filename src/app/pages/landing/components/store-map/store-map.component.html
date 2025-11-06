@@ -1,0 +1,64 @@
+<section class="store-map">
+  <header class="store-map__header">
+    <h2>{{ 'app.landing.storeMap.title' | t }}</h2>
+    <p>
+      {{ 'app.landing.storeMap.description' | t }}
+    </p>
+  </header>
+
+  <div class="store-map__content">
+    <ul class="store-map__list" [attr.aria-label]="'app.landing.storeMap.listAriaLabel' | t">
+      <li *ngFor="let view of storeViews(); trackBy: trackStoreView" class="store-map__list-item">
+        <button
+          type="button"
+          class="store-map__list-button"
+          [class.store-map__list-button--active]="selectedStoreId() === view.id"
+          (click)="onStoreOptionClick(view.id)"
+          (keydown)="onListOptionKeydown($event, view.id)"
+        >
+          <span class="store-map__list-name">{{ view.store.name }}</span>
+          <span class="store-map__list-address">{{ view.store.address }}</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="store-map__map" role="presentation">
+      <div class="store-map__background" aria-hidden="true"></div>
+
+      <ng-container *ngFor="let view of storeViews(); trackBy: trackStoreView">
+        <button
+          type="button"
+          class="store-map__marker"
+          [class.store-map__marker--restaurant]="view.category === 'restaurant'"
+          [class.store-map__marker--shop]="view.category === 'shop'"
+          [class.store-map__marker--service]="view.category === 'service'"
+          (click)="onMarkerClick(view.id)"
+          (focus)="onMarkerFocus(view.id)"
+          (blur)="onMarkerBlur(view.id, $event)"
+          [style.left.%]="view.left"
+          [style.top.%]="view.top"
+          [attr.aria-label]="view.store.name"
+          [attr.data-store-id]="view.id"
+          [class.store-map__marker--active]="selectedStoreId() === view.id"
+        ></button>
+      </ng-container>
+
+      <article
+        *ngIf="selectedStore() as store"
+        class="store-map__bubble"
+        role="button"
+        tabindex="0"
+        (click)="onInfoBubbleClick()"
+        (keydown)="onInfoBubbleKeydown($event)"
+        [style.left.%]="bubblePosition()?.left ?? 0"
+        [style.top.%]="bubblePosition()?.top ?? 0"
+        [attr.data-store-id]="store.id"
+        [attr.aria-label]="store.name + '. ' + ('app.landing.storeMap.bubbleHint' | t)"
+      >
+        <h3>{{ store.name }}</h3>
+        <p>{{ store.address }}</p>
+        <span class="store-map__bubble-hint">{{ 'app.landing.storeMap.bubbleHint' | t }}</span>
+      </article>
+    </div>
+  </div>
+</section>

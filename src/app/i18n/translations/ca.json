@@ -12,7 +12,13 @@
       "badge": "Comença a anotar",
       "title": "Maqueta coordenades de qualsevol PDF en segons",
       "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
-      "cta": "Selecciona PDF"
+      "cta": "Selecciona PDF",
+      "storeMap": {
+        "title": "Comerços destacats",
+        "description": "Fes clic a la llista o en un marcador del mapa per obrir la ubicació a Google Maps.",
+        "bubbleHint": "Obre-ho a Google Maps",
+        "listAriaLabel": "Llista de comerços"
+      }
     },
     "upload": {
       "title": "Carrega el teu PDF",

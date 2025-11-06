@@ -10,6 +10,7 @@ import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone
 import { LandingFooterComponent } from './components/footer/landing-footer.component';
 import { LandingHeroComponent } from './components/hero/landing-hero.component';
 import { LandingLanguageBarComponent } from './components/language-bar/landing-language-bar.component';
+import { StoreMapComponent } from './components/store-map/store-map.component';
 
 @Component({
   selector: 'app-landing-page',
@@ -21,6 +22,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingLanguageBarComponent,
     LandingHeroComponent,
     LandingDropzoneComponent,
+    StoreMapComponent,
     LandingFooterComponent,
   ],
 })
