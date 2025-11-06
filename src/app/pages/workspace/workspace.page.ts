@@ -3533,6 +3533,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
         for (const field of fields) {
           const styledField = this.ensureFieldStyle(field);
+          if (styledField.hidden) {
+            continue;
+          }
           const text = this.getFieldRenderValue(styledField);
           const fontOption = this.getFontOptionById(styledField.fontFamily ?? DEFAULT_FONT_ID);
           const embeddedFont = await getFontFromDescriptor(fontOption.descriptor);
