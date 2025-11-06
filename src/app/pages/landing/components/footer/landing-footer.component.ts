@@ -12,4 +12,5 @@ export class LandingFooterComponent {
   @Input({ required: true }) version = '';
   @Input({ required: true }) currentYear!: number;
   @Input({ required: true }) appAuthor = '';
+  @Input({ required: true }) environmentLabel = '';
 }

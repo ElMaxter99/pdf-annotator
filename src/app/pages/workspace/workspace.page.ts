@@ -45,6 +45,7 @@ import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { SessionService, SessionState, WorkspaceSummary, CloudUser } from '../../services/session.service';
 import { take } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -204,6 +205,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
   readonly currentYear = new Date().getFullYear();
+  readonly environmentLabel = environment.name.toUpperCase();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly sessionState = signal<SessionState>(this.sessionService.getSnapshot());
@@ -363,6 +365,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   ngOnDestroy() {
+    this.pendingFileService.clearActiveDocument();
     this.revokeThumbnailUrls();
     if (!this.document) {
       return;
@@ -1411,6 +1414,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
+    this.pendingFileService.clearActiveDocument();
     this.pdfByteSources.clear();
     const buf = await file.arrayBuffer();
     const typed = new Uint8Array(buf);
@@ -1446,6 +1450,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       console.error('No se pudieron generar las miniaturas del documento.', error)
     );
     this.fileDropActive.set(false);
+    this.pendingFileService.markActiveDocumentLoaded();
   }
 
   async render() {

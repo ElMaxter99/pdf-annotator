@@ -1,4 +1,4 @@
 export const environment = {
-  name: 'pre',
+  name: 'test',
   apiBaseUrl: 'https://test-pdf-annotator-api.alvaromaxter.es/api/v1',
 } as const;
