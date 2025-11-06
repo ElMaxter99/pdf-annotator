@@ -150,6 +150,14 @@
           "label": "Sufix",
           "placeholder": "Ex.: %"
         }
+      },
+      "locked": {
+        "label": "Bloqueja l'anotació",
+        "toggle": "Evita canvis i arrossegaments"
+      },
+      "hidden": {
+        "label": "Oculta l'anotació",
+        "toggle": "No mostrar en exportacions"
       }
     },
     "color": {

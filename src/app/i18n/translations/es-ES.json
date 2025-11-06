@@ -150,6 +150,14 @@
           "label": "Sufijo",
           "placeholder": "Ej.: %"
         }
+      },
+      "locked": {
+        "label": "Bloquear anotación",
+        "toggle": "Evitar ediciones y arrastre"
+      },
+      "hidden": {
+        "label": "Ocultar anotación",
+        "toggle": "No mostrar al exportar"
       }
     },
     "color": {

@@ -348,6 +348,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   setFieldFont(mode: EditorMode, fontId: string) {
+    if (mode === 'edit') {
+      const editState = this.editing();
+      if (editState?.field.locked) {
+        return;
+      }
+    }
     const normalized = this.normalizeFontFamily(fontId);
     this.updateWorkingField(mode, (field) =>
       this.ensureFieldStyle({ ...field, fontFamily: normalized })
@@ -360,6 +366,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   toggleFontDropdown(mode: EditorMode) {
+    if (mode === 'edit') {
+      const editState = this.editing();
+      if (editState?.field.locked) {
+        return;
+      }
+    }
     let opened = false;
     this.fontDropdownState.update((state) => {
       const nextOpen = !state[mode].open;
@@ -473,6 +485,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   setFieldOpacity(mode: EditorMode, value: string | number) {
+    if (mode === 'edit') {
+      const editState = this.editing();
+      if (editState?.field.locked) {
+        return;
+      }
+    }
     const normalized = this.normalizeOpacityValue(value);
     this.updateWorkingField(mode, (field) =>
       this.ensureFieldStyle({
@@ -485,6 +503,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   setFieldBackground(mode: EditorMode, value: string) {
+    if (mode === 'edit') {
+      const editState = this.editing();
+      if (editState?.field.locked) {
+        return;
+      }
+    }
     const normalized = this.normalizeBackgroundColor(value);
     if (!normalized) {
       this.clearFieldBackground(mode);
@@ -497,6 +521,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   clearFieldBackground(mode: EditorMode) {
+    if (mode === 'edit') {
+      const editState = this.editing();
+      if (editState?.field.locked) {
+        return;
+      }
+    }
     this.updateWorkingField(mode, (field) =>
       this.ensureFieldStyle({ ...field, backgroundColor: null })
     );
@@ -1465,6 +1495,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       fontFamily: DEFAULT_FONT_ID,
       opacity: DEFAULT_OPACITY,
       backgroundColor: null,
+      locked: false,
+      hidden: false,
     };
     const styledField = this.ensureFieldStyle(baseField);
     this.preview.set({
@@ -1607,24 +1639,51 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   setEditColorFromHex(value: string) {
+    const editState = this.editing();
+    if (editState?.field.locked) {
+      return;
+    }
     this.editHexInput.set(value);
     const normalized = this.normalizeHexInput(value);
     if (!normalized) return;
-    this.editing.update((e) => (e ? { ...e, field: { ...e.field, color: normalized } } : e));
+    this.editing.update((e) => {
+      if (!e || e.field.locked) {
+        return e;
+      }
+      return { ...e, field: { ...e.field, color: normalized } };
+    });
     this.updateEditingColorState(normalized);
   }
 
   setEditColorFromRgb(value: string) {
+    const editState = this.editing();
+    if (editState?.field.locked) {
+      return;
+    }
     this.editRgbInput.set(value);
     const rgb = this.parseRgbText(value);
     if (!rgb) return;
     const hex = this.rgbToHex(rgb);
-    this.editing.update((e) => (e ? { ...e, field: { ...e.field, color: hex } } : e));
+    this.editing.update((e) => {
+      if (!e || e.field.locked) {
+        return e;
+      }
+      return { ...e, field: { ...e.field, color: hex } };
+    });
     this.updateEditingColorState(hex);
   }
 
   onEditColorPicker(value: string) {
-    this.editing.update((e) => (e ? { ...e, field: { ...e.field, color: value } } : e));
+    const editState = this.editing();
+    if (editState?.field.locked) {
+      return;
+    }
+    this.editing.update((e) => {
+      if (!e || e.field.locked) {
+        return e;
+      }
+      return { ...e, field: { ...e.field, color: value } };
+    });
     this.updateEditingColorState(value);
   }
 
@@ -1868,6 +1927,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       fontFamily: styled.fontFamily ?? DEFAULT_FONT_ID,
       opacity: styled.opacity ?? DEFAULT_OPACITY,
       backgroundColor: styled.backgroundColor ?? null,
+      locked: !!styled.locked,
+      hidden: !!styled.hidden,
     };
 
     const value = this.sanitizeTextPreservingSpacing(styled.value);
@@ -1901,6 +1962,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       value: typeof styled.value === 'string' ? styled.value : '',
       appender: typeof styled.appender === 'string' ? styled.appender : '',
       decimals,
+      locked: !!styled.locked,
+      hidden: !!styled.hidden,
     };
   }
 
@@ -1947,6 +2010,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     this.editing.update((state) => {
       if (!state) {
+        return state;
+      }
+      if (mode === 'edit' && state.field.locked) {
         return state;
       }
       const nextField = mutator(state.field);
@@ -2306,6 +2372,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const fontFamily = this.normalizeFontFamily(field.fontFamily);
     const opacity = this.normalizeOpacityValue(field.opacity) ?? DEFAULT_OPACITY;
     const background = this.normalizeBackgroundColor(field.backgroundColor) ?? null;
+    const locked = !!field.locked;
+    const hidden = !!field.hidden;
     const legacyField = field as PageField & {
       fontWeight?: unknown;
       textAlign?: unknown;
@@ -2317,6 +2385,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       field.fontFamily === fontFamily &&
       (field.opacity ?? DEFAULT_OPACITY) === opacity &&
       (field.backgroundColor ?? null) === background &&
+      (field.locked ?? false) === locked &&
+      (field.hidden ?? false) === hidden &&
       !hasLegacyWeight &&
       !hasLegacyAlign
     ) {
@@ -2330,6 +2400,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       fontFamily,
       opacity,
       backgroundColor: background,
+      locked,
+      hidden,
     };
   }
 
@@ -2875,6 +2947,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           const styledField = this.ensureFieldStyle(field);
           const left = styledField.x * scale;
           const top = pdfCanvas.height - styledField.y * scale;
+          const isLocked = styledField.locked ?? false;
+          const isHidden = styledField.hidden ?? false;
 
           const el = document.createElement('div');
           el.className = 'annotation';
@@ -2889,8 +2963,21 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           el.style.opacity = `${styledField.opacity ?? DEFAULT_OPACITY}`;
           el.style.backgroundColor = styledField.backgroundColor ?? 'transparent';
           el.style.width = 'auto';
-
-          el.onpointerdown = (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
+          if (isLocked) {
+            el.dataset['locked'] = 'true';
+          } else {
+            delete el.dataset['locked'];
+          }
+          if (isHidden) {
+            el.dataset['hidden'] = 'true';
+          } else {
+            delete el.dataset['hidden'];
+          }
+          el.classList.toggle('annotation--locked', isLocked);
+          el.classList.toggle('annotation--hidden', isHidden);
+          el.onpointerdown = isLocked
+            ? (evt) => this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex)
+            : (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
           layer.appendChild(el);
 
           this.runAfterRender(() => this.updateAnnotationLeft(el, styledField, scale));
@@ -2898,6 +2985,21 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       });
 
     this.refreshOverlay();
+  }
+
+  private handleLockedAnnotationPointerDown(
+    evt: PointerEvent,
+    pageIndex: number,
+    fieldIndex: number
+  ) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    const page = this.coords()[pageIndex];
+    const field = page?.fields[fieldIndex];
+    if (!field) {
+      return;
+    }
+    this.startEditing(pageIndex, fieldIndex, field);
   }
 
   private handleAnnotationPointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number) {
@@ -2909,7 +3011,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');
     const page = this.coords()[pageIndex];
     const field = page?.fields[fieldIndex];
-    const styledField = field ? this.ensureFieldStyle(field) : null;
+    if (!field || field.locked) {
+      return;
+    }
+    const styledField = this.ensureFieldStyle(field);
+    if (styledField?.locked) {
+      this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex);
+      return;
+    }
     this.dragInfo = {
       pageIndex,
       fieldIndex,
@@ -3060,7 +3169,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const scale = this.scale();
     const page = this.coords()[pageIndex];
     const field = page?.fields[fieldIndex];
-    const styledField = field ? this.ensureFieldStyle(field) : null;
+    if (!field || field.locked) {
+      return;
+    }
     const bounds = this.computeHorizontalBounds(widthPx, pdfCanvas.width);
     const boundedLeft = Math.min(Math.max(leftPx, bounds.minLeft), bounds.maxLeft);
     const boundedTop = Math.min(Math.max(topPx, -fontSizePx), pdfCanvas.height - fontSizePx);
@@ -3422,6 +3533,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
         for (const field of fields) {
           const styledField = this.ensureFieldStyle(field);
+          if (styledField.hidden) {
+            continue;
+          }
           const text = this.getFieldRenderValue(styledField);
           const fontOption = this.getFontOptionById(styledField.fontFamily ?? DEFAULT_FONT_ID);
           const embeddedFont = await getFontFromDescriptor(fontOption.descriptor);
@@ -3617,7 +3731,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       (sanitizedA.decimals ?? undefined) === (sanitizedB.decimals ?? undefined) &&
       (sanitizedA.fontFamily ?? DEFAULT_FONT_ID) === (sanitizedB.fontFamily ?? DEFAULT_FONT_ID) &&
       (sanitizedA.opacity ?? DEFAULT_OPACITY) === (sanitizedB.opacity ?? DEFAULT_OPACITY) &&
-      (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null)
+      (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null) &&
+      (sanitizedA.locked ?? false) === (sanitizedB.locked ?? false) &&
+      (sanitizedA.hidden ?? false) === (sanitizedB.hidden ?? false)
     );
   }
 
