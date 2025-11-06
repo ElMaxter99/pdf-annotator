@@ -57,13 +57,16 @@ export class CloudTemplatesService {
       return throwError(() => new Error('No hay un espacio de trabajo seleccionado.'));
     }
 
-    const payload = this.mapToPayload(template);
+    const expectedVersion = template.version ?? 0;
+    const payload = this.mapToPayload(template, expectedVersion);
     const url = this.buildUrl(
       `/workspaces/${encodeURIComponent(targetWorkspace)}/templates/${encodeURIComponent(template.id)}`
     );
 
     return this.http
-      .put<CloudAnnotationTemplateDto>(url, payload, { headers: this.buildHeaders() })
+      .put<CloudAnnotationTemplateDto>(url, payload, {
+        headers: this.buildHeaders(undefined, expectedVersion),
+      })
       .pipe(map((item) => this.mapFromDto(item)));
   }
 
@@ -79,12 +82,17 @@ export class CloudTemplatesService {
     return this.http.delete<void>(url, { headers: this.buildHeaders() });
   }
 
-  private buildHeaders(): HttpHeaders {
-    const token = this.sessionService.getToken();
+  private buildHeaders(tokenOverride?: string | null, ifMatchVersion?: number): HttpHeaders {
+    const token = tokenOverride ?? this.sessionService.getToken();
     let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
+
+    if (ifMatchVersion !== undefined) {
+      headers = headers.set('If-Match', `W/"${ifMatchVersion}"`);
+    }
+
     return headers;
   }
 
@@ -112,8 +120,7 @@ export class CloudTemplatesService {
     };
   }
 
-  private mapToPayload(template: AnnotationTemplate): CloudTemplatePayload {
-    const version = template.version ?? 1;
+  private mapToPayload(template: AnnotationTemplate, version: number): CloudTemplatePayload {
     return {
       name: template.name,
       version,

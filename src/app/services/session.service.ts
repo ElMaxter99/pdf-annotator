@@ -70,8 +70,10 @@ export class SessionService {
   login(payload: LoginPayload): Observable<void> {
     this.stateSubject.next({ ...this.stateSubject.value, status: 'authenticating', error: null });
 
+    const body: LoginPayload = { ...payload, projectKey: 'pdf-annotator' };
+
     return this.http
-      .post<LoginResponse>(this.buildUrl('/auth/sessions'), payload, { headers: this.buildHeaders(false) })
+      .post<LoginResponse>(this.buildUrl('/auth/sessions'), body, { headers: this.buildHeaders(false) })
       .pipe(
         tap((response) => {
           const activeWorkspaceId = this.ensureWorkspace(
