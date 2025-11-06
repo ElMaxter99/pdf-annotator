@@ -62,7 +62,8 @@
             <select
               id="workspace-select"
               [value]="session.activeWorkspaceId ?? ''"
-              (change)="vm.onWorkspaceSelected($event.target.value)"
+              #workspaceSelect
+              (change)="vm.onWorkspaceSelected(workspaceSelect.value)"
               [disabled]="vm.sessionLoading()"
             >
               <option value="" disabled>{{ 'sidebar.session.workspacePlaceholder' | t }}</option>
