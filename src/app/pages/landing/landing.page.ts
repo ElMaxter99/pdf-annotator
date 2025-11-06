@@ -6,10 +6,10 @@ import { Language, TranslationService } from '../../i18n/translation.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
-import { LandingDropzoneComponent } from './components/landing-dropzone.component';
-import { LandingFooterComponent } from './components/landing-footer.component';
-import { LandingHeroComponent } from './components/landing-hero.component';
-import { LandingLanguageBarComponent } from './components/landing-language-bar.component';
+import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone.component';
+import { LandingFooterComponent } from './components/footer/landing-footer.component';
+import { LandingHeroComponent } from './components/hero/landing-hero.component';
+import { LandingLanguageBarComponent } from './components/language-bar/landing-language-bar.component';
 
 @Component({
   selector: 'app-landing-page',

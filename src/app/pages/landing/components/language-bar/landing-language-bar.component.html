@@ -1,0 +1,8 @@
+<div class="landing__language">
+  <app-language-selector
+    [languages]="languages"
+    [selectedLanguage]="selectedLanguage"
+    (languageChange)="languageChange.emit($event)"
+    variant="compact"
+  ></app-language-selector>
+</div>
