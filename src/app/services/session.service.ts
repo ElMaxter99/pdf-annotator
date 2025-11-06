@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, map, of, tap, throwError } from 'rxjs';
+
+import { API_BASE_URL } from '../config/api.config';
 
 export interface CloudUser {
   id: string;
@@ -50,15 +52,18 @@ interface PersistedSession {
 }
 
 @Injectable({ providedIn: 'root' })
+
 export class SessionService {
-  private readonly baseUrl = '/api/v1';
   private readonly storageKey = 'pdf-annotator.session';
   private readonly stateSubject = new BehaviorSubject<SessionState>(this.createSignedOutState());
 
   readonly session$ = this.stateSubject.asObservable();
   readonly activeWorkspace$ = this.session$.pipe(map((state) => state.activeWorkspaceId));
 
-  constructor(private readonly http: HttpClient) {
+  constructor(
+    @Inject(API_BASE_URL) private readonly apiBaseUrl: string,
+    private readonly http: HttpClient
+  ) {
     this.restoreFromStorage();
   }
 
@@ -66,7 +71,7 @@ export class SessionService {
     this.stateSubject.next({ ...this.stateSubject.value, status: 'authenticating', error: null });
 
     return this.http
-      .post<LoginResponse>(`${this.baseUrl}/auth/sessions`, payload, { headers: this.buildHeaders(false) })
+      .post<LoginResponse>(this.buildUrl('/auth/sessions'), payload, { headers: this.buildHeaders(false) })
       .pipe(
         tap((response) => {
           const activeWorkspaceId = this.ensureWorkspace(
@@ -119,7 +124,7 @@ export class SessionService {
     }
 
     return this.http
-      .get<WorkspaceSummary[]>(`${this.baseUrl}/workspaces`, { headers: this.buildHeaders(true) })
+      .get<WorkspaceSummary[]>(this.buildUrl('/workspaces'), { headers: this.buildHeaders(true) })
       .pipe(
         tap((workspaces) => {
           const current = this.stateSubject.value;
@@ -228,6 +233,14 @@ export class SessionService {
       }
     }
     return headers;
+  }
+
+  private buildUrl(path: string): string {
+    if (!this.apiBaseUrl) {
+      throw new Error('No se configuró una URL base para la API.');
+    }
+
+    return `${this.apiBaseUrl}${path.startsWith('/') ? path : `/${path}`}`;
   }
 
   private resolveErrorMessage(error: unknown): string {

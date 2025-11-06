@@ -1,11 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { PageAnnotations, PageField } from '../models/annotation.model';
 import { AnnotationTemplate } from '../models/annotation-template.model';
 import { GuideSettings, cloneGuideSettings } from '../models/guide-settings.model';
+import { API_BASE_URL } from '../config/api.config';
 import { SessionService } from './session.service';
 
 interface CloudAnnotationTemplateDto {
@@ -30,9 +31,11 @@ interface CloudTemplatePayload {
 
 @Injectable({ providedIn: 'root' })
 export class CloudTemplatesService {
-  private readonly baseUrl = '/api/v1';
-
-  constructor(private readonly http: HttpClient, private readonly sessionService: SessionService) {}
+  constructor(
+    @Inject(API_BASE_URL) private readonly apiBaseUrl: string,
+    private readonly http: HttpClient,
+    private readonly sessionService: SessionService
+  ) {}
 
   listTemplates(workspaceId?: string): Observable<AnnotationTemplate[]> {
     const targetWorkspace = workspaceId ?? this.sessionService.getActiveWorkspaceId();
@@ -42,7 +45,7 @@ export class CloudTemplatesService {
 
     return this.http
       .get<CloudAnnotationTemplateDto[]>(
-        `${this.baseUrl}/workspaces/${encodeURIComponent(targetWorkspace)}/templates`,
+        this.buildUrl(`/workspaces/${encodeURIComponent(targetWorkspace)}/templates`),
         { headers: this.buildHeaders() }
       )
       .pipe(map((items) => items.map((item) => this.mapFromDto(item))));
@@ -55,7 +58,9 @@ export class CloudTemplatesService {
     }
 
     const payload = this.mapToPayload(template);
-    const url = `${this.baseUrl}/workspaces/${encodeURIComponent(targetWorkspace)}/templates/${encodeURIComponent(template.id)}`;
+    const url = this.buildUrl(
+      `/workspaces/${encodeURIComponent(targetWorkspace)}/templates/${encodeURIComponent(template.id)}`
+    );
 
     return this.http
       .put<CloudAnnotationTemplateDto>(url, payload, { headers: this.buildHeaders() })
@@ -68,7 +73,9 @@ export class CloudTemplatesService {
       return throwError(() => new Error('No hay un espacio de trabajo seleccionado.'));
     }
 
-    const url = `${this.baseUrl}/workspaces/${encodeURIComponent(targetWorkspace)}/templates/${encodeURIComponent(id)}`;
+    const url = this.buildUrl(
+      `/workspaces/${encodeURIComponent(targetWorkspace)}/templates/${encodeURIComponent(id)}`
+    );
     return this.http.delete<void>(url, { headers: this.buildHeaders() });
   }
 
@@ -79,6 +86,14 @@ export class CloudTemplatesService {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
     return headers;
+  }
+
+  private buildUrl(path: string): string {
+    if (!this.apiBaseUrl) {
+      throw new Error('No se configuró una URL base para la API.');
+    }
+
+    return `${this.apiBaseUrl}${path.startsWith('/') ? path : `/${path}`}`;
   }
 
   private mapFromDto(dto: CloudAnnotationTemplateDto): AnnotationTemplate {
