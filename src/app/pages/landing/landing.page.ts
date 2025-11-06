@@ -2,18 +2,27 @@ import { CommonModule } from '@angular/common';
 import { Component, ViewChild, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
-import { LandingComponent } from '../../components/landing/landing.component';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { LandingDropzoneComponent } from './components/landing-dropzone.component';
+import { LandingFooterComponent } from './components/landing-footer.component';
+import { LandingHeroComponent } from './components/landing-hero.component';
+import { LandingLanguageBarComponent } from './components/landing-language-bar.component';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
   templateUrl: './landing.page.html',
   styleUrls: ['./landing.page.scss'],
-  imports: [CommonModule, LandingComponent],
+  imports: [
+    CommonModule,
+    LandingLanguageBarComponent,
+    LandingHeroComponent,
+    LandingDropzoneComponent,
+    LandingFooterComponent,
+  ],
 })
 export class LandingPageComponent {
   private readonly translationService = inject(TranslationService);
@@ -29,7 +38,8 @@ export class LandingPageComponent {
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly fileDropActive = signal(false);
 
-  @ViewChild(LandingComponent) private landingComponent?: LandingComponent;
+  @ViewChild(LandingDropzoneComponent)
+  private landingDropzoneComponent?: LandingDropzoneComponent;
 
   constructor() {
     this.metadataService.applyDefaultMetadata();
@@ -56,13 +66,7 @@ export class LandingPageComponent {
 
   openPdfFilePicker() {
     this.fileDropActive.set(false);
-    const input = this.landingComponent?.pdfFileInputRef?.nativeElement;
-    if (!input) {
-      return;
-    }
-
-    input.value = '';
-    input.click();
+    this.landingDropzoneComponent?.triggerFilePicker();
   }
 
   onFileUploadKeydown(event: KeyboardEvent) {
