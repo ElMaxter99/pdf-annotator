@@ -1,0 +1,65 @@
+<header class="header">
+  <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
+    <div class="footer__brand">
+      <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
+      <div class="footer__brand-text">
+        <span class="footer__app-name">{{ vm.appName }}</span>
+        <span class="footer__version">v{{ vm.version }}</span>
+      </div>
+    </div>
+
+    <input #coordsFileInput type="file" accept="application/json" (change)="vm.onCoordsFileSelected($event)" hidden />
+
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
+      <button class="btn btn--icon" (click)="vm.prevPage()" [disabled]="!vm.pdfDoc || vm.pageIndex()===1">
+        <span class="btn__icon" aria-hidden="true">⟨</span>
+        <span class="btn__label">{{ 'controls.prev' | t }}</span>
+      </button>
+      <span class="toolbar__badge">
+        {{ 'controls.pageIndicator' | t : { current: vm.pageIndex(), total: vm.pageCount || 0 } }}
+      </span>
+      <button class="btn btn--icon" (click)="vm.nextPage()" [disabled]="!vm.pdfDoc || vm.pageIndex()===vm.pageCount">
+        <span class="btn__label">{{ 'controls.next' | t }}</span>
+        <span class="btn__icon" aria-hidden="true">⟩</span>
+      </button>
+    </div>
+
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
+      <button class="btn btn--icon" (click)="vm.zoomOut()" [disabled]="!vm.pdfDoc">
+        <span class="btn__icon" aria-hidden="true">−</span>
+        <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
+      </button>
+      <span class="toolbar__badge">{{ 'controls.zoomLabel' | t }} {{ vm.scale() | number:'1.0-2' }}×</span>
+      <button class="btn btn--icon" (click)="vm.zoomIn()" [disabled]="!vm.pdfDoc">
+        <span class="btn__label">{{ 'controls.zoomIn' | t }}</span>
+        <span class="btn__icon" aria-hidden="true">＋</span>
+      </button>
+    </div>
+
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
+      <button class="btn btn--icon" (click)="vm.undo()" [disabled]="!vm.canUndo()">
+        <span class="btn__icon" aria-hidden="true">↺</span>
+        <span class="btn__label">{{ 'controls.undo' | t }}</span>
+      </button>
+      <button class="btn btn--icon" (click)="vm.redo()" [disabled]="!vm.canRedo()">
+        <span class="btn__icon" aria-hidden="true">↻</span>
+        <span class="btn__label">{{ 'controls.redo' | t }}</span>
+      </button>
+      <button class="btn btn--icon btn--danger" (click)="vm.clearAll()" [disabled]="!vm.coords().length">
+        <span class="btn__icon" aria-hidden="true">🧹</span>
+        <span class="btn__label">{{ 'controls.clear' | t }}</span>
+      </button>
+    </div>
+
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
+      <button class="btn btn--icon" (click)="vm.downloadAnnotatedPDF()" [disabled]="!vm.coords().length || !vm.pdfDoc">
+        <span class="btn__icon" aria-hidden="true">⬇</span>
+        <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
+      </button>
+    </div>
+
+    <app-language-selector class="header__language-selector" [languages]="vm.languages"
+      [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
+    </app-language-selector>
+  </div>
+</header>
