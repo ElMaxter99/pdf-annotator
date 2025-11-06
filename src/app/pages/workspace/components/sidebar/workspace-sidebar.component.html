@@ -1,0 +1,253 @@
+<aside class="sidebar">
+  <section class="sidebar-upload" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
+    (keydown)="vm.onFileUploadKeydown($event)" (dragover)="vm.onFileDragOver($event)"
+    (dragleave)="vm.onFileDragLeave($event)" (drop)="vm.onFileDrop($event)"
+    [class.sidebar-upload--active]="vm.fileDropActive()" [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t">
+    <input #pdfFileInput type="file" accept="application/pdf" (change)="vm.onFileSelected($event)" hidden />
+
+    <div class="sidebar-upload__body">
+      <div class="sidebar-upload__icon" aria-hidden="true">🗂️</div>
+      <div class="sidebar-upload__copy">
+        <span class="sidebar-upload__title">{{ 'app.workspaceUpload.title' | t }}</span>
+        <span class="sidebar-upload__subtitle">{{ 'app.workspaceUpload.subtitle' | t }}</span>
+      </div>
+    </div>
+    <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
+  </section>
+  <h4>{{ 'sidebar.title' | t }}</h4>
+  <div class="sidebar-actions">
+    <button type="button" class="btn" (click)="vm.triggerImportCoords()">
+      {{ 'sidebar.importJsonFile' | t }}
+    </button>
+    <button type="button" class="btn" (click)="vm.applyCoordsText()">
+      {{ 'sidebar.applyJson' | t }}
+    </button>
+  </div>
+  <section class="sidebar-thumbnails" *ngIf="vm.pageThumbnails().length">
+    <h5 class="sidebar-thumbnails__title">{{ 'sidebar.thumbnails.title' | t }}</h5>
+    <div class="sidebar-thumbnails__list">
+      <app-page-thumbnails
+        [thumbnails]="vm.pageThumbnails()"
+        [activePage]="vm.pageIndex()"
+        (pageSelected)="vm.setPageIndex($event)"
+      ></app-page-thumbnails>
+    </div>
+  </section>
+  <section class="templates">
+    <h5>{{ 'sidebar.templates.title' | t }}</h5>
+    <div class="templates__save">
+      <input type="text" [(ngModel)]="vm.templateNameModel" [ngModelOptions]="{ standalone: true }"
+        [placeholder]="'sidebar.templates.placeholder' | t" />
+      <button type="button" class="btn" (click)="vm.saveCurrentAsTemplate()"
+        [disabled]="!vm.coords().length || !vm.templateNameModel.trim()">
+        {{ 'sidebar.templates.saveButton' | t }}
+      </button>
+    </div>
+    <ng-container *ngIf="vm.templates().length; else emptyTemplates">
+      <div class="templates__select">
+        <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
+        <div class="templates__controls">
+          <select [(ngModel)]="vm.selectedTemplateId" [ngModelOptions]="{ standalone: true }">
+            <option *ngFor="let template of vm.templates()" [value]="template.id">
+              {{ template.name }}
+            </option>
+          </select>
+          <button type="button" class="btn" (click)="vm.loadSelectedTemplate()" [disabled]="!vm.selectedTemplateId">
+            {{ 'sidebar.templates.loadButton' | t }}
+          </button>
+          <button type="button" class="btn templates__delete" (click)="vm.deleteSelectedTemplate()" [disabled]="
+            !vm.selectedTemplateId || vm.selectedTemplateId === vm.defaultTemplateId
+          ">
+            {{ 'sidebar.templates.deleteButton' | t }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #emptyTemplates>
+      <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
+    </ng-template>
+  </section>
+  <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
+    <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel"
+      (ngModelChange)="vm.onCoordsTextChange($event)" [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
+  </ng-container>
+  <ng-template #jsonTreeView>
+    <div *ngIf="vm.jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
+      <app-json-tree #jsonTree [value]="vm.jsonTreePreview.value"></app-json-tree>
+    </div>
+    <ng-template #jsonTreePlaceholder>
+      <div class="json-tree-placeholder">
+        <p *ngIf="vm.jsonTreePreview.status === 'empty'">{{ 'sidebar.jsonTree.empty' | t }}</p>
+        <p *ngIf="vm.jsonTreePreview.status === 'error'">{{ 'sidebar.jsonTree.invalid' | t }}</p>
+      </div>
+    </ng-template>
+  </ng-template>
+  <div class="json-toolbar">
+    <div class="json-toolbar__view-toggle-group" role="group"
+      [attr.aria-label]="'controls.jsonViewModeToggle' | t">
+      <button type="button" class="json-toolbar__view-toggle-option"
+        [class.json-toolbar__view-toggle-option--active]="vm.jsonViewMode() === 'text'"
+        (click)="vm.setJsonViewMode('text')" [attr.aria-pressed]="vm.jsonViewMode() === 'text'">
+        <span class="json-toolbar__view-toggle-icon" aria-hidden="true">📝</span>
+        <span>{{ 'controls.viewJsonText' | t }}</span>
+      </button>
+      <button type="button" class="json-toolbar__view-toggle-option"
+        [class.json-toolbar__view-toggle-option--active]="vm.jsonViewMode() === 'tree'"
+        (click)="vm.setJsonViewMode('tree')" [attr.aria-pressed]="vm.jsonViewMode() === 'tree'">
+        <span class="json-toolbar__view-toggle-icon" aria-hidden="true">🌳</span>
+        <span>{{ 'controls.viewJsonTree' | t }}</span>
+      </button>
+    </div>
+    <button type="button" class="btn" (click)="vm.copyJSON()"
+      [disabled]="!vm.coords().length">{{ 'controls.copyJson' | t }}</button>
+    <button type="button" class="btn" (click)="vm.downloadJSON()"
+      [disabled]="!vm.coords().length">{{ 'controls.downloadJson' | t }}</button>
+  </div>
+  <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
+
+  <section class="advanced-panel" [class.open]="vm.advancedOptionsOpen()"
+    [class.active]="vm.guidesFeatureEnabled() || vm.customFontsFeatureEnabled()">
+    <button type="button" class="advanced-toggle" (click)="vm.toggleAdvancedOptions(!vm.advancedOptionsOpen())"
+      [attr.aria-expanded]="vm.advancedOptionsOpen()">
+      <span>{{ 'sidebar.advancedTitle' | t }}</span>
+      <span class="advanced-icon" aria-hidden="true">▾</span>
+    </button>
+
+    <ng-container *ngIf="vm.advancedOptionsOpen()">
+      <div class="advanced-content">
+        <div class="sidebar-divider"></div>
+
+        <label class="advanced-checkbox">
+          <input type="checkbox" [checked]="vm.customFontsFeatureEnabled()"
+            (change)="vm.toggleCustomFontsFeature($event.target.checked)" />
+          <span>{{ 'fonts.custom.enableFeature' | t }}</span>
+        </label>
+        <small class="advanced-hint">{{ 'fonts.custom.hint' | t }}</small>
+
+        <section class="custom-fonts-panel" *ngIf="vm.customFontsFeatureEnabled()">
+          <h5>{{ 'fonts.custom.title' | t }}</h5>
+          <p class="custom-fonts-panel__hint">{{ 'fonts.custom.description' | t }}</p>
+          <div class="custom-fonts-panel__actions">
+            <button type="button" class="btn" (click)="vm.triggerCustomFontPicker()">
+              {{ 'fonts.custom.add' | t }}
+            </button>
+            <input #customFontInput type="file" accept=".ttf,.otf,.woff,.woff2" multiple hidden
+              (change)="vm.onCustomFontSelected($event)" />
+          </div>
+          <ul class="custom-fonts-panel__list" *ngIf="vm.customFonts().length; else customFontsEmpty">
+            <li class="custom-fonts-panel__item" *ngFor="let font of vm.customFonts()">
+              <span class="custom-fonts-panel__name">{{ font.name }}</span>
+              <button type="button" class="btn btn--icon" (click)="vm.removeCustomFont(font.id)"
+                [title]="'fonts.custom.remove' | t">
+                ✕
+              </button>
+            </li>
+          </ul>
+          <ng-template #customFontsEmpty>
+            <p class="custom-fonts-panel__empty">{{ 'fonts.custom.empty' | t }}</p>
+          </ng-template>
+        </section>
+
+        <div class="sidebar-divider"></div>
+
+        <label class="advanced-checkbox">
+          <input type="checkbox" [checked]="vm.guidesFeatureEnabled()"
+            (change)="vm.toggleGuidesFeature($event.target.checked)" />
+          <span>{{ 'guides.enableFeature' | t }}</span>
+        </label>
+        <small class="advanced-hint">{{ 'sidebar.advancedHint' | t }}</small>
+
+        <section class="guides-panel" *ngIf="vm.guidesFeatureEnabled() && vm.guideSettings() as guides">
+          <h5>{{ 'guides.title' | t }}</h5>
+          <div class="guides-toggles">
+            <label>
+              <input type="checkbox" [checked]="guides.showGrid"
+                (change)="vm.toggleGuideSetting('showGrid', $event.target.checked)" />
+              <span>{{ 'guides.showGrid' | t }}</span>
+            </label>
+            <label>
+              <input type="checkbox" [checked]="guides.showRulers"
+                (change)="vm.toggleGuideSetting('showRulers', $event.target.checked)" />
+              <span>{{ 'guides.showRulers' | t }}</span>
+            </label>
+            <label>
+              <input type="checkbox" [checked]="guides.showAlignment"
+                (change)="vm.toggleGuideSetting('showAlignment', $event.target.checked)" />
+              <span>{{ 'guides.showAlignment' | t }}</span>
+            </label>
+            <label>
+              <input type="checkbox" [checked]="guides.snapToGrid"
+                (change)="vm.toggleGuideSetting('snapToGrid', $event.target.checked)" />
+              <span>{{ 'guides.snapGrid' | t }}</span>
+            </label>
+            <label>
+              <input type="checkbox" [checked]="guides.snapToMargins"
+                (change)="vm.toggleGuideSetting('snapToMargins', $event.target.checked)" />
+              <span>{{ 'guides.snapMargins' | t }}</span>
+            </label>
+            <label>
+              <input type="checkbox" [checked]="guides.snapToCenters"
+                (change)="vm.toggleGuideSetting('snapToCenters', $event.target.checked)" />
+              <span>{{ 'guides.snapCenters' | t }}</span>
+            </label>
+            <label>
+              <input type="checkbox" [checked]="guides.snapToCustom"
+                (change)="vm.toggleGuideSetting('snapToCustom', $event.target.checked)" />
+              <span>{{ 'guides.snapCustom' | t }}</span>
+            </label>
+          </div>
+
+          <div class="guides-mode" role="radiogroup"
+            [attr.aria-label]="'guides.coordinateMode.label' | t">
+            <span class="guides-mode__label">{{ 'guides.coordinateMode.label' | t }}</span>
+            <div class="guides-mode__options">
+              <label>
+                <input type="radio" name="coordinateMode" [checked]="!guides.usePdfCoordinates"
+                  (change)="vm.setCoordinateMode('canvas')" />
+                <span>{{ 'guides.coordinateMode.canvas' | t }}</span>
+              </label>
+              <label>
+                <input type="radio" name="coordinateMode" [checked]="guides.usePdfCoordinates"
+                  (change)="vm.setCoordinateMode('pdf')" />
+                <span>{{ 'guides.coordinateMode.pdf' | t }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="guides-inputs">
+            <label>
+              <span>{{ 'guides.gridSize' | t }}</span>
+              <input type="number" min="0.5" step="0.5" [ngModel]="guides.gridSize"
+                (ngModelChange)="vm.updateGuideNumber('gridSize', $event)" [ngModelOptions]="{ standalone: true }" />
+            </label>
+            <label>
+              <span>{{ 'guides.marginSize' | t }}</span>
+              <input type="number" min="0" step="1" [ngModel]="guides.marginSize"
+                (ngModelChange)="vm.updateGuideNumber('marginSize', $event)" [ngModelOptions]="{ standalone: true }" />
+            </label>
+            <label>
+              <span>{{ 'guides.tolerance' | t }}</span>
+              <input type="number" min="0" step="1" [ngModel]="guides.snapTolerance"
+                (ngModelChange)="vm.updateGuideNumber('snapTolerance', $event)"
+                [ngModelOptions]="{ standalone: true }" />
+            </label>
+          </div>
+
+          <div class="guides-custom">
+            <label>
+              <span>{{ 'guides.customX' | t }}</span>
+              <input type="text" [ngModel]="vm.snapPointsXText()" (ngModelChange)="vm.onSnapPointsInput('x', $event)"
+                [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
+            </label>
+            <label>
+              <span>{{ (guides.usePdfCoordinates ? 'guides.customY.pdf' : 'guides.customY.canvas') | t }}</span>
+              <input type="text" [ngModel]="vm.snapPointsYText()" (ngModelChange)="vm.onSnapPointsInput('y', $event)"
+                [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
+            </label>
+            <small class="guides-hint">{{ (guides.usePdfCoordinates ? 'guides.customHint.pdf' : 'guides.customHint.canvas') | t }}</small>
+          </div>
+        </section>
+      </div>
+    </ng-container>
+  </section>
+</aside>

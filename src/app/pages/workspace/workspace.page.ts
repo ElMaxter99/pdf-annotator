@@ -27,7 +27,10 @@ import {
   cloneGuideSettings,
   differsFromDefaultGuideSettings,
 } from '../../models/guide-settings.model';
-import { WorkspaceComponent } from '../../components/workspace/workspace.component';
+import { WorkspaceHeaderComponent } from './components/header/workspace-header.component';
+import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sidebar.component';
+import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
+import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnail } from '../../models/page-thumbnail.model';
 import {
   STANDARD_FONT_FAMILIES,
@@ -136,7 +139,14 @@ const DEFAULT_OPACITY = 1;
   standalone: true,
   templateUrl: './workspace.page.html',
   styleUrls: ['./workspace.page.scss'],
-  imports: [CommonModule, FormsModule, WorkspaceComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    WorkspaceHeaderComponent,
+    WorkspaceSidebarComponent,
+    WorkspaceViewerComponent,
+    WorkspaceFooterComponent,
+  ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   private static fontkitPromise: Promise<PdfLibFontkit> | null = null;
@@ -212,66 +222,68 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private overlayGuides: OverlayGuide[] = [];
   private clipboard: PageField | null = null;
 
-  @ViewChild(WorkspaceComponent) private workspaceComponent?: WorkspaceComponent;
+  @ViewChild(WorkspaceHeaderComponent) private headerComponent?: WorkspaceHeaderComponent;
+  @ViewChild(WorkspaceSidebarComponent) private sidebarComponent?: WorkspaceSidebarComponent;
+  @ViewChild(WorkspaceViewerComponent) private viewerComponent?: WorkspaceViewerComponent;
 
   get pdfCanvasRef(): ElementRef<HTMLCanvasElement> | undefined {
-    return this.workspaceComponent?.pdfCanvasRef;
+    return this.viewerComponent?.pdfCanvasRef;
   }
 
   get overlayCanvasRef(): ElementRef<HTMLCanvasElement> | undefined {
-    return this.workspaceComponent?.overlayCanvasRef;
+    return this.viewerComponent?.overlayCanvasRef;
   }
 
   get annotationsLayerRef(): ElementRef<HTMLDivElement> | undefined {
-    return this.workspaceComponent?.annotationsLayerRef;
+    return this.viewerComponent?.annotationsLayerRef;
   }
 
   get pdfViewerRef(): ElementRef<HTMLDivElement> | undefined {
-    return this.workspaceComponent?.pdfViewerRef;
+    return this.viewerComponent?.pdfViewerRef;
   }
 
   get previewEditorRef(): ElementRef<HTMLDivElement> | undefined {
-    return this.workspaceComponent?.previewEditorRef;
+    return this.viewerComponent?.previewEditorRef;
   }
 
   get editEditorRef(): ElementRef<HTMLDivElement> | undefined {
-    return this.workspaceComponent?.editEditorRef;
+    return this.viewerComponent?.editEditorRef;
   }
 
   get previewFontDropdownRef(): ElementRef<HTMLDivElement> | undefined {
-    return this.workspaceComponent?.previewFontDropdownRef;
+    return this.viewerComponent?.previewFontDropdownRef;
   }
 
   get editFontDropdownRef(): ElementRef<HTMLDivElement> | undefined {
-    return this.workspaceComponent?.editFontDropdownRef;
+    return this.viewerComponent?.editFontDropdownRef;
   }
 
   get previewFontSearchRef(): ElementRef<HTMLInputElement> | undefined {
-    return this.workspaceComponent?.previewFontSearchRef;
+    return this.viewerComponent?.previewFontSearchRef;
   }
 
   get editFontSearchRef(): ElementRef<HTMLInputElement> | undefined {
-    return this.workspaceComponent?.editFontSearchRef;
+    return this.viewerComponent?.editFontSearchRef;
   }
 
   get pdfFileInputRef(): ElementRef<HTMLInputElement> | undefined {
-    return this.workspaceComponent?.pdfFileInputRef;
+    return this.sidebarComponent?.pdfFileInputRef;
   }
 
   get coordsFileInputRef(): ElementRef<HTMLInputElement> | undefined {
-    return this.workspaceComponent?.coordsFileInputRef;
+    return this.headerComponent?.coordsFileInputRef;
   }
 
   get customFontInputRef(): ElementRef<HTMLInputElement> | undefined {
-    return this.workspaceComponent?.customFontInputRef;
+    return this.sidebarComponent?.customFontInputRef;
   }
 
   get jsonEditorRef(): ElementRef<HTMLTextAreaElement> | undefined {
-    return this.workspaceComponent?.jsonEditorRef;
+    return this.sidebarComponent?.jsonEditorRef;
   }
 
   get jsonTreeComponent() {
-    return this.workspaceComponent?.jsonTreeComponent;
+    return this.sidebarComponent?.jsonTreeComponent;
   }
 
   private static async loadFontkit(): Promise<PdfLibFontkit> {

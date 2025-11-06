@@ -6,8 +6,8 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { PageThumbnail } from '../../models/page-thumbnail.model';
-import { TranslationPipe } from '../../i18n/translation.pipe';
+import { PageThumbnail } from '../../../../models/page-thumbnail.model';
+import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
 @Component({
   selector: 'app-page-thumbnails',
