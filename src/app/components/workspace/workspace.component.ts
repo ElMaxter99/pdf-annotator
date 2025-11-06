@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import type { App } from '../../app';
+import type { WorkspacePageComponent } from '../../pages/workspace/workspace.page';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
 import { JsonTreeComponent } from '../json-tree/json-tree.component';
@@ -22,7 +22,7 @@ import { PageThumbnailsComponent } from '../page-thumbnails/page-thumbnails.comp
   ],
 })
 export class WorkspaceComponent {
-  @Input({ required: true }) vm!: App;
+  @Input({ required: true }) vm!: WorkspacePageComponent;
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
