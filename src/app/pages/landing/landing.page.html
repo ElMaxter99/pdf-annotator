@@ -1,0 +1,8 @@
+<div class="app app--landing">
+  <app-landing [languages]="languages" [selectedLanguage]="languageModel" [appName]="appName"
+    [version]="version" [currentYear]="currentYear" [appAuthor]="appAuthor"
+    [fileDropActive]="fileDropActive()" (languageChange)="onLanguageChange($event)"
+    (fileSelected)="onFileSelected($event)" (fileUploadKeydown)="onFileUploadKeydown($event)"
+    (fileDragOver)="onFileDragOver($event)" (fileDragLeave)="onFileDragLeave($event)"
+    (fileDrop)="onFileDrop($event)" (openFilePicker)="openPdfFilePicker()"></app-landing>
+</div>
