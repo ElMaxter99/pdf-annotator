@@ -10,8 +10,10 @@ import {
   OnDestroy,
   OnInit,
   inject,
+  DestroyRef,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, FormsModule, Validators } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import type { PdfLibFontkit } from '@pdf-lib/fontkit';
@@ -20,7 +22,8 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
 import '../../array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from '../../models/annotation.model';
-import { AnnotationTemplatesService, AnnotationTemplate } from '../../annotation-templates.service';
+import { AnnotationTemplate } from '../../models/annotation-template.model';
+import { AnnotationTemplatesService } from '../../annotation-templates.service';
 import {
   DEFAULT_GUIDE_SETTINGS,
   GuideSettings,
@@ -40,6 +43,8 @@ import {
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { SessionService, SessionState, WorkspaceSummary, CloudUser } from '../../services/session.service';
+import { take } from 'rxjs';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -188,6 +193,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
+  private readonly sessionService = inject(SessionService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
   readonly templates = signal<AnnotationTemplate[]>([]);
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
   templateNameModel = '';
@@ -198,6 +206,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly currentYear = new Date().getFullYear();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
+  readonly sessionState = signal<SessionState>(this.sessionService.getSnapshot());
+  readonly sessionLoading = computed(() => this.sessionState().status === 'authenticating');
+  readonly availableWorkspaces = computed(() => this.sessionState().workspaces);
+  readonly loginForm = this.formBuilder.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+  });
   readonly defaultFontId = DEFAULT_FONT_ID;
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
@@ -309,6 +324,20 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.setDocumentMetadata();
     const storedTemplates = this.templatesService.getTemplates();
     this.templates.set(storedTemplates);
+    this.templatesService.templates$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((templates) => {
+        this.templates.set(templates);
+        if (this.selectedTemplateId && !templates.some((template) => template.id === this.selectedTemplateId)) {
+          this.selectedTemplateId = templates[0]?.id ?? null;
+        } else if (!this.selectedTemplateId && templates.length) {
+          this.selectedTemplateId = templates[0].id;
+        }
+      });
+
+    this.sessionService.session$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((session) => this.sessionState.set(session));
 
     const initialTemplate =
       storedTemplates.find((template) => template.id === this.templatesService.defaultTemplateId) ??
@@ -345,6 +374,83 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       this.coordsFileInputFallback = null;
     }
+  }
+
+  submitLogin() {
+    if (this.sessionLoading()) {
+      return;
+    }
+
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    const { email, password } = this.loginForm.getRawValue();
+    this.sessionService
+      .login({ email, password })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.loginForm.reset({ email: '', password: '' });
+          this.sessionService
+            .refreshWorkspaces()
+            .pipe(take(1))
+            .subscribe({
+              error: (error) =>
+                console.error('No se pudieron actualizar los espacios de trabajo.', error),
+            });
+        },
+        error: (error) => console.error('No se pudo iniciar sesión.', error),
+      });
+  }
+
+  logoutSession() {
+    this.sessionService.logout();
+    this.templatesService.refreshFromCloud();
+  }
+
+  refreshSharedWorkspaces() {
+    this.sessionService
+      .refreshWorkspaces()
+      .pipe(take(1))
+      .subscribe({
+        error: (error) =>
+          console.error('No se pudieron actualizar los espacios de trabajo.', error),
+      });
+  }
+
+  onWorkspaceSelected(workspaceId: string) {
+    this.sessionService.selectWorkspace(workspaceId || null);
+  }
+
+  sessionWorkspaceLabel(workspace: WorkspaceSummary): string {
+    const roleLabel = this.translationService.translate(
+      `sidebar.session.role.${workspace.role}`
+    );
+    return `${workspace.name} · ${roleLabel}`;
+  }
+
+  sessionAvatar(user: CloudUser | null): string {
+    if (!user) {
+      return '👤';
+    }
+    const base = (user.name || user.email || '').trim();
+    if (!base) {
+      return '👤';
+    }
+    return base.charAt(0).toUpperCase();
+  }
+
+  sessionUserName(user: CloudUser | null): string {
+    if (!user) {
+      return '';
+    }
+    return user.name?.trim() || user.email;
+  }
+
+  sessionUserEmail(user: CloudUser | null): string {
+    return user?.email ?? '';
   }
 
   setFieldFont(mode: EditorMode, fontId: string) {
