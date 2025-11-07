@@ -13,6 +13,8 @@ export interface PageField {
   fontFamily?: string;
   opacity?: number;
   backgroundColor?: string | null;
+  locked?: boolean;
+  hidden?: boolean;
 }
 
 export interface PageAnnotations {
