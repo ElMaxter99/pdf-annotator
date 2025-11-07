@@ -1121,6 +1121,55 @@ header .logo {
   background: rgba(94, 234, 212, 0.15);
 }
 
+.annotation--locked {
+  cursor: pointer;
+  outline-color: rgba(94, 234, 212, 0.4);
+}
+
+.annotation--locked:hover {
+  background: rgba(94, 234, 212, 0.12);
+  outline-style: solid;
+}
+
+.annotation--hidden {
+  position: relative;
+  color: transparent !important;
+  outline: 1px dashed rgba(148, 163, 184, 0.6);
+  min-width: 18px;
+  min-height: 18px;
+}
+
+.annotation--hidden::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(94, 234, 212, 0.2) 0,
+    rgba(94, 234, 212, 0.2) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  pointer-events: none;
+}
+
+.annotation--hidden::after {
+  content: '👁';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .9rem;
+  color: rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+
+.annotation--hidden.annotation--locked {
+  outline-style: dashed;
+}
+
 .annotation.dragging {
   cursor: grabbing;
 }
@@ -1220,6 +1269,42 @@ header .logo {
 
   .field-row .field {
     flex: 1 1 140px;
+  }
+
+  .field-row--toggles {
+    gap: 16px;
+  }
+
+  .field-toggle {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .field-row--toggles .field-toggle {
+    flex: 1 1 150px;
+  }
+
+  .toggle-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+    color: var(--text);
+  }
+
+  .toggle-control input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+  }
+
+  .toggle-control span {
+    font-weight: 500;
+  }
+
+  .toggle-control input[disabled] + span {
+    opacity: .6;
   }
 
   .field-row--metrics .field-size {

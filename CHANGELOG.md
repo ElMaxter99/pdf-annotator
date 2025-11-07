@@ -1,4 +1,14 @@
-## [v1.2.0] - 2025-11-01
+## [v1.3.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.0) - 20YY-11-07
+### Added
+- Add page thumbnails sidebar #92
+- Add lock and hide controls for workspace annotations #97
+
+### Dev
+- Split landing and workspace into routed pages #94
+- Refactor landing page into page-scoped components #95
+- Refactor workspace page into dedicated layout components #96
+
+## [v1.2.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.2.0) - 2025-11-01
 ### Added
 - Move JSON actions into sidebar panel #64
 - Feat: refresh toolbar ui and pdf upload #65
@@ -12,7 +22,7 @@
 ### Dev
 - Split landing and workspace into dedicated components #87
 
-## [v1.1.0] - 2025-10-30
+## [v1.1.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.1.0) - 2025-10-30
 ### Added
 - docs: Improve branding and add issue templates #40
 - Add Vercel speed insights integration and update dependencies #38
@@ -37,7 +47,7 @@
 ### Fix
 - Fix PDF.js worker selection for older Chrome (Issue in Chrome 113)
 
-## [v1.0.0] - 2025-10-27
+## [v1.0.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.0.0) - 2025-10-27
 ### Added
 - Add @vercel/analytics integration to enhance tracking capabilities
 - Add keyboard shortcuts to confirm, cancel or delete annotation editors

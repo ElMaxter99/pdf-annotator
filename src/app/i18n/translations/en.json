@@ -67,6 +67,10 @@
       "deleteButton": "Delete",
       "empty": "You haven't saved any templates yet."
     },
+    "thumbnails": {
+      "title": "Thumbnails",
+      "pageLabel": "Page {{index}}"
+    },
     "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data.",
     "advancedTitle": "Advanced options",
     "advancedHint": "Toggle guides and snapping helpers when you need extra precision."
@@ -146,6 +150,14 @@
           "label": "Suffix",
           "placeholder": "E.g. %"
         }
+      },
+      "locked": {
+        "label": "Lock annotation",
+        "toggle": "Prevent edits and dragging"
+      },
+      "hidden": {
+        "label": "Hidden",
+        "toggle": "Hide when exporting"
       }
     },
     "color": {

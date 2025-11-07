@@ -67,6 +67,10 @@
       "deleteButton": "Eliminar",
       "empty": "Aún no tienes plantillas guardadas."
     },
+    "thumbnails": {
+      "title": "Miniaturas",
+      "pageLabel": "Página {{index}}"
+    },
     "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado.",
     "advancedTitle": "Opciones avanzadas",
     "advancedHint": "Activa las guías y el snapping solo cuando necesites más precisión."
@@ -146,6 +150,14 @@
           "label": "Sufijo",
           "placeholder": "Ej.: %"
         }
+      },
+      "locked": {
+        "label": "Bloquear anotación",
+        "toggle": "Evitar ediciones y arrastre"
+      },
+      "hidden": {
+        "label": "Ocultar anotación",
+        "toggle": "No mostrar al exportar"
       }
     },
     "color": {

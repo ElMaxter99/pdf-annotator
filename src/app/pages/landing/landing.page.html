@@ -1,0 +1,16 @@
+<div class="app app--landing">
+  <section class="landing">
+    <app-landing-language-bar [languages]="languages" [selectedLanguage]="languageModel"
+      (languageChange)="onLanguageChange($event)"></app-landing-language-bar>
+
+    <app-landing-hero></app-landing-hero>
+
+    <app-landing-dropzone [fileDropActive]="fileDropActive()" (fileSelected)="onFileSelected($event)"
+      (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
+      (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
+      (openFilePicker)="openPdfFilePicker()"></app-landing-dropzone>
+  </section>
+
+  <app-landing-footer [appName]="appName" [version]="version" [currentYear]="currentYear"
+    [appAuthor]="appAuthor"></app-landing-footer>
+</div>

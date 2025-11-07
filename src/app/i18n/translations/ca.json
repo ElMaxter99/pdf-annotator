@@ -67,6 +67,10 @@
       "deleteButton": "Elimina",
       "empty": "Encara no tens cap plantilla desada."
     },
+    "thumbnails": {
+      "title": "Miniatures",
+      "pageLabel": "Pàgina {{index}}"
+    },
     "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat.",
     "advancedTitle": "Opcions avançades",
     "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió."
@@ -146,6 +150,14 @@
           "label": "Sufix",
           "placeholder": "Ex.: %"
         }
+      },
+      "locked": {
+        "label": "Bloqueja l'anotació",
+        "toggle": "Evita canvis i arrossegaments"
+      },
+      "hidden": {
+        "label": "Oculta l'anotació",
+        "toggle": "No mostrar en exportacions"
       }
     },
     "color": {
