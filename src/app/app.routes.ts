@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { workspaceAccessGuard } from './guards/workspace-access.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
@@ -9,6 +10,7 @@ export const routes: Routes = [
   },
   {
     path: 'workspace',
+    canActivate: [workspaceAccessGuard],
     loadComponent: () =>
       import('./pages/workspace/workspace.page').then((m) => m.WorkspacePageComponent),
   },

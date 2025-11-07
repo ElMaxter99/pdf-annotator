@@ -2,6 +2,147 @@
   display: contents;
 }
 
+.session-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(14px);
+}
+
+.session-panel__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.session-panel__description {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.session-panel__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.session-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.session-panel__field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.session-panel__field input,
+.session-panel__workspace-controls select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  background: rgba(26, 26, 40, 0.85);
+  color: var(--text);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.session-panel__field input:focus,
+.session-panel__workspace-controls select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
+}
+
+.session-panel__field input:disabled,
+.session-panel__workspace-controls select:disabled {
+  opacity: 0.65;
+}
+
+.session-panel__field-error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #ff8a8a;
+}
+
+.session-panel__submit {
+  width: 100%;
+  justify-content: center;
+}
+
+.session-panel__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.session-panel__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(94, 234, 212, 0.16);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.session-panel__details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.session-panel__name {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.session-panel__email {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.session-panel__workspaces {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.session-panel__workspace-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-panel__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.session-panel__error-message {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #ff8a8a;
+}
+
+.session-panel__refresh {
+  flex-shrink: 0;
+}
+
 .sidebar-thumbnails {
   display: flex;
   flex-direction: column;

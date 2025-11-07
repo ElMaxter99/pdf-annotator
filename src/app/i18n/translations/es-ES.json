@@ -50,6 +50,26 @@
     "exportGroup": "Opciones de exportación"
   },
   "sidebar": {
+    "session": {
+      "title": "Sesiones en la nube",
+      "description": "Inicia sesión para sincronizar plantillas y compartirlas con tu equipo.",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "login": "Iniciar sesión",
+      "loading": "Conectando...",
+      "logout": "Cerrar sesión",
+      "workspaceLabel": "Espacios compartidos",
+      "workspacePlaceholder": "Selecciona un espacio",
+      "refresh": "Actualizar espacios",
+      "emptyWorkspaces": "Todavía no perteneces a ningún espacio compartido.",
+      "emailError": "Introduce un correo válido.",
+      "passwordError": "La contraseña es obligatoria.",
+      "role": {
+        "owner": "Propietario",
+        "editor": "Editor",
+        "viewer": "Lector"
+      }
+    },
     "title": "Anotaciones (JSON)",
     "importJsonFile": "Importar desde archivo",
     "applyJson": "Aplicar JSON",

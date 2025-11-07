@@ -1,4 +1,94 @@
 <aside class="sidebar">
+  <section class="session-panel">
+    <h5 class="session-panel__title">{{ 'sidebar.session.title' | t }}</h5>
+    <p class="session-panel__description">{{ 'sidebar.session.description' | t }}</p>
+    <ng-container *ngIf="vm.sessionState() as session">
+      <form
+        *ngIf="session.status !== 'authenticated'; else sessionInfo"
+        class="session-panel__form"
+        [formGroup]="vm.loginForm"
+        (ngSubmit)="vm.submitLogin()"
+      >
+        <div class="session-panel__field">
+          <label for="session-email">{{ 'sidebar.session.email' | t }}</label>
+          <input
+            id="session-email"
+            type="email"
+            formControlName="email"
+            [disabled]="vm.sessionLoading()"
+            [attr.aria-invalid]="vm.loginForm.controls.email.invalid && vm.loginForm.controls.email.touched"
+          />
+          <small
+            class="session-panel__field-error"
+            *ngIf="vm.loginForm.controls.email.invalid && vm.loginForm.controls.email.touched"
+          >
+            {{ 'sidebar.session.emailError' | t }}
+          </small>
+        </div>
+        <div class="session-panel__field">
+          <label for="session-password">{{ 'sidebar.session.password' | t }}</label>
+          <input
+            id="session-password"
+            type="password"
+            formControlName="password"
+            [disabled]="vm.sessionLoading()"
+            [attr.aria-invalid]="vm.loginForm.controls.password.invalid && vm.loginForm.controls.password.touched"
+          />
+          <small
+            class="session-panel__field-error"
+            *ngIf="vm.loginForm.controls.password.invalid && vm.loginForm.controls.password.touched"
+          >
+            {{ 'sidebar.session.passwordError' | t }}
+          </small>
+        </div>
+        <button type="submit" class="btn session-panel__submit" [disabled]="vm.sessionLoading()">
+          {{ vm.sessionLoading() ? ('sidebar.session.loading' | t) : ('sidebar.session.login' | t) }}
+        </button>
+      </form>
+      <ng-template #sessionInfo>
+        <div class="session-panel__user" *ngIf="session.user as user">
+          <span class="session-panel__avatar" aria-hidden="true">{{ vm.sessionAvatar(user) }}</span>
+          <div class="session-panel__details">
+            <span class="session-panel__name">{{ vm.sessionUserName(user) }}</span>
+            <span class="session-panel__email">{{ vm.sessionUserEmail(user) }}</span>
+          </div>
+          <button type="button" class="btn btn--ghost session-panel__logout" (click)="vm.logoutSession()">
+            {{ 'sidebar.session.logout' | t }}
+          </button>
+        </div>
+        <div class="session-panel__workspaces" *ngIf="session.workspaces.length; else emptyWorkspaces">
+          <label for="workspace-select">{{ 'sidebar.session.workspaceLabel' | t }}</label>
+          <div class="session-panel__workspace-controls">
+            <select
+              id="workspace-select"
+              [value]="session.activeWorkspaceId ?? ''"
+              #workspaceSelect
+              (change)="vm.onWorkspaceSelected(workspaceSelect.value)"
+              [disabled]="vm.sessionLoading()"
+            >
+              <option value="" disabled>{{ 'sidebar.session.workspacePlaceholder' | t }}</option>
+              <option *ngFor="let workspace of vm.availableWorkspaces()" [value]="workspace.id">
+                {{ vm.sessionWorkspaceLabel(workspace) }}
+              </option>
+            </select>
+            <button
+              type="button"
+              class="btn btn--icon session-panel__refresh"
+              (click)="vm.refreshSharedWorkspaces()"
+              [disabled]="vm.sessionLoading()"
+              [title]="'sidebar.session.refresh' | t"
+            >
+              🔄
+            </button>
+          </div>
+        </div>
+        <ng-template #emptyWorkspaces>
+          <p class="session-panel__hint">{{ 'sidebar.session.emptyWorkspaces' | t }}</p>
+        </ng-template>
+      </ng-template>
+      <p class="session-panel__error-message" *ngIf="session.error">{{ session.error }}</p>
+    </ng-container>
+  </section>
   <section class="sidebar-upload" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
     (keydown)="vm.onFileUploadKeydown($event)" (dragover)="vm.onFileDragOver($event)"
     (dragleave)="vm.onFileDragLeave($event)" (drop)="vm.onFileDrop($event)"
