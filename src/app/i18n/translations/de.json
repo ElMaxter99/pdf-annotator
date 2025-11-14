@@ -1,0 +1,194 @@
+{
+  "app": {
+    "title": "PDF Annotator",
+    "languageLabel": "Sprache",
+    "languageAriaLabel": "Wählen Sie die Anwendungssprache aus",
+    "languages": {
+      "es-ES": "Spanisch",
+      "en": "Englisch",
+      "ca": "Katalanisch",
+      "fr": "Französisch",
+      "it": "Italienisch",
+      "pt": "Portugiesisch",
+      "de": "Deutsch"
+    },
+    "landing": {
+      "badge": "Schneller annotieren",
+      "title": "Platzieren Sie in Sekunden Koordinaten auf jedem PDF",
+      "description": "Laden Sie Ihr Dokument hoch, um JSON-gestützte Anmerkungen hinzuzufügen, Vorlagen wiederzuverwenden und exportfertige Dateien zu erstellen.",
+      "cta": "PDF auswählen"
+    },
+    "upload": {
+      "title": "Laden Sie Ihr PDF hoch",
+      "subtitle": "Ziehen Sie die Datei hierher oder klicken Sie, um zu durchsuchen",
+      "hint": "Nur PDF",
+      "invalidFormat": "Es werden nur PDF-Dateien unterstützt."
+    },
+    "workspaceUpload": {
+      "title": "Projekt zurücksetzen?",
+      "subtitle": "Legen Sie ein anderes PDF ab oder klicken Sie, um das aktuelle Dokument zu ersetzen.",
+      "ariaLabel": "Neues PDF hochladen, um den Arbeitsbereich zurückzusetzen"
+    }
+  },
+  "controls": {
+    "prev": "Zurück",
+    "next": "Weiter",
+    "pageIndicator": "Seite {{current}} / {{total}}",
+    "zoomLabel": "Zoom",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "undo": "Rückgängig",
+    "redo": "Wiederholen",
+    "clear": "Leeren",
+    "copyJson": "JSON kopieren",
+    "importJson": "JSON importieren",
+    "downloadJson": "JSON herunterladen",
+    "viewJsonTree": "Baumansicht",
+    "viewJsonText": "JSON-Editor",
+    "jsonViewModeToggle": "JSON-Ansicht",
+    "downloadPdf": "PDF herunterladen",
+    "toolbarAriaLabel": "PDF-Aktionen",
+    "navigationGroup": "Seitennavigation",
+    "zoomGroup": "Zoom-Steuerung",
+    "historyGroup": "Verlauf",
+    "exportGroup": "Exportoptionen"
+  },
+  "sidebar": {
+    "title": "Anmerkungen (JSON)",
+    "importJsonFile": "Aus Datei importieren",
+    "applyJson": "JSON anwenden",
+    "jsonPlaceholder": "Fügen Sie hier Koordinaten ein oder bearbeiten Sie diese...",
+    "jsonTree": {
+      "empty": "Der JSON-Editor ist leer.",
+      "invalid": "Der Inhalt ist kein gültiges JSON. Beheben Sie die Fehler, um die Baumansicht zu sehen."
+    },
+    "templates": {
+      "title": "Wiederverwendbare Vorlagen",
+      "placeholder": "Vorlagenname",
+      "saveButton": "Vorlage speichern",
+      "selectLabel": "Gespeicherte Vorlagen",
+      "loadButton": "Laden",
+      "deleteButton": "Löschen",
+      "empty": "Sie haben noch keine Vorlagen gespeichert."
+    },
+    "thumbnails": {
+      "title": "Miniaturen",
+      "pageLabel": "Seite {{index}}"
+    },
+    "jsonHint": "Fügen Sie Koordinaten ein oder importieren Sie sie aus einer JSON-Datei mit demselben Format wie die exportierten Daten.",
+    "advancedTitle": "Erweiterte Optionen",
+    "advancedHint": "Aktivieren Sie Hilfslinien und Einrast-Hilfen nur bei Bedarf für mehr Präzision."
+  },
+  "guides": {
+    "enableFeature": "Hilfslinien & Einrasten aktivieren",
+    "title": "Hilfslinien & Einrasten",
+    "showGrid": "Raster anzeigen",
+    "showRulers": "Lineale anzeigen",
+    "showAlignment": "Aktive Ausrichtungen hervorheben",
+    "snapGrid": "Am Raster einrasten",
+    "snapMargins": "An Rändern einrasten",
+    "snapCenters": "An Mittelachsen einrasten",
+    "snapCustom": "An benutzerdefinierten Koordinaten einrasten",
+    "gridSize": "Rasterabstand (pt)",
+    "marginSize": "Rand (pt)",
+    "tolerance": "Toleranz (px)",
+    "customX": "X-Koordinaten (pt)",
+    "customY": {
+      "canvas": "Y-Koordinaten (pt ab Oberkante)",
+      "pdf": "Y-Koordinaten (pt ab Unterkante)"
+    },
+    "customPlaceholder": "z. B. 24, 48, 120",
+    "customHint": {
+      "canvas": "Geben Sie Punktwerte getrennt durch Kommas oder Leerzeichen ein. Y wird ab der Oberkante des PDFs gemessen.",
+      "pdf": "Geben Sie Punktwerte getrennt durch Kommas oder Leerzeichen ein. Y wird ab der Unterkante des PDFs gemessen."
+    },
+    "coordinateMode": {
+      "label": "Koordinatenursprung",
+      "canvas": "Oben links (Canvas)",
+      "pdf": "Unten links (PDF)"
+    }
+  },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Text",
+        "placeholder": "Text..."
+      },
+      "size": {
+        "label": "Größe"
+      },
+      "font": {
+        "label": "Schriftart",
+        "customTag": "Benutzerdefiniert",
+        "searchPlaceholder": "Schriften suchen...",
+        "noResults": "Keine Schrift stimmt mit Ihrer Suche überein."
+      },
+      "opacity": {
+        "label": "Deckkraft"
+      },
+      "color": {
+        "label": "Farbe"
+      },
+      "background": {
+        "label": "Hintergrund",
+        "clear": "Hintergrund entfernen"
+      },
+      "type": {
+        "label": "Typ",
+        "options": {
+          "text": "Text",
+          "check": "Kontrollkästchen",
+          "radio": "Optionsfeld",
+          "number": "Zahl"
+        }
+      },
+      "value": {
+        "label": "Fester Wert",
+        "placeholder": "Optionaler fixer Wert..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Dezimalstellen"
+        },
+        "appender": {
+          "label": "Suffix",
+          "placeholder": "Z. B. %"
+        }
+      },
+      "locked": {
+        "label": "Anmerkung sperren",
+        "toggle": "Bearbeitung und Verschieben verhindern"
+      },
+      "hidden": {
+        "label": "Anmerkung ausblenden",
+        "toggle": "Beim Export ausblenden"
+      }
+    },
+    "color": {
+      "hintPreview": "Wählen Sie eine Farbe, geben Sie HEX oder RGB ein. Der JSON-Export verwendet immer HEX.",
+      "hintEdit": "Fügen Sie einen vorhandenen HEX- oder RGB-Wert ein, um identische Farben zu verwenden.",
+      "hexPlaceholder": "#5eead4",
+      "rgbPlaceholder": "rgb(94, 234, 212)"
+    },
+    "actions": {
+      "duplicate": "Anmerkung duplizieren"
+    },
+    "editingBadge": "Bearbeitung"
+  },
+  "fonts": {
+    "custom": {
+      "enableFeature": "Benutzerdefinierte Schriften aktivieren",
+      "hint": "Aktivieren Sie diese Option, um eigene Schriftdateien über das erweiterte Menü zu laden.",
+      "title": "Benutzerdefinierte Schriften",
+      "description": "Laden Sie .ttf-, .otf-, .woff- oder .woff2-Dateien hoch, um sie in Ihren Anmerkungen zu verwenden.",
+      "add": "Schrift hinzufügen",
+      "remove": "Entfernen",
+      "empty": "Sie haben noch keine benutzerdefinierten Schriften hinzugefügt.",
+      "unsupported": "Ihr Browser unterstützt das Laden benutzerdefinierter Schriften nicht.",
+      "error": "Die Schriftdatei konnte nicht geladen werden. Versuchen Sie es mit einer anderen."
+    }
+  },
+  "viewer": {
+    "emptyMessage": "Laden Sie ein PDF hoch und klicken Sie irgendwo, um Anmerkungen hinzuzufügen. Bearbeiten Sie sie in der Vorschau, bevor Sie bestätigen ✅."
+  }
+}

@@ -6,7 +6,11 @@
     "languages": {
       "es-ES": "Espanyol",
       "en": "Anglès",
-      "ca": "Català"
+      "ca": "Català",
+      "fr": "Francès",
+      "it": "Italià",
+      "pt": "Portuguès",
+      "de": "Alemany"
     },
     "landing": {
       "badge": "Comença a anotar",

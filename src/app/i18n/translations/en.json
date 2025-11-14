@@ -6,7 +6,11 @@
     "languages": {
       "es-ES": "Spanish",
       "en": "English",
-      "ca": "Catalan"
+      "ca": "Catalan",
+      "fr": "French",
+      "it": "Italian",
+      "pt": "Portuguese",
+      "de": "German"
     },
     "landing": {
       "badge": "Annotate smarter",
