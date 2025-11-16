@@ -54,6 +54,26 @@
     "exportGroup": "Export options"
   },
   "sidebar": {
+    "session": {
+      "title": "Cloud sessions",
+      "description": "Sign in to sync templates and collaborate with your team.",
+      "email": "Email",
+      "password": "Password",
+      "login": "Sign in",
+      "loading": "Signing in...",
+      "logout": "Sign out",
+      "workspaceLabel": "Shared workspaces",
+      "workspacePlaceholder": "Choose a workspace",
+      "refresh": "Refresh workspaces",
+      "emptyWorkspaces": "You haven't joined any shared workspace yet.",
+      "emailError": "Please enter a valid email address.",
+      "passwordError": "Password is required.",
+      "role": {
+        "owner": "Owner",
+        "editor": "Editor",
+        "viewer": "Viewer"
+      }
+    },
     "title": "Annotations (JSON)",
     "importJsonFile": "Import from file",
     "applyJson": "Apply JSON",

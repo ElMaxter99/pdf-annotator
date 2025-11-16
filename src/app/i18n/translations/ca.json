@@ -54,6 +54,26 @@
     "exportGroup": "Opcions d'exportació"
   },
   "sidebar": {
+    "session": {
+      "title": "Sessions al núvol",
+      "description": "Inicia sessió per sincronitzar plantilles i compartir-les amb el teu equip.",
+      "email": "Correu electrònic",
+      "password": "Contrasenya",
+      "login": "Inicia sessió",
+      "loading": "Connectant...",
+      "logout": "Tanca la sessió",
+      "workspaceLabel": "Espais compartits",
+      "workspacePlaceholder": "Tria un espai",
+      "refresh": "Actualitza els espais",
+      "emptyWorkspaces": "Encara no formes part de cap espai compartit.",
+      "emailError": "Introdueix un correu electrònic vàlid.",
+      "passwordError": "La contrasenya és obligatòria.",
+      "role": {
+        "owner": "Propietari",
+        "editor": "Editor",
+        "viewer": "Lector"
+      }
+    },
     "title": "Anotacions (JSON)",
     "importJsonFile": "Importa des d'un fitxer",
     "applyJson": "Aplica el JSON",

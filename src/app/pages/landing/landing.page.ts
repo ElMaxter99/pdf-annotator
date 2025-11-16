@@ -10,6 +10,7 @@ import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone
 import { LandingFooterComponent } from './components/footer/landing-footer.component';
 import { LandingHeroComponent } from './components/hero/landing-hero.component';
 import { LandingLanguageBarComponent } from './components/language-bar/landing-language-bar.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-landing-page',
@@ -34,6 +35,7 @@ export class LandingPageComponent {
   readonly version = APP_VERSION;
   readonly currentYear = new Date().getFullYear();
   readonly appAuthor = APP_AUTHOR;
+  readonly environmentLabel = environment.name.toUpperCase();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly fileDropActive = signal(false);

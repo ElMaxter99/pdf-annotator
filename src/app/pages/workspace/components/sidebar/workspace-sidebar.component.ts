@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { JsonTreeComponent } from '../json-tree/json-tree.component';
@@ -11,7 +11,7 @@ import { PageThumbnailsComponent } from '../page-thumbnails/page-thumbnails.comp
   standalone: true,
   templateUrl: './workspace-sidebar.component.html',
   styleUrls: ['./workspace-sidebar.component.scss'],
-  imports: [CommonModule, FormsModule, TranslationPipe, JsonTreeComponent, PageThumbnailsComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslationPipe, JsonTreeComponent, PageThumbnailsComponent],
 })
 export class WorkspaceSidebarComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
