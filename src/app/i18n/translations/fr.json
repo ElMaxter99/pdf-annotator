@@ -1,0 +1,194 @@
+{
+  "app": {
+    "title": "PDF Annotator",
+    "languageLabel": "Langue",
+    "languageAriaLabel": "Sélectionnez la langue de l'application",
+    "languages": {
+      "es-ES": "Espagnol",
+      "en": "Anglais",
+      "ca": "Catalan",
+      "fr": "Français",
+      "it": "Italien",
+      "pt": "Portugais",
+      "de": "Allemand"
+    },
+    "landing": {
+      "badge": "Annotez plus vite",
+      "title": "Placez des coordonnées sur n'importe quel PDF en quelques secondes",
+      "description": "Téléversez votre document pour ajouter des annotations reliées à du JSON, réutiliser des modèles et exporter vos fichiers prêts à l'emploi.",
+      "cta": "Sélectionner un PDF"
+    },
+    "upload": {
+      "title": "Téléversez votre PDF",
+      "subtitle": "Glissez-déposez le fichier ici ou cliquez pour parcourir",
+      "hint": "PDF uniquement",
+      "invalidFormat": "Seuls les fichiers PDF sont pris en charge."
+    },
+    "workspaceUpload": {
+      "title": "Envie de repartir de zéro ?",
+      "subtitle": "Déposez un autre PDF ou cliquez pour remplacer le document actuel.",
+      "ariaLabel": "Téléverser un nouveau PDF pour réinitialiser l'espace de travail"
+    }
+  },
+  "controls": {
+    "prev": "Précédent",
+    "next": "Suivant",
+    "pageIndicator": "Page {{current}} / {{total}}",
+    "zoomLabel": "Zoom",
+    "zoomIn": "Agrandir",
+    "zoomOut": "Réduire",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "clear": "Effacer",
+    "copyJson": "Copier le JSON",
+    "importJson": "Importer du JSON",
+    "downloadJson": "Télécharger le JSON",
+    "viewJsonTree": "Voir l'arbre",
+    "viewJsonText": "Voir l'éditeur JSON",
+    "jsonViewModeToggle": "Mode d'affichage du JSON",
+    "downloadPdf": "Télécharger le PDF",
+    "toolbarAriaLabel": "Actions PDF",
+    "navigationGroup": "Navigation des pages",
+    "zoomGroup": "Contrôles du zoom",
+    "historyGroup": "Actions d'historique",
+    "exportGroup": "Options d'export"
+  },
+  "sidebar": {
+    "title": "Annotations (JSON)",
+    "importJsonFile": "Importer depuis un fichier",
+    "applyJson": "Appliquer le JSON",
+    "jsonPlaceholder": "Collez ou modifiez ici les coordonnées des annotations...",
+    "jsonTree": {
+      "empty": "L'éditeur JSON est vide.",
+      "invalid": "Le contenu n'est pas un JSON valide. Corrigez les erreurs pour afficher l'arbre."
+    },
+    "templates": {
+      "title": "Modèles réutilisables",
+      "placeholder": "Nom du modèle",
+      "saveButton": "Enregistrer le modèle",
+      "selectLabel": "Modèles enregistrés",
+      "loadButton": "Charger",
+      "deleteButton": "Supprimer",
+      "empty": "Vous n'avez pas encore enregistré de modèles."
+    },
+    "thumbnails": {
+      "title": "Vignettes",
+      "pageLabel": "Page {{index}}"
+    },
+    "jsonHint": "Collez les coordonnées ou importez-les depuis un JSON en suivant le même format que les données exportées.",
+    "advancedTitle": "Options avancées",
+    "advancedHint": "Activez les guides et les aides d'alignement uniquement lorsque vous avez besoin de plus de précision."
+  },
+  "guides": {
+    "enableFeature": "Activer guides et aimantation",
+    "title": "Guides et aimantation",
+    "showGrid": "Afficher la grille",
+    "showRulers": "Afficher les règles",
+    "showAlignment": "Mettre en évidence les alignements actifs",
+    "snapGrid": "Aimanter à la grille",
+    "snapMargins": "Aimanter aux marges",
+    "snapCenters": "Aimanter aux axes centraux",
+    "snapCustom": "Aimanter aux coordonnées personnalisées",
+    "gridSize": "Espacement de grille (pt)",
+    "marginSize": "Marge (pt)",
+    "tolerance": "Tolérance (px)",
+    "customX": "Coordonnées X (pt)",
+    "customY": {
+      "canvas": "Coordonnées Y (pt depuis le bord supérieur)",
+      "pdf": "Coordonnées Y (pt depuis le bord inférieur)"
+    },
+    "customPlaceholder": "ex. 24, 48, 120",
+    "customHint": {
+      "canvas": "Saisissez des valeurs en points séparées par des virgules ou des espaces. Les valeurs Y sont mesurées depuis le bord supérieur du PDF.",
+      "pdf": "Saisissez des valeurs en points séparées par des virgules ou des espaces. Les valeurs Y sont mesurées depuis le bord inférieur du PDF."
+    },
+    "coordinateMode": {
+      "label": "Origine des coordonnées",
+      "canvas": "Coin supérieur gauche (Canvas)",
+      "pdf": "Coin inférieur gauche (PDF)"
+    }
+  },
+  "annotation": {
+    "fields": {
+      "text": {
+        "label": "Texte",
+        "placeholder": "Texte..."
+      },
+      "size": {
+        "label": "Taille"
+      },
+      "font": {
+        "label": "Police",
+        "customTag": "Personnalisée",
+        "searchPlaceholder": "Rechercher des polices...",
+        "noResults": "Aucune police ne correspond à votre recherche."
+      },
+      "opacity": {
+        "label": "Opacité"
+      },
+      "color": {
+        "label": "Couleur"
+      },
+      "background": {
+        "label": "Arrière-plan",
+        "clear": "Supprimer l'arrière-plan"
+      },
+      "type": {
+        "label": "Type",
+        "options": {
+          "text": "Texte",
+          "check": "Case à cocher",
+          "radio": "Bouton radio",
+          "number": "Nombre"
+        }
+      },
+      "value": {
+        "label": "Valeur forcée",
+        "placeholder": "Valeur fixe optionnelle..."
+      },
+      "number": {
+        "decimals": {
+          "label": "Décimales"
+        },
+        "appender": {
+          "label": "Suffixe",
+          "placeholder": "Ex. %"
+        }
+      },
+      "locked": {
+        "label": "Verrouiller l'annotation",
+        "toggle": "Empêcher les modifications et le déplacement"
+      },
+      "hidden": {
+        "label": "Masquer l'annotation",
+        "toggle": "Masquer lors de l'export"
+      }
+    },
+    "color": {
+      "hintPreview": "Choisissez une couleur, saisissez un HEX ou un RGB. Le JSON exportera toujours la couleur en HEX.",
+      "hintEdit": "Collez un HEX ou un RGB existant pour réutiliser des couleurs exactes.",
+      "hexPlaceholder": "#5eead4",
+      "rgbPlaceholder": "rgb(94, 234, 212)"
+    },
+    "actions": {
+      "duplicate": "Dupliquer l'annotation"
+    },
+    "editingBadge": "Édition"
+  },
+  "fonts": {
+    "custom": {
+      "enableFeature": "Activer les polices personnalisées",
+      "hint": "Activez cette option pour charger vos propres fichiers de police depuis le menu avancé.",
+      "title": "Polices personnalisées",
+      "description": "Téléversez des fichiers .ttf, .otf, .woff ou .woff2 pour les réutiliser dans vos annotations.",
+      "add": "Ajouter une police",
+      "remove": "Supprimer",
+      "empty": "Vous n'avez pas encore ajouté de polices personnalisées.",
+      "unsupported": "Votre navigateur ne permet pas de charger des polices personnalisées.",
+      "error": "Impossible de charger ce fichier de police. Essayez avec un autre."
+    }
+  },
+  "viewer": {
+    "emptyMessage": "Téléversez un PDF et cliquez n'importe où pour ajouter des annotations. Modifiez-les dans l'aperçu avant de valider ✅."
+  }
+}
