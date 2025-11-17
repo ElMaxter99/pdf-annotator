@@ -1,0 +1,17 @@
+.landing__library-cta {
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.landing__library-cta:hover,
+.landing__library-cta:focus-visible {
+  background: rgba(94, 234, 212, 0.12);
+  color: #e5fffa;
+  transform: translateY(-1px);
+}

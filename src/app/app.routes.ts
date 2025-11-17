@@ -12,5 +12,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/workspace/workspace.page').then((m) => m.WorkspacePageComponent),
   },
+  {
+    path: 'workspace/:documentId',
+    loadComponent: () =>
+      import('./pages/workspace/workspace.page').then((m) => m.WorkspacePageComponent),
+  },
+  {
+    path: 'library',
+    loadComponent: () =>
+      import('./pages/library/library.page').then((m) => m.LibraryPageComponent),
+  },
   { path: '**', redirectTo: 'landing' },
 ];

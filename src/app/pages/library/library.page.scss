@@ -1,0 +1,126 @@
+.library {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 40%, #0b1224 100%);
+  color: #e5e7eb;
+}
+
+.library__toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.library__toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.library__logo {
+  width: 36px;
+  height: 36px;
+}
+
+.library__title {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.library__spacer {
+  flex: 1;
+}
+
+.library__content {
+  padding: 2rem clamp(1rem, 3vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.library__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.library__search {
+  flex: 1;
+  min-width: min(360px, 100%);
+}
+
+.library__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.library__card {
+  background: #0b1224;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  color: inherit;
+}
+
+.library__thumb {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  display: grid;
+  place-items: center;
+  background: #111827;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.library__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.library__thumb--empty {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.library__card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.library__state {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #d1d5db;
+}
+
+.library__state--loading {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+}
+
+@media (max-width: 599px) {
+  .library__toolbar {
+    padding-inline: 0.5rem;
+  }
+
+  .library__filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .library__card-actions {
+    flex-direction: column;
+  }
+}

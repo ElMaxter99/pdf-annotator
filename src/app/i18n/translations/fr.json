@@ -53,7 +53,26 @@
     "navigationGroup": "Navigation des pages",
     "zoomGroup": "Contrôles du zoom",
     "historyGroup": "Actions d'historique",
-    "exportGroup": "Options d'export"
+    "exportGroup": "Options d'export",
+    "library": "Bibliothèque"
+  },
+  "library": {
+    "title": "Bibliothèque hors ligne",
+    "search": {
+      "label": "Rechercher des PDF",
+      "placeholder": "Filtrer par titre"
+    },
+    "loading": "Synchronisation de vos PDF enregistrés...",
+    "empty": "Enregistrez un PDF depuis l'éditeur pour le retrouver ici même sans connexion.",
+    "thumbnailFallback": "Pas d'aperçu",
+    "pages": "{{count}} pages",
+    "actions": {
+      "goHome": "Accueil",
+      "new": "Nouveau PDF",
+      "refresh": "Rafraîchir",
+      "open": "Ouvrir",
+      "delete": "Supprimer"
+    }
   },
   "sidebar": {
     "title": "Annotations (JSON)",

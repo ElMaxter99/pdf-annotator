@@ -53,7 +53,26 @@
     "navigationGroup": "Seitennavigation",
     "zoomGroup": "Zoom-Steuerung",
     "historyGroup": "Verlauf",
-    "exportGroup": "Exportoptionen"
+    "exportGroup": "Exportoptionen",
+    "library": "Bibliothek"
+  },
+  "library": {
+    "title": "Offline-Bibliothek",
+    "search": {
+      "label": "PDFs suchen",
+      "placeholder": "Nach Titel filtern"
+    },
+    "loading": "Gespeicherte PDFs werden synchronisiert...",
+    "empty": "Speichere ein PDF aus dem Arbeitsbereich, um es hier auch offline zu nutzen.",
+    "thumbnailFallback": "Keine Vorschau",
+    "pages": "{{count}} Seiten",
+    "actions": {
+      "goHome": "Start",
+      "new": "Neues PDF",
+      "refresh": "Aktualisieren",
+      "open": "Öffnen",
+      "delete": "Löschen"
+    }
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",

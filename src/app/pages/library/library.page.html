@@ -1,0 +1,62 @@
+<div class="library">
+  <mat-toolbar color="primary" class="library__toolbar">
+    <div class="library__toolbar-brand">
+      <img src="/logo.svg" alt="PDF Annotator" class="library__logo" />
+      <div class="library__title">{{ 'library.title' | t }}</div>
+    </div>
+    <span class="library__spacer"></span>
+    <button mat-button (click)="goToLanding()">{{ 'library.actions.goHome' | t }}</button>
+    <button mat-flat-button color="accent" (click)="startNewWorkspace()">
+      {{ 'library.actions.new' | t }}
+    </button>
+  </mat-toolbar>
+
+  <section class="library__content">
+    <div class="library__filters">
+      <mat-form-field appearance="outline" class="library__search">
+        <mat-label>{{ 'library.search.label' | t }}</mat-label>
+        <input
+          matInput
+          type="search"
+          [value]="query()"
+          (input)="onSearch($any($event.target)?.value ?? '')"
+          [placeholder]="'library.search.placeholder' | t"
+        />
+      </mat-form-field>
+      <button mat-stroked-button color="primary" (click)="refreshLibrary()">
+        {{ 'library.actions.refresh' | t }}
+      </button>
+    </div>
+
+    <div *ngIf="loading()" class="library__state library__state--loading">
+      <mat-progress-spinner mode="indeterminate" diameter="42"></mat-progress-spinner>
+      <p>{{ 'library.loading' | t }}</p>
+    </div>
+
+    <div *ngIf="!loading() && !visibleSummaries().length" class="library__state">
+      <p>{{ 'library.empty' | t }}</p>
+    </div>
+
+    <div *ngIf="!loading() && visibleSummaries().length" class="library__grid">
+      <mat-card class="library__card" *ngFor="let doc of visibleSummaries()">
+        <div class="library__thumb" [class.library__thumb--empty]="!doc.thumbnailDataUrl">
+          <img *ngIf="doc.thumbnailDataUrl" [src]="doc.thumbnailDataUrl" [alt]="doc.name" />
+          <span *ngIf="!doc.thumbnailDataUrl">{{ 'library.thumbnailFallback' | t }}</span>
+        </div>
+        <mat-card-title>{{ doc.name }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ 'library.pages' | t : { count: doc.pageCount } }} ·
+          {{ doc.updatedAt | date: 'short' }}
+        </mat-card-subtitle>
+        <div class="library__card-actions">
+          <button mat-stroked-button color="primary" (click)="openDocument(doc.id)">
+            {{ 'library.actions.open' | t }}
+          </button>
+          <button mat-button color="warn" (click)="deleteDocument(doc.id)">
+            {{ 'library.actions.delete' | t }}
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  </section>
+</div>

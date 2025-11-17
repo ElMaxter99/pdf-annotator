@@ -1,3 +1,20 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$primary: mat.define-palette(mat.$indigo-palette, 600);
+$accent: mat.define-palette(mat.$cyan-palette, 400);
+$theme: mat.define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+  ),
+  density: 0,
+  typography: mat.define-typography-config(),
+));
+
+@include mat.all-component-themes($theme);
+
 :root {
   --bg: #1e1e2f;
   --panel: #2a2a3d;

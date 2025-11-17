@@ -53,7 +53,26 @@
     "navigationGroup": "Navegação de páginas",
     "zoomGroup": "Controlos de zoom",
     "historyGroup": "Ações de histórico",
-    "exportGroup": "Opções de exportação"
+    "exportGroup": "Opções de exportação",
+    "library": "Biblioteca"
+  },
+  "library": {
+    "title": "Biblioteca offline",
+    "search": {
+      "label": "Procurar PDFs",
+      "placeholder": "Filtrar por título"
+    },
+    "loading": "A sincronizar os PDFs guardados...",
+    "empty": "Guarde um PDF no editor para o ver aqui mesmo sem ligação à internet.",
+    "thumbnailFallback": "Sem pré-visualização",
+    "pages": "{{count}} páginas",
+    "actions": {
+      "goHome": "Início",
+      "new": "Novo PDF",
+      "refresh": "Atualizar",
+      "open": "Abrir",
+      "delete": "Eliminar"
+    }
   },
   "sidebar": {
     "title": "Anotações (JSON)",

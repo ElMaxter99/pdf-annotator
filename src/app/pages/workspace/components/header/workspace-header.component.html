@@ -8,6 +8,13 @@
       </div>
     </div>
 
+    <div class="toolbar__group toolbar__group--secondary" role="group">
+      <span class="toolbar__badge" *ngIf="vm.documentName()">{{ vm.documentName() }}</span>
+      <button class="btn" (click)="vm.goToLibrary()">
+        <span class="btn__label">{{ 'controls.library' | t }}</span>
+      </button>
+    </div>
+
     <input #coordsFileInput type="file" accept="application/json" (change)="vm.onCoordsFileSelected($event)" hidden />
 
     <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
