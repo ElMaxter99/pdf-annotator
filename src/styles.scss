@@ -2,12 +2,11 @@
 
 @include mat.core();
 
-$primary: mat.define-palette(mat.$indigo-palette, 600);
-$accent: mat.define-palette(mat.$cyan-palette, 400);
-$theme: mat.define-light-theme((
+$theme: mat.define-theme((
   color: (
-    primary: $primary,
-    accent: $accent,
+    theme-type: dark,
+    primary: mat.$indigo-palette,
+    tertiary: mat.$cyan-palette,
   ),
   density: 0,
   typography: mat.define-typography-config(),
