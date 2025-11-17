@@ -131,7 +131,7 @@
 
         <label class="advanced-checkbox">
           <input type="checkbox" [checked]="vm.customFontsFeatureEnabled()"
-            (change)="vm.toggleCustomFontsFeature($event.target.checked)" />
+            (change)="vm.toggleCustomFontsFeature(!!$any($event.target)?.checked)" />
           <span>{{ 'fonts.custom.enableFeature' | t }}</span>
         </label>
         <small class="advanced-hint">{{ 'fonts.custom.hint' | t }}</small>
@@ -164,7 +164,7 @@
 
         <label class="advanced-checkbox">
           <input type="checkbox" [checked]="vm.guidesFeatureEnabled()"
-            (change)="vm.toggleGuidesFeature($event.target.checked)" />
+            (change)="vm.toggleGuidesFeature(!!$any($event.target)?.checked)" />
           <span>{{ 'guides.enableFeature' | t }}</span>
         </label>
         <small class="advanced-hint">{{ 'sidebar.advancedHint' | t }}</small>
@@ -174,37 +174,37 @@
           <div class="guides-toggles">
             <label>
               <input type="checkbox" [checked]="guides.showGrid"
-                (change)="vm.toggleGuideSetting('showGrid', $event.target.checked)" />
+                (change)="vm.toggleGuideSetting('showGrid', !!$any($event.target)?.checked)" />
               <span>{{ 'guides.showGrid' | t }}</span>
             </label>
             <label>
               <input type="checkbox" [checked]="guides.showRulers"
-                (change)="vm.toggleGuideSetting('showRulers', $event.target.checked)" />
+                (change)="vm.toggleGuideSetting('showRulers', !!$any($event.target)?.checked)" />
               <span>{{ 'guides.showRulers' | t }}</span>
             </label>
             <label>
               <input type="checkbox" [checked]="guides.showAlignment"
-                (change)="vm.toggleGuideSetting('showAlignment', $event.target.checked)" />
+                (change)="vm.toggleGuideSetting('showAlignment', !!$any($event.target)?.checked)" />
               <span>{{ 'guides.showAlignment' | t }}</span>
             </label>
             <label>
               <input type="checkbox" [checked]="guides.snapToGrid"
-                (change)="vm.toggleGuideSetting('snapToGrid', $event.target.checked)" />
+                (change)="vm.toggleGuideSetting('snapToGrid', !!$any($event.target)?.checked)" />
               <span>{{ 'guides.snapGrid' | t }}</span>
             </label>
             <label>
               <input type="checkbox" [checked]="guides.snapToMargins"
-                (change)="vm.toggleGuideSetting('snapToMargins', $event.target.checked)" />
+                (change)="vm.toggleGuideSetting('snapToMargins', !!$any($event.target)?.checked)" />
               <span>{{ 'guides.snapMargins' | t }}</span>
             </label>
             <label>
               <input type="checkbox" [checked]="guides.snapToCenters"
-                (change)="vm.toggleGuideSetting('snapToCenters', $event.target.checked)" />
+                (change)="vm.toggleGuideSetting('snapToCenters', !!$any($event.target)?.checked)" />
               <span>{{ 'guides.snapCenters' | t }}</span>
             </label>
             <label>
               <input type="checkbox" [checked]="guides.snapToCustom"
-                (change)="vm.toggleGuideSetting('snapToCustom', $event.target.checked)" />
+                (change)="vm.toggleGuideSetting('snapToCustom', !!$any($event.target)?.checked)" />
               <span>{{ 'guides.snapCustom' | t }}</span>
             </label>
           </div>

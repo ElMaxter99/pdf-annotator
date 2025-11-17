@@ -1375,7 +1375,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const pageIndex = options.history?.pageIndex ?? 1;
     this.pageIndex.set(Math.min(Math.max(1, pageIndex), loadedPdf.numPages));
     this.documentId = options.documentId ?? this.documentId ?? this.createDocumentId();
-    this.documentName.set(options.sourceName ?? this.documentName() || this.appName);
+    this.documentName.set((options.sourceName ?? this.documentName()) || this.appName);
     this.documentCreatedAt = options.createdAt ?? Date.now();
     this.coverThumbnailDataUrl = options.thumbnailDataUrl ?? null;
 

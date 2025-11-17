@@ -1,12 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { OfflineLibraryService } from '../../services/offline-library.service';
 import { OfflinePdfSummary } from '../../models/offline-library.model';
@@ -18,12 +12,6 @@ import { OfflinePdfSummary } from '../../models/offline-library.model';
   styleUrls: ['./library.page.scss'],
   imports: [
     CommonModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
     TranslationPipe,
   ],
 })
