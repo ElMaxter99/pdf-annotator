@@ -47,6 +47,8 @@
     "viewJsonText": "View JSON editor",
     "jsonViewModeToggle": "JSON view mode",
     "downloadPdf": "Download PDF",
+    "cursorLabel": "Cursor (PDF)",
+    "cursorInactive": "Hover over the PDF to see coordinates",
     "toolbarAriaLabel": "PDF actions",
     "navigationGroup": "Page navigation",
     "zoomGroup": "Zoom controls",
