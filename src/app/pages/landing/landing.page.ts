@@ -10,6 +10,7 @@ import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone
 import { LandingFooterComponent } from './components/footer/landing-footer.component';
 import { LandingHeroComponent } from './components/hero/landing-hero.component';
 import { LandingLanguageBarComponent } from './components/language-bar/landing-language-bar.component';
+import { TranslationPipe } from '../../i18n/translation.pipe';
 
 @Component({
   selector: 'app-landing-page',
@@ -22,6 +23,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingHeroComponent,
     LandingDropzoneComponent,
     LandingFooterComponent,
+    TranslationPipe,
   ],
 })
 export class LandingPageComponent {
@@ -114,5 +116,9 @@ export class LandingPageComponent {
 
     this.pendingFileService.setPendingFile(file);
     await this.router.navigate(['/workspace']);
+  }
+
+  goToLibrary() {
+    this.router.navigate(['/library']);
   }
 }

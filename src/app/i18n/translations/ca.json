@@ -53,7 +53,26 @@
     "navigationGroup": "Navegació de pàgines",
     "zoomGroup": "Controls de zoom",
     "historyGroup": "Accions d'historial",
-    "exportGroup": "Opcions d'exportació"
+    "exportGroup": "Opcions d'exportació",
+    "library": "Biblioteca"
+  },
+  "library": {
+    "title": "Biblioteca offline",
+    "search": {
+      "label": "Cerca PDFs",
+      "placeholder": "Filtra per títol"
+    },
+    "loading": "Sincronitzant els teus PDFs desats...",
+    "empty": "Desa un PDF des de l'editor per veure'l aquí fins i tot sense connexió.",
+    "thumbnailFallback": "Sense vista prèvia",
+    "pages": "{{count}} pàgines",
+    "actions": {
+      "goHome": "Inici",
+      "new": "Nou PDF",
+      "refresh": "Actualitza",
+      "open": "Obrir",
+      "delete": "Eliminar"
+    }
   },
   "sidebar": {
     "title": "Anotacions (JSON)",

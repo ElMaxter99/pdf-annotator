@@ -9,6 +9,10 @@
       (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
       (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
       (openFilePicker)="openPdfFilePicker()"></app-landing-dropzone>
+
+    <button class="landing__library-cta" type="button" (click)="goToLibrary()">
+      {{ 'library.actions.open' | t }}
+    </button>
   </section>
 
   <app-landing-footer [appName]="appName" [version]="version" [currentYear]="currentYear"

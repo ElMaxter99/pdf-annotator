@@ -12,6 +12,7 @@ import {
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import type { PdfLibFontkit } from '@pdf-lib/fontkit';
@@ -40,6 +41,8 @@ import {
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { OfflineLibraryService } from '../../services/offline-library.service';
+import { OfflinePdfDocument, OfflinePdfSource } from '../../models/offline-library.model';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -189,6 +192,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
+  private readonly offlineLibrary = inject(OfflineLibraryService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   readonly templates = signal<AnnotationTemplate[]>([]);
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
   templateNameModel = '';
@@ -198,6 +204,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly appAuthor = APP_AUTHOR;
   readonly currentYear = new Date().getFullYear();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
+  readonly documentName = signal('');
+  private documentId: string | null = null;
+  private documentCreatedAt = Date.now();
+  private coverThumbnailDataUrl: string | null = null;
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly defaultFontId = DEFAULT_FONT_ID;
   private readonly coordsFileInputChangeHandler = (event: Event) =>
@@ -325,12 +335,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const documentId = this.route.snapshot.paramMap.get('documentId');
+    if (documentId) {
+      await this.loadOfflineDocument(documentId);
+      return;
+    }
+
     const pendingFile = this.pendingFileService.consumePendingFile();
     if (pendingFile) {
-      this.loadPdfFile(pendingFile).catch((error) =>
-        console.error('No se pudo cargar el PDF pendiente.', error)
-      );
+      await this.loadPdfFile(pendingFile);
     }
   }
 
@@ -599,6 +613,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.editing.set(null);
     this.syncCoordsTextModel();
     this.redrawAllForPage();
+    void this.persistCurrentDocumentState();
   }
 
   redo() {
@@ -618,11 +633,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.editing.set(null);
     this.syncCoordsTextModel();
     this.redrawAllForPage();
+    void this.persistCurrentDocumentState();
   }
 
   onLanguageChange(language: Language) {
     this.translationService.setLanguage(language);
     this.languageModel = this.translationService.getCurrentLanguage();
+  }
+
+  goToLibrary() {
+    this.router.navigate(['/library']);
   }
 
   toggleGuidesFeature(enabled: boolean) {
@@ -1300,19 +1320,37 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.loadPdfFile(file);
   }
 
-  private async loadPdfFile(file: File) {
-    if (!isPdfFile(file)) {
-      alert(this.translationService.translate('app.upload.invalidFormat'));
+  private async loadPdfFromBytes(
+    data: Uint8Array,
+    options: {
+      sourceName?: string;
+      documentId?: string;
+      createdAt?: number;
+      byteSources?: OfflinePdfSource[];
+      history?: {
+        coords: PageAnnotations[];
+        undo: PageAnnotations[][];
+        redo: PageAnnotations[][];
+        pageIndex?: number;
+      };
+      thumbnailDataUrl?: string | null;
+      skipPersist?: boolean;
+    } = {}
+  ) {
+    this.pdfByteSources.clear();
+    options.byteSources?.forEach((source) => this.rememberPdfBytes(source.bytes, source.weight));
+    this.rememberPdfBytes(data, 0);
+
+    let loadedPdf: PDFDocumentProxy;
+
+    try {
+      loadedPdf = await pdfjsLib.getDocument({ data }).promise;
+    } catch (error) {
+      console.error('No se pudo leer el PDF proporcionado.', error);
+      alert('No se pudo cargar el PDF. Comprueba que el archivo no esté dañado.');
       return;
     }
 
-    this.pdfByteSources.clear();
-    const buf = await file.arrayBuffer();
-    const typed = new Uint8Array(buf);
-    this.rememberPdfBytes(typed, 0);
-
-    const loadingTask = pdfjsLib.getDocument({ data: typed });
-    const loadedPdf = await loadingTask.promise;
     this.pdfDoc = loadedPdf;
     this.cursorPdfCoords.set(null);
 
@@ -1334,13 +1372,83 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
     }
 
-    this.pageIndex.set(1);
-    this.resetHistory();
-    this.clearAll({ skipHistory: true });
+    const pageIndex = options.history?.pageIndex ?? 1;
+    this.pageIndex.set(Math.min(Math.max(1, pageIndex), loadedPdf.numPages));
+    this.documentId = options.documentId ?? this.documentId ?? this.createDocumentId();
+    this.documentName.set((options.sourceName ?? this.documentName()) || this.appName);
+    this.documentCreatedAt = options.createdAt ?? Date.now();
+    this.coverThumbnailDataUrl = options.thumbnailDataUrl ?? null;
+
+    if (options.history) {
+      this.undoStack.set(options.history.undo.map((state) => this.snapshotCoords(state)));
+      this.redoStack.set(options.history.redo.map((state) => this.snapshotCoords(state)));
+      this.coords.set(this.snapshotCoords(options.history.coords));
+    } else {
+      this.resetHistory();
+      this.coords.set([]);
+    }
+
+    this.preview.set(null);
+    this.editing.set(null);
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
     await this.render();
     this.generatePageThumbnails().catch((error) =>
       console.error('No se pudieron generar las miniaturas del documento.', error)
     );
+
+    if (this.documentId && !options.documentId) {
+      await this.router.navigate(['/workspace', this.documentId], { replaceUrl: true });
+    }
+
+    if (!options.skipPersist) {
+      await this.persistCurrentDocumentState({ thumbnailOverride: this.coverThumbnailDataUrl });
+    }
+  }
+
+  private async loadOfflineDocument(documentId: string) {
+    try {
+      const stored = await this.offlineLibrary.getDocument(documentId);
+
+      if (!stored) {
+        alert('No encontramos el documento solicitado en tu biblioteca offline.');
+        return;
+      }
+
+      await this.loadPdfFromBytes(stored.pdfBytes, {
+        documentId: stored.id,
+        sourceName: stored.name,
+        createdAt: stored.createdAt,
+        byteSources: stored.byteSources,
+        history: {
+          coords: stored.annotations,
+          undo: stored.undoStack,
+          redo: stored.redoStack,
+          pageIndex: stored.pageIndex,
+        },
+        thumbnailDataUrl: stored.thumbnailDataUrl ?? null,
+        skipPersist: true,
+      });
+
+      await this.persistCurrentDocumentState({ thumbnailOverride: stored.thumbnailDataUrl ?? null });
+    } catch (error) {
+      console.error('No se pudo restaurar el documento offline.', error);
+      alert('No se pudo abrir el documento guardado. Intenta de nuevo o recarga la página.');
+    }
+  }
+
+  private async loadPdfFile(file: File) {
+    if (!isPdfFile(file)) {
+      alert(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
+
+    const buf = await file.arrayBuffer();
+    await this.loadPdfFromBytes(new Uint8Array(buf), {
+      sourceName: file.name,
+      createdAt: Date.now(),
+    });
+
     this.fileDropActive.set(false);
   }
 
@@ -1405,6 +1513,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     const thumbnails: PageThumbnail[] = [];
     const objectUrls: string[] = [];
+    let coverDataUrl: string | null = null;
 
     try {
       for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber += 1) {
@@ -1440,6 +1549,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           .promise;
 
         const blob = await canvas.convertToBlob({ type: 'image/png' });
+        if (!coverDataUrl) {
+          try {
+            coverDataUrl = await this.blobToDataUrl(blob);
+          } catch (error) {
+            console.warn('No se pudo serializar la miniatura de portada.', error);
+          }
+        }
+
         const url = URL.createObjectURL(blob);
 
         objectUrls.push(url);
@@ -1466,6 +1583,19 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     this.thumbnailObjectUrls = objectUrls;
     this.pageThumbnails.set(thumbnails);
+    if (coverDataUrl) {
+      this.coverThumbnailDataUrl = coverDataUrl;
+      void this.persistCurrentDocumentState({ thumbnailOverride: coverDataUrl });
+    }
+  }
+
+  private async blobToDataUrl(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
   }
 
   private domToPdfCoords(evt: MouseEvent) {
@@ -3238,6 +3368,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.pageIndex.set(clamped);
     await this.render();
     this.redrawAllForPage();
+    void this.persistCurrentDocumentState();
   }
 
   async prevPage() {
@@ -3646,16 +3777,75 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return data;
   }
 
-  private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
-    if (!data) return;
+  private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0): boolean {
+    if (!data) return false;
     const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
-    if (!typed.length) return;
+    if (!typed.length) return false;
     const head = Array.from(typed.slice(0, 16)).join(',');
     const key = `${typed.length}:${head}`;
     const existing = this.pdfByteSources.get(key);
     if (!existing || weight >= existing.weight) {
       this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
+      return true;
     }
+    return false;
+  }
+
+  private createDocumentId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return `doc-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  private getByteSourcesSnapshot(): OfflinePdfSource[] {
+    return Array.from(this.pdfByteSources.values()).map((source) => ({
+      weight: source.weight,
+      bytes: source.bytes.slice(),
+    }));
+  }
+
+  private async persistCurrentDocumentState(options?: { thumbnailOverride?: string | null }) {
+    if (!this.pdfDoc || !this.documentId) {
+      return;
+    }
+
+    let bestSource = this.getBestCachedPdfBytes();
+
+    if (!bestSource) {
+      [bestSource] = await this.getPdfByteCandidates();
+    }
+
+    if (!bestSource) {
+      return;
+    }
+
+    const payload: OfflinePdfDocument = {
+      id: this.documentId,
+      name: this.documentName() || this.appName,
+      fileName: this.documentName(),
+      createdAt: this.documentCreatedAt,
+      updatedAt: Date.now(),
+      pageCount: this.pageCount,
+      pageIndex: this.pageIndex(),
+      pdfBytes: bestSource,
+      annotations: this.snapshotCoords(),
+      undoStack: this.undoStack().map((state) => this.snapshotCoords(state)),
+      redoStack: this.redoStack().map((state) => this.snapshotCoords(state)),
+      byteSources: this.getByteSourcesSnapshot(),
+      thumbnailDataUrl: options?.thumbnailOverride ?? this.coverThumbnailDataUrl ?? undefined,
+    };
+
+    await this.offlineLibrary.saveDocument(payload);
+  }
+
+  private getBestCachedPdfBytes(): Uint8Array | null {
+    if (!this.pdfByteSources.size) {
+      return null;
+    }
+
+    const [best] = Array.from(this.pdfByteSources.values()).sort((a, b) => b.weight - a.weight);
+    return best?.bytes?.slice() ?? null;
   }
 
   private syncCoordsTextModel(persist = true) {
@@ -3681,6 +3871,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (changed) {
       this.undoStack.update((stack) => [...stack, previous]);
       this.redoStack.set([]);
+      void this.persistCurrentDocumentState();
     }
     return changed;
   }
@@ -3696,6 +3887,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.editing.set(null);
     this.syncCoordsTextModel();
     this.redrawAllForPage();
+    void this.persistCurrentDocumentState();
   }
 
   private resetHistory() {

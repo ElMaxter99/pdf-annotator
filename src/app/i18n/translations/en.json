@@ -53,7 +53,26 @@
     "navigationGroup": "Page navigation",
     "zoomGroup": "Zoom controls",
     "historyGroup": "History actions",
-    "exportGroup": "Export options"
+    "exportGroup": "Export options",
+    "library": "Library"
+  },
+  "library": {
+    "title": "Offline library",
+    "search": {
+      "label": "Search PDFs",
+      "placeholder": "Filter by title"
+    },
+    "loading": "Syncing your saved PDFs...",
+    "empty": "Save a PDF from the workspace to see it here, even when you're offline.",
+    "thumbnailFallback": "No preview",
+    "pages": "{{count}} pages",
+    "actions": {
+      "goHome": "Home",
+      "new": "New PDF",
+      "refresh": "Refresh",
+      "open": "Open",
+      "delete": "Remove"
+    }
   },
   "sidebar": {
     "title": "Annotations (JSON)",

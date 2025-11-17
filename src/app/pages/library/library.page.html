@@ -1,0 +1,65 @@
+<div class="library">
+  <header class="library__toolbar">
+    <div class="library__toolbar-brand">
+      <img src="/logo.svg" alt="PDF Annotator" class="library__logo" />
+      <div class="library__title">{{ 'library.title' | t }}</div>
+    </div>
+    <span class="library__spacer"></span>
+    <div class="library__actions">
+      <button type="button" class="library__btn library__btn--ghost" (click)="goToLanding()">
+        {{ 'library.actions.goHome' | t }}
+      </button>
+      <button type="button" class="library__btn" (click)="startNewWorkspace()">
+        {{ 'library.actions.new' | t }}
+      </button>
+    </div>
+  </header>
+
+  <section class="library__content">
+    <div class="library__filters">
+      <label class="library__search">
+        <span class="library__search-label">{{ 'library.search.label' | t }}</span>
+        <input
+          type="search"
+          [value]="query()"
+          (input)="onSearch($any($event.target)?.value ?? '')"
+          [placeholder]="'library.search.placeholder' | t"
+        />
+      </label>
+      <button type="button" class="library__btn library__btn--ghost" (click)="refreshLibrary()">
+        {{ 'library.actions.refresh' | t }}
+      </button>
+    </div>
+
+    <div *ngIf="loading()" class="library__state library__state--loading">
+      <div class="library__spinner" aria-hidden="true"></div>
+      <p>{{ 'library.loading' | t }}</p>
+    </div>
+
+    <div *ngIf="!loading() && !visibleSummaries().length" class="library__state">
+      <p>{{ 'library.empty' | t }}</p>
+    </div>
+
+    <div *ngIf="!loading() && visibleSummaries().length" class="library__grid">
+      <article class="library__card" *ngFor="let doc of visibleSummaries()">
+        <div class="library__thumb" [class.library__thumb--empty]="!doc.thumbnailDataUrl">
+          <img *ngIf="doc.thumbnailDataUrl" [src]="doc.thumbnailDataUrl" [alt]="doc.name" />
+          <span *ngIf="!doc.thumbnailDataUrl">{{ 'library.thumbnailFallback' | t }}</span>
+        </div>
+        <h3 class="library__card-title">{{ doc.name }}</h3>
+        <p class="library__card-subtitle">
+          {{ 'library.pages' | t : { count: doc.pageCount } }} ·
+          {{ doc.updatedAt | date: 'short' }}
+        </p>
+        <div class="library__card-actions">
+          <button type="button" class="library__btn library__btn--ghost" (click)="openDocument(doc.id)">
+            {{ 'library.actions.open' | t }}
+          </button>
+          <button type="button" class="library__btn library__btn--danger" (click)="deleteDocument(doc.id)">
+            {{ 'library.actions.delete' | t }}
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>
