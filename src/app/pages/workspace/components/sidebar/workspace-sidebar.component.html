@@ -67,6 +67,18 @@
       <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
     </ng-template>
   </section>
+  <div class="json-coords" role="status" [attr.aria-label]="'controls.cursorLabel' | t">
+    <ng-container *ngIf="vm.cursorPdfCoords() as cursor; else coordsIdle">
+      <span class="json-coords__label">{{ 'controls.cursorLabel' | t }}</span>
+      <span class="json-coords__value">X: {{ cursor.x | number:'1.0-2' }}</span>
+      <span class="json-coords__divider" aria-hidden="true">·</span>
+      <span class="json-coords__value">Y: {{ cursor.y | number:'1.0-2' }}</span>
+    </ng-container>
+    <ng-template #coordsIdle>
+      <span class="json-coords__idle">{{ 'controls.cursorInactive' | t }}</span>
+    </ng-template>
+  </div>
+
   <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
     <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel"
       (ngModelChange)="vm.onCoordsTextChange($event)" [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>

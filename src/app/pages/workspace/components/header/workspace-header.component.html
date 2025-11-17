@@ -36,21 +36,6 @@
       </button>
     </div>
 
-    <div class="toolbar__group toolbar__group--coords" role="status"
-      [attr.aria-label]="'controls.cursorLabel' | t">
-      <ng-container *ngIf="vm.cursorPdfCoords() as cursor; else coordsIdle">
-        <span class="toolbar__badge toolbar__badge--coords">
-          <span class="toolbar__coords-label">{{ 'controls.cursorLabel' | t }}</span>
-          <span class="toolbar__coords-value">X: {{ cursor.x | number:'1.0-2' }}</span>
-          <span class="toolbar__coords-divider" aria-hidden="true">·</span>
-          <span class="toolbar__coords-value">Y: {{ cursor.y | number:'1.0-2' }}</span>
-        </span>
-      </ng-container>
-      <ng-template #coordsIdle>
-        <span class="toolbar__badge toolbar__badge--coords">{{ 'controls.cursorInactive' | t }}</span>
-      </ng-template>
-    </div>
-
     <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
       <button class="btn btn--icon" (click)="vm.undo()" [disabled]="!vm.canUndo()">
         <span class="btn__icon" aria-hidden="true">↺</span>
