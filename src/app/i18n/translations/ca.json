@@ -47,6 +47,8 @@
     "viewJsonText": "Veure editor JSON",
     "jsonViewModeToggle": "Mode de visualització del JSON",
     "downloadPdf": "Descarregar PDF",
+    "cursorLabel": "Cursor (PDF)",
+    "cursorInactive": "Passa el cursor pel PDF per veure les coordenades",
     "toolbarAriaLabel": "Accions del PDF",
     "navigationGroup": "Navegació de pàgines",
     "zoomGroup": "Controls de zoom",

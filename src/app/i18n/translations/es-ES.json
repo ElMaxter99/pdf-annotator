@@ -47,6 +47,8 @@
     "viewJsonText": "Volver al editor",
     "jsonViewModeToggle": "Modo de visualización del JSON",
     "downloadPdf": "Descargar PDF",
+    "cursorLabel": "Cursor (PDF)",
+    "cursorInactive": "Mueve el cursor sobre el PDF",
     "toolbarAriaLabel": "Acciones del PDF",
     "navigationGroup": "Navegación de páginas",
     "zoomGroup": "Controles de zoom",
