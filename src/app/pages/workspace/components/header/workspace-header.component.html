@@ -58,6 +58,14 @@
       </button>
     </div>
 
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.accessibilityGroup' | t">
+      <button class="btn btn--icon" type="button" (click)="vm.toggleHighContrast()"
+        [attr.aria-pressed]="vm.highContrast()" [attr.aria-label]="'controls.highContrastToggle' | t">
+        <span class="btn__icon" aria-hidden="true">🌗</span>
+        <span class="btn__label">{{ 'controls.highContrast' | t }}</span>
+      </button>
+    </div>
+
     <app-language-selector class="header__language-selector" [languages]="vm.languages"
       [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
     </app-language-selector>

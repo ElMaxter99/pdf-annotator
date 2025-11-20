@@ -133,6 +133,8 @@ interface FontDropdownUiState {
 
 const DEFAULT_FONT_ID = 'standard:helvetica';
 const DEFAULT_OPACITY = 1;
+const ANNOTATION_FOCUS_CLASS = 'annotation--focused';
+const HIGH_CONTRAST_CLASS = 'theme-high-contrast';
 
 @Component({
   selector: 'app-workspace-page',
@@ -173,6 +175,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   advancedOptionsOpen = signal(false);
   customFontsFeatureEnabled = signal(false);
   customFonts = signal<CustomFontEntry[]>([]);
+  highContrast = signal(false);
+  private focusedAnnotation: { pageIndex: number; fieldIndex: number } | null = null;
   private readonly fontDropdownState = signal<Record<EditorMode, FontDropdownUiState>>({
     preview: { open: false, query: '' },
     edit: { open: false, query: '' },
@@ -326,6 +330,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   ngOnInit(): void {
+    this.applyHighContrastTheme(this.highContrast());
     const pendingFile = this.pendingFileService.consumePendingFile();
     if (pendingFile) {
       this.loadPdfFile(pendingFile).catch((error) =>
@@ -346,6 +351,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       this.coordsFileInputFallback = null;
     }
+
+    this.applyHighContrastTheme(false);
   }
 
   setFieldFont(mode: EditorMode, fontId: string) {
@@ -1234,6 +1241,69 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  @HostListener('document:keydown', ['$event'])
+  onGlobalKeydown(event: KeyboardEvent) {
+    if (this.shouldSkipShortcut(event)) {
+      return;
+    }
+
+    const lowerKey = event.key.toLowerCase();
+
+    if (event.ctrlKey && event.altKey && lowerKey === 'n') {
+      event.preventDefault();
+      this.createKeyboardAnnotation();
+      return;
+    }
+
+    if (event.ctrlKey && event.altKey && lowerKey === 'e') {
+      event.preventDefault();
+      this.editFocusedAnnotation();
+      return;
+    }
+
+    if (event.ctrlKey && event.altKey && lowerKey === 'arrowright') {
+      event.preventDefault();
+      void this.focusNextAnnotation(1);
+      return;
+    }
+
+    if (event.ctrlKey && event.altKey && lowerKey === 'arrowleft') {
+      event.preventDefault();
+      void this.focusNextAnnotation(-1);
+      return;
+    }
+
+    if (event.altKey && lowerKey.startsWith('arrow')) {
+      const step = event.shiftKey ? 10 : 2;
+      switch (lowerKey) {
+        case 'arrowup':
+          this.nudgeFocusedAnnotation(0, -step);
+          event.preventDefault();
+          break;
+        case 'arrowdown':
+          this.nudgeFocusedAnnotation(0, step);
+          event.preventDefault();
+          break;
+        case 'arrowleft':
+          this.nudgeFocusedAnnotation(-step, 0);
+          event.preventDefault();
+          break;
+        case 'arrowright':
+          this.nudgeFocusedAnnotation(step, 0);
+          event.preventDefault();
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  toggleHighContrast() {
+    const next = !this.highContrast();
+    this.highContrast.set(next);
+    this.applyHighContrastTheme(next);
+  }
+
   get pageCount() {
     return this.pdfDoc?.numPages ?? 0;
   }
@@ -1478,25 +1548,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return { x: +(xPx / scale).toFixed(2), y: +((canvas.height - yPx) / scale).toFixed(2) };
   }
 
-  onViewerMouseMove(evt: MouseEvent) {
-    if (!this.pdfDoc) {
-      this.cursorPdfCoords.set(null);
-      return;
-    }
-
-    const coords = this.domToPdfCoords(evt);
-    this.cursorPdfCoords.set(coords);
-  }
-
-  onViewerMouseLeave() {
-    this.cursorPdfCoords.set(null);
-  }
-
-  onHitboxClick(evt: MouseEvent) {
-    if (!this.pdfDoc || this.editing()) return;
-    const pt = this.domToPdfCoords(evt);
-    if (!pt) return;
-
+  private openPreviewAtPoint(pt: { x: number; y: number }) {
     const defaultColor = '#000000';
     const baseField: PageField = {
       x: pt.x,
@@ -1520,6 +1572,198 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       field: styledField,
     });
     this.updatePreviewColorState(defaultColor);
+  }
+
+  onViewerMouseMove(evt: MouseEvent) {
+    if (!this.pdfDoc) {
+      this.cursorPdfCoords.set(null);
+      return;
+    }
+
+    const coords = this.domToPdfCoords(evt);
+    this.cursorPdfCoords.set(coords);
+  }
+
+  onViewerMouseLeave() {
+    this.cursorPdfCoords.set(null);
+  }
+
+  onHitboxClick(evt: MouseEvent) {
+    if (!this.pdfDoc || this.editing()) return;
+    const pt = this.domToPdfCoords(evt);
+    if (!pt) return;
+
+    this.openPreviewAtPoint(pt);
+  }
+
+  private shouldSkipShortcut(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return false;
+    }
+
+    const tagName = target.tagName.toLowerCase();
+    const editableTags = ['input', 'textarea', 'select', 'option', 'button'];
+    return editableTags.includes(tagName) || target.isContentEditable;
+  }
+
+  private getCanvasCenterCoords(): { x: number; y: number } | null {
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!pdfCanvas) {
+      return null;
+    }
+    const scale = this.scale();
+    return {
+      x: +(pdfCanvas.width / scale / 2).toFixed(2),
+      y: +((pdfCanvas.height / scale / 2)).toFixed(2),
+    };
+  }
+
+  private createKeyboardAnnotation() {
+    if (!this.pdfDoc || this.editing()) {
+      return;
+    }
+
+    const point = this.cursorPdfCoords() ?? this.getCanvasCenterCoords();
+    if (!point) {
+      return;
+    }
+
+    this.openPreviewAtPoint(point);
+  }
+
+  private editFocusedAnnotation() {
+    const focus = this.focusedAnnotation;
+    if (!focus) {
+      return;
+    }
+
+    const page = this.coords()[focus.pageIndex];
+    const field = page?.fields[focus.fieldIndex];
+    if (field) {
+      this.startEditing(focus.pageIndex, focus.fieldIndex, field);
+    }
+  }
+
+  private buildAnnotationAriaLabel(field: PageField, pageNumber: number, fieldIndex: number) {
+    const type = this.normalizeFieldType(field.type ?? 'text');
+    const typeLabel = this.translationService.translate(`annotation.fields.type.options.${type}`);
+    const name = field.mapField?.trim() || this.translationService.translate('annotation.aria.unnamed');
+    return this.translationService.translate('annotation.aria.summary', {
+      page: pageNumber,
+      name,
+      type: typeLabel,
+      index: fieldIndex + 1,
+    });
+  }
+
+  private async focusNextAnnotation(direction: 1 | -1) {
+    const annotations = this.coords().flatMap((page, pageIndex) =>
+      page.fields.map((field, fieldIndex) => ({ pageIndex, fieldIndex, pageNum: page.num ?? pageIndex + 1, field }))
+    );
+
+    if (!annotations.length) {
+      return;
+    }
+
+    const currentIndex = this.focusedAnnotation
+      ? annotations.findIndex(
+          (item) =>
+            item.pageIndex === this.focusedAnnotation?.pageIndex && item.fieldIndex === this.focusedAnnotation?.fieldIndex
+        )
+      : -1;
+
+    const nextIndex = (currentIndex + direction + annotations.length) % annotations.length;
+    const target = annotations[nextIndex];
+    await this.setPageIndex(target.pageNum);
+    this.runAfterRender(() => this.focusAnnotationElement(target.pageIndex, target.fieldIndex, true));
+  }
+
+  private getAnnotationElement(pageIndex: number, fieldIndex: number): HTMLDivElement | null {
+    const layer = this.annotationsLayerRef?.nativeElement;
+    if (!layer) {
+      return null;
+    }
+    return layer.querySelector<HTMLDivElement>(
+      `.annotation[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`
+    );
+  }
+
+  private focusAnnotationElement(pageIndex: number, fieldIndex: number, scrollIntoView = false) {
+    const el = this.getAnnotationElement(pageIndex, fieldIndex);
+    if (!el) {
+      return;
+    }
+
+    if (scrollIntoView) {
+      el.scrollIntoView({ block: 'center', inline: 'center' });
+    }
+    el.focus({ preventScroll: scrollIntoView });
+    this.focusedAnnotation = { pageIndex, fieldIndex };
+    this.highlightFocusedAnnotation();
+  }
+
+  private highlightFocusedAnnotation() {
+    const layer = this.annotationsLayerRef?.nativeElement;
+    if (!layer) {
+      return;
+    }
+
+    const focused = this.focusedAnnotation;
+    layer.querySelectorAll<HTMLElement>('.annotation').forEach((node) => {
+      const matches =
+        focused &&
+        node.dataset['pageIndex'] === String(focused.pageIndex) &&
+        node.dataset['fieldIndex'] === String(focused.fieldIndex);
+      node.classList.toggle(ANNOTATION_FOCUS_CLASS, !!matches);
+    });
+  }
+
+  private handleAnnotationKeydown(event: KeyboardEvent, pageIndex: number, fieldIndex: number) {
+    const key = event.key;
+    if (key === 'Enter' || key === ' ') {
+      event.preventDefault();
+      const page = this.coords()[pageIndex];
+      const field = page?.fields[fieldIndex];
+      if (field) {
+        this.startEditing(pageIndex, fieldIndex, field);
+      }
+    }
+  }
+
+  private nudgeFocusedAnnotation(deltaX: number, deltaY: number) {
+    const focus = this.focusedAnnotation;
+    if (!focus) {
+      return;
+    }
+
+    const page = this.coords()[focus.pageIndex];
+    const field = page?.fields[focus.fieldIndex];
+    if (!page || !field || field.locked) {
+      return;
+    }
+
+    const el = this.getAnnotationElement(focus.pageIndex, focus.fieldIndex);
+    if (!el) {
+      return;
+    }
+
+    const styledField = this.ensureFieldStyle(field);
+    const fontSizePx = styledField.fontSize * this.scale();
+    const widthPx = Math.max(el.offsetWidth, styledField.fontSize * this.scale());
+    const currentLeft = parseFloat(el.style.left || '0');
+    const currentTop = parseFloat(el.style.top || '0');
+
+    this.updateAnnotationPosition(
+      focus.pageIndex,
+      focus.fieldIndex,
+      currentLeft + deltaX,
+      currentTop + deltaY,
+      fontSizePx,
+      widthPx
+    );
+
+    this.runAfterRender(() => this.highlightFocusedAnnotation());
   }
 
   private normalizeColor(color: string) {
@@ -1835,6 +2079,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.redrawAllForPage();
     }
     this.editing.set(null);
+    this.focusedAnnotation = null;
+    this.highlightFocusedAnnotation();
   }
 
   copyAnnotation(): boolean {
@@ -2570,6 +2816,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return { minLeft: min, maxLeft: max < min ? min : max };
   }
 
+  private applyHighContrastTheme(enabled: boolean) {
+    const root = this.document?.documentElement;
+    if (!root) {
+      return;
+    }
+
+    root.classList.toggle(HIGH_CONTRAST_CLASS, enabled);
+  }
+
   private runAfterRender(callback: () => void) {
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(() => callback());
@@ -2968,6 +3223,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
           const el = document.createElement('div');
           el.className = 'annotation';
+          el.dataset['pageIndex'] = String(pageIndex);
+          el.dataset['fieldIndex'] = String(fieldIndex);
+          el.setAttribute('role', 'button');
+          el.tabIndex = 0;
+          el.setAttribute(
+            'aria-label',
+            this.buildAnnotationAriaLabel(styledField, page.num ?? pageIndex + 1, fieldIndex)
+          );
           el.textContent = this.getFieldRenderValue(styledField);
           el.style.left = `${left}px`;
           el.style.top = `${top - styledField.fontSize * scale}px`;
@@ -2991,6 +3254,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           }
           el.classList.toggle('annotation--locked', isLocked);
           el.classList.toggle('annotation--hidden', isHidden);
+          el.onfocus = () => {
+            this.focusedAnnotation = { pageIndex, fieldIndex };
+            this.highlightFocusedAnnotation();
+          };
+          el.onblur = () => el.classList.remove(ANNOTATION_FOCUS_CLASS);
+          el.onkeydown = (evt) => this.handleAnnotationKeydown(evt, pageIndex, fieldIndex);
           el.onpointerdown = isLocked
             ? (evt) => this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex)
             : (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
@@ -3000,6 +3269,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         });
       });
 
+    this.highlightFocusedAnnotation();
     this.refreshOverlay();
   }
 

@@ -53,7 +53,10 @@
     "navigationGroup": "Navigation des pages",
     "zoomGroup": "Contrôles du zoom",
     "historyGroup": "Actions d'historique",
-    "exportGroup": "Options d'export"
+    "exportGroup": "Options d'export",
+    "accessibilityGroup": "Options d’accessibilité",
+    "highContrast": "Contraste élevé",
+    "highContrastToggle": "Activer le thème à contraste élevé"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -172,10 +175,17 @@
       "hexPlaceholder": "#5eead4",
       "rgbPlaceholder": "rgb(94, 234, 212)"
     },
-    "actions": {
-      "duplicate": "Dupliquer l'annotation"
-    },
-    "editingBadge": "Édition"
+      "actions": {
+        "duplicate": "Dupliquer l'annotation",
+        "confirm": "Enregistrer l’annotation",
+        "cancel": "Annuler l’édition",
+        "delete": "Supprimer l’annotation"
+      },
+      "aria": {
+        "summary": "Annotation {{index}} page {{page}} ({{type}} : {{name}})",
+        "unnamed": "Champ sans nom"
+      },
+      "editingBadge": "Édition"
   },
   "fonts": {
     "custom": {

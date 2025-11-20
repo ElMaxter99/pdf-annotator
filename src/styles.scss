@@ -7,6 +7,15 @@
   --muted: #b0b0b0;
 }
 
+:root.theme-high-contrast {
+  --bg: #000000;
+  --panel: #0f0f0f;
+  --accent: #ffdd2d;
+  --danger: #ff7b7b;
+  --text: #ffffff;
+  --muted: #e0e0e0;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -1133,6 +1142,12 @@ header .logo {
   user-select: none;
   padding: 0;
   outline: 1px solid transparent;
+}
+
+.annotation:focus-visible,
+.annotation--focused {
+  outline: 2px solid var(--accent);
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.35);
 }
 
 .annotation:hover {

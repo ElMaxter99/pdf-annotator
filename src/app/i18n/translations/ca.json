@@ -53,7 +53,10 @@
     "navigationGroup": "Navegació de pàgines",
     "zoomGroup": "Controls de zoom",
     "historyGroup": "Accions d'historial",
-    "exportGroup": "Opcions d'exportació"
+    "exportGroup": "Opcions d'exportació",
+    "accessibilityGroup": "Opcions d'accessibilitat",
+    "highContrast": "Alt contrast",
+    "highContrastToggle": "Activar tema d'alt contrast"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
@@ -172,10 +175,17 @@
       "hexPlaceholder": "#5eead4",
       "rgbPlaceholder": "rgb(94, 234, 212)"
     },
-    "actions": {
-      "duplicate": "Duplicar anotació"
-    },
-    "editingBadge": "Editant"
+      "actions": {
+        "duplicate": "Duplicar anotació",
+        "confirm": "Desar anotació",
+        "cancel": "Cancel·lar edició",
+        "delete": "Eliminar anotació"
+      },
+      "aria": {
+        "summary": "Anotació {{index}} a la pàgina {{page}} ({{type}}: {{name}})",
+        "unnamed": "Camp sense nom"
+      },
+      "editingBadge": "Editant"
   },
   "fonts": {
     "custom": {

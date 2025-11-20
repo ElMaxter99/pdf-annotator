@@ -130,8 +130,10 @@
         <small class="color-hint">{{ 'annotation.color.hintPreview' | t }}</small>
       </div>
       <div class="editor-actions">
-        <button class="action-primary" (click)="vm.confirmPreview()">✅</button>
-        <button (click)="vm.cancelPreview()">❌</button>
+        <button type="button" class="action-primary" (click)="vm.confirmPreview()"
+          [attr.aria-label]="'annotation.actions.confirm' | t">✅</button>
+        <button type="button" (click)="vm.cancelPreview()"
+          [attr.aria-label]="'annotation.actions.cancel' | t">❌</button>
       </div>
     </div>
 
@@ -272,9 +274,10 @@
       <div class="editor-actions">
         <button type="button" (click)="vm.duplicateAnnotation()" [title]="'annotation.actions.duplicate' | t"
           [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
-        <button class="btn-delete" (click)="vm.deleteAnnotation()">🗑️</button>
-        <button class="action-primary" (click)="vm.confirmEdit()">✅</button>
-        <button (click)="vm.cancelEdit()">❌</button>
+        <button class="btn-delete" (click)="vm.deleteAnnotation()" [attr.aria-label]="'annotation.actions.delete' | t">🗑️</button>
+        <button type="button" class="action-primary" (click)="vm.confirmEdit()"
+          [attr.aria-label]="'annotation.actions.confirm' | t">✅</button>
+        <button type="button" (click)="vm.cancelEdit()" [attr.aria-label]="'annotation.actions.cancel' | t">❌</button>
       </div>
     </div>
   </div>

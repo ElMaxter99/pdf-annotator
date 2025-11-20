@@ -16,7 +16,8 @@
     <span class="landing__headline">{{ 'app.upload.title' | t }}</span>
     <span class="landing__subheadline">{{ 'app.upload.subtitle' | t }}</span>
   </div>
-  <button type="button" class="landing__cta" (click)="onOpenFilePicker($event)">
+  <button type="button" class="landing__cta" (click)="onOpenFilePicker($event)"
+    [attr.aria-label]="'app.landing.cta' | t">
     {{ 'app.landing.cta' | t }}
   </button>
   <span class="landing__hint">{{ 'app.upload.hint' | t }}</span>

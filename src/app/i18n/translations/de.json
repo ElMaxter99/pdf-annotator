@@ -53,7 +53,10 @@
     "navigationGroup": "Seitennavigation",
     "zoomGroup": "Zoom-Steuerung",
     "historyGroup": "Verlauf",
-    "exportGroup": "Exportoptionen"
+    "exportGroup": "Exportoptionen",
+    "accessibilityGroup": "Barrierefreiheit",
+    "highContrast": "Hoher Kontrast",
+    "highContrastToggle": "Hochkontrast-Theme aktivieren"
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",
@@ -172,10 +175,17 @@
       "hexPlaceholder": "#5eead4",
       "rgbPlaceholder": "rgb(94, 234, 212)"
     },
-    "actions": {
-      "duplicate": "Anmerkung duplizieren"
-    },
-    "editingBadge": "Bearbeitung"
+      "actions": {
+        "duplicate": "Anmerkung duplizieren",
+        "confirm": "Annotation speichern",
+        "cancel": "Bearbeitung abbrechen",
+        "delete": "Annotation löschen"
+      },
+      "aria": {
+        "summary": "Anmerkung {{index}} auf Seite {{page}} ({{type}}: {{name}})",
+        "unnamed": "Unbenanntes Feld"
+      },
+      "editingBadge": "Bearbeitung"
   },
   "fonts": {
     "custom": {
