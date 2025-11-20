@@ -55,6 +55,12 @@
     "historyGroup": "Acciones de historial",
     "exportGroup": "Opciones de exportación"
   },
+  "acroForm": {
+    "title": "Campos del formulario",
+    "empty": "Este PDF no incluye campos de formulario.",
+    "associate": "Asociar anotación",
+    "pageLabel": "Página {{page}}"
+  },
   "sidebar": {
     "title": "Anotaciones (JSON)",
     "importJsonFile": "Importar desde archivo",

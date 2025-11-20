@@ -13,13 +13,13 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import type { PdfLibFontkit } from '@pdf-lib/fontkit';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
 import '../../array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from '../../models/annotation.model';
+import { AcroFormField, AcroFormFieldRect } from '../../models/acro-form-field.model';
 import { AnnotationTemplatesService, AnnotationTemplate } from '../../annotation-templates.service';
 import {
   DEFAULT_GUIDE_SETTINGS,
@@ -39,50 +39,8 @@ import {
 } from '../../fonts/standard-font-families';
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
+import { PdfLoaderService } from '../../services/pdf-loader.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
-
-const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
-const PDF_WORKER_TYPE_MODULE = 'module';
-
-function supportsModuleWorkers(): boolean {
-  if (
-    typeof Worker === 'undefined' ||
-    typeof Blob === 'undefined' ||
-    typeof URL === 'undefined' ||
-    typeof URL.createObjectURL !== 'function'
-  ) {
-    return false;
-  }
-
-  let url: string | null = null;
-
-  try {
-    const blob = new Blob([''], { type: 'application/javascript' });
-    url = URL.createObjectURL(blob);
-    const tester = new Worker(url, { type: 'module' });
-    tester.terminate();
-    return true;
-  } catch {
-    return false;
-  } finally {
-    if (url) {
-      URL.revokeObjectURL(url);
-    }
-  }
-}
-
-const workerOptions = (pdfjsLib as any).GlobalWorkerOptions as {
-  workerSrc?: string;
-  workerType?: string;
-};
-
-if (supportsModuleWorkers()) {
-  workerOptions.workerSrc = PDF_WORKER_MODULE_SRC;
-  workerOptions.workerType = PDF_WORKER_TYPE_MODULE;
-} else {
-  workerOptions.workerSrc = undefined;
-  workerOptions.workerType = undefined;
-}
 
 type PreviewState = { page: number; field: PageField } | null;
 
@@ -155,6 +113,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   pageIndex = signal(1);
   scale = signal(1.5);
   coords = signal<PageAnnotations[]>([]);
+  acroFormFields = signal<AcroFormField[]>([]);
   cursorPdfCoords = signal<{ x: number; y: number } | null>(null);
   private readonly undoStack = signal<PageAnnotations[][]>([]);
   private readonly redoStack = signal<PageAnnotations[][]>([]);
@@ -184,11 +143,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   snapPointsYText = signal('');
   fileDropActive = signal(false);
   readonly jsonViewMode = signal<JsonViewMode>('text');
+  readonly acroFormFieldsByPage = computed(() => this.groupAcroFieldsByPage());
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
+  private readonly pdfLoader = inject(PdfLoaderService);
   readonly templates = signal<AnnotationTemplate[]>([]);
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
   templateNameModel = '';
@@ -1307,25 +1268,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     this.pdfByteSources.clear();
+    this.acroFormFields.set([]);
     const buf = await file.arrayBuffer();
     const typed = new Uint8Array(buf);
     this.rememberPdfBytes(typed, 0);
 
-    const loadingTask = pdfjsLib.getDocument({ data: typed });
-    const loadedPdf = await loadingTask.promise;
-    this.pdfDoc = loadedPdf;
+    const { pdf, acroFormFields } = await this.pdfLoader.loadDocument(typed);
+    this.pdfDoc = pdf;
+    this.acroFormFields.set(acroFormFields);
     this.cursorPdfCoords.set(null);
 
     try {
-      const canonicalData = await loadedPdf.getData();
+      const canonicalData = await pdf.getData();
       this.rememberPdfBytes(canonicalData, 1);
     } catch (error) {
       console.warn('No se pudo obtener una copia canonizada del PDF cargado.', error);
     }
 
-    if (typeof loadedPdf.saveDocument === 'function') {
+    if (typeof pdf.saveDocument === 'function') {
       try {
-        const sanitizedData = await loadedPdf.saveDocument();
+        const sanitizedData = await pdf.saveDocument();
         const typedSanitized =
           sanitizedData instanceof Uint8Array ? sanitizedData : new Uint8Array(sanitizedData);
         this.rememberPdfBytes(typedSanitized, 2);
@@ -1520,6 +1482,51 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       field: styledField,
     });
     this.updatePreviewColorState(defaultColor);
+  }
+
+  async associateAnnotationWithField(field: AcroFormField) {
+    const defaultColor = '#000000';
+    const suggestedFontSize = Math.max(
+      8,
+      Math.min(18, Math.round((field.rect.height ?? 0) - 2))
+    );
+    const baseField: PageField = {
+      x: Math.round((field.rect.x + 2) * 100) / 100,
+      y: Math.round((field.rect.y + Math.max(field.rect.height - 2, 0)) * 100) / 100,
+      mapField: field.name,
+      fontSize: Number.isFinite(suggestedFontSize) ? suggestedFontSize : 14,
+      color: defaultColor,
+      type: 'text',
+      value: '',
+      appender: '',
+      decimals: null,
+      fontFamily: DEFAULT_FONT_ID,
+      opacity: DEFAULT_OPACITY,
+      backgroundColor: null,
+      locked: false,
+      hidden: false,
+      acroField: field,
+    } as PageField;
+
+    const styledField = this.ensureFieldStyle(baseField);
+    const storedField = this.prepareFieldForStorage(styledField);
+    const targetPage = Math.max(1, Math.round(field.page));
+    const changed = this.applyCoordsChange(() =>
+      this.coords.update((pages) => this.addFieldToPages(targetPage, storedField, pages))
+    );
+
+    await this.setPageIndex(targetPage);
+
+    if (changed) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+      const pages = this.coords();
+      const pageIndex = pages.findIndex((page) => page.num === targetPage);
+      const fieldIndex = pageIndex >= 0 ? pages[pageIndex].fields.length - 1 : -1;
+      if (pageIndex >= 0 && fieldIndex >= 0) {
+        this.startEditing(pageIndex, fieldIndex, pages[pageIndex].fields[fieldIndex]);
+      }
+    }
   }
 
   private normalizeColor(color: string) {
@@ -1923,7 +1930,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return true;
     }
 
-    return field.mapField.trim().length > 0;
+    const mapValue = (field.mapField ?? '').trim();
+    const acroFieldName = field.acroField?.name?.trim() ?? '';
+    return mapValue.length > 0 || acroFieldName.length > 0;
   }
 
   private fieldRequiresStorageUpdate(original: PageField, sanitized: PageField): boolean {
@@ -1933,10 +1942,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private prepareFieldForStorage(field: PageField): PageField {
     const styled = this.ensureFieldStyle(field);
     const type = this.normalizeFieldType(styled.type);
+    const acroField = this.sanitizeAcroField(styled.acroField);
     const base: PageField = {
       x: styled.x,
       y: styled.y,
-      mapField: typeof styled.mapField === 'string' ? styled.mapField : '',
+      mapField:
+        typeof styled.mapField === 'string' && styled.mapField.trim().length > 0
+          ? styled.mapField.trim()
+          : '',
       fontSize: styled.fontSize,
       color: this.normalizeColor(styled.color),
       type,
@@ -1946,6 +1959,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       locked: !!styled.locked,
       hidden: !!styled.hidden,
     };
+
+    if (acroField) {
+      base.acroField = acroField;
+    }
 
     const value = this.sanitizeTextPreservingSpacing(styled.value);
     if (value !== undefined) {
@@ -1968,6 +1985,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private prepareFieldForForm(field: PageField): PageField {
     const styled = this.ensureFieldStyle(field);
+    const acroField = this.sanitizeAcroField(styled.acroField);
     const decimals =
       typeof styled.decimals === 'number' && Number.isFinite(styled.decimals)
         ? Math.max(0, Math.round(styled.decimals))
@@ -1980,6 +1998,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       decimals,
       locked: !!styled.locked,
       hidden: !!styled.hidden,
+      acroField: acroField ?? null,
     };
   }
 
@@ -2382,6 +2401,60 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return undefined;
     }
     return this.normalizeColor(trimmed);
+  }
+
+  private sanitizeAcroFieldRect(rect: unknown): AcroFormFieldRect | null {
+    if (!rect || typeof rect !== 'object') {
+      return null;
+    }
+
+    const typedRect = rect as Record<string, unknown>;
+    const x = this.toFiniteNumber(typedRect.x);
+    const y = this.toFiniteNumber(typedRect.y);
+    const width = this.toFiniteNumber(typedRect.width);
+    const height = this.toFiniteNumber(typedRect.height);
+
+    if (x === null || y === null || width === null || height === null) {
+      return null;
+    }
+
+    if (width <= 0 || height <= 0) {
+      return null;
+    }
+
+    return {
+      x: Math.round(x * 100) / 100,
+      y: Math.round(y * 100) / 100,
+      width: Math.round(width * 100) / 100,
+      height: Math.round(height * 100) / 100,
+    };
+  }
+
+  private sanitizeAcroField(value: unknown): AcroFormField | undefined {
+    if (!value || typeof value !== 'object') {
+      return undefined;
+    }
+
+    const typed = value as { name?: unknown; page?: unknown; rect?: unknown };
+    if (typeof typed.name !== 'string' || !typed.name.trim()) {
+      return undefined;
+    }
+
+    const page = this.toFiniteNumber(typed.page);
+    if (!page || !Number.isInteger(page) || page < 1) {
+      return undefined;
+    }
+
+    const rect = this.sanitizeAcroFieldRect(typed.rect);
+    if (!rect) {
+      return undefined;
+    }
+
+    return {
+      name: typed.name.trim(),
+      page,
+      rect,
+    };
   }
 
   private ensureFieldStyle(field: PageField): PageField {
@@ -2877,7 +2950,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return 'X';
     }
 
-    const baseText = typeof field.mapField === 'string' ? field.mapField : '';
+    const baseText =
+      (typeof field.mapField === 'string' && field.mapField.trim().length > 0
+        ? field.mapField
+        : field.acroField?.name) ?? '';
 
     if (type === 'number') {
       const numeric = this.toFiniteNumber(baseText);
@@ -2921,7 +2997,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         return page;
       }
       const updatedFields = page.fields.map((item, itemIdx) =>
-        itemIdx === fieldIndex ? { ...field } : item
+        itemIdx === fieldIndex ? this.cloneField(field) : item
       );
       return { ...page, fields: updatedFields };
     });
@@ -3430,8 +3506,41 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private clonePages(pages: readonly PageAnnotations[]): PageAnnotations[] {
     return pages.map((page) => ({
       num: page.num,
-      fields: page.fields.map((field) => ({ ...field })),
+      fields: page.fields.map((field) => this.cloneField(field)),
     }));
+  }
+
+  private cloneField(field: PageField): PageField {
+    const base: PageField = { ...field };
+
+    if (field.acroField) {
+      base.acroField = {
+        name: field.acroField.name,
+        page: field.acroField.page,
+        rect: { ...field.acroField.rect },
+      };
+    }
+
+    return base;
+  }
+
+  private groupAcroFieldsByPage(): { page: number; fields: AcroFormField[] }[] {
+    const grouped = new Map<number, AcroFormField[]>();
+
+    this.acroFormFields().forEach((field) => {
+      const collection = grouped.get(field.page) ?? [];
+      collection.push(field);
+      grouped.set(field.page, collection);
+    });
+
+    return Array.from(grouped.entries())
+      .map(([page, fields]) => ({
+        page,
+        fields: fields
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name) || a.rect.x - b.rect.x),
+      }))
+      .sort((a, b) => a.page - b.page);
   }
 
   private ensureCoordsFileInput(): HTMLInputElement | null {
@@ -3557,8 +3666,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           const embeddedFont = await getFontFromDescriptor(fontOption.descriptor);
           const textColor = this.hexToRgbComponents(styledField.color) ?? { r: 0, g: 0, b: 0 };
           const opacity = styledField.opacity ?? DEFAULT_OPACITY;
-
-          const drawX = styledField.x;
+          const acroField = this.sanitizeAcroField(styledField.acroField);
+          const drawX =
+            acroField && acroField.page === pageAnnotations.num
+              ? acroField.rect.x + (styledField.x - acroField.rect.x)
+              : styledField.x;
+          const drawY =
+            acroField && acroField.page === pageAnnotations.num
+              ? acroField.rect.y + (styledField.y - acroField.rect.y)
+              : styledField.y;
           const textWidth = embeddedFont.widthOfTextAtSize(text, styledField.fontSize);
 
           if (styledField.backgroundColor) {
@@ -3570,7 +3686,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
               if (textWidth > 0 && totalHeight > 0) {
                 page.drawRectangle({
                   x: drawX,
-                  y: styledField.y - descent,
+                  y: drawY - descent,
                   width: textWidth,
                   height: totalHeight,
                   color: rgb(bg.r / 255, bg.g / 255, bg.b / 255),
@@ -3583,7 +3699,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           if (text) {
             page.drawText(text, {
               x: drawX,
-              y: styledField.y,
+              y: drawY,
               size: styledField.fontSize,
               color: rgb(textColor.r / 255, textColor.g / 255, textColor.b / 255),
               font: embeddedFont,
@@ -3670,7 +3786,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private snapshotCoords(pages: PageAnnotations[] = this.coords()): PageAnnotations[] {
     return pages.map((page) => ({
       num: page.num,
-      fields: page.fields.map((field) => ({ ...field })),
+      fields: page.fields.map((field) => this.cloneField(field)),
     }));
   }
 
@@ -3749,7 +3865,27 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       (sanitizedA.opacity ?? DEFAULT_OPACITY) === (sanitizedB.opacity ?? DEFAULT_OPACITY) &&
       (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null) &&
       (sanitizedA.locked ?? false) === (sanitizedB.locked ?? false) &&
-      (sanitizedA.hidden ?? false) === (sanitizedB.hidden ?? false)
+      (sanitizedA.hidden ?? false) === (sanitizedB.hidden ?? false) &&
+      this.areAcroFieldsEqual(sanitizedA.acroField, sanitizedB.acroField)
+    );
+  }
+
+  private areAcroFieldsEqual(a?: AcroFormField | null, b?: AcroFormField | null): boolean {
+    if (!a && !b) {
+      return true;
+    }
+
+    if (!a || !b) {
+      return false;
+    }
+
+    return (
+      a.name === b.name &&
+      a.page === b.page &&
+      a.rect.x === b.rect.x &&
+      a.rect.y === b.rect.y &&
+      a.rect.width === b.rect.width &&
+      a.rect.height === b.rect.height
     );
   }
 
@@ -3914,10 +4050,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
         const { x, y, mapField, fontSize, color, value, type, decimals, appender } =
           rawField as Record<string, unknown>;
+        const importedAcroField = this.sanitizeAcroField(
+          (rawField as { acroField?: unknown }).acroField
+        );
 
         const normalizedType = this.normalizeFieldType(type);
         const normalizedValue = this.normalizeFieldText(value);
-        const normalizedMapField = this.normalizeFieldText(mapField) ?? normalizedValue;
+        const normalizedMapField =
+          this.normalizeFieldText(mapField) ??
+          this.normalizeFieldText(importedAcroField?.name) ??
+          normalizedValue;
         const normalizedX = this.toFiniteNumber(x);
         const normalizedY = this.toFiniteNumber(y);
 
@@ -3974,6 +4116,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           fontFamily: this.resolveImportedFontFamily(...fontCandidates),
           opacity: rawOpacity as number | string | undefined,
           backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,
+          acroField: importedAcroField,
         } as PageField);
 
         fields.push(styledField);

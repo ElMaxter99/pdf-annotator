@@ -45,6 +45,33 @@
       ></app-page-thumbnails>
     </div>
   </section>
+  <section class="acroform-panel">
+    <div class="acroform-panel__header">
+      <h5 class="acroform-panel__title">{{ 'acroForm.title' | t }}</h5>
+      <span class="acroform-panel__badge" *ngIf="vm.acroFormFields().length">{{ vm.acroFormFields().length }}</span>
+    </div>
+    <ng-container *ngIf="vm.acroFormFields().length; else acroFormEmpty">
+      <div class="acroform-panel__pages">
+        <div class="acroform-panel__page" *ngFor="let page of vm.acroFormFieldsByPage()">
+          <div class="acroform-panel__page-header">
+            <span class="acroform-panel__page-title">{{ 'acroForm.pageLabel' | t:{ page: page.page } }}</span>
+            <span class="acroform-panel__badge">{{ page.fields.length }}</span>
+          </div>
+          <ul class="acroform-panel__field-list">
+            <li class="acroform-panel__field" *ngFor="let field of page.fields">
+              <span class="acroform-panel__field-name" [title]="field.name">{{ field.name }}</span>
+              <button type="button" class="btn btn--inline" (click)="vm.associateAnnotationWithField(field)">
+                {{ 'acroForm.associate' | t }}
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #acroFormEmpty>
+      <p class="acroform-panel__empty">{{ 'acroForm.empty' | t }}</p>
+    </ng-template>
+  </section>
   <section class="templates">
     <h5>{{ 'sidebar.templates.title' | t }}</h5>
     <div class="templates__save">

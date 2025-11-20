@@ -55,6 +55,12 @@
     "historyGroup": "Verlauf",
     "exportGroup": "Exportoptionen"
   },
+  "acroForm": {
+    "title": "Formularfelder",
+    "empty": "Dieses PDF enthält keine Formularfelder.",
+    "associate": "Annotation verknüpfen",
+    "pageLabel": "Seite {{page}}"
+  },
   "sidebar": {
     "title": "Anmerkungen (JSON)",
     "importJsonFile": "Aus Datei importieren",

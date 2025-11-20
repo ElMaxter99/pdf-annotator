@@ -142,8 +142,23 @@ export class AnnotationTemplatesService {
   private clonePages(pages: readonly PageAnnotations[]): PageAnnotations[] {
     return pages.map((page) => ({
       num: page.num,
-      fields: page.fields.map((field): PageField => ({ ...field })),
+      fields: page.fields.map((field): PageField => this.cloneField(field)),
     }));
+  }
+
+  private cloneField(field: PageField): PageField {
+    if (!field.acroField) {
+      return { ...field };
+    }
+
+    return {
+      ...field,
+      acroField: {
+        name: field.acroField.name,
+        page: field.acroField.page,
+        rect: { ...field.acroField.rect },
+      },
+    };
   }
 
   private getStoredTemplates(): AnnotationTemplate[] {
