@@ -40,6 +40,7 @@ import {
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { AnnotationDiff, DiffKind, DiffResolution } from '../../models/annotation-diff.model';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -184,6 +185,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   snapPointsYText = signal('');
   fileDropActive = signal(false);
   readonly jsonViewMode = signal<JsonViewMode>('text');
+  diffBasePages = signal<PageAnnotations[] | null>(null);
+  diffTargetPages = signal<PageAnnotations[] | null>(null);
+  diffEntries = signal<AnnotationDiff[]>([]);
+  diffOverlayVisible = signal(false);
+  selectedDiffId = signal<string | null>(null);
+  diffBaseName = signal<string | null>(null);
+  diffTargetName = signal<string | null>(null);
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
@@ -678,6 +686,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     checked: boolean
   ) {
     this.guideSettings.update((settings) => ({ ...settings, [key]: checked }));
+    this.renderDiffHighlights(layer, scale);
     this.refreshOverlay();
   }
 
@@ -4107,5 +4116,386 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
+  }
+
+  async onDiffFileSelected(event: Event, role: 'base' | 'target') {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      const pages = await this.readDiffFile(file);
+      if (role === 'base') {
+        this.diffBasePages.set(pages);
+        this.diffBaseName.set(file.name);
+      } else {
+        this.diffTargetPages.set(pages);
+        this.diffTargetName.set(file.name);
+      }
+      this.computeDiffEntriesFromSources();
+    } catch (error) {
+      console.error('No se pudo cargar el archivo de diferencias.', error);
+      alert('No se pudo leer el JSON seleccionado. Verifica que tenga el formato de anotaciones.');
+    } finally {
+      input.value = '';
+    }
+  }
+
+  toggleDiffOverlay(visible: boolean) {
+    this.diffOverlayVisible.set(visible);
+    this.redrawAllForPage();
+  }
+
+  resetDiffReview() {
+    this.diffBasePages.set(null);
+    this.diffTargetPages.set(null);
+    this.diffEntries.set([]);
+    this.selectedDiffId.set(null);
+    this.diffOverlayVisible.set(false);
+    this.diffBaseName.set(null);
+    this.diffTargetName.set(null);
+    this.redrawAllForPage();
+  }
+
+  selectDiff(id: string) {
+    if (!id) {
+      this.selectedDiffId.set(null);
+      this.redrawAllForPage();
+      return;
+    }
+
+    const diff = this.diffEntries().find((item) => item.id === id);
+    if (!diff) {
+      return;
+    }
+
+    if (this.pageIndex() !== diff.page) {
+      this.setPageIndex(diff.page);
+    }
+    this.selectedDiffId.set(id);
+    this.redrawAllForPage();
+  }
+
+  resolveDiff(id: string, resolution: DiffResolution) {
+    this.diffEntries.update((entries) =>
+      entries.map((item) => (item.id === id ? { ...item, resolution } : item))
+    );
+    this.redrawAllForPage();
+  }
+
+  exportConsolidatedDiff() {
+    const consolidated = this.buildConsolidatedDiff();
+    if (!consolidated.length) {
+      alert('No hay cambios aceptados para consolidar.');
+      return;
+    }
+
+    const blob = new Blob([JSON.stringify({ pages: consolidated }, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'coords-consolidadas.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  private async readDiffFile(file: File): Promise<PageAnnotations[]> {
+    const text = await file.text();
+    const parsed = this.parseLooseJson(text);
+    const normalized = this.normalizeImportedCoordinates(parsed);
+
+    if (normalized === null) {
+      throw new Error('Formato no válido');
+    }
+
+    return normalized;
+  }
+
+  private computeDiffEntriesFromSources() {
+    const base = this.diffBasePages();
+    const target = this.diffTargetPages();
+
+    if (!base || !target) {
+      this.diffEntries.set([]);
+      this.selectedDiffId.set(null);
+      this.diffOverlayVisible.set(false);
+      this.redrawAllForPage();
+      return;
+    }
+
+    const diffs = this.buildAnnotationDiffs(base, target);
+    this.diffEntries.set(diffs);
+    this.selectedDiffId.set(diffs[0]?.id ?? null);
+    this.diffOverlayVisible.set(diffs.length > 0);
+    this.redrawAllForPage();
+  }
+
+  private buildAnnotationDiffs(
+    base: PageAnnotations[],
+    target: PageAnnotations[]
+  ): AnnotationDiff[] {
+    const pageNumbers = new Set<number>([
+      ...base.map((page) => page.num),
+      ...target.map((page) => page.num),
+    ]);
+
+    const result: AnnotationDiff[] = [];
+    for (const pageNum of Array.from(pageNumbers).sort((a, b) => a - b)) {
+      const basePage = base.find((page) => page.num === pageNum);
+      const targetPage = target.find((page) => page.num === pageNum);
+      const baseFields = this.indexFieldsByKey(basePage?.fields ?? []);
+      const targetFields = this.indexFieldsByKey(targetPage?.fields ?? []);
+
+      const keys = new Set<string>([...baseFields.keys(), ...targetFields.keys()]);
+      for (const key of keys) {
+        const baseField = baseFields.get(key);
+        const targetField = targetFields.get(key);
+
+        if (baseField && !targetField) {
+          result.push({
+            id: `${pageNum}-${key}-removed`,
+            page: pageNum,
+            fieldKey: key,
+            kind: 'removed',
+            baseField,
+            resolution: 'pending',
+          });
+          continue;
+        }
+
+        if (!baseField && targetField) {
+          result.push({
+            id: `${pageNum}-${key}-added`,
+            page: pageNum,
+            fieldKey: key,
+            kind: 'added',
+            targetField,
+            resolution: 'pending',
+          });
+          continue;
+        }
+
+        if (baseField && targetField && !this.areFieldsEquivalent(baseField, targetField)) {
+          result.push({
+            id: `${pageNum}-${key}-modified`,
+            page: pageNum,
+            fieldKey: key,
+            kind: 'modified',
+            baseField,
+            targetField,
+            changes: this.diffChanges(baseField, targetField),
+            resolution: 'pending',
+          });
+        }
+      }
+    }
+
+    return result;
+  }
+
+  private indexFieldsByKey(fields: PageField[]): Map<string, PageField> {
+    const map = new Map<string, PageField>();
+    fields.forEach((field) => {
+      const key = this.buildFieldKey(field);
+      if (!map.has(key)) {
+        map.set(key, field);
+      }
+    });
+    return map;
+  }
+
+  private buildFieldKey(field: PageField): string {
+    if (field.mapField?.trim()) {
+      return field.mapField.trim();
+    }
+    const normalizedType = this.normalizeFieldType(field.type) ?? 'text';
+    return `${normalizedType}@${this.roundToTwo(field.x)}:${this.roundToTwo(field.y)}`;
+  }
+
+  private areFieldsEquivalent(a: PageField, b: PageField): boolean {
+    return JSON.stringify(this.normalizeFieldSnapshot(a)) === JSON.stringify(this.normalizeFieldSnapshot(b));
+  }
+
+  private normalizeFieldSnapshot(field: PageField) {
+    return {
+      mapField: field.mapField ?? '',
+      type: this.normalizeFieldType(field.type) ?? 'text',
+      x: this.roundToTwo(field.x),
+      y: this.roundToTwo(field.y),
+      fontSize: this.roundToTwo(field.fontSize),
+      color: this.normalizeColor(field.color),
+      value: field.value ?? '',
+      decimals: field.decimals ?? null,
+      appender: field.appender ?? '',
+      fontFamily: field.fontFamily ?? DEFAULT_FONT_ID,
+      opacity: field.opacity ?? DEFAULT_OPACITY,
+      backgroundColor: field.backgroundColor ?? null,
+      locked: field.locked ?? false,
+      hidden: field.hidden ?? false,
+    };
+  }
+
+  private diffChanges(base: PageField, target: PageField) {
+    const baseSnapshot = this.normalizeFieldSnapshot(base);
+    const targetSnapshot = this.normalizeFieldSnapshot(target);
+    const keys = new Set([...Object.keys(baseSnapshot), ...Object.keys(targetSnapshot)]);
+    return Array.from(keys)
+      .filter(
+        (key) =>
+          baseSnapshot[key as keyof typeof baseSnapshot] !==
+          targetSnapshot[key as keyof typeof targetSnapshot]
+      )
+      .map((property) => ({
+        property,
+        before: baseSnapshot[property as keyof typeof baseSnapshot],
+        after: targetSnapshot[property as keyof typeof targetSnapshot],
+      }));
+  }
+
+  private buildConsolidatedDiff(): PageAnnotations[] {
+    const base = this.diffBasePages();
+    const target = this.diffTargetPages();
+    if (!base || !target) {
+      return [];
+    }
+
+    let result = base.map((page) => ({
+      num: page.num,
+      fields: page.fields.map((field) => ({ ...field })),
+    }));
+
+    for (const diff of this.diffEntries()) {
+      if (diff.resolution !== 'accepted') {
+        continue;
+      }
+
+      if (diff.kind === 'added' && diff.targetField) {
+        result = this.addFieldToPages(diff.page, { ...diff.targetField }, result);
+        continue;
+      }
+
+      const pageIndex = result.findIndex((page) => page.num === diff.page);
+      if (pageIndex < 0) {
+        continue;
+      }
+
+      const fieldIndex = this.findFieldIndexByKey(result[pageIndex]?.fields ?? [], diff.fieldKey);
+
+      if (diff.kind === 'removed' && fieldIndex >= 0) {
+        result = this.removeFieldFromPages(pageIndex, fieldIndex, result);
+        continue;
+      }
+
+      if (diff.kind === 'modified' && diff.targetField) {
+        if (fieldIndex >= 0) {
+          result = this.updateFieldInPages(pageIndex, fieldIndex, { ...diff.targetField }, result);
+        } else {
+          result = this.addFieldToPages(diff.page, { ...diff.targetField }, result);
+        }
+      }
+    }
+
+    return result
+      .map((page) => ({ ...page, fields: [...page.fields] }))
+      .filter((page) => page.fields.length)
+      .sort((a, b) => a.num - b.num);
+  }
+
+  private findFieldIndexByKey(fields: PageField[], key: string): number {
+    return fields.findIndex((field) => this.buildFieldKey(field) === key);
+  }
+
+  private renderDiffHighlights(layer: HTMLDivElement, scale: number) {
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!pdfCanvas || !this.diffOverlayVisible()) {
+      return;
+    }
+
+    const diffs = this.diffEntries();
+    if (!diffs.length) {
+      return;
+    }
+
+    const currentPage = this.pageIndex();
+    const selected = this.selectedDiffId();
+
+    diffs
+      .filter((diff) => diff.page === currentPage)
+      .forEach((diff) => {
+        const field = this.resolveDiffField(diff);
+        if (!field) {
+          return;
+        }
+
+        const styledField = this.ensureFieldStyle(field);
+        const box = this.measureFieldBox(styledField, scale);
+        const left = styledField.x * scale;
+        const top = pdfCanvas.height - styledField.y * scale - box.height;
+
+        const overlay = (this.document?.createElement('div') ?? document.createElement('div')) as HTMLDivElement;
+        overlay.className = `diff-overlay diff-overlay--${diff.kind}`;
+        if (diff.resolution === 'accepted') {
+          overlay.classList.add('diff-overlay--accepted');
+        }
+        if (diff.resolution === 'rejected') {
+          overlay.classList.add('diff-overlay--rejected');
+        }
+        if (diff.id === selected) {
+          overlay.classList.add('diff-overlay--active');
+        }
+
+        overlay.style.left = `${left}px`;
+        overlay.style.top = `${top}px`;
+        overlay.style.width = `${box.width}px`;
+        overlay.style.height = `${box.height}px`;
+        overlay.dataset['diffId'] = diff.id;
+        overlay.title = `${diff.fieldKey} · ${this.describeDiffKind(diff.kind)}`;
+
+        layer.appendChild(overlay);
+      });
+  }
+
+  private measureFieldBox(field: PageField, scale: number): { width: number; height: number } {
+    if (!this.document) {
+      return { width: field.fontSize * scale * 4, height: field.fontSize * scale };
+    }
+
+    const probe = this.document.createElement('span');
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    probe.style.pointerEvents = 'none';
+    probe.style.fontSize = `${field.fontSize * scale}px`;
+    probe.style.fontFamily = this.resolveCssFontFamily(field.fontFamily ?? DEFAULT_FONT_ID);
+    probe.textContent = this.getFieldRenderValue(field) || '•';
+    this.document.body.appendChild(probe);
+    const rect = probe.getBoundingClientRect();
+    this.document.body.removeChild(probe);
+
+    return {
+      width: rect.width || field.fontSize * scale * 3,
+      height: rect.height || field.fontSize * scale,
+    };
+  }
+
+  private resolveDiffField(diff: AnnotationDiff): PageField | null {
+    if (diff.kind === 'added' || diff.kind === 'modified') {
+      return diff.targetField ?? null;
+    }
+    return diff.baseField ?? null;
+  }
+
+  private describeDiffKind(kind: DiffKind): string {
+    switch (kind) {
+      case 'added':
+        return 'Añadido';
+      case 'removed':
+        return 'Eliminado';
+      case 'modified':
+        return 'Modificado';
+    }
   }
 }
