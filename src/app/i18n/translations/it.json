@@ -55,6 +55,12 @@
     "historyGroup": "Azioni cronologia",
     "exportGroup": "Opzioni di esportazione"
   },
+  "acroForm": {
+    "title": "Campi del modulo",
+    "empty": "Questo PDF non contiene campi modulo.",
+    "associate": "Associa annotazione",
+    "pageLabel": "Pagina {{page}}"
+  },
   "sidebar": {
     "title": "Annotazioni (JSON)",
     "importJsonFile": "Importa da file",

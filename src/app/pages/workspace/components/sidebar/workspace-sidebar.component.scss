@@ -60,6 +60,106 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
+.acroform-panel {
+  margin: 18px 0;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 234, 212, 0.14);
+  background: rgba(18, 20, 30, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acroform-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.acroform-panel__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.acroform-panel__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: rgba(94, 234, 212, 0.12);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.acroform-panel__pages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acroform-panel__page {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(94, 234, 212, 0.14);
+  background: rgba(8, 12, 22, 0.65);
+}
+
+.acroform-panel__page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.acroform-panel__page-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.acroform-panel__field-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.acroform-panel__field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.acroform-panel__field-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acroform-panel__empty {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.btn--inline {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
 @media (max-width: 1024px) {
   .sidebar-thumbnails__list {
     max-height: clamp(140px, 28vh, 300px);

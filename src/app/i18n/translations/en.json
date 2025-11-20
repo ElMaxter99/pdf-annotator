@@ -55,6 +55,12 @@
     "historyGroup": "History actions",
     "exportGroup": "Export options"
   },
+  "acroForm": {
+    "title": "Form fields",
+    "empty": "This PDF does not define form fields.",
+    "associate": "Link annotation",
+    "pageLabel": "Page {{page}}"
+  },
   "sidebar": {
     "title": "Annotations (JSON)",
     "importJsonFile": "Import from file",

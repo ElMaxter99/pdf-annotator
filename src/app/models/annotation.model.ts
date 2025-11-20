@@ -1,3 +1,5 @@
+import { AcroFormField } from './acro-form-field.model';
+
 export type FieldType = 'text' | 'check' | 'radio' | 'number';
 
 export interface PageField {
@@ -15,6 +17,7 @@ export interface PageField {
   backgroundColor?: string | null;
   locked?: boolean;
   hidden?: boolean;
+  acroField?: AcroFormField | null;
 }
 
 export interface PageAnnotations {

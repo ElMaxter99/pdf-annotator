@@ -55,6 +55,12 @@
     "historyGroup": "Accions d'historial",
     "exportGroup": "Opcions d'exportació"
   },
+  "acroForm": {
+    "title": "Camps del formulari",
+    "empty": "Aquest PDF no inclou camps de formulari.",
+    "associate": "Associar anotació",
+    "pageLabel": "Pàgina {{page}}"
+  },
   "sidebar": {
     "title": "Anotacions (JSON)",
     "importJsonFile": "Importa des d'un fitxer",
