@@ -1,0 +1,159 @@
+:host {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.shortcuts-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.shortcuts-dialog {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  max-width: 840px;
+  width: min(960px, 100%);
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  outline: none;
+}
+
+.shortcuts-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.shortcuts-dialog__eyebrow {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.shortcuts-dialog__title {
+  margin: 0.1rem 0 0.35rem;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.shortcuts-dialog__description {
+  margin: 0;
+  color: #475569;
+  max-width: 48ch;
+}
+
+.shortcuts-list {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem;
+  background: #f8fafc;
+  overflow: auto;
+  max-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shortcuts-list__item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.shortcuts-list__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.shortcuts-list__label {
+  margin: 0;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.shortcuts-list__hint {
+  margin: 0;
+  color: #0284c7;
+  font-size: 0.9rem;
+}
+
+.shortcuts-list__bindings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.shortcut-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 999px;
+  background: #0ea5e9;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.chip-remove {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.chip-remove:hover,
+.chip-remove:focus {
+  opacity: 0.8;
+}
+
+.shortcuts-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .shortcuts-dialog__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .shortcuts-list__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .shortcuts-list__bindings {
+    justify-content: flex-start;
+  }
+}

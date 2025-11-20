@@ -53,7 +53,8 @@
     "navigationGroup": "Seitennavigation",
     "zoomGroup": "Zoom-Steuerung",
     "historyGroup": "Verlauf",
-    "exportGroup": "Exportoptionen"
+    "exportGroup": "Exportoptionen",
+    "shortcuts": "Shortcuts"
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",
@@ -188,6 +189,25 @@
       "empty": "Sie haben noch keine benutzerdefinierten Schriften hinzugefügt.",
       "unsupported": "Ihr Browser unterstützt das Laden benutzerdefinierter Schriften nicht.",
       "error": "Die Schriftdatei konnte nicht geladen werden. Versuchen Sie es mit einer anderen."
+    }
+  },
+  "shortcuts": {
+    "title": "Tastenkombinationen",
+    "description": "Passen Sie die Tasten für häufige Aktionen im Arbeitsbereich an.",
+    "addBinding": "Shortcut hinzufügen",
+    "removeBinding": "Entfernen",
+    "restoreDefaults": "Standard wiederherstellen",
+    "close": "Schließen",
+    "listening": "Drücken Sie die gewünschte Kombination…",
+    "actions": {
+      "openShortcuts": "Shortcut-Dialog öffnen",
+      "prevPage": "Vorherige Seite",
+      "nextPage": "Nächste Seite",
+      "zoomIn": "Heranzoomen",
+      "zoomOut": "Herauszoomen",
+      "undo": "Rückgängig",
+      "redo": "Wiederholen",
+      "downloadPdf": "Annotiertes PDF herunterladen"
     }
   },
   "viewer": {

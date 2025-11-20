@@ -31,6 +31,7 @@ import { WorkspaceHeaderComponent } from './components/header/workspace-header.c
 import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sidebar.component';
 import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
+import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
 import { PageThumbnail } from '../../models/page-thumbnail.model';
 import {
   STANDARD_FONT_FAMILIES,
@@ -40,6 +41,11 @@ import {
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import {
+  ShortcutAction,
+  ShortcutDefinition,
+  ShortcutsService,
+} from '../../services/shortcuts.service';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -146,6 +152,7 @@ const DEFAULT_OPACITY = 1;
     WorkspaceSidebarComponent,
     WorkspaceViewerComponent,
     WorkspaceFooterComponent,
+    ShortcutsDialogComponent,
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
@@ -184,8 +191,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   snapPointsYText = signal('');
   fileDropActive = signal(false);
   readonly jsonViewMode = signal<JsonViewMode>('text');
+  shortcutsDialogOpen = signal(false);
+  readonly shortcutDefinitions: readonly ShortcutDefinition[] = this.shortcutsService.definitions;
+  readonly shortcutBindings = computed(() => this.shortcutsService.getBindings());
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
+  private readonly shortcutsService = inject(ShortcutsService);
   private readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
@@ -1726,6 +1737,119 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   cancelPreview() {
     this.preview.set(null);
     this.closeFontDropdown('preview');
+  }
+
+  openShortcutsDialog() {
+    this.shortcutsDialogOpen.set(true);
+  }
+
+  closeShortcutsDialog() {
+    this.shortcutsDialogOpen.set(false);
+  }
+
+  restoreShortcutDefaults() {
+    this.shortcutsService.resetBindings();
+  }
+
+  addShortcutBinding(action: ShortcutAction, combo: string) {
+    this.shortcutsService.addBinding(action, combo);
+  }
+
+  removeShortcutBinding(action: ShortcutAction, combo: string) {
+    this.shortcutsService.removeBinding(action, combo);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent) {
+    if (this.shortcutsDialogOpen()) {
+      return;
+    }
+
+    if (event.defaultPrevented || this.shouldIgnoreShortcutEvent(event)) {
+      return;
+    }
+
+    const action = this.shortcutsService.matchAny(event);
+    if (!action) {
+      return;
+    }
+
+    switch (action) {
+      case 'openShortcuts': {
+        event.preventDefault();
+        this.openShortcutsDialog();
+        break;
+      }
+      case 'prevPage': {
+        if (this.pdfDoc && this.pageIndex() > 1) {
+          event.preventDefault();
+          void this.prevPage();
+        }
+        break;
+      }
+      case 'nextPage': {
+        if (this.pdfDoc && this.pageIndex() < this.pageCount) {
+          event.preventDefault();
+          void this.nextPage();
+        }
+        break;
+      }
+      case 'zoomIn': {
+        if (this.pdfDoc) {
+          event.preventDefault();
+          void this.zoomIn();
+        }
+        break;
+      }
+      case 'zoomOut': {
+        if (this.pdfDoc) {
+          event.preventDefault();
+          void this.zoomOut();
+        }
+        break;
+      }
+      case 'undo': {
+        if (this.canUndo()) {
+          event.preventDefault();
+          this.undo();
+        }
+        break;
+      }
+      case 'redo': {
+        if (this.canRedo()) {
+          event.preventDefault();
+          this.redo();
+        }
+        break;
+      }
+      case 'downloadPdf': {
+        if (this.pdfDoc && this.coords().length) {
+          event.preventDefault();
+          this.downloadAnnotatedPDF();
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  private shouldIgnoreShortcutEvent(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return false;
+    }
+
+    const tagName = target.tagName;
+    if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT') {
+      return true;
+    }
+
+    if (target.isContentEditable) {
+      return true;
+    }
+
+    return false;
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {

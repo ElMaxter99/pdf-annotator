@@ -53,7 +53,8 @@
     "navigationGroup": "Navigation des pages",
     "zoomGroup": "Contrôles du zoom",
     "historyGroup": "Actions d'historique",
-    "exportGroup": "Options d'export"
+    "exportGroup": "Options d'export",
+    "shortcuts": "Raccourcis"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -188,6 +189,25 @@
       "empty": "Vous n'avez pas encore ajouté de polices personnalisées.",
       "unsupported": "Votre navigateur ne permet pas de charger des polices personnalisées.",
       "error": "Impossible de charger ce fichier de police. Essayez avec un autre."
+    }
+  },
+  "shortcuts": {
+    "title": "Raccourcis clavier",
+    "description": "Personnalisez les touches pour les actions courantes de l'espace de travail.",
+    "addBinding": "Ajouter un raccourci",
+    "removeBinding": "Supprimer",
+    "restoreDefaults": "Restaurer les valeurs par défaut",
+    "close": "Fermer",
+    "listening": "Appuyez sur la combinaison souhaitée…",
+    "actions": {
+      "openShortcuts": "Ouvrir la fenêtre des raccourcis",
+      "prevPage": "Page précédente",
+      "nextPage": "Page suivante",
+      "zoomIn": "Zoom avant",
+      "zoomOut": "Zoom arrière",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "downloadPdf": "Télécharger le PDF annoté"
     }
   },
   "viewer": {

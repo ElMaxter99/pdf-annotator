@@ -3,4 +3,10 @@
   <app-workspace-sidebar [vm]="vm"></app-workspace-sidebar>
   <app-workspace-viewer [vm]="vm"></app-workspace-viewer>
   <app-workspace-footer [vm]="vm"></app-workspace-footer>
+  <app-shortcuts-dialog *ngIf="vm.shortcutsDialogOpen()" [definitions]="vm.shortcutDefinitions"
+    [bindings]="vm.shortcutBindings()" (close)="vm.closeShortcutsDialog()"
+    (restoreDefaults)="vm.restoreShortcutDefaults()"
+    (bindingAdded)="vm.addShortcutBinding($event.action, $event.combo)"
+    (bindingRemoved)="vm.removeShortcutBinding($event.action, $event.combo)">
+  </app-shortcuts-dialog>
 </div>
