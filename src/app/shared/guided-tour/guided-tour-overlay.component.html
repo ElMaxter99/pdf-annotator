@@ -1,0 +1,33 @@
+@if (isActive()) {
+  <div class="tour-overlay" role="dialog" aria-modal="true" aria-live="assertive">
+    <div class="tour-overlay__backdrop"></div>
+    @if (highlightStyle() as style) {
+      <div class="tour-overlay__highlight" [ngStyle]="style"></div>
+    }
+
+    <div class="tour-overlay__card" [class.tour-overlay__card--floating]="!!highlightStyle()" [class.tour-overlay__card--centered]="!highlightStyle()">
+      <header class="tour-overlay__header">
+        <span class="tour-overlay__badge">{{ 'tour.badge' | t }}</span>
+        <button type="button" class="tour-overlay__close" (click)="close()" [attr.aria-label]="'tour.close' | t">✕</button>
+      </header>
+
+      <div class="tour-overlay__body">
+        <p class="tour-overlay__kicker">{{ 'tour.progress' | t : { current: currentIndex() + 1, total: steps().length } }}</p>
+        <h3 class="tour-overlay__title">{{ currentStep()?.title }}</h3>
+        <p class="tour-overlay__description">{{ currentStep()?.description }}</p>
+      </div>
+
+      <footer class="tour-overlay__footer">
+        <button type="button" class="tour-overlay__link" (click)="restart()">{{ 'tour.restart' | t }}</button>
+        <div class="tour-overlay__actions">
+          <button type="button" class="tour-overlay__button" (click)="previous()" [disabled]="currentIndex() === 0">
+            {{ 'tour.previous' | t }}
+          </button>
+          <button type="button" class="tour-overlay__button tour-overlay__button--primary" (click)="next()">
+            {{ currentIndex() + 1 === steps().length ? ('tour.finish' | t) : ('tour.next' | t) }}
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+}

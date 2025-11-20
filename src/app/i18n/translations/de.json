@@ -192,5 +192,37 @@
   },
   "viewer": {
     "emptyMessage": "Laden Sie ein PDF hoch und klicken Sie irgendwo, um Anmerkungen hinzuzufügen. Bearbeiten Sie sie in der Vorschau, bevor Sie bestätigen ✅."
+  },
+  "tour": {
+    "badge": "Schnellstart",
+    "startCta": "Anleitung ansehen",
+    "close": "Schließen",
+    "progress": "Schritt {{current}} von {{total}}",
+    "restart": "Neu starten",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "finish": "Fertig",
+    "steps": {
+      "upload": {
+        "title": "PDF laden",
+        "description": "Ziehe die Datei hinein oder nutze die Upload-Kachel, um Viewer und Anmerkungen zu aktivieren."
+      },
+      "zoom": {
+        "title": "Zoom anpassen",
+        "description": "Nutze die oberen Steuerelemente, um Seiten zu wechseln und den Zoomfaktor zu setzen."
+      },
+      "annotate": {
+        "title": "Anmerkungen hinzufügen",
+        "description": "Klicke auf die Arbeitsfläche, schreibe deinen Text, passe Größe und Farbe an und bestätige zum Speichern."
+      },
+      "json": {
+        "title": "JSON verwalten",
+        "description": "Bearbeite oder füge Koordinaten ein, wechsle zwischen Text-/Baumansicht und kopiere oder lade das Schema herunter."
+      },
+      "export": {
+        "title": "Kommentiertes PDF exportieren",
+        "description": "Sobald Markierungen existieren, nutze den Download-Button, um das PDF mit Anmerkungen zu erhalten."
+      }
+    }
   }
 }

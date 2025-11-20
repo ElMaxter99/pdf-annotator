@@ -192,5 +192,37 @@
   },
   "viewer": {
     "emptyMessage": "Carregue um PDF e clique em qualquer ponto para adicionar anotações. Edite-as na pré-visualização antes de confirmar ✅."
+  },
+  "tour": {
+    "badge": "Guia rápida",
+    "startCta": "Ver guia",
+    "close": "Fechar",
+    "progress": "Passo {{current}} de {{total}}",
+    "restart": "Reiniciar",
+    "previous": "Anterior",
+    "next": "Avançar",
+    "finish": "Concluir",
+    "steps": {
+      "upload": {
+        "title": "Carregue um PDF",
+        "description": "Arraste o arquivo ou use o cartão de upload para habilitar o visualizador e as anotações."
+      },
+      "zoom": {
+        "title": "Ajuste o zoom",
+        "description": "Use os controles superiores para trocar de página e definir o fator de zoom."
+      },
+      "annotate": {
+        "title": "Adicione anotações",
+        "description": "Clique na área de trabalho, escreva o texto, ajuste tamanho e cor e confirme para salvar."
+      },
+      "json": {
+        "title": "Gerencie o JSON",
+        "description": "Edite ou cole coordenadas, alterne a visualização texto/árvore e copie ou baixe o esquema."
+      },
+      "export": {
+        "title": "Exporte o PDF anotado",
+        "description": "Quando houver marcações, use o botão de download para obter o PDF com as anotações aplicadas."
+      }
+    }
   }
 }

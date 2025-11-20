@@ -192,5 +192,37 @@
   },
   "viewer": {
     "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
+  },
+  "tour": {
+    "badge": "Quick guide",
+    "startCta": "View guide",
+    "close": "Close",
+    "progress": "Step {{current}} of {{total}}",
+    "restart": "Restart",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish",
+    "steps": {
+      "upload": {
+        "title": "Load a PDF",
+        "description": "Drag the file or use the upload card to enable the viewer and annotations."
+      },
+      "zoom": {
+        "title": "Adjust zoom",
+        "description": "Use the top controls to change pages and lock in the zoom factor."
+      },
+      "annotate": {
+        "title": "Add annotations",
+        "description": "Click on the canvas, write your text, tune size and color, then confirm to save."
+      },
+      "json": {
+        "title": "Manage JSON",
+        "description": "Edit or paste coordinates, switch text/tree views, and copy or download the schema."
+      },
+      "export": {
+        "title": "Export annotated PDF",
+        "description": "When you have marks, use the download button to get the PDF with annotations applied."
+      }
+    }
   }
 }

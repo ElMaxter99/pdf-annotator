@@ -192,5 +192,37 @@
   },
   "viewer": {
     "emptyMessage": "Carica un PDF e fai clic in qualsiasi punto per aggiungere annotazioni. Modificale nell'anteprima prima di confermare ✅."
+  },
+  "tour": {
+    "badge": "Guida rapida",
+    "startCta": "Vedi guida",
+    "close": "Chiudi",
+    "progress": "Passo {{current}} di {{total}}",
+    "restart": "Riavvia",
+    "previous": "Indietro",
+    "next": "Avanti",
+    "finish": "Fine",
+    "steps": {
+      "upload": {
+        "title": "Carica un PDF",
+        "description": "Trascina il file o usa il pannello di upload per abilitare il visualizzatore e le annotazioni."
+      },
+      "zoom": {
+        "title": "Regola lo zoom",
+        "description": "Usa i controlli superiori per cambiare pagina e fissare il fattore di zoom."
+      },
+      "annotate": {
+        "title": "Aggiungi annotazioni",
+        "description": "Fai clic sul canvas, scrivi il testo, regola dimensione e colore e conferma per salvare."
+      },
+      "json": {
+        "title": "Gestisci il JSON",
+        "description": "Modifica o incolla coordinate, alterna vista testo/albero e copia o scarica lo schema."
+      },
+      "export": {
+        "title": "Esporta il PDF annotato",
+        "description": "Quando hai annotazioni, usa il pulsante di download per ottenere il PDF con le note applicate."
+      }
+    }
   }
 }
