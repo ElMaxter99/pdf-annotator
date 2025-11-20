@@ -14,7 +14,8 @@
   <section class="sidebar-upload" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
     (keydown)="vm.onFileUploadKeydown($event)" (dragover)="vm.onFileDragOver($event)"
     (dragleave)="vm.onFileDragLeave($event)" (drop)="vm.onFileDrop($event)"
-    [class.sidebar-upload--active]="vm.fileDropActive()" [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t">
+    [class.sidebar-upload--active]="vm.fileDropActive()" [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t"
+    appGuideAnchor="upload">
     <input #pdfFileInput type="file" accept="application/pdf" (change)="vm.onFileSelected($event)" hidden />
 
     <div class="sidebar-upload__body">
@@ -94,7 +95,7 @@
       </div>
     </ng-template>
   </ng-template>
-  <div class="json-toolbar">
+  <div class="json-toolbar" appGuideAnchor="json">
     <div class="json-toolbar__view-toggle-group" role="group"
       [attr.aria-label]="'controls.jsonViewModeToggle' | t">
       <button type="button" class="json-toolbar__view-toggle-option"

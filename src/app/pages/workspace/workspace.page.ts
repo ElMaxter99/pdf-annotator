@@ -5,6 +5,7 @@ import {
   ViewChild,
   signal,
   computed,
+  effect,
   AfterViewChecked,
   HostListener,
   OnDestroy,
@@ -40,6 +41,8 @@ import {
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { GuidedTourOverlayComponent } from '../../shared/guided-tour/guided-tour-overlay.component';
+import { GuidedTourService, GuidedTourStep } from '../../shared/guided-tour/guided-tour.service';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -146,6 +149,7 @@ const DEFAULT_OPACITY = 1;
     WorkspaceSidebarComponent,
     WorkspaceViewerComponent,
     WorkspaceFooterComponent,
+    GuidedTourOverlayComponent,
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
@@ -189,6 +193,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
+  private readonly guidedTourService = inject(GuidedTourService);
+  private readonly guidedTourStepsEffect = effect(
+    () => {
+      this.translationService.language();
+      this.guidedTourService.setSteps(this.buildGuidedTourSteps());
+    },
+    { allowSignalWrites: true }
+  );
   readonly templates = signal<AnnotationTemplate[]>([]);
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
   templateNameModel = '';
@@ -325,6 +337,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  openGuidedTour() {
+    this.guidedTourService.restartTour();
+    this.guidedTourService.refreshAnchorRect();
+  }
+
   ngOnInit(): void {
     const pendingFile = this.pendingFileService.consumePendingFile();
     if (pendingFile) {
@@ -336,6 +353,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   ngOnDestroy() {
     this.revokeThumbnailUrls();
+    this.guidedTourService.endTour();
     if (!this.document) {
       return;
     }
@@ -735,6 +753,41 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.guideSettings.update((settings) => ({ ...settings, snapPointsY: parsed }));
     }
     this.refreshOverlay();
+  }
+
+  private buildGuidedTourSteps(): GuidedTourStep[] {
+    return [
+      {
+        id: 'upload',
+        anchorId: 'upload',
+        title: this.translationService.translate('tour.steps.upload.title'),
+        description: this.translationService.translate('tour.steps.upload.description'),
+      },
+      {
+        id: 'zoom',
+        anchorId: 'zoom',
+        title: this.translationService.translate('tour.steps.zoom.title'),
+        description: this.translationService.translate('tour.steps.zoom.description'),
+      },
+      {
+        id: 'annotate',
+        anchorId: 'annotate',
+        title: this.translationService.translate('tour.steps.annotate.title'),
+        description: this.translationService.translate('tour.steps.annotate.description'),
+      },
+      {
+        id: 'json',
+        anchorId: 'json',
+        title: this.translationService.translate('tour.steps.json.title'),
+        description: this.translationService.translate('tour.steps.json.description'),
+      },
+      {
+        id: 'export',
+        anchorId: 'export',
+        title: this.translationService.translate('tour.steps.export.title'),
+        description: this.translationService.translate('tour.steps.export.description'),
+      },
+    ];
   }
 
   private setDocumentMetadata() {

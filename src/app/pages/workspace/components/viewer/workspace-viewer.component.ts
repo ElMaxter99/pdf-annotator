@@ -3,13 +3,14 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
+import { GuidedTourAnchorDirective } from '../../../../shared/guided-tour/guided-tour-anchor.directive';
 
 @Component({
   selector: 'app-workspace-viewer',
   standalone: true,
   templateUrl: './workspace-viewer.component.html',
   styleUrls: ['./workspace-viewer.component.scss'],
-  imports: [CommonModule, FormsModule, TranslationPipe],
+  imports: [CommonModule, FormsModule, TranslationPipe, GuidedTourAnchorDirective],
 })
 export class WorkspaceViewerComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;

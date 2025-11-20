@@ -192,5 +192,37 @@
   },
   "viewer": {
     "emptyMessage": "Téléversez un PDF et cliquez n'importe où pour ajouter des annotations. Modifiez-les dans l'aperçu avant de valider ✅."
+  },
+  "tour": {
+    "badge": "Guide rapide",
+    "startCta": "Voir le guide",
+    "close": "Fermer",
+    "progress": "Étape {{current}} sur {{total}}",
+    "restart": "Redémarrer",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "steps": {
+      "upload": {
+        "title": "Chargez un PDF",
+        "description": "Glissez le fichier ou utilisez la carte d'import pour activer le lecteur et les annotations."
+      },
+      "zoom": {
+        "title": "Ajustez le zoom",
+        "description": "Utilisez les contrôles supérieurs pour changer de page et verrouiller le niveau de zoom."
+      },
+      "annotate": {
+        "title": "Ajoutez des annotations",
+        "description": "Cliquez sur la zone de travail, saisissez le texte, ajustez taille et couleur puis validez pour enregistrer."
+      },
+      "json": {
+        "title": "Gérez le JSON",
+        "description": "Modifiez ou collez des coordonnées, alternez vue texte/arbre et copiez ou téléchargez le schéma."
+      },
+      "export": {
+        "title": "Exportez le PDF annoté",
+        "description": "Quand des marques existent, utilisez le bouton de téléchargement pour obtenir le PDF annoté."
+      }
+    }
   }
 }

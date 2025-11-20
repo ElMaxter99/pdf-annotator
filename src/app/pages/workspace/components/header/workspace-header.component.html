@@ -24,7 +24,7 @@
       </button>
     </div>
 
-    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
+    <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t" appGuideAnchor="zoom">
       <button class="btn btn--icon" (click)="vm.zoomOut()" [disabled]="!vm.pdfDoc">
         <span class="btn__icon" aria-hidden="true">−</span>
         <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
@@ -52,9 +52,16 @@
     </div>
 
     <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
-      <button class="btn btn--icon" (click)="vm.downloadAnnotatedPDF()" [disabled]="!vm.coords().length || !vm.pdfDoc">
+      <button class="btn btn--icon" (click)="vm.downloadAnnotatedPDF()" [disabled]="!vm.coords().length || !vm.pdfDoc"
+        appGuideAnchor="export">
         <span class="btn__icon" aria-hidden="true">⬇</span>
         <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
+      </button>
+    </div>
+
+    <div class="toolbar__group">
+      <button class="btn" type="button" (click)="vm.openGuidedTour()">
+        {{ 'tour.startCta' | t }}
       </button>
     </div>
 

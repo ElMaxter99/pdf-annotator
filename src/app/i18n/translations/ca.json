@@ -192,5 +192,37 @@
   },
   "viewer": {
     "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."
+  },
+  "tour": {
+    "badge": "Guia ràpida",
+    "startCta": "Veure guia",
+    "close": "Tancar",
+    "progress": "Pas {{current}} de {{total}}",
+    "restart": "Reiniciar",
+    "previous": "Anterior",
+    "next": "Següent",
+    "finish": "Acabar",
+    "steps": {
+      "upload": {
+        "title": "Carrega un PDF",
+        "description": "Arrossega el fitxer o usa la targeta de pujada per habilitar el visor i les anotacions."
+      },
+      "zoom": {
+        "title": "Ajusta el zoom",
+        "description": "Utilitza els controls superiors per canviar de pàgina i fixar el factor de zoom."
+      },
+      "annotate": {
+        "title": "Afegeix anotacions",
+        "description": "Fes clic sobre el llenç, escriu el text, ajusta mida i color i confirma per desar."
+      },
+      "json": {
+        "title": "Gestiona el JSON",
+        "description": "Edita o enganxa coordenades, alterna vista de text/arbres i copia o descarrega l'esquema."
+      },
+      "export": {
+        "title": "Exporta el PDF anotat",
+        "description": "Quan tinguis marques, usa el botó de descàrrega per obtenir el PDF amb anotacions."
+      }
+    }
   }
 }
