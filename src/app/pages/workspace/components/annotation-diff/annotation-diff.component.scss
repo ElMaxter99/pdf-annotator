@@ -1,0 +1,227 @@
+:host {
+  display: block;
+}
+
+.diff-panel {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(94, 234, 212, 0.15);
+  background: rgba(12, 17, 27, 0.75);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.diff-panel__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.diff-panel__kicker {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: .75rem;
+}
+
+.diff-panel__hint {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.diff-panel__toggles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.diff-panel__inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.diff-panel__file {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.diff-panel__file small {
+  color: var(--muted);
+}
+
+.diff-panel__summary {
+  border-radius: 12px;
+  border: 1px dashed rgba(94, 234, 212, 0.25);
+  padding: 10px;
+  background: rgba(18, 24, 38, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diff-panel__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.diff-panel__helper {
+  margin: 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.diff-panel__empty {
+  margin: 0;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(33, 41, 55, 0.75);
+  color: var(--muted);
+}
+
+.diff-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.diff-card {
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  padding: 10px;
+  background: rgba(20, 26, 40, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.diff-card--active {
+  border-color: rgba(94, 234, 212, 0.45);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
+}
+
+.diff-card__info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.diff-card__field {
+  color: var(--muted);
+}
+
+.diff-card__status {
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: .85rem;
+  background: rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.diff-card__status[data-status="accepted"] {
+  background: rgba(52, 211, 153, 0.18);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #7fffd4;
+}
+
+.diff-card__status[data-status="rejected"] {
+  background: rgba(248, 113, 113, 0.18);
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #fecdd3;
+}
+
+.diff-card__changes {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.diff-card__change {
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.16);
+  color: var(--text);
+  font-size: .85rem;
+}
+
+.diff-card__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.diff-card__cta {
+  display: flex;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  color: var(--text);
+  font-size: .85rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  white-space: nowrap;
+}
+
+.chip--added {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.35);
+  color: #7fffd4;
+}
+
+.chip--removed {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.35);
+  color: #fecdd3;
+}
+
+.chip--modified {
+  background: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.35);
+  color: #facc15;
+}
+
+.toggle {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.btn--danger {
+  border-color: rgba(248, 113, 113, 0.5);
+  color: #fecdd3;
+}
+
+@media (max-width: 640px) {
+  .diff-panel__header {
+    flex-direction: column;
+  }
+
+  .diff-panel__status {
+    margin-left: 0;
+  }
+}

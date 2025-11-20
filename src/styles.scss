@@ -1111,6 +1111,44 @@ header .logo {
   pointer-events: none;
 }
 
+.diff-overlay {
+  position: absolute;
+  border-radius: 6px;
+  border: 2px solid rgba(148, 163, 184, 0.6);
+  background: rgba(148, 163, 184, 0.2);
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  transition: box-shadow .2s, opacity .2s;
+}
+
+.diff-overlay--added {
+  border-color: rgba(52, 211, 153, 0.8);
+  background: rgba(52, 211, 153, 0.18);
+}
+
+.diff-overlay--removed {
+  border-color: rgba(248, 113, 113, 0.9);
+  background: rgba(248, 113, 113, 0.2);
+}
+
+.diff-overlay--modified {
+  border-color: rgba(251, 191, 36, 0.9);
+  background: rgba(251, 191, 36, 0.18);
+}
+
+.diff-overlay--active {
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.45);
+}
+
+.diff-overlay--accepted {
+  opacity: 0.75;
+}
+
+.diff-overlay--rejected {
+  opacity: 0.35;
+  border-style: dashed;
+}
+
 .hitbox {
   position: absolute;
   inset: 0;

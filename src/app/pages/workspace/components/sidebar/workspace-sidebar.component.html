@@ -117,6 +117,8 @@
   </div>
   <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
 
+  <app-annotation-diff [vm]="vm"></app-annotation-diff>
+
   <section class="advanced-panel" [class.open]="vm.advancedOptionsOpen()"
     [class.active]="vm.guidesFeatureEnabled() || vm.customFontsFeatureEnabled()">
     <button type="button" class="advanced-toggle" (click)="vm.toggleAdvancedOptions(!vm.advancedOptionsOpen())"

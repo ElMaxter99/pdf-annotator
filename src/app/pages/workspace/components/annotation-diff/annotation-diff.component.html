@@ -1,0 +1,77 @@
+<section class="diff-panel">
+  <header class="diff-panel__header">
+    <div>
+      <p class="diff-panel__kicker">Revisión de cambios</p>
+      <h5>Compara dos JSON de anotaciones</h5>
+      <p class="diff-panel__hint">Carga un archivo base y otro con cambios para revisar las diferencias por página y campo.</p>
+    </div>
+    <div class="diff-panel__toggles">
+      <label class="toggle">
+        <input type="checkbox" [checked]="vm.diffOverlayVisible()" (change)="vm.toggleDiffOverlay($event.target.checked)" />
+        <span>Ver overlays</span>
+      </label>
+      <button type="button" class="btn btn--ghost" (click)="vm.resetDiffReview()" [disabled]="!summary().total">Limpiar</button>
+    </div>
+  </header>
+
+  <div class="diff-panel__inputs">
+    <label class="btn diff-panel__file">
+      <span>JSON base</span>
+      <input type="file" accept="application/json" (change)="vm.onDiffFileSelected($event, 'base')" hidden />
+      <small *ngIf="vm.diffBaseName()">{{ vm.diffBaseName() }}</small>
+    </label>
+    <label class="btn diff-panel__file">
+      <span>JSON con cambios</span>
+      <input type="file" accept="application/json" (change)="vm.onDiffFileSelected($event, 'target')" hidden />
+      <small *ngIf="vm.diffTargetName()">{{ vm.diffTargetName() }}</small>
+    </label>
+    <button type="button" class="btn" (click)="vm.exportConsolidatedDiff()" [disabled]="!summary().accepted">
+      Descargar JSON consolidado
+    </button>
+  </div>
+
+  <div class="diff-panel__summary" *ngIf="summary().total">
+    <div class="diff-panel__chips">
+      <span class="chip chip--added">Añadidos: {{ summary().added }}</span>
+      <span class="chip chip--removed">Eliminados: {{ summary().removed }}</span>
+      <span class="chip chip--modified">Modificados: {{ summary().modified }}</span>
+      <span class="chip">Aceptados: {{ summary().accepted }}</span>
+    </div>
+    <p class="diff-panel__helper">Selecciona un cambio para verlo sobre el lienzo y usa Aceptar/Rechazar para generar el JSON final.</p>
+  </div>
+
+  <p class="diff-panel__empty" *ngIf="!summary().total && (vm.diffBaseName() || vm.diffTargetName())">No se detectaron diferencias entre los archivos cargados.</p>
+
+  <div class="diff-panel__list" *ngIf="summary().total">
+    <article class="diff-card" *ngFor="let diff of vm.diffEntries(); trackBy: trackById" [class.diff-card--active]="vm.selectedDiffId() === diff.id">
+      <div class="diff-card__info">
+        <span class="chip" [class.chip--added]="diff.kind === 'added'" [class.chip--removed]="diff.kind === 'removed'" [class.chip--modified]="diff.kind === 'modified'">
+          {{ formatKind(diff.kind) }}
+        </span>
+        <strong>Página {{ diff.page }}</strong>
+        <span class="diff-card__field">{{ diff.fieldKey }}</span>
+        <span class="diff-card__status" [attr.data-status]="diff.resolution">
+          {{ diff.resolution === 'pending' ? 'Pendiente' : diff.resolution === 'accepted' ? 'Aceptado' : 'Rechazado' }}
+        </span>
+      </div>
+      <div class="diff-card__changes" *ngIf="diff.changes?.length">
+        <span class="diff-card__change" *ngFor="let change of diff.changes">
+          {{ change.property }}
+        </span>
+      </div>
+      <div class="diff-card__actions">
+        <button type="button" class="btn" (click)="vm.selectDiff(diff.id)" [attr.aria-pressed]="vm.selectedDiffId() === diff.id">
+          Ver overlay
+        </button>
+        <div class="diff-card__cta">
+          <button type="button" class="btn" [class.btn--ghost]="diff.resolution !== 'accepted'" (click)="vm.resolveDiff(diff.id, 'accepted')">
+            Aceptar
+          </button>
+          <button type="button" class="btn btn--ghost" [class.btn--danger]="diff.resolution === 'rejected'" (click)="vm.resolveDiff(diff.id, 'rejected')">
+            Rechazar
+          </button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
