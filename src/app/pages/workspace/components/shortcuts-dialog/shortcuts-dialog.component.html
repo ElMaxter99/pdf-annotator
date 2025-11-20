@@ -1,0 +1,52 @@
+<div class="shortcuts-overlay" (click)="onBackdropClick($event)">
+  <div #dialogRoot class="shortcuts-dialog" role="dialog" tabindex="-1"
+    aria-modal="true" [attr.aria-label]="'shortcuts.title' | t" (keydown)="onKeydown($event)">
+    <header class="shortcuts-dialog__header">
+      <div>
+        <p class="shortcuts-dialog__eyebrow">⌨️</p>
+        <h2 class="shortcuts-dialog__title">{{ 'shortcuts.title' | t }}</h2>
+        <p class="shortcuts-dialog__description">{{ 'shortcuts.description' | t }}</p>
+      </div>
+      <button type="button" class="btn btn--icon" (click)="close.emit()">
+        <span class="btn__icon" aria-hidden="true">✕</span>
+        <span class="btn__label">{{ 'shortcuts.close' | t }}</span>
+      </button>
+    </header>
+
+    <div class="shortcuts-list" role="list">
+      <div class="shortcuts-list__item" *ngFor="let shortcut of definitions" role="listitem">
+        <div class="shortcuts-list__info">
+          <p class="shortcuts-list__label">{{ shortcut.labelKey | t }}</p>
+          <p class="shortcuts-list__hint" *ngIf="listeningFor === shortcut.action">
+            {{ 'shortcuts.listening' | t }}
+          </p>
+        </div>
+        <div class="shortcuts-list__bindings">
+          <ng-container *ngFor="let binding of getBindingsFor(shortcut.action)">
+            <span class="shortcut-chip">
+              <span>{{ formatBinding(binding) }}</span>
+              <button type="button" class="chip-remove" (click)="removeBinding(shortcut.action, binding)"
+                [attr.aria-label]="'shortcuts.removeBinding' | t">
+                ✕
+              </button>
+            </span>
+          </ng-container>
+          <button type="button" class="btn btn--icon" (click)="startListening(shortcut.action)"
+            [disabled]="listeningFor === shortcut.action">
+            <span class="btn__icon" aria-hidden="true">＋</span>
+            <span class="btn__label">{{ 'shortcuts.addBinding' | t }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="shortcuts-dialog__footer">
+      <button type="button" class="btn" (click)="restoreDefaults.emit()">
+        {{ 'shortcuts.restoreDefaults' | t }}
+      </button>
+      <button type="button" class="btn" (click)="close.emit()">
+        {{ 'shortcuts.close' | t }}
+      </button>
+    </div>
+  </div>
+</div>

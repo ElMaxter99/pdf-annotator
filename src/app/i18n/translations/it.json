@@ -53,7 +53,8 @@
     "navigationGroup": "Navigazione pagine",
     "zoomGroup": "Controlli zoom",
     "historyGroup": "Azioni cronologia",
-    "exportGroup": "Opzioni di esportazione"
+    "exportGroup": "Opzioni di esportazione",
+    "shortcuts": "Scorciatoie"
   },
   "sidebar": {
     "title": "Annotazioni (JSON)",
@@ -188,6 +189,25 @@
       "empty": "Non hai ancora aggiunto font personalizzati.",
       "unsupported": "Il tuo browser non supporta il caricamento di font personalizzati.",
       "error": "Impossibile caricare il file del font. Prova con un altro."
+    }
+  },
+  "shortcuts": {
+    "title": "Scorciatoie da tastiera",
+    "description": "Personalizza i tasti per le azioni più comuni nell'area di lavoro.",
+    "addBinding": "Aggiungi scorciatoia",
+    "removeBinding": "Rimuovi",
+    "restoreDefaults": "Ripristina predefiniti",
+    "close": "Chiudi",
+    "listening": "Premi la combinazione desiderata…",
+    "actions": {
+      "openShortcuts": "Apri i tasti di scelta rapida",
+      "prevPage": "Pagina precedente",
+      "nextPage": "Pagina successiva",
+      "zoomIn": "Ingrandisci",
+      "zoomOut": "Riduci",
+      "undo": "Annulla",
+      "redo": "Ripristina",
+      "downloadPdf": "Scarica PDF annotato"
     }
   },
   "viewer": {

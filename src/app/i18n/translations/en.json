@@ -53,7 +53,8 @@
     "navigationGroup": "Page navigation",
     "zoomGroup": "Zoom controls",
     "historyGroup": "History actions",
-    "exportGroup": "Export options"
+    "exportGroup": "Export options",
+    "shortcuts": "Shortcuts"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -192,5 +193,24 @@
   },
   "viewer": {
     "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "description": "Customize the keys for common workspace actions.",
+    "addBinding": "Add shortcut",
+    "removeBinding": "Remove",
+    "restoreDefaults": "Restore defaults",
+    "close": "Close",
+    "listening": "Press the desired keys…",
+    "actions": {
+      "openShortcuts": "Open shortcuts dialog",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "undo": "Undo",
+      "redo": "Redo",
+      "downloadPdf": "Download annotated PDF"
+    }
   }
 }

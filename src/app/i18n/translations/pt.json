@@ -53,7 +53,8 @@
     "navigationGroup": "Navegação de páginas",
     "zoomGroup": "Controlos de zoom",
     "historyGroup": "Ações de histórico",
-    "exportGroup": "Opções de exportação"
+    "exportGroup": "Opções de exportação",
+    "shortcuts": "Atalhos"
   },
   "sidebar": {
     "title": "Anotações (JSON)",
@@ -188,6 +189,25 @@
       "empty": "Ainda não adicionou tipos de letra personalizados.",
       "unsupported": "O seu navegador não suporta o carregamento de tipos de letra personalizados.",
       "error": "Não foi possível carregar esse ficheiro de fonte. Tente outro."
+    }
+  },
+  "shortcuts": {
+    "title": "Atalhos de teclado",
+    "description": "Personalize as teclas para as ações comuns do espaço de trabalho.",
+    "addBinding": "Adicionar atalho",
+    "removeBinding": "Remover",
+    "restoreDefaults": "Restaurar predefinições",
+    "close": "Fechar",
+    "listening": "Prima a combinação pretendida…",
+    "actions": {
+      "openShortcuts": "Abrir atalhos",
+      "prevPage": "Página anterior",
+      "nextPage": "Página seguinte",
+      "zoomIn": "Aumentar zoom",
+      "zoomOut": "Reduzir zoom",
+      "undo": "Anular",
+      "redo": "Refazer",
+      "downloadPdf": "Transferir PDF anotado"
     }
   },
   "viewer": {

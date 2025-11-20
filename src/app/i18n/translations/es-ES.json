@@ -53,7 +53,8 @@
     "navigationGroup": "Navegación de páginas",
     "zoomGroup": "Controles de zoom",
     "historyGroup": "Acciones de historial",
-    "exportGroup": "Opciones de exportación"
+    "exportGroup": "Opciones de exportación",
+    "shortcuts": "Atajos"
   },
   "sidebar": {
     "title": "Anotaciones (JSON)",
@@ -188,6 +189,25 @@
       "empty": "Aún no agregaste fuentes personalizadas.",
       "unsupported": "Tu navegador no soporta la carga de fuentes personalizadas.",
       "error": "No se pudo cargar la fuente seleccionada. Intenta con otro archivo."
+    }
+  },
+  "shortcuts": {
+    "title": "Atajos de teclado",
+    "description": "Configura las teclas para las acciones habituales del espacio de trabajo.",
+    "addBinding": "Añadir atajo",
+    "removeBinding": "Quitar",
+    "restoreDefaults": "Restaurar valores por defecto",
+    "close": "Cerrar",
+    "listening": "Pulsa la combinación deseada…",
+    "actions": {
+      "openShortcuts": "Abrir ayuda de atajos",
+      "prevPage": "Página anterior",
+      "nextPage": "Página siguiente",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "downloadPdf": "Descargar PDF anotado"
     }
   },
   "viewer": {
