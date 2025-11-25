@@ -1,0 +1,65 @@
+<div class="app app--contact">
+  <section class="contact">
+    <header class="contact__header">
+      <a class="contact__pill" routerLink="/landing">← Volver al inicio</a>
+      <div class="contact__titles">
+        <p class="contact__eyebrow">QA & Customer Care</p>
+        <h1 class="contact__title">Contacto rápido y cuidados extra para tu release</h1>
+        <p class="contact__subtitle">
+          Acceso directo al equipo de QA para desbloquear regresiones, validar flujos críticos
+          y recibir acompañamiento en pruebas con PDFs pesados o escenarios edge.
+        </p>
+        <div class="contact__cta-row">
+          <a class="btn contact__btn" routerLink="/workspace">Abrir workspace</a>
+          <span class="contact__hint">Prometemos respuestas accionables, no solo "funciona en mi máquina".</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="contact__grid">
+      <article class="contact__card" *ngFor="let channel of contactChannels">
+        <div class="contact__card-icon">{{ channel.icon }}</div>
+        <div class="contact__card-body">
+          <div class="contact__card-header">
+            <span class="contact__badge">Canal</span>
+            <h2>{{ channel.title }}</h2>
+          </div>
+          <p class="contact__card-text">{{ channel.description }}</p>
+          <a class="contact__link" [href]="channel.link" target="_blank" rel="noopener noreferrer">
+            {{ channel.ctaLabel }}
+          </a>
+          <span class="contact__card-hint" *ngIf="channel.hint">{{ channel.hint }}</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="contact__insights">
+      <div class="contact__column">
+        <h3>Cómo garantizamos calidad</h3>
+        <div class="contact__highlights">
+          <div class="contact__highlight" *ngFor="let highlight of qaHighlights">
+            <span class="contact__tag">{{ highlight.pill }}</span>
+            <div>
+              <h4>{{ highlight.title }}</h4>
+              <p>{{ highlight.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact__column contact__column--panel">
+        <h3>Guardrails que ya vienen listos</h3>
+        <ul class="contact__list">
+          <li *ngFor="let guardrail of guardrails">{{ guardrail }}</li>
+        </ul>
+        <div class="contact__panel-footer">
+          <div>
+            <p class="contact__metric">SLA <strong>2h</strong></p>
+            <span class="contact__metric-hint">Respuesta en horario laboral (UTC+1)</span>
+          </div>
+          <a class="contact__link" routerLink="/landing">Ver roadmap</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

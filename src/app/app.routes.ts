@@ -12,5 +12,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/workspace/workspace.page').then((m) => m.WorkspacePageComponent),
   },
+  {
+    path: 'contact-qa',
+    loadComponent: () =>
+      import('./pages/contact-qa/contact-qa.page').then((m) => m.ContactQaPageComponent),
+  },
   { path: '**', redirectTo: 'landing' },
 ];
