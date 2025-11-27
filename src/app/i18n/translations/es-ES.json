@@ -6,7 +6,11 @@
     "languages": {
       "es-ES": "Español",
       "en": "Inglés",
-      "ca": "Catalán"
+      "ca": "Catalán",
+      "fr": "Francés",
+      "it": "Italiano",
+      "pt": "Portugués",
+      "de": "Alemán"
     },
     "landing": {
       "badge": "Empieza a anotar",
@@ -26,6 +30,12 @@
       "ariaLabel": "Subir un nuevo PDF para reiniciar el espacio de trabajo"
     }
   },
+  "theme": {
+    "toggleLabel": "Cambiar tema",
+    "light": "Modo claro",
+    "dark": "Modo oscuro",
+    "switchTo": "Cambiar a {{mode}}"
+  },
   "controls": {
     "prev": "Anterior",
     "next": "Siguiente",
@@ -43,11 +53,14 @@
     "viewJsonText": "Volver al editor",
     "jsonViewModeToggle": "Modo de visualización del JSON",
     "downloadPdf": "Descargar PDF",
+    "cursorLabel": "Cursor (PDF)",
+    "cursorInactive": "Mueve el cursor sobre el PDF",
     "toolbarAriaLabel": "Acciones del PDF",
     "navigationGroup": "Navegación de páginas",
     "zoomGroup": "Controles de zoom",
     "historyGroup": "Acciones de historial",
-    "exportGroup": "Opciones de exportación"
+    "exportGroup": "Opciones de exportación",
+    "preferencesGroup": "Preferencias"
   },
   "sidebar": {
     "title": "Anotaciones (JSON)",

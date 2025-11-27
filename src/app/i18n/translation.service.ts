@@ -3,10 +3,14 @@ import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 
 import ca from './translations/ca.json';
+import de from './translations/de.json';
 import en from './translations/en.json';
 import es from './translations/es-ES.json';
+import fr from './translations/fr.json';
+import it from './translations/it.json';
+import pt from './translations/pt.json';
 
-export const LANGUAGES = ['es-ES', 'en', 'ca'] as const;
+export const LANGUAGES = ['es-ES', 'en', 'ca', 'fr', 'it', 'pt', 'de'] as const;
 export type Language = (typeof LANGUAGES)[number];
 
 type TranslationRecord = typeof es;
@@ -15,6 +19,10 @@ const TRANSLATIONS: Record<Language, TranslationRecord> = {
   'es-ES': es,
   en,
   ca,
+  fr,
+  it,
+  pt,
+  de,
 };
 
 const LANGUAGE_STORAGE_KEY = 'pdf-annotator.language';

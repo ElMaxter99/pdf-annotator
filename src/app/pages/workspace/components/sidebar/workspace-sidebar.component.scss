@@ -30,6 +30,36 @@
   display: block;
 }
 
+.json-coords {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 234, 212, 0.14);
+  background: rgba(18, 20, 30, 0.7);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.json-coords__label {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.json-coords__value {
+  font-weight: 600;
+}
+
+.json-coords__divider {
+  opacity: 0.6;
+}
+
+.json-coords__idle {
+  color: rgba(255, 255, 255, 0.75);
+}
+
 @media (max-width: 1024px) {
   .sidebar-thumbnails__list {
     max-height: clamp(140px, 28vh, 300px);

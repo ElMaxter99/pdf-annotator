@@ -155,6 +155,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   pageIndex = signal(1);
   scale = signal(1.5);
   coords = signal<PageAnnotations[]>([]);
+  cursorPdfCoords = signal<{ x: number; y: number } | null>(null);
   private readonly undoStack = signal<PageAnnotations[][]>([]);
   private readonly redoStack = signal<PageAnnotations[][]>([]);
   readonly pageThumbnails = signal<readonly PageThumbnail[]>([]);
@@ -1313,6 +1314,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const loadingTask = pdfjsLib.getDocument({ data: typed });
     const loadedPdf = await loadingTask.promise;
     this.pdfDoc = loadedPdf;
+    this.cursorPdfCoords.set(null);
 
     try {
       const canonicalData = await loadedPdf.getData();
@@ -1474,6 +1476,20 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const yPx = evt.clientY - rect.top;
     const scale = this.scale();
     return { x: +(xPx / scale).toFixed(2), y: +((canvas.height - yPx) / scale).toFixed(2) };
+  }
+
+  onViewerMouseMove(evt: MouseEvent) {
+    if (!this.pdfDoc) {
+      this.cursorPdfCoords.set(null);
+      return;
+    }
+
+    const coords = this.domToPdfCoords(evt);
+    this.cursorPdfCoords.set(coords);
+  }
+
+  onViewerMouseLeave() {
+    this.cursorPdfCoords.set(null);
   }
 
   onHitboxClick(evt: MouseEvent) {

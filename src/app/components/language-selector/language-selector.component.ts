@@ -10,6 +10,10 @@ const LANGUAGE_FLAGS: Record<Language, string> = {
   'es-ES': '🇪🇸',
   en: '🇬🇧',
   ca: '🏴',
+  fr: '🇫🇷',
+  it: '🇮🇹',
+  pt: '🇵🇹',
+  de: '🇩🇪',
 };
 
 function getLanguageFlag(language: Language): string {

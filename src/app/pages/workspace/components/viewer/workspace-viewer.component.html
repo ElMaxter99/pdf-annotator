@@ -1,5 +1,5 @@
 <main class="viewer" *ngIf="vm.pdfDoc as _">
-  <div class="canvas-container" #pdfViewer>
+  <div class="canvas-container" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
     <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
     <div #annotationsLayer class="annotations-layer"></div>

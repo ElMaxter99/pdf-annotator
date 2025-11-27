@@ -6,7 +6,11 @@
     "languages": {
       "es-ES": "Espanyol",
       "en": "Anglès",
-      "ca": "Català"
+      "ca": "Català",
+      "fr": "Francès",
+      "it": "Italià",
+      "pt": "Portuguès",
+      "de": "Alemany"
     },
     "landing": {
       "badge": "Comença a anotar",
@@ -26,6 +30,12 @@
       "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
     }
   },
+  "theme": {
+    "toggleLabel": "Canviar tema",
+    "light": "Mode clar",
+    "dark": "Mode fosc",
+    "switchTo": "Canvia a {{mode}}"
+  },
   "controls": {
     "prev": "Anterior",
     "next": "Següent",
@@ -43,11 +53,14 @@
     "viewJsonText": "Veure editor JSON",
     "jsonViewModeToggle": "Mode de visualització del JSON",
     "downloadPdf": "Descarregar PDF",
+    "cursorLabel": "Cursor (PDF)",
+    "cursorInactive": "Passa el cursor pel PDF per veure les coordenades",
     "toolbarAriaLabel": "Accions del PDF",
     "navigationGroup": "Navegació de pàgines",
     "zoomGroup": "Controls de zoom",
     "historyGroup": "Accions d'historial",
-    "exportGroup": "Opcions d'exportació"
+    "exportGroup": "Opcions d'exportació",
+    "preferencesGroup": "Preferències"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
