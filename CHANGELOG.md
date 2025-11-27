@@ -1,4 +1,14 @@
-## [v1.3.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.0) - 20YY-11-07
+## [v1.3.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.1) - 2025-11-27
+### Added
+- Add French, Italian, Portuguese, and German translations #100
+- Add PDF cursor coordinate indicator #101
+- Add legal notice to landing footer #111
+- Add light/dark theme toggle #113
+  
+### Dev
+- [Snyk] Upgrade pdfjs-dist from 5.4.296 to 5.4.394 #108
+
+## [v1.3.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.0) - 2025-11-07
 ### Added
 - Add page thumbnails sidebar #92
 - Add lock and hide controls for workspace annotations #97
