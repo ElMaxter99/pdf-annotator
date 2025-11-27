@@ -30,6 +30,12 @@
       "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
     }
   },
+  "theme": {
+    "toggleLabel": "Canviar tema",
+    "light": "Mode clar",
+    "dark": "Mode fosc",
+    "switchTo": "Canvia a {{mode}}"
+  },
   "controls": {
     "prev": "Anterior",
     "next": "Següent",
@@ -53,7 +59,8 @@
     "navigationGroup": "Navegació de pàgines",
     "zoomGroup": "Controls de zoom",
     "historyGroup": "Accions d'historial",
-    "exportGroup": "Opcions d'exportació"
+    "exportGroup": "Opcions d'exportació",
+    "preferencesGroup": "Preferències"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",

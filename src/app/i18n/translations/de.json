@@ -30,6 +30,12 @@
       "ariaLabel": "Neues PDF hochladen, um den Arbeitsbereich zurückzusetzen"
     }
   },
+  "theme": {
+    "toggleLabel": "Design wechseln",
+    "light": "Heller Modus",
+    "dark": "Dunkler Modus",
+    "switchTo": "Zu {{mode}} wechseln"
+  },
   "controls": {
     "prev": "Zurück",
     "next": "Weiter",
@@ -53,7 +59,8 @@
     "navigationGroup": "Seitennavigation",
     "zoomGroup": "Zoom-Steuerung",
     "historyGroup": "Verlauf",
-    "exportGroup": "Exportoptionen"
+    "exportGroup": "Exportoptionen",
+    "preferencesGroup": "Einstellungen"
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",

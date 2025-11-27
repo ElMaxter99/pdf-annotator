@@ -30,6 +30,12 @@
       "ariaLabel": "Upload a new PDF to restart the annotation workspace"
     }
   },
+  "theme": {
+    "toggleLabel": "Toggle theme",
+    "light": "Light mode",
+    "dark": "Dark mode",
+    "switchTo": "Switch to {{mode}}"
+  },
   "controls": {
     "prev": "Prev",
     "next": "Next",
@@ -53,7 +59,8 @@
     "navigationGroup": "Page navigation",
     "zoomGroup": "Zoom controls",
     "historyGroup": "History actions",
-    "exportGroup": "Export options"
+    "exportGroup": "Export options",
+    "preferencesGroup": "Preferences"
   },
   "sidebar": {
     "title": "Annotations (JSON)",

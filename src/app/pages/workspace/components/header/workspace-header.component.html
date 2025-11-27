@@ -58,8 +58,11 @@
       </button>
     </div>
 
-    <app-language-selector class="header__language-selector" [languages]="vm.languages"
-      [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
-    </app-language-selector>
+    <div class="toolbar__group toolbar__group--preferences" role="group" [attr.aria-label]="'controls.preferencesGroup' | t">
+      <app-theme-toggle></app-theme-toggle>
+      <app-language-selector class="header__language-selector" [languages]="vm.languages"
+        [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
+      </app-language-selector>
+    </div>
   </div>
 </header>
