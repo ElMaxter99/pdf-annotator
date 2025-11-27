@@ -31,6 +31,12 @@
       "ariaLabel": "Téléverser un nouveau PDF pour réinitialiser l'espace de travail"
     }
   },
+  "theme": {
+    "toggleLabel": "Changer de thème",
+    "light": "Mode clair",
+    "dark": "Mode sombre",
+    "switchTo": "Passer en {{mode}}"
+  },
   "controls": {
     "prev": "Précédent",
     "next": "Suivant",
@@ -54,7 +60,8 @@
     "navigationGroup": "Navigation des pages",
     "zoomGroup": "Contrôles du zoom",
     "historyGroup": "Actions d'historique",
-    "exportGroup": "Options d'export"
+    "exportGroup": "Options d'export",
+    "preferencesGroup": "Préférences"
   },
   "sidebar": {
     "title": "Annotations (JSON)",

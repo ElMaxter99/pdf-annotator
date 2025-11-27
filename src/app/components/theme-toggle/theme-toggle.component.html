@@ -1,0 +1,12 @@
+<button
+  type="button"
+  class="btn btn--icon btn--ghost theme-toggle"
+  (click)="toggleTheme()"
+  [attr.aria-label]="
+    'theme.switchTo' | t : { mode: isLight() ? ('theme.dark' | t) : ('theme.light' | t) }
+  "
+  [attr.title]="'theme.toggleLabel' | t"
+>
+  <span class="btn__icon" aria-hidden="true">{{ isLight() ? '🌙' : '🌞' }}</span>
+  <span class="btn__label">{{ isLight() ? ('theme.dark' | t) : ('theme.light' | t) }}</span>
+</button>
