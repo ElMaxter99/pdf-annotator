@@ -5,6 +5,10 @@
 
     <app-landing-hero></app-landing-hero>
 
+    <div class="landing__disclaimer" role="alert">
+      ¡DISCLAIMER! Esta es una herramienta de demostración. Usa tus PDFs bajo tu responsabilidad.
+    </div>
+
     <app-landing-dropzone [fileDropActive]="fileDropActive()" (fileSelected)="onFileSelected($event)"
       (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
       (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
