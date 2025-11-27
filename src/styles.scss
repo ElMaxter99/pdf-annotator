@@ -1086,13 +1086,11 @@ header .logo {
     gap: 4px;
     text-align: right;
     color: var(--muted);
-  }
 
-  &__legal {
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.4;
-    text-wrap: balance;
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
   }
 }
 
