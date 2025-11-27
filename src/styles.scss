@@ -1086,6 +1086,11 @@ header .logo {
     gap: 4px;
     text-align: right;
     color: var(--muted);
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
   }
 }
 
