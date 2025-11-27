@@ -10,6 +10,7 @@ const LANGUAGE_FLAGS: Record<Language, string> = {
   'es-ES': '🇪🇸',
   en: '🇬🇧',
   ca: '🏴',
+  'ca-ES-valencia': '🏴',
   fr: '🇫🇷',
   it: '🇮🇹',
   pt: '🇵🇹',
