@@ -177,6 +177,28 @@
     },
     "editingBadge": "Editant"
   },
+  "funCorner": {
+    "title": "Espurna creativa",
+    "shuffle": "Mostra'm una altra idea",
+    "prompts": {
+      "magic": {
+        "title": "Afegeix una etiqueta màgica",
+        "description": "Posa una anotació amb l'emoji ✨ al costat de la signatura o ressalta la clàusula estrella."
+      },
+      "navigator": {
+        "title": "Mini recorregut guiat",
+        "description": "Col·loca petites notes numerades (1️⃣, 2️⃣, 3️⃣) per crear un camí de revisió divertit per a l'equip."
+      },
+      "bubble": {
+        "title": "Bombolla de diàleg",
+        "description": "Utilitza una nota arrodonida amb 💬 i lletra en negreta per simular un comentari d'estil còmic."
+      },
+      "target": {
+        "title": "Repte de precisió",
+        "description": "Puja el zoom al 200% i alinea dues anotacions amb les guies; després celebra-ho amb 🎯."
+      }
+    }
+  },
   "fonts": {
     "custom": {
       "enableFeature": "Activa les fonts personalitzades",

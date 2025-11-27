@@ -177,6 +177,28 @@
     },
     "editingBadge": "A editar"
   },
+  "funCorner": {
+    "title": "Faísca criativa",
+    "shuffle": "Mostrar outra ideia",
+    "prompts": {
+      "magic": {
+        "title": "Solte um rótulo mágico",
+        "description": "Adicione uma anotação com o emoji ✨ perto da assinatura ou destaque a melhor cláusula."
+      },
+      "navigator": {
+        "title": "Micro tour guiado",
+        "description": "Posicione pequenas notas numeradas (1️⃣, 2️⃣, 3️⃣) para criar um percurso divertido para o time."
+      },
+      "bubble": {
+        "title": "Clima de balão de fala",
+        "description": "Use uma nota arredondada com 💬 e fonte em negrito para simular um comentário em estilo quadrinhos."
+      },
+      "target": {
+        "title": "Desafio de precisão",
+        "description": "Aumente para 200% e alinhe duas anotações com as guias; depois comemore com 🎯."
+      }
+    }
+  },
   "fonts": {
     "custom": {
       "enableFeature": "Ativar tipos de letra personalizados",

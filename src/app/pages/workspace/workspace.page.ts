@@ -131,6 +131,12 @@ interface FontDropdownUiState {
   readonly query: string;
 }
 
+interface FunPromptDefinition {
+  readonly emoji: string;
+  readonly titleKey: string;
+  readonly descriptionKey: string;
+}
+
 const DEFAULT_FONT_ID = 'standard:helvetica';
 const DEFAULT_OPACITY = 1;
 
@@ -199,6 +205,38 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly currentYear = new Date().getFullYear();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
+  private readonly funPrompts: readonly FunPromptDefinition[] = [
+    {
+      emoji: '🪄',
+      titleKey: 'funCorner.prompts.magic.title',
+      descriptionKey: 'funCorner.prompts.magic.description',
+    },
+    {
+      emoji: '🧭',
+      titleKey: 'funCorner.prompts.navigator.title',
+      descriptionKey: 'funCorner.prompts.navigator.description',
+    },
+    {
+      emoji: '💬',
+      titleKey: 'funCorner.prompts.bubble.title',
+      descriptionKey: 'funCorner.prompts.bubble.description',
+    },
+    {
+      emoji: '🎯',
+      titleKey: 'funCorner.prompts.target.title',
+      descriptionKey: 'funCorner.prompts.target.description',
+    },
+  ];
+  readonly funPromptIndex = signal(this.buildRandomFunPromptIndex());
+  readonly funPrompt = computed(() => {
+    const prompt = this.funPrompts[this.funPromptIndex()];
+
+    return {
+      emoji: prompt.emoji,
+      title: this.translationService.translate(prompt.titleKey),
+      description: this.translationService.translate(prompt.descriptionKey),
+    };
+  });
   readonly defaultFontId = DEFAULT_FONT_ID;
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
@@ -346,6 +384,25 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       this.coordsFileInputFallback = null;
     }
+  }
+
+  refreshFunPrompt() {
+    if (!this.funPrompts.length) {
+      return;
+    }
+
+    const currentIndex = this.funPromptIndex();
+    let nextIndex = this.buildRandomFunPromptIndex();
+
+    if (this.funPrompts.length > 1 && nextIndex === currentIndex) {
+      nextIndex = (nextIndex + 1) % this.funPrompts.length;
+    }
+
+    this.funPromptIndex.set(nextIndex);
+  }
+
+  private buildRandomFunPromptIndex(): number {
+    return Math.floor(Math.random() * this.funPrompts.length);
   }
 
   setFieldFont(mode: EditorMode, fontId: string) {

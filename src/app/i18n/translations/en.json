@@ -177,6 +177,28 @@
     },
     "editingBadge": "Editing"
   },
+  "funCorner": {
+    "title": "Creative spark",
+    "shuffle": "Show another idea",
+    "prompts": {
+      "magic": {
+        "title": "Drop a magic label",
+        "description": "Add an annotation with a ✨ emoji next to the signature or highlight the best clause."
+      },
+      "navigator": {
+        "title": "Guided micro-tour",
+        "description": "Place small numbered notes (1️⃣, 2️⃣, 3️⃣) to create a playful review path for teammates."
+      },
+      "bubble": {
+        "title": "Speech bubble vibe",
+        "description": "Use a rounded note with 💬 and a bold font to simulate a comic-style comment on the PDF."
+      },
+      "target": {
+        "title": "Precision challenge",
+        "description": "Scale to 200% and try to align two annotations perfectly using guides—then celebrate with 🎯."
+      }
+    }
+  },
   "fonts": {
     "custom": {
       "enableFeature": "Enable custom fonts",

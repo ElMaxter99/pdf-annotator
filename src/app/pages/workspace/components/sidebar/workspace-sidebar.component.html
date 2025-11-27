@@ -79,6 +79,19 @@
       <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
     </ng-template>
   </section>
+  <section class="fun-box" aria-live="polite">
+    <div class="fun-box__header">
+      <span class="fun-box__emoji" aria-hidden="true">{{ vm.funPrompt().emoji }}</span>
+      <div>
+        <p class="fun-box__eyebrow">{{ 'funCorner.title' | t }}</p>
+        <p class="fun-box__title">{{ vm.funPrompt().title }}</p>
+      </div>
+    </div>
+    <p class="fun-box__description">{{ vm.funPrompt().description }}</p>
+    <button type="button" class="btn fun-box__button" (click)="vm.refreshFunPrompt()">
+      {{ 'funCorner.shuffle' | t }}
+    </button>
+  </section>
   <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
     <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel"
       (ngModelChange)="vm.onCoordsTextChange($event)" [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>

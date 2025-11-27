@@ -177,6 +177,28 @@
     },
     "editingBadge": "Bearbeitung"
   },
+  "funCorner": {
+    "title": "Kreativfunke",
+    "shuffle": "Noch eine Idee",
+    "prompts": {
+      "magic": {
+        "title": "Zauber-Label setzen",
+        "description": "Füge eine Anmerkung mit dem Emoji ✨ neben der Unterschrift hinzu oder markiere die beste Klausel."
+      },
+      "navigator": {
+        "title": "Geführte Mini-Tour",
+        "description": "Platziere kleine nummerierte Notizen (1️⃣, 2️⃣, 3️⃣), um einen spielerischen Prüfpfad fürs Team zu bauen."
+      },
+      "bubble": {
+        "title": "Sprechblasen-Feeling",
+        "description": "Nutze eine runde Notiz mit 💬 und fetter Schrift, um einen Comic-Kommentar nachzuahmen."
+      },
+      "target": {
+        "title": "Präzisions-Challenge",
+        "description": "Zoome auf 200 % und richte zwei Anmerkungen mit den Hilfslinien aus – danach feiern mit 🎯."
+      }
+    }
+  },
   "fonts": {
     "custom": {
       "enableFeature": "Benutzerdefinierte Schriften aktivieren",

@@ -60,6 +60,61 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
+.fun-box {
+  margin: 16px 0 12px;
+  padding: 14px 14px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(94, 234, 212, 0.12);
+  background: linear-gradient(145deg, rgba(23, 27, 45, 0.95), rgba(27, 31, 53, 0.75));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
+}
+
+.fun-box__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fun-box__emoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(94, 234, 212, 0.12);
+  font-size: 1.4rem;
+}
+
+.fun-box__eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.fun-box__title {
+  margin: 2px 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.fun-box__description {
+  margin: 10px 0 12px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.45;
+}
+
+.fun-box__button {
+  width: 100%;
+  justify-content: center;
+  background: rgba(94, 234, 212, 0.16);
+}
+
+.fun-box__button:hover {
+  background: rgba(94, 234, 212, 0.26);
+}
+
 @media (max-width: 1024px) {
   .sidebar-thumbnails__list {
     max-height: clamp(140px, 28vh, 300px);

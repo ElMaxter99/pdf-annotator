@@ -177,6 +177,28 @@
     },
     "editingBadge": "Édition"
   },
+  "funCorner": {
+    "title": "Étincelle créative",
+    "shuffle": "Une autre idée",
+    "prompts": {
+      "magic": {
+        "title": "Dépose une étiquette magique",
+        "description": "Ajoute une annotation avec l'emoji ✨ près de la signature ou souligne la meilleure clause."
+      },
+      "navigator": {
+        "title": "Mini-visite guidée",
+        "description": "Place de petites notes numérotées (1️⃣, 2️⃣, 3️⃣) pour créer un parcours ludique pour l'équipe."
+      },
+      "bubble": {
+        "title": "Bulle de dialogue",
+        "description": "Utilise une note arrondie avec 💬 et une police en gras pour simuler un commentaire façon BD."
+      },
+      "target": {
+        "title": "Défi précision",
+        "description": "Passe à 200 % et aligne deux annotations avec les repères, puis fête ça avec 🎯."
+      }
+    }
+  },
   "fonts": {
     "custom": {
       "enableFeature": "Activer les polices personnalisées",

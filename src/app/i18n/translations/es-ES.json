@@ -177,6 +177,28 @@
     },
     "editingBadge": "Editando"
   },
+  "funCorner": {
+    "title": "Chispa creativa",
+    "shuffle": "Quiero otra idea",
+    "prompts": {
+      "magic": {
+        "title": "Pon una etiqueta mágica",
+        "description": "Añade una anotación con el emoji ✨ junto a la firma o resalta la cláusula estrella."
+      },
+      "navigator": {
+        "title": "Mini tour guiado",
+        "description": "Coloca notas numeradas (1️⃣, 2️⃣, 3️⃣) para proponer un recorrido divertido a tu equipo."
+      },
+      "bubble": {
+        "title": "Burbuja de diálogo",
+        "description": "Usa una nota redondeada con 💬 y fuente en negrita para imitar un comentario estilo cómic."
+      },
+      "target": {
+        "title": "Reto de precisión",
+        "description": "Sube el zoom a 200% y alinea dos anotaciones con las guías; después celebra con 🎯."
+      }
+    }
+  },
   "fonts": {
     "custom": {
       "enableFeature": "Activar fuentes personalizadas",
