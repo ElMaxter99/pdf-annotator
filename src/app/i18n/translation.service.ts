@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 
 import ca from './translations/ca.json';
+import caValencia from './translations/ca-ES-valencia.json';
 import de from './translations/de.json';
 import en from './translations/en.json';
 import es from './translations/es-ES.json';
@@ -10,7 +11,7 @@ import fr from './translations/fr.json';
 import it from './translations/it.json';
 import pt from './translations/pt.json';
 
-export const LANGUAGES = ['es-ES', 'en', 'ca', 'fr', 'it', 'pt', 'de'] as const;
+export const LANGUAGES = ['es-ES', 'en', 'ca', 'ca-ES-valencia', 'fr', 'it', 'pt', 'de'] as const;
 export type Language = (typeof LANGUAGES)[number];
 
 type TranslationRecord = typeof es;
@@ -19,6 +20,7 @@ const TRANSLATIONS: Record<Language, TranslationRecord> = {
   'es-ES': es,
   en,
   ca,
+  'ca-ES-valencia': caValencia,
   fr,
   it,
   pt,

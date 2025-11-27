@@ -5,7 +5,7 @@
     "languageAriaLabel": "Selecciona l'idioma de l'aplicació",
     "languages": {
       "es-ES": "Espanyol",
-      "en": "Anglès",
+      "en": "Anglés",
       "ca": "Català",
       "ca-ES-valencia": "Valencià",
       "fr": "Francès",
@@ -21,7 +21,7 @@
     },
     "upload": {
       "title": "Carrega el teu PDF",
-      "subtitle": "Arrossega i deixa anar el fitxer aquí o fes clic per cercar",
+      "subtitle": "Arrossega i deixa anar el fitxer ací o fes clic per cercar",
       "hint": "Només PDF",
       "invalidFormat": "Només s'admeten fitxers PDF."
     },
@@ -60,7 +60,7 @@
     "title": "Anotacions (JSON)",
     "importJsonFile": "Importa des d'un fitxer",
     "applyJson": "Aplica el JSON",
-    "jsonPlaceholder": "Enganxa o edita aquí les coordenades de les anotacions...",
+    "jsonPlaceholder": "Enganxa o edita ací les coordenades de les anotacions...",
     "jsonTree": {
       "empty": "L'editor JSON és buit.",
       "invalid": "El contingut no és un JSON vàlid. Corregeix els errors per veure l'arbre."
