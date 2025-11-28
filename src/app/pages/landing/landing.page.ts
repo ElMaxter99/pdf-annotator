@@ -37,6 +37,7 @@ export class LandingPageComponent {
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly fileDropActive = signal(false);
+  showLiveTestModal = true;
 
   @ViewChild(LandingDropzoneComponent)
   private landingDropzoneComponent?: LandingDropzoneComponent;
@@ -104,6 +105,10 @@ export class LandingPageComponent {
     }
 
     await this.handleFileSelection(file);
+  }
+
+  closeLiveTestModal() {
+    this.showLiveTestModal = false;
   }
 
   private async handleFileSelection(file: File) {
