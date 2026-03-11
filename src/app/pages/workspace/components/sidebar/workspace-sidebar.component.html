@@ -195,6 +195,13 @@
         </label>
         <small class="advanced-hint">{{ 'sidebar.advancedHint' | t }}</small>
 
+        <label class="advanced-checkbox">
+          <input type="checkbox" [checked]="vm.includeAdvancedJsonFields()"
+            (change)="vm.toggleIncludeAdvancedJsonFields($event.target.checked)" />
+          <span>{{ 'sidebar.includeAdvancedJsonFields' | t }}</span>
+        </label>
+        <small class="advanced-hint">{{ 'sidebar.includeAdvancedJsonFieldsHint' | t }}</small>
+
         <section class="guides-panel" *ngIf="vm.guidesFeatureEnabled() && vm.guideSettings() as guides">
           <h5>{{ 'guides.title' | t }}</h5>
           <div class="guides-toggles">

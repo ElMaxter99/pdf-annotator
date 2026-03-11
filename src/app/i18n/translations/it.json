@@ -87,6 +87,8 @@
     "jsonHint": "Incolla le coordinate o importale da un JSON seguendo lo stesso formato dei dati esportati.",
     "advancedTitle": "Opzioni avanzate",
     "advancedHint": "Attiva guide e agganci solo quando ti serve maggiore precisione.",
+    "includeAdvancedJsonFields": "Includi proprietà avanzate nel JSON",
+    "includeAdvancedJsonFieldsHint": "Disattivato: solo x, y, mapField, fontSize e type. Attivato: esporta anche colore, font, opacità, sfondo, blocco e visibilità.",
     "jsonPanelHide": "Hide JSON",
     "jsonPanelShow": "Show JSON",
     "minimizeSidebar": "Minimize sidebar",

@@ -174,6 +174,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
   customFontsFeatureEnabled = signal(false);
+  includeAdvancedJsonFields = signal(false);
   customFonts = signal<CustomFontEntry[]>([]);
   private readonly fontDropdownState = signal<Record<EditorMode, FontDropdownUiState>>({
     preview: { open: false, query: '' },
@@ -2753,14 +2754,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private buildPageJsonBlock(page: PageAnnotations): string {
-    return JSON.stringify(page, null, 2)
+    return JSON.stringify(this.serializePageForJson(page), null, 2)
       .split('\n')
       .map((line) => `    ${line}`)
       .join('\n');
   }
 
   private buildFieldJsonBlock(field: PageField): string {
-    return JSON.stringify(field, null, 2)
+    return JSON.stringify(this.serializeFieldForJson(field), null, 2)
       .split('\n')
       .map((line) => `        ${line}`)
       .join('\n');
@@ -3324,6 +3325,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     navigator.clipboard.writeText(this.coordsTextModel).catch(() => {});
   }
 
+  toggleIncludeAdvancedJsonFields(checked: boolean) {
+    if (this.includeAdvancedJsonFields() === checked) {
+      return;
+    }
+
+    this.includeAdvancedJsonFields.set(checked);
+    this.syncCoordsTextModel(false);
+  }
+
   onCoordsTextChange(value: string) {
     this.coordsTextModel = value;
     this.refreshJsonPreview();
@@ -3384,7 +3394,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         throw new Error('Formato no válido');
       }
 
-      this.replaceCoords(normalized);
+      this.replaceCoords(normalized, { preserveTextModel: true });
       return true;
     } catch (error) {
       if (!options.silent) {
@@ -3421,7 +3431,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         throw new Error('Formato no válido');
       }
 
-      this.replaceCoords(normalized);
+      this.replaceCoords(normalized, { preserveTextModel: true });
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
@@ -3431,7 +3441,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   downloadJSON() {
-    const blob = new Blob([JSON.stringify({ pages: this.coords() }, null, 2)], {
+    const blob = new Blob([this.coordsTextModel], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
@@ -3742,7 +3752,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private syncCoordsTextModel(persist = true) {
     const currentCoords = this.coords();
-    this.coordsTextModel = JSON.stringify({ pages: currentCoords }, null, 2);
+    this.coordsTextModel = JSON.stringify(this.buildJsonExportPayload(currentCoords), null, 2);
     this.refreshJsonPreview();
     if (persist) {
       this.templatesService.storeLastCoords(currentCoords);
@@ -3756,6 +3766,39 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }));
   }
 
+  private buildJsonExportPayload(pages: PageAnnotations[]): {
+    pages: Array<{ num: number; fields: Array<Record<string, unknown>> }>;
+  } {
+    return {
+      pages: pages.map((page) => this.serializePageForJson(page)),
+    };
+  }
+
+  private serializePageForJson(
+    page: PageAnnotations
+  ): { num: number; fields: Array<Record<string, unknown>> } {
+    return {
+      num: page.num,
+      fields: page.fields.map((field) => this.serializeFieldForJson(field)),
+    };
+  }
+
+  private serializeFieldForJson(field: PageField): Record<string, unknown> {
+    const sanitized = this.prepareFieldForStorage(field);
+
+    if (this.includeAdvancedJsonFields()) {
+      return { ...sanitized };
+    }
+
+    return {
+      x: sanitized.x,
+      y: sanitized.y,
+      mapField: sanitized.mapField,
+      fontSize: sanitized.fontSize,
+      type: sanitized.type,
+    };
+  }
+
   private applyCoordsChange(mutator: () => void): boolean {
     const previous = this.snapshotCoords();
     mutator();
@@ -3767,7 +3810,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return changed;
   }
 
-  private replaceCoords(newCoords: PageAnnotations[], options?: { skipHistory?: boolean }) {
+  private replaceCoords(
+    newCoords: PageAnnotations[],
+    options?: { skipHistory?: boolean; preserveTextModel?: boolean }
+  ) {
     const snapshot = this.snapshotCoords(newCoords);
     if (options?.skipHistory) {
       this.coords.set(snapshot);
@@ -3776,7 +3822,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     this.preview.set(null);
     this.editing.set(null);
-    this.syncCoordsTextModel();
+    if (options?.preserveTextModel) {
+      this.refreshJsonPreview();
+    } else {
+      this.syncCoordsTextModel();
+    }
     this.redrawAllForPage();
   }
 
