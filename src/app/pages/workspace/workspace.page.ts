@@ -1784,6 +1784,37 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.closeFontDropdown('edit');
   }
 
+  @HostListener('document:keydown', ['$event'])
+  onGlobalKeydown(event: KeyboardEvent) {
+    const key = event.key.toLowerCase();
+    const hasPrimaryModifier = event.ctrlKey || event.metaKey;
+
+    if (!hasPrimaryModifier) {
+      return;
+    }
+
+    if (key === 's') {
+      event.preventDefault();
+      this.applyCoordsText();
+      return;
+    }
+
+    if (key === 'z' && !event.shiftKey) {
+      if (this.canUndo()) {
+        event.preventDefault();
+        this.undo();
+      }
+      return;
+    }
+
+    if (key === 'y' || (key === 'z' && event.shiftKey)) {
+      if (this.canRedo()) {
+        event.preventDefault();
+        this.redo();
+      }
+    }
+  }
+
   @HostListener('document:mousedown', ['$event'])
   onDocumentMouseDown(event: MouseEvent) {
     const editState = this.editing();
