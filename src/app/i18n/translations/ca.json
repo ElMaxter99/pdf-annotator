@@ -86,7 +86,11 @@
     },
     "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat.",
     "advancedTitle": "Opcions avançades",
-    "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió."
+    "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió.",
+    "jsonPanelHide": "Hide JSON",
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Activa les guies i el snapping",

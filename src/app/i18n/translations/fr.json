@@ -86,7 +86,11 @@
     },
     "jsonHint": "Collez les coordonnées ou importez-les depuis un JSON en suivant le même format que les données exportées.",
     "advancedTitle": "Options avancées",
-    "advancedHint": "Activez les guides et les aides d'alignement uniquement lorsque vous avez besoin de plus de précision."
+    "advancedHint": "Activez les guides et les aides d'alignement uniquement lorsque vous avez besoin de plus de précision.",
+    "jsonPanelHide": "Hide JSON",
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Activer guides et aimantation",

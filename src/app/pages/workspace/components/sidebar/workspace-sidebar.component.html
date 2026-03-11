@@ -1,4 +1,12 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.sidebar--minimized]="vm.sidebarMinimized()">
+  <button type="button" class="sidebar-minimize-toggle"
+    (click)="vm.toggleSidebarMinimized()"
+    [attr.aria-label]="(vm.sidebarMinimized() ? 'sidebar.expandSidebar' : 'sidebar.minimizeSidebar') | t"
+    [attr.title]="(vm.sidebarMinimized() ? 'sidebar.expandSidebar' : 'sidebar.minimizeSidebar') | t">
+    <span aria-hidden="true">{{ vm.sidebarMinimized() ? '⟩' : '⟨' }}</span>
+  </button>
+
+  <div class="sidebar-content" *ngIf="!vm.sidebarMinimized()">
   <div class="json-coords" role="status" [attr.aria-label]="'controls.cursorLabel' | t">
     <ng-container *ngIf="vm.cursorPdfCoords() as cursor; else coordsIdle">
       <span class="json-coords__label">{{ 'controls.cursorLabel' | t }}</span>
@@ -26,7 +34,6 @@
     </div>
     <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
   </section>
-  <h4>{{ 'sidebar.title' | t }}</h4>
   <div class="sidebar-actions">
     <button type="button" class="btn" (click)="vm.triggerImportCoords()">
       {{ 'sidebar.importJsonFile' | t }}
@@ -79,44 +86,62 @@
       <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
     </ng-template>
   </section>
-  <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
-    <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel"
-      (ngModelChange)="vm.onCoordsTextChange($event)" (paste)="vm.onCoordsTextPaste()"
-      [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
-  </ng-container>
-  <ng-template #jsonTreeView>
-    <div *ngIf="vm.jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
-      <app-json-tree #jsonTree [value]="vm.jsonTreePreview.value"></app-json-tree>
+  <section class="json-panel" [class.json-panel--collapsed]="vm.jsonPanelCollapsed()">
+    <div class="json-panel__header">
+      <h5 class="json-panel__title">{{ 'sidebar.title' | t }}</h5>
+      <button type="button" class="json-panel__toggle" (click)="vm.toggleJsonPanelCollapsed()"
+        [attr.aria-expanded]="!vm.jsonPanelCollapsed()">
+        <span>{{ (vm.jsonPanelCollapsed() ? 'sidebar.jsonPanelShow' : 'sidebar.jsonPanelHide') | t }}</span>
+        <span class="json-panel__toggle-icon" aria-hidden="true">{{ vm.jsonPanelCollapsed() ? '⟩' : '⟨' }}</span>
+      </button>
     </div>
-    <ng-template #jsonTreePlaceholder>
-      <div class="json-tree-placeholder">
-        <p *ngIf="vm.jsonTreePreview.status === 'empty'">{{ 'sidebar.jsonTree.empty' | t }}</p>
-        <p *ngIf="vm.jsonTreePreview.status === 'error'">{{ 'sidebar.jsonTree.invalid' | t }}</p>
+
+    <ng-container *ngIf="!vm.jsonPanelCollapsed()">
+      <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
+        <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel"
+          (ngModelChange)="vm.onCoordsTextChange($event)" (paste)="vm.onCoordsTextPaste()"
+          [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
+      </ng-container>
+      <ng-template #jsonTreeView>
+        <div *ngIf="vm.jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
+          <app-json-tree #jsonTree [value]="vm.jsonTreePreview.value"></app-json-tree>
+        </div>
+        <ng-template #jsonTreePlaceholder>
+          <div class="json-tree-placeholder">
+            <p *ngIf="vm.jsonTreePreview.status === 'empty'">{{ 'sidebar.jsonTree.empty' | t }}</p>
+            <p *ngIf="vm.jsonTreePreview.status === 'error'">{{ 'sidebar.jsonTree.invalid' | t }}</p>
+          </div>
+        </ng-template>
+      </ng-template>
+      <div class="json-toolbar">
+        <div class="json-toolbar__view-toggle-group" role="group"
+          [attr.aria-label]="'controls.jsonViewModeToggle' | t">
+          <button type="button" class="json-toolbar__view-toggle-option"
+            [class.json-toolbar__view-toggle-option--active]="vm.jsonViewMode() === 'text'"
+            (click)="vm.setJsonViewMode('text')" [attr.aria-pressed]="vm.jsonViewMode() === 'text'">
+            <span class="json-toolbar__view-toggle-icon" aria-hidden="true">📝</span>
+            <span>{{ 'controls.viewJsonText' | t }}</span>
+          </button>
+          <button type="button" class="json-toolbar__view-toggle-option"
+            [class.json-toolbar__view-toggle-option--active]="vm.jsonViewMode() === 'tree'"
+            (click)="vm.setJsonViewMode('tree')" [attr.aria-pressed]="vm.jsonViewMode() === 'tree'">
+            <span class="json-toolbar__view-toggle-icon" aria-hidden="true">🌳</span>
+            <span>{{ 'controls.viewJsonTree' | t }}</span>
+          </button>
+        </div>
+        <button type="button" class="btn" (click)="vm.copyJSON()"
+          [disabled]="!vm.coords().length">{{ 'controls.copyJson' | t }}</button>
+        <button type="button" class="btn" (click)="vm.downloadJSON()"
+          [disabled]="!vm.coords().length">{{ 'controls.downloadJson' | t }}</button>
       </div>
-    </ng-template>
-  </ng-template>
-  <div class="json-toolbar">
-    <div class="json-toolbar__view-toggle-group" role="group"
-      [attr.aria-label]="'controls.jsonViewModeToggle' | t">
-      <button type="button" class="json-toolbar__view-toggle-option"
-        [class.json-toolbar__view-toggle-option--active]="vm.jsonViewMode() === 'text'"
-        (click)="vm.setJsonViewMode('text')" [attr.aria-pressed]="vm.jsonViewMode() === 'text'">
-        <span class="json-toolbar__view-toggle-icon" aria-hidden="true">📝</span>
-        <span>{{ 'controls.viewJsonText' | t }}</span>
-      </button>
-      <button type="button" class="json-toolbar__view-toggle-option"
-        [class.json-toolbar__view-toggle-option--active]="vm.jsonViewMode() === 'tree'"
-        (click)="vm.setJsonViewMode('tree')" [attr.aria-pressed]="vm.jsonViewMode() === 'tree'">
-        <span class="json-toolbar__view-toggle-icon" aria-hidden="true">🌳</span>
-        <span>{{ 'controls.viewJsonTree' | t }}</span>
-      </button>
-    </div>
-    <button type="button" class="btn" (click)="vm.copyJSON()"
-      [disabled]="!vm.coords().length">{{ 'controls.copyJson' | t }}</button>
-    <button type="button" class="btn" (click)="vm.downloadJSON()"
-      [disabled]="!vm.coords().length">{{ 'controls.downloadJson' | t }}</button>
-  </div>
-  <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
+      <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
+    </ng-container>
+  </section>
+
+  <button *ngIf="vm.jsonPanelCollapsed()" type="button" class="json-panel__restore"
+    (click)="vm.setJsonPanelCollapsed(false)">
+    {{ 'sidebar.jsonPanelShow' | t }}
+  </button>
 
   <section class="advanced-panel" [class.open]="vm.advancedOptionsOpen()"
     [class.active]="vm.guidesFeatureEnabled() || vm.customFontsFeatureEnabled()">
@@ -263,4 +288,5 @@
       </div>
     </ng-container>
   </section>
+  </div>
 </aside>

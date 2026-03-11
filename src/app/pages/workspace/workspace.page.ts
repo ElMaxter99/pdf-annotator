@@ -186,6 +186,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   snapPointsYText = signal('');
   fileDropActive = signal(false);
   readonly jsonViewMode = signal<JsonViewMode>('text');
+  readonly jsonPanelCollapsed = signal(false);
+  readonly sidebarMinimized = signal(false);
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
@@ -260,6 +262,22 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   get editFontDropdownRef(): ElementRef<HTMLDivElement> | undefined {
     return this.viewerComponent?.editFontDropdownRef;
+  }
+
+  toggleJsonPanelCollapsed(): void {
+    this.jsonPanelCollapsed.update((current) => !current);
+  }
+
+  setJsonPanelCollapsed(collapsed: boolean): void {
+    this.jsonPanelCollapsed.set(collapsed);
+  }
+
+  toggleSidebarMinimized(): void {
+    this.sidebarMinimized.update((current) => !current);
+  }
+
+  setSidebarMinimized(minimized: boolean): void {
+    this.sidebarMinimized.set(minimized);
   }
 
   get previewFontSearchRef(): ElementRef<HTMLInputElement> | undefined {
