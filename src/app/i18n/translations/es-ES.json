@@ -86,7 +86,9 @@
     },
     "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado.",
     "advancedTitle": "Opciones avanzadas",
-    "advancedHint": "Activa las guías y el snapping solo cuando necesites más precisión."
+    "advancedHint": "Activa las guías y el snapping solo cuando necesites más precisión.",
+    "jsonPanelHide": "Ocultar JSON",
+    "jsonPanelShow": "Mostrar JSON"
   },
   "guides": {
     "enableFeature": "Activar guías y snapping",

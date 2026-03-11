@@ -86,7 +86,9 @@
     },
     "jsonHint": "Incolla le coordinate o importale da un JSON seguendo lo stesso formato dei dati esportati.",
     "advancedTitle": "Opzioni avanzate",
-    "advancedHint": "Attiva guide e agganci solo quando ti serve maggiore precisione."
+    "advancedHint": "Attiva guide e agganci solo quando ti serve maggiore precisione.",
+    "jsonPanelHide": "Hide JSON",
+    "jsonPanelShow": "Show JSON"
   },
   "guides": {
     "enableFeature": "Attiva guide e agganci",

@@ -86,7 +86,9 @@
     },
     "jsonHint": "Fügen Sie Koordinaten ein oder importieren Sie sie aus einer JSON-Datei mit demselben Format wie die exportierten Daten.",
     "advancedTitle": "Erweiterte Optionen",
-    "advancedHint": "Aktivieren Sie Hilfslinien und Einrast-Hilfen nur bei Bedarf für mehr Präzision."
+    "advancedHint": "Aktivieren Sie Hilfslinien und Einrast-Hilfen nur bei Bedarf für mehr Präzision.",
+    "jsonPanelHide": "Hide JSON",
+    "jsonPanelShow": "Show JSON"
   },
   "guides": {
     "enableFeature": "Hilfslinien & Einrasten aktivieren",
