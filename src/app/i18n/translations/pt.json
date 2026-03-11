@@ -88,7 +88,9 @@
     "advancedTitle": "Opções avançadas",
     "advancedHint": "Ative as guias e os auxiliares de alinhamento apenas quando precisar de mais precisão.",
     "jsonPanelHide": "Hide JSON",
-    "jsonPanelShow": "Show JSON"
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Ativar guias e encaixes",

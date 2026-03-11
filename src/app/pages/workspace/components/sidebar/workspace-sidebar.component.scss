@@ -107,3 +107,39 @@
 .json-panel__restore {
   margin-top: 8px;
 }
+
+.sidebar {
+  position: relative;
+}
+
+.sidebar-content {
+  min-width: 0;
+}
+
+.sidebar-minimize-toggle {
+  position: sticky;
+  top: 8px;
+  z-index: 2;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: rgba(94, 234, 212, 0.1);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.sidebar--minimized {
+  padding: 10px 8px;
+  overflow: hidden;
+}
+
+.sidebar--minimized .sidebar-minimize-toggle {
+  margin: 0 auto;
+  width: 36px;
+  height: 36px;
+}

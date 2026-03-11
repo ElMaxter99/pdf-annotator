@@ -88,7 +88,9 @@
     "advancedTitle": "Erweiterte Optionen",
     "advancedHint": "Aktivieren Sie Hilfslinien und Einrast-Hilfen nur bei Bedarf für mehr Präzision.",
     "jsonPanelHide": "Hide JSON",
-    "jsonPanelShow": "Show JSON"
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Hilfslinien & Einrasten aktivieren",

@@ -88,7 +88,9 @@
     "advancedTitle": "Advanced options",
     "advancedHint": "Toggle guides and snapping helpers when you need extra precision.",
     "jsonPanelHide": "Hide JSON",
-    "jsonPanelShow": "Show JSON"
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Enable guides & snapping",

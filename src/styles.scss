@@ -54,6 +54,10 @@ body {
   padding: 12px;
 }
 
+.app--sidebar-minimized {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
 .app--landing {
   display: flex;
   flex-direction: column;

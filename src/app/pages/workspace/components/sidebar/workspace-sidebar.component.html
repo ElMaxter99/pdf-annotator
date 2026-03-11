@@ -1,4 +1,12 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.sidebar--minimized]="vm.sidebarMinimized()">
+  <button type="button" class="sidebar-minimize-toggle"
+    (click)="vm.toggleSidebarMinimized()"
+    [attr.aria-label]="(vm.sidebarMinimized() ? 'sidebar.expandSidebar' : 'sidebar.minimizeSidebar') | t"
+    [attr.title]="(vm.sidebarMinimized() ? 'sidebar.expandSidebar' : 'sidebar.minimizeSidebar') | t">
+    <span aria-hidden="true">{{ vm.sidebarMinimized() ? '⟩' : '⟨' }}</span>
+  </button>
+
+  <div class="sidebar-content" *ngIf="!vm.sidebarMinimized()">
   <div class="json-coords" role="status" [attr.aria-label]="'controls.cursorLabel' | t">
     <ng-container *ngIf="vm.cursorPdfCoords() as cursor; else coordsIdle">
       <span class="json-coords__label">{{ 'controls.cursorLabel' | t }}</span>
@@ -280,4 +288,5 @@
       </div>
     </ng-container>
   </section>
+  </div>
 </aside>
