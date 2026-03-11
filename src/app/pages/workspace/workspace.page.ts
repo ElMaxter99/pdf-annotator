@@ -1812,6 +1812,24 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
+    if (this.isEditableElement(event.target)) {
+      return;
+    }
+
+    if (key === 'c') {
+      if (this.copyAnnotation()) {
+        event.preventDefault();
+      }
+      return;
+    }
+
+    if (key === 'v') {
+      if (this.pasteAnnotation()) {
+        event.preventDefault();
+      }
+      return;
+    }
+
     if (key === 's') {
       event.preventDefault();
       this.applyCoordsText();
