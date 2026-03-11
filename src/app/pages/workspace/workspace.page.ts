@@ -99,6 +99,8 @@ interface JsonTreePreview {
   value: unknown | null;
 }
 
+const AUTO_APPLY_JSON_DELAY_MS = 300;
+
 type OverlayGuide = {
   orientation: 'horizontal' | 'vertical';
   position: number;
@@ -203,6 +205,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
   private coordsFileInputFallback: HTMLInputElement | null = null;
+  private autoApplyCoordsTimer: ReturnType<typeof setTimeout> | null = null;
 
   private dragInfo: {
     pageIndex: number;
@@ -336,6 +339,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   ngOnDestroy() {
     this.revokeThumbnailUrls();
+    if (this.autoApplyCoordsTimer) {
+      clearTimeout(this.autoApplyCoordsTimer);
+      this.autoApplyCoordsTimer = null;
+    }
     if (!this.document) {
       return;
     }
@@ -1775,6 +1782,37 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   cancelEdit() {
     this.editing.set(null);
     this.closeFontDropdown('edit');
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onGlobalKeydown(event: KeyboardEvent) {
+    const key = event.key.toLowerCase();
+    const hasPrimaryModifier = event.ctrlKey || event.metaKey;
+
+    if (!hasPrimaryModifier) {
+      return;
+    }
+
+    if (key === 's') {
+      event.preventDefault();
+      this.applyCoordsText();
+      return;
+    }
+
+    if (key === 'z' && !event.shiftKey) {
+      if (this.canUndo()) {
+        event.preventDefault();
+        this.undo();
+      }
+      return;
+    }
+
+    if (key === 'y' || (key === 'z' && event.shiftKey)) {
+      if (this.canRedo()) {
+        event.preventDefault();
+        this.redo();
+      }
+    }
   }
 
   @HostListener('document:mousedown', ['$event'])
@@ -3271,6 +3309,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   onCoordsTextChange(value: string) {
     this.coordsTextModel = value;
     this.refreshJsonPreview();
+    this.scheduleCoordsAutoApply();
+  }
+
+  onCoordsTextPaste() {
+    this.scheduleCoordsAutoApply(0);
   }
 
   setJsonViewMode(mode: JsonViewMode) {
@@ -3291,11 +3334,28 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   applyCoordsText() {
+    this.tryApplyCoordsText({ silent: false, clearWhenEmpty: true });
+  }
+
+  private scheduleCoordsAutoApply(delayMs = AUTO_APPLY_JSON_DELAY_MS) {
+    if (this.autoApplyCoordsTimer) {
+      clearTimeout(this.autoApplyCoordsTimer);
+    }
+
+    this.autoApplyCoordsTimer = setTimeout(() => {
+      this.autoApplyCoordsTimer = null;
+      this.tryApplyCoordsText({ silent: true, clearWhenEmpty: false });
+    }, delayMs);
+  }
+
+  private tryApplyCoordsText(options: { silent: boolean; clearWhenEmpty: boolean }): boolean {
     const text = this.coordsTextModel.trim();
 
     if (!text) {
-      this.clearAll();
-      return;
+      if (options.clearWhenEmpty) {
+        this.clearAll();
+      }
+      return false;
     }
 
     try {
@@ -3307,9 +3367,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
 
       this.replaceCoords(normalized);
+      return true;
     } catch (error) {
-      console.error('No se pudo importar el JSON de anotaciones.', error);
-      alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+      if (!options.silent) {
+        console.error('No se pudo importar el JSON de anotaciones.', error);
+        alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+      }
+      return false;
     }
   }
 

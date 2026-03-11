@@ -81,7 +81,8 @@
   </section>
   <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
     <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel"
-      (ngModelChange)="vm.onCoordsTextChange($event)" [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
+      (ngModelChange)="vm.onCoordsTextChange($event)" (paste)="vm.onCoordsTextPaste()"
+      [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
   </ng-container>
   <ng-template #jsonTreeView>
     <div *ngIf="vm.jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
