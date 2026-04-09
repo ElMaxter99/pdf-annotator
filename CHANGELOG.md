@@ -1,3 +1,9 @@
+## [v1.3.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.2) - 2026-04-09
+### Added
+- fix: use PDF coordinates by default for guide inputs #118
+- feat: add collapsible JSON panel in workspace sidebar #119
+- Export JSON: show minimal fields by default and add advanced-fields toggle #120
+
 ## [v1.3.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.1) - 2025-11-27
 ### Added
 - Add French, Italian, Portuguese, and German translations #100
