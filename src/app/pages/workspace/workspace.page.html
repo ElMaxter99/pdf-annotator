@@ -1,4 +1,4 @@
-<div class="app">
+<div class="app" [class.app--sidebar-minimized]="vm.sidebarMinimized()">
   <app-workspace-header [vm]="vm"></app-workspace-header>
   <app-workspace-sidebar [vm]="vm"></app-workspace-sidebar>
   <app-workspace-viewer [vm]="vm"></app-workspace-viewer>

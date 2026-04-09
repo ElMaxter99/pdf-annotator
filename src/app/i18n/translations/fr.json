@@ -86,7 +86,13 @@
     },
     "jsonHint": "Collez les coordonnées ou importez-les depuis un JSON en suivant le même format que les données exportées.",
     "advancedTitle": "Options avancées",
-    "advancedHint": "Activez les guides et les aides d'alignement uniquement lorsque vous avez besoin de plus de précision."
+    "advancedHint": "Activez les guides et les aides d'alignement uniquement lorsque vous avez besoin de plus de précision.",
+    "includeAdvancedJsonFields": "Inclure les propriétés avancées dans le JSON",
+    "includeAdvancedJsonFieldsHint": "Désactivé : uniquement x, y, mapField, fontSize et type. Activé : exporte aussi la couleur, la police, l'opacité, le fond, le verrouillage et la visibilité.",
+    "jsonPanelHide": "Hide JSON",
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Activer guides et aimantation",

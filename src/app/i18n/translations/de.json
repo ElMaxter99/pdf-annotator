@@ -86,7 +86,13 @@
     },
     "jsonHint": "Fügen Sie Koordinaten ein oder importieren Sie sie aus einer JSON-Datei mit demselben Format wie die exportierten Daten.",
     "advancedTitle": "Erweiterte Optionen",
-    "advancedHint": "Aktivieren Sie Hilfslinien und Einrast-Hilfen nur bei Bedarf für mehr Präzision."
+    "advancedHint": "Aktivieren Sie Hilfslinien und Einrast-Hilfen nur bei Bedarf für mehr Präzision.",
+    "includeAdvancedJsonFields": "Erweiterte Eigenschaften in JSON einschließen",
+    "includeAdvancedJsonFieldsHint": "Deaktiviert: nur x, y, mapField, fontSize und type. Aktiviert: exportiert zusätzlich Farbe, Schriftart, Deckkraft, Hintergrund, Sperre und Sichtbarkeit.",
+    "jsonPanelHide": "Hide JSON",
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Hilfslinien & Einrasten aktivieren",
