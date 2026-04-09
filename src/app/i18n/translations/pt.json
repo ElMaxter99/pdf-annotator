@@ -86,7 +86,13 @@
     },
     "jsonHint": "Cole as coordenadas ou importe-as de um JSON com o mesmo formato dos dados exportados.",
     "advancedTitle": "Opções avançadas",
-    "advancedHint": "Ative as guias e os auxiliares de alinhamento apenas quando precisar de mais precisão."
+    "advancedHint": "Ative as guias e os auxiliares de alinhamento apenas quando precisar de mais precisão.",
+    "includeAdvancedJsonFields": "Incluir propriedades avançadas no JSON",
+    "includeAdvancedJsonFieldsHint": "Desativado: apenas x, y, mapField, fontSize e type. Ativado: também exporta cor, fonte, opacidade, fundo, bloqueio e visibilidade.",
+    "jsonPanelHide": "Hide JSON",
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Ativar guias e encaixes",

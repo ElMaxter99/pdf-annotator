@@ -86,7 +86,13 @@
     },
     "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat.",
     "advancedTitle": "Opcions avançades",
-    "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió."
+    "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió.",
+    "includeAdvancedJsonFields": "Inclou propietats avançades al JSON",
+    "includeAdvancedJsonFieldsHint": "Desactivat: només x, y, mapField, fontSize i type. Activat: també exporta color, font, opacitat, fons, bloqueig i visibilitat.",
+    "jsonPanelHide": "Hide JSON",
+    "jsonPanelShow": "Show JSON",
+    "minimizeSidebar": "Minimize sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "guides": {
     "enableFeature": "Activa les guies i el snapping",

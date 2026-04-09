@@ -27,7 +27,7 @@ export const DEFAULT_GUIDE_SETTINGS: GuideSettings = {
   snapTolerance: 8,
   snapPointsX: [],
   snapPointsY: [],
-  usePdfCoordinates: false,
+  usePdfCoordinates: true,
 };
 
 export function cloneGuideSettings(settings: GuideSettings): GuideSettings {

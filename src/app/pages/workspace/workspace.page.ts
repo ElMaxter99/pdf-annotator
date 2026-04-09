@@ -99,6 +99,8 @@ interface JsonTreePreview {
   value: unknown | null;
 }
 
+const AUTO_APPLY_JSON_DELAY_MS = 300;
+
 type OverlayGuide = {
   orientation: 'horizontal' | 'vertical';
   position: number;
@@ -172,6 +174,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
   customFontsFeatureEnabled = signal(false);
+  includeAdvancedJsonFields = signal(false);
   customFonts = signal<CustomFontEntry[]>([]);
   private readonly fontDropdownState = signal<Record<EditorMode, FontDropdownUiState>>({
     preview: { open: false, query: '' },
@@ -184,6 +187,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   snapPointsYText = signal('');
   fileDropActive = signal(false);
   readonly jsonViewMode = signal<JsonViewMode>('text');
+  readonly jsonPanelCollapsed = signal(false);
+  readonly sidebarMinimized = signal(false);
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
@@ -203,6 +208,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
   private coordsFileInputFallback: HTMLInputElement | null = null;
+  private autoApplyCoordsTimer: ReturnType<typeof setTimeout> | null = null;
 
   private dragInfo: {
     pageIndex: number;
@@ -257,6 +263,22 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   get editFontDropdownRef(): ElementRef<HTMLDivElement> | undefined {
     return this.viewerComponent?.editFontDropdownRef;
+  }
+
+  toggleJsonPanelCollapsed(): void {
+    this.jsonPanelCollapsed.update((current) => !current);
+  }
+
+  setJsonPanelCollapsed(collapsed: boolean): void {
+    this.jsonPanelCollapsed.set(collapsed);
+  }
+
+  toggleSidebarMinimized(): void {
+    this.sidebarMinimized.update((current) => !current);
+  }
+
+  setSidebarMinimized(minimized: boolean): void {
+    this.sidebarMinimized.set(minimized);
   }
 
   get previewFontSearchRef(): ElementRef<HTMLInputElement> | undefined {
@@ -336,6 +358,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   ngOnDestroy() {
     this.revokeThumbnailUrls();
+    if (this.autoApplyCoordsTimer) {
+      clearTimeout(this.autoApplyCoordsTimer);
+      this.autoApplyCoordsTimer = null;
+    }
     if (!this.document) {
       return;
     }
@@ -1777,6 +1803,37 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.closeFontDropdown('edit');
   }
 
+  @HostListener('document:keydown', ['$event'])
+  onGlobalKeydown(event: KeyboardEvent) {
+    const key = event.key.toLowerCase();
+    const hasPrimaryModifier = event.ctrlKey || event.metaKey;
+
+    if (!hasPrimaryModifier) {
+      return;
+    }
+
+    if (key === 's') {
+      event.preventDefault();
+      this.applyCoordsText();
+      return;
+    }
+
+    if (key === 'z' && !event.shiftKey) {
+      if (this.canUndo()) {
+        event.preventDefault();
+        this.undo();
+      }
+      return;
+    }
+
+    if (key === 'y' || (key === 'z' && event.shiftKey)) {
+      if (this.canRedo()) {
+        event.preventDefault();
+        this.redo();
+      }
+    }
+  }
+
   @HostListener('document:mousedown', ['$event'])
   onDocumentMouseDown(event: MouseEvent) {
     const editState = this.editing();
@@ -2697,14 +2754,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private buildPageJsonBlock(page: PageAnnotations): string {
-    return JSON.stringify(page, null, 2)
+    return JSON.stringify(this.serializePageForJson(page), null, 2)
       .split('\n')
       .map((line) => `    ${line}`)
       .join('\n');
   }
 
   private buildFieldJsonBlock(field: PageField): string {
-    return JSON.stringify(field, null, 2)
+    return JSON.stringify(this.serializeFieldForJson(field), null, 2)
       .split('\n')
       .map((line) => `        ${line}`)
       .join('\n');
@@ -3268,9 +3325,23 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     navigator.clipboard.writeText(this.coordsTextModel).catch(() => {});
   }
 
+  toggleIncludeAdvancedJsonFields(checked: boolean) {
+    if (this.includeAdvancedJsonFields() === checked) {
+      return;
+    }
+
+    this.includeAdvancedJsonFields.set(checked);
+    this.syncCoordsTextModel(false);
+  }
+
   onCoordsTextChange(value: string) {
     this.coordsTextModel = value;
     this.refreshJsonPreview();
+    this.scheduleCoordsAutoApply();
+  }
+
+  onCoordsTextPaste() {
+    this.scheduleCoordsAutoApply(0);
   }
 
   setJsonViewMode(mode: JsonViewMode) {
@@ -3291,11 +3362,28 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   applyCoordsText() {
+    this.tryApplyCoordsText({ silent: false, clearWhenEmpty: true });
+  }
+
+  private scheduleCoordsAutoApply(delayMs = AUTO_APPLY_JSON_DELAY_MS) {
+    if (this.autoApplyCoordsTimer) {
+      clearTimeout(this.autoApplyCoordsTimer);
+    }
+
+    this.autoApplyCoordsTimer = setTimeout(() => {
+      this.autoApplyCoordsTimer = null;
+      this.tryApplyCoordsText({ silent: true, clearWhenEmpty: false });
+    }, delayMs);
+  }
+
+  private tryApplyCoordsText(options: { silent: boolean; clearWhenEmpty: boolean }): boolean {
     const text = this.coordsTextModel.trim();
 
     if (!text) {
-      this.clearAll();
-      return;
+      if (options.clearWhenEmpty) {
+        this.clearAll();
+      }
+      return false;
     }
 
     try {
@@ -3306,10 +3394,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         throw new Error('Formato no válido');
       }
 
-      this.replaceCoords(normalized);
+      this.replaceCoords(normalized, { preserveTextModel: true });
+      return true;
     } catch (error) {
-      console.error('No se pudo importar el JSON de anotaciones.', error);
-      alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+      if (!options.silent) {
+        console.error('No se pudo importar el JSON de anotaciones.', error);
+        alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+      }
+      return false;
     }
   }
 
@@ -3339,7 +3431,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         throw new Error('Formato no válido');
       }
 
-      this.replaceCoords(normalized);
+      this.replaceCoords(normalized, { preserveTextModel: true });
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
@@ -3349,7 +3441,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   downloadJSON() {
-    const blob = new Blob([JSON.stringify({ pages: this.coords() }, null, 2)], {
+    const blob = new Blob([this.coordsTextModel], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
@@ -3660,7 +3752,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private syncCoordsTextModel(persist = true) {
     const currentCoords = this.coords();
-    this.coordsTextModel = JSON.stringify({ pages: currentCoords }, null, 2);
+    this.coordsTextModel = JSON.stringify(this.buildJsonExportPayload(currentCoords), null, 2);
     this.refreshJsonPreview();
     if (persist) {
       this.templatesService.storeLastCoords(currentCoords);
@@ -3674,6 +3766,39 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }));
   }
 
+  private buildJsonExportPayload(pages: PageAnnotations[]): {
+    pages: Array<{ num: number; fields: Array<Record<string, unknown>> }>;
+  } {
+    return {
+      pages: pages.map((page) => this.serializePageForJson(page)),
+    };
+  }
+
+  private serializePageForJson(
+    page: PageAnnotations
+  ): { num: number; fields: Array<Record<string, unknown>> } {
+    return {
+      num: page.num,
+      fields: page.fields.map((field) => this.serializeFieldForJson(field)),
+    };
+  }
+
+  private serializeFieldForJson(field: PageField): Record<string, unknown> {
+    const sanitized = this.prepareFieldForStorage(field);
+
+    if (this.includeAdvancedJsonFields()) {
+      return { ...sanitized };
+    }
+
+    return {
+      x: sanitized.x,
+      y: sanitized.y,
+      mapField: sanitized.mapField,
+      fontSize: sanitized.fontSize,
+      type: sanitized.type,
+    };
+  }
+
   private applyCoordsChange(mutator: () => void): boolean {
     const previous = this.snapshotCoords();
     mutator();
@@ -3685,7 +3810,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return changed;
   }
 
-  private replaceCoords(newCoords: PageAnnotations[], options?: { skipHistory?: boolean }) {
+  private replaceCoords(
+    newCoords: PageAnnotations[],
+    options?: { skipHistory?: boolean; preserveTextModel?: boolean }
+  ) {
     const snapshot = this.snapshotCoords(newCoords);
     if (options?.skipHistory) {
       this.coords.set(snapshot);
@@ -3694,7 +3822,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     this.preview.set(null);
     this.editing.set(null);
-    this.syncCoordsTextModel();
+    if (options?.preserveTextModel) {
+      this.refreshJsonPreview();
+    } else {
+      this.syncCoordsTextModel();
+    }
     this.redrawAllForPage();
   }
 
