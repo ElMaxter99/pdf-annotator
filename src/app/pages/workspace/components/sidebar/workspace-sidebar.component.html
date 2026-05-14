@@ -138,11 +138,6 @@
     </ng-container>
   </section>
 
-  <button *ngIf="vm.jsonPanelCollapsed()" type="button" class="json-panel__restore"
-    (click)="vm.setJsonPanelCollapsed(false)">
-    {{ 'sidebar.jsonPanelShow' | t }}
-  </button>
-
   <section class="advanced-panel" [class.open]="vm.advancedOptionsOpen()"
     [class.active]="vm.guidesFeatureEnabled() || vm.customFontsFeatureEnabled()">
     <button type="button" class="advanced-toggle" (click)="vm.toggleAdvancedOptions(!vm.advancedOptionsOpen())"

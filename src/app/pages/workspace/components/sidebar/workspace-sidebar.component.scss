@@ -85,7 +85,7 @@
 }
 
 .json-panel__toggle,
-.json-panel__restore {
+.json-panel__toggle {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -102,10 +102,6 @@
 .json-panel__toggle-icon {
   font-size: 0.95rem;
   line-height: 1;
-}
-
-.json-panel__restore {
-  margin-top: 8px;
 }
 
 .sidebar {
