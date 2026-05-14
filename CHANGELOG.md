@@ -1,3 +1,7 @@
+## [v1.3.3](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.3) - 2026-04-09
+### Added
+- Refine the workspace navbar with hierarchy and spacing #122
+
 ## [v1.3.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.2) - 2026-04-09
 ### Added
 - fix: use PDF coordinates by default for guide inputs #118
