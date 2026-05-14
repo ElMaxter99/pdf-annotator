@@ -283,11 +283,29 @@ header .logo {
 }
 
 .toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
   gap: 12px;
   width: 100%;
+}
+
+.toolbar__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toolbar__cluster {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toolbar__identity {
+  display: inline-flex;
+  align-items: center;
 }
 
 .toolbar__group {
@@ -393,6 +411,18 @@ header .logo {
   padding-inline: 14px;
 }
 
+.toolbar__row--primary .toolbar__group {
+  box-shadow: 0 8px 20px rgba(5, 5, 17, 0.3);
+}
+
+.toolbar__row--secondary .toolbar__group {
+  background: rgba(24, 24, 38, 0.62);
+}
+
+.toolbar__group--preferences {
+  margin-left: auto;
+}
+
 .btn--danger {
   border-color: rgba(255, 77, 77, 0.4);
   background: rgba(255, 77, 77, 0.15);
@@ -443,6 +473,20 @@ header .logo {
 
   .header__top {
     flex-wrap: nowrap;
+  }
+
+  .toolbar__row {
+    flex-wrap: nowrap;
+  }
+
+  .toolbar__cluster {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 840px) {
+  .toolbar__group--preferences {
+    margin-left: 0;
   }
 }
 
