@@ -2,125 +2,106 @@
   display: block;
   color: var(--text);
 }
-
 .json-tree {
   list-style: none;
   margin: 0;
   padding: 0;
-  font-family: 'Fira Code', monospace;
-  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
 }
-
 .json-tree__node {
   margin: 0;
   padding: 0;
 }
-
 .json-tree__row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  line-height: 1.6;
-  padding: 0 4px;
-  border-radius: 6px;
+  gap: 7px;
+  line-height: 1.7;
+  padding: 2px 6px;
+  border-radius: 10px;
   scroll-margin: 16px 0;
-  transition: background 0.2s ease;
+  transition: background 0.18s ease;
 }
-
+.json-tree__row:hover,
 .json-tree__row--focused {
-  background: rgba(94, 234, 212, 0.16);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
-
 .json-tree__toggle {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: grid;
   place-items: center;
-  border: none;
-  border-radius: 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
   background: transparent;
   color: inherit;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
-
 .json-tree__toggle:hover,
 .json-tree__toggle:focus-visible {
-  background: rgba(94, 234, 212, 0.15);
+  background: var(--surface);
+  border-color: var(--border);
   outline: none;
 }
-
 .json-tree__toggle-placeholder {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: inline-block;
 }
-
 .json-tree__chevron {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-right: 2px solid var(--muted);
   border-bottom: 2px solid var(--muted);
   transform: rotate(45deg);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
-
 .json-tree__chevron--collapsed {
   transform: rotate(-45deg);
 }
-
 .json-tree__label {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--accent);
+  color: color-mix(in srgb, var(--accent-2) 70%, var(--text));
+  font-weight: 700;
 }
-
-.json-tree__colon {
+.json-tree__colon,
+.json-tree__brackets,
+.json-tree__meta,
+.json-tree__closing {
   color: var(--muted);
 }
-
-.json-tree__brackets {
-  color: var(--muted);
-}
-
 .json-tree__meta {
-  color: var(--muted);
   font-size: 0.75rem;
 }
-
 .json-tree__value {
   font-family: inherit;
 }
-
 .json-tree__value--string {
-  color: #9cdcfe;
+  color: #38bdf8;
 }
-
 .json-tree__value--number {
-  color: #b5cea8;
+  color: #86efac;
 }
-
 .json-tree__value--boolean {
-  color: #569cd6;
+  color: #c084fc;
 }
-
 .json-tree__value--null {
-  color: #c586c0;
+  color: #fda4af;
 }
-
 .json-tree__value--unknown {
   color: var(--muted);
 }
-
 .json-tree__children {
   list-style: none;
   margin: 4px 0 4px 24px;
   padding: 0 0 0 12px;
-  border-left: 1px solid rgba(94, 234, 212, 0.12);
+  border-left: 1px solid var(--border);
 }
-
 .json-tree__closing {
-  margin-left: 32px;
-  color: var(--muted);
+  margin-left: 34px;
 }
