@@ -1762,3 +1762,234 @@ header .logo {
   text-align: center;
   max-width: 400px;
 }
+
+/* Vercel-inspired monochrome refresh: minimal, high-contrast, rounded, and tool-like. */
+:root,
+:root.theme-dark {
+  --bg: #000000;
+  --panel: #0a0a0a;
+  --accent: #ffffff;
+  --danger: #ff4d4f;
+  --text: #fafafa;
+  --muted: #a1a1aa;
+  --surface-1: #050505;
+  --surface-2: #0f0f0f;
+  --surface-3: #171717;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  --shadow-card: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --radius-card: 20px;
+  color-scheme: dark;
+}
+
+:root.theme-light {
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --accent: #000000;
+  --danger: #b42318;
+  --text: #000000;
+  --muted: #666666;
+  --surface-1: #ffffff;
+  --surface-2: #fafafa;
+  --surface-3: #f5f5f5;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.18);
+  --shadow-card: 0 16px 48px rgba(0, 0, 0, 0.08);
+  color-scheme: light;
+}
+
+html,
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -0.01em;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 34rem),
+    var(--bg);
+}
+
+:root.theme-light body {
+  background:
+    radial-gradient(circle at top, rgba(0, 0, 0, 0.035), transparent 34rem),
+    var(--bg);
+}
+
+.app {
+  gap: 16px;
+  padding: 16px;
+}
+
+.app--landing {
+  gap: 40px;
+  padding: 88px 18px 32px;
+}
+
+.landing {
+  max-width: 760px;
+  gap: 28px;
+}
+
+.landing__badge,
+.toolbar__badge,
+.editor-badge {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border-subtle);
+  color: var(--text) !important;
+  letter-spacing: 0.08em;
+}
+
+.landing__title {
+  max-width: 820px;
+  font-size: clamp(2.6rem, 8vw, 5.5rem);
+  font-weight: 750;
+  line-height: 0.95;
+  letter-spacing: -0.075em;
+}
+
+.landing__description {
+  max-width: 620px;
+  font-size: clamp(1rem, 2vw, 1.18rem);
+}
+
+.landing__dropzone,
+.sidebar-upload,
+header.header,
+.sidebar,
+.viewer,
+.footer,
+.advanced-panel,
+.annotation-editor {
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-card) !important;
+  background: color-mix(in srgb, var(--panel) 92%, transparent) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+.landing__dropzone {
+  width: min(560px, 92vw);
+  border-style: dashed !important;
+  padding: 40px;
+}
+
+.landing__dropzone:hover,
+.sidebar-upload:hover,
+.advanced-panel.open {
+  border-color: var(--border-strong) !important;
+  background: var(--surface-2) !important;
+  transform: translateY(-2px);
+}
+
+.landing__icon,
+.sidebar-upload__icon,
+.language-selector__icon {
+  background: var(--surface-3) !important;
+  border: 1px solid var(--border-subtle);
+  color: var(--text);
+}
+
+.landing__cta,
+.btn,
+.annotation-editor button,
+.sidebar-minimize-toggle,
+.json-panel__toggle,
+.advanced-toggle,
+.font-dropdown__trigger,
+.background-clear {
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 999px !important;
+  background: var(--text) !important;
+  color: var(--bg) !important;
+  box-shadow: none !important;
+}
+
+.btn:hover:not(:disabled),
+.landing__cta:hover,
+.annotation-editor button:hover,
+.sidebar-minimize-toggle:hover,
+.json-panel__toggle:hover,
+.advanced-toggle:hover {
+  border-color: var(--border-strong) !important;
+  filter: invert(0.08);
+  transform: translateY(-1px);
+}
+
+.btn--danger,
+.templates__delete {
+  background: transparent !important;
+  color: var(--danger) !important;
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent) !important;
+}
+
+.toolbar__group,
+.json-coords,
+.sidebar-thumbnails__list,
+.json-toolbar__view-toggle-group,
+.advanced-panel .custom-fonts-panel,
+.advanced-panel .guides-panel,
+.advanced-panel .guides-panel .guides-mode,
+.advanced-panel .guides-panel .guides-mode__options label span,
+.advanced-panel .custom-fonts-panel__item,
+.annotation-editor .font-dropdown__panel,
+.annotation-editor .font-dropdown__option,
+.annotation-editor .font-dropdown__empty {
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 14px !important;
+  background: var(--surface-2) !important;
+  box-shadow: none !important;
+}
+
+.sidebar h4,
+.templates h5,
+.sidebar-thumbnails__title,
+.json-panel__title,
+.json-coords__label,
+.advanced-panel .custom-fonts-panel h5,
+.advanced-panel .guides-panel h5,
+.advanced-panel .guides-panel .guides-mode__label,
+.annotation-editor .field-label,
+.annotation-editor .font-dropdown__tag,
+.footer__app-name {
+  color: var(--text) !important;
+}
+
+.json-editor,
+.json-tree-container,
+.json-tree-placeholder,
+.templates input,
+.templates select,
+.advanced-panel input[type='number'],
+.advanced-panel input[type='text'],
+.annotation-editor input[type='text'],
+.annotation-editor input[type='search'],
+.annotation-editor input[type='number'],
+.annotation-editor select {
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 12px !important;
+  background: var(--surface-1) !important;
+  color: var(--text) !important;
+}
+
+.json-editor,
+.json-tree-container,
+.json-tree-placeholder,
+.color-inputs input[type='text'] {
+  font-family: 'SFMono-Regular', 'Cascadia Code', 'Liberation Mono', Menlo, monospace !important;
+}
+
+.json-toolbar__view-toggle-option--active,
+.annotation-editor.editing .editor-badge,
+.advanced-panel .guides-panel .guides-mode__options label input[type='radio']:checked + span {
+  background: var(--text) !important;
+  color: var(--bg) !important;
+  border-color: var(--text) !important;
+}
+
+.canvas-container .canvas {
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--border-subtle), 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.annotation:hover,
+.annotation--locked:hover {
+  outline-color: var(--text);
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
