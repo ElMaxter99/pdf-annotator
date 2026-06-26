@@ -11,7 +11,14 @@
   [attr.aria-label]="'app.upload.title' | t"
 >
   <input #pdfFileInput type="file" accept="application/pdf" (change)="fileSelected.emit($event)" hidden />
-  <div class="landing__icon" aria-hidden="true">📄</div>
+  <div class="landing__icon" aria-hidden="true">
+    <svg viewBox="0 0 64 64" role="img" focusable="false">
+      <path d="M18 6h20l14 14v38H18z" fill="currentColor" opacity="0.18" />
+      <path d="M38 6v15h14" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4" />
+      <path d="M18 6h20l14 14v38H18z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4" />
+      <path d="M26 38h12M32 30v16M32 30l-6 6M32 30l6 6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" />
+    </svg>
+  </div>
   <div class="landing__text">
     <span class="landing__headline">{{ 'app.upload.title' | t }}</span>
     <span class="landing__subheadline">{{ 'app.upload.subtitle' | t }}</span>
