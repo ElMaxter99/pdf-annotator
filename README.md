@@ -9,34 +9,57 @@
 </p>
 
 <p align="center">
-  <a href="#-caracteristicas-destacadas"><img src="https://img.shields.io/badge/Highlights-Descubre%20funciones-ff6b6b?style=for-the-badge" alt="Características" /></a>
-  <a href="https://github.com/ElMaxter99/pdf-annotator/issues/new/choose"><img src="https://img.shields.io/badge/Issues-Bienvenido%20feedback-00b894?style=for-the-badge&logo=github" alt="Reportar issue" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.4.0-4dd9c0?style=for-the-badge" alt="Versión 1.4.0" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="Licencia MIT" /></a>
+  <img src="https://img.shields.io/badge/Angular-20-dd0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 20" />
+  <img src="https://img.shields.io/badge/Node-22.12-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node 22" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Docker-ready-2496ed?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/i18n-ES%20·%20EN%20·%20FR%20·%20IT%20·%20PT%20·%20DE-ff9f43" alt="Idiomas" />
+  <a href="https://github.com/ElMaxter99/pdf-annotator/stargazers"><img src="https://img.shields.io/github/stars/ElMaxter99/pdf-annotator?style=flat&logo=github" alt="Stars" /></a>
+  <a href="https://github.com/ElMaxter99/pdf-annotator/issues/new/choose"><img src="https://img.shields.io/badge/Issues-feedback%20bienvenido-00b894?logo=github" alt="Reportar issue" /></a>
+</p>
+
+<p align="center">
+  <a href="#-vista-previa">Vista previa</a> ·
+  <a href="#-instalación">Instalación</a> ·
+  <a href="#-despliegue-con-docker">Docker</a> ·
+  <a href="#-uso-paso-a-paso">Uso</a> ·
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
+
+<p align="center">
+  <img src="./screenshots/example_use.png" alt="PDF Annotator en acción" width="90%" />
 </p>
 
 ---
 
 ## 📚 Tabla de contenidos
-- [📚 Tabla de contenidos](#-tabla-de-contenidos)
+- [🖼 Vista previa](#-vista-previa)
 - [✨ Características destacadas](#-características-destacadas)
 - [🧰 Stack tecnológico](#-stack-tecnológico)
 - [🛠 Requisitos](#-requisitos)
 - [⚙ Instalación](#-instalación)
 - [🚀 Despliegue con Docker](#-despliegue-con-docker)
 - [▶ Uso paso a paso](#-uso-paso-a-paso)
-  - [1. Inicia el servidor de desarrollo](#1-inicia-el-servidor-de-desarrollo)
-  - [2. Carga un PDF](#2-carga-un-pdf)
-  - [3. Navega y ajusta el zoom](#3-navega-y-ajusta-el-zoom)
-  - [4. Crea una anotación](#4-crea-una-anotación)
-  - [5. Edita o mueve anotaciones](#5-edita-o-mueve-anotaciones)
-  - [6. Controla el color y la tipografía](#6-controla-el-color-y-la-tipografía)
-  - [7. Gestiona las anotaciones en JSON](#7-gestiona-las-anotaciones-en-json)
-  - [8. Exporta un PDF anotado](#8-exporta-un-pdf-anotado)
-  - [9. Atajos de teclado](#9-atajos-de-teclado)
-  - [10. Formato de las coordenadas](#10-formato-de-las-coordenadas)
 - [📸 Galería](#-galería)
 - [🧰 Solución de problemas](#-solución-de-problemas)
 - [🧱 Plantillas para contribuir](#-plantillas-para-contribuir)
 - [📝 Licencia](#-licencia)
+
+## 🖼 Vista previa
+| 1️⃣ Carga tu PDF | 2️⃣ Espacio de trabajo |
+| :---: | :---: |
+| <img src="./screenshots/main.png" alt="Pantalla de bienvenida" width="100%" /> | <img src="./screenshots/workspace.png" alt="Espacio de trabajo con panel JSON y visor" width="100%" /> |
+| Arrastra y suelta o selecciona un PDF. | Visor, zoom, deshacer/rehacer y panel de anotaciones JSON. |
+
+| 3️⃣ Edita cada anotación |
+| :---: |
+| <img src="./screenshots/example_use.png" alt="Editor de anotación con texto, fuente, color y opacidad" width="80%" /> |
+| Texto, tipo, fuente, tamaño, opacidad, fondo y color (HEX/RGB) con JSON sincronizado en vivo. |
 
 ## ✨ Características destacadas
 - 🎯 **Anotaciones precisas**: define posición, color y tipografía sobre un lienzo sincronizado con cada página.
@@ -48,7 +71,7 @@
 ## 🧰 Stack tecnológico
 | Frontend | Renderizado PDF | Utilidades |
 | --- | --- | --- |
-| Angular 20 · RxJS · Angular Material | pdf-lib · pdfjs-dist | TypeScript · Sass · Vite dev server |
+| ![Angular](https://img.shields.io/badge/Angular-20-dd0031?logo=angular&logoColor=white) RxJS · Angular Material | pdf-lib · pdfjs-dist | TypeScript · Sass · Vite dev server |
 
 > El repositorio incluye scripts para validar traducciones (`npm run i18n:check`) antes de construir la aplicación.
 
@@ -172,12 +195,11 @@ Cada anotación se almacena como:
 - `color` acepta hexadecimales (`#RRGGBB`).
 
 ## 📸 Galería
-<p align="center" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-  <img src="./screenshots/main.png" alt="Vista principal" style="width: 32%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px;" />
-  <img src="./screenshots/workspace.png" alt="Espacio de trabajo" style="width: 32%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px;" />
-  <img src="./screenshots/example_use.png" alt="Ejemplo de uso" style="width: 32%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px;" />
+<p align="center">
+  <a href="./screenshots/main.png"><img src="./screenshots/main.png" alt="Vista principal" width="32%" /></a>
+  <a href="./screenshots/workspace.png"><img src="./screenshots/workspace.png" alt="Espacio de trabajo" width="32%" /></a>
+  <a href="./screenshots/example_use.png"><img src="./screenshots/example_use.png" alt="Ejemplo de uso" width="32%" /></a>
 </p>
-
 
 ## 🧰 Solución de problemas
 - **El PDF no se renderiza**: revisa que el archivo no esté protegido y que el servidor de desarrollo muestre el log sin errores.
@@ -195,7 +217,13 @@ El repositorio incluye plantillas en `.github/`:
 Además, en la pestaña **About** del repositorio puedes añadir etiquetas (Angular, PDF, annotations) y la URL de la demo para mejorar la visibilidad.
 
 ## 📝 Licencia
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="MIT" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.4.0-4dd9c0?style=for-the-badge" alt="v1.4.0" /></a>
+</p>
+
 Proyecto público y gratuito bajo licencia [MIT](LICENSE) © 2025 AlvaroMaxter ([ElMaxter99](https://github.com/ElMaxter99)).
 
 Puedes usarlo, modificarlo y redistribuirlo libremente, siempre que menciones al autor original y enlaces a <https://github.com/ElMaxter99/pdf-annotator>.
-# redeploy
+
+<p align="center"><sub>Hecho con ❤️ y Angular · <a href="#">⬆ Volver arriba</a></sub></p>
