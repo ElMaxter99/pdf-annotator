@@ -1,3 +1,8 @@
+## Unreleased
+### Added
+- Replace legal notice with MIT license referencing the GitHub repository
+- Show read-only PDF coordinates in the annotation edit modal
+
 ## [v1.3.3](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.3) - 2026-04-09
 ### Added
 - Refine the workspace navbar with hierarchy and spacing #122

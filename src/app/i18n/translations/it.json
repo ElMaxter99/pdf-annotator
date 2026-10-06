@@ -188,7 +188,8 @@
     "actions": {
       "duplicate": "Duplica annotazione"
     },
-    "editingBadge": "Modifica in corso"
+    "editingBadge": "Modifica in corso",
+    "coordinatesLabel": "Coordinate (PDF)"
   },
   "fonts": {
     "custom": {

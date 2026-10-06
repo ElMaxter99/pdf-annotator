@@ -195,5 +195,7 @@ El repositorio incluye plantillas en `.github/`:
 Además, en la pestaña **About** del repositorio puedes añadir etiquetas (Angular, PDF, annotations) y la URL de la demo para mejorar la visibilidad.
 
 ## 📝 Licencia
-MIT © 2025 AlvaroMaxter
+Proyecto público y gratuito bajo licencia [MIT](LICENSE) © 2025 AlvaroMaxter ([ElMaxter99](https://github.com/ElMaxter99)).
+
+Puedes usarlo, modificarlo y redistribuirlo libremente, siempre que menciones al autor original y enlaces a <https://github.com/ElMaxter99/pdf-annotator>.
 # redeploy
