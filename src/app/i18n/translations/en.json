@@ -188,7 +188,8 @@
     "actions": {
       "duplicate": "Duplicate annotation"
     },
-    "editingBadge": "Editing"
+    "editingBadge": "Editing",
+    "coordinatesLabel": "Coordinates (PDF)"
   },
   "fonts": {
     "custom": {
