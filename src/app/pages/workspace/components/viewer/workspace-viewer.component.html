@@ -140,6 +140,10 @@
       (keydown)="vm.onEditorKeydown($event, 'edit')">
       <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
       <label class="field">
+        <span class="field-label">{{ 'annotation.coordinatesLabel' | t }}</span>
+        <input type="text" readonly [value]="'X: ' + (e.field.x | number:'1.0-2') + '  Y: ' + (e.field.y | number:'1.0-2')" />
+      </label>
+      <label class="field">
         <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
         <input type="text" [(ngModel)]="e.field.mapField" [disabled]="!!e.field.locked"
           [placeholder]="'annotation.fields.text.placeholder' | t" />
