@@ -1,3 +1,10 @@
+## Unreleased
+### Changed
+- Redesigned `/landing`: centered drop zone as the focal point, top bar with GitHub link, theme and language, product preview, feature cards and a compact open-source footer; fully responsive
+
+### Added
+- "Try with a sample document" button on the landing page
+
 ## [v1.4.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.0) - 2026-10-20
 ### Added
 - Replace legal notice with MIT license referencing the GitHub repository

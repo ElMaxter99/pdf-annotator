@@ -16,7 +16,36 @@
       "badge": "Schneller annotieren",
       "title": "Platzieren Sie in Sekunden Koordinaten auf jedem PDF",
       "description": "Laden Sie Ihr Dokument hoch, um JSON-gestützte Anmerkungen hinzuzufügen, Vorlagen wiederzuverwenden und exportfertige Dateien zu erstellen.",
-      "cta": "PDF auswählen"
+      "cta": "PDF auswählen",
+      "tryExample": "Mit einem Beispieldokument testen",
+      "previewAlt": "Vorschau des PDF-Annotator-Arbeitsbereichs",
+      "featuresTitle": "Alles, was Sie zum Annotieren brauchen",
+      "trust": {
+        "browser": "100 % in Ihrem Browser",
+        "languages": "7 Sprachen",
+        "openSource": "Open Source"
+      },
+      "features": {
+        "precision": {
+          "title": "Exakte Koordinaten",
+          "text": "Jeder Klick wird zu einer Position in PDF-Punkten, mit Hilfslinien und Einrasten für präzises Ausrichten."
+        },
+        "json": {
+          "title": "Live-JSON",
+          "text": "Bearbeiten Sie das JSON oder die Ansicht: beides bleibt sofort synchron. Importieren, kopieren, herunterladen."
+        },
+        "templates": {
+          "title": "Wiederverwendbare Vorlagen",
+          "text": "Speichern Sie Ihre Anmerkungen und wenden Sie sie mit einem Klick auf andere Dokumente an."
+        },
+        "privacy": {
+          "title": "Privat von Grund auf",
+          "text": "Alles läuft in Ihrem Browser. Ihr PDF wird nie auf einen Server hochgeladen."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Laden Sie Ihr PDF hoch",
@@ -30,7 +59,10 @@
       "ariaLabel": "Neues PDF hochladen, um den Arbeitsbereich zurückzusetzen"
     },
     "footer": {
-      "developedBy": "Entwickelt von {{author}}"
+      "developedBy": "Entwickelt von {{author}}",
+      "license": "MIT-Lizenz",
+      "changelog": "Neuigkeiten",
+      "openSource": "Open-Source-Projekt"
     }
   },
   "theme": {

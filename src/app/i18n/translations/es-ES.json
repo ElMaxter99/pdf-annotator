@@ -16,7 +16,36 @@
       "badge": "Empieza a anotar",
       "title": "Maqueta coordenadas de cualquier PDF en segundos",
       "description": "Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.",
-      "cta": "Seleccionar PDF"
+      "cta": "Seleccionar PDF",
+      "tryExample": "Probar con un documento de ejemplo",
+      "previewAlt": "Vista previa del espacio de trabajo de PDF Annotator",
+      "featuresTitle": "Todo lo que necesitas para anotar",
+      "trust": {
+        "browser": "100 % en tu navegador",
+        "languages": "7 idiomas",
+        "openSource": "Código abierto"
+      },
+      "features": {
+        "precision": {
+          "title": "Coordenadas exactas",
+          "text": "Cada clic se convierte en una posición en puntos PDF, con guías y snapping para alinear con precisión."
+        },
+        "json": {
+          "title": "JSON en vivo",
+          "text": "Edita el JSON o el visor: ambos se sincronizan al instante. Importa, copia y descarga."
+        },
+        "templates": {
+          "title": "Plantillas reutilizables",
+          "text": "Guarda tus anotaciones y aplícalas a otros documentos con un clic."
+        },
+        "privacy": {
+          "title": "Privado por diseño",
+          "text": "Todo ocurre en tu navegador. Tu PDF nunca se sube a ningún servidor."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Carga tu PDF",
@@ -30,7 +59,10 @@
       "ariaLabel": "Subir un nuevo PDF para reiniciar el espacio de trabajo"
     },
     "footer": {
-      "developedBy": "Desarrollado por {{author}}"
+      "developedBy": "Desarrollado por {{author}}",
+      "license": "Licencia MIT",
+      "changelog": "Novedades",
+      "openSource": "Proyecto de código abierto"
     }
   },
   "theme": {

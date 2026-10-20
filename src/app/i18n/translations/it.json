@@ -16,7 +16,36 @@
       "badge": "Annota più velocemente",
       "title": "Posiziona coordinate su qualsiasi PDF in pochi secondi",
       "description": "Carica il documento per aggiungere annotazioni collegate a JSON, riutilizzare modelli ed esportare file pronti all'uso.",
-      "cta": "Seleziona PDF"
+      "cta": "Seleziona PDF",
+      "tryExample": "Prova con un documento di esempio",
+      "previewAlt": "Anteprima dello spazio di lavoro di PDF Annotator",
+      "featuresTitle": "Tutto ciò che serve per annotare",
+      "trust": {
+        "browser": "100 % nel tuo browser",
+        "languages": "7 lingue",
+        "openSource": "Open source"
+      },
+      "features": {
+        "precision": {
+          "title": "Coordinate esatte",
+          "text": "Ogni clic diventa una posizione in punti PDF, con guide e snapping per un allineamento preciso."
+        },
+        "json": {
+          "title": "JSON in tempo reale",
+          "text": "Modifica il JSON o il visualizzatore: restano sincronizzati all'istante. Importa, copia e scarica."
+        },
+        "templates": {
+          "title": "Modelli riutilizzabili",
+          "text": "Salva le tue annotazioni e applicale ad altri documenti con un clic."
+        },
+        "privacy": {
+          "title": "Privato per progetto",
+          "text": "Tutto avviene nel tuo browser. Il tuo PDF non viene mai caricato su alcun server."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Carica il tuo PDF",
@@ -30,7 +59,10 @@
       "ariaLabel": "Carica un nuovo PDF per reimpostare l'area di lavoro"
     },
     "footer": {
-      "developedBy": "Sviluppato da {{author}}"
+      "developedBy": "Sviluppato da {{author}}",
+      "license": "Licenza MIT",
+      "changelog": "Novità",
+      "openSource": "Progetto open source"
     }
   },
   "theme": {
