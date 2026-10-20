@@ -1,6 +1,9 @@
-<div class="app" [class.app--sidebar-minimized]="vm.sidebarMinimized()">
+<div class="app app--workspace" [class.app--sidebar-minimized]="vm.sidebarMinimized()">
   <app-workspace-header [vm]="vm"></app-workspace-header>
   <app-workspace-sidebar [vm]="vm"></app-workspace-sidebar>
   <app-workspace-viewer [vm]="vm"></app-workspace-viewer>
   <app-workspace-footer [vm]="vm"></app-workspace-footer>
 </div>
+@if (vm.shortcutsOpen()) {
+  <app-shortcuts-dialog (closed)="vm.toggleShortcuts(false)"></app-shortcuts-dialog>
+}

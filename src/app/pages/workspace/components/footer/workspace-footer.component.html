@@ -1,13 +1,6 @@
 <footer class="footer">
-  <div class="footer__brand">
-    <img class="footer__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
-    <div class="footer__brand-text">
-      <span class="footer__app-name">{{ vm.appName }}</span>
-      <span class="footer__version">v{{ vm.version }}</span>
-    </div>
-  </div>
-  <div class="footer__details">
-    <span>© {{ vm.currentYear }} {{ vm.appName }}</span>
-    <span>Desarrollado por {{ vm.appAuthor }}</span>
-  </div>
+  <span class="footer__hint"><kbd>?</kbd> {{ 'shortcuts.footerHint' | t }}</span>
+  <span class="footer__details">
+    © {{ vm.currentYear }} {{ vm.appName }} · v{{ vm.version }} · {{ 'app.footer.developedBy' | t : { author: vm.appAuthor } }}
+  </span>
 </footer>

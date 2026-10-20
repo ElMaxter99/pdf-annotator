@@ -28,6 +28,9 @@
       "title": "Need to reset this project?",
       "subtitle": "Drop a different PDF or click to replace the current document.",
       "ariaLabel": "Upload a new PDF to restart the annotation workspace"
+    },
+    "footer": {
+      "developedBy": "Developed by {{author}}"
     }
   },
   "theme": {
@@ -60,7 +63,8 @@
     "zoomGroup": "Zoom controls",
     "historyGroup": "History actions",
     "exportGroup": "Export options",
-    "preferencesGroup": "Preferences"
+    "preferencesGroup": "Preferences",
+    "fitWidth": "Fit"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -206,5 +210,32 @@
   },
   "viewer": {
     "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "close": "Close",
+    "open": "Keyboard shortcuts",
+    "openShort": "Shortcuts",
+    "footerHint": "Keyboard shortcuts",
+    "groups": {
+      "navigation": "Navigation and view",
+      "annotations": "Annotations",
+      "general": "General"
+    },
+    "items": {
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "firstLastPage": "First / last page",
+      "zoom": "Zoom in / out",
+      "fitWidth": "Fit to width",
+      "toggleSidebar": "Show or hide the sidebar",
+      "addAnnotation": "Add an annotation on the PDF",
+      "confirm": "Confirm the annotation",
+      "cancel": "Cancel / close",
+      "undo": "Undo",
+      "redo": "Redo",
+      "applyJson": "Apply the JSON from the editor",
+      "help": "Show this help"
+    }
   }
 }

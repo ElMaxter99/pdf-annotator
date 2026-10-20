@@ -1,14 +1,22 @@
 ## 📌 Resumen
-- [ ] Incluye una descripción corta de la mejora o fix.
-- [ ] Menciona si hay issues relacionados (ej. `Closes #123`).
+<!-- Qué cambia y por qué. Enlaza issues: `Closes #123`. -->
+
+## 🔧 Tipo de cambio
+- [ ] Fix
+- [ ] Nueva funcionalidad
+- [ ] Refactor / deuda técnica
+- [ ] Documentación
+- [ ] Seguridad
 
 ## ✅ Checklist
-- [ ] Probé los cambios en local (`npm start` / `npm run build`).
-- [ ] Añadí o actualicé pruebas cuando fue necesario.
-- [ ] Actualicé documentación, screenshots o textos relacionados.
+- [ ] `npm run build` y `npm test` pasan.
+- [ ] Textos nuevos traducidos en los 7 idiomas (`npm run i18n:check`).
+- [ ] Probado en tema oscuro y claro, escritorio y móvil.
+- [ ] Sin `eval`/`Function` ni HTML sin sanear con datos del usuario.
+- [ ] README, `AGENTS.md`/`docs/` y `CHANGELOG.md` actualizados si procede.
 
 ## 🧪 Evidencias
-<!-- Adjunta capturas, GIFs o describe comandos ejecutados. -->
+<!-- Capturas/GIFs (antes y después) o comandos ejecutados. -->
 
-## 🗒️ Notas adicionales
-<!-- Información relevante para los revisores: consideraciones, follow-ups, etc. -->
+## 🗒️ Notas para revisores
+<!-- Riesgos, decisiones, follow-ups. -->
