@@ -10,6 +10,7 @@
 - Footer text is now translated in every language
 
 ### Changed (branding)
+- Redesigned the social preview image (`og-image`, 1200×630; metadata now points to the PNG, since crawlers ignore SVG)
 - Regenerated the logo as a high-resolution SVG (gradients, folded corner and coordinate marker) with matching PNG/ICO favicons, Apple touch icon and PWA icons; web manifest now has name and theme colour
 
 ### Fixed

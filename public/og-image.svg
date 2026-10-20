@@ -1,99 +1,126 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">PDF Annotator – Crea coordenadas precisas en segundos</title>
-  <desc id="desc">Composición que muestra un documento PDF con áreas resaltadas y una barra lateral que explica los pasos para anotar y exportar coordenadas.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="t d">
+  <title id="t">PDF Annotator · Anota PDFs con precisión</title>
+  <desc id="d">Documento PDF con campos marcados y sus coordenadas exactas, junto al título de PDF Annotator.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#101637" />
-      <stop offset="55%" stop-color="#1a2758" />
-      <stop offset="100%" stop-color="#080b1a" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#15152B"/><stop offset="1" stop-color="#1E1E2F"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ff7a18" />
-      <stop offset="100%" stop-color="#af002d" />
-    </linearGradient>
-    <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#68d8ff" />
-      <stop offset="100%" stop-color="#36a9ff" />
-    </linearGradient>
-    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#9c6dff" />
-      <stop offset="100%" stop-color="#5a3cff" />
-    </linearGradient>
-    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.35" />
-    </filter>
-    <pattern id="grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-      <path d="M20 0H0V20" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1" />
+    <radialGradient id="glow" cx="900" cy="300" r="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5EEAD4" stop-opacity="0.22"/><stop offset="1" stop-color="#5EEAD4" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#FFFFFF" stroke-opacity="0.04"/>
     </pattern>
+    <linearGradient id="band" x1="700" y1="0" x2="1060" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2BC4B0"/><stop offset="1" stop-color="#5EEAD4"/>
+    </linearGradient>
+    <linearGradient id="title" x1="72" y1="190" x2="560" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B8F7EC"/>
+    </linearGradient>
+    <filter id="sh" x="-20%" y="-10%" width="140%" height="130%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <g transform="translate(72 64) scale(0.15625)">
+  <defs>
+    <linearGradient id="lg_tile" x1="64" y1="0" x2="448" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34344F"/>
+      <stop offset="1" stop-color="#1A1A2A"/>
+    </linearGradient>
+    <linearGradient id="lg_doc" x1="112" y1="120" x2="400" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8DF7E5"/>
+      <stop offset="0.55" stop-color="#5EEAD4"/>
+      <stop offset="1" stop-color="#22B8A6"/>
+    </linearGradient>
+    <linearGradient id="lg_fold" x1="288" y1="120" x2="368" y2="208" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#C9FFF6"/>
+      <stop offset="1" stop-color="#4FD8C4"/>
+    </linearGradient>
+    <linearGradient id="lg_gloss" x1="256" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="lg_shadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="lg_pinShadow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#04302B" flood-opacity="0.45"/>
+    </filter>
   </defs>
 
-  <rect width="1200" height="630" fill="url(#bg)" />
-  <rect width="1200" height="630" fill="url(#grid)" />
+  <rect width="512" height="512" rx="104" fill="url(#lg_tile)"/>
+  <rect width="512" height="256" rx="104" fill="url(#lg_gloss)"/>
+  <rect x="2" y="2" width="508" height="508" rx="102" stroke="#5EEAD4" stroke-opacity="0.18" stroke-width="4"/>
 
-  <g transform="translate(120 90)" filter="url(#soft-shadow)">
-    <rect width="640" height="450" rx="28" ry="28" fill="#f7f9ff" />
-    <rect x="48" y="68" width="544" height="320" rx="22" ry="22" fill="#ffffff" stroke="#d6deff" stroke-width="3" />
-    <g fill="none" stroke="url(#accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="18 18">
-      <rect x="116" y="132" width="160" height="96" rx="22" ry="22" />
-      <rect x="328" y="214" width="178" height="98" rx="22" ry="22" />
-    </g>
-    <g opacity="0.72" fill="#1a2758">
-      <rect x="116" y="102" width="210" height="14" rx="7" />
-      <rect x="116" y="250" width="140" height="12" rx="6" />
-      <rect x="328" y="184" width="190" height="14" rx="7" />
-      <rect x="328" y="330" width="160" height="12" rx="6" />
-      <rect x="180" y="312" width="210" height="12" rx="6" />
-    </g>
-    <g transform="translate(470 80)">
-      <rect x="0" y="0" width="90" height="34" rx="17" ry="17" fill="#101637" opacity="0.12" />
-      <circle cx="24" cy="17" r="6" fill="#ff8976" />
-      <circle cx="44" cy="17" r="6" fill="#ffc85c" />
-      <circle cx="64" cy="17" r="6" fill="#8fe388" />
-    </g>
-    <g transform="translate(80 392)">
-      <rect width="160" height="14" rx="7" fill="#d6deff" />
-      <rect x="190" width="110" height="14" rx="7" fill="#d6deff" opacity="0.6" />
-      <rect x="320" width="90" height="14" rx="7" fill="#d6deff" opacity="0.3" />
+  <g filter="url(#lg_shadow)">
+    <path d="M168 104H298L392 198V380C392 405.4 371.4 426 346 426H168C142.6 426 122 405.4 122 380V150C122 124.6 142.6 104 168 104Z" fill="url(#lg_doc)"/>
+  </g>
+  <path d="M298 104V170C298 185.5 310.5 198 326 198H392L298 104Z" fill="url(#lg_fold)"/>
+  <path d="M298 104V170C298 185.5 310.5 198 326 198H392" stroke="#1A8F80" stroke-opacity="0.35" stroke-width="3" stroke-linejoin="round"/>
+
+  <rect x="170" y="238" width="142" height="22" rx="11" fill="#1E1E2F"/>
+  <rect x="170" y="290" width="104" height="22" rx="11" fill="#1E1E2F" fill-opacity="0.85"/>
+  <rect x="170" y="342" width="76" height="22" rx="11" fill="#1E1E2F" fill-opacity="0.6"/>
+
+  <g filter="url(#lg_pinShadow)">
+    <circle cx="352" cy="356" r="44" fill="#1E1E2F"/>
+    <circle cx="352" cy="356" r="44" stroke="#FFFFFF" stroke-width="8"/>
+    <path d="M352 326V346M352 366V386M322 356H342M362 356H382" stroke="#5EEAD4" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="352" cy="356" r="6" fill="#FFFFFF"/>
+  </g>
+</g>
+  <text x="168" y="118" font-family="'Segoe UI','Inter','Helvetica Neue',Arial,sans-serif" font-size="30" font-weight="700" fill="#5EEAD4" letter-spacing="1">PDF Annotator</text>
+
+  <g font-family="'Segoe UI','Inter','Helvetica Neue',Arial,sans-serif">
+    <text x="72" y="250" font-size="76" font-weight="800" fill="url(#title)">Anota PDFs</text>
+    <text x="72" y="335" font-size="76" font-weight="800" fill="url(#title)">con precisión</text>
+    <text x="72" y="402" font-size="28" fill="#B0B8CC">Haz clic, obtén las coordenadas exactas</text>
+    <text x="72" y="440" font-size="28" fill="#B0B8CC">en JSON y exporta el PDF anotado.</text>
+
+    <g font-size="21" font-weight="600" fill="#E6FBF7">
+      <rect x="72" y="486" width="276" height="44" rx="22" fill="#5EEAD4" fill-opacity="0.12" stroke="#5EEAD4" stroke-opacity="0.45"/>
+      <text x="96" y="515">100 % en tu navegador</text>
+      <rect x="364" y="486" width="140" height="44" rx="22" fill="#5EEAD4" fill-opacity="0.12" stroke="#5EEAD4" stroke-opacity="0.45"/>
+      <text x="388" y="515">7 idiomas</text>
+      <rect x="520" y="486" width="164" height="44" rx="22" fill="#5EEAD4" fill-opacity="0.12" stroke="#5EEAD4" stroke-opacity="0.45"/>
+      <text x="544" y="515">Open source</text>
     </g>
   </g>
 
-  <g transform="translate(820 120)">
-    <rect width="260" height="80" rx="18" ry="18" fill="#141f45" stroke="rgba(255,255,255,0.1)" />
-    <text x="30" y="48" fill="#7cd7ff" font-size="30" font-family="'Inter', 'Segoe UI', sans-serif" letter-spacing="0.18em">PDF ANNOTATOR</text>
+  <g filter="url(#sh)">
+    <path d="M722 52H986L1078 144V560C1078 573.3 1067.3 584 1054 584H722C708.7 584 698 573.3 698 560V76C698 62.7 708.7 52 722 52Z" fill="#FFFFFF"/>
+  </g>
+  <path d="M986 52V120C986 133.3 996.7 144 1010 144H1078L986 52Z" fill="#DCE7EE"/>
+  <rect x="698" y="52" width="288" height="12" fill="url(#band)"/>
+  <path d="M722 52H986V64H698V76C698 62.7 708.7 52 722 52Z" fill="url(#band)"/>
+
+  <g fill="#C9D3DE">
+    <rect x="736" y="96" width="150" height="16" rx="8" fill="#1E1E2F" fill-opacity="0.85"/>
+    <rect x="736" y="132" width="90" height="10" rx="5"/>
+    <rect x="736" y="236" width="70" height="10" rx="5"/>
+    <rect x="736" y="336" width="110" height="10" rx="5"/>
+    <rect x="736" y="424" width="90" height="10" rx="5"/>
+    <rect x="736" y="500" width="200" height="10" rx="5"/>
+    <rect x="736" y="524" width="150" height="10" rx="5"/>
   </g>
 
-  <g transform="translate(820 230)">
-    <text x="0" y="0" fill="#ffffff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="58" font-weight="700">Anota PDFs en</text>
-    <text x="0" y="70" fill="#ffffff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="58" font-weight="700">modo visual</text>
+  <g font-family="'Fira Code','DejaVu Sans Mono',Consolas,monospace" font-size="17" font-weight="600">
+    <rect x="730" y="162" width="300" height="52" rx="8" fill="#5EEAD4" fill-opacity="0.18" stroke="#16A394" stroke-width="2.5" stroke-dasharray="9 6"/>
+    <text x="746" y="195" fill="#0F6F64">{{cliente.nombre}}</text>
+    <rect x="730" y="262" width="190" height="52" rx="8" fill="#5EEAD4" fill-opacity="0.18" stroke="#16A394" stroke-width="2.5" stroke-dasharray="9 6"/>
+    <text x="746" y="295" fill="#0F6F64">{{cliente.nif}}</text>
+    <rect x="730" y="360" width="300" height="52" rx="8" fill="#5EEAD4" fill-opacity="0.18" stroke="#16A394" stroke-width="2.5" stroke-dasharray="9 6"/>
+    <text x="746" y="393" fill="#0F6F64">{{factura.total}} €</text>
   </g>
 
-  <g transform="translate(820 360)">
-    <text x="0" y="0" fill="#dbe6ff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="26" font-weight="400">
-      Define regiones, lee coordenadas y
-    </text>
-    <text x="0" y="40" fill="#dbe6ff" font-family="'Inter', 'Segoe UI', sans-serif" font-size="26" font-weight="400">
-      exporta datos listos para automatizar.
-    </text>
-  </g>
-
-  <g transform="translate(820 450)" font-family="'Inter', 'Segoe UI', sans-serif" font-size="22" fill="#f7f9ff" letter-spacing="0.03em">
-    <g transform="translate(0 0)">
-      <circle cx="20" cy="20" r="20" fill="url(#aqua)" />
-      <text x="20" y="28" text-anchor="middle" font-weight="700">1</text>
-      <text x="60" y="18" font-weight="600">Carga tu PDF</text>
-      <text x="60" y="45" opacity="0.7">Ve cada página al instante.</text>
-    </g>
-    <g transform="translate(0 90)">
-      <circle cx="20" cy="20" r="20" fill="url(#purple)" />
-      <text x="20" y="28" text-anchor="middle" font-weight="700">2</text>
-      <text x="60" y="18" font-weight="600">Traza regiones</text>
-      <text x="60" y="45" opacity="0.7">Arrastra y ajusta con precisión.</text>
-    </g>
-    <g transform="translate(0 180)">
-      <circle cx="20" cy="20" r="20" fill="url(#accent)" />
-      <text x="20" y="28" text-anchor="middle" font-weight="700">3</text>
-      <text x="60" y="18" font-weight="600">Exporta coordenadas</text>
-      <text x="60" y="45" opacity="0.7">Genera datos listos para tu pipeline.</text>
-    </g>
+  <g>
+    <circle cx="1030" cy="466" r="22" fill="#1E1E2F" stroke="#5EEAD4" stroke-width="4"/>
+    <path d="M1030 452V462M1030 470V480M1016 466H1026M1034 466H1044" stroke="#5EEAD4" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="852" y="446" width="148" height="40" rx="20" fill="#1E1E2F"/>
+    <text x="926" y="472" text-anchor="middle" font-family="'Fira Code','DejaVu Sans Mono',Consolas,monospace" font-size="17" font-weight="600" fill="#5EEAD4">x 150 · y 722</text>
   </g>
 </svg>
