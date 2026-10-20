@@ -1,4 +1,9 @@
 ## Unreleased
+### Added
+- End-to-end test suite with Playwright (`npm run e2e`, 25 tests): landing, annotation editor, undo/redo history, JSON import (including that pasted code is never executed), fonts and PDF/JSON export
+- GitHub Actions CI (`.github/workflows/ci.yml`): build + i18n check, unit tests and e2e on pull requests and pushes to `develop`/`master`
+- `npm run test:ci` (headless Chrome without sandbox) and `karma.conf.cjs`
+
 ### Changed
 - Refactor: imported-JSON normalisation moved to `AnnotationImportService` and `utils/annotation-fields.utils.ts` (`workspace.page.ts` ~3,530 → ~3,340 lines)
 - Refactor: annotations and undo/redo history moved to `AnnotationStore`; pure page/field operations in `utils/annotation-pages.utils.ts` (`workspace.page.ts` ~3,640 → ~3,530 lines)

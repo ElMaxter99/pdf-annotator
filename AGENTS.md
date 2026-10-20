@@ -17,12 +17,14 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 | `npm install` | Instala dependencias (Node 22.12) |
 | `npm run start:local` | Dev server en `http://localhost:4200` |
 | `npm run build` | `i18n:check` + `ng build` (producción, prerender SSR de rutas) |
-| `npm test` | Karma/Jasmine (necesita Chrome; en CI usa `ChromeHeadless --no-sandbox`) |
+| `npm test` | Karma/Jasmine (necesita Chrome) |
+| `npm run test:ci` | Igual, headless y sin sandbox (como en GitHub Actions) |
+| `npm run e2e` | Playwright sobre el build de producción (`npm run build` antes; `PW_CHROMIUM=<ruta>` para usar un Chromium ya instalado) |
 | `npm run i18n:check` | Verifica que los 7 JSON de traducción tengan **las mismas claves** que `es-ES` |
 | `node scripts/generate-example.mjs` | Regenera `examples/factura-ejemplo.pdf` |
 | `npm run start:docker` | Imagen NGINX en `http://localhost:4444` |
 
-**Antes de dar una tarea por terminada:** `npm run build` y `npm test` en verde.
+**Antes de dar una tarea por terminada:** `npm run build`, `npm run test:ci` y `npm run e2e` en verde. Si tocas el editor, el historial, la importación JSON, las fuentes o la exportación, **los e2e son tu red de seguridad** (`e2e/*.spec.ts`): ejecútalos antes y después y añade casos para el comportamiento nuevo.
 
 ## 3. Mapa del repositorio
 ```
@@ -41,6 +43,8 @@ src/app/
 src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
 public/                      logo, favicons, og-image, worker de pdf.js (assets/pdfjs)
 examples/                    PDF y JSON de ejemplo usados en README y capturas
+e2e/                         Tests Playwright (landing, editor, historial, importación, fuentes, exportación) + servidor estático
+.github/workflows/ci.yml     CI: build, tests unitarios y e2e en PRs y pushes a develop/master
 nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 ```
 
@@ -77,7 +81,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - SSR: `localStorage`, `window` y `Worker` solo existen en el navegador; protege el acceso (`typeof window`).
 
 ## 8. Definición de terminado
-- [ ] `npm run build` y `npm test` pasan.
+- [ ] `npm run build`, `npm run test:ci` y `npm run e2e` pasan.
 - [ ] Textos nuevos traducidos en 7 idiomas.
 - [ ] Probado en oscuro y claro, escritorio y móvil.
 - [ ] README/CHANGELOG/atajos actualizados si cambia el comportamiento visible.

@@ -41,3 +41,7 @@ Thumbs.db
 
 # Archivo de bloqueo de paquetes
 package-lock.json
+
+# Playwright
+test-results/
+playwright-report/

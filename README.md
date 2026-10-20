@@ -206,7 +206,9 @@ sh scripts/docker-down.sh     # detener
 | --- | --- |
 | `npm run start:local` | Servidor de desarrollo (4200) |
 | `npm run build` | Comprueba traducciones y compila |
-| `npm test` | Pruebas unitarias |
+| `npm test` | Pruebas unitarias (Karma/Jasmine) |
+| `npm run test:ci` | Igual, headless y sin sandbox (como en CI) |
+| `npm run e2e` | Pruebas end-to-end con Playwright sobre el build de producción |
 | `npm run i18n:check` | Claves de los 7 idiomas coherentes |
 | `node scripts/generate-example.mjs` | Regenera el PDF de ejemplo |
 
