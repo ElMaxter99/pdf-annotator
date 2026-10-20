@@ -1,6 +1,6 @@
 ## Unreleased
 ### Changed
-- Redesigned `/landing`: centered drop zone as the focal point, top bar with GitHub link, theme and language, product preview, feature cards and a compact open-source footer; fully responsive
+- Redesigned `/landing`: first screen focused on the action (title, centered drop zone, sample document, compact feature strip), full editor preview below, top bar with GitHub link, theme and language, and a compact open-source footer; fully responsive
 
 ### Added
 - "Try with a sample document" button on the landing page

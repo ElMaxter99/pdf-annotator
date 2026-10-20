@@ -26,15 +26,6 @@
         </ul>
       </div>
 
-      <figure class="landing__preview" aria-hidden="false">
-        <div class="landing__window">
-          <div class="landing__window-bar" aria-hidden="true"><span></span><span></span><span></span></div>
-          <img class="landing__preview-img landing__preview-img--dark" src="/assets/landing/preview-dark.webp"
-            [attr.alt]="'app.landing.previewAlt' | t" width="1200" height="740" fetchpriority="high" />
-          <img class="landing__preview-img landing__preview-img--light" src="/assets/landing/preview-light.webp"
-            [attr.alt]="'app.landing.previewAlt' | t" width="1200" height="740" fetchpriority="high" />
-        </div>
-      </figure>
     </section>
 
     <section class="landing__features" [attr.aria-label]="'app.landing.featuresTitle' | t">
@@ -61,6 +52,18 @@
           <p>{{ 'app.landing.features.privacy.text' | t }}</p>
         </article>
       </div>
+    </section>
+
+    <section class="landing__showcase">
+      <figure class="landing__preview" aria-hidden="false">
+        <div class="landing__window">
+          <div class="landing__window-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+          <img class="landing__preview-img landing__preview-img--dark" src="/assets/landing/preview-dark.webp"
+            [attr.alt]="'app.landing.previewAlt' | t" width="1200" height="740" fetchpriority="high" />
+          <img class="landing__preview-img landing__preview-img--light" src="/assets/landing/preview-light.webp"
+            [attr.alt]="'app.landing.previewAlt' | t" width="1200" height="740" fetchpriority="high" />
+        </div>
+      </figure>
     </section>
   </main>
 
