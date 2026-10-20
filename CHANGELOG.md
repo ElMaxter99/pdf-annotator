@@ -2,6 +2,17 @@
 ### Added
 - Replace legal notice with MIT license referencing the GitHub repository
 - Show read-only PDF coordinates in the annotation edit modal
+- Keyboard shortcuts (page navigation, zoom, fit to width, sidebar toggle) with an in-app help dialog (`?`)
+- "Fit to width" zoom button and shortcut hints in toolbar tooltips
+
+### Changed
+- Workspace layout: single-row compact toolbar, fixed-viewport shell with independent sidebar/viewer scroll, slim footer and a stacked layout below 960px
+- Footer text is now translated in every language
+
+### Security
+- Pasted/imported JSON is parsed with a non-evaluating parser; `Function(...)` evaluation removed (arbitrary code execution)
+- JSON imports are limited to 5 MB
+- nginx: CSP, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` and `server_tokens off`
 
 ## [v1.3.3](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.3.3) - 2026-04-09
 ### Added

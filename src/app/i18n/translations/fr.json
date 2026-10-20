@@ -28,6 +28,9 @@
       "title": "Envie de repartir de zéro ?",
       "subtitle": "Déposez un autre PDF ou cliquez pour remplacer le document actuel.",
       "ariaLabel": "Téléverser un nouveau PDF pour réinitialiser l'espace de travail"
+    },
+    "footer": {
+      "developedBy": "Développé par {{author}}"
     }
   },
   "theme": {
@@ -60,7 +63,8 @@
     "zoomGroup": "Contrôles du zoom",
     "historyGroup": "Actions d'historique",
     "exportGroup": "Options d'export",
-    "preferencesGroup": "Préférences"
+    "preferencesGroup": "Préférences",
+    "fitWidth": "Ajuster"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -206,5 +210,32 @@
   },
   "viewer": {
     "emptyMessage": "Téléversez un PDF et cliquez n'importe où pour ajouter des annotations. Modifiez-les dans l'aperçu avant de valider ✅."
+  },
+  "shortcuts": {
+    "title": "Raccourcis clavier",
+    "close": "Fermer",
+    "open": "Raccourcis clavier",
+    "openShort": "Raccourcis",
+    "footerHint": "Raccourcis clavier",
+    "groups": {
+      "navigation": "Navigation et affichage",
+      "annotations": "Annotations",
+      "general": "Général"
+    },
+    "items": {
+      "prevPage": "Page précédente",
+      "nextPage": "Page suivante",
+      "firstLastPage": "Première / dernière page",
+      "zoom": "Zoom avant / arrière",
+      "fitWidth": "Ajuster à la largeur",
+      "toggleSidebar": "Afficher ou masquer la barre latérale",
+      "addAnnotation": "Ajouter une annotation sur le PDF",
+      "confirm": "Confirmer l'annotation",
+      "cancel": "Annuler / fermer",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "applyJson": "Appliquer le JSON de l'éditeur",
+      "help": "Afficher cette aide"
+    }
   }
 }

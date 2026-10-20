@@ -166,8 +166,21 @@ Con al menos una anotación y un PDF cargado:
 2. La app reutiliza los bytes del archivo original, renderiza las marcas con `pdf-lib` (tipografía Helvetica) y descarga `annotated.pdf`.
 
 ### 9. Atajos de teclado
-- **Enter** confirma la anotación en curso (creación o edición).
-- **Escape** cancela la tarjeta activa.
+Pulsa **?** en cualquier momento (o el botón **Atajos** de la cabecera) para ver la lista dentro de la app.
+
+| Atajo | Acción |
+| --- | --- |
+| `←` / `→` · `PgUp` / `PgDn` | Página anterior / siguiente |
+| `Home` / `End` | Primera / última página |
+| `+` / `−` | Acercar / alejar |
+| `0` | Ajustar el PDF al ancho disponible |
+| `B` | Mostrar u ocultar la barra lateral |
+| `Enter` | Confirma la anotación en curso (creación o edición) |
+| `Esc` | Cancela la tarjeta activa o cierra la ayuda |
+| `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
+| `Ctrl/⌘ + S` | Aplica el JSON del editor |
+
+Los atajos de una sola tecla se ignoran mientras escribes en un campo de texto.
 
 ### 10. Formato de las coordenadas
 Cada anotación se almacena como:
