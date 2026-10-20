@@ -40,7 +40,7 @@ interface PageAnnotations { num: number; fields: PageField[] }
 - Texto pintado = `value` (si no está vacío) → `X` para `check/radio` → `mapField` (con `decimals` y `appender` para `number`).
 - `hidden` no se exporta al PDF; `locked` impide editar/arrastrar.
 - JSON mínimo: `x, y, mapField, fontSize, type`. Con *"Incluir propiedades avanzadas"*: además color, fuente, opacidad, fondo, `locked`, `hidden`, etc.
-- Importación tolerante (`normalizeImportedCoordinates`): acepta array directo o `{ pages }`, normaliza colores, tipos, fuentes y opacidades.
+- Importación tolerante (`AnnotationImportService.normalizeImportedCoordinates`, con helpers puros en `utils/annotation-fields.utils.ts`): acepta array directo o `{ pages }`, normaliza colores, tipos, fuentes y opacidades.
 
 ## 4. Renderizado
 1. `pdfjs-dist` (worker módulo en `/assets/pdfjs/pdf.worker.entry.mjs`, con *fallback* sin worker) pinta la página en `canvas.canvas--pdf` a `scale`.

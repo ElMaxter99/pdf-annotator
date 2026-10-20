@@ -38,11 +38,18 @@ import {
   FontOption,
 } from '../../fonts/font-catalog.service';
 import { FontVariantDescriptor } from '../../fonts/font-variant';
+import { AnnotationImportService } from '../../services/annotation-import.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import {
+  normalizeFieldDecimals,
+  normalizeFieldType,
+  sanitizeOptionalAppender,
+  sanitizeTextPreservingSpacing,
+} from '../../utils/annotation-fields.utils';
 import {
   addFieldToPages,
   cloneAnnotationPages,
@@ -194,6 +201,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly pendingFileService = inject(PendingFileService);
   private readonly pdfExportService = inject(PdfExportService);
   private readonly store = inject(AnnotationStore);
+  private readonly annotationImport = inject(AnnotationImportService);
   private readonly fontCatalog = inject(FontCatalogService);
   readonly coords = this.store.coords;
   readonly customFontsFeatureEnabled = this.fontCatalog.customFontsFeatureEnabled;
@@ -1955,7 +1963,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return true;
     }
 
-    const type = this.normalizeFieldType(field.type);
+    const type = normalizeFieldType(field.type);
     if (type === 'check' || type === 'radio') {
       return true;
     }
@@ -1969,7 +1977,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private prepareFieldForStorage(field: PageField): PageField {
     const styled = this.ensureFieldStyle(field);
-    const type = this.normalizeFieldType(styled.type);
+    const type = normalizeFieldType(styled.type);
     const base: PageField = {
       x: styled.x,
       y: styled.y,
@@ -1984,17 +1992,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       hidden: !!styled.hidden,
     };
 
-    const value = this.sanitizeTextPreservingSpacing(styled.value);
+    const value = sanitizeTextPreservingSpacing(styled.value);
     if (value !== undefined) {
       base.value = value;
     }
 
     if (type === 'number') {
-      const decimals = this.normalizeFieldDecimals(styled.decimals);
+      const decimals = normalizeFieldDecimals(styled.decimals);
       if (decimals !== undefined) {
         base.decimals = decimals;
       }
-      const appender = this.sanitizeOptionalAppender(styled.appender);
+      const appender = sanitizeOptionalAppender(styled.appender);
       if (appender !== undefined) {
         base.appender = appender;
       }
@@ -2020,34 +2028,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-  private normalizeFieldType(value: unknown): FieldType {
-    if (typeof value === 'string') {
-      const normalized = value.toLowerCase();
-      if (
-        normalized === 'check' ||
-        normalized === 'radio' ||
-        normalized === 'number' ||
-        normalized === 'text'
-      ) {
-        return normalized as FieldType;
-      }
-    }
-    return 'text';
-  }
 
-  private sanitizeTextPreservingSpacing(value: unknown): string | undefined {
-    if (typeof value !== 'string') {
-      return undefined;
-    }
-    return value.trim() ? value : undefined;
-  }
 
-  private sanitizeOptionalAppender(value: unknown): string | undefined {
-    if (typeof value !== 'string') {
-      return undefined;
-    }
-    return value.trim() ? value : undefined;
-  }
 
   private updateWorkingField(mode: EditorMode, mutator: (field: PageField) => PageField) {
     if (mode === 'preview') {
@@ -2534,16 +2516,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
 
-  private normalizeFieldDecimals(value: unknown): number | undefined {
-    if (value === null || value === undefined || value === '') {
-      return undefined;
-    }
-    const parsed = toFiniteNumber(value);
-    if (parsed === null || parsed < 0) {
-      return undefined;
-    }
-    return Math.round(parsed);
-  }
 
   private getFieldRenderValue(field: PageField): string {
     const override =
@@ -2552,7 +2524,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return override;
     }
 
-    const type = this.normalizeFieldType(field.type);
+    const type = normalizeFieldType(field.type);
     if (type === 'check' || type === 'radio') {
       return 'X';
     }
@@ -2562,10 +2534,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (type === 'number') {
       const numeric = toFiniteNumber(baseText);
       if (numeric !== null) {
-        const decimals = this.normalizeFieldDecimals(field.decimals);
+        const decimals = normalizeFieldDecimals(field.decimals);
         const formatted =
           decimals !== undefined ? formatNumberWithTruncation(numeric, decimals) : baseText;
-        const appender = this.sanitizeOptionalAppender(field.appender) ?? '';
+        const appender = sanitizeOptionalAppender(field.appender) ?? '';
         return `${formatted}${appender}`;
       }
     }
@@ -2989,7 +2961,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     try {
       const parsed = parseLooseJson(text);
-      const normalized = this.normalizeImportedCoordinates(parsed);
+      const normalized = this.annotationImport.normalizeImportedCoordinates(parsed, (field) =>
+        this.prepareFieldForStorage(field)
+      );
 
       if (normalized === null) {
         throw new Error('Formato no válido');
@@ -3030,7 +3004,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       const text = await file.text();
       const parsed = parseLooseJson(text);
-      const normalized = this.normalizeImportedCoordinates(parsed);
+      const normalized = this.annotationImport.normalizeImportedCoordinates(parsed, (field) =>
+        this.prepareFieldForStorage(field)
+      );
       if (normalized === null) {
         throw new Error('Formato no válido');
       }
@@ -3320,170 +3296,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {
-    const pagesData = this.extractPagesCollection(data);
-    if (!Array.isArray(pagesData)) {
-      return null;
-    }
-
-    const normalized: PageAnnotations[] = [];
-
-    for (const rawPage of pagesData) {
-      if (!rawPage || typeof rawPage !== 'object') {
-        continue;
-      }
-
-      const pageNum = toFiniteNumber((rawPage as { num?: unknown }).num);
-      if (!pageNum || !Number.isInteger(pageNum) || pageNum < 1) {
-        continue;
-      }
-
-      const rawFields = (rawPage as { fields?: unknown }).fields;
-      if (!Array.isArray(rawFields)) {
-        continue;
-      }
-
-      const fields: PageField[] = [];
-
-      for (const rawField of rawFields) {
-        if (!rawField || typeof rawField !== 'object') {
-          continue;
-        }
-
-        const { x, y, mapField, fontSize, color, value, type, decimals, appender } =
-          rawField as Record<string, unknown>;
-
-        const normalizedType = this.normalizeFieldType(type);
-        const normalizedValue = this.normalizeFieldText(value);
-        const normalizedMapField = this.normalizeFieldText(mapField) ?? normalizedValue;
-        const normalizedX = toFiniteNumber(x);
-        const normalizedY = toFiniteNumber(y);
-
-        if (normalizedX === null || normalizedY === null) {
-          continue;
-        }
-
-        if (
-          normalizedMapField === null &&
-          normalizedValue === null &&
-          normalizedType !== 'check' &&
-          normalizedType !== 'radio'
-        ) {
-          continue;
-        }
-
-        const normalizedFontSize = toFiniteNumber(fontSize);
-        const normalizedColor =
-          typeof color === 'string' && color.trim() ? color.trim() : '#000000';
-
-        const normalizedField: PageField = {
-          x: Math.round(normalizedX * 100) / 100,
-          y: Math.round(normalizedY * 100) / 100,
-          mapField: normalizedMapField ?? '',
-          fontSize:
-            normalizedFontSize && normalizedFontSize > 0
-              ? Math.round(normalizedFontSize * 100) / 100
-              : 14,
-          color: normalizeColor(normalizedColor),
-          type: normalizedType,
-        };
-
-        if (normalizedValue !== null) {
-          normalizedField.value = normalizedValue;
-        }
-
-        if (normalizedType === 'number') {
-          const normalizedDecimals = this.normalizeFieldDecimals(decimals);
-          if (normalizedDecimals !== undefined) {
-            normalizedField.decimals = normalizedDecimals;
-          }
-          const normalizedAppender = this.sanitizeOptionalAppender(appender);
-          if (normalizedAppender !== undefined) {
-            normalizedField.appender = normalizedAppender;
-          }
-        }
-
-        const rawOpacity = (rawField as { opacity?: unknown }).opacity;
-        const rawBackground = (rawField as { backgroundColor?: unknown }).backgroundColor;
-        const fontCandidates = this.fontCatalog.collectFontFamilyCandidates(rawField as Record<string, unknown>);
-
-        const styledField = this.prepareFieldForStorage({
-          ...normalizedField,
-          fontFamily: this.fontCatalog.resolveImportedFontFamily(...fontCandidates),
-          opacity: rawOpacity as number | string | undefined,
-          backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,
-        } as PageField);
-
-        fields.push(styledField);
-      }
-
-      if (fields.length) {
-        normalized.push({ num: pageNum, fields });
-      }
-    }
-
-    normalized.sort((a, b) => a.num - b.num);
-    return normalized;
-  }
-
-  private extractPagesCollection(data: unknown): unknown {
-    if (Array.isArray(data)) {
-      return data;
-    }
-
-    if (data && typeof data === 'object') {
-      const maybePages = (data as { pages?: unknown }).pages;
-      if (Array.isArray(maybePages)) {
-        return maybePages;
-      }
-    }
-
-    return null;
-  }
 
 
 
-  private normalizeFieldText(value: unknown): string | null {
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        const normalized = this.normalizeFieldText(item);
-        if (normalized !== null) {
-          return normalized;
-        }
-      }
-      return null;
-    }
 
-    let source: string | null = null;
-
-    if (typeof value === 'string') {
-      source = value;
-    } else if (typeof value === 'number' && Number.isFinite(value)) {
-      source = String(value);
-    } else if (typeof value === 'boolean') {
-      source = value ? 'true' : 'false';
-    }
-
-    if (!source) {
-      return null;
-    }
-
-    const collapsed = source
-      .replace(/\r\n?/g, '\n')
-      .replace(/\n+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    if (!collapsed) {
-      return null;
-    }
-
-    if (/[\.\[\]]/.test(collapsed)) {
-      return collapsed.replace(/\s*([\.\[\]])\s*/g, '$1');
-    }
-
-    return collapsed;
-  }
 
   private isEditableElement(target: EventTarget | null): boolean {
     const el = target as HTMLElement | null;
