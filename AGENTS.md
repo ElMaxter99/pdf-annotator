@@ -29,14 +29,14 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
 ├─ pages/workspace/
-│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~3.600 líneas): estado, render, JSON, atajos
+│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~3.530 líneas): render, JSON, atajos y UI
 │  └─ components/            header · sidebar · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle
-├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib)
+├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace)
 ├─ i18n/                     translation.service + pipe `t` + translations/*.json
 ├─ models/                   annotation.model, guide-settings.model, page-thumbnail.model
 ├─ fonts/                    font-catalog.service (fuentes estándar + personalizadas, resolución de nombres del JSON), standard-font-families, font-variant
-├─ utils/                    pdf-file.utils, loose-json (parser seguro), color.utils, number.utils, download.utils (puros, con tests)
+├─ utils/                    pdf-file.utils, loose-json (parser seguro), color.utils, number.utils, download.utils, annotation-pages.utils (puros, con tests)
 └─ annotation-templates.service.ts   plantillas + última sesión en localStorage
 src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
 public/                      logo, favicons, og-image, worker de pdf.js (assets/pdfjs)
@@ -69,6 +69,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 ## 7. Trampas conocidas
 - Los editores de crear (`preview`) y editar (`edit`) comparten **un único** componente (`annotation-editor`, input `mode`). Cualquier campo nuevo se añade una sola vez; ojo con las reglas `locked` (solo aplican en modo `edit`).
 - Lógica pura (colores, números) va en `utils/*.ts` con su `.spec.ts`; no la metas de nuevo en `workspace.page.ts`.
+- Cambios en las anotaciones: pásalos siempre por `applyCoordsChange(...)` (→ `AnnotationStore.applyChange`) para que entren en el historial; `replaceCoords(..., { skipHistory: true })` solo al cargar un PDF.
 - `Ctrl+Z/Y` globales también se disparan dentro del textarea JSON (comportamiento heredado).
 - `preserveTextModel: true` en `replaceCoords` evita reformatear el texto que el usuario está escribiendo; **no** lo uses al importar archivos/plantillas.
 - El PDF se guarda en memoria (`pdfByteSources`) en tres variantes para que el export sea robusto ante PDFs raros.
