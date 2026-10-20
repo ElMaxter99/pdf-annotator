@@ -1369,6 +1369,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.resetHistory();
     this.clearAll({ skipHistory: true });
     await this.render();
+    if (typeof window !== 'undefined' && window.innerWidth < 960) {
+      await this.fitWidth();
+    }
     this.generatePageThumbnails().catch((error) =>
       console.error('No se pudieron generar las miniaturas del documento.', error)
     );
@@ -3552,7 +3555,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         throw new Error('Formato no válido');
       }
 
-      this.replaceCoords(normalized, { preserveTextModel: true });
+      this.replaceCoords(normalized, { preserveTextModel: false });
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');

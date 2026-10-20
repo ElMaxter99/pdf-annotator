@@ -1781,6 +1781,10 @@ header .logo {
   grid-template-columns: 72px minmax(0, 1fr);
 }
 
+.app--workspace .viewer {
+  justify-content: flex-start;
+}
+
 .app--workspace .sidebar,
 .app--workspace .viewer {
   min-height: 0;
@@ -2012,4 +2016,10 @@ kbd {
     transition: none !important;
     animation: none !important;
   }
+}
+
+:root.theme-light .sidebar .json-toolbar__view-toggle-group {
+  background: #eef2f7;
+  border-color: #d7dde9;
+  box-shadow: none;
 }

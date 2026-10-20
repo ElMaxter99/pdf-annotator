@@ -1,0 +1,19 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        { "x": 150, "y": 722, "mapField": "{{cliente.nombre}}", "fontSize": 12, "type": "text" },
+        { "x": 125, "y": 682, "mapField": "{{cliente.nif}}", "fontSize": 12, "type": "text" },
+        { "x": 145, "y": 642, "mapField": "{{cliente.direccion}}", "fontSize": 12, "type": "text" },
+        { "x": 450, "y": 722, "mapField": "{{factura.fecha}}", "fontSize": 12, "type": "text" },
+        { "x": 440, "y": 800, "mapField": "{{factura.numero}}", "fontSize": 14, "type": "text", "color": "#FFFFFF" },
+        { "x": 125, "y": 562, "mapField": "{{linea.concepto}}", "fontSize": 12, "type": "text" },
+        { "x": 160, "y": 482, "mapField": "1250.5", "fontSize": 12, "type": "number", "decimals": 2, "appender": " €" },
+        { "x": 160, "y": 442, "mapField": "262.61", "fontSize": 12, "type": "number", "decimals": 2, "appender": " €" },
+        { "x": 160, "y": 402, "mapField": "1513.11", "fontSize": 14, "type": "number", "decimals": 2, "appender": " €" },
+        { "x": 125, "y": 342, "mapField": "pagada", "fontSize": 14, "type": "check" }
+      ]
+    }
+  ]
+}
