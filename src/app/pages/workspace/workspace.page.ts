@@ -14,7 +14,6 @@ import {
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
-import type { PdfLibFontkit } from '@pdf-lib/fontkit';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
@@ -38,9 +37,12 @@ import {
   StandardFontFamilyDefinition,
   StandardFontName,
 } from '../../fonts/standard-font-families';
+import { FontVariantDescriptor } from '../../fonts/font-variant';
+import { PdfExportService } from '../../services/pdf-export.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
 import { parseLooseJson } from '../../utils/loose-json';
 import {
   ensureHex,
@@ -121,10 +123,6 @@ type OverlayGuide = {
   highlighted?: boolean;
 };
 
-type FontVariantDescriptor =
-  | { kind: 'standard'; name: StandardFontName }
-  | { kind: 'custom'; fontId: string };
-
 type FontOptionType = 'standard' | 'custom';
 
 interface FontOption {
@@ -166,7 +164,6 @@ const DEFAULT_OPACITY = 1;
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
-  private static fontkitPromise: Promise<PdfLibFontkit> | null = null;
   pdfDoc: PDFDocumentProxy | null = null;
   readonly vm: WorkspacePageComponent;
   pageIndex = signal(1);
@@ -210,6 +207,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
+  private readonly pdfExportService = inject(PdfExportService);
   readonly templates = signal<AnnotationTemplate[]>([]);
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
   templateNameModel = '';
@@ -325,22 +323,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return this.sidebarComponent?.jsonTreeComponent;
   }
 
-  private static async loadFontkit(): Promise<PdfLibFontkit> {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      throw new Error('fontkit solo puede cargarse en el navegador.');
-    }
-
-    if (!WorkspacePageComponent.fontkitPromise) {
-      WorkspacePageComponent.fontkitPromise = import('@pdf-lib/fontkit')
-        .then((module) => (module.default ?? module) as PdfLibFontkit)
-        .catch((error) => {
-          WorkspacePageComponent.fontkitPromise = null;
-          throw error;
-        });
-    }
-
-    return WorkspacePageComponent.fontkitPromise;
-  }
 
 
   constructor() {
@@ -3481,15 +3463,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   downloadJSON() {
-    const blob = new Blob([this.coordsTextModel], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'coords.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([this.coordsTextModel], { type: 'application/json' }), 'coords.json');
   }
 
   saveCurrentAsTemplate() {
@@ -3589,150 +3563,22 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!this.pdfDoc) return;
 
     try {
-      const pdfLib = await import('pdf-lib');
-      const { PDFDocument: PdfLibDocument, rgb, StandardFonts } = pdfLib;
-      const loadOptions = {
-        ignoreEncryption: true,
-        updateMetadata: false,
-        throwOnInvalidObject: false,
-      } as const;
+      const customFonts = new Map<string, CustomFontEntry>();
+      this.customFonts().forEach((fontEntry) => customFonts.set(fontEntry.id, fontEntry));
 
-      const candidates = await this.getPdfByteCandidates();
-      if (!candidates.length) {
-        throw new Error('No se encontraron bytes de PDF para procesar.');
-      }
+      const { bytes, sourceBytes } = await this.pdfExportService.exportAnnotatedPdf({
+        pdfByteCandidates: await this.getPdfByteCandidates(),
+        pages: this.coords(),
+        customFonts,
+        defaultFontId: DEFAULT_FONT_ID,
+        defaultOpacity: DEFAULT_OPACITY,
+        styleField: (field) => this.ensureFieldStyle(field),
+        renderText: (field) => this.getFieldRenderValue(field),
+        resolveFont: (fontId) => this.getFontOptionById(fontId),
+      });
 
-      let pdf: InstanceType<typeof PdfLibDocument> | null = null;
-      let usedBytes: Uint8Array | null = null;
-      const loadErrors: unknown[] = [];
-
-      for (const candidate of candidates) {
-        try {
-          pdf = await PdfLibDocument.load(candidate, loadOptions);
-          usedBytes = candidate;
-          break;
-        } catch (error) {
-          loadErrors.push(error);
-        }
-      }
-
-      if (!pdf || !usedBytes) {
-        throw new Error(
-          `No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`
-        );
-      }
-
-      this.rememberPdfBytes(usedBytes, 3);
-      const fontCache = new Map<string, any>();
-      const customFontMap = new Map<string, CustomFontEntry>();
-      this.customFonts().forEach((fontEntry) => customFontMap.set(fontEntry.id, fontEntry));
-      const needsFontkit = customFontMap.size > 0;
-      if (needsFontkit) {
-        try {
-          const fontkit = await WorkspacePageComponent.loadFontkit();
-          if (typeof pdf.registerFontkit === 'function') {
-            pdf.registerFontkit(fontkit);
-          } else {
-            console.warn('La instancia de PDFDocument no soporta registerFontkit.');
-          }
-        } catch (error) {
-          console.error('No se pudo registrar fontkit para fuentes personalizadas.', error);
-          throw error instanceof Error
-            ? error
-            : new Error('No se pudo inicializar fontkit para fuentes personalizadas.');
-        }
-      }
-      const defaultFontOption = this.getFontOptionById(DEFAULT_FONT_ID);
-      const defaultVariant = defaultFontOption.descriptor;
-      const pdfPageCount = pdf.getPageCount();
-
-      const getFontFromDescriptor = async (descriptor: FontVariantDescriptor): Promise<any> => {
-        if (descriptor.kind === 'standard') {
-          const cacheKey = `standard:${descriptor.name}`;
-          if (!fontCache.has(cacheKey)) {
-            fontCache.set(cacheKey, await pdf.embedFont(StandardFonts[descriptor.name]));
-          }
-          return fontCache.get(cacheKey);
-        }
-
-        const custom = customFontMap.get(descriptor.fontId);
-        if (!custom) {
-          return getFontFromDescriptor(defaultVariant);
-        }
-
-        const cacheKey = `custom:${descriptor.fontId}`;
-        if (!fontCache.has(cacheKey)) {
-          fontCache.set(cacheKey, await pdf.embedFont(custom.data, { subset: true }));
-        }
-        return fontCache.get(cacheKey);
-      };
-
-      for (const pageAnnotations of this.coords()) {
-        const targetIndex = Math.trunc(pageAnnotations.num) - 1;
-        if (!Number.isFinite(targetIndex) || targetIndex < 0 || targetIndex >= pdfPageCount) {
-          console.warn(
-            `Se ignoraron anotaciones para la página ${pageAnnotations.num} porque el PDF solo tiene ${pdfPageCount} páginas.`
-          );
-          continue;
-        }
-
-        const page = pdf.getPage(targetIndex);
-        const fields = pageAnnotations.fields ?? [];
-
-        for (const field of fields) {
-          const styledField = this.ensureFieldStyle(field);
-          if (styledField.hidden) {
-            continue;
-          }
-          const text = this.getFieldRenderValue(styledField);
-          const fontOption = this.getFontOptionById(styledField.fontFamily ?? DEFAULT_FONT_ID);
-          const embeddedFont = await getFontFromDescriptor(fontOption.descriptor);
-          const textColor = hexToRgbComponents(styledField.color) ?? { r: 0, g: 0, b: 0 };
-          const opacity = styledField.opacity ?? DEFAULT_OPACITY;
-
-          const drawX = styledField.x;
-          const textWidth = embeddedFont.widthOfTextAtSize(text, styledField.fontSize);
-
-          if (styledField.backgroundColor) {
-            const bg = hexToRgbComponents(styledField.backgroundColor);
-            if (bg) {
-              const totalHeight = embeddedFont.heightAtSize(styledField.fontSize);
-              const ascent = embeddedFont.heightAtSize(styledField.fontSize, { descender: false });
-              const descent = totalHeight - ascent;
-              if (textWidth > 0 && totalHeight > 0) {
-                page.drawRectangle({
-                  x: drawX,
-                  y: styledField.y - descent,
-                  width: textWidth,
-                  height: totalHeight,
-                  color: rgb(bg.r / 255, bg.g / 255, bg.b / 255),
-                  opacity,
-                });
-              }
-            }
-          }
-
-          if (text) {
-            page.drawText(text, {
-              x: drawX,
-              y: styledField.y,
-              size: styledField.fontSize,
-              color: rgb(textColor.r / 255, textColor.g / 255, textColor.b / 255),
-              font: embeddedFont,
-              opacity,
-            });
-          }
-        }
-      }
-
-      const pdfBytes = await pdf.save({ useObjectStreams: false });
-      const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'annotated.pdf';
-      a.click();
-      URL.revokeObjectURL(url);
+      this.rememberPdfBytes(sourceBytes, 3);
+      downloadBlob(new Blob([toArrayBuffer(bytes)], { type: 'application/pdf' }), 'annotated.pdf');
     } catch (error) {
       console.error('No se pudo generar el PDF anotado.', error);
       alert(
@@ -3769,14 +3615,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       .map((entry) => entry.bytes.slice());
   }
 
-  private toArrayBuffer(data: Uint8Array<ArrayBufferLike> | ArrayBuffer): ArrayBuffer {
-    if (data instanceof Uint8Array) {
-      const copy = new Uint8Array(data.byteLength);
-      copy.set(data);
-      return copy.buffer;
-    }
-    return data;
-  }
 
   private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
     if (!data) return;

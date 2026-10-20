@@ -1,10 +1,11 @@
 ## Unreleased
 ### Changed
+- Refactor: PDF export moved from `workspace.page.ts` to `PdfExportService` (fontkit loading included); download helpers in `utils/download.utils.ts` shared by PDF and JSON downloads
 - Refactor: create/edit annotation forms merged into a single `AnnotationEditorComponent` (~130 duplicated template lines removed, no behaviour change)
-- Refactor: colour and number helpers extracted from `workspace.page.ts` into `utils/color.utils.ts` and `utils/number.utils.ts`
+- Refactor: colour and number helpers extracted into `utils/color.utils.ts` and `utils/number.utils.ts` (`workspace.page.ts` from ~4,300 to ~3,990 lines)
 
 ### Added
-- Unit tests for the colour and number utilities (14 tests in total)
+- Unit tests for the colour, number and PDF export utilities; 18 tests in total
 
 ## [v1.4.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.1) - 2026-10-20
 ### Changed
