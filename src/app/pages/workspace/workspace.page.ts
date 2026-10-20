@@ -38,10 +38,17 @@ import {
   FontOption,
 } from '../../fonts/font-catalog.service';
 import { FontVariantDescriptor } from '../../fonts/font-variant';
+import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import {
+  addFieldToPages,
+  cloneAnnotationPages,
+  removeFieldFromPages,
+  updateFieldInPages,
+} from '../../utils/annotation-pages.utils';
 import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
 import { parseLooseJson } from '../../utils/loose-json';
 import {
@@ -136,6 +143,7 @@ const DEFAULT_OPACITY = 1;
   standalone: true,
   templateUrl: './workspace.page.html',
   styleUrls: ['./workspace.page.scss'],
+  providers: [AnnotationStore],
   imports: [
     CommonModule,
     FormsModule,
@@ -151,10 +159,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly vm: WorkspacePageComponent;
   pageIndex = signal(1);
   scale = signal(1.5);
-  coords = signal<PageAnnotations[]>([]);
   cursorPdfCoords = signal<{ x: number; y: number } | null>(null);
-  private readonly undoStack = signal<PageAnnotations[][]>([]);
-  private readonly redoStack = signal<PageAnnotations[][]>([]);
   readonly pageThumbnails = signal<readonly PageThumbnail[]>([]);
   private thumbnailObjectUrls: string[] = [];
   private thumbnailGenerationToken = 0;
@@ -188,7 +193,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
   private readonly pdfExportService = inject(PdfExportService);
+  private readonly store = inject(AnnotationStore);
   private readonly fontCatalog = inject(FontCatalogService);
+  readonly coords = this.store.coords;
   readonly customFontsFeatureEnabled = this.fontCatalog.customFontsFeatureEnabled;
   readonly customFonts = this.fontCatalog.customFonts;
   readonly fontOptions = this.fontCatalog.fontOptions;
@@ -310,6 +317,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
 
   constructor() {
+    this.store.setFieldComparator((a, b) => this.areFieldsEqual(a, b));
     this.vm = this;
     this.setDocumentMetadata();
     const storedTemplates = this.templatesService.getTemplates();
@@ -583,45 +591,28 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   canUndo() {
-    return this.undoStack().length > 0;
+    return this.store.canUndo();
   }
 
   canRedo() {
-    return this.redoStack().length > 0;
+    return this.store.canRedo();
   }
 
   undo() {
-    const undoStates = this.undoStack();
-    if (!undoStates.length) {
+    if (!this.store.undo()) {
       return;
     }
-
-    const previous = undoStates[undoStates.length - 1];
-    const currentSnapshot = this.snapshotCoords();
-
-    this.undoStack.update((stack) => stack.slice(0, -1));
-    this.redoStack.update((stack) => [...stack, currentSnapshot]);
-
-    this.coords.set(this.snapshotCoords(previous));
-    this.preview.set(null);
-    this.editing.set(null);
-    this.syncCoordsTextModel();
-    this.redrawAllForPage();
+    this.afterHistoryJump();
   }
 
   redo() {
-    const redoStates = this.redoStack();
-    if (!redoStates.length) {
+    if (!this.store.redo()) {
       return;
     }
+    this.afterHistoryJump();
+  }
 
-    const next = redoStates[redoStates.length - 1];
-    const currentSnapshot = this.snapshotCoords();
-
-    this.redoStack.update((stack) => stack.slice(0, -1));
-    this.undoStack.update((stack) => [...stack, currentSnapshot]);
-
-    this.coords.set(this.snapshotCoords(next));
+  private afterHistoryJump() {
     this.preview.set(null);
     this.editing.set(null);
     this.syncCoordsTextModel();
@@ -1643,7 +1634,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const normalizedField = this.prepareFieldForStorage(p.field);
     if (
       this.applyCoordsChange(() =>
-        this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages))
+        this.coords.update((pages) => addFieldToPages(p.page, normalizedField, pages))
       )
     ) {
       this.syncCoordsTextModel();
@@ -1664,7 +1655,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       if (
         this.applyCoordsChange(() =>
           this.coords.update((pages) =>
-            this.updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
+            updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
           )
         )
       ) {
@@ -1691,7 +1682,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) =>
-          this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
+          updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
         )
       )
     ) {
@@ -1874,7 +1865,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!e) return;
     if (
       this.applyCoordsChange(() =>
-        this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages))
+        this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages))
       )
     ) {
       this.syncCoordsTextModel();
@@ -1917,7 +1908,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     const changed = this.applyCoordsChange(() => {
       this.coords.update((pages) => {
-        const updated = this.addFieldToPages(pageNum, newField, pages);
+        const updated = addFieldToPages(pageNum, newField, pages);
         insertedPageIndex = updated.findIndex((page) => page.num === pageNum);
         if (insertedPageIndex >= 0) {
           insertedFieldIndex = updated[insertedPageIndex].fields.length - 1;
@@ -2582,58 +2573,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return baseText;
   }
 
-  private addFieldToPages(
-    pageNum: number,
-    field: PageField,
-    pages: PageAnnotations[]
-  ): PageAnnotations[] {
-    const pageIndex = pages.findIndex((page) => page.num === pageNum);
-    if (pageIndex >= 0) {
-      return pages.map((page, idx) =>
-        idx === pageIndex ? { ...page, fields: [...page.fields, field] } : page
-      );
-    }
-    return [...pages, { num: pageNum, fields: [field] }].sort((a, b) => a.num - b.num);
-  }
 
-  private updateFieldInPages(
-    pageIndex: number,
-    fieldIndex: number,
-    field: PageField,
-    pages: PageAnnotations[]
-  ): PageAnnotations[] {
-    return pages.map((page, idx) => {
-      if (idx !== pageIndex) {
-        return page;
-      }
-      if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
-        return page;
-      }
-      const updatedFields = page.fields.map((item, itemIdx) =>
-        itemIdx === fieldIndex ? { ...field } : item
-      );
-      return { ...page, fields: updatedFields };
-    });
-  }
 
-  private removeFieldFromPages(
-    pageIndex: number,
-    fieldIndex: number,
-    pages: PageAnnotations[]
-  ): PageAnnotations[] {
-    return pages
-      .map((page, idx) => {
-        if (idx !== pageIndex) {
-          return page;
-        }
-        if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
-          return page;
-        }
-        const updatedFields = page.fields.filter((_, i) => i !== fieldIndex);
-        return { ...page, fields: updatedFields };
-      })
-      .filter((page) => page.fields.length > 0);
-  }
 
   redrawAllForPage() {
     const layer = this.annotationsLayerRef?.nativeElement;
@@ -3156,7 +3097,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private applyTemplate(template: AnnotationTemplate) {
-    const clonedPages = this.clonePages(template.pages);
+    const clonedPages = cloneAnnotationPages(template.pages);
     const nextGuideSettings = cloneGuideSettings(template.guideSettings);
 
     this.coords.set(clonedPages);
@@ -3174,12 +3115,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.redrawAllForPage();
   }
 
-  private clonePages(pages: readonly PageAnnotations[]): PageAnnotations[] {
-    return pages.map((page) => ({
-      num: page.num,
-      fields: page.fields.map((field) => ({ ...field })),
-    }));
-  }
 
   private ensureCoordsFileInput(): HTMLInputElement | null {
     if (this.coordsFileInputFallback) {
@@ -3279,10 +3214,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private snapshotCoords(pages: PageAnnotations[] = this.coords()): PageAnnotations[] {
-    return pages.map((page) => ({
-      num: page.num,
-      fields: page.fields.map((field) => ({ ...field })),
-    }));
+    return this.store.snapshot(pages);
   }
 
   private buildJsonExportPayload(pages: PageAnnotations[]): {
@@ -3319,14 +3251,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private applyCoordsChange(mutator: () => void): boolean {
-    const previous = this.snapshotCoords();
-    mutator();
-    const changed = !this.areCoordsEqual(previous, this.coords());
-    if (changed) {
-      this.undoStack.update((stack) => [...stack, previous]);
-      this.redoStack.set([]);
-    }
-    return changed;
+    return this.store.applyChange(mutator);
   }
 
   private replaceCoords(
@@ -3350,37 +3275,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private resetHistory() {
-    this.undoStack.set([]);
-    this.redoStack.set([]);
+    this.store.resetHistory();
   }
 
-  private areCoordsEqual(a: PageAnnotations[], b: PageAnnotations[]): boolean {
-    if (a.length !== b.length) {
-      return false;
-    }
-
-    for (let i = 0; i < a.length; i += 1) {
-      const pageA = a[i];
-      const pageB = b[i];
-      if (!pageB || pageA.num !== pageB.num) {
-        return false;
-      }
-
-      if (pageA.fields.length !== pageB.fields.length) {
-        return false;
-      }
-
-      for (let j = 0; j < pageA.fields.length; j += 1) {
-        const fieldA = pageA.fields[j];
-        const fieldB = pageB.fields[j];
-        if (!fieldB || !this.areFieldsEqual(fieldA, fieldB)) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
 
   private areFieldsEqual(a: PageField, b: PageField): boolean {
     const sanitizedA = this.prepareFieldForStorage(a);
