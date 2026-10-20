@@ -2332,3 +2332,34 @@ kbd {
   border-color: #d7dde9;
   box-shadow: none;
 }
+
+/* Light theme: sidebar surfaces that were still dark */
+:root.theme-light .sidebar .json-coords {
+  background: #eef2f7;
+  border-color: #d7dde9;
+  color: var(--text);
+}
+
+:root.theme-light .sidebar .json-coords__label {
+  color: var(--accent);
+}
+
+:root.theme-light .sidebar .json-coords__idle {
+  color: var(--muted);
+}
+
+:root.theme-light .sidebar .sidebar-thumbnails__list {
+  background: #f1f5f9;
+  border-color: #d7dde9;
+}
+
+:root.theme-light .sidebar .templates {
+  border-top-color: #d7dde9;
+}
+
+:root.theme-light .sidebar .templates__save input,
+:root.theme-light .sidebar .templates__controls select {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: var(--text);
+}
