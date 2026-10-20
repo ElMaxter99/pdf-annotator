@@ -12,7 +12,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:pdf-annotator": "node dist/pdf-annotator/server/server.mjs",
-    "i18n:check": "node scripts/check-translations.mjs"
+    "i18n:check": "node scripts/check-translations.mjs",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCI --karma-config=karma.conf.cjs",
+    "e2e": "playwright test"
   },
   "prettier": {
     "printWidth": 100,
@@ -50,6 +52,7 @@
     "@angular/build": "^20.2.1",
     "@angular/cli": "^20.2.1",
     "@angular/compiler-cli": "^20.2.0",
+    "@playwright/test": "1.56.1",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.17.19",
