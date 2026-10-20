@@ -1,0 +1,82 @@
+# AGENTS.md · Guía para agentes de IA y colaboradores
+
+Este archivo es la fuente de verdad para cualquier agente (Claude Code, Copilot, Codex, Cursor…) que trabaje en este repositorio. `CLAUDE.md` lo importa. Para el detalle técnico completo ve a [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## 1. Qué es la app
+**PDF Annotator** es una SPA en **Angular 20** (standalone components + signals) que permite:
+1. Cargar un PDF (100 % en el navegador, no hay backend ni subida de archivos).
+2. Colocar anotaciones de texto/check/radio/número sobre cualquier página, con coordenadas en **puntos PDF** (origen abajo-izquierda).
+3. Sincronizar esas anotaciones con un **JSON** editable (`{ "pages": [{ "num", "fields": [...] }] }`).
+4. Exportar el JSON o un **PDF anotado** (`pdf-lib`), y guardar **plantillas** reutilizables en `localStorage`.
+
+Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en, ca, fr, it, pt, de. Temas: oscuro/claro.
+
+## 2. Comandos
+| Comando | Uso |
+| --- | --- |
+| `npm install` | Instala dependencias (Node 22.12) |
+| `npm run start:local` | Dev server en `http://localhost:4200` |
+| `npm run build` | `i18n:check` + `ng build` (producción, prerender SSR de rutas) |
+| `npm test` | Karma/Jasmine (necesita Chrome; en CI usa `ChromeHeadless --no-sandbox`) |
+| `npm run i18n:check` | Verifica que los 7 JSON de traducción tengan **las mismas claves** que `es-ES` |
+| `node scripts/generate-example.mjs` | Regenera `examples/factura-ejemplo.pdf` |
+| `npm run start:docker` | Imagen NGINX en `http://localhost:4444` |
+
+**Antes de dar una tarea por terminada:** `npm run build` y `npm test` en verde.
+
+## 3. Mapa del repositorio
+```
+src/app/
+├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
+├─ pages/workspace/
+│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.300 líneas): estado, render, JSON, export, atajos
+│  └─ components/            header · sidebar · viewer · footer · page-thumbnails · json-tree · shortcuts-dialog
+├─ components/               language-selector, theme-toggle
+├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG)
+├─ i18n/                     translation.service + pipe `t` + translations/*.json
+├─ models/                   annotation.model, guide-settings.model, page-thumbnail.model
+├─ fonts/                    catálogo de fuentes estándar PDF
+├─ utils/                    pdf-file.utils, loose-json (parser seguro)
+└─ annotation-templates.service.ts   plantillas + última sesión en localStorage
+src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
+public/                      logo, favicons, og-image, worker de pdf.js (assets/pdfjs)
+examples/                    PDF y JSON de ejemplo usados en README y capturas
+nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
+```
+
+## 4. Convenciones
+- **Angular:** componentes *standalone*, signals (`signal`, `computed`), control flow `@if/@for` en código nuevo (el antiguo usa `*ngIf/*ngFor`). Los subcomponentes del workspace reciben `[vm]="vm"` (la página entera) en lugar de inputs granulares — respeta ese patrón o refactoriza de forma deliberada.
+- **Estilo:** Prettier (`printWidth` 100, comillas simples). Sigue el estilo del archivo que tocas; sin comentarios innecesarios.
+- **Estilos:** tokens `--bg --panel --accent --danger --text --muted`. Tema claro = `:root.theme-light`. El shell del workspace vive bajo `.app--workspace` en `styles.scss`.
+- **i18n:** TODO texto visible usa la pipe `t` (`{{ 'clave' | t }}`). Añade la clave a **los 7 JSON** y ejecuta `npm run i18n:check`. No dejes cadenas fijas en español (quedan algunas heredadas en `alert()`/`console`; no las amplíes).
+- **Coordenadas:** `x,y` en puntos PDF. El DOM usa `top = canvas.height − y·scale`. Conversión en `domToPdfCoords`.
+- **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
+
+## 5. Reglas de seguridad (no negociables)
+1. **Nunca evalúes entrada del usuario** (`eval`, `Function`, `new Function`, `setTimeout(string)`). El JSON "flexible" se parsea con `utils/loose-json.ts`.
+2. **No uses `innerHTML` / `bypassSecurityTrust*`** con datos del usuario (textos de anotaciones, nombres de plantilla/fuente). Usa `textContent` o bindings de Angular.
+3. Valida tamaño y tipo de archivos importados (PDF: `isPdfFile`; JSON: ≤ 5 MB; fuentes: `.ttf/.otf/.woff/.woff2`).
+4. Todo lo que se guarda en `localStorage` se lee como no confiable: normaliza antes de usar (`AnnotationTemplatesService`).
+5. No añadas `connect-src` externos ni scripts de terceros sin actualizar la CSP de `nginx.conf`.
+6. Nada de secretos en el repo: la app no tiene backend ni claves.
+
+## 6. Cómo trabajar en tareas típicas
+- **Nuevo atajo:** añade el caso en `handlePlainShortcut` (`workspace.page.ts`), la fila en `shortcuts-dialog.component.ts`, las claves `shortcuts.items.*` en los 7 idiomas y la tabla del README.
+- **Nuevo campo de anotación:** `models/annotation.model.ts` → `prepareFieldForStorage/Form` → `serializeFieldForJson` (campos avanzados) → `normalizeImportedCoordinates` → template del editor (preview **y** edit) → render (`redrawAllForPage`) → export PDF (`downloadAnnotatedPDF`).
+- **Nuevo idioma:** añade `translations/xx.json`, impórtalo en `translation.service.ts` (`LANGUAGES`, `TRANSLATIONS`) y la etiqueta en `app.languages.xx`.
+- **Cambio de layout:** revisa tres anchos (≥1650, ~1280 y <960 px) y ambos temas.
+
+## 7. Trampas conocidas
+- `preview` y `editing` duplican ~140 líneas de HTML en `workspace-viewer.component.html`; cambia los dos.
+- `Ctrl+Z/Y` globales también se disparan dentro del textarea JSON (comportamiento heredado).
+- `preserveTextModel: true` en `replaceCoords` evita reformatear el texto que el usuario está escribiendo; **no** lo uses al importar archivos/plantillas.
+- El PDF se guarda en memoria (`pdfByteSources`) en tres variantes para que el export sea robusto ante PDFs raros.
+- Vercel Analytics/Speed Insights se inyectan como scripts; la CSP debe permitirlos si se despliega con ellos.
+- SSR: `localStorage`, `window` y `Worker` solo existen en el navegador; protege el acceso (`typeof window`).
+
+## 8. Definición de terminado
+- [ ] `npm run build` y `npm test` pasan.
+- [ ] Textos nuevos traducidos en 7 idiomas.
+- [ ] Probado en oscuro y claro, escritorio y móvil.
+- [ ] README/CHANGELOG/atajos actualizados si cambia el comportamiento visible.
+- [ ] Sin evaluación de entrada del usuario ni HTML sin sanear.

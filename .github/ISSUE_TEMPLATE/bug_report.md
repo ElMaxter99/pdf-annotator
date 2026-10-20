@@ -13,13 +13,19 @@ assignees: ''
 2. 
 3. 
 
+## 📎 Archivos de apoyo
+<!-- Si puedes, adjunta el JSON de anotaciones (sin datos sensibles) que provoca el fallo. -->
+
 ## 📸 Evidencias
 <!-- Adjunta capturas, GIFs o logs de consola si los tienes. -->
 
 ## 🧪 Entorno
 - Navegador / versión:
 - Sistema operativo:
-- Versión del proyecto (`git rev-parse HEAD` o número de release):
+- Versión de la app (visible en la cabecera) / commit:
+- Idioma y tema (claro/oscuro):
+- Tamaño de ventana o dispositivo:
+- ¿Reproducible con `examples/factura-ejemplo.pdf`? (sí/no)
 
 ## ✅ Información adicional
 <!-- Agrega contexto extra, notas o posibles soluciones. -->

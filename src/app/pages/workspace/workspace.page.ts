@@ -30,6 +30,7 @@ import {
 import { WorkspaceHeaderComponent } from './components/header/workspace-header.component';
 import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sidebar.component';
 import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
+import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnail } from '../../models/page-thumbnail.model';
 import {
@@ -40,6 +41,7 @@ import {
 import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { parseLooseJson } from '../../utils/loose-json';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -100,6 +102,7 @@ interface JsonTreePreview {
 }
 
 const AUTO_APPLY_JSON_DELAY_MS = 300;
+const MAX_JSON_IMPORT_BYTES = 5 * 1024 * 1024;
 
 type OverlayGuide = {
   orientation: 'horizontal' | 'vertical';
@@ -148,6 +151,7 @@ const DEFAULT_OPACITY = 1;
     WorkspaceSidebarComponent,
     WorkspaceViewerComponent,
     WorkspaceFooterComponent,
+    ShortcutsDialogComponent,
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
@@ -189,6 +193,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly jsonViewMode = signal<JsonViewMode>('text');
   readonly jsonPanelCollapsed = signal(false);
   readonly sidebarMinimized = signal(false);
+  readonly shortcutsOpen = signal(false);
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
@@ -1364,6 +1369,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.resetHistory();
     this.clearAll({ skipHistory: true });
     await this.render();
+    if (typeof window !== 'undefined' && window.innerWidth < 960) {
+      await this.fitWidth();
+    }
     this.generatePageThumbnails().catch((error) =>
       console.error('No se pudieron generar las miniaturas del documento.', error)
     );
@@ -1809,6 +1817,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const hasPrimaryModifier = event.ctrlKey || event.metaKey;
 
     if (!hasPrimaryModifier) {
+      this.handlePlainShortcut(event, key);
       return;
     }
 
@@ -1831,6 +1840,90 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         event.preventDefault();
         this.redo();
       }
+    }
+  }
+
+  private handlePlainShortcut(event: KeyboardEvent, key: string) {
+    if (event.altKey || event.defaultPrevented) {
+      return;
+    }
+
+    if (key === 'escape' && this.shortcutsOpen()) {
+      event.preventDefault();
+      this.toggleShortcuts(false);
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    const tag = target?.tagName;
+    if (
+      tag === 'INPUT' ||
+      tag === 'TEXTAREA' ||
+      tag === 'SELECT' ||
+      tag === 'BUTTON' ||
+      target?.isContentEditable
+    ) {
+      return;
+    }
+
+    const needsDocument = () => !!this.pdfDoc;
+    switch (key) {
+      case '?':
+        event.preventDefault();
+        this.toggleShortcuts();
+        break;
+      case 'arrowleft':
+      case 'pageup':
+        if (needsDocument()) {
+          event.preventDefault();
+          void this.prevPage();
+        }
+        break;
+      case 'arrowright':
+      case 'pagedown':
+        if (needsDocument()) {
+          event.preventDefault();
+          void this.nextPage();
+        }
+        break;
+      case 'home':
+        if (needsDocument()) {
+          event.preventDefault();
+          void this.setPageIndex(1);
+        }
+        break;
+      case 'end':
+        if (needsDocument()) {
+          event.preventDefault();
+          void this.setPageIndex(this.pageCount);
+        }
+        break;
+      case '+':
+      case '=':
+        if (needsDocument()) {
+          event.preventDefault();
+          void this.zoomIn();
+        }
+        break;
+      case '-':
+      case '_':
+        if (needsDocument()) {
+          event.preventDefault();
+          void this.zoomOut();
+        }
+        break;
+      case '0':
+        if (needsDocument()) {
+          event.preventDefault();
+          void this.fitWidth();
+        }
+        break;
+      case 'b':
+        event.preventDefault();
+        this.toggleSidebarMinimized();
+        break;
+      default:
+        break;
     }
   }
 
@@ -3317,6 +3410,34 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.redrawAllForPage();
   }
 
+  async fitWidth() {
+    if (!this.pdfDoc) {
+      return;
+    }
+
+    const container = this.pdfViewerRef?.nativeElement.parentElement;
+    if (!container) {
+      return;
+    }
+
+    const page = await this.pdfDoc.getPage(this.pageIndex());
+    const baseWidth = page.getViewport({ scale: 1 }).width;
+    const style = getComputedStyle(container);
+    const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const available = container.clientWidth - padding;
+    if (!(baseWidth > 0) || !(available > 0)) {
+      return;
+    }
+
+    this.scale.set(Math.min(4, Math.max(0.25, Math.floor((available / baseWidth) * 100) / 100)));
+    await this.render();
+    this.redrawAllForPage();
+  }
+
+  toggleShortcuts(open = !this.shortcutsOpen()) {
+    this.shortcutsOpen.set(open);
+  }
+
   clearAll(options?: { skipHistory?: boolean }) {
     this.replaceCoords([], options);
   }
@@ -3387,7 +3508,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     try {
-      const parsed = this.parseLooseJson(text);
+      const parsed = parseLooseJson(text);
       const normalized = this.normalizeImportedCoordinates(parsed);
 
       if (normalized === null) {
@@ -3424,14 +3545,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     try {
+      if (file.size > MAX_JSON_IMPORT_BYTES) {
+        throw new Error('El archivo JSON supera el tamaño máximo permitido');
+      }
       const text = await file.text();
-      const parsed = this.parseLooseJson(text);
+      const parsed = parseLooseJson(text);
       const normalized = this.normalizeImportedCoordinates(parsed);
       if (normalized === null) {
         throw new Error('Formato no válido');
       }
 
-      this.replaceCoords(normalized, { preserveTextModel: true });
+      this.replaceCoords(normalized, { preserveTextModel: false });
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
@@ -3897,121 +4021,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     try {
-      const parsed = this.parseLooseJson(trimmed);
+      const parsed = parseLooseJson(trimmed);
       return { status: 'ready', value: parsed };
     } catch {
       return { status: 'error', value: null };
     }
-  }
-
-  private parseLooseJson(text: string): unknown {
-    try {
-      return JSON.parse(text);
-    } catch {
-      const sanitized = this.escapeMultilineStrings(text);
-      try {
-        // eslint-disable-next-line no-new-func
-        return Function('"use strict";return (' + sanitized + ')')();
-      } catch (looseError) {
-        throw looseError;
-      }
-    }
-  }
-
-  private escapeMultilineStrings(text: string): string {
-    let sanitized = '';
-    let mode: 'none' | 'single' | 'double' | 'template' = 'none';
-    let escapeNext = false;
-
-    for (let i = 0; i < text.length; i += 1) {
-      const char = text[i];
-
-      if (escapeNext) {
-        sanitized += char;
-        escapeNext = false;
-        continue;
-      }
-
-      if (mode === 'single') {
-        if (char === '\\') {
-          sanitized += char;
-          escapeNext = true;
-          continue;
-        }
-
-        if (char === '\n') {
-          sanitized += '\\n';
-          continue;
-        }
-
-        if (char === '\r') {
-          continue;
-        }
-
-        sanitized += char;
-
-        if (char === "'") {
-          mode = 'none';
-        }
-        continue;
-      }
-
-      if (mode === 'double') {
-        if (char === '\\') {
-          sanitized += char;
-          escapeNext = true;
-          continue;
-        }
-
-        if (char === '\n') {
-          sanitized += '\\n';
-          continue;
-        }
-
-        if (char === '\r') {
-          continue;
-        }
-
-        sanitized += char;
-
-        if (char === '"') {
-          mode = 'none';
-        }
-        continue;
-      }
-
-      if (mode === 'template') {
-        sanitized += char;
-
-        if (char === '\\') {
-          escapeNext = true;
-          continue;
-        }
-
-        if (char === '`') {
-          mode = 'none';
-        }
-        continue;
-      }
-
-      sanitized += char;
-
-      if (char === "'") {
-        mode = 'single';
-        continue;
-      }
-
-      if (char === '"') {
-        mode = 'double';
-        continue;
-      }
-
-      if (char === '`') {
-        mode = 'template';
-      }
-    }
-
-    return sanitized;
   }
 
   private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {

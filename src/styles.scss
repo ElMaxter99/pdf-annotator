@@ -1762,3 +1762,264 @@ header .logo {
   text-align: center;
   max-width: 400px;
 }
+
+/* ==========================================================================
+   Workspace shell: fixed-viewport layout with independent scroll areas
+   ========================================================================== */
+.app--workspace {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  grid-template-columns: clamp(320px, 28vw, 440px) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 10px;
+}
+
+.app--workspace.app--sidebar-minimized {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.app--workspace .viewer {
+  justify-content: flex-start;
+}
+
+.app--workspace .sidebar,
+.app--workspace .viewer {
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+.app--workspace header.header {
+  padding: 10px 14px;
+  gap: 0;
+  border-radius: 16px;
+}
+
+.app--workspace .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.app--workspace .toolbar__cluster {
+  flex: 1 1 auto;
+  gap: 10px;
+  min-width: 0;
+}
+
+.app--workspace .toolbar__group {
+  padding: 6px 8px;
+  gap: 6px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.app--workspace .toolbar__group .btn {
+  padding: 6px 10px;
+}
+
+.app--workspace .toolbar__group--preferences {
+  margin-left: auto;
+}
+
+.toolbar__logo {
+  width: 32px;
+  height: 32px;
+}
+
+.toolbar__identity {
+  gap: 10px;
+}
+
+.toolbar__brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.toolbar__app-name {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.toolbar__version {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.btn--primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: #041818;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent);
+  box-shadow: 0 6px 16px rgba(94, 234, 212, 0.3);
+}
+
+:root.theme-light .btn--primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+:root.theme-light .btn--primary:hover:not(:disabled) {
+  background: var(--accent);
+}
+
+.btn:focus-visible,
+.toolbar__group button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1650px) {
+  .app--workspace .toolbar__group .btn:not(.btn--primary) .btn__label {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .app--workspace {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas:
+      "header"
+      "viewer"
+      "sidebar"
+      "footer";
+  }
+
+  .app--workspace.app--sidebar-minimized {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app--workspace .viewer {
+    min-height: 60vh;
+    max-height: 85vh;
+  }
+
+  .app--workspace .sidebar {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .app--workspace .toolbar__group--preferences {
+    margin-left: 0;
+  }
+}
+
+.footer__hint kbd,
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 1px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: rgba(94, 234, 212, 0.1);
+  color: var(--text);
+  font: 600 0.8rem/1.5 'Fira Code', monospace;
+  text-align: center;
+}
+
+.app--workspace .footer {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Shortcuts dialog */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(5, 5, 17, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.dialog {
+  width: min(640px, 100%);
+  max-height: min(80vh, 720px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 30px 60px rgba(5, 5, 17, 0.55);
+}
+
+.dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(94, 234, 212, 0.15);
+}
+
+.dialog__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.dialog__body {
+  overflow: auto;
+  padding: 8px 18px 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.shortcut-group__title {
+  margin: 10px 0 6px;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.shortcut-list {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.shortcut-list__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 40%) 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.shortcut-list dt,
+.shortcut-list dd {
+  margin: 0;
+}
+
+.shortcut-list__sep {
+  margin: 0 4px;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+:root.theme-light .sidebar .json-toolbar__view-toggle-group {
+  background: #eef2f7;
+  border-color: #d7dde9;
+  box-shadow: none;
+}

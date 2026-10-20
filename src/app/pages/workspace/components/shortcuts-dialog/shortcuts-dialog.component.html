@@ -1,0 +1,29 @@
+<div class="dialog-backdrop" (click)="closed.emit()">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title"
+    (click)="$event.stopPropagation()">
+    <header class="dialog__header">
+      <h2 id="shortcuts-title" class="dialog__title">{{ 'shortcuts.title' | t }}</h2>
+      <button #closeButton type="button" class="btn btn--ghost" (click)="closed.emit()"
+        [attr.aria-label]="'shortcuts.close' | t">✕</button>
+    </header>
+    <div class="dialog__body">
+      @for (group of groups; track group.titleKey) {
+        <section class="shortcut-group">
+          <h3 class="shortcut-group__title">{{ group.titleKey | t }}</h3>
+          <dl class="shortcut-list">
+            @for (item of group.items; track item.labelKey) {
+              <div class="shortcut-list__row">
+                <dt>
+                  @for (key of item.keys; track key; let last = $last) {
+                    <kbd>{{ key }}</kbd>@if (!last) { <span class="shortcut-list__sep">{{ item.sep ?? '+' }}</span> }
+                  }
+                </dt>
+                <dd>{{ item.labelKey | t }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+      }
+    </div>
+  </div>
+</div>
