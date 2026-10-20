@@ -1,5 +1,11 @@
 ## Unreleased
 ### Changed
+- Refactor: PDF export moved from `workspace.page.ts` to `PdfExportService` (fontkit loading included); download helpers in `utils/download.utils.ts` shared by PDF and JSON downloads (~160 lines removed from the page component)
+
+### Added
+- Unit tests for `PdfExportService` (valid output, hidden fields and missing pages ignored, candidate fallback, failure cases); 18 tests in total
+
+### Changed
 - Refactor: create/edit annotation forms merged into a single `AnnotationEditorComponent` (~130 duplicated template lines removed, no behaviour change)
 - Refactor: colour and number helpers extracted from `workspace.page.ts` into `utils/color.utils.ts` and `utils/number.utils.ts`
 
