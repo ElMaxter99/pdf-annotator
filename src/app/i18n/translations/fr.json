@@ -16,7 +16,36 @@
       "badge": "Annotez plus vite",
       "title": "Placez des coordonnées sur n'importe quel PDF en quelques secondes",
       "description": "Téléversez votre document pour ajouter des annotations reliées à du JSON, réutiliser des modèles et exporter vos fichiers prêts à l'emploi.",
-      "cta": "Sélectionner un PDF"
+      "cta": "Sélectionner un PDF",
+      "tryExample": "Essayer avec un document d'exemple",
+      "previewAlt": "Aperçu de l'espace de travail de PDF Annotator",
+      "featuresTitle": "Tout ce qu'il faut pour annoter",
+      "trust": {
+        "browser": "100 % dans votre navigateur",
+        "languages": "7 langues",
+        "openSource": "Open source"
+      },
+      "features": {
+        "precision": {
+          "title": "Coordonnées exactes",
+          "text": "Chaque clic devient une position en points PDF, avec guides et magnétisme pour un alignement précis."
+        },
+        "json": {
+          "title": "JSON en direct",
+          "text": "Modifiez le JSON ou la visionneuse : les deux restent synchronisés. Importez, copiez et téléchargez."
+        },
+        "templates": {
+          "title": "Modèles réutilisables",
+          "text": "Enregistrez vos annotations et appliquez-les à d'autres documents en un clic."
+        },
+        "privacy": {
+          "title": "Privé par conception",
+          "text": "Tout se passe dans votre navigateur. Votre PDF n'est jamais envoyé à un serveur."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Téléversez votre PDF",
@@ -30,7 +59,10 @@
       "ariaLabel": "Téléverser un nouveau PDF pour réinitialiser l'espace de travail"
     },
     "footer": {
-      "developedBy": "Développé par {{author}}"
+      "developedBy": "Développé par {{author}}",
+      "license": "Licence MIT",
+      "changelog": "Nouveautés",
+      "openSource": "Projet open source"
     }
   },
   "theme": {

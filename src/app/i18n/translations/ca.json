@@ -16,7 +16,36 @@
       "badge": "Comença a anotar",
       "title": "Maqueta coordenades de qualsevol PDF en segons",
       "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
-      "cta": "Selecciona PDF"
+      "cta": "Selecciona PDF",
+      "tryExample": "Prova-ho amb un document d'exemple",
+      "previewAlt": "Vista prèvia de l'espai de treball de PDF Annotator",
+      "featuresTitle": "Tot el que necessites per anotar",
+      "trust": {
+        "browser": "100 % al teu navegador",
+        "languages": "7 idiomes",
+        "openSource": "Codi obert"
+      },
+      "features": {
+        "precision": {
+          "title": "Coordenades exactes",
+          "text": "Cada clic es converteix en una posició en punts PDF, amb guies i snapping per alinear amb precisió."
+        },
+        "json": {
+          "title": "JSON en directe",
+          "text": "Edita el JSON o el visor: tots dos es sincronitzen a l'instant. Importa, copia i descarrega."
+        },
+        "templates": {
+          "title": "Plantilles reutilitzables",
+          "text": "Desa les teves anotacions i aplica-les a altres documents amb un clic."
+        },
+        "privacy": {
+          "title": "Privat per disseny",
+          "text": "Tot passa al teu navegador. El teu PDF no es puja mai a cap servidor."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Carrega el teu PDF",
@@ -30,7 +59,10 @@
       "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
     },
     "footer": {
-      "developedBy": "Desenvolupat per {{author}}"
+      "developedBy": "Desenvolupat per {{author}}",
+      "license": "Llicència MIT",
+      "changelog": "Novetats",
+      "openSource": "Projecte de codi obert"
     }
   },
   "theme": {

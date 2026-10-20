@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ViewChild, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
+import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { PendingFileService } from '../../services/pending-file.service';
@@ -22,6 +23,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingHeroComponent,
     LandingDropzoneComponent,
     LandingFooterComponent,
+    TranslationPipe,
   ],
 })
 export class LandingPageComponent {
@@ -104,6 +106,21 @@ export class LandingPageComponent {
     }
 
     await this.handleFileSelection(file);
+  }
+
+  async loadExampleDocument() {
+    try {
+      const response = await fetch('/examples/factura-ejemplo.pdf');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const blob = await response.blob();
+      await this.handleFileSelection(
+        new File([blob], 'factura-ejemplo.pdf', { type: 'application/pdf' })
+      );
+    } catch (error) {
+      console.error('No se pudo cargar el documento de ejemplo.', error);
+    }
   }
 
   private async handleFileSelection(file: File) {

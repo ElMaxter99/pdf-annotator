@@ -16,7 +16,36 @@
       "badge": "Annotate smarter",
       "title": "Lay out coordinates on any PDF in seconds",
       "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
-      "cta": "Select PDF"
+      "cta": "Select PDF",
+      "tryExample": "Try it with a sample document",
+      "previewAlt": "Preview of the PDF Annotator workspace",
+      "featuresTitle": "Everything you need to annotate",
+      "trust": {
+        "browser": "100% in your browser",
+        "languages": "7 languages",
+        "openSource": "Open source"
+      },
+      "features": {
+        "precision": {
+          "title": "Exact coordinates",
+          "text": "Every click becomes a position in PDF points, with guides and snapping for precise alignment."
+        },
+        "json": {
+          "title": "Live JSON",
+          "text": "Edit the JSON or the viewer: both stay in sync instantly. Import, copy and download."
+        },
+        "templates": {
+          "title": "Reusable templates",
+          "text": "Save your annotations and apply them to other documents in one click."
+        },
+        "privacy": {
+          "title": "Private by design",
+          "text": "Everything happens in your browser. Your PDF is never uploaded to any server."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Upload your PDF",
@@ -30,7 +59,10 @@
       "ariaLabel": "Upload a new PDF to restart the annotation workspace"
     },
     "footer": {
-      "developedBy": "Developed by {{author}}"
+      "developedBy": "Developed by {{author}}",
+      "license": "MIT License",
+      "changelog": "Changelog",
+      "openSource": "Open source project"
     }
   },
   "theme": {

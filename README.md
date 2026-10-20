@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.4.0-4dd9c0?style=for-the-badge" alt="Versión 1.4.0" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.4.1-4dd9c0?style=for-the-badge" alt="Versión 1.4.1" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="Licencia MIT" /></a>
   <img src="https://img.shields.io/badge/Angular-20-dd0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 20" />
   <img src="https://img.shields.io/badge/Node-22.12-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node 22" />

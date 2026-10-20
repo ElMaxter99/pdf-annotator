@@ -1,15 +1,71 @@
 <div class="app app--landing">
-  <section class="landing">
+  <header class="landing-nav">
+    <a class="landing-nav__brand" href="/" [attr.aria-label]="appName">
+      <img class="landing-nav__logo" src="/logo.svg" alt="" width="36" height="36" />
+      <span class="landing-nav__name">{{ appName }}</span>
+      <span class="landing-nav__version">v{{ version }}</span>
+    </a>
     <app-landing-language-bar [languages]="languages" [selectedLanguage]="languageModel"
       (languageChange)="onLanguageChange($event)"></app-landing-language-bar>
+  </header>
 
-    <app-landing-hero></app-landing-hero>
+  <main class="landing">
+    <section class="landing__hero-grid">
+      <div class="landing__intro">
+        <app-landing-hero></app-landing-hero>
 
-    <app-landing-dropzone [fileDropActive]="fileDropActive()" (fileSelected)="onFileSelected($event)"
-      (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
-      (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
-      (openFilePicker)="openPdfFilePicker()"></app-landing-dropzone>
-  </section>
+        <app-landing-dropzone [fileDropActive]="fileDropActive()" (fileSelected)="onFileSelected($event)"
+          (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
+          (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
+          (openFilePicker)="openPdfFilePicker()" (tryExample)="loadExampleDocument()"></app-landing-dropzone>
+
+        <ul class="landing__trust">
+          <li>🔒 {{ 'app.landing.trust.browser' | t }}</li>
+          <li>🌍 {{ 'app.landing.trust.languages' | t }}</li>
+          <li>💚 {{ 'app.landing.trust.openSource' | t }}</li>
+        </ul>
+      </div>
+
+    </section>
+
+    <section class="landing__features" [attr.aria-label]="'app.landing.featuresTitle' | t">
+      <h2 class="landing__features-title">{{ 'app.landing.featuresTitle' | t }}</h2>
+      <div class="landing__features-grid">
+        <article class="landing__feature">
+          <span class="landing__feature-icon" aria-hidden="true">🎯</span>
+          <h3>{{ 'app.landing.features.precision.title' | t }}</h3>
+          <p>{{ 'app.landing.features.precision.text' | t }}</p>
+        </article>
+        <article class="landing__feature">
+          <span class="landing__feature-icon" aria-hidden="true">🧾</span>
+          <h3>{{ 'app.landing.features.json.title' | t }}</h3>
+          <p>{{ 'app.landing.features.json.text' | t }}</p>
+        </article>
+        <article class="landing__feature">
+          <span class="landing__feature-icon" aria-hidden="true">🧩</span>
+          <h3>{{ 'app.landing.features.templates.title' | t }}</h3>
+          <p>{{ 'app.landing.features.templates.text' | t }}</p>
+        </article>
+        <article class="landing__feature">
+          <span class="landing__feature-icon" aria-hidden="true">🔐</span>
+          <h3>{{ 'app.landing.features.privacy.title' | t }}</h3>
+          <p>{{ 'app.landing.features.privacy.text' | t }}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="landing__showcase">
+      <figure class="landing__preview" aria-hidden="false">
+        <div class="landing__window">
+          <div class="landing__window-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+          <img class="landing__preview-img landing__preview-img--dark" src="/assets/landing/preview-dark.webp"
+            [attr.alt]="'app.landing.previewAlt' | t" width="1440" height="860" fetchpriority="high" />
+          <img class="landing__preview-img landing__preview-img--light" src="/assets/landing/preview-light.webp"
+            [attr.alt]="'app.landing.previewAlt' | t" width="1440" height="860" fetchpriority="high" />
+        </div>
+      </figure>
+    </section>
+  </main>
 
   <app-landing-footer [appName]="appName" [version]="version" [currentYear]="currentYear"
     [appAuthor]="appAuthor"></app-landing-footer>
