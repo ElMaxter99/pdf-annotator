@@ -9,6 +9,9 @@
 - Workspace layout: single-row compact toolbar, fixed-viewport shell with independent sidebar/viewer scroll, slim footer and a stacked layout below 960px
 - Footer text is now translated in every language
 
+### Changed (branding)
+- Regenerated the logo as a high-resolution SVG (gradients, folded corner and coordinate marker) with matching PNG/ICO favicons, Apple touch icon and PWA icons; web manifest now has name and theme colour
+
 ### Fixed
 - Importing a JSON file now refreshes the JSON editor (it kept showing the previous content)
 - Viewer no longer clips the left side of the page when it is wider than the viewport; PDFs fit to width on small screens
