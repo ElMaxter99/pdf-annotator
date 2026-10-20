@@ -29,13 +29,13 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
 ├─ pages/workspace/
-│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.300 líneas): estado, render, JSON, export, atajos
+│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~3.600 líneas): estado, render, JSON, atajos
 │  └─ components/            header · sidebar · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle
 ├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib)
 ├─ i18n/                     translation.service + pipe `t` + translations/*.json
 ├─ models/                   annotation.model, guide-settings.model, page-thumbnail.model
-├─ fonts/                    catálogo de fuentes estándar PDF
+├─ fonts/                    font-catalog.service (fuentes estándar + personalizadas, resolución de nombres del JSON), standard-font-families, font-variant
 ├─ utils/                    pdf-file.utils, loose-json (parser seguro), color.utils, number.utils, download.utils (puros, con tests)
 └─ annotation-templates.service.ts   plantillas + última sesión en localStorage
 src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
