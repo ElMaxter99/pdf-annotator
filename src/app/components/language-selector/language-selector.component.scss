@@ -114,3 +114,15 @@ select:focus {
     width: 100%;
   }
 }
+
+:host-context(:root.theme-light) {
+  background: linear-gradient(145deg, #ffffff, #eef2f7);
+  border-color: #d7dde9;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+}
+
+:host-context(:root.theme-light) select {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: var(--text);
+}

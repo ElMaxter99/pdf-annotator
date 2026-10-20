@@ -1,4 +1,4 @@
-## Unreleased
+## [v1.4.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.0) - 2026-10-20
 ### Added
 - Replace legal notice with MIT license referencing the GitHub repository
 - Show read-only PDF coordinates in the annotation edit modal
@@ -8,6 +8,14 @@
 ### Changed
 - Workspace layout: single-row compact toolbar, fixed-viewport shell with independent sidebar/viewer scroll, slim footer and a stacked layout below 960px
 - Footer text is now translated in every language
+
+### Fixed
+- Importing a JSON file now refreshes the JSON editor (it kept showing the previous content)
+- Viewer no longer clips the left side of the page when it is wider than the viewport; PDFs fit to width on small screens
+- Language selector and JSON view toggle contrast in light theme
+
+### Documentation
+- New `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md` and `docs/ARCHITECTURE.md`; rewritten README with screenshots and workflows; `examples/` with a sample PDF and annotations; improved issue/PR templates
 
 ### Security
 - Pasted/imported JSON is parsed with a non-evaluating parser; `Function(...)` evaluation removed (arbitrary code execution)

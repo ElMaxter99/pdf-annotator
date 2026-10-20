@@ -1,11 +1,12 @@
 <p align="center">
-  <img src="./public/logo.svg" alt="PDF Annotator logo" width="140" />
+  <img src="./public/logo.svg" alt="PDF Annotator logo" width="120" />
 </p>
 
-<h1 align="center">📑 PDF Annotator</h1>
+<h1 align="center">PDF Annotator</h1>
 
 <p align="center">
-  Herramienta web en <strong>Angular 20</strong> para crear, editar y exportar anotaciones sobre cualquier PDF sin alterar el archivo original.
+  <strong>Marca cualquier PDF, obtén las coordenadas exactas en JSON y exporta el documento anotado.</strong><br />
+  100 % en tu navegador · sin subir archivos · 7 idiomas · tema claro y oscuro
 </p>
 
 <p align="center">
@@ -18,155 +19,132 @@
 <p align="center">
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Docker-ready-2496ed?logo=docker&logoColor=white" alt="Docker" />
-  <img src="https://img.shields.io/badge/i18n-ES%20·%20EN%20·%20FR%20·%20IT%20·%20PT%20·%20DE-ff9f43" alt="Idiomas" />
+  <img src="https://img.shields.io/badge/i18n-ES%20·%20EN%20·%20CA%20·%20FR%20·%20IT%20·%20PT%20·%20DE-ff9f43" alt="Idiomas" />
   <a href="https://github.com/ElMaxter99/pdf-annotator/stargazers"><img src="https://img.shields.io/github/stars/ElMaxter99/pdf-annotator?style=flat&logo=github" alt="Stars" /></a>
-  <a href="https://github.com/ElMaxter99/pdf-annotator/issues/new/choose"><img src="https://img.shields.io/badge/Issues-feedback%20bienvenido-00b894?logo=github" alt="Reportar issue" /></a>
 </p>
 
 <p align="center">
-  <a href="#-vista-previa">Vista previa</a> ·
-  <a href="#-instalación">Instalación</a> ·
-  <a href="#-despliegue-con-docker">Docker</a> ·
-  <a href="#-uso-paso-a-paso">Uso</a> ·
-  <a href="CHANGELOG.md">Changelog</a>
+  <a href="#-qué-es">Qué es</a> ·
+  <a href="#-empieza-en-1-minuto">Empieza</a> ·
+  <a href="#-tour-de-la-interfaz">Tour</a> ·
+  <a href="#-flujos-de-trabajo">Flujos</a> ·
+  <a href="#%EF%B8%8F-atajos-de-teclado">Atajos</a> ·
+  <a href="#-formato-json">JSON</a> ·
+  <a href="#-despliegue">Despliegue</a> ·
+  <a href="AGENTS.md">Para agentes</a>
 </p>
 
 <p align="center">
-  <img src="./screenshots/example_use.png" alt="PDF Annotator en acción" width="90%" />
+  <img src="./screenshots/workspace.png" alt="Espacio de trabajo de PDF Annotator" width="95%" />
 </p>
 
 ---
 
-## 📚 Tabla de contenidos
-- [🖼 Vista previa](#-vista-previa)
-- [✨ Características destacadas](#-características-destacadas)
-- [🧰 Stack tecnológico](#-stack-tecnológico)
-- [🛠 Requisitos](#-requisitos)
-- [⚙ Instalación](#-instalación)
-- [🚀 Despliegue con Docker](#-despliegue-con-docker)
-- [▶ Uso paso a paso](#-uso-paso-a-paso)
-- [📸 Galería](#-galería)
-- [🧰 Solución de problemas](#-solución-de-problemas)
-- [🧱 Plantillas para contribuir](#-plantillas-para-contribuir)
-- [📝 Licencia](#-licencia)
+## 🎯 Qué es
+PDF Annotator es un editor visual de **coordenadas sobre PDFs**. Haces clic donde quieres un dato, le das un nombre (`{{cliente.nombre}}`) y la app te devuelve su posición exacta en **puntos PDF**, lista para que tu backend rellene el documento (facturas, contratos, formularios, certificados…). También puede **estampar** los textos en el propio PDF.
 
-## 🖼 Vista previa
-| 1️⃣ Carga tu PDF | 2️⃣ Espacio de trabajo |
-| :---: | :---: |
-| <img src="./screenshots/main.png" alt="Pantalla de bienvenida" width="100%" /> | <img src="./screenshots/workspace.png" alt="Espacio de trabajo con panel JSON y visor" width="100%" /> |
-| Arrastra y suelta o selecciona un PDF. | Visor, zoom, deshacer/rehacer y panel de anotaciones JSON. |
+**¿Para quién?**
+- Desarrolladores que generan PDFs desde plantillas y necesitan saber *dónde* escribir cada campo.
+- Equipos de QA/operaciones que quieren rellenar o revisar formularios sin editores pesados.
+- Cualquiera que necesite marcar texto, checks o importes sobre un PDF sin tocar el original.
 
-| 3️⃣ Edita cada anotación |
-| :---: |
-| <img src="./screenshots/example_use.png" alt="Editor de anotación con texto, fuente, color y opacidad" width="80%" /> |
-| Texto, tipo, fuente, tamaño, opacidad, fondo y color (HEX/RGB) con JSON sincronizado en vivo. |
+## ✨ Qué puedes hacer
+| | |
+| --- | --- |
+| 🎯 **Colocar** | Clic sobre el PDF para crear textos, *checks*, *radios* o números con formato (decimales y sufijo, p. ej. `1250.50 €`). |
+| 🖱️ **Mover y editar** | Arrastra anotaciones, edita fuente, tamaño, color (selector/HEX/RGB), opacidad y fondo. Bloquea u oculta las que no quieres tocar o exportar. |
+| 📐 **Ser preciso** | Rejilla, reglas, guías de alineación e *imán* a rejilla, márgenes, centros o puntos propios. Coordenadas PDF o de canvas. |
+| 🧾 **JSON en vivo** | Editor de texto y vista de árbol sincronizados. Pega, importa, copia o descarga. |
+| 🧩 **Plantillas** | Guarda conjuntos de anotaciones y recárgalos en otros documentos. |
+| ⬇️ **Exportar** | JSON (`coords.json`) o PDF anotado (`annotated.pdf`) con fuentes estándar o propias (`.ttf/.otf/.woff/.woff2`). |
+| ⌨️ **Ir rápido** | Atajos para páginas, zoom, ajuste al ancho, deshacer/rehacer y más. Pulsa `?` para verlos. |
+| 🌍 **A tu manera** | Español, inglés, catalán, francés, italiano, portugués y alemán; tema claro/oscuro; responsive hasta móvil. |
+| 🔒 **Privado** | El PDF no sale de tu navegador. No hay servidor de procesado ni cuentas. |
 
-## ✨ Características destacadas
-- 🎯 **Anotaciones precisas**: define posición, color y tipografía sobre un lienzo sincronizado con cada página.
-- 🔁 **Edición en vivo**: arrastra tarjetas, actualiza el texto y visualiza los cambios sin refrescar el PDF.
-- 💾 **Gestión de datos**: importa/exporta anotaciones en JSON normalizado o descarga un PDF con las marcas aplicadas.
-- ⚡ **Experiencia fluida**: atajos de teclado, zoom incremental y feedback instantáneo en el panel lateral.
-- 🧪 **Flujos listos para QA**: reproduce escenarios con JSON compartible para validar diseños y firmas.
-
-## 🧰 Stack tecnológico
-| Frontend | Renderizado PDF | Utilidades |
-| --- | --- | --- |
-| ![Angular](https://img.shields.io/badge/Angular-20-dd0031?logo=angular&logoColor=white) RxJS · Angular Material | pdf-lib · pdfjs-dist | TypeScript · Sass · Vite dev server |
-
-> El repositorio incluye scripts para validar traducciones (`npm run i18n:check`) antes de construir la aplicación.
-
-## 🛠 Requisitos
-- Node.js **v22.12.0** (o compatible con Angular 20).
-- Angular CLI **v20.2.0** instalado globalmente (`npm install -g @angular/cli`) o disponible vía `npx`.
-- Navegador moderno con soporte para ES2022.
-
-## ⚙ Instalación
+## 🚀 Empieza en 1 minuto
 ```bash
-# Clona el repositorio
 git clone https://github.com/ElMaxter99/pdf-annotator.git
 cd pdf-annotator
-
-# Instala las dependencias
 npm install
+npm run start:local      # → http://localhost:4200
+```
+Requisitos: **Node 22.12** y un navegador moderno. ¿Prefieres contenedor? `npm run start:docker` → <http://localhost:4444>.
+
+> 💡 **Pruébalo ya con los ejemplos incluidos:** carga [`examples/factura-ejemplo.pdf`](examples/factura-ejemplo.pdf) y luego **Importar desde archivo** → [`examples/anotaciones-ejemplo.json`](examples/anotaciones-ejemplo.json).
+
+## 🧭 Tour de la interfaz
+### 1 · Pantalla de bienvenida
+Arrastra un PDF o haz clic para seleccionarlo. El idioma se cambia arriba a la derecha.
+
+<p align="center"><img src="./screenshots/main.png" alt="Pantalla de bienvenida" width="85%" /></p>
+
+### 2 · Espacio de trabajo
+<p align="center"><img src="./screenshots/workspace.png" alt="Espacio de trabajo" width="95%" /></p>
+
+| Zona | Qué hay |
+| --- | --- |
+| **Cabecera** (una fila) | Página anterior/siguiente · zoom `−`/`+`/**Ajustar** · deshacer/rehacer/limpiar · **Descargar PDF** · **Atajos** · tema · idioma. |
+| **Panel lateral** | Cursor en coordenadas PDF · cambiar de documento · importar/aplicar JSON · **miniaturas** · **plantillas** · **editor JSON** (texto/árbol, copiar, descargar) · **opciones avanzadas** (fuentes, guías, campos extra del JSON). Se minimiza con `B`. |
+| **Visor** | Página con capa de anotaciones. Clic para crear, clic sobre una anotación para editarla, arrastrar para moverla. Scroll propio. |
+| **Pie** | Recordatorio de `?` y versión. |
+
+### 3 · Edita cada anotación
+Texto (`mapField`), tipo, bloqueo/ocultar, valor fijo, decimales y sufijo (números), tamaño, opacidad, fuente (buscador), fondo y color. Los botones permiten **duplicar** ⧉, **borrar** 🗑️, confirmar ✅ o cancelar ❌.
+
+<p align="center"><img src="./screenshots/example_use.png" alt="Editor de anotación" width="90%" /></p>
+
+### 4 · Guías y precisión
+En **Opciones avanzadas → Activar guías y snapping** aparecen rejilla, reglas en puntos PDF y líneas de alineación.
+
+<p align="center"><img src="./screenshots/guides.png" alt="Guías, reglas y rejilla" width="90%" /></p>
+
+### 5 · JSON en modo árbol
+Alterna entre editor de texto y árbol; al seleccionar una anotación en el visor, el editor JSON enfoca su bloque.
+
+<p align="center"><img src="./screenshots/json-tree.png" alt="JSON en árbol" width="90%" /></p>
+
+### 6 · Atajos, tema claro y móvil
+<p align="center">
+  <img src="./screenshots/shortcuts.png" alt="Diálogo de atajos" width="48%" />
+  <img src="./screenshots/light.png" alt="Tema claro" width="48%" />
+</p>
+<p align="center"><img src="./screenshots/mobile.png" alt="Vista móvil" width="26%" /></p>
+
+## 🔄 Flujos de trabajo
+### A · Mapear una factura para tu backend
+1. Carga `factura-ejemplo.pdf` (o tu plantilla).
+2. Pulsa **`0`** para ajustar al ancho. Haz clic junto a *Cliente*, escribe `{{cliente.nombre}}`, `Enter`.
+3. Repite para NIF, fecha, importes. Para importes elige tipo **Número**, 2 decimales y sufijo ` €`.
+4. Activa **guías** para alinear campos a la misma línea base.
+5. **Descargar JSON** → entrega `coords.json` a tu servicio de generación.
+
+```json
+{ "pages": [ { "num": 1, "fields": [
+  { "x": 150, "y": 722, "mapField": "{{cliente.nombre}}", "fontSize": 12, "type": "text" },
+  { "x": 160, "y": 402, "mapField": "1513.11", "fontSize": 14, "type": "number" }
+] } ] }
 ```
 
-### ▶️ Ejecuta la app en tu máquina (Node 22)
+### B · Rellenar un PDF y descargarlo
+1. Carga el PDF → crea anotaciones con el **texto final** (o usa *Valor fijo*).
+2. Marca *checks* para casillas (se pintan como `X`).
+3. **Descargar PDF** → `annotated.pdf` con las marcas estampadas. El original no se modifica.
 
-```bash
-npm run start:local
-```
+### C · Reutilizar con plantillas
+1. Con tus anotaciones hechas, escribe un nombre en **Plantillas reutilizables** → **Guardar plantilla**.
+2. En otro PDF similar: selecciona la plantilla → **Cargar**.
+3. Ajusta posiciones arrastrando y exporta. (Las plantillas viven en el `localStorage` de tu navegador.)
 
-El servidor de desarrollo queda disponible en `http://localhost:4200` con soporte para hot-reload. Si faltan dependencias críticas de Angular (por ejemplo `@angular/build`), el script se detiene con un aviso para que ejecutes `npm install` manualmente antes de volver a lanzar `ng serve`; así evitas el error `Could not find the '@angular/build:dev-server' builder's node package.` típico de los entornos recién clonados.
+### D · Editar a mano o desde código
+1. Abre el editor JSON, pega coordenadas (acepta JSON "flexible": comillas simples, claves sin comillas, comentarios y comas finales).
+2. Se aplican solas tras una pausa, o con **Aplicar JSON** / `Ctrl/⌘ + S`.
+3. Usa **Importar desde archivo** para cargar un `.json` completo (máx. 5 MB).
 
-> ¿Tu equipo no puede instalar Node.js 22 o Angular 20? Ejecuta la versión en contenedor.
+### E · Revisión de un PDF largo
+Miniaturas para saltar de página, `←/→` para navegar, `+/−` para zoom, **Deshacer** (`Ctrl/⌘+Z`) ante cualquier error y **Limpiar** para empezar de cero.
 
-### 🐳 Ejecuta la app con Docker (alternativa)
-
-```bash
-npm run start:docker
-```
-
-El comando delega en `scripts/docker-up.sh` para construir la imagen y exponer la SPA en `http://localhost:4444`.
-
-## 🚀 Despliegue con Docker
-> Requiere Docker Desktop, Docker Engine o una instalación compatible con Docker Compose.
-
-```bash
-npm run start:docker
-```
-
-El script compila la aplicación con Node.js 22.12.0, construye la imagen `pdf-annotator:latest` y levanta el servicio detrás de NGINX. Una vez completado, la SPA queda disponible en `http://localhost:4444`.
-
-Para detener y limpiar los contenedores:
-
-```bash
-sh scripts/docker-down.sh
-```
-
-Al finalizar, la aplicación dejará de estar disponible en `http://localhost:4444`.
-
-## ▶ Uso paso a paso
-### 1. Inicia el servidor de desarrollo
-```bash
-npm run start:local
-```
-Abre `http://localhost:4200` en tu navegador (o la IP indicada si usaste otro host).
-
-### 2. Carga un PDF
-Haz clic en **Seleccionar PDF** y elige un archivo `.pdf`. El visor mostrará la primera página y habilitará el panel de anotaciones.
-
-### 3. Navega y ajusta el zoom
-- Usa **◀ / ▶** para cambiar de página.
-- Ajusta el zoom con los botones `−` y `+` (pasos de 0.25x). El escalado se aplica tanto al PDF como a las anotaciones ya dibujadas.
-
-### 4. Crea una anotación
-1. Haz clic sobre el documento (capa transparente "Hitbox").
-2. En la tarjeta flotante escribe el texto que quieres mostrar (`mapField`).
-3. Ajusta el tamaño de fuente (8–72 px) y selecciona un color desde el selector o introduciendo valores hex (`#RRGGBB`) o RGB (`rgb(r, g, b)`).
-4. Pulsa ✅ para confirmar o ❌ para cancelar.
-
-### 5. Edita o mueve anotaciones
-- Haz clic sobre una anotación existente para abrir el editor en modo **Edición**.
-- Arrastra la tarjeta para reposicionarla; el sistema recalcula las coordenadas en tiempo real.
-- Modifica texto, tamaño o color y confirma con ✅. Usa 🗑️ para eliminar la marca.
-
-### 6. Controla el color y la tipografía
-El panel de edición sincroniza automáticamente el selector de color, la entrada hexadecimal y la representación RGB. Cambiar cualquiera actualiza las otras. El tamaño de fuente se guarda en puntos (`fontSize`).
-
-### 7. Gestiona las anotaciones en JSON
-- **Panel lateral**: visualiza y edita el JSON en vivo. Puedes pegar datos y aplicar cambios con **Aplicar JSON**.
-- **Copiar JSON**: copia el objeto `{ pages: [...] }` al portapapeles.
-- **Descargar JSON**: guarda las coordenadas como `coords.json`.
-- **Importar JSON**: carga un archivo externo desde el botón del panel.
-- El sistema acepta tanto un array directo como un objeto `{ "pages": [...] }` y normaliza coordenadas, textos y colores.
-
-### 8. Exporta un PDF anotado
-Con al menos una anotación y un PDF cargado:
-1. Haz clic en **Descargar PDF anotado**.
-2. La app reutiliza los bytes del archivo original, renderiza las marcas con `pdf-lib` (tipografía Helvetica) y descarga `annotated.pdf`.
-
-### 9. Atajos de teclado
-Pulsa **?** en cualquier momento (o el botón **Atajos** de la cabecera) para ver la lista dentro de la app.
+## ⌨️ Atajos de teclado
+Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 
 | Atajo | Acción |
 | --- | --- |
@@ -175,68 +153,82 @@ Pulsa **?** en cualquier momento (o el botón **Atajos** de la cabecera) para ve
 | `+` / `−` | Acercar / alejar |
 | `0` | Ajustar el PDF al ancho disponible |
 | `B` | Mostrar u ocultar la barra lateral |
-| `Enter` | Confirma la anotación en curso (creación o edición) |
-| `Esc` | Cancela la tarjeta activa o cierra la ayuda |
+| `Enter` | Confirmar la anotación en curso |
+| `Esc` | Cancelar la tarjeta activa / cerrar la ayuda |
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
-| `Ctrl/⌘ + S` | Aplica el JSON del editor |
+| `Ctrl/⌘ + S` | Aplicar el JSON del editor |
 
-Los atajos de una sola tecla se ignoran mientras escribes en un campo de texto.
+Los atajos de una sola tecla se ignoran mientras escribes en un campo.
 
-### 10. Formato de las coordenadas
-Cada anotación se almacena como:
+## 🧾 Formato JSON
 ```json
 {
   "pages": [
     {
       "num": 1,
       "fields": [
-        {
-          "x": 120.5,
-          "y": 450.25,
-          "mapField": "Firma",
-          "fontSize": 14,
-          "color": "#FF0000"
-        }
+        { "x": 120.5, "y": 450.25, "mapField": "Firma", "fontSize": 14, "type": "text" }
       ]
     }
   ]
 }
 ```
-- `x` e `y` están en puntos PDF (origen en la esquina inferior izquierda).
-- `mapField` corresponde al texto que se pintará sobre el documento.
-- `fontSize` se almacena en puntos; si no se indica, la app usa 14.
-- `color` acepta hexadecimales (`#RRGGBB`).
+| Campo | Descripción |
+| --- | --- |
+| `x`, `y` | Puntos PDF. Origen en la **esquina inferior izquierda**. |
+| `mapField` | Texto (o clave) que se pinta/mapea. |
+| `fontSize` | Puntos (por defecto 14). |
+| `type` | `text` · `check` · `radio` · `number`. |
+| *avanzados* (opcional) | `color` (`#RRGGBB`), `fontFamily`, `opacity` (0.1–1), `backgroundColor`, `value`, `decimals`, `appender`, `locked`, `hidden`. Actívalos con **Incluir propiedades avanzadas en el JSON**. |
 
-## 📸 Galería
-<p align="center">
-  <a href="./screenshots/main.png"><img src="./screenshots/main.png" alt="Vista principal" width="32%" /></a>
-  <a href="./screenshots/workspace.png"><img src="./screenshots/workspace.png" alt="Espacio de trabajo" width="32%" /></a>
-  <a href="./screenshots/example_use.png"><img src="./screenshots/example_use.png" alt="Ejemplo de uso" width="32%" /></a>
-</p>
+Se acepta también un array directo de páginas. Detalle del modelo en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## 🧰 Solución de problemas
-- **El PDF no se renderiza**: revisa que el archivo no esté protegido y que el servidor de desarrollo muestre el log sin errores.
-- **No puedo mover una anotación**: asegúrate de arrastrar desde el cuerpo de la tarjeta (no solo desde los campos de texto).
-- **Error al importar JSON**: confirma que el archivo contenga la estructura indicada y que los valores numéricos sean válidos.
-- **El PDF exportado no abre**: prueba con otra copia del PDF original; la app intenta tres variantes (original, canónica y saneada) para asegurar compatibilidad.
+## 🧰 Stack
+| Frontend | PDF | Calidad |
+| --- | --- | --- |
+| Angular 20 · signals · standalone · SCSS | `pdfjs-dist` (render) · `pdf-lib` + `fontkit` (export) | Karma/Jasmine · i18n check · Prettier |
 
-## 🧱 Plantillas para contribuir
-El repositorio incluye plantillas en `.github/`:
+## 🐳 Despliegue
+```bash
+npm run build                 # genera dist/pdf-annotator/browser
+npm run start:docker          # NGINX en http://localhost:4444
+sh scripts/docker-down.sh     # detener
+```
+`nginx.conf` incluye cabeceras de seguridad (CSP, `nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`). Si añades scripts de terceros (p. ej. analíticas), amplía la CSP.
 
-- `ISSUE_TEMPLATE/bug_report.md`: guía para reportar errores con pasos reproducibles.
-- `ISSUE_TEMPLATE/feature_request.md`: estructura sugerencias de mejora con contexto y alcance.
-- `PULL_REQUEST_TEMPLATE.md`: checklist para documentar pruebas y evidencia de los cambios.
+## 🔐 Seguridad y privacidad
+- El PDF y las anotaciones **no se envían a ningún servidor**; solo se guardan plantillas, idioma, tema y última sesión en tu `localStorage`.
+- El JSON pegado se interpreta con un parser propio **sin evaluar código**.
+- Límites de importación: JSON ≤ 5 MB; solo PDFs y fuentes `.ttf/.otf/.woff/.woff2`.
 
-Además, en la pestaña **About** del repositorio puedes añadir etiquetas (Angular, PDF, annotations) y la URL de la demo para mejorar la visibilidad.
+## 🛠️ Desarrollo
+| Comando | Descripción |
+| --- | --- |
+| `npm run start:local` | Servidor de desarrollo (4200) |
+| `npm run build` | Comprueba traducciones y compila |
+| `npm test` | Pruebas unitarias |
+| `npm run i18n:check` | Claves de los 7 idiomas coherentes |
+| `node scripts/generate-example.mjs` | Regenera el PDF de ejemplo |
+
+Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para personas y agentes de IA) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Hoja de ruta: [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md). Cómo contribuir: [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+## 🧯 Solución de problemas
+| Síntoma | Qué hacer |
+| --- | --- |
+| El PDF no se ve | Comprueba que no esté protegido/corrupto y mira la consola del navegador. |
+| Error al importar JSON | Revisa que tenga `pages[].fields[]` con `x`/`y` numéricos y que pese < 5 MB. |
+| No puedo mover una anotación | Puede estar **bloqueada**; desbloquéala en su editor. |
+| El PDF exportado no abre | Prueba con otra copia del original; la app intenta tres variantes (original, canónica y saneada). |
+| Los atajos no responden | El foco está en un campo de texto o botón; haz clic en el visor y vuelve a probar. |
+| `ng serve` no encuentra el builder | Ejecuta `npm install` antes de `npm run start:local`. |
+
+## 🗺️ Roadmap
+Pestañas en el panel lateral, selección múltiple y alineación, recuperación de sesión (IndexedDB), validación de esquema JSON con errores por línea y refactor del componente principal. Detalle en [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md).
+
+## 🤝 Contribuir
+Issues y PRs son bienvenidos: usa las plantillas de [`.github/`](.github) y revisa [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## 📝 Licencia
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="MIT" /></a>
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.4.0-4dd9c0?style=for-the-badge" alt="v1.4.0" /></a>
-</p>
+Proyecto público bajo licencia [MIT](LICENSE) © 2025 AlvaroMaxter ([ElMaxter99](https://github.com/ElMaxter99)). Puedes usarlo, modificarlo y redistribuirlo mencionando al autor y enlazando a <https://github.com/ElMaxter99/pdf-annotator>.
 
-Proyecto público y gratuito bajo licencia [MIT](LICENSE) © 2025 AlvaroMaxter ([ElMaxter99](https://github.com/ElMaxter99)).
-
-Puedes usarlo, modificarlo y redistribuirlo libremente, siempre que menciones al autor original y enlaces a <https://github.com/ElMaxter99/pdf-annotator>.
-
-<p align="center"><sub>Hecho con ❤️ y Angular · <a href="#">⬆ Volver arriba</a></sub></p>
+<p align="center"><sub>Hecho con ❤️ y Angular · <a href="#pdf-annotator">⬆ Volver arriba</a></sub></p>
