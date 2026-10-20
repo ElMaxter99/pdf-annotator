@@ -17,7 +17,7 @@ export class AppMetadataService {
     const fallbackOrigin = 'https://pdf-annotator-rho.vercel.app';
     const documentLocation = this.document?.location;
     const baseUrl = (documentLocation?.origin ?? fallbackOrigin).replace(/\/$/, '');
-    const imageUrl = `${baseUrl}/og-image.svg`;
+    const imageUrl = `${baseUrl}/og-image.png`;
 
     this.title.setTitle(appTitle);
     this.meta.updateTag({ name: 'description', content: description });
