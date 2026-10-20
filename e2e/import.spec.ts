@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test';
 import { applyJsonText, jsonEditor, openWorkspace, renderedAnnotations } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  page.on('dialog', (dialog) => dialog.accept());
   await openWorkspace(page);
 });
 
@@ -62,7 +61,7 @@ test('an invalid JSON file leaves the annotations untouched', async ({ page }) =
     mimeType: 'application/json',
     buffer: Buffer.from('{ not json'),
   });
-  await page.waitForTimeout(300);
+  await expect(page.locator('.toast--error')).toContainText('JSON');
   expect((await renderedAnnotations(page)).map((r) => r.text)).toEqual(['a']);
   await expect(jsonEditor(page)).toBeVisible();
 });

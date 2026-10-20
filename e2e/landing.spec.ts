@@ -23,18 +23,16 @@ test('"try with a sample document" opens the editor', async ({ page }) => {
 
 test('rejects non-PDF files', async ({ page }) => {
   await page.goto('/landing');
-  let message = '';
-  page.once('dialog', async (dialog) => {
-    message = dialog.message();
-    await dialog.accept();
-  });
   await page.locator('input[type=file]').setInputFiles({
     name: 'nope.txt',
     mimeType: 'text/plain',
     buffer: Buffer.from('hello'),
   });
-  await expect.poll(() => message).toContain('PDF');
+  await expect(page.locator('.toast--error')).toContainText('PDF');
   await expect(page).toHaveURL(/landing/);
+
+  await page.getByRole('button', { name: 'Cerrar aviso' }).click();
+  await expect(page.locator('.toast')).toHaveCount(0);
 });
 
 test('language can be switched', async ({ page }) => {

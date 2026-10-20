@@ -269,5 +269,10 @@
       "applyJson": "Aplicar el JSON del editor",
       "help": "Mostrar esta ayuda"
     }
+  },
+  "toast": {
+    "close": "Cerrar aviso",
+    "importJsonFailed": "No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.",
+    "exportPdfFailed": "No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia."
   }
 }
