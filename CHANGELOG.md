@@ -1,4 +1,4 @@
-## Unreleased
+## [v1.4.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.0) - 2026-10-20
 ### Added
 - Replace legal notice with MIT license referencing the GitHub repository
 - Show read-only PDF coordinates in the annotation edit modal
