@@ -1,5 +1,6 @@
 ## Unreleased
 ### Changed
+- Refactor: imported-JSON normalisation moved to `AnnotationImportService` and `utils/annotation-fields.utils.ts` (`workspace.page.ts` ~3,530 → ~3,340 lines)
 - Refactor: annotations and undo/redo history moved to `AnnotationStore`; pure page/field operations in `utils/annotation-pages.utils.ts` (`workspace.page.ts` ~3,640 → ~3,530 lines)
 - Refactor: font catalogue, custom fonts and imported-font-name matching moved to `FontCatalogService` (`workspace.page.ts` ~3,990 → ~3,640 lines)
 - Refactor: PDF export moved from `workspace.page.ts` to `PdfExportService` (fontkit loading included); download helpers in `utils/download.utils.ts` shared by PDF and JSON downloads
@@ -7,7 +8,7 @@
 - Refactor: colour and number helpers extracted into `utils/color.utils.ts` and `utils/number.utils.ts` (`workspace.page.ts` from ~4,300 to ~3,990 lines)
 
 ### Added
-- Unit tests for `FontCatalogService` and the colour, number and PDF export utilities; 35 tests in total
+- Unit tests for `FontCatalogService` and the colour, number and PDF export utilities; 46 tests in total
 
 ## [v1.4.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.1) - 2026-10-20
 ### Changed
