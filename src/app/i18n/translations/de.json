@@ -28,6 +28,9 @@
       "title": "Projekt zurücksetzen?",
       "subtitle": "Legen Sie ein anderes PDF ab oder klicken Sie, um das aktuelle Dokument zu ersetzen.",
       "ariaLabel": "Neues PDF hochladen, um den Arbeitsbereich zurückzusetzen"
+    },
+    "footer": {
+      "developedBy": "Entwickelt von {{author}}"
     }
   },
   "theme": {
@@ -60,7 +63,8 @@
     "zoomGroup": "Zoom-Steuerung",
     "historyGroup": "Verlauf",
     "exportGroup": "Exportoptionen",
-    "preferencesGroup": "Einstellungen"
+    "preferencesGroup": "Einstellungen",
+    "fitWidth": "Anpassen"
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",
@@ -206,5 +210,32 @@
   },
   "viewer": {
     "emptyMessage": "Laden Sie ein PDF hoch und klicken Sie irgendwo, um Anmerkungen hinzuzufügen. Bearbeiten Sie sie in der Vorschau, bevor Sie bestätigen ✅."
+  },
+  "shortcuts": {
+    "title": "Tastenkürzel",
+    "close": "Schließen",
+    "open": "Tastenkürzel",
+    "openShort": "Kürzel",
+    "footerHint": "Tastenkürzel",
+    "groups": {
+      "navigation": "Navigation und Ansicht",
+      "annotations": "Anmerkungen",
+      "general": "Allgemein"
+    },
+    "items": {
+      "prevPage": "Vorherige Seite",
+      "nextPage": "Nächste Seite",
+      "firstLastPage": "Erste / letzte Seite",
+      "zoom": "Vergrößern / verkleinern",
+      "fitWidth": "An Breite anpassen",
+      "toggleSidebar": "Seitenleiste ein- oder ausblenden",
+      "addAnnotation": "Anmerkung im PDF hinzufügen",
+      "confirm": "Anmerkung bestätigen",
+      "cancel": "Abbrechen / schließen",
+      "undo": "Rückgängig",
+      "redo": "Wiederholen",
+      "applyJson": "JSON aus dem Editor anwenden",
+      "help": "Diese Hilfe anzeigen"
+    }
   }
 }

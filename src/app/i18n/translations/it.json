@@ -28,6 +28,9 @@
       "title": "Vuoi ricominciare da capo?",
       "subtitle": "Trascina un altro PDF oppure fai clic per sostituire il documento attuale.",
       "ariaLabel": "Carica un nuovo PDF per reimpostare l'area di lavoro"
+    },
+    "footer": {
+      "developedBy": "Sviluppato da {{author}}"
     }
   },
   "theme": {
@@ -60,7 +63,8 @@
     "zoomGroup": "Controlli zoom",
     "historyGroup": "Azioni cronologia",
     "exportGroup": "Opzioni di esportazione",
-    "preferencesGroup": "Preferenze"
+    "preferencesGroup": "Preferenze",
+    "fitWidth": "Adatta"
   },
   "sidebar": {
     "title": "Annotazioni (JSON)",
@@ -206,5 +210,32 @@
   },
   "viewer": {
     "emptyMessage": "Carica un PDF e fai clic in qualsiasi punto per aggiungere annotazioni. Modificale nell'anteprima prima di confermare ✅."
+  },
+  "shortcuts": {
+    "title": "Scorciatoie da tastiera",
+    "close": "Chiudi",
+    "open": "Scorciatoie da tastiera",
+    "openShort": "Scorciatoie",
+    "footerHint": "Scorciatoie da tastiera",
+    "groups": {
+      "navigation": "Navigazione e vista",
+      "annotations": "Annotazioni",
+      "general": "Generale"
+    },
+    "items": {
+      "prevPage": "Pagina precedente",
+      "nextPage": "Pagina successiva",
+      "firstLastPage": "Prima / ultima pagina",
+      "zoom": "Ingrandisci / riduci",
+      "fitWidth": "Adatta alla larghezza",
+      "toggleSidebar": "Mostra o nascondi la barra laterale",
+      "addAnnotation": "Aggiungi un'annotazione al PDF",
+      "confirm": "Conferma l'annotazione",
+      "cancel": "Annulla / chiudi",
+      "undo": "Annulla",
+      "redo": "Ripristina",
+      "applyJson": "Applica il JSON dell'editor",
+      "help": "Mostra questa guida"
+    }
   }
 }

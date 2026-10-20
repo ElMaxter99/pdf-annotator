@@ -28,6 +28,9 @@
       "title": "Vols començar de zero?",
       "subtitle": "Arrossega un altre PDF o fes clic per substituir el document actual.",
       "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
+    },
+    "footer": {
+      "developedBy": "Desenvolupat per {{author}}"
     }
   },
   "theme": {
@@ -60,7 +63,8 @@
     "zoomGroup": "Controls de zoom",
     "historyGroup": "Accions d'historial",
     "exportGroup": "Opcions d'exportació",
-    "preferencesGroup": "Preferències"
+    "preferencesGroup": "Preferències",
+    "fitWidth": "Ajusta"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
@@ -206,5 +210,32 @@
   },
   "viewer": {
     "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."
+  },
+  "shortcuts": {
+    "title": "Dreceres de teclat",
+    "close": "Tanca",
+    "open": "Dreceres de teclat",
+    "openShort": "Dreceres",
+    "footerHint": "Dreceres de teclat",
+    "groups": {
+      "navigation": "Navegació i vista",
+      "annotations": "Anotacions",
+      "general": "General"
+    },
+    "items": {
+      "prevPage": "Pàgina anterior",
+      "nextPage": "Pàgina següent",
+      "firstLastPage": "Primera / última pàgina",
+      "zoom": "Apropa / allunya",
+      "fitWidth": "Ajusta a l'amplada",
+      "toggleSidebar": "Mostra o amaga la barra lateral",
+      "addAnnotation": "Afegeix una anotació al PDF",
+      "confirm": "Confirma l'anotació",
+      "cancel": "Cancel·la / tanca",
+      "undo": "Desfés",
+      "redo": "Refés",
+      "applyJson": "Aplica el JSON de l'editor",
+      "help": "Mostra aquesta ajuda"
+    }
   }
 }
