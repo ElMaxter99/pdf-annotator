@@ -18,7 +18,7 @@
 - Nuevo botón **Ajustar** (fit-to-width).
 
 ## Propuestas siguientes (por valor / esfuerzo)
-1. **Dividir `workspace.page.ts` (≈4.300 líneas)** en servicios (`PdfRenderService`, `AnnotationStore`, `JsonSyncService`, `FontService`, `ExportService`) y componentes de editor de anotación. Hoy preview y edición duplican ~140 líneas de template: extraer `<app-annotation-editor>`.
+1. **Dividir `workspace.page.ts` (≈4.150 líneas)** en servicios (`PdfRenderService`, `AnnotationStore`, `JsonSyncService`, `FontService`, `ExportService`). ✅ Hecho: `<app-annotation-editor>` unificado y utilidades `color.utils`/`number.utils` con tests. Pendiente: los servicios.
 2. **Sidebar por pestañas** (Documento · Anotaciones · Plantillas · Avanzado) para no hacer scroll con tantas secciones.
 3. **Barra de herramientas del visor**: selección múltiple, mover con flechas, alinear/distribuir, copiar/pegar anotaciones.
 4. **Persistencia de sesión** (IndexedDB): recuperar PDF y anotaciones tras recargar; aviso antes de perder cambios.

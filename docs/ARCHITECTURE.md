@@ -44,7 +44,7 @@ interface PageAnnotations { num: number; fields: PageField[] }
 2. `canvas--overlay`: rejilla, reglas y guías (`refreshOverlay`, `drawGrid`, `drawRulers`, `drawStaticGuides`, `drawActiveGuides`).
 3. `.annotations-layer`: un `div` por anotación (creado con `textContent`).
 4. `.hitbox`: captura clics/movimiento y calcula coordenadas PDF.
-5. Editores flotantes `preview` y `edit` posicionados con `left = x·scale`, `top = canvas.height − y·scale`.
+5. Editor flotante (`AnnotationEditorComponent`, `mode = 'preview' | 'edit'`) posicionado con `left = x·scale`, `top = canvas.height − y·scale`. El visor expone sus referencias (`previewEditorRef`, `editFontSearchRef`…) a la página sin cambiar su API.
 
 Zoom: pasos de 0.25 (mín. 0.25), `fitWidth()` ajusta al ancho útil del visor (máx. 4×). En pantallas < 960 px se ajusta al cargar.
 
