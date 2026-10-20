@@ -30,13 +30,13 @@ src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
 ├─ pages/workspace/
 │  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.300 líneas): estado, render, JSON, export, atajos
-│  └─ components/            header · sidebar · viewer · footer · page-thumbnails · json-tree · shortcuts-dialog
+│  └─ components/            header · sidebar · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle
 ├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG)
 ├─ i18n/                     translation.service + pipe `t` + translations/*.json
 ├─ models/                   annotation.model, guide-settings.model, page-thumbnail.model
 ├─ fonts/                    catálogo de fuentes estándar PDF
-├─ utils/                    pdf-file.utils, loose-json (parser seguro)
+├─ utils/                    pdf-file.utils, loose-json (parser seguro), color.utils, number.utils (puros, con tests)
 └─ annotation-templates.service.ts   plantillas + última sesión en localStorage
 src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
 public/                      logo, favicons, og-image, worker de pdf.js (assets/pdfjs)
@@ -62,12 +62,13 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 
 ## 6. Cómo trabajar en tareas típicas
 - **Nuevo atajo:** añade el caso en `handlePlainShortcut` (`workspace.page.ts`), la fila en `shortcuts-dialog.component.ts`, las claves `shortcuts.items.*` en los 7 idiomas y la tabla del README.
-- **Nuevo campo de anotación:** `models/annotation.model.ts` → `prepareFieldForStorage/Form` → `serializeFieldForJson` (campos avanzados) → `normalizeImportedCoordinates` → template del editor (preview **y** edit) → render (`redrawAllForPage`) → export PDF (`downloadAnnotatedPDF`).
+- **Nuevo campo de anotación:** `models/annotation.model.ts` → `prepareFieldForStorage/Form` → `serializeFieldForJson` (campos avanzados) → `normalizeImportedCoordinates` → template del editor (`annotation-editor.component.html`, un único formulario) → render (`redrawAllForPage`) → export PDF (`downloadAnnotatedPDF`).
 - **Nuevo idioma:** añade `translations/xx.json`, impórtalo en `translation.service.ts` (`LANGUAGES`, `TRANSLATIONS`) y la etiqueta en `app.languages.xx`.
 - **Cambio de layout:** revisa tres anchos (≥1650, ~1280 y <960 px) y ambos temas.
 
 ## 7. Trampas conocidas
-- `preview` y `editing` duplican ~140 líneas de HTML en `workspace-viewer.component.html`; cambia los dos.
+- Los editores de crear (`preview`) y editar (`edit`) comparten **un único** componente (`annotation-editor`, input `mode`). Cualquier campo nuevo se añade una sola vez; ojo con las reglas `locked` (solo aplican en modo `edit`).
+- Lógica pura (colores, números) va en `utils/*.ts` con su `.spec.ts`; no la metas de nuevo en `workspace.page.ts`.
 - `Ctrl+Z/Y` globales también se disparan dentro del textarea JSON (comportamiento heredado).
 - `preserveTextModel: true` en `replaceCoords` evita reformatear el texto que el usuario está escribiendo; **no** lo uses al importar archivos/plantillas.
 - El PDF se guarda en memoria (`pdfByteSources`) en tres variantes para que el export sea robusto ante PDFs raros.

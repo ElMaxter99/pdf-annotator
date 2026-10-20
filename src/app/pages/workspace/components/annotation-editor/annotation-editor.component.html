@@ -1,0 +1,146 @@
+<div class="annotation-editor" [class.editing]="isEdit" #editorRoot [style.left.px]="leftPx" [style.top.px]="topPx"
+  (keydown)="vm.onEditorKeydown($event, mode)">
+  @if (isEdit) {
+    <span class="editor-badge">{{ 'annotation.editingBadge' | t }}</span>
+    <label class="field">
+      <span class="field-label">{{ 'annotation.coordinatesLabel' | t }}</span>
+      <input type="text" readonly [value]="'X: ' + (field.x | number:'1.0-2') + '  Y: ' + (field.y | number:'1.0-2')" />
+    </label>
+  }
+  <label class="field">
+    <span class="field-label">{{ 'annotation.fields.text.label' | t }}</span>
+    <input type="text" [(ngModel)]="field.mapField" [disabled]="locked"
+      [placeholder]="'annotation.fields.text.placeholder' | t" />
+  </label>
+  <label class="field">
+    <span class="field-label">{{ 'annotation.fields.type.label' | t }}</span>
+    <select [(ngModel)]="field.type" [disabled]="locked">
+      <option value="text">{{ 'annotation.fields.type.options.text' | t }}</option>
+      <option value="check">{{ 'annotation.fields.type.options.check' | t }}</option>
+      <option value="radio">{{ 'annotation.fields.type.options.radio' | t }}</option>
+      <option value="number">{{ 'annotation.fields.type.options.number' | t }}</option>
+    </select>
+  </label>
+  <div class="field-row field-row--toggles">
+    <div class="field field-toggle">
+      <span class="field-label">{{ 'annotation.fields.locked.label' | t }}</span>
+      <label class="toggle-control">
+        <input type="checkbox" [(ngModel)]="field.locked" />
+        <span>{{ 'annotation.fields.locked.toggle' | t }}</span>
+      </label>
+    </div>
+    <div class="field field-toggle">
+      <span class="field-label">{{ 'annotation.fields.hidden.label' | t }}</span>
+      <label class="toggle-control">
+        <input type="checkbox" [(ngModel)]="field.hidden" [disabled]="locked" />
+        <span>{{ 'annotation.fields.hidden.toggle' | t }}</span>
+      </label>
+    </div>
+  </div>
+  <label class="field">
+    <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
+    <input type="text" [(ngModel)]="field.value" [disabled]="locked"
+      [placeholder]="'annotation.fields.value.placeholder' | t" />
+  </label>
+  @if (field.type === 'number') {
+    <label class="field field-small">
+      <span class="field-label">{{ 'annotation.fields.number.decimals.label' | t }}</span>
+      <input type="number" [(ngModel)]="field.decimals" min="0" [disabled]="locked" />
+    </label>
+    <label class="field field-small">
+      <span class="field-label">{{ 'annotation.fields.number.appender.label' | t }}</span>
+      <input type="text" [(ngModel)]="field.appender" [disabled]="locked"
+        [placeholder]="'annotation.fields.number.appender.placeholder' | t" />
+    </label>
+  }
+  <div class="field-row field-row--metrics">
+    <label class="field field-small field-size">
+      <span class="field-label">{{ 'annotation.fields.size.label' | t }}</span>
+      <input type="number" [(ngModel)]="field.fontSize" min="8" max="72" [disabled]="locked" />
+    </label>
+    <label class="field field-inline opacity-field field-opacity">
+      <span class="field-label">{{ 'annotation.fields.opacity.label' | t }}</span>
+      <div class="opacity-controls">
+        <input type="range" min="0.1" max="1" step="0.05" [ngModel]="field.opacity ?? 1"
+          (ngModelChange)="vm.setFieldOpacity(mode, $event)" [disabled]="locked" />
+        <input type="number" min="0.1" max="1" step="0.05" [ngModel]="field.opacity ?? 1"
+          (ngModelChange)="vm.setFieldOpacity(mode, $event)" [disabled]="locked" />
+      </div>
+    </label>
+  </div>
+  <div class="field field-small font-field">
+    <span class="field-label" [id]="mode + '-font-label'">{{ 'annotation.fields.font.label' | t }}</span>
+    <div class="font-dropdown" #fontDropdown [class.font-dropdown--open]="vm.fontDropdownOpen(mode)">
+      <button type="button" class="font-dropdown__trigger" (click)="vm.toggleFontDropdown(mode)"
+        aria-haspopup="listbox" [attr.aria-expanded]="vm.fontDropdownOpen(mode)" [disabled]="locked"
+        [attr.aria-labelledby]="mode + '-font-label'">
+        @if (vm.fontSummaryOption(field.fontFamily); as selectedFont) {
+          <span class="font-dropdown__value">{{ selectedFont.label }}</span>
+          @if (selectedFont.type === 'custom') {
+            <span class="font-dropdown__tag">{{ 'annotation.fields.font.customTag' | t }}</span>
+          }
+        }
+        <span class="font-dropdown__icon" aria-hidden="true">▾</span>
+      </button>
+      @if (vm.fontDropdownOpen(mode)) {
+        <div class="font-dropdown__panel" role="listbox" [attr.aria-labelledby]="mode + '-font-label'">
+          <input #fontSearch type="search" class="font-dropdown__search"
+            [placeholder]="'annotation.fields.font.searchPlaceholder' | t" [value]="vm.fontSearchQuery(mode)"
+            (input)="vm.onFontSearch(mode, $any($event.target).value)"
+            (keydown.escape)="vm.closeFontDropdown(mode)" />
+          @if (vm.filteredFontOptions(mode); as options) {
+            @if (options.length) {
+              <div class="font-dropdown__list">
+                @for (option of options; track option.id) {
+                  <button type="button" class="font-dropdown__option" (click)="vm.chooseFontOption(mode, option.id)"
+                    role="option" [attr.aria-selected]="option.id === (field.fontFamily ?? vm.defaultFontId)">
+                    <span class="font-dropdown__option-label">{{ option.label }}</span>
+                    @if (option.type === 'custom') {
+                      <span class="font-dropdown__tag">{{ 'annotation.fields.font.customTag' | t }}</span>
+                    }
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="font-dropdown__empty">{{ 'annotation.fields.font.noResults' | t }}</div>
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+  <div class="background-section">
+    <span class="field-label">{{ 'annotation.fields.background.label' | t }}</span>
+    <div class="background-row">
+      <input type="color" [value]="field.backgroundColor ?? '#ffffff'"
+        (input)="vm.setFieldBackground(mode, $any($event.target).value)" [disabled]="locked" />
+      <button type="button" class="background-clear" (click)="vm.clearFieldBackground(mode)" [disabled]="locked">
+        {{ 'annotation.fields.background.clear' | t }}
+      </button>
+    </div>
+  </div>
+  <div class="color-section">
+    <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
+    <div class="color-row">
+      <input type="color" [(ngModel)]="field.color" (ngModelChange)="onColorPicker($event)" [disabled]="locked" />
+      <div class="color-inputs">
+        <input type="text" [ngModel]="hexValue" (ngModelChange)="onHexInput($event)"
+          [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t"
+          [disabled]="locked" />
+        <input type="text" [ngModel]="rgbValue" (ngModelChange)="onRgbInput($event)"
+          [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.rgbPlaceholder' | t"
+          [disabled]="locked" />
+      </div>
+    </div>
+    <small class="color-hint">{{ (isEdit ? 'annotation.color.hintEdit' : 'annotation.color.hintPreview') | t }}</small>
+  </div>
+  <div class="editor-actions">
+    @if (isEdit) {
+      <button type="button" (click)="vm.duplicateAnnotation()" [title]="'annotation.actions.duplicate' | t"
+        [attr.aria-label]="'annotation.actions.duplicate' | t">⧉</button>
+      <button class="btn-delete" (click)="vm.deleteAnnotation()">🗑️</button>
+    }
+    <button class="action-primary" (click)="confirm()">✅</button>
+    <button (click)="cancel()">❌</button>
+  </div>
+</div>

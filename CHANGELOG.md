@@ -1,3 +1,11 @@
+## Unreleased
+### Changed
+- Refactor: create/edit annotation forms merged into a single `AnnotationEditorComponent` (~130 duplicated template lines removed, no behaviour change)
+- Refactor: colour and number helpers extracted from `workspace.page.ts` into `utils/color.utils.ts` and `utils/number.utils.ts`
+
+### Added
+- Unit tests for the colour and number utilities (14 tests in total)
+
 ## [v1.4.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.1) - 2026-10-20
 ### Changed
 - Light theme: sidebar cursor box, thumbnails, template inputs now follow the theme
