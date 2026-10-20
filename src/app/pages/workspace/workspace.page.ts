@@ -42,6 +42,17 @@ import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { parseLooseJson } from '../../utils/loose-json';
+import {
+  ensureHex,
+  hexToRgbComponents,
+  normalizeColor,
+  normalizeHexInput,
+  parseColorComponents,
+  parseRgbText,
+  rgbToHex,
+  toRgbString,
+} from '../../utils/color.utils';
+import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -746,7 +757,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   updateGuideNumber(key: 'gridSize' | 'marginSize' | 'snapTolerance', rawValue: string | number) {
-    const numeric = this.toFiniteNumber(rawValue);
+    const numeric = toFiniteNumber(rawValue);
     if (numeric === null) {
       return;
     }
@@ -775,7 +786,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private parseNumericList(value: string): number[] {
     return value
       .split(/[\s,;]+/)
-      .map((token) => this.toFiniteNumber(token))
+      .map((token) => toFiniteNumber(token))
       .filter((num): num is number => num !== null && num >= 0)
       .map((num) => +num.toFixed(2))
       .filter((num, index, arr) => arr.indexOf(num) === index)
@@ -1556,119 +1567,38 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.updatePreviewColorState(defaultColor);
   }
 
-  private normalizeColor(color: string) {
-    if (color.startsWith('#')) {
-      const hex =
-        color.length === 4
-          ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
-          : color;
-      return hex.toLowerCase();
-    }
 
-    const match = color.match(
-      /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(\d*\.?\d+))?\)$/i
-    );
-    if (!match) return color;
 
-    const [, r, g, b] = match;
-    const toHex = (value: string) => {
-      const num = Math.max(0, Math.min(255, parseInt(value, 10)));
-      return num.toString(16).padStart(2, '0');
-    };
 
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  }
 
-  private normalizeHexInput(value: string) {
-    const trimmed = value.trim();
-    const match = trimmed.match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i);
-    if (!match) return null;
-    let hex = match[1];
-    if (hex.length === 3) {
-      hex = hex
-        .split('')
-        .map((ch) => ch + ch)
-        .join('');
-    }
-    return `#${hex.toLowerCase()}`;
-  }
 
-  private parseRgbText(value: string) {
-    const trimmed = value.trim();
-    if (!trimmed) return null;
-    const rgbMatch = trimmed.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i);
-    const fallbackMatch = trimmed.match(/^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/);
-    const match = rgbMatch ?? fallbackMatch;
-    if (!match) return null;
-    const [, r, g, b] = match;
-    const clamp = (num: number) => Math.max(0, Math.min(255, num));
-    return {
-      r: clamp(parseInt(r, 10)),
-      g: clamp(parseInt(g, 10)),
-      b: clamp(parseInt(b, 10)),
-    };
-  }
 
-  private rgbToHex(rgb: { r: number; g: number; b: number }) {
-    const toHex = (num: number) => num.toString(16).padStart(2, '0');
-    return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
-  }
-
-  private parseColorComponents(color: string) {
-    const hex = this.normalizeHexInput(color);
-    if (hex) {
-      return {
-        r: parseInt(hex.slice(1, 3), 16),
-        g: parseInt(hex.slice(3, 5), 16),
-        b: parseInt(hex.slice(5, 7), 16),
-      };
-    }
-
-    const match = color.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i);
-    if (!match) return null;
-    return {
-      r: Math.max(0, Math.min(255, parseInt(match[1], 10))),
-      g: Math.max(0, Math.min(255, parseInt(match[2], 10))),
-      b: Math.max(0, Math.min(255, parseInt(match[3], 10))),
-    };
-  }
-
-  private toRgbString(color: string) {
-    const comps = this.parseColorComponents(color);
-    if (!comps) return '';
-    return `rgb(${comps.r}, ${comps.g}, ${comps.b})`;
-  }
-
-  private ensureHex(color: string) {
-    const normalized = this.normalizeColor(color);
-    return normalized.startsWith('#') ? normalized : null;
-  }
 
   private updatePreviewColorState(color: string) {
-    const hex = this.ensureHex(color);
+    const hex = ensureHex(color);
     if (hex) {
       this.previewHexInput.set(hex);
-      this.previewRgbInput.set(this.toRgbString(hex));
+      this.previewRgbInput.set(toRgbString(hex));
     } else {
       this.previewHexInput.set(color.trim());
-      this.previewRgbInput.set(this.toRgbString(color));
+      this.previewRgbInput.set(toRgbString(color));
     }
   }
 
   private updateEditingColorState(color: string) {
-    const hex = this.ensureHex(color);
+    const hex = ensureHex(color);
     if (hex) {
       this.editHexInput.set(hex);
-      this.editRgbInput.set(this.toRgbString(hex));
+      this.editRgbInput.set(toRgbString(hex));
     } else {
       this.editHexInput.set(color.trim());
-      this.editRgbInput.set(this.toRgbString(color));
+      this.editRgbInput.set(toRgbString(color));
     }
   }
 
   setPreviewColorFromHex(value: string) {
     this.previewHexInput.set(value);
-    const normalized = this.normalizeHexInput(value);
+    const normalized = normalizeHexInput(value);
     if (!normalized) return;
     this.preview.update((p) => (p ? { ...p, field: { ...p.field, color: normalized } } : p));
     this.updatePreviewColorState(normalized);
@@ -1676,9 +1606,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   setPreviewColorFromRgb(value: string) {
     this.previewRgbInput.set(value);
-    const rgb = this.parseRgbText(value);
+    const rgb = parseRgbText(value);
     if (!rgb) return;
-    const hex = this.rgbToHex(rgb);
+    const hex = rgbToHex(rgb);
     this.preview.update((p) => (p ? { ...p, field: { ...p.field, color: hex } } : p));
     this.updatePreviewColorState(hex);
   }
@@ -1694,7 +1624,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.editHexInput.set(value);
-    const normalized = this.normalizeHexInput(value);
+    const normalized = normalizeHexInput(value);
     if (!normalized) return;
     this.editing.update((e) => {
       if (!e || e.field.locked) {
@@ -1711,9 +1641,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.editRgbInput.set(value);
-    const rgb = this.parseRgbText(value);
+    const rgb = parseRgbText(value);
     if (!rgb) return;
-    const hex = this.rgbToHex(rgb);
+    const hex = rgbToHex(rgb);
     this.editing.update((e) => {
       if (!e || e.field.locked) {
         return e;
@@ -2088,7 +2018,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       y: styled.y,
       mapField: typeof styled.mapField === 'string' ? styled.mapField : '',
       fontSize: styled.fontSize,
-      color: this.normalizeColor(styled.color),
+      color: normalizeColor(styled.color),
       type,
       fontFamily: styled.fontFamily ?? DEFAULT_FONT_ID,
       opacity: styled.opacity ?? DEFAULT_OPACITY,
@@ -2515,7 +2445,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private normalizeOpacityValue(value: unknown): number | undefined {
-    const numeric = this.toFiniteNumber(value);
+    const numeric = toFiniteNumber(value);
     if (numeric === null) {
       return undefined;
     }
@@ -2531,7 +2461,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!trimmed || trimmed.toLowerCase() === 'transparent') {
       return undefined;
     }
-    return this.normalizeColor(trimmed);
+    return normalizeColor(trimmed);
   }
 
   private ensureFieldStyle(field: PageField): PageField {
@@ -2989,26 +2919,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     el.style.width = `${width}px`;
   }
 
-  private hexToRgbComponents(color: string): { r: number; g: number; b: number } | null {
-    const normalized = this.normalizeColor(color);
-    const hex = normalized.replace('#', '');
-    if (hex.length !== 6) {
-      return null;
-    }
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    if ([r, g, b].some((value) => Number.isNaN(value))) {
-      return null;
-    }
-    return { r, g, b };
-  }
 
   private normalizeFieldDecimals(value: unknown): number | undefined {
     if (value === null || value === undefined || value === '') {
       return undefined;
     }
-    const parsed = this.toFiniteNumber(value);
+    const parsed = toFiniteNumber(value);
     if (parsed === null || parsed < 0) {
       return undefined;
     }
@@ -3030,11 +2946,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const baseText = typeof field.mapField === 'string' ? field.mapField : '';
 
     if (type === 'number') {
-      const numeric = this.toFiniteNumber(baseText);
+      const numeric = toFiniteNumber(baseText);
       if (numeric !== null) {
         const decimals = this.normalizeFieldDecimals(field.decimals);
         const formatted =
-          decimals !== undefined ? this.formatNumberWithTruncation(numeric, decimals) : baseText;
+          decimals !== undefined ? formatNumberWithTruncation(numeric, decimals) : baseText;
         const appender = this.sanitizeOptionalAppender(field.appender) ?? '';
         return `${formatted}${appender}`;
       }
@@ -3771,14 +3687,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           const text = this.getFieldRenderValue(styledField);
           const fontOption = this.getFontOptionById(styledField.fontFamily ?? DEFAULT_FONT_ID);
           const embeddedFont = await getFontFromDescriptor(fontOption.descriptor);
-          const textColor = this.hexToRgbComponents(styledField.color) ?? { r: 0, g: 0, b: 0 };
+          const textColor = hexToRgbComponents(styledField.color) ?? { r: 0, g: 0, b: 0 };
           const opacity = styledField.opacity ?? DEFAULT_OPACITY;
 
           const drawX = styledField.x;
           const textWidth = embeddedFont.widthOfTextAtSize(text, styledField.fontSize);
 
           if (styledField.backgroundColor) {
-            const bg = this.hexToRgbComponents(styledField.backgroundColor);
+            const bg = hexToRgbComponents(styledField.backgroundColor);
             if (bg) {
               const totalHeight = embeddedFont.heightAtSize(styledField.fontSize);
               const ascent = embeddedFont.heightAtSize(styledField.fontSize, { descender: false });
@@ -4041,7 +3957,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         continue;
       }
 
-      const pageNum = this.toFiniteNumber((rawPage as { num?: unknown }).num);
+      const pageNum = toFiniteNumber((rawPage as { num?: unknown }).num);
       if (!pageNum || !Number.isInteger(pageNum) || pageNum < 1) {
         continue;
       }
@@ -4064,8 +3980,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         const normalizedType = this.normalizeFieldType(type);
         const normalizedValue = this.normalizeFieldText(value);
         const normalizedMapField = this.normalizeFieldText(mapField) ?? normalizedValue;
-        const normalizedX = this.toFiniteNumber(x);
-        const normalizedY = this.toFiniteNumber(y);
+        const normalizedX = toFiniteNumber(x);
+        const normalizedY = toFiniteNumber(y);
 
         if (normalizedX === null || normalizedY === null) {
           continue;
@@ -4080,7 +3996,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           continue;
         }
 
-        const normalizedFontSize = this.toFiniteNumber(fontSize);
+        const normalizedFontSize = toFiniteNumber(fontSize);
         const normalizedColor =
           typeof color === 'string' && color.trim() ? color.trim() : '#000000';
 
@@ -4092,7 +4008,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
             normalizedFontSize && normalizedFontSize > 0
               ? Math.round(normalizedFontSize * 100) / 100
               : 14,
-          color: this.normalizeColor(normalizedColor),
+          color: normalizeColor(normalizedColor),
           type: normalizedType,
         };
 
@@ -4149,28 +4065,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return null;
   }
 
-  private toFiniteNumber(value: unknown): number | null {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : null;
-    }
 
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return null;
-      }
-      const parsed = Number(trimmed);
-      return Number.isFinite(parsed) ? parsed : null;
-    }
-
-    return null;
-  }
-
-  private formatNumberWithTruncation(value: number, decimals: number): string {
-    const factor = 10 ** decimals;
-    const truncated = Math.trunc(value * factor) / factor;
-    return truncated.toFixed(decimals);
-  }
 
   private normalizeFieldText(value: unknown): string | null {
     if (Array.isArray(value)) {

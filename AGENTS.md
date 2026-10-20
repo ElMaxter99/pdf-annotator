@@ -30,7 +30,7 @@ src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
 ├─ pages/workspace/
 │  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.300 líneas): estado, render, JSON, export, atajos
-│  └─ components/            header · sidebar · viewer · footer · page-thumbnails · json-tree · shortcuts-dialog
+│  └─ components/            header · sidebar · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle
 ├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG)
 ├─ i18n/                     translation.service + pipe `t` + translations/*.json
