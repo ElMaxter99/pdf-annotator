@@ -164,4 +164,24 @@ describe('AnnotationImportService', () => {
       expect(result![0].fields[0].fontSize).toBe(100);
     });
   });
+
+  it('imports locked and hidden flags (so an advanced export round-trips)', () => {
+    const result = service.normalizeImportedCoordinates(
+      [
+        {
+          num: 1,
+          fields: [
+            { x: 1, y: 1, mapField: 'a', locked: true, hidden: 'true' },
+            { x: 2, y: 2, mapField: 'b', locked: false },
+            { x: 3, y: 3, mapField: 'c', locked: 'yes', hidden: 1 },
+          ],
+        },
+      ],
+      identity
+    );
+    const [a, b, c] = result![0].fields;
+    expect([a.locked, a.hidden]).toEqual([true, true]);
+    expect([b.locked, b.hidden]).toEqual([false, false]);
+    expect([c.locked, c.hidden]).toEqual([false, false]);
+  });
 });

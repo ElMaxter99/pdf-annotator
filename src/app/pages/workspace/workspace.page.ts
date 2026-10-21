@@ -67,6 +67,7 @@ import {
   updateFieldInPages,
 } from '../../utils/annotation-pages.utils';
 import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
+import { AlignMode, alignBoxes } from '../../utils/alignment.utils';
 import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
 import {
   ensureHex,
@@ -273,6 +274,20 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     null;
   private overlayGuides: OverlayGuide[] = [];
   private clipboard: PageField | null = null;
+
+  /** Annotations picked with Shift/Ctrl+click or Ctrl+A. Always on one page, never locked. */
+  readonly selection = signal<{ pageIndex: number; fields: readonly number[] } | null>(null);
+  readonly selectionCount = computed(() => this.selection()?.fields.length ?? 0);
+  private selectionClipboard: PageField[] = [];
+  private groupDrag: {
+    pointerId: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
+    dx: number;
+    dy: number;
+    items: { el: HTMLElement; startLeft: number; startTop: number; width: number; fontPx: number }[];
+  } | null = null;
 
   @ViewChild(WorkspaceHeaderComponent) private headerComponent?: WorkspaceHeaderComponent;
   @ViewChild(WorkspaceSidebarComponent) private sidebarComponent?: WorkspaceSidebarComponent;
@@ -692,6 +707,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private afterHistoryJump() {
+    this.selection.set(null);
     this.preview.set(null);
     this.editing.set(null);
     this.syncCoordsTextModel();
@@ -1500,7 +1516,38 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.fileDropActive.set(false);
   }
 
+  private rendering = false;
+  private renderRequestedWhileBusy = false;
+
+  /**
+   * Draws the current page. pdf.js cannot render twice on the same canvas at once, so calls that
+   * arrive mid-render (e.g. a held zoom key) are coalesced into one more pass with the latest
+   * scale/page, and the annotations are repainted afterwards.
+   */
   async render() {
+    if (this.rendering) {
+      this.renderRequestedWhileBusy = true;
+      return;
+    }
+
+    this.rendering = true;
+    let coalesced = false;
+    try {
+      do {
+        this.renderRequestedWhileBusy = false;
+        await this.renderOnce();
+        coalesced = coalesced || this.renderRequestedWhileBusy;
+      } while (this.renderRequestedWhileBusy);
+    } finally {
+      this.rendering = false;
+    }
+
+    if (coalesced) {
+      this.redrawAllForPage();
+    }
+  }
+
+  private async renderOnce() {
     if (!this.pdfDoc) {
       return;
     }
@@ -1650,6 +1697,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   onHitboxClick(evt: MouseEvent) {
     if (!this.pdfDoc || this.editing()) return;
+    this.clearSelection();
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
 
@@ -1804,6 +1852,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
+    if (this.selection()) {
+      this.selection.set(null);
+      this.redrawAllForPage();
+    }
     const sanitized = this.prepareFieldForStorage(field);
     if (this.fieldRequiresStorageUpdate(field, sanitized)) {
       if (
@@ -1881,6 +1933,41 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         event.preventDefault();
         this.redo();
       }
+      return;
+    }
+
+    this.handleSelectionShortcut(event, key);
+  }
+
+  /** Ctrl/⌘+A, C, V and D work on the annotation selection (never while typing in a field). */
+  private handleSelectionShortcut(event: KeyboardEvent, key: string) {
+    if (!this.pdfDoc || this.isEditableElement(event.target) || this.preview() || this.editing()) {
+      return;
+    }
+
+    switch (key) {
+      case 'a':
+        event.preventDefault();
+        this.selectAllOnPage();
+        break;
+      case 'c':
+        if (this.copySelection()) {
+          event.preventDefault();
+        }
+        break;
+      case 'v':
+        if (this.selectionClipboard.length && this.pasteSelection()) {
+          event.preventDefault();
+        }
+        break;
+      case 'd':
+        if (this.selection()) {
+          event.preventDefault();
+          this.duplicateSelection();
+        }
+        break;
+      default:
+        break;
     }
   }
 
@@ -1905,6 +1992,31 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       target?.isContentEditable
     ) {
       return;
+    }
+
+    if (this.selection() && !this.preview() && !this.editing()) {
+      const step = event.shiftKey ? 10 : 1;
+      const nudges: Record<string, [number, number]> = {
+        arrowleft: [-step, 0],
+        arrowright: [step, 0],
+        arrowup: [0, step],
+        arrowdown: [0, -step],
+      };
+      if (key === 'escape') {
+        event.preventDefault();
+        this.clearSelection();
+        return;
+      }
+      if (key === 'delete' || key === 'backspace') {
+        event.preventDefault();
+        this.deleteSelection();
+        return;
+      }
+      if (nudges[key]) {
+        event.preventDefault();
+        this.moveSelection(nudges[key][0], nudges[key][1], 'nudge');
+        return;
+      }
     }
 
     const needsDocument = () => !!this.pdfDoc;
@@ -2739,6 +2851,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           }
           el.classList.toggle('annotation--locked', isLocked);
           el.classList.toggle('annotation--hidden', isHidden);
+          el.dataset['pageIndex'] = `${pageIndex}`;
+          el.dataset['fieldIndex'] = `${fieldIndex}`;
+          el.classList.toggle('annotation--selected', this.isSelected(pageIndex, fieldIndex));
           el.onpointerdown = isLocked
             ? (evt) => this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex)
             : (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
@@ -2750,6 +2865,328 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     this.refreshOverlay();
   }
+
+  isSelected(pageIndex: number, fieldIndex: number): boolean {
+    const selected = this.selection();
+    return !!selected && selected.pageIndex === pageIndex && selected.fields.includes(fieldIndex);
+  }
+
+  /** Drops the selection and repaints (call before changing what is shown). */
+  clearSelection(): void {
+    if (!this.selection()) {
+      return;
+    }
+    this.selection.set(null);
+    this.redrawAllForPage();
+  }
+
+  toggleSelection(pageIndex: number, fieldIndex: number): void {
+    this.dismissEditors();
+    // Pressing on an annotation does not move focus, so leave any text field the user was in;
+    // otherwise Delete/arrow/Ctrl+C would keep going to that field instead of the selection.
+    this.releaseButtonFocus();
+    const selected = this.selection();
+    const current = selected && selected.pageIndex === pageIndex ? selected.fields : [];
+    const next = current.includes(fieldIndex)
+      ? current.filter((index) => index !== fieldIndex)
+      : [...current, fieldIndex].sort((a, b) => a - b);
+    this.selection.set(next.length ? { pageIndex, fields: next } : null);
+    this.redrawAllForPage();
+  }
+
+  selectAllOnPage(): void {
+    const pageIndex = this.coords().findIndex((page) => page.num === this.pageIndex());
+    if (pageIndex < 0) {
+      return;
+    }
+    const fields = this.coords()[pageIndex].fields
+      .map((field, index) => ({ field, index }))
+      .filter(({ field }) => !field.locked)
+      .map(({ index }) => index);
+    this.dismissEditors();
+    this.selection.set(fields.length ? { pageIndex, fields } : null);
+    this.redrawAllForPage();
+  }
+
+  /** Aligns the selected annotations (needs at least two) as a single undo step. */
+  alignSelection(mode: AlignMode): void {
+    const selected = this.selection();
+    const scale = this.scale();
+    if (!selected || selected.fields.length < 2 || !scale) {
+      return;
+    }
+
+    const page = this.coords()[selected.pageIndex];
+    const boxes = selected.fields.map((index) => {
+      const field = this.ensureFieldStyle(page.fields[index]);
+      return {
+        x: field.x,
+        y: field.y,
+        width: this.annotationWidthPx(selected.pageIndex, index, field) / scale,
+        height: field.fontSize,
+      };
+    });
+    const positions = alignBoxes(boxes, mode);
+
+    this.updateSelectedFields((field, order) => ({ ...field, ...positions[order] }));
+    this.releaseButtonFocus();
+  }
+
+  /** Moves the selection by a delta in PDF points (clamped to the page). */
+  moveSelection(dx: number, dy: number, coalesceKey?: string): void {
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    const scale = this.scale();
+    if (!this.selection() || !pdfCanvas || !scale) {
+      return;
+    }
+    const maxX = pdfCanvas.width / scale;
+    const maxY = pdfCanvas.height / scale;
+    this.updateSelectedFields(
+      (field) => ({
+        ...field,
+        x: this.roundToTwo(this.clamp(field.x + dx, 0, maxX)),
+        y: this.roundToTwo(this.clamp(field.y + dy, 0, maxY)),
+      }),
+      coalesceKey
+    );
+  }
+
+  deleteSelection(): void {
+    const selected = this.selection();
+    if (!selected) {
+      return;
+    }
+    const doomed = new Set(selected.fields);
+    const changed = this.applyCoordsChange(() =>
+      this.coords.update((pages) =>
+        pages
+          .map((page, index) =>
+            index === selected.pageIndex
+              ? { ...page, fields: page.fields.filter((_, i) => !doomed.has(i)) }
+              : page
+          )
+          .filter((page) => page.fields.length > 0)
+      )
+    );
+    this.selection.set(null);
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
+    this.redrawAllForPage();
+    this.releaseButtonFocus();
+  }
+
+  copySelection(): boolean {
+    const fields = this.selectedFields();
+    if (!fields.length) {
+      return false;
+    }
+    this.selectionClipboard = fields.map((field) => ({ ...this.prepareFieldForStorage(field) }));
+    return true;
+  }
+
+  pasteSelection(): boolean {
+    return this.insertCopies(this.selectionClipboard);
+  }
+
+  duplicateSelection(): void {
+    if (this.copySelection()) {
+      this.insertCopies(this.selectionClipboard);
+    }
+    this.releaseButtonFocus();
+  }
+
+  /** Adds offset copies on the current page as one undo step and selects them. */
+  private insertCopies(fields: readonly PageField[]): boolean {
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    const scale = this.scale();
+    if (!fields.length || !this.pdfDoc || !pdfCanvas || !scale) {
+      return false;
+    }
+
+    const pageNum = this.pageIndex();
+    const offset = this.roundToTwo(8 / scale);
+    const maxX = this.roundToTwo(pdfCanvas.width / scale);
+    const maxY = this.roundToTwo(pdfCanvas.height / scale);
+    const copies = fields.map((field) => ({
+      ...field,
+      x: this.roundToTwo(this.clamp(field.x + offset, 0, maxX)),
+      y: this.roundToTwo(this.clamp(field.y - offset, 0, maxY)),
+    }));
+
+    let firstIndex = 0;
+    const changed = this.applyCoordsChange(() =>
+      this.coords.update((pages) => {
+        const existing = pages.find((page) => page.num === pageNum);
+        firstIndex = existing ? existing.fields.length : 0;
+        return copies.reduce((acc, copy) => addFieldToPages(pageNum, copy, acc), pages);
+      })
+    );
+    if (!changed) {
+      return false;
+    }
+
+    const pageIndex = this.coords().findIndex((page) => page.num === pageNum);
+    this.dismissEditors();
+    this.selection.set({
+      pageIndex,
+      fields: copies.map((_, i) => firstIndex + i),
+    });
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
+    return true;
+  }
+
+  private selectedFields(): PageField[] {
+    const selected = this.selection();
+    if (!selected) {
+      return [];
+    }
+    const page = this.coords()[selected.pageIndex];
+    return selected.fields.map((index) => page?.fields[index]).filter((f): f is PageField => !!f);
+  }
+
+  /** Applies `update` to every selected field in a single history step. */
+  private updateSelectedFields(
+    update: (field: PageField, order: number) => PageField,
+    coalesceKey?: string
+  ): void {
+    const selected = this.selection();
+    if (!selected) {
+      return;
+    }
+    const order = new Map(selected.fields.map((index, position) => [index, position]));
+    const changed = this.applyCoordsChange(
+      () =>
+        this.coords.update((pages) =>
+          pages.map((page, pageIdx) =>
+            pageIdx !== selected.pageIndex
+              ? page
+              : {
+                  ...page,
+                  fields: page.fields.map((field, fieldIdx) =>
+                    order.has(fieldIdx) ? update(field, order.get(fieldIdx)!) : field
+                  ),
+                }
+          )
+        ),
+      coalesceKey ? { coalesceKey } : undefined
+    );
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
+    this.redrawAllForPage();
+  }
+
+  /** Rendered width of an annotation in px (falls back to a rough estimate before first paint). */
+  private annotationWidthPx(pageIndex: number, fieldIndex: number, field: PageField): number {
+    const el = this.annotationsLayerRef?.nativeElement.querySelector<HTMLElement>(
+      `[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`
+    );
+    if (el && el.offsetWidth > 0) {
+      return el.offsetWidth;
+    }
+    return this.getFieldRenderValue(field).length * field.fontSize * 0.5 * this.scale();
+  }
+
+  private releaseButtonFocus(): void {
+    (this.document?.activeElement as HTMLElement | null)?.blur?.();
+  }
+
+  private startGroupDrag(evt: PointerEvent, pressed: HTMLElement, fields: readonly number[]) {
+    const layer = this.annotationsLayerRef?.nativeElement;
+    if (!layer) {
+      return;
+    }
+    const items = fields
+      .map((index) =>
+        layer.querySelector<HTMLElement>(`[data-field-index="${index}"]`)
+      )
+      .filter((el): el is HTMLElement => !!el)
+      .map((el) => ({
+        el,
+        startLeft: parseFloat(el.style.left || '0'),
+        startTop: parseFloat(el.style.top || '0'),
+        width: el.offsetWidth,
+        fontPx: parseFloat(getComputedStyle(el).fontSize || '0'),
+      }));
+
+    this.groupDrag = {
+      pointerId: evt.pointerId,
+      startX: evt.clientX,
+      startY: evt.clientY,
+      moved: false,
+      dx: 0,
+      dy: 0,
+      items,
+    };
+    pressed.setPointerCapture(evt.pointerId);
+    pressed.onpointermove = this.handleGroupPointerMove;
+    pressed.onpointerup = this.handleGroupPointerUp;
+    pressed.onpointercancel = this.handleGroupPointerUp;
+  }
+
+  private handleGroupPointerMove = (evt: PointerEvent) => {
+    const drag = this.groupDrag;
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!drag || !pdfCanvas || evt.pointerId !== drag.pointerId) {
+      return;
+    }
+    evt.preventDefault();
+    const rawDx = evt.clientX - drag.startX;
+    const rawDy = evt.clientY - drag.startY;
+    if (!drag.moved && Math.abs(rawDx) <= 2 && Math.abs(rawDy) <= 2) {
+      return;
+    }
+    drag.moved = true;
+
+    // Clamp the whole group so every member stays inside the page and spacing is preserved.
+    const minDx = Math.max(...drag.items.map((i) => -i.startLeft));
+    const maxDx = Math.min(...drag.items.map((i) => pdfCanvas.width - i.width - i.startLeft));
+    const minDy = Math.max(...drag.items.map((i) => -i.fontPx - i.startTop));
+    const maxDy = Math.min(...drag.items.map((i) => pdfCanvas.height - i.fontPx - i.startTop));
+    drag.dx = this.clamp(rawDx, Math.min(minDx, 0), Math.max(maxDx, 0));
+    drag.dy = this.clamp(rawDy, Math.min(minDy, 0), Math.max(maxDy, 0));
+
+    for (const item of drag.items) {
+      item.el.style.left = `${item.startLeft + drag.dx}px`;
+      item.el.style.top = `${item.startTop + drag.dy}px`;
+    }
+  };
+
+  private handleGroupPointerUp = (evt: PointerEvent) => {
+    const drag = this.groupDrag;
+    if (!drag || evt.pointerId !== drag.pointerId) {
+      return;
+    }
+    evt.preventDefault();
+    evt.stopPropagation();
+    const pressed = evt.currentTarget as HTMLElement | null;
+    pressed?.releasePointerCapture?.(evt.pointerId);
+    if (pressed) {
+      pressed.onpointermove = null;
+      pressed.onpointerup = null;
+      pressed.onpointercancel = null;
+    }
+    this.groupDrag = null;
+
+    if (drag.moved && evt.type !== 'pointercancel') {
+      const scale = this.scale();
+      this.moveSelection(drag.dx / scale, -drag.dy / scale);
+    } else {
+      // A plain click on a member: behave like a normal click on that annotation.
+      this.redrawAllForPage();
+      if (evt.type !== 'pointercancel') {
+        const index = Number(pressed?.dataset['fieldIndex']);
+        const pageIdx = Number(pressed?.dataset['pageIndex']);
+        const field = this.coords()[pageIdx]?.fields[index];
+        this.selection.set(null);
+        if (field) {
+          this.startEditing(pageIdx, index, field);
+        }
+      }
+    }
+  };
 
   private handleLockedAnnotationPointerDown(
     evt: PointerEvent,
@@ -2783,6 +3220,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex);
       return;
     }
+
+    if (evt.shiftKey || evt.ctrlKey || evt.metaKey) {
+      this.toggleSelection(pageIndex, fieldIndex);
+      return;
+    }
+
+    const selected = this.selection();
+    if (
+      selected &&
+      selected.pageIndex === pageIndex &&
+      selected.fields.length > 1 &&
+      selected.fields.includes(fieldIndex)
+    ) {
+      this.startGroupDrag(evt, el, selected.fields);
+      return;
+    }
+    if (selected) {
+      this.clearSelection();
+    }
+
     this.dragInfo = {
       pageIndex,
       fieldIndex,
@@ -2983,6 +3440,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
+    this.selection.set(null);
     this.pageIndex.set(clamped);
     await this.render();
     this.redrawAllForPage();
@@ -3380,8 +3838,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-  private applyCoordsChange(mutator: () => void): boolean {
-    return this.store.applyChange(mutator);
+  private applyCoordsChange(mutator: () => void, options?: { coalesceKey?: string }): boolean {
+    return this.store.applyChange(mutator, options);
   }
 
   private replaceCoords(
@@ -3389,6 +3847,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     options?: { skipHistory?: boolean; preserveTextModel?: boolean }
   ) {
     const snapshot = this.snapshotCoords(newCoords);
+    this.selection.set(null);
     if (options?.skipHistory) {
       this.coords.set(snapshot);
     } else {

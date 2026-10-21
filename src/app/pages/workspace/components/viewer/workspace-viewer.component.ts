@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import type { WorkspacePageComponent } from '../../workspace.page';
+import { TranslationPipe } from '../../../../i18n/translation.pipe';
+import type { AlignMode } from '../../../../utils/alignment.utils';
 import { AnnotationEditorComponent } from '../annotation-editor/annotation-editor.component';
 
 @Component({
@@ -8,10 +10,19 @@ import { AnnotationEditorComponent } from '../annotation-editor/annotation-edito
   standalone: true,
   templateUrl: './workspace-viewer.component.html',
   styleUrls: ['./workspace-viewer.component.scss'],
-  imports: [CommonModule, AnnotationEditorComponent],
+  imports: [CommonModule, AnnotationEditorComponent, TranslationPipe],
 })
 export class WorkspaceViewerComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
+
+  readonly alignModes: readonly { id: AlignMode; icon: string }[] = [
+    { id: 'left', icon: '⇤' },
+    { id: 'center', icon: '↔' },
+    { id: 'right', icon: '⇥' },
+    { id: 'top', icon: '⤒' },
+    { id: 'middle', icon: '↕' },
+    { id: 'bottom', icon: '⤓' },
+  ];
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;

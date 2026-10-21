@@ -264,7 +264,8 @@
     "groups": {
       "navigation": "Navigation und Ansicht",
       "annotations": "Anmerkungen",
-      "general": "Allgemein"
+      "general": "Allgemein",
+      "selection": "Mehrfachauswahl"
     },
     "items": {
       "prevPage": "Vorherige Seite",
@@ -279,7 +280,14 @@
       "undo": "Rückgängig",
       "redo": "Wiederholen",
       "applyJson": "JSON aus dem Editor anwenden",
-      "help": "Diese Hilfe anzeigen"
+      "help": "Diese Hilfe anzeigen",
+      "selectToggle": "Zur Auswahl hinzufügen oder entfernen",
+      "selectAll": "Alles auf der Seite auswählen",
+      "selectMove": "Auswahl verschieben (Umschalt: ×10)",
+      "selectDelete": "Auswahl löschen",
+      "selectCopy": "Auswahl kopieren / einfügen",
+      "selectDuplicate": "Auswahl duplizieren",
+      "selectClear": "Auswahl aufheben"
     }
   },
   "toast": {
@@ -306,5 +314,21 @@
     "continue": "Fortsetzen",
     "discard": "Verwerfen",
     "privacy": "Wird nur in diesem Browser gespeichert."
+  },
+  "selection": {
+    "toolbar": "Aktionen für die Auswahl",
+    "count": "{{count}} ausgewählt",
+    "alignLabel": "Ausrichten",
+    "align": {
+      "left": "Links ausrichten",
+      "center": "Horizontal zentrieren",
+      "right": "Rechts ausrichten",
+      "top": "Oben ausrichten",
+      "middle": "Vertikal zentrieren",
+      "bottom": "Unten ausrichten"
+    },
+    "duplicate": "Auswahl duplizieren",
+    "delete": "Auswahl löschen",
+    "clear": "Auswahl aufheben"
   }
 }

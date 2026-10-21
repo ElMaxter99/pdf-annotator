@@ -1,4 +1,11 @@
 ## Unreleased
+### Added
+- Multi-selection: Shift/Ctrl+click to add or remove annotations, Ctrl+A for the whole page (locked ones excluded), group drag, arrow-key nudging (Shift ×10), Delete, Ctrl+C / Ctrl+V and Ctrl+D (offset copies), and a selection bar with six align actions (left, centre, right, top, middle, bottom), duplicate, delete and clear. Each action is one undo step; held arrow keys merge into one (`AnnotationStore` coalescing). Texts in the 7 languages, shortcuts listed in the help dialog; 8 + 1 unit and 13 e2e tests
+
+### Fixed
+- JSON import ignored `locked` and `hidden`, so an advanced export lost them on re-import
+- Zooming quickly (e.g. holding `-`) could start overlapping renders on the same canvas and leave the PDF badly drawn; renders are now serialized and coalesced
+
 ### Changed
 - Sidebar tabs keep their content width and scroll horizontally on very narrow screens (checked on phones and with the longest German labels)
 - Workspace sidebar organised in four tabs (Document, Annotations with a count badge, Templates, Advanced) with keyboard navigation, instead of one long scrolling column; tab labels in the 7 languages

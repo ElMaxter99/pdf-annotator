@@ -144,8 +144,11 @@ export class AnnotationImportService {
         const rawBackground = (rawField as { backgroundColor?: unknown }).backgroundColor;
         const fontCandidates = this.fontCatalog.collectFontFamilyCandidates(rawField as Record<string, unknown>);
 
+        const flag = (value: unknown) => value === true || value === 'true';
         const styledField = prepareField({
           ...normalizedField,
+          locked: flag((rawField as { locked?: unknown }).locked),
+          hidden: flag((rawField as { hidden?: unknown }).hidden),
           fontFamily: this.fontCatalog.resolveImportedFontFamily(...fontCandidates),
           opacity: rawOpacity as number | string | undefined,
           backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,

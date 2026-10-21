@@ -52,7 +52,7 @@ PDF Annotator es un editor visual de **coordenadas sobre PDFs**. Haces clic dond
 | | |
 | --- | --- |
 | 🎯 **Colocar** | Clic sobre el PDF para crear textos, *checks*, *radios* o números con formato (decimales y sufijo, p. ej. `1250.50 €`). |
-| 🖱️ **Mover y editar** | Arrastra anotaciones, edita fuente, tamaño, color (selector/HEX/RGB), opacidad y fondo. Bloquea u oculta las que no quieres tocar o exportar. |
+| 🖱️ **Mover y editar** | Selecciona varias con `Shift`+clic y muévelas, alinéalas (izquierda, centro, derecha, arriba, medio, abajo), duplícalas o bórralas de una vez. Arrastra anotaciones, edita fuente, tamaño, color (selector/HEX/RGB), opacidad y fondo. Bloquea u oculta las que no quieres tocar o exportar. |
 | 📐 **Ser preciso** | Rejilla, reglas, guías de alineación e *imán* a rejilla, márgenes, centros o puntos propios. Coordenadas PDF o de canvas. |
 | 🧾 **JSON en vivo** | Editor de texto y vista de árbol sincronizados. Pega, importa, copia o descarga. |
 | 🧩 **Plantillas** | Guarda conjuntos de anotaciones y recárgalos en otros documentos. |
@@ -157,6 +157,12 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | `Esc` | Cancelar la tarjeta activa / cerrar la ayuda |
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
 | `Ctrl/⌘ + S` | Aplicar el JSON del editor |
+| `Shift + clic` | Añadir o quitar una anotación de la selección |
+| `Ctrl/⌘ + A` | Seleccionar todas las anotaciones de la página (las bloqueadas no) |
+| `←` `↑` `→` `↓` | Mover la selección 1 pt (`Shift`: 10 pt) |
+| `Supr` | Eliminar la selección |
+| `Ctrl/⌘ + C` · `V` · `D` | Copiar, pegar o duplicar la selección |
+| `Esc` | Quitar la selección |
 
 Los atajos de una sola tecla se ignoran mientras escribes en un campo.
 
