@@ -180,3 +180,83 @@ test('typing in the JSON editor does not trigger selection shortcuts', async ({ 
   await page.keyboard.press('Control+a');
   await expect(bar(page)).toHaveCount(0);
 });
+
+test('dragging on an empty area selects what the box touches without creating an annotation', async ({ page }) => {
+  const a = (await ann(page, 0).boundingBox())!;
+  const b = (await ann(page, 1).boundingBox())!;
+  const x1 = Math.min(a.x, b.x) - 12;
+  const y1 = Math.min(a.y, b.y) - 12;
+  const x2 = Math.max(a.x + a.width, b.x + b.width) + 12;
+  const y2 = Math.max(a.y + a.height, b.y + b.height) + 6;
+
+  await page.mouse.move(x1, y1);
+  await page.mouse.down();
+  await page.mouse.move((x1 + x2) / 2, (y1 + y2) / 2, { steps: 4 });
+  await expect(page.locator('.lasso')).toBeVisible();
+  await page.mouse.move(x2, y2, { steps: 4 });
+  await page.mouse.up();
+
+  await expect(page.locator('.lasso')).toHaveCount(0);
+  await expect(bar(page)).toContainText('2 seleccionada');
+  await expect(page.locator('.annotation--selected')).toHaveCount(2);
+  await expect(ann(page, 0)).toHaveClass(/annotation--selected/);
+  await expect(ann(page, 1)).toHaveClass(/annotation--selected/);
+  await expect(page.locator('.annotation-editor')).toHaveCount(0);
+  await expect.poll(() => fieldCount(page)).toBe(4);
+});
+
+test('Shift while dragging a box adds to the selection', async ({ page }) => {
+  await ann(page, 3).click({ modifiers: ['Shift'] });
+  const a = (await ann(page, 0).boundingBox())!;
+  const x1 = a.x - 12;
+  const y1 = a.y - 12;
+  await page.keyboard.down('Shift');
+  await page.mouse.move(x1, y1);
+  await page.mouse.down();
+  await page.mouse.move(a.x + a.width + 10, a.y + a.height + 6, { steps: 5 });
+  await page.mouse.up();
+  await page.keyboard.up('Shift');
+  await expect(bar(page)).toContainText('2 seleccionada');
+  await expect(ann(page, 0)).toHaveClass(/annotation--selected/);
+  await expect(ann(page, 3)).toHaveClass(/annotation--selected/);
+});
+
+test('a box over nothing selects nothing and does not open an editor', async ({ page }) => {
+  const box = (await page.locator('.hitbox').boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.75, box.y + box.height * 0.35);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.45, { steps: 5 });
+  await page.mouse.up();
+  await expect(bar(page)).toHaveCount(0);
+  await expect(page.locator('.annotation-editor')).toHaveCount(0);
+});
+
+test('distribute spaces three or more annotations with equal gaps', async ({ page }) => {
+  await ann(page, 0).click({ modifiers: ['Shift'] });
+  await ann(page, 1).click({ modifiers: ['Shift'] });
+  await expect(page.getByRole('button', { name: 'Distribuir horizontalmente' })).toBeDisabled();
+
+  await leaveTextFields(page);
+  await page.keyboard.press('Control+a');
+  await expect(bar(page)).toContainText('4 seleccionada');
+  await page.getByRole('button', { name: 'Distribuir horizontalmente' }).click();
+  await expect
+    .poll(async () => {
+      const boxes = (await page.locator('.annotation').evaluateAll((els) =>
+        els.map((el) => {
+          const r = el.getBoundingClientRect();
+          return { left: r.left, right: r.right };
+        })
+      )).sort((p, q) => p.left - q.left);
+      const gaps = boxes.slice(1).map((box, i) => box.left - boxes[i].right);
+      return Math.max(...gaps) - Math.min(...gaps) < 1.5;
+    })
+    .toBe(true);
+  // extremes stay where they were
+  const xs = (await positions(page)).map((p: number[]) => p[0]);
+  expect(Math.min(...xs)).toBe(50);
+  expect(Math.max(...xs)).toBe(200);
+
+  await page.keyboard.press('Control+z');
+  await expect.poll(async () => (await positions(page)).map((p: number[]) => p[0])).toEqual([50, 150, 100, 200]);
+});

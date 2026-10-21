@@ -1,35 +1,21 @@
-## Unreleased
+## [v1.5.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.5.0) - 2026-10-21
 ### Added
-- Multi-selection: Shift/Ctrl+click to add or remove annotations, Ctrl+A for the whole page (locked ones excluded), group drag, arrow-key nudging (Shift ×10), Delete, Ctrl+C / Ctrl+V and Ctrl+D (offset copies), and a selection bar with six align actions (left, centre, right, top, middle, bottom), duplicate, delete and clear. Each action is one undo step; held arrow keys merge into one (`AnnotationStore` coalescing). Texts in the 7 languages, shortcuts listed in the help dialog; 8 + 1 unit and 13 e2e tests
+- **Multi-selection**: Shift/Ctrl+click or a rubber band (drag on an empty area; Shift adds) to pick annotations, Ctrl+A for the whole page (locked ones excluded), group drag, arrow-key nudging (Shift ×10), Delete, Ctrl+C / Ctrl+V / Ctrl+D (offset copies) and a selection bar with six align actions (left, centre, right, top, middle, bottom), distribute horizontally/vertically (3+), duplicate, delete and clear. Each action is one undo step; held arrow keys merge into one (`AnnotationStore` coalescing)
+- **Session recovery**: the last PDF, its annotations, page and zoom are autosaved in the browser (IndexedDB, nothing leaves the device); the landing page offers to continue or discard them
+- Opening or reloading `/workspace` without a PDF redirects to the landing page (`workspaceGuard`) instead of leaving an empty editor
+- **Sidebar tabs** (Document, Annotations with a count badge, Templates, Advanced) with keyboard navigation; they scroll horizontally on very narrow screens
+- **JSON feedback**: validity line under the editor (valid + annotation count / syntax error with line and column / missing `pages`), import errors that say where the problem is (`LooseJsonError`) and a warning toast after an explicit apply/import listing what was skipped or looks wrong (invalid fields or pages, annotations outside the page, pages missing from the PDF, font sizes outside 8–72, opacities outside 0.1–1); nothing in the import result changes and live typing stays silent
+- Non-blocking toast notifications (`ToastService` + `app-toast-host`) replace every `alert()`; the import/export error messages that were hard-coded in Spanish are now translated
+- Quality: Playwright end-to-end suite (`npm run e2e`, 62 tests), GitHub Actions CI (build + i18n check, unit tests, e2e on PRs and pushes to `develop`/`master`), `npm run test:ci` (headless, no sandbox) and `karma.conf.cjs`; 80 unit tests
+- All new texts are translated in the 7 languages and listed in the shortcuts dialog where relevant
+
+### Changed
+- Refactor of `workspace.page.ts` (~4,300 → ~3,340 lines, no behaviour change): `AnnotationEditorComponent` (create/edit forms merged), `PdfExportService`, `FontCatalogService`, `AnnotationStore` (annotations + undo/redo), `AnnotationImportService` and pure utilities (`color`, `number`, `download`, `annotation-pages`, `annotation-fields`, `alignment`)
 
 ### Fixed
 - JSON import ignored `locked` and `hidden`, so an advanced export lost them on re-import
 - Zooming quickly (e.g. holding `-`) could start overlapping renders on the same canvas and leave the PDF badly drawn; renders are now serialized and coalesced
-
-### Changed
-- Sidebar tabs keep their content width and scroll horizontally on very narrow screens (checked on phones and with the longest German labels)
-- Workspace sidebar organised in four tabs (Document, Annotations with a count badge, Templates, Advanced) with keyboard navigation, instead of one long scrolling column; tab labels in the 7 languages
-- Opening or reloading `/workspace` without a PDF now redirects to the landing page (`workspaceGuard`), where a saved session can be resumed instead of leaving an empty editor
-
-### Added
-- Import warnings: after applying or importing a JSON explicitly, a warning toast lists what was skipped or looks wrong (invalid fields/pages, annotations outside the page, pages missing from the PDF, font sizes outside 8–72, opacities outside 0.1–1); nothing in the import result changes and live typing stays silent. 3 unit + 3 e2e tests, texts in the 7 languages
-- Session recovery: the last PDF, its annotations, page and zoom are autosaved in the browser (IndexedDB, nothing leaves the device) and the landing page offers to continue or discard them; 5 e2e tests, 5 unit tests, texts in the 7 languages
-- JSON validity line under the editor (valid + annotation count / syntax error with line and column / missing `pages`), and import errors that say where the problem is (`LooseJsonError` with line/column), translated in the 7 languages
-- Non-blocking toast notifications (`ToastService` + `app-toast-host`) replace every `alert()`; previously hard-coded Spanish import/export error messages are now translated in the 7 languages
-- End-to-end test suite with Playwright (`npm run e2e`, 25 tests): landing, annotation editor, undo/redo history, JSON import (including that pasted code is never executed), fonts and PDF/JSON export
-- GitHub Actions CI (`.github/workflows/ci.yml`): build + i18n check, unit tests and e2e on pull requests and pushes to `develop`/`master`
-- `npm run test:ci` (headless Chrome without sandbox) and `karma.conf.cjs`
-
-### Changed
-- Refactor: imported-JSON normalisation moved to `AnnotationImportService` and `utils/annotation-fields.utils.ts` (`workspace.page.ts` ~3,530 → ~3,340 lines)
-- Refactor: annotations and undo/redo history moved to `AnnotationStore`; pure page/field operations in `utils/annotation-pages.utils.ts` (`workspace.page.ts` ~3,640 → ~3,530 lines)
-- Refactor: font catalogue, custom fonts and imported-font-name matching moved to `FontCatalogService` (`workspace.page.ts` ~3,990 → ~3,640 lines)
-- Refactor: PDF export moved from `workspace.page.ts` to `PdfExportService` (fontkit loading included); download helpers in `utils/download.utils.ts` shared by PDF and JSON downloads
-- Refactor: create/edit annotation forms merged into a single `AnnotationEditorComponent` (~130 duplicated template lines removed, no behaviour change)
-- Refactor: colour and number helpers extracted into `utils/color.utils.ts` and `utils/number.utils.ts` (`workspace.page.ts` from ~4,300 to ~3,990 lines)
-
-### Added
-- Unit tests for `FontCatalogService` and the colour, number and PDF export utilities; 46 tests in total
+- The old copy of the annotations that `annotation-templates.service` wrote to `localStorage` (`pdf-annotator.last-coords`, never read back) is no longer written and is deleted on startup
 
 ## [v1.4.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.1) - 2026-10-20
 ### Changed

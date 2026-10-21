@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
-import type { AlignMode } from '../../../../utils/alignment.utils';
+import type { AlignMode, DistributeAxis } from '../../../../utils/alignment.utils';
 import { AnnotationEditorComponent } from '../annotation-editor/annotation-editor.component';
 
 @Component({
@@ -22,6 +22,11 @@ export class WorkspaceViewerComponent {
     { id: 'top', icon: '⤒' },
     { id: 'middle', icon: '↕' },
     { id: 'bottom', icon: '⤓' },
+  ];
+
+  readonly distributeModes: readonly { id: DistributeAxis; icon: string }[] = [
+    { id: 'horizontal', icon: '⇹' },
+    { id: 'vertical', icon: '⇳' },
   ];
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;

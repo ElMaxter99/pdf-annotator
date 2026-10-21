@@ -287,7 +287,8 @@
       "selectDelete": "Elimina la selecció",
       "selectCopy": "Copia / enganxa la selecció",
       "selectDuplicate": "Duplica la selecció",
-      "selectClear": "Treu la selecció"
+      "selectClear": "Treu la selecció",
+      "selectLasso": "Arrossega en una zona buida per seleccionar amb un requadre (amb Shift, afegeix)"
     }
   },
   "toast": {
@@ -329,6 +330,11 @@
     },
     "duplicate": "Duplica la selecció",
     "delete": "Elimina la selecció",
-    "clear": "Treu la selecció"
+    "clear": "Treu la selecció",
+    "distributeLabel": "Distribueix",
+    "distribute": {
+      "horizontal": "Distribueix horitzontalment",
+      "vertical": "Distribueix verticalment"
+    }
   }
 }

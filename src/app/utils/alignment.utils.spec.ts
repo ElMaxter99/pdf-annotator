@@ -1,4 +1,4 @@
-import { alignBoxes, AlignBox } from './alignment.utils';
+import { alignBoxes, AlignBox, distributeBoxes } from './alignment.utils';
 
 describe('alignBoxes', () => {
   const boxes: AlignBox[] = [
@@ -43,5 +43,60 @@ describe('alignBoxes', () => {
   it('handles empty input and a single box', () => {
     expect(alignBoxes([], 'left')).toEqual([]);
     expect(alignBoxes([boxes[0]], 'center')).toEqual([{ x: 10, y: 100 }]);
+  });
+});
+
+describe('distributeBoxes', () => {
+  it('spaces boxes with equal gaps horizontally, keeping the outer ones', () => {
+    const boxes: AlignBox[] = [
+      { x: 0, y: 0, width: 10, height: 10 },
+      { x: 20, y: 0, width: 30, height: 10 },
+      { x: 90, y: 0, width: 10, height: 10 },
+    ];
+    // span 100, widths 50 → gap 25
+    expect(distributeBoxes(boxes, 'horizontal')).toEqual([
+      { x: 0, y: 0 },
+      { x: 35, y: 0 },
+      { x: 90, y: 0 },
+    ]);
+  });
+
+  it('works on unsorted input and preserves the input order of the result', () => {
+    const boxes: AlignBox[] = [
+      { x: 90, y: 5, width: 10, height: 10 },
+      { x: 0, y: 6, width: 10, height: 10 },
+      { x: 20, y: 7, width: 30, height: 10 },
+    ];
+    expect(distributeBoxes(boxes, 'horizontal')).toEqual([
+      { x: 90, y: 5 },
+      { x: 0, y: 6 },
+      { x: 35, y: 7 },
+    ]);
+  });
+
+  it('distributes vertically using the box height', () => {
+    const boxes: AlignBox[] = [
+      { x: 1, y: 0, width: 10, height: 10 },
+      { x: 2, y: 10, width: 10, height: 20 },
+      { x: 3, y: 100, width: 10, height: 10 },
+    ];
+    // span 110, heights 40 → gap 35
+    expect(distributeBoxes(boxes, 'vertical')).toEqual([
+      { x: 1, y: 0 },
+      { x: 2, y: 45 },
+      { x: 3, y: 100 },
+    ]);
+  });
+
+  it('leaves fewer than three boxes untouched', () => {
+    const two: AlignBox[] = [
+      { x: 0, y: 0, width: 5, height: 5 },
+      { x: 50, y: 9, width: 5, height: 5 },
+    ];
+    expect(distributeBoxes(two, 'horizontal')).toEqual([
+      { x: 0, y: 0 },
+      { x: 50, y: 9 },
+    ]);
+    expect(distributeBoxes([], 'vertical')).toEqual([]);
   });
 });

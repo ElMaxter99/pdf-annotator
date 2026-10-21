@@ -287,7 +287,8 @@
       "selectDelete": "Supprimer la sélection",
       "selectCopy": "Copier / coller la sélection",
       "selectDuplicate": "Dupliquer la sélection",
-      "selectClear": "Désélectionner"
+      "selectClear": "Désélectionner",
+      "selectLasso": "Faites glisser sur une zone vide pour sélectionner avec un cadre (Maj pour ajouter)"
     }
   },
   "toast": {
@@ -329,6 +330,11 @@
     },
     "duplicate": "Dupliquer la sélection",
     "delete": "Supprimer la sélection",
-    "clear": "Désélectionner"
+    "clear": "Désélectionner",
+    "distributeLabel": "Répartir",
+    "distribute": {
+      "horizontal": "Répartir horizontalement",
+      "vertical": "Répartir verticalement"
+    }
   }
 }

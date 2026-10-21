@@ -287,7 +287,8 @@
       "selectDelete": "Delete the selection",
       "selectCopy": "Copy / paste the selection",
       "selectDuplicate": "Duplicate the selection",
-      "selectClear": "Clear the selection"
+      "selectClear": "Clear the selection",
+      "selectLasso": "Drag on an empty area to select with a box (hold Shift to add)"
     }
   },
   "toast": {
@@ -329,6 +330,11 @@
     },
     "duplicate": "Duplicate selection",
     "delete": "Delete selection",
-    "clear": "Clear selection"
+    "clear": "Clear selection",
+    "distributeLabel": "Distribute",
+    "distribute": {
+      "horizontal": "Distribute horizontally",
+      "vertical": "Distribute vertically"
+    }
   }
 }

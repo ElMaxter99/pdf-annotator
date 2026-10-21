@@ -41,3 +41,39 @@ export function alignBoxes(boxes: readonly AlignBox[], mode: AlignMode): { x: nu
     }
   });
 }
+
+export type DistributeAxis = 'horizontal' | 'vertical';
+
+/**
+ * Spaces the boxes evenly between the two outermost ones along the axis (equal gaps between
+ * edges). Needs at least three boxes; fewer are returned unchanged. Result order matches input.
+ */
+export function distributeBoxes(
+  boxes: readonly AlignBox[],
+  axis: DistributeAxis
+): { x: number; y: number }[] {
+  const unchanged = boxes.map((b) => ({ x: b.x, y: b.y }));
+  if (boxes.length < 3) {
+    return unchanged;
+  }
+
+  const start = (b: AlignBox) => (axis === 'horizontal' ? b.x : b.y);
+  const size = (b: AlignBox) => (axis === 'horizontal' ? b.width : b.height);
+  const order = boxes.map((_, i) => i).sort((a, b) => start(boxes[a]) - start(boxes[b]));
+
+  const first = boxes[order[0]];
+  const last = boxes[order[order.length - 1]];
+  const span = start(last) + size(last) - start(first);
+  const totalSize = boxes.reduce((sum, b) => sum + size(b), 0);
+  const gap = (span - totalSize) / (boxes.length - 1);
+
+  const result = unchanged;
+  let cursor = start(first);
+  for (const index of order) {
+    const box = boxes[index];
+    const position = round2(cursor);
+    result[index] = axis === 'horizontal' ? { x: position, y: box.y } : { x: box.x, y: position };
+    cursor += size(box) + gap;
+  }
+  return result;
+}

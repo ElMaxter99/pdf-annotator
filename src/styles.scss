@@ -2644,3 +2644,13 @@ kbd {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
+
+/* Rubber-band selection */
+.lasso {
+  position: absolute;
+  z-index: 18;
+  pointer-events: none;
+  border: 1.5px dashed var(--accent);
+  background: rgba(94, 234, 212, 0.12);
+  border-radius: 2px;
+}

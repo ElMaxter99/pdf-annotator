@@ -67,7 +67,12 @@ import {
   updateFieldInPages,
 } from '../../utils/annotation-pages.utils';
 import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
-import { AlignMode, alignBoxes } from '../../utils/alignment.utils';
+import {
+  AlignMode,
+  alignBoxes,
+  DistributeAxis,
+  distributeBoxes,
+} from '../../utils/alignment.utils';
 import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
 import {
   ensureHex,
@@ -1696,6 +1701,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   onHitboxClick(evt: MouseEvent) {
+    if (this.suppressHitboxClick) {
+      this.suppressHitboxClick = false;
+      return;
+    }
     if (!this.pdfDoc || this.editing()) return;
     this.clearSelection();
     const pt = this.domToPdfCoords(evt);
@@ -2916,8 +2925,28 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
+    const positions = alignBoxes(this.selectionBoxes(), mode);
+    this.updateSelectedFields((field, order) => ({ ...field, ...positions[order] }));
+    this.releaseButtonFocus();
+  }
+
+  /** Spaces the selected annotations evenly between the outermost ones (needs three or more). */
+  distributeSelection(axis: DistributeAxis): void {
+    const selected = this.selection();
+    if (!selected || selected.fields.length < 3 || !this.scale()) {
+      return;
+    }
+    const positions = distributeBoxes(this.selectionBoxes(), axis);
+    this.updateSelectedFields((field, order) => ({ ...field, ...positions[order] }));
+    this.releaseButtonFocus();
+  }
+
+  /** Selected annotations as boxes in PDF points (width from the rendered element). */
+  private selectionBoxes() {
+    const selected = this.selection()!;
+    const scale = this.scale();
     const page = this.coords()[selected.pageIndex];
-    const boxes = selected.fields.map((index) => {
+    return selected.fields.map((index) => {
       const field = this.ensureFieldStyle(page.fields[index]);
       return {
         x: field.x,
@@ -2926,10 +2955,97 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         height: field.fontSize,
       };
     });
-    const positions = alignBoxes(boxes, mode);
+  }
 
-    this.updateSelectedFields((field, order) => ({ ...field, ...positions[order] }));
-    this.releaseButtonFocus();
+  /** Rubber-band rectangle (px, relative to the page) while dragging on an empty area. */
+  readonly lasso = signal<{ left: number; top: number; width: number; height: number } | null>(
+    null
+  );
+  private lassoDrag: {
+    pointerId: number;
+    startX: number;
+    startY: number;
+    originLeft: number;
+    originTop: number;
+    active: boolean;
+    additive: boolean;
+  } | null = null;
+  private suppressHitboxClick = false;
+
+  onHitboxPointerDown(evt: PointerEvent): void {
+    if (evt.button !== 0 || !this.pdfDoc || this.editing()) {
+      return;
+    }
+    const target = evt.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    this.lassoDrag = {
+      pointerId: evt.pointerId,
+      startX: evt.clientX,
+      startY: evt.clientY,
+      originLeft: rect.left,
+      originTop: rect.top,
+      active: false,
+      additive: evt.shiftKey || evt.ctrlKey || evt.metaKey,
+    };
+    target.setPointerCapture?.(evt.pointerId);
+  }
+
+  onHitboxPointerMove(evt: PointerEvent): void {
+    const drag = this.lassoDrag;
+    if (!drag || evt.pointerId !== drag.pointerId) {
+      return;
+    }
+    if (!drag.active) {
+      if (Math.hypot(evt.clientX - drag.startX, evt.clientY - drag.startY) <= 4) {
+        return;
+      }
+      drag.active = true;
+      this.dismissEditors();
+    }
+    evt.preventDefault();
+    this.lasso.set({
+      left: Math.min(drag.startX, evt.clientX) - drag.originLeft,
+      top: Math.min(drag.startY, evt.clientY) - drag.originTop,
+      width: Math.abs(evt.clientX - drag.startX),
+      height: Math.abs(evt.clientY - drag.startY),
+    });
+  }
+
+  onHitboxPointerUp(evt: PointerEvent): void {
+    const drag = this.lassoDrag;
+    if (!drag || evt.pointerId !== drag.pointerId) {
+      return;
+    }
+    this.lassoDrag = null;
+    (evt.currentTarget as HTMLElement).releasePointerCapture?.(evt.pointerId);
+    this.lasso.set(null);
+    if (!drag.active || evt.type === 'pointercancel') {
+      return;
+    }
+
+    // The click that follows a drag must not create an annotation.
+    this.suppressHitboxClick = true;
+    setTimeout(() => (this.suppressHitboxClick = false), 0);
+
+    const x1 = Math.min(drag.startX, evt.clientX);
+    const x2 = Math.max(drag.startX, evt.clientX);
+    const y1 = Math.min(drag.startY, evt.clientY);
+    const y2 = Math.max(drag.startY, evt.clientY);
+    const layer = this.annotationsLayerRef?.nativeElement;
+    const hit = Array.from(layer?.querySelectorAll<HTMLElement>('.annotation') ?? [])
+      .filter((el) => el.dataset['locked'] !== 'true')
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.right >= x1 && r.left <= x2 && r.bottom >= y1 && r.top <= y2;
+      })
+      .map((el) => ({ pageIndex: Number(el.dataset['pageIndex']), field: Number(el.dataset['fieldIndex']) }));
+
+    const previous = this.selection();
+    const pageIndex = hit[0]?.pageIndex ?? previous?.pageIndex ?? 0;
+    const base = drag.additive && previous?.pageIndex === pageIndex ? previous.fields : [];
+    const fields = Array.from(new Set([...base, ...hit.map((h) => h.field)])).sort((a, b) => a - b);
+    this.selection.set(fields.length ? { pageIndex, fields } : null);
+    this.redrawAllForPage();
   }
 
   /** Moves the selection by a delta in PDF points (clamped to the page). */
@@ -3508,7 +3624,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     this.includeAdvancedJsonFields.set(checked);
-    this.syncCoordsTextModel(false);
+    this.syncCoordsTextModel();
   }
 
   onCoordsTextChange(value: string) {
@@ -3792,13 +3908,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  private syncCoordsTextModel(persist = true) {
-    const currentCoords = this.coords();
-    this.coordsTextModel = JSON.stringify(this.buildJsonExportPayload(currentCoords), null, 2);
+  private syncCoordsTextModel() {
+    this.coordsTextModel = JSON.stringify(this.buildJsonExportPayload(this.coords()), null, 2);
     this.refreshJsonPreview();
-    if (persist) {
-      this.templatesService.storeLastCoords(currentCoords);
-    }
   }
 
   private snapshotCoords(pages: PageAnnotations[] = this.coords()): PageAnnotations[] {
