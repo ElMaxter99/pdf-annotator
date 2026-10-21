@@ -98,3 +98,48 @@ test('applying invalid JSON explains where the problem is', async ({ page }) => 
   await page.keyboard.press('Control+s');
   await expect(page.locator('.toast--error')).toContainText('pages');
 });
+
+test.describe('import warnings', () => {
+  test('explicit apply warns about skipped, out-of-page and odd values but still imports', async ({ page }) => {
+    await applyJsonText(page, {
+      pages: [
+        {
+          num: 1,
+          fields: [
+            { x: 50, y: 700, mapField: 'ok' },
+            { x: 'bad', y: 1, mapField: 'omitido' },
+            { x: 9999, y: 9999, mapField: 'fuera' },
+            { x: 60, y: 600, mapField: 'grande', fontSize: 120 },
+          ],
+        },
+        { num: 7, fields: [{ x: 1, y: 1, mapField: 'otra pagina' }] },
+      ],
+    });
+    const toast = page.locator('.toast--warning');
+    await expect(toast).toContainText('JSON aplicado, pero revisa');
+    await expect(toast).toContainText('1 campo(s) omitido(s)');
+    await expect(toast).toContainText('1 anotación(es) fuera de la página');
+    await expect(toast).toContainText('1 página(s) que no existen en el PDF');
+    await expect(toast).toContainText('1 tamaño(s) de fuente fuera de 8–72');
+    expect((await renderedAnnotations(page)).map((r) => r.text)).toEqual(['ok', 'fuera', 'grande']);
+  });
+
+  test('clean JSON and live typing do not warn', async ({ page }) => {
+    await applyJsonText(page, [{ num: 1, fields: [{ x: 50, y: 700, mapField: 'ok', fontSize: 12 }] }]);
+    await expect(page.locator('.toast')).toHaveCount(0);
+
+    // Auto-apply while typing is silent even when the content has problems.
+    await jsonEditor(page).fill(JSON.stringify([{ num: 1, fields: [{ x: 'bad', y: 1, mapField: 'x' }] }]));
+    await page.waitForTimeout(800);
+    await expect(page.locator('.toast')).toHaveCount(0);
+  });
+
+  test('importing a file warns as well', async ({ page }) => {
+    await page.locator('input[type=file][accept="application/json"]').setInputFiles({
+      name: 'raro.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify({ pages: [{ num: 1, fields: [{ x: 1, y: 1, mapField: 'a', opacity: 3 }] }] })),
+    });
+    await expect(page.locator('.toast--warning')).toContainText('1 opacidad(es) fuera de 0,1–1');
+  });
+});

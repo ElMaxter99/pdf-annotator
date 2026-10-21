@@ -289,7 +289,16 @@
     "importJsonFailedAt": "Impossibile importare il JSON: errore alla riga {{line}}, colonna {{column}}.",
     "importJsonNoPages": "Il JSON non contiene un elenco «pages» con pagine e campi.",
     "sessionRestoreFailed": "Impossibile ripristinare la sessione salvata.",
-    "sessionDiscarded": "Sessione salvata scartata."
+    "sessionDiscarded": "Sessione salvata scartata.",
+    "importIssues": {
+      "title": "JSON applicato, ma controlla:",
+      "skippedFields": "{{count}} campo/i ignorato/i per dati non validi",
+      "skippedPages": "{{count}} pagina/e ignorata/e (numero o campi non validi)",
+      "missingPages": "{{count}} pagina/e che non esistono nel PDF",
+      "outOfPage": "{{count}} annotazione/i fuori dalla pagina",
+      "fontSize": "{{count}} dimensione/i del carattere fuori da 8–72",
+      "opacity": "{{count}} opacità fuori da 0,1–1"
+    }
   },
   "session": {
     "title": "Riprendi da dove avevi lasciato",

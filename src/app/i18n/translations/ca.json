@@ -289,7 +289,16 @@
     "importJsonFailedAt": "No s'ha pogut importar el JSON: error a la línia {{line}}, columna {{column}}.",
     "importJsonNoPages": "El JSON no té una llista «pages» amb pàgines i camps.",
     "sessionRestoreFailed": "No s'ha pogut recuperar la sessió desada.",
-    "sessionDiscarded": "Sessió desada descartada."
+    "sessionDiscarded": "Sessió desada descartada.",
+    "importIssues": {
+      "title": "JSON aplicat, però revisa:",
+      "skippedFields": "{{count}} camp(s) omès(os) per dades no vàlides",
+      "skippedPages": "{{count}} pàgina(es) omesa(es) (número o camps no vàlids)",
+      "missingPages": "{{count}} pàgina(es) que no existeixen al PDF",
+      "outOfPage": "{{count}} anotació(ns) fora de la pàgina",
+      "fontSize": "{{count}} mida(es) de font fora de 8–72",
+      "opacity": "{{count}} opacitat(s) fora de 0,1–1"
+    }
   },
   "session": {
     "title": "Continua on ho vas deixar",

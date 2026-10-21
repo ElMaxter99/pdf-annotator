@@ -41,7 +41,11 @@ import {
   FontOption,
 } from '../../fonts/font-catalog.service';
 import { FontVariantDescriptor } from '../../fonts/font-variant';
-import { AnnotationImportService } from '../../services/annotation-import.service';
+import {
+  AnnotationImportService,
+  emptyImportReport,
+  ImportReport,
+} from '../../services/annotation-import.service';
 import { ToastService } from '../../services/toast.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
@@ -3103,8 +3107,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     try {
       const parsed = parseLooseJson(text);
-      const normalized = this.annotationImport.normalizeImportedCoordinates(parsed, (field) =>
-        this.prepareFieldForStorage(field)
+      const report = emptyImportReport();
+      const normalized = this.annotationImport.normalizeImportedCoordinates(
+        parsed,
+        (field) => this.prepareFieldForStorage(field),
+        report
       );
 
       if (normalized === null) {
@@ -3112,6 +3119,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
 
       this.replaceCoords(normalized, { preserveTextModel: true });
+      if (!options.silent) {
+        void this.reportImportIssues(report, normalized);
+      }
       return true;
     } catch (error) {
       if (!options.silent) {
@@ -3146,14 +3156,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       const text = await file.text();
       const parsed = parseLooseJson(text);
-      const normalized = this.annotationImport.normalizeImportedCoordinates(parsed, (field) =>
-        this.prepareFieldForStorage(field)
+      const report = emptyImportReport();
+      const normalized = this.annotationImport.normalizeImportedCoordinates(
+        parsed,
+        (field) => this.prepareFieldForStorage(field),
+        report
       );
       if (normalized === null) {
         throw new JsonShapeError();
       }
 
       this.replaceCoords(normalized, { preserveTextModel: false });
+      void this.reportImportIssues(report, normalized);
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       this.reportJsonImportError(error);
@@ -3441,6 +3455,44 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         error instanceof LooseJsonError ? { line: error.line, column: error.column } : undefined;
       return { status: 'error', value: null, errorAt };
     }
+  }
+
+  /**
+   * After an explicit import/apply, warns about what was skipped or looks wrong. The import itself
+   * is never altered: these are hints so the user can fix the JSON.
+   */
+  private async reportImportIssues(report: ImportReport, pages: PageAnnotations[]) {
+    let outOfPage = 0;
+    let missingPages = 0;
+    const doc = this.pdfDoc;
+    if (doc) {
+      for (const page of pages) {
+        if (page.num > doc.numPages) {
+          missingPages += 1;
+          continue;
+        }
+        const { width, height } = (await doc.getPage(page.num)).getViewport({ scale: 1 });
+        outOfPage += page.fields.filter(
+          (field) => field.x < 0 || field.y < 0 || field.x > width || field.y > height
+        ).length;
+      }
+    }
+
+    const t = (key: string, count: number) =>
+      this.translationService.translate(`toast.importIssues.${key}`, { count });
+    const parts: string[] = [];
+    if (report.skippedFields) parts.push(t('skippedFields', report.skippedFields));
+    if (report.skippedPages) parts.push(t('skippedPages', report.skippedPages));
+    if (missingPages) parts.push(t('missingPages', missingPages));
+    if (outOfPage) parts.push(t('outOfPage', outOfPage));
+    if (report.fontSizeOutOfRange) parts.push(t('fontSize', report.fontSizeOutOfRange));
+    if (report.opacityOutOfRange) parts.push(t('opacity', report.opacityOutOfRange));
+    if (!parts.length) {
+      return;
+    }
+
+    const title = this.translationService.translate('toast.importIssues.title');
+    this.toast.warning(`${title} ${parts.join('; ')}.`);
   }
 
   /** Shows why a JSON import failed, with the line/column when the syntax is at fault. */

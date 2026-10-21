@@ -2563,3 +2563,8 @@ kbd {
 .sidebar-panel[hidden] {
   display: none;
 }
+
+.toast--warning {
+  border-color: rgba(245, 158, 11, 0.5);
+  border-left-color: #f59e0b;
+}

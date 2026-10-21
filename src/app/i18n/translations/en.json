@@ -289,7 +289,16 @@
     "importJsonFailedAt": "The JSON could not be imported: error on line {{line}}, column {{column}}.",
     "importJsonNoPages": "The JSON has no \"pages\" list with pages and fields.",
     "sessionRestoreFailed": "The saved session could not be restored.",
-    "sessionDiscarded": "Saved session discarded."
+    "sessionDiscarded": "Saved session discarded.",
+    "importIssues": {
+      "title": "JSON applied, but please check:",
+      "skippedFields": "{{count}} field(s) skipped because of invalid data",
+      "skippedPages": "{{count}} page(s) skipped (invalid number or fields)",
+      "missingPages": "{{count}} page(s) that do not exist in the PDF",
+      "outOfPage": "{{count}} annotation(s) outside the page",
+      "fontSize": "{{count}} font size(s) outside 8–72",
+      "opacity": "{{count}} opacity value(s) outside 0.1–1"
+    }
   },
   "session": {
     "title": "Pick up where you left off",
