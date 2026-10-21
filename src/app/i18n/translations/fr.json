@@ -264,7 +264,8 @@
     "groups": {
       "navigation": "Navigation et affichage",
       "annotations": "Annotations",
-      "general": "Général"
+      "general": "Général",
+      "selection": "Sélection multiple"
     },
     "items": {
       "prevPage": "Page précédente",
@@ -279,7 +280,14 @@
       "undo": "Annuler",
       "redo": "Rétablir",
       "applyJson": "Appliquer le JSON de l'éditeur",
-      "help": "Afficher cette aide"
+      "help": "Afficher cette aide",
+      "selectToggle": "Ajouter ou retirer de la sélection",
+      "selectAll": "Tout sélectionner sur la page",
+      "selectMove": "Déplacer la sélection (Maj : ×10)",
+      "selectDelete": "Supprimer la sélection",
+      "selectCopy": "Copier / coller la sélection",
+      "selectDuplicate": "Dupliquer la sélection",
+      "selectClear": "Désélectionner"
     }
   },
   "toast": {
@@ -306,5 +314,21 @@
     "continue": "Continuer",
     "discard": "Ignorer",
     "privacy": "Enregistré uniquement dans ce navigateur."
+  },
+  "selection": {
+    "toolbar": "Actions de la sélection",
+    "count": "{{count}} sélectionnée(s)",
+    "alignLabel": "Aligner",
+    "align": {
+      "left": "Aligner à gauche",
+      "center": "Centrer horizontalement",
+      "right": "Aligner à droite",
+      "top": "Aligner en haut",
+      "middle": "Centrer verticalement",
+      "bottom": "Aligner en bas"
+    },
+    "duplicate": "Dupliquer la sélection",
+    "delete": "Supprimer la sélection",
+    "clear": "Désélectionner"
   }
 }

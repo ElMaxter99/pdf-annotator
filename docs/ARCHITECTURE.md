@@ -34,6 +34,9 @@ Los errores de sintaxis del JSON se lanzan como `LooseJsonError` (`utils/loose-j
 
 El importador además rellena un `ImportReport` (campos y páginas omitidos, tamaños de fuente fuera de 8–72, opacidades fuera de 0,1–1) sin alterar el resultado. Tras aplicar o importar de forma explícita, `reportImportIssues` lo completa con comprobaciones que dependen del PDF (anotaciones fuera de la página según su tamaño real, páginas que no existen) y muestra un único aviso `warning`; el autoaplicado mientras se escribe es silencioso.
 
+## 2c. Selección múltiple
+`WorkspacePageComponent.selection` guarda `{ pageIndex, fields[] }` (siempre una sola página, sin anotaciones bloqueadas). Se llena con Shift/Ctrl+clic (`toggleSelection`) o Ctrl+A (`selectAllOnPage`) y se pinta con la clase `annotation--selected` (`redrawAllForPage` marca cada `.annotation` con `data-page-index`/`data-field-index`). Acciones: arrastre en grupo (`startGroupDrag`: el delta se limita para que ningún miembro salga de la página y se mantenga la separación), `moveSelection` (flechas), `alignSelection` (`alignBoxes` sobre cajas en puntos PDF con el ancho real del DOM y `height = fontSize`), borrar, copiar/pegar y duplicar. Cada acción es **un** paso de historial mediante `updateSelectedFields`; las pulsaciones repetidas de flecha comparten `coalesceKey` y `AnnotationStore.applyChange` las fusiona si ocurren a menos de 800 ms. `render()` está serializado: una llamada durante un render en curso solo marca "repetir" y se repinta al final.
+
 ## 3. Modelo
 ```ts
 type FieldType = 'text' | 'check' | 'radio' | 'number';

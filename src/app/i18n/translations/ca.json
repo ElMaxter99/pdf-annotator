@@ -264,7 +264,8 @@
     "groups": {
       "navigation": "Navegació i vista",
       "annotations": "Anotacions",
-      "general": "General"
+      "general": "General",
+      "selection": "Selecció múltiple"
     },
     "items": {
       "prevPage": "Pàgina anterior",
@@ -279,7 +280,14 @@
       "undo": "Desfés",
       "redo": "Refés",
       "applyJson": "Aplica el JSON de l'editor",
-      "help": "Mostra aquesta ajuda"
+      "help": "Mostra aquesta ajuda",
+      "selectToggle": "Afegeix o treu de la selecció",
+      "selectAll": "Selecciona-ho tot a la pàgina",
+      "selectMove": "Mou la selecció (Shift: ×10)",
+      "selectDelete": "Elimina la selecció",
+      "selectCopy": "Copia / enganxa la selecció",
+      "selectDuplicate": "Duplica la selecció",
+      "selectClear": "Treu la selecció"
     }
   },
   "toast": {
@@ -306,5 +314,21 @@
     "continue": "Continua",
     "discard": "Descarta",
     "privacy": "Es desa només en aquest navegador."
+  },
+  "selection": {
+    "toolbar": "Accions de la selecció",
+    "count": "{{count}} seleccionada/es",
+    "alignLabel": "Alinea",
+    "align": {
+      "left": "Alinea a l'esquerra",
+      "center": "Centra horitzontalment",
+      "right": "Alinea a la dreta",
+      "top": "Alinea a dalt",
+      "middle": "Centra verticalment",
+      "bottom": "Alinea a baix"
+    },
+    "duplicate": "Duplica la selecció",
+    "delete": "Elimina la selecció",
+    "clear": "Treu la selecció"
   }
 }

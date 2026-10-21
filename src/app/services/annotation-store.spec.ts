@@ -76,4 +76,59 @@ describe('AnnotationStore', () => {
     snap[0].fields[0].mapField = 'x';
     expect(store.coords()[0].fields[0].mapField).toBe('a');
   });
+
+  describe('coalescing', () => {
+    beforeEach(() => store.setFieldComparator((a, b) => a.mapField === b.mapField && a.x === b.x));
+
+    const move = (dx: number, key?: string) =>
+      store.applyChange(
+        () =>
+          store.coords.update((pages) =>
+            pages.map((p) => ({ ...p, fields: p.fields.map((f) => ({ ...f, x: f.x + dx })) }))
+          ),
+        key ? { coalesceKey: key } : {}
+      );
+
+    it('merges rapid changes with the same key into one undo step', () => {
+      add('a');
+      move(1, 'nudge');
+      move(1, 'nudge');
+      move(1, 'nudge');
+      expect(store.coords()[0].fields[0].x).toBe(4);
+
+      store.undo();
+      expect(store.coords()[0].fields[0].x).toBe(1); // back to just after the add
+      store.undo();
+      expect(store.coords()).toEqual([]);
+    });
+
+    it('does not merge different keys or changes without a key', () => {
+      add('a');
+      move(1, 'nudge');
+      move(1, 'other');
+      move(1);
+      store.undo();
+      expect(store.coords()[0].fields[0].x).toBe(3);
+      store.undo();
+      expect(store.coords()[0].fields[0].x).toBe(2);
+      store.undo();
+      expect(store.coords()[0].fields[0].x).toBe(1);
+    });
+
+    it('starts a new step after an undo', () => {
+      add('a');
+      move(1, 'nudge');
+      store.undo();
+      move(1, 'nudge');
+      store.undo();
+      expect(store.coords()[0].fields[0].x).toBe(1);
+    });
+
+    it('does not record steps for changes that do nothing', () => {
+      add('a');
+      expect(move(0, 'nudge')).toBeFalse();
+      store.undo();
+      expect(store.coords()).toEqual([]);
+    });
+  });
 });

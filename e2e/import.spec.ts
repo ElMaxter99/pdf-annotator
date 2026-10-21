@@ -143,3 +143,19 @@ test.describe('import warnings', () => {
     await expect(page.locator('.toast--warning')).toContainText('1 opacidad(es) fuera de 0,1–1');
   });
 });
+
+test('locked and hidden flags survive an import', async ({ page }) => {
+  await applyJsonText(page, [
+    {
+      num: 1,
+      fields: [
+        { x: 50, y: 700, mapField: 'bloqueada', locked: true },
+        { x: 60, y: 600, mapField: 'oculta', hidden: true },
+        { x: 70, y: 500, mapField: 'normal' },
+      ],
+    },
+  ]);
+  await expect(page.locator('.annotation--locked')).toHaveCount(1);
+  await expect(page.locator('.annotation--hidden')).toHaveCount(1);
+  await expect(page.locator('.annotation--locked')).toHaveText('bloqueada');
+});
