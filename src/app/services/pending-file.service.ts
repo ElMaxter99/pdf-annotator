@@ -18,6 +18,11 @@ export class PendingFileService {
     this.pendingRestore = restore;
   }
 
+  /** True while a file is waiting to be opened by the workspace (does not consume it). */
+  hasPendingFile(): boolean {
+    return this.pendingFile() !== null;
+  }
+
   consumePendingFile(): File | null {
     const file = this.pendingFile();
     this.pendingFile.set(null);
