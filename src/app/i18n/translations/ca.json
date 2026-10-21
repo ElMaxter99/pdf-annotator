@@ -128,7 +128,12 @@
     "jsonPanelHide": "Hide JSON",
     "jsonPanelShow": "Show JSON",
     "minimizeSidebar": "Minimize sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "jsonStatus": {
+      "valid": "JSON vàlid · anotacions: {{count}}",
+      "noPages": "Falta la llista «pages»",
+      "error": "Error a la línia {{line}}, columna {{column}}"
+    }
   },
   "guides": {
     "enableFeature": "Activa les guies i el snapping",
@@ -273,6 +278,8 @@
   "toast": {
     "close": "Tanca l'avís",
     "importJsonFailed": "No s'ha pogut importar el fitxer JSON. Comprova que el format sigui correcte.",
-    "exportPdfFailed": "No s'ha pogut generar el PDF anotat. Comprova que el fitxer sigui vàlid o prova amb una altra còpia."
+    "exportPdfFailed": "No s'ha pogut generar el PDF anotat. Comprova que el fitxer sigui vàlid o prova amb una altra còpia.",
+    "importJsonFailedAt": "No s'ha pogut importar el JSON: error a la línia {{line}}, columna {{column}}.",
+    "importJsonNoPages": "El JSON no té una llista «pages» amb pàgines i camps."
   }
 }

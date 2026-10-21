@@ -113,6 +113,21 @@
           </div>
         </ng-template>
       </ng-template>
+      <div class="json-status" role="status" aria-live="polite">
+        <ng-container [ngSwitch]="vm.jsonTreePreview.status">
+          <span *ngSwitchCase="'error'" class="json-status__item json-status__item--error">
+            ✗ {{ 'sidebar.jsonStatus.error' | t : { line: vm.jsonTreePreview.errorAt?.line ?? '?', column: vm.jsonTreePreview.errorAt?.column ?? '?' } }}
+          </span>
+          <ng-container *ngSwitchCase="'ready'">
+            <span *ngIf="vm.jsonTreePreview.hasPages; else jsonNoPages" class="json-status__item json-status__item--ok">
+              ✓ {{ 'sidebar.jsonStatus.valid' | t : { count: vm.jsonTreePreview.fieldCount ?? 0 } }}
+            </span>
+            <ng-template #jsonNoPages>
+              <span class="json-status__item json-status__item--warn">⚠ {{ 'sidebar.jsonStatus.noPages' | t }}</span>
+            </ng-template>
+          </ng-container>
+        </ng-container>
+      </div>
       <div class="json-toolbar">
         <div class="json-toolbar__view-toggle-group" role="group"
           [attr.aria-label]="'controls.jsonViewModeToggle' | t">

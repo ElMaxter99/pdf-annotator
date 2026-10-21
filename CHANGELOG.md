@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- JSON validity line under the editor (valid + annotation count / syntax error with line and column / missing `pages`), and import errors that say where the problem is (`LooseJsonError` with line/column), translated in the 7 languages
 - Non-blocking toast notifications (`ToastService` + `app-toast-host`) replace every `alert()`; previously hard-coded Spanish import/export error messages are now translated in the 7 languages
 - End-to-end test suite with Playwright (`npm run e2e`, 25 tests): landing, annotation editor, undo/redo history, JSON import (including that pasted code is never executed), fonts and PDF/JSON export
 - GitHub Actions CI (`.github/workflows/ci.yml`): build + i18n check, unit tests and e2e on pull requests and pushes to `develop`/`master`
