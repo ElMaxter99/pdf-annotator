@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.4.0-4dd9c0?style=for-the-badge" alt="Versión 1.4.0" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.5.0-4dd9c0?style=for-the-badge" alt="Versión 1.5.0" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="Licencia MIT" /></a>
   <img src="https://img.shields.io/badge/Angular-20-dd0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 20" />
   <img src="https://img.shields.io/badge/Node-22.12-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node 22" />
@@ -52,7 +52,7 @@ PDF Annotator es un editor visual de **coordenadas sobre PDFs**. Haces clic dond
 | | |
 | --- | --- |
 | 🎯 **Colocar** | Clic sobre el PDF para crear textos, *checks*, *radios* o números con formato (decimales y sufijo, p. ej. `1250.50 €`). |
-| 🖱️ **Mover y editar** | Arrastra anotaciones, edita fuente, tamaño, color (selector/HEX/RGB), opacidad y fondo. Bloquea u oculta las que no quieres tocar o exportar. |
+| 🖱️ **Mover y editar** | Selecciona varias con `Shift`+clic y muévelas, selecciónalas también con un recuadro, alinéalas (izquierda, centro, derecha, arriba, medio, abajo) o distribúyelas con huecos iguales, duplícalas o bórralas de una vez. Arrastra anotaciones, edita fuente, tamaño, color (selector/HEX/RGB), opacidad y fondo. Bloquea u oculta las que no quieres tocar o exportar. |
 | 📐 **Ser preciso** | Rejilla, reglas, guías de alineación e *imán* a rejilla, márgenes, centros o puntos propios. Coordenadas PDF o de canvas. |
 | 🧾 **JSON en vivo** | Editor de texto y vista de árbol sincronizados. Pega, importa, copia o descarga. |
 | 🧩 **Plantillas** | Guarda conjuntos de anotaciones y recárgalos en otros documentos. |
@@ -84,7 +84,7 @@ Arrastra un PDF o haz clic para seleccionarlo. El idioma se cambia arriba a la d
 | Zona | Qué hay |
 | --- | --- |
 | **Cabecera** (una fila) | Página anterior/siguiente · zoom `−`/`+`/**Ajustar** · deshacer/rehacer/limpiar · **Descargar PDF** · **Atajos** · tema · idioma. |
-| **Panel lateral** | Cursor en coordenadas PDF · cambiar de documento · importar/aplicar JSON · **miniaturas** · **plantillas** · **editor JSON** (texto/árbol, copiar, descargar) · **opciones avanzadas** (fuentes, guías, campos extra del JSON). Se minimiza con `B`. |
+| **Panel lateral** (4 pestañas) | Cursor en coordenadas PDF siempre visible, y debajo: **Documento** (cambiar de PDF, miniaturas) · **Anotaciones** (editor JSON en texto o árbol, importar/aplicar, copiar, descargar; con contador) · **Plantillas** · **Avanzado** (fuentes, guías y campos extra del JSON). Se navega con ratón o flechas ←/→. Se minimiza con `B`. |
 | **Visor** | Página con capa de anotaciones. Clic para crear, clic sobre una anotación para editarla, arrastrar para moverla. Scroll propio. |
 | **Pie** | Recordatorio de `?` y versión. |
 
@@ -157,6 +157,13 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | `Esc` | Cancelar la tarjeta activa / cerrar la ayuda |
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
 | `Ctrl/⌘ + S` | Aplicar el JSON del editor |
+| `Shift + clic` | Añadir o quitar una anotación de la selección |
+| Arrastrar en una zona vacía | Seleccionar con un recuadro (con `Shift`, suma a la selección) |
+| `Ctrl/⌘ + A` | Seleccionar todas las anotaciones de la página (las bloqueadas no) |
+| `←` `↑` `→` `↓` | Mover la selección 1 pt (`Shift`: 10 pt) |
+| `Supr` | Eliminar la selección |
+| `Ctrl/⌘ + C` · `V` · `D` | Copiar, pegar o duplicar la selección |
+| `Esc` | Quitar la selección |
 
 Los atajos de una sola tecla se ignoran mientras escribes en un campo.
 
@@ -197,7 +204,7 @@ sh scripts/docker-down.sh     # detener
 `nginx.conf` incluye cabeceras de seguridad (CSP, `nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`). Si añades scripts de terceros (p. ej. analíticas), amplía la CSP.
 
 ## 🔐 Seguridad y privacidad
-- El PDF y las anotaciones **no se envían a ningún servidor**; solo se guardan plantillas, idioma, tema y última sesión en tu `localStorage`.
+- El PDF y las anotaciones **no se envían a ningún servidor**. Se guardan solo en tu navegador: plantillas, idioma y tema (`localStorage`) y la **última sesión** (PDF + anotaciones, `IndexedDB`) para retomarla desde la portada; puedes descartarla con un clic.
 - El JSON pegado se interpreta con un parser propio **sin evaluar código**.
 - Límites de importación: JSON ≤ 5 MB; solo PDFs y fuentes `.ttf/.otf/.woff/.woff2`.
 
@@ -206,7 +213,9 @@ sh scripts/docker-down.sh     # detener
 | --- | --- |
 | `npm run start:local` | Servidor de desarrollo (4200) |
 | `npm run build` | Comprueba traducciones y compila |
-| `npm test` | Pruebas unitarias |
+| `npm test` | Pruebas unitarias (Karma/Jasmine) |
+| `npm run test:ci` | Igual, headless y sin sandbox (como en CI) |
+| `npm run e2e` | Pruebas end-to-end con Playwright sobre el build de producción |
 | `npm run i18n:check` | Claves de los 7 idiomas coherentes |
 | `node scripts/generate-example.mjs` | Regenera el PDF de ejemplo |
 
@@ -223,7 +232,7 @@ Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para per
 | `ng serve` no encuentra el builder | Ejecuta `npm install` antes de `npm run start:local`. |
 
 ## 🗺️ Roadmap
-Pestañas en el panel lateral, selección múltiple y alineación, recuperación de sesión (IndexedDB), validación de esquema JSON con errores por línea y refactor del componente principal. Detalle en [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md).
+Pestañas en el panel lateral, selección múltiple y alineación, validación por esquema de cada campo y refactor del componente principal. Detalle en [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md).
 
 ## 🤝 Contribuir
 Issues y PRs son bienvenidos: usa las plantillas de [`.github/`](.github) y revisa [`CONTRIBUTING.md`](CONTRIBUTING.md).

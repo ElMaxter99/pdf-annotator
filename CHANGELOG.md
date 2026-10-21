@@ -1,3 +1,30 @@
+## [v1.5.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.5.0) - 2026-10-21
+### Added
+- **Multi-selection**: Shift/Ctrl+click or a rubber band (drag on an empty area; Shift adds) to pick annotations, Ctrl+A for the whole page (locked ones excluded), group drag, arrow-key nudging (Shift ×10), Delete, Ctrl+C / Ctrl+V / Ctrl+D (offset copies) and a selection bar with six align actions (left, centre, right, top, middle, bottom), distribute horizontally/vertically (3+), duplicate, delete and clear. Each action is one undo step; held arrow keys merge into one (`AnnotationStore` coalescing)
+- **Session recovery**: the last PDF, its annotations, page and zoom are autosaved in the browser (IndexedDB, nothing leaves the device); the landing page offers to continue or discard them
+- Opening or reloading `/workspace` without a PDF redirects to the landing page (`workspaceGuard`) instead of leaving an empty editor
+- **Sidebar tabs** (Document, Annotations with a count badge, Templates, Advanced) with keyboard navigation; they scroll horizontally on very narrow screens
+- **JSON feedback**: validity line under the editor (valid + annotation count / syntax error with line and column / missing `pages`), import errors that say where the problem is (`LooseJsonError`) and a warning toast after an explicit apply/import listing what was skipped or looks wrong (invalid fields or pages, annotations outside the page, pages missing from the PDF, font sizes outside 8–72, opacities outside 0.1–1); nothing in the import result changes and live typing stays silent
+- Non-blocking toast notifications (`ToastService` + `app-toast-host`) replace every `alert()`; the import/export error messages that were hard-coded in Spanish are now translated
+- Quality: Playwright end-to-end suite (`npm run e2e`, 62 tests), GitHub Actions CI (build + i18n check, unit tests, e2e on PRs and pushes to `develop`/`master`), `npm run test:ci` (headless, no sandbox) and `karma.conf.cjs`; 80 unit tests
+- All new texts are translated in the 7 languages and listed in the shortcuts dialog where relevant
+
+### Changed
+- Refactor of `workspace.page.ts` (~4,300 → ~3,340 lines, no behaviour change): `AnnotationEditorComponent` (create/edit forms merged), `PdfExportService`, `FontCatalogService`, `AnnotationStore` (annotations + undo/redo), `AnnotationImportService` and pure utilities (`color`, `number`, `download`, `annotation-pages`, `annotation-fields`, `alignment`)
+
+### Fixed
+- JSON import ignored `locked` and `hidden`, so an advanced export lost them on re-import
+- Zooming quickly (e.g. holding `-`) could start overlapping renders on the same canvas and leave the PDF badly drawn; renders are now serialized and coalesced
+- The old copy of the annotations that `annotation-templates.service` wrote to `localStorage` (`pdf-annotator.last-coords`, never read back) is no longer written and is deleted on startup
+
+## [v1.4.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.1) - 2026-10-20
+### Changed
+- Light theme: sidebar cursor box, thumbnails, template inputs now follow the theme
+- Redesigned `/landing`: first screen focused on the action (title, centered drop zone, sample document, compact feature strip), full editor preview below, top bar with GitHub link, theme and language, and a compact open-source footer; fully responsive
+
+### Added
+- "Try with a sample document" button on the landing page
+
 ## [v1.4.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.4.0) - 2026-10-20
 ### Added
 - Replace legal notice with MIT license referencing the GitHub repository
@@ -8,6 +35,10 @@
 ### Changed
 - Workspace layout: single-row compact toolbar, fixed-viewport shell with independent sidebar/viewer scroll, slim footer and a stacked layout below 960px
 - Footer text is now translated in every language
+
+### Changed (branding)
+- Redesigned the social preview image (`og-image`, 1200×630; metadata now points to the PNG, since crawlers ignore SVG)
+- Regenerated the logo as a high-resolution SVG (gradients, folded corner and coordinate marker) with matching PNG/ICO favicons, Apple touch icon and PWA icons; web manifest now has name and theme colour
 
 ### Fixed
 - Importing a JSON file now refreshes the JSON editor (it kept showing the previous content)

@@ -16,7 +16,36 @@
       "badge": "Schneller annotieren",
       "title": "Platzieren Sie in Sekunden Koordinaten auf jedem PDF",
       "description": "Laden Sie Ihr Dokument hoch, um JSON-gestützte Anmerkungen hinzuzufügen, Vorlagen wiederzuverwenden und exportfertige Dateien zu erstellen.",
-      "cta": "PDF auswählen"
+      "cta": "PDF auswählen",
+      "tryExample": "Mit einem Beispieldokument testen",
+      "previewAlt": "Vorschau des PDF-Annotator-Arbeitsbereichs",
+      "featuresTitle": "Alles, was Sie zum Annotieren brauchen",
+      "trust": {
+        "browser": "100 % in Ihrem Browser",
+        "languages": "7 Sprachen",
+        "openSource": "Open Source"
+      },
+      "features": {
+        "precision": {
+          "title": "Exakte Koordinaten",
+          "text": "Jeder Klick wird zu einer Position in PDF-Punkten, mit Hilfslinien und Einrasten für präzises Ausrichten."
+        },
+        "json": {
+          "title": "Live-JSON",
+          "text": "Bearbeiten Sie das JSON oder die Ansicht: beides bleibt sofort synchron. Importieren, kopieren, herunterladen."
+        },
+        "templates": {
+          "title": "Wiederverwendbare Vorlagen",
+          "text": "Speichern Sie Ihre Anmerkungen und wenden Sie sie mit einem Klick auf andere Dokumente an."
+        },
+        "privacy": {
+          "title": "Privat von Grund auf",
+          "text": "Alles läuft in Ihrem Browser. Ihr PDF wird nie auf einen Server hochgeladen."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Laden Sie Ihr PDF hoch",
@@ -30,7 +59,10 @@
       "ariaLabel": "Neues PDF hochladen, um den Arbeitsbereich zurückzusetzen"
     },
     "footer": {
-      "developedBy": "Entwickelt von {{author}}"
+      "developedBy": "Entwickelt von {{author}}",
+      "license": "MIT-Lizenz",
+      "changelog": "Neuigkeiten",
+      "openSource": "Open-Source-Projekt"
     }
   },
   "theme": {
@@ -96,7 +128,19 @@
     "jsonPanelHide": "Hide JSON",
     "jsonPanelShow": "Show JSON",
     "minimizeSidebar": "Minimize sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "jsonStatus": {
+      "valid": "Gültiges JSON · Anmerkungen: {{count}}",
+      "noPages": "Die Liste „pages“ fehlt",
+      "error": "Fehler in Zeile {{line}}, Spalte {{column}}"
+    },
+    "tabs": {
+      "label": "Bereiche des Panels",
+      "document": "Dokument",
+      "annotations": "Anmerkungen",
+      "templates": "Vorlagen",
+      "advanced": "Erweitert"
+    }
   },
   "guides": {
     "enableFeature": "Hilfslinien & Einrasten aktivieren",
@@ -220,7 +264,8 @@
     "groups": {
       "navigation": "Navigation und Ansicht",
       "annotations": "Anmerkungen",
-      "general": "Allgemein"
+      "general": "Allgemein",
+      "selection": "Mehrfachauswahl"
     },
     "items": {
       "prevPage": "Vorherige Seite",
@@ -235,7 +280,61 @@
       "undo": "Rückgängig",
       "redo": "Wiederholen",
       "applyJson": "JSON aus dem Editor anwenden",
-      "help": "Diese Hilfe anzeigen"
+      "help": "Diese Hilfe anzeigen",
+      "selectToggle": "Zur Auswahl hinzufügen oder entfernen",
+      "selectAll": "Alles auf der Seite auswählen",
+      "selectMove": "Auswahl verschieben (Umschalt: ×10)",
+      "selectDelete": "Auswahl löschen",
+      "selectCopy": "Auswahl kopieren / einfügen",
+      "selectDuplicate": "Auswahl duplizieren",
+      "selectClear": "Auswahl aufheben",
+      "selectLasso": "Auf einer leeren Fläche ziehen, um mit einem Rahmen auszuwählen (mit Umschalt hinzufügen)"
+    }
+  },
+  "toast": {
+    "close": "Hinweis schließen",
+    "importJsonFailed": "Die JSON-Datei konnte nicht importiert werden. Prüfen Sie, ob das Format korrekt ist.",
+    "exportPdfFailed": "Das annotierte PDF konnte nicht erstellt werden. Prüfen Sie, ob die Datei gültig ist, oder versuchen Sie eine andere Kopie.",
+    "importJsonFailedAt": "Das JSON konnte nicht importiert werden: Fehler in Zeile {{line}}, Spalte {{column}}.",
+    "importJsonNoPages": "Das JSON enthält keine Liste „pages“ mit Seiten und Feldern.",
+    "sessionRestoreFailed": "Die gespeicherte Sitzung konnte nicht wiederhergestellt werden.",
+    "sessionDiscarded": "Gespeicherte Sitzung verworfen.",
+    "importIssues": {
+      "title": "JSON angewendet, bitte prüfen:",
+      "skippedFields": "{{count}} Feld(er) wegen ungültiger Daten übersprungen",
+      "skippedPages": "{{count}} Seite(n) übersprungen (ungültige Nummer oder Felder)",
+      "missingPages": "{{count}} Seite(n), die im PDF nicht existieren",
+      "outOfPage": "{{count}} Anmerkung(en) außerhalb der Seite",
+      "fontSize": "{{count}} Schriftgröße(n) außerhalb von 8–72",
+      "opacity": "{{count}} Deckkraftwert(e) außerhalb von 0,1–1"
+    }
+  },
+  "session": {
+    "title": "Dort weitermachen, wo Sie aufgehört haben",
+    "description": "„{{name}}“ · Anmerkungen: {{count}} · gespeichert am {{date}}",
+    "continue": "Fortsetzen",
+    "discard": "Verwerfen",
+    "privacy": "Wird nur in diesem Browser gespeichert."
+  },
+  "selection": {
+    "toolbar": "Aktionen für die Auswahl",
+    "count": "{{count}} ausgewählt",
+    "alignLabel": "Ausrichten",
+    "align": {
+      "left": "Links ausrichten",
+      "center": "Horizontal zentrieren",
+      "right": "Rechts ausrichten",
+      "top": "Oben ausrichten",
+      "middle": "Vertikal zentrieren",
+      "bottom": "Unten ausrichten"
+    },
+    "duplicate": "Auswahl duplizieren",
+    "delete": "Auswahl löschen",
+    "clear": "Auswahl aufheben",
+    "distributeLabel": "Verteilen",
+    "distribute": {
+      "horizontal": "Horizontal verteilen",
+      "vertical": "Vertikal verteilen"
     }
   }
 }

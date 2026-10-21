@@ -16,7 +16,36 @@
       "badge": "Comença a anotar",
       "title": "Maqueta coordenades de qualsevol PDF en segons",
       "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
-      "cta": "Selecciona PDF"
+      "cta": "Selecciona PDF",
+      "tryExample": "Prova-ho amb un document d'exemple",
+      "previewAlt": "Vista prèvia de l'espai de treball de PDF Annotator",
+      "featuresTitle": "Tot el que necessites per anotar",
+      "trust": {
+        "browser": "100 % al teu navegador",
+        "languages": "7 idiomes",
+        "openSource": "Codi obert"
+      },
+      "features": {
+        "precision": {
+          "title": "Coordenades exactes",
+          "text": "Cada clic es converteix en una posició en punts PDF, amb guies i snapping per alinear amb precisió."
+        },
+        "json": {
+          "title": "JSON en directe",
+          "text": "Edita el JSON o el visor: tots dos es sincronitzen a l'instant. Importa, copia i descarrega."
+        },
+        "templates": {
+          "title": "Plantilles reutilitzables",
+          "text": "Desa les teves anotacions i aplica-les a altres documents amb un clic."
+        },
+        "privacy": {
+          "title": "Privat per disseny",
+          "text": "Tot passa al teu navegador. El teu PDF no es puja mai a cap servidor."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Carrega el teu PDF",
@@ -30,7 +59,10 @@
       "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
     },
     "footer": {
-      "developedBy": "Desenvolupat per {{author}}"
+      "developedBy": "Desenvolupat per {{author}}",
+      "license": "Llicència MIT",
+      "changelog": "Novetats",
+      "openSource": "Projecte de codi obert"
     }
   },
   "theme": {
@@ -96,7 +128,19 @@
     "jsonPanelHide": "Hide JSON",
     "jsonPanelShow": "Show JSON",
     "minimizeSidebar": "Minimize sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "jsonStatus": {
+      "valid": "JSON vàlid · anotacions: {{count}}",
+      "noPages": "Falta la llista «pages»",
+      "error": "Error a la línia {{line}}, columna {{column}}"
+    },
+    "tabs": {
+      "label": "Seccions del panell",
+      "document": "Document",
+      "annotations": "Anotacions",
+      "templates": "Plantilles",
+      "advanced": "Avançat"
+    }
   },
   "guides": {
     "enableFeature": "Activa les guies i el snapping",
@@ -220,7 +264,8 @@
     "groups": {
       "navigation": "Navegació i vista",
       "annotations": "Anotacions",
-      "general": "General"
+      "general": "General",
+      "selection": "Selecció múltiple"
     },
     "items": {
       "prevPage": "Pàgina anterior",
@@ -235,7 +280,61 @@
       "undo": "Desfés",
       "redo": "Refés",
       "applyJson": "Aplica el JSON de l'editor",
-      "help": "Mostra aquesta ajuda"
+      "help": "Mostra aquesta ajuda",
+      "selectToggle": "Afegeix o treu de la selecció",
+      "selectAll": "Selecciona-ho tot a la pàgina",
+      "selectMove": "Mou la selecció (Shift: ×10)",
+      "selectDelete": "Elimina la selecció",
+      "selectCopy": "Copia / enganxa la selecció",
+      "selectDuplicate": "Duplica la selecció",
+      "selectClear": "Treu la selecció",
+      "selectLasso": "Arrossega en una zona buida per seleccionar amb un requadre (amb Shift, afegeix)"
+    }
+  },
+  "toast": {
+    "close": "Tanca l'avís",
+    "importJsonFailed": "No s'ha pogut importar el fitxer JSON. Comprova que el format sigui correcte.",
+    "exportPdfFailed": "No s'ha pogut generar el PDF anotat. Comprova que el fitxer sigui vàlid o prova amb una altra còpia.",
+    "importJsonFailedAt": "No s'ha pogut importar el JSON: error a la línia {{line}}, columna {{column}}.",
+    "importJsonNoPages": "El JSON no té una llista «pages» amb pàgines i camps.",
+    "sessionRestoreFailed": "No s'ha pogut recuperar la sessió desada.",
+    "sessionDiscarded": "Sessió desada descartada.",
+    "importIssues": {
+      "title": "JSON aplicat, però revisa:",
+      "skippedFields": "{{count}} camp(s) omès(os) per dades no vàlides",
+      "skippedPages": "{{count}} pàgina(es) omesa(es) (número o camps no vàlids)",
+      "missingPages": "{{count}} pàgina(es) que no existeixen al PDF",
+      "outOfPage": "{{count}} anotació(ns) fora de la pàgina",
+      "fontSize": "{{count}} mida(es) de font fora de 8–72",
+      "opacity": "{{count}} opacitat(s) fora de 0,1–1"
+    }
+  },
+  "session": {
+    "title": "Continua on ho vas deixar",
+    "description": "«{{name}}» · anotacions: {{count}} · desat el {{date}}",
+    "continue": "Continua",
+    "discard": "Descarta",
+    "privacy": "Es desa només en aquest navegador."
+  },
+  "selection": {
+    "toolbar": "Accions de la selecció",
+    "count": "{{count}} seleccionada/es",
+    "alignLabel": "Alinea",
+    "align": {
+      "left": "Alinea a l'esquerra",
+      "center": "Centra horitzontalment",
+      "right": "Alinea a la dreta",
+      "top": "Alinea a dalt",
+      "middle": "Centra verticalment",
+      "bottom": "Alinea a baix"
+    },
+    "duplicate": "Duplica la selecció",
+    "delete": "Elimina la selecció",
+    "clear": "Treu la selecció",
+    "distributeLabel": "Distribueix",
+    "distribute": {
+      "horizontal": "Distribueix horitzontalment",
+      "vertical": "Distribueix verticalment"
     }
   }
 }

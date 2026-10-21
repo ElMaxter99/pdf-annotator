@@ -17,30 +17,35 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 | `npm install` | Instala dependencias (Node 22.12) |
 | `npm run start:local` | Dev server en `http://localhost:4200` |
 | `npm run build` | `i18n:check` + `ng build` (producción, prerender SSR de rutas) |
-| `npm test` | Karma/Jasmine (necesita Chrome; en CI usa `ChromeHeadless --no-sandbox`) |
+| `npm test` | Karma/Jasmine (necesita Chrome) |
+| `npm run test:ci` | Igual, headless y sin sandbox (como en GitHub Actions) |
+| `npm run e2e` | Playwright sobre el build de producción (`npm run build` antes; `PW_CHROMIUM=<ruta>` para usar un Chromium ya instalado) |
 | `npm run i18n:check` | Verifica que los 7 JSON de traducción tengan **las mismas claves** que `es-ES` |
 | `node scripts/generate-example.mjs` | Regenera `examples/factura-ejemplo.pdf` |
 | `npm run start:docker` | Imagen NGINX en `http://localhost:4444` |
 
-**Antes de dar una tarea por terminada:** `npm run build` y `npm test` en verde.
+**Antes de dar una tarea por terminada:** `npm run build`, `npm run test:ci` y `npm run e2e` en verde. Si tocas el editor, el historial, la importación JSON, las fuentes o la exportación, **los e2e son tu red de seguridad** (`e2e/*.spec.ts`): ejecútalos antes y después y añade casos para el comportamiento nuevo.
 
 ## 3. Mapa del repositorio
 ```
 src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
 ├─ pages/workspace/
-│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.300 líneas): estado, render, JSON, export, atajos
-│  └─ components/            header · sidebar · viewer · footer · page-thumbnails · json-tree · shortcuts-dialog
-├─ components/               language-selector, theme-toggle
-├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG)
+│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~3.340 líneas): render del PDF, sincronización del JSON, atajos y UI
+│  └─ components/            header · sidebar (4 pestañas: Documento, Anotaciones, Plantillas, Avanzado) · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
+├─ components/               language-selector, theme-toggle, toast-host (avisos globales)
+├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace), annotation-import (normaliza JSON importado → anotaciones), toast (avisos no bloqueantes), session-store (última sesión en IndexedDB: PDF + anotaciones + página y zoom)
+├─ guards/                   workspace.guard (sin PDF pendiente → /landing)
 ├─ i18n/                     translation.service + pipe `t` + translations/*.json
 ├─ models/                   annotation.model, guide-settings.model, page-thumbnail.model
-├─ fonts/                    catálogo de fuentes estándar PDF
-├─ utils/                    pdf-file.utils, loose-json (parser seguro)
+├─ fonts/                    font-catalog.service (fuentes estándar + personalizadas, resolución de nombres del JSON), standard-font-families, font-variant
+├─ utils/                    pdf-file.utils, loose-json (parser seguro), color.utils, number.utils, download.utils, annotation-pages.utils, annotation-fields.utils, alignment.utils (puros, con tests)
 └─ annotation-templates.service.ts   plantillas + última sesión en localStorage
 src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
 public/                      logo, favicons, og-image, worker de pdf.js (assets/pdfjs)
 examples/                    PDF y JSON de ejemplo usados en README y capturas
+e2e/                         Tests Playwright (landing, editor, historial, importación, fuentes, exportación) + servidor estático
+.github/workflows/ci.yml     CI: build, tests unitarios y e2e en PRs y pushes a develop/master
 nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 ```
 
@@ -48,7 +53,8 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **Angular:** componentes *standalone*, signals (`signal`, `computed`), control flow `@if/@for` en código nuevo (el antiguo usa `*ngIf/*ngFor`). Los subcomponentes del workspace reciben `[vm]="vm"` (la página entera) en lugar de inputs granulares — respeta ese patrón o refactoriza de forma deliberada.
 - **Estilo:** Prettier (`printWidth` 100, comillas simples). Sigue el estilo del archivo que tocas; sin comentarios innecesarios.
 - **Estilos:** tokens `--bg --panel --accent --danger --text --muted`. Tema claro = `:root.theme-light`. El shell del workspace vive bajo `.app--workspace` en `styles.scss`.
-- **i18n:** TODO texto visible usa la pipe `t` (`{{ 'clave' | t }}`). Añade la clave a **los 7 JSON** y ejecuta `npm run i18n:check`. No dejes cadenas fijas en español (quedan algunas heredadas en `alert()`/`console`; no las amplíes).
+- **i18n:** TODO texto visible usa la pipe `t` (`{{ 'clave' | t }}`). Añade la clave a **los 7 JSON** y ejecuta `npm run i18n:check`. No dejes cadenas fijas en español (solo quedan mensajes de `console`).
+- **Avisos al usuario:** nunca `alert()`/`confirm()`; usa `ToastService.error/warning/show` con una clave i18n (`toast.*`). Los e2e esperan `.toast--error`.
 - **Coordenadas:** `x,y` en puntos PDF. El DOM usa `top = canvas.height − y·scale`. Conversión en `domToPdfCoords`.
 - **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
 
@@ -62,12 +68,20 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 
 ## 6. Cómo trabajar en tareas típicas
 - **Nuevo atajo:** añade el caso en `handlePlainShortcut` (`workspace.page.ts`), la fila en `shortcuts-dialog.component.ts`, las claves `shortcuts.items.*` en los 7 idiomas y la tabla del README.
-- **Nuevo campo de anotación:** `models/annotation.model.ts` → `prepareFieldForStorage/Form` → `serializeFieldForJson` (campos avanzados) → `normalizeImportedCoordinates` → template del editor (preview **y** edit) → render (`redrawAllForPage`) → export PDF (`downloadAnnotatedPDF`).
+- **Nuevo campo de anotación:** `models/annotation.model.ts` → `prepareFieldForStorage/Form` → `serializeFieldForJson` (campos avanzados) → `AnnotationImportService.normalizeImportedCoordinates` (+ `utils/annotation-fields.utils.ts`) → template del editor (`annotation-editor.component.html`, un único formulario) → render (`redrawAllForPage`) → export PDF (`PdfExportService.exportAnnotatedPdf`, ya dibuja con los datos que le pasa la página).
 - **Nuevo idioma:** añade `translations/xx.json`, impórtalo en `translation.service.ts` (`LANGUAGES`, `TRANSLATIONS`) y la etiqueta en `app.languages.xx`.
 - **Cambio de layout:** revisa tres anchos (≥1650, ~1280 y <960 px) y ambos temas.
 
 ## 7. Trampas conocidas
-- `preview` y `editing` duplican ~140 líneas de HTML en `workspace-viewer.component.html`; cambia los dos.
+- Los editores de crear (`preview`) y editar (`edit`) comparten **un único** componente (`annotation-editor`, input `mode`). Cualquier campo nuevo se añade una sola vez; ojo con las reglas `locked` (solo aplican en modo `edit`).
+- Lógica pura (colores, números) va en `utils/*.ts` con su `.spec.ts`; no la metas de nuevo en `workspace.page.ts`.
+- Cambios en las anotaciones: pásalos siempre por `applyCoordsChange(...)` (→ `AnnotationStore.applyChange`) para que entren en el historial; `replaceCoords(..., { skipHistory: true })` solo al cargar un PDF.
+- Sidebar por pestañas (`vm.sidebarTab`): los paneles se ocultan con `[hidden]` (no `*ngIf`) para conservar los `@ViewChild` (editor JSON, inputs de archivo). Un elemento nuevo del panel va dentro del panel que corresponda; en los e2e abre la pestaña con `openSidebarTab(page, 'Anotaciones')` (`openWorkspace` abre Anotaciones por defecto).
+- Selección múltiple (`vm.selection`, solo una página y sin anotaciones bloqueadas): Shift/Ctrl+clic, Ctrl+A, arrastre en grupo, flechas, Supr, Ctrl+C/V/D y barra `.selection-bar` en el visor. También hay selección por recuadro (`onHitboxPointer*`, `vm.lasso`; un arrastre >4 px sobre zona vacía; el `click` que sigue se ignora con `suppressHitboxClick`) y distribuir (`distributeBoxes`, ≥3). Toda acción de grupo pasa por `updateSelectedFields`/`applyCoordsChange` (un paso de historial; las flechas usan `coalesceKey: 'nudge'` para fusionarse). La selección se vacía al cambiar de página, deshacer/rehacer, importar o abrir un editor. Las matemáticas de alinear viven en `utils/alignment.utils.ts`. Los atajos de selección se ignoran con el foco en un campo de texto; al seleccionar se hace `blur()` del campo (pulsar una anotación no mueve el foco).
+- `render()` serializa y fusiona llamadas simultáneas (pdf.js no admite dos renders a la vez en un canvas): llama siempre a `render()`, nunca a pdf.js directamente.
+- Avisos de importación: `AnnotationImportService.normalizeImportedCoordinates(data, prepare, report)` rellena un `ImportReport` (solo cuenta, no cambia el resultado) y la página lo convierte en un toast `warning` únicamente al aplicar/importar de forma explícita (`reportImportIssues`), nunca en el autoaplicado al escribir. Una regla nueva de validación = un contador en el informe + clave `toast.importIssues.*` en los 7 idiomas.
+- Ruta `/workspace`: `workspaceGuard` redirige a `/landing` si no hay un PDF pendiente en `PendingFileService` (recarga o URL directa). El guard solo mira (`hasPendingFile`); el consumo lo hace el componente. Cualquier flujo nuevo que abra el workspace debe dejar antes un archivo pendiente.
+- Sesión guardada: `workspace.page.ts` guarda con debounce (800 ms) en `SessionStoreService` solo si hay anotaciones o historial; al limpiar todo borra la sesión. Los datos restaurados se tratan como no confiables (pasan por `AnnotationImportService`). Si añades estado que deba sobrevivir a una recarga, inclúyelo en `SavedSession`.
 - `Ctrl+Z/Y` globales también se disparan dentro del textarea JSON (comportamiento heredado).
 - `preserveTextModel: true` en `replaceCoords` evita reformatear el texto que el usuario está escribiendo; **no** lo uses al importar archivos/plantillas.
 - El PDF se guarda en memoria (`pdfByteSources`) en tres variantes para que el export sea robusto ante PDFs raros.
@@ -75,7 +89,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - SSR: `localStorage`, `window` y `Worker` solo existen en el navegador; protege el acceso (`typeof window`).
 
 ## 8. Definición de terminado
-- [ ] `npm run build` y `npm test` pasan.
+- [ ] `npm run build`, `npm run test:ci` y `npm run e2e` pasan.
 - [ ] Textos nuevos traducidos en 7 idiomas.
 - [ ] Probado en oscuro y claro, escritorio y móvil.
 - [ ] README/CHANGELOG/atajos actualizados si cambia el comportamiento visible.

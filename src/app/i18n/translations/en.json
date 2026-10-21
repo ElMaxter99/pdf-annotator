@@ -16,7 +16,36 @@
       "badge": "Annotate smarter",
       "title": "Lay out coordinates on any PDF in seconds",
       "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
-      "cta": "Select PDF"
+      "cta": "Select PDF",
+      "tryExample": "Try it with a sample document",
+      "previewAlt": "Preview of the PDF Annotator workspace",
+      "featuresTitle": "Everything you need to annotate",
+      "trust": {
+        "browser": "100% in your browser",
+        "languages": "7 languages",
+        "openSource": "Open source"
+      },
+      "features": {
+        "precision": {
+          "title": "Exact coordinates",
+          "text": "Every click becomes a position in PDF points, with guides and snapping for precise alignment."
+        },
+        "json": {
+          "title": "Live JSON",
+          "text": "Edit the JSON or the viewer: both stay in sync instantly. Import, copy and download."
+        },
+        "templates": {
+          "title": "Reusable templates",
+          "text": "Save your annotations and apply them to other documents in one click."
+        },
+        "privacy": {
+          "title": "Private by design",
+          "text": "Everything happens in your browser. Your PDF is never uploaded to any server."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Upload your PDF",
@@ -30,7 +59,10 @@
       "ariaLabel": "Upload a new PDF to restart the annotation workspace"
     },
     "footer": {
-      "developedBy": "Developed by {{author}}"
+      "developedBy": "Developed by {{author}}",
+      "license": "MIT License",
+      "changelog": "Changelog",
+      "openSource": "Open source project"
     }
   },
   "theme": {
@@ -96,7 +128,19 @@
     "jsonPanelHide": "Hide JSON",
     "jsonPanelShow": "Show JSON",
     "minimizeSidebar": "Minimize sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "jsonStatus": {
+      "valid": "Valid JSON · annotations: {{count}}",
+      "noPages": "The \"pages\" list is missing",
+      "error": "Error on line {{line}}, column {{column}}"
+    },
+    "tabs": {
+      "label": "Panel sections",
+      "document": "Document",
+      "annotations": "Annotations",
+      "templates": "Templates",
+      "advanced": "Advanced"
+    }
   },
   "guides": {
     "enableFeature": "Enable guides & snapping",
@@ -220,7 +264,8 @@
     "groups": {
       "navigation": "Navigation and view",
       "annotations": "Annotations",
-      "general": "General"
+      "general": "General",
+      "selection": "Multi-selection"
     },
     "items": {
       "prevPage": "Previous page",
@@ -235,7 +280,61 @@
       "undo": "Undo",
       "redo": "Redo",
       "applyJson": "Apply the JSON from the editor",
-      "help": "Show this help"
+      "help": "Show this help",
+      "selectToggle": "Add or remove from the selection",
+      "selectAll": "Select all on the page",
+      "selectMove": "Move the selection (Shift: ×10)",
+      "selectDelete": "Delete the selection",
+      "selectCopy": "Copy / paste the selection",
+      "selectDuplicate": "Duplicate the selection",
+      "selectClear": "Clear the selection",
+      "selectLasso": "Drag on an empty area to select with a box (hold Shift to add)"
+    }
+  },
+  "toast": {
+    "close": "Dismiss",
+    "importJsonFailed": "The JSON file could not be imported. Check that the format is correct.",
+    "exportPdfFailed": "The annotated PDF could not be generated. Make sure the file is valid or try another copy.",
+    "importJsonFailedAt": "The JSON could not be imported: error on line {{line}}, column {{column}}.",
+    "importJsonNoPages": "The JSON has no \"pages\" list with pages and fields.",
+    "sessionRestoreFailed": "The saved session could not be restored.",
+    "sessionDiscarded": "Saved session discarded.",
+    "importIssues": {
+      "title": "JSON applied, but please check:",
+      "skippedFields": "{{count}} field(s) skipped because of invalid data",
+      "skippedPages": "{{count}} page(s) skipped (invalid number or fields)",
+      "missingPages": "{{count}} page(s) that do not exist in the PDF",
+      "outOfPage": "{{count}} annotation(s) outside the page",
+      "fontSize": "{{count}} font size(s) outside 8–72",
+      "opacity": "{{count}} opacity value(s) outside 0.1–1"
+    }
+  },
+  "session": {
+    "title": "Pick up where you left off",
+    "description": "\"{{name}}\" · annotations: {{count}} · saved {{date}}",
+    "continue": "Continue",
+    "discard": "Discard",
+    "privacy": "Stored only in this browser."
+  },
+  "selection": {
+    "toolbar": "Selection actions",
+    "count": "{{count}} selected",
+    "alignLabel": "Align",
+    "align": {
+      "left": "Align left",
+      "center": "Centre horizontally",
+      "right": "Align right",
+      "top": "Align top",
+      "middle": "Centre vertically",
+      "bottom": "Align bottom"
+    },
+    "duplicate": "Duplicate selection",
+    "delete": "Delete selection",
+    "clear": "Clear selection",
+    "distributeLabel": "Distribute",
+    "distribute": {
+      "horizontal": "Distribute horizontally",
+      "vertical": "Distribute vertically"
     }
   }
 }

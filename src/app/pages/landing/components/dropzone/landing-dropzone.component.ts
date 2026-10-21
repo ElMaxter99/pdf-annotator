@@ -17,6 +17,7 @@ export class LandingDropzoneComponent {
   @Output() fileDragLeave = new EventEmitter<DragEvent>();
   @Output() fileDrop = new EventEmitter<DragEvent>();
   @Output() openFilePicker = new EventEmitter<void>();
+  @Output() tryExample = new EventEmitter<void>();
 
   @ViewChild('pdfFileInput', { static: false })
   private pdfFileInputRef?: ElementRef<HTMLInputElement>;

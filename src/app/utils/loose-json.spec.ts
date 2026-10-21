@@ -1,4 +1,4 @@
-import { parseLooseJson } from './loose-json';
+import { LooseJsonError, parseLooseJson } from './loose-json';
 
 describe('parseLooseJson', () => {
   it('parses strict JSON', () => {
@@ -30,5 +30,29 @@ describe('parseLooseJson', () => {
 
   it('rejects excessively nested input', () => {
     expect(() => parseLooseJson('['.repeat(200) + "'a'" + ']'.repeat(200))).toThrow();
+  });
+
+  it('reports the line and column of a syntax error', () => {
+    const text = '{\n  pages: [\n    { num: 1, fields: [ { x: 1 y: 2 } ] }\n  ]\n}';
+    try {
+      parseLooseJson(text);
+      fail('expected a syntax error');
+    } catch (error) {
+      expect(error instanceof LooseJsonError).toBeTrue();
+      const located = error as LooseJsonError;
+      expect(located.line).toBe(3);
+      expect(text.split('\n')[2].charAt(located.column - 1)).toBe('y');
+    }
+  });
+
+  it('reports errors at the end of truncated input', () => {
+    try {
+      parseLooseJson('{ pages: [');
+      fail('expected a syntax error');
+    } catch (error) {
+      const located = error as LooseJsonError;
+      expect(located.line).toBe(1);
+      expect(located.column).toBe(11);
+    }
   });
 });

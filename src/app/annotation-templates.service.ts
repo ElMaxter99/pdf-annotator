@@ -27,7 +27,8 @@ type StoredAnnotationTemplate = {
 @Injectable({ providedIn: 'root' })
 export class AnnotationTemplatesService {
   private readonly templatesKey = 'pdf-annotator.templates';
-  private readonly lastCoordsKey = 'pdf-annotator.last-coords';
+  /** Old copy of the annotations that nothing ever read back; removed on startup (privacy). */
+  private readonly legacyLastCoordsKey = 'pdf-annotator.last-coords';
   readonly defaultTemplateId = '__default-template__';
   private readonly defaultTemplateName = 'Predeterminada';
 
@@ -94,13 +95,16 @@ export class AnnotationTemplatesService {
     this.persistTemplates(nextTemplates);
   }
 
-  storeLastCoords(pages: readonly PageAnnotations[]) {
-    this.writeToStorage(this.lastCoordsKey, this.clonePages(pages));
+  constructor() {
+    this.purgeLegacyData();
   }
 
-  loadLastCoords(): PageAnnotations[] | null {
-    const stored = this.readFromStorage<PageAnnotations[] | null>(this.lastCoordsKey, null);
-    return stored ? this.clonePages(stored) : null;
+  private purgeLegacyData() {
+    try {
+      this.getStorage()?.removeItem(this.legacyLastCoordsKey);
+    } catch {
+      // Storage may be blocked; nothing to clean up then.
+    }
   }
 
   private persistTemplates(templates: readonly AnnotationTemplate[]) {
