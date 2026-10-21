@@ -1,8 +1,11 @@
 ## Unreleased
 ### Added
+- Rubber-band selection (drag on an empty area; Shift adds to the selection) and "distribute horizontally/vertically" (3+ annotations, equal gaps between the outermost ones) in the selection bar; 4 unit + 4 e2e tests, texts in the 7 languages
+
 - Multi-selection: Shift/Ctrl+click to add or remove annotations, Ctrl+A for the whole page (locked ones excluded), group drag, arrow-key nudging (Shift ×10), Delete, Ctrl+C / Ctrl+V and Ctrl+D (offset copies), and a selection bar with six align actions (left, centre, right, top, middle, bottom), duplicate, delete and clear. Each action is one undo step; held arrow keys merge into one (`AnnotationStore` coalescing). Texts in the 7 languages, shortcuts listed in the help dialog; 8 + 1 unit and 13 e2e tests
 
 ### Fixed
+- The old copy of the annotations that `annotation-templates.service` wrote to `localStorage` (`pdf-annotator.last-coords`, never read back) is no longer written and is deleted on startup
 - JSON import ignored `locked` and `hidden`, so an advanced export lost them on re-import
 - Zooming quickly (e.g. holding `-`) could start overlapping renders on the same canvas and leave the PDF badly drawn; renders are now serialized and coalesced
 

@@ -9,6 +9,13 @@
             (click)="vm.alignSelection(mode.id)">{{ mode.icon }}</button>
         }
       </div>
+      <div class="selection-bar__group" role="group" [attr.aria-label]="'selection.distributeLabel' | t">
+        @for (mode of distributeModes; track mode.id) {
+          <button type="button" class="selection-bar__btn" [disabled]="vm.selectionCount() < 3"
+            [attr.title]="('selection.distribute.' + mode.id) | t" [attr.aria-label]="('selection.distribute.' + mode.id) | t"
+            (click)="vm.distributeSelection(mode.id)">{{ mode.icon }}</button>
+        }
+      </div>
       <button type="button" class="selection-bar__btn" (click)="vm.duplicateSelection()"
         [attr.title]="'selection.duplicate' | t" [attr.aria-label]="'selection.duplicate' | t">⧉</button>
       <button type="button" class="selection-bar__btn selection-bar__btn--danger" (click)="vm.deleteSelection()"
@@ -21,7 +28,13 @@
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
     <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
     <div #annotationsLayer class="annotations-layer"></div>
-    <div class="hitbox" (click)="vm.onHitboxClick($event)"></div>
+    <div class="hitbox" (click)="vm.onHitboxClick($event)" (pointerdown)="vm.onHitboxPointerDown($event)"
+      (pointermove)="vm.onHitboxPointerMove($event)" (pointerup)="vm.onHitboxPointerUp($event)"
+      (pointercancel)="vm.onHitboxPointerUp($event)"></div>
+    @if (vm.lasso(); as l) {
+      <div class="lasso" [style.left.px]="l.left" [style.top.px]="l.top" [style.width.px]="l.width"
+        [style.height.px]="l.height"></div>
+    }
 
     @if (vm.preview(); as p) {
       <app-annotation-editor #previewEditor [vm]="vm" mode="preview" [field]="p.field"

@@ -287,7 +287,8 @@
       "selectDelete": "Auswahl löschen",
       "selectCopy": "Auswahl kopieren / einfügen",
       "selectDuplicate": "Auswahl duplizieren",
-      "selectClear": "Auswahl aufheben"
+      "selectClear": "Auswahl aufheben",
+      "selectLasso": "Auf einer leeren Fläche ziehen, um mit einem Rahmen auszuwählen (mit Umschalt hinzufügen)"
     }
   },
   "toast": {
@@ -329,6 +330,11 @@
     },
     "duplicate": "Auswahl duplizieren",
     "delete": "Auswahl löschen",
-    "clear": "Auswahl aufheben"
+    "clear": "Auswahl aufheben",
+    "distributeLabel": "Verteilen",
+    "distribute": {
+      "horizontal": "Horizontal verteilen",
+      "vertical": "Vertikal verteilen"
+    }
   }
 }

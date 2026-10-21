@@ -47,6 +47,7 @@ export class ShortcutsDialogComponent implements AfterViewInit {
       titleKey: 'shortcuts.groups.selection',
       items: [
         { keys: ['Shift', 'Click'], labelKey: 'shortcuts.items.selectToggle' },
+        { keys: ['▭'], labelKey: 'shortcuts.items.selectLasso' },
         { keys: ['Ctrl/⌘', 'A'], labelKey: 'shortcuts.items.selectAll' },
         { keys: ['←', '↑', '→', '↓'], sep: '/', labelKey: 'shortcuts.items.selectMove' },
         { keys: ['Supr', 'Del'], sep: '/', labelKey: 'shortcuts.items.selectDelete' },
