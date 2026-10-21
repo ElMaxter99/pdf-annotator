@@ -62,3 +62,22 @@ test('the tab choice is kept when the sidebar is minimized and expanded again', 
   await expect(tab(page, 'Plantillas')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('.templates')).toBeVisible();
 });
+
+test.describe('narrow screens', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test('the tabs fit on a phone without horizontal page scroll and stay usable', async ({ page }) => {
+    const metrics = await page.evaluate(() => {
+      const tabs = document.querySelector('.sidebar-tabs') as HTMLElement;
+      return {
+        tabsOverflow: tabs.scrollWidth - tabs.clientWidth,
+        pageOverflow: document.documentElement.scrollWidth - window.innerWidth,
+      };
+    });
+    expect(metrics.tabsOverflow).toBeLessThanOrEqual(0);
+    expect(metrics.pageOverflow).toBeLessThanOrEqual(0);
+
+    await openSidebarTab(page, 'Avanzado');
+    await expect(page.locator('.advanced-panel')).toBeVisible();
+  });
+});
