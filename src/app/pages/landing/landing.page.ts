@@ -2,8 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, ViewChild, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
+import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
+import { SessionStoreService, SavedSessionSummary } from '../../services/session-store.service';
+import { ToastService } from '../../services/toast.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone.component';
@@ -22,6 +25,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingHeroComponent,
     LandingDropzoneComponent,
     LandingFooterComponent,
+    TranslationPipe,
   ],
 })
 export class LandingPageComponent {
@@ -29,6 +33,9 @@ export class LandingPageComponent {
   private readonly pendingFileService = inject(PendingFileService);
   private readonly router = inject(Router);
   private readonly metadataService = inject(AppMetadataService);
+  private readonly toast = inject(ToastService);
+  private readonly sessionStore = inject(SessionStoreService);
+  readonly savedSession = signal<SavedSessionSummary | null>(null);
 
   readonly appName = APP_NAME;
   readonly version = APP_VERSION;
@@ -43,6 +50,42 @@ export class LandingPageComponent {
 
   constructor() {
     this.metadataService.applyDefaultMetadata();
+    if (typeof window !== 'undefined') {
+      void this.sessionStore.summary().then((summary) => this.savedSession.set(summary));
+    }
+  }
+
+  get savedSessionDate(): string {
+    const saved = this.savedSession();
+    return saved
+      ? new Date(saved.savedAt).toLocaleString(this.languageModel, {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        })
+      : '';
+  }
+
+  async resumeSession() {
+    const session = await this.sessionStore.load();
+    if (!session) {
+      this.savedSession.set(null);
+      this.toast.error(this.translationService.translate('toast.sessionRestoreFailed'));
+      return;
+    }
+
+    const file = new File([session.pdf], session.name, { type: 'application/pdf' });
+    this.pendingFileService.setPendingFile(file, {
+      coords: session.coords,
+      pageIndex: session.pageIndex,
+      scale: session.scale,
+    });
+    await this.router.navigate(['/workspace']);
+  }
+
+  async discardSession() {
+    await this.sessionStore.clear();
+    this.savedSession.set(null);
+    this.toast.show(this.translationService.translate('toast.sessionDiscarded'), 'info');
   }
 
   onLanguageChange(language: Language) {
@@ -106,9 +149,24 @@ export class LandingPageComponent {
     await this.handleFileSelection(file);
   }
 
+  async loadExampleDocument() {
+    try {
+      const response = await fetch('/examples/factura-ejemplo.pdf');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const blob = await response.blob();
+      await this.handleFileSelection(
+        new File([blob], 'factura-ejemplo.pdf', { type: 'application/pdf' })
+      );
+    } catch (error) {
+      console.error('No se pudo cargar el documento de ejemplo.', error);
+    }
+  }
+
   private async handleFileSelection(file: File) {
     if (!isPdfFile(file)) {
-      alert(this.translationService.translate('app.upload.invalidFormat'));
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
 

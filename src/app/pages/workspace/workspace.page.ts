@@ -6,6 +6,8 @@ import {
   signal,
   computed,
   AfterViewChecked,
+  effect,
+  untracked,
   HostListener,
   OnDestroy,
   OnInit,
@@ -14,7 +16,6 @@ import {
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
-import type { PdfLibFontkit } from '@pdf-lib/fontkit';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
@@ -34,14 +35,56 @@ import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcut
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnail } from '../../models/page-thumbnail.model';
 import {
-  STANDARD_FONT_FAMILIES,
-  StandardFontFamilyDefinition,
-  StandardFontName,
-} from '../../fonts/standard-font-families';
-import { PendingFileService } from '../../services/pending-file.service';
+  CustomFontEntry,
+  DEFAULT_FONT_ID,
+  FontCatalogService,
+  FontOption,
+} from '../../fonts/font-catalog.service';
+import { FontVariantDescriptor } from '../../fonts/font-variant';
+import {
+  AnnotationImportService,
+  emptyImportReport,
+  ImportReport,
+} from '../../services/annotation-import.service';
+import { ToastService } from '../../services/toast.service';
+import { AnnotationStore } from '../../services/annotation-store';
+import { PdfExportService } from '../../services/pdf-export.service';
+import { SessionStoreService } from '../../services/session-store.service';
+import { PendingFileService, PendingRestore } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
-import { parseLooseJson } from '../../utils/loose-json';
+import {
+  extractPagesCollection,
+  normalizeFieldDecimals,
+  normalizeFieldType,
+  sanitizeOptionalAppender,
+  sanitizeTextPreservingSpacing,
+} from '../../utils/annotation-fields.utils';
+import {
+  addFieldToPages,
+  cloneAnnotationPages,
+  removeFieldFromPages,
+  updateFieldInPages,
+} from '../../utils/annotation-pages.utils';
+import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
+import {
+  AlignMode,
+  alignBoxes,
+  DistributeAxis,
+  distributeBoxes,
+} from '../../utils/alignment.utils';
+import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
+import {
+  ensureHex,
+  hexToRgbComponents,
+  normalizeColor,
+  normalizeHexInput,
+  parseColorComponents,
+  parseRgbText,
+  rgbToHex,
+  toRgbString,
+} from '../../utils/color.utils';
+import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -99,9 +142,22 @@ type JsonTreePreviewStatus = 'empty' | 'ready' | 'error';
 interface JsonTreePreview {
   status: JsonTreePreviewStatus;
   value: unknown | null;
+  /** Position of the syntax error (status `error`). */
+  errorAt?: { line: number; column: number };
+  /** Whether the document has a usable `pages` list (status `ready`). */
+  hasPages?: boolean;
+  /** Raw number of field entries across all pages (status `ready`). */
+  fieldCount?: number;
 }
 
+const SIDEBAR_TABS = ['document', 'annotations', 'templates', 'advanced'] as const;
+type SidebarTab = (typeof SIDEBAR_TABS)[number];
+
 const AUTO_APPLY_JSON_DELAY_MS = 300;
+const SESSION_SAVE_DELAY_MS = 800;
+
+/** The JSON parsed fine but has no `pages` list. */
+class JsonShapeError extends Error {}
 const MAX_JSON_IMPORT_BYTES = 5 * 1024 * 1024;
 
 type OverlayGuide = {
@@ -110,33 +166,12 @@ type OverlayGuide = {
   highlighted?: boolean;
 };
 
-type FontVariantDescriptor =
-  | { kind: 'standard'; name: StandardFontName }
-  | { kind: 'custom'; fontId: string };
-
-type FontOptionType = 'standard' | 'custom';
-
-interface FontOption {
-  readonly id: string;
-  readonly label: string;
-  readonly type: FontOptionType;
-  readonly cssFamily: string;
-  readonly descriptor: FontVariantDescriptor;
-}
-
-interface CustomFontEntry {
-  readonly id: string;
-  readonly name: string;
-  readonly cssName: string;
-  readonly data: Uint8Array;
-}
 
 interface FontDropdownUiState {
   readonly open: boolean;
   readonly query: string;
 }
 
-const DEFAULT_FONT_ID = 'standard:helvetica';
 const DEFAULT_OPACITY = 1;
 
 @Component({
@@ -144,6 +179,7 @@ const DEFAULT_OPACITY = 1;
   standalone: true,
   templateUrl: './workspace.page.html',
   styleUrls: ['./workspace.page.scss'],
+  providers: [AnnotationStore],
   imports: [
     CommonModule,
     FormsModule,
@@ -155,15 +191,11 @@ const DEFAULT_OPACITY = 1;
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
-  private static fontkitPromise: Promise<PdfLibFontkit> | null = null;
   pdfDoc: PDFDocumentProxy | null = null;
   readonly vm: WorkspacePageComponent;
   pageIndex = signal(1);
   scale = signal(1.5);
-  coords = signal<PageAnnotations[]>([]);
   cursorPdfCoords = signal<{ x: number; y: number } | null>(null);
-  private readonly undoStack = signal<PageAnnotations[][]>([]);
-  private readonly redoStack = signal<PageAnnotations[][]>([]);
   readonly pageThumbnails = signal<readonly PageThumbnail[]>([]);
   private thumbnailObjectUrls: string[] = [];
   private thumbnailGenerationToken = 0;
@@ -177,15 +209,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   jsonTreePreview: JsonTreePreview = this.buildJsonTreePreview(this.coordsTextModel);
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
-  customFontsFeatureEnabled = signal(false);
   includeAdvancedJsonFields = signal(false);
-  customFonts = signal<CustomFontEntry[]>([]);
   private readonly fontDropdownState = signal<Record<EditorMode, FontDropdownUiState>>({
     preview: { open: false, query: '' },
     edit: { open: false, query: '' },
   });
   private pendingFontSearchFocus: EditorMode | null = null;
-  readonly fontOptions = computed<readonly FontOption[]>(() => this.buildFontOptions());
   guideSettings = signal<GuideSettings>(cloneGuideSettings(DEFAULT_GUIDE_SETTINGS));
   snapPointsXText = signal('');
   snapPointsYText = signal('');
@@ -193,12 +222,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly jsonViewMode = signal<JsonViewMode>('text');
   readonly jsonPanelCollapsed = signal(false);
   readonly sidebarMinimized = signal(false);
+  readonly sidebarTab = signal<SidebarTab>('document');
+  readonly annotationCount = computed(() =>
+    this.store.coords().reduce((total, page) => total + page.fields.length, 0)
+  );
   readonly shortcutsOpen = signal(false);
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
+  private readonly pdfExportService = inject(PdfExportService);
+  private readonly toast = inject(ToastService);
+  private readonly sessionStore = inject(SessionStoreService);
+  private readonly store = inject(AnnotationStore);
+  private readonly annotationImport = inject(AnnotationImportService);
+  private readonly fontCatalog = inject(FontCatalogService);
+  readonly coords = this.store.coords;
+  readonly customFontsFeatureEnabled = this.fontCatalog.customFontsFeatureEnabled;
+  readonly customFonts = this.fontCatalog.customFonts;
+  readonly fontOptions = this.fontCatalog.fontOptions;
   readonly templates = signal<AnnotationTemplate[]>([]);
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
   templateNameModel = '';
@@ -228,11 +271,28 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     moved: boolean;
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
+  /** Original file of the open PDF, kept so the session can be saved and restored. */
+  private sessionFile: File | null = null;
+  private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
   private overlayDragRect: { left: number; top: number; width: number; height: number } | null =
     null;
   private overlayGuides: OverlayGuide[] = [];
   private clipboard: PageField | null = null;
+
+  /** Annotations picked with Shift/Ctrl+click or Ctrl+A. Always on one page, never locked. */
+  readonly selection = signal<{ pageIndex: number; fields: readonly number[] } | null>(null);
+  readonly selectionCount = computed(() => this.selection()?.fields.length ?? 0);
+  private selectionClipboard: PageField[] = [];
+  private groupDrag: {
+    pointerId: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
+    dx: number;
+    dy: number;
+    items: { el: HTMLElement; startLeft: number; startTop: number; width: number; fontPx: number }[];
+  } | null = null;
 
   @ViewChild(WorkspaceHeaderComponent) private headerComponent?: WorkspaceHeaderComponent;
   @ViewChild(WorkspaceSidebarComponent) private sidebarComponent?: WorkspaceSidebarComponent;
@@ -278,6 +338,37 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.jsonPanelCollapsed.set(collapsed);
   }
 
+  setSidebarTab(tab: SidebarTab): void {
+    this.sidebarTab.set(tab);
+  }
+
+  /** Arrow keys / Home / End move between tabs, as in the WAI-ARIA tabs pattern. */
+  onSidebarTabKeydown(event: KeyboardEvent): void {
+    const index = SIDEBAR_TABS.indexOf(this.sidebarTab());
+    let next = index;
+    switch (event.key) {
+      case 'ArrowRight':
+        next = (index + 1) % SIDEBAR_TABS.length;
+        break;
+      case 'ArrowLeft':
+        next = (index - 1 + SIDEBAR_TABS.length) % SIDEBAR_TABS.length;
+        break;
+      case 'Home':
+        next = 0;
+        break;
+      case 'End':
+        next = SIDEBAR_TABS.length - 1;
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    this.setSidebarTab(SIDEBAR_TABS[next]);
+    this.runAfterRender(() =>
+      this.document?.getElementById(`sidebar-tab-${SIDEBAR_TABS[next]}`)?.focus()
+    );
+  }
+
   toggleSidebarMinimized(): void {
     this.sidebarMinimized.update((current) => !current);
   }
@@ -314,25 +405,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return this.sidebarComponent?.jsonTreeComponent;
   }
 
-  private static async loadFontkit(): Promise<PdfLibFontkit> {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      throw new Error('fontkit solo puede cargarse en el navegador.');
-    }
-
-    if (!WorkspacePageComponent.fontkitPromise) {
-      WorkspacePageComponent.fontkitPromise = import('@pdf-lib/fontkit')
-        .then((module) => (module.default ?? module) as PdfLibFontkit)
-        .catch((error) => {
-          WorkspacePageComponent.fontkitPromise = null;
-          throw error;
-        });
-    }
-
-    return WorkspacePageComponent.fontkitPromise;
-  }
 
 
   constructor() {
+    this.store.setFieldComparator((a, b) => this.areFieldsEqual(a, b));
+    effect(() => {
+      this.store.coords();
+      this.pageIndex();
+      this.scale();
+      untracked(() => this.scheduleSessionSave());
+    });
     this.vm = this;
     this.setDocumentMetadata();
     const storedTemplates = this.templatesService.getTemplates();
@@ -354,8 +436,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   ngOnInit(): void {
     const pendingFile = this.pendingFileService.consumePendingFile();
+    const pendingRestore = this.pendingFileService.consumePendingRestore();
     if (pendingFile) {
-      this.loadPdfFile(pendingFile).catch((error) =>
+      this.loadPdfFile(pendingFile, pendingRestore).catch((error) =>
         console.error('No se pudo cargar el PDF pendiente.', error)
       );
     }
@@ -367,6 +450,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       clearTimeout(this.autoApplyCoordsTimer);
       this.autoApplyCoordsTimer = null;
     }
+    this.flushSessionSave();
     if (!this.document) {
       return;
     }
@@ -386,7 +470,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         return;
       }
     }
-    const normalized = this.normalizeFontFamily(fontId);
+    const normalized = this.fontCatalog.normalizeFontFamily(fontId);
     this.updateWorkingField(mode, (field) =>
       this.ensureFieldStyle({ ...field, fontFamily: normalized })
     );
@@ -513,7 +597,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   fontSummaryOption(fontId: string | null | undefined): FontOption {
-    return this.getFontOptionById(this.normalizeFontFamily(fontId));
+    return this.fontCatalog.getFontOptionById(this.fontCatalog.normalizeFontFamily(fontId));
   }
 
   setFieldOpacity(mode: EditorMode, value: string | number) {
@@ -567,7 +651,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   triggerCustomFontPicker() {
     if (typeof FontFace === 'undefined') {
-      alert(this.translationService.translate('fonts.custom.unsupported'));
+      this.toast.error(this.translationService.translate('fonts.custom.unsupported'));
       return;
     }
     const input = this.customFontInputRef?.nativeElement;
@@ -595,7 +679,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   removeCustomFont(id: string) {
-    const optionId = this.toCustomFontOptionId(id);
+    const optionId = this.fontCatalog.toCustomFontOptionId(id);
     const previousFonts = this.customFonts();
     if (!previousFonts.some((font) => font.id === id)) {
       return;
@@ -606,45 +690,29 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   canUndo() {
-    return this.undoStack().length > 0;
+    return this.store.canUndo();
   }
 
   canRedo() {
-    return this.redoStack().length > 0;
+    return this.store.canRedo();
   }
 
   undo() {
-    const undoStates = this.undoStack();
-    if (!undoStates.length) {
+    if (!this.store.undo()) {
       return;
     }
-
-    const previous = undoStates[undoStates.length - 1];
-    const currentSnapshot = this.snapshotCoords();
-
-    this.undoStack.update((stack) => stack.slice(0, -1));
-    this.redoStack.update((stack) => [...stack, currentSnapshot]);
-
-    this.coords.set(this.snapshotCoords(previous));
-    this.preview.set(null);
-    this.editing.set(null);
-    this.syncCoordsTextModel();
-    this.redrawAllForPage();
+    this.afterHistoryJump();
   }
 
   redo() {
-    const redoStates = this.redoStack();
-    if (!redoStates.length) {
+    if (!this.store.redo()) {
       return;
     }
+    this.afterHistoryJump();
+  }
 
-    const next = redoStates[redoStates.length - 1];
-    const currentSnapshot = this.snapshotCoords();
-
-    this.redoStack.update((stack) => stack.slice(0, -1));
-    this.undoStack.update((stack) => [...stack, currentSnapshot]);
-
-    this.coords.set(this.snapshotCoords(next));
+  private afterHistoryJump() {
+    this.selection.set(null);
     this.preview.set(null);
     this.editing.set(null);
     this.syncCoordsTextModel();
@@ -687,7 +755,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const removedFonts = this.customFonts();
-    const removedOptionIds = removedFonts.map((font) => this.toCustomFontOptionId(font.id));
+    const removedOptionIds = removedFonts.map((font) => this.fontCatalog.toCustomFontOptionId(font.id));
     this.customFontsFeatureEnabled.set(false);
     if (removedOptionIds.length) {
       this.handleRemovedFontOptions(removedOptionIds);
@@ -746,7 +814,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   updateGuideNumber(key: 'gridSize' | 'marginSize' | 'snapTolerance', rawValue: string | number) {
-    const numeric = this.toFiniteNumber(rawValue);
+    const numeric = toFiniteNumber(rawValue);
     if (numeric === null) {
       return;
     }
@@ -775,7 +843,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private parseNumericList(value: string): number[] {
     return value
       .split(/[\s,;]+/)
-      .map((token) => this.toFiniteNumber(token))
+      .map((token) => toFiniteNumber(token))
       .filter((num): num is number => num !== null && num >= 0)
       .map((num) => +num.toFixed(2))
       .filter((num, index, arr) => arr.indexOf(num) === index)
@@ -1331,13 +1399,83 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.loadPdfFile(file);
   }
 
-  private async loadPdfFile(file: File) {
+  /** Re-applies annotations, page and zoom saved by a previous visit (treated as untrusted input). */
+  private applyRestoredSession(restore: PendingRestore) {
+    const normalized = this.annotationImport.normalizeImportedCoordinates(
+      { pages: restore.coords },
+      (field) => this.prepareFieldForStorage(field)
+    );
+    if (normalized === null) {
+      this.toast.error(this.translationService.translate('toast.sessionRestoreFailed'));
+      return;
+    }
+
+    this.replaceCoords(normalized, { skipHistory: true });
+    if (Number.isFinite(restore.scale) && restore.scale >= 0.25 && restore.scale <= 8) {
+      this.scale.set(restore.scale);
+    }
+    const lastPage = this.pdfDoc?.numPages ?? 1;
+    this.pageIndex.set(Math.min(lastPage, Math.max(1, Math.round(restore.pageIndex) || 1)));
+  }
+
+  private scheduleSessionSave() {
+    if (this.sessionSaveTimer) {
+      clearTimeout(this.sessionSaveTimer);
+      this.sessionSaveTimer = null;
+    }
+
+    const file = this.sessionFile;
+    if (!file || !this.pdfDoc || typeof window === 'undefined') {
+      return;
+    }
+
+    const hasAnnotations = this.store.coords().length > 0;
+    if (!hasAnnotations && !this.store.canUndo()) {
+      return; // nothing worth keeping yet: do not overwrite a previous session
+    }
+
+    this.sessionSaveTimer = setTimeout(() => {
+      this.sessionSaveTimer = null;
+      this.persistSession(file);
+    }, SESSION_SAVE_DELAY_MS);
+  }
+
+  private persistSession(file: File) {
+    if (!this.store.coords().length) {
+      void this.sessionStore.clear();
+      return;
+    }
+    void this.sessionStore.save({
+      name: file.name,
+      pdf: file,
+      coords: this.store.snapshot(),
+      pageIndex: this.pageIndex(),
+      scale: this.scale(),
+      savedAt: Date.now(),
+    });
+  }
+
+  /** Writes a pending save right away (page closing or leaving the workspace). */
+  @HostListener('window:pagehide')
+  flushSessionSave() {
+    if (!this.sessionSaveTimer) {
+      return;
+    }
+    clearTimeout(this.sessionSaveTimer);
+    this.sessionSaveTimer = null;
+    if (this.sessionFile) {
+      this.persistSession(this.sessionFile);
+    }
+  }
+
+  private async loadPdfFile(file: File, restore: PendingRestore | null = null) {
     if (!isPdfFile(file)) {
-      alert(this.translationService.translate('app.upload.invalidFormat'));
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
 
     this.pdfByteSources.clear();
+    this.sessionFile = file;
     const buf = await file.arrayBuffer();
     const typed = new Uint8Array(buf);
     this.rememberPdfBytes(typed, 0);
@@ -1368,8 +1506,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.pageIndex.set(1);
     this.resetHistory();
     this.clearAll({ skipHistory: true });
+    if (restore) {
+      this.applyRestoredSession(restore);
+    }
     await this.render();
-    if (typeof window !== 'undefined' && window.innerWidth < 960) {
+    if (restore) {
+      this.redrawAllForPage();
+    } else if (typeof window !== 'undefined' && window.innerWidth < 960) {
       await this.fitWidth();
     }
     this.generatePageThumbnails().catch((error) =>
@@ -1378,7 +1521,38 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.fileDropActive.set(false);
   }
 
+  private rendering = false;
+  private renderRequestedWhileBusy = false;
+
+  /**
+   * Draws the current page. pdf.js cannot render twice on the same canvas at once, so calls that
+   * arrive mid-render (e.g. a held zoom key) are coalesced into one more pass with the latest
+   * scale/page, and the annotations are repainted afterwards.
+   */
   async render() {
+    if (this.rendering) {
+      this.renderRequestedWhileBusy = true;
+      return;
+    }
+
+    this.rendering = true;
+    let coalesced = false;
+    try {
+      do {
+        this.renderRequestedWhileBusy = false;
+        await this.renderOnce();
+        coalesced = coalesced || this.renderRequestedWhileBusy;
+      } while (this.renderRequestedWhileBusy);
+    } finally {
+      this.rendering = false;
+    }
+
+    if (coalesced) {
+      this.redrawAllForPage();
+    }
+  }
+
+  private async renderOnce() {
     if (!this.pdfDoc) {
       return;
     }
@@ -1527,7 +1701,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   onHitboxClick(evt: MouseEvent) {
+    if (this.suppressHitboxClick) {
+      this.suppressHitboxClick = false;
+      return;
+    }
     if (!this.pdfDoc || this.editing()) return;
+    this.clearSelection();
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
 
@@ -1556,119 +1735,38 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.updatePreviewColorState(defaultColor);
   }
 
-  private normalizeColor(color: string) {
-    if (color.startsWith('#')) {
-      const hex =
-        color.length === 4
-          ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
-          : color;
-      return hex.toLowerCase();
-    }
 
-    const match = color.match(
-      /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(\d*\.?\d+))?\)$/i
-    );
-    if (!match) return color;
 
-    const [, r, g, b] = match;
-    const toHex = (value: string) => {
-      const num = Math.max(0, Math.min(255, parseInt(value, 10)));
-      return num.toString(16).padStart(2, '0');
-    };
 
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  }
 
-  private normalizeHexInput(value: string) {
-    const trimmed = value.trim();
-    const match = trimmed.match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i);
-    if (!match) return null;
-    let hex = match[1];
-    if (hex.length === 3) {
-      hex = hex
-        .split('')
-        .map((ch) => ch + ch)
-        .join('');
-    }
-    return `#${hex.toLowerCase()}`;
-  }
 
-  private parseRgbText(value: string) {
-    const trimmed = value.trim();
-    if (!trimmed) return null;
-    const rgbMatch = trimmed.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i);
-    const fallbackMatch = trimmed.match(/^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/);
-    const match = rgbMatch ?? fallbackMatch;
-    if (!match) return null;
-    const [, r, g, b] = match;
-    const clamp = (num: number) => Math.max(0, Math.min(255, num));
-    return {
-      r: clamp(parseInt(r, 10)),
-      g: clamp(parseInt(g, 10)),
-      b: clamp(parseInt(b, 10)),
-    };
-  }
 
-  private rgbToHex(rgb: { r: number; g: number; b: number }) {
-    const toHex = (num: number) => num.toString(16).padStart(2, '0');
-    return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
-  }
-
-  private parseColorComponents(color: string) {
-    const hex = this.normalizeHexInput(color);
-    if (hex) {
-      return {
-        r: parseInt(hex.slice(1, 3), 16),
-        g: parseInt(hex.slice(3, 5), 16),
-        b: parseInt(hex.slice(5, 7), 16),
-      };
-    }
-
-    const match = color.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i);
-    if (!match) return null;
-    return {
-      r: Math.max(0, Math.min(255, parseInt(match[1], 10))),
-      g: Math.max(0, Math.min(255, parseInt(match[2], 10))),
-      b: Math.max(0, Math.min(255, parseInt(match[3], 10))),
-    };
-  }
-
-  private toRgbString(color: string) {
-    const comps = this.parseColorComponents(color);
-    if (!comps) return '';
-    return `rgb(${comps.r}, ${comps.g}, ${comps.b})`;
-  }
-
-  private ensureHex(color: string) {
-    const normalized = this.normalizeColor(color);
-    return normalized.startsWith('#') ? normalized : null;
-  }
 
   private updatePreviewColorState(color: string) {
-    const hex = this.ensureHex(color);
+    const hex = ensureHex(color);
     if (hex) {
       this.previewHexInput.set(hex);
-      this.previewRgbInput.set(this.toRgbString(hex));
+      this.previewRgbInput.set(toRgbString(hex));
     } else {
       this.previewHexInput.set(color.trim());
-      this.previewRgbInput.set(this.toRgbString(color));
+      this.previewRgbInput.set(toRgbString(color));
     }
   }
 
   private updateEditingColorState(color: string) {
-    const hex = this.ensureHex(color);
+    const hex = ensureHex(color);
     if (hex) {
       this.editHexInput.set(hex);
-      this.editRgbInput.set(this.toRgbString(hex));
+      this.editRgbInput.set(toRgbString(hex));
     } else {
       this.editHexInput.set(color.trim());
-      this.editRgbInput.set(this.toRgbString(color));
+      this.editRgbInput.set(toRgbString(color));
     }
   }
 
   setPreviewColorFromHex(value: string) {
     this.previewHexInput.set(value);
-    const normalized = this.normalizeHexInput(value);
+    const normalized = normalizeHexInput(value);
     if (!normalized) return;
     this.preview.update((p) => (p ? { ...p, field: { ...p.field, color: normalized } } : p));
     this.updatePreviewColorState(normalized);
@@ -1676,9 +1774,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   setPreviewColorFromRgb(value: string) {
     this.previewRgbInput.set(value);
-    const rgb = this.parseRgbText(value);
+    const rgb = parseRgbText(value);
     if (!rgb) return;
-    const hex = this.rgbToHex(rgb);
+    const hex = rgbToHex(rgb);
     this.preview.update((p) => (p ? { ...p, field: { ...p.field, color: hex } } : p));
     this.updatePreviewColorState(hex);
   }
@@ -1694,7 +1792,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.editHexInput.set(value);
-    const normalized = this.normalizeHexInput(value);
+    const normalized = normalizeHexInput(value);
     if (!normalized) return;
     this.editing.update((e) => {
       if (!e || e.field.locked) {
@@ -1711,9 +1809,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.editRgbInput.set(value);
-    const rgb = this.parseRgbText(value);
+    const rgb = parseRgbText(value);
     if (!rgb) return;
-    const hex = this.rgbToHex(rgb);
+    const hex = rgbToHex(rgb);
     this.editing.update((e) => {
       if (!e || e.field.locked) {
         return e;
@@ -1747,7 +1845,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const normalizedField = this.prepareFieldForStorage(p.field);
     if (
       this.applyCoordsChange(() =>
-        this.coords.update((pages) => this.addFieldToPages(p.page, normalizedField, pages))
+        this.coords.update((pages) => addFieldToPages(p.page, normalizedField, pages))
       )
     ) {
       this.syncCoordsTextModel();
@@ -1763,12 +1861,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   startEditing(pageIndex: number, fieldIndex: number, field: PageField) {
+    if (this.selection()) {
+      this.selection.set(null);
+      this.redrawAllForPage();
+    }
     const sanitized = this.prepareFieldForStorage(field);
     if (this.fieldRequiresStorageUpdate(field, sanitized)) {
       if (
         this.applyCoordsChange(() =>
           this.coords.update((pages) =>
-            this.updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
+            updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
           )
         )
       ) {
@@ -1795,7 +1897,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) =>
-          this.updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
+          updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
         )
       )
     ) {
@@ -1840,6 +1942,41 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         event.preventDefault();
         this.redo();
       }
+      return;
+    }
+
+    this.handleSelectionShortcut(event, key);
+  }
+
+  /** Ctrl/⌘+A, C, V and D work on the annotation selection (never while typing in a field). */
+  private handleSelectionShortcut(event: KeyboardEvent, key: string) {
+    if (!this.pdfDoc || this.isEditableElement(event.target) || this.preview() || this.editing()) {
+      return;
+    }
+
+    switch (key) {
+      case 'a':
+        event.preventDefault();
+        this.selectAllOnPage();
+        break;
+      case 'c':
+        if (this.copySelection()) {
+          event.preventDefault();
+        }
+        break;
+      case 'v':
+        if (this.selectionClipboard.length && this.pasteSelection()) {
+          event.preventDefault();
+        }
+        break;
+      case 'd':
+        if (this.selection()) {
+          event.preventDefault();
+          this.duplicateSelection();
+        }
+        break;
+      default:
+        break;
     }
   }
 
@@ -1864,6 +2001,31 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       target?.isContentEditable
     ) {
       return;
+    }
+
+    if (this.selection() && !this.preview() && !this.editing()) {
+      const step = event.shiftKey ? 10 : 1;
+      const nudges: Record<string, [number, number]> = {
+        arrowleft: [-step, 0],
+        arrowright: [step, 0],
+        arrowup: [0, step],
+        arrowdown: [0, -step],
+      };
+      if (key === 'escape') {
+        event.preventDefault();
+        this.clearSelection();
+        return;
+      }
+      if (key === 'delete' || key === 'backspace') {
+        event.preventDefault();
+        this.deleteSelection();
+        return;
+      }
+      if (nudges[key]) {
+        event.preventDefault();
+        this.moveSelection(nudges[key][0], nudges[key][1], 'nudge');
+        return;
+      }
     }
 
     const needsDocument = () => !!this.pdfDoc;
@@ -1978,7 +2140,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!e) return;
     if (
       this.applyCoordsChange(() =>
-        this.coords.update((pages) => this.removeFieldFromPages(e.pageIndex, e.fieldIndex, pages))
+        this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages))
       )
     ) {
       this.syncCoordsTextModel();
@@ -2021,7 +2183,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     const changed = this.applyCoordsChange(() => {
       this.coords.update((pages) => {
-        const updated = this.addFieldToPages(pageNum, newField, pages);
+        const updated = addFieldToPages(pageNum, newField, pages);
         insertedPageIndex = updated.findIndex((page) => page.num === pageNum);
         if (insertedPageIndex >= 0) {
           insertedFieldIndex = updated[insertedPageIndex].fields.length - 1;
@@ -2068,7 +2230,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return true;
     }
 
-    const type = this.normalizeFieldType(field.type);
+    const type = normalizeFieldType(field.type);
     if (type === 'check' || type === 'radio') {
       return true;
     }
@@ -2082,13 +2244,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private prepareFieldForStorage(field: PageField): PageField {
     const styled = this.ensureFieldStyle(field);
-    const type = this.normalizeFieldType(styled.type);
+    const type = normalizeFieldType(styled.type);
     const base: PageField = {
       x: styled.x,
       y: styled.y,
       mapField: typeof styled.mapField === 'string' ? styled.mapField : '',
       fontSize: styled.fontSize,
-      color: this.normalizeColor(styled.color),
+      color: normalizeColor(styled.color),
       type,
       fontFamily: styled.fontFamily ?? DEFAULT_FONT_ID,
       opacity: styled.opacity ?? DEFAULT_OPACITY,
@@ -2097,17 +2259,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       hidden: !!styled.hidden,
     };
 
-    const value = this.sanitizeTextPreservingSpacing(styled.value);
+    const value = sanitizeTextPreservingSpacing(styled.value);
     if (value !== undefined) {
       base.value = value;
     }
 
     if (type === 'number') {
-      const decimals = this.normalizeFieldDecimals(styled.decimals);
+      const decimals = normalizeFieldDecimals(styled.decimals);
       if (decimals !== undefined) {
         base.decimals = decimals;
       }
-      const appender = this.sanitizeOptionalAppender(styled.appender);
+      const appender = sanitizeOptionalAppender(styled.appender);
       if (appender !== undefined) {
         base.appender = appender;
       }
@@ -2133,34 +2295,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-  private normalizeFieldType(value: unknown): FieldType {
-    if (typeof value === 'string') {
-      const normalized = value.toLowerCase();
-      if (
-        normalized === 'check' ||
-        normalized === 'radio' ||
-        normalized === 'number' ||
-        normalized === 'text'
-      ) {
-        return normalized as FieldType;
-      }
-    }
-    return 'text';
-  }
 
-  private sanitizeTextPreservingSpacing(value: unknown): string | undefined {
-    if (typeof value !== 'string') {
-      return undefined;
-    }
-    return value.trim() ? value : undefined;
-  }
 
-  private sanitizeOptionalAppender(value: unknown): string | undefined {
-    if (typeof value !== 'string') {
-      return undefined;
-    }
-    return value.trim() ? value : undefined;
-  }
 
   private updateWorkingField(mode: EditorMode, mutator: (field: PageField) => PageField) {
     if (mode === 'preview') {
@@ -2186,336 +2322,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     });
   }
 
-  private buildFontOptions(): FontOption[] {
-    const standardOptions = STANDARD_FONT_FAMILIES.map(
-      (family): FontOption => ({
-        id: `standard:${family.id}`,
-        label: family.label,
-        type: 'standard',
-        cssFamily: family.cssFamily,
-        descriptor: { kind: 'standard', name: family.pdfName },
-      })
-    );
 
-    const customEnabled = this.customFontsFeatureEnabled();
-    const customOptions = customEnabled
-      ? this.customFonts().map(
-          (font): FontOption => ({
-            id: this.toCustomFontOptionId(font.id),
-            label: font.name,
-            type: 'custom',
-            cssFamily: `"${font.cssName}"`,
-            descriptor: { kind: 'custom', fontId: font.id },
-          })
-        )
-      : [];
 
-    return [...standardOptions, ...customOptions];
-  }
 
-  private toCustomFontOptionId(fontId: string): string {
-    return `custom:${fontId}`;
-  }
 
-  private getFontOptionById(fontId: string): FontOption {
-    const normalized = this.normalizeFontFamily(fontId);
-    const option = this.fontOptions().find((item) => item.id === normalized);
-    if (option) {
-      return option;
-    }
-    const fallback = this.fontOptions().find((item) => item.id === DEFAULT_FONT_ID);
-    if (!fallback) {
-      throw new Error('Default font option is not available.');
-    }
-    return fallback;
-  }
 
-  private normalizeFontFamily(value: unknown): string {
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      if (trimmed) {
-        const options = this.fontOptions();
-        if (options.some((option) => option.id === trimmed)) {
-          return trimmed;
-        }
-      }
-    }
-    return DEFAULT_FONT_ID;
-  }
-
-  private collectFontFamilyCandidates(rawField: Record<string, unknown>): unknown[] {
-    const candidates: unknown[] = [];
-    const push = (value: unknown) => {
-      if (value !== undefined && value !== null) {
-        candidates.push(value);
-      }
-    };
-
-    const directKeys = [
-      'fontFamily',
-      'fontfamily',
-      'font_family',
-      'fontFamilyName',
-      'font_family_name',
-      'font',
-      'fontName',
-      'font_name',
-      'familyName',
-      'fontId',
-      'font_id',
-      'fontFamilyId',
-      'font_family_id',
-      'fontFace',
-      'font_face',
-      'fontType',
-      'font_type',
-      'typeface',
-    ];
-
-    for (const key of directKeys) {
-      if (key in rawField) {
-        push(rawField[key]);
-      }
-    }
-
-    const style = rawField['style'];
-    if (style && typeof style === 'object') {
-      const styleRecord = style as Record<string, unknown>;
-      push(styleRecord['fontFamily']);
-      push(styleRecord['fontfamily']);
-      push(styleRecord['font']);
-      push(styleRecord['fontName']);
-      push(styleRecord['font_name']);
-    }
-
-    const font = rawField['font'];
-    if (font && typeof font === 'object') {
-      const fontRecord = font as Record<string, unknown>;
-      push(font);
-      push(fontRecord['id']);
-      push(fontRecord['name']);
-      push(fontRecord['family']);
-      push(fontRecord['value']);
-      push(fontRecord['fontFamily']);
-      push(fontRecord['font_name']);
-    }
-
-    const typography = (rawField as { typography?: unknown }).typography;
-    if (typography && typeof typography === 'object') {
-      const typographyRecord = typography as Record<string, unknown>;
-      push(typographyRecord['fontFamily']);
-      push(typographyRecord['font']);
-      push(typographyRecord['name']);
-    }
-
-    const meta = (rawField as { meta?: unknown }).meta;
-    if (meta && typeof meta === 'object') {
-      const metaRecord = meta as Record<string, unknown>;
-      const metaFont = metaRecord['font'];
-      if (metaFont && typeof metaFont === 'object') {
-        const metaFontRecord = metaFont as Record<string, unknown>;
-        push(metaFontRecord['id']);
-        push(metaFontRecord['name']);
-        push(metaFontRecord['family']);
-        push(metaFontRecord['fontFamily']);
-      }
-    }
-
-    return candidates;
-  }
-
-  private resolveImportedFontFamily(...candidates: unknown[]): string | undefined {
-    if (!candidates.length) {
-      return undefined;
-    }
-
-    const options = this.fontOptions();
-    if (!options.length) {
-      return undefined;
-    }
-
-    const sanitize = (value: string) => value.toLowerCase();
-    const canonical = (value: string) => sanitize(value).replace(/[^a-z0-9]/g, '');
-    const visited = new Set<string>();
-
-    const tryMatchOption = (input: string): string | undefined => {
-      const normalized = sanitize(input);
-      const simplified = canonical(input);
-
-      for (const option of options) {
-        if (option.id === input) {
-          return option.id;
-        }
-
-        const optionIdNormalized = sanitize(option.id);
-        if (optionIdNormalized === normalized || canonical(option.id) === simplified) {
-          return option.id;
-        }
-
-        const labelNormalized = sanitize(option.label);
-        if (labelNormalized === normalized || canonical(option.label) === simplified) {
-          return option.id;
-        }
-
-        if (option.type === 'standard') {
-          const baseId = option.id.replace(/^standard:/, '');
-          const baseNormalized = sanitize(baseId);
-          const baseCanonical = canonical(baseId);
-          if (
-            baseId === input ||
-            baseNormalized === normalized ||
-            baseCanonical === simplified ||
-            (baseCanonical.length >= 3 && simplified.includes(baseCanonical))
-          ) {
-            return option.id;
-          }
-        }
-
-        const labelCanonical = canonical(option.label);
-        if (labelCanonical.length >= 3 && simplified.includes(labelCanonical)) {
-          return option.id;
-        }
-
-        const cssParts = option.cssFamily
-          .split(',')
-          .map((part) => part.trim().replace(/^["'`]+|["'`]+$/g, ''))
-          .filter(Boolean);
-        for (const cssPart of cssParts) {
-          const cssNormalized = sanitize(cssPart);
-          if (cssNormalized === normalized || canonical(cssPart) === simplified) {
-            return option.id;
-          }
-        }
-      }
-
-      return undefined;
-    };
-
-    const attemptString = (value: string): string | undefined => {
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return undefined;
-      }
-
-      if (visited.has(trimmed)) {
-        return undefined;
-      }
-      visited.add(trimmed);
-
-      const direct = tryMatchOption(trimmed);
-      if (direct) {
-        return direct;
-      }
-
-      if (trimmed.includes(',')) {
-        for (const part of trimmed.split(',')) {
-          const result = attemptString(part.replace(/^["'`]+|["'`]+$/g, ''));
-          if (result) {
-            return result;
-          }
-        }
-      }
-
-      const unquoted = trimmed.replace(/^["'`]+|["'`]+$/g, '');
-      if (unquoted !== trimmed) {
-        const result = attemptString(unquoted);
-        if (result) {
-          return result;
-        }
-      }
-
-      return undefined;
-    };
-
-    const attempt = (value: unknown): string | undefined => {
-      if (value === null || value === undefined) {
-        return undefined;
-      }
-
-      if (typeof value === 'string') {
-        return attemptString(value);
-      }
-
-      if (typeof value === 'number' || typeof value === 'boolean') {
-        return attemptString(String(value));
-      }
-
-      if (Array.isArray(value)) {
-        for (const item of value) {
-          const result = attempt(item);
-          if (result) {
-            return result;
-          }
-        }
-        return undefined;
-      }
-
-      if (typeof value === 'object') {
-        const record = value as Record<string, unknown>;
-        const objectCandidates: unknown[] = [];
-
-        const candidateKeys = [
-          'id',
-          'value',
-          'name',
-          'label',
-          'family',
-          'font',
-          'fontFamily',
-          'fontFamilyId',
-          'fontId',
-          'font_id',
-          'font_name',
-          'fontFace',
-          'css',
-          'cssFamily',
-        ];
-
-        for (const key of candidateKeys) {
-          if (key in record) {
-            objectCandidates.push(record[key]);
-          }
-        }
-
-        const recordType = record['type'];
-        const recordName = record['name'];
-        if (typeof recordType === 'string' && typeof recordName === 'string') {
-          objectCandidates.push(`${recordType}:${recordName}`);
-        }
-
-        const recordKind = record['kind'];
-        if (typeof recordKind === 'string' && typeof recordName === 'string') {
-          objectCandidates.push(`${recordKind}:${recordName}`);
-        }
-
-        const recordAliases = record['aliases'];
-        if (Array.isArray(recordAliases)) {
-          objectCandidates.push(...recordAliases);
-        }
-
-        for (const candidate of objectCandidates) {
-          const result = attempt(candidate);
-          if (result) {
-            return result;
-          }
-        }
-      }
-
-      return undefined;
-    };
-
-    for (const candidate of candidates) {
-      const result = attempt(candidate);
-      if (result) {
-        return result;
-      }
-    }
-
-    return undefined;
-  }
 
   private normalizeOpacityValue(value: unknown): number | undefined {
-    const numeric = this.toFiniteNumber(value);
+    const numeric = toFiniteNumber(value);
     if (numeric === null) {
       return undefined;
     }
@@ -2531,11 +2345,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!trimmed || trimmed.toLowerCase() === 'transparent') {
       return undefined;
     }
-    return this.normalizeColor(trimmed);
+    return normalizeColor(trimmed);
   }
 
   private ensureFieldStyle(field: PageField): PageField {
-    const fontFamily = this.normalizeFontFamily(field.fontFamily);
+    const fontFamily = this.fontCatalog.normalizeFontFamily(field.fontFamily);
     const opacity = this.normalizeOpacityValue(field.opacity) ?? DEFAULT_OPACITY;
     const background = this.normalizeBackgroundColor(field.backgroundColor) ?? null;
     const locked = !!field.locked;
@@ -2571,40 +2385,19 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-  private resolveCssFontFamily(fontId: string): string {
-    const option = this.getFontOptionById(fontId);
-    return option.cssFamily;
-  }
+
 
   private async registerCustomFont(file: File) {
     if (typeof FontFace === 'undefined') {
-      alert(this.translationService.translate('fonts.custom.unsupported'));
+      this.toast.error(this.translationService.translate('fonts.custom.unsupported'));
       return;
     }
 
     try {
-      const buffer = await file.arrayBuffer();
-      const fontId = this.createRuntimeId('font');
-      const baseName = file.name.replace(/\.[^.]+$/, '') || file.name;
-      const safeName = baseName.replace(/[^a-zA-Z0-9_-]+/g, '-');
-      const cssName = `${safeName}-${fontId}`;
-      const fontFace = new FontFace(cssName, buffer);
-      await fontFace.load();
-      if (this.document?.fonts) {
-        this.document.fonts.add(fontFace);
-      }
-
-      const entry: CustomFontEntry = {
-        id: fontId,
-        name: baseName,
-        cssName,
-        data: new Uint8Array(buffer),
-      };
-
-      this.customFonts.update((fonts) => [entry, ...fonts.filter((font) => font.id !== entry.id)]);
+      await this.fontCatalog.registerCustomFont(file);
     } catch (error) {
       console.error('No se pudo cargar la fuente personalizada.', error);
-      alert(this.translationService.translate('fonts.custom.error'));
+      this.toast.error(this.translationService.translate('fonts.custom.error'));
     }
   }
 
@@ -2989,31 +2782,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     el.style.width = `${width}px`;
   }
 
-  private hexToRgbComponents(color: string): { r: number; g: number; b: number } | null {
-    const normalized = this.normalizeColor(color);
-    const hex = normalized.replace('#', '');
-    if (hex.length !== 6) {
-      return null;
-    }
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    if ([r, g, b].some((value) => Number.isNaN(value))) {
-      return null;
-    }
-    return { r, g, b };
-  }
 
-  private normalizeFieldDecimals(value: unknown): number | undefined {
-    if (value === null || value === undefined || value === '') {
-      return undefined;
-    }
-    const parsed = this.toFiniteNumber(value);
-    if (parsed === null || parsed < 0) {
-      return undefined;
-    }
-    return Math.round(parsed);
-  }
 
   private getFieldRenderValue(field: PageField): string {
     const override =
@@ -3022,7 +2791,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return override;
     }
 
-    const type = this.normalizeFieldType(field.type);
+    const type = normalizeFieldType(field.type);
     if (type === 'check' || type === 'radio') {
       return 'X';
     }
@@ -3030,12 +2799,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const baseText = typeof field.mapField === 'string' ? field.mapField : '';
 
     if (type === 'number') {
-      const numeric = this.toFiniteNumber(baseText);
+      const numeric = toFiniteNumber(baseText);
       if (numeric !== null) {
-        const decimals = this.normalizeFieldDecimals(field.decimals);
+        const decimals = normalizeFieldDecimals(field.decimals);
         const formatted =
-          decimals !== undefined ? this.formatNumberWithTruncation(numeric, decimals) : baseText;
-        const appender = this.sanitizeOptionalAppender(field.appender) ?? '';
+          decimals !== undefined ? formatNumberWithTruncation(numeric, decimals) : baseText;
+        const appender = sanitizeOptionalAppender(field.appender) ?? '';
         return `${formatted}${appender}`;
       }
     }
@@ -3043,58 +2812,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return baseText;
   }
 
-  private addFieldToPages(
-    pageNum: number,
-    field: PageField,
-    pages: PageAnnotations[]
-  ): PageAnnotations[] {
-    const pageIndex = pages.findIndex((page) => page.num === pageNum);
-    if (pageIndex >= 0) {
-      return pages.map((page, idx) =>
-        idx === pageIndex ? { ...page, fields: [...page.fields, field] } : page
-      );
-    }
-    return [...pages, { num: pageNum, fields: [field] }].sort((a, b) => a.num - b.num);
-  }
 
-  private updateFieldInPages(
-    pageIndex: number,
-    fieldIndex: number,
-    field: PageField,
-    pages: PageAnnotations[]
-  ): PageAnnotations[] {
-    return pages.map((page, idx) => {
-      if (idx !== pageIndex) {
-        return page;
-      }
-      if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
-        return page;
-      }
-      const updatedFields = page.fields.map((item, itemIdx) =>
-        itemIdx === fieldIndex ? { ...field } : item
-      );
-      return { ...page, fields: updatedFields };
-    });
-  }
 
-  private removeFieldFromPages(
-    pageIndex: number,
-    fieldIndex: number,
-    pages: PageAnnotations[]
-  ): PageAnnotations[] {
-    return pages
-      .map((page, idx) => {
-        if (idx !== pageIndex) {
-          return page;
-        }
-        if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
-          return page;
-        }
-        const updatedFields = page.fields.filter((_, i) => i !== fieldIndex);
-        return { ...page, fields: updatedFields };
-      })
-      .filter((page) => page.fields.length > 0);
-  }
 
   redrawAllForPage() {
     const layer = this.annotationsLayerRef?.nativeElement;
@@ -3123,7 +2842,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           el.style.top = `${top - styledField.fontSize * scale}px`;
           el.style.fontSize = `${styledField.fontSize * scale}px`;
           el.style.color = styledField.color;
-          el.style.fontFamily = this.resolveCssFontFamily(
+          el.style.fontFamily = this.fontCatalog.resolveCssFontFamily(
             styledField.fontFamily ?? DEFAULT_FONT_ID
           );
           el.style.opacity = `${styledField.opacity ?? DEFAULT_OPACITY}`;
@@ -3141,6 +2860,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           }
           el.classList.toggle('annotation--locked', isLocked);
           el.classList.toggle('annotation--hidden', isHidden);
+          el.dataset['pageIndex'] = `${pageIndex}`;
+          el.dataset['fieldIndex'] = `${fieldIndex}`;
+          el.classList.toggle('annotation--selected', this.isSelected(pageIndex, fieldIndex));
           el.onpointerdown = isLocked
             ? (evt) => this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex)
             : (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
@@ -3152,6 +2874,435 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     this.refreshOverlay();
   }
+
+  isSelected(pageIndex: number, fieldIndex: number): boolean {
+    const selected = this.selection();
+    return !!selected && selected.pageIndex === pageIndex && selected.fields.includes(fieldIndex);
+  }
+
+  /** Drops the selection and repaints (call before changing what is shown). */
+  clearSelection(): void {
+    if (!this.selection()) {
+      return;
+    }
+    this.selection.set(null);
+    this.redrawAllForPage();
+  }
+
+  toggleSelection(pageIndex: number, fieldIndex: number): void {
+    this.dismissEditors();
+    // Pressing on an annotation does not move focus, so leave any text field the user was in;
+    // otherwise Delete/arrow/Ctrl+C would keep going to that field instead of the selection.
+    this.releaseButtonFocus();
+    const selected = this.selection();
+    const current = selected && selected.pageIndex === pageIndex ? selected.fields : [];
+    const next = current.includes(fieldIndex)
+      ? current.filter((index) => index !== fieldIndex)
+      : [...current, fieldIndex].sort((a, b) => a - b);
+    this.selection.set(next.length ? { pageIndex, fields: next } : null);
+    this.redrawAllForPage();
+  }
+
+  selectAllOnPage(): void {
+    const pageIndex = this.coords().findIndex((page) => page.num === this.pageIndex());
+    if (pageIndex < 0) {
+      return;
+    }
+    const fields = this.coords()[pageIndex].fields
+      .map((field, index) => ({ field, index }))
+      .filter(({ field }) => !field.locked)
+      .map(({ index }) => index);
+    this.dismissEditors();
+    this.selection.set(fields.length ? { pageIndex, fields } : null);
+    this.redrawAllForPage();
+  }
+
+  /** Aligns the selected annotations (needs at least two) as a single undo step. */
+  alignSelection(mode: AlignMode): void {
+    const selected = this.selection();
+    const scale = this.scale();
+    if (!selected || selected.fields.length < 2 || !scale) {
+      return;
+    }
+
+    const positions = alignBoxes(this.selectionBoxes(), mode);
+    this.updateSelectedFields((field, order) => ({ ...field, ...positions[order] }));
+    this.releaseButtonFocus();
+  }
+
+  /** Spaces the selected annotations evenly between the outermost ones (needs three or more). */
+  distributeSelection(axis: DistributeAxis): void {
+    const selected = this.selection();
+    if (!selected || selected.fields.length < 3 || !this.scale()) {
+      return;
+    }
+    const positions = distributeBoxes(this.selectionBoxes(), axis);
+    this.updateSelectedFields((field, order) => ({ ...field, ...positions[order] }));
+    this.releaseButtonFocus();
+  }
+
+  /** Selected annotations as boxes in PDF points (width from the rendered element). */
+  private selectionBoxes() {
+    const selected = this.selection()!;
+    const scale = this.scale();
+    const page = this.coords()[selected.pageIndex];
+    return selected.fields.map((index) => {
+      const field = this.ensureFieldStyle(page.fields[index]);
+      return {
+        x: field.x,
+        y: field.y,
+        width: this.annotationWidthPx(selected.pageIndex, index, field) / scale,
+        height: field.fontSize,
+      };
+    });
+  }
+
+  /** Rubber-band rectangle (px, relative to the page) while dragging on an empty area. */
+  readonly lasso = signal<{ left: number; top: number; width: number; height: number } | null>(
+    null
+  );
+  private lassoDrag: {
+    pointerId: number;
+    startX: number;
+    startY: number;
+    originLeft: number;
+    originTop: number;
+    active: boolean;
+    additive: boolean;
+  } | null = null;
+  private suppressHitboxClick = false;
+
+  onHitboxPointerDown(evt: PointerEvent): void {
+    if (evt.button !== 0 || !this.pdfDoc || this.editing()) {
+      return;
+    }
+    const target = evt.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    this.lassoDrag = {
+      pointerId: evt.pointerId,
+      startX: evt.clientX,
+      startY: evt.clientY,
+      originLeft: rect.left,
+      originTop: rect.top,
+      active: false,
+      additive: evt.shiftKey || evt.ctrlKey || evt.metaKey,
+    };
+    target.setPointerCapture?.(evt.pointerId);
+  }
+
+  onHitboxPointerMove(evt: PointerEvent): void {
+    const drag = this.lassoDrag;
+    if (!drag || evt.pointerId !== drag.pointerId) {
+      return;
+    }
+    if (!drag.active) {
+      if (Math.hypot(evt.clientX - drag.startX, evt.clientY - drag.startY) <= 4) {
+        return;
+      }
+      drag.active = true;
+      this.dismissEditors();
+    }
+    evt.preventDefault();
+    this.lasso.set({
+      left: Math.min(drag.startX, evt.clientX) - drag.originLeft,
+      top: Math.min(drag.startY, evt.clientY) - drag.originTop,
+      width: Math.abs(evt.clientX - drag.startX),
+      height: Math.abs(evt.clientY - drag.startY),
+    });
+  }
+
+  onHitboxPointerUp(evt: PointerEvent): void {
+    const drag = this.lassoDrag;
+    if (!drag || evt.pointerId !== drag.pointerId) {
+      return;
+    }
+    this.lassoDrag = null;
+    (evt.currentTarget as HTMLElement).releasePointerCapture?.(evt.pointerId);
+    this.lasso.set(null);
+    if (!drag.active || evt.type === 'pointercancel') {
+      return;
+    }
+
+    // The click that follows a drag must not create an annotation.
+    this.suppressHitboxClick = true;
+    setTimeout(() => (this.suppressHitboxClick = false), 0);
+
+    const x1 = Math.min(drag.startX, evt.clientX);
+    const x2 = Math.max(drag.startX, evt.clientX);
+    const y1 = Math.min(drag.startY, evt.clientY);
+    const y2 = Math.max(drag.startY, evt.clientY);
+    const layer = this.annotationsLayerRef?.nativeElement;
+    const hit = Array.from(layer?.querySelectorAll<HTMLElement>('.annotation') ?? [])
+      .filter((el) => el.dataset['locked'] !== 'true')
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.right >= x1 && r.left <= x2 && r.bottom >= y1 && r.top <= y2;
+      })
+      .map((el) => ({ pageIndex: Number(el.dataset['pageIndex']), field: Number(el.dataset['fieldIndex']) }));
+
+    const previous = this.selection();
+    const pageIndex = hit[0]?.pageIndex ?? previous?.pageIndex ?? 0;
+    const base = drag.additive && previous?.pageIndex === pageIndex ? previous.fields : [];
+    const fields = Array.from(new Set([...base, ...hit.map((h) => h.field)])).sort((a, b) => a - b);
+    this.selection.set(fields.length ? { pageIndex, fields } : null);
+    this.redrawAllForPage();
+  }
+
+  /** Moves the selection by a delta in PDF points (clamped to the page). */
+  moveSelection(dx: number, dy: number, coalesceKey?: string): void {
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    const scale = this.scale();
+    if (!this.selection() || !pdfCanvas || !scale) {
+      return;
+    }
+    const maxX = pdfCanvas.width / scale;
+    const maxY = pdfCanvas.height / scale;
+    this.updateSelectedFields(
+      (field) => ({
+        ...field,
+        x: this.roundToTwo(this.clamp(field.x + dx, 0, maxX)),
+        y: this.roundToTwo(this.clamp(field.y + dy, 0, maxY)),
+      }),
+      coalesceKey
+    );
+  }
+
+  deleteSelection(): void {
+    const selected = this.selection();
+    if (!selected) {
+      return;
+    }
+    const doomed = new Set(selected.fields);
+    const changed = this.applyCoordsChange(() =>
+      this.coords.update((pages) =>
+        pages
+          .map((page, index) =>
+            index === selected.pageIndex
+              ? { ...page, fields: page.fields.filter((_, i) => !doomed.has(i)) }
+              : page
+          )
+          .filter((page) => page.fields.length > 0)
+      )
+    );
+    this.selection.set(null);
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
+    this.redrawAllForPage();
+    this.releaseButtonFocus();
+  }
+
+  copySelection(): boolean {
+    const fields = this.selectedFields();
+    if (!fields.length) {
+      return false;
+    }
+    this.selectionClipboard = fields.map((field) => ({ ...this.prepareFieldForStorage(field) }));
+    return true;
+  }
+
+  pasteSelection(): boolean {
+    return this.insertCopies(this.selectionClipboard);
+  }
+
+  duplicateSelection(): void {
+    if (this.copySelection()) {
+      this.insertCopies(this.selectionClipboard);
+    }
+    this.releaseButtonFocus();
+  }
+
+  /** Adds offset copies on the current page as one undo step and selects them. */
+  private insertCopies(fields: readonly PageField[]): boolean {
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    const scale = this.scale();
+    if (!fields.length || !this.pdfDoc || !pdfCanvas || !scale) {
+      return false;
+    }
+
+    const pageNum = this.pageIndex();
+    const offset = this.roundToTwo(8 / scale);
+    const maxX = this.roundToTwo(pdfCanvas.width / scale);
+    const maxY = this.roundToTwo(pdfCanvas.height / scale);
+    const copies = fields.map((field) => ({
+      ...field,
+      x: this.roundToTwo(this.clamp(field.x + offset, 0, maxX)),
+      y: this.roundToTwo(this.clamp(field.y - offset, 0, maxY)),
+    }));
+
+    let firstIndex = 0;
+    const changed = this.applyCoordsChange(() =>
+      this.coords.update((pages) => {
+        const existing = pages.find((page) => page.num === pageNum);
+        firstIndex = existing ? existing.fields.length : 0;
+        return copies.reduce((acc, copy) => addFieldToPages(pageNum, copy, acc), pages);
+      })
+    );
+    if (!changed) {
+      return false;
+    }
+
+    const pageIndex = this.coords().findIndex((page) => page.num === pageNum);
+    this.dismissEditors();
+    this.selection.set({
+      pageIndex,
+      fields: copies.map((_, i) => firstIndex + i),
+    });
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
+    return true;
+  }
+
+  private selectedFields(): PageField[] {
+    const selected = this.selection();
+    if (!selected) {
+      return [];
+    }
+    const page = this.coords()[selected.pageIndex];
+    return selected.fields.map((index) => page?.fields[index]).filter((f): f is PageField => !!f);
+  }
+
+  /** Applies `update` to every selected field in a single history step. */
+  private updateSelectedFields(
+    update: (field: PageField, order: number) => PageField,
+    coalesceKey?: string
+  ): void {
+    const selected = this.selection();
+    if (!selected) {
+      return;
+    }
+    const order = new Map(selected.fields.map((index, position) => [index, position]));
+    const changed = this.applyCoordsChange(
+      () =>
+        this.coords.update((pages) =>
+          pages.map((page, pageIdx) =>
+            pageIdx !== selected.pageIndex
+              ? page
+              : {
+                  ...page,
+                  fields: page.fields.map((field, fieldIdx) =>
+                    order.has(fieldIdx) ? update(field, order.get(fieldIdx)!) : field
+                  ),
+                }
+          )
+        ),
+      coalesceKey ? { coalesceKey } : undefined
+    );
+    if (changed) {
+      this.syncCoordsTextModel();
+    }
+    this.redrawAllForPage();
+  }
+
+  /** Rendered width of an annotation in px (falls back to a rough estimate before first paint). */
+  private annotationWidthPx(pageIndex: number, fieldIndex: number, field: PageField): number {
+    const el = this.annotationsLayerRef?.nativeElement.querySelector<HTMLElement>(
+      `[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`
+    );
+    if (el && el.offsetWidth > 0) {
+      return el.offsetWidth;
+    }
+    return this.getFieldRenderValue(field).length * field.fontSize * 0.5 * this.scale();
+  }
+
+  private releaseButtonFocus(): void {
+    (this.document?.activeElement as HTMLElement | null)?.blur?.();
+  }
+
+  private startGroupDrag(evt: PointerEvent, pressed: HTMLElement, fields: readonly number[]) {
+    const layer = this.annotationsLayerRef?.nativeElement;
+    if (!layer) {
+      return;
+    }
+    const items = fields
+      .map((index) =>
+        layer.querySelector<HTMLElement>(`[data-field-index="${index}"]`)
+      )
+      .filter((el): el is HTMLElement => !!el)
+      .map((el) => ({
+        el,
+        startLeft: parseFloat(el.style.left || '0'),
+        startTop: parseFloat(el.style.top || '0'),
+        width: el.offsetWidth,
+        fontPx: parseFloat(getComputedStyle(el).fontSize || '0'),
+      }));
+
+    this.groupDrag = {
+      pointerId: evt.pointerId,
+      startX: evt.clientX,
+      startY: evt.clientY,
+      moved: false,
+      dx: 0,
+      dy: 0,
+      items,
+    };
+    pressed.setPointerCapture(evt.pointerId);
+    pressed.onpointermove = this.handleGroupPointerMove;
+    pressed.onpointerup = this.handleGroupPointerUp;
+    pressed.onpointercancel = this.handleGroupPointerUp;
+  }
+
+  private handleGroupPointerMove = (evt: PointerEvent) => {
+    const drag = this.groupDrag;
+    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
+    if (!drag || !pdfCanvas || evt.pointerId !== drag.pointerId) {
+      return;
+    }
+    evt.preventDefault();
+    const rawDx = evt.clientX - drag.startX;
+    const rawDy = evt.clientY - drag.startY;
+    if (!drag.moved && Math.abs(rawDx) <= 2 && Math.abs(rawDy) <= 2) {
+      return;
+    }
+    drag.moved = true;
+
+    // Clamp the whole group so every member stays inside the page and spacing is preserved.
+    const minDx = Math.max(...drag.items.map((i) => -i.startLeft));
+    const maxDx = Math.min(...drag.items.map((i) => pdfCanvas.width - i.width - i.startLeft));
+    const minDy = Math.max(...drag.items.map((i) => -i.fontPx - i.startTop));
+    const maxDy = Math.min(...drag.items.map((i) => pdfCanvas.height - i.fontPx - i.startTop));
+    drag.dx = this.clamp(rawDx, Math.min(minDx, 0), Math.max(maxDx, 0));
+    drag.dy = this.clamp(rawDy, Math.min(minDy, 0), Math.max(maxDy, 0));
+
+    for (const item of drag.items) {
+      item.el.style.left = `${item.startLeft + drag.dx}px`;
+      item.el.style.top = `${item.startTop + drag.dy}px`;
+    }
+  };
+
+  private handleGroupPointerUp = (evt: PointerEvent) => {
+    const drag = this.groupDrag;
+    if (!drag || evt.pointerId !== drag.pointerId) {
+      return;
+    }
+    evt.preventDefault();
+    evt.stopPropagation();
+    const pressed = evt.currentTarget as HTMLElement | null;
+    pressed?.releasePointerCapture?.(evt.pointerId);
+    if (pressed) {
+      pressed.onpointermove = null;
+      pressed.onpointerup = null;
+      pressed.onpointercancel = null;
+    }
+    this.groupDrag = null;
+
+    if (drag.moved && evt.type !== 'pointercancel') {
+      const scale = this.scale();
+      this.moveSelection(drag.dx / scale, -drag.dy / scale);
+    } else {
+      // A plain click on a member: behave like a normal click on that annotation.
+      this.redrawAllForPage();
+      if (evt.type !== 'pointercancel') {
+        const index = Number(pressed?.dataset['fieldIndex']);
+        const pageIdx = Number(pressed?.dataset['pageIndex']);
+        const field = this.coords()[pageIdx]?.fields[index];
+        this.selection.set(null);
+        if (field) {
+          this.startEditing(pageIdx, index, field);
+        }
+      }
+    }
+  };
 
   private handleLockedAnnotationPointerDown(
     evt: PointerEvent,
@@ -3185,6 +3336,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex);
       return;
     }
+
+    if (evt.shiftKey || evt.ctrlKey || evt.metaKey) {
+      this.toggleSelection(pageIndex, fieldIndex);
+      return;
+    }
+
+    const selected = this.selection();
+    if (
+      selected &&
+      selected.pageIndex === pageIndex &&
+      selected.fields.length > 1 &&
+      selected.fields.includes(fieldIndex)
+    ) {
+      this.startGroupDrag(evt, el, selected.fields);
+      return;
+    }
+    if (selected) {
+      this.clearSelection();
+    }
+
     this.dragInfo = {
       pageIndex,
       fieldIndex,
@@ -3385,6 +3556,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
+    this.selection.set(null);
     this.pageIndex.set(clamped);
     await this.render();
     this.redrawAllForPage();
@@ -3452,7 +3624,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     this.includeAdvancedJsonFields.set(checked);
-    this.syncCoordsTextModel(false);
+    this.syncCoordsTextModel();
   }
 
   onCoordsTextChange(value: string) {
@@ -3509,18 +3681,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     try {
       const parsed = parseLooseJson(text);
-      const normalized = this.normalizeImportedCoordinates(parsed);
+      const report = emptyImportReport();
+      const normalized = this.annotationImport.normalizeImportedCoordinates(
+        parsed,
+        (field) => this.prepareFieldForStorage(field),
+        report
+      );
 
       if (normalized === null) {
-        throw new Error('Formato no válido');
+        throw new JsonShapeError();
       }
 
       this.replaceCoords(normalized, { preserveTextModel: true });
+      if (!options.silent) {
+        void this.reportImportIssues(report, normalized);
+      }
       return true;
     } catch (error) {
       if (!options.silent) {
         console.error('No se pudo importar el JSON de anotaciones.', error);
-        alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+        this.reportJsonImportError(error);
       }
       return false;
     }
@@ -3550,30 +3730,28 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       const text = await file.text();
       const parsed = parseLooseJson(text);
-      const normalized = this.normalizeImportedCoordinates(parsed);
+      const report = emptyImportReport();
+      const normalized = this.annotationImport.normalizeImportedCoordinates(
+        parsed,
+        (field) => this.prepareFieldForStorage(field),
+        report
+      );
       if (normalized === null) {
-        throw new Error('Formato no válido');
+        throw new JsonShapeError();
       }
 
       this.replaceCoords(normalized, { preserveTextModel: false });
+      void this.reportImportIssues(report, normalized);
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
-      alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+      this.reportJsonImportError(error);
     } finally {
       input.value = '';
     }
   }
 
   downloadJSON() {
-    const blob = new Blob([this.coordsTextModel], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'coords.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([this.coordsTextModel], { type: 'application/json' }), 'coords.json');
   }
 
   saveCurrentAsTemplate() {
@@ -3625,7 +3803,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private applyTemplate(template: AnnotationTemplate) {
-    const clonedPages = this.clonePages(template.pages);
+    const clonedPages = cloneAnnotationPages(template.pages);
     const nextGuideSettings = cloneGuideSettings(template.guideSettings);
 
     this.coords.set(clonedPages);
@@ -3643,12 +3821,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.redrawAllForPage();
   }
 
-  private clonePages(pages: readonly PageAnnotations[]): PageAnnotations[] {
-    return pages.map((page) => ({
-      num: page.num,
-      fields: page.fields.map((field) => ({ ...field })),
-    }));
-  }
 
   private ensureCoordsFileInput(): HTMLInputElement | null {
     if (this.coordsFileInputFallback) {
@@ -3673,155 +3845,25 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!this.pdfDoc) return;
 
     try {
-      const pdfLib = await import('pdf-lib');
-      const { PDFDocument: PdfLibDocument, rgb, StandardFonts } = pdfLib;
-      const loadOptions = {
-        ignoreEncryption: true,
-        updateMetadata: false,
-        throwOnInvalidObject: false,
-      } as const;
+      const customFonts = new Map<string, CustomFontEntry>();
+      this.customFonts().forEach((fontEntry) => customFonts.set(fontEntry.id, fontEntry));
 
-      const candidates = await this.getPdfByteCandidates();
-      if (!candidates.length) {
-        throw new Error('No se encontraron bytes de PDF para procesar.');
-      }
+      const { bytes, sourceBytes } = await this.pdfExportService.exportAnnotatedPdf({
+        pdfByteCandidates: await this.getPdfByteCandidates(),
+        pages: this.coords(),
+        customFonts,
+        defaultFontId: DEFAULT_FONT_ID,
+        defaultOpacity: DEFAULT_OPACITY,
+        styleField: (field) => this.ensureFieldStyle(field),
+        renderText: (field) => this.getFieldRenderValue(field),
+        resolveFont: (fontId) => this.fontCatalog.getFontOptionById(fontId),
+      });
 
-      let pdf: InstanceType<typeof PdfLibDocument> | null = null;
-      let usedBytes: Uint8Array | null = null;
-      const loadErrors: unknown[] = [];
-
-      for (const candidate of candidates) {
-        try {
-          pdf = await PdfLibDocument.load(candidate, loadOptions);
-          usedBytes = candidate;
-          break;
-        } catch (error) {
-          loadErrors.push(error);
-        }
-      }
-
-      if (!pdf || !usedBytes) {
-        throw new Error(
-          `No se pudo cargar el PDF original (${loadErrors.length} intentos fallidos).`
-        );
-      }
-
-      this.rememberPdfBytes(usedBytes, 3);
-      const fontCache = new Map<string, any>();
-      const customFontMap = new Map<string, CustomFontEntry>();
-      this.customFonts().forEach((fontEntry) => customFontMap.set(fontEntry.id, fontEntry));
-      const needsFontkit = customFontMap.size > 0;
-      if (needsFontkit) {
-        try {
-          const fontkit = await WorkspacePageComponent.loadFontkit();
-          if (typeof pdf.registerFontkit === 'function') {
-            pdf.registerFontkit(fontkit);
-          } else {
-            console.warn('La instancia de PDFDocument no soporta registerFontkit.');
-          }
-        } catch (error) {
-          console.error('No se pudo registrar fontkit para fuentes personalizadas.', error);
-          throw error instanceof Error
-            ? error
-            : new Error('No se pudo inicializar fontkit para fuentes personalizadas.');
-        }
-      }
-      const defaultFontOption = this.getFontOptionById(DEFAULT_FONT_ID);
-      const defaultVariant = defaultFontOption.descriptor;
-      const pdfPageCount = pdf.getPageCount();
-
-      const getFontFromDescriptor = async (descriptor: FontVariantDescriptor): Promise<any> => {
-        if (descriptor.kind === 'standard') {
-          const cacheKey = `standard:${descriptor.name}`;
-          if (!fontCache.has(cacheKey)) {
-            fontCache.set(cacheKey, await pdf.embedFont(StandardFonts[descriptor.name]));
-          }
-          return fontCache.get(cacheKey);
-        }
-
-        const custom = customFontMap.get(descriptor.fontId);
-        if (!custom) {
-          return getFontFromDescriptor(defaultVariant);
-        }
-
-        const cacheKey = `custom:${descriptor.fontId}`;
-        if (!fontCache.has(cacheKey)) {
-          fontCache.set(cacheKey, await pdf.embedFont(custom.data, { subset: true }));
-        }
-        return fontCache.get(cacheKey);
-      };
-
-      for (const pageAnnotations of this.coords()) {
-        const targetIndex = Math.trunc(pageAnnotations.num) - 1;
-        if (!Number.isFinite(targetIndex) || targetIndex < 0 || targetIndex >= pdfPageCount) {
-          console.warn(
-            `Se ignoraron anotaciones para la página ${pageAnnotations.num} porque el PDF solo tiene ${pdfPageCount} páginas.`
-          );
-          continue;
-        }
-
-        const page = pdf.getPage(targetIndex);
-        const fields = pageAnnotations.fields ?? [];
-
-        for (const field of fields) {
-          const styledField = this.ensureFieldStyle(field);
-          if (styledField.hidden) {
-            continue;
-          }
-          const text = this.getFieldRenderValue(styledField);
-          const fontOption = this.getFontOptionById(styledField.fontFamily ?? DEFAULT_FONT_ID);
-          const embeddedFont = await getFontFromDescriptor(fontOption.descriptor);
-          const textColor = this.hexToRgbComponents(styledField.color) ?? { r: 0, g: 0, b: 0 };
-          const opacity = styledField.opacity ?? DEFAULT_OPACITY;
-
-          const drawX = styledField.x;
-          const textWidth = embeddedFont.widthOfTextAtSize(text, styledField.fontSize);
-
-          if (styledField.backgroundColor) {
-            const bg = this.hexToRgbComponents(styledField.backgroundColor);
-            if (bg) {
-              const totalHeight = embeddedFont.heightAtSize(styledField.fontSize);
-              const ascent = embeddedFont.heightAtSize(styledField.fontSize, { descender: false });
-              const descent = totalHeight - ascent;
-              if (textWidth > 0 && totalHeight > 0) {
-                page.drawRectangle({
-                  x: drawX,
-                  y: styledField.y - descent,
-                  width: textWidth,
-                  height: totalHeight,
-                  color: rgb(bg.r / 255, bg.g / 255, bg.b / 255),
-                  opacity,
-                });
-              }
-            }
-          }
-
-          if (text) {
-            page.drawText(text, {
-              x: drawX,
-              y: styledField.y,
-              size: styledField.fontSize,
-              color: rgb(textColor.r / 255, textColor.g / 255, textColor.b / 255),
-              font: embeddedFont,
-              opacity,
-            });
-          }
-        }
-      }
-
-      const pdfBytes = await pdf.save({ useObjectStreams: false });
-      const blob = new Blob([this.toArrayBuffer(pdfBytes)], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'annotated.pdf';
-      a.click();
-      URL.revokeObjectURL(url);
+      this.rememberPdfBytes(sourceBytes, 3);
+      downloadBlob(new Blob([toArrayBuffer(bytes)], { type: 'application/pdf' }), 'annotated.pdf');
     } catch (error) {
       console.error('No se pudo generar el PDF anotado.', error);
-      alert(
-        'No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.'
-      );
+      this.toast.error(this.translationService.translate('toast.exportPdfFailed'));
     }
   }
 
@@ -3853,14 +3895,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       .map((entry) => entry.bytes.slice());
   }
 
-  private toArrayBuffer(data: Uint8Array<ArrayBufferLike> | ArrayBuffer): ArrayBuffer {
-    if (data instanceof Uint8Array) {
-      const copy = new Uint8Array(data.byteLength);
-      copy.set(data);
-      return copy.buffer;
-    }
-    return data;
-  }
 
   private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
     if (!data) return;
@@ -3874,20 +3908,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  private syncCoordsTextModel(persist = true) {
-    const currentCoords = this.coords();
-    this.coordsTextModel = JSON.stringify(this.buildJsonExportPayload(currentCoords), null, 2);
+  private syncCoordsTextModel() {
+    this.coordsTextModel = JSON.stringify(this.buildJsonExportPayload(this.coords()), null, 2);
     this.refreshJsonPreview();
-    if (persist) {
-      this.templatesService.storeLastCoords(currentCoords);
-    }
   }
 
   private snapshotCoords(pages: PageAnnotations[] = this.coords()): PageAnnotations[] {
-    return pages.map((page) => ({
-      num: page.num,
-      fields: page.fields.map((field) => ({ ...field })),
-    }));
+    return this.store.snapshot(pages);
   }
 
   private buildJsonExportPayload(pages: PageAnnotations[]): {
@@ -3923,15 +3950,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-  private applyCoordsChange(mutator: () => void): boolean {
-    const previous = this.snapshotCoords();
-    mutator();
-    const changed = !this.areCoordsEqual(previous, this.coords());
-    if (changed) {
-      this.undoStack.update((stack) => [...stack, previous]);
-      this.redoStack.set([]);
-    }
-    return changed;
+  private applyCoordsChange(mutator: () => void, options?: { coalesceKey?: string }): boolean {
+    return this.store.applyChange(mutator, options);
   }
 
   private replaceCoords(
@@ -3939,6 +3959,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     options?: { skipHistory?: boolean; preserveTextModel?: boolean }
   ) {
     const snapshot = this.snapshotCoords(newCoords);
+    this.selection.set(null);
     if (options?.skipHistory) {
       this.coords.set(snapshot);
     } else {
@@ -3955,37 +3976,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private resetHistory() {
-    this.undoStack.set([]);
-    this.redoStack.set([]);
+    this.store.resetHistory();
   }
 
-  private areCoordsEqual(a: PageAnnotations[], b: PageAnnotations[]): boolean {
-    if (a.length !== b.length) {
-      return false;
-    }
-
-    for (let i = 0; i < a.length; i += 1) {
-      const pageA = a[i];
-      const pageB = b[i];
-      if (!pageB || pageA.num !== pageB.num) {
-        return false;
-      }
-
-      if (pageA.fields.length !== pageB.fields.length) {
-        return false;
-      }
-
-      for (let j = 0; j < pageA.fields.length; j += 1) {
-        const fieldA = pageA.fields[j];
-        const fieldB = pageB.fields[j];
-        if (!fieldB || !this.areFieldsEqual(fieldA, fieldB)) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
 
   private areFieldsEqual(a: PageField, b: PageField): boolean {
     const sanitizedA = this.prepareFieldForStorage(a);
@@ -4014,205 +4007,85 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private buildJsonTreePreview(text: string): JsonTreePreview {
-    const trimmed = text.trim();
-
-    if (!trimmed) {
+    if (!text.trim()) {
       return { status: 'empty', value: null };
     }
 
     try {
-      const parsed = parseLooseJson(trimmed);
-      return { status: 'ready', value: parsed };
-    } catch {
-      return { status: 'error', value: null };
+      const parsed = parseLooseJson(text);
+      const pages = extractPagesCollection(parsed);
+      const fieldCount = Array.isArray(pages)
+        ? pages.reduce<number>((total, page) => {
+            const fields = (page as { fields?: unknown } | null)?.fields;
+            return total + (Array.isArray(fields) ? fields.length : 0);
+          }, 0)
+        : 0;
+      return { status: 'ready', value: parsed, hasPages: Array.isArray(pages), fieldCount };
+    } catch (error) {
+      const errorAt =
+        error instanceof LooseJsonError ? { line: error.line, column: error.column } : undefined;
+      return { status: 'error', value: null, errorAt };
     }
   }
 
-  private normalizeImportedCoordinates(data: unknown): PageAnnotations[] | null {
-    const pagesData = this.extractPagesCollection(data);
-    if (!Array.isArray(pagesData)) {
-      return null;
-    }
-
-    const normalized: PageAnnotations[] = [];
-
-    for (const rawPage of pagesData) {
-      if (!rawPage || typeof rawPage !== 'object') {
-        continue;
-      }
-
-      const pageNum = this.toFiniteNumber((rawPage as { num?: unknown }).num);
-      if (!pageNum || !Number.isInteger(pageNum) || pageNum < 1) {
-        continue;
-      }
-
-      const rawFields = (rawPage as { fields?: unknown }).fields;
-      if (!Array.isArray(rawFields)) {
-        continue;
-      }
-
-      const fields: PageField[] = [];
-
-      for (const rawField of rawFields) {
-        if (!rawField || typeof rawField !== 'object') {
+  /**
+   * After an explicit import/apply, warns about what was skipped or looks wrong. The import itself
+   * is never altered: these are hints so the user can fix the JSON.
+   */
+  private async reportImportIssues(report: ImportReport, pages: PageAnnotations[]) {
+    let outOfPage = 0;
+    let missingPages = 0;
+    const doc = this.pdfDoc;
+    if (doc) {
+      for (const page of pages) {
+        if (page.num > doc.numPages) {
+          missingPages += 1;
           continue;
         }
-
-        const { x, y, mapField, fontSize, color, value, type, decimals, appender } =
-          rawField as Record<string, unknown>;
-
-        const normalizedType = this.normalizeFieldType(type);
-        const normalizedValue = this.normalizeFieldText(value);
-        const normalizedMapField = this.normalizeFieldText(mapField) ?? normalizedValue;
-        const normalizedX = this.toFiniteNumber(x);
-        const normalizedY = this.toFiniteNumber(y);
-
-        if (normalizedX === null || normalizedY === null) {
-          continue;
-        }
-
-        if (
-          normalizedMapField === null &&
-          normalizedValue === null &&
-          normalizedType !== 'check' &&
-          normalizedType !== 'radio'
-        ) {
-          continue;
-        }
-
-        const normalizedFontSize = this.toFiniteNumber(fontSize);
-        const normalizedColor =
-          typeof color === 'string' && color.trim() ? color.trim() : '#000000';
-
-        const normalizedField: PageField = {
-          x: Math.round(normalizedX * 100) / 100,
-          y: Math.round(normalizedY * 100) / 100,
-          mapField: normalizedMapField ?? '',
-          fontSize:
-            normalizedFontSize && normalizedFontSize > 0
-              ? Math.round(normalizedFontSize * 100) / 100
-              : 14,
-          color: this.normalizeColor(normalizedColor),
-          type: normalizedType,
-        };
-
-        if (normalizedValue !== null) {
-          normalizedField.value = normalizedValue;
-        }
-
-        if (normalizedType === 'number') {
-          const normalizedDecimals = this.normalizeFieldDecimals(decimals);
-          if (normalizedDecimals !== undefined) {
-            normalizedField.decimals = normalizedDecimals;
-          }
-          const normalizedAppender = this.sanitizeOptionalAppender(appender);
-          if (normalizedAppender !== undefined) {
-            normalizedField.appender = normalizedAppender;
-          }
-        }
-
-        const rawOpacity = (rawField as { opacity?: unknown }).opacity;
-        const rawBackground = (rawField as { backgroundColor?: unknown }).backgroundColor;
-        const fontCandidates = this.collectFontFamilyCandidates(rawField as Record<string, unknown>);
-
-        const styledField = this.prepareFieldForStorage({
-          ...normalizedField,
-          fontFamily: this.resolveImportedFontFamily(...fontCandidates),
-          opacity: rawOpacity as number | string | undefined,
-          backgroundColor: typeof rawBackground === 'string' ? rawBackground : undefined,
-        } as PageField);
-
-        fields.push(styledField);
-      }
-
-      if (fields.length) {
-        normalized.push({ num: pageNum, fields });
+        const { width, height } = (await doc.getPage(page.num)).getViewport({ scale: 1 });
+        outOfPage += page.fields.filter(
+          (field) => field.x < 0 || field.y < 0 || field.x > width || field.y > height
+        ).length;
       }
     }
 
-    normalized.sort((a, b) => a.num - b.num);
-    return normalized;
+    const t = (key: string, count: number) =>
+      this.translationService.translate(`toast.importIssues.${key}`, { count });
+    const parts: string[] = [];
+    if (report.skippedFields) parts.push(t('skippedFields', report.skippedFields));
+    if (report.skippedPages) parts.push(t('skippedPages', report.skippedPages));
+    if (missingPages) parts.push(t('missingPages', missingPages));
+    if (outOfPage) parts.push(t('outOfPage', outOfPage));
+    if (report.fontSizeOutOfRange) parts.push(t('fontSize', report.fontSizeOutOfRange));
+    if (report.opacityOutOfRange) parts.push(t('opacity', report.opacityOutOfRange));
+    if (!parts.length) {
+      return;
+    }
+
+    const title = this.translationService.translate('toast.importIssues.title');
+    this.toast.warning(`${title} ${parts.join('; ')}.`);
   }
 
-  private extractPagesCollection(data: unknown): unknown {
-    if (Array.isArray(data)) {
-      return data;
+  /** Shows why a JSON import failed, with the line/column when the syntax is at fault. */
+  private reportJsonImportError(error: unknown) {
+    if (error instanceof LooseJsonError) {
+      this.toast.error(
+        this.translationService.translate('toast.importJsonFailedAt', {
+          line: error.line,
+          column: error.column,
+        })
+      );
+      return;
     }
 
-    if (data && typeof data === 'object') {
-      const maybePages = (data as { pages?: unknown }).pages;
-      if (Array.isArray(maybePages)) {
-        return maybePages;
-      }
-    }
-
-    return null;
+    const key = error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
+    this.toast.error(this.translationService.translate(key));
   }
 
-  private toFiniteNumber(value: unknown): number | null {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : null;
-    }
 
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return null;
-      }
-      const parsed = Number(trimmed);
-      return Number.isFinite(parsed) ? parsed : null;
-    }
 
-    return null;
-  }
 
-  private formatNumberWithTruncation(value: number, decimals: number): string {
-    const factor = 10 ** decimals;
-    const truncated = Math.trunc(value * factor) / factor;
-    return truncated.toFixed(decimals);
-  }
 
-  private normalizeFieldText(value: unknown): string | null {
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        const normalized = this.normalizeFieldText(item);
-        if (normalized !== null) {
-          return normalized;
-        }
-      }
-      return null;
-    }
-
-    let source: string | null = null;
-
-    if (typeof value === 'string') {
-      source = value;
-    } else if (typeof value === 'number' && Number.isFinite(value)) {
-      source = String(value);
-    } else if (typeof value === 'boolean') {
-      source = value ? 'true' : 'false';
-    }
-
-    if (!source) {
-      return null;
-    }
-
-    const collapsed = source
-      .replace(/\r\n?/g, '\n')
-      .replace(/\n+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    if (!collapsed) {
-      return null;
-    }
-
-    if (/[\.\[\]]/.test(collapsed)) {
-      return collapsed.replace(/\s*([\.\[\]])\s*/g, '$1');
-    }
-
-    return collapsed;
-  }
 
   private isEditableElement(target: EventTarget | null): boolean {
     const el = target as HTMLElement | null;

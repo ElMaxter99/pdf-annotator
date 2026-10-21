@@ -16,7 +16,36 @@
       "badge": "Anote mais rápido",
       "title": "Marque coordenadas em qualquer PDF em segundos",
       "description": "Envie o seu documento para adicionar anotações ligadas a JSON, reutilizar modelos e exportar ficheiros prontos a usar.",
-      "cta": "Selecionar PDF"
+      "cta": "Selecionar PDF",
+      "tryExample": "Experimentar com um documento de exemplo",
+      "previewAlt": "Pré-visualização do espaço de trabalho do PDF Annotator",
+      "featuresTitle": "Tudo o que precisa para anotar",
+      "trust": {
+        "browser": "100 % no seu navegador",
+        "languages": "7 idiomas",
+        "openSource": "Código aberto"
+      },
+      "features": {
+        "precision": {
+          "title": "Coordenadas exatas",
+          "text": "Cada clique torna-se uma posição em pontos PDF, com guias e snapping para alinhar com precisão."
+        },
+        "json": {
+          "title": "JSON em direto",
+          "text": "Edite o JSON ou o visualizador: ambos sincronizam de imediato. Importe, copie e descarregue."
+        },
+        "templates": {
+          "title": "Modelos reutilizáveis",
+          "text": "Guarde as suas anotações e aplique-as a outros documentos com um clique."
+        },
+        "privacy": {
+          "title": "Privado por conceção",
+          "text": "Tudo acontece no seu navegador. O seu PDF nunca é enviado para nenhum servidor."
+        }
+      },
+      "nav": {
+        "github": "GitHub"
+      }
     },
     "upload": {
       "title": "Carregue o seu PDF",
@@ -30,7 +59,10 @@
       "ariaLabel": "Carregar um novo PDF para reiniciar o espaço de trabalho"
     },
     "footer": {
-      "developedBy": "Desenvolvido por {{author}}"
+      "developedBy": "Desenvolvido por {{author}}",
+      "license": "Licença MIT",
+      "changelog": "Novidades",
+      "openSource": "Projeto de código aberto"
     }
   },
   "theme": {
@@ -96,7 +128,19 @@
     "jsonPanelHide": "Hide JSON",
     "jsonPanelShow": "Show JSON",
     "minimizeSidebar": "Minimize sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "jsonStatus": {
+      "valid": "JSON válido · anotações: {{count}}",
+      "noPages": "Falta a lista «pages»",
+      "error": "Erro na linha {{line}}, coluna {{column}}"
+    },
+    "tabs": {
+      "label": "Secções do painel",
+      "document": "Documento",
+      "annotations": "Anotações",
+      "templates": "Modelos",
+      "advanced": "Avançado"
+    }
   },
   "guides": {
     "enableFeature": "Ativar guias e encaixes",
@@ -220,7 +264,8 @@
     "groups": {
       "navigation": "Navegação e vista",
       "annotations": "Anotações",
-      "general": "Geral"
+      "general": "Geral",
+      "selection": "Seleção múltipla"
     },
     "items": {
       "prevPage": "Página anterior",
@@ -235,7 +280,61 @@
       "undo": "Desfazer",
       "redo": "Refazer",
       "applyJson": "Aplicar o JSON do editor",
-      "help": "Mostrar esta ajuda"
+      "help": "Mostrar esta ajuda",
+      "selectToggle": "Adicionar ou remover da seleção",
+      "selectAll": "Selecionar tudo na página",
+      "selectMove": "Mover a seleção (Shift: ×10)",
+      "selectDelete": "Eliminar a seleção",
+      "selectCopy": "Copiar / colar a seleção",
+      "selectDuplicate": "Duplicar a seleção",
+      "selectClear": "Limpar a seleção",
+      "selectLasso": "Arraste numa zona vazia para selecionar com um retângulo (com Shift, adiciona)"
+    }
+  },
+  "toast": {
+    "close": "Fechar aviso",
+    "importJsonFailed": "Não foi possível importar o ficheiro JSON. Verifique se o formato está correto.",
+    "exportPdfFailed": "Não foi possível gerar o PDF anotado. Verifique se o ficheiro é válido ou tente outra cópia.",
+    "importJsonFailedAt": "Não foi possível importar o JSON: erro na linha {{line}}, coluna {{column}}.",
+    "importJsonNoPages": "O JSON não tem uma lista «pages» com páginas e campos.",
+    "sessionRestoreFailed": "Não foi possível recuperar a sessão guardada.",
+    "sessionDiscarded": "Sessão guardada descartada.",
+    "importIssues": {
+      "title": "JSON aplicado, mas verifique:",
+      "skippedFields": "{{count}} campo(s) ignorado(s) por dados inválidos",
+      "skippedPages": "{{count}} página(s) ignorada(s) (número ou campos inválidos)",
+      "missingPages": "{{count}} página(s) que não existem no PDF",
+      "outOfPage": "{{count}} anotação(ões) fora da página",
+      "fontSize": "{{count}} tamanho(s) de letra fora de 8–72",
+      "opacity": "{{count}} opacidade(s) fora de 0,1–1"
+    }
+  },
+  "session": {
+    "title": "Continuar onde ficou",
+    "description": "«{{name}}» · anotações: {{count}} · guardado em {{date}}",
+    "continue": "Continuar",
+    "discard": "Descartar",
+    "privacy": "Guardado apenas neste navegador."
+  },
+  "selection": {
+    "toolbar": "Ações da seleção",
+    "count": "{{count}} selecionada(s)",
+    "alignLabel": "Alinhar",
+    "align": {
+      "left": "Alinhar à esquerda",
+      "center": "Centrar horizontalmente",
+      "right": "Alinhar à direita",
+      "top": "Alinhar ao topo",
+      "middle": "Centrar verticalmente",
+      "bottom": "Alinhar em baixo"
+    },
+    "duplicate": "Duplicar seleção",
+    "delete": "Eliminar seleção",
+    "clear": "Limpar seleção",
+    "distributeLabel": "Distribuir",
+    "distribute": {
+      "horizontal": "Distribuir horizontalmente",
+      "vertical": "Distribuir verticalmente"
     }
   }
 }

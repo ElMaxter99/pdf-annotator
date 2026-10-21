@@ -18,11 +18,11 @@
 - Nuevo botón **Ajustar** (fit-to-width).
 
 ## Propuestas siguientes (por valor / esfuerzo)
-1. **Dividir `workspace.page.ts` (≈4.300 líneas)** en servicios (`PdfRenderService`, `AnnotationStore`, `JsonSyncService`, `FontService`, `ExportService`) y componentes de editor de anotación. Hoy preview y edición duplican ~140 líneas de template: extraer `<app-annotation-editor>`.
-2. **Sidebar por pestañas** (Documento · Anotaciones · Plantillas · Avanzado) para no hacer scroll con tantas secciones.
-3. **Barra de herramientas del visor**: selección múltiple, mover con flechas, alinear/distribuir, copiar/pegar anotaciones.
-4. **Persistencia de sesión** (IndexedDB): recuperar PDF y anotaciones tras recargar; aviso antes de perder cambios.
-5. **Validación del esquema JSON** (esquema + mensajes de error con línea) en lugar de `alert(...)`; toasts en vez de `alert`.
+1. **Dividir `workspace.page.ts` (≈3.340 líneas)** en servicios (`PdfRenderService`, `AnnotationStore`, `JsonSyncService`, `FontService`, `ExportService`). ✅ Hecho: `<app-annotation-editor>` unificado y utilidades `color.utils`/`number.utils` con tests. ✅ `PdfExportService`, `FontCatalogService` y `AnnotationStore` (anotaciones + historial) y `AnnotationImportService` (normalización del JSON importado) extraídos, con tests. Pendiente: render del PDF/miniaturas y el resto de la sincronización del JSON (texto, árbol, autoaplicado).
+2. ✅ **Sidebar por pestañas** (Documento · Anotaciones · Plantillas · Avanzado).
+3. ✅ **Selección múltiple**: Shift+clic, Ctrl+A, arrastre en grupo, flechas, alinear (6 acciones), copiar/pegar/duplicar/borrar en un paso de historial. Incluye selección por recuadro y distribuir uniformemente.
+4. ✅ **Persistencia de sesión** (IndexedDB): recuperar PDF, anotaciones, página y zoom desde la landing (Continuar / Descartar).
+5. ✅ Toasts en lugar de `alert(...)` (hecho: `ToastService` + `app-toast-host`, textos en 7 idiomas). ✅ Validación del JSON con línea y columna del error (estado bajo el editor y avisos al aplicar/importar). ✅ Avisos de importación por campo (omitidos, fuera de la página, páginas inexistentes, tamaños y opacidades fuera de rango).
 6. **Accesibilidad**: trap de foco en diálogos/editores, `aria-live` para coordenadas, contraste revisado en tema claro.
 7. **Rendimiento**: render de miniaturas bajo demanda (virtualización) y `OnPush` en los componentes.
 8. **Dockerfile**: usar `nginxinc/nginx-unprivileged` y `npm ci`; añadir `npm audit` y Dependabot en CI.
