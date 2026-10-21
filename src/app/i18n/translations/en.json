@@ -280,6 +280,15 @@
     "importJsonFailed": "The JSON file could not be imported. Check that the format is correct.",
     "exportPdfFailed": "The annotated PDF could not be generated. Make sure the file is valid or try another copy.",
     "importJsonFailedAt": "The JSON could not be imported: error on line {{line}}, column {{column}}.",
-    "importJsonNoPages": "The JSON has no \"pages\" list with pages and fields."
+    "importJsonNoPages": "The JSON has no \"pages\" list with pages and fields.",
+    "sessionRestoreFailed": "The saved session could not be restored.",
+    "sessionDiscarded": "Saved session discarded."
+  },
+  "session": {
+    "title": "Pick up where you left off",
+    "description": "\"{{name}}\" · annotations: {{count}} · saved {{date}}",
+    "continue": "Continue",
+    "discard": "Discard",
+    "privacy": "Stored only in this browser."
   }
 }

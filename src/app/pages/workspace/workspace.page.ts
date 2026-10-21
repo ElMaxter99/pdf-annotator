@@ -5,6 +5,8 @@ import {
   ViewChild,
   signal,
   AfterViewChecked,
+  effect,
+  untracked,
   HostListener,
   OnDestroy,
   OnInit,
@@ -42,7 +44,8 @@ import { AnnotationImportService } from '../../services/annotation-import.servic
 import { ToastService } from '../../services/toast.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
-import { PendingFileService } from '../../services/pending-file.service';
+import { SessionStoreService } from '../../services/session-store.service';
+import { PendingFileService, PendingRestore } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import {
@@ -137,6 +140,7 @@ interface JsonTreePreview {
 }
 
 const AUTO_APPLY_JSON_DELAY_MS = 300;
+const SESSION_SAVE_DELAY_MS = 800;
 
 /** The JSON parsed fine but has no `pages` list. */
 class JsonShapeError extends Error {}
@@ -212,6 +216,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly pendingFileService = inject(PendingFileService);
   private readonly pdfExportService = inject(PdfExportService);
   private readonly toast = inject(ToastService);
+  private readonly sessionStore = inject(SessionStoreService);
   private readonly store = inject(AnnotationStore);
   private readonly annotationImport = inject(AnnotationImportService);
   private readonly fontCatalog = inject(FontCatalogService);
@@ -248,6 +253,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     moved: boolean;
   } | null = null;
   private draggingElement: HTMLDivElement | null = null;
+  /** Original file of the open PDF, kept so the session can be saved and restored. */
+  private sessionFile: File | null = null;
+  private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
   private overlayDragRect: { left: number; top: number; width: number; height: number } | null =
     null;
@@ -338,6 +346,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   constructor() {
     this.store.setFieldComparator((a, b) => this.areFieldsEqual(a, b));
+    effect(() => {
+      this.store.coords();
+      this.pageIndex();
+      this.scale();
+      untracked(() => this.scheduleSessionSave());
+    });
     this.vm = this;
     this.setDocumentMetadata();
     const storedTemplates = this.templatesService.getTemplates();
@@ -359,8 +373,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   ngOnInit(): void {
     const pendingFile = this.pendingFileService.consumePendingFile();
+    const pendingRestore = this.pendingFileService.consumePendingRestore();
     if (pendingFile) {
-      this.loadPdfFile(pendingFile).catch((error) =>
+      this.loadPdfFile(pendingFile, pendingRestore).catch((error) =>
         console.error('No se pudo cargar el PDF pendiente.', error)
       );
     }
@@ -372,6 +387,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       clearTimeout(this.autoApplyCoordsTimer);
       this.autoApplyCoordsTimer = null;
     }
+    this.flushSessionSave();
     if (!this.document) {
       return;
     }
@@ -1319,13 +1335,83 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.loadPdfFile(file);
   }
 
-  private async loadPdfFile(file: File) {
+  /** Re-applies annotations, page and zoom saved by a previous visit (treated as untrusted input). */
+  private applyRestoredSession(restore: PendingRestore) {
+    const normalized = this.annotationImport.normalizeImportedCoordinates(
+      { pages: restore.coords },
+      (field) => this.prepareFieldForStorage(field)
+    );
+    if (normalized === null) {
+      this.toast.error(this.translationService.translate('toast.sessionRestoreFailed'));
+      return;
+    }
+
+    this.replaceCoords(normalized, { skipHistory: true });
+    if (Number.isFinite(restore.scale) && restore.scale >= 0.25 && restore.scale <= 8) {
+      this.scale.set(restore.scale);
+    }
+    const lastPage = this.pdfDoc?.numPages ?? 1;
+    this.pageIndex.set(Math.min(lastPage, Math.max(1, Math.round(restore.pageIndex) || 1)));
+  }
+
+  private scheduleSessionSave() {
+    if (this.sessionSaveTimer) {
+      clearTimeout(this.sessionSaveTimer);
+      this.sessionSaveTimer = null;
+    }
+
+    const file = this.sessionFile;
+    if (!file || !this.pdfDoc || typeof window === 'undefined') {
+      return;
+    }
+
+    const hasAnnotations = this.store.coords().length > 0;
+    if (!hasAnnotations && !this.store.canUndo()) {
+      return; // nothing worth keeping yet: do not overwrite a previous session
+    }
+
+    this.sessionSaveTimer = setTimeout(() => {
+      this.sessionSaveTimer = null;
+      this.persistSession(file);
+    }, SESSION_SAVE_DELAY_MS);
+  }
+
+  private persistSession(file: File) {
+    if (!this.store.coords().length) {
+      void this.sessionStore.clear();
+      return;
+    }
+    void this.sessionStore.save({
+      name: file.name,
+      pdf: file,
+      coords: this.store.snapshot(),
+      pageIndex: this.pageIndex(),
+      scale: this.scale(),
+      savedAt: Date.now(),
+    });
+  }
+
+  /** Writes a pending save right away (page closing or leaving the workspace). */
+  @HostListener('window:pagehide')
+  flushSessionSave() {
+    if (!this.sessionSaveTimer) {
+      return;
+    }
+    clearTimeout(this.sessionSaveTimer);
+    this.sessionSaveTimer = null;
+    if (this.sessionFile) {
+      this.persistSession(this.sessionFile);
+    }
+  }
+
+  private async loadPdfFile(file: File, restore: PendingRestore | null = null) {
     if (!isPdfFile(file)) {
       this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
 
     this.pdfByteSources.clear();
+    this.sessionFile = file;
     const buf = await file.arrayBuffer();
     const typed = new Uint8Array(buf);
     this.rememberPdfBytes(typed, 0);
@@ -1356,8 +1442,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.pageIndex.set(1);
     this.resetHistory();
     this.clearAll({ skipHistory: true });
+    if (restore) {
+      this.applyRestoredSession(restore);
+    }
     await this.render();
-    if (typeof window !== 'undefined' && window.innerWidth < 960) {
+    if (restore) {
+      this.redrawAllForPage();
+    } else if (typeof window !== 'undefined' && window.innerWidth < 960) {
       await this.fitWidth();
     }
     this.generatePageThumbnails().catch((error) =>

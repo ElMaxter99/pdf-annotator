@@ -197,7 +197,7 @@ sh scripts/docker-down.sh     # detener
 `nginx.conf` incluye cabeceras de seguridad (CSP, `nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`). Si añades scripts de terceros (p. ej. analíticas), amplía la CSP.
 
 ## 🔐 Seguridad y privacidad
-- El PDF y las anotaciones **no se envían a ningún servidor**; solo se guardan plantillas, idioma, tema y última sesión en tu `localStorage`.
+- El PDF y las anotaciones **no se envían a ningún servidor**. Se guardan solo en tu navegador: plantillas, idioma y tema (`localStorage`) y la **última sesión** (PDF + anotaciones, `IndexedDB`) para retomarla desde la portada; puedes descartarla con un clic.
 - El JSON pegado se interpreta con un parser propio **sin evaluar código**.
 - Límites de importación: JSON ≤ 5 MB; solo PDFs y fuentes `.ttf/.otf/.woff/.woff2`.
 
@@ -225,7 +225,7 @@ Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para per
 | `ng serve` no encuentra el builder | Ejecuta `npm install` antes de `npm run start:local`. |
 
 ## 🗺️ Roadmap
-Pestañas en el panel lateral, selección múltiple y alineación, recuperación de sesión (IndexedDB), validación de esquema JSON con errores por línea y refactor del componente principal. Detalle en [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md).
+Pestañas en el panel lateral, selección múltiple y alineación, validación por esquema de cada campo y refactor del componente principal. Detalle en [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md).
 
 ## 🤝 Contribuir
 Issues y PRs son bienvenidos: usa las plantillas de [`.github/`](.github) y revisa [`CONTRIBUTING.md`](CONTRIBUTING.md).

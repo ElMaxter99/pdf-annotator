@@ -280,6 +280,15 @@
     "importJsonFailed": "Não foi possível importar o ficheiro JSON. Verifique se o formato está correto.",
     "exportPdfFailed": "Não foi possível gerar o PDF anotado. Verifique se o ficheiro é válido ou tente outra cópia.",
     "importJsonFailedAt": "Não foi possível importar o JSON: erro na linha {{line}}, coluna {{column}}.",
-    "importJsonNoPages": "O JSON não tem uma lista «pages» com páginas e campos."
+    "importJsonNoPages": "O JSON não tem uma lista «pages» com páginas e campos.",
+    "sessionRestoreFailed": "Não foi possível recuperar a sessão guardada.",
+    "sessionDiscarded": "Sessão guardada descartada."
+  },
+  "session": {
+    "title": "Continuar onde ficou",
+    "description": "«{{name}}» · anotações: {{count}} · guardado em {{date}}",
+    "continue": "Continuar",
+    "discard": "Descartar",
+    "privacy": "Guardado apenas neste navegador."
   }
 }
