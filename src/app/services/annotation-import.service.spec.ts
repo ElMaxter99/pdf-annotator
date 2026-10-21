@@ -1,6 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { PageField } from '../models/annotation.model';
-import { AnnotationImportService } from './annotation-import.service';
+import {
+  AnnotationImportService,
+  emptyImportReport,
+  hasImportIssues,
+} from './annotation-import.service';
 
 describe('AnnotationImportService', () => {
   let service: AnnotationImportService;
@@ -104,5 +108,60 @@ describe('AnnotationImportService', () => {
     expect(arg.opacity as unknown).toBe('0.5');
     expect(arg.backgroundColor).toBe('#ffee00');
     expect(arg.fontFamily).toBe('standard:courier');
+  });
+
+  describe('report', () => {
+    it('stays empty for clean data', () => {
+      const report = emptyImportReport();
+      service.normalizeImportedCoordinates(
+        [{ num: 1, fields: [{ x: 1, y: 2, mapField: 'a', fontSize: 12, opacity: 0.5 }] }],
+        identity,
+        report
+      );
+      expect(hasImportIssues(report)).toBeFalse();
+    });
+
+    it('counts skipped pages and fields without changing the result', () => {
+      const report = emptyImportReport();
+      const result = service.normalizeImportedCoordinates(
+        [
+          null,
+          { num: 0, fields: [] },
+          { num: 2 },
+          {
+            num: 1,
+            fields: [null, 'str', { x: 'bad', y: 1, mapField: 'a' }, { x: 1, y: 2 }, { x: 5, y: 6, mapField: 'ok' }],
+          },
+        ],
+        identity,
+        report
+      );
+      expect(report.skippedPages).toBe(3);
+      expect(report.skippedFields).toBe(4);
+      expect(result?.length).toBe(1);
+      expect(result![0].fields.length).toBe(1);
+    });
+
+    it('flags font sizes and opacities outside the editor limits but keeps the data', () => {
+      const report = emptyImportReport();
+      const result = service.normalizeImportedCoordinates(
+        [
+          {
+            num: 1,
+            fields: [
+              { x: 1, y: 1, mapField: 'a', fontSize: 100, opacity: 0.05 },
+              { x: 2, y: 2, mapField: 'b', fontSize: 4, opacity: 2 },
+              { x: 3, y: 3, mapField: 'c', fontSize: 8, opacity: 1 },
+            ],
+          },
+        ],
+        identity,
+        report
+      );
+      expect(report.fontSizeOutOfRange).toBe(2);
+      expect(report.opacityOutOfRange).toBe(2);
+      expect(result![0].fields.length).toBe(3);
+      expect(result![0].fields[0].fontSize).toBe(100);
+    });
   });
 });

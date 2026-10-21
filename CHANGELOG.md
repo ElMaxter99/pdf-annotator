@@ -5,6 +5,7 @@
 - Opening or reloading `/workspace` without a PDF now redirects to the landing page (`workspaceGuard`), where a saved session can be resumed instead of leaving an empty editor
 
 ### Added
+- Import warnings: after applying or importing a JSON explicitly, a warning toast lists what was skipped or looks wrong (invalid fields/pages, annotations outside the page, pages missing from the PDF, font sizes outside 8–72, opacities outside 0.1–1); nothing in the import result changes and live typing stays silent. 3 unit + 3 e2e tests, texts in the 7 languages
 - Session recovery: the last PDF, its annotations, page and zoom are autosaved in the browser (IndexedDB, nothing leaves the device) and the landing page offers to continue or discard them; 5 e2e tests, 5 unit tests, texts in the 7 languages
 - JSON validity line under the editor (valid + annotation count / syntax error with line and column / missing `pages`), and import errors that say where the problem is (`LooseJsonError` with line/column), translated in the 7 languages
 - Non-blocking toast notifications (`ToastService` + `app-toast-host`) replace every `alert()`; previously hard-coded Spanish import/export error messages are now translated in the 7 languages

@@ -11,6 +11,26 @@ import {
 } from '../utils/annotation-fields.utils';
 import { toFiniteNumber } from '../utils/number.utils';
 
+/** What looked wrong in imported data. Nothing here changes the imported result. */
+export interface ImportReport {
+  /** Pages ignored because of a bad `num` or a missing `fields` list. */
+  skippedPages: number;
+  /** Entries ignored because they are not objects, lack numeric x/y, or have no content. */
+  skippedFields: number;
+  /** Font sizes outside the 8–72 range the editor allows. */
+  fontSizeOutOfRange: number;
+  /** Opacities outside 0.1–1. */
+  opacityOutOfRange: number;
+}
+
+export function emptyImportReport(): ImportReport {
+  return { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0 };
+}
+
+export function hasImportIssues(report: ImportReport): boolean {
+  return Object.values(report).some((count) => count > 0);
+}
+
 /** Turns arbitrary (possibly hand-written) JSON into well-formed annotations. */
 @Injectable({ providedIn: 'root' })
 export class AnnotationImportService {
@@ -22,7 +42,8 @@ export class AnnotationImportService {
    */
   normalizeImportedCoordinates(
     data: unknown,
-    prepareField: (field: PageField) => PageField
+    prepareField: (field: PageField) => PageField,
+    report: ImportReport = emptyImportReport()
   ): PageAnnotations[] | null {
     const pagesData = extractPagesCollection(data);
     if (!Array.isArray(pagesData)) {
@@ -33,16 +54,19 @@ export class AnnotationImportService {
 
     for (const rawPage of pagesData) {
       if (!rawPage || typeof rawPage !== 'object') {
+        report.skippedPages += 1;
         continue;
       }
 
       const pageNum = toFiniteNumber((rawPage as { num?: unknown }).num);
       if (!pageNum || !Number.isInteger(pageNum) || pageNum < 1) {
+        report.skippedPages += 1;
         continue;
       }
 
       const rawFields = (rawPage as { fields?: unknown }).fields;
       if (!Array.isArray(rawFields)) {
+        report.skippedPages += 1;
         continue;
       }
 
@@ -50,6 +74,7 @@ export class AnnotationImportService {
 
       for (const rawField of rawFields) {
         if (!rawField || typeof rawField !== 'object') {
+          report.skippedFields += 1;
           continue;
         }
 
@@ -63,6 +88,7 @@ export class AnnotationImportService {
         const normalizedY = toFiniteNumber(y);
 
         if (normalizedX === null || normalizedY === null) {
+          report.skippedFields += 1;
           continue;
         }
 
@@ -72,10 +98,14 @@ export class AnnotationImportService {
           normalizedType !== 'check' &&
           normalizedType !== 'radio'
         ) {
+          report.skippedFields += 1;
           continue;
         }
 
         const normalizedFontSize = toFiniteNumber(fontSize);
+        if (normalizedFontSize !== null && (normalizedFontSize < 8 || normalizedFontSize > 72)) {
+          report.fontSizeOutOfRange += 1;
+        }
         const normalizedColor =
           typeof color === 'string' && color.trim() ? color.trim() : '#000000';
 
@@ -107,6 +137,10 @@ export class AnnotationImportService {
         }
 
         const rawOpacity = (rawField as { opacity?: unknown }).opacity;
+        const numericOpacity = toFiniteNumber(rawOpacity);
+        if (numericOpacity !== null && (numericOpacity < 0.1 || numericOpacity > 1)) {
+          report.opacityOutOfRange += 1;
+        }
         const rawBackground = (rawField as { backgroundColor?: unknown }).backgroundColor;
         const fontCandidates = this.fontCatalog.collectFontFamilyCandidates(rawField as Record<string, unknown>);
 

@@ -54,7 +54,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **Estilo:** Prettier (`printWidth` 100, comillas simples). Sigue el estilo del archivo que tocas; sin comentarios innecesarios.
 - **Estilos:** tokens `--bg --panel --accent --danger --text --muted`. Tema claro = `:root.theme-light`. El shell del workspace vive bajo `.app--workspace` en `styles.scss`.
 - **i18n:** TODO texto visible usa la pipe `t` (`{{ 'clave' | t }}`). Añade la clave a **los 7 JSON** y ejecuta `npm run i18n:check`. No dejes cadenas fijas en español (solo quedan mensajes de `console`).
-- **Avisos al usuario:** nunca `alert()`/`confirm()`; usa `ToastService.error/show` con una clave i18n (`toast.*`). Los e2e esperan `.toast--error`.
+- **Avisos al usuario:** nunca `alert()`/`confirm()`; usa `ToastService.error/warning/show` con una clave i18n (`toast.*`). Los e2e esperan `.toast--error`.
 - **Coordenadas:** `x,y` en puntos PDF. El DOM usa `top = canvas.height − y·scale`. Conversión en `domToPdfCoords`.
 - **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
 
@@ -77,6 +77,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - Lógica pura (colores, números) va en `utils/*.ts` con su `.spec.ts`; no la metas de nuevo en `workspace.page.ts`.
 - Cambios en las anotaciones: pásalos siempre por `applyCoordsChange(...)` (→ `AnnotationStore.applyChange`) para que entren en el historial; `replaceCoords(..., { skipHistory: true })` solo al cargar un PDF.
 - Sidebar por pestañas (`vm.sidebarTab`): los paneles se ocultan con `[hidden]` (no `*ngIf`) para conservar los `@ViewChild` (editor JSON, inputs de archivo). Un elemento nuevo del panel va dentro del panel que corresponda; en los e2e abre la pestaña con `openSidebarTab(page, 'Anotaciones')` (`openWorkspace` abre Anotaciones por defecto).
+- Avisos de importación: `AnnotationImportService.normalizeImportedCoordinates(data, prepare, report)` rellena un `ImportReport` (solo cuenta, no cambia el resultado) y la página lo convierte en un toast `warning` únicamente al aplicar/importar de forma explícita (`reportImportIssues`), nunca en el autoaplicado al escribir. Una regla nueva de validación = un contador en el informe + clave `toast.importIssues.*` en los 7 idiomas.
 - Ruta `/workspace`: `workspaceGuard` redirige a `/landing` si no hay un PDF pendiente en `PendingFileService` (recarga o URL directa). El guard solo mira (`hasPendingFile`); el consumo lo hace el componente. Cualquier flujo nuevo que abra el workspace debe dejar antes un archivo pendiente.
 - Sesión guardada: `workspace.page.ts` guarda con debounce (800 ms) en `SessionStoreService` solo si hay anotaciones o historial; al limpiar todo borra la sesión. Los datos restaurados se tratan como no confiables (pasan por `AnnotationImportService`). Si añades estado que deba sobrevivir a una recarga, inclúyelo en `SavedSession`.
 - `Ctrl+Z/Y` globales también se disparan dentro del textarea JSON (comportamiento heredado).
