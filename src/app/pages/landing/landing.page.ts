@@ -5,6 +5,7 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
+import { ToastService } from '../../services/toast.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone.component';
@@ -31,6 +32,7 @@ export class LandingPageComponent {
   private readonly pendingFileService = inject(PendingFileService);
   private readonly router = inject(Router);
   private readonly metadataService = inject(AppMetadataService);
+  private readonly toast = inject(ToastService);
 
   readonly appName = APP_NAME;
   readonly version = APP_VERSION;
@@ -125,7 +127,7 @@ export class LandingPageComponent {
 
   private async handleFileSelection(file: File) {
     if (!isPdfFile(file)) {
-      alert(this.translationService.translate('app.upload.invalidFormat'));
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
 

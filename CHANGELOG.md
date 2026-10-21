@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- Non-blocking toast notifications (`ToastService` + `app-toast-host`) replace every `alert()`; previously hard-coded Spanish import/export error messages are now translated in the 7 languages
 - End-to-end test suite with Playwright (`npm run e2e`, 25 tests): landing, annotation editor, undo/redo history, JSON import (including that pasted code is never executed), fonts and PDF/JSON export
 - GitHub Actions CI (`.github/workflows/ci.yml`): build + i18n check, unit tests and e2e on pull requests and pushes to `develop`/`master`
 - `npm run test:ci` (headless Chrome without sandbox) and `karma.conf.cjs`

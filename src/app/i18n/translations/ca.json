@@ -269,5 +269,10 @@
       "applyJson": "Aplica el JSON de l'editor",
       "help": "Mostra aquesta ajuda"
     }
+  },
+  "toast": {
+    "close": "Tanca l'avís",
+    "importJsonFailed": "No s'ha pogut importar el fitxer JSON. Comprova que el format sigui correcte.",
+    "exportPdfFailed": "No s'ha pogut generar el PDF anotat. Comprova que el fitxer sigui vàlid o prova amb una altra còpia."
   }
 }

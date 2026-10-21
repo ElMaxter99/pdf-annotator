@@ -39,6 +39,7 @@ import {
 } from '../../fonts/font-catalog.service';
 import { FontVariantDescriptor } from '../../fonts/font-variant';
 import { AnnotationImportService } from '../../services/annotation-import.service';
+import { ToastService } from '../../services/toast.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
 import { PendingFileService } from '../../services/pending-file.service';
@@ -200,6 +201,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
   private readonly pdfExportService = inject(PdfExportService);
+  private readonly toast = inject(ToastService);
   private readonly store = inject(AnnotationStore);
   private readonly annotationImport = inject(AnnotationImportService);
   private readonly fontCatalog = inject(FontCatalogService);
@@ -560,7 +562,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   triggerCustomFontPicker() {
     if (typeof FontFace === 'undefined') {
-      alert(this.translationService.translate('fonts.custom.unsupported'));
+      this.toast.error(this.translationService.translate('fonts.custom.unsupported'));
       return;
     }
     const input = this.customFontInputRef?.nativeElement;
@@ -1309,7 +1311,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private async loadPdfFile(file: File) {
     if (!isPdfFile(file)) {
-      alert(this.translationService.translate('app.upload.invalidFormat'));
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
 
@@ -2122,7 +2124,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private async registerCustomFont(file: File) {
     if (typeof FontFace === 'undefined') {
-      alert(this.translationService.translate('fonts.custom.unsupported'));
+      this.toast.error(this.translationService.translate('fonts.custom.unsupported'));
       return;
     }
 
@@ -2130,7 +2132,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       await this.fontCatalog.registerCustomFont(file);
     } catch (error) {
       console.error('No se pudo cargar la fuente personalizada.', error);
-      alert(this.translationService.translate('fonts.custom.error'));
+      this.toast.error(this.translationService.translate('fonts.custom.error'));
     }
   }
 
@@ -2974,7 +2976,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     } catch (error) {
       if (!options.silent) {
         console.error('No se pudo importar el JSON de anotaciones.', error);
-        alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+        this.toast.error(this.translationService.translate('toast.importJsonFailed'));
       }
       return false;
     }
@@ -3014,7 +3016,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.replaceCoords(normalized, { preserveTextModel: false });
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
-      alert('No se pudo importar el archivo JSON. Comprueba que el formato sea correcto.');
+      this.toast.error(this.translationService.translate('toast.importJsonFailed'));
     } finally {
       input.value = '';
     }
@@ -3133,9 +3135,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       downloadBlob(new Blob([toArrayBuffer(bytes)], { type: 'application/pdf' }), 'annotated.pdf');
     } catch (error) {
       console.error('No se pudo generar el PDF anotado.', error);
-      alert(
-        'No se pudo generar el PDF anotado. Revisa que el archivo sea válido o intenta con otra copia.'
-      );
+      this.toast.error(this.translationService.translate('toast.exportPdfFailed'));
     }
   }
 
