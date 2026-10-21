@@ -133,6 +133,13 @@
       "valid": "Gültiges JSON · Anmerkungen: {{count}}",
       "noPages": "Die Liste „pages“ fehlt",
       "error": "Fehler in Zeile {{line}}, Spalte {{column}}"
+    },
+    "tabs": {
+      "label": "Bereiche des Panels",
+      "document": "Dokument",
+      "annotations": "Anmerkungen",
+      "templates": "Vorlagen",
+      "advanced": "Erweitert"
     }
   },
   "guides": {

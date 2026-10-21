@@ -133,6 +133,13 @@
       "valid": "Valid JSON · annotations: {{count}}",
       "noPages": "The \"pages\" list is missing",
       "error": "Error on line {{line}}, column {{column}}"
+    },
+    "tabs": {
+      "label": "Panel sections",
+      "document": "Document",
+      "annotations": "Annotations",
+      "templates": "Templates",
+      "advanced": "Advanced"
     }
   },
   "guides": {

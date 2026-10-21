@@ -133,6 +133,13 @@
       "valid": "JSON valide · annotations : {{count}}",
       "noPages": "La liste « pages » est manquante",
       "error": "Erreur à la ligne {{line}}, colonne {{column}}"
+    },
+    "tabs": {
+      "label": "Sections du panneau",
+      "document": "Document",
+      "annotations": "Annotations",
+      "templates": "Modèles",
+      "advanced": "Avancé"
     }
   },
   "guides": {

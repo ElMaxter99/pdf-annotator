@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
-import { applyJsonText, openWorkspace, renderedAnnotations } from './helpers';
+import { applyJsonText, openSidebarTab, openWorkspace, renderedAnnotations } from './helpers';
 
 const DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf';
 
 test.beforeEach(async ({ page }) => {
   await openWorkspace(page);
+  await openSidebarTab(page, 'Avanzado');
   await page.locator('.advanced-toggle').click();
 });
 

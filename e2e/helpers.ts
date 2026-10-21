@@ -12,7 +12,16 @@ export async function stubAnalytics(page: Page) {
 }
 
 /** Opens the workspace with the example invoice loaded and zoomed out to see the whole page. */
-export async function openWorkspace(page: Page, options: { zoomOut?: number } = {}) {
+export type SidebarTab = 'Documento' | 'Anotaciones' | 'Plantillas' | 'Avanzado';
+
+export async function openSidebarTab(page: Page, name: SidebarTab) {
+  await page.getByRole('tab', { name: new RegExp(`^\\s*${name}`) }).click();
+}
+
+export async function openWorkspace(
+  page: Page,
+  options: { zoomOut?: number; tab?: SidebarTab } = {}
+) {
   await stubAnalytics(page);
   await page.goto('/landing');
   await page.locator('input[type=file]').setInputFiles(EXAMPLE_PDF);
@@ -23,6 +32,8 @@ export async function openWorkspace(page: Page, options: { zoomOut?: number } = 
     await page.keyboard.press('-');
     await page.waitForTimeout(120);
   }
+  // Most flows work with the JSON editor, which lives in the "Anotaciones" tab.
+  await openSidebarTab(page, options.tab ?? 'Anotaciones');
 }
 
 export const jsonEditor = (page: Page) => page.locator('textarea.json-editor');
