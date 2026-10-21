@@ -34,6 +34,8 @@ export async function openWorkspace(
   }
   // Most flows work with the JSON editor, which lives in the "Anotaciones" tab.
   await openSidebarTab(page, options.tab ?? 'Anotaciones');
+  // Single-key shortcuts are ignored while a button has focus, so leave the tab button.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
 }
 
 export const jsonEditor = (page: Page) => page.locator('textarea.json-editor');
