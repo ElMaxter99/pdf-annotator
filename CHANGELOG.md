@@ -1,5 +1,6 @@
 ## Unreleased
 ### Changed
+- Sidebar tabs keep their content width and scroll horizontally on very narrow screens (checked on phones and with the longest German labels)
 - Workspace sidebar organised in four tabs (Document, Annotations with a count badge, Templates, Advanced) with keyboard navigation, instead of one long scrolling column; tab labels in the 7 languages
 - Opening or reloading `/workspace` without a PDF now redirects to the landing page (`workspaceGuard`), where a saved session can be resumed instead of leaving an empty editor
 

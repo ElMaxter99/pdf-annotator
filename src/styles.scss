@@ -2503,13 +2503,14 @@ kbd {
   gap: 2px;
   margin: 0 -12px 12px;
   padding: 8px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
   background: var(--panel);
   border-bottom: 1px solid rgba(94, 234, 212, 0.14);
 }
 
 .sidebar-tab {
-  flex: 1 1 auto;
-  min-width: 0;
+  flex: 1 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
