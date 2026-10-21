@@ -128,7 +128,12 @@
     "jsonPanelHide": "Hide JSON",
     "jsonPanelShow": "Show JSON",
     "minimizeSidebar": "Minimize sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "jsonStatus": {
+      "valid": "Valid JSON · annotations: {{count}}",
+      "noPages": "The \"pages\" list is missing",
+      "error": "Error on line {{line}}, column {{column}}"
+    }
   },
   "guides": {
     "enableFeature": "Enable guides & snapping",
@@ -273,6 +278,8 @@
   "toast": {
     "close": "Dismiss",
     "importJsonFailed": "The JSON file could not be imported. Check that the format is correct.",
-    "exportPdfFailed": "The annotated PDF could not be generated. Make sure the file is valid or try another copy."
+    "exportPdfFailed": "The annotated PDF could not be generated. Make sure the file is valid or try another copy.",
+    "importJsonFailedAt": "The JSON could not be imported: error on line {{line}}, column {{column}}.",
+    "importJsonNoPages": "The JSON has no \"pages\" list with pages and fields."
   }
 }

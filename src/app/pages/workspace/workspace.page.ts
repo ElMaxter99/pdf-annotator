@@ -46,6 +46,7 @@ import { PendingFileService } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import {
+  extractPagesCollection,
   normalizeFieldDecimals,
   normalizeFieldType,
   sanitizeOptionalAppender,
@@ -58,7 +59,7 @@ import {
   updateFieldInPages,
 } from '../../utils/annotation-pages.utils';
 import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
-import { parseLooseJson } from '../../utils/loose-json';
+import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
 import {
   ensureHex,
   hexToRgbComponents,
@@ -127,9 +128,18 @@ type JsonTreePreviewStatus = 'empty' | 'ready' | 'error';
 interface JsonTreePreview {
   status: JsonTreePreviewStatus;
   value: unknown | null;
+  /** Position of the syntax error (status `error`). */
+  errorAt?: { line: number; column: number };
+  /** Whether the document has a usable `pages` list (status `ready`). */
+  hasPages?: boolean;
+  /** Raw number of field entries across all pages (status `ready`). */
+  fieldCount?: number;
 }
 
 const AUTO_APPLY_JSON_DELAY_MS = 300;
+
+/** The JSON parsed fine but has no `pages` list. */
+class JsonShapeError extends Error {}
 const MAX_JSON_IMPORT_BYTES = 5 * 1024 * 1024;
 
 type OverlayGuide = {
@@ -2968,7 +2978,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       );
 
       if (normalized === null) {
-        throw new Error('Formato no válido');
+        throw new JsonShapeError();
       }
 
       this.replaceCoords(normalized, { preserveTextModel: true });
@@ -2976,7 +2986,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     } catch (error) {
       if (!options.silent) {
         console.error('No se pudo importar el JSON de anotaciones.', error);
-        this.toast.error(this.translationService.translate('toast.importJsonFailed'));
+        this.reportJsonImportError(error);
       }
       return false;
     }
@@ -3010,13 +3020,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         this.prepareFieldForStorage(field)
       );
       if (normalized === null) {
-        throw new Error('Formato no válido');
+        throw new JsonShapeError();
       }
 
       this.replaceCoords(normalized, { preserveTextModel: false });
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
-      this.toast.error(this.translationService.translate('toast.importJsonFailed'));
+      this.reportJsonImportError(error);
     } finally {
       input.value = '';
     }
@@ -3282,18 +3292,41 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private buildJsonTreePreview(text: string): JsonTreePreview {
-    const trimmed = text.trim();
-
-    if (!trimmed) {
+    if (!text.trim()) {
       return { status: 'empty', value: null };
     }
 
     try {
-      const parsed = parseLooseJson(trimmed);
-      return { status: 'ready', value: parsed };
-    } catch {
-      return { status: 'error', value: null };
+      const parsed = parseLooseJson(text);
+      const pages = extractPagesCollection(parsed);
+      const fieldCount = Array.isArray(pages)
+        ? pages.reduce<number>((total, page) => {
+            const fields = (page as { fields?: unknown } | null)?.fields;
+            return total + (Array.isArray(fields) ? fields.length : 0);
+          }, 0)
+        : 0;
+      return { status: 'ready', value: parsed, hasPages: Array.isArray(pages), fieldCount };
+    } catch (error) {
+      const errorAt =
+        error instanceof LooseJsonError ? { line: error.line, column: error.column } : undefined;
+      return { status: 'error', value: null, errorAt };
     }
+  }
+
+  /** Shows why a JSON import failed, with the line/column when the syntax is at fault. */
+  private reportJsonImportError(error: unknown) {
+    if (error instanceof LooseJsonError) {
+      this.toast.error(
+        this.translationService.translate('toast.importJsonFailedAt', {
+          line: error.line,
+          column: error.column,
+        })
+      );
+      return;
+    }
+
+    const key = error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
+    this.toast.error(this.translationService.translate(key));
   }
 
 

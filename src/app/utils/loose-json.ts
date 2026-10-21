@@ -5,6 +5,27 @@
  */
 const MAX_DEPTH = 64;
 
+/** Syntax error with a 1-based position inside the parsed text. */
+export class LooseJsonError extends SyntaxError {
+  constructor(
+    message: string,
+    readonly position: number,
+    readonly line: number,
+    readonly column: number
+  ) {
+    super(message);
+    this.name = 'LooseJsonError';
+  }
+}
+
+function locate(text: string, position: number): { line: number; column: number } {
+  const clamped = Math.min(Math.max(position, 0), text.length);
+  const before = text.slice(0, clamped);
+  const line = before.split('\n').length;
+  const column = clamped - (before.lastIndexOf('\n') + 1) + 1;
+  return { line, column };
+}
+
 class LooseJsonParser {
   private pos = 0;
 
@@ -20,7 +41,8 @@ class LooseJsonParser {
   }
 
   private fail(): never {
-    throw new SyntaxError(`Unexpected token at position ${this.pos}`);
+    const { line, column } = locate(this.src, this.pos);
+    throw new LooseJsonError(`Unexpected token at position ${this.pos}`, this.pos, line, column);
   }
 
   private skipTrivia() {

@@ -14,12 +14,12 @@ test('undo and redo walk through the history and keep JSON and buttons in sync',
 
   await addAnnotation(page, 0.3, 0.3, 'uno');
   await addAnnotation(page, 0.5, 0.5, 'dos');
-  expect(await fieldCount(page)).toBe(2);
+  await expect.poll(() => fieldCount(page)).toBe(2);
   await expect(redoBtn(page)).toBeDisabled();
 
   await page.keyboard.press('Control+z');
   await expect(page.locator('.annotation')).toHaveCount(1);
-  expect(await fieldCount(page)).toBe(1);
+  await expect.poll(() => fieldCount(page)).toBe(1);
   await expect(redoBtn(page)).toBeEnabled();
 
   await page.keyboard.press('Control+z');

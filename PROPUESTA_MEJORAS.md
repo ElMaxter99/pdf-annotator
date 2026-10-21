@@ -22,7 +22,7 @@
 2. **Sidebar por pestañas** (Documento · Anotaciones · Plantillas · Avanzado) para no hacer scroll con tantas secciones.
 3. **Barra de herramientas del visor**: selección múltiple, mover con flechas, alinear/distribuir, copiar/pegar anotaciones.
 4. **Persistencia de sesión** (IndexedDB): recuperar PDF y anotaciones tras recargar; aviso antes de perder cambios.
-5. ✅ Toasts en lugar de `alert(...)` (hecho: `ToastService` + `app-toast-host`, textos en 7 idiomas). Pendiente: **validación del esquema JSON** con mensajes de error por línea.
+5. ✅ Toasts en lugar de `alert(...)` (hecho: `ToastService` + `app-toast-host`, textos en 7 idiomas). ✅ Validación del JSON con línea y columna del error (estado bajo el editor y avisos al aplicar/importar). Pendiente: validación por esquema de cada campo (tipos y rangos) con avisos por campo.
 6. **Accesibilidad**: trap de foco en diálogos/editores, `aria-live` para coordenadas, contraste revisado en tema claro.
 7. **Rendimiento**: render de miniaturas bajo demanda (virtualización) y `OnPush` en los componentes.
 8. **Dockerfile**: usar `nginxinc/nginx-unprivileged` y `npm ci`; añadir `npm audit` y Dependabot en CI.

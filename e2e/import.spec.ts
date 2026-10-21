@@ -74,3 +74,27 @@ test('importing a file refreshes the JSON editor', async ({ page }) => {
   });
   await expect(jsonEditor(page)).toHaveValue(/desdeArchivo/);
 });
+
+test('shows whether the JSON is valid, with the error position', async ({ page }) => {
+  const status = page.locator('.json-status');
+  await jsonEditor(page).fill('{ "pages": [ { "num": 1, "fields": [ { "x": 1, "y": 2, "mapField": "a" }, { "x": 3, "y": 4, "mapField": "b" } ] } ] }');
+  await expect(status).toContainText('JSON válido');
+  await expect(status).toContainText('2');
+
+  await jsonEditor(page).fill('{ "pages": [\n  { "num": 1 "fields": [] }\n] }');
+  await expect(status).toContainText('línea 2');
+
+  await jsonEditor(page).fill('{ "foo": 1 }');
+  await expect(status).toContainText('«pages»');
+});
+
+test('applying invalid JSON explains where the problem is', async ({ page }) => {
+  await jsonEditor(page).fill('{ "pages": [\n  { "num": 1 "fields": [] }\n] }');
+  await page.keyboard.press('Control+s');
+  await expect(page.locator('.toast--error')).toContainText('línea 2');
+
+  await page.locator('.toast__close').click();
+  await jsonEditor(page).fill('{ "foo": 1 }');
+  await page.keyboard.press('Control+s');
+  await expect(page.locator('.toast--error')).toContainText('pages');
+});

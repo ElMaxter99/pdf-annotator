@@ -74,7 +74,7 @@ test('Escape and outside clicks cancel the editor', async ({ page }) => {
   await expect(page.locator('.annotation-editor')).toBeVisible();
   await page.locator('header.header').click({ position: { x: 5, y: 5 } });
   await expect(page.locator('.annotation-editor')).toHaveCount(0);
-  expect(await fieldCount(page)).toBe(0);
+  await expect.poll(() => fieldCount(page)).toBe(0);
 });
 
 test('keyboard shortcuts: zoom, fit width, sidebar and help dialog', async ({ page }) => {

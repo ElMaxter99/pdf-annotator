@@ -2425,3 +2425,23 @@ kbd {
 :root.theme-light .toast {
   box-shadow: 0 14px 28px rgba(15, 23, 42, 0.18);
 }
+
+/* JSON validity line under the editor */
+.json-status {
+  min-height: 1.4em;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.json-status__item--ok {
+  color: var(--accent);
+}
+
+.json-status__item--warn {
+  color: #d97706;
+}
+
+.json-status__item--error {
+  color: var(--danger);
+}

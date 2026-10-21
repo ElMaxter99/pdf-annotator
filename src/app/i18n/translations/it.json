@@ -128,7 +128,12 @@
     "jsonPanelHide": "Hide JSON",
     "jsonPanelShow": "Show JSON",
     "minimizeSidebar": "Minimize sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "jsonStatus": {
+      "valid": "JSON valido · annotazioni: {{count}}",
+      "noPages": "Manca l'elenco «pages»",
+      "error": "Errore alla riga {{line}}, colonna {{column}}"
+    }
   },
   "guides": {
     "enableFeature": "Attiva guide e agganci",
@@ -273,6 +278,8 @@
   "toast": {
     "close": "Chiudi",
     "importJsonFailed": "Impossibile importare il file JSON. Controlla che il formato sia corretto.",
-    "exportPdfFailed": "Impossibile generare il PDF annotato. Verifica che il file sia valido o prova con un'altra copia."
+    "exportPdfFailed": "Impossibile generare il PDF annotato. Verifica che il file sia valido o prova con un'altra copia.",
+    "importJsonFailedAt": "Impossibile importare il JSON: errore alla riga {{line}}, colonna {{column}}.",
+    "importJsonNoPages": "Il JSON non contiene un elenco «pages» con pagine e campi."
   }
 }
