@@ -19,7 +19,7 @@
 
 ## Propuestas siguientes (por valor / esfuerzo)
 1. **Dividir `workspace.page.ts` (≈3.340 líneas)** en servicios (`PdfRenderService`, `AnnotationStore`, `JsonSyncService`, `FontService`, `ExportService`). ✅ Hecho: `<app-annotation-editor>` unificado y utilidades `color.utils`/`number.utils` con tests. ✅ `PdfExportService`, `FontCatalogService` y `AnnotationStore` (anotaciones + historial) y `AnnotationImportService` (normalización del JSON importado) extraídos, con tests. Pendiente: render del PDF/miniaturas y el resto de la sincronización del JSON (texto, árbol, autoaplicado).
-2. **Sidebar por pestañas** (Documento · Anotaciones · Plantillas · Avanzado) para no hacer scroll con tantas secciones.
+2. ✅ **Sidebar por pestañas** (Documento · Anotaciones · Plantillas · Avanzado).
 3. **Barra de herramientas del visor**: selección múltiple, mover con flechas, alinear/distribuir, copiar/pegar anotaciones.
 4. ✅ **Persistencia de sesión** (IndexedDB): recuperar PDF, anotaciones, página y zoom desde la landing (Continuar / Descartar).
 5. ✅ Toasts en lugar de `alert(...)` (hecho: `ToastService` + `app-toast-host`, textos en 7 idiomas). ✅ Validación del JSON con línea y columna del error (estado bajo el editor y avisos al aplicar/importar). Pendiente: validación por esquema de cada campo (tipos y rangos) con avisos por campo.

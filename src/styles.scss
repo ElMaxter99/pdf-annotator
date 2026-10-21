@@ -2500,9 +2500,9 @@ kbd {
   top: -12px;
   z-index: 3;
   display: flex;
-  gap: 4px;
+  gap: 2px;
   margin: 0 -12px 12px;
-  padding: 8px 12px;
+  padding: 8px 10px;
   background: var(--panel);
   border-bottom: 1px solid rgba(94, 234, 212, 0.14);
 }
@@ -2513,14 +2513,14 @@ kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 7px 6px;
+  gap: 5px;
+  padding: 7px 4px;
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
   color: var(--muted);
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -2544,8 +2544,9 @@ kbd {
 }
 
 .sidebar-tab__badge {
-  min-width: 1.4em;
-  padding: 0 6px;
+  flex: none;
+  min-width: 1.6em;
+  padding: 0 5px;
   border-radius: 999px;
   background: var(--accent);
   color: #041818;
