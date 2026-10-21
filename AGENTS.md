@@ -32,7 +32,7 @@ src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
 ├─ pages/workspace/
 │  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~3.340 líneas): render del PDF, sincronización del JSON, atajos y UI
-│  └─ components/            header · sidebar · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
+│  └─ components/            header · sidebar (4 pestañas: Documento, Anotaciones, Plantillas, Avanzado) · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle, toast-host (avisos globales)
 ├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace), annotation-import (normaliza JSON importado → anotaciones), toast (avisos no bloqueantes), session-store (última sesión en IndexedDB: PDF + anotaciones + página y zoom)
 ├─ guards/                   workspace.guard (sin PDF pendiente → /landing)
@@ -76,6 +76,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - Los editores de crear (`preview`) y editar (`edit`) comparten **un único** componente (`annotation-editor`, input `mode`). Cualquier campo nuevo se añade una sola vez; ojo con las reglas `locked` (solo aplican en modo `edit`).
 - Lógica pura (colores, números) va en `utils/*.ts` con su `.spec.ts`; no la metas de nuevo en `workspace.page.ts`.
 - Cambios en las anotaciones: pásalos siempre por `applyCoordsChange(...)` (→ `AnnotationStore.applyChange`) para que entren en el historial; `replaceCoords(..., { skipHistory: true })` solo al cargar un PDF.
+- Sidebar por pestañas (`vm.sidebarTab`): los paneles se ocultan con `[hidden]` (no `*ngIf`) para conservar los `@ViewChild` (editor JSON, inputs de archivo). Un elemento nuevo del panel va dentro del panel que corresponda; en los e2e abre la pestaña con `openSidebarTab(page, 'Anotaciones')` (`openWorkspace` abre Anotaciones por defecto).
 - Ruta `/workspace`: `workspaceGuard` redirige a `/landing` si no hay un PDF pendiente en `PendingFileService` (recarga o URL directa). El guard solo mira (`hasPendingFile`); el consumo lo hace el componente. Cualquier flujo nuevo que abra el workspace debe dejar antes un archivo pendiente.
 - Sesión guardada: `workspace.page.ts` guarda con debounce (800 ms) en `SessionStoreService` solo si hay anotaciones o historial; al limpiar todo borra la sesión. Los datos restaurados se tratan como no confiables (pasan por `AnnotationImportService`). Si añades estado que deba sobrevivir a una recarga, inclúyelo en `SavedSession`.
 - `Ctrl+Z/Y` globales también se disparan dentro del textarea JSON (comportamiento heredado).

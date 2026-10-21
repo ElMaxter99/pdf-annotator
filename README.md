@@ -84,7 +84,7 @@ Arrastra un PDF o haz clic para seleccionarlo. El idioma se cambia arriba a la d
 | Zona | Qué hay |
 | --- | --- |
 | **Cabecera** (una fila) | Página anterior/siguiente · zoom `−`/`+`/**Ajustar** · deshacer/rehacer/limpiar · **Descargar PDF** · **Atajos** · tema · idioma. |
-| **Panel lateral** | Cursor en coordenadas PDF · cambiar de documento · importar/aplicar JSON · **miniaturas** · **plantillas** · **editor JSON** (texto/árbol, copiar, descargar) · **opciones avanzadas** (fuentes, guías, campos extra del JSON). Se minimiza con `B`. |
+| **Panel lateral** (4 pestañas) | Cursor en coordenadas PDF siempre visible, y debajo: **Documento** (cambiar de PDF, miniaturas) · **Anotaciones** (editor JSON en texto o árbol, importar/aplicar, copiar, descargar; con contador) · **Plantillas** · **Avanzado** (fuentes, guías y campos extra del JSON). Se navega con ratón o flechas ←/→. Se minimiza con `B`. |
 | **Visor** | Página con capa de anotaciones. Clic para crear, clic sobre una anotación para editarla, arrastrar para moverla. Scroll propio. |
 | **Pie** | Recordatorio de `?` y versión. |
 

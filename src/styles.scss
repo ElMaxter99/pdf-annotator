@@ -2493,3 +2493,72 @@ kbd {
     justify-content: center;
   }
 }
+
+/* Sidebar tabs */
+.sidebar-tabs {
+  position: sticky;
+  top: -12px;
+  z-index: 3;
+  display: flex;
+  gap: 2px;
+  margin: 0 -12px 12px;
+  padding: 8px 10px;
+  background: var(--panel);
+  border-bottom: 1px solid rgba(94, 234, 212, 0.14);
+}
+
+.sidebar-tab {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 4px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-tab:hover {
+  color: var(--text);
+  background: rgba(94, 234, 212, 0.08);
+}
+
+.sidebar-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.sidebar-tab--active {
+  color: var(--accent);
+  background: rgba(94, 234, 212, 0.14);
+  border-color: rgba(94, 234, 212, 0.35);
+}
+
+.sidebar-tab__badge {
+  flex: none;
+  min-width: 1.6em;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #041818;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+:root.theme-light .sidebar-tab__badge {
+  color: #ffffff;
+}
+
+.sidebar-panel[hidden] {
+  display: none;
+}

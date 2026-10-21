@@ -1,11 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { applyJsonText, openWorkspace, renderedAnnotations } from './helpers';
+import { applyJsonText, openSidebarTab, openWorkspace, renderedAnnotations } from './helpers';
 
 const DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf';
 
 test.beforeEach(async ({ page }) => {
   await openWorkspace(page);
-  await page.locator('.advanced-toggle').click();
 });
 
 test('imported font names are matched to the available families', async ({ page }) => {
@@ -25,16 +24,20 @@ test('imported font names are matched to the available families', async ({ page 
 
 test('custom fonts can be added, used, removed and fall back to Helvetica', async ({ page }) => {
   test.skip(!require('node:fs').existsSync(DEJAVU), 'DejaVu Serif Bold is not installed');
+  await openSidebarTab(page, 'Avanzado');
+  await page.locator('.advanced-toggle').click();
   await page.locator('.advanced-checkbox input').first().check();
   await page.locator('input[type=file][accept=".ttf,.otf,.woff,.woff2"]').setInputFiles(DEJAVU);
   await expect(page.locator('.custom-fonts-panel__item')).toHaveCount(1);
   await expect(page.locator('.custom-fonts-panel__name')).toHaveText('DejaVuSerif-Bold');
 
+  await openSidebarTab(page, 'Anotaciones');
   await applyJsonText(page, { pages: [{ num: 1, fields: [{ x: 50, y: 700, mapField: 'c', fontSize: 12, type: 'text', fontFamily: 'DejaVuSerif-Bold' }, { x: 50, y: 660, mapField: 'd', fontSize: 12, type: 'text', fontFamily: 'custom:unknown' }] }] });
   let families = (await renderedAnnotations(page)).map((r) => r.fontFamily);
   expect(families[0]).toContain('DejaVuSerif-Bold');
   expect(families[1]).toContain('Helvetica');
 
+  await openSidebarTab(page, 'Avanzado');
   await page.locator('.custom-fonts-panel__item button').first().click();
   await expect(page.locator('.custom-fonts-panel__item')).toHaveCount(0);
   families = (await renderedAnnotations(page)).map((r) => r.fontFamily);

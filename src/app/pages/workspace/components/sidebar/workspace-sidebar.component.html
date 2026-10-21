@@ -19,6 +19,31 @@
     </ng-template>
   </div>
 
+  <div class="sidebar-tabs" role="tablist" [attr.aria-label]="'sidebar.tabs.label' | t"
+    (keydown)="vm.onSidebarTabKeydown($event)">
+    <button type="button" role="tab" id="sidebar-tab-document" class="sidebar-tab"
+      [class.sidebar-tab--active]="vm.sidebarTab() === 'document'" [attr.aria-selected]="vm.sidebarTab() === 'document'"
+      aria-controls="sidebar-panel-document" [attr.tabindex]="vm.sidebarTab() === 'document' ? 0 : -1"
+      (click)="vm.setSidebarTab('document')">{{ 'sidebar.tabs.document' | t }}</button>
+    <button type="button" role="tab" id="sidebar-tab-annotations" class="sidebar-tab"
+      [class.sidebar-tab--active]="vm.sidebarTab() === 'annotations'" [attr.aria-selected]="vm.sidebarTab() === 'annotations'"
+      aria-controls="sidebar-panel-annotations" [attr.tabindex]="vm.sidebarTab() === 'annotations' ? 0 : -1"
+      (click)="vm.setSidebarTab('annotations')">
+      {{ 'sidebar.tabs.annotations' | t }}
+      <span class="sidebar-tab__badge" *ngIf="vm.annotationCount() as count">{{ count }}</span>
+    </button>
+    <button type="button" role="tab" id="sidebar-tab-templates" class="sidebar-tab"
+      [class.sidebar-tab--active]="vm.sidebarTab() === 'templates'" [attr.aria-selected]="vm.sidebarTab() === 'templates'"
+      aria-controls="sidebar-panel-templates" [attr.tabindex]="vm.sidebarTab() === 'templates' ? 0 : -1"
+      (click)="vm.setSidebarTab('templates')">{{ 'sidebar.tabs.templates' | t }}</button>
+    <button type="button" role="tab" id="sidebar-tab-advanced" class="sidebar-tab"
+      [class.sidebar-tab--active]="vm.sidebarTab() === 'advanced'" [attr.aria-selected]="vm.sidebarTab() === 'advanced'"
+      aria-controls="sidebar-panel-advanced" [attr.tabindex]="vm.sidebarTab() === 'advanced' ? 0 : -1"
+      (click)="vm.setSidebarTab('advanced')">{{ 'sidebar.tabs.advanced' | t }}</button>
+  </div>
+
+  <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-document" aria-labelledby="sidebar-tab-document"
+    [hidden]="vm.sidebarTab() !== 'document'">
   <section class="sidebar-upload" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
     (keydown)="vm.onFileUploadKeydown($event)" (dragover)="vm.onFileDragOver($event)"
     (dragleave)="vm.onFileDragLeave($event)" (drop)="vm.onFileDrop($event)"
@@ -34,14 +59,6 @@
     </div>
     <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
   </section>
-  <div class="sidebar-actions">
-    <button type="button" class="btn" (click)="vm.triggerImportCoords()">
-      {{ 'sidebar.importJsonFile' | t }}
-    </button>
-    <button type="button" class="btn" (click)="vm.applyCoordsText()">
-      {{ 'sidebar.applyJson' | t }}
-    </button>
-  </div>
   <section class="sidebar-thumbnails" *ngIf="vm.pageThumbnails().length">
     <h5 class="sidebar-thumbnails__title">{{ 'sidebar.thumbnails.title' | t }}</h5>
     <div class="sidebar-thumbnails__list">
@@ -52,40 +69,17 @@
       ></app-page-thumbnails>
     </div>
   </section>
-  <section class="templates">
-    <h5>{{ 'sidebar.templates.title' | t }}</h5>
-    <div class="templates__save">
-      <input type="text" [(ngModel)]="vm.templateNameModel" [ngModelOptions]="{ standalone: true }"
-        [placeholder]="'sidebar.templates.placeholder' | t" />
-      <button type="button" class="btn" (click)="vm.saveCurrentAsTemplate()"
-        [disabled]="!vm.coords().length || !vm.templateNameModel.trim()">
-        {{ 'sidebar.templates.saveButton' | t }}
-      </button>
-    </div>
-    <ng-container *ngIf="vm.templates().length; else emptyTemplates">
-      <div class="templates__select">
-        <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
-        <div class="templates__controls">
-          <select [(ngModel)]="vm.selectedTemplateId" [ngModelOptions]="{ standalone: true }">
-            <option *ngFor="let template of vm.templates()" [value]="template.id">
-              {{ template.name }}
-            </option>
-          </select>
-          <button type="button" class="btn" (click)="vm.loadSelectedTemplate()" [disabled]="!vm.selectedTemplateId">
-            {{ 'sidebar.templates.loadButton' | t }}
-          </button>
-          <button type="button" class="btn templates__delete" (click)="vm.deleteSelectedTemplate()" [disabled]="
-            !vm.selectedTemplateId || vm.selectedTemplateId === vm.defaultTemplateId
-          ">
-            {{ 'sidebar.templates.deleteButton' | t }}
-          </button>
-        </div>
-      </div>
-    </ng-container>
-    <ng-template #emptyTemplates>
-      <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
-    </ng-template>
-  </section>
+  </div>
+  <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-annotations" aria-labelledby="sidebar-tab-annotations"
+    [hidden]="vm.sidebarTab() !== 'annotations'">
+  <div class="sidebar-actions">
+    <button type="button" class="btn" (click)="vm.triggerImportCoords()">
+      {{ 'sidebar.importJsonFile' | t }}
+    </button>
+    <button type="button" class="btn" (click)="vm.applyCoordsText()">
+      {{ 'sidebar.applyJson' | t }}
+    </button>
+  </div>
   <section class="json-panel" [class.json-panel--collapsed]="vm.jsonPanelCollapsed()">
     <div class="json-panel__header">
       <h5 class="json-panel__title">{{ 'sidebar.title' | t }}</h5>
@@ -152,7 +146,46 @@
       <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
     </ng-container>
   </section>
-
+  </div>
+  <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-templates" aria-labelledby="sidebar-tab-templates"
+    [hidden]="vm.sidebarTab() !== 'templates'">
+  <section class="templates">
+    <h5>{{ 'sidebar.templates.title' | t }}</h5>
+    <div class="templates__save">
+      <input type="text" [(ngModel)]="vm.templateNameModel" [ngModelOptions]="{ standalone: true }"
+        [placeholder]="'sidebar.templates.placeholder' | t" />
+      <button type="button" class="btn" (click)="vm.saveCurrentAsTemplate()"
+        [disabled]="!vm.coords().length || !vm.templateNameModel.trim()">
+        {{ 'sidebar.templates.saveButton' | t }}
+      </button>
+    </div>
+    <ng-container *ngIf="vm.templates().length; else emptyTemplates">
+      <div class="templates__select">
+        <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
+        <div class="templates__controls">
+          <select [(ngModel)]="vm.selectedTemplateId" [ngModelOptions]="{ standalone: true }">
+            <option *ngFor="let template of vm.templates()" [value]="template.id">
+              {{ template.name }}
+            </option>
+          </select>
+          <button type="button" class="btn" (click)="vm.loadSelectedTemplate()" [disabled]="!vm.selectedTemplateId">
+            {{ 'sidebar.templates.loadButton' | t }}
+          </button>
+          <button type="button" class="btn templates__delete" (click)="vm.deleteSelectedTemplate()" [disabled]="
+            !vm.selectedTemplateId || vm.selectedTemplateId === vm.defaultTemplateId
+          ">
+            {{ 'sidebar.templates.deleteButton' | t }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #emptyTemplates>
+      <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>
+    </ng-template>
+  </section>
+  </div>
+  <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-advanced" aria-labelledby="sidebar-tab-advanced"
+    [hidden]="vm.sidebarTab() !== 'advanced'">
   <section class="advanced-panel" [class.open]="vm.advancedOptionsOpen()"
     [class.active]="vm.guidesFeatureEnabled() || vm.customFontsFeatureEnabled()">
     <button type="button" class="advanced-toggle" (click)="vm.toggleAdvancedOptions(!vm.advancedOptionsOpen())"
@@ -305,5 +338,6 @@
       </div>
     </ng-container>
   </section>
+  </div>
   </div>
 </aside>

@@ -4,6 +4,7 @@ import {
   ElementRef,
   ViewChild,
   signal,
+  computed,
   AfterViewChecked,
   effect,
   untracked,
@@ -139,6 +140,9 @@ interface JsonTreePreview {
   fieldCount?: number;
 }
 
+const SIDEBAR_TABS = ['document', 'annotations', 'templates', 'advanced'] as const;
+type SidebarTab = (typeof SIDEBAR_TABS)[number];
+
 const AUTO_APPLY_JSON_DELAY_MS = 300;
 const SESSION_SAVE_DELAY_MS = 800;
 
@@ -208,6 +212,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly jsonViewMode = signal<JsonViewMode>('text');
   readonly jsonPanelCollapsed = signal(false);
   readonly sidebarMinimized = signal(false);
+  readonly sidebarTab = signal<SidebarTab>('document');
+  readonly annotationCount = computed(() =>
+    this.store.coords().reduce((total, page) => total + page.fields.length, 0)
+  );
   readonly shortcutsOpen = signal(false);
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
@@ -304,6 +312,37 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   setJsonPanelCollapsed(collapsed: boolean): void {
     this.jsonPanelCollapsed.set(collapsed);
+  }
+
+  setSidebarTab(tab: SidebarTab): void {
+    this.sidebarTab.set(tab);
+  }
+
+  /** Arrow keys / Home / End move between tabs, as in the WAI-ARIA tabs pattern. */
+  onSidebarTabKeydown(event: KeyboardEvent): void {
+    const index = SIDEBAR_TABS.indexOf(this.sidebarTab());
+    let next = index;
+    switch (event.key) {
+      case 'ArrowRight':
+        next = (index + 1) % SIDEBAR_TABS.length;
+        break;
+      case 'ArrowLeft':
+        next = (index - 1 + SIDEBAR_TABS.length) % SIDEBAR_TABS.length;
+        break;
+      case 'Home':
+        next = 0;
+        break;
+      case 'End':
+        next = SIDEBAR_TABS.length - 1;
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    this.setSidebarTab(SIDEBAR_TABS[next]);
+    this.runAfterRender(() =>
+      this.document?.getElementById(`sidebar-tab-${SIDEBAR_TABS[next]}`)?.focus()
+    );
   }
 
   toggleSidebarMinimized(): void {
