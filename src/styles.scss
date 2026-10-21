@@ -2445,3 +2445,51 @@ kbd {
 .json-status__item--error {
   color: var(--danger);
 }
+
+/* Landing: resume previous session */
+.landing__resume {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(580px, 100%);
+  padding: 14px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: rgba(94, 234, 212, 0.08);
+  text-align: left;
+}
+
+.landing__resume-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.landing__resume-text span {
+  overflow-wrap: anywhere;
+}
+
+.landing__resume-text small {
+  color: var(--muted);
+}
+
+.landing__resume-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .landing__resume {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .landing__resume-actions {
+    justify-content: center;
+  }
+}

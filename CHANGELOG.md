@@ -1,5 +1,9 @@
 ## Unreleased
+### Changed
+- Opening or reloading `/workspace` without a PDF now redirects to the landing page (`workspaceGuard`), where a saved session can be resumed instead of leaving an empty editor
+
 ### Added
+- Session recovery: the last PDF, its annotations, page and zoom are autosaved in the browser (IndexedDB, nothing leaves the device) and the landing page offers to continue or discard them; 5 e2e tests, 5 unit tests, texts in the 7 languages
 - JSON validity line under the editor (valid + annotation count / syntax error with line and column / missing `pages`), and import errors that say where the problem is (`LooseJsonError` with line/column), translated in the 7 languages
 - Non-blocking toast notifications (`ToastService` + `app-toast-host`) replace every `alert()`; previously hard-coded Spanish import/export error messages are now translated in the 7 languages
 - End-to-end test suite with Playwright (`npm run e2e`, 25 tests): landing, annotation editor, undo/redo history, JSON import (including that pasted code is never executed), fonts and PDF/JSON export

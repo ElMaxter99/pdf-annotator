@@ -280,6 +280,15 @@
     "importJsonFailed": "No s'ha pogut importar el fitxer JSON. Comprova que el format sigui correcte.",
     "exportPdfFailed": "No s'ha pogut generar el PDF anotat. Comprova que el fitxer sigui vàlid o prova amb una altra còpia.",
     "importJsonFailedAt": "No s'ha pogut importar el JSON: error a la línia {{line}}, columna {{column}}.",
-    "importJsonNoPages": "El JSON no té una llista «pages» amb pàgines i camps."
+    "importJsonNoPages": "El JSON no té una llista «pages» amb pàgines i camps.",
+    "sessionRestoreFailed": "No s'ha pogut recuperar la sessió desada.",
+    "sessionDiscarded": "Sessió desada descartada."
+  },
+  "session": {
+    "title": "Continua on ho vas deixar",
+    "description": "«{{name}}» · anotacions: {{count}} · desat el {{date}}",
+    "continue": "Continua",
+    "discard": "Descarta",
+    "privacy": "Es desa només en aquest navegador."
   }
 }

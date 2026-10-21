@@ -34,7 +34,8 @@ src/app/
 │  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~3.340 líneas): render del PDF, sincronización del JSON, atajos y UI
 │  └─ components/            header · sidebar · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle, toast-host (avisos globales)
-├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace), annotation-import (normaliza JSON importado → anotaciones), toast (avisos no bloqueantes)
+├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace), annotation-import (normaliza JSON importado → anotaciones), toast (avisos no bloqueantes), session-store (última sesión en IndexedDB: PDF + anotaciones + página y zoom)
+├─ guards/                   workspace.guard (sin PDF pendiente → /landing)
 ├─ i18n/                     translation.service + pipe `t` + translations/*.json
 ├─ models/                   annotation.model, guide-settings.model, page-thumbnail.model
 ├─ fonts/                    font-catalog.service (fuentes estándar + personalizadas, resolución de nombres del JSON), standard-font-families, font-variant
@@ -75,6 +76,8 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - Los editores de crear (`preview`) y editar (`edit`) comparten **un único** componente (`annotation-editor`, input `mode`). Cualquier campo nuevo se añade una sola vez; ojo con las reglas `locked` (solo aplican en modo `edit`).
 - Lógica pura (colores, números) va en `utils/*.ts` con su `.spec.ts`; no la metas de nuevo en `workspace.page.ts`.
 - Cambios en las anotaciones: pásalos siempre por `applyCoordsChange(...)` (→ `AnnotationStore.applyChange`) para que entren en el historial; `replaceCoords(..., { skipHistory: true })` solo al cargar un PDF.
+- Ruta `/workspace`: `workspaceGuard` redirige a `/landing` si no hay un PDF pendiente en `PendingFileService` (recarga o URL directa). El guard solo mira (`hasPendingFile`); el consumo lo hace el componente. Cualquier flujo nuevo que abra el workspace debe dejar antes un archivo pendiente.
+- Sesión guardada: `workspace.page.ts` guarda con debounce (800 ms) en `SessionStoreService` solo si hay anotaciones o historial; al limpiar todo borra la sesión. Los datos restaurados se tratan como no confiables (pasan por `AnnotationImportService`). Si añades estado que deba sobrevivir a una recarga, inclúyelo en `SavedSession`.
 - `Ctrl+Z/Y` globales también se disparan dentro del textarea JSON (comportamiento heredado).
 - `preserveTextModel: true` en `replaceCoords` evita reformatear el texto que el usuario está escribiendo; **no** lo uses al importar archivos/plantillas.
 - El PDF se guarda en memoria (`pdfByteSources`) en tres variantes para que el export sea robusto ante PDFs raros.

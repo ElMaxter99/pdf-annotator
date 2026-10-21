@@ -280,6 +280,15 @@
     "importJsonFailed": "Die JSON-Datei konnte nicht importiert werden. Prüfen Sie, ob das Format korrekt ist.",
     "exportPdfFailed": "Das annotierte PDF konnte nicht erstellt werden. Prüfen Sie, ob die Datei gültig ist, oder versuchen Sie eine andere Kopie.",
     "importJsonFailedAt": "Das JSON konnte nicht importiert werden: Fehler in Zeile {{line}}, Spalte {{column}}.",
-    "importJsonNoPages": "Das JSON enthält keine Liste „pages“ mit Seiten und Feldern."
+    "importJsonNoPages": "Das JSON enthält keine Liste „pages“ mit Seiten und Feldern.",
+    "sessionRestoreFailed": "Die gespeicherte Sitzung konnte nicht wiederhergestellt werden.",
+    "sessionDiscarded": "Gespeicherte Sitzung verworfen."
+  },
+  "session": {
+    "title": "Dort weitermachen, wo Sie aufgehört haben",
+    "description": "„{{name}}“ · Anmerkungen: {{count}} · gespeichert am {{date}}",
+    "continue": "Fortsetzen",
+    "discard": "Verwerfen",
+    "privacy": "Wird nur in diesem Browser gespeichert."
   }
 }
