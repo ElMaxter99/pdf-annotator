@@ -1,3 +1,7 @@
+## Unreleased
+### Security
+- `e2e/static-server.mjs` (test/dev helper, not part of the build): listens only on `127.0.0.1`, confines files to the served folder with `path.relative`, answers 400 on malformed URLs and 404 on read errors
+
 ## [v1.5.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.5.0) - 2026-10-21
 ### Added
 - **Multi-selection**: Shift/Ctrl+click or a rubber band (drag on an empty area; Shift adds) to pick annotations, Ctrl+A for the whole page (locked ones excluded), group drag, arrow-key nudging (Shift ×10), Delete, Ctrl+C / Ctrl+V / Ctrl+D (offset copies) and a selection bar with six align actions (left, centre, right, top, middle, bottom), distribute horizontally/vertically (3+), duplicate, delete and clear. Each action is one undo step; held arrow keys merge into one (`AnnotationStore` coalescing)

@@ -14,7 +14,7 @@ export default defineConfig({
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? [['github'], ['list']] : 'list',
   use: {
-    baseURL: 'http://localhost:4300',
+    baseURL: 'http://127.0.0.1:4300',
     viewport: { width: 1720, height: 900 },
     launchOptions: process.env['PW_CHROMIUM']
       ? { executablePath: process.env['PW_CHROMIUM'] }
@@ -22,7 +22,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'node e2e/static-server.mjs dist/pdf-annotator/browser',
-    url: 'http://localhost:4300',
+    url: 'http://127.0.0.1:4300',
     reuseExistingServer: !process.env['CI'],
   },
 });
