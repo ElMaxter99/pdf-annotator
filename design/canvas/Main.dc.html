@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tokens de diseño</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:'Segoe UI',sans-serif}
+</style>
+</helmet>
+<div style="width: 1280px; height: 760px; box-sizing: border-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); font-family: 'Segoe UI', sans-serif">
+
+<section style="background: #1e1e2f; color: #f5f5f5; padding: 48px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 32px; font-weight: 600">Tema oscuro</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #b0b0b0">Tema por defecto. Valores de <code>:root</code> en <code>src/styles.scss</code>.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="background: #2a2a3d; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #1e1e2f; border: 1px solid #b0b0b0"></div>
+<div><div style="font-size: 16px; font-weight: 600">--bg</div><div style="font-size: 14px; color: #b0b0b0">#1e1e2f · fondo de la app</div></div>
+</div>
+<div style="background: #2a2a3d; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #2a2a3d; border: 1px solid #b0b0b0"></div>
+<div><div style="font-size: 16px; font-weight: 600">--panel</div><div style="font-size: 14px; color: #b0b0b0">#2a2a3d · paneles y tarjetas</div></div>
+</div>
+<div style="background: #2a2a3d; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #5eead4"></div>
+<div><div style="font-size: 16px; font-weight: 600">--accent</div><div style="font-size: 14px; color: #b0b0b0">#5eead4 · acción principal, foco</div></div>
+</div>
+<div style="background: #2a2a3d; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #ff4d4d"></div>
+<div><div style="font-size: 16px; font-weight: 600">--danger</div><div style="font-size: 14px; color: #b0b0b0">#ff4d4d · errores y borrar</div></div>
+</div>
+<div style="background: #2a2a3d; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #f5f5f5"></div>
+<div><div style="font-size: 16px; font-weight: 600">--text</div><div style="font-size: 14px; color: #b0b0b0">#f5f5f5 · texto principal</div></div>
+</div>
+<div style="background: #2a2a3d; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #b0b0b0"></div>
+<div><div style="font-size: 16px; font-weight: 600">--muted</div><div style="font-size: 14px; color: #b0b0b0">#b0b0b0 · texto secundario</div></div>
+</div>
+</div>
+<div style="display: flex; gap: 12px; align-items: center">
+<button type="button" style="font: inherit; font-size: 15px; font-weight: 600; padding: 10px 18px; min-height: 44px; border-radius: 10px; border: none; background: #5eead4; color: #1e1e2f">Descargar PDF</button>
+<button type="button" style="font: inherit; font-size: 15px; padding: 10px 18px; min-height: 44px; border-radius: 10px; border: 1px solid #b0b0b0; background: transparent; color: #f5f5f5">Importar JSON</button>
+<button type="button" style="font: inherit; font-size: 15px; padding: 10px 18px; min-height: 44px; border-radius: 10px; border: 1px solid #ff4d4d; background: transparent; color: #ff4d4d">Borrar</button>
+</div>
+</section>
+
+<section style="background: #f6f7fb; color: #0f172a; padding: 48px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 32px; font-weight: 600">Tema claro</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #475569">Valores de <code>:root.theme-light</code>. El acento no llega a 4,5:1 sobre blanco: úsalo en fondos de botón con texto blanco grande, bordes y foco.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="background: #ffffff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #f6f7fb; border: 1px solid #475569"></div>
+<div><div style="font-size: 16px; font-weight: 600">--bg</div><div style="font-size: 14px; color: #475569">#f6f7fb · fondo de la app</div></div>
+</div>
+<div style="background: #ffffff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #ffffff; border: 1px solid #475569"></div>
+<div><div style="font-size: 16px; font-weight: 600">--panel</div><div style="font-size: 14px; color: #475569">#ffffff · paneles y tarjetas</div></div>
+</div>
+<div style="background: #ffffff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #0f9b8e"></div>
+<div><div style="font-size: 16px; font-weight: 600">--accent</div><div style="font-size: 14px; color: #475569">#0f9b8e · acción principal, foco</div></div>
+</div>
+<div style="background: #ffffff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #dc2626"></div>
+<div><div style="font-size: 16px; font-weight: 600">--danger</div><div style="font-size: 14px; color: #475569">#dc2626 · errores y borrar</div></div>
+</div>
+<div style="background: #ffffff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #0f172a"></div>
+<div><div style="font-size: 16px; font-weight: 600">--text</div><div style="font-size: 14px; color: #475569">#0f172a · texto principal</div></div>
+</div>
+<div style="background: #ffffff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="height: 56px; border-radius: 8px; background: #475569"></div>
+<div><div style="font-size: 16px; font-weight: 600">--muted</div><div style="font-size: 14px; color: #475569">#475569 · texto secundario</div></div>
+</div>
+</div>
+<div style="display: flex; gap: 12px; align-items: center">
+<button type="button" style="font: inherit; font-size: 15px; font-weight: 600; padding: 10px 18px; min-height: 44px; border-radius: 10px; border: none; background: #0f9b8e; color: #ffffff">Descargar PDF</button>
+<button type="button" style="font: inherit; font-size: 15px; padding: 10px 18px; min-height: 44px; border-radius: 10px; border: 1px solid #475569; background: transparent; color: #0f172a">Importar JSON</button>
+<button type="button" style="font: inherit; font-size: 15px; padding: 10px 18px; min-height: 44px; border-radius: 10px; border: 1px solid #dc2626; background: transparent; color: #dc2626">Borrar</button>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

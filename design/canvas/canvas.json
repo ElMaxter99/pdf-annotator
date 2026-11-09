@@ -1,0 +1,26 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-11-09T15:35:00Z" },
+  "title": "PDF Annotator · Diseño de la interfaz",
+  "launch": { "view": "canvas" },
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1280, "h": 760, "title": "Tokens de diseño" }
+  },
+  "order": ["Main.dc.html"],
+  "notes": {
+    "titulo": {
+      "x": 0,
+      "y": -300,
+      "text": "PDF Annotator · Referencia",
+      "kind": "title1",
+      "maxW": 1280
+    },
+    "convencion": {
+      "x": -420,
+      "y": 0,
+      "w": 340,
+      "text": "Convención: V-NN pantallas que ya existen, P-NN propuestas. Una fila por versión o propuesta, solo con las mesas que cambian. Se dibuja a tres anchos (≥1650, ~1280, <960 px) y en tema oscuro y claro cuando cambia el layout. Los tokens salen de src/styles.scss."
+    }
+  },
+  "designSystems": []
+}
