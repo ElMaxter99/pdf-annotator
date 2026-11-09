@@ -9,7 +9,7 @@ Este archivo es la fuente de verdad para cualquier agente (Claude Code, Copilot,
 3. Sincronizar esas anotaciones con un **JSON** editable (`{ "pages": [{ "num", "fields": [...] }] }`).
 4. Exportar el JSON o un **PDF anotado** (`pdf-lib`), y guardar **plantillas** reutilizables en `localStorage`.
 
-Rutas: `/landing` (carga inicial) → `/workspace` (editor); con varios PDF, `/batch` (lista) → `/batch/:id` (plantilla, PDF nuevo y comparar). Idiomas: es-ES, en, ca, fr, it, pt, de. Temas: oscuro/claro.
+Rutas: `/landing` (carga inicial) → `/workspace` (editor); con varios PDF, `/batch/load` (cargar PDF y plantillas) → `/batch/match` (emparejar) → `/batch` (lista) → `/batch/:id` (plantilla, PDF nuevo y comparar). Idiomas: es-ES, en, ca, fr, it, pt, de. Temas: oscuro/claro.
 
 ## 2. Comandos
 | Comando | Uso |
@@ -30,7 +30,7 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor); con varios PDF, `/b
 ```
 src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
-├─ pages/batch/              Remaquetado por lotes: lista (`batch.page`), ficha por PDF (`batch-item.page`) y componentes (comparar, pasos)
+├─ pages/batch/              Remaquetado por lotes: cargar (`batch-load.page`), emparejar (`batch-match.page`), lista (`batch.page`), ficha por PDF (`batch-item.page`) y componentes (comparar, pasos)
 ├─ pages/workspace/
 │  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.130 líneas): render del PDF, sincronización del JSON, atajos y UI
 │  └─ components/            header · sidebar (4 pestañas: Documento, Anotaciones, Plantillas, Avanzado) · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog

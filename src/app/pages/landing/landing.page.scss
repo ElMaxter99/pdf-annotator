@@ -3,10 +3,11 @@
 .landing__modes-title { margin: 0; font-size: 20px; font-weight: 600; }
 .landing__modes-lead { margin: 0; color: var(--muted); font-size: 14px; }
 .landing__modes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.landing__mode { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; border-radius: 16px; background: var(--panel); border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+.landing__mode { text-align: left; display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; border-radius: 16px; background: var(--panel); border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
   header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; strong { font-size: 18px; } span { color: var(--muted); font-size: 13px; } }
   p { margin: 0; font-size: 15px; line-height: 1.5; }
   ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 14px; }
-  .btn { align-self: flex-start; margin-top: auto; }
-  &--batch { border-color: var(--accent); } }
+  .btn { align-self: flex-start; margin-top: auto; min-height: 44px; padding: 10px 22px; border-radius: 999px; font-weight: 600; cursor: pointer; border: 1px solid color-mix(in srgb, var(--text) 30%, transparent); background: transparent; color: var(--text); }
+  &--batch { border-color: var(--accent); .btn { background: var(--accent); color: var(--bg); border-color: transparent; } } }
+:host-context(:root.theme-light) .landing__mode--batch .btn { background: #0b7a70; color: #fff; }
 @media (max-width: 960px) { .landing__modes-grid { grid-template-columns: 1fr; } }

@@ -28,7 +28,7 @@
           <h1 style="margin: 0; font-size: 19px">{{ 'batch.match.title' | t }}</h1>
           <span class="spacer"></span>
           <div class="pills">
-            <span class="pill pill--ok">✓ {{ 'batch.match.pill.ready' | t : { count: counts().exact + counts().manual + counts().paste } }}</span>
+            <span class="pill pill--ok">✓ {{ 'batch.match.pill.ready' | t : { count: counts().ready } }}</span>
             @if (counts().similar) { <span class="pill">≈ {{ 'batch.match.pill.similar' | t : { count: counts().similar } }}</span> }
             @if (counts().choose) { <span class="pill pill--warn">? {{ 'batch.match.pill.choose' | t : { count: counts().choose } }}</span> }
             @if (counts().none) { <span class="pill pill--warn">{{ 'batch.match.pill.none' | t : { count: counts().none } }}</span> }

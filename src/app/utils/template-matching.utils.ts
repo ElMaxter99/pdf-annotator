@@ -34,14 +34,14 @@ export interface MatchOutcome {
   readonly candidates: readonly string[];
 }
 
-/** Lower case, no accents, no `.pdf`, separators collapsed: `Álbarán_0331.PDF` → `albaran-0331`. */
+/** Lower case, no accents, no `.pdf`/`.json`, separators collapsed: `Álbarán_0331.PDF` → `albaran-0331`. */
 export function normalizeMatchName(value: string): string {
   return value
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .trim()
-    .replace(/\.pdf$/, '')
+    .replace(/\.(pdf|jsonl|ndjson|json)$/, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }

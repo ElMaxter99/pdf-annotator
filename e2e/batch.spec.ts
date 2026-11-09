@@ -16,7 +16,27 @@ async function startBatch(page: import('@playwright/test').Page) {
   await page
     .locator('input[type=file]')
     .setInputFiles([pdfFile('uno.pdf'), pdfFile('dos.pdf'), pdfFile('tres.pdf'), jsonFile('uno.json')]);
+  await page.waitForURL('**/batch/load');
+  await page.getByRole('button', { name: /^Emparejar 3 con 1/ }).click();
+  await page.waitForURL('**/batch/match');
+  await page.getByRole('button', { name: /^Continuar con/ }).click();
   await page.waitForURL('**/batch');
+}
+
+const template = (name: string, x = 10) =>
+  JSON.stringify({
+    _id: { $oid: '6650a1f3c2b4e8a1d4f00031' },
+    pdfName: name,
+    pages: [{ num: 1, fields: [{ x, y: 20, mapField: 'k', fontSize: 12 }] }],
+  });
+
+/** Loads three PDFs on the landing and pastes the given template text in the load step. */
+async function loadAndPaste(page: import('@playwright/test').Page, text: string) {
+  await stubAnalytics(page);
+  await page.goto('/landing');
+  await page.locator('input[type=file]').setInputFiles([pdfFile('uno.pdf'), pdfFile('dos.pdf'), pdfFile('tres.pdf')]);
+  await page.waitForURL('**/batch/load');
+  await page.locator('#batch-paste').fill(text);
 }
 
 /** Waits until IndexedDB holds `count` re-laid-out items, so a reload cannot lose a pending write. */
@@ -48,13 +68,58 @@ async function waitForSavedLayouts(page: import('@playwright/test').Page, count:
   );
 }
 
-test('several files open the batch list and pair JSON by name', async ({ page }) => {
+test('several files open the load step and a lone JSON still pairs by file name', async ({ page }) => {
   await startBatch(page);
   await expect(page.getByRole('heading', { name: /Lote · 3 PDF/ })).toBeVisible();
   const rows = page.locator('.table [role=row][data-status]');
   await expect(rows).toHaveCount(3);
   await expect(rows.filter({ hasText: 'uno.pdf' })).toHaveAttribute('data-status', 'missingNew');
   await expect(rows.filter({ hasText: 'dos.pdf' })).toHaveAttribute('data-status', 'noTemplate');
+});
+
+test('the landing explains both modes and the batch card opens the load step', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/landing');
+  await expect(page.getByRole('heading', { name: '¿Con cuántos PDF vas a trabajar?' })).toBeVisible();
+  await expect(page.locator('.landing__mode')).toHaveCount(2);
+  await page.getByRole('button', { name: 'Cargar PDF y plantillas' }).click();
+  await page.waitForURL('**/batch/load');
+  await expect(page.getByRole('navigation', { name: 'Modo de trabajo' })).toBeVisible();
+  await page.getByRole('link', { name: 'Editor · 1 PDF' }).click();
+  await page.waitForURL('**/landing');
+});
+
+test('pasting a mongoexport pairs each template with its PDF by pdfName', async ({ page }) => {
+  const text = [template('uno.pdf'), template('dos.pdf', 30), template('TRES'), template('sobra.pdf', 50)].join('\n');
+  await loadAndPaste(page, text);
+  await expect(page.locator('.pill--ok')).toContainText('4 plantillas');
+  await page.getByRole('button', { name: 'Añadir 4 plantillas' }).click();
+  await page.getByRole('button', { name: /^Emparejar 3 con 4/ }).click();
+  await page.waitForURL('**/batch/match');
+  const rows = page.locator('.table [role=row][data-match]');
+  await expect(rows).toHaveCount(3);
+  await expect(rows.filter({ hasText: 'uno.pdf' })).toHaveAttribute('data-match', 'exact');
+  await expect(rows.filter({ hasText: 'tres.pdf' })).toHaveAttribute('data-match', 'similar');
+  await expect(page.locator('.tpl-row')).toHaveCount(1);
+  await page.getByRole('button', { name: /^Continuar con/ }).click();
+  await page.waitForURL('**/batch');
+  await expect(page.locator('.table [role=row]', { hasText: 'uno.pdf' })).toHaveAttribute('data-status', 'missingNew');
+});
+
+test('a PDF without a template is assigned by hand and broken pasted templates stay in the box', async ({ page }) => {
+  const broken = '{"pdfName":"dos.pdf","pages":[ {"num":1, fields: ';
+  await loadAndPaste(page, [template('uno.pdf'), template('sobra.pdf', 50), broken].join('\n'));
+  await expect(page.locator('.pill--bad')).toContainText('1 con error');
+  await page.getByRole('button', { name: 'Añadir 2 plantillas' }).click();
+  await expect(page.locator('#batch-paste')).toHaveValue(broken);
+  await page.getByRole('button', { name: /^Emparejar 3 con 2/ }).click();
+  await page.waitForURL('**/batch/match');
+  const row = page.locator('.table [role=row]', { hasText: 'tres.pdf' });
+  await expect(row).toHaveAttribute('data-match', 'none');
+  await row.getByRole('button', { name: 'Asignar' }).click();
+  await page.getByRole('radio', { name: /sobra\.pdf/ }).click();
+  await page.getByRole('button', { name: 'Asignar esta plantilla' }).click();
+  await expect(row).toHaveAttribute('data-match', 'manual');
 });
 
 test('a single PDF still opens the editor', async ({ page }) => {

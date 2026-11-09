@@ -22,7 +22,11 @@
           <textarea id="template-text" class="ta" spellcheck="false" rows="11" [value]="draft()" (input)="onDraft($event)" [class.ta--error]="draft().trim() && !validation().ok" [attr.aria-invalid]="draft().trim() && !validation().ok ? 'true' : null" [attr.aria-describedby]="'template-status'" placeholder="var pdfTemplate = { pages: [ ... ] };"></textarea>
           <div id="template-status" role="status" aria-live="polite">
             @if (!draft().trim()) {
-              <p class="cap">{{ 'batch.template.hint' | t }}</p>
+              @if (it.template && !it.templateIssue) {
+                <p class="note note--ok">✓ <span><b>{{ 'batch.template.found' | t : { pages: pageSummary().length, fields: fieldCount(it.template) } }}</b>@if (it.templateName) {<br />{{ it.templateName }}}</span></p>
+              } @else {
+                <p class="cap">{{ 'batch.template.hint' | t }}</p>
+              }
             } @else {
               @let v = validation();
               @if (v.ok) {

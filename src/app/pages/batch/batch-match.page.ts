@@ -165,8 +165,8 @@ export class BatchMatchPageComponent implements OnInit {
     const first = row.state.templateId ?? row.state.candidates[0];
     this.chosenId.set(first ?? null);
     if (!first) {
-      const best = this.dialogList()[0];
-      this.chosenId.set(best && best.score >= 40 && !best.inUse ? best.template.id : null);
+      const best = this.dialogList().find((entry) => !entry.inUse && entry.score >= 40);
+      this.chosenId.set(best ? best.template.id : null);
     }
   }
 
