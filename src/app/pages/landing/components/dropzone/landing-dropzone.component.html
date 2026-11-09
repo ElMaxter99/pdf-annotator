@@ -8,22 +8,58 @@
     (dragover)="fileDragOver.emit($event)"
     (dragleave)="fileDragLeave.emit($event)"
     (drop)="fileDrop.emit($event)"
-    [class.landing__dropzone--active]="fileDropActive"
+    [class.landing__dropzone--active]="fileDropActive && !busy"
+    [class.landing__dropzone--busy]="busy"
+    [class.landing__dropzone--error]="hasError && !fileDropActive && !busy"
     [attr.aria-label]="'app.upload.title' | t"
+    [attr.aria-busy]="busy ? 'true' : null"
   >
     <input #pdfFileInput type="file" multiple accept="application/pdf,.pdf,application/json,.json" (change)="fileSelected.emit($event)" hidden />
-    <div class="landing__icon" aria-hidden="true">📄</div>
-    <div class="landing__text">
-      <span class="landing__headline">{{ 'app.upload.title' | t }}</span>
-      <span class="landing__subheadline">{{ 'app.upload.subtitle' | t }}</span>
-      <span class="landing__hint">{{ 'app.upload.hint' | t }}</span>
-      <span class="landing__hint">{{ 'batch.landing.hint' | t }}</span>
+    <div class="landing__mock" aria-hidden="true">
+      <div class="landing__mock-page">
+        <span class="landing__mock-band"></span>
+        <span class="landing__mock-line" style="top: 26%; left: 10%; width: 50%"></span>
+        <span class="landing__mock-line" style="top: 36%; left: 10%; width: 72%"></span>
+        <span class="landing__mock-line" style="top: 46%; left: 10%; width: 64%"></span>
+        <span class="landing__mock-line" style="top: 60%; left: 10%; width: 76%"></span>
+        <span class="landing__mock-line" style="top: 70%; left: 10%; width: 56%"></span>
+        @if (!busy) {
+          <span class="landing__mock-field" style="top: 17%; left: 10%; width: 44%; height: 7%; animation-delay: 0.1s"></span>
+          <span class="landing__mock-field" style="top: 42%; left: 52%; width: 30%; height: 7%; animation-delay: 0.35s"></span>
+          <span class="landing__mock-field" style="top: 56%; left: 10%; width: 46%; height: 7%; animation-delay: 0.6s"></span>
+          <span class="landing__mock-field" style="top: 78%; left: 58%; width: 30%; height: 8%; animation-delay: 0.85s"></span>
+        }
+      </div>
     </div>
-    <button type="button" class="landing__cta" (click)="onOpenFilePicker($event)">
-      {{ 'app.landing.cta' | t }}
-    </button>
+    <div class="landing__text" aria-live="polite">
+      @if (busy) {
+        <span class="landing__headline">{{ 'app.landing.busy.title' | t : { name: busyName } }}</span>
+        <span class="landing__subheadline">{{ 'app.landing.busy.text' | t }}</span>
+        <span class="landing__progress" role="progressbar" [attr.aria-label]="'app.landing.busy.title' | t : { name: busyName }"><i></i></span>
+      } @else if (fileDropActive) {
+        @if (dragCount > 1) {
+          <span class="landing__headline">{{ 'app.landing.drop.batchTitle' | t }}</span>
+          <span class="landing__subheadline">{{ 'app.landing.drop.batchText' | t : { count: dragCount } }}</span>
+        } @else {
+          <span class="landing__headline">{{ 'app.landing.drop.editorTitle' | t }}</span>
+          <span class="landing__subheadline">{{ 'app.landing.drop.editorText' | t }}</span>
+        }
+      } @else if (hasError) {
+        <span class="landing__headline">{{ 'app.landing.error.title' | t }}</span>
+        <span class="landing__subheadline">{{ 'app.landing.error.text' | t }}</span>
+        <div class="landing__actions">
+          <button type="button" class="landing__cta landing__cta--ghost" (click)="onOpenFilePicker($event)">{{ 'app.landing.error.again' | t }}</button>
+          <button type="button" class="landing__example" (click)="onTryExample($event)">{{ 'app.landing.tryExample' | t }}</button>
+        </div>
+      } @else {
+        <h2 class="landing__headline">{{ 'app.upload.title' | t }}</h2>
+        <span class="landing__subheadline">{{ 'app.upload.subtitle' | t }}</span>
+        <div class="landing__actions">
+          <button type="button" class="landing__cta" (click)="onOpenFilePicker($event)">{{ 'app.landing.cta' | t }}</button>
+          <button type="button" class="landing__example" (click)="onTryExample($event)">✨ {{ 'app.landing.tryExample' | t }}</button>
+        </div>
+        <span class="landing__hint">{{ 'app.upload.hint' | t }}</span>
+      }
+    </div>
   </div>
-  <button type="button" class="landing__example" (click)="tryExample.emit()">
-    ✨ {{ 'app.landing.tryExample' | t }}
-  </button>
 </div>

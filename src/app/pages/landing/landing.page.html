@@ -41,38 +41,22 @@
           </section>
         }
 
-        <section class="landing__modes" aria-labelledby="modes-title">
-          <h2 id="modes-title" class="landing__modes-title">{{ 'batch.modes.title' | t }}</h2>
-          <p class="landing__modes-lead">{{ 'batch.modes.lead' | t }}</p>
-          <div class="landing__modes-grid">
-            <article class="landing__mode">
-              <header><strong>{{ 'batch.modes.editor.title' | t }}</strong><span>{{ 'batch.modes.editor.count' | t }}</span></header>
-              <p>{{ 'batch.modes.editor.text' | t }}</p>
-              <ul>
-                <li>{{ 'batch.modes.editor.p1' | t }}</li>
-                <li>{{ 'batch.modes.editor.p2' | t }}</li>
-                <li>{{ 'batch.modes.editor.p3' | t }}</li>
-              </ul>
-              <button type="button" class="btn btn--ghost" (click)="openPdfFilePicker()">{{ 'batch.modes.editor.cta' | t }}</button>
-            </article>
-            <article class="landing__mode landing__mode--batch">
-              <header><strong>{{ 'batch.modes.batch.title' | t }}</strong><span>{{ 'batch.modes.batch.count' | t }}</span></header>
-              <p>{{ 'batch.modes.batch.text' | t }}</p>
-              <ul>
-                <li>{{ 'batch.modes.batch.p1' | t }}</li>
-                <li>{{ 'batch.modes.batch.p2' | t }}</li>
-                <li>{{ 'batch.modes.batch.p3' | t }}</li>
-              </ul>
-              <button type="button" class="btn btn--ghost" (click)="startBatch()">{{ 'batch.modes.batch.cta' | t }}</button>
-            </article>
-          </div>
-          <p class="landing__modes-lead">{{ 'batch.modes.note' | t }}</p>
-        </section>
-
-        <app-landing-dropzone [fileDropActive]="fileDropActive()" (fileSelected)="onFileSelected($event)"
+        <app-landing-dropzone [fileDropActive]="fileDropActive()" [dragCount]="dragCount()" [busy]="busy()"
+          [busyName]="busyName()" [hasError]="dropError()" (fileSelected)="onFileSelected($event)"
           (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
           (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
           (openFilePicker)="openPdfFilePicker()" (tryExample)="loadExampleDocument()"></app-landing-dropzone>
+
+        <ol class="landing__steps" [attr.aria-label]="'app.landing.steps.one' | t">
+          <li><b aria-hidden="true">1</b>{{ 'app.landing.steps.one' | t }}</li>
+          <li><b aria-hidden="true">2</b>{{ 'app.landing.steps.two' | t }}</li>
+          <li><b aria-hidden="true">3</b>{{ 'app.landing.steps.three' | t }}</li>
+        </ol>
+
+        <p class="landing__batch">
+          <span>{{ 'app.landing.batchNotice.text' | t }}</span>
+          <button type="button" class="landing__batch-link" (click)="startBatch()">{{ 'app.landing.batchNotice.cta' | t }} →</button>
+        </p>
 
         <ul class="landing__trust">
           <li>🔒 {{ 'app.landing.trust.browser' | t }}</li>
@@ -90,21 +74,25 @@
           <span class="landing__feature-icon" aria-hidden="true">🎯</span>
           <h3>{{ 'app.landing.features.precision.title' | t }}</h3>
           <p>{{ 'app.landing.features.precision.text' | t }}</p>
+          <a class="landing__feature-more" [routerLink]="['/guide', 'guides']">{{ 'app.landing.features.more' | t }}<span aria-hidden="true"> →</span></a>
         </article>
         <article class="landing__feature">
           <span class="landing__feature-icon" aria-hidden="true">🧾</span>
           <h3>{{ 'app.landing.features.json.title' | t }}</h3>
           <p>{{ 'app.landing.features.json.text' | t }}</p>
+          <a class="landing__feature-more" [routerLink]="['/guide', 'json']">{{ 'app.landing.features.more' | t }}<span aria-hidden="true"> →</span></a>
         </article>
         <article class="landing__feature">
           <span class="landing__feature-icon" aria-hidden="true">🧩</span>
           <h3>{{ 'app.landing.features.templates.title' | t }}</h3>
           <p>{{ 'app.landing.features.templates.text' | t }}</p>
+          <a class="landing__feature-more" [routerLink]="['/guide', 'templates']">{{ 'app.landing.features.more' | t }}<span aria-hidden="true"> →</span></a>
         </article>
         <article class="landing__feature">
           <span class="landing__feature-icon" aria-hidden="true">🔐</span>
           <h3>{{ 'app.landing.features.privacy.title' | t }}</h3>
           <p>{{ 'app.landing.features.privacy.text' | t }}</p>
+          <a class="landing__feature-more" [routerLink]="['/guide', 'start']">{{ 'app.landing.features.more' | t }}<span aria-hidden="true"> →</span></a>
         </article>
       </div>
     </section>

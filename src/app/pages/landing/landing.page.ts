@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language, TranslationService } from '../../i18n/translation.service';
@@ -26,6 +26,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingHeroComponent,
     LandingDropzoneComponent,
     LandingFooterComponent,
+    RouterLink,
     TranslationPipe,
   ],
 })
@@ -47,6 +48,11 @@ export class LandingPageComponent {
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   languageModel: Language = this.translationService.getCurrentLanguage();
   readonly fileDropActive = signal(false);
+  readonly dragCount = signal(0);
+  readonly busy = signal(false);
+  readonly busyName = signal('');
+  readonly dropError = signal(false);
+  private errorTimer: ReturnType<typeof setTimeout> | null = null;
 
   @ViewChild(LandingDropzoneComponent)
   private landingDropzoneComponent?: LandingDropzoneComponent;
@@ -113,6 +119,7 @@ export class LandingPageComponent {
 
   openPdfFilePicker() {
     this.fileDropActive.set(false);
+    this.clearError();
     this.landingDropzoneComponent?.triggerFilePicker();
   }
 
@@ -129,6 +136,7 @@ export class LandingPageComponent {
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = 'copy';
     }
+    this.dragCount.set(event.dataTransfer?.items?.length ?? 0);
     this.fileDropActive.set(true);
   }
 
@@ -144,6 +152,7 @@ export class LandingPageComponent {
   async onFileDrop(event: DragEvent) {
     event.preventDefault();
     this.fileDropActive.set(false);
+    this.dragCount.set(0);
 
     const files = Array.from(event.dataTransfer?.files ?? []);
     if (!files.length) {
@@ -176,13 +185,15 @@ export class LandingPageComponent {
     const hasPdf = files.some((file) => isPdfFile(file));
     const hasJson = files.some((file) => /\.(json|jsonl|ndjson)$/i.test(file.name) || file.type === 'application/json');
     if (!hasPdf && !hasJson) {
-      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      this.showInvalidFile();
       return;
     }
 
+    this.startBusy(this.translationService.translate('app.landing.busy.many', { count: files.length }));
     const report = await this.batchStore.addFiles(files);
     if (report.added === 0 && report.templatesAdded === 0 && this.batchStore.items().length === 0) {
-      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      this.busy.set(false);
+      this.showInvalidFile();
       return;
     }
     if (report.rejected.length > 0) {
@@ -194,6 +205,7 @@ export class LandingPageComponent {
   }
 
   async loadExampleDocument() {
+    this.startBusy('factura-ejemplo.pdf');
     try {
       const response = await fetch('/examples/factura-ejemplo.pdf');
       if (!response.ok) {
@@ -205,16 +217,42 @@ export class LandingPageComponent {
       );
     } catch (error) {
       console.error('No se pudo cargar el documento de ejemplo.', error);
+      this.busy.set(false);
+      this.toast.error(this.translationService.translate('guide.tryFailed'));
     }
   }
 
   private async handleFileSelection(file: File) {
     if (!isPdfFile(file)) {
-      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      this.showInvalidFile();
       return;
     }
 
+    this.startBusy(file.name);
     this.pendingFileService.setPendingFile(file);
     await this.router.navigate(['/workspace']);
+  }
+
+  private startBusy(name: string) {
+    this.clearError();
+    this.busyName.set(name);
+    this.busy.set(true);
+  }
+
+  private showInvalidFile() {
+    this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+    this.dropError.set(true);
+    if (this.errorTimer) {
+      clearTimeout(this.errorTimer);
+    }
+    this.errorTimer = setTimeout(() => this.dropError.set(false), 8000);
+  }
+
+  private clearError() {
+    this.dropError.set(false);
+    if (this.errorTimer) {
+      clearTimeout(this.errorTimer);
+      this.errorTimer = null;
+    }
   }
 }

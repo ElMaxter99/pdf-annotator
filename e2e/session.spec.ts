@@ -74,7 +74,7 @@ test('opening the workspace without a PDF goes back to the landing page', async 
   await stubAnalytics(page);
   await page.goto('/workspace');
   await expect(page).toHaveURL(/\/landing$/);
-  await expect(page.getByText('Carga tu PDF')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Arrastra aquí tu PDF' })).toBeVisible();
 });
 
 test('reloading the workspace returns to the landing page, where the session can be resumed', async ({ page }) => {

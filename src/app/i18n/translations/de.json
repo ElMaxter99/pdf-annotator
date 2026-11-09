@@ -41,16 +41,43 @@
         "privacy": {
           "title": "Privat von Grund auf",
           "text": "Alles läuft in Ihrem Browser. Ihr PDF wird nie auf einen Server hochgeladen."
-        }
+        },
+        "more": "In der Anleitung ansehen"
       },
       "nav": {
-        "github": "GitHub"
+        "github": "GitHub",
+        "guide": "Anleitung"
+      },
+      "steps": {
+        "one": "PDF ablegen",
+        "two": "Anmerkungen setzen",
+        "three": "JSON oder PDF exportieren"
+      },
+      "batchNotice": {
+        "text": "Viele PDFs mit Vorlagen?",
+        "cta": "Stapelmodus ausprobieren"
+      },
+      "drop": {
+        "editorTitle": "Loslassen, um im Editor zu öffnen",
+        "editorText": "Es wird im Editor geöffnet.",
+        "batchTitle": "Loslassen, um im Stapelmodus zu öffnen",
+        "batchText": "{{count}} Dateien erkannt · der Stapelmodus öffnet sich."
+      },
+      "busy": {
+        "title": "{{name}} wird geöffnet",
+        "text": "Seite 1 wird vorbereitet…",
+        "many": "{{count}} Dateien"
+      },
+      "error": {
+        "title": "Diese Datei ist kein PDF",
+        "text": "Versuche eine andere oder das Beispieldokument.",
+        "again": "Andere wählen"
       }
     },
     "upload": {
-      "title": "Laden Sie Ihr PDF hoch",
-      "subtitle": "Ziehen Sie die Datei hierher oder klicken Sie, um zu durchsuchen",
-      "hint": "Nur PDF",
+      "title": "PDF hierher ziehen",
+      "subtitle": "oder klicken, um es auf deinem Rechner zu suchen. Es öffnet sich sofort im Editor.",
+      "hint": "Nur PDF · verlässt deinen Browser nicht",
       "invalidFormat": "Es werden nur PDF-Dateien unterstützt."
     },
     "workspaceUpload": {
@@ -768,6 +795,143 @@
       "tooLarge": "Die Datei ist größer als 5 MB.",
       "readFailed": "Die Datei konnte nicht gelesen werden.",
       "empty": "Keine Testdaten: Musterwerte werden verwendet."
+    }
+  },
+  "guide": {
+    "badge": "Anleitung",
+    "heading": "Alles, was PDF Annotator kann",
+    "lead": "Such dir einen Einstieg. Jedes Thema erklärt eine Funktion mit Screenshot, Schritten und passenden Tastenkürzeln.",
+    "back": "Zurück zum Start",
+    "nav": "Inhalt der Anleitung",
+    "search": {
+      "label": "In der Anleitung suchen",
+      "placeholder": "In der Anleitung suchen",
+      "results": "{{count}} Treffer",
+      "none": "Nichts für „{{query}}“",
+      "noneHint": "Versuche ein anderes Wort oder sieh dir alle Themen an.",
+      "all": "Alle Themen ansehen",
+      "clear": "Suche löschen"
+    },
+    "paths": {
+      "editor": {
+        "title": "Ein PDF: der Editor",
+        "text": "Du setzt Felder von Hand und feilst per JSON nach."
+      },
+      "batch": {
+        "title": "Viele PDFs: Stapel",
+        "text": "Layout von 2 bis 50 PDFs mit vorhandenen Vorlagen neu setzen."
+      }
+    },
+    "read": "Lesen",
+    "groups": {
+      "start": "Erste Schritte",
+      "editor": "Editor",
+      "batch": "Stapel",
+      "more": "Mehr"
+    },
+    "crumb": {
+      "home": "Start"
+    },
+    "steps": "Schritte",
+    "tip": "Tipp",
+    "shortcuts": "Tastenkürzel",
+    "try": "In der App ausprobieren",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "shotAlt": "Screenshot: {{title}}",
+    "noShot": "Schema",
+    "tryFailed": "Das Beispieldokument konnte nicht geladen werden.",
+    "link": "Anleitung ansehen",
+    "topics": {
+      "start": {
+        "title": "Loslegen",
+        "summary": "Öffne ein PDF, setze deine erste Anmerkung und exportiere.",
+        "s1": "Lege ein PDF im mittleren Feld ab oder wähle „Mit einem Beispieldokument ausprobieren“.",
+        "s2": "Klicke auf die Seite, um deine erste Anmerkung zu setzen.",
+        "s3": "Lade das JSON oder das annotierte PDF über die Kopfzeile herunter.",
+        "tip": "Alles passiert in deinem Browser: Das PDF wird nie auf einen Server hochgeladen."
+      },
+      "workspace": {
+        "title": "Arbeitsbereich",
+        "summary": "Kopfzeile, Seitenleiste mit vier Tabs und Ansicht.",
+        "s1": "Nutze die Kopfzeile zum Blättern, Zoomen, Rückgängigmachen oder Herunterladen.",
+        "s2": "In der Seitenleiste wechselst du zwischen Dokument, Anmerkungen, Vorlagen und Erweitert.",
+        "s3": "Klicke in die Ansicht, um Anmerkungen zu erstellen, und ziehe sie, um sie zu verschieben.",
+        "tip": "Blende die Seitenleiste mit der Taste B aus, um mehr von der Seite zu sehen."
+      },
+      "edit": {
+        "title": "Anmerkung bearbeiten",
+        "summary": "Text oder Zuordnung, Typ, fester Wert, Größe, Schrift, Farbe und mehr.",
+        "s1": "Klicke auf das PDF: Der schwebende Editor öffnet sich an dieser Stelle.",
+        "s2": "Gib den Text oder eine Zuordnung wie kunde.name ein, um sie mit deinen Daten zu verknüpfen.",
+        "s3": "Passe Typ, Schrift, Größe und Farbe an und bestätige mit Enter.",
+        "tip": "Sperre eine Anmerkung mit dem Schloss, damit du sie nicht versehentlich verschiebst."
+      },
+      "selection": {
+        "title": "Auswahl und Ausrichtung",
+        "summary": "Mehrere Anmerkungen gleichzeitig verschieben, ausrichten, verteilen und duplizieren.",
+        "s1": "Halte Umschalt oder Strg und klicke mehrere Anmerkungen an, oder ziehe einen Rahmen über einen leeren Bereich.",
+        "s2": "Nutze die Leiste über der Ansicht zum Ausrichten oder Verteilen.",
+        "s3": "Verschiebe sie per Ziehen oder mit den Pfeiltasten; dupliziere oder lösche sie auf einmal.",
+        "tip": "Ab drei Anmerkungen kannst du sie mit gleichen Abständen verteilen."
+      },
+      "guides": {
+        "title": "Hilfslinien und Präzision",
+        "summary": "Raster, Lineale in PDF-Punkten, Einrasten und Ausrichtungslinien.",
+        "s1": "Öffne Erweitert und aktiviere „Hilfslinien und Einrasten aktivieren“.",
+        "s2": "Wähle das Raster und die Punkte, an denen eingerastet wird.",
+        "s3": "Ziehe eine Anmerkung: Du siehst Ausrichtungslinien und Lineale.",
+        "tip": "Koordinaten sind PDF-Punkte mit dem Ursprung unten links."
+      },
+      "json": {
+        "title": "Live-JSON",
+        "summary": "Text oder Baum, synchron mit der Ansicht.",
+        "s1": "Öffne den Tab Anmerkungen: Das JSON spiegelt jede Änderung der Ansicht.",
+        "s2": "Bearbeite es als Text oder wechsle zur Baumansicht.",
+        "s3": "Importiere, kopiere oder lade das JSON herunter, wann immer du willst.",
+        "tip": "Wählst du eine Anmerkung in der Ansicht aus, springt der Editor zu ihrem Block."
+      },
+      "templates": {
+        "title": "Vorlagen",
+        "summary": "Speichere Anmerkungssätze und nutze sie in anderen PDFs wieder.",
+        "s1": "Setze die Anmerkungen, die du wiederverwenden willst.",
+        "s2": "Gib ihr im Tab Vorlagen einen Namen und speichere sie.",
+        "s3": "Öffne ein anderes PDF und wende die Vorlage mit einem Klick an.",
+        "tip": "Vorlagen werden nur in diesem Browser gespeichert."
+      },
+      "samples": {
+        "title": "Beispielwerte und Testdaten",
+        "summary": "Vorschau mit XXXXX, mit der Zuordnung oder mit einem Test-JSON.",
+        "s1": "Bearbeite unter Erweitert die Beispielwerte, die erscheinen, wenn eine Anmerkung keinen Wert hat.",
+        "s2": "Füge unter Erweitert ein Test-JSON ein oder lade es: Jede Zuordnung wird dagegen aufgelöst.",
+        "s3": "Wähle in der Editorleiste Beispiel, Zuordnung oder Daten.",
+        "tip": "Ein fester Wert gewinnt immer; danach die Testdaten, zuletzt der Beispielwert."
+      },
+      "shortcuts": {
+        "title": "Tastenkürzel und helles Design",
+        "summary": "Drücke ?, um alle Kürzel zu sehen; das Design wechselst du in der Kopfzeile.",
+        "s1": "Drücke ? im Editor, um den Kürzel-Dialog zu öffnen.",
+        "s2": "Nutze Pfeil- und Bildtasten, um dich ohne Maus zu bewegen.",
+        "s3": "Wechsle mit dem Button in der Kopfzeile zwischen dunklem und hellem Design.",
+        "tip": "Kürzel werden ignoriert, solange du in ein Textfeld schreibst."
+      },
+      "batch": {
+        "title": "Stapelmodus",
+        "summary": "2 bis 50 PDFs mit JSON-Vorlagen: laden, zuordnen, vergleichen und herunterladen.",
+        "s1": "Lege mehrere PDFs (und JSON-Vorlagen) auf der Startseite ab oder nutze „Stapelmodus ausprobieren“.",
+        "s2": "Jede Vorlage wird über das Feld pdfName ihrem PDF zugeordnet; Mehrdeutiges entscheidest du.",
+        "s3": "Öffne jedes PDF, lade das neue PDF hoch und vergleiche Original und Neu.",
+        "tip": "Der Stapel wird in deinem Browser gespeichert; du kannst später weitermachen.",
+        "s4": "Lade die Ergebnisse als einzelne Dateien herunter."
+      },
+      "export": {
+        "title": "Exportieren",
+        "summary": "JSON oder annotiertes PDF mit Standard- oder eigenen Schriften.",
+        "s1": "Lade das JSON mit den Koordinaten im Tab Anmerkungen herunter.",
+        "s2": "Lade bei Bedarf eigene Schriften (.ttf, .otf, .woff, .woff2) unter Erweitert hoch.",
+        "s3": "Klicke in der Kopfzeile auf „PDF herunterladen“, um das annotierte PDF zu erhalten.",
+        "tip": "Das exportierte PDF zeigt dasselbe wie die Ansicht."
+      }
     }
   }
 }

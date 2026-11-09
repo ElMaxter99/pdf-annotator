@@ -4,6 +4,10 @@
     <span class="btn__icon" aria-hidden="true">★</span>
     <span class="btn__label">{{ 'app.landing.nav.github' | t }}</span>
   </a>
+  <a class="btn btn--icon btn--ghost" routerLink="/guide">
+    <span class="btn__icon" aria-hidden="true">📖</span>
+    <span class="btn__label">{{ 'app.landing.nav.guide' | t }}</span>
+  </a>
   <app-theme-toggle></app-theme-toggle>
   <app-language-selector
     [languages]="languages"

@@ -73,6 +73,8 @@ Requisitos: **Node 22.12** y un navegador moderno. ¿Prefieres contenedor? `npm 
 > 💡 **Pruébalo ya con los ejemplos incluidos:** carga [`examples/factura-ejemplo.pdf`](examples/factura-ejemplo.pdf) y luego **Importar desde archivo** → [`examples/anotaciones-ejemplo.json`](examples/anotaciones-ejemplo.json).
 
 ## 🧭 Tour de la interfaz
+> 📖 La app incluye una **Guía** (enlace «Guía» en la cabecera de la pantalla de bienvenida, o `/guide`) con cada función explicada paso a paso. Su fuente es [`docs/GUIDE.md`](docs/GUIDE.md).
+
 ### 1 · Pantalla de bienvenida
 Arrastra un PDF o haz clic para seleccionarlo. El idioma se cambia arriba a la derecha.
 

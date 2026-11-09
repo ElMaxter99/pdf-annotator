@@ -41,16 +41,43 @@
         "privacy": {
           "title": "Privé par conception",
           "text": "Tout se passe dans votre navigateur. Votre PDF n'est jamais envoyé à un serveur."
-        }
+        },
+        "more": "Voir dans le guide"
       },
       "nav": {
-        "github": "GitHub"
+        "github": "GitHub",
+        "guide": "Guide"
+      },
+      "steps": {
+        "one": "Déposez votre PDF",
+        "two": "Placez des annotations",
+        "three": "Exportez en JSON ou PDF"
+      },
+      "batchNotice": {
+        "text": "Beaucoup de PDF avec des modèles ?",
+        "cta": "Essayer le mode Lots"
+      },
+      "drop": {
+        "editorTitle": "Déposez pour ouvrir dans l'éditeur",
+        "editorText": "Il s'ouvrira dans l'éditeur.",
+        "batchTitle": "Déposez pour ouvrir en mode Lots",
+        "batchText": "{{count}} fichiers détectés · le mode Lots va s'ouvrir."
+      },
+      "busy": {
+        "title": "Ouverture de {{name}}",
+        "text": "Préparation de la page 1…",
+        "many": "{{count}} fichiers"
+      },
+      "error": {
+        "title": "Ce fichier n'est pas un PDF",
+        "text": "Essayez-en un autre ou le document d'exemple.",
+        "again": "Choisir un autre"
       }
     },
     "upload": {
-      "title": "Téléversez votre PDF",
-      "subtitle": "Glissez-déposez le fichier ici ou cliquez pour parcourir",
-      "hint": "PDF uniquement",
+      "title": "Déposez ici votre PDF",
+      "subtitle": "ou cliquez pour le chercher sur votre ordinateur. Il s'ouvre aussitôt dans l'éditeur.",
+      "hint": "PDF uniquement · ne quitte pas votre navigateur",
       "invalidFormat": "Seuls les fichiers PDF sont pris en charge."
     },
     "workspaceUpload": {
@@ -768,6 +795,143 @@
       "tooLarge": "Le fichier dépasse 5 Mo.",
       "readFailed": "Impossible de lire le fichier.",
       "empty": "Pas de données de test : les valeurs d'exemple sont utilisées."
+    }
+  },
+  "guide": {
+    "badge": "Guide",
+    "heading": "Tout ce que PDF Annotator sait faire",
+    "lead": "Choisissez par où commencer. Chaque sujet explique une fonction avec sa capture, les étapes et les raccourcis associés.",
+    "back": "Retour à l'accueil",
+    "nav": "Sommaire du guide",
+    "search": {
+      "label": "Rechercher dans le guide",
+      "placeholder": "Rechercher dans le guide",
+      "results": "{{count}} résultats",
+      "none": "Rien pour « {{query}} »",
+      "noneHint": "Essayez un autre mot ou parcourez tous les sujets.",
+      "all": "Voir tous les sujets",
+      "clear": "Effacer la recherche"
+    },
+    "paths": {
+      "editor": {
+        "title": "Un PDF : l'éditeur",
+        "text": "Vous placez les champs à la main et les affinez avec le JSON."
+      },
+      "batch": {
+        "title": "Beaucoup de PDF : Lots",
+        "text": "Remettez en page 2 à 50 PDF avec des modèles que vous avez déjà."
+      }
+    },
+    "read": "Lire",
+    "groups": {
+      "start": "Premiers pas",
+      "editor": "Éditeur",
+      "batch": "Lots",
+      "more": "Plus"
+    },
+    "crumb": {
+      "home": "Accueil"
+    },
+    "steps": "Étapes",
+    "tip": "Astuce",
+    "shortcuts": "Raccourcis",
+    "try": "Essayer dans l'app",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "shotAlt": "Capture : {{title}}",
+    "noShot": "Schéma",
+    "tryFailed": "Impossible de charger le document d'exemple.",
+    "link": "Voir le guide",
+    "topics": {
+      "start": {
+        "title": "Démarrer",
+        "summary": "Ouvrez un PDF, placez votre première annotation et exportez.",
+        "s1": "Déposez un PDF dans le cadre central ou choisissez « Essayer avec un document d'exemple ».",
+        "s2": "Cliquez sur la page pour placer votre première annotation.",
+        "s3": "Téléchargez le JSON ou le PDF annoté depuis l'en-tête.",
+        "tip": "Tout se passe dans votre navigateur : le PDF n'est jamais envoyé à un serveur."
+      },
+      "workspace": {
+        "title": "Espace de travail",
+        "summary": "En-tête, panneau latéral à quatre onglets et visionneuse.",
+        "s1": "Utilisez l'en-tête pour changer de page, zoomer, annuler ou télécharger.",
+        "s2": "Dans le panneau latéral, passez de Document à Annotations, Modèles et Avancé.",
+        "s3": "Cliquez dans la visionneuse pour créer des annotations et faites-les glisser pour les déplacer.",
+        "tip": "Réduisez le panneau latéral avec la touche B pour voir plus de page."
+      },
+      "edit": {
+        "title": "Modifier une annotation",
+        "summary": "Texte ou mappage, type, valeur fixe, taille, police, couleur et plus.",
+        "s1": "Cliquez sur le PDF : l'éditeur flottant s'ouvre à cet endroit.",
+        "s2": "Saisissez le texte ou un mappage comme client.nom pour le lier à vos données.",
+        "s3": "Réglez type, police, taille et couleur, puis validez avec Entrée.",
+        "tip": "Verrouillez une annotation avec le cadenas pour ne pas la déplacer par erreur."
+      },
+      "selection": {
+        "title": "Sélection et alignement",
+        "summary": "Déplacez, alignez, répartissez et dupliquez plusieurs annotations à la fois.",
+        "s1": "Maintenez Maj ou Ctrl et cliquez sur plusieurs annotations, ou tracez un cadre sur une zone vide.",
+        "s2": "Utilisez la barre qui apparaît au-dessus de la visionneuse pour aligner ou répartir.",
+        "s3": "Déplacez-les en les faisant glisser ou avec les flèches ; dupliquez-les ou supprimez-les d'un coup.",
+        "tip": "Avec trois annotations ou plus, vous pouvez les répartir à espaces égaux."
+      },
+      "guides": {
+        "title": "Repères et précision",
+        "summary": "Grille, règles en points PDF, aimantation et lignes d'alignement.",
+        "s1": "Ouvrez Avancé et activez « Activer les repères et l'aimantation ».",
+        "s2": "Choisissez la grille et les points d'aimantation.",
+        "s3": "Faites glisser une annotation : les lignes d'alignement et les règles apparaissent.",
+        "tip": "Les coordonnées sont des points PDF, l'origine étant en bas à gauche."
+      },
+      "json": {
+        "title": "JSON en direct",
+        "summary": "Texte ou arbre, synchronisé avec la visionneuse.",
+        "s1": "Ouvrez l'onglet Annotations : le JSON reflète chaque changement de la visionneuse.",
+        "s2": "Modifiez-le en texte ou passez à la vue en arbre.",
+        "s3": "Importez, copiez ou téléchargez le JSON quand vous voulez.",
+        "tip": "Sélectionner une annotation dans la visionneuse place le focus sur son bloc dans l'éditeur."
+      },
+      "templates": {
+        "title": "Modèles",
+        "summary": "Enregistrez des ensembles d'annotations et réutilisez-les sur d'autres PDF.",
+        "s1": "Placez les annotations que vous voulez réutiliser.",
+        "s2": "Dans l'onglet Modèles, donnez-lui un nom et enregistrez-le.",
+        "s3": "Ouvrez un autre PDF et appliquez le modèle d'un clic.",
+        "tip": "Les modèles sont enregistrés uniquement dans ce navigateur."
+      },
+      "samples": {
+        "title": "Valeurs d'exemple et données de test",
+        "summary": "Prévisualisez avec XXXXX, avec le mappage ou avec un JSON de test.",
+        "s1": "Dans Avancé, modifiez les valeurs d'exemple affichées quand une annotation n'a pas de valeur.",
+        "s2": "Collez ou chargez un JSON de test dans Avancé : chaque mappage est résolu avec lui.",
+        "s3": "Choisissez Exemple, Mappage ou Données dans la barre de l'éditeur.",
+        "tip": "Une valeur fixe l'emporte toujours ; viennent ensuite les données de test, puis l'exemple."
+      },
+      "shortcuts": {
+        "title": "Raccourcis et thème clair",
+        "summary": "Appuyez sur ? pour voir tous les raccourcis ; le thème se change dans l'en-tête.",
+        "s1": "Appuyez sur ? dans l'éditeur pour ouvrir la boîte des raccourcis.",
+        "s2": "Utilisez les flèches et les touches de page pour vous déplacer sans souris.",
+        "s3": "Passez du thème sombre au thème clair avec le bouton de l'en-tête.",
+        "tip": "Les raccourcis sont ignorés pendant la saisie dans un champ de texte."
+      },
+      "batch": {
+        "title": "Mode Lots",
+        "summary": "2 à 50 PDF avec des modèles JSON : charger, associer, comparer et télécharger.",
+        "s1": "Déposez plusieurs PDF (et modèles JSON) sur l'accueil, ou utilisez « Essayer le mode Lots ».",
+        "s2": "Chaque modèle est associé à son PDF par le champ pdfName ; vous tranchez ce qui est ambigu.",
+        "s3": "Ouvrez chaque PDF, ajoutez le nouveau PDF et comparez l'original au nouveau.",
+        "tip": "Le lot est conservé dans votre navigateur ; vous pourrez le reprendre plus tard.",
+        "s4": "Téléchargez les résultats sous forme de fichiers séparés."
+      },
+      "export": {
+        "title": "Exporter",
+        "summary": "JSON ou PDF annoté avec des polices standard ou personnelles.",
+        "s1": "Téléchargez le JSON avec les coordonnées depuis l'onglet Annotations.",
+        "s2": "Ajoutez vos polices (.ttf, .otf, .woff, .woff2) dans Avancé si besoin.",
+        "s3": "Cliquez sur « Télécharger le PDF » dans l'en-tête pour obtenir le PDF annoté.",
+        "tip": "Le PDF exporté affiche la même chose que la visionneuse."
+      }
     }
   }
 }

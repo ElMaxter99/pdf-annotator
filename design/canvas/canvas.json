@@ -254,6 +254,62 @@
    "w": 1720,
    "h": 900,
    "title": "P-15 Datos de prueba (claro)"
+  },
+  "P-16-inicio.dc.html": {
+   "x": 0,
+   "y": 24686,
+   "w": 1720,
+   "h": 1060,
+   "title": "P-16 Inicio"
+  },
+  "P-17-inicio-estados.dc.html": {
+   "x": 1800,
+   "y": 24686,
+   "w": 1720,
+   "h": 1040,
+   "title": "P-17 Inicio · estados"
+  },
+  "P-18-inicio-claro.dc.html": {
+   "x": 3600,
+   "y": 24686,
+   "w": 1720,
+   "h": 1060,
+   "title": "P-18 Inicio (claro)"
+  },
+  "P-19-guia-general.dc.html": {
+   "x": 0,
+   "y": 26126,
+   "w": 1720,
+   "h": 1150,
+   "title": "P-19 Guía · vista general"
+  },
+  "P-20-guia-tema.dc.html": {
+   "x": 1800,
+   "y": 26126,
+   "w": 1720,
+   "h": 1130,
+   "title": "P-20 Guía · tema"
+  },
+  "P-21-guia-estados.dc.html": {
+   "x": 3600,
+   "y": 26126,
+   "w": 1720,
+   "h": 1010,
+   "title": "P-21 Guía · estados"
+  },
+  "P-22-guia-tema-claro.dc.html": {
+   "x": 0,
+   "y": 27656,
+   "w": 1720,
+   "h": 1130,
+   "title": "P-22 Guía · tema (claro)"
+  },
+  "P-23-mantenimiento-guia.dc.html": {
+   "x": 1800,
+   "y": 27656,
+   "w": 1720,
+   "h": 960,
+   "title": "P-23 Cómo se mantiene la guía"
   }
  },
  "order": [
@@ -291,7 +347,15 @@
   "P-12-prioridad-y-comparacion.dc.html",
   "P-13-datos-de-prueba.dc.html",
   "P-14-datos-de-prueba-estados.dc.html",
-  "P-15-datos-de-prueba-claro.dc.html"
+  "P-15-datos-de-prueba-claro.dc.html",
+  "P-16-inicio.dc.html",
+  "P-17-inicio-estados.dc.html",
+  "P-18-inicio-claro.dc.html",
+  "P-19-guia-general.dc.html",
+  "P-20-guia-tema.dc.html",
+  "P-21-guia-estados.dc.html",
+  "P-22-guia-tema-claro.dc.html",
+  "P-23-mantenimiento-guia.dc.html"
  ],
  "notes": {
   "t0": {
@@ -362,6 +426,33 @@
    "text": "Propuesta · previsualización de anotaciones (pendiente de aprobación) · valores de muestra y datos de prueba",
    "kind": "title1",
    "maxW": 5400
+  },
+  "g0": {
+   "x": 0,
+   "y": 24386,
+   "text": "Propuesta · nueva vista inicial (pendiente de aprobación) · zona de carga, estados y tema claro",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "g1": {
+   "x": 0,
+   "y": 25826,
+   "text": "Propuesta · vista de guía (pendiente de aprobación) · índice, tema y estados",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "g2": {
+   "x": 0,
+   "y": 27356,
+   "text": "Propuesta · guía en tema claro y cómo se mantiene",
+   "kind": "title1",
+   "maxW": 3520
+  },
+  "gn": {
+   "x": -420,
+   "y": 24686,
+   "w": 340,
+   "text": "P-16 a P-23: la vista inicial recupera el cuadrado central «arrastra aquí» con un aviso discreto a Lotes (sustituye las tarjetas de R-02 en la landing; R-02 sigue valiendo para la explicación de modos dentro de la guía) y una vista de Guía con captura y pasos por tema, alimentada por docs/GUIDE.md. Solo escritorio."
   }
  },
  "designSystems": []
