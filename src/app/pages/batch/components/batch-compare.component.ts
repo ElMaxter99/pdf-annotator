@@ -17,7 +17,8 @@ import type { PageAnnotations, PageField } from '../../../models/annotation.mode
 import type { BatchItem } from '../../../services/batch-store.service';
 import { ToastService } from '../../../services/toast.service';
 import { cloneAnnotationPages, updateFieldInPages } from '../../../utils/annotation-pages.utils';
-import { fieldRenderText } from '../../../utils/field-text.utils';
+import { PreviewSettingsService } from '../../../services/preview-settings.service';
+import { resolveFieldPreview } from '../../../utils/preview-values.utils';
 import { boxesOverlap, fieldBox, formatPageSize } from '../../../utils/page-size.utils';
 
 export type CompareMode = 'original' | 'new' | 'side' | 'overlay';
@@ -54,6 +55,7 @@ const HISTORY_LIMIT = 100;
 })
 export class BatchCompareComponent implements OnDestroy {
   private readonly toast = inject(ToastService);
+  private readonly preview = inject(PreviewSettingsService);
   private readonly i18n = inject(TranslationService);
 
   readonly item = input.required<BatchItem>();
@@ -193,8 +195,9 @@ export class BatchCompareComponent implements OnDestroy {
     const page = source.find((p) => p.num === this.pageNumber());
     if (!page) return [];
     const misplaced = pane === 'new' ? this.textBoxes() : [];
+    const ctx = this.preview.context();
     return page.fields.map((field, index) => {
-      const text = fieldRenderText(field);
+      const text = resolveFieldPreview(field, ctx).text;
       const box = fieldBox(field, text);
       const isMisplaced =
         pane === 'new' &&

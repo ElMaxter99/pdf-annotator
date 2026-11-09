@@ -10,7 +10,6 @@ import {
 } from '../utils/preview-values.utils';
 
 const SAMPLES_KEY = 'pdf-annotator.sampleValues';
-const DATA_KEY = 'pdf-annotator.testData';
 const MODE_KEY = 'pdf-annotator.previewMode';
 export const MAX_TEST_DATA_BYTES = 5 * 1024 * 1024;
 
@@ -22,12 +21,12 @@ export interface TestDataError {
 
 /**
  * Global preview settings: sample values per annotation type, the optional test-data JSON and the
- * view mode. Saved values live in the browser and are read as untrusted.
+ * view mode. Sample values and mode are saved in the browser (read as untrusted); the test data lasts only for the session.
  */
 @Injectable({ providedIn: 'root' })
 export class PreviewSettingsService {
   readonly samples = signal<SampleValues>(this.loadSamples());
-  readonly testDataText = signal<string>(this.loadText());
+  readonly testDataText = signal<string>('');
   readonly mode = signal<PreviewMode>(this.loadMode());
 
   private readonly parsed = computed<{ data: unknown | null; error: TestDataError | null }>(() => {
@@ -87,7 +86,6 @@ export class PreviewSettingsService {
     if (!hadData && this.hasTestData() && this.mode() === 'sample') {
       this.setMode('data');
     }
-    this.save(DATA_KEY, text.length <= MAX_TEST_DATA_BYTES ? text : '');
     if (!text.trim() && this.mode() === 'data') {
       this.setMode('sample');
     }
@@ -112,15 +110,6 @@ export class PreviewSettingsService {
       return raw === 'map' || raw === 'data' ? raw : 'sample';
     } catch {
       return 'sample';
-    }
-  }
-
-  private loadText(): string {
-    try {
-      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(DATA_KEY) : null;
-      return typeof raw === 'string' && raw.length <= MAX_TEST_DATA_BYTES ? raw : '';
-    } catch {
-      return '';
     }
   }
 

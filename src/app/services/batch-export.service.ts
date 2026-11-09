@@ -3,7 +3,8 @@ import { DEFAULT_FONT_ID, FontCatalogService } from '../fonts/font-catalog.servi
 import type { PageAnnotations, PageField } from '../models/annotation.model';
 import { baseName } from '../utils/batch-files.utils';
 import { toArrayBuffer } from '../utils/download.utils';
-import { fieldRenderText } from '../utils/field-text.utils';
+import { PreviewSettingsService } from './preview-settings.service';
+import { resolveFieldPreview } from '../utils/preview-values.utils';
 import type { BatchItem } from './batch-store.service';
 import { PdfExportService } from './pdf-export.service';
 
@@ -41,6 +42,7 @@ export interface BatchExportFile {
 export class BatchExportService {
   private readonly pdfExport = inject(PdfExportService);
   private readonly fonts = inject(FontCatalogService);
+  private readonly preview = inject(PreviewSettingsService);
 
   json(item: BatchItem): BatchExportFile {
     const pages = item.layout ?? [];
@@ -58,6 +60,7 @@ export class BatchExportService {
       throw new Error('El PDF no tiene un PDF nuevo asociado.');
     }
     const bytes = new Uint8Array(await source.arrayBuffer());
+    const ctx = this.preview.context();
     const { bytes: out } = await this.pdfExport.exportAnnotatedPdf({
       pdfByteCandidates: [bytes],
       pages: item.layout ?? [],
@@ -69,7 +72,7 @@ export class BatchExportService {
         fontFamily: this.fonts.normalizeFontFamily(field.fontFamily),
         opacity: typeof field.opacity === 'number' ? field.opacity : 1,
       }),
-      renderText: fieldRenderText,
+      renderText: (field) => resolveFieldPreview(field, ctx).text,
       resolveFont: (fontId) => this.fonts.getFontOptionById(fontId),
     });
     return {
