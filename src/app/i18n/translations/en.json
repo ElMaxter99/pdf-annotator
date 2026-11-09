@@ -61,12 +61,16 @@
       },
       "footer": {
         "batch": "Batch mode"
-      }
+      },
+      "badge": "Annotate smarter",
+      "title": "Lay out coordinates on any PDF in seconds",
+      "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
+      "featuresTitle": "Everything you need to annotate"
     },
     "upload": {
-      "title": "Drop your PDF here",
-      "subtitle": "or click to browse your computer",
-      "hint": "PDF only · never leaves your browser",
+      "title": "Upload your PDF",
+      "subtitle": "Drag & drop the file here or click to browse",
+      "hint": "PDF only",
       "invalidFormat": "Only PDF files are supported."
     },
     "workspaceUpload": {

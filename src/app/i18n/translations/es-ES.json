@@ -61,12 +61,16 @@
       },
       "footer": {
         "batch": "Modo Lotes"
-      }
+      },
+      "badge": "Empieza a anotar",
+      "title": "Maqueta coordenadas de cualquier PDF en segundos",
+      "description": "Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.",
+      "featuresTitle": "Todo lo que necesitas para anotar"
     },
     "upload": {
-      "title": "Arrastra aquí tu PDF",
-      "subtitle": "o haz clic para buscarlo en tu equipo",
-      "hint": "Solo PDF · no sale de tu navegador",
+      "title": "Carga tu PDF",
+      "subtitle": "Arrastra y suelta el archivo aquí o haz clic para buscar",
+      "hint": "Solo PDF",
       "invalidFormat": "Solo se admiten archivos PDF."
     },
     "workspaceUpload": {

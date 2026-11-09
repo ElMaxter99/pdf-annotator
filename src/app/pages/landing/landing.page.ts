@@ -12,6 +12,7 @@ import { PendingFileService } from '../../services/pending-file.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone.component';
 import { LandingFooterComponent } from './components/footer/landing-footer.component';
+import { LandingHeroComponent } from './components/hero/landing-hero.component';
 import { LandingLanguageBarComponent } from './components/language-bar/landing-language-bar.component';
 
 @Component({
@@ -22,6 +23,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
   imports: [
     CommonModule,
     LandingLanguageBarComponent,
+    LandingHeroComponent,
     LandingDropzoneComponent,
     LandingFooterComponent,
     TranslationPipe,

@@ -58,12 +58,15 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | P-21 Guía · estados | Cargando, búsqueda, sin resultados, foco | [`P-21-guia-estados.dc.html`](canvas/P-21-guia-estados.dc.html) | nueva página | Aprobado e implementado (PR #156) |
 | P-22 Guía · tema claro | P-20 en tema claro | [`P-22-guia-tema-claro.dc.html`](canvas/P-22-guia-tema-claro.dc.html) | nueva página | Aprobado e implementado (PR #156) |
 | P-23 Mantenimiento de la guía | `docs/GUIDE.md` y regla para IA | [`propuestas/inicio-y-guia.md`](propuestas/inicio-y-guia.md) | — | Aprobado e implementado (PR #156) |
-| P-24 Inicio (A) | Zona grande al centro, cabecera mínima, pie con Lotes, Guía y GitHub | [`P-24-inicio-a.dc.html`](canvas/P-24-inicio-a.dc.html) | `pages/landing` | Aprobado e implementado (PR #156) |
+| P-24 Inicio (A) | Zona grande al centro, cabecera mínima, pie con Lotes, Guía y GitHub | [`P-24-inicio-a.dc.html`](canvas/P-24-inicio-a.dc.html) | `pages/landing` | Sustituida por P-30 a P-32 |
 | P-25 Inicio (B) | Variante descartada | [`P-25-inicio-b.dc.html`](canvas/P-25-inicio-b.dc.html) | — | Descartada |
 | P-26 Inicio (C) | Variante descartada | [`P-26-inicio-c.dc.html`](canvas/P-26-inicio-c.dc.html) | — | Descartada |
-| P-27 Inicio (A) · estados | Foco, arrastrando uno o varios, abriendo, no válido, recuperables | [`P-27-inicio-a-estados.dc.html`](canvas/P-27-inicio-a-estados.dc.html) | `pages/landing` | Aprobado e implementado (PR #156) |
-| P-28 Inicio (A) claro | P-24 en tema claro | [`P-28-inicio-a-claro.dc.html`](canvas/P-28-inicio-a-claro.dc.html) | `pages/landing` | Aprobado e implementado (PR #156) |
+| P-27 Inicio (A) · estados | Foco, arrastrando uno o varios, abriendo, no válido, recuperables | [`P-27-inicio-a-estados.dc.html`](canvas/P-27-inicio-a-estados.dc.html) | `pages/landing` | Sustituida por P-30 a P-32 |
+| P-28 Inicio (A) claro | P-24 en tema claro | [`P-28-inicio-a-claro.dc.html`](canvas/P-28-inicio-a-claro.dc.html) | `pages/landing` | Sustituida por P-30 a P-32 |
 | P-29 Guía · «Así se ve» | La vista previa y las cuatro ventajas, ahora en la guía | [`P-29-guia-asi-se-ve.dc.html`](canvas/P-29-guia-asi-se-ve.dc.html) | `pages/guide` | Aprobado e implementado (PR #156) |
+| P-30 Inicio · referencia | La inicio como la captura de Maxter, con las diferencias marcadas | [`P-30-inicio-referencia.dc.html`](canvas/P-30-inicio-referencia.dc.html) | `pages/landing` | Pendiente de aprobación (PR #156) |
+| P-31 Inicio · referencia (claro) | P-30 en tema claro | [`P-31-inicio-referencia-claro.dc.html`](canvas/P-31-inicio-referencia-claro.dc.html) | `pages/landing` | Pendiente de aprobación (PR #156) |
+| P-32 Inicio · estados | Foco, arrastrando, abriendo, no válido, recuperables | [`P-32-inicio-referencia-estados.dc.html`](canvas/P-32-inicio-referencia-estados.dc.html) | `pages/landing` | Pendiente de aprobación (PR #156) |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

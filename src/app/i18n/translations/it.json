@@ -61,12 +61,16 @@
       },
       "footer": {
         "batch": "Modalità Lotti"
-      }
+      },
+      "badge": "Annota più velocemente",
+      "title": "Posiziona coordinate su qualsiasi PDF in pochi secondi",
+      "description": "Carica il documento per aggiungere annotazioni collegate a JSON, riutilizzare modelli ed esportare file pronti all'uso.",
+      "featuresTitle": "Tutto ciò che serve per annotare"
     },
     "upload": {
-      "title": "Trascina qui il tuo PDF",
-      "subtitle": "oppure fai clic per cercarlo sul computer",
-      "hint": "Solo PDF · non lascia il tuo browser",
+      "title": "Carica il tuo PDF",
+      "subtitle": "Trascina il file qui oppure fai clic per sfogliare",
+      "hint": "Solo PDF",
       "invalidFormat": "Sono supportati solo i file PDF."
     },
     "workspaceUpload": {

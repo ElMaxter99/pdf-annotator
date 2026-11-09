@@ -10,8 +10,10 @@
   </header>
 
   <main class="landing">
-    <section class="landing__stage">
-      <div class="landing__center">
+    <section class="landing__hero-grid">
+      <div class="landing__intro">
+        <app-landing-hero></app-landing-hero>
+
         @if (savedSession(); as saved) {
           <section class="landing__resume" aria-labelledby="resume-title">
             <div class="landing__resume-text">
@@ -45,11 +47,37 @@
           (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
           (openFilePicker)="openPdfFilePicker()" (tryExample)="loadExampleDocument()"></app-landing-dropzone>
 
-        <p class="landing__values">
-          <span>{{ 'app.landing.features.precision.title' | t }}</span>
-          <span>{{ 'app.landing.features.json.title' | t }}</span>
-          <span>{{ 'app.landing.trust.browser' | t }}</span>
-        </p>
+        <ul class="landing__trust">
+          <li>🔒 {{ 'app.landing.trust.browser' | t }}</li>
+          <li>🌍 {{ 'app.landing.trust.languages' | t }}</li>
+          <li>💚 {{ 'app.landing.trust.openSource' | t }}</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="landing__features" [attr.aria-label]="'app.landing.featuresTitle' | t">
+      <h2 class="landing__features-title">{{ 'app.landing.featuresTitle' | t }}</h2>
+      <div class="landing__features-grid">
+        <article class="landing__feature">
+          <span class="landing__feature-icon" aria-hidden="true">🎯</span>
+          <h3>{{ 'app.landing.features.precision.title' | t }}</h3>
+          <p>{{ 'app.landing.features.precision.text' | t }}</p>
+        </article>
+        <article class="landing__feature">
+          <span class="landing__feature-icon" aria-hidden="true">🧾</span>
+          <h3>{{ 'app.landing.features.json.title' | t }}</h3>
+          <p>{{ 'app.landing.features.json.text' | t }}</p>
+        </article>
+        <article class="landing__feature">
+          <span class="landing__feature-icon" aria-hidden="true">🧩</span>
+          <h3>{{ 'app.landing.features.templates.title' | t }}</h3>
+          <p>{{ 'app.landing.features.templates.text' | t }}</p>
+        </article>
+        <article class="landing__feature">
+          <span class="landing__feature-icon" aria-hidden="true">🔐</span>
+          <h3>{{ 'app.landing.features.privacy.title' | t }}</h3>
+          <p>{{ 'app.landing.features.privacy.text' | t }}</p>
+        </article>
       </div>
     </section>
   </main>

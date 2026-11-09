@@ -15,9 +15,7 @@
     [attr.aria-busy]="busy ? 'true' : null"
   >
     <input #pdfFileInput type="file" multiple accept="application/pdf,.pdf,application/json,.json" (change)="fileSelected.emit($event)" hidden />
-    <span class="landing__icon" aria-hidden="true">
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
-    </span>
+    <div class="landing__icon" aria-hidden="true">📄</div>
     <div class="landing__text" aria-live="polite">
       @if (busy) {
         <span class="landing__headline">{{ 'app.landing.busy.title' | t : { name: busyName } }}</span>
@@ -39,14 +37,15 @@
           <button type="button" class="landing__example" (click)="onTryExample($event)">{{ 'app.landing.tryExample' | t }}</button>
         </div>
       } @else {
-        <h1 class="landing__headline">{{ 'app.upload.title' | t }}</h1>
+        <span class="landing__headline">{{ 'app.upload.title' | t }}</span>
         <span class="landing__subheadline">{{ 'app.upload.subtitle' | t }}</span>
-        <div class="landing__actions">
-          <button type="button" class="landing__cta" (click)="onOpenFilePicker($event)">{{ 'app.landing.cta' | t }}</button>
-          <button type="button" class="landing__example" (click)="onTryExample($event)">✨ {{ 'app.landing.tryExample' | t }}</button>
-        </div>
         <span class="landing__hint">{{ 'app.upload.hint' | t }}</span>
+        <span class="landing__hint">{{ 'batch.landing.hint' | t }}</span>
+        <button type="button" class="landing__cta" (click)="onOpenFilePicker($event)">{{ 'app.landing.cta' | t }}</button>
       }
     </div>
   </div>
+  @if (!busy && !fileDropActive && !hasError) {
+    <button type="button" class="landing__example" (click)="onTryExample($event)">✨ {{ 'app.landing.tryExample' | t }}</button>
+  }
 </div>

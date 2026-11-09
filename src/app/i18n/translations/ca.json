@@ -61,12 +61,16 @@
       },
       "footer": {
         "batch": "Mode Lots"
-      }
+      },
+      "badge": "Comença a anotar",
+      "title": "Maqueta coordenades de qualsevol PDF en segons",
+      "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
+      "featuresTitle": "Tot el que necessites per anotar"
     },
     "upload": {
-      "title": "Arrossega aquí el teu PDF",
-      "subtitle": "o fes clic per cercar-lo al teu equip",
-      "hint": "Només PDF · no surt del teu navegador",
+      "title": "Carrega el teu PDF",
+      "subtitle": "Arrossega i deixa anar el fitxer aquí o fes clic per cercar",
+      "hint": "Només PDF",
       "invalidFormat": "Només s'admeten fitxers PDF."
     },
     "workspaceUpload": {

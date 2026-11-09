@@ -61,12 +61,16 @@
       },
       "footer": {
         "batch": "Modo Lotes"
-      }
+      },
+      "badge": "Anote mais rápido",
+      "title": "Marque coordenadas em qualquer PDF em segundos",
+      "description": "Envie o seu documento para adicionar anotações ligadas a JSON, reutilizar modelos e exportar ficheiros prontos a usar.",
+      "featuresTitle": "Tudo o que precisa para anotar"
     },
     "upload": {
-      "title": "Arraste aqui o seu PDF",
-      "subtitle": "ou clique para procurá-lo no seu computador",
-      "hint": "Só PDF · não sai do seu navegador",
+      "title": "Carregue o seu PDF",
+      "subtitle": "Arraste e largue o ficheiro aqui ou clique para procurar",
+      "hint": "Apenas PDF",
       "invalidFormat": "Apenas ficheiros PDF são suportados."
     },
     "workspaceUpload": {

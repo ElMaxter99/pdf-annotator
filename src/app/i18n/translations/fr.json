@@ -61,12 +61,16 @@
       },
       "footer": {
         "batch": "Mode Lots"
-      }
+      },
+      "badge": "Annotez plus vite",
+      "title": "Placez des coordonnées sur n'importe quel PDF en quelques secondes",
+      "description": "Téléversez votre document pour ajouter des annotations reliées à du JSON, réutiliser des modèles et exporter vos fichiers prêts à l'emploi.",
+      "featuresTitle": "Tout ce qu'il faut pour annoter"
     },
     "upload": {
-      "title": "Déposez ici votre PDF",
-      "subtitle": "ou cliquez pour le chercher sur votre ordinateur",
-      "hint": "PDF uniquement · ne quitte pas votre navigateur",
+      "title": "Téléversez votre PDF",
+      "subtitle": "Glissez-déposez le fichier ici ou cliquez pour parcourir",
+      "hint": "PDF uniquement",
       "invalidFormat": "Seuls les fichiers PDF sont pris en charge."
     },
     "workspaceUpload": {

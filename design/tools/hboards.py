@@ -157,3 +157,66 @@ board('P-29', 'Guía · «Así se ve» (lo que sale de la inicio)', gbody, 'dark
 
 json.dump(made, open(f'{OUT}/../h_made.json', 'w'))
 print('ok', [m[0] for m in made])
+
+
+# ---------------------------------------------------------------- inicio como la referencia de Maxter (P-30 a P-32)
+H2 = '''
+.ref{width:1720px;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;display:flex;flex-direction:column;align-items:center}
+.ref h1,.ref h2,.ref h3,.ref p{margin:0}
+.ref .top{width:1200px;padding:22px 0}
+.ref .badge2{margin-top:18px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:700;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:7px 16px;border-radius:999px}
+.ref h1{font-size:56px;line-height:1.1;letter-spacing:-.02em;text-align:center;max-width:760px;margin-top:16px;font-weight:700}
+.ref .desc{color:var(--muted);font-size:16px;line-height:1.6;max-width:600px;text-align:center;margin-top:14px}
+.ref .zone{margin-top:22px;width:960px;border:1.5px dashed color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:26px;background:color-mix(in srgb,var(--accent) 3%,var(--panel));padding:30px 36px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.ico{width:64px;height:64px;border-radius:20px;background:color-mix(in srgb,var(--accent) 16%,var(--panel));display:grid;place-items:center;font-size:30px;margin-bottom:6px}
+.ref .zone h2{font-size:22px;font-weight:700}
+.ref .zone .s{color:var(--muted);font-size:16px}
+.ref .zone .t{color:var(--muted);font-size:13px}
+.ref .trust{display:flex;gap:26px;color:var(--muted);font-size:15px;margin-top:22px}
+.ref .feats{width:1200px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--line);margin-top:34px;padding-top:26px}
+.ref .feat{display:flex;gap:14px}.ref .feat .fi{flex:none;width:38px;height:38px;border-radius:12px;background:color-mix(in srgb,var(--accent) 14%,var(--panel));display:grid;place-items:center;font-size:18px}
+.ref .feat h3{font-size:16px;font-weight:700}.ref .feat p{color:var(--muted);font-size:13.5px;line-height:1.5;margin-top:4px}
+.ref .rf{width:1200px;display:flex;align-items:center;justify-content:space-between;padding:26px 0 30px;color:var(--muted);font-size:14px;margin-top:20px}
+.ref .rf .ls{display:flex;align-items:center;gap:26px}.ref .rf .ls .hl{color:var(--accent);font-weight:600}
+.ref .rf .gh{display:inline-flex;gap:8px;align-items:center;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:999px;padding:5px 14px;color:var(--text)}
+.zc .ico{width:50px;height:50px;font-size:24px;border-radius:15px}
+'''
+CSS = CSS + H2
+NOTA = '<div style="position:absolute;right:22px;top:92px;width:300px;background:color-mix(in srgb,var(--accent) 10%,var(--panel));border:1px solid var(--accent);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5"><b>Diferencias a propósito</b><br>1. El pie añade «Modo Lotes» y «Guía» junto a GitHub.<br>2. Sin vista previa de la app (está en la Guía → «Así se ve»).</div>'
+
+
+def varI(theme, note=True):
+    lbl = 'Tema oscuro' if theme == 'dark' else 'Tema claro'
+    feats = ''.join(f'<div class="feat"><span class="fi">{ic}</span><div><h3>{t}</h3><p>{d}</p></div></div>' for ic, t, d in [
+        ('🎯', 'Coordenadas exactas', 'Cada clic se convierte en una posición en puntos PDF, con guías y snapping para alinear con precisión.'),
+        ('🧾', 'JSON en vivo', 'Edita el JSON o el visor: ambos se sincronizan al instante. Importa, copia y descarga.'),
+        ('🧩', 'Plantillas reutilizables', 'Guarda tus anotaciones y aplícalas a otros documentos con un clic.'),
+        ('🔐', 'Privado por diseño', 'Todo ocurre en tu navegador. Tu PDF nunca se sube a ningún servidor.')])
+    return f'''<div class="bg"></div>{top(lbl)}<span class="badge2">Empieza a anotar</span><h1>Maqueta coordenadas de cualquier PDF en segundos</h1>
+<p class="desc">Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.</p>
+<div class="zone" role="button" aria-label="Carga tu PDF"><span class="ico">📄</span><h2>Carga tu PDF</h2><p class="s">Arrastra y suelta el archivo aquí o haz clic para buscar</p><p class="t">Solo PDF</p><p class="t">¿Muchos PDF? Elige varios (y sus JSON) y se abre el remaquetado por lotes.</p><span class="btn" style="margin-top:6px">Seleccionar PDF</span></div>
+<span class="ex" style="margin-top:18px">{svg("spark",18)} Probar con un documento de ejemplo</span>
+<div class="trust"><span>🔒 100 % en tu navegador</span><span>🌍 7 idiomas</span><span>💚 Código abierto</span></div>
+<div class="feats">{feats}</div>
+<div class="rf"><span><b style="color:var(--text)">Pdf Annotator</b> v1.5.0</span><div class="ls"><a class="hl">Modo Lotes</a><a>Guía</a><span class="gh">Proyecto de código abierto · Licencia MIT</span></div><span>© 2026 · Desarrollado por AAmoros</span></div>{NOTA if note else ''}'''
+
+
+board('P-30', 'Inicio · como la referencia', varI('dark'), 'dark', 'inicio-referencia', 1180, 'ref')
+board('P-31', 'Inicio · como la referencia (claro)', varI('light', False), 'light', 'inicio-referencia-claro', 1180, 'ref')
+
+
+def zi(lab, cls, title, text, extra='', note=''):
+    return (f'<div class="cell"><span class="lab">{lab}</span><div class="zc {cls}"><span class="ico">📄</span><h3>{title}</h3><p class="cap" style="font-size:14px">{text}</p>{extra}</div><p class="cap" style="font-size:13px">{note}</p></div>')
+
+
+cells2 = [
+    zi('Reposo con foco de teclado', 'focus', 'Carga tu PDF', 'Arrastra y suelta el archivo aquí o haz clic para buscar', '<span class="btn s">Seleccionar PDF</span>', 'Enter o Espacio abren el selector.'),
+    zi('Arrastrando un PDF', 'act', 'Suelta para abrir en el Editor', 'factura-ejemplo.pdf · 1,2 MB', '', 'La zona se ilumina en 150 ms.'),
+    zi('Arrastrando varios archivos', 'act', 'Suelta para abrir en Lotes', '3 PDF y 2 JSON detectados · se abrirá el modo Lotes', '', '2 o más PDF, o cualquier JSON, abren Lotes.'),
+    zi('Abriendo el PDF', 'busy', 'Abriendo factura-ejemplo.pdf', 'Preparando la página 1…', '<div class="bar" style="width:240px"><i style="width:62%"></i></div>', 'Barra de progreso.'),
+    zi('Archivo no válido', 'err', 'Ese archivo no es un PDF', 'Prueba con otro o con el documento de ejemplo.', '<div style="display:flex;gap:8px"><span class="btn g s">Elegir otro</span><span class="ex" style="font-size:14px">Probar el ejemplo</span></div>', 'Borde rojo, texto y aviso (no solo color).'),
+    cells[5],
+]
+body2 = '<div style="padding:22px 44px;display:flex;flex-direction:column;gap:6px"><span class="lab">P-32 · Versión final</span><h1 style="font-size:26px;font-weight:600">Inicio · todos los estados</h1><p class="cap">La zona de P-30 en cada estado.</p></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:0 44px 24px">' + ''.join(cells2) + '</div>'
+board('P-32', 'Inicio · estados de la zona', body2, 'dark', 'inicio-referencia-estados', 900, 'hp')
+json.dump(made, open(f'{OUT}/../h_made.json', 'w'))

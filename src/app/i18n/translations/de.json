@@ -61,12 +61,16 @@
       },
       "footer": {
         "batch": "Stapelmodus"
-      }
+      },
+      "badge": "Schneller annotieren",
+      "title": "Platzieren Sie in Sekunden Koordinaten auf jedem PDF",
+      "description": "Laden Sie Ihr Dokument hoch, um JSON-gestützte Anmerkungen hinzuzufügen, Vorlagen wiederzuverwenden und exportfertige Dateien zu erstellen.",
+      "featuresTitle": "Alles, was Sie zum Annotieren brauchen"
     },
     "upload": {
-      "title": "PDF hierher ziehen",
-      "subtitle": "oder klicken, um es auf deinem Rechner zu suchen",
-      "hint": "Nur PDF · verlässt deinen Browser nicht",
+      "title": "Laden Sie Ihr PDF hoch",
+      "subtitle": "Ziehen Sie die Datei hierher oder klicken Sie, um zu durchsuchen",
+      "hint": "Nur PDF",
       "invalidFormat": "Es werden nur PDF-Dateien unterstützt."
     },
     "workspaceUpload": {

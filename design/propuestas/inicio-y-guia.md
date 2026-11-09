@@ -19,3 +19,6 @@ La landing de la PR #154 pone dos tarjetas de modo encima de la zona de carga y 
 
 ## Actualización: inicio simplificado (P-24 a P-29)
 Tras revisar la primera versión (P-16 a P-23), se rechazó por sobrecargada. Se ofrecieron tres variantes (A, B, C) y se aprobó la **A**: zona «arrastra aquí tu PDF» grande y centrada, cabecera con nombre, versión, idioma y tema, una línea de valores y pie con Modo Lotes, Guía y GitHub. La vista previa del editor y las cuatro ventajas pasaron a la guía como primer tema «Así se ve» (`preview`). P-16, P-17 y P-18 quedan sustituidas.
+
+## Actualización: inicio como la referencia (P-30 a P-32)
+Maxter envió una captura de cómo debía verse la inicio. P-30 a P-32 la reproducen (etiqueta, titular, zona «Carga tu PDF» con aviso de Lotes, ejemplo, confianza, cuatro ventajas, pie). Diferencias a propósito: el pie añade «Modo Lotes» y «Guía», y la vista previa de la app vive en la Guía («Así se ve»). Sustituye a P-24 a P-28.

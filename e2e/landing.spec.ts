@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => stubAnalytics(page));
 
 test('landing shows the drop zone, links to the repository and loads a PDF', async ({ page }) => {
   await page.goto('/landing');
-  await expect(page.getByRole('heading', { name: 'Arrastra aquí tu PDF' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Maqueta coordenadas/ })).toBeVisible();
   await expect(page.locator('a[href="https://github.com/ElMaxter99/pdf-annotator"]').first()).toBeVisible();
 
   await page.locator('input[type=file]').setInputFiles(EXAMPLE_PDF);
@@ -39,7 +39,7 @@ test('rejects non-PDF files', async ({ page }) => {
 test('language can be switched', async ({ page }) => {
   await page.goto('/landing');
   await page.locator('app-language-selector select').selectOption('en');
-  await expect(page.getByRole('heading', { name: 'Drop your PDF here' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Lay out coordinates/ })).toBeVisible();
 });
 
 test('the footer keeps the links to Batch mode, the guide and GitHub', async ({ page }) => {
@@ -52,12 +52,4 @@ test('the footer keeps the links to Batch mode, the guide and GitHub', async ({ 
   await page.getByRole('contentinfo').getByRole('link', { name: 'Guía' }).click();
   await page.waitForURL('**/guide');
   await expect(page.getByRole('heading', { name: 'Todo lo que puede hacer PDF Annotator' })).toBeVisible();
-});
-
-test('the landing is a single screen without scroll at 1280x720', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 720 });
-  await page.goto('/landing');
-  await expect(page.getByRole('heading', { name: 'Arrastra aquí tu PDF' })).toBeVisible();
-  const overflow = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
-  expect(overflow).toBeLessThanOrEqual(1);
 });
