@@ -339,7 +339,7 @@
   },
   "batch": {
     "landing": {
-      "hint": "Muitos PDF? Escolha vários (e os seus JSON) para abrir a remontagem em lote."
+      "hint": "Muitos PDF? Escolha vários (e os seus JSON) e abre-se a remodelação por lotes."
     },
     "nav": {
       "home": "Ir para a página inicial",
@@ -348,16 +348,16 @@
     "privacy": "Tudo acontece no seu navegador. Nada é enviado para nenhum servidor.",
     "steps": {
       "label": "Passos da remontagem",
-      "lot": "Lote",
-      "template": "Modelo",
       "newPdf": "PDF novo",
       "compare": "Comparar",
-      "export": "Exportar"
+      "export": "Exportar",
+      "load": "Carregar",
+      "match": "Emparelhar"
     },
     "empty": {
-      "title": "Carregue os seus PDF e JSON",
-      "text": "Arraste até 50 PDF e os seus JSON (mesmo nome), ou procure os ficheiros. Até {{limit}} MB por PDF.",
-      "cta": "Selecionar ficheiros"
+      "title": "Ainda não há lote",
+      "text": "Carregue os seus PDF e modelos para começar a remodelação.",
+      "cta": "Carregar PDF e modelos"
     },
     "resume": {
       "title": "Tem um lote em curso",
@@ -378,7 +378,6 @@
       "tooBigJson": "O JSON excede 5 MB.",
       "invalidJson": "JSON inválido",
       "duplicate": "Já está no lote",
-      "unmatchedJson": "Nenhum PDF com esse nome",
       "limit": "Lote cheio ou sem espaço"
     },
     "list": {
@@ -393,7 +392,8 @@
       "next": "Remontar o seguinte",
       "noResults": "Nenhum PDF corresponde ao filtro.",
       "nothingPending": "Não resta nada pendente. Bom trabalho!",
-      "keys": "Atalhos: ↑ ↓ mover · Enter abrir · N próximo pendente"
+      "keys": "Atalhos: ↑ ↓ mover · Enter abrir · N próximo pendente",
+      "match": "Emparelhar"
     },
     "filter": {
       "all": "Todos",
@@ -463,7 +463,13 @@
       "page": "Página {{num}}",
       "fieldsCount": "{{count}} campos",
       "errorItem": "Este PDF fica como «Erro no JSON» e não bloqueia os outros. Pode saltá-lo e voltar depois.",
-      "invalidToast": "O modelo não é válido. Veja o aviso junto ao texto."
+      "invalidToast": "O modelo não é válido. Veja o aviso junto ao texto.",
+      "reason": {
+        "empty": "texto vazio",
+        "no-object": "sem objeto",
+        "syntax": "erro de sintaxe",
+        "no-pages": "falta «pages»"
+      }
     },
     "newPdf": {
       "label": "PDF novo",
@@ -555,6 +561,171 @@
       "again": "Descarregar de novo",
       "newBatch": "Começar outro lote",
       "close": "Fechar"
+    },
+    "mode": {
+      "label": "Modo de trabalho",
+      "editor": "Editor · 1 PDF",
+      "batch": "Lotes · vários PDF",
+      "editorHint": "Abre o editor com um único PDF",
+      "batchHint": "Remodela muitos PDF com os seus modelos"
+    },
+    "modes": {
+      "title": "Com quantos PDF vai trabalhar?",
+      "lead": "Escolha um modo. Também pode largar os ficheiros e a app escolhe por si.",
+      "note": "Se largar ficheiros sem escolher: 1 PDF abre o Editor; 2 ou mais PDF, ou qualquer JSON, abrem os Lotes.",
+      "editor": {
+        "title": "Editor",
+        "count": "Um PDF",
+        "text": "Coloca campos à mão num documento e afina-os com o JSON.",
+        "p1": "Um PDF de cada vez",
+        "p2": "Anotações, JSON e modelos guardados no navegador",
+        "p3": "Exporta o PDF anotado ou o JSON",
+        "cta": "Escolher um PDF"
+      },
+      "batch": {
+        "title": "Lotes",
+        "count": "De 2 a 50 PDF",
+        "text": "Remodela muitos PDF com modelos que já tem, um a seguir ao outro.",
+        "p1": "Carrega PDF e modelos JSON de uma vez, em ficheiros ou colados",
+        "p2": "Cada modelo emparelha-se sozinho com o seu PDF",
+        "p3": "Revê antes e depois, e descarrega tudo no fim",
+        "cta": "Carregar PDF e modelos"
+      }
+    },
+    "load": {
+      "title": "Carregar PDF e modelos",
+      "pdfs": {
+        "title": "PDF",
+        "dropTitle": "Largue os seus PDF",
+        "dropText": "Até 50 PDF, {{limit}} MB cada. Pode ir acrescentando.",
+        "pick": "Selecionar PDF",
+        "empty": "Ainda não há PDF.",
+        "more": "e mais {{count}}"
+      },
+      "templates": {
+        "title": "Modelos"
+      },
+      "tab": {
+        "paste": "Colar texto",
+        "files": "Enviar ficheiros"
+      },
+      "files": {
+        "dropTitle": "Largue os seus JSON",
+        "dropText": "Aceita .json, .jsonl e .ndjson. Um ficheiro pode trazer um modelo ou centenas: array, objetos seguidos ou uma linha por documento.",
+        "pick": "Selecionar JSON",
+        "count": "{{count}} modelos",
+        "pasted": "Texto colado",
+        "later": "Os modelos podem chegar depois. Com os PDF carregados já pode passar ao emparelhamento.",
+        "clear": "Limpar modelos"
+      },
+      "paste": {
+        "label": "Cole os modelos que quiser, um a seguir ao outro. Não é preciso um array.",
+        "placeholder": "{\"pdfName\":\"albaran-0331.pdf\",\"pages\":[…]}\n{\"pdfName\":\"albaran-0332.pdf\",\"pages\":[…]}",
+        "add": "Adicionar {{count}} modelos",
+        "clear": "Limpar",
+        "lines": "{{count}} linhas",
+        "valid": "{{count}} modelos",
+        "invalid": "{{count}} com erro",
+        "rowInfo": "{{pages}} págs. · {{fields}} campos",
+        "rowError": "Linha {{line}}: {{reason}}",
+        "errorHelp": "Os modelos com erro ficam na caixa: corrija-os e adicione de novo. O seu texto não se perde.",
+        "note": "Só se usa «pages». O resto é ignorado e leem-se $oid, $date e $numberInt.",
+        "formats": "Formatos aceites",
+        "more": "e mais {{count}}",
+        "addedToast": "{{count}} modelos adicionados"
+      },
+      "formats": {
+        "sequence": "Objetos seguidos",
+        "lines": "Uma linha por documento (mongoexport, JSONL)",
+        "array": "Um array de modelos",
+        "script": "Script com var pdfTemplate"
+      },
+      "summary": {
+        "title": "Resumo",
+        "ready": "Pronto para emparelhar",
+        "pdfs": "PDF lidos",
+        "templates": "Modelos válidos",
+        "failedTemplates": "{{count}} modelos com erro de sintaxe.",
+        "go": "Emparelhar {{pdfs}} com {{templates}} →",
+        "needPdfs": "Carregue pelo menos um PDF para continuar."
+      }
+    },
+    "match": {
+      "title": "Emparelhamento",
+      "filter": "Filtrar",
+      "filters": {
+        "all": "Todos",
+        "ready": "Prontos",
+        "choose": "Por escolher",
+        "none": "Sem modelo",
+        "error": "Com erro"
+      },
+      "col": {
+        "template": "Modelo",
+        "how": "Como foi emparelhado"
+      },
+      "how": {
+        "exact": "✓ Nome exato",
+        "similar": "≈ Nome parecido",
+        "manual": "✓ Atribuída à mão",
+        "paste": "✓ Colada no PDF",
+        "choose": "? É preciso escolher",
+        "none": "· Sem modelo",
+        "error": "! JSON com erro"
+      },
+      "action": {
+        "change": "Alterar",
+        "choose": "Escolher",
+        "assign": "Atribuir",
+        "fix": "Corrigir"
+      },
+      "candidates": "{{count}} candidatas",
+      "pill": {
+        "ready": "{{count}} prontos",
+        "similar": "{{count}} parecidos",
+        "choose": "{{count}} por escolher",
+        "none": "{{count}} PDF sem modelo",
+        "error": "{{count}} com erro"
+      },
+      "continue": "Continuar com {{count}} prontos →",
+      "later": "Pode voltar aqui a partir da lista do lote.",
+      "back": "← Carregar mais",
+      "emptyTitle": "Não há PDF para emparelhar",
+      "emptyText": "Carregue primeiro os seus PDF e modelos.",
+      "fields": "{{count}} campos",
+      "side": {
+        "title": "Como funciona o emparelhamento",
+        "field": "Campo do modelo",
+        "fileName": "Nome do ficheiro",
+        "detected": "Com valor em {{count}} de {{total}} modelos.",
+        "rules": "Compara-se primeiro o valor exato; se não houver, ignoram-se maiúsculas, acentos e a extensão. Se ainda assim não coincidir, sugere-se o mais parecido e nunca se atribui sozinho."
+      },
+      "unused": {
+        "title": "Modelos sem PDF",
+        "empty": "Todos os modelos têm PDF.",
+        "hint": "Arraste uma para a linha de um PDF, ou use «Atribuir» para a escolher numa lista."
+      },
+      "assign": {
+        "title": "Atribuir modelo a {{name}}",
+        "pdf": "PDF · {{pages}} págs.",
+        "search": "Pesquisar entre {{count}} modelos",
+        "suggested": "Sugeridas por nome parecido",
+        "score": "{{score}} % parecido",
+        "inUse": "já usada",
+        "copyNote": "Um modelo que já tem PDF pode ser reutilizado. É copiado, por isso o outro não muda.",
+        "chosen": "Modelo escolhido",
+        "pages": "Páginas",
+        "fields": "Campos",
+        "pagesMatch": "As páginas do PDF e do modelo coincidem.",
+        "pagesDiffer": "O PDF tem {{pdf}} páginas e o modelo {{tpl}}.",
+        "nothing": "Escolha um modelo da lista.",
+        "confirm": "Atribuir este modelo",
+        "paste": "Colar outro modelo",
+        "none": "Deixar sem modelo",
+        "cancel": "Cancelar",
+        "noResults": "Nenhum modelo corresponde à pesquisa.",
+        "doneText": "{{name}} já tem {{count}} campos."
+      }
     }
   }
 }

@@ -19,6 +19,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/batch/batch.page').then((m) => m.BatchPageComponent),
   },
   {
+    path: 'batch/load',
+    loadComponent: () =>
+      import('./pages/batch/batch-load.page').then((m) => m.BatchLoadPageComponent),
+  },
+  {
+    path: 'batch/match',
+    loadComponent: () =>
+      import('./pages/batch/batch-match.page').then((m) => m.BatchMatchPageComponent),
+  },
+  {
     path: 'batch/:id',
     loadComponent: () =>
       import('./pages/batch/batch-item.page').then((m) => m.BatchItemPageComponent),

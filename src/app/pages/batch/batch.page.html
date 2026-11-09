@@ -4,7 +4,9 @@
       <img src="/logo.svg" alt="" width="32" height="32" />
       <span>Pdf Annotator <small>{{ 'batch.nav.subtitle' | t }}</small></span>
     </a>
-    <app-batch-steps [active]="1"></app-batch-steps>
+    <app-batch-steps [active]="3"></app-batch-steps>
+    <span class="spacer"></span>
+    <app-mode-switch active="batch"></app-mode-switch>
   </header>
 
   <input #fileInput type="file" multiple accept="application/pdf,.pdf,application/json,.json" hidden (change)="onFilesSelected($event)" />
@@ -22,7 +24,7 @@
         <div class="drop__icon" aria-hidden="true">📄</div>
         <h1>{{ 'batch.empty.title' | t }}</h1>
         <p class="cap">{{ 'batch.empty.text' | t : { limit: maxMb } }}</p>
-        <button type="button" class="btn" (click)="pickFiles()">{{ 'batch.empty.cta' | t }}</button>
+        <a class="btn" style="text-decoration: none; display: inline-flex; align-items: center" routerLink="/batch/load">{{ 'batch.empty.cta' | t }}</a>
       </div>
       <p class="cap">🔒 {{ 'batch.privacy' | t }}</p>
     </section>
@@ -66,6 +68,7 @@
         <div class="toolbar">
           <span class="cap" aria-live="polite">{{ 'batch.list.selected' | t : { count: selected().size } }}</span>
           <span class="spacer"></span>
+          <a class="btn btn--ghost btn--sm" style="text-decoration: none; display: inline-flex; align-items: center" routerLink="/batch/match">{{ 'batch.list.match' | t }}</a>
           <button type="button" class="btn btn--ghost btn--sm" (click)="pickFiles()">{{ 'batch.list.add' | t }}</button>
           <button type="button" class="btn btn--ghost btn--sm" [class.btn--danger]="confirmRemove()" [disabled]="selected().size === 0" (click)="removeSelected()">
             {{ (confirmRemove() ? 'batch.list.confirmRemove' : 'batch.list.remove') | t : { count: selected().size } }}

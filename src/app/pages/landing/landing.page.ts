@@ -157,25 +157,31 @@ export class LandingPageComponent {
     await this.router.navigate(['/batch']);
   }
 
+  async startBatch() {
+    await this.router.navigate(['/batch/load']);
+  }
+
   async discardBatch() {
     await this.batchStore.clear();
     this.toast.show(this.translationService.translate('batch.resume.discarded'), 'info');
   }
 
-  /** One PDF opens the editor as always; several files (or JSON) start a batch. */
+  /** One PDF opens the editor as always; several files, or any JSON, start a batch. */
   private async handleSelection(files: File[]) {
     if (files.length === 1 && isPdfFile(files[0])) {
       await this.handleFileSelection(files[0]);
       return;
     }
 
-    if (!files.some((file) => isPdfFile(file))) {
+    const hasPdf = files.some((file) => isPdfFile(file));
+    const hasJson = files.some((file) => /\.(json|jsonl|ndjson)$/i.test(file.name) || file.type === 'application/json');
+    if (!hasPdf && !hasJson) {
       this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
 
     const report = await this.batchStore.addFiles(files);
-    if (report.added === 0 && this.batchStore.items().length === 0) {
+    if (report.added === 0 && report.templatesAdded === 0 && this.batchStore.items().length === 0) {
       this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
@@ -184,7 +190,7 @@ export class LandingPageComponent {
         this.translationService.translate('batch.upload.rejected', { count: report.rejected.length })
       );
     }
-    await this.router.navigate(['/batch']);
+    await this.router.navigate(['/batch/load']);
   }
 
   async loadExampleDocument() {

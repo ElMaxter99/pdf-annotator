@@ -1,11 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { FontCatalogService } from '../fonts/font-catalog.service';
 import type { PageAnnotations, PageField } from '../models/annotation.model';
-import {
-  groupBatchFiles,
-  pairTemplates,
-  pairingKey,
-} from '../utils/batch-files.utils';
+import { groupBatchFiles, pairingKey } from '../utils/batch-files.utils';
 import { isPdfFile } from '../utils/pdf-file.utils';
 import {
   PageSize,
@@ -14,7 +10,20 @@ import {
   scaleAnnotations,
   sizeRuleKey,
 } from '../utils/page-size.utils';
-import { parseTemplateText, TemplateTextResult } from '../utils/template-text.utils';
+import {
+  DEFAULT_KEY_FIELD,
+  FILE_KEY,
+  MatchOutcome,
+  detectKeyField,
+  matchAll,
+  templateLabel,
+} from '../utils/template-matching.utils';
+import {
+  TemplateDocument,
+  TemplateTextResult,
+  parseTemplateText,
+  splitTemplateDocuments,
+} from '../utils/template-text.utils';
 import { cloneAnnotationPages } from '../utils/annotation-pages.utils';
 import { normalizeColor } from '../utils/color.utils';
 import { normalizeFieldType } from '../utils/annotation-fields.utils';
@@ -42,6 +51,39 @@ export interface TemplateIssue {
   readonly column?: number;
 }
 
+/** How a PDF got its template. */
+export type BatchMatchKind = 'exact' | 'similar' | 'manual' | 'paste';
+
+/** One template of the pool loaded in bulk (pasted text or a JSON file), before or after pairing. */
+export interface BatchTemplate {
+  readonly id: string;
+  /** File name, or `paste` for text typed into the box. */
+  readonly source: string;
+  /** Top-level texts (such as `pdfName`) used to pair it with a PDF. */
+  readonly keys: Readonly<Record<string, string>>;
+  /** Annotations in original coordinates; null when the template could not be read. */
+  readonly pages: PageAnnotations[] | null;
+  readonly pageCount: number;
+  readonly fieldCount: number;
+  readonly issue?: TemplateIssue;
+  readonly line?: number;
+  readonly addedAt: number;
+}
+
+export interface TemplateAddReport {
+  readonly added: number;
+  readonly failed: readonly { readonly line: number; readonly issue: TemplateIssue; readonly label: string }[];
+  readonly tooBig: readonly string[];
+  readonly unreadable: readonly string[];
+}
+
+/** What the pairing screen shows for each PDF. */
+export interface MatchState {
+  readonly kind: BatchMatchKind | 'choose' | 'none' | 'error';
+  readonly templateId?: string;
+  readonly candidates: readonly string[];
+}
+
 export interface BatchItem {
   readonly id: string;
   readonly name: string;
@@ -51,6 +93,9 @@ export interface BatchItem {
   readonly addedAt: number;
   readonly templateName?: string;
   readonly templateText?: string;
+  /** Template of the bulk pool this PDF was paired with, and how. */
+  readonly templateId?: string;
+  readonly matchKind?: BatchMatchKind;
   /** Annotations as pasted (original coordinates). */
   readonly template: PageAnnotations[] | null;
   readonly templateIssue?: TemplateIssue;
@@ -66,7 +111,7 @@ export interface BatchItem {
   readonly exported: boolean;
 }
 
-export type RejectReason = 'notAllowed' | 'tooBig' | 'invalidJson' | 'duplicate' | 'unmatchedJson' | 'limit';
+export type RejectReason = 'notAllowed' | 'tooBig' | 'tooBigJson' | 'invalidJson' | 'duplicate' | 'limit';
 
 export interface RejectedFile {
   readonly name: string;
@@ -76,7 +121,11 @@ export interface RejectedFile {
 export interface AddReport {
   readonly added: number;
   readonly rejected: RejectedFile[];
+  readonly templatesAdded: number;
+  readonly templatesFailed: number;
 }
+
+export const MAX_TEMPLATES = 2000;
 
 export function countFields(pages: readonly PageAnnotations[] | null | undefined): number {
   return (pages ?? []).reduce((total, page) => total + page.fields.length, 0);
@@ -93,6 +142,8 @@ export function batchStatusOf(item: BatchItem): BatchStatus {
 
 const DB_NAME = 'pdf-annotator-batch';
 const STORE = 'items';
+const TEMPLATE_STORE = 'templates';
+const KEY_FIELD_STORAGE = 'pdf-annotator-batch-key-field';
 
 /** Gives an imported field the same defaults the editor stores. */
 function prepareImportedField(fonts: FontCatalogService, field: PageField): PageField {
@@ -119,19 +170,59 @@ export class BatchStoreService {
   private readonly pdfInfo = inject(PdfInfoService);
 
   readonly items = signal<readonly BatchItem[]>([]);
+  readonly templates = signal<readonly BatchTemplate[]>([]);
+  /** Template field that holds the PDF's name (usually `pdfName`). */
+  readonly keyField = signal<string>(DEFAULT_KEY_FIELD);
   readonly loaded = signal(false);
   readonly busy = signal<{ done: number; total: number } | null>(null);
   readonly storage = signal<{ used: number; quota: number } | null>(null);
   readonly totalBytes = computed(() =>
     this.items().reduce((sum, item) => sum + item.pdf.size + (item.newPdf?.size ?? 0), 0)
   );
+  /** Pairing state of every PDF: what it got, or what still needs a decision. */
+  readonly matchStates = computed(() => {
+    const items = this.items();
+    const templates = this.templates();
+    const outcomes = matchAll(
+      items.filter((item) => !item.template && !item.templateIssue).map((item) => ({ id: item.id, name: item.name })),
+      templates.filter((template) => !items.some((item) => item.templateId === template.id)),
+      this.keyField()
+    );
+    const states = new Map<string, MatchState>();
+    for (const item of items) {
+      if (item.templateIssue || item.template) {
+        states.set(item.id, {
+          kind: item.templateIssue ? 'error' : item.matchKind ?? 'paste',
+          templateId: item.templateId,
+          candidates: [],
+        });
+        continue;
+      }
+      const outcome: MatchOutcome | undefined = outcomes.get(item.id);
+      states.set(item.id, {
+        kind: outcome?.kind === 'choose' ? 'choose' : 'none',
+        candidates: outcome?.kind === 'choose' ? outcome.candidates : [],
+      });
+    }
+    return states;
+  });
+  /** Templates of the pool that no PDF uses yet. */
+  readonly unusedTemplates = computed(() => {
+    const used = new Set(this.items().map((item) => item.templateId).filter(Boolean));
+    return this.templates().filter((template) => !used.has(template.id));
+  });
   /** "Same size change, same choice" rules picked in the page-size dialog (this session only). */
   private readonly sizeRules = new Map<string, SizeStrategy>();
   private loadPromise: Promise<void> | null = null;
 
   load(): Promise<void> {
-    this.loadPromise ??= this.readAll().then((items) => {
+    this.loadPromise ??= Promise.all([
+      this.readAll(),
+      this.readAllRaw(TEMPLATE_STORE).then((values) => values.filter(isBatchTemplate)),
+    ]).then(([items, templates]) => {
       this.items.set(items.sort((a, b) => a.addedAt - b.addedAt));
+      this.templates.set(templates.sort((a, b) => a.addedAt - b.addedAt));
+      this.keyField.set(this.storedKeyField() ?? detectKeyField(templates));
       this.loaded.set(true);
     });
     return this.loadPromise;
@@ -190,15 +281,6 @@ export class BatchStoreService {
       }
     }
 
-    // JSON can also match PDFs that were added to the batch earlier.
-    const known = [...this.items().map((item) => ({ name: item.name })), ...accepted];
-    const { unmatched } = pairTemplates(known, jsons);
-    unmatched.forEach((json) => rejected.push({ name: json.name, reason: 'unmatchedJson' }));
-    const templates = new Map<string, File>();
-    for (const json of jsons) {
-      if (!unmatched.includes(json)) templates.set(pairingKey(json.name), json);
-    }
-
     this.busy.set({ done: 0, total: accepted.length });
     let added = 0;
     const created: BatchItem[] = [];
@@ -227,16 +309,219 @@ export class BatchStoreService {
     this.items.update((list) => [...list, ...created]);
     await Promise.all(created.map((item) => this.persist(item)));
 
-    for (const [key, json] of templates) {
-      const target = this.items().find((item) => pairingKey(item.name) === key);
-      if (!target) continue;
-      const issue = await this.applyTemplateFile(target.id, json);
-      if (issue === 'invalidJson') rejected.push({ name: json.name, reason: 'invalidJson' });
-    }
+    const templateReport = await this.addTemplateFiles(jsons);
+    templateReport.tooBig.forEach((name) => rejected.push({ name, reason: 'tooBigJson' }));
+    templateReport.unreadable.forEach((name) => rejected.push({ name, reason: 'invalidJson' }));
+    this.rematch();
 
     this.busy.set(null);
     await this.refreshStorage();
-    return { added, rejected };
+    return {
+      added,
+      rejected,
+      templatesAdded: templateReport.added,
+      templatesFailed: templateReport.failed.length,
+    };
+  }
+
+  // ---- bulk templates ---------------------------------------------------------------------------
+
+  /** Reads templates from JSON files (one, many, array or one per line). */
+  async addTemplateFiles(files: readonly File[]): Promise<TemplateAddReport> {
+    await this.load();
+    const total = { added: 0, failed: [] as TemplateAddReport['failed'][number][], tooBig: [] as string[], unreadable: [] as string[] };
+    for (const file of files) {
+      if (file.size > MAX_TEMPLATE_BYTES) {
+        total.tooBig.push(file.name);
+        continue;
+      }
+      const report = await this.addTemplateText(await file.text(), file.name);
+      total.added += report.added;
+      total.failed.push(...report.failed);
+      if (report.added === 0 && report.failed.length === 0) total.unreadable.push(file.name);
+    }
+    return total;
+  }
+
+  /** Adds every template found in the text. Failed ones are reported with their line. */
+  async addTemplateText(text: string, source = 'paste'): Promise<TemplateAddReport> {
+    await this.load();
+    const docs = splitTemplateDocuments(text, MAX_TEMPLATES);
+    const room = Math.max(0, MAX_TEMPLATES - this.templates().length);
+    const created: BatchTemplate[] = [];
+    const failed: TemplateAddReport['failed'][number][] = [];
+    const now = Date.now();
+    // A broken template from a file is kept (without pages) so its PDF can show the error; one
+    // pasted in the box stays in the box for the user to fix.
+    const keepFailed = source !== 'paste';
+    let added = 0;
+    for (const doc of docs) {
+      if (!doc.result.ok) {
+        failed.push({ line: doc.line, issue: this.issueOf(doc.result), label: this.docLabel(doc) });
+        if (keepFailed && created.length < room) {
+          created.push(this.toTemplate(doc, source, docs.length === 1, now + created.length));
+        }
+        continue;
+      }
+      if (created.length >= room) continue;
+      created.push(this.toTemplate(doc, source, docs.length === 1, now + created.length));
+      added += 1;
+    }
+    if (created.length) {
+      const wasEmpty = this.templates().length === 0;
+      this.templates.update((list) => [...list, ...created]);
+      if (wasEmpty && !this.storedKeyField()) this.keyField.set(detectKeyField(this.templates()));
+      await this.run(TEMPLATE_STORE, 'readwrite', (store) => created.forEach((t) => store.put(t)));
+      this.rematch();
+    }
+    return { added, failed, tooBig: [], unreadable: [] };
+  }
+
+  setKeyField(field: string) {
+    this.keyField.set(field);
+    try {
+      localStorage.setItem(KEY_FIELD_STORAGE, field);
+    } catch {
+      /* private mode: the choice just lasts this session */
+    }
+    this.rematch();
+  }
+
+  /** Pairs a PDF with a template of the pool by hand; null releases it. */
+  assignTemplate(itemId: string, templateId: string | null) {
+    const item = this.get(itemId);
+    if (!item) return;
+    const template = templateId ? this.templates().find((t) => t.id === templateId) : undefined;
+    if (!template) {
+      this.patch(itemId, this.releasePatch(item));
+      return;
+    }
+    this.patch(itemId, this.assignPatch(item, template, 'manual'));
+  }
+
+  async removeTemplates(ids: readonly string[]): Promise<void> {
+    const drop = new Set(ids);
+    this.templates.update((list) => list.filter((t) => !drop.has(t.id)));
+    await this.run(TEMPLATE_STORE, 'readwrite', (store) => ids.forEach((id) => store.delete(id)));
+  }
+
+  async clearTemplates(): Promise<void> {
+    this.templates.set([]);
+    await this.run(TEMPLATE_STORE, 'readwrite', (store) => store.clear());
+  }
+
+  templateLabelOf(template: BatchTemplate): string {
+    return templateLabel(template, this.keyField(), template.source);
+  }
+
+  /** Pairs every PDF that has no hand-made pairing with the template that clearly belongs to it. */
+  rematch() {
+    const field = this.keyField();
+    const items = this.items();
+    const manualIds = new Set(
+      items.filter((i) => i.matchKind === 'manual' || i.matchKind === 'paste').map((i) => i.templateId).filter(Boolean)
+    );
+    const autoItems = items.filter((i) => i.matchKind !== 'manual' && i.matchKind !== 'paste');
+    const pool = this.templates().filter((t) => !manualIds.has(t.id));
+    const outcomes = matchAll(autoItems.map((i) => ({ id: i.id, name: i.name })), pool, field);
+    for (const item of autoItems) {
+      const outcome = outcomes.get(item.id);
+      const template =
+        outcome?.templateId && (outcome.kind === 'exact' || outcome.kind === 'similar')
+          ? pool.find((t) => t.id === outcome.templateId)
+          : undefined;
+      if (template) {
+        if (item.templateId !== template.id || item.matchKind !== outcome?.kind) {
+          this.patch(item.id, this.assignPatch(item, template, outcome!.kind as 'exact' | 'similar'));
+        }
+      } else if (item.matchKind === 'exact' || item.matchKind === 'similar') {
+        this.patch(item.id, this.releasePatch(item));
+      }
+    }
+  }
+
+  private docLabel(doc: TemplateDocument): string {
+    return doc.keys[this.keyField()] ?? Object.values(doc.keys)[0] ?? '';
+  }
+
+  private issueOf(result: TemplateTextResult): TemplateIssue {
+    if (result.ok) return { reason: 'syntax' };
+    return { reason: result.reason, line: result.line, column: result.column };
+  }
+
+  private toTemplate(doc: TemplateDocument, source: string, single: boolean, addedAt: number): BatchTemplate {
+    const keys: Record<string, string> = { ...doc.keys };
+    if (single && source !== 'paste') keys[FILE_KEY] = source;
+    const pages = doc.result.ok
+      ? this.importer.normalizeImportedCoordinates(
+          doc.result.data,
+          (field) => prepareImportedField(this.fonts, field),
+          emptyImportReport()
+        ) ?? []
+      : null;
+    return {
+      id: crypto.randomUUID(),
+      source,
+      keys,
+      pages,
+      pageCount: pages?.length ?? 0,
+      fieldCount: countFields(pages),
+      issue: doc.result.ok ? undefined : this.issueOf(doc.result),
+      line: doc.line,
+      addedAt,
+    };
+  }
+
+  private assignPatch(item: BatchItem, template: BatchTemplate, kind: BatchMatchKind): Partial<BatchItem> {
+    const label = this.templateLabelOf(template);
+    if (!template.pages) {
+      return {
+        templateId: template.id,
+        matchKind: kind,
+        templateName: label,
+        template: null,
+        templateIssue: template.issue,
+        layout: null,
+        relaid: false,
+        exported: false,
+      };
+    }
+    return {
+      templateId: template.id,
+      matchKind: kind,
+      templateName: label,
+      templateText: undefined,
+      template: template.pages,
+      templateIssue: undefined,
+      layout:
+        item.newPdf && item.sizeStrategy
+          ? this.initialLayout(item, template.pages, item.sizeStrategy)
+          : null,
+      relaid: false,
+      exported: false,
+    };
+  }
+
+  private releasePatch(item: BatchItem): Partial<BatchItem> {
+    return {
+      templateId: undefined,
+      matchKind: undefined,
+      templateName: undefined,
+      templateText: undefined,
+      template: null,
+      templateIssue: undefined,
+      layout: item.newPdf && item.sizeStrategy ? null : item.layout,
+      relaid: false,
+      exported: false,
+    };
+  }
+
+  private storedKeyField(): string | null {
+    try {
+      return localStorage.getItem(KEY_FIELD_STORAGE);
+    } catch {
+      return null;
+    }
   }
 
   async applyTemplateFile(id: string, file: File): Promise<'ok' | 'invalidJson' | 'tooBig'> {
@@ -254,6 +539,8 @@ export class BatchStoreService {
       this.patch(id, {
         templateText: text,
         templateName,
+        matchKind: 'paste',
+        templateId: undefined,
         templateIssue: { reason: result.reason, line: result.line, column: result.column },
       });
       return result;
@@ -268,6 +555,8 @@ export class BatchStoreService {
     this.patch(id, {
       templateText: text,
       templateName: templateName ?? item?.templateName,
+      templateId: undefined,
+      matchKind: 'paste',
       template: pages,
       templateIssue: undefined,
       layout:
@@ -356,6 +645,7 @@ export class BatchStoreService {
   async clear(): Promise<void> {
     this.items.set([]);
     await this.run('readwrite', (store) => store.clear());
+    await this.clearTemplates();
     await this.refreshStorage();
   }
 
@@ -413,8 +703,14 @@ export class BatchStoreService {
     if (typeof indexedDB === 'undefined') return Promise.resolve(null);
     return new Promise((resolve) => {
       try {
-        const request = indexedDB.open(DB_NAME, 1);
-        request.onupgradeneeded = () => request.result.createObjectStore(STORE, { keyPath: 'id' });
+        const request = indexedDB.open(DB_NAME, 2);
+        request.onupgradeneeded = () => {
+          for (const name of [STORE, TEMPLATE_STORE]) {
+            if (!request.result.objectStoreNames.contains(name)) {
+              request.result.createObjectStore(name, { keyPath: 'id' });
+            }
+          }
+        };
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => resolve(null);
         request.onblocked = () => resolve(null);
@@ -424,13 +720,20 @@ export class BatchStoreService {
     });
   }
 
-  private async run(mode: IDBTransactionMode, action: (store: IDBObjectStore) => void): Promise<void> {
+  private async run(
+    storeOrMode: string,
+    modeOrAction: IDBTransactionMode | ((store: IDBObjectStore) => void),
+    maybeAction?: (store: IDBObjectStore) => void
+  ): Promise<void> {
+    const storeName = maybeAction ? storeOrMode : STORE;
+    const mode = (maybeAction ? modeOrAction : storeOrMode) as IDBTransactionMode;
+    const action = (maybeAction ?? modeOrAction) as (store: IDBObjectStore) => void;
     const db = await this.open();
     if (!db) return;
     await new Promise<void>((resolve) => {
       try {
-        const tx = db.transaction(STORE, mode);
-        action(tx.objectStore(STORE));
+        const tx = db.transaction(storeName, mode);
+        action(tx.objectStore(storeName));
         tx.oncomplete = () => resolve();
         tx.onerror = () => resolve();
         tx.onabort = () => resolve();
@@ -441,18 +744,21 @@ export class BatchStoreService {
   }
 
   private async readAll(): Promise<BatchItem[]> {
+    return (await this.readAllRaw(STORE)).filter(isBatchItem);
+  }
+
+  private async readAllRaw(storeName: string): Promise<unknown[]> {
     const db = await this.open();
     if (!db) return [];
-    const values = await new Promise<unknown[]>((resolve) => {
+    return new Promise<unknown[]>((resolve) => {
       try {
-        const request = db.transaction(STORE, 'readonly').objectStore(STORE).getAll();
+        const request = db.transaction(storeName, 'readonly').objectStore(storeName).getAll();
         request.onsuccess = () => resolve(request.result as unknown[]);
         request.onerror = () => resolve([]);
       } catch {
         resolve([]);
       }
     }).finally(() => db.close());
-    return values.filter(isBatchItem);
   }
 }
 
@@ -473,6 +779,35 @@ function isPages(value: unknown): value is PageAnnotations[] {
   );
 }
 
+function isIssue(value: unknown): boolean {
+  const v = value as { reason?: unknown } | null;
+  return !!v && ['empty', 'no-object', 'syntax', 'no-pages'].includes(v.reason as string);
+}
+
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    Object.values(value as Record<string, unknown>).every((entry) => typeof entry === 'string')
+  );
+}
+
+function isBatchTemplate(value: unknown): value is BatchTemplate {
+  const v = value as Partial<BatchTemplate> | null;
+  return (
+    !!v &&
+    typeof v.id === 'string' &&
+    typeof v.source === 'string' &&
+    isStringRecord(v.keys) &&
+    (v.pages === null || isPages(v.pages)) &&
+    typeof v.pageCount === 'number' &&
+    typeof v.fieldCount === 'number' &&
+    typeof v.addedAt === 'number' &&
+    (v.issue === undefined || isIssue(v.issue))
+  );
+}
+
 function isBatchItem(value: unknown): value is BatchItem {
   const v = value as Partial<BatchItem> | null;
   return (
@@ -486,6 +821,8 @@ function isBatchItem(value: unknown): value is BatchItem {
     (v.template === null || isPages(v.template)) &&
     (v.layout === null || isPages(v.layout)) &&
     (v.newPdf === undefined || v.newPdf instanceof Blob) &&
+    (v.templateId === undefined || typeof v.templateId === 'string') &&
+    (v.matchKind === undefined || ['exact', 'similar', 'manual', 'paste'].includes(v.matchKind)) &&
     typeof v.relaid === 'boolean' &&
     typeof v.exported === 'boolean'
   );

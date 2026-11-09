@@ -1,4 +1,4 @@
-import { parseTemplateText } from './template-text.utils';
+import { parseTemplateText, splitTemplateDocuments } from './template-text.utils';
 
 describe('parseTemplateText', () => {
   it('reads plain JSON', () => {
@@ -34,5 +34,52 @@ describe('parseTemplateText', () => {
     const result = parseTemplateText('var t = { pages: [], x: (() => { window.__templateEvalProbe = true })() };');
     expect(result.ok).toBeFalse();
     expect((window as unknown as { __templateEvalProbe?: boolean }).__templateEvalProbe).toBeUndefined();
+  });
+});
+
+describe('splitTemplateDocuments', () => {
+  const doc = (name: string, extra = '') =>
+    `{"_id":{"$oid":"6650a1f3c2b4e8a1d4f00031"},"pdfName":"${name}","pages":[{"num":1,"fields":[{"x":1,"y":2,"mapField":"a"${extra}}]}]}`;
+
+  it('splits objects pasted one after another', () => {
+    const docs = splitTemplateDocuments(`${doc('a.pdf')} ${doc('b.pdf')}`);
+    expect(docs.length).toBe(2);
+    expect(docs.every((d) => d.result.ok)).toBeTrue();
+    expect(docs.map((d) => d.keys['pdfName'])).toEqual(['a.pdf', 'b.pdf']);
+  });
+
+  it('reads a mongoexport file with one document per line', () => {
+    const docs = splitTemplateDocuments(`${doc('a.pdf')}\n${doc('b.pdf')}\n`);
+    expect(docs.map((d) => d.line)).toEqual([1, 2]);
+  });
+
+  it('reads an array of templates and a script', () => {
+    expect(splitTemplateDocuments(`[ ${doc('a.pdf')}, ${doc('b.pdf')} ]`).length).toBe(2);
+    expect(splitTemplateDocuments(`var pdfTemplate = ${doc('a.pdf')};\ndb.t.insert(pdfTemplate);`).length).toBe(1);
+  });
+
+  it('unwraps Extended JSON numbers', () => {
+    const text = '{"pages":[{"num":{"$numberInt":"1"},"fields":[{"x":{"$numberDouble":"12.5"},"y":2}]}]}';
+    const [first] = splitTemplateDocuments(text);
+    expect(first.result.ok).toBeTrue();
+    if (first.result.ok) {
+      const page = (first.result.data as { pages: { num: number; fields: { x: number }[] }[] }).pages[0];
+      expect(page.num).toBe(1);
+      expect(page.fields[0].x).toBe(12.5);
+    }
+  });
+
+  it('keeps a broken template apart, with its line and key', () => {
+    const broken = '{"pdfName":"c.pdf",\n "pages":[ {"num":1, fields: ';
+    const docs = splitTemplateDocuments(`${doc('a.pdf')}\n${broken}`);
+    expect(docs.length).toBe(2);
+    expect(docs[0].result.ok).toBeTrue();
+    expect(docs[1].result.ok).toBeFalse();
+    expect(docs[1].keys['pdfName']).toBe('c.pdf');
+    expect(docs[1].line).toBe(2);
+  });
+
+  it('returns nothing when there is no object', () => {
+    expect(splitTemplateDocuments('hola')).toEqual([]);
   });
 });

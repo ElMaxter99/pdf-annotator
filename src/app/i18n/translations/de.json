@@ -339,7 +339,7 @@
   },
   "batch": {
     "landing": {
-      "hint": "Viele PDFs? Wähle mehrere (und ihre JSON-Dateien), um das Layout im Stapel zu öffnen."
+      "hint": "Viele PDFs? Wählen Sie mehrere (und ihre JSON) und das Neusetzen im Stapel öffnet sich."
     },
     "nav": {
       "home": "Zur Startseite",
@@ -348,16 +348,16 @@
     "privacy": "Alles passiert in deinem Browser. Nichts wird auf einen Server hochgeladen.",
     "steps": {
       "label": "Schritte des Neulayouts",
-      "lot": "Stapel",
-      "template": "Vorlage",
       "newPdf": "Neues PDF",
       "compare": "Vergleichen",
-      "export": "Exportieren"
+      "export": "Exportieren",
+      "load": "Laden",
+      "match": "Zuordnen"
     },
     "empty": {
-      "title": "Lade deine PDFs und JSON-Dateien",
-      "text": "Ziehe bis zu 50 PDFs und ihre JSON-Dateien (gleicher Name) hierher oder suche die Dateien aus. Bis zu {{limit}} MB pro PDF.",
-      "cta": "Dateien auswählen"
+      "title": "Noch kein Stapel",
+      "text": "Laden Sie Ihre PDFs und Vorlagen hoch, um das Neusetzen zu beginnen.",
+      "cta": "PDFs und Vorlagen laden"
     },
     "resume": {
       "title": "Du hast einen Stapel in Arbeit",
@@ -378,7 +378,6 @@
       "tooBigJson": "Die JSON-Datei ist größer als 5 MB.",
       "invalidJson": "Ungültiges JSON",
       "duplicate": "Schon im Stapel",
-      "unmatchedJson": "Kein PDF mit diesem Namen",
       "limit": "Stapel voll oder kein Platz"
     },
     "list": {
@@ -393,7 +392,8 @@
       "next": "Nächstes neu layouten",
       "noResults": "Kein PDF entspricht dem Filter.",
       "nothingPending": "Nichts mehr offen. Gute Arbeit!",
-      "keys": "Kürzel: ↑ ↓ bewegen · Enter öffnen · N nächstes offenes"
+      "keys": "Kürzel: ↑ ↓ bewegen · Enter öffnen · N nächstes offenes",
+      "match": "Zuordnen"
     },
     "filter": {
       "all": "Alle",
@@ -463,7 +463,13 @@
       "page": "Seite {{num}}",
       "fieldsCount": "{{count}} Felder",
       "errorItem": "Dieses PDF bleibt als „JSON-Fehler“ stehen und blockiert die anderen nicht. Du kannst es überspringen und später zurückkommen.",
-      "invalidToast": "Die Vorlage ist ungültig. Sieh dir den Hinweis neben dem Text an."
+      "invalidToast": "Die Vorlage ist ungültig. Sieh dir den Hinweis neben dem Text an.",
+      "reason": {
+        "empty": "leerer Text",
+        "no-object": "kein Objekt",
+        "syntax": "Syntaxfehler",
+        "no-pages": "«pages» fehlt"
+      }
     },
     "newPdf": {
       "label": "Neues PDF",
@@ -555,6 +561,171 @@
       "again": "Erneut herunterladen",
       "newBatch": "Neuen Stapel beginnen",
       "close": "Schließen"
+    },
+    "mode": {
+      "label": "Arbeitsmodus",
+      "editor": "Editor · 1 PDF",
+      "batch": "Stapel · mehrere PDFs",
+      "editorHint": "Öffnet den Editor mit einem einzelnen PDF",
+      "batchHint": "Layout vieler PDFs mit ihren Vorlagen neu setzen"
+    },
+    "modes": {
+      "title": "Mit wie vielen PDFs arbeiten Sie?",
+      "lead": "Wählen Sie einen Modus. Sie können auch Dateien ablegen, dann wählt die App für Sie.",
+      "note": "Wenn Sie Dateien ohne Auswahl ablegen: 1 PDF öffnet den Editor; 2 oder mehr PDFs oder ein beliebiges JSON öffnen Stapel.",
+      "editor": {
+        "title": "Editor",
+        "count": "Ein PDF",
+        "text": "Sie platzieren Felder von Hand auf einem Dokument und feilen mit dem JSON nach.",
+        "p1": "Ein PDF nach dem anderen",
+        "p2": "Anmerkungen, JSON und Vorlagen im Browser gespeichert",
+        "p3": "Sie exportieren das annotierte PDF oder das JSON",
+        "cta": "PDF auswählen"
+      },
+      "batch": {
+        "title": "Stapel",
+        "count": "2 bis 50 PDFs",
+        "text": "Sie setzen viele PDFs mit vorhandenen Vorlagen nacheinander neu.",
+        "p1": "Sie laden PDFs und JSON-Vorlagen auf einmal hoch, als Dateien oder eingefügt",
+        "p2": "Jede Vorlage wird automatisch ihrem PDF zugeordnet",
+        "p3": "Sie prüfen vorher und nachher und laden am Ende alles herunter",
+        "cta": "PDFs und Vorlagen laden"
+      }
+    },
+    "load": {
+      "title": "PDFs und Vorlagen laden",
+      "pdfs": {
+        "title": "PDFs",
+        "dropTitle": "PDFs hier ablegen",
+        "dropText": "Bis zu 50 PDFs, je {{limit}} MB. Sie können nach und nach weitere hinzufügen.",
+        "pick": "PDFs auswählen",
+        "empty": "Noch keine PDFs.",
+        "more": "und {{count}} weitere"
+      },
+      "templates": {
+        "title": "Vorlagen"
+      },
+      "tab": {
+        "paste": "Text einfügen",
+        "files": "Dateien hochladen"
+      },
+      "files": {
+        "dropTitle": "JSON-Dateien hier ablegen",
+        "dropText": "Akzeptiert .json, .jsonl und .ndjson. Eine Datei kann eine oder hunderte Vorlagen enthalten: Array, aufeinanderfolgende Objekte oder eine Zeile pro Dokument.",
+        "pick": "JSON auswählen",
+        "count": "{{count}} Vorlagen",
+        "pasted": "Eingefügter Text",
+        "later": "Vorlagen können später folgen. Mit den geladenen PDFs können Sie bereits zum Zuordnen übergehen.",
+        "clear": "Vorlagen leeren"
+      },
+      "paste": {
+        "label": "Fügen Sie beliebig viele Vorlagen nacheinander ein. Ein Array ist nicht nötig.",
+        "placeholder": "{\"pdfName\":\"albaran-0331.pdf\",\"pages\":[…]}\n{\"pdfName\":\"albaran-0332.pdf\",\"pages\":[…]}",
+        "add": "{{count}} Vorlagen hinzufügen",
+        "clear": "Leeren",
+        "lines": "{{count}} Zeilen",
+        "valid": "{{count}} Vorlagen",
+        "invalid": "{{count}} mit Fehler",
+        "rowInfo": "{{pages}} Seiten · {{fields}} Felder",
+        "rowError": "Zeile {{line}}: {{reason}}",
+        "errorHelp": "Vorlagen mit Fehlern bleiben im Feld: korrigieren und erneut hinzufügen. Ihr Text geht nicht verloren.",
+        "note": "Nur «pages» wird verwendet. Alles andere wird ignoriert; $oid, $date und $numberInt werden verstanden.",
+        "formats": "Unterstützte Formate",
+        "more": "und {{count}} weitere",
+        "addedToast": "{{count}} Vorlagen hinzugefügt"
+      },
+      "formats": {
+        "sequence": "Aufeinanderfolgende Objekte",
+        "lines": "Eine Zeile pro Dokument (mongoexport, JSONL)",
+        "array": "Ein Array von Vorlagen",
+        "script": "Skript mit var pdfTemplate"
+      },
+      "summary": {
+        "title": "Zusammenfassung",
+        "ready": "Bereit zum Zuordnen",
+        "pdfs": "Gelesene PDFs",
+        "templates": "Gültige Vorlagen",
+        "failedTemplates": "{{count}} Vorlagen mit Syntaxfehlern.",
+        "go": "{{pdfs}} mit {{templates}} zuordnen →",
+        "needPdfs": "Laden Sie mindestens ein PDF, um fortzufahren."
+      }
+    },
+    "match": {
+      "title": "Zuordnung",
+      "filter": "Filtern",
+      "filters": {
+        "all": "Alle",
+        "ready": "Bereit",
+        "choose": "Auszuwählen",
+        "none": "Ohne Vorlage",
+        "error": "Mit Fehler"
+      },
+      "col": {
+        "template": "Vorlage",
+        "how": "Wie zugeordnet"
+      },
+      "how": {
+        "exact": "✓ Exakter Name",
+        "similar": "≈ Ähnlicher Name",
+        "manual": "✓ Von Hand zugewiesen",
+        "paste": "✓ Auf dem PDF eingefügt",
+        "choose": "? Auswahl nötig",
+        "none": "· Keine Vorlage",
+        "error": "! JSON mit Fehler"
+      },
+      "action": {
+        "change": "Ändern",
+        "choose": "Wählen",
+        "assign": "Zuweisen",
+        "fix": "Korrigieren"
+      },
+      "candidates": "{{count}} Kandidaten",
+      "pill": {
+        "ready": "{{count}} bereit",
+        "similar": "{{count}} ähnlich",
+        "choose": "{{count}} auszuwählen",
+        "none": "{{count}} PDFs ohne Vorlage",
+        "error": "{{count}} mit Fehler"
+      },
+      "continue": "Weiter mit {{count}} bereiten →",
+      "later": "Sie können über die Stapelliste hierher zurückkehren.",
+      "back": "← Mehr laden",
+      "emptyTitle": "Keine PDFs zum Zuordnen",
+      "emptyText": "Laden Sie zuerst Ihre PDFs und Vorlagen.",
+      "fields": "{{count}} Felder",
+      "side": {
+        "title": "So funktioniert die Zuordnung",
+        "field": "Vorlagenfeld",
+        "fileName": "Dateiname",
+        "detected": "Hat einen Wert in {{count}} von {{total}} Vorlagen.",
+        "rules": "Zuerst wird der exakte Wert verglichen; sonst werden Groß-/Kleinschreibung, Akzente und Endung ignoriert. Passt es weiterhin nicht, wird die ähnlichste vorgeschlagen und nie automatisch zugewiesen."
+      },
+      "unused": {
+        "title": "Vorlagen ohne PDF",
+        "empty": "Jede Vorlage hat ein PDF.",
+        "hint": "Ziehen Sie eine auf die Zeile eines PDFs oder wählen Sie sie mit „Zuweisen“ aus einer Liste."
+      },
+      "assign": {
+        "title": "Vorlage für {{name}} zuweisen",
+        "pdf": "PDF · {{pages}} Seiten",
+        "search": "Unter {{count}} Vorlagen suchen",
+        "suggested": "Vorschläge nach ähnlichem Namen",
+        "score": "{{score}} % ähnlich",
+        "inUse": "bereits verwendet",
+        "copyNote": "Eine Vorlage mit PDF kann wiederverwendet werden. Sie wird kopiert, die andere bleibt unverändert.",
+        "chosen": "Gewählte Vorlage",
+        "pages": "Seiten",
+        "fields": "Felder",
+        "pagesMatch": "PDF und Vorlage haben gleich viele Seiten.",
+        "pagesDiffer": "Das PDF hat {{pdf}} Seiten, die Vorlage {{tpl}}.",
+        "nothing": "Wählen Sie eine Vorlage aus der Liste.",
+        "confirm": "Diese Vorlage zuweisen",
+        "paste": "Andere Vorlage einfügen",
+        "none": "Ohne Vorlage lassen",
+        "cancel": "Abbrechen",
+        "noResults": "Keine Vorlage entspricht der Suche.",
+        "doneText": "{{name}} hat jetzt {{count}} Felder."
+      }
     }
   }
 }

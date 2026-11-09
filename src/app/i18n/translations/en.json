@@ -339,7 +339,7 @@
   },
   "batch": {
     "landing": {
-      "hint": "Many PDFs? Pick several (and their JSON files) to open batch re-layout."
+      "hint": "Many PDFs? Pick several (and their JSON) and batch re-layout opens."
     },
     "nav": {
       "home": "Go to the home page",
@@ -348,16 +348,16 @@
     "privacy": "Everything happens in your browser. Nothing is uploaded to any server.",
     "steps": {
       "label": "Re-layout steps",
-      "lot": "Batch",
-      "template": "Template",
       "newPdf": "New PDF",
       "compare": "Compare",
-      "export": "Export"
+      "export": "Export",
+      "load": "Load",
+      "match": "Match"
     },
     "empty": {
-      "title": "Load your PDFs and JSON files",
-      "text": "Drop up to 50 PDFs and their JSON files (same name), or browse for them. Up to {{limit}} MB per PDF.",
-      "cta": "Select files"
+      "title": "There is no batch yet",
+      "text": "Upload your PDFs and templates to start re-laying them out.",
+      "cta": "Load PDFs and templates"
     },
     "resume": {
       "title": "You have a batch in progress",
@@ -378,7 +378,6 @@
       "tooBigJson": "The JSON is over 5 MB.",
       "invalidJson": "Invalid JSON",
       "duplicate": "Already in the batch",
-      "unmatchedJson": "No PDF with that name",
       "limit": "Batch full or out of space"
     },
     "list": {
@@ -393,7 +392,8 @@
       "next": "Re-layout the next one",
       "noResults": "No PDF matches the filter.",
       "nothingPending": "Nothing left to do. Great work!",
-      "keys": "Shortcuts: ↑ ↓ move · Enter open · N next pending"
+      "keys": "Shortcuts: ↑ ↓ move · Enter open · N next pending",
+      "match": "Match"
     },
     "filter": {
       "all": "All",
@@ -463,7 +463,13 @@
       "page": "Page {{num}}",
       "fieldsCount": "{{count}} fields",
       "errorItem": "This PDF stays as “JSON error” and does not block the rest. You can skip it and come back later.",
-      "invalidToast": "The template is not valid. Check the notice next to the text."
+      "invalidToast": "The template is not valid. Check the notice next to the text.",
+      "reason": {
+        "empty": "empty text",
+        "no-object": "no object",
+        "syntax": "syntax error",
+        "no-pages": "«pages» missing"
+      }
     },
     "newPdf": {
       "label": "New PDF",
@@ -555,6 +561,171 @@
       "again": "Download again",
       "newBatch": "Start another batch",
       "close": "Close"
+    },
+    "mode": {
+      "label": "Work mode",
+      "editor": "Editor · 1 PDF",
+      "batch": "Batches · many PDFs",
+      "editorHint": "Opens the editor with a single PDF",
+      "batchHint": "Re-lay out many PDFs with their templates"
+    },
+    "modes": {
+      "title": "How many PDFs are you working with?",
+      "lead": "Pick a mode. You can also drop your files and the app picks for you.",
+      "note": "If you drop files without choosing: 1 PDF opens the Editor; 2 or more PDFs, or any JSON, open Batches.",
+      "editor": {
+        "title": "Editor",
+        "count": "One PDF",
+        "text": "You place fields by hand on a document and fine-tune them with the JSON.",
+        "p1": "One PDF at a time",
+        "p2": "Annotations, JSON and templates saved in the browser",
+        "p3": "You export the annotated PDF or the JSON",
+        "cta": "Choose a PDF"
+      },
+      "batch": {
+        "title": "Batches",
+        "count": "2 to 50 PDFs",
+        "text": "You re-lay out many PDFs with templates you already have, one after another.",
+        "p1": "You upload PDFs and JSON templates at once, as files or pasted",
+        "p2": "Each template pairs itself with its PDF",
+        "p3": "You review before and after, and download everything at the end",
+        "cta": "Load PDFs and templates"
+      }
+    },
+    "load": {
+      "title": "Load PDFs and templates",
+      "pdfs": {
+        "title": "PDFs",
+        "dropTitle": "Drop your PDFs",
+        "dropText": "Up to 50 PDFs, {{limit}} MB each. You can keep adding more.",
+        "pick": "Select PDFs",
+        "empty": "No PDFs yet.",
+        "more": "and {{count}} more"
+      },
+      "templates": {
+        "title": "Templates"
+      },
+      "tab": {
+        "paste": "Paste text",
+        "files": "Upload files"
+      },
+      "files": {
+        "dropTitle": "Drop your JSON files",
+        "dropText": "Accepts .json, .jsonl and .ndjson. A file can hold one template or hundreds: an array, objects in a row or one line per document all work.",
+        "pick": "Select JSON files",
+        "count": "{{count}} templates",
+        "pasted": "Pasted text",
+        "later": "Templates can come later. With the PDFs loaded you can already move on to matching.",
+        "clear": "Clear templates"
+      },
+      "paste": {
+        "label": "Paste as many templates as you like, one after another. No array needed.",
+        "placeholder": "{\"pdfName\":\"albaran-0331.pdf\",\"pages\":[…]}\n{\"pdfName\":\"albaran-0332.pdf\",\"pages\":[…]}",
+        "add": "Add {{count}} templates",
+        "clear": "Clear",
+        "lines": "{{count}} lines",
+        "valid": "{{count}} templates",
+        "invalid": "{{count}} with errors",
+        "rowInfo": "{{pages}} pages · {{fields}} fields",
+        "rowError": "Line {{line}}: {{reason}}",
+        "errorHelp": "Templates with errors stay in the box: fix them and add again. Your text is not lost.",
+        "note": "Only «pages» is used. Everything else is ignored, and $oid, $date and $numberInt are understood.",
+        "formats": "Accepted formats",
+        "more": "and {{count}} more",
+        "addedToast": "{{count}} templates added"
+      },
+      "formats": {
+        "sequence": "Objects in a row",
+        "lines": "One line per document (mongoexport, JSONL)",
+        "array": "An array of templates",
+        "script": "A script with var pdfTemplate"
+      },
+      "summary": {
+        "title": "Summary",
+        "ready": "Ready to match",
+        "pdfs": "PDFs read",
+        "templates": "Valid templates",
+        "failedTemplates": "{{count}} templates with syntax errors.",
+        "go": "Match {{pdfs}} with {{templates}} →",
+        "needPdfs": "Load at least one PDF to continue."
+      }
+    },
+    "match": {
+      "title": "Matching",
+      "filter": "Filter",
+      "filters": {
+        "all": "All",
+        "ready": "Ready",
+        "choose": "To choose",
+        "none": "No template",
+        "error": "With errors"
+      },
+      "col": {
+        "template": "Template",
+        "how": "How it matched"
+      },
+      "how": {
+        "exact": "✓ Exact name",
+        "similar": "≈ Similar name",
+        "manual": "✓ Assigned by hand",
+        "paste": "✓ Pasted on the PDF",
+        "choose": "? Needs a choice",
+        "none": "· No template",
+        "error": "! JSON with errors"
+      },
+      "action": {
+        "change": "Change",
+        "choose": "Choose",
+        "assign": "Assign",
+        "fix": "Fix"
+      },
+      "candidates": "{{count}} candidates",
+      "pill": {
+        "ready": "{{count}} ready",
+        "similar": "{{count}} similar",
+        "choose": "{{count}} to choose",
+        "none": "{{count}} PDFs without template",
+        "error": "{{count}} with errors"
+      },
+      "continue": "Continue with {{count}} ready →",
+      "later": "You can come back here from the batch list.",
+      "back": "← Load more",
+      "emptyTitle": "No PDFs to match",
+      "emptyText": "Load your PDFs and templates first.",
+      "fields": "{{count}} fields",
+      "side": {
+        "title": "How matching works",
+        "field": "Template field",
+        "fileName": "File name",
+        "detected": "Has a value in {{count}} of {{total}} templates.",
+        "rules": "The exact value is compared first; if none matches, case, accents and the extension are ignored. If it still does not match, the closest one is suggested and never assigned on its own."
+      },
+      "unused": {
+        "title": "Templates without a PDF",
+        "empty": "Every template has a PDF.",
+        "hint": "Drag one onto a PDF row, or use “Assign” to pick it from a list."
+      },
+      "assign": {
+        "title": "Assign a template to {{name}}",
+        "pdf": "PDF · {{pages}} pages",
+        "search": "Search among {{count}} templates",
+        "suggested": "Suggested by similar name",
+        "score": "{{score}} % similar",
+        "inUse": "already used",
+        "copyNote": "A template that already has a PDF can be reused. It is copied, so the other one does not change.",
+        "chosen": "Chosen template",
+        "pages": "Pages",
+        "fields": "Fields",
+        "pagesMatch": "The PDF and the template have the same number of pages.",
+        "pagesDiffer": "The PDF has {{pdf}} pages and the template {{tpl}}.",
+        "nothing": "Pick a template from the list.",
+        "confirm": "Assign this template",
+        "paste": "Paste another template",
+        "none": "Leave without template",
+        "cancel": "Cancel",
+        "noResults": "No template matches the search.",
+        "doneText": "{{name}} now has {{count}} fields."
+      }
     }
   }
 }

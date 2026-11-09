@@ -1,0 +1,143 @@
+<div class="batch">
+  <header class="batch__nav">
+    <a class="batch__brand" routerLink="/landing" [attr.aria-label]="'batch.nav.home' | t">
+      <img src="/logo.svg" alt="" width="32" height="32" />
+      <span>Pdf Annotator <small>{{ 'batch.nav.subtitle' | t }}</small></span>
+    </a>
+    <app-batch-steps [active]="1"></app-batch-steps>
+    <span class="spacer"></span>
+    <app-mode-switch active="batch"></app-mode-switch>
+  </header>
+
+  <input #pdfInput id="batch-pdf-input" type="file" multiple accept="application/pdf,.pdf" hidden (change)="onFilesSelected($event)" />
+  <input #jsonInput id="batch-json-input" type="file" multiple accept="application/json,.json,.jsonl,.ndjson" hidden (change)="onFilesSelected($event)" />
+
+  <h1 class="visually-hidden">{{ 'batch.load.title' | t }}</h1>
+
+  <div class="cols">
+    <section class="card" [attr.aria-label]="'batch.load.pdfs.title' | t">
+      <div class="card__head">
+        <h2>{{ 'batch.load.pdfs.title' | t }}</h2>
+        <span class="spacer"></span>
+        <b>{{ store.items().length }}</b>
+        <span class="cap">· {{ bytes(store.totalBytes()) }}</span>
+      </div>
+      <div class="zone" [class.is-active]="pdfDrop()" (dragover)="onDragOver($event, 'pdf')" (dragleave)="onDragLeave('pdf')" (drop)="onDrop($event, 'pdf')">
+        <div aria-hidden="true">📄</div>
+        <h3>{{ 'batch.load.pdfs.dropTitle' | t }}</h3>
+        <p class="cap">{{ 'batch.load.pdfs.dropText' | t : { limit: maxMb } }}</p>
+        <button type="button" class="btn" (click)="pickPdfs()">{{ 'batch.load.pdfs.pick' | t }}</button>
+      </div>
+      @if (store.busy(); as busy) {
+        <div class="progress" role="status" aria-live="polite">
+          <div class="progress__head"><b>{{ 'batch.upload.reading' | t : { done: busy.done, total: busy.total } }}</b></div>
+          <div class="bar"><i [style.width.%]="busy.total ? (busy.done / busy.total) * 100 : 0"></i></div>
+        </div>
+      }
+      <div class="rows">
+        @for (item of firstPdfs(); track item.id) {
+          <div class="rowline fade-in"><span class="ok" aria-hidden="true">✓</span><span class="grow ellipsis" [title]="item.name">{{ item.name }}</span><span class="cap">{{ bytes(item.pdf.size) }}</span></div>
+        } @empty {
+          <p class="cap">{{ 'batch.load.pdfs.empty' | t }}</p>
+        }
+        @if (store.items().length > shown) {
+          <p class="cap">{{ 'batch.load.pdfs.more' | t : { count: store.items().length - shown } }}</p>
+        }
+      </div>
+    </section>
+
+    <section class="card" [attr.aria-label]="'batch.load.templates.title' | t">
+      <div class="card__head">
+        <h2>{{ 'batch.load.templates.title' | t }}</h2>
+        <div class="tabs" role="tablist" [attr.aria-label]="'batch.load.templates.title' | t">
+          <button type="button" role="tab" class="tab" [class.is-active]="tab() === 'paste'" [attr.aria-selected]="tab() === 'paste'" (click)="setTab('paste')">{{ 'batch.load.tab.paste' | t }}</button>
+          <button type="button" role="tab" class="tab" [class.is-active]="tab() === 'files'" [attr.aria-selected]="tab() === 'files'" (click)="setTab('files')">{{ 'batch.load.tab.files' | t }}</button>
+        </div>
+        <span class="spacer"></span>
+        <b>{{ validTemplates() }}</b>
+      </div>
+
+      @if (tab() === 'files') {
+        <div class="zone" [class.is-active]="jsonDrop()" (dragover)="onDragOver($event, 'json')" (dragleave)="onDragLeave('json')" (drop)="onDrop($event, 'json')">
+          <div aria-hidden="true">{{ '{ }' }}</div>
+          <h3>{{ 'batch.load.files.dropTitle' | t }}</h3>
+          <p class="cap">{{ 'batch.load.files.dropText' | t }}</p>
+          <button type="button" class="btn" (click)="pickJson()">{{ 'batch.load.files.pick' | t }}</button>
+        </div>
+        <div class="rows">
+          @for (group of sources(); track group.source) {
+            <div class="rowline fade-in"><span class="ok" aria-hidden="true">✓</span><span class="grow ellipsis">{{ group.source === 'paste' ? ('batch.load.files.pasted' | t) : group.source }}</span><span class="cap">{{ 'batch.load.files.count' | t : { count: group.count } }}</span></div>
+          }
+        </div>
+        @if (store.templates().length) {
+          <button type="button" class="btn btn--ghost btn--sm" style="align-self: flex-start" (click)="clearTemplates()">{{ 'batch.load.files.clear' | t }}</button>
+        }
+        <p class="note note--info" role="note">ⓘ {{ 'batch.load.files.later' | t }}</p>
+      } @else {
+        <label class="cap" for="batch-paste">{{ 'batch.load.paste.label' | t }}</label>
+        <textarea id="batch-paste" class="paste" spellcheck="false" autocomplete="off" [class.has-error]="analysis().invalid > 0"
+          [attr.aria-describedby]="'batch-paste-status'" [value]="draft()" (input)="onDraft($event)"
+          [placeholder]="'batch.load.paste.placeholder' | t"></textarea>
+        <div class="actions">
+          <button type="button" class="btn" [disabled]="analysis().valid === 0" (click)="addPasted()">{{ 'batch.load.paste.add' | t : { count: analysis().valid } }}</button>
+          <button type="button" class="btn btn--ghost" [disabled]="!draft()" (click)="clearDraft()">{{ 'batch.load.paste.clear' | t }}</button>
+          <span class="spacer"></span>
+          <span class="cap">{{ 'batch.load.paste.lines' | t : { count: lineCount() } }}</span>
+        </div>
+        <div id="batch-paste-status" class="stack" style="gap: 8px" aria-live="polite">
+          @if (analysis().rows.length) {
+            <div class="pills">
+              <span class="pill pill--ok">✓ {{ 'batch.load.paste.valid' | t : { count: analysis().valid } }}</span>
+              @if (analysis().invalid) { <span class="pill pill--bad">! {{ 'batch.load.paste.invalid' | t : { count: analysis().invalid } }}</span> }
+            </div>
+            @for (row of analysis().rows.slice(0, shown); track row.index) {
+              <div class="rowline">
+                @if (row.ok) { <span class="ok" aria-hidden="true">✓</span> } @else { <span class="bad" aria-hidden="true">!</span> }
+                <span class="grow ellipsis mono" [title]="row.label">{{ row.label }}</span>
+                @if (row.ok) { <span class="cap">{{ 'batch.load.paste.rowInfo' | t : { pages: row.pages, fields: row.fields } }}</span> }
+                @else { <span class="cap">{{ 'batch.load.paste.rowError' | t : { line: row.line, reason: reasonLabel(row.reason) } }}</span> }
+              </div>
+            }
+            @if (analysis().rows.length > shown) { <p class="cap">{{ 'batch.load.paste.more' | t : { count: analysis().rows.length - shown } }}</p> }
+            @if (analysis().invalid) { <p class="note note--error" role="alert">! {{ 'batch.load.paste.errorHelp' | t }}</p> }
+          }
+          <p class="cap">{{ 'batch.load.paste.note' | t }}</p>
+          <details>
+            <summary class="cap">{{ 'batch.load.paste.formats' | t }}</summary>
+            <ul class="cap">
+              <li>{{ 'batch.load.formats.sequence' | t }}</li>
+              <li>{{ 'batch.load.formats.lines' | t }}</li>
+              <li>{{ 'batch.load.formats.array' | t }}</li>
+              <li>{{ 'batch.load.formats.script' | t }}</li>
+            </ul>
+          </details>
+        </div>
+      }
+    </section>
+
+    <aside class="card" [attr.aria-label]="'batch.load.summary.title' | t">
+      <span class="cap">{{ 'batch.load.summary.title' | t }}</span>
+      <h2 style="margin: 0; font-size: 20px">{{ 'batch.load.summary.ready' | t }}</h2>
+      <div class="sum"><span>{{ 'batch.load.summary.pdfs' | t }}</span><b>{{ store.items().length }}</b></div>
+      <div class="sum"><span>{{ 'batch.load.summary.templates' | t }}</span><b>{{ validTemplates() }}</b></div>
+      @if (report(); as rep) {
+        <div class="note note--warn" role="alert">
+          <div>
+            <b>{{ 'batch.upload.rejected' | t : { count: rep.rejected.length } }}</b>
+            <ul class="rejects">
+              @for (r of rep.rejected; track $index) {
+                <li><span class="bad">!</span> <span class="rejects__name">{{ r.name }}</span> <span class="cap">{{ rejectLabel(r.reason) }}</span></li>
+              }
+            </ul>
+            @if (rep.templatesFailed) { <p class="cap">{{ 'batch.load.summary.failedTemplates' | t : { count: rep.templatesFailed } }}</p> }
+          </div>
+          <button type="button" class="btn btn--ghost btn--sm" (click)="report.set(null)">{{ 'batch.upload.dismiss' | t }}</button>
+        </div>
+      }
+      <span class="grow-y"></span>
+      <button type="button" class="btn" [disabled]="store.items().length === 0" (click)="goMatch()">{{ 'batch.load.summary.go' | t : { pdfs: store.items().length, templates: validTemplates() } }}</button>
+      @if (store.items().length === 0) { <p class="cap">{{ 'batch.load.summary.needPdfs' | t }}</p> }
+      <p class="cap">🔒 {{ 'batch.privacy' | t }}</p>
+    </aside>
+  </div>
+</div>

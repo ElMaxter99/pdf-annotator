@@ -8,6 +8,8 @@
       </div>
     </div>
 
+    <app-mode-switch active="editor"></app-mode-switch>
+
     <input #coordsFileInput type="file" accept="application/json" (change)="vm.onCoordsFileSelected($event)" hidden />
 
     <div class="toolbar__cluster">

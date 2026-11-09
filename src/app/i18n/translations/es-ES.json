@@ -348,16 +348,16 @@
     "privacy": "Todo ocurre en tu navegador. Nada se sube a ningún servidor.",
     "steps": {
       "label": "Pasos del remaquetado",
-      "lot": "Lote",
-      "template": "Plantilla",
       "newPdf": "PDF nuevo",
       "compare": "Comparar",
-      "export": "Exportar"
+      "export": "Exportar",
+      "load": "Cargar",
+      "match": "Emparejar"
     },
     "empty": {
-      "title": "Carga tus PDF y JSON",
-      "text": "Arrastra hasta 50 PDF y sus JSON (mismo nombre), o busca los archivos. Hasta {{limit}} MB por PDF.",
-      "cta": "Seleccionar archivos"
+      "title": "Todavía no hay lote",
+      "text": "Sube tus PDF y tus plantillas para empezar el remaquetado.",
+      "cta": "Cargar PDF y plantillas"
     },
     "resume": {
       "title": "Tienes un lote en curso",
@@ -378,7 +378,6 @@
       "tooBigJson": "El JSON supera 5 MB.",
       "invalidJson": "JSON no válido",
       "duplicate": "Ya está en el lote",
-      "unmatchedJson": "Ningún PDF con ese nombre",
       "limit": "Lote lleno o sin espacio"
     },
     "list": {
@@ -393,7 +392,8 @@
       "next": "Remaquetar el siguiente",
       "noResults": "Ningún PDF coincide con el filtro.",
       "nothingPending": "No queda nada pendiente. ¡Buen trabajo!",
-      "keys": "Atajos: ↑ ↓ moverse · Intro abrir · N siguiente pendiente"
+      "keys": "Atajos: ↑ ↓ moverse · Intro abrir · N siguiente pendiente",
+      "match": "Emparejar"
     },
     "filter": {
       "all": "Todos",
@@ -463,7 +463,13 @@
       "page": "Página {{num}}",
       "fieldsCount": "{{count}} campos",
       "errorItem": "Este PDF queda como «Error en JSON» y no bloquea al resto. Puedes saltarlo y volver luego.",
-      "invalidToast": "La plantilla no es válida. Revisa el aviso junto al texto."
+      "invalidToast": "La plantilla no es válida. Revisa el aviso junto al texto.",
+      "reason": {
+        "empty": "texto vacío",
+        "no-object": "no hay objeto",
+        "syntax": "error de sintaxis",
+        "no-pages": "falta «pages»"
+      }
     },
     "newPdf": {
       "label": "PDF nuevo",
@@ -555,6 +561,171 @@
       "again": "Descargar de nuevo",
       "newBatch": "Empezar otro lote",
       "close": "Cerrar"
+    },
+    "mode": {
+      "label": "Modo de trabajo",
+      "editor": "Editor · 1 PDF",
+      "batch": "Lotes · varios PDF",
+      "editorHint": "Abre el editor con un solo PDF",
+      "batchHint": "Remaqueta muchos PDF con sus plantillas"
+    },
+    "modes": {
+      "title": "¿Con cuántos PDF vas a trabajar?",
+      "lead": "Elige un modo. También puedes soltar los archivos y la app lo elige por ti.",
+      "note": "Si sueltas archivos sin elegir: 1 PDF abre el Editor; 2 o más PDF, o cualquier JSON, abren Lotes.",
+      "editor": {
+        "title": "Editor",
+        "count": "Un PDF",
+        "text": "Colocas campos a mano sobre un documento y los afinas con el JSON.",
+        "p1": "Un PDF cada vez",
+        "p2": "Anotaciones, JSON y plantillas guardadas en el navegador",
+        "p3": "Exportas el PDF anotado o el JSON",
+        "cta": "Elegir un PDF"
+      },
+      "batch": {
+        "title": "Lotes",
+        "count": "De 2 a 50 PDF",
+        "text": "Remaquetas muchos PDF con plantillas que ya tienes, uno detrás de otro.",
+        "p1": "Subes PDF y plantillas JSON de golpe, en ficheros o pegadas",
+        "p2": "Cada plantilla se empareja sola con su PDF",
+        "p3": "Revisas antes y después, y descargas todo al final",
+        "cta": "Cargar PDF y plantillas"
+      }
+    },
+    "load": {
+      "title": "Cargar PDF y plantillas",
+      "pdfs": {
+        "title": "PDF",
+        "dropTitle": "Suelta tus PDF",
+        "dropText": "Hasta 50 PDF, {{limit}} MB cada uno. Se pueden ir añadiendo.",
+        "pick": "Seleccionar PDF",
+        "empty": "Aún no hay PDF.",
+        "more": "y {{count}} más"
+      },
+      "templates": {
+        "title": "Plantillas"
+      },
+      "tab": {
+        "paste": "Pegar texto",
+        "files": "Subir archivos"
+      },
+      "files": {
+        "dropTitle": "Suelta tus JSON",
+        "dropText": "Acepta .json, .jsonl y .ndjson. Un archivo puede traer una plantilla o cientos: da igual si es un array, objetos seguidos o una línea por documento.",
+        "pick": "Seleccionar JSON",
+        "count": "{{count}} plantillas",
+        "pasted": "Texto pegado",
+        "later": "Las plantillas pueden llegar después. Con los PDF cargados ya puedes pasar a emparejar y añadir más plantillas allí.",
+        "clear": "Vaciar plantillas"
+      },
+      "paste": {
+        "label": "Pega todas las plantillas que quieras, una detrás de otra. No hace falta un array.",
+        "placeholder": "{\"pdfName\":\"albaran-0331.pdf\",\"pages\":[…]}\n{\"pdfName\":\"albaran-0332.pdf\",\"pages\":[…]}",
+        "add": "Añadir {{count}} plantillas",
+        "clear": "Vaciar",
+        "lines": "{{count}} líneas",
+        "valid": "{{count}} plantillas",
+        "invalid": "{{count}} con error",
+        "rowInfo": "{{pages}} págs. · {{fields}} campos",
+        "rowError": "Línea {{line}}: {{reason}}",
+        "errorHelp": "Las plantillas con error se quedan en el cuadro: corrígelas y vuelve a añadir. Tu texto no se pierde.",
+        "note": "Solo se usa «pages». Se ignora lo demás y se leen $oid, $date y $numberInt.",
+        "formats": "Formatos que se entienden",
+        "more": "y {{count}} más",
+        "addedToast": "{{count}} plantillas añadidas"
+      },
+      "formats": {
+        "sequence": "Objetos seguidos",
+        "lines": "Una línea por documento (mongoexport, JSONL)",
+        "array": "Un array de plantillas",
+        "script": "Script con var pdfTemplate"
+      },
+      "summary": {
+        "title": "Resumen",
+        "ready": "Listo para emparejar",
+        "pdfs": "PDF leídos",
+        "templates": "Plantillas válidas",
+        "failedTemplates": "{{count}} plantillas con error de sintaxis.",
+        "go": "Emparejar {{pdfs}} con {{templates}} →",
+        "needPdfs": "Carga al menos un PDF para continuar."
+      }
+    },
+    "match": {
+      "title": "Emparejado",
+      "filter": "Filtrar",
+      "filters": {
+        "all": "Todos",
+        "ready": "Listos",
+        "choose": "Por elegir",
+        "none": "Sin plantilla",
+        "error": "Con error"
+      },
+      "col": {
+        "template": "Plantilla",
+        "how": "Cómo se emparejó"
+      },
+      "how": {
+        "exact": "✓ Nombre exacto",
+        "similar": "≈ Nombre parecido",
+        "manual": "✓ Asignada a mano",
+        "paste": "✓ Pegada en el PDF",
+        "choose": "? Hay que elegir",
+        "none": "· Sin plantilla",
+        "error": "! JSON con error"
+      },
+      "action": {
+        "change": "Cambiar",
+        "choose": "Elegir",
+        "assign": "Asignar",
+        "fix": "Corregir"
+      },
+      "candidates": "{{count}} candidatas",
+      "pill": {
+        "ready": "{{count}} listos",
+        "similar": "{{count}} parecidos",
+        "choose": "{{count}} por elegir",
+        "none": "{{count}} PDF sin plantilla",
+        "error": "{{count}} con error"
+      },
+      "continue": "Continuar con {{count}} listos →",
+      "later": "Puedes volver aquí desde la lista del lote.",
+      "back": "← Cargar más",
+      "emptyTitle": "No hay PDF que emparejar",
+      "emptyText": "Carga primero tus PDF y tus plantillas.",
+      "fields": "{{count}} campos",
+      "side": {
+        "title": "Cómo se empareja",
+        "field": "Campo de la plantilla",
+        "fileName": "Nombre del archivo",
+        "detected": "Con valor en {{count}} de {{total}} plantillas.",
+        "rules": "Primero se compara el valor exacto; si no hay, se ignoran mayúsculas, acentos y la extensión. Si aún no casa, se sugiere la más parecida y nunca se asigna sola."
+      },
+      "unused": {
+        "title": "Plantillas sin PDF",
+        "empty": "Todas las plantillas tienen PDF.",
+        "hint": "Arrastra una a la fila de un PDF, o usa «Asignar» para elegirla en una lista."
+      },
+      "assign": {
+        "title": "Asignar plantilla a {{name}}",
+        "pdf": "PDF · {{pages}} págs.",
+        "search": "Buscar entre {{count}} plantillas",
+        "suggested": "Sugeridas por parecido de nombre",
+        "score": "{{score}} % parecido",
+        "inUse": "ya usada",
+        "copyNote": "Una plantilla que ya tiene PDF se puede reutilizar. Se copia, así que la otra no cambia.",
+        "chosen": "Plantilla elegida",
+        "pages": "Páginas",
+        "fields": "Campos",
+        "pagesMatch": "Las páginas del PDF y de la plantilla coinciden.",
+        "pagesDiffer": "El PDF tiene {{pdf}} páginas y la plantilla {{tpl}}.",
+        "nothing": "Elige una plantilla de la lista.",
+        "confirm": "Asignar esta plantilla",
+        "paste": "Pegar otra plantilla",
+        "none": "Dejar sin plantilla",
+        "cancel": "Cancelar",
+        "noResults": "Ninguna plantilla coincide con la búsqueda.",
+        "doneText": "{{name}} ya tiene {{count}} campos."
+      }
     }
   }
 }

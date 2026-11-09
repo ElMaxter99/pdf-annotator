@@ -339,7 +339,7 @@
   },
   "batch": {
     "landing": {
-      "hint": "Beaucoup de PDF ? Choisissez-en plusieurs (et leurs JSON) pour ouvrir la mise en page par lots."
+      "hint": "Beaucoup de PDF ? Choisissez-en plusieurs (et leurs JSON) pour ouvrir la remise en page par lots."
     },
     "nav": {
       "home": "Aller à la page d'accueil",
@@ -348,16 +348,16 @@
     "privacy": "Tout se passe dans votre navigateur. Rien n'est envoyé à un serveur.",
     "steps": {
       "label": "Étapes de la mise en page",
-      "lot": "Lot",
-      "template": "Modèle",
       "newPdf": "Nouveau PDF",
       "compare": "Comparer",
-      "export": "Exporter"
+      "export": "Exporter",
+      "load": "Charger",
+      "match": "Associer"
     },
     "empty": {
-      "title": "Chargez vos PDF et JSON",
-      "text": "Déposez jusqu'à 50 PDF et leurs JSON (même nom), ou parcourez vos fichiers. Jusqu'à {{limit}} Mo par PDF.",
-      "cta": "Sélectionner des fichiers"
+      "title": "Pas encore de lot",
+      "text": "Envoyez vos PDF et modèles pour commencer la remise en page.",
+      "cta": "Charger PDF et modèles"
     },
     "resume": {
       "title": "Vous avez un lot en cours",
@@ -378,7 +378,6 @@
       "tooBigJson": "Le JSON dépasse 5 Mo.",
       "invalidJson": "JSON non valide",
       "duplicate": "Déjà dans le lot",
-      "unmatchedJson": "Aucun PDF de ce nom",
       "limit": "Lot plein ou plus d'espace"
     },
     "list": {
@@ -393,7 +392,8 @@
       "next": "Mettre en page le suivant",
       "noResults": "Aucun PDF ne correspond au filtre.",
       "nothingPending": "Il ne reste rien à faire. Bravo !",
-      "keys": "Raccourcis : ↑ ↓ se déplacer · Entrée ouvrir · N prochain en attente"
+      "keys": "Raccourcis : ↑ ↓ se déplacer · Entrée ouvrir · N prochain en attente",
+      "match": "Associer"
     },
     "filter": {
       "all": "Tous",
@@ -463,7 +463,13 @@
       "page": "Page {{num}}",
       "fieldsCount": "{{count}} champs",
       "errorItem": "Ce PDF reste en « Erreur de JSON » et ne bloque pas les autres. Vous pouvez le passer et y revenir.",
-      "invalidToast": "Le modèle n'est pas valide. Voyez l'avis à côté du texte."
+      "invalidToast": "Le modèle n'est pas valide. Voyez l'avis à côté du texte.",
+      "reason": {
+        "empty": "texte vide",
+        "no-object": "pas d’objet",
+        "syntax": "erreur de syntaxe",
+        "no-pages": "«pages» manquant"
+      }
     },
     "newPdf": {
       "label": "Nouveau PDF",
@@ -555,6 +561,171 @@
       "again": "Télécharger à nouveau",
       "newBatch": "Commencer un autre lot",
       "close": "Fermer"
+    },
+    "mode": {
+      "label": "Mode de travail",
+      "editor": "Éditeur · 1 PDF",
+      "batch": "Lots · plusieurs PDF",
+      "editorHint": "Ouvre l’éditeur avec un seul PDF",
+      "batchHint": "Remet en page plusieurs PDF avec leurs modèles"
+    },
+    "modes": {
+      "title": "Avec combien de PDF allez-vous travailler ?",
+      "lead": "Choisissez un mode. Vous pouvez aussi déposer vos fichiers et l’app choisit pour vous.",
+      "note": "Si vous déposez des fichiers sans choisir : 1 PDF ouvre l’Éditeur ; 2 PDF ou plus, ou n’importe quel JSON, ouvrent les Lots.",
+      "editor": {
+        "title": "Éditeur",
+        "count": "Un PDF",
+        "text": "Vous placez des champs à la main sur un document et les ajustez avec le JSON.",
+        "p1": "Un PDF à la fois",
+        "p2": "Annotations, JSON et modèles enregistrés dans le navigateur",
+        "p3": "Vous exportez le PDF annoté ou le JSON",
+        "cta": "Choisir un PDF"
+      },
+      "batch": {
+        "title": "Lots",
+        "count": "De 2 à 50 PDF",
+        "text": "Vous remettez en page de nombreux PDF avec des modèles que vous avez déjà, l’un après l’autre.",
+        "p1": "Vous envoyez PDF et modèles JSON d’un coup, en fichiers ou collés",
+        "p2": "Chaque modèle s’associe seul à son PDF",
+        "p3": "Vous comparez avant et après, et téléchargez tout à la fin",
+        "cta": "Charger PDF et modèles"
+      }
+    },
+    "load": {
+      "title": "Charger PDF et modèles",
+      "pdfs": {
+        "title": "PDF",
+        "dropTitle": "Déposez vos PDF",
+        "dropText": "Jusqu’à 50 PDF, {{limit}} Mo chacun. Vous pouvez en ajouter au fur et à mesure.",
+        "pick": "Sélectionner des PDF",
+        "empty": "Pas encore de PDF.",
+        "more": "et {{count}} de plus"
+      },
+      "templates": {
+        "title": "Modèles"
+      },
+      "tab": {
+        "paste": "Coller du texte",
+        "files": "Envoyer des fichiers"
+      },
+      "files": {
+        "dropTitle": "Déposez vos fichiers JSON",
+        "dropText": "Accepte .json, .jsonl et .ndjson. Un fichier peut contenir un modèle ou des centaines : tableau, objets à la suite ou une ligne par document.",
+        "pick": "Sélectionner des JSON",
+        "count": "{{count}} modèles",
+        "pasted": "Texte collé",
+        "later": "Les modèles peuvent arriver plus tard. Avec les PDF chargés, vous pouvez déjà passer à l’association.",
+        "clear": "Vider les modèles"
+      },
+      "paste": {
+        "label": "Collez autant de modèles que vous voulez, l’un après l’autre. Pas besoin de tableau.",
+        "placeholder": "{\"pdfName\":\"albaran-0331.pdf\",\"pages\":[…]}\n{\"pdfName\":\"albaran-0332.pdf\",\"pages\":[…]}",
+        "add": "Ajouter {{count}} modèles",
+        "clear": "Vider",
+        "lines": "{{count}} lignes",
+        "valid": "{{count}} modèles",
+        "invalid": "{{count}} avec erreur",
+        "rowInfo": "{{pages}} pages · {{fields}} champs",
+        "rowError": "Ligne {{line}} : {{reason}}",
+        "errorHelp": "Les modèles en erreur restent dans la zone : corrigez-les et ajoutez-les de nouveau. Votre texte n’est pas perdu.",
+        "note": "Seul «pages» est utilisé. Le reste est ignoré et $oid, $date et $numberInt sont compris.",
+        "formats": "Formats acceptés",
+        "more": "et {{count}} de plus",
+        "addedToast": "{{count}} modèles ajoutés"
+      },
+      "formats": {
+        "sequence": "Objets à la suite",
+        "lines": "Une ligne par document (mongoexport, JSONL)",
+        "array": "Un tableau de modèles",
+        "script": "Script avec var pdfTemplate"
+      },
+      "summary": {
+        "title": "Résumé",
+        "ready": "Prêt à associer",
+        "pdfs": "PDF lus",
+        "templates": "Modèles valides",
+        "failedTemplates": "{{count}} modèles avec erreur de syntaxe.",
+        "go": "Associer {{pdfs}} à {{templates}} →",
+        "needPdfs": "Chargez au moins un PDF pour continuer."
+      }
+    },
+    "match": {
+      "title": "Association",
+      "filter": "Filtrer",
+      "filters": {
+        "all": "Tous",
+        "ready": "Prêts",
+        "choose": "À choisir",
+        "none": "Sans modèle",
+        "error": "En erreur"
+      },
+      "col": {
+        "template": "Modèle",
+        "how": "Comment associé"
+      },
+      "how": {
+        "exact": "✓ Nom exact",
+        "similar": "≈ Nom proche",
+        "manual": "✓ Assigné à la main",
+        "paste": "✓ Collé sur le PDF",
+        "choose": "? À choisir",
+        "none": "· Sans modèle",
+        "error": "! JSON en erreur"
+      },
+      "action": {
+        "change": "Changer",
+        "choose": "Choisir",
+        "assign": "Assigner",
+        "fix": "Corriger"
+      },
+      "candidates": "{{count}} candidats",
+      "pill": {
+        "ready": "{{count}} prêts",
+        "similar": "{{count}} proches",
+        "choose": "{{count}} à choisir",
+        "none": "{{count}} PDF sans modèle",
+        "error": "{{count}} en erreur"
+      },
+      "continue": "Continuer avec {{count}} prêts →",
+      "later": "Vous pouvez revenir ici depuis la liste du lot.",
+      "back": "← Charger plus",
+      "emptyTitle": "Aucun PDF à associer",
+      "emptyText": "Chargez d’abord vos PDF et modèles.",
+      "fields": "{{count}} champs",
+      "side": {
+        "title": "Comment l’association fonctionne",
+        "field": "Champ du modèle",
+        "fileName": "Nom du fichier",
+        "detected": "Renseigné dans {{count}} modèles sur {{total}}.",
+        "rules": "On compare d’abord la valeur exacte ; sinon, on ignore la casse, les accents et l’extension. Si rien ne correspond, le plus proche est suggéré et jamais assigné seul."
+      },
+      "unused": {
+        "title": "Modèles sans PDF",
+        "empty": "Tous les modèles ont un PDF.",
+        "hint": "Faites-en glisser une sur la ligne d’un PDF, ou utilisez « Assigner » pour la choisir dans une liste."
+      },
+      "assign": {
+        "title": "Assigner un modèle à {{name}}",
+        "pdf": "PDF · {{pages}} pages",
+        "search": "Rechercher parmi {{count}} modèles",
+        "suggested": "Suggérés par nom proche",
+        "score": "{{score}} % de similarité",
+        "inUse": "déjà utilisé",
+        "copyNote": "Un modèle qui a déjà un PDF peut être réutilisé. Il est copié, l’autre ne change pas.",
+        "chosen": "Modèle choisi",
+        "pages": "Pages",
+        "fields": "Champs",
+        "pagesMatch": "Le PDF et le modèle ont le même nombre de pages.",
+        "pagesDiffer": "Le PDF a {{pdf}} pages et le modèle {{tpl}}.",
+        "nothing": "Choisissez un modèle dans la liste.",
+        "confirm": "Assigner ce modèle",
+        "paste": "Coller un autre modèle",
+        "none": "Laisser sans modèle",
+        "cancel": "Annuler",
+        "noResults": "Aucun modèle ne correspond à la recherche.",
+        "doneText": "{{name}} a maintenant {{count}} champs."
+      }
     }
   }
 }

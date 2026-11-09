@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { ModeSwitchComponent } from '../../components/mode-switch/mode-switch.component';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import {
@@ -39,7 +40,7 @@ const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, 
 @Component({
   selector: 'app-batch-page',
   standalone: true,
-  imports: [RouterLink, TranslationPipe, BatchStepsComponent],
+  imports: [RouterLink, TranslationPipe, BatchStepsComponent, ModeSwitchComponent],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
 })

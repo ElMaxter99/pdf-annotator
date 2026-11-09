@@ -1,9 +1,9 @@
 import { Component, input } from '@angular/core';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 
-const STEPS = ['lot', 'template', 'newPdf', 'compare', 'export'] as const;
+const STEPS = ['load', 'match', 'newPdf', 'compare', 'export'] as const;
 
-/** Progress chips of the batch flow (1 Lote … 5 Exportar). Purely informative. */
+/** Progress chips of the batch flow (1 Cargar … 5 Exportar). Purely informative. */
 @Component({
   selector: 'app-batch-steps',
   standalone: true,

@@ -339,7 +339,7 @@
   },
   "batch": {
     "landing": {
-      "hint": "Molts PDF? Tria'n diversos (i els seus JSON) i s'obre el remaquetatge per lots."
+      "hint": "Molts PDF? Tria’n diversos (i els seus JSON) i s’obre el remaquetat per lots."
     },
     "nav": {
       "home": "Anar a la pàgina d'inici",
@@ -348,16 +348,16 @@
     "privacy": "Tot passa al teu navegador. No es puja res a cap servidor.",
     "steps": {
       "label": "Passos del remaquetatge",
-      "lot": "Lot",
-      "template": "Plantilla",
       "newPdf": "PDF nou",
       "compare": "Comparar",
-      "export": "Exportar"
+      "export": "Exportar",
+      "load": "Carregar",
+      "match": "Aparellar"
     },
     "empty": {
-      "title": "Carrega els teus PDF i JSON",
-      "text": "Arrossega fins a 50 PDF i els seus JSON (mateix nom), o cerca els fitxers. Fins a {{limit}} MB per PDF.",
-      "cta": "Seleccionar fitxers"
+      "title": "Encara no hi ha cap lot",
+      "text": "Puja els teus PDF i plantilles per començar el remaquetat.",
+      "cta": "Carregar PDF i plantilles"
     },
     "resume": {
       "title": "Tens un lot en curs",
@@ -378,7 +378,6 @@
       "tooBigJson": "El JSON supera 5 MB.",
       "invalidJson": "JSON no vàlid",
       "duplicate": "Ja és al lot",
-      "unmatchedJson": "Cap PDF amb aquest nom",
       "limit": "Lot ple o sense espai"
     },
     "list": {
@@ -393,7 +392,8 @@
       "next": "Remaquetar el següent",
       "noResults": "Cap PDF coincideix amb el filtre.",
       "nothingPending": "No queda res pendent. Bona feina!",
-      "keys": "Dreceres: ↑ ↓ moure's · Intro obrir · N següent pendent"
+      "keys": "Dreceres: ↑ ↓ moure's · Intro obrir · N següent pendent",
+      "match": "Aparellar"
     },
     "filter": {
       "all": "Tots",
@@ -463,7 +463,13 @@
       "page": "Pàgina {{num}}",
       "fieldsCount": "{{count}} camps",
       "errorItem": "Aquest PDF queda com «Error al JSON» i no bloqueja la resta. El pots saltar i tornar-hi després.",
-      "invalidToast": "La plantilla no és vàlida. Revisa l'avís al costat del text."
+      "invalidToast": "La plantilla no és vàlida. Revisa l'avís al costat del text.",
+      "reason": {
+        "empty": "text buit",
+        "no-object": "no hi ha objecte",
+        "syntax": "error de sintaxi",
+        "no-pages": "falta «pages»"
+      }
     },
     "newPdf": {
       "label": "PDF nou",
@@ -555,6 +561,171 @@
       "again": "Baixar de nou",
       "newBatch": "Començar un altre lot",
       "close": "Tancar"
+    },
+    "mode": {
+      "label": "Mode de treball",
+      "editor": "Editor · 1 PDF",
+      "batch": "Lots · diversos PDF",
+      "editorHint": "Obre l’editor amb un sol PDF",
+      "batchHint": "Remaqueta molts PDF amb les seves plantilles"
+    },
+    "modes": {
+      "title": "Amb quants PDF vas a treballar?",
+      "lead": "Tria un mode. També pots deixar anar els fitxers i l’app tria per tu.",
+      "note": "Si deixes anar fitxers sense triar: 1 PDF obre l’Editor; 2 o més PDF, o qualsevol JSON, obren Lots.",
+      "editor": {
+        "title": "Editor",
+        "count": "Un PDF",
+        "text": "Col·loques camps a mà sobre un document i els afines amb el JSON.",
+        "p1": "Un PDF cada vegada",
+        "p2": "Anotacions, JSON i plantilles desades al navegador",
+        "p3": "Exportes el PDF anotat o el JSON",
+        "cta": "Tria un PDF"
+      },
+      "batch": {
+        "title": "Lots",
+        "count": "De 2 a 50 PDF",
+        "text": "Remaquetes molts PDF amb plantilles que ja tens, un darrere l’altre.",
+        "p1": "Puges PDF i plantilles JSON de cop, en fitxers o enganxades",
+        "p2": "Cada plantilla s’aparella sola amb el seu PDF",
+        "p3": "Revises abans i després, i ho descarregues tot al final",
+        "cta": "Carregar PDF i plantilles"
+      }
+    },
+    "load": {
+      "title": "Carregar PDF i plantilles",
+      "pdfs": {
+        "title": "PDF",
+        "dropTitle": "Deixa anar els teus PDF",
+        "dropText": "Fins a 50 PDF, {{limit}} MB cadascun. Se’n poden anar afegint.",
+        "pick": "Seleccionar PDF",
+        "empty": "Encara no hi ha cap PDF.",
+        "more": "i {{count}} més"
+      },
+      "templates": {
+        "title": "Plantilles"
+      },
+      "tab": {
+        "paste": "Enganxar text",
+        "files": "Pujar fitxers"
+      },
+      "files": {
+        "dropTitle": "Deixa anar els teus JSON",
+        "dropText": "Accepta .json, .jsonl i .ndjson. Un fitxer pot dur una plantilla o centenars: tant és si és un array, objectes seguits o una línia per document.",
+        "pick": "Seleccionar JSON",
+        "count": "{{count}} plantilles",
+        "pasted": "Text enganxat",
+        "later": "Les plantilles poden arribar després. Amb els PDF carregats ja pots passar a aparellar.",
+        "clear": "Buidar plantilles"
+      },
+      "paste": {
+        "label": "Enganxa totes les plantilles que vulguis, una darrere l’altra. No cal un array.",
+        "placeholder": "{\"pdfName\":\"albaran-0331.pdf\",\"pages\":[…]}\n{\"pdfName\":\"albaran-0332.pdf\",\"pages\":[…]}",
+        "add": "Afegir {{count}} plantilles",
+        "clear": "Buidar",
+        "lines": "{{count}} línies",
+        "valid": "{{count}} plantilles",
+        "invalid": "{{count}} amb error",
+        "rowInfo": "{{pages}} pàgs. · {{fields}} camps",
+        "rowError": "Línia {{line}}: {{reason}}",
+        "errorHelp": "Les plantilles amb error es queden al quadre: corregeix-les i torna a afegir. El teu text no es perd.",
+        "note": "Només s’usa «pages». La resta s’ignora i es llegeixen $oid, $date i $numberInt.",
+        "formats": "Formats que s’entenen",
+        "more": "i {{count}} més",
+        "addedToast": "{{count}} plantilles afegides"
+      },
+      "formats": {
+        "sequence": "Objectes seguits",
+        "lines": "Una línia per document (mongoexport, JSONL)",
+        "array": "Un array de plantilles",
+        "script": "Script amb var pdfTemplate"
+      },
+      "summary": {
+        "title": "Resum",
+        "ready": "A punt per aparellar",
+        "pdfs": "PDF llegits",
+        "templates": "Plantilles vàlides",
+        "failedTemplates": "{{count}} plantilles amb error de sintaxi.",
+        "go": "Aparellar {{pdfs}} amb {{templates}} →",
+        "needPdfs": "Carrega almenys un PDF per continuar."
+      }
+    },
+    "match": {
+      "title": "Aparellament",
+      "filter": "Filtrar",
+      "filters": {
+        "all": "Tots",
+        "ready": "Llestos",
+        "choose": "Per triar",
+        "none": "Sense plantilla",
+        "error": "Amb error"
+      },
+      "col": {
+        "template": "Plantilla",
+        "how": "Com s’ha aparellat"
+      },
+      "how": {
+        "exact": "✓ Nom exacte",
+        "similar": "≈ Nom semblant",
+        "manual": "✓ Assignada a mà",
+        "paste": "✓ Enganxada al PDF",
+        "choose": "? Cal triar",
+        "none": "· Sense plantilla",
+        "error": "! JSON amb error"
+      },
+      "action": {
+        "change": "Canviar",
+        "choose": "Triar",
+        "assign": "Assignar",
+        "fix": "Corregir"
+      },
+      "candidates": "{{count}} candidates",
+      "pill": {
+        "ready": "{{count}} llestos",
+        "similar": "{{count}} semblants",
+        "choose": "{{count}} per triar",
+        "none": "{{count}} PDF sense plantilla",
+        "error": "{{count}} amb error"
+      },
+      "continue": "Continuar amb {{count}} llestos →",
+      "later": "Pots tornar aquí des de la llista del lot.",
+      "back": "← Carregar-ne més",
+      "emptyTitle": "No hi ha PDF per aparellar",
+      "emptyText": "Carrega primer els teus PDF i plantilles.",
+      "fields": "{{count}} camps",
+      "side": {
+        "title": "Com s’aparella",
+        "field": "Camp de la plantilla",
+        "fileName": "Nom del fitxer",
+        "detected": "Amb valor en {{count}} de {{total}} plantilles.",
+        "rules": "Primer es compara el valor exacte; si no n’hi ha, s’ignoren majúscules, accents i l’extensió. Si encara no quadra, se suggereix la més semblant i mai s’assigna sola."
+      },
+      "unused": {
+        "title": "Plantilles sense PDF",
+        "empty": "Totes les plantilles tenen PDF.",
+        "hint": "Arrossega’n una a la fila d’un PDF, o usa «Assignar» per triar-la en una llista."
+      },
+      "assign": {
+        "title": "Assignar plantilla a {{name}}",
+        "pdf": "PDF · {{pages}} pàgs.",
+        "search": "Cerca entre {{count}} plantilles",
+        "suggested": "Suggerides per nom semblant",
+        "score": "{{score}} % semblant",
+        "inUse": "ja usada",
+        "copyNote": "Una plantilla que ja té PDF es pot reutilitzar. Es copia, així que l’altra no canvia.",
+        "chosen": "Plantilla triada",
+        "pages": "Pàgines",
+        "fields": "Camps",
+        "pagesMatch": "Les pàgines del PDF i de la plantilla coincideixen.",
+        "pagesDiffer": "El PDF té {{pdf}} pàgines i la plantilla {{tpl}}.",
+        "nothing": "Tria una plantilla de la llista.",
+        "confirm": "Assignar aquesta plantilla",
+        "paste": "Enganxar una altra plantilla",
+        "none": "Deixar sense plantilla",
+        "cancel": "Cancel·lar",
+        "noResults": "Cap plantilla coincideix amb la cerca.",
+        "doneText": "{{name}} ja té {{count}} camps."
+      }
     }
   }
 }

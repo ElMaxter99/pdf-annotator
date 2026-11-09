@@ -41,6 +41,34 @@
           </section>
         }
 
+        <section class="landing__modes" aria-labelledby="modes-title">
+          <h2 id="modes-title" class="landing__modes-title">{{ 'batch.modes.title' | t }}</h2>
+          <p class="landing__modes-lead">{{ 'batch.modes.lead' | t }}</p>
+          <div class="landing__modes-grid">
+            <article class="landing__mode">
+              <header><strong>{{ 'batch.modes.editor.title' | t }}</strong><span>{{ 'batch.modes.editor.count' | t }}</span></header>
+              <p>{{ 'batch.modes.editor.text' | t }}</p>
+              <ul>
+                <li>{{ 'batch.modes.editor.p1' | t }}</li>
+                <li>{{ 'batch.modes.editor.p2' | t }}</li>
+                <li>{{ 'batch.modes.editor.p3' | t }}</li>
+              </ul>
+              <button type="button" class="btn btn--ghost" (click)="openPdfFilePicker()">{{ 'batch.modes.editor.cta' | t }}</button>
+            </article>
+            <article class="landing__mode landing__mode--batch">
+              <header><strong>{{ 'batch.modes.batch.title' | t }}</strong><span>{{ 'batch.modes.batch.count' | t }}</span></header>
+              <p>{{ 'batch.modes.batch.text' | t }}</p>
+              <ul>
+                <li>{{ 'batch.modes.batch.p1' | t }}</li>
+                <li>{{ 'batch.modes.batch.p2' | t }}</li>
+                <li>{{ 'batch.modes.batch.p3' | t }}</li>
+              </ul>
+              <button type="button" class="btn btn--ghost" (click)="startBatch()">{{ 'batch.modes.batch.cta' | t }}</button>
+            </article>
+          </div>
+          <p class="landing__modes-lead">{{ 'batch.modes.note' | t }}</p>
+        </section>
+
         <app-landing-dropzone [fileDropActive]="fileDropActive()" (fileSelected)="onFileSelected($event)"
           (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
           (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"

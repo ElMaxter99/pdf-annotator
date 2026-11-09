@@ -1,0 +1,163 @@
+<div class="batch">
+  <header class="batch__nav">
+    <a class="batch__brand" routerLink="/landing" [attr.aria-label]="'batch.nav.home' | t">
+      <img src="/logo.svg" alt="" width="32" height="32" />
+      <span>Pdf Annotator <small>{{ 'batch.nav.subtitle' | t }}</small></span>
+    </a>
+    <app-batch-steps [active]="2"></app-batch-steps>
+    <span class="spacer"></span>
+    <app-mode-switch active="batch"></app-mode-switch>
+  </header>
+
+  @if (!store.loaded()) {
+    <section class="card" aria-busy="true">
+      <div class="skeleton skeleton--line"></div>
+      <div class="skeleton skeleton--row"></div>
+      <div class="skeleton skeleton--row"></div>
+    </section>
+  } @else if (store.items().length === 0) {
+    <section class="card empty">
+      <h1>{{ 'batch.match.emptyTitle' | t }}</h1>
+      <p class="cap">{{ 'batch.match.emptyText' | t }}</p>
+      <a class="btn" style="align-self: flex-start; text-decoration: none; display: inline-flex; align-items: center" routerLink="/batch/load">{{ 'batch.empty.cta' | t }}</a>
+    </section>
+  } @else {
+    <div class="cols" style="grid-template-columns: minmax(0, 1fr) 440px">
+      <section class="card" [attr.aria-label]="'batch.match.title' | t">
+        <div class="card__head">
+          <h1 style="margin: 0; font-size: 19px">{{ 'batch.match.title' | t }}</h1>
+          <span class="spacer"></span>
+          <div class="pills">
+            <span class="pill pill--ok">✓ {{ 'batch.match.pill.ready' | t : { count: counts().exact + counts().manual + counts().paste } }}</span>
+            @if (counts().similar) { <span class="pill">≈ {{ 'batch.match.pill.similar' | t : { count: counts().similar } }}</span> }
+            @if (counts().choose) { <span class="pill pill--warn">? {{ 'batch.match.pill.choose' | t : { count: counts().choose } }}</span> }
+            @if (counts().none) { <span class="pill pill--warn">{{ 'batch.match.pill.none' | t : { count: counts().none } }}</span> }
+            @if (counts().error) { <span class="pill pill--bad">! {{ 'batch.match.pill.error' | t : { count: counts().error } }}</span> }
+          </div>
+        </div>
+        <div class="tabs" role="group" [attr.aria-label]="'batch.match.filter' | t" style="align-self: flex-start">
+          @for (f of filters; track f) {
+            <button type="button" class="tab" [class.is-active]="filter() === f" [attr.aria-pressed]="filter() === f" (click)="filter.set(f)">{{ 'batch.match.filters.' + f | t }} · {{ filterCount(f) }}</button>
+          }
+        </div>
+
+        <div class="table" role="table" [attr.aria-label]="'batch.match.title' | t">
+          <div class="mtr mtr--head" role="row">
+            <span role="columnheader">{{ 'batch.col.pdf' | t }}</span><span></span>
+            <span role="columnheader">{{ 'batch.match.col.template' | t }}</span>
+            <span role="columnheader">{{ 'batch.match.col.how' | t }}</span><span></span>
+          </div>
+          @for (row of visible(); track row.item.id) {
+            <div class="mtr" role="row" [attr.data-match]="row.state.kind" [class.is-drop]="dropTarget() === row.item.id"
+              (dragover)="onRowDragOver($event, row.item.id)" (dragleave)="dropTarget.set(null)" (drop)="onRowDrop($event, row)">
+              <span role="cell" class="ellipsis" [title]="row.item.name">{{ row.item.name }}</span>
+              <span role="cell" aria-hidden="true" class="cap">↔</span>
+              <span role="cell" class="ellipsis cap" [title]="labelOf(row.template)">
+                @if (row.template) { {{ labelOf(row.template) }} }
+                @else if (row.state.kind === 'choose') { {{ 'batch.match.candidates' | t : { count: row.state.candidates.length } }} }
+                @else if (row.item.template) { {{ row.item.templateName || '·' }} }
+                @else { <span class="warn-text">{{ 'batch.status.noTemplate' | t }}</span> }
+              </span>
+              <span role="cell"><span class="pill" [class.pill--ok]="row.state.kind === 'exact' || row.state.kind === 'manual' || row.state.kind === 'paste'" [class.pill--warn]="row.state.kind === 'choose' || row.state.kind === 'none'" [class.pill--bad]="row.state.kind === 'error'">{{ 'batch.match.how.' + row.state.kind | t }}</span></span>
+              <span role="cell" class="cell-action"><button type="button" class="btn btn--ghost btn--sm" (click)="act(row)">{{ 'batch.match.action.' + actionKey(row.state.kind) | t }}</button></span>
+            </div>
+          } @empty {
+            <p class="cap table__empty">{{ 'batch.list.noResults' | t }}</p>
+          }
+        </div>
+
+        <div class="actions" style="margin-top: auto">
+          <button type="button" class="btn" (click)="continue()">{{ 'batch.match.continue' | t : { count: counts().ready } }}</button>
+          <span class="cap">{{ 'batch.match.later' | t }}</span>
+          <span class="spacer"></span>
+          <a class="btn btn--ghost" style="text-decoration: none; display: inline-flex; align-items: center" routerLink="/batch/load">{{ 'batch.match.back' | t }}</a>
+        </div>
+      </section>
+
+      <div class="stack">
+        <section class="card">
+          <span class="cap">{{ 'batch.match.side.title' | t }}</span>
+          <div class="actions">
+            <label class="cap" for="match-field">{{ 'batch.match.side.field' | t }}</label>
+            <select id="match-field" class="select mono" [value]="store.keyField()" (change)="onKeyField($event)">
+              @for (option of keyOptions(); track option.field) {
+                <option [value]="option.field" [selected]="option.field === store.keyField()">{{ fieldLabel(option.field) }} ({{ option.count }})</option>
+              }
+              @if (keyOptions().length === 0) { <option [value]="store.keyField()">{{ store.keyField() }}</option> }
+            </select>
+          </div>
+          <p class="cap">{{ 'batch.match.side.detected' | t : { count: keyCoverage(), total: store.templates().length } }}</p>
+          <p class="cap">{{ 'batch.match.side.rules' | t }}</p>
+        </section>
+        <section class="card grow-y">
+          <div class="card__head"><span class="cap">{{ 'batch.match.unused.title' | t }}</span><span class="spacer"></span><b>{{ store.unusedTemplates().length }}</b></div>
+          <div class="rows">
+            @for (template of store.unusedTemplates(); track template.id) {
+              <div class="rowline tpl-row" draggable="true" (dragstart)="onTemplateDragStart($event, template.id)">
+                <span class="cap" aria-hidden="true">⠿</span>
+                <span class="grow ellipsis mono" [title]="store.templateLabelOf(template)">{{ store.templateLabelOf(template) }}</span>
+                <span class="cap">{{ template.pages ? ('batch.match.fields' | t : { count: template.fieldCount }) : '!' }}</span>
+              </div>
+            } @empty {
+              <p class="cap">{{ 'batch.match.unused.empty' | t }}</p>
+            }
+          </div>
+          <p class="cap">{{ 'batch.match.unused.hint' | t }}</p>
+        </section>
+      </div>
+    </div>
+  }
+
+  @if (dialogRow(); as row) {
+    <div class="overlay" role="dialog" aria-modal="true" [attr.aria-label]="'batch.match.assign.title' | t : { name: row.item.name }" (keydown.escape)="closeDialog()">
+      <div class="dialog dialog--wide card">
+        <div class="card__head"><h2>{{ 'batch.match.assign.title' | t : { name: row.item.name } }}</h2><span class="spacer"></span><button type="button" class="btn btn--ghost btn--sm" (click)="closeDialog()">{{ 'batch.match.assign.cancel' | t }}</button></div>
+        <div class="dlg-cols">
+          <div class="stack" style="gap: 8px">
+            <span class="cap">{{ 'batch.match.assign.pdf' | t : { pages: row.item.pageCount } }}</span>
+            <b class="ellipsis">{{ row.item.name }}</b>
+          </div>
+          <div class="stack" style="gap: 8px; min-width: 0">
+            <label class="visually-hidden" for="assign-search">{{ 'batch.match.assign.search' | t }}</label>
+            <input id="assign-search" class="field" type="search" [placeholder]="'batch.match.assign.search' | t : { count: store.templates().length }" [value]="query()" (input)="onQuery($event)" />
+            <span class="cap">{{ 'batch.match.assign.suggested' | t }}</span>
+            <div class="rows" role="radiogroup" [attr.aria-label]="'batch.match.assign.suggested' | t" style="max-height: 340px; overflow: auto">
+              @for (entry of dialogList(); track entry.template.id) {
+                <button type="button" role="radio" class="radio-row" [class.is-selected]="chosenId() === entry.template.id" [attr.aria-checked]="chosenId() === entry.template.id" (click)="chosenId.set(entry.template.id)">
+                  <span class="dot" aria-hidden="true"></span>
+                  <span class="grow ellipsis mono">{{ entry.label }}</span>
+                  <span class="cap">{{ entry.inUse ? ('batch.match.assign.inUse' | t) : ('batch.match.assign.score' | t : { score: entry.score }) }}</span>
+                </button>
+              } @empty {
+                <p class="cap">{{ 'batch.match.assign.noResults' | t }}</p>
+              }
+            </div>
+            <p class="note note--info" role="note">ⓘ {{ 'batch.match.assign.copyNote' | t }}</p>
+          </div>
+          <div class="card" style="background: var(--bg)">
+            <span class="cap">{{ 'batch.match.assign.chosen' | t }}</span>
+            @if (dialogChosen(); as chosen) {
+              <b class="mono ellipsis">{{ store.templateLabelOf(chosen) }}</b>
+              <div class="sum"><span>{{ 'batch.match.assign.pages' | t }}</span><b>{{ chosen.pageCount }}</b></div>
+              <div class="sum"><span>{{ 'batch.match.assign.fields' | t }}</span><b>{{ chosen.fieldCount }}</b></div>
+              @if (!chosen.pages) {
+                <p class="note note--error" role="alert">! {{ 'batch.match.how.error' | t }}</p>
+              } @else if (chosen.pageCount === row.item.pageCount) {
+                <p class="cap">{{ 'batch.match.assign.pagesMatch' | t }}</p>
+              } @else {
+                <p class="note note--warn" role="status">⚠ {{ 'batch.match.assign.pagesDiffer' | t : { pdf: row.item.pageCount, tpl: chosen.pageCount } }}</p>
+              }
+            } @else {
+              <p class="cap">{{ 'batch.match.assign.nothing' | t }}</p>
+            }
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn" [disabled]="!chosenId()" (click)="confirmDialog()">{{ 'batch.match.assign.confirm' | t }}</button>
+          <button type="button" class="btn btn--ghost" (click)="pasteInstead()">{{ 'batch.match.assign.paste' | t }}</button>
+          <button type="button" class="btn btn--ghost" (click)="releaseDialog()">{{ 'batch.match.assign.none' | t }}</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
