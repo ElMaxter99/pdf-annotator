@@ -15,22 +15,9 @@
     [attr.aria-busy]="busy ? 'true' : null"
   >
     <input #pdfFileInput type="file" multiple accept="application/pdf,.pdf,application/json,.json" (change)="fileSelected.emit($event)" hidden />
-    <div class="landing__mock" aria-hidden="true">
-      <div class="landing__mock-page">
-        <span class="landing__mock-band"></span>
-        <span class="landing__mock-line" style="top: 26%; left: 10%; width: 50%"></span>
-        <span class="landing__mock-line" style="top: 36%; left: 10%; width: 72%"></span>
-        <span class="landing__mock-line" style="top: 46%; left: 10%; width: 64%"></span>
-        <span class="landing__mock-line" style="top: 60%; left: 10%; width: 76%"></span>
-        <span class="landing__mock-line" style="top: 70%; left: 10%; width: 56%"></span>
-        @if (!busy) {
-          <span class="landing__mock-field" style="top: 17%; left: 10%; width: 44%; height: 7%; animation-delay: 0.1s"></span>
-          <span class="landing__mock-field" style="top: 42%; left: 52%; width: 30%; height: 7%; animation-delay: 0.35s"></span>
-          <span class="landing__mock-field" style="top: 56%; left: 10%; width: 46%; height: 7%; animation-delay: 0.6s"></span>
-          <span class="landing__mock-field" style="top: 78%; left: 58%; width: 30%; height: 8%; animation-delay: 0.85s"></span>
-        }
-      </div>
-    </div>
+    <span class="landing__icon" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+    </span>
     <div class="landing__text" aria-live="polite">
       @if (busy) {
         <span class="landing__headline">{{ 'app.landing.busy.title' | t : { name: busyName } }}</span>

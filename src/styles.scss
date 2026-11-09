@@ -159,21 +159,28 @@ body {
   opacity: 0.6;
 }
 
+app-landing-dropzone {
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+}
+
 .landing__drop {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: min(1000px, 100%);
+  width: 100%;
+  max-width: 1000px;
 }
 
 .landing__dropzone {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  text-align: left;
+  text-align: center;
   justify-content: center;
-  gap: 56px;
+  gap: 22px;
   width: 100%;
   min-height: clamp(320px, 52vh, 480px);
   padding: 40px 64px;
@@ -239,20 +246,19 @@ body {
   flex: none;
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
   background: rgba(94, 234, 212, 0.15);
-  font-size: 2.1rem;
+  color: var(--accent);
 }
 
 .landing__text {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   min-width: 0;
-  flex: 1;
 }
 
 .landing__text h2 {
@@ -260,7 +266,9 @@ body {
 }
 
 .landing__actions {
+  margin-top: 10px;
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px 14px;
@@ -437,7 +445,8 @@ body {
 .landing__preview {
   margin: 0 auto;
   min-width: 0;
-  width: min(1000px, 100%);
+  width: 100%;
+  max-width: 1000px;
 }
 
 .landing__window {
