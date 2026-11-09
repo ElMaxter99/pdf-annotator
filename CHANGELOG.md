@@ -9,6 +9,11 @@
 - JSON import inherits a template-level `fontSize` for fields that do not set one (it used to force 14)
 - Texts translated in the 7 languages (`batch.*`); unit tests and an e2e suite (`e2e/batch.spec.ts`)
 
+### Documentation
+- Context docs for people and agents: `docs/PRODUCT.md`, `DOMAIN.md`, `DECISIONS.md`, `ROADMAP.md`, `TESTING.md` and `WORKFLOW.md` (design-first flow); `PROPUESTA_MEJORAS.md` moved to `docs/archive/`
+- Design canvas created (link in `design/README.md`) with the design tokens board and 1:1 captures of the current app (`V-01` to `V-19`: landing, resumable session, invalid file toast, workspace tabs, saved template, editors, selection, shortcuts, errors, toasts, guides, JSON tree; dark, light and 1280; desktop only) and the batch re-layout proposal boards (`P-01` to `P-10`: upload, list, template, side-by-side and overlay compare, page size mismatch, PDF size/storage, ZIP or loose download), pending approval; plus `design/tools/` to regenerate them. Designs are desktop only (decision 11)
+- `design/` folder (outside the build and the Docker image) for approved designs; `AGENTS.md` and `CLAUDE.md` updated (real size of `workspace.page.ts`, design-first section)
+
 ### Security
 - `e2e/static-server.mjs` (test/dev helper, not part of the build): listens only on `127.0.0.1`, confines files to the served folder with `path.relative`, answers 400 on malformed URLs and 404 on read errors
 

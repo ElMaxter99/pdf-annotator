@@ -58,7 +58,7 @@ PDF Annotator es un editor visual de **coordenadas sobre PDFs**. Haces clic dond
 | 🧩 **Plantillas** | Guarda conjuntos de anotaciones y recárgalos en otros documentos. |
 | ⬇️ **Exportar** | JSON (`coords.json`) o PDF anotado (`annotated.pdf`) con fuentes estándar o propias (`.ttf/.otf/.woff/.woff2`). |
 | ⌨️ **Ir rápido** | Atajos para páginas, zoom, ajuste al ancho, deshacer/rehacer y más. Pulsa `?` para verlos. |
-| 🌍 **A tu manera** | Español, inglés, catalán, francés, italiano, portugués y alemán; tema claro/oscuro; responsive hasta móvil. |
+| 🌍 **A tu manera** | Español, inglés, catalán, francés, italiano, portugués y alemán; tema claro/oscuro; pensada para escritorio. |
 | 🔒 **Privado** | El PDF no sale de tu navegador. No hay servidor de procesado ni cuentas. |
 
 ## 🚀 Empieza en 1 minuto
@@ -219,7 +219,7 @@ sh scripts/docker-down.sh     # detener
 | `npm run i18n:check` | Claves de los 7 idiomas coherentes |
 | `node scripts/generate-example.mjs` | Regenera el PDF de ejemplo |
 
-Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para personas y agentes de IA) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Hoja de ruta: [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md). Cómo contribuir: [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para personas y agentes de IA) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Hoja de ruta: [`docs/ROADMAP.md`](docs/ROADMAP.md). Cómo contribuir: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## 🧯 Solución de problemas
 | Síntoma | Qué hacer |
@@ -232,7 +232,7 @@ Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para per
 | `ng serve` no encuentra el builder | Ejecuta `npm install` antes de `npm run start:local`. |
 
 ## 🗺️ Roadmap
-Pestañas en el panel lateral, selección múltiple y alineación, validación por esquema de cada campo y refactor del componente principal. Detalle en [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md).
+Pestañas en el panel lateral, selección múltiple y alineación, validación por esquema de cada campo y refactor del componente principal. Detalle en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## 🤝 Contribuir
 Issues y PRs son bienvenidos: usa las plantillas de [`.github/`](.github) y revisa [`CONTRIBUTING.md`](CONTRIBUTING.md).

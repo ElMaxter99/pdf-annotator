@@ -1,0 +1,321 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-09T15:35:00Z"
+ },
+ "title": "PDF Annotator · Diseño de la interfaz",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 760,
+   "title": "Tokens de diseño"
+  },
+  "V-01-landing.dc.html": {
+   "x": 0,
+   "y": 1140,
+   "w": 1720,
+   "h": 1697,
+   "title": "V-01 Landing"
+  },
+  "V-02-landing-claro.dc.html": {
+   "x": 1800,
+   "y": 1140,
+   "w": 1720,
+   "h": 1697,
+   "title": "V-02 Landing claro"
+  },
+  "V-03-landing-con-sesion-recuperable.dc.html": {
+   "x": 3600,
+   "y": 1140,
+   "w": 1720,
+   "h": 1829,
+   "title": "V-03 Landing con sesión recuperable"
+  },
+  "V-19-landing-archivo-no-valido-aviso.dc.html": {
+   "x": 0,
+   "y": 3089,
+   "w": 1720,
+   "h": 1697,
+   "title": "V-19 Landing · archivo no válido (aviso)"
+  },
+  "V-04-workspace-anotaciones.dc.html": {
+   "x": 0,
+   "y": 5166,
+   "w": 1720,
+   "h": 900,
+   "title": "V-04 Workspace · Anotaciones"
+  },
+  "V-05-workspace-documento.dc.html": {
+   "x": 1800,
+   "y": 5166,
+   "w": 1720,
+   "h": 900,
+   "title": "V-05 Workspace · Documento"
+  },
+  "V-06-workspace-plantillas.dc.html": {
+   "x": 3600,
+   "y": 5166,
+   "w": 1720,
+   "h": 900,
+   "title": "V-06 Workspace · Plantillas"
+  },
+  "V-07-workspace-avanzado.dc.html": {
+   "x": 0,
+   "y": 6186,
+   "w": 1720,
+   "h": 900,
+   "title": "V-07 Workspace · Avanzado"
+  },
+  "V-08-workspace-anotaciones-claro.dc.html": {
+   "x": 1800,
+   "y": 6186,
+   "w": 1720,
+   "h": 900,
+   "title": "V-08 Workspace · Anotaciones (claro)"
+  },
+  "V-09-workspace-1280.dc.html": {
+   "x": 3600,
+   "y": 6186,
+   "w": 1280,
+   "h": 800,
+   "title": "V-09 Workspace 1280"
+  },
+  "V-10-workspace-plantillas-con-plantilla-guardada.dc.html": {
+   "x": 0,
+   "y": 7206,
+   "w": 1720,
+   "h": 900,
+   "title": "V-10 Workspace · Plantillas con plantilla guardada"
+  },
+  "V-11-crear-anotacion-editor-flotante.dc.html": {
+   "x": 0,
+   "y": 8486,
+   "w": 1720,
+   "h": 900,
+   "title": "V-11 Crear anotación (editor flotante)"
+  },
+  "V-12-editar-anotacion-editor-flotante.dc.html": {
+   "x": 1800,
+   "y": 8486,
+   "w": 1720,
+   "h": 900,
+   "title": "V-12 Editar anotación (editor flotante)"
+  },
+  "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html": {
+   "x": 3600,
+   "y": 8486,
+   "w": 1720,
+   "h": 900,
+   "title": "V-13 Selección múltiple y barra de alineación"
+  },
+  "V-14-dialogo-de-atajos.dc.html": {
+   "x": 0,
+   "y": 9766,
+   "w": 1720,
+   "h": 900,
+   "title": "V-14 Diálogo de atajos"
+  },
+  "V-15-json-con-error-de-sintaxis.dc.html": {
+   "x": 1800,
+   "y": 9766,
+   "w": 1720,
+   "h": 900,
+   "title": "V-15 JSON con error de sintaxis"
+  },
+  "V-16-aviso-de-importacion-toast.dc.html": {
+   "x": 3600,
+   "y": 9766,
+   "w": 1720,
+   "h": 900,
+   "title": "V-16 Aviso de importación (toast)"
+  },
+  "V-17-guias-y-rejilla-activas.dc.html": {
+   "x": 0,
+   "y": 10786,
+   "w": 1720,
+   "h": 900,
+   "title": "V-17 Guías y rejilla activas"
+  },
+  "V-18-arbol-json.dc.html": {
+   "x": 1800,
+   "y": 10786,
+   "w": 1720,
+   "h": 900,
+   "title": "V-18 Árbol JSON"
+  },
+  "P-01-flujo.dc.html": {
+   "x": 0,
+   "y": 12066,
+   "w": 1720,
+   "h": 900,
+   "title": "P-01 Flujo de remaquetado"
+  },
+  "P-02-subir-lote.dc.html": {
+   "x": 1800,
+   "y": 12066,
+   "w": 1720,
+   "h": 900,
+   "title": "P-02 Subir el lote"
+  },
+  "P-03-lista-lote.dc.html": {
+   "x": 3600,
+   "y": 12066,
+   "w": 1720,
+   "h": 900,
+   "title": "P-03 Lista del lote"
+  },
+  "P-04-plantilla-pdf-nuevo.dc.html": {
+   "x": 0,
+   "y": 13346,
+   "w": 1720,
+   "h": 900,
+   "title": "P-04 Plantilla y PDF sustituto"
+  },
+  "P-05-comparar-lado-a-lado.dc.html": {
+   "x": 1800,
+   "y": 13346,
+   "w": 1720,
+   "h": 900,
+   "title": "P-05 Comparar · lado a lado"
+  },
+  "P-06-comparar-superpuesto.dc.html": {
+   "x": 3600,
+   "y": 13346,
+   "w": 1720,
+   "h": 900,
+   "title": "P-06 Comparar · superpuesto"
+  },
+  "P-07-tamano-pagina.dc.html": {
+   "x": 0,
+   "y": 14366,
+   "w": 1720,
+   "h": 900,
+   "title": "P-07 Tamaño de página distinto"
+  },
+  "P-08-peso-almacenamiento.dc.html": {
+   "x": 1800,
+   "y": 14366,
+   "w": 1720,
+   "h": 900,
+   "title": "P-08 Tamaño de los PDF y almacenamiento"
+  },
+  "P-09-cierre-descarga.dc.html": {
+   "x": 0,
+   "y": 15646,
+   "w": 1720,
+   "h": 900,
+   "title": "P-09 Cierre y descarga"
+  },
+  "P-10-comparar-lado-a-lado-claro.dc.html": {
+   "x": 1800,
+   "y": 15646,
+   "w": 1720,
+   "h": 900,
+   "title": "P-10 Comparar · lado a lado (claro)"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "V-01-landing.dc.html",
+  "V-02-landing-claro.dc.html",
+  "V-03-landing-con-sesion-recuperable.dc.html",
+  "V-19-landing-archivo-no-valido-aviso.dc.html",
+  "V-04-workspace-anotaciones.dc.html",
+  "V-05-workspace-documento.dc.html",
+  "V-06-workspace-plantillas.dc.html",
+  "V-07-workspace-avanzado.dc.html",
+  "V-08-workspace-anotaciones-claro.dc.html",
+  "V-09-workspace-1280.dc.html",
+  "V-10-workspace-plantillas-con-plantilla-guardada.dc.html",
+  "V-11-crear-anotacion-editor-flotante.dc.html",
+  "V-12-editar-anotacion-editor-flotante.dc.html",
+  "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html",
+  "V-14-dialogo-de-atajos.dc.html",
+  "V-15-json-con-error-de-sintaxis.dc.html",
+  "V-16-aviso-de-importacion-toast.dc.html",
+  "V-17-guias-y-rejilla-activas.dc.html",
+  "V-18-arbol-json.dc.html",
+  "P-01-flujo.dc.html",
+  "P-02-subir-lote.dc.html",
+  "P-03-lista-lote.dc.html",
+  "P-04-plantilla-pdf-nuevo.dc.html",
+  "P-05-comparar-lado-a-lado.dc.html",
+  "P-06-comparar-superpuesto.dc.html",
+  "P-07-tamano-pagina.dc.html",
+  "P-08-peso-almacenamiento.dc.html",
+  "P-09-cierre-descarga.dc.html",
+  "P-10-comparar-lado-a-lado-claro.dc.html"
+ ],
+ "notes": {
+  "t0": {
+   "x": 0,
+   "y": -300,
+   "text": "Referencia · tokens",
+   "kind": "title1",
+   "maxW": 1280
+  },
+  "convencion": {
+   "x": -420,
+   "y": 0,
+   "w": 340,
+   "text": "Convención: V-NN pantallas que ya existen, P-NN propuestas (remaquetado por lotes, pendiente de aprobación). Una fila por versión o propuesta, solo con las mesas que cambian. La app es solo de escritorio (no hay diseño móvil). Las mesas V-01 a V-19 son capturas del DOM real de la app v1.5.0 (1:1): textos, medidas y colores salen del código. Las imágenes del visor y las miniaturas son del PDF de ejemplo; las miniaturas aparecen como cajas grises."
+  },
+  "r0": {
+   "x": 0,
+   "y": 840,
+   "text": "Landing",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r1": {
+   "x": 0,
+   "y": 4866,
+   "text": "Workspace · pestañas y temas",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r2": {
+   "x": 0,
+   "y": 8186,
+   "text": "Workspace · editores y selección",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r3": {
+   "x": 0,
+   "y": 9466,
+   "text": "Workspace · atajos, avisos y vistas",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r4": {
+   "x": 0,
+   "y": 11766,
+   "text": "Propuesta · remaquetado por lotes (pendiente de aprobación) · flujo y lote",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r5": {
+   "x": 0,
+   "y": 13046,
+   "text": "Propuesta · remaquetado · plantilla, comparar y tamaños",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r6": {
+   "x": 0,
+   "y": 15346,
+   "text": "Propuesta · remaquetado · cierre y tema claro",
+   "kind": "title1",
+   "maxW": 5400
+  }
+ },
+ "designSystems": []
+}

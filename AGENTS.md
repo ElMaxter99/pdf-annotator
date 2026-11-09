@@ -1,6 +1,6 @@
 # AGENTS.md · Guía para agentes de IA y colaboradores
 
-Este archivo es la fuente de verdad para cualquier agente (Claude Code, Copilot, Codex, Cursor…) que trabaje en este repositorio. `CLAUDE.md` lo importa. Para el detalle técnico completo ve a [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Este archivo es la fuente de verdad para cualquier agente (Claude Code, Copilot, Codex, Cursor…) que trabaje en este repositorio. `CLAUDE.md` lo importa. Para el detalle técnico completo ve a [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Contexto de producto y dominio: [`docs/PRODUCT.md`](docs/PRODUCT.md), [`docs/DOMAIN.md`](docs/DOMAIN.md); decisiones: [`docs/DECISIONS.md`](docs/DECISIONS.md); hoja de ruta: [`docs/ROADMAP.md`](docs/ROADMAP.md); pruebas: [`docs/TESTING.md`](docs/TESTING.md).
 
 ## 1. Qué es la app
 **PDF Annotator** es una SPA en **Angular 20** (standalone components + signals) que permite:
@@ -32,7 +32,7 @@ src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
 ├─ pages/batch/              Remaquetado por lotes: lista (`batch.page`), ficha por PDF (`batch-item.page`) y componentes (comparar, pasos)
 ├─ pages/workspace/
-│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~3.340 líneas): render del PDF, sincronización del JSON, atajos y UI
+│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.130 líneas): render del PDF, sincronización del JSON, atajos y UI
 │  └─ components/            header · sidebar (4 pestañas: Documento, Anotaciones, Plantillas, Avanzado) · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle, toast-host (avisos globales)
 ├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace), annotation-import (normaliza JSON importado → anotaciones), toast (avisos no bloqueantes), session-store (última sesión en IndexedDB: PDF + anotaciones + página y zoom), batch-store (lote de remaquetado en IndexedDB), batch-export, pdf-info
@@ -45,6 +45,7 @@ src/app/
 src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
 public/                      logo, favicons, og-image, worker de pdf.js (assets/pdfjs)
 examples/                    PDF y JSON de ejemplo usados en README y capturas
+design/                      Diseños aprobados (lienzo de claude.ai, copias, propuestas). Fuera del build
 e2e/                         Tests Playwright (landing, editor, historial, importación, fuentes, exportación) + servidor estático
 .github/workflows/ci.yml     CI: build, tests unitarios y e2e en PRs y pushes a develop/master
 nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
@@ -59,6 +60,9 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **Coordenadas:** `x,y` en puntos PDF. El DOM usa `top = canvas.height − y·scale`. Conversión en `domToPdfCoords`.
 - **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
 
+## 4b. Diseño primero
+Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes de programarse** en el lienzo de claude.ai y lo aprueba la persona responsable; **no programes la interfaz hasta que esté aprobada**. Lo invisible (motor, tests, rendimiento, docs) avanza sin esperar. Detalle en [`docs/WORKFLOW.md`](docs/WORKFLOW.md) y [`design/README.md`](design/README.md): lienzo único, mesas `V-NN`/`P-NN`, tokens de `styles.scss`, anchos de escritorio y ambos temas, copia del diseño aprobado en `design/canvas/`. Incluye reglas de estilo, feedback, accesibilidad y autonomía.
+
 ## 5. Reglas de seguridad (no negociables)
 1. **Nunca evalúes entrada del usuario** (`eval`, `Function`, `new Function`, `setTimeout(string)`). El JSON "flexible" se parsea con `utils/loose-json.ts`.
 2. **No uses `innerHTML` / `bypassSecurityTrust*`** con datos del usuario (textos de anotaciones, nombres de plantilla/fuente). Usa `textContent` o bindings de Angular.
@@ -71,7 +75,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **Nuevo atajo:** añade el caso en `handlePlainShortcut` (`workspace.page.ts`), la fila en `shortcuts-dialog.component.ts`, las claves `shortcuts.items.*` en los 7 idiomas y la tabla del README.
 - **Nuevo campo de anotación:** `models/annotation.model.ts` → `prepareFieldForStorage/Form` → `serializeFieldForJson` (campos avanzados) → `AnnotationImportService.normalizeImportedCoordinates` (+ `utils/annotation-fields.utils.ts`) → template del editor (`annotation-editor.component.html`, un único formulario) → render (`redrawAllForPage`) → export PDF (`PdfExportService.exportAnnotatedPdf`, ya dibuja con los datos que le pasa la página).
 - **Nuevo idioma:** añade `translations/xx.json`, impórtalo en `translation.service.ts` (`LANGUAGES`, `TRANSLATIONS`) y la etiqueta en `app.languages.xx`.
-- **Cambio de layout:** revisa tres anchos (≥1650, ~1280 y <960 px) y ambos temas.
+- **Cambio de layout:** la app se diseña solo para escritorio; revisa ~1650 y ~1280 px de ancho y ambos temas. El CSS móvil que ya existe se conserva pero no se diseña ni se amplía.
 
 ## 7. Trampas conocidas
 - Los editores de crear (`preview`) y editar (`edit`) comparten **un único** componente (`annotation-editor`, input `mode`). Cualquier campo nuevo se añade una sola vez; ojo con las reglas `locked` (solo aplican en modo `edit`).
@@ -92,6 +96,6 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 ## 8. Definición de terminado
 - [ ] `npm run build`, `npm run test:ci` y `npm run e2e` pasan.
 - [ ] Textos nuevos traducidos en 7 idiomas.
-- [ ] Probado en oscuro y claro, escritorio y móvil.
+- [ ] Probado en oscuro y claro, escritorio (1650 y 1280 px).
 - [ ] README/CHANGELOG/atajos actualizados si cambia el comportamiento visible.
 - [ ] Sin evaluación de entrada del usuario ni HTML sin sanear.

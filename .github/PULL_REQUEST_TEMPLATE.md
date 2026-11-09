@@ -11,7 +11,7 @@
 ## ✅ Checklist
 - [ ] `npm run build` y `npm test` pasan.
 - [ ] Textos nuevos traducidos en los 7 idiomas (`npm run i18n:check`).
-- [ ] Probado en tema oscuro y claro, escritorio y móvil.
+- [ ] Probado en tema oscuro y claro, escritorio.
 - [ ] Sin `eval`/`Function` ni HTML sin sanear con datos del usuario.
 - [ ] README, `AGENTS.md`/`docs/` y `CHANGELOG.md` actualizados si procede.
 

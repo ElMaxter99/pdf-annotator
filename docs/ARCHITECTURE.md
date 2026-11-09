@@ -97,8 +97,8 @@ La plantilla "Predeterminada" es sintética y no se puede borrar. Todos los acce
 ## 8b. Panel lateral
 El sidebar tiene cuatro pestañas (patrón WAI-ARIA tabs: `role=tablist/tab/tabpanel`, flechas/Inicio/Fin): **Documento** (cambiar PDF, miniaturas), **Anotaciones** (editor/árbol JSON, importar/aplicar, contador en la insignia), **Plantillas** y **Avanzado** (fuentes, guías, campos extra del JSON). Las coordenadas del cursor quedan sobre las pestañas. La pestaña activa vive en `WorkspacePageComponent.sidebarTab`; los paneles inactivos se ocultan con `[hidden]` para no destruir sus referencias.
 
-## 9. Layout y responsive
-Shell `.app--workspace`: grid `header / sidebar+viewer / footer`, `100dvh`, scroll independiente en sidebar y visor. Sidebar `clamp(320px, 28vw, 440px)`, minimizable a 72 px (`B`). < 960 px: una columna (visor → panel). Cabecera: una fila; etiquetas ocultas < 1650 px (tooltips con atajo).
+## 9. Layout (diseñado solo para escritorio)
+Shell `.app--workspace`: grid `header / sidebar+viewer / footer`, `100dvh`, scroll independiente en sidebar y visor. Sidebar `clamp(320px, 28vw, 440px)`, minimizable a 72 px (`B`). El CSS tiene un modo de una columna por debajo de 960 px (visor → panel): se conserva pero no se diseña ni se prueba como producto (decisión 11). Cabecera: una fila; etiquetas ocultas < 1650 px (tooltips con atajo).
 
 ## 10. Seguridad
 - Parser JSON sin evaluación (`utils/loose-json.ts`, ignora `__proto__`, profundidad máx. 64).
@@ -107,4 +107,4 @@ Shell `.app--workspace`: grid `header / sidebar+viewer / footer`, `100dvh`, scro
 - Sin backend: el PDF nunca sale del navegador.
 
 ## 11. Deuda técnica y hoja de ruta
-Ver [`PROPUESTA_MEJORAS.md`](../PROPUESTA_MEJORAS.md): dividir `workspace.page.ts`, extraer `<app-annotation-editor>`, pestañas en el sidebar, persistencia de sesión con IndexedDB, toasts en vez de `alert`.
+Ver [`ROADMAP.md`](ROADMAP.md). Pendiente principal: dividir `workspace.page.ts` (render del PDF, miniaturas y sincronización del JSON).
