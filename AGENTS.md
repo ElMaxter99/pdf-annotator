@@ -60,7 +60,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
 
 ## 4b. Diseño primero
-Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes de programarse** en el lienzo de claude.ai y lo aprueba la persona responsable; **no programes la interfaz hasta que esté aprobada**. Lo invisible (motor, tests, rendimiento, docs) avanza sin esperar. Detalle en [`docs/WORKFLOW.md`](docs/WORKFLOW.md) y [`design/README.md`](design/README.md): lienzo único, mesas `V-NN`/`P-NN`, tokens de `styles.scss`, tres anchos y ambos temas, copia del diseño aprobado en `design/canvas/`.
+Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes de programarse** en el lienzo de claude.ai y lo aprueba la persona responsable; **no programes la interfaz hasta que esté aprobada**. Lo invisible (motor, tests, rendimiento, docs) avanza sin esperar. Detalle en [`docs/WORKFLOW.md`](docs/WORKFLOW.md) y [`design/README.md`](design/README.md): lienzo único, mesas `V-NN`/`P-NN`, tokens de `styles.scss`, tres anchos y ambos temas, copia del diseño aprobado en `design/canvas/`. Incluye reglas de estilo, feedback, accesibilidad y autonomía.
 
 ## 5. Reglas de seguridad (no negociables)
 1. **Nunca evalúes entrada del usuario** (`eval`, `Function`, `new Function`, `setTimeout(string)`). El JSON "flexible" se parsea con `utils/loose-json.ts`.
