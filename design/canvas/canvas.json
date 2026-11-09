@@ -1,26 +1,212 @@
 {
-  "v": 3,
-  "createdOnFiles": { "v": 1, "at": "2026-11-09T15:35:00Z" },
-  "title": "PDF Annotator · Diseño de la interfaz",
-  "launch": { "view": "canvas" },
-  "boards": {
-    "Main.dc.html": { "x": 0, "y": 0, "w": 1280, "h": 760, "title": "Tokens de diseño" }
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-09T15:35:00Z"
+ },
+ "title": "PDF Annotator · Diseño de la interfaz",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 760,
+   "title": "Tokens de diseño"
   },
-  "order": ["Main.dc.html"],
-  "notes": {
-    "titulo": {
-      "x": 0,
-      "y": -300,
-      "text": "PDF Annotator · Referencia",
-      "kind": "title1",
-      "maxW": 1280
-    },
-    "convencion": {
-      "x": -420,
-      "y": 0,
-      "w": 340,
-      "text": "Convención: V-NN pantallas que ya existen, P-NN propuestas. Una fila por versión o propuesta, solo con las mesas que cambian. Se dibuja a tres anchos (≥1650, ~1280, <960 px) y en tema oscuro y claro cuando cambia el layout. Los tokens salen de src/styles.scss."
-    }
+  "V-01-landing.dc.html": {
+   "x": 0,
+   "y": 1140,
+   "w": 1720,
+   "h": 1697,
+   "title": "V-01 Landing"
   },
-  "designSystems": []
+  "V-02-landing-claro.dc.html": {
+   "x": 1800,
+   "y": 1140,
+   "w": 1720,
+   "h": 1697,
+   "title": "V-02 Landing claro"
+  },
+  "V-03-landing-movil.dc.html": {
+   "x": 3600,
+   "y": 1140,
+   "w": 430,
+   "h": 1586,
+   "title": "V-03 Landing móvil"
+  },
+  "V-04-workspace-anotaciones.dc.html": {
+   "x": 0,
+   "y": 3217,
+   "w": 1720,
+   "h": 900,
+   "title": "V-04 Workspace · Anotaciones"
+  },
+  "V-05-workspace-documento.dc.html": {
+   "x": 1800,
+   "y": 3217,
+   "w": 1720,
+   "h": 900,
+   "title": "V-05 Workspace · Documento"
+  },
+  "V-06-workspace-plantillas.dc.html": {
+   "x": 3600,
+   "y": 3217,
+   "w": 1720,
+   "h": 900,
+   "title": "V-06 Workspace · Plantillas"
+  },
+  "V-07-workspace-avanzado.dc.html": {
+   "x": 0,
+   "y": 4237,
+   "w": 1720,
+   "h": 900,
+   "title": "V-07 Workspace · Avanzado"
+  },
+  "V-08-workspace-anotaciones-claro.dc.html": {
+   "x": 1800,
+   "y": 4237,
+   "w": 1720,
+   "h": 900,
+   "title": "V-08 Workspace · Anotaciones (claro)"
+  },
+  "V-09-workspace-1280.dc.html": {
+   "x": 3600,
+   "y": 4237,
+   "w": 1280,
+   "h": 800,
+   "title": "V-09 Workspace 1280"
+  },
+  "V-10-workspace-movil.dc.html": {
+   "x": 0,
+   "y": 5517,
+   "w": 430,
+   "h": 1786,
+   "title": "V-10 Workspace móvil"
+  },
+  "V-11-crear-anotacion-editor-flotante.dc.html": {
+   "x": 510,
+   "y": 5517,
+   "w": 1720,
+   "h": 900,
+   "title": "V-11 Crear anotación (editor flotante)"
+  },
+  "V-12-editar-anotacion-editor-flotante.dc.html": {
+   "x": 2310,
+   "y": 5517,
+   "w": 1720,
+   "h": 900,
+   "title": "V-12 Editar anotación (editor flotante)"
+  },
+  "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html": {
+   "x": 0,
+   "y": 7683,
+   "w": 1720,
+   "h": 900,
+   "title": "V-13 Selección múltiple y barra de alineación"
+  },
+  "V-14-dialogo-de-atajos.dc.html": {
+   "x": 1800,
+   "y": 7683,
+   "w": 1720,
+   "h": 900,
+   "title": "V-14 Diálogo de atajos"
+  },
+  "V-15-json-con-error-de-sintaxis.dc.html": {
+   "x": 3600,
+   "y": 7683,
+   "w": 1720,
+   "h": 900,
+   "title": "V-15 JSON con error de sintaxis"
+  },
+  "V-16-aviso-de-importacion-toast.dc.html": {
+   "x": 0,
+   "y": 8703,
+   "w": 1720,
+   "h": 900,
+   "title": "V-16 Aviso de importación (toast)"
+  },
+  "V-17-guias-y-rejilla-activas.dc.html": {
+   "x": 1800,
+   "y": 8703,
+   "w": 1720,
+   "h": 900,
+   "title": "V-17 Guías y rejilla activas"
+  },
+  "V-18-arbol-json.dc.html": {
+   "x": 3600,
+   "y": 8703,
+   "w": 1720,
+   "h": 900,
+   "title": "V-18 Árbol JSON"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "V-01-landing.dc.html",
+  "V-02-landing-claro.dc.html",
+  "V-03-landing-movil.dc.html",
+  "V-04-workspace-anotaciones.dc.html",
+  "V-05-workspace-documento.dc.html",
+  "V-06-workspace-plantillas.dc.html",
+  "V-07-workspace-avanzado.dc.html",
+  "V-08-workspace-anotaciones-claro.dc.html",
+  "V-09-workspace-1280.dc.html",
+  "V-10-workspace-movil.dc.html",
+  "V-11-crear-anotacion-editor-flotante.dc.html",
+  "V-12-editar-anotacion-editor-flotante.dc.html",
+  "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html",
+  "V-14-dialogo-de-atajos.dc.html",
+  "V-15-json-con-error-de-sintaxis.dc.html",
+  "V-16-aviso-de-importacion-toast.dc.html",
+  "V-17-guias-y-rejilla-activas.dc.html",
+  "V-18-arbol-json.dc.html"
+ ],
+ "notes": {
+  "t0": {
+   "x": 0,
+   "y": -300,
+   "text": "Referencia · tokens",
+   "kind": "title1",
+   "maxW": 1280
+  },
+  "convencion": {
+   "x": -420,
+   "y": 0,
+   "w": 340,
+   "text": "Convención: V-NN pantallas que ya existen, P-NN propuestas. Una fila por versión o propuesta, solo con las mesas que cambian. Las mesas V-01 a V-18 son capturas del DOM real de la app v1.5.0 (1:1): textos, medidas y colores salen del código. Las imágenes del visor y las miniaturas son del PDF de ejemplo; las miniaturas aparecen como cajas grises."
+  },
+  "r0": {
+   "x": 0,
+   "y": 840,
+   "text": "Landing",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r1": {
+   "x": 0,
+   "y": 2917,
+   "text": "Workspace · pestañas y temas",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r2": {
+   "x": 0,
+   "y": 5217,
+   "text": "Workspace · móvil y editores",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r3": {
+   "x": 0,
+   "y": 7383,
+   "text": "Workspace · selección, atajos y avisos",
+   "kind": "title1",
+   "maxW": 5400
+  }
+ },
+ "designSystems": []
 }

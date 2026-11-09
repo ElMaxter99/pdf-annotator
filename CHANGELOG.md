@@ -1,7 +1,7 @@
 ## Unreleased
 ### Documentation
 - Context docs for people and agents: `docs/PRODUCT.md`, `DOMAIN.md`, `DECISIONS.md`, `ROADMAP.md`, `TESTING.md` and `WORKFLOW.md` (design-first flow); `PROPUESTA_MEJORAS.md` moved to `docs/archive/`
-- Design canvas created (link in `design/README.md`) with the design tokens board
+- Design canvas created (link in `design/README.md`) with the design tokens board and 1:1 captures of the current app (`V-01` to `V-18`: landing, workspace tabs, editors, selection, shortcuts, errors, toasts, guides, JSON tree; dark, light, 1280 and mobile) plus `design/tools/` to regenerate them
 - `design/` folder (outside the build and the Docker image) for approved designs; `AGENTS.md` and `CLAUDE.md` updated (real size of `workspace.page.ts`, design-first section)
 
 ### Security
