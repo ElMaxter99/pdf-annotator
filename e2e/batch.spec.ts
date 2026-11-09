@@ -83,6 +83,7 @@ test('exports the JSON and the annotated PDF as loose files', async ({ page }) =
   await page.locator('input[type=file][accept^="application/pdf"]').setInputFiles(pdfFile('uno-nuevo.pdf'));
   await expect(page.locator('app-batch-compare')).toBeVisible();
   await page.getByRole('button', { name: 'Guardar y siguiente' }).click();
+  await page.waitForURL(/\/batch(\/.+)?$/);
   await page.goto('/batch');
   await page.getByRole('button', { name: /Descargar \(1\)/ }).click();
   const names: string[] = [];
