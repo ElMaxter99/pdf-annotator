@@ -574,7 +574,12 @@
       "save": "Guardar",
       "unsaved": "Cambios sin guardar",
       "savedToast": "Remaquetado guardado.",
-      "onlyA": "Este PDF no tiene versión B: aquí ves la versión A con sus coordenadas. Sube una versión B para compararla."
+      "onlyA": "Este PDF no tiene versión B: aquí ves la versión A con sus coordenadas. Sube una versión B para compararla.",
+      "edit": "Coordenadas que se mueven",
+      "editA": "Ajustar A",
+      "editB": "Ajustar B",
+      "copyAB": "Copiar A a B",
+      "backA": "Volver a A"
     },
     "export": {
       "title": "Descargar el lote",
@@ -783,7 +788,8 @@
       "openPdf": "Abrir {{name}}",
       "pillTemplate": "Plantilla",
       "pillB": "Versión B",
-      "pillOnlyA": "Solo versión A"
+      "pillOnlyA": "Solo versión A",
+      "testData": "Datos de prueba (opcional)"
     },
     "templates": {
       "title": "Importar plantillas",
@@ -842,6 +848,58 @@
       "unsaved": "Hay cambios sin guardar: se guardarán al validar.",
       "confirm": "Sí, validar",
       "done": "{{name}} validado"
+    },
+    "step": {
+      "label": "Pasos previos",
+      "badge": "Paso previo · aún no hay panel",
+      "subtitle": "Preparar el lote",
+      "s1": {
+        "title": "Subir PDF",
+        "hint": "Obligatorio"
+      },
+      "s2": {
+        "title": "Plantillas",
+        "hint": "Opcional · se puede hacer luego"
+      },
+      "s3": {
+        "title": "Empezar",
+        "hint": "Revisar y entrar al panel"
+      },
+      "back": {
+        "landing": "← Volver a la landing"
+      },
+      "next": {
+        "templates": "Siguiente: plantillas →",
+        "start": "Siguiente: empezar →"
+      },
+      "prev": "← Anterior",
+      "skip": "Saltar este paso",
+      "ready": "Todo listo para entrar al panel",
+      "summary": {
+        "paired": "Plantillas emparejadas con su PDF",
+        "noTemplate": "PDF sin plantilla (podrás añadirla desde el panel)",
+        "unused": "Plantillas sin PDF",
+        "note": "Entras al panel con todo en versión A. La versión B, la validación y la descarga se hacen allí, PDF a PDF."
+      },
+      "optional": "Opcional"
+    },
+    "tabs": {
+      "label": "PDF abiertos",
+      "close": "Cerrar {{name}}"
+    },
+    "testData": {
+      "title": "Datos de prueba",
+      "help": "Opcional. Pega un JSON para que la vista previa pinte valores reales en lugar de los de muestra. Solo dura esta sesión y no se guarda.",
+      "active": "Datos de prueba activos: la vista previa y el PDF usan estos valores.",
+      "done": "Hecho"
+    },
+    "menu": {
+      "more": "Más acciones de {{name}}",
+      "open": "Abrir",
+      "replaceB": "Subir o reemplazar versión B…",
+      "removeB": "Quitar la versión B",
+      "unvalidate": "Quitar la validación",
+      "remove": "Quitar del lote"
     }
   },
   "preview": {

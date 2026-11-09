@@ -574,7 +574,12 @@
       "save": "Desar",
       "unsaved": "Canvis sense desar",
       "savedToast": "Remaquetatge desat.",
-      "onlyA": "Aquest PDF no té versió B: aquí veus la versió A amb les seves coordenades. Puja una versió B per comparar-la."
+      "onlyA": "Aquest PDF no té versió B: aquí veus la versió A amb les seves coordenades. Puja una versió B per comparar-la.",
+      "edit": "Coordenades que es mouen",
+      "editA": "Ajusta A",
+      "editB": "Ajusta B",
+      "copyAB": "Copia A a B",
+      "backA": "Torna a A"
     },
     "export": {
       "title": "Baixar el lot",
@@ -783,7 +788,8 @@
       "openPdf": "Obre {{name}}",
       "pillTemplate": "Plantilla",
       "pillB": "Versió B",
-      "pillOnlyA": "Només versió A"
+      "pillOnlyA": "Només versió A",
+      "testData": "Dades de prova (opcional)"
     },
     "templates": {
       "title": "Importa plantilles",
@@ -842,6 +848,58 @@
       "unsaved": "Hi ha canvis sense desar: es desaran en validar.",
       "confirm": "Sí, valida",
       "done": "{{name}} validat"
+    },
+    "step": {
+      "label": "Passos previs",
+      "badge": "Pas previ · encara no hi ha tauler",
+      "subtitle": "Prepara el lot",
+      "s1": {
+        "title": "Puja PDF",
+        "hint": "Obligatori"
+      },
+      "s2": {
+        "title": "Plantilles",
+        "hint": "Opcional · es pot fer després"
+      },
+      "s3": {
+        "title": "Comença",
+        "hint": "Revisa i entra al tauler"
+      },
+      "back": {
+        "landing": "← Torna a la pàgina d’inici"
+      },
+      "next": {
+        "templates": "Següent: plantilles →",
+        "start": "Següent: comença →"
+      },
+      "prev": "← Anterior",
+      "skip": "Salta aquest pas",
+      "ready": "Tot a punt per entrar al tauler",
+      "summary": {
+        "paired": "Plantilles emparellades amb el seu PDF",
+        "noTemplate": "PDF sense plantilla (la podràs afegir des del tauler)",
+        "unused": "Plantilles sense PDF",
+        "note": "Entres al tauler amb tot en versió A. La versió B, la validació i la descàrrega es fan allà, PDF a PDF."
+      },
+      "optional": "Opcional"
+    },
+    "tabs": {
+      "label": "PDF oberts",
+      "close": "Tanca {{name}}"
+    },
+    "testData": {
+      "title": "Dades de prova",
+      "help": "Opcional. Enganxa un JSON perquè la vista prèvia pinti valors reals en lloc dels de mostra. Només dura aquesta sessió i no es desa.",
+      "active": "Dades de prova actives: la vista prèvia i el PDF fan servir aquests valors.",
+      "done": "Fet"
+    },
+    "menu": {
+      "more": "Més accions de {{name}}",
+      "open": "Obre",
+      "replaceB": "Puja o reemplaça la versió B…",
+      "removeB": "Treu la versió B",
+      "unvalidate": "Treu la validació",
+      "remove": "Treu del lot"
     }
   },
   "preview": {

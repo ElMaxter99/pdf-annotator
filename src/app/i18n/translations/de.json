@@ -574,7 +574,12 @@
       "save": "Speichern",
       "unsaved": "Ungespeicherte Änderungen",
       "savedToast": "Neulayout gespeichert.",
-      "onlyA": "Dieses PDF hat keine Version B: Du siehst Version A mit ihren Koordinaten. Lade eine Version B zum Vergleichen hoch."
+      "onlyA": "Dieses PDF hat keine Version B: Du siehst Version A mit ihren Koordinaten. Lade eine Version B zum Vergleichen hoch.",
+      "edit": "Verschobene Koordinaten",
+      "editA": "A anpassen",
+      "editB": "B anpassen",
+      "copyAB": "A nach B kopieren",
+      "backA": "Zurück zu A"
     },
     "export": {
       "title": "Stapel herunterladen",
@@ -783,7 +788,8 @@
       "openPdf": "{{name}} öffnen",
       "pillTemplate": "Vorlage",
       "pillB": "Version B",
-      "pillOnlyA": "Nur Version A"
+      "pillOnlyA": "Nur Version A",
+      "testData": "Testdaten (optional)"
     },
     "templates": {
       "title": "Vorlagen importieren",
@@ -842,6 +848,58 @@
       "unsaved": "Es gibt ungespeicherte Änderungen: Sie werden beim Validieren gespeichert.",
       "confirm": "Ja, validieren",
       "done": "{{name}} validiert"
+    },
+    "step": {
+      "label": "Vorbereitende Schritte",
+      "badge": "Vorbereitung · noch keine Übersicht",
+      "subtitle": "Charge vorbereiten",
+      "s1": {
+        "title": "PDF hochladen",
+        "hint": "Erforderlich"
+      },
+      "s2": {
+        "title": "Vorlagen",
+        "hint": "Optional · später möglich"
+      },
+      "s3": {
+        "title": "Starten",
+        "hint": "Prüfen und zur Übersicht"
+      },
+      "back": {
+        "landing": "← Zurück zur Startseite"
+      },
+      "next": {
+        "templates": "Weiter: Vorlagen →",
+        "start": "Weiter: starten →"
+      },
+      "prev": "← Zurück",
+      "skip": "Diesen Schritt überspringen",
+      "ready": "Bereit für die Übersicht",
+      "summary": {
+        "paired": "Vorlagen mit ihrem PDF verknüpft",
+        "noTemplate": "PDF ohne Vorlage (in der Übersicht ergänzbar)",
+        "unused": "Vorlagen ohne PDF",
+        "note": "Sie starten mit allem als Version A. Version B, Validierung und Download erfolgen dort, PDF für PDF."
+      },
+      "optional": "Optional"
+    },
+    "tabs": {
+      "label": "Geöffnete PDFs",
+      "close": "{{name}} schließen"
+    },
+    "testData": {
+      "title": "Testdaten",
+      "help": "Optional. Fügen Sie ein JSON ein, damit die Vorschau echte statt Beispielwerte zeigt. Gilt nur für diese Sitzung und wird nicht gespeichert.",
+      "active": "Testdaten aktiv: Vorschau und PDF verwenden diese Werte.",
+      "done": "Fertig"
+    },
+    "menu": {
+      "more": "Weitere Aktionen für {{name}}",
+      "open": "Öffnen",
+      "replaceB": "Version B hochladen oder ersetzen …",
+      "removeB": "Version B entfernen",
+      "unvalidate": "Validierung entfernen",
+      "remove": "Aus der Charge entfernen"
     }
   },
   "preview": {

@@ -22,8 +22,14 @@ import { PreviewSettingsService } from '../../../services/preview-settings.servi
 import { resolveFieldPreview } from '../../../utils/preview-values.utils';
 import { boxesOverlap, fieldBox, formatPageSize } from '../../../utils/page-size.utils';
 
+export type CoordSet = 'A' | 'B';
 export type CompareMode = 'original' | 'new' | 'side' | 'overlay';
 type Pane = 'orig' | 'new';
+
+interface Sets {
+  a: PageAnnotations[];
+  b: PageAnnotations[];
+}
 
 interface PaneView {
   width: number;
@@ -60,7 +66,7 @@ export class BatchCompareComponent implements OnDestroy {
   private readonly i18n = inject(TranslationService);
 
   readonly item = input.required<BatchItem>();
-  readonly saved = output<{ layout: PageAnnotations[]; next: boolean }>();
+  readonly saved = output<{ layout: PageAnnotations[] | null; template: PageAnnotations[] | null; next: boolean }>();
 
   private readonly origCanvas = viewChild<ElementRef<HTMLCanvasElement>>('origCanvas');
   private readonly newCanvas = viewChild<ElementRef<HTMLCanvasElement>>('newCanvas');
@@ -79,11 +85,14 @@ export class BatchCompareComponent implements OnDestroy {
   readonly views = signal<Record<Pane, PaneView | null>>({ orig: null, new: null });
   readonly selected = signal<number | null>(null);
   readonly layout = signal<PageAnnotations[]>([]);
+  /** Coordinates A (the template) and which of the two sets the fields drag. */
+  readonly tpl = signal<PageAnnotations[]>([]);
+  readonly edit = signal<CoordSet>('A');
   readonly dirty = signal(false);
   private readonly textBoxes = signal<readonly (readonly [number, number, number, number])[]>([]);
 
-  private undoStack: PageAnnotations[][] = [];
-  private redoStack: PageAnnotations[][] = [];
+  private undoStack: Sets[] = [];
+  private redoStack: Sets[] = [];
   readonly historyVersion = signal(0);
   readonly canUndo = computed(() => this.historyVersion() >= 0 && this.undoStack.length > 0);
   readonly canRedo = computed(() => this.historyVersion() >= 0 && this.redoStack.length > 0);
@@ -99,7 +108,8 @@ export class BatchCompareComponent implements OnDestroy {
     originX: number;
     originY: number;
     moved: boolean;
-    before: PageAnnotations[];
+    before: Sets;
+    pane: Pane;
   } | null = null;
 
   readonly pageCount = computed(() =>
@@ -128,6 +138,7 @@ export class BatchCompareComponent implements OnDestroy {
     effect(() => {
       const item = this.item();
       this.layout.set(cloneAnnotationPages(item.layout ?? []));
+      this.tpl.set(cloneAnnotationPages(item.template ?? []));
       this.undoStack = [];
       this.redoStack = [];
       this.historyVersion.update((v) => v + 1);
@@ -138,7 +149,10 @@ export class BatchCompareComponent implements OnDestroy {
     });
     effect(() => {
       const hasNew = this.hasNew();
-      untracked(() => this.mode.set(hasNew ? 'side' : 'original'));
+      untracked(() => {
+        this.mode.set(hasNew ? 'side' : 'original');
+        this.edit.set(hasNew ? 'B' : 'A');
+      });
     });
     effect(() => {
       // Re-render whenever page, zoom or documents change.
@@ -198,8 +212,7 @@ export class BatchCompareComponent implements OnDestroy {
     const view = this.views()[pane];
     if (!view) return [];
     const scale = this.scales()[pane];
-    const source =
-      pane === 'orig' ? this.item().template ?? [] : this.layout();
+    const source = pane === 'orig' ? this.tpl() : this.layout();
     const page = source.find((p) => p.num === this.pageNumber());
     if (!page) return [];
     const misplaced = pane === 'new' ? this.textBoxes() : [];
@@ -236,11 +249,50 @@ export class BatchCompareComponent implements OnDestroy {
     this.selected.set(index);
   }
 
-  onFieldPointerDown(event: PointerEvent, view: FieldView) {
+  /** The pane whose fields can be moved: A before there is a version B, then the chosen set. */
+  canEdit(pane: Pane): boolean {
+    return pane === 'orig' ? this.edit() === 'A' : this.hasNew() && this.edit() === 'B';
+  }
+
+  setEdit(set: CoordSet) {
+    if (set === 'B' && !this.hasNew()) return;
+    this.selected.set(null);
+    this.edit.set(set);
+  }
+
+  private snapshot(): Sets {
+    return { a: cloneAnnotationPages(this.tpl()), b: cloneAnnotationPages(this.layout()) };
+  }
+
+  private restore(sets: Sets) {
+    this.tpl.set(sets.a);
+    this.layout.set(sets.b);
+  }
+
+  private markDirty(_pane: Pane) {
+    this.dirty.set(true);
+  }
+
+  /** Starts version B from the coordinates A, as many times as needed. */
+  copyAToB() {
+    if (!this.hasNew()) return;
+    const before = this.snapshot();
+    this.layout.set(cloneAnnotationPages(this.tpl()));
+    this.pushHistory(before);
+    this.markDirty('new');
+    this.edit.set('B');
+  }
+
+  /** Goes back to work on the coordinates A. */
+  backToA() {
+    this.setEdit('A');
+  }
+
+  onFieldPointerDown(event: PointerEvent, view: FieldView, pane: Pane = 'new') {
     if (event.button !== 0) return;
     event.preventDefault();
     this.selected.set(view.index);
-    this.activePane.set('new');
+    this.activePane.set(pane);
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     this.drag = {
       index: view.index,
@@ -249,19 +301,20 @@ export class BatchCompareComponent implements OnDestroy {
       originX: view.field.x,
       originY: view.field.y,
       moved: false,
-      before: cloneAnnotationPages(this.layout()),
+      before: this.snapshot(),
+      pane,
     };
   }
 
   onFieldPointerMove(event: PointerEvent) {
     const drag = this.drag;
     if (!drag) return;
-    const scale = this.scales().new;
+    const scale = this.scales()[drag.pane];
     const dx = (event.clientX - drag.startX) / scale;
     const dy = (event.clientY - drag.startY) / scale;
     if (!drag.moved && Math.hypot(dx, dy) * scale < 3) return;
     drag.moved = true;
-    this.setFieldPosition(drag.index, drag.originX + dx, drag.originY - dy);
+    this.setFieldPosition(drag.pane, drag.index, drag.originX + dx, drag.originY - dy);
   }
 
   onFieldPointerUp() {
@@ -269,11 +322,11 @@ export class BatchCompareComponent implements OnDestroy {
     this.drag = null;
     if (drag?.moved) {
       this.pushHistory(drag.before);
-      this.dirty.set(true);
+      this.markDirty(drag.pane);
     }
   }
 
-  onFieldKeydown(event: KeyboardEvent, view: FieldView) {
+  onFieldKeydown(event: KeyboardEvent, view: FieldView, pane: Pane = 'new') {
     const step = event.shiftKey ? 10 : 1;
     const moves: Record<string, [number, number]> = {
       ArrowLeft: [-step, 0],
@@ -284,17 +337,18 @@ export class BatchCompareComponent implements OnDestroy {
     const move = moves[event.key];
     if (!move) return;
     event.preventDefault();
-    const before = cloneAnnotationPages(this.layout());
-    this.setFieldPosition(view.index, view.field.x + move[0], view.field.y + move[1]);
+    const before = this.snapshot();
+    this.setFieldPosition(pane, view.index, view.field.x + move[0], view.field.y + move[1]);
     this.pushHistory(before);
-    this.dirty.set(true);
+    this.markDirty(pane);
   }
 
-  private setFieldPosition(index: number, x: number, y: number) {
+  private setFieldPosition(pane: Pane, index: number, x: number, y: number) {
     const roundTo = (value: number) => Math.round(value * 100) / 100;
-    const pageIndex = this.layout().findIndex((p) => p.num === this.pageNumber());
+    const target = pane === 'orig' ? this.tpl : this.layout;
+    const pageIndex = target().findIndex((p) => p.num === this.pageNumber());
     if (pageIndex < 0) return;
-    this.layout.update((pages) => {
+    target.update((pages) => {
       const current = pages[pageIndex]?.fields[index];
       return current
         ? updateFieldInPages(pageIndex, index, { ...current, x: roundTo(x), y: roundTo(y) }, pages)
@@ -302,7 +356,7 @@ export class BatchCompareComponent implements OnDestroy {
     });
   }
 
-  private pushHistory(before: PageAnnotations[]) {
+  private pushHistory(before: Sets) {
     this.undoStack.push(before);
     if (this.undoStack.length > HISTORY_LIMIT) this.undoStack.shift();
     this.redoStack = [];
@@ -312,8 +366,8 @@ export class BatchCompareComponent implements OnDestroy {
   undo() {
     const previous = this.undoStack.pop();
     if (!previous) return;
-    this.redoStack.push(cloneAnnotationPages(this.layout()));
-    this.layout.set(previous);
+    this.redoStack.push(this.snapshot());
+    this.restore(previous);
     this.historyVersion.update((v) => v + 1);
     this.dirty.set(true);
   }
@@ -321,8 +375,8 @@ export class BatchCompareComponent implements OnDestroy {
   redo() {
     const next = this.redoStack.pop();
     if (!next) return;
-    this.undoStack.push(cloneAnnotationPages(this.layout()));
-    this.layout.set(next);
+    this.undoStack.push(this.snapshot());
+    this.restore(next);
     this.historyVersion.update((v) => v + 1);
     this.dirty.set(true);
   }
@@ -344,8 +398,16 @@ export class BatchCompareComponent implements OnDestroy {
     }
   }
 
+  private changed(now: PageAnnotations[], saved: PageAnnotations[] | null | undefined): boolean {
+    return JSON.stringify(now) !== JSON.stringify(saved ?? []);
+  }
+
   save(next: boolean) {
-    this.saved.emit({ layout: cloneAnnotationPages(this.layout()), next });
+    this.saved.emit({
+      layout: this.changed(this.layout(), this.item().layout) ? cloneAnnotationPages(this.layout()) : null,
+      template: this.changed(this.tpl(), this.item().template) ? cloneAnnotationPages(this.tpl()) : null,
+      next,
+    });
     this.dirty.set(false);
   }
 

@@ -1,10 +1,10 @@
-<div class="batch" (keydown)="onPageKeydown($event)">
+<div class="batch" (keydown)="onPageKeydown($event)" (click)="closeMenu()">
   <header class="batch__nav">
     <a class="batch__brand" routerLink="/landing" [attr.aria-label]="'batch.nav.home' | t">
       <img src="/logo.svg" alt="" width="32" height="32" />
       <span>Pdf Annotator <small>{{ 'batch.nav.subtitle' | t }}</small></span>
     </a>
-    <span class="tab-chip is-active" aria-current="page">▦ {{ 'batch.panel.tab' | t }}</span>
+    <app-batch-tabs></app-batch-tabs>
     <span class="spacer"></span>
     @if (store.items().length) {
       <div class="progressbox" role="status" aria-live="polite">
@@ -64,6 +64,7 @@
         <button type="button" class="btn btn--ghost btn--sm" (click)="pickFiles()">{{ 'batch.list.add' | t }}</button>
         <button type="button" class="btn btn--ghost btn--sm" id="open-templates" (click)="drawer.set('templates')">{{ 'batch.panel.importTemplates' | t }}</button>
         <button type="button" class="btn btn--ghost btn--sm" id="open-version-b" (click)="drawer.set('versionB')">{{ 'batch.panel.uploadB' | t }}</button>
+        <button type="button" class="btn btn--ghost btn--sm" id="open-test-data" (click)="drawer.set('testData')">{{ 'batch.panel.testData' | t }}</button>
         <button type="button" class="btn btn--ghost btn--sm" [class.btn--danger]="confirmRemove()" [disabled]="selected().size === 0" (click)="removeSelected()">
           {{ (confirmRemove() ? 'batch.list.confirmRemove' : 'batch.list.remove') | t : { count: selected().size } }}
         </button>
@@ -112,6 +113,18 @@
                 <span class="chip" [class]="'chip chip--' + row.status">{{ 'batch.status.' + row.status | t }}</span>
                 <span class="spacer"></span>
                 <button type="button" class="btn btn--sm" [class.btn--ghost]="row.status === 'validated'" (click)="open(row.item.id)">{{ 'batch.action.' + actionKey(row.status) | t }}</button>
+                <div class="pmenu">
+                  <button type="button" class="btn btn--ghost btn--sm pmenu__btn" [attr.aria-label]="'batch.menu.more' | t : { name: row.item.name }" aria-haspopup="menu" [attr.aria-expanded]="menuFor() === row.item.id" (click)="toggleMenu(row.item.id, $event)">⋯</button>
+                  @if (menuFor() === row.item.id) {
+                    <ul class="pmenu__list" role="menu" (click)="$event.stopPropagation()" (keydown.escape)="closeMenu()">
+                      <li role="none"><button type="button" role="menuitem" (click)="open(row.item.id)">{{ 'batch.menu.open' | t }}</button></li>
+                      <li role="none"><button type="button" role="menuitem" (click)="menuOpenB()">{{ 'batch.menu.replaceB' | t }}</button></li>
+                      @if (row.item.newPdf) { <li role="none"><button type="button" role="menuitem" (click)="menuRemoveB(row.item.id)">{{ 'batch.menu.removeB' | t }}</button></li> }
+                      @if (row.item.validated) { <li role="none"><button type="button" role="menuitem" (click)="menuUnvalidate(row.item.id)">{{ 'batch.menu.unvalidate' | t }}</button></li> }
+                      <li role="none"><button type="button" role="menuitem" class="is-danger" (click)="menuRemove(row.item.id)">{{ 'batch.menu.remove' | t }}</button></li>
+                    </ul>
+                  }
+                </div>
               </div>
             </article>
           } @empty {
@@ -167,6 +180,7 @@
   @switch (drawer()) {
     @case ('templates') { <app-batch-templates-drawer (closed)="closeDrawer()"></app-batch-templates-drawer> }
     @case ('versionB') { <app-batch-version-b-drawer (closed)="closeDrawer()"></app-batch-version-b-drawer> }
+    @case ('testData') { <app-batch-test-data-drawer (closed)="closeDrawer()"></app-batch-test-data-drawer> }
   }
 
   @if (exportPhase() !== 'closed') {

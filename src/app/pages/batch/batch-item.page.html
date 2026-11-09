@@ -1,7 +1,7 @@
 <div class="item">
   @if (item(); as it) {
     <header class="item__nav">
-      <a class="back" routerLink="/batch">← {{ 'batch.item.backPanel' | t }}</a>
+      <app-batch-tabs [current]="it.id"></app-batch-tabs>
       <div class="item__title">
         <h1>{{ it.name }}</h1>
         <span class="cap">{{ 'batch.item.position' | t : { n: index() + 1, total: total() } }} · {{ sizeLabel(it.pageSize) }} · {{ bytes(it.pdf.size) }}</span>

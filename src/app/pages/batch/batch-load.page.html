@@ -2,8 +2,9 @@
   <header class="batch__nav">
     <a class="batch__brand" routerLink="/landing" [attr.aria-label]="'batch.nav.home' | t">
       <img src="/logo.svg" alt="" width="32" height="32" />
-      <span>Pdf Annotator <small>{{ 'batch.nav.subtitle' | t }}</small></span>
+      <span>Pdf Annotator <small>{{ 'batch.step.subtitle' | t }}</small></span>
     </a>
+    <span class="pill pill--warn">{{ 'batch.step.badge' | t }}</span>
     <span class="spacer"></span>
     <app-mode-switch active="batch"></app-mode-switch>
   </header>
@@ -13,7 +14,19 @@
 
   <h1 class="visually-hidden">{{ 'batch.load.title' | t }}</h1>
 
-  <div class="cols">
+  <nav class="stepper card" role="list" [attr.aria-label]="'batch.step.label' | t">
+    @for (s of steps; track s.n) {
+      <div class="stepper__item" role="listitem" [class.is-on]="step() === s.n" [class.is-done]="step() > s.n" [attr.aria-current]="step() === s.n ? 'step' : null">
+        <span class="stepper__n" aria-hidden="true">{{ step() > s.n ? '✓' : s.n }}</span>
+        <span class="stepper__t">{{ s.title | t }}<small>{{ s.hint | t }}</small></span>
+      </div>
+      @if (s.n < 3) { <span class="stepper__line" [class.is-done]="step() > s.n" aria-hidden="true"></span> }
+    }
+  </nav>
+
+  <div class="wiz">
+    @switch (step()) {
+      @case (1) {
     <section class="card" [attr.aria-label]="'batch.load.pdfs.title' | t">
       <div class="card__head">
         <h2>{{ 'batch.load.pdfs.title' | t }}</h2>
@@ -44,10 +57,32 @@
         }
       </div>
     </section>
-
+      @if (report(); as rep) {
+        <div class="note note--warn" role="alert">
+          <div>
+            <b>{{ 'batch.upload.rejected' | t : { count: rep.rejected.length } }}</b>
+            <ul class="rejects">
+              @for (r of rep.rejected; track $index) {
+                <li><span class="bad">!</span> <span class="rejects__name">{{ r.name }}</span> <span class="cap">{{ rejectLabel(r.reason) }}</span></li>
+              }
+            </ul>
+            @if (rep.templatesFailed) { <p class="cap">{{ 'batch.load.summary.failedTemplates' | t : { count: rep.templatesFailed } }}</p> }
+          </div>
+          <button type="button" class="btn btn--ghost btn--sm" (click)="report.set(null)">{{ 'batch.upload.dismiss' | t }}</button>
+        </div>
+      }
+        <div class="wiz__foot">
+          <a class="btn btn--ghost" routerLink="/landing">{{ 'batch.step.back.landing' | t }}</a>
+          <span class="spacer"></span>
+          <span class="cap">🔒 {{ 'batch.privacy' | t }}</span>
+          <button type="button" id="step-next" class="btn" [disabled]="store.items().length === 0" (click)="go(2)">{{ 'batch.step.next.templates' | t }}</button>
+        </div>
+      }
+      @case (2) {
     <section class="card" [attr.aria-label]="'batch.load.templates.title' | t">
       <div class="card__head">
         <h2>{{ 'batch.load.templates.title' | t }}</h2>
+        <span class="pill">{{ 'batch.step.optional' | t }}</span>
         <div class="tabs" role="tablist" [attr.aria-label]="'batch.load.templates.title' | t">
           <button type="button" role="tab" class="tab" [class.is-active]="tab() === 'paste'" [attr.aria-selected]="tab() === 'paste'" (click)="setTab('paste')">{{ 'batch.load.tab.paste' | t }}</button>
           <button type="button" role="tab" class="tab" [class.is-active]="tab() === 'files'" [attr.aria-selected]="tab() === 'files'" (click)="setTab('files')">{{ 'batch.load.tab.files' | t }}</button>
@@ -113,12 +148,21 @@
         </div>
       }
     </section>
-
-    <aside class="card" [attr.aria-label]="'batch.load.summary.title' | t">
-      <span class="cap">{{ 'batch.load.summary.title' | t }}</span>
-      <h2 style="margin: 0; font-size: 20px">{{ 'batch.load.summary.ready' | t }}</h2>
+        <div class="wiz__foot">
+          <button type="button" class="btn btn--ghost" (click)="go(1)">{{ 'batch.step.prev' | t }}</button>
+          <span class="spacer"></span>
+          <button type="button" id="step-skip" class="btn btn--ghost" (click)="go(3)">{{ 'batch.step.skip' | t }}</button>
+          <button type="button" id="step-next" class="btn" (click)="go(3)">{{ 'batch.step.next.start' | t }}</button>
+        </div>
+      }
+      @case (3) {
+        <section class="card" [attr.aria-label]="'batch.load.summary.title' | t">
+          <h2 style="margin: 0; font-size: 20px">{{ 'batch.step.ready' | t }}</h2>
       <div class="sum"><span>{{ 'batch.load.summary.pdfs' | t }}</span><b>{{ store.items().length }}</b></div>
       <div class="sum"><span>{{ 'batch.load.summary.templates' | t }}</span><b>{{ validTemplates() }}</b></div>
+          <div class="sum"><span>{{ 'batch.step.summary.paired' | t }}</span><b>{{ pairedCount() }}</b></div>
+          <div class="sum"><span>{{ 'batch.step.summary.noTemplate' | t }}</span><b>{{ store.items().length - pairedCount() }}</b></div>
+          <div class="sum"><span>{{ 'batch.step.summary.unused' | t }}</span><b>{{ store.unusedTemplates().length }}</b></div>
       @if (report(); as rep) {
         <div class="note note--warn" role="alert">
           <div>
@@ -133,10 +177,14 @@
           <button type="button" class="btn btn--ghost btn--sm" (click)="report.set(null)">{{ 'batch.upload.dismiss' | t }}</button>
         </div>
       }
-      <span class="grow-y"></span>
-      <button type="button" class="btn" [disabled]="store.items().length === 0" (click)="goPanel()">{{ 'batch.load.summary.go' | t : { pdfs: store.items().length, templates: validTemplates() } }}</button>
-      @if (store.items().length === 0) { <p class="cap">{{ 'batch.load.summary.needPdfs' | t }}</p> }
-      <p class="cap">🔒 {{ 'batch.privacy' | t }}</p>
-    </aside>
+          <p class="note note--info" role="note">ⓘ {{ 'batch.step.summary.note' | t }}</p>
+        </section>
+        <div class="wiz__foot">
+          <button type="button" class="btn btn--ghost" (click)="go(2)">{{ 'batch.step.prev' | t }}</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn" [disabled]="store.items().length === 0" (click)="goPanel()">{{ 'batch.load.summary.go' | t : { pdfs: store.items().length, templates: validTemplates() } }}</button>
+        </div>
+      }
+    }
   </div>
 </div>

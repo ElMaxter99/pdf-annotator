@@ -574,7 +574,12 @@
       "save": "Salva",
       "unsaved": "Modifiche non salvate",
       "savedToast": "Impaginazione salvata.",
-      "onlyA": "Questo PDF non ha una versione B: qui vedi la versione A con le sue coordinate. Carica una versione B per confrontarla."
+      "onlyA": "Questo PDF non ha una versione B: qui vedi la versione A con le sue coordinate. Carica una versione B per confrontarla.",
+      "edit": "Coordinate che si spostano",
+      "editA": "Regola A",
+      "editB": "Regola B",
+      "copyAB": "Copia A in B",
+      "backA": "Torna ad A"
     },
     "export": {
       "title": "Scarica il lotto",
@@ -783,7 +788,8 @@
       "openPdf": "Apri {{name}}",
       "pillTemplate": "Modello",
       "pillB": "Versione B",
-      "pillOnlyA": "Solo versione A"
+      "pillOnlyA": "Solo versione A",
+      "testData": "Dati di prova (facoltativo)"
     },
     "templates": {
       "title": "Importa modelli",
@@ -842,6 +848,58 @@
       "unsaved": "Ci sono modifiche non salvate: verranno salvate con la convalida.",
       "confirm": "Sì, convalida",
       "done": "{{name}} convalidato"
+    },
+    "step": {
+      "label": "Passaggi preliminari",
+      "badge": "Passaggio preliminare · ancora nessun pannello",
+      "subtitle": "Prepara il lotto",
+      "s1": {
+        "title": "Carica PDF",
+        "hint": "Obbligatorio"
+      },
+      "s2": {
+        "title": "Modelli",
+        "hint": "Facoltativo · si può fare dopo"
+      },
+      "s3": {
+        "title": "Inizia",
+        "hint": "Controlla ed entra nel pannello"
+      },
+      "back": {
+        "landing": "← Torna alla pagina iniziale"
+      },
+      "next": {
+        "templates": "Avanti: modelli →",
+        "start": "Avanti: inizia →"
+      },
+      "prev": "← Indietro",
+      "skip": "Salta questo passaggio",
+      "ready": "Tutto pronto per entrare nel pannello",
+      "summary": {
+        "paired": "Modelli abbinati al loro PDF",
+        "noTemplate": "PDF senza modello (potrai aggiungerlo dal pannello)",
+        "unused": "Modelli senza PDF",
+        "note": "Entri nel pannello con tutto in versione A. Versione B, convalida e download si fanno lì, PDF per PDF."
+      },
+      "optional": "Facoltativo"
+    },
+    "tabs": {
+      "label": "PDF aperti",
+      "close": "Chiudi {{name}}"
+    },
+    "testData": {
+      "title": "Dati di prova",
+      "help": "Facoltativo. Incolla un JSON perché l’anteprima mostri valori reali invece di quelli di esempio. Dura solo questa sessione e non viene salvato.",
+      "active": "Dati di prova attivi: anteprima e PDF usano questi valori.",
+      "done": "Fatto"
+    },
+    "menu": {
+      "more": "Altre azioni per {{name}}",
+      "open": "Apri",
+      "replaceB": "Carica o sostituisci la versione B…",
+      "removeB": "Rimuovi la versione B",
+      "unvalidate": "Rimuovi la convalida",
+      "remove": "Rimuovi dal lotto"
     }
   },
   "preview": {

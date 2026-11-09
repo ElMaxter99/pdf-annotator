@@ -20,6 +20,9 @@ import { ToastService } from '../../services/toast.service';
 import { formatBytes } from '../../utils/batch-files.utils';
 import { downloadBlob } from '../../utils/download.utils';
 import { formatPageSize } from '../../utils/page-size.utils';
+import { BatchTabsService } from '../../services/batch-tabs.service';
+import { BatchTabsComponent } from './components/batch-tabs.component';
+import { BatchTestDataDrawerComponent } from './components/batch-test-data-drawer.component';
 import { BatchTemplatesDrawerComponent } from './components/batch-templates-drawer.component';
 import { BatchThumbComponent } from './components/batch-thumb.component';
 import { BatchVersionBDrawerComponent } from './components/batch-version-b-drawer.component';
@@ -37,7 +40,7 @@ const FILTERS: readonly Filter[] = [
   'validated',
 ];
 
-type Drawer = 'none' | 'templates' | 'versionB';
+type Drawer = 'none' | 'templates' | 'versionB' | 'testData';
 type View = 'grid' | 'table';
 type Coords = 'b' | 'a' | 'both';
 const VIEW_KEY = 'pdf-annotator-batch-view';
@@ -57,12 +60,15 @@ const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, 
     BatchThumbComponent,
     BatchTemplatesDrawerComponent,
     BatchVersionBDrawerComponent,
+    BatchTestDataDrawerComponent,
+    BatchTabsComponent,
   ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
 })
 export class BatchPageComponent implements OnInit {
   readonly store = inject(BatchStoreService);
+  private readonly tabs = inject(BatchTabsService);
   private readonly exporter = inject(BatchExportService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -296,9 +302,45 @@ export class BatchPageComponent implements OnInit {
       setTimeout(() => this.confirmRemove.set(false), 5000);
       return;
     }
+    this.tabs.forget([...this.selected()]);
     await this.store.remove([...this.selected()]);
     this.selected.set(new Set());
     this.confirmRemove.set(false);
+  }
+
+  // ---- card menu ("⋯") ---------------------------------------------------------------------------
+
+  readonly menuFor = signal<string | null>(null);
+
+  toggleMenu(id: string, event: Event) {
+    event.stopPropagation();
+    this.menuFor.update((current) => (current === id ? null : id));
+  }
+
+  closeMenu() {
+    this.menuFor.set(null);
+  }
+
+  menuOpenB() {
+    this.closeMenu();
+    this.drawer.set('versionB');
+  }
+
+  menuRemoveB(id: string) {
+    this.closeMenu();
+    this.store.clearNewPdf(id);
+  }
+
+  menuUnvalidate(id: string) {
+    this.closeMenu();
+    this.store.setValidated(id, false);
+  }
+
+  async menuRemove(id: string) {
+    this.closeMenu();
+    this.tabs.forget([id]);
+    await this.store.remove([id]);
+    this.selected.update((set) => new Set([...set].filter((x) => x !== id)));
   }
 
   async removeExported() {

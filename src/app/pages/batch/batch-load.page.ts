@@ -12,8 +12,9 @@ import { splitTemplateDocuments } from '../../utils/template-text.utils';
 
 type Tab = 'paste' | 'files';
 const SHOWN_ROWS = 6;
+type Step = 1 | 2 | 3;
 
-/** Step 1: load the PDFs and the templates, each in its own column. */
+/** Preparation stepper: 1 upload the PDFs, 2 add templates (optional), 3 review and enter the panel. */
 @Component({
   selector: 'app-batch-load-page',
   standalone: true,
@@ -31,6 +32,13 @@ export class BatchLoadPageComponent implements OnInit {
   private readonly pdfInput = viewChild<ElementRef<HTMLInputElement>>('pdfInput');
   private readonly jsonInput = viewChild<ElementRef<HTMLInputElement>>('jsonInput');
 
+  readonly step = signal<Step>(1);
+  readonly steps = [
+    { n: 1, title: 'batch.step.s1.title', hint: 'batch.step.s1.hint' },
+    { n: 2, title: 'batch.step.s2.title', hint: 'batch.step.s2.hint' },
+    { n: 3, title: 'batch.step.s3.title', hint: 'batch.step.s3.hint' },
+  ];
+  readonly pairedCount = computed(() => this.store.items().filter((item) => !!item.templateId).length);
   readonly tab = signal<Tab>('paste');
   readonly draft = signal('');
   readonly pdfDrop = signal(false);
@@ -88,6 +96,10 @@ export class BatchLoadPageComponent implements OnInit {
   ngOnInit() {
     if (typeof window === 'undefined') return;
     void this.store.load().then(() => this.store.refreshStorage());
+  }
+
+  go(step: Step) {
+    this.step.set(step);
   }
 
   setTab(tab: Tab) {

@@ -18,6 +18,8 @@ async function startBatch(page: import('@playwright/test').Page) {
     .locator('input[type=file]')
     .setInputFiles([pdfFile('uno.pdf'), pdfFile('dos.pdf'), pdfFile('tres.pdf'), jsonFile('uno.json')]);
   await page.waitForURL('**/batch/load');
+  await page.locator('#step-next').click();
+  await page.locator('#step-skip').click();
   await page.getByRole('button', { name: /^Ir al panel con 3 PDF/ }).click();
   await page.waitForURL('**/batch');
 }
@@ -45,6 +47,8 @@ async function loadAndPaste(page: import('@playwright/test').Page, text: string)
   await page.goto('/landing');
   await page.locator('input[type=file]').setInputFiles([pdfFile('uno.pdf'), pdfFile('dos.pdf'), pdfFile('tres.pdf')]);
   await page.waitForURL('**/batch/load');
+  await expect(page.locator('[aria-current=step]')).toContainText('Subir PDF');
+  await page.locator('#step-next').click();
   await page.locator('#batch-paste').fill(text);
 }
 
@@ -111,6 +115,8 @@ test('pasting a mongoexport pairs each template with its PDF by pdfName', async 
   await loadAndPaste(page, text);
   await expect(page.locator('.pill--ok')).toContainText('4 plantillas');
   await page.getByRole('button', { name: 'Añadir 4 plantillas' }).click();
+  await page.locator('#step-next').click();
+  await expect(page.getByText('Todo listo para entrar al panel')).toBeVisible();
   await page.getByRole('button', { name: /^Ir al panel con 3 PDF/ }).click();
   await page.waitForURL('**/batch');
   for (const name of ['uno.pdf', 'dos.pdf', 'tres.pdf']) {
@@ -255,4 +261,85 @@ test('the editor can add its PDF to the batch and opens the panel', async ({ pag
   await page.getByRole('button', { name: 'Añadir al lote' }).click();
   await page.waitForURL('**/batch');
   await expect(card(page, 'solo.pdf')).toHaveAttribute('data-status', 'noTemplate');
+});
+
+test('the load step is a three-step stepper and templates can be skipped', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/landing');
+  await page.locator('input[type=file]').setInputFiles([pdfFile('uno.pdf'), pdfFile('dos.pdf')]);
+  await page.waitForURL('**/batch/load');
+  await expect(page.getByText('Paso previo · aún no hay panel')).toBeVisible();
+  const current = page.locator('[aria-current=step]');
+  await expect(current).toContainText('Subir PDF');
+  await page.locator('#step-next').click();
+  await expect(current).toContainText('Plantillas');
+  await page.getByRole('button', { name: '← Anterior' }).click();
+  await expect(current).toContainText('Subir PDF');
+  await page.locator('#step-next').click();
+  await page.locator('#step-skip').click();
+  await expect(current).toContainText('Empezar');
+  await expect(page.getByText('PDF sin plantilla (podrás añadirla desde el panel)')).toBeVisible();
+  await page.getByRole('button', { name: /^Ir al panel con 2 PDF/ }).click();
+  await page.waitForURL('**/batch');
+});
+
+test('opened PDFs become tabs of the session and can be closed', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/batch\/.+/);
+  const tabs = page.getByRole('tablist', { name: 'PDF abiertos' });
+  await expect(tabs.getByRole('link', { name: 'uno.pdf' })).toBeVisible();
+  await tabs.getByRole('link', { name: /Panel del lote/ }).click();
+  await page.waitForURL('**/batch');
+  await expect(tabs.getByRole('link', { name: 'uno.pdf' })).toBeVisible();
+  await tabs.getByRole('button', { name: 'Cerrar uno.pdf' }).click();
+  await expect(tabs.getByRole('link', { name: 'uno.pdf' })).toHaveCount(0);
+});
+
+test('the card menu removes version B and the validation', async ({ page }) => {
+  await startBatch(page);
+  await page.locator('#open-version-b').click();
+  const drawer = page.getByRole('dialog', { name: 'Subir versión B' });
+  await drawer.locator('input[type=file]').setInputFiles([await otherPdf('dos.pdf')]);
+  await drawer.getByRole('button', { name: /^Añadir 1 versiones B/ }).click();
+  await expect(card(page, 'dos.pdf')).toContainText('Versión B');
+  await card(page, 'dos.pdf').getByRole('button', { name: /Más acciones de dos.pdf/ }).click();
+  await page.getByRole('menuitem', { name: 'Quitar la versión B' }).click();
+  await expect(card(page, 'dos.pdf')).toContainText('Solo versión A');
+  await card(page, 'dos.pdf').getByRole('button', { name: /Más acciones de dos.pdf/ }).click();
+  await page.getByRole('menuitem', { name: 'Quitar del lote' }).click();
+  await expect(page.locator('.pcard')).toHaveCount(2);
+});
+
+test('optional test data are pasted in a drawer and last only the session', async ({ page }) => {
+  await startBatch(page);
+  await page.locator('#open-test-data').click();
+  const drawer = page.getByRole('dialog', { name: 'Datos de prueba' });
+  await drawer.locator('#test-data-text').fill('{"cliente":{"nombre":"Lucía"}}');
+  await expect(drawer.getByText('Datos de prueba activos')).toBeVisible();
+  await drawer.locator('#test-data-text').fill('{"cliente": ');
+  await expect(drawer.getByRole('alert')).toBeVisible();
+});
+
+test('coordinates A can be adjusted and version B can start from a copy of A', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/batch\/.+/);
+  // Without a version B only A moves.
+  const a = page.locator('.fld--orig').first();
+  await expect(a).toBeVisible();
+  const before = await a.boundingBox();
+  await page.mouse.move(before!.x + 4, before!.y + 4);
+  await page.mouse.down();
+  await page.mouse.move(before!.x + 44, before!.y + 34, { steps: 4 });
+  await page.mouse.up();
+  const after = await a.boundingBox();
+  expect(after!.x).toBeGreaterThan(before!.x + 25);
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await page.locator('#replace-b').setInputFiles(await otherPdf('uno-b.pdf'));
+  await expect(page.locator('.pane:visible')).toHaveCount(2);
+  await expect(page.getByRole('button', { name: 'Ajustar B' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Copiar A a B' }).click();
+  await page.getByRole('button', { name: 'Ajustar A' }).click();
+  await expect(page.getByRole('button', { name: 'Ajustar A' })).toHaveAttribute('aria-pressed', 'true');
 });

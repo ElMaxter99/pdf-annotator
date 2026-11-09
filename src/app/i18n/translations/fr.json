@@ -574,7 +574,12 @@
       "save": "Enregistrer",
       "unsaved": "Modifications non enregistrées",
       "savedToast": "Mise en page enregistrée.",
-      "onlyA": "Ce PDF n'a pas de version B : vous voyez la version A avec ses coordonnées. Importez une version B pour comparer."
+      "onlyA": "Ce PDF n'a pas de version B : vous voyez la version A avec ses coordonnées. Importez une version B pour comparer.",
+      "edit": "Coordonnées déplacées",
+      "editA": "Ajuster A",
+      "editB": "Ajuster B",
+      "copyAB": "Copier A vers B",
+      "backA": "Revenir à A"
     },
     "export": {
       "title": "Télécharger le lot",
@@ -783,7 +788,8 @@
       "openPdf": "Ouvrir {{name}}",
       "pillTemplate": "Modèle",
       "pillB": "Version B",
-      "pillOnlyA": "Version A seule"
+      "pillOnlyA": "Version A seule",
+      "testData": "Données de test (facultatif)"
     },
     "templates": {
       "title": "Importer des modèles",
@@ -842,6 +848,58 @@
       "unsaved": "Il y a des modifications non enregistrées : elles seront enregistrées à la validation.",
       "confirm": "Oui, valider",
       "done": "{{name}} validé"
+    },
+    "step": {
+      "label": "Étapes préalables",
+      "badge": "Étape préalable · pas encore de tableau",
+      "subtitle": "Préparer le lot",
+      "s1": {
+        "title": "Importer des PDF",
+        "hint": "Obligatoire"
+      },
+      "s2": {
+        "title": "Modèles",
+        "hint": "Facultatif · possible plus tard"
+      },
+      "s3": {
+        "title": "Commencer",
+        "hint": "Vérifier et entrer dans le tableau"
+      },
+      "back": {
+        "landing": "← Retour à l’accueil"
+      },
+      "next": {
+        "templates": "Suivant : modèles →",
+        "start": "Suivant : commencer →"
+      },
+      "prev": "← Précédent",
+      "skip": "Passer cette étape",
+      "ready": "Tout est prêt pour entrer dans le tableau",
+      "summary": {
+        "paired": "Modèles associés à leur PDF",
+        "noTemplate": "PDF sans modèle (à ajouter depuis le tableau)",
+        "unused": "Modèles sans PDF",
+        "note": "Vous entrez dans le tableau avec tout en version A. La version B, la validation et le téléchargement s’y font, PDF par PDF."
+      },
+      "optional": "Facultatif"
+    },
+    "tabs": {
+      "label": "PDF ouverts",
+      "close": "Fermer {{name}}"
+    },
+    "testData": {
+      "title": "Données de test",
+      "help": "Facultatif. Collez un JSON pour que l’aperçu affiche des valeurs réelles au lieu des exemples. Valable pour cette session seulement, sans enregistrement.",
+      "active": "Données de test actives : l’aperçu et le PDF utilisent ces valeurs.",
+      "done": "Terminé"
+    },
+    "menu": {
+      "more": "Plus d’actions pour {{name}}",
+      "open": "Ouvrir",
+      "replaceB": "Importer ou remplacer la version B…",
+      "removeB": "Retirer la version B",
+      "unvalidate": "Retirer la validation",
+      "remove": "Retirer du lot"
     }
   },
   "preview": {

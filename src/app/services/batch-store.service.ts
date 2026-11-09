@@ -664,6 +664,25 @@ export class BatchStoreService {
     this.patch(id, { layout: cloneAnnotationPages(layout), relaid, exported: false, validated: false });
   }
 
+  /** Saves what changed in the compare view: coordinates B (the layout) and/or A (the template). */
+  saveCoordinates(
+    id: string,
+    change: { layout: PageAnnotations[] | null; template: PageAnnotations[] | null }
+  ) {
+    const item = this.get(id);
+    if (!item) return;
+    const template = change.template
+      ? {
+          template: cloneAnnotationPages(change.template),
+          templateIssue: undefined,
+          // An edited copy must not be replaced when the pool is matched again.
+          ...(item.matchKind === 'exact' || item.matchKind === 'similar' ? { matchKind: 'manual' as const } : {}),
+        }
+      : {};
+    const layout = change.layout ? { layout: cloneAnnotationPages(change.layout), relaid: true } : {};
+    this.patch(id, { exported: false, validated: false, ...template, ...layout });
+  }
+
   setValidated(id: string, validated: boolean) {
     this.patch(id, { validated });
   }

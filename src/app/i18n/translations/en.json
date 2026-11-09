@@ -574,7 +574,12 @@
       "save": "Save",
       "unsaved": "Unsaved changes",
       "savedToast": "Re-layout saved.",
-      "onlyA": "This PDF has no version B: you see version A with its coordinates. Upload a version B to compare."
+      "onlyA": "This PDF has no version B: you see version A with its coordinates. Upload a version B to compare.",
+      "edit": "Coordinates being moved",
+      "editA": "Adjust A",
+      "editB": "Adjust B",
+      "copyAB": "Copy A to B",
+      "backA": "Back to A"
     },
     "export": {
       "title": "Download the batch",
@@ -783,7 +788,8 @@
       "openPdf": "Open {{name}}",
       "pillTemplate": "Template",
       "pillB": "Version B",
-      "pillOnlyA": "Version A only"
+      "pillOnlyA": "Version A only",
+      "testData": "Test data (optional)"
     },
     "templates": {
       "title": "Import templates",
@@ -842,6 +848,58 @@
       "unsaved": "There are unsaved changes: they will be saved when you validate.",
       "confirm": "Yes, validate",
       "done": "{{name}} validated"
+    },
+    "step": {
+      "label": "Steps before the panel",
+      "badge": "Preparation step · no panel yet",
+      "subtitle": "Prepare the batch",
+      "s1": {
+        "title": "Upload PDFs",
+        "hint": "Required"
+      },
+      "s2": {
+        "title": "Templates",
+        "hint": "Optional · can be done later"
+      },
+      "s3": {
+        "title": "Start",
+        "hint": "Review and enter the panel"
+      },
+      "back": {
+        "landing": "← Back to the landing page"
+      },
+      "next": {
+        "templates": "Next: templates →",
+        "start": "Next: start →"
+      },
+      "prev": "← Previous",
+      "skip": "Skip this step",
+      "ready": "Ready to enter the panel",
+      "summary": {
+        "paired": "Templates paired with their PDF",
+        "noTemplate": "PDFs without a template (you can add it from the panel)",
+        "unused": "Templates without a PDF",
+        "note": "You enter the panel with everything as version A. Version B, validation and download happen there, PDF by PDF."
+      },
+      "optional": "Optional"
+    },
+    "tabs": {
+      "label": "Open PDFs",
+      "close": "Close {{name}}"
+    },
+    "testData": {
+      "title": "Test data",
+      "help": "Optional. Paste a JSON so the preview paints real values instead of samples. It only lasts this session and is not saved.",
+      "active": "Test data is active: the preview and the PDF use these values.",
+      "done": "Done"
+    },
+    "menu": {
+      "more": "More actions for {{name}}",
+      "open": "Open",
+      "replaceB": "Upload or replace version B…",
+      "removeB": "Remove version B",
+      "unvalidate": "Remove validation",
+      "remove": "Remove from the batch"
     }
   },
   "preview": {

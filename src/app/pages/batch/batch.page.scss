@@ -92,3 +92,8 @@ hr { border: 0; border-top: 1px solid var(--line); width: 100%; margin: 4px 0; }
 :host-context(:root.theme-light) { .pill--ok { color: #0f766e; } .pill--warn { color: #92400e; } }
 .tthumb { width: 34px; height: 46px; overflow: hidden; }
 .foot { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+.pmenu { position: absolute; top: 10px; right: 10px; z-index: 2; }
+.pmenu__btn { padding-inline: 10px; background: color-mix(in srgb, var(--bg) 70%, transparent); }
+.pmenu__list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; list-style: none; margin: 0; padding: 6px; min-width: 210px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,.4); display: flex; flex-direction: column; gap: 2px;
+  button { width: 100%; text-align: left; font: inherit; font-size: 14px; color: var(--text); background: transparent; border: 0; border-radius: 8px; padding: 8px 10px; cursor: pointer; min-height: 36px; &:hover, &:focus-visible { background: color-mix(in srgb, var(--text) 10%, transparent); outline: none; } &.is-danger { color: var(--danger); } } }

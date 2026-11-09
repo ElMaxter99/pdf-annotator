@@ -574,7 +574,12 @@
       "save": "Guardar",
       "unsaved": "Alterações por guardar",
       "savedToast": "Remontagem guardada.",
-      "onlyA": "Este PDF não tem versão B: aqui vê a versão A com as suas coordenadas. Carregue uma versão B para comparar."
+      "onlyA": "Este PDF não tem versão B: aqui vê a versão A com as suas coordenadas. Carregue uma versão B para comparar.",
+      "edit": "Coordenadas que se movem",
+      "editA": "Ajustar A",
+      "editB": "Ajustar B",
+      "copyAB": "Copiar A para B",
+      "backA": "Voltar a A"
     },
     "export": {
       "title": "Descarregar o lote",
@@ -783,7 +788,8 @@
       "openPdf": "Abrir {{name}}",
       "pillTemplate": "Modelo",
       "pillB": "Versão B",
-      "pillOnlyA": "Só versão A"
+      "pillOnlyA": "Só versão A",
+      "testData": "Dados de teste (opcional)"
     },
     "templates": {
       "title": "Importar modelos",
@@ -842,6 +848,58 @@
       "unsaved": "Há alterações por guardar: serão guardadas ao validar.",
       "confirm": "Sim, validar",
       "done": "{{name}} validado"
+    },
+    "step": {
+      "label": "Passos prévios",
+      "badge": "Passo prévio · ainda não há painel",
+      "subtitle": "Preparar o lote",
+      "s1": {
+        "title": "Carregar PDF",
+        "hint": "Obrigatório"
+      },
+      "s2": {
+        "title": "Modelos",
+        "hint": "Opcional · pode fazer-se depois"
+      },
+      "s3": {
+        "title": "Começar",
+        "hint": "Rever e entrar no painel"
+      },
+      "back": {
+        "landing": "← Voltar à página inicial"
+      },
+      "next": {
+        "templates": "Seguinte: modelos →",
+        "start": "Seguinte: começar →"
+      },
+      "prev": "← Anterior",
+      "skip": "Saltar este passo",
+      "ready": "Tudo pronto para entrar no painel",
+      "summary": {
+        "paired": "Modelos emparelhados com o seu PDF",
+        "noTemplate": "PDF sem modelo (poderá adicioná-lo no painel)",
+        "unused": "Modelos sem PDF",
+        "note": "Entra no painel com tudo na versão A. A versão B, a validação e a descarga fazem-se lá, PDF a PDF."
+      },
+      "optional": "Opcional"
+    },
+    "tabs": {
+      "label": "PDF abertos",
+      "close": "Fechar {{name}}"
+    },
+    "testData": {
+      "title": "Dados de teste",
+      "help": "Opcional. Cole um JSON para que a pré-visualização mostre valores reais em vez dos de exemplo. Só dura esta sessão e não é guardado.",
+      "active": "Dados de teste ativos: a pré-visualização e o PDF usam estes valores.",
+      "done": "Concluído"
+    },
+    "menu": {
+      "more": "Mais ações de {{name}}",
+      "open": "Abrir",
+      "replaceB": "Carregar ou substituir a versão B…",
+      "removeB": "Remover a versão B",
+      "unvalidate": "Remover a validação",
+      "remove": "Remover do lote"
     }
   },
   "preview": {

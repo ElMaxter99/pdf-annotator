@@ -1,0 +1,27 @@
+<div class="overlay" (click)="closed.emit()" (keydown.escape)="closed.emit()">
+  <div class="drawer" role="dialog" aria-modal="true" [attr.aria-label]="'batch.testData.title' | t" (click)="$event.stopPropagation()">
+    <div class="drawer__head">
+      <h2>{{ 'batch.testData.title' | t }}</h2>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="closed.emit()">{{ 'batch.versionB.close' | t }}</button>
+    </div>
+    <p class="cap">{{ 'batch.testData.help' | t }}</p>
+    <textarea id="test-data-text" class="ta mono" spellcheck="false" rows="14" [value]="preview.testDataText()" (input)="onText($event)"
+      [attr.aria-label]="'batch.testData.title' | t" [placeholder]="'preview.testData.placeholder' | t" [attr.aria-invalid]="preview.testDataError() ? 'true' : null"></textarea>
+    @if (preview.testDataError()) {
+      <p class="note note--error" role="alert">⚠ <span>{{ errorText() }}</span></p>
+    } @else if (preview.hasTestData()) {
+      <p class="note note--info" role="status">✓ <span>{{ 'batch.testData.active' | t }}</span></p>
+    } @else {
+      <p class="cap">{{ 'preview.testData.empty' | t }}</p>
+    }
+    <div class="drawer__foot">
+      <label class="btn btn--ghost">
+        {{ 'preview.testData.load' | t }}
+        <input type="file" accept=".json,application/json" hidden (change)="onFile($event)" />
+      </label>
+      <button type="button" class="btn btn--ghost" [disabled]="!preview.testDataText()" (click)="preview.clearTestData()">{{ 'preview.testData.clear' | t }}</button>
+      <span class="spacer" style="flex: 1"></span>
+      <button type="button" class="btn" (click)="closed.emit()">{{ 'batch.testData.done' | t }}</button>
+    </div>
+  </div>
+</div>

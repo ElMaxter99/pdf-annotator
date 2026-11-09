@@ -13,12 +13,14 @@ import { formatPageSize, pageSizesDiffer, scaleAnnotations, SizeStrategy } from 
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { parseTemplateText } from '../../utils/template-text.utils';
 import { suggestTemplates } from '../../utils/template-matching.utils';
+import { BatchTabsService } from '../../services/batch-tabs.service';
+import { BatchTabsComponent } from './components/batch-tabs.component';
 import { BatchCompareComponent } from './components/batch-compare.component';
 
 @Component({
   selector: 'app-batch-item-page',
   standalone: true,
-  imports: [RouterLink, TranslationPipe, BatchCompareComponent],
+  imports: [RouterLink, TranslationPipe, BatchCompareComponent, BatchTabsComponent],
   templateUrl: './batch-item.page.html',
   styleUrls: ['./batch-item.page.scss'],
 })
@@ -29,6 +31,7 @@ export class BatchItemPageComponent {
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(TranslationService);
   private readonly metadata = inject(AppMetadataService);
+  private readonly tabs = inject(BatchTabsService);
 
   readonly itemId = signal('');
   readonly confirmValidate = signal(false);
@@ -126,7 +129,10 @@ export class BatchItemPageComponent {
       this.showSetup.set(false);
       this.confirmValidate.set(false);
       this.sameNotice.set('');
-      void this.store.load().then(() => this.syncDraft());
+      void this.store.load().then(() => {
+        if (this.item()) this.tabs.add(this.itemId());
+        this.syncDraft();
+      });
     });
   }
 
@@ -267,8 +273,8 @@ export class BatchItemPageComponent {
     void this.router.navigate(next ? ['/batch', next] : ['/batch']);
   }
 
-  onSaved(event: { layout: PageAnnotations[]; next: boolean }) {
-    this.store.saveLayout(this.itemId(), event.layout, true);
+  onSaved(event: { layout: PageAnnotations[] | null; template: PageAnnotations[] | null; next: boolean }) {
+    this.store.saveCoordinates(this.itemId(), event);
     this.toast.show(this.i18n.translate('batch.compare.savedToast'), 'success');
     if (event.next) {
       const next = this.store.nextPendingId(this.itemId());
