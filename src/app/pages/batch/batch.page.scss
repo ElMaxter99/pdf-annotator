@@ -83,7 +83,7 @@ hr { border: 0; border-top: 1px solid var(--line); width: 100%; margin: 4px 0; }
 .pcard__chk { position: absolute; left: 14px; top: 14px; width: 18px; height: 18px; }
 .pcard__thumb { height: 190px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 0; border-radius: 12px; padding: 10px; cursor: pointer; &:focus-visible { outline: 2px solid var(--accent); } }
 .pcard__name { font-weight: 600; }
-.pcard__foot { display: flex; align-items: center; gap: 8px; }
+.pcard__foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .pills { display: flex; gap: 6px; flex-wrap: wrap; }
 .pill { display: inline-flex; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--muted);
   &--ok { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
