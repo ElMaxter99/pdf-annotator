@@ -12,3 +12,4 @@ Formato: decisión · motivo · consecuencia. Añade una entrada nueva en vez de
 8. **`workspace.page.ts` sigue siendo grande a propósito** hasta que se extraiga por partes con tests; la lógica nueva va a servicios y `utils/*.ts`.
 9. **Subcomponentes reciben `[vm]="vm"`** en lugar de inputs granulares; se respeta el patrón o se refactoriza de forma deliberada.
 10. **Diseño primero** para todo cambio visible (ver `docs/WORKFLOW.md`). Fecha: 2026-11-09. Motivo: mismo flujo que usa el autor en pugIDE; evita rehacer UI.
+11. **Diseño solo para escritorio.** Fecha: 2026-11-09. Motivo: la app no está pensada para móvil (decisión de Maxter). Consecuencia: el lienzo no tiene mesas móviles; las propuestas se dibujan a ≥1650 y ~1280 px. El CSS móvil existente se conserva sin ampliarlo.

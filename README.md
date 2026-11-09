@@ -58,7 +58,7 @@ PDF Annotator es un editor visual de **coordenadas sobre PDFs**. Haces clic dond
 | 🧩 **Plantillas** | Guarda conjuntos de anotaciones y recárgalos en otros documentos. |
 | ⬇️ **Exportar** | JSON (`coords.json`) o PDF anotado (`annotated.pdf`) con fuentes estándar o propias (`.ttf/.otf/.woff/.woff2`). |
 | ⌨️ **Ir rápido** | Atajos para páginas, zoom, ajuste al ancho, deshacer/rehacer y más. Pulsa `?` para verlos. |
-| 🌍 **A tu manera** | Español, inglés, catalán, francés, italiano, portugués y alemán; tema claro/oscuro; responsive hasta móvil. |
+| 🌍 **A tu manera** | Español, inglés, catalán, francés, italiano, portugués y alemán; tema claro/oscuro; pensada para escritorio. |
 | 🔒 **Privado** | El PDF no sale de tu navegador. No hay servidor de procesado ni cuentas. |
 
 ## 🚀 Empieza en 1 minuto

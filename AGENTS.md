@@ -60,7 +60,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
 
 ## 4b. Diseño primero
-Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes de programarse** en el lienzo de claude.ai y lo aprueba la persona responsable; **no programes la interfaz hasta que esté aprobada**. Lo invisible (motor, tests, rendimiento, docs) avanza sin esperar. Detalle en [`docs/WORKFLOW.md`](docs/WORKFLOW.md) y [`design/README.md`](design/README.md): lienzo único, mesas `V-NN`/`P-NN`, tokens de `styles.scss`, tres anchos y ambos temas, copia del diseño aprobado en `design/canvas/`. Incluye reglas de estilo, feedback, accesibilidad y autonomía.
+Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes de programarse** en el lienzo de claude.ai y lo aprueba la persona responsable; **no programes la interfaz hasta que esté aprobada**. Lo invisible (motor, tests, rendimiento, docs) avanza sin esperar. Detalle en [`docs/WORKFLOW.md`](docs/WORKFLOW.md) y [`design/README.md`](design/README.md): lienzo único, mesas `V-NN`/`P-NN`, tokens de `styles.scss`, anchos de escritorio y ambos temas, copia del diseño aprobado en `design/canvas/`. Incluye reglas de estilo, feedback, accesibilidad y autonomía.
 
 ## 5. Reglas de seguridad (no negociables)
 1. **Nunca evalúes entrada del usuario** (`eval`, `Function`, `new Function`, `setTimeout(string)`). El JSON "flexible" se parsea con `utils/loose-json.ts`.
@@ -74,7 +74,7 @@ Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes d
 - **Nuevo atajo:** añade el caso en `handlePlainShortcut` (`workspace.page.ts`), la fila en `shortcuts-dialog.component.ts`, las claves `shortcuts.items.*` en los 7 idiomas y la tabla del README.
 - **Nuevo campo de anotación:** `models/annotation.model.ts` → `prepareFieldForStorage/Form` → `serializeFieldForJson` (campos avanzados) → `AnnotationImportService.normalizeImportedCoordinates` (+ `utils/annotation-fields.utils.ts`) → template del editor (`annotation-editor.component.html`, un único formulario) → render (`redrawAllForPage`) → export PDF (`PdfExportService.exportAnnotatedPdf`, ya dibuja con los datos que le pasa la página).
 - **Nuevo idioma:** añade `translations/xx.json`, impórtalo en `translation.service.ts` (`LANGUAGES`, `TRANSLATIONS`) y la etiqueta en `app.languages.xx`.
-- **Cambio de layout:** revisa tres anchos (≥1650, ~1280 y <960 px) y ambos temas.
+- **Cambio de layout:** la app se diseña solo para escritorio; revisa ~1650 y ~1280 px de ancho y ambos temas. El CSS móvil que ya existe se conserva pero no se diseña ni se amplía.
 
 ## 7. Trampas conocidas
 - Los editores de crear (`preview`) y editar (`edit`) comparten **un único** componente (`annotation-editor`, input `mode`). Cualquier campo nuevo se añade una sola vez; ojo con las reglas `locked` (solo aplican en modo `edit`).
@@ -95,6 +95,6 @@ Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes d
 ## 8. Definición de terminado
 - [ ] `npm run build`, `npm run test:ci` y `npm run e2e` pasan.
 - [ ] Textos nuevos traducidos en 7 idiomas.
-- [ ] Probado en oscuro y claro, escritorio y móvil.
+- [ ] Probado en oscuro y claro, escritorio (1650 y 1280 px).
 - [ ] README/CHANGELOG/atajos actualizados si cambia el comportamiento visible.
 - [ ] Sin evaluación de entrada del usuario ni HTML sin sanear.
