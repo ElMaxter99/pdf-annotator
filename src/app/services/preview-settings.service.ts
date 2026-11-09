@@ -81,7 +81,12 @@ export class PreviewSettingsService {
   }
 
   setTestDataText(text: string): void {
+    const hadData = this.hasTestData();
     this.testDataText.set(text);
+    // Valid data that was not there before is what the user wants to see: switch from the samples to it.
+    if (!hadData && this.hasTestData() && this.mode() === 'sample') {
+      this.setMode('data');
+    }
     this.save(DATA_KEY, text.length <= MAX_TEST_DATA_BYTES ? text : '');
     if (!text.trim() && this.mode() === 'data') {
       this.setMode('sample');
