@@ -50,6 +50,14 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | P-13 Datos de prueba | JSON de datos y modo Muestra / Mapeo / Datos | [`P-13-datos-de-prueba.dc.html`](canvas/P-13-datos-de-prueba.dc.html) | `sidebar`, `header` | Aprobada, implementada |
 | P-14 Datos de prueba · estados | Vacío, error, incompleto y éxito | [`P-14-datos-de-prueba-estados.dc.html`](canvas/P-14-datos-de-prueba-estados.dc.html) | `sidebar` | Aprobada, implementada |
 | P-15 Datos de prueba claro | P-13 en tema claro | [`P-15-datos-de-prueba-claro.dc.html`](canvas/P-15-datos-de-prueba-claro.dc.html) | `sidebar`, `header` | Aprobada, implementada |
+| P-16 Inicio | Zona «arrastra aquí» mejorada y aviso a Lotes | — | `pages/landing` | Propuesta, pendiente de aprobación |
+| P-17 Inicio · estados | Arrastrando, leyendo, no válido, sesión, lote | — | `pages/landing` | Propuesta, pendiente de aprobación |
+| P-18 Inicio claro | P-16 en tema claro | — | `pages/landing` | Propuesta, pendiente de aprobación |
+| P-19 Guía · general | Índice, caminos y tarjetas con capturas | — | nueva página | Propuesta, pendiente de aprobación |
+| P-20 Guía · tema | Captura numerada, pasos, atajos | — | nueva página | Propuesta, pendiente de aprobación |
+| P-21 Guía · estados | Cargando, búsqueda, sin resultados, foco | — | nueva página | Propuesta, pendiente de aprobación |
+| P-22 Guía · tema claro | P-20 en tema claro | — | nueva página | Propuesta, pendiente de aprobación |
+| P-23 Mantenimiento de la guía | `docs/GUIDE.md` y regla para IA | [`propuestas/inicio-y-guia.md`](propuestas/inicio-y-guia.md) | — | Propuesta, pendiente de aprobación |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 
