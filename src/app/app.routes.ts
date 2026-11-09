@@ -14,5 +14,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/workspace/workspace.page').then((m) => m.WorkspacePageComponent),
   },
+  {
+    path: 'batch',
+    loadComponent: () => import('./pages/batch/batch.page').then((m) => m.BatchPageComponent),
+  },
+  {
+    path: 'batch/:id',
+    loadComponent: () =>
+      import('./pages/batch/batch-item.page').then((m) => m.BatchItemPageComponent),
+  },
   { path: '**', redirectTo: 'landing' },
 ];

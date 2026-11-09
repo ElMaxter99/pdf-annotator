@@ -1,0 +1,118 @@
+<div class="cmp" (keydown)="onKeydown($event)">
+  <div class="cmp__bar">
+    <div class="seg" role="group" [attr.aria-label]="'batch.compare.view' | t">
+      <button type="button" [class.on]="mode() === 'original'" [attr.aria-pressed]="mode() === 'original'" (click)="setMode('original')">{{ 'batch.compare.original' | t }}</button>
+      <button type="button" [class.on]="mode() === 'new'" [attr.aria-pressed]="mode() === 'new'" (click)="setMode('new')">{{ 'batch.compare.new' | t }}</button>
+      <button type="button" [class.on]="mode() === 'side'" [attr.aria-pressed]="mode() === 'side'" (click)="setMode('side')">{{ 'batch.compare.side' | t }}</button>
+      <button type="button" [class.on]="mode() === 'overlay'" [attr.aria-pressed]="mode() === 'overlay'" (click)="setMode('overlay')">{{ 'batch.compare.overlay' | t }}</button>
+    </div>
+    <label class="cmp__check" [class.is-off]="mode() !== 'side'">
+      <input type="checkbox" [checked]="syncScroll()" [disabled]="mode() !== 'side'" (change)="syncScroll.set($any($event.target).checked)" />
+      {{ 'batch.compare.sync' | t }}
+    </label>
+    <div class="cmp__zoom" role="group" [attr.aria-label]="'batch.compare.zoom' | t">
+      <button type="button" class="btn btn--ghost btn--sm" (click)="zoom(-0.1)" [attr.aria-label]="'batch.compare.zoomOut' | t">−</button>
+      <span aria-live="polite">{{ zoomLabel() }}</span>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="zoom(0.1)" [attr.aria-label]="'batch.compare.zoomIn' | t">+</button>
+    </div>
+    <div class="cmp__zoom" role="group" [attr.aria-label]="'batch.compare.page' | t">
+      <button type="button" class="btn btn--ghost btn--sm" (click)="goToPage(-1)" [disabled]="pageNumber() <= 1" [attr.aria-label]="'batch.compare.prevPage' | t">‹</button>
+      <span>{{ 'batch.compare.pageOf' | t : { page: pageNumber(), total: pageCount() } }}</span>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="goToPage(1)" [disabled]="pageNumber() >= pageCount()" [attr.aria-label]="'batch.compare.nextPage' | t">›</button>
+    </div>
+    <span class="cmp__spacer"></span>
+    <button type="button" class="btn btn--ghost btn--sm" (click)="undo()" [disabled]="!canUndo()">↶ {{ 'batch.compare.undo' | t }}</button>
+    <button type="button" class="btn btn--ghost btn--sm" (click)="redo()" [disabled]="!canRedo()">↷ {{ 'batch.compare.redo' | t }}</button>
+  </div>
+
+  @if (mode() === 'overlay') {
+    <div class="cmp__overlay-ctl">
+      <label>
+        {{ 'batch.compare.opacity' | t }}
+        <input type="range" min="0" max="100" step="5" [value]="overlayOpacity()" (input)="overlayOpacity.set(+$any($event.target).value)" />
+        <b>{{ overlayOpacity() }} %</b>
+      </label>
+      <label class="cmp__check">
+        <input type="checkbox" [checked]="showOutlines()" (change)="showOutlines.set($any($event.target).checked)" />
+        {{ 'batch.compare.outlines' | t }}
+      </label>
+    </div>
+  }
+
+  @if (loadFailed()) {
+    <div class="cmp__state cmp__state--error" role="alert">{{ 'batch.compare.loadFailed' | t }}</div>
+  } @else if (loading()) {
+    <div class="cmp__state" aria-busy="true">
+      <div class="skeleton skeleton--page"></div>
+      <div class="skeleton skeleton--page"></div>
+    </div>
+  }
+
+  <div class="cmp__main" [hidden]="loading() || loadFailed()">
+    <div class="cmp__panes" [class.cmp__panes--overlay]="mode() === 'overlay'" [style.--overlay-opacity]="overlayOpacity() / 100">
+      <section class="pane pane--orig" [hidden]="mode() === 'new'" (pointerdown)="activePane.set('orig')">
+        <header class="pane__tag"><span class="tag">{{ 'batch.compare.before' | t }} · {{ item().name }}</span><span class="cap">{{ origSizeLabel() }}</span></header>
+        <div #origScroll class="pane__scroll" (scroll)="onScroll('orig', $event)">
+          <div class="page" [style.width.px]="views().orig?.width" [style.height.px]="views().orig?.height" [hidden]="!hasOrigPage()">
+            <canvas #origCanvas></canvas>
+            @for (f of originalFields(); track f.index) {
+              <div class="fld fld--orig" [class.fld--ghost]="mode() === 'overlay'" [hidden]="mode() === 'overlay' && !showOutlines()"
+                [style.left.px]="f.left" [style.top.px]="f.top" [style.width.px]="f.width" [style.height.px]="f.height" [style.font-size.px]="f.fontSize">{{ f.text }}</div>
+            }
+          </div>
+          @if (!hasOrigPage()) {
+            <p class="pane__empty">{{ 'batch.compare.noPage' | t }}</p>
+          }
+        </div>
+      </section>
+
+      <section class="pane pane--new" [hidden]="mode() === 'original'" (pointerdown)="activePane.set('new')">
+        <header class="pane__tag"><span class="tag tag--accent">{{ 'batch.compare.after' | t }} · {{ item().newName }}</span><span class="cap">{{ newSizeLabel() }}</span></header>
+        <div #newScroll class="pane__scroll" (scroll)="onScroll('new', $event)">
+          <div class="page" [style.width.px]="views().new?.width" [style.height.px]="views().new?.height" [hidden]="!hasNewPage()">
+            <canvas #newCanvas></canvas>
+            @for (f of newFields(); track f.index) {
+              <div class="fld fld--new" [class.is-bad]="f.misplaced" [class.is-selected]="selected() === f.index" tabindex="0" role="button"
+                [attr.aria-label]="fieldLabel(f)"
+                [style.left.px]="f.left" [style.top.px]="f.top" [style.width.px]="f.width" [style.height.px]="f.height" [style.font-size.px]="f.fontSize"
+                (pointerdown)="onFieldPointerDown($event, f)" (pointermove)="onFieldPointerMove($event)" (pointerup)="onFieldPointerUp()" (pointercancel)="onFieldPointerUp()"
+                (focus)="select(f.index)" (keydown)="onFieldKeydown($event, f)">{{ f.text }}</div>
+            }
+          </div>
+          @if (!hasNewPage()) {
+            <p class="pane__empty">{{ 'batch.compare.noPage' | t }}</p>
+          }
+        </div>
+      </section>
+    </div>
+
+    <aside class="cmp__fields" [attr.aria-label]="'batch.compare.fields' | t : { page: pageNumber() }">
+      <h3>{{ 'batch.compare.fields' | t : { page: pageNumber() } }}</h3>
+      <ul>
+        @for (f of newFields(); track f.index) {
+          <li>
+            <button type="button" class="fieldrow" [class.is-selected]="selected() === f.index" (click)="select(f.index)">
+              <span [class]="f.misplaced ? 'bad' : 'good'" aria-hidden="true">{{ f.misplaced ? '!' : '✓' }}</span>
+              <span class="fieldrow__name">{{ f.field.mapField || f.text }}</span>
+              <span class="visually-hidden">{{ (f.misplaced ? 'batch.compare.misplaced' : 'batch.compare.inPlace') | t }}</span>
+            </button>
+          </li>
+        } @empty {
+          <li class="cap">{{ 'batch.compare.noFields' | t }}</li>
+        }
+      </ul>
+      @if (misplacedCount() > 0) {
+        <p class="note note--warn" role="status">⚠ {{ 'batch.compare.misplacedCount' | t : { count: misplacedCount() } }}</p>
+      } @else {
+        <p class="cap">{{ 'batch.compare.dragHint' | t }}</p>
+      }
+      <div class="cmp__actions">
+        <button type="button" class="btn" (click)="save(true)">{{ 'batch.compare.saveNext' | t }}</button>
+        <button type="button" class="btn btn--ghost" (click)="save(false)">{{ 'batch.compare.save' | t }}</button>
+        @if (dirty()) {
+          <span class="cap" role="status">{{ 'batch.compare.unsaved' | t }}</span>
+        }
+      </div>
+    </aside>
+  </div>
+</div>

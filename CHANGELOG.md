@@ -1,4 +1,13 @@
 ## Unreleased
+### Added
+- **Batch re-layout** (`/batch`, `/batch/:id`): pick 20–50 PDFs (and optionally their JSON, paired by file name) on the landing page; a single PDF still opens the editor as before. The list shows one row per PDF with six states (no template, JSON error, new PDF missing, ready, re-laid out, exported), filters with counters, search, keyboard navigation (↑ ↓, Enter, N for the next pending one) and browser-storage usage with warnings at 70 % and a block at 90 %. The batch is stored in IndexedDB and survives a reload; the landing offers to continue or discard it
+- Template paste accepts plain JSON or a Mongo-style script (`var pdfTemplate = { ... };`, `ObjectId(...)`, `ISODate(...)`): the first balanced `{ ... }` block goes through the safe loose parser and only `pages` is used; live validation reports the line and column of an error. Nothing is evaluated
+- New-PDF upload with page-size detection (A4/Letter…) and a dialog to scale the fields, keep the coordinates or adjust by hand, optionally remembered for the next PDFs with the same size change
+- Compare view: original, new, side by side (synced scroll) or overlay (opacity slider and outlines of the original), zoom, page navigation, draggable and keyboard-movable fields, misplaced-field detection (overlap with text or outside the page), undo/redo, save and next
+- Download as loose files (JSON with `pages` and annotated PDF named after the original) with an «n of N files» counter, retry of failures and a summary; 25 MB per PDF (provisional)
+- `utils`: `template-text`, `batch-files`, `page-size`, `field-text` (render text, shared with the editor) and `pdfjs-setup` (pdf.js worker setup, now shared by the editor and the batch pages); services `BatchStoreService`, `BatchExportService`, `PdfInfoService`
+- Texts translated in the 7 languages (`batch.*`); unit tests and an e2e suite (`e2e/batch.spec.ts`)
+
 ### Security
 - `e2e/static-server.mjs` (test/dev helper, not part of the build): listens only on `127.0.0.1`, confines files to the served folder with `path.relative`, answers 400 on malformed URLs and 404 on read errors
 

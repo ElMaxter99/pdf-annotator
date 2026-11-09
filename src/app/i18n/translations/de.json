@@ -336,5 +336,225 @@
       "horizontal": "Horizontal verteilen",
       "vertical": "Vertikal verteilen"
     }
+  },
+  "batch": {
+    "landing": {
+      "hint": "Viele PDFs? Wähle mehrere (und ihre JSON-Dateien), um das Layout im Stapel zu öffnen."
+    },
+    "nav": {
+      "home": "Zur Startseite",
+      "subtitle": "Stapel-Neulayout"
+    },
+    "privacy": "Alles passiert in deinem Browser. Nichts wird auf einen Server hochgeladen.",
+    "steps": {
+      "label": "Schritte des Neulayouts",
+      "lot": "Stapel",
+      "template": "Vorlage",
+      "newPdf": "Neues PDF",
+      "compare": "Vergleichen",
+      "export": "Exportieren"
+    },
+    "empty": {
+      "title": "Lade deine PDFs und JSON-Dateien",
+      "text": "Ziehe bis zu 50 PDFs und ihre JSON-Dateien (gleicher Name) hierher oder suche die Dateien aus. Bis zu {{limit}} MB pro PDF.",
+      "cta": "Dateien auswählen"
+    },
+    "resume": {
+      "title": "Du hast einen Stapel in Arbeit",
+      "description": "{{count}} PDFs in diesem Browser gespeichert.",
+      "continue": "Stapel fortsetzen",
+      "discard": "Stapel verwerfen",
+      "discarded": "Stapel verworfen."
+    },
+    "upload": {
+      "reading": "Lese {{done}} von {{total}}",
+      "ready": "{{count}} PDFs im Stapel bereit",
+      "rejected": "{{count}} Dateien wurden nicht hinzugefügt",
+      "dismiss": "Hinweise ausblenden"
+    },
+    "reject": {
+      "notAllowed": "Nur PDF und JSON",
+      "tooBig": "Größer als {{limit}} MB",
+      "tooBigJson": "Die JSON-Datei ist größer als 5 MB.",
+      "invalidJson": "Ungültiges JSON",
+      "duplicate": "Schon im Stapel",
+      "unmatchedJson": "Kein PDF mit diesem Namen",
+      "limit": "Stapel voll oder kein Platz"
+    },
+    "list": {
+      "title": "Stapel · {{count}} PDFs",
+      "search": "Nach Namen suchen",
+      "selected": "{{count}} ausgewählt",
+      "selectAll": "Alle auswählen",
+      "add": "Dateien hinzufügen",
+      "remove": "Aus dem Stapel entfernen",
+      "confirmRemove": "Bestätigen: {{count}} entfernen",
+      "download": "Herunterladen ({{count}})",
+      "next": "Nächstes neu layouten",
+      "noResults": "Kein PDF entspricht dem Filter.",
+      "nothingPending": "Nichts mehr offen. Gute Arbeit!",
+      "keys": "Kürzel: ↑ ↓ bewegen · Enter öffnen · N nächstes offenes"
+    },
+    "filter": {
+      "all": "Alle",
+      "noTemplate": "Ohne Vorlage",
+      "templateError": "Mit Fehler",
+      "missingNew": "Neues PDF fehlt",
+      "ready": "Bereit zum Neulayout",
+      "relaid": "Neu gelayoutet",
+      "exported": "Exportiert"
+    },
+    "status": {
+      "noTemplate": "Ohne Vorlage",
+      "templateError": "JSON-Fehler",
+      "missingNew": "Neues PDF fehlt",
+      "ready": "Bereit zum Neulayout",
+      "relaid": "Neu gelayoutet",
+      "exported": "✓ Exportiert"
+    },
+    "action": {
+      "pasteTemplate": "Vorlage einfügen",
+      "fix": "Korrigieren",
+      "uploadNew": "Neues PDF hochladen",
+      "review": "Prüfen",
+      "open": "Öffnen"
+    },
+    "col": {
+      "pdf": "PDF",
+      "template": "JSON-Vorlage",
+      "page": "Seite",
+      "weight": "Größe",
+      "fields": "Felder",
+      "status": "Status"
+    },
+    "storage": {
+      "title": "Lokaler Speicher",
+      "usage": "{{used}} von etwa {{quota}} verfügbar",
+      "batch": "Der Stapel belegt {{size}}.",
+      "warn": "Der Platz wird knapp. Entferne bereits exportierte PDFs, um ihn freizugeben.",
+      "block": "Speicher fast voll: Es können keine Dateien mehr hinzugefügt werden.",
+      "removeExported": "Exportierte entfernen ({{count}} · {{size}})"
+    },
+    "item": {
+      "back": "Zurück zum Stapel",
+      "position": "{{n}} von {{total}}",
+      "prev": "Zurück",
+      "nextOne": "Weiter",
+      "skip": "Dieses PDF überspringen",
+      "editSetup": "Vorlage oder neues PDF ändern"
+    },
+    "template": {
+      "label": "Vorlage",
+      "labelOk": "Gültige Vorlage",
+      "labelError": "Vorlage mit Fehler",
+      "title": "Vorlage einfügen",
+      "paste": "Füge das JSON oder das Mongo-Skript ein",
+      "hint": "Reines JSON oder etwas wie var pdfTemplate = {…}; geht. Nur „pages“ wird verwendet.",
+      "found": "{{pages}} Seiten · {{fields}} Felder",
+      "onlyPages": "Nur „pages“ wird verwendet. Der Rest des Skripts wird ignoriert.",
+      "error": "Die Vorlage kann nicht gelesen werden",
+      "errorAt": "Fehler in Zeile {{line}}, Spalte {{column}}",
+      "errorHelp": "Korrigiere ihn, dann wird automatisch neu geprüft.",
+      "noPages": "Ich finde keine „pages“-Liste",
+      "noPagesHelp": "Prüfe, ob du das ganze Objekt kopiert hast. Dein Text ist nicht verloren.",
+      "use": "Vorlage verwenden",
+      "loadFile": ".json-Datei laden",
+      "pages": "Erkannte Seiten",
+      "page": "Seite {{num}}",
+      "fieldsCount": "{{count}} Felder",
+      "errorItem": "Dieses PDF bleibt als „JSON-Fehler“ stehen und blockiert die anderen nicht. Du kannst es überspringen und später zurückkommen.",
+      "invalidToast": "Die Vorlage ist ungültig. Sieh dir den Hinweis neben dem Text an."
+    },
+    "newPdf": {
+      "label": "Neues PDF",
+      "title": "{{name}} ersetzen",
+      "original": "Original",
+      "drop": "Neues PDF hier ablegen",
+      "limit": "Nur ein PDF · bis zu {{limit}} MB",
+      "choose": "Neues PDF wählen",
+      "change": "Ändern",
+      "reading": "PDF wird gelesen…",
+      "unreadable": "Dieses PDF konnte nicht gelesen werden. Versuche ein anderes.",
+      "pagesDiffer": "Das Original hat {{orig}} Seiten, das neue {{next}}. Du kannst fortfahren.",
+      "sameSize": "Gleiche Seitengröße wie das Original: Die Anmerkungen bleiben, wo sie sind.",
+      "scaled": "Andere Größe: Die Anmerkungen wurden skaliert. Prüfe sie im Vergleich.",
+      "compare": "Vergleichen"
+    },
+    "size": {
+      "label": "Andere Seitengröße",
+      "title": "Das neue PDF hat nicht dieselbe Größe",
+      "intro": "Wähle, wie die Anmerkungen platziert werden. Danach kannst du sie im Vergleich anpassen.",
+      "original": "Original",
+      "new": "Neu",
+      "diff": "Unterschied: {{dw}} pt in der Breite und {{dh}} pt in der Höhe.",
+      "example": "Mit „Skalieren“ wandert das Feld {{field}} von ({{x}}, {{y}}) nach ({{nx}}, {{ny}}).",
+      "choose": "Wie die Anmerkungen platziert werden",
+      "scale": "Felder proportional skalieren",
+      "scaleHelp": "Multipliziert x und y mit dem Verhältnis beider Seiten. Behält die relative Position.",
+      "keep": "Koordinaten beibehalten",
+      "keepHelp": "Lässt x und y unverändert. Nutze es, wenn der neue Inhalt vom selben Ursprung ausgeht (unten links).",
+      "manual": "Von Hand anpassen",
+      "manualHelp": "Sie starten an den ursprünglichen Koordinaten und du platzierst sie im Vergleich.",
+      "recommended": "Empfohlen",
+      "applyAll": "Dieselbe Option für die nächsten PDFs mit dieser Größenänderung verwenden",
+      "apply": "Anwenden und vergleichen"
+    },
+    "compare": {
+      "view": "Ansicht",
+      "original": "Original",
+      "new": "Neu",
+      "side": "Nebeneinander",
+      "overlay": "Überlagert",
+      "before": "VORHER",
+      "after": "NACHHER",
+      "sync": "Synchrones Scrollen",
+      "zoom": "Zoom",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "page": "Seite",
+      "pageOf": "{{page}} / {{total}}",
+      "prevPage": "Vorherige Seite",
+      "nextPage": "Nächste Seite",
+      "undo": "Rückgängig",
+      "redo": "Wiederholen",
+      "opacity": "Deckkraft des Originals",
+      "outlines": "Umrisse des Originals zeigen",
+      "noPage": "Keine entsprechende Seite",
+      "loadFailed": "Die PDFs konnten für den Vergleich nicht geöffnet werden. Lade das neue PDF erneut hoch.",
+      "fields": "Felder auf Seite {{page}}",
+      "noFields": "Diese Seite hat keine Felder.",
+      "misplaced": "Verschoben",
+      "inPlace": "An seinem Platz",
+      "misplacedCount": "{{count}} verschobene Felder (rot). Ziehe sie oder nutze die Pfeiltasten.",
+      "misplacedToast": "{{count}} verschobene Felder auf dieser Seite.",
+      "dragHint": "Ziehe ein Feld im neuen PDF oder bewege es mit den Pfeiltasten (Umschalt = 10 pt).",
+      "emptyField": "Leeres Feld",
+      "saveNext": "Speichern und weiter",
+      "save": "Speichern",
+      "unsaved": "Ungespeicherte Änderungen",
+      "savedToast": "Neulayout gespeichert."
+    },
+    "export": {
+      "title": "Stapel herunterladen",
+      "intro": "{{count}} PDFs zum Herunterladen bereit. Sie kommen als einzelne Dateien mit dem Namen des Originals.",
+      "content": "Inhalt",
+      "json": "Neu gelayouteter JSON je PDF",
+      "pdf": "Annotiertes PDF (neue Größe)",
+      "loose": "Namen: {name}.json · {name}.pdf. Der Browser fragt eventuell nach Erlaubnis für mehrere Downloads.",
+      "skipped": "{{count}} übersprungen (ohne Vorlage oder ohne neues PDF)",
+      "start": "{{count}} Dateien herunterladen",
+      "cancel": "Abbrechen",
+      "running": "Lade {{done}} von {{total}} Dateien herunter",
+      "keepOpen": "Lass diesen Tab offen, bis es fertig ist.",
+      "done": "Stapel heruntergeladen",
+      "donePartial": "Download mit Fehlern beendet",
+      "doneCount": "{{count}} insgesamt exportiert",
+      "errorCount": "{{count}} mit Fehler",
+      "failed": "Konnte nicht erzeugt werden: {{names}}",
+      "retry": "Fehlgeschlagene wiederholen",
+      "again": "Erneut herunterladen",
+      "newBatch": "Neuen Stapel beginnen",
+      "close": "Schließen"
+    }
   }
 }

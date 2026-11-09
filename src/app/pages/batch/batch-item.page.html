@@ -1,0 +1,130 @@
+<div class="item">
+  @if (item(); as it) {
+    <header class="item__nav">
+      <a class="back" routerLink="/batch">← {{ 'batch.item.back' | t }}</a>
+      <div class="item__title">
+        <h1>{{ it.name }}</h1>
+        <span class="cap">{{ 'batch.item.position' | t : { n: index() + 1, total: total() } }} · {{ sizeLabel(it.pageSize) }} · {{ bytes(it.pdf.size) }}</span>
+      </div>
+      <app-batch-steps [active]="activeStep()"></app-batch-steps>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="goTo(-1)" [disabled]="index() <= 0">{{ 'batch.item.prev' | t }}</button>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="goTo(1)" [disabled]="index() >= total() - 1">{{ 'batch.item.nextOne' | t }}</button>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="skip()">{{ 'batch.item.skip' | t }}</button>
+    </header>
+
+    @if (setupMode()) {
+      <div class="grid">
+        <section class="card">
+          <span class="lab">{{ (it.templateIssue ? 'batch.template.labelError' : it.template ? 'batch.template.labelOk' : 'batch.template.label') | t }}</span>
+          <h2>{{ 'batch.template.title' | t }}</h2>
+          <label class="cap" for="template-text">{{ 'batch.template.paste' | t }}</label>
+          <textarea id="template-text" class="ta" spellcheck="false" rows="11" [value]="draft()" (input)="onDraft($event)" [class.ta--error]="draft().trim() && !validation().ok" [attr.aria-invalid]="draft().trim() && !validation().ok ? 'true' : null" [attr.aria-describedby]="'template-status'" placeholder="var pdfTemplate = { pages: [ ... ] };"></textarea>
+          <div id="template-status" role="status" aria-live="polite">
+            @if (!draft().trim()) {
+              <p class="cap">{{ 'batch.template.hint' | t }}</p>
+            } @else {
+              @let v = validation();
+              @if (v.ok) {
+                <p class="note note--ok">✓ <span><b>{{ 'batch.template.found' | t : { pages: v.pages, fields: v.fields } }}</b><br />{{ 'batch.template.onlyPages' | t }}</span></p>
+              } @else if (v.reason === 'syntax') {
+                <p class="note note--error">⚠ <span><b>{{ (v.line ? 'batch.template.errorAt' : 'batch.template.error') | t : { line: v.line, column: v.column } }}</b><br />{{ 'batch.template.errorHelp' | t }}</span></p>
+              } @else {
+                <p class="note note--error">⚠ <span><b>{{ 'batch.template.noPages' | t }}</b><br />{{ 'batch.template.noPagesHelp' | t }}</span></p>
+              }
+            }
+          </div>
+          <div class="actions">
+            <button type="button" class="btn" [disabled]="!validation().ok" (click)="useTemplate()">{{ 'batch.template.use' | t }}</button>
+            <label class="btn btn--ghost file">
+              {{ 'batch.template.loadFile' | t }}
+              <input type="file" accept="application/json,.json" hidden (change)="onTemplateFile($event)" />
+            </label>
+          </div>
+          @if (pageSummary().length && it.template && !it.templateIssue) {
+            <hr />
+            <h3>{{ 'batch.template.pages' | t }}</h3>
+            @for (p of pageSummary(); track p.num) {
+              <div class="row"><span>{{ 'batch.template.page' | t : { num: p.num } }}</span><span class="cap">{{ 'batch.template.fieldsCount' | t : { count: p.fields } }}</span></div>
+            }
+          }
+          @if (it.templateIssue) {
+            <p class="cap">{{ 'batch.template.errorItem' | t }}</p>
+          }
+        </section>
+
+        <section class="card">
+          <span class="lab">{{ 'batch.newPdf.label' | t }}</span>
+          <h2>{{ 'batch.newPdf.title' | t : { name: it.name } }}</h2>
+          <div class="row"><span aria-hidden="true">📄</span><span class="grow ellipsis">{{ 'batch.newPdf.original' | t }} · {{ it.name }}</span><span class="cap">{{ sizeLabel(it.pageSize) }} · {{ bytes(it.pdf.size) }}</span></div>
+          <div class="drop" [class.drop--active]="dropActive()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+            <h3>{{ 'batch.newPdf.drop' | t }}</h3>
+            <p class="cap">{{ 'batch.newPdf.limit' | t : { limit: maxMb } }}</p>
+            <label class="btn file" [attr.aria-busy]="uploading()">
+              {{ (it.newPdf ? 'batch.newPdf.change' : 'batch.newPdf.choose') | t }}
+              <input type="file" accept="application/pdf,.pdf" hidden (change)="onNewPdf($event)" />
+            </label>
+          </div>
+          @if (uploading()) {
+            <div class="bar" role="progressbar" aria-busy="true"><i class="bar--indeterminate"></i></div>
+            <p class="cap">{{ 'batch.newPdf.reading' | t }}</p>
+          }
+          @if (it.newPdf && it.newPageSize) {
+            <div class="row row--sel"><span class="ok" aria-hidden="true">✓</span><span class="grow ellipsis">{{ it.newName }}</span><span class="cap">{{ sizeLabel(it.newPageSize) }} · {{ bytes(it.newPdf.size) }}</span></div>
+            @if (it.newPageCount !== it.pageCount) {
+              <p class="note note--warn">⚠ <span>{{ 'batch.newPdf.pagesDiffer' | t : { orig: it.pageCount, next: it.newPageCount } }}</span></p>
+            } @else if (!needsSize()) {
+              <p class="note note--ok">ℹ <span>{{ (sizeInfo() && it.sizeStrategy === 'scale' ? 'batch.newPdf.scaled' : 'batch.newPdf.sameSize') | t }}</span></p>
+            }
+          }
+          <div class="actions">
+            <button type="button" class="btn" [disabled]="!it.template || !it.newPdf || needsSize() || !!it.templateIssue" (click)="showSetup.set(false)">{{ 'batch.newPdf.compare' | t }} →</button>
+            <button type="button" class="btn btn--ghost" (click)="skip()">{{ 'batch.item.skip' | t }}</button>
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="compare-head">
+        <button type="button" class="btn btn--ghost btn--sm" (click)="showSetup.set(true)">✎ {{ 'batch.item.editSetup' | t }}</button>
+      </div>
+      <app-batch-compare [item]="it" (saved)="onSaved($event)"></app-batch-compare>
+    }
+
+    @if (needsSize() && sizeInfo(); as info) {
+      <div class="overlay" role="dialog" aria-modal="true" aria-labelledby="size-title" (keydown.escape)="cancelSize()">
+        <div class="dialog card">
+          <span class="lab">{{ 'batch.size.label' | t }}</span>
+          <h2 id="size-title">⚠ {{ 'batch.size.title' | t }}</h2>
+          <p class="cap">{{ 'batch.size.intro' | t }}</p>
+          <div class="sizes" aria-hidden="true">
+            <figure><div class="sheet" [style.width.px]="info.fromBox.w" [style.height.px]="info.fromBox.h"></div><figcaption>{{ 'batch.size.original' | t }} · {{ info.fromLabel }} pt</figcaption></figure>
+            <figure><div class="sheet sheet--new" [style.width.px]="info.toBox.w" [style.height.px]="info.toBox.h"></div><figcaption>{{ 'batch.size.new' | t }} · {{ info.toLabel }} pt</figcaption></figure>
+          </div>
+          <p class="cap">{{ 'batch.size.diff' | t : { dw: info.dw, dh: info.dh } }}</p>
+          @if (info.sample && info.scaled) {
+            <p class="cap">{{ 'batch.size.example' | t : { field: info.sample.mapField, x: info.sample.x, y: info.sample.y, nx: info.scaled.x, ny: info.scaled.y } }}</p>
+          }
+          <fieldset class="opts">
+            <legend class="visually-hidden">{{ 'batch.size.choose' | t }}</legend>
+            @for (opt of ['scale', 'keep', 'manual']; track opt) {
+              <label class="radio" [class.is-on]="strategy() === opt">
+                <input type="radio" name="size-strategy" [value]="opt" [checked]="strategy() === opt" (change)="strategy.set($any(opt))" />
+                <span><b>{{ 'batch.size.' + opt | t }}</b> @if (opt === 'scale') { <span class="chip">{{ 'batch.size.recommended' | t }}</span> }<br /><span class="cap">{{ 'batch.size.' + opt + 'Help' | t }}</span></span>
+              </label>
+            }
+          </fieldset>
+          <label class="opt"><input type="checkbox" [checked]="rememberRule()" (change)="rememberRule.set($any($event.target).checked)" /> {{ 'batch.size.applyAll' | t }}</label>
+          <div class="actions">
+            <button type="button" class="btn" (click)="applySize()">{{ 'batch.size.apply' | t }} →</button>
+            <button type="button" class="btn btn--ghost" (click)="cancelSize()">{{ 'batch.export.cancel' | t }}</button>
+          </div>
+        </div>
+      </div>
+    }
+  } @else {
+    <section class="card" aria-busy="true">
+      <div class="skeleton skeleton--line"></div>
+      <div class="skeleton skeleton--block"></div>
+    </section>
+  }
+</div>

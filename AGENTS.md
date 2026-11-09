@@ -9,7 +9,7 @@ Este archivo es la fuente de verdad para cualquier agente (Claude Code, Copilot,
 3. Sincronizar esas anotaciones con un **JSON** editable (`{ "pages": [{ "num", "fields": [...] }] }`).
 4. Exportar el JSON o un **PDF anotado** (`pdf-lib`), y guardar **plantillas** reutilizables en `localStorage`.
 
-Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en, ca, fr, it, pt, de. Temas: oscuro/claro.
+Rutas: `/landing` (carga inicial) → `/workspace` (editor); con varios PDF, `/batch` (lista) → `/batch/:id` (plantilla, PDF nuevo y comparar). Idiomas: es-ES, en, ca, fr, it, pt, de. Temas: oscuro/claro.
 
 ## 2. Comandos
 | Comando | Uso |
@@ -30,11 +30,12 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 ```
 src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
+├─ pages/batch/              Remaquetado por lotes: lista (`batch.page`), ficha por PDF (`batch-item.page`) y componentes (comparar, pasos)
 ├─ pages/workspace/
 │  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~3.340 líneas): render del PDF, sincronización del JSON, atajos y UI
 │  └─ components/            header · sidebar (4 pestañas: Documento, Anotaciones, Plantillas, Avanzado) · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle, toast-host (avisos globales)
-├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace), annotation-import (normaliza JSON importado → anotaciones), toast (avisos no bloqueantes), session-store (última sesión en IndexedDB: PDF + anotaciones + página y zoom)
+├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace), annotation-import (normaliza JSON importado → anotaciones), toast (avisos no bloqueantes), session-store (última sesión en IndexedDB: PDF + anotaciones + página y zoom), batch-store (lote de remaquetado en IndexedDB), batch-export, pdf-info
 ├─ guards/                   workspace.guard (sin PDF pendiente → /landing)
 ├─ i18n/                     translation.service + pipe `t` + translations/*.json
 ├─ models/                   annotation.model, guide-settings.model, page-thumbnail.model

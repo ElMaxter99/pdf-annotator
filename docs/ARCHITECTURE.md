@@ -80,6 +80,14 @@ La plantilla "Predeterminada" es sintética y no se puede borrar. Todos los acce
 ## 6b. Sesión guardada (IndexedDB)
 `SessionStoreService` guarda la última sesión (`pdf` como Blob, `coords`, `pageIndex`, `scale`, `savedAt`) en la base `pdf-annotator`, almacén `session`, clave `last`. La página la escribe con un debounce de 800 ms desde un `effect` sobre anotaciones, página y zoom (y la vuelca al salir con `pagehide`/`ngOnDestroy`); solo guarda si hay anotaciones o historial, y la borra al limpiar todas. PDFs de más de 40 MB no se guardan. La landing ofrece **Continuar** (pasa archivo y `PendingRestore` por `PendingFileService`; el workspace los aplica con `skipHistory`) o **Descartar**. Todos los accesos toleran IndexedDB bloqueada o llena.
 
+## 6c. Remaquetado por lotes (`/batch`)
+- Entrada: la landing acepta varios archivos; con un solo PDF abre el editor, con varios (o JSON) llama a `BatchStoreService.addFiles` y navega a `/batch`. Los JSON se asocian al PDF con el mismo nombre base (`utils/batch-files.utils.ts`).
+- `BatchStoreService` guarda los items (PDF original, plantilla, PDF nuevo, `layout`) en IndexedDB (`pdf-annotator-batch`, aparte de la sesión). El estado de cada fila se deriva con `batchStatusOf`. Límites: 50 PDF, 25 MB por PDF (provisional), aviso al 70 % y bloqueo al 90 % de la cuota del navegador.
+- Plantilla: `parseTemplateText` toma el primer bloque `{ ... }` equilibrado (admite `var x = {...}`, `ObjectId(..)`, `ISODate(..)`), lo pasa por `parseLooseJson` y exige `pages`; luego `AnnotationImportService` lo normaliza. Nunca se evalúa nada.
+- `/batch/:id` (`BatchItemPageComponent`): pegar plantilla, subir PDF nuevo y, si la página mide distinto, elegir escalar/mantener/manual (`utils/page-size.utils.ts`). `BatchCompareComponent` renderiza original y nuevo con pdf.js (`utils/pdfjs-setup.ts` configura el worker y lo comparte con el editor), arrastra campos sobre el nuevo y detecta campos descolocados con `getTextContent`.
+- Exportación: `BatchExportService` genera `{nombre}.json` (solo `pages`) y `{nombre}.pdf` (con `PdfExportService`); la página los descarga sueltos con contador. No hay ZIP.
+- Las rutas `batch` y `batch/:id` se renderizan solo en cliente (`app.routes.server.ts`).
+
 ## 7. Guías y snapping
 `GuideSettings` (`models/guide-settings.model.ts`): rejilla (`gridSize`), reglas, alineación, *snap* a rejilla/márgenes/centros/puntos personalizados, `snapTolerance`, y modo de coordenadas (PDF o canvas). Se activan en **Opciones avanzadas → Activar guías y snapping**.
 

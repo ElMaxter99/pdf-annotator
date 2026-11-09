@@ -336,5 +336,225 @@
       "horizontal": "Distribuir horizontalmente",
       "vertical": "Distribuir verticalmente"
     }
+  },
+  "batch": {
+    "landing": {
+      "hint": "Muitos PDF? Escolha vários (e os seus JSON) para abrir a remontagem em lote."
+    },
+    "nav": {
+      "home": "Ir para a página inicial",
+      "subtitle": "Remontagem em lote"
+    },
+    "privacy": "Tudo acontece no seu navegador. Nada é enviado para nenhum servidor.",
+    "steps": {
+      "label": "Passos da remontagem",
+      "lot": "Lote",
+      "template": "Modelo",
+      "newPdf": "PDF novo",
+      "compare": "Comparar",
+      "export": "Exportar"
+    },
+    "empty": {
+      "title": "Carregue os seus PDF e JSON",
+      "text": "Arraste até 50 PDF e os seus JSON (mesmo nome), ou procure os ficheiros. Até {{limit}} MB por PDF.",
+      "cta": "Selecionar ficheiros"
+    },
+    "resume": {
+      "title": "Tem um lote em curso",
+      "description": "{{count}} PDF guardados neste navegador.",
+      "continue": "Continuar o lote",
+      "discard": "Descartar o lote",
+      "discarded": "Lote descartado."
+    },
+    "upload": {
+      "reading": "A ler {{done}} de {{total}}",
+      "ready": "{{count}} PDF prontos no lote",
+      "rejected": "{{count}} ficheiros não foram adicionados",
+      "dismiss": "Ocultar avisos"
+    },
+    "reject": {
+      "notAllowed": "Apenas PDF e JSON",
+      "tooBig": "Excede {{limit}} MB",
+      "tooBigJson": "O JSON excede 5 MB.",
+      "invalidJson": "JSON inválido",
+      "duplicate": "Já está no lote",
+      "unmatchedJson": "Nenhum PDF com esse nome",
+      "limit": "Lote cheio ou sem espaço"
+    },
+    "list": {
+      "title": "Lote · {{count}} PDF",
+      "search": "Procurar por nome",
+      "selected": "{{count}} selecionados",
+      "selectAll": "Selecionar todos",
+      "add": "Adicionar ficheiros",
+      "remove": "Retirar do lote",
+      "confirmRemove": "Confirmar: retirar {{count}}",
+      "download": "Descarregar ({{count}})",
+      "next": "Remontar o seguinte",
+      "noResults": "Nenhum PDF corresponde ao filtro.",
+      "nothingPending": "Não resta nada pendente. Bom trabalho!",
+      "keys": "Atalhos: ↑ ↓ mover · Enter abrir · N próximo pendente"
+    },
+    "filter": {
+      "all": "Todos",
+      "noTemplate": "Sem modelo",
+      "templateError": "Com erro",
+      "missingNew": "Falta PDF novo",
+      "ready": "Prontos para remontar",
+      "relaid": "Remontados",
+      "exported": "Exportados"
+    },
+    "status": {
+      "noTemplate": "Sem modelo",
+      "templateError": "Erro no JSON",
+      "missingNew": "Falta PDF novo",
+      "ready": "Pronto para remontar",
+      "relaid": "Remontado",
+      "exported": "✓ Exportado"
+    },
+    "action": {
+      "pasteTemplate": "Colar modelo",
+      "fix": "Corrigir",
+      "uploadNew": "Enviar PDF novo",
+      "review": "Rever",
+      "open": "Abrir"
+    },
+    "col": {
+      "pdf": "PDF",
+      "template": "Modelo JSON",
+      "page": "Página",
+      "weight": "Peso",
+      "fields": "Campos",
+      "status": "Estado"
+    },
+    "storage": {
+      "title": "Armazenamento local",
+      "usage": "{{used}} de cerca de {{quota}} disponíveis",
+      "batch": "O lote ocupa {{size}}.",
+      "warn": "Resta pouco espaço. Retire os PDF já exportados para libertar espaço.",
+      "block": "Armazenamento quase cheio: não é possível adicionar mais ficheiros.",
+      "removeExported": "Retirar exportados ({{count}} · {{size}})"
+    },
+    "item": {
+      "back": "Voltar ao lote",
+      "position": "{{n}} de {{total}}",
+      "prev": "Anterior",
+      "nextOne": "Seguinte",
+      "skip": "Saltar este PDF",
+      "editSetup": "Alterar modelo ou PDF novo"
+    },
+    "template": {
+      "label": "Modelo",
+      "labelOk": "Modelo válido",
+      "labelError": "Modelo com erro",
+      "title": "Colar o modelo",
+      "paste": "Cole o JSON ou o script do Mongo",
+      "hint": "Serve um JSON ou algo como var pdfTemplate = {…}; só se usa «pages».",
+      "found": "{{pages}} páginas · {{fields}} campos",
+      "onlyPages": "Só se usa «pages». O resto do script é ignorado.",
+      "error": "Não é possível ler o modelo",
+      "errorAt": "Erro na linha {{line}}, coluna {{column}}",
+      "errorHelp": "Corrija-o e volta a validar sozinho.",
+      "noPages": "Não encontro uma lista «pages»",
+      "noPagesHelp": "Verifique se copiou o objeto completo. O seu texto não se perdeu.",
+      "use": "Usar modelo",
+      "loadFile": "Carregar ficheiro .json",
+      "pages": "Páginas detetadas",
+      "page": "Página {{num}}",
+      "fieldsCount": "{{count}} campos",
+      "errorItem": "Este PDF fica como «Erro no JSON» e não bloqueia os outros. Pode saltá-lo e voltar depois.",
+      "invalidToast": "O modelo não é válido. Veja o aviso junto ao texto."
+    },
+    "newPdf": {
+      "label": "PDF novo",
+      "title": "Substituir {{name}}",
+      "original": "Original",
+      "drop": "Largue o PDF novo",
+      "limit": "Só um PDF · até {{limit}} MB",
+      "choose": "Escolher PDF novo",
+      "change": "Alterar",
+      "reading": "A ler o PDF…",
+      "unreadable": "Não foi possível ler esse PDF. Tente outro.",
+      "pagesDiffer": "O original tem {{orig}} páginas e o novo {{next}}. Pode continuar.",
+      "sameSize": "Mesmo tamanho de página que o original: as anotações ficam como estão.",
+      "scaled": "Tamanho diferente: as anotações foram redimensionadas. Reveja-as na comparação.",
+      "compare": "Comparar"
+    },
+    "size": {
+      "label": "Tamanho de página diferente",
+      "title": "O PDF novo não tem o mesmo tamanho",
+      "intro": "Escolha como colocar as anotações. Depois poderá ajustá-las na comparação.",
+      "original": "Original",
+      "new": "Novo",
+      "diff": "Diferença: {{dw}} pt de largura e {{dh}} pt de altura.",
+      "example": "Com «Redimensionar», o campo {{field}} passa de ({{x}}, {{y}}) para ({{nx}}, {{ny}}).",
+      "choose": "Como colocar as anotações",
+      "scale": "Redimensionar campos proporcionalmente",
+      "scaleHelp": "Multiplica x e y pela relação entre as duas páginas. Mantém a posição relativa.",
+      "keep": "Manter as coordenadas",
+      "keepHelp": "Não toca em x nem y. Use se o conteúdo novo parte da mesma origem (em baixo à esquerda).",
+      "manual": "Ajustar à mão",
+      "manualHelp": "Começam nas coordenadas originais e coloca-os você na comparação.",
+      "recommended": "Recomendado",
+      "applyAll": "Aplicar a mesma opção aos próximos PDF com esta mudança de tamanho",
+      "apply": "Aplicar e comparar"
+    },
+    "compare": {
+      "view": "Vista",
+      "original": "Original",
+      "new": "Novo",
+      "side": "Lado a lado",
+      "overlay": "Sobreposto",
+      "before": "ANTES",
+      "after": "DEPOIS",
+      "sync": "Deslocamento sincronizado",
+      "zoom": "Zoom",
+      "zoomIn": "Aproximar",
+      "zoomOut": "Afastar",
+      "page": "Página",
+      "pageOf": "{{page}} / {{total}}",
+      "prevPage": "Página anterior",
+      "nextPage": "Página seguinte",
+      "undo": "Anular",
+      "redo": "Refazer",
+      "opacity": "Opacidade do original",
+      "outlines": "Mostrar contornos do original",
+      "noPage": "Sem página equivalente",
+      "loadFailed": "Não foi possível abrir os PDF para comparar. Volte a enviar o PDF novo.",
+      "fields": "Campos da página {{page}}",
+      "noFields": "Esta página não tem campos.",
+      "misplaced": "Mal colocado",
+      "inPlace": "No sítio",
+      "misplacedCount": "{{count}} campos mal colocados (a vermelho). Arraste-os ou use as setas.",
+      "misplacedToast": "{{count}} campos mal colocados nesta página.",
+      "dragHint": "Arraste um campo do PDF novo ou mova-o com as setas (Shift = 10 pt).",
+      "emptyField": "Campo vazio",
+      "saveNext": "Guardar e seguinte",
+      "save": "Guardar",
+      "unsaved": "Alterações por guardar",
+      "savedToast": "Remontagem guardada."
+    },
+    "export": {
+      "title": "Descarregar o lote",
+      "intro": "{{count}} PDF prontos a descarregar. Vêm como ficheiros soltos, com o nome do original.",
+      "content": "Conteúdo",
+      "json": "JSON remontado de cada PDF",
+      "pdf": "PDF anotado (tamanho novo)",
+      "loose": "Nomes: {nome}.json · {nome}.pdf. O navegador pode pedir permissão para várias transferências.",
+      "skipped": "{{count}} saltados (sem modelo ou sem PDF novo)",
+      "start": "Descarregar {{count}} ficheiros",
+      "cancel": "Cancelar",
+      "running": "A descarregar {{done}} de {{total}} ficheiros",
+      "keepOpen": "Não feche este separador até terminar.",
+      "done": "Lote descarregado",
+      "donePartial": "Transferência concluída com erros",
+      "doneCount": "{{count}} exportados no total",
+      "errorCount": "{{count}} com erro",
+      "failed": "Não foi possível gerar: {{names}}",
+      "retry": "Repetir os que falharam",
+      "again": "Descarregar de novo",
+      "newBatch": "Começar outro lote",
+      "close": "Fechar"
+    }
   }
 }

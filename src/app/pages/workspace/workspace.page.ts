@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import { pdfjsLib } from '../../utils/pdfjs-setup';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
@@ -85,49 +85,8 @@ import {
   toRgbString,
 } from '../../utils/color.utils';
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
+import { fieldRenderText } from '../../utils/field-text.utils';
 
-const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
-const PDF_WORKER_TYPE_MODULE = 'module';
-
-function supportsModuleWorkers(): boolean {
-  if (
-    typeof Worker === 'undefined' ||
-    typeof Blob === 'undefined' ||
-    typeof URL === 'undefined' ||
-    typeof URL.createObjectURL !== 'function'
-  ) {
-    return false;
-  }
-
-  let url: string | null = null;
-
-  try {
-    const blob = new Blob([''], { type: 'application/javascript' });
-    url = URL.createObjectURL(blob);
-    const tester = new Worker(url, { type: 'module' });
-    tester.terminate();
-    return true;
-  } catch {
-    return false;
-  } finally {
-    if (url) {
-      URL.revokeObjectURL(url);
-    }
-  }
-}
-
-const workerOptions = (pdfjsLib as any).GlobalWorkerOptions as {
-  workerSrc?: string;
-  workerType?: string;
-};
-
-if (supportsModuleWorkers()) {
-  workerOptions.workerSrc = PDF_WORKER_MODULE_SRC;
-  workerOptions.workerType = PDF_WORKER_TYPE_MODULE;
-} else {
-  workerOptions.workerSrc = undefined;
-  workerOptions.workerType = undefined;
-}
 
 type PreviewState = { page: number; field: PageField } | null;
 
@@ -2785,31 +2744,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
 
   private getFieldRenderValue(field: PageField): string {
-    const override =
-      typeof field.value === 'string' && field.value.trim() ? field.value : undefined;
-    if (override !== undefined) {
-      return override;
-    }
-
-    const type = normalizeFieldType(field.type);
-    if (type === 'check' || type === 'radio') {
-      return 'X';
-    }
-
-    const baseText = typeof field.mapField === 'string' ? field.mapField : '';
-
-    if (type === 'number') {
-      const numeric = toFiniteNumber(baseText);
-      if (numeric !== null) {
-        const decimals = normalizeFieldDecimals(field.decimals);
-        const formatted =
-          decimals !== undefined ? formatNumberWithTruncation(numeric, decimals) : baseText;
-        const appender = sanitizeOptionalAppender(field.appender) ?? '';
-        return `${formatted}${appender}`;
-      }
-    }
-
-    return baseText;
+    return fieldRenderText(field);
   }
 
 

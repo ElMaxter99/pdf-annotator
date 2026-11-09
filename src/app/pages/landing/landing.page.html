@@ -28,6 +28,19 @@
           </section>
         }
 
+        @if (batchCount() > 0) {
+          <section class="landing__resume" aria-labelledby="resume-batch-title">
+            <div class="landing__resume-text">
+              <strong id="resume-batch-title">{{ 'batch.resume.title' | t }}</strong>
+              <span>{{ 'batch.resume.description' | t : { count: batchCount() } }}</span>
+            </div>
+            <div class="landing__resume-actions">
+              <button type="button" class="landing__cta" (click)="continueBatch()">{{ 'batch.resume.continue' | t }}</button>
+              <button type="button" class="btn btn--ghost" (click)="discardBatch()">{{ 'batch.resume.discard' | t }}</button>
+            </div>
+          </section>
+        }
+
         <app-landing-dropzone [fileDropActive]="fileDropActive()" (fileSelected)="onFileSelected($event)"
           (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
           (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"

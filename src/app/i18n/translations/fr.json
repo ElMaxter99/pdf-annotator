@@ -336,5 +336,225 @@
       "horizontal": "Répartir horizontalement",
       "vertical": "Répartir verticalement"
     }
+  },
+  "batch": {
+    "landing": {
+      "hint": "Beaucoup de PDF ? Choisissez-en plusieurs (et leurs JSON) pour ouvrir la mise en page par lots."
+    },
+    "nav": {
+      "home": "Aller à la page d'accueil",
+      "subtitle": "Mise en page par lots"
+    },
+    "privacy": "Tout se passe dans votre navigateur. Rien n'est envoyé à un serveur.",
+    "steps": {
+      "label": "Étapes de la mise en page",
+      "lot": "Lot",
+      "template": "Modèle",
+      "newPdf": "Nouveau PDF",
+      "compare": "Comparer",
+      "export": "Exporter"
+    },
+    "empty": {
+      "title": "Chargez vos PDF et JSON",
+      "text": "Déposez jusqu'à 50 PDF et leurs JSON (même nom), ou parcourez vos fichiers. Jusqu'à {{limit}} Mo par PDF.",
+      "cta": "Sélectionner des fichiers"
+    },
+    "resume": {
+      "title": "Vous avez un lot en cours",
+      "description": "{{count}} PDF enregistrés dans ce navigateur.",
+      "continue": "Continuer le lot",
+      "discard": "Abandonner le lot",
+      "discarded": "Lot abandonné."
+    },
+    "upload": {
+      "reading": "Lecture de {{done}} sur {{total}}",
+      "ready": "{{count}} PDF prêts dans le lot",
+      "rejected": "{{count}} fichiers n'ont pas été ajoutés",
+      "dismiss": "Masquer les avis"
+    },
+    "reject": {
+      "notAllowed": "PDF et JSON uniquement",
+      "tooBig": "Dépasse {{limit}} Mo",
+      "tooBigJson": "Le JSON dépasse 5 Mo.",
+      "invalidJson": "JSON non valide",
+      "duplicate": "Déjà dans le lot",
+      "unmatchedJson": "Aucun PDF de ce nom",
+      "limit": "Lot plein ou plus d'espace"
+    },
+    "list": {
+      "title": "Lot · {{count}} PDF",
+      "search": "Rechercher par nom",
+      "selected": "{{count}} sélectionnés",
+      "selectAll": "Tout sélectionner",
+      "add": "Ajouter des fichiers",
+      "remove": "Retirer du lot",
+      "confirmRemove": "Confirmer : retirer {{count}}",
+      "download": "Télécharger ({{count}})",
+      "next": "Mettre en page le suivant",
+      "noResults": "Aucun PDF ne correspond au filtre.",
+      "nothingPending": "Il ne reste rien à faire. Bravo !",
+      "keys": "Raccourcis : ↑ ↓ se déplacer · Entrée ouvrir · N prochain en attente"
+    },
+    "filter": {
+      "all": "Tous",
+      "noTemplate": "Sans modèle",
+      "templateError": "Avec erreur",
+      "missingNew": "Nouveau PDF manquant",
+      "ready": "Prêts à mettre en page",
+      "relaid": "Mis en page",
+      "exported": "Exportés"
+    },
+    "status": {
+      "noTemplate": "Sans modèle",
+      "templateError": "Erreur de JSON",
+      "missingNew": "Nouveau PDF manquant",
+      "ready": "Prêt à mettre en page",
+      "relaid": "Mis en page",
+      "exported": "✓ Exporté"
+    },
+    "action": {
+      "pasteTemplate": "Coller le modèle",
+      "fix": "Corriger",
+      "uploadNew": "Envoyer le nouveau PDF",
+      "review": "Vérifier",
+      "open": "Ouvrir"
+    },
+    "col": {
+      "pdf": "PDF",
+      "template": "Modèle JSON",
+      "page": "Page",
+      "weight": "Poids",
+      "fields": "Champs",
+      "status": "État"
+    },
+    "storage": {
+      "title": "Stockage local",
+      "usage": "{{used}} sur environ {{quota}} disponibles",
+      "batch": "Le lot occupe {{size}}.",
+      "warn": "Il reste peu d'espace. Retirez les PDF déjà exportés pour en libérer.",
+      "block": "Stockage presque plein : impossible d'ajouter d'autres fichiers.",
+      "removeExported": "Retirer les exportés ({{count}} · {{size}})"
+    },
+    "item": {
+      "back": "Retour au lot",
+      "position": "{{n}} sur {{total}}",
+      "prev": "Précédent",
+      "nextOne": "Suivant",
+      "skip": "Passer ce PDF",
+      "editSetup": "Changer le modèle ou le nouveau PDF"
+    },
+    "template": {
+      "label": "Modèle",
+      "labelOk": "Modèle valide",
+      "labelError": "Modèle avec erreur",
+      "title": "Coller le modèle",
+      "paste": "Collez le JSON ou le script Mongo",
+      "hint": "Un JSON ou quelque chose comme var pdfTemplate = {…}; convient. Seul « pages » est utilisé.",
+      "found": "{{pages}} pages · {{fields}} champs",
+      "onlyPages": "Seul « pages » est utilisé. Le reste du script est ignoré.",
+      "error": "Le modèle est illisible",
+      "errorAt": "Erreur à la ligne {{line}}, colonne {{column}}",
+      "errorHelp": "Corrigez-la et la validation se refait toute seule.",
+      "noPages": "Je ne trouve pas de liste « pages »",
+      "noPagesHelp": "Vérifiez que vous avez copié l'objet complet. Votre texte n'est pas perdu.",
+      "use": "Utiliser le modèle",
+      "loadFile": "Charger un fichier .json",
+      "pages": "Pages détectées",
+      "page": "Page {{num}}",
+      "fieldsCount": "{{count}} champs",
+      "errorItem": "Ce PDF reste en « Erreur de JSON » et ne bloque pas les autres. Vous pouvez le passer et y revenir.",
+      "invalidToast": "Le modèle n'est pas valide. Voyez l'avis à côté du texte."
+    },
+    "newPdf": {
+      "label": "Nouveau PDF",
+      "title": "Remplacer {{name}}",
+      "original": "Original",
+      "drop": "Déposez le nouveau PDF",
+      "limit": "Un seul PDF · jusqu'à {{limit}} Mo",
+      "choose": "Choisir le nouveau PDF",
+      "change": "Changer",
+      "reading": "Lecture du PDF…",
+      "unreadable": "Ce PDF est illisible. Essayez-en un autre.",
+      "pagesDiffer": "L'original a {{orig}} pages et le nouveau {{next}}. Vous pouvez continuer.",
+      "sameSize": "Même taille de page que l'original : les annotations sont placées telles quelles.",
+      "scaled": "Taille différente : les annotations ont été mises à l'échelle. Vérifiez-les dans la comparaison.",
+      "compare": "Comparer"
+    },
+    "size": {
+      "label": "Taille de page différente",
+      "title": "Le nouveau PDF n'a pas la même taille",
+      "intro": "Choisissez comment placer les annotations. Vous pourrez les ajuster ensuite dans la comparaison.",
+      "original": "Original",
+      "new": "Nouveau",
+      "diff": "Différence : {{dw}} pt de large et {{dh}} pt de haut.",
+      "example": "Avec « Mettre à l'échelle », le champ {{field}} passe de ({{x}}, {{y}}) à ({{nx}}, {{ny}}).",
+      "choose": "Comment placer les annotations",
+      "scale": "Mettre les champs à l'échelle",
+      "scaleHelp": "Multiplie x et y par le rapport entre les deux pages. Garde la position relative.",
+      "keep": "Garder les coordonnées",
+      "keepHelp": "Ne touche ni x ni y. À utiliser si le nouveau contenu part de la même origine (en bas à gauche).",
+      "manual": "Ajuster à la main",
+      "manualHelp": "Ils partent des coordonnées d'origine et vous les placez dans la comparaison.",
+      "recommended": "Recommandé",
+      "applyAll": "Appliquer la même option aux prochains PDF avec ce changement de taille",
+      "apply": "Appliquer et comparer"
+    },
+    "compare": {
+      "view": "Vue",
+      "original": "Original",
+      "new": "Nouveau",
+      "side": "Côte à côte",
+      "overlay": "Superposé",
+      "before": "AVANT",
+      "after": "APRÈS",
+      "sync": "Défilement synchronisé",
+      "zoom": "Zoom",
+      "zoomIn": "Agrandir",
+      "zoomOut": "Réduire",
+      "page": "Page",
+      "pageOf": "{{page}} / {{total}}",
+      "prevPage": "Page précédente",
+      "nextPage": "Page suivante",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "opacity": "Opacité de l'original",
+      "outlines": "Afficher les contours de l'original",
+      "noPage": "Pas de page équivalente",
+      "loadFailed": "Impossible d'ouvrir les PDF pour comparer. Renvoyez le nouveau PDF.",
+      "fields": "Champs de la page {{page}}",
+      "noFields": "Cette page n'a pas de champs.",
+      "misplaced": "Mal placé",
+      "inPlace": "À sa place",
+      "misplacedCount": "{{count}} champs mal placés (en rouge). Faites-les glisser ou utilisez les flèches.",
+      "misplacedToast": "{{count}} champs mal placés sur cette page.",
+      "dragHint": "Faites glisser un champ du nouveau PDF ou déplacez-le avec les flèches (Maj = 10 pt).",
+      "emptyField": "Champ vide",
+      "saveNext": "Enregistrer et suivant",
+      "save": "Enregistrer",
+      "unsaved": "Modifications non enregistrées",
+      "savedToast": "Mise en page enregistrée."
+    },
+    "export": {
+      "title": "Télécharger le lot",
+      "intro": "{{count}} PDF prêts à télécharger. Ils arrivent en fichiers séparés, au nom de l'original.",
+      "content": "Contenu",
+      "json": "JSON remis en page de chaque PDF",
+      "pdf": "PDF annoté (nouvelle taille)",
+      "loose": "Noms : {nom}.json · {nom}.pdf. Le navigateur peut demander l'autorisation de télécharger plusieurs fichiers.",
+      "skipped": "{{count}} ignorés (sans modèle ou sans nouveau PDF)",
+      "start": "Télécharger {{count}} fichiers",
+      "cancel": "Annuler",
+      "running": "Téléchargement de {{done}} fichiers sur {{total}}",
+      "keepOpen": "Gardez cet onglet ouvert jusqu'à la fin.",
+      "done": "Lot téléchargé",
+      "donePartial": "Téléchargement terminé avec des erreurs",
+      "doneCount": "{{count}} exportés au total",
+      "errorCount": "{{count}} en erreur",
+      "failed": "Génération impossible : {{names}}",
+      "retry": "Réessayer les échecs",
+      "again": "Télécharger à nouveau",
+      "newBatch": "Commencer un autre lot",
+      "close": "Fermer"
+    }
   }
 }

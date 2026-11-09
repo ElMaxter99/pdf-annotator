@@ -336,5 +336,225 @@
       "horizontal": "Distribueix horitzontalment",
       "vertical": "Distribueix verticalment"
     }
+  },
+  "batch": {
+    "landing": {
+      "hint": "Molts PDF? Tria'n diversos (i els seus JSON) i s'obre el remaquetatge per lots."
+    },
+    "nav": {
+      "home": "Anar a la pàgina d'inici",
+      "subtitle": "Remaquetatge per lots"
+    },
+    "privacy": "Tot passa al teu navegador. No es puja res a cap servidor.",
+    "steps": {
+      "label": "Passos del remaquetatge",
+      "lot": "Lot",
+      "template": "Plantilla",
+      "newPdf": "PDF nou",
+      "compare": "Comparar",
+      "export": "Exportar"
+    },
+    "empty": {
+      "title": "Carrega els teus PDF i JSON",
+      "text": "Arrossega fins a 50 PDF i els seus JSON (mateix nom), o cerca els fitxers. Fins a {{limit}} MB per PDF.",
+      "cta": "Seleccionar fitxers"
+    },
+    "resume": {
+      "title": "Tens un lot en curs",
+      "description": "{{count}} PDF desats en aquest navegador.",
+      "continue": "Continuar el lot",
+      "discard": "Descartar el lot",
+      "discarded": "Lot descartat."
+    },
+    "upload": {
+      "reading": "Llegint {{done}} de {{total}}",
+      "ready": "{{count}} PDF a punt al lot",
+      "rejected": "{{count}} fitxers no s'han afegit",
+      "dismiss": "Amagar avisos"
+    },
+    "reject": {
+      "notAllowed": "Només PDF i JSON",
+      "tooBig": "Supera {{limit}} MB",
+      "tooBigJson": "El JSON supera 5 MB.",
+      "invalidJson": "JSON no vàlid",
+      "duplicate": "Ja és al lot",
+      "unmatchedJson": "Cap PDF amb aquest nom",
+      "limit": "Lot ple o sense espai"
+    },
+    "list": {
+      "title": "Lot · {{count}} PDF",
+      "search": "Cercar per nom",
+      "selected": "{{count}} seleccionats",
+      "selectAll": "Seleccionar-los tots",
+      "add": "Afegir fitxers",
+      "remove": "Treure del lot",
+      "confirmRemove": "Confirma: treure {{count}}",
+      "download": "Baixar ({{count}})",
+      "next": "Remaquetar el següent",
+      "noResults": "Cap PDF coincideix amb el filtre.",
+      "nothingPending": "No queda res pendent. Bona feina!",
+      "keys": "Dreceres: ↑ ↓ moure's · Intro obrir · N següent pendent"
+    },
+    "filter": {
+      "all": "Tots",
+      "noTemplate": "Sense plantilla",
+      "templateError": "Amb error",
+      "missingNew": "Falta PDF nou",
+      "ready": "A punt per remaquetar",
+      "relaid": "Remaquetats",
+      "exported": "Exportats"
+    },
+    "status": {
+      "noTemplate": "Sense plantilla",
+      "templateError": "Error al JSON",
+      "missingNew": "Falta PDF nou",
+      "ready": "A punt per remaquetar",
+      "relaid": "Remaquetat",
+      "exported": "✓ Exportat"
+    },
+    "action": {
+      "pasteTemplate": "Enganxar plantilla",
+      "fix": "Corregir",
+      "uploadNew": "Pujar PDF nou",
+      "review": "Revisar",
+      "open": "Obrir"
+    },
+    "col": {
+      "pdf": "PDF",
+      "template": "Plantilla JSON",
+      "page": "Pàgina",
+      "weight": "Pes",
+      "fields": "Camps",
+      "status": "Estat"
+    },
+    "storage": {
+      "title": "Emmagatzematge local",
+      "usage": "{{used}} d'uns {{quota}} disponibles",
+      "batch": "El lot ocupa {{size}}.",
+      "warn": "Queda poc espai. Treu els PDF ja exportats per alliberar-ne.",
+      "block": "Emmagatzematge gairebé ple: no es poden afegir més fitxers.",
+      "removeExported": "Treure exportats ({{count}} · {{size}})"
+    },
+    "item": {
+      "back": "Tornar al lot",
+      "position": "{{n}} de {{total}}",
+      "prev": "Anterior",
+      "nextOne": "Següent",
+      "skip": "Saltar aquest PDF",
+      "editSetup": "Canviar plantilla o PDF nou"
+    },
+    "template": {
+      "label": "Plantilla",
+      "labelOk": "Plantilla vàlida",
+      "labelError": "Plantilla amb error",
+      "title": "Enganxar la plantilla",
+      "paste": "Enganxa el JSON o l'script de Mongo",
+      "hint": "Val un JSON o alguna cosa com var pdfTemplate = {…}; només s'usa «pages».",
+      "found": "{{pages}} pàgines · {{fields}} camps",
+      "onlyPages": "Només s'usa «pages». La resta de l'script s'ignora.",
+      "error": "No es pot llegir la plantilla",
+      "errorAt": "Error a la línia {{line}}, columna {{column}}",
+      "errorHelp": "Corregeix-lo i es torna a validar sol.",
+      "noPages": "No trobo una llista «pages»",
+      "noPagesHelp": "Comprova que has copiat l'objecte complet. El teu text no s'ha perdut.",
+      "use": "Usar plantilla",
+      "loadFile": "Carregar fitxer .json",
+      "pages": "Pàgines detectades",
+      "page": "Pàgina {{num}}",
+      "fieldsCount": "{{count}} camps",
+      "errorItem": "Aquest PDF queda com «Error al JSON» i no bloqueja la resta. El pots saltar i tornar-hi després.",
+      "invalidToast": "La plantilla no és vàlida. Revisa l'avís al costat del text."
+    },
+    "newPdf": {
+      "label": "PDF nou",
+      "title": "Substituir {{name}}",
+      "original": "Original",
+      "drop": "Deixa anar el PDF nou",
+      "limit": "Només un PDF · fins a {{limit}} MB",
+      "choose": "Triar PDF nou",
+      "change": "Canviar",
+      "reading": "Llegint el PDF…",
+      "unreadable": "No s'ha pogut llegir aquest PDF. Prova amb un altre.",
+      "pagesDiffer": "L'original té {{orig}} pàgines i el nou {{next}}. Pots continuar.",
+      "sameSize": "Mateixa mida de pàgina que l'original: les anotacions es col·loquen tal qual.",
+      "scaled": "Mida diferent: les anotacions s'han escalat. Revisa-les a la comparació.",
+      "compare": "Comparar"
+    },
+    "size": {
+      "label": "Mida de pàgina diferent",
+      "title": "El PDF nou no fa la mateixa mida",
+      "intro": "Tria com col·locar les anotacions. Després les podràs ajustar a la comparació.",
+      "original": "Original",
+      "new": "Nou",
+      "diff": "Diferència: {{dw}} pt d'ample i {{dh}} pt d'alt.",
+      "example": "Amb «Escalar» el camp {{field}} passa de ({{x}}, {{y}}) a ({{nx}}, {{ny}}).",
+      "choose": "Com col·locar les anotacions",
+      "scale": "Escalar camps proporcionalment",
+      "scaleHelp": "Multiplica x i y per la relació entre les dues pàgines. Manté la posició relativa.",
+      "keep": "Mantenir les coordenades",
+      "keepHelp": "No toca x ni y. Fes-ho servir si el contingut nou parteix del mateix origen (a baix a l'esquerra).",
+      "manual": "Ajustar a mà",
+      "manualHelp": "Comencen a les coordenades originals i els col·loques tu a la comparació.",
+      "recommended": "Recomanat",
+      "applyAll": "Aplicar la mateixa opció als següents PDF amb aquest canvi de mida",
+      "apply": "Aplicar i comparar"
+    },
+    "compare": {
+      "view": "Vista",
+      "original": "Original",
+      "new": "Nou",
+      "side": "Un al costat de l'altre",
+      "overlay": "Superposat",
+      "before": "ABANS",
+      "after": "DESPRÉS",
+      "sync": "Scroll sincronitzat",
+      "zoom": "Zoom",
+      "zoomIn": "Apropar",
+      "zoomOut": "Allunyar",
+      "page": "Pàgina",
+      "pageOf": "{{page}} / {{total}}",
+      "prevPage": "Pàgina anterior",
+      "nextPage": "Pàgina següent",
+      "undo": "Desfer",
+      "redo": "Refer",
+      "opacity": "Opacitat de l'original",
+      "outlines": "Mostrar contorns de l'original",
+      "noPage": "Sense pàgina equivalent",
+      "loadFailed": "No s'han pogut obrir els PDF per comparar. Torna a pujar el PDF nou.",
+      "fields": "Camps de la pàgina {{page}}",
+      "noFields": "Aquesta pàgina no té camps.",
+      "misplaced": "Mal col·locat",
+      "inPlace": "Al seu lloc",
+      "misplacedCount": "{{count}} camps mal col·locats (en vermell). Arrossega'ls o usa les fletxes.",
+      "misplacedToast": "{{count}} camps mal col·locats en aquesta pàgina.",
+      "dragHint": "Arrossega un camp del PDF nou o mou-lo amb les fletxes (Maj = 10 pt).",
+      "emptyField": "Camp buit",
+      "saveNext": "Desar i següent",
+      "save": "Desar",
+      "unsaved": "Canvis sense desar",
+      "savedToast": "Remaquetatge desat."
+    },
+    "export": {
+      "title": "Baixar el lot",
+      "intro": "{{count}} PDF a punt per baixar. Es baixen com a fitxers solts, amb el nom de l'original.",
+      "content": "Contingut",
+      "json": "JSON remaquetat de cada PDF",
+      "pdf": "PDF anotat (mida nova)",
+      "loose": "Noms: {nom}.json · {nom}.pdf. El navegador pot demanar permís per a baixades múltiples.",
+      "skipped": "{{count}} saltats (sense plantilla o sense PDF nou)",
+      "start": "Baixar {{count}} fitxers",
+      "cancel": "Cancel·lar",
+      "running": "Baixant {{done}} de {{total}} fitxers",
+      "keepOpen": "No tanquis aquesta pestanya fins que acabi.",
+      "done": "Lot baixat",
+      "donePartial": "Baixada acabada amb errors",
+      "doneCount": "{{count}} exportats en total",
+      "errorCount": "{{count}} amb error",
+      "failed": "No s'ha pogut generar: {{names}}",
+      "retry": "Reintentar els fallits",
+      "again": "Baixar de nou",
+      "newBatch": "Començar un altre lot",
+      "close": "Tancar"
+    }
   }
 }

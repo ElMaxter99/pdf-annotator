@@ -336,5 +336,225 @@
       "horizontal": "Distribute horizontally",
       "vertical": "Distribute vertically"
     }
+  },
+  "batch": {
+    "landing": {
+      "hint": "Many PDFs? Pick several (and their JSON files) to open batch re-layout."
+    },
+    "nav": {
+      "home": "Go to the home page",
+      "subtitle": "Batch re-layout"
+    },
+    "privacy": "Everything happens in your browser. Nothing is uploaded to any server.",
+    "steps": {
+      "label": "Re-layout steps",
+      "lot": "Batch",
+      "template": "Template",
+      "newPdf": "New PDF",
+      "compare": "Compare",
+      "export": "Export"
+    },
+    "empty": {
+      "title": "Load your PDFs and JSON files",
+      "text": "Drop up to 50 PDFs and their JSON files (same name), or browse for them. Up to {{limit}} MB per PDF.",
+      "cta": "Select files"
+    },
+    "resume": {
+      "title": "You have a batch in progress",
+      "description": "{{count}} PDFs saved in this browser.",
+      "continue": "Continue the batch",
+      "discard": "Discard batch",
+      "discarded": "Batch discarded."
+    },
+    "upload": {
+      "reading": "Reading {{done}} of {{total}}",
+      "ready": "{{count}} PDFs ready in the batch",
+      "rejected": "{{count}} files were not added",
+      "dismiss": "Hide notices"
+    },
+    "reject": {
+      "notAllowed": "PDF and JSON only",
+      "tooBig": "Over {{limit}} MB",
+      "tooBigJson": "The JSON is over 5 MB.",
+      "invalidJson": "Invalid JSON",
+      "duplicate": "Already in the batch",
+      "unmatchedJson": "No PDF with that name",
+      "limit": "Batch full or out of space"
+    },
+    "list": {
+      "title": "Batch · {{count}} PDFs",
+      "search": "Search by name",
+      "selected": "{{count}} selected",
+      "selectAll": "Select all",
+      "add": "Add files",
+      "remove": "Remove from batch",
+      "confirmRemove": "Confirm: remove {{count}}",
+      "download": "Download ({{count}})",
+      "next": "Re-layout the next one",
+      "noResults": "No PDF matches the filter.",
+      "nothingPending": "Nothing left to do. Great work!",
+      "keys": "Shortcuts: ↑ ↓ move · Enter open · N next pending"
+    },
+    "filter": {
+      "all": "All",
+      "noTemplate": "No template",
+      "templateError": "With error",
+      "missingNew": "New PDF missing",
+      "ready": "Ready to re-layout",
+      "relaid": "Re-laid out",
+      "exported": "Exported"
+    },
+    "status": {
+      "noTemplate": "No template",
+      "templateError": "JSON error",
+      "missingNew": "New PDF missing",
+      "ready": "Ready to re-layout",
+      "relaid": "Re-laid out",
+      "exported": "✓ Exported"
+    },
+    "action": {
+      "pasteTemplate": "Paste template",
+      "fix": "Fix",
+      "uploadNew": "Upload new PDF",
+      "review": "Review",
+      "open": "Open"
+    },
+    "col": {
+      "pdf": "PDF",
+      "template": "JSON template",
+      "page": "Page",
+      "weight": "Size",
+      "fields": "Fields",
+      "status": "Status"
+    },
+    "storage": {
+      "title": "Local storage",
+      "usage": "{{used}} of about {{quota}} available",
+      "batch": "The batch takes {{size}}.",
+      "warn": "Space is running low. Remove the PDFs already exported to free it.",
+      "block": "Storage almost full: no more files can be added.",
+      "removeExported": "Remove exported ({{count}} · {{size}})"
+    },
+    "item": {
+      "back": "Back to the batch",
+      "position": "{{n}} of {{total}}",
+      "prev": "Previous",
+      "nextOne": "Next",
+      "skip": "Skip this PDF",
+      "editSetup": "Change template or new PDF"
+    },
+    "template": {
+      "label": "Template",
+      "labelOk": "Valid template",
+      "labelError": "Template with error",
+      "title": "Paste the template",
+      "paste": "Paste the JSON or the Mongo script",
+      "hint": "Plain JSON or something like var pdfTemplate = {…}; works. Only “pages” is used.",
+      "found": "{{pages}} pages · {{fields}} fields",
+      "onlyPages": "Only “pages” is used. The rest of the script is ignored.",
+      "error": "The template cannot be read",
+      "errorAt": "Error at line {{line}}, column {{column}}",
+      "errorHelp": "Fix it and it is validated again automatically.",
+      "noPages": "I can't find a “pages” list",
+      "noPagesHelp": "Check that you copied the whole object. Your text has not been lost.",
+      "use": "Use template",
+      "loadFile": "Load .json file",
+      "pages": "Detected pages",
+      "page": "Page {{num}}",
+      "fieldsCount": "{{count}} fields",
+      "errorItem": "This PDF stays as “JSON error” and does not block the rest. You can skip it and come back later.",
+      "invalidToast": "The template is not valid. Check the notice next to the text."
+    },
+    "newPdf": {
+      "label": "New PDF",
+      "title": "Replace {{name}}",
+      "original": "Original",
+      "drop": "Drop the new PDF",
+      "limit": "One PDF only · up to {{limit}} MB",
+      "choose": "Choose new PDF",
+      "change": "Change",
+      "reading": "Reading the PDF…",
+      "unreadable": "That PDF could not be read. Try another one.",
+      "pagesDiffer": "The original has {{orig}} pages and the new one {{next}}. You can continue.",
+      "sameSize": "Same page size as the original: annotations are placed as they are.",
+      "scaled": "Different size: the annotations were scaled. Check them in the comparison.",
+      "compare": "Compare"
+    },
+    "size": {
+      "label": "Different page size",
+      "title": "The new PDF is not the same size",
+      "intro": "Choose how to place the annotations. You can adjust them afterwards in the comparison.",
+      "original": "Original",
+      "new": "New",
+      "diff": "Difference: {{dw}} pt wide and {{dh}} pt tall.",
+      "example": "With “Scale”, field {{field}} moves from ({{x}}, {{y}}) to ({{nx}}, {{ny}}).",
+      "choose": "How to place the annotations",
+      "scale": "Scale fields proportionally",
+      "scaleHelp": "Multiplies x and y by the ratio between both pages. Keeps the relative position.",
+      "keep": "Keep the coordinates",
+      "keepHelp": "Leaves x and y alone. Use it if the new content starts from the same origin (bottom left).",
+      "manual": "Adjust by hand",
+      "manualHelp": "They start at the original coordinates and you place them in the comparison.",
+      "recommended": "Recommended",
+      "applyAll": "Use the same option for the next PDFs with this size change",
+      "apply": "Apply and compare"
+    },
+    "compare": {
+      "view": "View",
+      "original": "Original",
+      "new": "New",
+      "side": "Side by side",
+      "overlay": "Overlay",
+      "before": "BEFORE",
+      "after": "AFTER",
+      "sync": "Synced scroll",
+      "zoom": "Zoom",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "page": "Page",
+      "pageOf": "{{page}} / {{total}}",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "undo": "Undo",
+      "redo": "Redo",
+      "opacity": "Original opacity",
+      "outlines": "Show outlines of the original",
+      "noPage": "No matching page",
+      "loadFailed": "The PDFs could not be opened for comparison. Upload the new PDF again.",
+      "fields": "Fields on page {{page}}",
+      "noFields": "This page has no fields.",
+      "misplaced": "Misplaced",
+      "inPlace": "In place",
+      "misplacedCount": "{{count}} misplaced fields (in red). Drag them or use the arrow keys.",
+      "misplacedToast": "{{count}} misplaced fields on this page.",
+      "dragHint": "Drag a field on the new PDF or move it with the arrow keys (Shift = 10 pt).",
+      "emptyField": "Empty field",
+      "saveNext": "Save and next",
+      "save": "Save",
+      "unsaved": "Unsaved changes",
+      "savedToast": "Re-layout saved."
+    },
+    "export": {
+      "title": "Download the batch",
+      "intro": "{{count}} PDFs ready to download. They come as separate files, named like the original.",
+      "content": "Contents",
+      "json": "Re-laid out JSON for each PDF",
+      "pdf": "Annotated PDF (new size)",
+      "loose": "Names: {name}.json · {name}.pdf. Your browser may ask for permission to download several files.",
+      "skipped": "{{count}} skipped (no template or no new PDF)",
+      "start": "Download {{count}} files",
+      "cancel": "Cancel",
+      "running": "Downloading {{done}} of {{total}} files",
+      "keepOpen": "Keep this tab open until it finishes.",
+      "done": "Batch downloaded",
+      "donePartial": "Download finished with errors",
+      "doneCount": "{{count}} exported in total",
+      "errorCount": "{{count}} with errors",
+      "failed": "Could not generate: {{names}}",
+      "retry": "Retry the failed ones",
+      "again": "Download again",
+      "newBatch": "Start another batch",
+      "close": "Close"
+    }
   }
 }

@@ -1,0 +1,49 @@
+:host { display: block; }
+.cmp { display: flex; flex-direction: column; gap: 12px; }
+.cmp__bar, .cmp__overlay-ctl { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line, rgba(255,255,255,.14)); border-radius: 16px; padding: 10px 16px; }
+.cmp__spacer { flex: 1; }
+.cmp__zoom { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.cmp__check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); &.is-off { opacity: .5; } }
+.seg { display: inline-flex; background: color-mix(in srgb, var(--text) 8%, transparent); border-radius: 999px; padding: 4px;
+  button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background .2s ease-out, color .2s ease-out;
+    &.on { background: var(--accent); color: var(--bg); }
+    &:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; } } }
+.cmp__main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 12px; align-items: start; }
+.cmp__panes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-width: 0;
+  &:has(.pane[hidden]) { grid-template-columns: minmax(0, 1fr); }
+  &--overlay { display: block; position: relative;
+    .pane--orig { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: var(--overlay-opacity, .5);
+      .pane__tag { display: none; } .pane__scroll { overflow: hidden; background: transparent; } }
+    .pane--new { position: relative; } } }
+.pane { background: var(--bg); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; &[hidden] { display: none; } }
+.pane__tag { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.tag { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--text) 10%, transparent); max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; &--accent { background: var(--accent); color: var(--bg); } }
+.cap { color: var(--muted); font-size: 13px; }
+.pane__scroll { overflow: auto; max-height: calc(100vh - 340px); min-height: 360px; background: color-mix(in srgb, var(--text) 5%, transparent); border-radius: 8px; padding: 8px; }
+.page { position: relative; margin: 0 auto; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.35); canvas { display: block; } &[hidden] { display: none; } }
+.pane__empty { color: var(--muted); text-align: center; padding: 48px 8px; }
+.fld { position: absolute; box-sizing: border-box; border: 2px solid #0f9b8e; background: rgba(15,155,142,.16); border-radius: 3px; color: #0b3b36; line-height: 1; white-space: nowrap; overflow: hidden; display: flex; align-items: flex-end;
+  &--orig { pointer-events: none; }
+  &--ghost { border: 2px dashed #dc2626; background: transparent; color: transparent; }
+  &--new { cursor: grab; touch-action: none; &:active { cursor: grabbing; } &:focus-visible, &.is-selected { outline: 2px solid var(--accent); outline-offset: 1px; box-shadow: 0 0 0 4px rgba(94,234,212,.25); }
+    &.is-bad { border-color: #dc2626; background: rgba(220,38,38,.16); } } }
+.cmp__fields { background: var(--panel); border: 1px solid var(--line, rgba(255,255,255,.14)); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; position: sticky; top: 12px;
+  h3 { margin: 0; font-size: 15px; } ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow: auto; } }
+.fieldrow { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; font: inherit; font-size: 14px; color: var(--text); background: color-mix(in srgb, var(--text) 6%, transparent); border: 0; border-radius: 10px; padding: 8px 10px; cursor: pointer; min-height: 36px;
+  &.is-selected { outline: 2px solid var(--accent); } &:focus-visible { outline: 2px solid var(--text); }
+  .good { color: var(--accent); font-weight: 700; } .bad { color: var(--danger); font-weight: 700; } &__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+.note--warn { margin: 0; font-size: 14px; border-radius: 12px; padding: 10px 12px; background: color-mix(in srgb, #fbbf24 14%, transparent); border: 1px solid color-mix(in srgb, #fbbf24 55%, transparent); }
+.cmp__actions { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.cmp__state { display: flex; gap: 12px; &--error { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); border: 1px solid var(--danger); border-radius: 12px; padding: 12px 16px; } }
+.skeleton { background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.14), rgba(255,255,255,.06)); background-size: 200% 100%; animation: sh 1.2s ease-out infinite; border-radius: 8px; &--page { flex: 1; aspect-ratio: 3 / 4; max-height: 520px; } }
+@keyframes sh { to { background-position: -200% 0; } }
+.btn { font: inherit; font-size: 14px; font-weight: 600; border: 0; border-radius: 999px; padding: 8px 18px; min-height: 40px; background: var(--accent); color: var(--bg); cursor: pointer;
+  &--ghost { background: transparent; color: var(--text); border: 1px solid var(--line, rgba(255,255,255,.25)); } &--sm { min-height: 32px; padding: 4px 12px; font-size: 13px; }
+  &[disabled] { opacity: .45; cursor: default; } &:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; } }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+:host-context(:root.theme-light) {
+  .btn:not(.btn--ghost) { background: #0b7a70; color: #fff; border-color: transparent; }
+  .btn--ghost { background: transparent; color: var(--text); border: 1px solid var(--line, rgba(15, 23, 42, .25)); }
+  .seg button.on, .tag--accent { background: #0b7a70; color: #fff; }
+}

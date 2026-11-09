@@ -1,0 +1,186 @@
+<div class="batch" (keydown)="onPageKeydown($event)">
+  <header class="batch__nav">
+    <a class="batch__brand" routerLink="/landing" [attr.aria-label]="'batch.nav.home' | t">
+      <img src="/logo.svg" alt="" width="32" height="32" />
+      <span>Pdf Annotator <small>{{ 'batch.nav.subtitle' | t }}</small></span>
+    </a>
+    <app-batch-steps [active]="1"></app-batch-steps>
+  </header>
+
+  <input #fileInput type="file" multiple accept="application/pdf,.pdf,application/json,.json" hidden (change)="onFilesSelected($event)" />
+
+  @if (!store.loaded()) {
+    <section class="card" aria-busy="true">
+      <div class="skeleton skeleton--line"></div>
+      <div class="skeleton skeleton--row"></div>
+      <div class="skeleton skeleton--row"></div>
+      <div class="skeleton skeleton--row"></div>
+    </section>
+  } @else if (store.items().length === 0 && !store.busy()) {
+    <section class="card empty">
+      <div class="drop" [class.drop--active]="dropActive()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+        <div class="drop__icon" aria-hidden="true">📄</div>
+        <h1>{{ 'batch.empty.title' | t }}</h1>
+        <p class="cap">{{ 'batch.empty.text' | t : { limit: maxMb } }}</p>
+        <button type="button" class="btn" (click)="pickFiles()">{{ 'batch.empty.cta' | t }}</button>
+      </div>
+      <p class="cap">🔒 {{ 'batch.privacy' | t }}</p>
+    </section>
+  } @else {
+    <div class="batch__layout">
+      <aside class="card side">
+        <h1 class="side__title">{{ 'batch.list.title' | t : { count: store.items().length } }}</h1>
+        <label class="search">
+          <span class="visually-hidden">{{ 'batch.list.search' | t }}</span>
+          <input type="search" [placeholder]="'batch.list.search' | t" [value]="query()" (input)="onQuery($event)" />
+        </label>
+        <ul class="filters" role="list">
+          @for (f of filters; track f) {
+            <li>
+              <button type="button" class="filter" [class.is-active]="filter() === f" [attr.aria-pressed]="filter() === f" (click)="setFilter(f)">
+                <span>{{ 'batch.filter.' + f | t }}</span><b>{{ counts()[f] }}</b>
+              </button>
+            </li>
+          }
+        </ul>
+        <hr />
+        <h2 class="side__sub">{{ 'batch.storage.title' | t }}</h2>
+        @if (store.storage(); as storage) {
+          <div class="bar" role="progressbar" [attr.aria-valuenow]="storagePercent()" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="'batch.storage.title' | t">
+            <i [class.is-warn]="storageLevel() === 'warn'" [class.is-block]="storageLevel() === 'block'" [style.width.%]="storagePercent()"></i>
+          </div>
+          <p class="cap">{{ 'batch.storage.usage' | t : { used: bytes(storage.used), quota: bytes(storage.quota) } }}</p>
+        }
+        <p class="cap">{{ 'batch.storage.batch' | t : { size: bytes(store.totalBytes()) } }}</p>
+        @if (storageLevel() === 'warn') {
+          <p class="note note--warn" role="status">⚠ {{ 'batch.storage.warn' | t }}</p>
+        } @else if (storageLevel() === 'block') {
+          <p class="note note--error" role="alert">⚠ {{ 'batch.storage.block' | t }}</p>
+        }
+        @if (exportedCount() > 0) {
+          <button type="button" class="btn btn--ghost btn--sm" (click)="removeExported()">{{ 'batch.storage.removeExported' | t : { count: exportedCount(), size: bytes(exportedBytes()) } }}</button>
+        }
+      </aside>
+
+      <section class="card main" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)" [class.main--drop]="dropActive()">
+        <div class="toolbar">
+          <span class="cap" aria-live="polite">{{ 'batch.list.selected' | t : { count: selected().size } }}</span>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn--ghost btn--sm" (click)="pickFiles()">{{ 'batch.list.add' | t }}</button>
+          <button type="button" class="btn btn--ghost btn--sm" [class.btn--danger]="confirmRemove()" [disabled]="selected().size === 0" (click)="removeSelected()">
+            {{ (confirmRemove() ? 'batch.list.confirmRemove' : 'batch.list.remove') | t : { count: selected().size } }}
+          </button>
+          <button type="button" class="btn btn--ghost btn--sm" [disabled]="exportable().length === 0" (click)="openExport()">{{ 'batch.list.download' | t : { count: exportable().length } }}</button>
+          <button type="button" class="btn" (click)="openNext()">{{ 'batch.list.next' | t }} →</button>
+        </div>
+
+        @if (store.busy(); as busy) {
+          <div class="progress" role="status" aria-live="polite">
+            <div class="progress__head"><b>{{ 'batch.upload.reading' | t : { done: busy.done, total: busy.total } }}</b></div>
+            <div class="bar"><i [style.width.%]="busy.total ? (busy.done / busy.total) * 100 : 0"></i></div>
+          </div>
+        }
+
+        @if (report(); as rep) {
+          <div class="note note--warn" role="alert">
+            <div>
+              <b>{{ 'batch.upload.rejected' | t : { count: rep.rejected.length } }}</b>
+              @if (rep.added > 0) { <span> · {{ 'batch.upload.ready' | t : { count: rep.added } }}</span> }
+              <ul class="rejects">
+                @for (r of rep.rejected; track $index) {
+                  <li><span class="bad">!</span> <span class="rejects__name">{{ r.name }}</span> <span class="cap">{{ rejectLabel(r.reason) }}</span></li>
+                }
+              </ul>
+            </div>
+            <button type="button" class="btn btn--ghost btn--sm" (click)="report.set(null)">{{ 'batch.upload.dismiss' | t }}</button>
+          </div>
+        }
+
+        <div class="table" role="table" [attr.aria-label]="'batch.list.title' | t : { count: store.items().length }">
+          <div class="tr tr--head" role="row">
+            <span role="columnheader"><input type="checkbox" [checked]="allSelected()" (change)="toggleAll()" [attr.aria-label]="'batch.list.selectAll' | t" /></span>
+            <span role="columnheader">{{ 'batch.col.pdf' | t }}</span>
+            <span role="columnheader">{{ 'batch.col.template' | t }}</span>
+            <span role="columnheader">{{ 'batch.col.page' | t }}</span>
+            <span role="columnheader">{{ 'batch.col.weight' | t }}</span>
+            <span role="columnheader">{{ 'batch.col.fields' | t }}</span>
+            <span role="columnheader">{{ 'batch.col.status' | t }}</span>
+            <span role="columnheader"></span>
+          </div>
+          @for (row of rows(); track row.item.id) {
+            <div class="tr" role="row" tabindex="0" [class.is-selected]="selected().has(row.item.id)" [attr.data-status]="row.status" (keydown)="onRowKeydown($event, row.item.id)">
+              <span role="cell"><input type="checkbox" [checked]="selected().has(row.item.id)" (change)="toggle(row.item.id)" [attr.aria-label]="row.item.name" /></span>
+              <span role="cell" class="ellipsis" [title]="row.item.name">{{ row.item.name }}</span>
+              <span role="cell" class="ellipsis cap">{{ row.item.templateName || (row.item.template ? '·' : '—') }}</span>
+              <span role="cell" class="cap">{{ sizeLabel(row.item) }}</span>
+              <span role="cell" class="cap">{{ bytes(row.item.pdf.size) }}</span>
+              <span role="cell" class="cap">{{ row.item.template ? fieldCount(row.item) : '—' }}</span>
+              <span role="cell"><span class="chip" [class]="'chip chip--' + row.status">{{ 'batch.status.' + row.status | t }}</span></span>
+              <span role="cell" class="cell-action"><button type="button" class="btn btn--ghost btn--sm" (click)="open(row.item.id)">{{ 'batch.action.' + actionKey(row.status) | t }}</button></span>
+            </div>
+          } @empty {
+            <p class="cap table__empty">{{ 'batch.list.noResults' | t }}</p>
+          }
+          @if (store.busy()) {
+            <div class="tr tr--skeleton" aria-hidden="true"><div class="skeleton skeleton--cell"></div></div>
+            <div class="tr tr--skeleton" aria-hidden="true"><div class="skeleton skeleton--cell"></div></div>
+          }
+        </div>
+        <p class="cap">{{ 'batch.list.keys' | t }}</p>
+      </section>
+    </div>
+  }
+
+  @if (exportPhase() !== 'closed') {
+    <div class="overlay" role="dialog" aria-modal="true" [attr.aria-label]="'batch.export.title' | t" (keydown.escape)="closeExport()">
+      <div class="dialog card">
+        @switch (exportPhase()) {
+          @case ('options') {
+            <h2>{{ 'batch.export.title' | t }}</h2>
+            <p class="cap">{{ 'batch.export.intro' | t : { count: exportable().length } }}</p>
+            <fieldset class="opts">
+              <legend class="visually-hidden">{{ 'batch.export.content' | t }}</legend>
+              <label class="opt"><input type="checkbox" [checked]="exportJson()" (change)="exportJson.set($any($event.target).checked)" /> <span>{{ 'batch.export.json' | t }}</span> <span class="cap">{{ exportable().length }} · {{ bytes(exportSizes().json) }}</span></label>
+              <label class="opt"><input type="checkbox" [checked]="exportPdf()" (change)="exportPdf.set($any($event.target).checked)" /> <span>{{ 'batch.export.pdf' | t }}</span> <span class="cap">{{ exportable().length }} · {{ bytes(exportSizes().pdf) }}</span></label>
+            </fieldset>
+            <p class="cap">{{ 'batch.export.loose' | t }}</p>
+            @if (skipped() > 0) {
+              <p class="note note--warn" role="status">⚠ {{ 'batch.export.skipped' | t : { count: skipped() } }}</p>
+            }
+            <div class="dialog__actions">
+              <button type="button" class="btn" [disabled]="exportTotalFiles() === 0" (click)="runExport()">⬇ {{ 'batch.export.start' | t : { count: exportTotalFiles() } }}</button>
+              <button type="button" class="btn btn--ghost" (click)="closeExport()">{{ 'batch.export.cancel' | t }}</button>
+            </div>
+          }
+          @case ('running') {
+            <h2>{{ 'batch.export.running' | t : { done: exportProgress().done, total: exportProgress().total } }}</h2>
+            <div class="bar" role="progressbar" [attr.aria-valuenow]="exportProgress().done" aria-valuemin="0" [attr.aria-valuemax]="exportProgress().total">
+              <i [style.width.%]="exportProgress().total ? (exportProgress().done / exportProgress().total) * 100 : 0"></i>
+            </div>
+            <p class="cap">{{ 'batch.export.keepOpen' | t }}</p>
+          }
+          @case ('done') {
+            <div class="big" aria-hidden="true">✓</div>
+            <h2>{{ (exportFailures().length ? 'batch.export.donePartial' : 'batch.export.done') | t }}</h2>
+            <ul class="summary">
+              <li>✓ {{ 'batch.export.doneCount' | t : { count: exportedCount() } }}</li>
+              <li>{{ 'batch.export.skipped' | t : { count: skipped() } }}</li>
+              <li>{{ 'batch.export.errorCount' | t : { count: exportFailures().length } }}</li>
+            </ul>
+            @if (exportFailures().length) {
+              <p class="note note--error" role="alert">⚠ {{ 'batch.export.failed' | t : { names: failedNames() } }}</p>
+            }
+            <div class="dialog__actions">
+              @if (exportFailures().length) {
+                <button type="button" class="btn" (click)="retryFailed()">{{ 'batch.export.retry' | t }}</button>
+              }
+              <button type="button" class="btn btn--ghost" (click)="openExport()">{{ 'batch.export.again' | t }}</button>
+              <button type="button" class="btn btn--ghost" (click)="clearBatch()">{{ 'batch.export.newBatch' | t }}</button>
+              <button type="button" class="btn btn--ghost" (click)="closeExport()">{{ 'batch.export.close' | t }}</button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,47 @@
+:host { display: block; min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; --line: color-mix(in srgb, var(--text) 14%, transparent); }
+.item { max-width: 1680px; margin: 0 auto; padding: 20px 24px 40px; display: flex; flex-direction: column; gap: 16px; }
+.item__nav { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 12px 20px; }
+.item__title { display: flex; flex-direction: column; min-width: 0; h1 { margin: 0; font-size: 17px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 380px; } }
+.back { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; &:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; border-radius: 6px; } }
+.spacer { flex: 1; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px; h2 { margin: 0; font-size: 17px; font-weight: 600; } h3 { margin: 0; font-size: 15px; font-weight: 600; } }
+.lab { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.cap { color: var(--muted); font-size: 14px; line-height: 1.45; margin: 0; }
+hr { border: 0; border-top: 1px solid var(--line); width: 100%; margin: 4px 0; }
+.ta { width: 100%; resize: vertical; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-family: Consolas, 'Fira Code', monospace; font-size: 13px; line-height: 1.55; min-height: 200px;
+  &:focus-visible { outline: 2px solid var(--accent); } &--error { border-color: var(--danger); } }
+.note { display: flex; gap: 12px; align-items: flex-start; border-radius: 12px; padding: 12px 16px; font-size: 14px; line-height: 1.45; margin: 0;
+  &--ok { background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+  &--warn { background: color-mix(in srgb, #fbbf24 14%, transparent); border: 1px solid color-mix(in srgb, #fbbf24 55%, transparent); }
+  &--error { background: color-mix(in srgb, var(--danger) 12%, transparent); border: 1px solid var(--danger); } }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { font: inherit; font-size: 14px; font-weight: 600; border: 0; border-radius: 999px; padding: 8px 18px; min-height: 40px; background: var(--accent); color: var(--bg); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; transition: opacity .15s ease-out;
+  &--ghost { background: transparent; color: var(--text); border: 1px solid var(--line); } &--sm { min-height: 32px; padding: 4px 12px; font-size: 13px; }
+  &[disabled] { opacity: .45; cursor: default; } &:focus-visible, &:has(input:focus-visible) { outline: 2px solid var(--text); outline-offset: 2px; } }
+.row { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, var(--text) 6%, transparent); font-size: 14px; justify-content: space-between; &--sel { outline: 2px solid var(--accent); } .ok { color: var(--accent); } }
+.grow { flex: 1; min-width: 0; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.drop { border: 2px dashed var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; background: var(--bg); transition: border-color .15s ease-out, background .15s ease-out;
+  &--active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg)); } }
+.bar { height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden; position: relative; i { display: block; height: 100%; width: 40%; background: var(--accent); border-radius: 999px; animation: slide 1s ease-out infinite; } }
+@keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+.compare-head { display: flex; justify-content: flex-end; }
+.skeleton { background: linear-gradient(90deg, rgba(128,128,128,.12), rgba(128,128,128,.28), rgba(128,128,128,.12)); background-size: 200% 100%; animation: sh 1.2s ease-out infinite; border-radius: 8px; &--line { height: 22px; width: 40%; } &--block { height: 280px; } }
+@keyframes sh { to { background-position: -200% 0; } }
+.overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .55); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50; animation: fade .2s ease-out; }
+.dialog { width: min(640px, 100%); max-height: 92vh; overflow: auto; box-shadow: 0 16px 48px rgba(0, 0, 0, .45); }
+@keyframes fade { from { opacity: 0; } }
+.sizes { display: flex; gap: 32px; align-items: flex-end; justify-content: center; background: var(--bg); border-radius: 12px; padding: 16px; figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); } }
+.sheet { background: #fff; border: 2px solid #8a8a8a; border-radius: 3px; &--new { border-color: var(--accent); } }
+.opts { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.radio { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); cursor: pointer; &.is-on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); } input { margin-top: 4px; accent-color: var(--accent); } }
+.chip { display: inline-flex; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); margin-left: 6px; }
+.opt { display: flex; gap: 10px; align-items: center; font-size: 14px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+:host-context(:root.theme-light) {
+  .btn:not(.btn--ghost) { background: #0b7a70; color: #fff; border-color: transparent; }
+  .btn--ghost { background: transparent; color: var(--text); border: 1px solid var(--line, rgba(15, 23, 42, .25)); }
+  .seg button.on, .tag--accent { background: #0b7a70; color: #fff; }
+}
