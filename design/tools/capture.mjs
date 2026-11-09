@@ -9,19 +9,21 @@ mkdirSync(OUT, { recursive: true });
 const PDF = join(REPO, 'examples/factura-ejemplo.pdf');
 const JSONTXT = readFileSync(join(REPO, 'examples/anotaciones-ejemplo.json'), 'utf8');
 
-const PROPS = ['display','position','top','left','right','bottom','width','height','margin-top','margin-right','margin-bottom','margin-left','padding-top','padding-right','padding-bottom','padding-left','border-top-width','border-top-style','border-top-color','border-right-width','border-right-style','border-right-color','border-bottom-width','border-bottom-style','border-bottom-color','border-left-width','border-left-style','border-left-color','border-top-left-radius','border-top-right-radius','border-bottom-right-radius','border-bottom-left-radius','box-sizing','background-color','background-image','color','font-family','font-size','font-weight','font-style','line-height','letter-spacing','text-align','text-transform','text-decoration-line','white-space','text-overflow','overflow-x','overflow-y','flex-direction','flex-wrap','flex-grow','flex-shrink','flex-basis','align-items','justify-content','align-self','gap','grid-template-columns','grid-template-rows','grid-column-start','grid-column-end','opacity','box-shadow','transform','z-index','visibility','vertical-align','object-fit','text-shadow','list-style-type','word-break','overflow-wrap'];
+const PROPS = ['display','position','top','left','right','bottom','width','height','margin-top','margin-right','margin-bottom','margin-left','padding-top','padding-right','padding-bottom','padding-left','border-top-width','border-top-style','border-top-color','border-right-width','border-right-style','border-right-color','border-bottom-width','border-bottom-style','border-bottom-color','border-left-width','border-left-style','border-left-color','border-top-left-radius','border-top-right-radius','border-bottom-right-radius','border-bottom-left-radius','box-sizing','background-color','background-image','color','font-family','font-size','font-weight','font-style','line-height','letter-spacing','text-align','text-transform','text-decoration-line','white-space','text-overflow','overflow-x','overflow-y','flex-direction','flex-wrap','flex-grow','flex-shrink','flex-basis','align-items','justify-content','align-self','gap','grid-template-columns','grid-template-rows','grid-template-areas','grid-column-start','grid-column-end','grid-row-start','grid-row-end','grid-auto-flow','grid-auto-columns','grid-auto-rows','place-items','align-content','justify-items','opacity','box-shadow','transform','z-index','visibility','vertical-align','object-fit','text-shadow','list-style-type','word-break','overflow-wrap'];
 
 async function extract(page, rootSel) {
   return page.evaluate(({ PROPS, rootSel }) => {
     const defaults = new Map();
-    const sandbox = document.createElement('div');
-    sandbox.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:0';
-    document.body.appendChild(sandbox);
+    const frame = document.createElement('iframe');
+    frame.style.cssText = 'position:absolute;left:-9999px;width:800px;height:600px;visibility:hidden';
+    document.body.appendChild(frame);
+    const fdoc = frame.contentDocument;
+    fdoc.open(); fdoc.write('<!doctype html><html><body></body></html>'); fdoc.close();
     const defFor = (tag) => {
       if (defaults.has(tag)) return defaults.get(tag);
-      const el = document.createElement(tag);
-      sandbox.appendChild(el);
-      const cs = getComputedStyle(el);
+      const el = fdoc.createElement(tag);
+      fdoc.body.appendChild(el);
+      const cs = frame.contentWindow.getComputedStyle(el);
       const d = {};
       for (const p of PROPS) d[p] = cs.getPropertyValue(p);
       defaults.set(tag, d);
@@ -32,20 +34,32 @@ async function extract(page, rootSel) {
     const canvases = [];
     const SKIP = new Set(['SCRIPT','STYLE','LINK','META','TITLE','NOSCRIPT','TEMPLATE','IFRAME','OBJECT','EMBED']);
     const VOID = new Set(['img','input','br','hr']);
+    const INH = new Set(['color','font-family','font-size','font-weight','font-style','line-height','letter-spacing','text-align','text-transform','white-space','visibility','list-style-type','word-break','overflow-wrap','text-shadow','text-decoration-line']);
     function styleOf(el, tag, rect) {
       const cs = getComputedStyle(el);
       const d = defFor(tag);
+      const pcs = el !== window.__rootEl && el.parentElement && el.parentElement !== document.documentElement ? getComputedStyle(el.parentElement) : null;
       const out = [];
       for (const p of PROPS) {
         let v = cs.getPropertyValue(p);
-        if (!v || v === d[p]) continue;
+        if (!v) continue;
+        if (INH.has(p)) { if (pcs && v === pcs.getPropertyValue(p) && el.tagName !== 'BODY') continue; }
+        else if (v === d[p]) continue;
         if (p === 'background-image' && /url\(/.test(v)) continue;
         if (['top','left','right','bottom'].includes(p) && cs.position === 'static') continue;
         if (p === 'font-family') v = v.replace(/"/g, "'");
         out.push(`${p}:${v}`);
       }
-      out.push(`width:${rect.width}px`, `height:${rect.height}px`);
-      return out.filter((s, i, a) => !(i < a.length - 2 && /^(width|height):/.test(s))).join(';');
+      const par = el.parentElement;
+      if (par && el.classList.contains('canvas-container') && ['block','flex'].includes(getComputedStyle(par).display) && ['block','flex','grid'].includes(cs.display) && cs.position !== 'absolute' && cs.position !== 'fixed' && cs.float === 'none') {
+        const pr = par.getBoundingClientRect(); const pcs2 = getComputedStyle(par);
+        const base = pr.left + parseFloat(pcs2.borderLeftWidth) + parseFloat(pcs2.paddingLeft) - par.scrollLeft;
+        const want = rect.left - base;
+        const have = parseFloat(cs.marginLeft) || 0;
+        if (Math.abs(want - have) > 1 && want > 0 && want < pr.width) out.push(`margin-left:${Math.round(want * 100) / 100}px`);
+      }
+      out.push(`box-sizing:border-box`, `width:${rect.width}px`, `height:${rect.height}px`);
+      return out.filter((s, i, a) => !(i < a.length - 3 && /^(width|height|box-sizing):/.test(s))).join(';');
     }
     function walk(node, depth) {
       if (node.nodeType === 3) return esc(node.nodeValue);
@@ -60,8 +74,13 @@ async function extract(page, rootSel) {
         if (el.classList.contains('canvas--pdf')) {
           const idx = canvases.length;
           canvases.push(el.toDataURL('image/png'));
-          return `<img alt="" src="__CANVAS_${idx}__" style="display:block;width:${rect.width}px;height:${rect.height}px;position:${cs.position};top:${cs.top};left:${cs.left}">`;
+          return `<img alt="" src="__CANVAS_${idx}__" style="${styleOf(el, 'canvas', rect).replace(/"/g, "'")};background-color:#fff">`;
         }
+        try {
+          const c2 = el.getContext('2d'); const d = c2.getImageData(0, 0, el.width, el.height).data; let any = false;
+          for (let i = 3; i < d.length; i += 4) { if (d[i]) { any = true; break; } }
+          if (any) { const idx = canvases.length; canvases.push(el.toDataURL('image/png')); return `<img alt="" src="__CANVAS_${idx}__" style="${styleOf(el, 'canvas', rect).replace(/"/g, "'")};pointer-events:none">`; }
+        } catch {}
         return `<div style="width:${rect.width}px;height:${rect.height}px;position:${cs.position === 'static' ? 'absolute' : cs.position};top:0;left:0;pointer-events:none"></div>`;
       }
       if (tag === 'svg') {
@@ -97,8 +116,10 @@ async function extract(page, rootSel) {
       return `${open}>${inner}</${tag}>`;
     }
     const root = document.querySelector(rootSel);
+    window.__rootEl = root;
     const rr = root.getBoundingClientRect();
     const html = walk(root, 0);
+    const rootCs = getComputedStyle(root.parentElement || root);
     return { html, canvases, w: Math.ceil(rr.width), h: Math.ceil(rr.height), bg: getComputedStyle(document.body).backgroundColor, bgImg: getComputedStyle(document.body).backgroundImage };
   }, { PROPS, rootSel });
 }
@@ -112,6 +133,7 @@ async function newPage(w, h, theme) {
   await page.addInitScript((t) => {
     try { localStorage.setItem('pdf-annotator-theme', t); localStorage.setItem('pdf-annotator.language', 'es-ES'); } catch {}
   }, theme);
+  await page.addInitScript(() => { const st = document.createElement('style'); st.textContent = '*,*::before,*::after{transition:none!important;animation:none!important;caret-color:transparent!important}'; document.addEventListener('DOMContentLoaded', () => document.head.appendChild(st)); });
   await page.route('**/_vercel/**', (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
   return page;
 }
@@ -143,6 +165,7 @@ async function applyJson(page, text) {
 }
 async function snap(id, name, file, page, rootSel, extra = {}) {
   await page.waitForTimeout(300);
+  await page.screenshot({ path: join(OUT, `${file}.real.png`) });
   const r = await extract(page, rootSel);
   const png = [];
   r.canvases.forEach((d, i) => { const f = `${file}-canvas${i}.png`; writeFileSync(join(OUT, f), Buffer.from(d.split(',')[1], 'base64')); png.push(f); });
@@ -164,15 +187,6 @@ for (const [theme, id, nameS] of [['dark', 'V-01', 'Landing'], ['light', 'V-02',
   await snap(id, nameS, `${id}`, p, 'app-root, body > app-root, body', { theme });
   await p.context().close();
 }
-if (want('V-03')) {
-  const p = await newPage(430, 900, 'dark');
-  await landing(p);
-  const h = await p.evaluate(() => document.documentElement.scrollHeight);
-  await p.setViewportSize({ width: 430, height: h });
-  await p.waitForTimeout(400);
-  await snap('V-03', 'Landing móvil', 'V-03', p, 'body', {});
-  await p.context().close();
-}
 // ---- Workspace
 const W = [
   ['V-04', 'Workspace · Anotaciones', { tab: 'Anotaciones' }, 'dark', 1720, 900],
@@ -181,14 +195,13 @@ const W = [
   ['V-07', 'Workspace · Avanzado', { tab: 'Avanzado' }, 'dark', 1720, 900],
   ['V-08', 'Workspace · Anotaciones (claro)', { tab: 'Anotaciones' }, 'light', 1720, 900],
   ['V-09', 'Workspace 1280', { tab: 'Anotaciones', zoomOut: 3 }, 'dark', 1280, 800],
-  ['V-10', 'Workspace móvil', { tab: 'Anotaciones', zoomOut: 1 }, 'dark', 430, 900],
 ];
 for (const [id, name, opts, theme, w, h] of W) {
   if (!want(id)) continue;
   const p = await newPage(w, h, theme);
   await workspace(p, opts);
   let hh = h;
-  if (w < 960) { hh = await p.evaluate(() => Math.max(document.documentElement.scrollHeight, innerHeight)); await p.setViewportSize({ width: w, height: hh }); await p.waitForTimeout(400); }
+  if (false) { hh = await p.evaluate(() => Math.max(document.documentElement.scrollHeight, innerHeight)); await p.setViewportSize({ width: w, height: hh }); await p.waitForTimeout(400); }
   await snap(id, name, id, p, 'body', { theme });
   await p.context().close();
 }
@@ -245,6 +258,40 @@ await stateScene('V-18', 'Árbol JSON', async (p) => {
   try { await t.click({ timeout: 3000 }); } catch {}
   await p.waitForTimeout(500);
 }, { json: true });
+
+
+// ---- Extra desktop states
+if (want('V-03')) {
+  const p = await newPage(1720, 900, 'dark');
+  await workspace(p, { tab: 'Anotaciones', zoomOut: 2, json: false });
+  await applyJson(p, JSON.stringify(FIELDS)); await p.waitForTimeout(2500);
+  await p.goto('http://127.0.0.1:4300/landing'); await p.waitForTimeout(1200);
+  const h = await p.evaluate(() => document.documentElement.scrollHeight);
+  await p.setViewportSize({ width: 1720, height: Math.max(900, h) }); await p.waitForTimeout(400);
+  await snap('V-03', 'Landing con sesión recuperable', 'V-03', p, 'app-root, body > app-root, body', { theme: 'dark' });
+  await p.context().close();
+}
+if (want('V-10')) {
+  const p = await newPage(1720, 900, 'dark');
+  await workspace(p, { tab: 'Anotaciones', zoomOut: 2, json: false });
+  await applyJson(p, JSON.stringify(FIELDS)); await p.evaluate(() => document.activeElement?.blur());
+  await openTab(p, 'Plantillas');
+  await p.locator('input[type=text]').first().fill('Factura trimestral');
+  await p.getByRole('button', { name: /Guardar/i }).first().click(); await p.waitForTimeout(600);
+  await p.locator('input[type=text]').first().fill('Factura mensual');
+  await snap('V-10', 'Workspace · Plantillas con plantilla guardada', 'V-10', p, 'body', { theme: 'dark' });
+  await p.context().close();
+}
+if (want('V-19')) {
+  const p = await newPage(1720, 900, 'dark');
+  await landing(p);
+  writeFileSync('/tmp/nota.txt', 'esto no es un pdf');
+  await p.locator('input[type=file]').setInputFiles('/tmp/nota.txt'); await p.waitForTimeout(700);
+  const h = await p.evaluate(() => document.documentElement.scrollHeight);
+  await p.setViewportSize({ width: 1720, height: Math.max(900, h) }); await p.waitForTimeout(400);
+  await snap('V-19', 'Landing · archivo no válido (aviso)', 'V-19', p, 'app-root, body > app-root, body', { theme: 'dark' });
+  await p.context().close();
+}
 
 writeFileSync(join(OUT, 'index.json'), JSON.stringify(index, null, 1));
 await browser.close();

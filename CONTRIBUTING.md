@@ -7,7 +7,7 @@
 2. Crea una rama desde `main`: `feat/…`, `fix/…`, `docs/…`.
 3. `npm install` y trabaja con `npm run start:local`.
 4. Antes del PR: `npm run build`, `npm run test:ci` y `npm run e2e` en verde (los e2e usan el build de producción).
-5. Abre el PR rellenando la plantilla, con capturas si cambia la UI (oscuro, claro y móvil).
+5. Abre el PR rellenando la plantilla, con capturas si cambia la UI (oscuro y claro, en escritorio).
 
 ## Reglas rápidas
 - Todo texto visible va en los **7 idiomas** (`npm run i18n:check`).

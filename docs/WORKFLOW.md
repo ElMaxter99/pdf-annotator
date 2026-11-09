@@ -28,7 +28,7 @@ Termina siempre con: **Estado** (dónde está el trabajo), **Hecho por Claude** 
 - Una mesa por pantalla o estado, con id estable: `V-NN` para pantallas ya existentes y `P-NN` para propuestas. No se renumera ni se reutiliza.
 - Una fila por versión o propuesta, solo con las mesas que cambian.
 - Tokens de `src/styles.scss` (`--bg --panel --accent --danger --text --muted`); no inventar colores ni tipografías.
-- Esta app es responsive: dibujar **tres anchos** (≥1650, ~1280 y <960 px) y ambos temas cuando cambie el layout.
+- La app se diseña **solo para escritorio** (decisión 11): no se dibujan mesas móviles. Anchos de referencia ≥1650 y ~1280 px, y ambos temas cuando cambie el layout.
 - Datos ficticios realistas (nada de lorem ipsum), contraste AA, `<button>` y `<a href>` reales.
 
 ## Carpeta `design/` (fuera del build)

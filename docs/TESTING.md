@@ -20,4 +20,4 @@ Un fichero por área: `landing`, `editor`, `history`, `import`, `fonts`, `export
 ## Reglas
 - Antes de cerrar una tarea: build, `test:ci` y e2e en verde. Si tocas editor, historial, importación, fuentes o exportación, ejecuta los e2e antes y después y añade casos.
 - Lógica pura (`utils/*.ts`, servicios) con `.spec.ts` al lado.
-- Cambios visuales: captura a 1600, 1280 y 430 px, en oscuro y claro.
+- Cambios visuales: captura a 1600 y 1280 px (solo escritorio), en oscuro y claro.
