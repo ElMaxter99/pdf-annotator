@@ -4,7 +4,7 @@
 | Término | Significado |
 | --- | --- |
 | **Anotación / campo** | Elemento colocado sobre una página: `{ x, y, mapField, fontSize, color, type, … }`. |
-| **`mapField`** | Lo que se pinta o la clave de datos (`{{cliente.nombre}}`, `generalData.month`). Con `value` relleno se pinta el valor. |
+| **`mapField`** | Lo que se pinta o la clave de datos (`{{cliente.nombre}}`, `generalData.month`). Con `value` relleno se pinta el valor; si no, la muestra del tipo o el dato resuelto del JSON de prueba (ver decisión 12). |
 | **Puntos PDF** | Unidad del PDF (1 pt = 1/72 in). Origen **abajo-izquierda**: `y` crece hacia arriba. |
 | **Página (`num`)** | Número de página empezando en 1. |
 | **Plantilla** | Conjunto de anotaciones guardado en `localStorage` (`AnnotationTemplatesService`). No confundir con la plantilla de Mongo del autor, que es un objeto con `pages` y más atributos. |

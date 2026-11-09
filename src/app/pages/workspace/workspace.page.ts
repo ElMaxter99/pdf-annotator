@@ -57,6 +57,13 @@ import {
 import { ToastService } from '../../services/toast.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
+import { MAX_TEST_DATA_BYTES, PreviewSettingsService } from '../../services/preview-settings.service';
+import {
+  resolveFieldPreview,
+  resolveMapPath,
+  type PreviewMode,
+  type SampleKind,
+} from '../../utils/preview-values.utils';
 import { SessionStoreService } from '../../services/session-store.service';
 import { BatchStoreService } from '../../services/batch-store.service';
 import {
@@ -283,6 +290,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly batch = inject(BatchStoreService);
   private readonly annotationImport = inject(AnnotationImportService);
   private readonly fontCatalog = inject(FontCatalogService);
+  readonly previewSettings = inject(PreviewSettingsService);
+  readonly sampleKinds: readonly SampleKind[] = ['text', 'check', 'radio', 'number'];
+  readonly previewModes: readonly PreviewMode[] = ['sample', 'map', 'data'];
   readonly coords = this.store.coords;
 
   /** Batch migration: set while a PDF of the batch is open (B is edited, A is the reference). */
@@ -626,6 +636,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.fitA();
       this.pageSizesB();
       untracked(() => void this.renderSplit());
+    });
+    effect(() => {
+      this.previewSettings.context();
+      untracked(() => this.redrawAllForPage());
     });
     this.vm = this;
     this.setDocumentMetadata();
@@ -2984,32 +2998,89 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private getFieldRenderValue(field: PageField): string {
-    const override =
-      typeof field.value === 'string' && field.value.trim() ? field.value : undefined;
-    if (override !== undefined) {
-      return override;
-    }
+    return resolveFieldPreview(field, this.previewSettings.context()).text;
+  }
 
-    const type = normalizeFieldType(field.type);
-    if (type === 'check' || type === 'radio') {
-      return 'X';
-    }
-
-    const baseText = typeof field.mapField === 'string' ? field.mapField : '';
-
-    if (type === 'number') {
-      const numeric = toFiniteNumber(baseText);
-      if (numeric !== null) {
-        const decimals = normalizeFieldDecimals(field.decimals);
-        const formatted =
-          decimals !== undefined ? formatNumberWithTruncation(numeric, decimals) : baseText;
-        const appender = sanitizeOptionalAppender(field.appender) ?? '';
-        return `${formatted}${appender}`;
+  /** Counts annotations that would paint a sample value, for the export notice. */
+  private countSampleFields(): number {
+    const ctx = this.previewSettings.context();
+    let count = 0;
+    for (const page of this.coords()) {
+      for (const field of page.fields) {
+        if (resolveFieldPreview(field, ctx).source === 'sample') {
+          count += 1;
+        }
       }
     }
-
-    return baseText;
+    return count;
   }
+
+  setPreviewMode(mode: PreviewMode) {
+    if (mode === 'data' && !this.previewSettings.hasTestData()) {
+      return;
+    }
+    this.previewSettings.setMode(mode);
+  }
+
+  onTestDataChange(text: string) {
+    this.previewSettings.setTestDataText(text);
+  }
+
+  onSampleChange(kind: SampleKind, value: string) {
+    this.previewSettings.setSample(kind, value);
+  }
+
+  async onTestDataFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (input) {
+      input.value = '';
+    }
+    if (!file) {
+      return;
+    }
+    if (file.size > MAX_TEST_DATA_BYTES) {
+      this.toast.error(this.translationService.translate('preview.testData.tooLarge'));
+      return;
+    }
+    try {
+      this.previewSettings.setTestDataText(await file.text());
+      if (this.previewSettings.hasTestData()) {
+        this.previewSettings.setMode('data');
+      }
+    } catch {
+      this.toast.error(this.translationService.translate('preview.testData.readFailed'));
+    }
+  }
+
+  clearTestData() {
+    this.previewSettings.clearTestData();
+  }
+
+  testDataStats = computed(() => {
+    const ctx = this.previewSettings.context();
+    let total = 0;
+    let resolved = 0;
+    const missing: string[] = [];
+    if (ctx.data === null) {
+      return { total, resolved, missing };
+    }
+    for (const page of this.coords()) {
+      for (const field of page.fields) {
+        const type = normalizeFieldType(field.type);
+        if (type === 'check' || type === 'radio' || (field.value ?? '').trim()) {
+          continue;
+        }
+        total += 1;
+        if (resolveMapPath(ctx.data, field.mapField ?? '') !== undefined) {
+          resolved += 1;
+        } else if (missing.length < 6 && !missing.includes(field.mapField)) {
+          missing.push(field.mapField);
+        }
+      }
+    }
+    return { total, resolved, missing };
+  });
 
   redrawAllForPage() {
     const layer = this.annotationsLayerRef?.nativeElement;
@@ -5041,6 +5112,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   async downloadAnnotatedPDF() {
     if (!this.pdfDoc) return;
 
+    const sampleFields = this.countSampleFields();
+
     try {
       const customFonts = new Map<string, CustomFontEntry>();
       this.customFonts().forEach((fontEntry) => customFonts.set(fontEntry.id, fontEntry));
@@ -5058,6 +5131,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
       this.rememberPdfBytes(sourceBytes, 3);
       downloadBlob(new Blob([toArrayBuffer(bytes)], { type: 'application/pdf' }), 'annotated.pdf');
+      if (sampleFields > 0) {
+        this.toast.warning(
+          this.translationService.translate('toast.exportSampleValues', { count: sampleFields })
+        );
+      }
     } catch (error) {
       console.error('No se pudo generar el PDF anotado.', error);
       this.toast.error(this.translationService.translate('toast.exportPdfFailed'));

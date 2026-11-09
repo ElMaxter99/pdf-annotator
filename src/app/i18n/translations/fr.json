@@ -323,7 +323,8 @@
       "templateFromAnnotations": "Les annotations de l’original deviennent le modèle A.",
       "copiedAdjusted": "Champs copiés et ajustés à la taille de B.",
       "adjustApplied": "{{count}} champs copiés, {{moved}} ajustés."
-    }
+    },
+    "exportSampleValues": "Le PDF contient {{count}} champ(s) avec des valeurs d'exemple au lieu de données réelles."
   },
   "session": {
     "title": "Reprendre là où vous en étiez",
@@ -660,6 +661,42 @@
         "outlier": "Diverge",
         "repeated": "Répété"
       }
+    }
+  },
+  "preview": {
+    "mode": {
+      "group": "Ce que peignent les annotations",
+      "label": "Afficher",
+      "sample": "Exemple",
+      "map": "Mappage",
+      "data": "Données",
+      "dataDisabled": "Chargez des données de test pour activer cette vue"
+    },
+    "samples": {
+      "title": "Valeurs d'exemple",
+      "description": "Ce que chaque type affiche quand le champ n'a ni «value» ni donnée de test. Évite qu'un long mappage casse la mise en page.",
+      "text": "Texte",
+      "check": "Case à cocher",
+      "radio": "Option",
+      "number": "Nombre",
+      "hint": "Jusqu'à 12 caractères.",
+      "reset": "Réinitialiser",
+      "note": "Enregistrées dans ce navigateur et communes à tous vos modèles. Visibles dans l'aperçu et dans le PDF exporté."
+    },
+    "testData": {
+      "title": "Données de test",
+      "description": "Collez un JSON réel ou fictif. Chaque mapField (holder[0].fullname) y est recherché et sa valeur est affichée.",
+      "placeholder": "{ \"holder\": [ { \"fullname\": \"Lucía Fernández\" } ] }",
+      "load": "Charger un fichier .json",
+      "clear": "Retirer",
+      "resolved": "{{resolved}} champs sur {{total}} résolus",
+      "resolvedHint": "Les champs sans donnée utilisent leur valeur d'exemple.",
+      "missing": "Sans donnée :",
+      "syntaxError": "JSON non valide à la ligne {{line}}, colonne {{column}}.",
+      "shapeError": "Le JSON de test doit être un objet ou une liste.",
+      "tooLarge": "Le fichier dépasse 5 Mo.",
+      "readFailed": "Impossible de lire le fichier.",
+      "empty": "Pas de données de test : les valeurs d'exemple sont utilisées."
     }
   }
 }

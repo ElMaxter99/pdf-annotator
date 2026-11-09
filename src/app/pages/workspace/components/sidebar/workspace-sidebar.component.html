@@ -346,6 +346,60 @@
       </div>
     </ng-container>
   </section>
+
+  <section class="preview-panel" aria-labelledby="preview-samples-title">
+    <h4 id="preview-samples-title">{{ 'preview.samples.title' | t }}</h4>
+    <p class="advanced-hint">{{ 'preview.samples.description' | t }}</p>
+    <div class="preview-samples">
+      <div class="preview-samples__row" *ngFor="let kind of vm.sampleKinds">
+        <label [for]="'sample-' + kind">{{ 'preview.samples.' + kind | t }}</label>
+        <input type="text" [id]="'sample-' + kind" maxlength="12" autocomplete="off"
+          [value]="vm.previewSettings.samples()[kind]"
+          (input)="vm.onSampleChange(kind, $any($event.target).value)" />
+        <button type="button" class="btn btn--small" (click)="vm.previewSettings.resetSample(kind)">
+          {{ 'preview.samples.reset' | t }}
+        </button>
+      </div>
+    </div>
+    <small class="advanced-hint">{{ 'preview.samples.hint' | t }} {{ 'preview.samples.note' | t }}</small>
+  </section>
+
+  <section class="preview-panel" aria-labelledby="preview-data-title">
+    <h4 id="preview-data-title">{{ 'preview.testData.title' | t }}</h4>
+    <p class="advanced-hint">{{ 'preview.testData.description' | t }}</p>
+    <textarea class="preview-data__input" rows="8" spellcheck="false"
+      [attr.aria-label]="'preview.testData.title' | t" [placeholder]="'preview.testData.placeholder' | t"
+      [attr.aria-invalid]="vm.previewSettings.testDataError() ? 'true' : null"
+      [value]="vm.previewSettings.testDataText()"
+      (input)="vm.onTestDataChange($any($event.target).value)"></textarea>
+    <div class="preview-data__actions">
+      <button type="button" class="btn btn--small" (click)="testDataFileInput.click()">
+        {{ 'preview.testData.load' | t }}
+      </button>
+      <input #testDataFileInput type="file" accept=".json,application/json" hidden
+        (change)="vm.onTestDataFileSelected($event)" />
+      <button type="button" class="btn btn--small" [disabled]="!vm.previewSettings.testDataText()"
+        (click)="vm.clearTestData()">{{ 'preview.testData.clear' | t }}</button>
+    </div>
+    <ng-container *ngIf="vm.previewSettings.testDataError() as err; else dataStatus">
+      <p class="preview-data__status preview-data__status--error" role="alert">
+        <ng-container *ngIf="err.line; else otherError">{{ 'preview.testData.syntaxError' | t: { line: err.line, column: err.column } }}</ng-container>
+        <ng-template #otherError>{{ (err.message === 'size' ? 'preview.testData.tooLarge' : 'preview.testData.shapeError') | t }}</ng-template>
+      </p>
+    </ng-container>
+    <ng-template #dataStatus>
+      <p class="preview-data__status" *ngIf="!vm.previewSettings.hasTestData()">{{ 'preview.testData.empty' | t }}</p>
+      <ng-container *ngIf="vm.previewSettings.hasTestData() && vm.testDataStats() as stats">
+        <p class="preview-data__status" role="status">
+          {{ 'preview.testData.resolved' | t: { resolved: stats.resolved, total: stats.total } }}
+        </p>
+        <ul class="preview-data__missing" *ngIf="stats.missing.length">
+          <li *ngFor="let name of stats.missing"><span>{{ 'preview.testData.missing' | t }}</span> <code>{{ name }}</code></li>
+        </ul>
+        <small class="advanced-hint" *ngIf="stats.missing.length">{{ 'preview.testData.resolvedHint' | t }}</small>
+      </ng-container>
+    </ng-template>
+  </section>
   </div>
   </div>
 </aside>

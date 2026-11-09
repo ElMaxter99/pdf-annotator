@@ -76,6 +76,11 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | T-01 Ajustar coordenadas a B | Aviso con elección cuando A y B miden distinto (preguntar, ajustado, tal cual) | [`T-01-ajustar-coordenadas-a-b.dc.html`](canvas/T-01-ajustar-coordenadas-a-b.dc.html) | `components/migration` | Aprobado, implementado |
 | T-02 Poner plantilla con ajuste | Casilla «Ajustar al tamaño de B» en el menú «Poner plantilla A» | [`T-02-poner-plantilla-con-ajuste.dc.html`](canvas/T-02-poner-plantilla-con-ajuste.dc.html) | `components/migration` | Aprobado, implementado |
 | W-01 Avisos cerrables y campana | ✕ en los avisos informativos y campana con el panel de cerrados | [`W-01-avisos-cerrables-y-campana.dc.html`](canvas/W-01-avisos-cerrables-y-campana.dc.html) | `components/migration` | Aprobado, implementado |
+| P-11 Avanzado · valores de muestra | Valores de muestra por tipo (texto, casilla, opción, número) | [`P-11-avanzado-valores-de-muestra.dc.html`](canvas/P-11-avanzado-valores-de-muestra.dc.html) | `sidebar` (Avanzado) | Aprobada, implementada |
+| P-12 Prioridad | `value` → dato de prueba → valor de muestra; antes y después | [`P-12-prioridad-y-comparacion.dc.html`](canvas/P-12-prioridad-y-comparacion.dc.html) | `workspace.page.ts` | Aprobada, implementada |
+| P-13 Datos de prueba | JSON de datos y modo Muestra / Mapeo / Datos | [`P-13-datos-de-prueba.dc.html`](canvas/P-13-datos-de-prueba.dc.html) | `sidebar`, `header` | Aprobada, implementada |
+| P-14 Datos de prueba · estados | Vacío, error, incompleto y éxito | [`P-14-datos-de-prueba-estados.dc.html`](canvas/P-14-datos-de-prueba-estados.dc.html) | `sidebar` | Aprobada, implementada |
+| P-15 Datos de prueba claro | P-13 en tema claro | [`P-15-datos-de-prueba-claro.dc.html`](canvas/P-15-datos-de-prueba-claro.dc.html) | `sidebar`, `header` | Aprobada, implementada |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

@@ -84,7 +84,7 @@ Arrastra un PDF o haz clic para seleccionarlo. El idioma se cambia arriba a la d
 | Zona | Qué hay |
 | --- | --- |
 | **Cabecera** (una fila) | Página anterior/siguiente · zoom `−`/`+`/**Ajustar** · deshacer/rehacer/limpiar · **Descargar PDF** · **Atajos** · tema · idioma. |
-| **Panel lateral** (4 pestañas) | Cursor en coordenadas PDF siempre visible, y debajo: **Documento** (cambiar de PDF, miniaturas) · **Anotaciones** (editor JSON en texto o árbol, importar/aplicar, copiar, descargar; con contador) · **Plantillas** · **Avanzado** (fuentes, guías y campos extra del JSON). Se navega con ratón o flechas ←/→. Se minimiza con `B`. |
+| **Panel lateral** (4 pestañas) | Cursor en coordenadas PDF siempre visible, y debajo: **Documento** (cambiar de PDF, miniaturas) · **Anotaciones** (editor JSON en texto o árbol, importar/aplicar, copiar, descargar; con contador) · **Plantillas** · **Avanzado** (fuentes, guías, campos extra del JSON, valores de muestra y datos de prueba). Se navega con ratón o flechas ←/→. Se minimiza con `B`. |
 | **Visor** | Página con capa de anotaciones. Clic para crear, clic sobre una anotación para editarla, arrastrar para moverla. Scroll propio. |
 | **Pie** | Recordatorio de `?` y versión. |
 
@@ -126,7 +126,7 @@ Alterna entre editor de texto y árbol; al seleccionar una anotación en el viso
 ```
 
 ### B · Rellenar un PDF y descargarlo
-1. Carga el PDF → crea anotaciones con el **texto final** (o usa *Valor fijo*).
+1. Carga el PDF → crea anotaciones con el **texto final** en *Valor fijo* (o cambia la vista a **Mapeo**; en **Muestra** se pinta `XXXXX`).
 2. Marca *checks* para casillas (se pintan como `X`).
 3. **Descargar PDF** → `annotated.pdf` con las marcas estampadas. El original no se modifica.
 
