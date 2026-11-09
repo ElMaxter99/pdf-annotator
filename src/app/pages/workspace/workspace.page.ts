@@ -13,6 +13,8 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
+import { Router } from '@angular/router';
+import { BatchStoreService } from '../../services/batch-store.service';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import { pdfjsLib } from '../../utils/pdfjs-setup';
@@ -193,6 +195,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly pendingFileService = inject(PendingFileService);
   private readonly pdfExportService = inject(PdfExportService);
   private readonly toast = inject(ToastService);
+  private readonly batchStore = inject(BatchStoreService);
+  private readonly router = inject(Router);
   private readonly sessionStore = inject(SessionStoreService);
   private readonly store = inject(AnnotationStore);
   private readonly annotationImport = inject(AnnotationImportService);
@@ -1375,6 +1379,27 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     const lastPage = this.pdfDoc?.numPages ?? 1;
     this.pageIndex.set(Math.min(lastPage, Math.max(1, Math.round(restore.pageIndex) || 1)));
+  }
+
+  /** Adds the open PDF to the batch and goes to the pairing step; the editor session is kept. */
+  async addToBatch() {
+    const file = this.sessionFile;
+    if (!file || !this.pdfDoc) {
+      return;
+    }
+    const report = await this.batchStore.addFiles([file]);
+    const rejected = report.rejected[0];
+    if (rejected) {
+      this.toast.warning(
+        this.translationService.translate(`batch.reject.${rejected.reason}`, { limit: 25 })
+      );
+    } else {
+      this.toast.show(
+        this.translationService.translate('batch.editor.added', { name: file.name }),
+        'success'
+      );
+    }
+    await this.router.navigate(['/batch/match']);
   }
 
   private scheduleSessionSave() {

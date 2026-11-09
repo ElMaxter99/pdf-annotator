@@ -726,6 +726,11 @@
         "noResults": "No template matches the search.",
         "doneText": "{{name}} now has {{count}} fields."
       }
+    },
+    "editor": {
+      "add": "Add to batch",
+      "addHint": "Adds this PDF to the batch and opens the matching step. Your editor session is kept.",
+      "added": "{{name}} added to the batch"
     }
   }
 }

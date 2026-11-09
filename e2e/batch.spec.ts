@@ -206,3 +206,14 @@ test('the batch survives a reload and exports loose files', async ({ page }) => 
   await expect(page.locator('.table [role=row][data-status]')).toHaveCount(3);
   await expect(page.getByRole('button', { name: /Descargar \(0\)/ })).toBeDisabled();
 });
+
+test('the editor can add its PDF to the batch and opens the pairing step', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.goto('/landing');
+  await page.locator('input[type=file]').setInputFiles(pdfFile('solo.pdf'));
+  await page.waitForURL('**/workspace');
+  await expect(page.getByRole('navigation', { name: 'Modo de trabajo' })).toBeVisible();
+  await page.getByRole('button', { name: 'Añadir al lote' }).click();
+  await page.waitForURL('**/batch/match');
+  await expect(page.locator('.table [role=row][data-match]', { hasText: 'solo.pdf' })).toHaveAttribute('data-match', 'none');
+});

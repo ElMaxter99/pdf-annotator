@@ -726,6 +726,11 @@
         "noResults": "Cap plantilla coincideix amb la cerca.",
         "doneText": "{{name}} ja té {{count}} camps."
       }
+    },
+    "editor": {
+      "add": "Afegir al lot",
+      "addHint": "Afegeix aquest PDF al lot i obre l’aparellament. La teva sessió de l’editor no es perd.",
+      "added": "{{name}} afegit al lot"
     }
   }
 }

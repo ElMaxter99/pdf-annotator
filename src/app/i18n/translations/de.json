@@ -726,6 +726,11 @@
         "noResults": "Keine Vorlage entspricht der Suche.",
         "doneText": "{{name}} hat jetzt {{count}} Felder."
       }
+    },
+    "editor": {
+      "add": "Zum Stapel hinzufügen",
+      "addHint": "Fügt dieses PDF dem Stapel hinzu und öffnet das Zuordnen. Ihre Editor-Sitzung bleibt erhalten.",
+      "added": "{{name}} zum Stapel hinzugefügt"
     }
   }
 }

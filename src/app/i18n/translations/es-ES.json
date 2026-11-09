@@ -726,6 +726,11 @@
         "noResults": "Ninguna plantilla coincide con la búsqueda.",
         "doneText": "{{name}} ya tiene {{count}} campos."
       }
+    },
+    "editor": {
+      "add": "Añadir al lote",
+      "addHint": "Añade este PDF al lote y abre el emparejado. Tu sesión del editor no se pierde.",
+      "added": "{{name}} añadido al lote"
     }
   }
 }

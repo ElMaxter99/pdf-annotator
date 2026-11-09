@@ -9,6 +9,8 @@
     </div>
 
     <app-mode-switch active="editor"></app-mode-switch>
+    <button type="button" class="btn" (click)="vm.addToBatch()" [disabled]="!vm.pdfDoc"
+      [attr.title]="'batch.editor.addHint' | t">{{ 'batch.editor.add' | t }}</button>
 
     <input #coordsFileInput type="file" accept="application/json" (change)="vm.onCoordsFileSelected($event)" hidden />
 

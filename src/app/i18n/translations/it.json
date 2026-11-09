@@ -726,6 +726,11 @@
         "noResults": "Nessun modello corrisponde alla ricerca.",
         "doneText": "{{name}} ora ha {{count}} campi."
       }
+    },
+    "editor": {
+      "add": "Aggiungi al lotto",
+      "addHint": "Aggiunge questo PDF al lotto e apre l’abbinamento. La sessione dell’editor non va persa.",
+      "added": "{{name}} aggiunto al lotto"
     }
   }
 }

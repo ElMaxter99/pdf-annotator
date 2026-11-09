@@ -726,6 +726,11 @@
         "noResults": "Nenhum modelo corresponde à pesquisa.",
         "doneText": "{{name}} já tem {{count}} campos."
       }
+    },
+    "editor": {
+      "add": "Adicionar ao lote",
+      "addHint": "Adiciona este PDF ao lote e abre o emparelhamento. A sua sessão do editor não se perde.",
+      "added": "{{name}} adicionado ao lote"
     }
   }
 }
