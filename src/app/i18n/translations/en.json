@@ -13,13 +13,9 @@
       "de": "German"
     },
     "landing": {
-      "badge": "Annotate smarter",
-      "title": "Lay out coordinates on any PDF in seconds",
-      "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
       "cta": "Select PDF",
       "tryExample": "Try it with a sample document",
       "previewAlt": "Preview of the PDF Annotator workspace",
-      "featuresTitle": "Everything you need to annotate",
       "trust": {
         "browser": "100% in your browser",
         "languages": "7 languages",
@@ -44,8 +40,32 @@
         }
       },
       "nav": {
-        "github": "GitHub"
-      }
+        "github": "GitHub",
+        "guide": "Guide"
+      },
+      "drop": {
+        "editorTitle": "Drop to open in the Editor",
+        "editorText": "It will open in the editor.",
+        "batchTitle": "Drop to open in Batch",
+        "batchText": "{{count}} files detected · Batch mode will open."
+      },
+      "busy": {
+        "title": "Opening {{name}}",
+        "text": "Preparing page 1…",
+        "many": "{{count}} files"
+      },
+      "error": {
+        "title": "That file is not a PDF",
+        "text": "Try another one or the sample document.",
+        "again": "Choose another"
+      },
+      "footer": {
+        "batch": "Batch mode"
+      },
+      "badge": "Annotate smarter",
+      "title": "Lay out coordinates on any PDF in seconds",
+      "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
+      "featuresTitle": "Everything you need to annotate"
     },
     "upload": {
       "title": "Upload your PDF",
@@ -858,6 +878,151 @@
       "tooLarge": "The file is larger than 5 MB.",
       "readFailed": "The file could not be read.",
       "empty": "No test data: sample values are used."
+    }
+  },
+  "guide": {
+    "badge": "Guide",
+    "heading": "Everything PDF Annotator can do",
+    "lead": "Pick where to start. Each topic explains a feature with a screenshot, the steps and related shortcuts.",
+    "back": "Back to home",
+    "nav": "Guide index",
+    "search": {
+      "label": "Search the guide",
+      "placeholder": "Search the guide",
+      "results": "{{count}} results",
+      "none": "Nothing for “{{query}}”",
+      "noneHint": "Try another word or browse all topics.",
+      "all": "See all topics",
+      "clear": "Clear search"
+    },
+    "paths": {
+      "editor": {
+        "title": "One PDF: the Editor",
+        "text": "Place fields by hand and fine-tune them with the JSON."
+      },
+      "batch": {
+        "title": "Many PDFs: Batch",
+        "text": "Re-layout 2 to 50 PDFs with templates you already have."
+      }
+    },
+    "read": "Read",
+    "groups": {
+      "start": "Getting started",
+      "editor": "Editor",
+      "batch": "Batch",
+      "more": "More"
+    },
+    "crumb": {
+      "home": "Home"
+    },
+    "steps": "Steps",
+    "tip": "Tip",
+    "shortcuts": "Shortcuts",
+    "try": "Try it in the app",
+    "prev": "Previous",
+    "next": "Next",
+    "shotAlt": "Screenshot: {{title}}",
+    "noShot": "Diagram",
+    "tryFailed": "The sample document could not be loaded.",
+    "link": "See the guide",
+    "topics": {
+      "preview": {
+        "title": "What it looks like",
+        "summary": "A quick look at the editor before you start: PDF in the middle, live JSON beside it.",
+        "s1": "Open a PDF and you will see the page in the centre, with its thumbnails on the left.",
+        "s2": "Each click places a field and the right-hand panel shows its JSON instantly.",
+        "s3": "Fine-tune, export the JSON or the annotated PDF, and reuse your work as a template.",
+        "tip": "Click one of the four benefits below to read the full topic."
+      },
+      "start": {
+        "title": "Getting started",
+        "summary": "Open a PDF, place your first annotation and export.",
+        "s1": "Drop a PDF on the central box or choose “Try with a sample document”.",
+        "s2": "Click on the page to place your first annotation.",
+        "s3": "Download the JSON or the annotated PDF from the header.",
+        "tip": "Everything happens in your browser: the PDF is never uploaded to any server."
+      },
+      "workspace": {
+        "title": "Workspace",
+        "summary": "Header, side panel with four tabs and viewer.",
+        "s1": "Use the header to change page, zoom, undo or download.",
+        "s2": "In the side panel switch between Document, Annotations, Templates and Advanced.",
+        "s3": "Click the viewer to create annotations and drag them to move them.",
+        "tip": "Minimise the side panel with the B key to see more of the page."
+      },
+      "edit": {
+        "title": "Edit an annotation",
+        "summary": "Text or mapping, type, fixed value, size, font, colour and more.",
+        "s1": "Click on the PDF: the floating editor opens at that position.",
+        "s2": "Type the text or a mapping such as customer.name to bind it to your data.",
+        "s3": "Adjust type, font, size and colour, and confirm with Enter.",
+        "tip": "Lock an annotation with the padlock so you don't move it by accident."
+      },
+      "selection": {
+        "title": "Selection and alignment",
+        "summary": "Move, align, distribute and duplicate several annotations at once.",
+        "s1": "Hold Shift or Ctrl and click several annotations, or draw a box over an empty area.",
+        "s2": "Use the bar that appears over the viewer to align or distribute.",
+        "s3": "Move them by dragging or with the arrow keys; duplicate or delete them in one go.",
+        "tip": "With three or more annotations you can distribute them with equal gaps."
+      },
+      "guides": {
+        "title": "Guides and precision",
+        "summary": "Grid, rulers in PDF points, snapping and alignment lines.",
+        "s1": "Open Advanced and switch on “Enable guides and snapping”.",
+        "s2": "Choose the grid and the points to snap to.",
+        "s3": "Drag an annotation: you will see alignment lines and the rulers.",
+        "tip": "Coordinates are PDF points with the origin at the bottom left."
+      },
+      "json": {
+        "title": "Live JSON",
+        "summary": "Text or tree, in sync with the viewer.",
+        "s1": "Open the Annotations tab: the JSON reflects every change in the viewer.",
+        "s2": "Edit it as text or switch to the tree view.",
+        "s3": "Import, copy or download the JSON whenever you need.",
+        "tip": "Selecting an annotation in the viewer focuses its block in the editor."
+      },
+      "templates": {
+        "title": "Templates",
+        "summary": "Save sets of annotations and reuse them on other PDFs.",
+        "s1": "Place the annotations you want to reuse.",
+        "s2": "In the Templates tab, name it and save it.",
+        "s3": "Open another PDF and apply the template with one click.",
+        "tip": "Templates are stored only in this browser."
+      },
+      "samples": {
+        "title": "Sample values and test data",
+        "summary": "Preview with XXXXX, with the mapping or with a test JSON.",
+        "s1": "In Advanced edit the sample values drawn when an annotation has no value.",
+        "s2": "Paste or load a test JSON in Advanced: every mapping is resolved against it.",
+        "s3": "Choose Sample, Mapping or Data in the editor bar.",
+        "tip": "A fixed value always wins; then test data, and finally the sample."
+      },
+      "shortcuts": {
+        "title": "Shortcuts and light theme",
+        "summary": "Press ? to see every shortcut; change the theme in the header.",
+        "s1": "Press ? inside the editor to open the shortcuts dialog.",
+        "s2": "Use the arrow and page keys to move around without the mouse.",
+        "s3": "Switch between dark and light theme with the header button.",
+        "tip": "Shortcuts are ignored while you type in a text field."
+      },
+      "batch": {
+        "title": "Batch mode",
+        "summary": "2 to 50 PDFs with JSON templates: load, pair, compare and download.",
+        "s1": "Drop several PDFs (and JSON templates) on the home page, or use “Try Batch mode”.",
+        "s2": "Each template is paired with its PDF by the pdfName field; you decide anything ambiguous.",
+        "s3": "Open each PDF, upload the new PDF and compare the original with the new one.",
+        "tip": "The batch is stored in your browser so you can continue it later.",
+        "s4": "Download the results as separate files."
+      },
+      "export": {
+        "title": "Export",
+        "summary": "JSON or annotated PDF with standard or custom fonts.",
+        "s1": "Download the JSON with the coordinates from the Annotations tab.",
+        "s2": "Upload your own fonts (.ttf, .otf, .woff, .woff2) in Advanced if you need them.",
+        "s3": "Press “Download PDF” in the header to get the annotated PDF.",
+        "tip": "The exported PDF draws the same as the viewer."
+      }
     }
   }
 }

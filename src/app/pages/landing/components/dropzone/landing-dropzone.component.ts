@@ -10,6 +10,10 @@ import { TranslationPipe } from '../../../../i18n/translation.pipe';
 })
 export class LandingDropzoneComponent {
   @Input({ required: true }) fileDropActive = false;
+  @Input() dragCount = 0;
+  @Input() busy = false;
+  @Input() busyName = '';
+  @Input() hasError = false;
 
   @Output() fileSelected = new EventEmitter<Event>();
   @Output() fileUploadKeydown = new EventEmitter<KeyboardEvent>();
@@ -30,6 +34,11 @@ export class LandingDropzoneComponent {
 
     input.value = '';
     input.click();
+  }
+
+  onTryExample(event: Event) {
+    event.stopPropagation();
+    this.tryExample.emit();
   }
 
   onOpenFilePicker(event?: Event) {

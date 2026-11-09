@@ -96,12 +96,10 @@ test('the panel also shows a table with the same PDFs', async ({ page }) => {
   await expect(page.locator('.pcard')).toHaveCount(3);
 });
 
-test('the landing explains both modes and the batch card opens the load step', async ({ page }) => {
+test('the landing offers Lotes discreetly and the link opens the load step', async ({ page }) => {
   await stubAnalytics(page);
   await page.goto('/landing');
-  await expect(page.getByRole('heading', { name: '¿Con cuántos PDF vas a trabajar?' })).toBeVisible();
-  await expect(page.locator('.landing__mode')).toHaveCount(2);
-  await page.getByRole('button', { name: 'Cargar PDF y plantillas' }).click();
+  await page.getByRole('contentinfo').getByRole('link', { name: 'Modo Lotes' }).click();
   await page.waitForURL('**/batch/load');
   await expect(page.getByRole('navigation', { name: 'Modo de trabajo' })).toBeVisible();
   await page.getByRole('link', { name: 'Editor · 1 PDF' }).click();

@@ -8,22 +8,44 @@
     (dragover)="fileDragOver.emit($event)"
     (dragleave)="fileDragLeave.emit($event)"
     (drop)="fileDrop.emit($event)"
-    [class.landing__dropzone--active]="fileDropActive"
+    [class.landing__dropzone--active]="fileDropActive && !busy"
+    [class.landing__dropzone--busy]="busy"
+    [class.landing__dropzone--error]="hasError && !fileDropActive && !busy"
     [attr.aria-label]="'app.upload.title' | t"
+    [attr.aria-busy]="busy ? 'true' : null"
   >
     <input #pdfFileInput type="file" multiple accept="application/pdf,.pdf,application/json,.json" (change)="fileSelected.emit($event)" hidden />
     <div class="landing__icon" aria-hidden="true">📄</div>
-    <div class="landing__text">
-      <span class="landing__headline">{{ 'app.upload.title' | t }}</span>
-      <span class="landing__subheadline">{{ 'app.upload.subtitle' | t }}</span>
-      <span class="landing__hint">{{ 'app.upload.hint' | t }}</span>
-      <span class="landing__hint">{{ 'batch.landing.hint' | t }}</span>
+    <div class="landing__text" aria-live="polite">
+      @if (busy) {
+        <span class="landing__headline">{{ 'app.landing.busy.title' | t : { name: busyName } }}</span>
+        <span class="landing__subheadline">{{ 'app.landing.busy.text' | t }}</span>
+        <span class="landing__progress" role="progressbar" [attr.aria-label]="'app.landing.busy.title' | t : { name: busyName }"><i></i></span>
+      } @else if (fileDropActive) {
+        @if (dragCount > 1) {
+          <span class="landing__headline">{{ 'app.landing.drop.batchTitle' | t }}</span>
+          <span class="landing__subheadline">{{ 'app.landing.drop.batchText' | t : { count: dragCount } }}</span>
+        } @else {
+          <span class="landing__headline">{{ 'app.landing.drop.editorTitle' | t }}</span>
+          <span class="landing__subheadline">{{ 'app.landing.drop.editorText' | t }}</span>
+        }
+      } @else if (hasError) {
+        <span class="landing__headline">{{ 'app.landing.error.title' | t }}</span>
+        <span class="landing__subheadline">{{ 'app.landing.error.text' | t }}</span>
+        <div class="landing__actions">
+          <button type="button" class="landing__cta landing__cta--ghost" (click)="onOpenFilePicker($event)">{{ 'app.landing.error.again' | t }}</button>
+          <button type="button" class="landing__example" (click)="onTryExample($event)">{{ 'app.landing.tryExample' | t }}</button>
+        </div>
+      } @else {
+        <span class="landing__headline">{{ 'app.upload.title' | t }}</span>
+        <span class="landing__subheadline">{{ 'app.upload.subtitle' | t }}</span>
+        <span class="landing__hint">{{ 'app.upload.hint' | t }}</span>
+        <span class="landing__hint">{{ 'batch.landing.hint' | t }}</span>
+        <button type="button" class="landing__cta" (click)="onOpenFilePicker($event)">{{ 'app.landing.cta' | t }}</button>
+      }
     </div>
-    <button type="button" class="landing__cta" (click)="onOpenFilePicker($event)">
-      {{ 'app.landing.cta' | t }}
-    </button>
   </div>
-  <button type="button" class="landing__example" (click)="tryExample.emit()">
-    ✨ {{ 'app.landing.tryExample' | t }}
-  </button>
+  @if (!busy && !fileDropActive && !hasError) {
+    <button type="button" class="landing__example" (click)="onTryExample($event)">✨ {{ 'app.landing.tryExample' | t }}</button>
+  }
 </div>

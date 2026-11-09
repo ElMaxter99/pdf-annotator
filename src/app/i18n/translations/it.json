@@ -13,13 +13,9 @@
       "de": "Tedesco"
     },
     "landing": {
-      "badge": "Annota più velocemente",
-      "title": "Posiziona coordinate su qualsiasi PDF in pochi secondi",
-      "description": "Carica il documento per aggiungere annotazioni collegate a JSON, riutilizzare modelli ed esportare file pronti all'uso.",
       "cta": "Seleziona PDF",
       "tryExample": "Prova con un documento di esempio",
       "previewAlt": "Anteprima dello spazio di lavoro di PDF Annotator",
-      "featuresTitle": "Tutto ciò che serve per annotare",
       "trust": {
         "browser": "100 % nel tuo browser",
         "languages": "7 lingue",
@@ -44,8 +40,32 @@
         }
       },
       "nav": {
-        "github": "GitHub"
-      }
+        "github": "GitHub",
+        "guide": "Guida"
+      },
+      "drop": {
+        "editorTitle": "Rilascia per aprire nell'Editor",
+        "editorText": "Si aprirà nell'editor.",
+        "batchTitle": "Rilascia per aprire in Lotti",
+        "batchText": "{{count}} file rilevati · si aprirà la modalità Lotti."
+      },
+      "busy": {
+        "title": "Apertura di {{name}}",
+        "text": "Preparazione della pagina 1…",
+        "many": "{{count}} file"
+      },
+      "error": {
+        "title": "Questo file non è un PDF",
+        "text": "Prova con un altro o con il documento di esempio.",
+        "again": "Scegline un altro"
+      },
+      "footer": {
+        "batch": "Modalità Lotti"
+      },
+      "badge": "Annota più velocemente",
+      "title": "Posiziona coordinate su qualsiasi PDF in pochi secondi",
+      "description": "Carica il documento per aggiungere annotazioni collegate a JSON, riutilizzare modelli ed esportare file pronti all'uso.",
+      "featuresTitle": "Tutto ciò che serve per annotare"
     },
     "upload": {
       "title": "Carica il tuo PDF",
@@ -858,6 +878,151 @@
       "tooLarge": "Il file supera i 5 MB.",
       "readFailed": "Impossibile leggere il file.",
       "empty": "Nessun dato di prova: si usano i valori di esempio."
+    }
+  },
+  "guide": {
+    "badge": "Guida",
+    "heading": "Tutto quello che sa fare PDF Annotator",
+    "lead": "Scegli da dove iniziare. Ogni argomento spiega una funzione con schermata, passaggi e scorciatoie correlate.",
+    "back": "Torna alla home",
+    "nav": "Indice della guida",
+    "search": {
+      "label": "Cerca nella guida",
+      "placeholder": "Cerca nella guida",
+      "results": "{{count}} risultati",
+      "none": "Niente per «{{query}}»",
+      "noneHint": "Prova con un'altra parola o guarda tutti gli argomenti.",
+      "all": "Vedi tutti gli argomenti",
+      "clear": "Cancella la ricerca"
+    },
+    "paths": {
+      "editor": {
+        "title": "Un PDF: l'Editor",
+        "text": "Posizioni i campi a mano e li rifinisci con il JSON."
+      },
+      "batch": {
+        "title": "Molti PDF: Lotti",
+        "text": "Reimpagini da 2 a 50 PDF con modelli che hai già."
+      }
+    },
+    "read": "Leggi",
+    "groups": {
+      "start": "Primi passi",
+      "editor": "Editor",
+      "batch": "Lotti",
+      "more": "Altro"
+    },
+    "crumb": {
+      "home": "Home"
+    },
+    "steps": "Passaggi",
+    "tip": "Suggerimento",
+    "shortcuts": "Scorciatoie",
+    "try": "Provalo nell'app",
+    "prev": "Precedente",
+    "next": "Successivo",
+    "shotAlt": "Schermata: {{title}}",
+    "noShot": "Schema",
+    "tryFailed": "Impossibile caricare il documento di esempio.",
+    "link": "Vedi la guida",
+    "topics": {
+      "preview": {
+        "title": "Come si presenta",
+        "summary": "Uno sguardo all'editor prima di iniziare: PDF al centro, JSON in tempo reale accanto.",
+        "s1": "Apri un PDF e vedrai la pagina al centro, con le miniature a sinistra.",
+        "s2": "Ogni clic inserisce un campo e il pannello di destra ne mostra subito il JSON.",
+        "s3": "Rifinisci, esporta il JSON o il PDF annotato e riutilizza il lavoro come modello.",
+        "tip": "Fai clic su uno dei quattro vantaggi qui sotto per leggere l'argomento completo."
+      },
+      "start": {
+        "title": "Iniziare",
+        "summary": "Apri un PDF, posiziona la prima annotazione ed esporta.",
+        "s1": "Trascina un PDF nel riquadro centrale o scegli «Prova con un documento di esempio».",
+        "s2": "Fai clic sulla pagina per posizionare la prima annotazione.",
+        "s3": "Scarica il JSON o il PDF annotato dall'intestazione.",
+        "tip": "Tutto avviene nel tuo browser: il PDF non viene mai caricato su nessun server."
+      },
+      "workspace": {
+        "title": "Area di lavoro",
+        "summary": "Intestazione, pannello laterale con quattro schede e visualizzatore.",
+        "s1": "Usa l'intestazione per cambiare pagina, ingrandire, annullare o scaricare.",
+        "s2": "Nel pannello laterale passa tra Documento, Annotazioni, Modelli e Avanzate.",
+        "s3": "Fai clic nel visualizzatore per creare annotazioni e trascinale per spostarle.",
+        "tip": "Riduci il pannello laterale con il tasto B per vedere più pagina."
+      },
+      "edit": {
+        "title": "Modificare un'annotazione",
+        "summary": "Testo o mappatura, tipo, valore fisso, dimensione, font, colore e altro.",
+        "s1": "Fai clic sul PDF: l'editor mobile si apre in quella posizione.",
+        "s2": "Scrivi il testo o una mappatura come cliente.nome per collegarlo ai tuoi dati.",
+        "s3": "Regola tipo, font, dimensione e colore e conferma con Invio.",
+        "tip": "Blocca un'annotazione con il lucchetto per non spostarla per errore."
+      },
+      "selection": {
+        "title": "Selezione e allineamento",
+        "summary": "Sposta, allinea, distribuisci e duplica più annotazioni insieme.",
+        "s1": "Tieni premuto Maiusc o Ctrl e fai clic su più annotazioni, oppure disegna un riquadro su un'area vuota.",
+        "s2": "Usa la barra che compare sopra il visualizzatore per allineare o distribuire.",
+        "s3": "Spostale trascinando o con le frecce; duplicale o eliminale in un colpo solo.",
+        "tip": "Con tre o più annotazioni puoi distribuirle con spazi uguali."
+      },
+      "guides": {
+        "title": "Guide e precisione",
+        "summary": "Griglia, righelli in punti PDF, aggancio e linee di allineamento.",
+        "s1": "Apri Avanzate e attiva «Attiva guide e aggancio».",
+        "s2": "Scegli la griglia e i punti di aggancio.",
+        "s3": "Trascina un'annotazione: vedrai le linee di allineamento e i righelli.",
+        "tip": "Le coordinate sono punti PDF con l'origine in basso a sinistra."
+      },
+      "json": {
+        "title": "JSON in tempo reale",
+        "summary": "Testo o albero, sincronizzato con il visualizzatore.",
+        "s1": "Apri la scheda Annotazioni: il JSON riflette ogni modifica del visualizzatore.",
+        "s2": "Modificalo come testo o passa alla vista ad albero.",
+        "s3": "Importa, copia o scarica il JSON quando serve.",
+        "tip": "Selezionando un'annotazione nel visualizzatore, l'editor evidenzia il suo blocco."
+      },
+      "templates": {
+        "title": "Modelli",
+        "summary": "Salva insiemi di annotazioni e riusali su altri PDF.",
+        "s1": "Posiziona le annotazioni che vuoi riutilizzare.",
+        "s2": "Nella scheda Modelli, dagli un nome e salvalo.",
+        "s3": "Apri un altro PDF e applica il modello con un clic.",
+        "tip": "I modelli sono salvati solo in questo browser."
+      },
+      "samples": {
+        "title": "Valori di esempio e dati di prova",
+        "summary": "Anteprima con XXXXX, con la mappatura o con un JSON di prova.",
+        "s1": "In Avanzate modifica i valori di esempio mostrati quando un'annotazione non ha valore.",
+        "s2": "Incolla o carica un JSON di prova in Avanzate: ogni mappatura viene risolta con esso.",
+        "s3": "Scegli Esempio, Mappatura o Dati nella barra dell'editor.",
+        "tip": "Un valore fisso vince sempre; poi i dati di prova e infine l'esempio."
+      },
+      "shortcuts": {
+        "title": "Scorciatoie e tema chiaro",
+        "summary": "Premi ? per vedere tutte le scorciatoie; il tema si cambia nell'intestazione.",
+        "s1": "Premi ? nell'editor per aprire la finestra delle scorciatoie.",
+        "s2": "Usa le frecce e i tasti pagina per muoverti senza mouse.",
+        "s3": "Passa dal tema scuro al chiaro con il pulsante dell'intestazione.",
+        "tip": "Le scorciatoie vengono ignorate mentre scrivi in un campo di testo."
+      },
+      "batch": {
+        "title": "Modalità Lotti",
+        "summary": "Da 2 a 50 PDF con modelli JSON: carica, abbina, confronta e scarica.",
+        "s1": "Trascina più PDF (e modelli JSON) nella home, oppure usa «Prova la modalità Lotti».",
+        "s2": "Ogni modello viene abbinato al suo PDF dal campo pdfName; i casi ambigui li decidi tu.",
+        "s3": "Apri ogni PDF, carica il nuovo PDF e confronta l'originale con il nuovo.",
+        "tip": "Il lotto viene salvato nel tuo browser e puoi riprenderlo dopo.",
+        "s4": "Scarica i risultati come file separati."
+      },
+      "export": {
+        "title": "Esportare",
+        "summary": "JSON o PDF annotato con font standard o personali.",
+        "s1": "Scarica il JSON con le coordinate dalla scheda Annotazioni.",
+        "s2": "Carica font personali (.ttf, .otf, .woff, .woff2) in Avanzate se ti servono.",
+        "s3": "Premi «Scarica PDF» nell'intestazione per ottenere il PDF annotato.",
+        "tip": "Il PDF esportato mostra lo stesso che vedi nel visualizzatore."
+      }
     }
   }
 }

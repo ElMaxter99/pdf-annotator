@@ -98,4 +98,5 @@ Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes d
 - [ ] Textos nuevos traducidos en 7 idiomas.
 - [ ] Probado en oscuro y claro, escritorio (1650 y 1280 px).
 - [ ] README/CHANGELOG/atajos actualizados si cambia el comportamiento visible.
+- [ ] Si añades, cambias o quitas una función visible, actualiza `docs/GUIDE.md` (tema, pasos, atajos, captura) y las claves `guide.*` de la vista de Guía en los 7 idiomas, en la misma PR.
 - [ ] Sin evaluación de entrada del usuario ni HTML sin sanear.

@@ -13,13 +13,9 @@
       "de": "Alemán"
     },
     "landing": {
-      "badge": "Empieza a anotar",
-      "title": "Maqueta coordenadas de cualquier PDF en segundos",
-      "description": "Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.",
       "cta": "Seleccionar PDF",
       "tryExample": "Probar con un documento de ejemplo",
       "previewAlt": "Vista previa del espacio de trabajo de PDF Annotator",
-      "featuresTitle": "Todo lo que necesitas para anotar",
       "trust": {
         "browser": "100 % en tu navegador",
         "languages": "7 idiomas",
@@ -44,8 +40,32 @@
         }
       },
       "nav": {
-        "github": "GitHub"
-      }
+        "github": "GitHub",
+        "guide": "Guía"
+      },
+      "drop": {
+        "editorTitle": "Suelta para abrir en el Editor",
+        "editorText": "Se abrirá en el editor.",
+        "batchTitle": "Suelta para abrir en Lotes",
+        "batchText": "{{count}} archivos detectados · se abrirá el modo Lotes."
+      },
+      "busy": {
+        "title": "Abriendo {{name}}",
+        "text": "Preparando la página 1…",
+        "many": "{{count}} archivos"
+      },
+      "error": {
+        "title": "Ese archivo no es un PDF",
+        "text": "Prueba con otro o con el documento de ejemplo.",
+        "again": "Elegir otro"
+      },
+      "footer": {
+        "batch": "Modo Lotes"
+      },
+      "badge": "Empieza a anotar",
+      "title": "Maqueta coordenadas de cualquier PDF en segundos",
+      "description": "Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.",
+      "featuresTitle": "Todo lo que necesitas para anotar"
     },
     "upload": {
       "title": "Carga tu PDF",
@@ -858,6 +878,151 @@
       "tooLarge": "El archivo supera los 5 MB.",
       "readFailed": "No se pudo leer el archivo.",
       "empty": "Sin datos de prueba: se usan los valores de muestra."
+    }
+  },
+  "guide": {
+    "badge": "Guía",
+    "heading": "Todo lo que puede hacer PDF Annotator",
+    "lead": "Elige por dónde empezar. Cada tema explica una función con su captura, los pasos y los atajos relacionados.",
+    "back": "Volver al inicio",
+    "nav": "Índice de la guía",
+    "search": {
+      "label": "Buscar en la guía",
+      "placeholder": "Buscar en la guía",
+      "results": "{{count}} resultados",
+      "none": "Nada para «{{query}}»",
+      "noneHint": "Prueba con otra palabra o mira todos los temas.",
+      "all": "Ver todos los temas",
+      "clear": "Borrar búsqueda"
+    },
+    "paths": {
+      "editor": {
+        "title": "Un PDF: el Editor",
+        "text": "Colocas campos a mano y los afinas con el JSON."
+      },
+      "batch": {
+        "title": "Muchos PDF: Lotes",
+        "text": "Remaquetas de 2 a 50 PDF con plantillas que ya tienes."
+      }
+    },
+    "read": "Leer",
+    "groups": {
+      "start": "Primeros pasos",
+      "editor": "Editor",
+      "batch": "Lotes",
+      "more": "Más"
+    },
+    "crumb": {
+      "home": "Inicio"
+    },
+    "steps": "Pasos",
+    "tip": "Consejo",
+    "shortcuts": "Atajos",
+    "try": "Probar en la app",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "shotAlt": "Captura: {{title}}",
+    "noShot": "Esquema",
+    "tryFailed": "No se pudo cargar el documento de ejemplo.",
+    "link": "Ver la guía",
+    "topics": {
+      "preview": {
+        "title": "Así se ve",
+        "summary": "Un vistazo al editor antes de empezar: PDF en el centro, JSON en vivo a un lado.",
+        "s1": "Abre un PDF y verás la página en el centro, con sus miniaturas a la izquierda.",
+        "s2": "Cada clic coloca un campo y el panel de la derecha muestra su JSON al instante.",
+        "s3": "Ajusta, exporta el JSON o el PDF anotado y reutiliza el trabajo como plantilla.",
+        "tip": "Pulsa una de las cuatro ventajas de abajo para leer el tema completo."
+      },
+      "start": {
+        "title": "Empezar",
+        "summary": "Abre un PDF, pon tu primera anotación y exporta.",
+        "s1": "Suelta un PDF en el cuadrado central o elige «Probar con un documento de ejemplo».",
+        "s2": "Haz clic sobre la página para colocar tu primera anotación.",
+        "s3": "Descarga el JSON o el PDF anotado desde la cabecera.",
+        "tip": "Todo ocurre en tu navegador: el PDF nunca se sube a ningún servidor."
+      },
+      "workspace": {
+        "title": "Espacio de trabajo",
+        "summary": "Cabecera, panel lateral con cuatro pestañas y visor.",
+        "s1": "Usa la cabecera para cambiar de página, hacer zoom, deshacer o descargar.",
+        "s2": "En el panel lateral alterna entre Documento, Anotaciones, Plantillas y Avanzado.",
+        "s3": "Haz clic en el visor para crear anotaciones y arrástralas para moverlas.",
+        "tip": "Minimiza el panel lateral con la tecla B para ver más página."
+      },
+      "edit": {
+        "title": "Editar una anotación",
+        "summary": "Texto o mapeo, tipo, valor fijo, tamaño, fuente, color y más.",
+        "s1": "Haz clic sobre el PDF: se abre el editor flotante en esa posición.",
+        "s2": "Escribe el texto o un mapeo como cliente.nombre para ligarlo a tus datos.",
+        "s3": "Ajusta tipo, fuente, tamaño y color, y confirma con Intro.",
+        "tip": "Bloquea una anotación con el candado para no moverla sin querer."
+      },
+      "selection": {
+        "title": "Selección y alineación",
+        "summary": "Mueve, alinea, distribuye y duplica varias anotaciones a la vez.",
+        "s1": "Pulsa Shift o Ctrl y haz clic en varias anotaciones, o dibuja un recuadro sobre una zona vacía.",
+        "s2": "Usa la barra que aparece sobre el visor para alinear o distribuir.",
+        "s3": "Muévelas arrastrando o con las flechas; duplícalas o bórralas de una vez.",
+        "tip": "Con tres o más anotaciones puedes distribuirlas con huecos iguales."
+      },
+      "guides": {
+        "title": "Guías y precisión",
+        "summary": "Rejilla, reglas en puntos PDF, imán y líneas de alineación.",
+        "s1": "Abre Avanzado y activa «Activar guías y snapping».",
+        "s2": "Elige la rejilla y los puntos a los que se imanta.",
+        "s3": "Arrastra una anotación: verás las líneas de alineación y las reglas.",
+        "tip": "Las coordenadas son puntos PDF con el origen abajo a la izquierda."
+      },
+      "json": {
+        "title": "JSON en vivo",
+        "summary": "Texto o árbol, sincronizado con el visor.",
+        "s1": "Abre la pestaña Anotaciones: el JSON refleja cada cambio del visor.",
+        "s2": "Edítalo como texto o cambia a la vista de árbol.",
+        "s3": "Importa, copia o descarga el JSON cuando lo necesites.",
+        "tip": "Al seleccionar una anotación en el visor, el editor enfoca su bloque."
+      },
+      "templates": {
+        "title": "Plantillas",
+        "summary": "Guarda conjuntos de anotaciones y reutilízalos en otros PDF.",
+        "s1": "Coloca las anotaciones que quieras reutilizar.",
+        "s2": "En la pestaña Plantillas, ponle un nombre y guárdala.",
+        "s3": "Abre otro PDF y aplica la plantilla con un clic.",
+        "tip": "Las plantillas se guardan solo en este navegador."
+      },
+      "samples": {
+        "title": "Valores de muestra y datos de prueba",
+        "summary": "Previsualiza con XXXXX, con el mapeo o con un JSON de prueba.",
+        "s1": "En Avanzado edita los valores de muestra que se pintan cuando una anotación no tiene valor.",
+        "s2": "Pega o carga un JSON de prueba en Avanzado: cada mapeo se resuelve contra él.",
+        "s3": "Elige Muestra, Mapeo o Datos en la barra del editor.",
+        "tip": "Un valor fijo gana siempre; después los datos de prueba y por último la muestra."
+      },
+      "shortcuts": {
+        "title": "Atajos y tema claro",
+        "summary": "Pulsa ? para ver todos los atajos; el tema se cambia en la cabecera.",
+        "s1": "Pulsa ? dentro del editor para abrir el diálogo de atajos.",
+        "s2": "Usa las flechas y las teclas de página para moverte sin ratón.",
+        "s3": "Cambia entre tema oscuro y claro con el botón de la cabecera.",
+        "tip": "Los atajos se ignoran mientras escribes en un campo de texto."
+      },
+      "batch": {
+        "title": "Modo Lotes",
+        "summary": "De 2 a 50 PDF con plantillas JSON: cargar, emparejar, comparar y descargar.",
+        "s1": "Suelta varios PDF (y plantillas JSON) en el inicio, o usa «Probar el modo Lotes».",
+        "s2": "Cada plantilla se empareja con su PDF por el campo pdfName; lo ambiguo lo decides tú.",
+        "s3": "Abre cada PDF, sube el PDF nuevo y compara el original con el nuevo.",
+        "tip": "El lote se guarda en tu navegador y puedes continuarlo después.",
+        "s4": "Descarga los resultados como archivos sueltos."
+      },
+      "export": {
+        "title": "Exportar",
+        "summary": "JSON o PDF anotado con fuentes estándar o propias.",
+        "s1": "Descarga el JSON con las coordenadas desde la pestaña Anotaciones.",
+        "s2": "Sube fuentes propias (.ttf, .otf, .woff, .woff2) en Avanzado si las necesitas.",
+        "s3": "Pulsa «Descargar PDF» en la cabecera para obtener el PDF anotado.",
+        "tip": "El PDF exportado pinta lo mismo que ves en el visor."
+      }
     }
   }
 }
