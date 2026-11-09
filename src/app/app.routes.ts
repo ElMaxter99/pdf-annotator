@@ -23,11 +23,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/batch/batch-load.page').then((m) => m.BatchLoadPageComponent),
   },
-  {
-    path: 'batch/match',
-    loadComponent: () =>
-      import('./pages/batch/batch-match.page').then((m) => m.BatchMatchPageComponent),
-  },
+  { path: 'batch/match', redirectTo: 'batch' },
   {
     path: 'batch/:id',
     loadComponent: () =>

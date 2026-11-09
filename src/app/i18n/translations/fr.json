@@ -400,25 +400,26 @@
       "all": "Tous",
       "noTemplate": "Sans modèle",
       "templateError": "Avec erreur",
-      "missingNew": "Nouveau PDF manquant",
-      "ready": "Prêts à mettre en page",
-      "relaid": "Mis en page",
-      "exported": "Exportés"
+      "missingNew": "Version A seule",
+      "ready": "À réviser",
+      "relaid": "Ajustés",
+      "validated": "Validés"
     },
     "status": {
       "noTemplate": "Sans modèle",
       "templateError": "Erreur de JSON",
-      "missingNew": "Nouveau PDF manquant",
-      "ready": "Prêt à mettre en page",
-      "relaid": "Mis en page",
-      "exported": "✓ Exporté"
+      "missingNew": "Version A seule",
+      "ready": "À réviser",
+      "relaid": "Ajusté",
+      "validated": "Validé"
     },
     "action": {
       "pasteTemplate": "Coller le modèle",
       "fix": "Corriger",
       "uploadNew": "Envoyer le nouveau PDF",
       "review": "Vérifier",
-      "open": "Ouvrir"
+      "open": "Ouvrir",
+      "validate": "Valider"
     },
     "col": {
       "pdf": "PDF",
@@ -426,7 +427,8 @@
       "page": "Page",
       "weight": "Poids",
       "fields": "Champs",
-      "status": "État"
+      "status": "État",
+      "versionB": "Version B"
     },
     "storage": {
       "title": "Stockage local",
@@ -442,7 +444,19 @@
       "prev": "Précédent",
       "nextOne": "Suivant",
       "skip": "Passer ce PDF",
-      "editSetup": "Changer le modèle ou le nouveau PDF"
+      "editSetup": "Changer le modèle ou le nouveau PDF",
+      "backPanel": "Tableau du lot",
+      "rail": "PDF du lot",
+      "railTitle": "PDF du lot",
+      "loose": "{{count}} modèles du lot sans PDF",
+      "looseUse": "Utiliser ce modèle",
+      "optionalB": "La version B est facultative : sans elle vous pouvez réviser et valider la version A. Tout nom de fichier convient.",
+      "reviewA": "Réviser",
+      "replaceB": "Remplacer la version B…",
+      "addB": "Importer la version B…",
+      "removeB": "Retirer la version B",
+      "unvalidate": "Retirer la validation",
+      "validate": "valider"
     },
     "template": {
       "label": "Modèle",
@@ -512,8 +526,8 @@
       "new": "Nouveau",
       "side": "Côte à côte",
       "overlay": "Superposé",
-      "before": "AVANT",
-      "after": "APRÈS",
+      "before": "VERSION A",
+      "after": "VERSION B",
       "sync": "Défilement synchronisé",
       "zoom": "Zoom",
       "zoomIn": "Agrandir",
@@ -539,16 +553,17 @@
       "saveNext": "Enregistrer et suivant",
       "save": "Enregistrer",
       "unsaved": "Modifications non enregistrées",
-      "savedToast": "Mise en page enregistrée."
+      "savedToast": "Mise en page enregistrée.",
+      "onlyA": "Ce PDF n'a pas de version B : vous voyez la version A avec ses coordonnées. Importez une version B pour comparer."
     },
     "export": {
       "title": "Télécharger le lot",
-      "intro": "{{count}} PDF prêts à télécharger. Ils arrivent en fichiers séparés, au nom de l'original.",
+      "intro": "{{count}} PDF validés à télécharger. Ils sont téléchargés comme fichiers séparés, avec le nom de l'original.",
       "content": "Contenu",
-      "json": "JSON remis en page de chaque PDF",
-      "pdf": "PDF annoté (nouvelle taille)",
+      "json": "JSON avec les coordonnées de chaque PDF",
+      "pdf": "PDF annoté",
       "loose": "Noms : {nom}.json · {nom}.pdf. Le navigateur peut demander l'autorisation de télécharger plusieurs fichiers.",
-      "skipped": "{{count}} ignorés (sans modèle ou sans nouveau PDF)",
+      "skipped": "{{count}} non validés (non téléchargés)",
       "start": "Télécharger {{count}} fichiers",
       "cancel": "Annuler",
       "running": "Téléchargement de {{done}} fichiers sur {{total}}",
@@ -561,7 +576,8 @@
       "retry": "Réessayer les échecs",
       "again": "Télécharger à nouveau",
       "newBatch": "Commencer un autre lot",
-      "close": "Fermer"
+      "close": "Fermer",
+      "coords": "Coordonnées à télécharger"
     },
     "mode": {
       "label": "Mode de travail",
@@ -647,7 +663,7 @@
         "pdfs": "PDF lus",
         "templates": "Modèles valides",
         "failedTemplates": "{{count}} modèles avec erreur de syntaxe.",
-        "go": "Associer {{pdfs}} à {{templates}} →",
+        "go": "Aller au tableau avec {{pdfs}} PDF et {{templates}} modèles →",
         "needPdfs": "Chargez au moins un PDF pour continuer."
       }
     },
@@ -732,6 +748,80 @@
       "add": "Ajouter au lot",
       "addHint": "Ajoute ce PDF au lot et ouvre l’association. Votre session de l’éditeur est conservée.",
       "added": "{{name}} ajouté au lot"
+    },
+    "panel": {
+      "tab": "Tableau du lot",
+      "validated": "{{done}} sur {{total}} validés",
+      "filters": "Filtrer par statut",
+      "view": "Type de vue",
+      "grid": "Grille",
+      "table": "Tableau",
+      "importTemplates": "Importer des modèles",
+      "uploadB": "Importer la version B",
+      "download": "Télécharger les validés ({{count}})",
+      "next": "Réviser le suivant",
+      "openPdf": "Ouvrir {{name}}",
+      "pillTemplate": "Modèle",
+      "pillB": "Version B",
+      "pillOnlyA": "Version A seule"
+    },
+    "templates": {
+      "title": "Importer des modèles",
+      "close": "Fermer",
+      "paste": "Coller du texte",
+      "files": "Importer des fichiers",
+      "pasteHelp": "Collez autant de modèles que vous voulez, l'un après l'autre. Pas besoin de tableau.",
+      "found": "{{valid}} modèles valides · {{broken}} avec erreur",
+      "add": "Ajouter {{count}} modèles",
+      "clear": "Vider",
+      "drop": "Déposez vos JSON",
+      "dropHelp": "Accepte .json, .jsonl et .ndjson. Un fichier peut contenir un modèle ou des centaines.",
+      "pick": "Choisir des JSON",
+      "result": "Résultat",
+      "added": "{{count}} modèles ajoutés",
+      "paired": "{{paired}} PDF ont un modèle ({{total}} modèles dans le lot)",
+      "unused": "{{count}} modèles sans PDF",
+      "unusedHelp": "Ils restent dans le lot. Assignez-les à la main depuis la fiche d'un PDF sans modèle.",
+      "line": "ligne {{line}}",
+      "keyField": "Champ d'appariement",
+      "issue": {
+        "empty": "Vide",
+        "no-object": "Pas d'objet JSON",
+        "syntax": "Erreur de syntaxe",
+        "no-pages": "Sans « pages »"
+      }
+    },
+    "versionB": {
+      "title": "Importer la version B",
+      "close": "Fermer",
+      "drop": "Déposez la version B",
+      "dropHelp": "Il est apparié par nom et le contenu réel du fichier (empreinte SHA-256) est comparé à celui déjà dans le lot.",
+      "pick": "Choisir des PDF",
+      "result": "Résultat de la vérification",
+      "similar": "Nom proche",
+      "chipB": "Version B",
+      "chipSame": "Même PDF",
+      "assign": "Choisir le PDF pour {{name}}",
+      "choosePdf": "Choisir le PDF…",
+      "remove": "Retirer {{name}}",
+      "sameNote": "{{name}} est le même PDF que celui déjà dans le lot (même contenu), il n'est donc pas ajouté comme version B.",
+      "apply": "Ajouter {{count}} versions B",
+      "cancel": "Annuler",
+      "never": "Ce qui est douteux n'est jamais attribué automatiquement.",
+      "added": "{{count}} versions B ajoutées",
+      "kind": {
+        "notPdf": "Ce n'est pas un PDF",
+        "tooBig": "Dépasse {{limit}} Mo"
+      }
+    },
+    "validate": {
+      "title": "Valider {{name}} ?",
+      "text": "Vous confirmez avoir vérifié les coordonnées de ce PDF et qu'elles sont correctes. Vous pourrez retirer la validation ensuite.",
+      "fields": "{{fields}} champs sur {{pages}} pages",
+      "warnings": "{{count}} champs mal placés (avertissement, n'empêche pas de valider)",
+      "unsaved": "Il y a des modifications non enregistrées : elles seront enregistrées à la validation.",
+      "confirm": "Oui, valider",
+      "done": "{{name}} validé"
     }
   },
   "preview": {

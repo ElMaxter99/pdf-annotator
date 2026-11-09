@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { PDFDocument } from 'pdf-lib';
 import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
 
 const pdfBytes = readFileSync(EXAMPLE_PDF);
@@ -17,11 +18,19 @@ async function startBatch(page: import('@playwright/test').Page) {
     .locator('input[type=file]')
     .setInputFiles([pdfFile('uno.pdf'), pdfFile('dos.pdf'), pdfFile('tres.pdf'), jsonFile('uno.json')]);
   await page.waitForURL('**/batch/load');
-  await page.getByRole('button', { name: /^Emparejar 3 con 1/ }).click();
-  await page.waitForURL('**/batch/match');
-  await page.getByRole('button', { name: /^Continuar con/ }).click();
+  await page.getByRole('button', { name: /^Ir al panel con 3 PDF/ }).click();
   await page.waitForURL('**/batch');
 }
+
+/** A real PDF with other content than the example, so it counts as a different file. */
+async function otherPdf(name: string, label = name) {
+  const doc = await PDFDocument.create();
+  doc.addPage([595, 842]).drawText(label, { x: 50, y: 700, size: 18 });
+  return { name, mimeType: 'application/pdf', buffer: Buffer.from(await doc.save()) };
+}
+
+const card = (page: import('@playwright/test').Page, name: string) =>
+  page.locator('.pcard', { hasText: name });
 
 const template = (name: string, x = 10) =>
   JSON.stringify({
@@ -70,11 +79,21 @@ async function waitForSavedLayouts(page: import('@playwright/test').Page, count:
 
 test('several files open the load step and a lone JSON still pairs by file name', async ({ page }) => {
   await startBatch(page);
-  await expect(page.getByRole('heading', { name: /Lote · 3 PDF/ })).toBeVisible();
-  const rows = page.locator('.table [role=row][data-status]');
-  await expect(rows).toHaveCount(3);
-  await expect(rows.filter({ hasText: 'uno.pdf' })).toHaveAttribute('data-status', 'missingNew');
-  await expect(rows.filter({ hasText: 'dos.pdf' })).toHaveAttribute('data-status', 'noTemplate');
+  await expect(page.getByText('0 de 3 validados')).toBeVisible();
+  const cards = page.locator('.pcard[data-status]');
+  await expect(cards).toHaveCount(3);
+  await expect(card(page, 'uno.pdf')).toHaveAttribute('data-status', 'missingNew');
+  await expect(card(page, 'dos.pdf')).toHaveAttribute('data-status', 'noTemplate');
+  // The first page of each PDF is drawn as a thumbnail.
+  await expect(page.locator('.pcard img')).toHaveCount(3, { timeout: 15_000 });
+});
+
+test('the panel also shows a table with the same PDFs', async ({ page }) => {
+  await startBatch(page);
+  await page.getByRole('button', { name: /Tabla/ }).click();
+  await expect(page.locator('.table [role=row][data-status]')).toHaveCount(3);
+  await page.getByRole('button', { name: /Cuadrícula/ }).click();
+  await expect(page.locator('.pcard')).toHaveCount(3);
 });
 
 test('the landing explains both modes and the batch card opens the load step', async ({ page }) => {
@@ -94,32 +113,23 @@ test('pasting a mongoexport pairs each template with its PDF by pdfName', async 
   await loadAndPaste(page, text);
   await expect(page.locator('.pill--ok')).toContainText('4 plantillas');
   await page.getByRole('button', { name: 'Añadir 4 plantillas' }).click();
-  await page.getByRole('button', { name: /^Emparejar 3 con 4/ }).click();
-  await page.waitForURL('**/batch/match');
-  const rows = page.locator('.table [role=row][data-match]');
-  await expect(rows).toHaveCount(3);
-  await expect(rows.filter({ hasText: 'uno.pdf' })).toHaveAttribute('data-match', 'exact');
-  await expect(rows.filter({ hasText: 'tres.pdf' })).toHaveAttribute('data-match', 'similar');
-  await expect(page.locator('.tpl-row')).toHaveCount(1);
-  await page.getByRole('button', { name: /^Continuar con/ }).click();
+  await page.getByRole('button', { name: /^Ir al panel con 3 PDF/ }).click();
   await page.waitForURL('**/batch');
-  await expect(page.locator('.table [role=row]', { hasText: 'uno.pdf' })).toHaveAttribute('data-status', 'missingNew');
+  for (const name of ['uno.pdf', 'dos.pdf', 'tres.pdf']) {
+    await expect(card(page, name)).toHaveAttribute('data-status', 'missingNew');
+  }
 });
 
-test('a PDF without a template is assigned by hand and broken pasted templates stay in the box', async ({ page }) => {
-  const broken = '{"pdfName":"dos.pdf","pages":[ {"num":1, fields: ';
-  await loadAndPaste(page, [template('uno.pdf'), template('sobra.pdf', 50), broken].join('\n'));
-  await expect(page.locator('.pill--bad')).toContainText('1 con error');
-  await page.getByRole('button', { name: 'Añadir 2 plantillas' }).click();
-  await expect(page.locator('#batch-paste')).toHaveValue(broken);
-  await page.getByRole('button', { name: /^Emparejar 3 con 2/ }).click();
-  await page.waitForURL('**/batch/match');
-  const row = page.locator('.table [role=row]', { hasText: 'tres.pdf' });
-  await expect(row).toHaveAttribute('data-match', 'none');
-  await row.getByRole('button', { name: 'Asignar' }).click();
-  await page.getByRole('radio', { name: /sobra\.pdf/ }).click();
-  await page.getByRole('button', { name: 'Asignar esta plantilla' }).click();
-  await expect(row).toHaveAttribute('data-match', 'manual');
+test('templates are imported from the panel and broken pasted ones stay in the box', async ({ page }) => {
+  await startBatch(page);
+  const broken = '{"pdfName":"tres.pdf","pages":[ {"num":1, fields: ';
+  await page.locator('#open-templates').click();
+  await page.locator('#tpl-paste').fill([template('dos.pdf', 30), broken].join('\n'));
+  await page.getByRole('button', { name: 'Añadir 1 plantillas' }).click();
+  await expect(page.locator('#tpl-paste')).toHaveValue(broken);
+  await page.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  await expect(card(page, 'dos.pdf')).toHaveAttribute('data-status', 'missingNew');
+  await expect(card(page, 'tres.pdf')).toHaveAttribute('data-status', 'noTemplate');
 });
 
 test('a single PDF still opens the editor', async ({ page }) => {
@@ -131,31 +141,83 @@ test('a single PDF still opens the editor', async ({ page }) => {
 
 test('duplicates and non-PDF files are reported without blocking the batch', async ({ page }) => {
   await startBatch(page);
-  await page.locator('input[type=file]').setInputFiles([pdfFile('uno.pdf'), { name: 'notas.txt', mimeType: 'text/plain', buffer: Buffer.from('x') }]);
+  await page.locator('input[type=file]').first().setInputFiles([pdfFile('uno.pdf'), { name: 'notas.txt', mimeType: 'text/plain', buffer: Buffer.from('x') }]);
   const notice = page.locator('.note--warn[role=alert]');
   await expect(notice).toContainText('uno.pdf');
   await expect(notice).toContainText('notas.txt');
 });
 
-test('paste a Mongo script, upload the new PDF, compare and save', async ({ page }) => {
+test('version B: the same content is only a notice, a different file pairs by name', async ({ page }) => {
   await startBatch(page);
-  await page.locator('.table [role=row]', { hasText: 'dos.pdf' }).getByRole('button', { name: 'Pegar plantilla' }).click();
-  await page.waitForURL(/\/batch\/.+/);
+  await page.locator('#open-version-b').click();
+  const drawer = page.getByRole('dialog', { name: 'Subir versión B' });
+  await drawer.locator('input[type=file]').setInputFiles([pdfFile('uno.pdf'), await otherPdf('dos.pdf')]);
+  await expect(drawer.getByText('Es el mismo PDF').first()).toBeVisible();
+  await expect(drawer.locator('.note--info')).toContainText('uno.pdf es el mismo PDF');
+  await expect(drawer.getByRole('button', { name: 'Añadir 1 versiones B' })).toBeEnabled();
+  await drawer.getByRole('button', { name: 'Añadir 1 versiones B' }).click();
+  await expect(page.getByRole('dialog', { name: 'Subir versión B' })).toHaveCount(0);
+  await expect(card(page, 'dos.pdf')).toContainText('Versión B');
+  await expect(card(page, 'uno.pdf')).toContainText('Solo versión A');
+});
 
+test('version B with another name is associated by hand from the PDF page', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/batch\/.+/);
+  await expect(page.locator('app-batch-compare')).toBeVisible();
+  // Same content, other name: not a new version.
+  await page.locator('#replace-b').setInputFiles(pdfFile('uno final.pdf'));
+  await expect(page.locator('.compare-head .note--ok')).toContainText('uno final.pdf es el mismo PDF');
+  await expect(page.locator('.pane:visible')).toHaveCount(1);
+  // Different content: it becomes version B whatever its name.
+  await page.locator('#replace-b').setInputFiles(await otherPdf('uno final.pdf'));
+  await expect(page.locator('.pane:visible')).toHaveCount(2);
+  await expect(page.locator('.tag--accent')).toContainText('uno final.pdf');
+});
+
+test('review the original, validate it with OK and a confirmation, then download it', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'dos.pdf').getByRole('button', { name: 'Pegar plantilla' }).click();
+  await page.waitForURL(/\/batch\/.+/);
   await page.locator('#template-text').fill('db.t.drop();\nvar pdfTemplate = { _id: ObjectId("abc"), pages: [ { num: 1, fields: [ { x: 150, y: 722, mapField: "cliente.nombre", fontSize: 12 } ] } ] };');
   await expect(page.locator('#template-status')).toContainText('1 páginas · 1 campos');
   await page.getByRole('button', { name: 'Usar plantilla' }).click();
-
-  await page.locator('input[type=file][accept^="application/pdf"]').setInputFiles(pdfFile('dos-nuevo.pdf'));
+  // Without a version B the original is reviewed with its coordinates.
   await expect(page.locator('app-batch-compare')).toBeVisible();
+  await expect(page.locator('.fld--orig')).toHaveCount(1);
+  await page.locator('#validate-ok').click();
+  await expect(page.getByRole('dialog', { name: /¿Validar dos\.pdf\?/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Cancelar' }).click();
+  await expect(page.locator('#validate-ok')).toBeVisible();
+  await page.locator('#validate-ok').click();
+  await page.locator('#confirm-validate').click();
+  await expect(page.getByText('Validado').first()).toBeVisible();
+
+  await page.getByRole('link', { name: /Panel del lote/ }).click();
+  await expect(card(page, 'dos.pdf')).toHaveAttribute('data-status', 'validated');
+  await expect(page.getByText('1 de 3 validados')).toBeVisible();
+  await page.locator('#download-validated').click();
+  const names: string[] = [];
+  page.on('download', (download) => names.push(download.suggestedFilename()));
+  await page.getByRole('button', { name: /Descargar 2 archivos/ }).click();
+  await expect(page.getByRole('heading', { name: 'Lote descargado' })).toBeVisible({ timeout: 30_000 });
+  expect(names.sort()).toEqual(['dos.json', 'dos.pdf']);
+});
+
+test('add a version B, compare, adjust the coordinates and save', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/batch\/.+/);
+  await page.locator('#replace-b').setInputFiles(await otherPdf('uno-b.pdf'));
   await expect(page.locator('.pane')).toHaveCount(2);
-  await expect(page.locator('.fld--new')).toHaveCount(1);
+  await expect(page.locator('.fld--new')).not.toHaveCount(0);
 
   await page.getByRole('button', { name: 'Superpuesto' }).click();
   await expect(page.locator('.cmp__panes--overlay')).toBeVisible();
   await page.getByRole('button', { name: 'Lado a lado' }).click();
 
-  const field = page.locator('.fld--new');
+  const field = page.locator('.fld--new').first();
   const before = await field.boundingBox();
   await page.mouse.move(before!.x + 4, before!.y + 4);
   await page.mouse.down();
@@ -165,55 +227,34 @@ test('paste a Mongo script, upload the new PDF, compare and save', async ({ page
   expect(after!.x).toBeGreaterThan(before!.x + 30);
   await expect(page.getByRole('button', { name: /Deshacer/ })).toBeEnabled();
 
-  await page.getByRole('button', { name: 'Guardar y siguiente' }).click();
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
   await waitForSavedLayouts(page, 1);
   await page.goto('/batch');
-  await expect(page.locator('.table [role=row]', { hasText: 'dos.pdf' })).toHaveAttribute('data-status', 'relaid');
-});
-
-test('exports the JSON and the annotated PDF as loose files', async ({ page }) => {
-  await startBatch(page);
-  await page.locator('.table [role=row]', { hasText: 'uno.pdf' }).getByRole('button', { name: 'Subir PDF nuevo' }).click();
-  await expect(page.locator('#template-status')).toContainText('campos');
-  await expect(async () => {
-    await page.locator('input[type=file][accept^="application/pdf"]').setInputFiles(pdfFile('uno-nuevo.pdf'));
-    await expect(page.locator('app-batch-compare')).toBeVisible({ timeout: 3000 });
-  }).toPass({ timeout: 15_000 });
-  await page.getByRole('button', { name: 'Guardar y siguiente' }).click();
-  await waitForSavedLayouts(page, 1);
-  await page.goto('/batch');
-  await page.getByRole('button', { name: /Descargar \(1\)/ }).click();
-  const names: string[] = [];
-  page.on('download', (download) => names.push(download.suggestedFilename()));
-  await page.getByRole('button', { name: /Descargar 2 archivos/ }).click();
-  await expect(page.getByRole('heading', { name: 'Lote descargado' })).toBeVisible({ timeout: 30_000 });
-  expect(names.sort()).toEqual(['uno.json', 'uno.pdf']);
-  await page.getByRole('button', { name: 'Cerrar' }).click();
-  await expect(page.locator('.table [role=row]', { hasText: 'uno.pdf' })).toHaveAttribute('data-status', 'exported');
+  await expect(card(page, 'uno.pdf')).toHaveAttribute('data-status', 'relaid');
 });
 
 test('a broken template is flagged with its line and does not block the others', async ({ page }) => {
   await startBatch(page);
-  await page.locator('.table [role=row]', { hasText: 'tres.pdf' }).getByRole('button', { name: 'Pegar plantilla' }).click();
+  await card(page, 'tres.pdf').getByRole('button', { name: 'Pegar plantilla' }).click();
   await page.locator('#template-text').fill('var t = {\n  pages: [ { num: 1, fields: [ { x: 1, y: , mapField: "a" } ] } ]\n};');
   await expect(page.locator('#template-status')).toContainText('línea 2');
   await expect(page.getByRole('button', { name: 'Usar plantilla' })).toBeDisabled();
 });
 
-test('the batch survives a reload and exports loose files', async ({ page }) => {
+test('the batch survives a reload and nothing is downloadable until it is validated', async ({ page }) => {
   await startBatch(page);
   await page.reload();
-  await expect(page.locator('.table [role=row][data-status]')).toHaveCount(3);
-  await expect(page.getByRole('button', { name: /Descargar \(0\)/ })).toBeDisabled();
+  await expect(page.locator('.pcard[data-status]')).toHaveCount(3);
+  await expect(page.locator('#download-validated')).toBeDisabled();
 });
 
-test('the editor can add its PDF to the batch and opens the pairing step', async ({ page }) => {
+test('the editor can add its PDF to the batch and opens the panel', async ({ page }) => {
   await stubAnalytics(page);
   await page.goto('/landing');
   await page.locator('input[type=file]').setInputFiles(pdfFile('solo.pdf'));
   await page.waitForURL('**/workspace');
   await expect(page.getByRole('navigation', { name: 'Modo de trabajo' })).toBeVisible();
   await page.getByRole('button', { name: 'Añadir al lote' }).click();
-  await page.waitForURL('**/batch/match');
-  await expect(page.locator('.table [role=row][data-match]', { hasText: 'solo.pdf' })).toHaveAttribute('data-match', 'none');
+  await page.waitForURL('**/batch');
+  await expect(card(page, 'solo.pdf')).toHaveAttribute('data-status', 'noTemplate');
 });

@@ -44,8 +44,9 @@ export class BatchExportService {
   private readonly fonts = inject(FontCatalogService);
   private readonly preview = inject(PreviewSettingsService);
 
-  json(item: BatchItem): BatchExportFile {
-    const pages = item.layout ?? [];
+  /** `a` exports the coordinates of the original PDF, `b` those adjusted over the version B. */
+  json(item: BatchItem, side: 'a' | 'b' = 'b'): BatchExportFile {
+    const pages = (side === 'b' ? item.layout : item.template) ?? item.template ?? [];
     return {
       filename: `${baseName(item.name)}.json`,
       blob: new Blob([JSON.stringify(serializeBatchPages(pages), null, 2)], {
@@ -54,16 +55,17 @@ export class BatchExportService {
     };
   }
 
-  async pdf(item: BatchItem): Promise<BatchExportFile> {
-    const source = item.newPdf;
+  async pdf(item: BatchItem, side: 'a' | 'b' = 'b'): Promise<BatchExportFile> {
+    const useB = side === 'b' && !!item.newPdf;
+    const source = useB ? item.newPdf : item.pdf;
     if (!source) {
-      throw new Error('El PDF no tiene un PDF nuevo asociado.');
+      throw new Error('El PDF no está disponible.');
     }
     const bytes = new Uint8Array(await source.arrayBuffer());
     const ctx = this.preview.context();
     const { bytes: out } = await this.pdfExport.exportAnnotatedPdf({
       pdfByteCandidates: [bytes],
-      pages: item.layout ?? [],
+      pages: (useB ? item.layout : item.template) ?? [],
       customFonts: new Map(),
       defaultFontId: DEFAULT_FONT_ID,
       defaultOpacity: 1,

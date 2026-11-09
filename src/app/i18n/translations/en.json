@@ -400,25 +400,26 @@
       "all": "All",
       "noTemplate": "No template",
       "templateError": "With error",
-      "missingNew": "New PDF missing",
-      "ready": "Ready to re-layout",
-      "relaid": "Re-laid out",
-      "exported": "Exported"
+      "missingNew": "Version A only",
+      "ready": "To review",
+      "relaid": "Adjusted",
+      "validated": "Validated"
     },
     "status": {
       "noTemplate": "No template",
       "templateError": "JSON error",
-      "missingNew": "New PDF missing",
-      "ready": "Ready to re-layout",
-      "relaid": "Re-laid out",
-      "exported": "✓ Exported"
+      "missingNew": "Version A only",
+      "ready": "To review",
+      "relaid": "Adjusted",
+      "validated": "Validated"
     },
     "action": {
       "pasteTemplate": "Paste template",
       "fix": "Fix",
       "uploadNew": "Upload new PDF",
       "review": "Review",
-      "open": "Open"
+      "open": "Open",
+      "validate": "Validate"
     },
     "col": {
       "pdf": "PDF",
@@ -426,7 +427,8 @@
       "page": "Page",
       "weight": "Size",
       "fields": "Fields",
-      "status": "Status"
+      "status": "Status",
+      "versionB": "Version B"
     },
     "storage": {
       "title": "Local storage",
@@ -442,7 +444,19 @@
       "prev": "Previous",
       "nextOne": "Next",
       "skip": "Skip this PDF",
-      "editSetup": "Change template or new PDF"
+      "editSetup": "Change template or new PDF",
+      "backPanel": "Batch panel",
+      "rail": "Batch PDFs",
+      "railTitle": "Batch PDFs",
+      "loose": "{{count}} batch templates without a PDF",
+      "looseUse": "Use this template",
+      "optionalB": "Version B is optional: without it you can still review and validate version A. Any file name works.",
+      "reviewA": "Review",
+      "replaceB": "Replace version B…",
+      "addB": "Upload version B…",
+      "removeB": "Remove version B",
+      "unvalidate": "Remove validation",
+      "validate": "validate"
     },
     "template": {
       "label": "Template",
@@ -512,8 +526,8 @@
       "new": "New",
       "side": "Side by side",
       "overlay": "Overlay",
-      "before": "BEFORE",
-      "after": "AFTER",
+      "before": "VERSION A",
+      "after": "VERSION B",
       "sync": "Synced scroll",
       "zoom": "Zoom",
       "zoomIn": "Zoom in",
@@ -539,16 +553,17 @@
       "saveNext": "Save and next",
       "save": "Save",
       "unsaved": "Unsaved changes",
-      "savedToast": "Re-layout saved."
+      "savedToast": "Re-layout saved.",
+      "onlyA": "This PDF has no version B: you see version A with its coordinates. Upload a version B to compare."
     },
     "export": {
       "title": "Download the batch",
-      "intro": "{{count}} PDFs ready to download. They come as separate files, named like the original.",
+      "intro": "{{count}} validated PDFs to download. They download as separate files, named after the original.",
       "content": "Contents",
-      "json": "Re-laid out JSON for each PDF",
-      "pdf": "Annotated PDF (new size)",
+      "json": "JSON with the coordinates of each PDF",
+      "pdf": "Annotated PDF",
       "loose": "Names: {name}.json · {name}.pdf. Your browser may ask for permission to download several files.",
-      "skipped": "{{count}} skipped (no template or no new PDF)",
+      "skipped": "{{count}} not validated (not downloaded)",
       "start": "Download {{count}} files",
       "cancel": "Cancel",
       "running": "Downloading {{done}} of {{total}} files",
@@ -561,7 +576,8 @@
       "retry": "Retry the failed ones",
       "again": "Download again",
       "newBatch": "Start another batch",
-      "close": "Close"
+      "close": "Close",
+      "coords": "Coordinates to download"
     },
     "mode": {
       "label": "Work mode",
@@ -647,7 +663,7 @@
         "pdfs": "PDFs read",
         "templates": "Valid templates",
         "failedTemplates": "{{count}} templates with syntax errors.",
-        "go": "Match {{pdfs}} with {{templates}} →",
+        "go": "Go to the panel with {{pdfs}} PDFs and {{templates}} templates →",
         "needPdfs": "Load at least one PDF to continue."
       }
     },
@@ -732,6 +748,80 @@
       "add": "Add to batch",
       "addHint": "Adds this PDF to the batch and opens the matching step. Your editor session is kept.",
       "added": "{{name}} added to the batch"
+    },
+    "panel": {
+      "tab": "Batch panel",
+      "validated": "{{done}} of {{total}} validated",
+      "filters": "Filter by status",
+      "view": "View type",
+      "grid": "Grid",
+      "table": "Table",
+      "importTemplates": "Import templates",
+      "uploadB": "Upload version B",
+      "download": "Download validated ({{count}})",
+      "next": "Review the next one",
+      "openPdf": "Open {{name}}",
+      "pillTemplate": "Template",
+      "pillB": "Version B",
+      "pillOnlyA": "Version A only"
+    },
+    "templates": {
+      "title": "Import templates",
+      "close": "Close",
+      "paste": "Paste text",
+      "files": "Upload files",
+      "pasteHelp": "Paste as many templates as you like, one after another. No array needed.",
+      "found": "{{valid}} valid templates · {{broken}} with errors",
+      "add": "Add {{count}} templates",
+      "clear": "Clear",
+      "drop": "Drop your JSON files",
+      "dropHelp": "Accepts .json, .jsonl and .ndjson. A file can hold one template or hundreds.",
+      "pick": "Choose JSON files",
+      "result": "Result",
+      "added": "{{count}} templates added",
+      "paired": "{{paired}} PDFs now have a template ({{total}} templates in the batch)",
+      "unused": "{{count}} templates without a PDF",
+      "unusedHelp": "They stay in the batch. Assign them by hand from the page of a PDF without a template.",
+      "line": "line {{line}}",
+      "keyField": "Pairing field",
+      "issue": {
+        "empty": "Empty",
+        "no-object": "No JSON object",
+        "syntax": "Syntax error",
+        "no-pages": "No \"pages\""
+      }
+    },
+    "versionB": {
+      "title": "Upload version B",
+      "close": "Close",
+      "drop": "Drop version B",
+      "dropHelp": "It is paired by name and the real file content (SHA-256 fingerprint) is compared with the one already in the batch.",
+      "pick": "Choose PDFs",
+      "result": "Check result",
+      "similar": "Similar name",
+      "chipB": "Version B",
+      "chipSame": "Same PDF",
+      "assign": "Choose the PDF for {{name}}",
+      "choosePdf": "Choose the PDF…",
+      "remove": "Remove {{name}}",
+      "sameNote": "{{name}} is the same PDF that is already in the batch (same content), so it is not added as version B.",
+      "apply": "Add {{count}} version B files",
+      "cancel": "Cancel",
+      "never": "Anything unclear is never assigned on its own.",
+      "added": "{{count}} version B files added",
+      "kind": {
+        "notPdf": "Not a PDF",
+        "tooBig": "Over {{limit}} MB"
+      }
+    },
+    "validate": {
+      "title": "Validate {{name}}?",
+      "text": "You confirm that you reviewed the coordinates of this PDF and they are right. You can remove the validation later.",
+      "fields": "{{fields}} fields on {{pages}} pages",
+      "warnings": "{{count}} misplaced fields (a warning, it does not stop you validating)",
+      "unsaved": "There are unsaved changes: they will be saved when you validate.",
+      "confirm": "Yes, validate",
+      "done": "{{name}} validated"
     }
   },
   "preview": {

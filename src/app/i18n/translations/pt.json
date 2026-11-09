@@ -400,25 +400,26 @@
       "all": "Todos",
       "noTemplate": "Sem modelo",
       "templateError": "Com erro",
-      "missingNew": "Falta PDF novo",
-      "ready": "Prontos para remontar",
-      "relaid": "Remontados",
-      "exported": "Exportados"
+      "missingNew": "Só versão A",
+      "ready": "Por rever",
+      "relaid": "Ajustados",
+      "validated": "Validados"
     },
     "status": {
       "noTemplate": "Sem modelo",
       "templateError": "Erro no JSON",
-      "missingNew": "Falta PDF novo",
-      "ready": "Pronto para remontar",
-      "relaid": "Remontado",
-      "exported": "✓ Exportado"
+      "missingNew": "Só versão A",
+      "ready": "Por rever",
+      "relaid": "Ajustado",
+      "validated": "Validado"
     },
     "action": {
       "pasteTemplate": "Colar modelo",
       "fix": "Corrigir",
       "uploadNew": "Enviar PDF novo",
       "review": "Rever",
-      "open": "Abrir"
+      "open": "Abrir",
+      "validate": "Validar"
     },
     "col": {
       "pdf": "PDF",
@@ -426,7 +427,8 @@
       "page": "Página",
       "weight": "Peso",
       "fields": "Campos",
-      "status": "Estado"
+      "status": "Estado",
+      "versionB": "Versão B"
     },
     "storage": {
       "title": "Armazenamento local",
@@ -442,7 +444,19 @@
       "prev": "Anterior",
       "nextOne": "Seguinte",
       "skip": "Saltar este PDF",
-      "editSetup": "Alterar modelo ou PDF novo"
+      "editSetup": "Alterar modelo ou PDF novo",
+      "backPanel": "Painel do lote",
+      "rail": "PDF do lote",
+      "railTitle": "PDF do lote",
+      "loose": "{{count}} modelos do lote sem PDF",
+      "looseUse": "Usar este modelo",
+      "optionalB": "A versão B é opcional: sem ela pode rever e validar a versão A. Qualquer nome de ficheiro serve.",
+      "reviewA": "Rever",
+      "replaceB": "Substituir a versão B…",
+      "addB": "Carregar versão B…",
+      "removeB": "Remover versão B",
+      "unvalidate": "Remover validação",
+      "validate": "validar"
     },
     "template": {
       "label": "Modelo",
@@ -512,8 +526,8 @@
       "new": "Novo",
       "side": "Lado a lado",
       "overlay": "Sobreposto",
-      "before": "ANTES",
-      "after": "DEPOIS",
+      "before": "VERSÃO A",
+      "after": "VERSÃO B",
       "sync": "Deslocamento sincronizado",
       "zoom": "Zoom",
       "zoomIn": "Aproximar",
@@ -539,16 +553,17 @@
       "saveNext": "Guardar e seguinte",
       "save": "Guardar",
       "unsaved": "Alterações por guardar",
-      "savedToast": "Remontagem guardada."
+      "savedToast": "Remontagem guardada.",
+      "onlyA": "Este PDF não tem versão B: aqui vê a versão A com as suas coordenadas. Carregue uma versão B para comparar."
     },
     "export": {
       "title": "Descarregar o lote",
-      "intro": "{{count}} PDF prontos a descarregar. Vêm como ficheiros soltos, com o nome do original.",
+      "intro": "{{count}} PDF validados para descarregar. São descarregados como ficheiros separados, com o nome do original.",
       "content": "Conteúdo",
-      "json": "JSON remontado de cada PDF",
-      "pdf": "PDF anotado (tamanho novo)",
+      "json": "JSON com as coordenadas de cada PDF",
+      "pdf": "PDF anotado",
       "loose": "Nomes: {nome}.json · {nome}.pdf. O navegador pode pedir permissão para várias transferências.",
-      "skipped": "{{count}} saltados (sem modelo ou sem PDF novo)",
+      "skipped": "{{count}} sem validar (não são descarregados)",
       "start": "Descarregar {{count}} ficheiros",
       "cancel": "Cancelar",
       "running": "A descarregar {{done}} de {{total}} ficheiros",
@@ -561,7 +576,8 @@
       "retry": "Repetir os que falharam",
       "again": "Descarregar de novo",
       "newBatch": "Começar outro lote",
-      "close": "Fechar"
+      "close": "Fechar",
+      "coords": "Coordenadas a descarregar"
     },
     "mode": {
       "label": "Modo de trabalho",
@@ -647,7 +663,7 @@
         "pdfs": "PDF lidos",
         "templates": "Modelos válidos",
         "failedTemplates": "{{count}} modelos com erro de sintaxe.",
-        "go": "Emparelhar {{pdfs}} com {{templates}} →",
+        "go": "Ir para o painel com {{pdfs}} PDF e {{templates}} modelos →",
         "needPdfs": "Carregue pelo menos um PDF para continuar."
       }
     },
@@ -732,6 +748,80 @@
       "add": "Adicionar ao lote",
       "addHint": "Adiciona este PDF ao lote e abre o emparelhamento. A sua sessão do editor não se perde.",
       "added": "{{name}} adicionado ao lote"
+    },
+    "panel": {
+      "tab": "Painel do lote",
+      "validated": "{{done}} de {{total}} validados",
+      "filters": "Filtrar por estado",
+      "view": "Tipo de vista",
+      "grid": "Grelha",
+      "table": "Tabela",
+      "importTemplates": "Importar modelos",
+      "uploadB": "Carregar versão B",
+      "download": "Descarregar validados ({{count}})",
+      "next": "Rever o seguinte",
+      "openPdf": "Abrir {{name}}",
+      "pillTemplate": "Modelo",
+      "pillB": "Versão B",
+      "pillOnlyA": "Só versão A"
+    },
+    "templates": {
+      "title": "Importar modelos",
+      "close": "Fechar",
+      "paste": "Colar texto",
+      "files": "Carregar ficheiros",
+      "pasteHelp": "Cole todos os modelos que quiser, um a seguir ao outro. Não é preciso um array.",
+      "found": "{{valid}} modelos válidos · {{broken}} com erro",
+      "add": "Adicionar {{count}} modelos",
+      "clear": "Limpar",
+      "drop": "Largue os seus JSON",
+      "dropHelp": "Aceita .json, .jsonl e .ndjson. Um ficheiro pode ter um modelo ou centenas.",
+      "pick": "Selecionar JSON",
+      "result": "Resultado",
+      "added": "{{count}} modelos adicionados",
+      "paired": "{{paired}} PDF já têm modelo ({{total}} modelos no lote)",
+      "unused": "{{count}} modelos sem PDF",
+      "unusedHelp": "Ficam no lote. Atribua-as à mão no separador de um PDF sem modelo.",
+      "line": "linha {{line}}",
+      "keyField": "Campo de emparelhamento",
+      "issue": {
+        "empty": "Vazia",
+        "no-object": "Sem objeto JSON",
+        "syntax": "Erro de sintaxe",
+        "no-pages": "Sem «pages»"
+      }
+    },
+    "versionB": {
+      "title": "Carregar versão B",
+      "close": "Fechar",
+      "drop": "Largue a versão B",
+      "dropHelp": "É emparelhado pelo nome e o conteúdo real do ficheiro (impressão SHA-256) é comparado com o que já está no lote.",
+      "pick": "Selecionar PDF",
+      "result": "Resultado da verificação",
+      "similar": "Nome parecido",
+      "chipB": "Versão B",
+      "chipSame": "É o mesmo PDF",
+      "assign": "Escolher o PDF de {{name}}",
+      "choosePdf": "Escolher o PDF…",
+      "remove": "Remover {{name}}",
+      "sameNote": "{{name}} é o mesmo PDF que já está no lote (mesmo conteúdo), por isso não é adicionado como versão B.",
+      "apply": "Adicionar {{count}} versões B",
+      "cancel": "Cancelar",
+      "never": "O que é duvidoso nunca é atribuído sozinho.",
+      "added": "{{count}} versões B adicionadas",
+      "kind": {
+        "notPdf": "Não é um PDF",
+        "tooBig": "Excede {{limit}} MB"
+      }
+    },
+    "validate": {
+      "title": "Validar {{name}}?",
+      "text": "Confirma que reviu as coordenadas deste PDF e que estão certas. Poderá remover a validação depois.",
+      "fields": "{{fields}} campos em {{pages}} páginas",
+      "warnings": "{{count}} campos mal posicionados (aviso, não impede validar)",
+      "unsaved": "Há alterações por guardar: serão guardadas ao validar.",
+      "confirm": "Sim, validar",
+      "done": "{{name}} validado"
     }
   },
   "preview": {

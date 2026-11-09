@@ -16,6 +16,8 @@ import {
   MatchOutcome,
   detectKeyField,
   matchAll,
+  nameSimilarity,
+  normalizeMatchName,
   templateLabel,
 } from '../utils/template-matching.utils';
 import {
@@ -29,6 +31,7 @@ import { normalizeColor } from '../utils/color.utils';
 import { normalizeFieldType } from '../utils/annotation-fields.utils';
 import { AnnotationImportService, emptyImportReport } from './annotation-import.service';
 import { PdfInfoService } from './pdf-info.service';
+import { hashBlob } from '../utils/file-hash.utils';
 
 export const MAX_BATCH_ITEMS = 50;
 /** Provisional per-file limit (to be confirmed); keeps the whole batch within browser quotas. */
@@ -43,7 +46,7 @@ export type BatchStatus =
   | 'missingNew'
   | 'ready'
   | 'relaid'
-  | 'exported';
+  | 'validated';
 
 export interface TemplateIssue {
   readonly reason: 'empty' | 'no-object' | 'syntax' | 'no-pages';
@@ -88,6 +91,8 @@ export interface BatchItem {
   readonly id: string;
   readonly name: string;
   readonly pdf: Blob;
+  /** SHA-256 of the version A file, to tell a really new PDF from the same one. */
+  readonly hash?: string;
   readonly pageCount: number;
   readonly pageSize: PageSize;
   readonly addedAt: number;
@@ -100,6 +105,9 @@ export interface BatchItem {
   readonly template: PageAnnotations[] | null;
   readonly templateIssue?: TemplateIssue;
   readonly newPdf?: Blob;
+  readonly newHash?: string;
+  /** The user confirmed (OK + modal) that the coordinates of this PDF are right. */
+  readonly validated?: boolean;
   readonly newName?: string;
   readonly newPageCount?: number;
   readonly newPageSize?: PageSize;
@@ -134,8 +142,8 @@ export function countFields(pages: readonly PageAnnotations[] | null | undefined
 export function batchStatusOf(item: BatchItem): BatchStatus {
   if (item.templateIssue) return 'templateError';
   if (!item.template) return 'noTemplate';
+  if (item.validated) return 'validated';
   if (!item.newPdf) return 'missingNew';
-  if (item.exported) return 'exported';
   if (item.relaid) return 'relaid';
   return 'ready';
 }
@@ -291,6 +299,7 @@ export class BatchStoreService {
           id: crypto.randomUUID(),
           name: file.name,
           pdf: file,
+          hash: await hashBlob(file),
           pageCount: info.pageCount,
           pageSize: info.pageSize,
           addedAt: Date.now() + index,
@@ -368,9 +377,8 @@ export class BatchStoreService {
       added += 1;
     }
     if (created.length) {
-      const wasEmpty = this.templates().length === 0;
       this.templates.update((list) => [...list, ...created]);
-      if (wasEmpty && !this.storedKeyField()) this.keyField.set(detectKeyField(this.templates()));
+      if (!this.storedKeyField()) this.keyField.set(detectKeyField(this.templates()));
       await this.run(TEMPLATE_STORE, 'readwrite', (store) => created.forEach((t) => store.put(t)));
       this.rematch();
     }
@@ -484,6 +492,7 @@ export class BatchStoreService {
         layout: null,
         relaid: false,
         exported: false,
+        validated: false,
       };
     }
     return {
@@ -499,6 +508,7 @@ export class BatchStoreService {
           : null,
       relaid: false,
       exported: false,
+      validated: false,
     };
   }
 
@@ -513,6 +523,7 @@ export class BatchStoreService {
       layout: item.newPdf && item.sizeStrategy ? null : item.layout,
       relaid: false,
       exported: false,
+      validated: false,
     };
   }
 
@@ -565,6 +576,7 @@ export class BatchStoreService {
           : item?.layout ?? null,
       relaid: false,
       exported: false,
+      validated: false,
     });
     return result;
   }
@@ -574,21 +586,25 @@ export class BatchStoreService {
     if (!item) return { ok: false, reason: 'missing' };
     if (file.size > MAX_BATCH_PDF_BYTES) return { ok: false, reason: 'tooBig' };
     let info;
+    let hash: string;
     try {
       info = await this.pdfInfo.read(file);
+      hash = await hashBlob(file);
     } catch {
       return { ok: false, reason: 'unreadable' };
     }
     // The item may have changed while pdf.js was reading the file (pairing, saved layout…).
     const current = this.get(id);
     if (!current) return { ok: false, reason: 'missing' };
-    return this.applyNewPdf(current, file, info, strategy);
+    if (await this.isSameContent(current, hash)) return { ok: false, reason: 'same' };
+    return this.applyNewPdf(current, file, info, hash, strategy);
   }
 
   private applyNewPdf(
     item: BatchItem,
     file: File,
     info: { pageCount: number; pageSize: PageSize },
+    hash: string,
     strategy?: SizeStrategy
   ): PdfSwapResult {
     const id = item.id;
@@ -597,11 +613,13 @@ export class BatchStoreService {
     const next: BatchItem = {
       ...item,
       newPdf: file,
+      newHash: hash,
       newName: file.name,
       newPageCount: info.pageCount,
       newPageSize: info.pageSize,
       relaid: false,
       exported: false,
+      validated: false,
     };
     if (differs && !rule) {
       this.patch(id, { ...next, sizeStrategy: undefined, layout: null });
@@ -630,6 +648,8 @@ export class BatchStoreService {
   clearNewPdf(id: string) {
     this.patch(id, {
       newPdf: undefined,
+      newHash: undefined,
+      validated: false,
       newName: undefined,
       newPageCount: undefined,
       newPageSize: undefined,
@@ -641,7 +661,74 @@ export class BatchStoreService {
   }
 
   saveLayout(id: string, layout: PageAnnotations[], relaid: boolean) {
-    this.patch(id, { layout: cloneAnnotationPages(layout), relaid, exported: false });
+    this.patch(id, { layout: cloneAnnotationPages(layout), relaid, exported: false, validated: false });
+  }
+
+  setValidated(id: string, validated: boolean) {
+    this.patch(id, { validated });
+  }
+
+  /** True when `hash` is the content of version A or of the version B already stored. */
+  private async isSameContent(item: BatchItem, hash: string): Promise<boolean> {
+    const a = item.hash ?? (await hashBlob(item.pdf));
+    return hash === a || (!!item.newHash && hash === item.newHash);
+  }
+
+  /** Whether `file` has exactly the content of this PDF (or of its stored version B). */
+  async isSame(id: string, file: Blob): Promise<boolean> {
+    const item = this.get(id);
+    return !!item && this.isSameContent(item, await hashBlob(file));
+  }
+
+  /**
+   * Decides, for each dropped file, which PDF of the batch it is the version B of. The name pairs
+   * them (exact, then similar); content decides whether it is really a different file. Nothing is
+   * stored: the caller shows the plan and applies it with `setNewPdf`.
+   */
+  async planVersionB(files: readonly File[]): Promise<VersionBPlan[]> {
+    await this.load();
+    const items = this.items();
+    const taken = new Set<string>();
+    const plans: VersionBPlan[] = [];
+    for (const file of files) {
+      if (!isPdfFile(file)) {
+        plans.push({ file, kind: 'notPdf', candidates: [] });
+        continue;
+      }
+      if (file.size > MAX_BATCH_PDF_BYTES) {
+        plans.push({ file, kind: 'tooBig', candidates: [] });
+        continue;
+      }
+      const key = normalizeMatchName(file.name);
+      const exact = items.filter((item) => normalizeMatchName(item.name) === key);
+      const scored = items
+        .map((item) => ({ id: item.id, score: nameSimilarity(file.name, item.name) }))
+        .sort((a, b) => b.score - a.score);
+      let itemId: string | undefined;
+      let similar = false;
+      let candidates: string[] = [];
+      if (exact.length === 1) {
+        itemId = exact[0].id;
+      } else if (exact.length > 1) {
+        candidates = exact.map((i) => i.id);
+      } else if (scored[0] && scored[0].score >= 80 && (!scored[1] || scored[0].score - scored[1].score >= 10)) {
+        itemId = scored[0].id;
+        similar = true;
+      } else {
+        candidates = scored.filter((c) => c.score >= 50).slice(0, 4).map((c) => c.id);
+      }
+      if (itemId && taken.has(itemId)) {
+        candidates = [itemId];
+        itemId = undefined;
+      }
+      if (!itemId) {
+        plans.push({ file, kind: candidates.length ? 'choose' : 'none', candidates });
+        continue;
+      }
+      taken.add(itemId);
+      plans.push({ file, kind: (await this.isSame(itemId, file)) ? 'same' : 'b', itemId, similar, candidates: [] });
+    }
+    return plans;
   }
 
   markExported(ids: readonly string[]) {
@@ -665,10 +752,7 @@ export class BatchStoreService {
   /** Next item that still needs work, searching after `afterId` and wrapping around. */
   nextPendingId(afterId?: string): string | null {
     const list = this.items();
-    const pending = (item: BatchItem) => {
-      const status = batchStatusOf(item);
-      return status === 'ready' || status === 'missingNew' || status === 'noTemplate' || status === 'templateError';
-    };
+    const pending = (item: BatchItem) => batchStatusOf(item) !== 'validated';
     const start = afterId ? list.findIndex((item) => item.id === afterId) + 1 : 0;
     const ordered = [...list.slice(start), ...list.slice(0, start)];
     return ordered.find((item) => item.id !== afterId && pending(item))?.id ?? null;
@@ -775,10 +859,19 @@ export class BatchStoreService {
   }
 }
 
+export interface VersionBPlan {
+  readonly file: File;
+  /** b: different content, ready · same: identical to what is stored · choose/none: needs the user. */
+  readonly kind: 'b' | 'same' | 'choose' | 'none' | 'notPdf' | 'tooBig';
+  readonly itemId?: string;
+  readonly similar?: boolean;
+  readonly candidates: readonly string[];
+}
+
 export type PdfSwapResult =
   | { ok: true; needsSizeChoice: false }
   | { ok: true; needsSizeChoice: true; from: PageSize; to: PageSize }
-  | { ok: false; reason: 'missing' | 'tooBig' | 'unreadable' };
+  | { ok: false; reason: 'missing' | 'tooBig' | 'unreadable' | 'same' };
 
 function isPageSize(value: unknown): value is PageSize {
   const v = value as Partial<PageSize> | null;
@@ -837,6 +930,9 @@ function isBatchItem(value: unknown): value is BatchItem {
     (v.templateId === undefined || typeof v.templateId === 'string') &&
     (v.matchKind === undefined || ['exact', 'similar', 'manual', 'paste'].includes(v.matchKind)) &&
     typeof v.relaid === 'boolean' &&
-    typeof v.exported === 'boolean'
+    typeof v.exported === 'boolean' &&
+    (v.validated === undefined || typeof v.validated === 'boolean') &&
+    (v.hash === undefined || typeof v.hash === 'string') &&
+    (v.newHash === undefined || typeof v.newHash === 'string')
   );
 }

@@ -9,7 +9,6 @@ import { ToastService } from '../../services/toast.service';
 import { extractPagesCollection } from '../../utils/annotation-fields.utils';
 import { formatBytes } from '../../utils/batch-files.utils';
 import { splitTemplateDocuments } from '../../utils/template-text.utils';
-import { BatchStepsComponent } from './components/batch-steps.component';
 
 type Tab = 'paste' | 'files';
 const SHOWN_ROWS = 6;
@@ -18,7 +17,7 @@ const SHOWN_ROWS = 6;
 @Component({
   selector: 'app-batch-load-page',
   standalone: true,
-  imports: [RouterLink, TranslationPipe, BatchStepsComponent, ModeSwitchComponent],
+  imports: [RouterLink, TranslationPipe, ModeSwitchComponent],
   templateUrl: './batch-load.page.html',
   styleUrls: ['./batch.page.scss', './batch-flow.scss'],
 })
@@ -175,7 +174,7 @@ export class BatchLoadPageComponent implements OnInit {
     return this.i18n.translate(`batch.template.reason.${reason}`);
   }
 
-  goMatch() {
-    void this.router.navigate(['/batch/match']);
+  goPanel() {
+    void this.router.navigate(['/batch']);
   }
 }

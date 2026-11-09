@@ -1,17 +1,34 @@
 <div class="item">
   @if (item(); as it) {
     <header class="item__nav">
-      <a class="back" routerLink="/batch">← {{ 'batch.item.back' | t }}</a>
+      <a class="back" routerLink="/batch">← {{ 'batch.item.backPanel' | t }}</a>
       <div class="item__title">
         <h1>{{ it.name }}</h1>
         <span class="cap">{{ 'batch.item.position' | t : { n: index() + 1, total: total() } }} · {{ sizeLabel(it.pageSize) }} · {{ bytes(it.pdf.size) }}</span>
       </div>
-      <app-batch-steps [active]="activeStep()"></app-batch-steps>
+      <span class="chip chip--status" [class.chip--ok]="status() === 'validated'">{{ 'batch.status.' + status() | t }}</span>
       <span class="spacer"></span>
+      <span class="cap" aria-live="polite">{{ 'batch.panel.validated' | t : { done: validatedCount(), total: total() } }}</span>
       <button type="button" class="btn btn--ghost btn--sm" (click)="goTo(-1)" [disabled]="index() <= 0">{{ 'batch.item.prev' | t }}</button>
       <button type="button" class="btn btn--ghost btn--sm" (click)="goTo(1)" [disabled]="index() >= total() - 1">{{ 'batch.item.nextOne' | t }}</button>
       <button type="button" class="btn btn--ghost btn--sm" (click)="skip()">{{ 'batch.item.skip' | t }}</button>
     </header>
+
+    <div class="layout">
+    <nav class="rail card" [attr.aria-label]="'batch.item.rail' | t">
+      <span class="lab">{{ 'batch.item.railTitle' | t }}</span>
+      <ul class="rail__list">
+        @for (row of rail(); track row.id) {
+          <li>
+            <a class="rail__link" [routerLink]="['/batch', row.id]" [class.is-current]="row.id === it.id" [attr.aria-current]="row.id === it.id ? 'page' : null">
+              <span class="ellipsis grow">{{ row.name }}</span>
+              <span class="rail__st" [attr.title]="'batch.status.' + row.status | t" [class.is-ok]="row.status === 'validated'">{{ row.mark }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+    <div class="body">
 
     @if (setupMode()) {
       <div class="grid">
@@ -38,6 +55,17 @@
               }
             }
           </div>
+          @if (!it.template && loose().length) {
+            <div class="row" style="flex-wrap: wrap">
+              <label class="grow cap" for="loose-template">{{ 'batch.item.loose' | t : { count: loose().length } }}</label>
+              <select id="loose-template" class="select" #loosePick>
+                @for (t of loose(); track t.id) {
+                  <option [value]="t.id">{{ store.templateLabelOf(t) }}</option>
+                }
+              </select>
+              <button type="button" class="btn btn--ghost btn--sm" (click)="assignLoose(loosePick.value)">{{ 'batch.item.looseUse' | t }}</button>
+            </div>
+          }
           <div class="actions">
             <button type="button" class="btn" [disabled]="!validation().ok" (click)="useTemplate()">{{ 'batch.template.use' | t }}</button>
             <label class="btn btn--ghost file">
@@ -60,6 +88,7 @@
         <section class="card">
           <span class="lab">{{ 'batch.newPdf.label' | t }}</span>
           <h2>{{ 'batch.newPdf.title' | t : { name: it.name } }}</h2>
+          <p class="cap">{{ 'batch.item.optionalB' | t }}</p>
           <div class="row"><span aria-hidden="true">📄</span><span class="grow ellipsis">{{ 'batch.newPdf.original' | t }} · {{ it.name }}</span><span class="cap">{{ sizeLabel(it.pageSize) }} · {{ bytes(it.pdf.size) }}</span></div>
           <div class="drop" [class.drop--active]="dropActive()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
             <h3>{{ 'batch.newPdf.drop' | t }}</h3>
@@ -81,17 +110,60 @@
               <p class="note note--ok">ℹ <span>{{ (sizeInfo() && it.sizeStrategy === 'scale' ? 'batch.newPdf.scaled' : 'batch.newPdf.sameSize') | t }}</span></p>
             }
           }
+          @if (sameNotice(); as same) {
+            <p class="note note--ok" role="status">ⓘ <span>{{ 'batch.versionB.sameNote' | t : { name: same } }}</span></p>
+          }
           <div class="actions">
-            <button type="button" class="btn" [disabled]="!it.template || !it.newPdf || needsSize() || !!it.templateIssue" (click)="showSetup.set(false)">{{ 'batch.newPdf.compare' | t }} →</button>
+            <button type="button" class="btn" id="continue-item" [disabled]="!it.template || needsSize() || !!it.templateIssue" (click)="showSetup.set(false)">{{ (it.newPdf ? 'batch.newPdf.compare' : 'batch.item.reviewA') | t }} →</button>
             <button type="button" class="btn btn--ghost" (click)="skip()">{{ 'batch.item.skip' | t }}</button>
           </div>
         </section>
       </div>
     } @else {
       <div class="compare-head">
+        @if (sameNotice(); as same) {
+          <p class="note note--ok" role="status">ⓘ <span>{{ 'batch.versionB.sameNote' | t : { name: same } }}</span></p>
+        }
+        <span class="spacer"></span>
         <button type="button" class="btn btn--ghost btn--sm" (click)="showSetup.set(true)">✎ {{ 'batch.item.editSetup' | t }}</button>
+        <label class="btn btn--ghost btn--sm">
+          {{ (it.newPdf ? 'batch.item.replaceB' : 'batch.item.addB') | t }}
+          <input type="file" id="replace-b" accept="application/pdf,.pdf" hidden (change)="onNewPdf($event)" />
+        </label>
+        @if (it.newPdf) {
+          <button type="button" class="btn btn--ghost btn--sm" (click)="removeB()">{{ 'batch.item.removeB' | t }}</button>
+        }
+        @if (it.validated) {
+          <span class="chip chip--ok">✓ {{ 'batch.status.validated' | t }}</span>
+          <button type="button" class="btn btn--ghost btn--sm" (click)="unvalidate()">{{ 'batch.item.unvalidate' | t }}</button>
+        } @else {
+          <button type="button" class="btn" id="validate-ok" (click)="confirmValidate.set(true)">OK · {{ 'batch.item.validate' | t }}</button>
+        }
       </div>
       <app-batch-compare [item]="it" (saved)="onSaved($event)"></app-batch-compare>
+    }
+
+    </div>
+    </div>
+
+    @if (confirmValidate()) {
+      <div class="overlay" role="dialog" aria-modal="true" aria-labelledby="validate-title" (keydown.escape)="confirmValidate.set(false)">
+        <div class="dialog card">
+          <h2 id="validate-title">{{ 'batch.validate.title' | t : { name: it.name } }}</h2>
+          <p class="cap">{{ 'batch.validate.text' | t }}</p>
+          <div class="row"><span class="ok" aria-hidden="true">✓</span><span class="grow">{{ 'batch.validate.fields' | t : { fields: fieldCount(it.newPdf ? it.layout : it.template), pages: (it.newPdf ? it.layout : it.template)?.length ?? 0 } }}</span></div>
+          @if (warnings() > 0) {
+            <div class="row"><span class="bad" aria-hidden="true">!</span><span class="grow">{{ 'batch.validate.warnings' | t : { count: warnings() } }}</span></div>
+          }
+          @if (dirtyCompare()) {
+            <p class="note note--warn">⚠ <span>{{ 'batch.validate.unsaved' | t }}</span></p>
+          }
+          <div class="actions">
+            <button type="button" class="btn" id="confirm-validate" (click)="validate()">{{ 'batch.validate.confirm' | t }}</button>
+            <button type="button" class="btn btn--ghost" (click)="confirmValidate.set(false)">{{ 'batch.export.cancel' | t }}</button>
+          </div>
+        </div>
+      </div>
     }
 
     @if (needsSize() && sizeInfo(); as info) {

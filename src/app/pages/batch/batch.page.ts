@@ -20,7 +20,9 @@ import { ToastService } from '../../services/toast.service';
 import { formatBytes } from '../../utils/batch-files.utils';
 import { downloadBlob } from '../../utils/download.utils';
 import { formatPageSize } from '../../utils/page-size.utils';
-import { BatchStepsComponent } from './components/batch-steps.component';
+import { BatchTemplatesDrawerComponent } from './components/batch-templates-drawer.component';
+import { BatchThumbComponent } from './components/batch-thumb.component';
+import { BatchVersionBDrawerComponent } from './components/batch-version-b-drawer.component';
 
 type Filter = 'all' | BatchStatus;
 type ExportPhase = 'closed' | 'options' | 'running' | 'done';
@@ -32,15 +34,30 @@ const FILTERS: readonly Filter[] = [
   'missingNew',
   'ready',
   'relaid',
-  'exported',
+  'validated',
 ];
+
+type Drawer = 'none' | 'templates' | 'versionB';
+type View = 'grid' | 'table';
+type Coords = 'b' | 'a' | 'both';
+const VIEW_KEY = 'pdf-annotator-batch-view';
+
+const withSuffix = (filename: string, suffix: string) =>
+  suffix ? filename.replace(/(\.[^.]+)$/, `${suffix}$1`) : filename;
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 @Component({
   selector: 'app-batch-page',
   standalone: true,
-  imports: [RouterLink, TranslationPipe, BatchStepsComponent, ModeSwitchComponent],
+  imports: [
+    RouterLink,
+    TranslationPipe,
+    ModeSwitchComponent,
+    BatchThumbComponent,
+    BatchTemplatesDrawerComponent,
+    BatchVersionBDrawerComponent,
+  ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
 })
@@ -63,6 +80,9 @@ export class BatchPageComponent implements OnInit {
   readonly confirmRemove = signal(false);
   readonly maxMb = MAX_BATCH_PDF_BYTES / (1024 * 1024);
 
+  readonly drawer = signal<Drawer>('none');
+  readonly view = signal<View>(this.loadView());
+  readonly coords = signal<Coords>('b');
   readonly exportPhase = signal<ExportPhase>('closed');
   readonly exportJson = signal(true);
   readonly exportPdf = signal(true);
@@ -81,7 +101,7 @@ export class BatchPageComponent implements OnInit {
 
   readonly counts = computed(() => {
     const counts: Record<Filter, number> = {
-      all: 0, noTemplate: 0, templateError: 0, missingNew: 0, ready: 0, relaid: 0, exported: 0,
+      all: 0, noTemplate: 0, templateError: 0, missingNew: 0, ready: 0, relaid: 0, validated: 0,
     };
     for (const item of this.store.items()) {
       counts.all += 1;
@@ -90,13 +110,19 @@ export class BatchPageComponent implements OnInit {
     return counts;
   });
 
-  readonly exportable = computed(() =>
-    this.store.items().filter((item) => !!item.newPdf && !!item.layout && !item.templateIssue)
-  );
+  /** Only what the user confirmed with OK is downloaded. */
+  readonly exportable = computed(() => this.store.items().filter((item) => !!item.validated && !item.templateIssue));
   readonly skipped = computed(() => this.store.items().length - this.exportable().length);
-  readonly exportTotalFiles = computed(
-    () => this.exportable().length * ((this.exportJson() ? 1 : 0) + (this.exportPdf() ? 1 : 0))
-  );
+  readonly anyB = computed(() => this.exportable().some((item) => !!item.newPdf && !!item.layout));
+  readonly exportTotalFiles = computed(() => {
+    const kinds = (this.exportJson() ? 1 : 0) + (this.exportPdf() ? 1 : 0);
+    return this.exportable().reduce((sum, item) => sum + this.variants(item).length * kinds, 0);
+  });
+  readonly validatedCount = computed(() => this.counts().validated);
+  readonly validatedPercent = computed(() => {
+    const total = this.store.items().length;
+    return total ? Math.round((this.validatedCount() / total) * 100) : 0;
+  });
   readonly storageLevel = computed(() => {
     const storage = this.store.storage();
     if (!storage) return 'ok';
@@ -116,6 +142,33 @@ export class BatchPageComponent implements OnInit {
 
   constructor() {
     this.metadata.applyDefaultMetadata();
+  }
+
+  private loadView(): View {
+    try {
+      return typeof localStorage !== 'undefined' && localStorage.getItem(VIEW_KEY) === 'table' ? 'table' : 'grid';
+    } catch {
+      return 'grid';
+    }
+  }
+
+  setView(view: View) {
+    this.view.set(view);
+    try {
+      localStorage.setItem(VIEW_KEY, view);
+    } catch {
+      /* the choice just lasts this session */
+    }
+  }
+
+  /** Which sides of an item are downloaded for the chosen coordinates. */
+  variants(item: BatchItem): ('a' | 'b')[] {
+    const hasB = !!item.newPdf && !!item.layout;
+    switch (this.coords()) {
+      case 'a': return ['a'];
+      case 'both': return hasB ? ['a', 'b'] : ['a'];
+      default: return [hasB ? 'b' : 'a'];
+    }
   }
 
   ngOnInit() {
@@ -153,7 +206,8 @@ export class BatchPageComponent implements OnInit {
     switch (status) {
       case 'noTemplate': return 'pasteTemplate';
       case 'templateError': return 'fix';
-      case 'missingNew': return 'uploadNew';
+      case 'missingNew': return 'validate';
+      case 'ready':
       case 'relaid': return 'review';
       default: return 'open';
     }
@@ -262,12 +316,29 @@ export class BatchPageComponent implements OnInit {
   // ---- exporting --------------------------------------------------------------------------------
 
   async openExport() {
-    const items = this.exportable();
-    const json = items.reduce((sum, item) => sum + this.exporter.json(item).blob.size, 0);
-    const pdf = items.reduce((sum, item) => sum + (item.newPdf?.size ?? 0), 0);
-    this.exportSizes.set({ json, pdf });
+    this.coords.set(this.anyB() ? 'b' : 'a');
+    this.refreshSizes();
     this.exportFailures.set([]);
     this.exportPhase.set('options');
+  }
+
+  setCoords(coords: Coords) {
+    this.coords.set(coords);
+    this.refreshSizes();
+  }
+
+  private refreshSizes() {
+    const items = this.exportable();
+    const json = items.reduce(
+      (sum, item) => sum + this.variants(item).reduce((n, side) => n + this.exporter.json(item, side).blob.size, 0),
+      0
+    );
+    const pdf = items.reduce(
+      (sum, item) =>
+        sum + this.variants(item).reduce((n, side) => n + (side === 'b' ? item.newPdf?.size ?? 0 : item.pdf.size), 0),
+      0
+    );
+    this.exportSizes.set({ json, pdf });
   }
 
   closeExport() {
@@ -280,7 +351,7 @@ export class BatchPageComponent implements OnInit {
     const withPdf = this.exportPdf();
     if (!items.length || (!withJson && !withPdf)) return;
 
-    const total = items.length * ((withJson ? 1 : 0) + (withPdf ? 1 : 0));
+    const total = items.reduce((sum, item) => sum + this.variants(item).length * ((withJson ? 1 : 0) + (withPdf ? 1 : 0)), 0);
     this.exportProgress.set({ done: 0, total });
     this.exportFailures.set([]);
     this.exportPhase.set('running');
@@ -288,27 +359,31 @@ export class BatchPageComponent implements OnInit {
     const completed: string[] = [];
     let done = 0;
 
+    const both = this.coords() === 'both';
     for (const item of items) {
       let ok = true;
-      if (withJson) {
-        const file = this.exporter.json(item);
-        downloadBlob(file.blob, file.filename);
-        done += 1;
-        this.exportProgress.set({ done, total });
-        await wait(120);
-      }
-      if (withPdf) {
-        try {
-          const file = await this.exporter.pdf(item);
-          downloadBlob(file.blob, file.filename);
-        } catch (error) {
-          console.error('No se pudo generar el PDF anotado del lote.', error);
-          ok = false;
-          failures.push(item.id);
+      for (const side of this.variants(item)) {
+        const suffix = both ? `-${side.toUpperCase()}` : '';
+        if (withJson) {
+          const file = this.exporter.json(item, side);
+          downloadBlob(file.blob, withSuffix(file.filename, suffix));
+          done += 1;
+          this.exportProgress.set({ done, total });
+          await wait(120);
         }
-        done += 1;
-        this.exportProgress.set({ done, total });
-        await wait(120);
+        if (withPdf) {
+          try {
+            const file = await this.exporter.pdf(item, side);
+            downloadBlob(file.blob, withSuffix(file.filename, suffix));
+          } catch (error) {
+            console.error('No se pudo generar el PDF anotado del lote.', error);
+            ok = false;
+            failures.push(item.id);
+          }
+          done += 1;
+          this.exportProgress.set({ done, total });
+          await wait(120);
+        }
       }
       if (ok) completed.push(item.id);
     }
@@ -316,6 +391,10 @@ export class BatchPageComponent implements OnInit {
     this.store.markExported(completed);
     this.exportFailures.set(failures);
     this.exportPhase.set('done');
+  }
+
+  closeDrawer() {
+    this.drawer.set('none');
   }
 
   failedNames(): string {

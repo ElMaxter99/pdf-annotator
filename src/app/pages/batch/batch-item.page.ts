@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslationPipe } from '../../i18n/translation.pipe';
@@ -6,19 +6,19 @@ import { TranslationService } from '../../i18n/translation.service';
 import { extractPagesCollection } from '../../utils/annotation-fields.utils';
 import type { PageAnnotations } from '../../models/annotation.model';
 import { AppMetadataService } from '../../services/app-metadata.service';
-import { BatchStoreService, MAX_BATCH_PDF_BYTES, countFields } from '../../services/batch-store.service';
+import { BatchStoreService, MAX_BATCH_PDF_BYTES, batchStatusOf, countFields } from '../../services/batch-store.service';
 import { ToastService } from '../../services/toast.service';
 import { formatBytes } from '../../utils/batch-files.utils';
 import { formatPageSize, pageSizesDiffer, scaleAnnotations, SizeStrategy } from '../../utils/page-size.utils';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { parseTemplateText } from '../../utils/template-text.utils';
+import { suggestTemplates } from '../../utils/template-matching.utils';
 import { BatchCompareComponent } from './components/batch-compare.component';
-import { BatchStepsComponent } from './components/batch-steps.component';
 
 @Component({
   selector: 'app-batch-item-page',
   standalone: true,
-  imports: [RouterLink, TranslationPipe, BatchStepsComponent, BatchCompareComponent],
+  imports: [RouterLink, TranslationPipe, BatchCompareComponent],
   templateUrl: './batch-item.page.html',
   styleUrls: ['./batch-item.page.scss'],
 })
@@ -31,6 +31,9 @@ export class BatchItemPageComponent {
   private readonly metadata = inject(AppMetadataService);
 
   readonly itemId = signal('');
+  readonly confirmValidate = signal(false);
+  readonly sameNotice = signal('');
+  private readonly compare = viewChild(BatchCompareComponent);
   readonly draft = signal('');
   readonly showSetup = signal(false);
   readonly dropActive = signal(false);
@@ -50,14 +53,30 @@ export class BatchItemPageComponent {
   });
   readonly setupMode = computed(() => {
     const item = this.item();
-    return !!item && (this.showSetup() || !item.template || !!item.templateIssue || !item.newPdf || this.needsSize());
+    return !!item && (this.showSetup() || !item.template || !!item.templateIssue || this.needsSize());
   });
-  readonly activeStep = computed(() => {
+  readonly status = computed(() => {
     const item = this.item();
-    if (!item?.template || item.templateIssue) return 2;
-    if (!item.newPdf || this.needsSize()) return 3;
-    return this.setupMode() ? 3 : 4;
+    return item ? batchStatusOf(item) : 'noTemplate';
   });
+  readonly validatedCount = computed(() => this.store.items().filter((i) => !!i.validated).length);
+  readonly warnings = computed(() => this.compare()?.misplacedCount() ?? 0);
+  readonly dirtyCompare = computed(() => !!this.compare()?.dirty());
+  /** Templates of the pool that no PDF uses, most similar to this PDF's name first. */
+  readonly loose = computed(() => {
+    const item = this.item();
+    const unused = this.store.unusedTemplates();
+    if (!item || !unused.length) return [];
+    const order = new Map(suggestTemplates(item.name, unused, this.store.keyField(), unused.length).map((s, i) => [s.templateId, i]));
+    return [...unused].sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+  });
+  readonly rail = computed(() =>
+    this.store.items().map((i) => {
+      const status = batchStatusOf(i);
+      const mark = status === 'validated' ? '✓' : status === 'templateError' ? '!' : status === 'noTemplate' ? '·' : '≈';
+      return { id: i.id, name: i.name, status, mark };
+    })
+  );
 
   /** Live validation of the pasted text; also counts what would be imported. */
   readonly validation = computed(() => {
@@ -105,6 +124,8 @@ export class BatchItemPageComponent {
     this.route.paramMap.pipe(takeUntilDestroyed(inject(DestroyRef))).subscribe((params) => {
       this.itemId.set(params.get('id') ?? '');
       this.showSetup.set(false);
+      this.confirmValidate.set(false);
+      this.sameNotice.set('');
       void this.store.load().then(() => this.syncDraft());
     });
   }
@@ -181,7 +202,13 @@ export class BatchItemPageComponent {
     }
     this.uploading.set(true);
     try {
+      this.sameNotice.set('');
       const result = await this.store.setNewPdf(this.itemId(), file);
+      if (!result.ok && result.reason === 'same') {
+        // Same name or not, identical content means this is not a new version.
+        this.sameNotice.set(file.name);
+        return;
+      }
       if (!result.ok) {
         const key = result.reason === 'tooBig' ? 'batch.reject.tooBig' : 'batch.newPdf.unreadable';
         this.toast.error(this.i18n.translate(key, { limit: this.maxMb }));
@@ -191,6 +218,30 @@ export class BatchItemPageComponent {
     } finally {
       this.uploading.set(false);
     }
+  }
+
+  assignLoose(templateId: string) {
+    if (templateId) this.store.assignTemplate(this.itemId(), templateId);
+  }
+
+  removeB() {
+    this.store.clearNewPdf(this.itemId());
+    this.sameNotice.set('');
+  }
+
+  // ---- validation ----------------------------------------------------------------------------------
+
+  validate() {
+    const compare = this.compare();
+    // Pending moves are saved first: saving removes a previous validation, so confirm afterwards.
+    if (compare?.dirty()) compare.save(false);
+    this.store.setValidated(this.itemId(), true);
+    this.confirmValidate.set(false);
+    this.toast.show(this.i18n.translate('batch.validate.done', { name: this.item()?.name ?? '' }), 'success');
+  }
+
+  unvalidate() {
+    this.store.setValidated(this.itemId(), false);
   }
 
   applySize() {

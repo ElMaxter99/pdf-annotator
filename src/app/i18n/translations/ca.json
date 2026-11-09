@@ -400,25 +400,26 @@
       "all": "Tots",
       "noTemplate": "Sense plantilla",
       "templateError": "Amb error",
-      "missingNew": "Falta PDF nou",
-      "ready": "A punt per remaquetar",
-      "relaid": "Remaquetats",
-      "exported": "Exportats"
+      "missingNew": "Només versió A",
+      "ready": "Per revisar",
+      "relaid": "Ajustats",
+      "validated": "Validats"
     },
     "status": {
       "noTemplate": "Sense plantilla",
       "templateError": "Error al JSON",
-      "missingNew": "Falta PDF nou",
-      "ready": "A punt per remaquetar",
-      "relaid": "Remaquetat",
-      "exported": "✓ Exportat"
+      "missingNew": "Només versió A",
+      "ready": "Per revisar",
+      "relaid": "Ajustat",
+      "validated": "Validat"
     },
     "action": {
       "pasteTemplate": "Enganxar plantilla",
       "fix": "Corregir",
       "uploadNew": "Pujar PDF nou",
       "review": "Revisar",
-      "open": "Obrir"
+      "open": "Obrir",
+      "validate": "Valida"
     },
     "col": {
       "pdf": "PDF",
@@ -426,7 +427,8 @@
       "page": "Pàgina",
       "weight": "Pes",
       "fields": "Camps",
-      "status": "Estat"
+      "status": "Estat",
+      "versionB": "Versió B"
     },
     "storage": {
       "title": "Emmagatzematge local",
@@ -442,7 +444,19 @@
       "prev": "Anterior",
       "nextOne": "Següent",
       "skip": "Saltar aquest PDF",
-      "editSetup": "Canviar plantilla o PDF nou"
+      "editSetup": "Canviar plantilla o PDF nou",
+      "backPanel": "Tauler del lot",
+      "rail": "PDF del lot",
+      "railTitle": "PDF del lot",
+      "loose": "{{count}} plantilles del lot sense PDF",
+      "looseUse": "Usa aquesta plantilla",
+      "optionalB": "La versió B és opcional: sense ella pots revisar i validar la versió A. Val qualsevol nom de fitxer.",
+      "reviewA": "Revisa",
+      "replaceB": "Reemplaça la versió B…",
+      "addB": "Puja la versió B…",
+      "removeB": "Treu la versió B",
+      "unvalidate": "Treu la validació",
+      "validate": "validar"
     },
     "template": {
       "label": "Plantilla",
@@ -512,8 +526,8 @@
       "new": "Nou",
       "side": "Un al costat de l'altre",
       "overlay": "Superposat",
-      "before": "ABANS",
-      "after": "DESPRÉS",
+      "before": "VERSIÓ A",
+      "after": "VERSIÓ B",
       "sync": "Scroll sincronitzat",
       "zoom": "Zoom",
       "zoomIn": "Apropar",
@@ -539,16 +553,17 @@
       "saveNext": "Desar i següent",
       "save": "Desar",
       "unsaved": "Canvis sense desar",
-      "savedToast": "Remaquetatge desat."
+      "savedToast": "Remaquetatge desat.",
+      "onlyA": "Aquest PDF no té versió B: aquí veus la versió A amb les seves coordenades. Puja una versió B per comparar-la."
     },
     "export": {
       "title": "Baixar el lot",
-      "intro": "{{count}} PDF a punt per baixar. Es baixen com a fitxers solts, amb el nom de l'original.",
+      "intro": "{{count}} PDF validats per descarregar. Es baixen com a fitxers solts, amb el nom de l'original.",
       "content": "Contingut",
-      "json": "JSON remaquetat de cada PDF",
-      "pdf": "PDF anotat (mida nova)",
+      "json": "JSON amb les coordenades de cada PDF",
+      "pdf": "PDF anotat",
       "loose": "Noms: {nom}.json · {nom}.pdf. El navegador pot demanar permís per a baixades múltiples.",
-      "skipped": "{{count}} saltats (sense plantilla o sense PDF nou)",
+      "skipped": "{{count}} sense validar (no es descarreguen)",
       "start": "Baixar {{count}} fitxers",
       "cancel": "Cancel·lar",
       "running": "Baixant {{done}} de {{total}} fitxers",
@@ -561,7 +576,8 @@
       "retry": "Reintentar els fallits",
       "again": "Baixar de nou",
       "newBatch": "Començar un altre lot",
-      "close": "Tancar"
+      "close": "Tancar",
+      "coords": "Coordenades a descarregar"
     },
     "mode": {
       "label": "Mode de treball",
@@ -647,7 +663,7 @@
         "pdfs": "PDF llegits",
         "templates": "Plantilles vàlides",
         "failedTemplates": "{{count}} plantilles amb error de sintaxi.",
-        "go": "Aparellar {{pdfs}} amb {{templates}} →",
+        "go": "Ves al tauler amb {{pdfs}} PDF i {{templates}} plantilles →",
         "needPdfs": "Carrega almenys un PDF per continuar."
       }
     },
@@ -732,6 +748,80 @@
       "add": "Afegir al lot",
       "addHint": "Afegeix aquest PDF al lot i obre l’aparellament. La teva sessió de l’editor no es perd.",
       "added": "{{name}} afegit al lot"
+    },
+    "panel": {
+      "tab": "Tauler del lot",
+      "validated": "{{done}} de {{total}} validats",
+      "filters": "Filtra per estat",
+      "view": "Tipus de vista",
+      "grid": "Quadrícula",
+      "table": "Taula",
+      "importTemplates": "Importa plantilles",
+      "uploadB": "Puja la versió B",
+      "download": "Descarrega els validats ({{count}})",
+      "next": "Revisa el següent",
+      "openPdf": "Obre {{name}}",
+      "pillTemplate": "Plantilla",
+      "pillB": "Versió B",
+      "pillOnlyA": "Només versió A"
+    },
+    "templates": {
+      "title": "Importa plantilles",
+      "close": "Tanca",
+      "paste": "Enganxa text",
+      "files": "Puja fitxers",
+      "pasteHelp": "Enganxa totes les plantilles que vulguis, una darrere l'altra. No cal un array.",
+      "found": "{{valid}} plantilles vàlides · {{broken}} amb error",
+      "add": "Afegeix {{count}} plantilles",
+      "clear": "Buida",
+      "drop": "Deixa anar els teus JSON",
+      "dropHelp": "Accepta .json, .jsonl i .ndjson. Un fitxer pot dur una plantilla o centenars.",
+      "pick": "Selecciona JSON",
+      "result": "Resultat",
+      "added": "{{count}} plantilles afegides",
+      "paired": "{{paired}} PDF ja tenen plantilla ({{total}} plantilles al lot)",
+      "unused": "{{count}} plantilles sense PDF",
+      "unusedHelp": "Es guarden al lot. Assigna-les a mà des de la pestanya d'un PDF sense plantilla.",
+      "line": "línia {{line}}",
+      "keyField": "Camp d'aparellament",
+      "issue": {
+        "empty": "Buida",
+        "no-object": "Sense objecte JSON",
+        "syntax": "Error de sintaxi",
+        "no-pages": "Sense «pages»"
+      }
+    },
+    "versionB": {
+      "title": "Puja la versió B",
+      "close": "Tanca",
+      "drop": "Deixa anar la versió B",
+      "dropHelp": "S'aparella pel nom i es compara el contingut real del fitxer (empremta SHA-256) amb el que ja és al lot.",
+      "pick": "Selecciona PDF",
+      "result": "Resultat de la comprovació",
+      "similar": "Nom semblant",
+      "chipB": "Versió B",
+      "chipSame": "És el mateix PDF",
+      "assign": "Tria el PDF de {{name}}",
+      "choosePdf": "Tria el PDF…",
+      "remove": "Treu {{name}}",
+      "sameNote": "{{name}} és el mateix PDF que ja és al lot (mateix contingut), així que no s'afegeix com a versió B.",
+      "apply": "Afegeix {{count}} versions B",
+      "cancel": "Cancel·la",
+      "never": "El que és dubtós no s'assigna mai sol.",
+      "added": "{{count}} versions B afegides",
+      "kind": {
+        "notPdf": "No és un PDF",
+        "tooBig": "Supera {{limit}} MB"
+      }
+    },
+    "validate": {
+      "title": "Vols validar {{name}}?",
+      "text": "Confirmes que has revisat les coordenades d'aquest PDF i que estan bé. Podràs treure la validació després.",
+      "fields": "{{fields}} camps en {{pages}} pàgines",
+      "warnings": "{{count}} camps desplaçats (avís, no impedeix validar)",
+      "unsaved": "Hi ha canvis sense desar: es desaran en validar.",
+      "confirm": "Sí, valida",
+      "done": "{{name}} validat"
     }
   },
   "preview": {

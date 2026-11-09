@@ -400,25 +400,26 @@
       "all": "Alle",
       "noTemplate": "Ohne Vorlage",
       "templateError": "Mit Fehler",
-      "missingNew": "Neues PDF fehlt",
-      "ready": "Bereit zum Neulayout",
-      "relaid": "Neu gelayoutet",
-      "exported": "Exportiert"
+      "missingNew": "Nur Version A",
+      "ready": "Zu prüfen",
+      "relaid": "Angepasst",
+      "validated": "Validiert"
     },
     "status": {
       "noTemplate": "Ohne Vorlage",
       "templateError": "JSON-Fehler",
-      "missingNew": "Neues PDF fehlt",
-      "ready": "Bereit zum Neulayout",
-      "relaid": "Neu gelayoutet",
-      "exported": "✓ Exportiert"
+      "missingNew": "Nur Version A",
+      "ready": "Zu prüfen",
+      "relaid": "Angepasst",
+      "validated": "Validiert"
     },
     "action": {
       "pasteTemplate": "Vorlage einfügen",
       "fix": "Korrigieren",
       "uploadNew": "Neues PDF hochladen",
       "review": "Prüfen",
-      "open": "Öffnen"
+      "open": "Öffnen",
+      "validate": "Validieren"
     },
     "col": {
       "pdf": "PDF",
@@ -426,7 +427,8 @@
       "page": "Seite",
       "weight": "Größe",
       "fields": "Felder",
-      "status": "Status"
+      "status": "Status",
+      "versionB": "Version B"
     },
     "storage": {
       "title": "Lokaler Speicher",
@@ -442,7 +444,19 @@
       "prev": "Zurück",
       "nextOne": "Weiter",
       "skip": "Dieses PDF überspringen",
-      "editSetup": "Vorlage oder neues PDF ändern"
+      "editSetup": "Vorlage oder neues PDF ändern",
+      "backPanel": "Chargen-Übersicht",
+      "rail": "PDFs des Stapels",
+      "railTitle": "PDFs des Stapels",
+      "loose": "{{count}} Vorlagen im Stapel ohne PDF",
+      "looseUse": "Diese Vorlage verwenden",
+      "optionalB": "Version B ist optional: ohne sie kannst du Version A prüfen und validieren. Jeder Dateiname ist möglich.",
+      "reviewA": "Prüfen",
+      "replaceB": "Version B ersetzen …",
+      "addB": "Version B hochladen …",
+      "removeB": "Version B entfernen",
+      "unvalidate": "Validierung entfernen",
+      "validate": "validieren"
     },
     "template": {
       "label": "Vorlage",
@@ -512,8 +526,8 @@
       "new": "Neu",
       "side": "Nebeneinander",
       "overlay": "Überlagert",
-      "before": "VORHER",
-      "after": "NACHHER",
+      "before": "VERSION A",
+      "after": "VERSION B",
       "sync": "Synchrones Scrollen",
       "zoom": "Zoom",
       "zoomIn": "Vergrößern",
@@ -539,16 +553,17 @@
       "saveNext": "Speichern und weiter",
       "save": "Speichern",
       "unsaved": "Ungespeicherte Änderungen",
-      "savedToast": "Neulayout gespeichert."
+      "savedToast": "Neulayout gespeichert.",
+      "onlyA": "Dieses PDF hat keine Version B: Du siehst Version A mit ihren Koordinaten. Lade eine Version B zum Vergleichen hoch."
     },
     "export": {
       "title": "Stapel herunterladen",
-      "intro": "{{count}} PDFs zum Herunterladen bereit. Sie kommen als einzelne Dateien mit dem Namen des Originals.",
+      "intro": "{{count}} validierte PDFs zum Download. Sie werden als einzelne Dateien mit dem Namen des Originals geladen.",
       "content": "Inhalt",
-      "json": "Neu gelayouteter JSON je PDF",
-      "pdf": "Annotiertes PDF (neue Größe)",
+      "json": "JSON mit den Koordinaten jedes PDFs",
+      "pdf": "Annotiertes PDF",
       "loose": "Namen: {name}.json · {name}.pdf. Der Browser fragt eventuell nach Erlaubnis für mehrere Downloads.",
-      "skipped": "{{count}} übersprungen (ohne Vorlage oder ohne neues PDF)",
+      "skipped": "{{count}} nicht validiert (werden nicht geladen)",
       "start": "{{count}} Dateien herunterladen",
       "cancel": "Abbrechen",
       "running": "Lade {{done}} von {{total}} Dateien herunter",
@@ -561,7 +576,8 @@
       "retry": "Fehlgeschlagene wiederholen",
       "again": "Erneut herunterladen",
       "newBatch": "Neuen Stapel beginnen",
-      "close": "Schließen"
+      "close": "Schließen",
+      "coords": "Zu ladende Koordinaten"
     },
     "mode": {
       "label": "Arbeitsmodus",
@@ -647,7 +663,7 @@
         "pdfs": "Gelesene PDFs",
         "templates": "Gültige Vorlagen",
         "failedTemplates": "{{count}} Vorlagen mit Syntaxfehlern.",
-        "go": "{{pdfs}} mit {{templates}} zuordnen →",
+        "go": "Zur Übersicht mit {{pdfs}} PDFs und {{templates}} Vorlagen →",
         "needPdfs": "Laden Sie mindestens ein PDF, um fortzufahren."
       }
     },
@@ -732,6 +748,80 @@
       "add": "Zum Stapel hinzufügen",
       "addHint": "Fügt dieses PDF dem Stapel hinzu und öffnet das Zuordnen. Ihre Editor-Sitzung bleibt erhalten.",
       "added": "{{name}} zum Stapel hinzugefügt"
+    },
+    "panel": {
+      "tab": "Chargen-Übersicht",
+      "validated": "{{done}} von {{total}} validiert",
+      "filters": "Nach Status filtern",
+      "view": "Ansichtstyp",
+      "grid": "Raster",
+      "table": "Tabelle",
+      "importTemplates": "Vorlagen importieren",
+      "uploadB": "Version B hochladen",
+      "download": "Validierte laden ({{count}})",
+      "next": "Nächstes prüfen",
+      "openPdf": "{{name}} öffnen",
+      "pillTemplate": "Vorlage",
+      "pillB": "Version B",
+      "pillOnlyA": "Nur Version A"
+    },
+    "templates": {
+      "title": "Vorlagen importieren",
+      "close": "Schließen",
+      "paste": "Text einfügen",
+      "files": "Dateien hochladen",
+      "pasteHelp": "Füge beliebig viele Vorlagen nacheinander ein. Ein Array ist nicht nötig.",
+      "found": "{{valid}} gültige Vorlagen · {{broken}} mit Fehler",
+      "add": "{{count}} Vorlagen hinzufügen",
+      "clear": "Leeren",
+      "drop": "JSON-Dateien hier ablegen",
+      "dropHelp": "Akzeptiert .json, .jsonl und .ndjson. Eine Datei kann eine oder hunderte Vorlagen enthalten.",
+      "pick": "JSON auswählen",
+      "result": "Ergebnis",
+      "added": "{{count}} Vorlagen hinzugefügt",
+      "paired": "{{paired}} PDFs haben eine Vorlage ({{total}} Vorlagen im Stapel)",
+      "unused": "{{count}} Vorlagen ohne PDF",
+      "unusedHelp": "Sie bleiben im Stapel. Weise sie auf der Seite eines PDFs ohne Vorlage manuell zu.",
+      "line": "Zeile {{line}}",
+      "keyField": "Zuordnungsfeld",
+      "issue": {
+        "empty": "Leer",
+        "no-object": "Kein JSON-Objekt",
+        "syntax": "Syntaxfehler",
+        "no-pages": "Ohne „pages“"
+      }
+    },
+    "versionB": {
+      "title": "Version B hochladen",
+      "close": "Schließen",
+      "drop": "Version B hier ablegen",
+      "dropHelp": "Die Zuordnung erfolgt über den Namen; der echte Dateiinhalt (SHA-256-Fingerabdruck) wird mit dem im Stapel verglichen.",
+      "pick": "PDFs auswählen",
+      "result": "Prüfergebnis",
+      "similar": "Ähnlicher Name",
+      "chipB": "Version B",
+      "chipSame": "Dasselbe PDF",
+      "assign": "PDF für {{name}} wählen",
+      "choosePdf": "PDF wählen …",
+      "remove": "{{name}} entfernen",
+      "sameNote": "{{name}} ist dasselbe PDF, das bereits im Stapel ist (gleicher Inhalt), und wird daher nicht als Version B hinzugefügt.",
+      "apply": "{{count}} Versionen B hinzufügen",
+      "cancel": "Abbrechen",
+      "never": "Unklare Fälle werden nie automatisch zugeordnet.",
+      "added": "{{count}} Versionen B hinzugefügt",
+      "kind": {
+        "notPdf": "Kein PDF",
+        "tooBig": "Größer als {{limit}} MB"
+      }
+    },
+    "validate": {
+      "title": "{{name}} validieren?",
+      "text": "Du bestätigst, dass du die Koordinaten dieses PDFs geprüft hast und sie stimmen. Die Validierung kann später entfernt werden.",
+      "fields": "{{fields}} Felder auf {{pages}} Seiten",
+      "warnings": "{{count}} falsch platzierte Felder (Hinweis, verhindert die Validierung nicht)",
+      "unsaved": "Es gibt ungespeicherte Änderungen: Sie werden beim Validieren gespeichert.",
+      "confirm": "Ja, validieren",
+      "done": "{{name}} validiert"
     }
   },
   "preview": {

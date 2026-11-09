@@ -400,25 +400,26 @@
       "all": "Tutti",
       "noTemplate": "Senza modello",
       "templateError": "Con errore",
-      "missingNew": "Manca il PDF nuovo",
-      "ready": "Pronti da impaginare",
-      "relaid": "Impaginati",
-      "exported": "Esportati"
+      "missingNew": "Solo versione A",
+      "ready": "Da rivedere",
+      "relaid": "Regolati",
+      "validated": "Convalidati"
     },
     "status": {
       "noTemplate": "Senza modello",
       "templateError": "Errore nel JSON",
-      "missingNew": "Manca il PDF nuovo",
-      "ready": "Pronto da impaginare",
-      "relaid": "Impaginato",
-      "exported": "✓ Esportato"
+      "missingNew": "Solo versione A",
+      "ready": "Da rivedere",
+      "relaid": "Regolato",
+      "validated": "Convalidato"
     },
     "action": {
       "pasteTemplate": "Incolla modello",
       "fix": "Correggi",
       "uploadNew": "Carica PDF nuovo",
       "review": "Rivedi",
-      "open": "Apri"
+      "open": "Apri",
+      "validate": "Convalida"
     },
     "col": {
       "pdf": "PDF",
@@ -426,7 +427,8 @@
       "page": "Pagina",
       "weight": "Peso",
       "fields": "Campi",
-      "status": "Stato"
+      "status": "Stato",
+      "versionB": "Versione B"
     },
     "storage": {
       "title": "Archivio locale",
@@ -442,7 +444,19 @@
       "prev": "Precedente",
       "nextOne": "Successivo",
       "skip": "Salta questo PDF",
-      "editSetup": "Cambia modello o PDF nuovo"
+      "editSetup": "Cambia modello o PDF nuovo",
+      "backPanel": "Pannello del lotto",
+      "rail": "PDF del lotto",
+      "railTitle": "PDF del lotto",
+      "loose": "{{count}} modelli del lotto senza PDF",
+      "looseUse": "Usa questo modello",
+      "optionalB": "La versione B è facoltativa: senza puoi comunque rivedere e convalidare la versione A. Va bene qualsiasi nome di file.",
+      "reviewA": "Rivedi",
+      "replaceB": "Sostituisci la versione B…",
+      "addB": "Carica la versione B…",
+      "removeB": "Rimuovi la versione B",
+      "unvalidate": "Rimuovi la convalida",
+      "validate": "convalidare"
     },
     "template": {
       "label": "Modello",
@@ -512,8 +526,8 @@
       "new": "Nuovo",
       "side": "Affiancati",
       "overlay": "Sovrapposto",
-      "before": "PRIMA",
-      "after": "DOPO",
+      "before": "VERSIONE A",
+      "after": "VERSIONE B",
       "sync": "Scorrimento sincronizzato",
       "zoom": "Zoom",
       "zoomIn": "Ingrandisci",
@@ -539,16 +553,17 @@
       "saveNext": "Salva e prossimo",
       "save": "Salva",
       "unsaved": "Modifiche non salvate",
-      "savedToast": "Impaginazione salvata."
+      "savedToast": "Impaginazione salvata.",
+      "onlyA": "Questo PDF non ha una versione B: qui vedi la versione A con le sue coordinate. Carica una versione B per confrontarla."
     },
     "export": {
       "title": "Scarica il lotto",
-      "intro": "{{count}} PDF pronti da scaricare. Arrivano come file separati, con il nome dell'originale.",
+      "intro": "{{count}} PDF convalidati da scaricare. Vengono scaricati come file singoli, con il nome dell'originale.",
       "content": "Contenuto",
-      "json": "JSON reimpaginato di ogni PDF",
-      "pdf": "PDF annotato (nuova dimensione)",
+      "json": "JSON con le coordinate di ogni PDF",
+      "pdf": "PDF annotato",
       "loose": "Nomi: {nome}.json · {nome}.pdf. Il browser potrebbe chiedere il permesso per più download.",
-      "skipped": "{{count}} saltati (senza modello o senza PDF nuovo)",
+      "skipped": "{{count}} non convalidati (non scaricati)",
       "start": "Scarica {{count}} file",
       "cancel": "Annulla",
       "running": "Download di {{done}} file su {{total}}",
@@ -561,7 +576,8 @@
       "retry": "Riprova quelli falliti",
       "again": "Scarica di nuovo",
       "newBatch": "Inizia un altro lotto",
-      "close": "Chiudi"
+      "close": "Chiudi",
+      "coords": "Coordinate da scaricare"
     },
     "mode": {
       "label": "Modalità di lavoro",
@@ -647,7 +663,7 @@
         "pdfs": "PDF letti",
         "templates": "Modelli validi",
         "failedTemplates": "{{count}} modelli con errori di sintassi.",
-        "go": "Abbina {{pdfs}} con {{templates}} →",
+        "go": "Vai al pannello con {{pdfs}} PDF e {{templates}} modelli →",
         "needPdfs": "Carica almeno un PDF per continuare."
       }
     },
@@ -732,6 +748,80 @@
       "add": "Aggiungi al lotto",
       "addHint": "Aggiunge questo PDF al lotto e apre l’abbinamento. La sessione dell’editor non va persa.",
       "added": "{{name}} aggiunto al lotto"
+    },
+    "panel": {
+      "tab": "Pannello del lotto",
+      "validated": "{{done}} di {{total}} convalidati",
+      "filters": "Filtra per stato",
+      "view": "Tipo di vista",
+      "grid": "Griglia",
+      "table": "Tabella",
+      "importTemplates": "Importa modelli",
+      "uploadB": "Carica la versione B",
+      "download": "Scarica i convalidati ({{count}})",
+      "next": "Rivedi il prossimo",
+      "openPdf": "Apri {{name}}",
+      "pillTemplate": "Modello",
+      "pillB": "Versione B",
+      "pillOnlyA": "Solo versione A"
+    },
+    "templates": {
+      "title": "Importa modelli",
+      "close": "Chiudi",
+      "paste": "Incolla testo",
+      "files": "Carica file",
+      "pasteHelp": "Incolla tutti i modelli che vuoi, uno dopo l'altro. Non serve un array.",
+      "found": "{{valid}} modelli validi · {{broken}} con errori",
+      "add": "Aggiungi {{count}} modelli",
+      "clear": "Svuota",
+      "drop": "Trascina i tuoi JSON",
+      "dropHelp": "Accetta .json, .jsonl e .ndjson. Un file può contenere un modello o centinaia.",
+      "pick": "Seleziona JSON",
+      "result": "Risultato",
+      "added": "{{count}} modelli aggiunti",
+      "paired": "{{paired}} PDF hanno un modello ({{total}} modelli nel lotto)",
+      "unused": "{{count}} modelli senza PDF",
+      "unusedHelp": "Restano nel lotto. Assegnale a mano dalla scheda di un PDF senza modello.",
+      "line": "riga {{line}}",
+      "keyField": "Campo di abbinamento",
+      "issue": {
+        "empty": "Vuota",
+        "no-object": "Nessun oggetto JSON",
+        "syntax": "Errore di sintassi",
+        "no-pages": "Senza «pages»"
+      }
+    },
+    "versionB": {
+      "title": "Carica la versione B",
+      "close": "Chiudi",
+      "drop": "Trascina la versione B",
+      "dropHelp": "Viene abbinato per nome e il contenuto reale del file (impronta SHA-256) viene confrontato con quello già nel lotto.",
+      "pick": "Seleziona PDF",
+      "result": "Esito del controllo",
+      "similar": "Nome simile",
+      "chipB": "Versione B",
+      "chipSame": "È lo stesso PDF",
+      "assign": "Scegli il PDF per {{name}}",
+      "choosePdf": "Scegli il PDF…",
+      "remove": "Rimuovi {{name}}",
+      "sameNote": "{{name}} è lo stesso PDF già presente nel lotto (stesso contenuto), quindi non viene aggiunto come versione B.",
+      "apply": "Aggiungi {{count}} versioni B",
+      "cancel": "Annulla",
+      "never": "Ciò che è dubbio non viene mai assegnato da solo.",
+      "added": "{{count}} versioni B aggiunte",
+      "kind": {
+        "notPdf": "Non è un PDF",
+        "tooBig": "Supera {{limit}} MB"
+      }
+    },
+    "validate": {
+      "title": "Convalidare {{name}}?",
+      "text": "Confermi di aver controllato le coordinate di questo PDF e che sono corrette. Potrai rimuovere la convalida in seguito.",
+      "fields": "{{fields}} campi su {{pages}} pagine",
+      "warnings": "{{count}} campi fuori posto (avviso, non impedisce di convalidare)",
+      "unsaved": "Ci sono modifiche non salvate: verranno salvate con la convalida.",
+      "confirm": "Sì, convalida",
+      "done": "{{name}} convalidato"
     }
   },
   "preview": {

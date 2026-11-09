@@ -1,0 +1,61 @@
+<div class="overlay" (click)="closed.emit()" (keydown.escape)="closed.emit()">
+  <div class="drawer" role="dialog" aria-modal="true" [attr.aria-label]="'batch.versionB.title' | t" (click)="$event.stopPropagation()">
+    <div class="drawer__head">
+      <h2>{{ 'batch.versionB.title' | t }}</h2>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="closed.emit()">{{ 'batch.versionB.close' | t }}</button>
+    </div>
+
+    <div class="zone" [class.is-active]="dropActive()" (dragover)="onDragOver($event)" (dragleave)="dropActive.set(false)" (drop)="onDrop($event)">
+      <b>{{ 'batch.versionB.drop' | t }}</b>
+      <p class="cap">{{ 'batch.versionB.dropHelp' | t }}</p>
+      <label class="btn" [attr.aria-busy]="busy()">
+        {{ 'batch.versionB.pick' | t }}
+        <input type="file" multiple accept="application/pdf,.pdf" hidden (change)="onPicked($event)" />
+      </label>
+    </div>
+
+    @if (rows().length) {
+      <span class="lab">{{ 'batch.versionB.result' | t }}</span>
+      <div class="list" role="status" aria-live="polite">
+        @for (row of rows(); track $index) {
+          <div class="rowline">
+            @switch (row.kind) {
+              @case ('b') { <span class="ok" aria-hidden="true">✓</span> }
+              @case ('same') { <span aria-hidden="true">=</span> }
+              @case ('choose') { <span class="warn" aria-hidden="true">?</span> }
+              @default { <span class="bad" aria-hidden="true">!</span> }
+            }
+            <span class="grow ellipsis" [title]="row.file.name">{{ row.file.name }}</span>
+            @if (row.kind === 'b') {
+              <span class="cap ellipsis">↔ {{ nameOf(row.itemId) }}</span>
+              <span class="chip chip--ok">{{ (row.similar ? 'batch.versionB.similar' : 'batch.versionB.chipB') | t }}</span>
+            } @else if (row.kind === 'same') {
+              <span class="cap ellipsis">{{ nameOf(row.itemId) }}</span>
+              <span class="chip">{{ 'batch.versionB.chipSame' | t }}</span>
+            }
+            @if (row.kind === 'choose' || row.kind === 'none' || row.kind === 'b' || row.kind === 'same') {
+              <select class="select" [attr.aria-label]="'batch.versionB.assign' | t : { name: row.file.name }" (change)="choose($index, $event)">
+                <option value="" [selected]="!row.itemId">{{ 'batch.versionB.choosePdf' | t }}</option>
+                @for (item of store.items(); track item.id) {
+                  <option [value]="item.id" [selected]="item.id === row.itemId">{{ item.name }}</option>
+                }
+              </select>
+            } @else {
+              <span class="cap">{{ reasonLabel(row.kind) }}</span>
+            }
+            <button type="button" class="btn btn--ghost btn--sm" [attr.aria-label]="'batch.versionB.remove' | t : { name: row.file.name }" (click)="remove($index)">×</button>
+          </div>
+          @if (row.kind === 'same') {
+            <p class="note note--info">ⓘ <span>{{ 'batch.versionB.sameNote' | t : { name: row.file.name } }}</span></p>
+          }
+        }
+      </div>
+    }
+
+    <div class="drawer__foot">
+      <button type="button" class="btn" [disabled]="ready() === 0 || busy()" (click)="apply()">{{ 'batch.versionB.apply' | t : { count: ready() } }}</button>
+      <button type="button" class="btn btn--ghost" (click)="closed.emit()">{{ 'batch.versionB.cancel' | t }}</button>
+      <span class="cap">{{ 'batch.versionB.never' | t }}</span>
+    </div>
+  </div>
+</div>

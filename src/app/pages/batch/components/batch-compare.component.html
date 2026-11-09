@@ -2,9 +2,11 @@
   <div class="cmp__bar">
     <div class="seg" role="group" [attr.aria-label]="'batch.compare.view' | t">
       <button type="button" [class.on]="mode() === 'original'" [attr.aria-pressed]="mode() === 'original'" (click)="setMode('original')">{{ 'batch.compare.original' | t }}</button>
-      <button type="button" [class.on]="mode() === 'new'" [attr.aria-pressed]="mode() === 'new'" (click)="setMode('new')">{{ 'batch.compare.new' | t }}</button>
-      <button type="button" [class.on]="mode() === 'side'" [attr.aria-pressed]="mode() === 'side'" (click)="setMode('side')">{{ 'batch.compare.side' | t }}</button>
-      <button type="button" [class.on]="mode() === 'overlay'" [attr.aria-pressed]="mode() === 'overlay'" (click)="setMode('overlay')">{{ 'batch.compare.overlay' | t }}</button>
+      @if (hasNew()) {
+        <button type="button" [class.on]="mode() === 'new'" [attr.aria-pressed]="mode() === 'new'" (click)="setMode('new')">{{ 'batch.compare.new' | t }}</button>
+        <button type="button" [class.on]="mode() === 'side'" [attr.aria-pressed]="mode() === 'side'" (click)="setMode('side')">{{ 'batch.compare.side' | t }}</button>
+        <button type="button" [class.on]="mode() === 'overlay'" [attr.aria-pressed]="mode() === 'overlay'" (click)="setMode('overlay')">{{ 'batch.compare.overlay' | t }}</button>
+      }
     </div>
     <label class="cmp__check" [class.is-off]="mode() !== 'side'">
       <input type="checkbox" [checked]="syncScroll()" [disabled]="mode() !== 'side'" (change)="syncScroll.set($any($event.target).checked)" />
@@ -89,7 +91,7 @@
     <aside class="cmp__fields" [attr.aria-label]="'batch.compare.fields' | t : { page: pageNumber() }">
       <h3>{{ 'batch.compare.fields' | t : { page: pageNumber() } }}</h3>
       <ul>
-        @for (f of newFields(); track f.index) {
+        @for (f of listedFields(); track f.index) {
           <li>
             <button type="button" class="fieldrow" [class.is-selected]="selected() === f.index" (click)="select(f.index)">
               <span [class]="f.misplaced ? 'bad' : 'good'" aria-hidden="true">{{ f.misplaced ? '!' : '✓' }}</span>
@@ -106,6 +108,7 @@
       } @else {
         <p class="cap">{{ 'batch.compare.dragHint' | t }}</p>
       }
+      @if (hasNew()) {
       <div class="cmp__actions">
         <button type="button" class="btn" (click)="save(true)">{{ 'batch.compare.saveNext' | t }}</button>
         <button type="button" class="btn btn--ghost" (click)="save(false)">{{ 'batch.compare.save' | t }}</button>
@@ -113,6 +116,9 @@
           <span class="cap" role="status">{{ 'batch.compare.unsaved' | t }}</span>
         }
       </div>
+      } @else {
+        <p class="cap">{{ 'batch.compare.onlyA' | t }}</p>
+      }
     </aside>
   </div>
 </div>

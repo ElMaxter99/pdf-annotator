@@ -1,0 +1,65 @@
+<div class="overlay" (click)="closed.emit()" (keydown.escape)="closed.emit()">
+  <div class="drawer" role="dialog" aria-modal="true" [attr.aria-label]="'batch.templates.title' | t" (click)="$event.stopPropagation()">
+    <div class="drawer__head">
+      <h2>{{ 'batch.templates.title' | t }}</h2>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="closed.emit()">{{ 'batch.templates.close' | t }}</button>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" class="tab" [class.is-active]="tab() === 'paste'" [attr.aria-selected]="tab() === 'paste'" (click)="tab.set('paste')">{{ 'batch.templates.paste' | t }}</button>
+      <button type="button" role="tab" class="tab" [class.is-active]="tab() === 'files'" [attr.aria-selected]="tab() === 'files'" (click)="tab.set('files')">{{ 'batch.templates.files' | t }}</button>
+    </div>
+
+    @if (tab() === 'paste') {
+      <label class="cap" for="tpl-paste">{{ 'batch.templates.pasteHelp' | t }}</label>
+      <textarea id="tpl-paste" class="paste" spellcheck="false" [value]="draft()" (input)="onDraft($event)" placeholder='{"pdfName":"albaran-0331.pdf","pages":[ ... ]}'></textarea>
+      <div role="status" aria-live="polite">
+        @if (draft().trim()) {
+          <p class="cap">{{ 'batch.templates.found' | t : { valid: valid(), broken: broken().length } }}</p>
+        }
+      </div>
+      <div class="drawer__foot" style="margin-top: 0">
+        <button type="button" class="btn" [disabled]="valid() === 0 || busy()" (click)="addPasted()">{{ 'batch.templates.add' | t : { count: valid() } }}</button>
+        <button type="button" class="btn btn--ghost" [disabled]="!draft()" (click)="draft.set('')">{{ 'batch.templates.clear' | t }}</button>
+      </div>
+    } @else {
+      <div class="zone" [class.is-active]="dropActive()" (dragover)="onDragOver($event)" (dragleave)="dropActive.set(false)" (drop)="onDrop($event)">
+        <b>{{ 'batch.templates.drop' | t }}</b>
+        <p class="cap">{{ 'batch.templates.dropHelp' | t }}</p>
+        <label class="btn" [attr.aria-busy]="busy()">
+          {{ 'batch.templates.pick' | t }}
+          <input type="file" multiple accept="application/json,.json,.jsonl,.ndjson,text/plain" hidden (change)="onPicked($event)" />
+        </label>
+      </div>
+    }
+
+    @if (report(); as rep) {
+      <span class="lab">{{ 'batch.templates.result' | t }}</span>
+      <div class="list" role="status" aria-live="polite">
+        <div class="rowline"><span class="ok" aria-hidden="true">✓</span><span class="grow">{{ 'batch.templates.added' | t : { count: rep.added } }}</span></div>
+        <div class="rowline"><span class="ok" aria-hidden="true">≈</span><span class="grow">{{ 'batch.templates.paired' | t : { paired: paired(), total: total() } }}</span></div>
+        @if (unused() > 0) {
+          <div class="rowline"><span class="warn" aria-hidden="true">?</span><span class="grow">{{ 'batch.templates.unused' | t : { count: unused() } }}</span></div>
+        }
+        @for (f of rep.failed; track $index) {
+          <div class="rowline"><span class="bad" aria-hidden="true">!</span><span class="grow ellipsis">{{ f.label || ('batch.templates.line' | t : { line: f.line }) }}</span><span class="cap">{{ issueLabel(f.issue.reason) }}@if (f.issue.line) { · {{ 'batch.templates.line' | t : { line: f.issue.line } }} }</span></div>
+        }
+        @for (name of rep.tooBig; track name) {
+          <div class="rowline"><span class="bad" aria-hidden="true">!</span><span class="grow ellipsis">{{ name }}</span><span class="cap">{{ 'batch.reject.tooBigJson' | t }}</span></div>
+        }
+      </div>
+      @if (unused() > 0) {
+        <p class="note note--info">ⓘ <span>{{ 'batch.templates.unusedHelp' | t }}</span></p>
+      }
+    }
+
+    <div class="rowline" style="margin-top: auto">
+      <span class="grow">{{ 'batch.templates.keyField' | t }}</span>
+      <select class="select mono" [value]="keyField()" (change)="onKey($event)" [attr.aria-label]="'batch.templates.keyField' | t">
+        @for (opt of keyOptions(); track opt.field) {
+          <option [value]="opt.field" [selected]="opt.field === keyField()">{{ opt.field }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,8 @@
 ## Unreleased
+### Changed
+- **Batch as a session** (`/batch`): after loading the PDFs a panel shows a grid (or table) with the first-page thumbnail, name and status of each PDF, filters, «Importar plantillas», «Subir versión B», «Descargar validados» and «Revisar el siguiente». The pairing step (`/batch/match`) and the steppers are gone; the PDF page keeps a list of all PDFs on its left.
+- What is uploaded first is **version A**, a later PDF is **version B**; A and B keep separate coordinates. A B with the same content (SHA-256) as A or as the stored B only shows a «same PDF» notice, whatever its name; a B with another name can be associated by hand from the PDF page.
+- A PDF is **validated** only with «OK · validar» plus a confirmation; replacing B, changing the template or saving the layout removes it. Download only includes validated PDFs, with coordinates A, B or A+B. The «exported» status no longer exists.
 ### Added
 - **Batch uses the sample values**: the batch comparison and the exported PDF paint the same sample values (or test data) as the editor preview. Test data now lasts only for the session and is no longer saved in the browser.
 - **Batch re-layout** (`/batch`, `/batch/:id`): pick 20–50 PDFs (and optionally their JSON, paired by file name) on the landing page; a single PDF still opens the editor as before. The list shows one row per PDF with six states (no template, JSON error, new PDF missing, ready, re-laid out, exported), filters with counters, search, keyboard navigation (↑ ↓, Enter, N for the next pending one) and browser-storage usage with warnings at 70 % and a block at 90 %. The batch is stored in IndexedDB and survives a reload; the landing offers to continue or discard it

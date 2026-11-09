@@ -8,6 +8,7 @@ import {
   input,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
@@ -112,8 +113,11 @@ export class BatchCompareComponent implements OnDestroy {
     return size ? formatPageSize(size) : '';
   });
 
+  /** Without a version B only the original PDF and its coordinates (A) are shown. */
+  readonly hasNew = computed(() => !!this.item().newPdf);
   readonly originalFields = computed(() => this.buildFields('orig'));
   readonly newFields = computed(() => this.buildFields('new'));
+  readonly listedFields = computed(() => (this.hasNew() ? this.newFields() : this.originalFields()));
   readonly misplacedCount = computed(() => this.newFields().filter((f) => f.misplaced).length);
   readonly zoomLabel = computed(() => {
     const scales = this.scales();
@@ -131,6 +135,10 @@ export class BatchCompareComponent implements OnDestroy {
       this.selected.set(null);
       this.pageNumber.set(1);
       void this.loadDocuments(item);
+    });
+    effect(() => {
+      const hasNew = this.hasNew();
+      untracked(() => this.mode.set(hasNew ? 'side' : 'original'));
     });
     effect(() => {
       // Re-render whenever page, zoom or documents change.

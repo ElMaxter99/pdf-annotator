@@ -1412,7 +1412,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         'success'
       );
     }
-    await this.router.navigate(['/batch/match']);
+    await this.router.navigate(['/batch']);
   }
 
   private scheduleSessionSave() {

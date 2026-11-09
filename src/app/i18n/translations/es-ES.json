@@ -400,25 +400,26 @@
       "all": "Todos",
       "noTemplate": "Sin plantilla",
       "templateError": "Con error",
-      "missingNew": "Falta PDF nuevo",
-      "ready": "Listos para remaquetar",
-      "relaid": "Remaquetados",
-      "exported": "Exportados"
+      "missingNew": "Solo versión A",
+      "ready": "Por revisar",
+      "relaid": "Ajustados",
+      "validated": "Validados"
     },
     "status": {
       "noTemplate": "Sin plantilla",
       "templateError": "Error en JSON",
-      "missingNew": "Falta PDF nuevo",
-      "ready": "Listo para remaquetar",
-      "relaid": "Remaquetado",
-      "exported": "✓ Exportado"
+      "missingNew": "Solo versión A",
+      "ready": "Por revisar",
+      "relaid": "Ajustado",
+      "validated": "Validado"
     },
     "action": {
       "pasteTemplate": "Pegar plantilla",
       "fix": "Corregir",
       "uploadNew": "Subir PDF nuevo",
       "review": "Revisar",
-      "open": "Abrir"
+      "open": "Abrir",
+      "validate": "Validar"
     },
     "col": {
       "pdf": "PDF",
@@ -426,7 +427,8 @@
       "page": "Página",
       "weight": "Peso",
       "fields": "Campos",
-      "status": "Estado"
+      "status": "Estado",
+      "versionB": "Versión B"
     },
     "storage": {
       "title": "Almacenamiento local",
@@ -442,7 +444,19 @@
       "prev": "Anterior",
       "nextOne": "Siguiente",
       "skip": "Saltar este PDF",
-      "editSetup": "Cambiar plantilla o PDF nuevo"
+      "editSetup": "Cambiar plantilla o PDF nuevo",
+      "backPanel": "Panel del lote",
+      "rail": "PDF del lote",
+      "railTitle": "PDF del lote",
+      "loose": "{{count}} plantillas del lote sin PDF",
+      "looseUse": "Usar esta plantilla",
+      "optionalB": "La versión B es opcional: sin ella puedes revisar y validar la versión A. Vale cualquier nombre de archivo.",
+      "reviewA": "Revisar",
+      "replaceB": "Reemplazar versión B…",
+      "addB": "Subir versión B…",
+      "removeB": "Quitar versión B",
+      "unvalidate": "Quitar validación",
+      "validate": "validar"
     },
     "template": {
       "label": "Plantilla",
@@ -512,8 +526,8 @@
       "new": "Nuevo",
       "side": "Lado a lado",
       "overlay": "Superpuesto",
-      "before": "ANTES",
-      "after": "DESPUÉS",
+      "before": "VERSIÓN A",
+      "after": "VERSIÓN B",
       "sync": "Scroll sincronizado",
       "zoom": "Zoom",
       "zoomIn": "Acercar",
@@ -539,16 +553,17 @@
       "saveNext": "Guardar y siguiente",
       "save": "Guardar",
       "unsaved": "Cambios sin guardar",
-      "savedToast": "Remaquetado guardado."
+      "savedToast": "Remaquetado guardado.",
+      "onlyA": "Este PDF no tiene versión B: aquí ves la versión A con sus coordenadas. Sube una versión B para compararla."
     },
     "export": {
       "title": "Descargar el lote",
-      "intro": "{{count}} PDF listos para descargar. Se bajan como archivos sueltos, con el nombre del original.",
+      "intro": "{{count}} PDF validados para descargar. Se bajan como archivos sueltos, con el nombre del original.",
       "content": "Contenido",
-      "json": "JSON remaquetado de cada PDF",
-      "pdf": "PDF anotado (tamaño nuevo)",
+      "json": "JSON con las coordenadas de cada PDF",
+      "pdf": "PDF anotado",
       "loose": "Nombres: {nombre}.json · {nombre}.pdf. El navegador puede pedir permiso para descargas múltiples.",
-      "skipped": "{{count}} saltados (sin plantilla o sin PDF nuevo)",
+      "skipped": "{{count}} sin validar (no se descargan)",
       "start": "Descargar {{count}} archivos",
       "cancel": "Cancelar",
       "running": "Descargando {{done}} de {{total}} archivos",
@@ -561,7 +576,8 @@
       "retry": "Reintentar los fallidos",
       "again": "Descargar de nuevo",
       "newBatch": "Empezar otro lote",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "coords": "Coordenadas a descargar"
     },
     "mode": {
       "label": "Modo de trabajo",
@@ -647,7 +663,7 @@
         "pdfs": "PDF leídos",
         "templates": "Plantillas válidas",
         "failedTemplates": "{{count}} plantillas con error de sintaxis.",
-        "go": "Emparejar {{pdfs}} con {{templates}} →",
+        "go": "Ir al panel con {{pdfs}} PDF y {{templates}} plantillas →",
         "needPdfs": "Carga al menos un PDF para continuar."
       }
     },
@@ -732,6 +748,80 @@
       "add": "Añadir al lote",
       "addHint": "Añade este PDF al lote y abre el emparejado. Tu sesión del editor no se pierde.",
       "added": "{{name}} añadido al lote"
+    },
+    "panel": {
+      "tab": "Panel del lote",
+      "validated": "{{done}} de {{total}} validados",
+      "filters": "Filtrar por estado",
+      "view": "Tipo de vista",
+      "grid": "Cuadrícula",
+      "table": "Tabla",
+      "importTemplates": "Importar plantillas",
+      "uploadB": "Subir versión B",
+      "download": "Descargar validados ({{count}})",
+      "next": "Revisar el siguiente",
+      "openPdf": "Abrir {{name}}",
+      "pillTemplate": "Plantilla",
+      "pillB": "Versión B",
+      "pillOnlyA": "Solo versión A"
+    },
+    "templates": {
+      "title": "Importar plantillas",
+      "close": "Cerrar",
+      "paste": "Pegar texto",
+      "files": "Subir archivos",
+      "pasteHelp": "Pega todas las plantillas que quieras, una detrás de otra. No hace falta un array.",
+      "found": "{{valid}} plantillas válidas · {{broken}} con error",
+      "add": "Añadir {{count}} plantillas",
+      "clear": "Vaciar",
+      "drop": "Suelta tus JSON",
+      "dropHelp": "Acepta .json, .jsonl y .ndjson. Un archivo puede traer una plantilla o cientos.",
+      "pick": "Seleccionar JSON",
+      "result": "Resultado",
+      "added": "{{count}} plantillas añadidas",
+      "paired": "{{paired}} PDF ya tienen plantilla ({{total}} plantillas en el lote)",
+      "unused": "{{count}} plantillas sin PDF",
+      "unusedHelp": "Se guardan en el lote. Asígnalas a mano desde la pestaña de un PDF sin plantilla.",
+      "line": "línea {{line}}",
+      "keyField": "Campo de emparejado",
+      "issue": {
+        "empty": "Vacía",
+        "no-object": "Sin objeto JSON",
+        "syntax": "Error de sintaxis",
+        "no-pages": "Sin «pages»"
+      }
+    },
+    "versionB": {
+      "title": "Subir versión B",
+      "close": "Cerrar",
+      "drop": "Suelta la versión B",
+      "dropHelp": "Se empareja por nombre y se compara el contenido real del archivo (huella SHA-256) con el que ya está en el lote.",
+      "pick": "Seleccionar PDF",
+      "result": "Resultado de la comprobación",
+      "similar": "Nombre parecido",
+      "chipB": "Versión B",
+      "chipSame": "Es el mismo PDF",
+      "assign": "Elegir el PDF de {{name}}",
+      "choosePdf": "Elegir el PDF…",
+      "remove": "Quitar {{name}}",
+      "sameNote": "{{name}} es el mismo PDF que ya está en el lote (mismo contenido), así que no se añade como versión B.",
+      "apply": "Añadir {{count}} versiones B",
+      "cancel": "Cancelar",
+      "never": "Lo dudoso nunca se asigna solo.",
+      "added": "{{count}} versiones B añadidas",
+      "kind": {
+        "notPdf": "No es un PDF",
+        "tooBig": "Supera {{limit}} MB"
+      }
+    },
+    "validate": {
+      "title": "¿Validar {{name}}?",
+      "text": "Confirmas que has revisado las coordenadas de este PDF y que están bien. Podrás quitar la validación después.",
+      "fields": "{{fields}} campos en {{pages}} páginas",
+      "warnings": "{{count}} campos descolocados (aviso, no impide validar)",
+      "unsaved": "Hay cambios sin guardar: se guardarán al validar.",
+      "confirm": "Sí, validar",
+      "done": "{{name}} validado"
     }
   },
   "preview": {
