@@ -307,7 +307,8 @@
       "outOfPage": "{{count}} anotação(ões) fora da página",
       "fontSize": "{{count}} tamanho(s) de letra fora de 8–72",
       "opacity": "{{count}} opacidade(s) fora de 0,1–1"
-    }
+    },
+    "exportSampleValues": "O PDF tem {{count}} campo(s) com valores de amostra em vez de dados reais."
   },
   "session": {
     "title": "Continuar onde ficou",
@@ -335,6 +336,42 @@
     "distribute": {
       "horizontal": "Distribuir horizontalmente",
       "vertical": "Distribuir verticalmente"
+    }
+  },
+  "preview": {
+    "mode": {
+      "group": "O que as anotações pintam",
+      "label": "Mostrar",
+      "sample": "Amostra",
+      "map": "Mapeamento",
+      "data": "Dados",
+      "dataDisabled": "Carregue dados de teste para ativar esta vista"
+    },
+    "samples": {
+      "title": "Valores de amostra",
+      "description": "O que cada tipo pinta quando o campo não tem «value» nem dado de teste. Evita que um mapeamento longo quebre o layout.",
+      "text": "Texto",
+      "check": "Caixa",
+      "radio": "Opção",
+      "number": "Número",
+      "hint": "Até 12 caracteres.",
+      "reset": "Repor",
+      "note": "Guardados neste navegador e válidos para todos os seus modelos. Visíveis na pré-visualização e no PDF exportado."
+    },
+    "testData": {
+      "title": "Dados de teste",
+      "description": "Cole um JSON real ou inventado. Cada mapField (holder[0].fullname) é procurado lá dentro e o seu valor é pintado.",
+      "placeholder": "{ \"holder\": [ { \"fullname\": \"Lucía Fernández\" } ] }",
+      "load": "Carregar ficheiro .json",
+      "clear": "Remover",
+      "resolved": "{{resolved}} de {{total}} campos resolvidos",
+      "resolvedHint": "Os campos sem dado usam o valor de amostra.",
+      "missing": "Sem dado:",
+      "syntaxError": "JSON inválido na linha {{line}}, coluna {{column}}.",
+      "shapeError": "O JSON de teste deve ser um objeto ou uma lista.",
+      "tooLarge": "O ficheiro excede 5 MB.",
+      "readFailed": "Não foi possível ler o ficheiro.",
+      "empty": "Sem dados de teste: usam-se os valores de amostra."
     }
   }
 }

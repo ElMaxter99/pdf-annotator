@@ -307,7 +307,8 @@
       "outOfPage": "{{count}} annotation(s) outside the page",
       "fontSize": "{{count}} font size(s) outside 8–72",
       "opacity": "{{count}} opacity value(s) outside 0.1–1"
-    }
+    },
+    "exportSampleValues": "The PDF has {{count}} field(s) with sample values instead of real data."
   },
   "session": {
     "title": "Pick up where you left off",
@@ -335,6 +336,42 @@
     "distribute": {
       "horizontal": "Distribute horizontally",
       "vertical": "Distribute vertically"
+    }
+  },
+  "preview": {
+    "mode": {
+      "group": "What annotations paint",
+      "label": "Show",
+      "sample": "Sample",
+      "map": "Mapping",
+      "data": "Data",
+      "dataDisabled": "Load test data to enable this view"
+    },
+    "samples": {
+      "title": "Sample values",
+      "description": "What each type paints when the field has no «value» and no test data. Keeps a long mapping from breaking the layout.",
+      "text": "Text",
+      "check": "Checkbox",
+      "radio": "Radio",
+      "number": "Number",
+      "hint": "Up to 12 characters.",
+      "reset": "Reset",
+      "note": "Saved in this browser and shared by all your templates. Shown in the preview and in the exported PDF."
+    },
+    "testData": {
+      "title": "Test data",
+      "description": "Paste a real or mock JSON. Each mapField (holder[0].fullname) is looked up in it and its value is painted.",
+      "placeholder": "{ \"holder\": [ { \"fullname\": \"Lucía Fernández\" } ] }",
+      "load": "Load .json file",
+      "clear": "Remove",
+      "resolved": "{{resolved}} of {{total}} fields resolved",
+      "resolvedHint": "Fields without data use their sample value.",
+      "missing": "No data:",
+      "syntaxError": "Invalid JSON at line {{line}}, column {{column}}.",
+      "shapeError": "The test JSON must be an object or a list.",
+      "tooLarge": "The file is larger than 5 MB.",
+      "readFailed": "The file could not be read.",
+      "empty": "No test data: sample values are used."
     }
   }
 }

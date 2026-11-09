@@ -307,7 +307,8 @@
       "outOfPage": "{{count}} Anmerkung(en) außerhalb der Seite",
       "fontSize": "{{count}} Schriftgröße(n) außerhalb von 8–72",
       "opacity": "{{count}} Deckkraftwert(e) außerhalb von 0,1–1"
-    }
+    },
+    "exportSampleValues": "Das PDF enthält {{count}} Feld(er) mit Musterwerten statt echter Daten."
   },
   "session": {
     "title": "Dort weitermachen, wo Sie aufgehört haben",
@@ -335,6 +336,42 @@
     "distribute": {
       "horizontal": "Horizontal verteilen",
       "vertical": "Vertikal verteilen"
+    }
+  },
+  "preview": {
+    "mode": {
+      "group": "Was die Anmerkungen anzeigen",
+      "label": "Anzeigen",
+      "sample": "Muster",
+      "map": "Zuordnung",
+      "data": "Daten",
+      "dataDisabled": "Testdaten laden, um diese Ansicht zu aktivieren"
+    },
+    "samples": {
+      "title": "Musterwerte",
+      "description": "Was jeder Typ anzeigt, wenn das Feld weder «value» noch Testdaten hat. So sprengt eine lange Zuordnung das Layout nicht.",
+      "text": "Text",
+      "check": "Kontrollkästchen",
+      "radio": "Option",
+      "number": "Zahl",
+      "hint": "Bis zu 12 Zeichen.",
+      "reset": "Zurücksetzen",
+      "note": "In diesem Browser gespeichert und für alle Vorlagen gültig. Sichtbar in der Vorschau und im exportierten PDF."
+    },
+    "testData": {
+      "title": "Testdaten",
+      "description": "Füge ein echtes oder erfundenes JSON ein. Jedes mapField (holder[0].fullname) wird darin gesucht und sein Wert angezeigt.",
+      "placeholder": "{ \"holder\": [ { \"fullname\": \"Lucía Fernández\" } ] }",
+      "load": "JSON-Datei laden",
+      "clear": "Entfernen",
+      "resolved": "{{resolved}} von {{total}} Feldern aufgelöst",
+      "resolvedHint": "Felder ohne Daten verwenden ihren Musterwert.",
+      "missing": "Ohne Daten:",
+      "syntaxError": "Ungültiges JSON in Zeile {{line}}, Spalte {{column}}.",
+      "shapeError": "Das Test-JSON muss ein Objekt oder eine Liste sein.",
+      "tooLarge": "Die Datei ist größer als 5 MB.",
+      "readFailed": "Die Datei konnte nicht gelesen werden.",
+      "empty": "Keine Testdaten: Musterwerte werden verwendet."
     }
   }
 }

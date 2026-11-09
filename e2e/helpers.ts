@@ -20,7 +20,7 @@ export async function openSidebarTab(page: Page, name: SidebarTab) {
 
 export async function openWorkspace(
   page: Page,
-  options: { zoomOut?: number; tab?: SidebarTab } = {}
+  options: { zoomOut?: number; tab?: SidebarTab; view?: 'Muestra' | 'Mapeo' | 'Datos' } = {}
 ) {
   await stubAnalytics(page);
   await page.goto('/landing');
@@ -32,6 +32,8 @@ export async function openWorkspace(
     await page.keyboard.press('-');
     await page.waitForTimeout(120);
   }
+  // Most tests assert the mapField text, so they open the "Mapeo" view (the app default is "Muestra").
+  await page.getByRole('group', { name: 'Qué se pinta en las anotaciones' }).getByRole('button', { name: options.view ?? 'Mapeo' }).click();
   // Most flows work with the JSON editor, which lives in the "Anotaciones" tab.
   await openSidebarTab(page, options.tab ?? 'Anotaciones');
   // Single-key shortcuts are ignored while a button has focus, so leave the tab button.

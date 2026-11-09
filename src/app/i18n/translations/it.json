@@ -307,7 +307,8 @@
       "outOfPage": "{{count}} annotazione/i fuori dalla pagina",
       "fontSize": "{{count}} dimensione/i del carattere fuori da 8–72",
       "opacity": "{{count}} opacità fuori da 0,1–1"
-    }
+    },
+    "exportSampleValues": "Il PDF contiene {{count}} campo/i con valori di esempio invece di dati reali."
   },
   "session": {
     "title": "Riprendi da dove avevi lasciato",
@@ -335,6 +336,42 @@
     "distribute": {
       "horizontal": "Distribuisci orizzontalmente",
       "vertical": "Distribuisci verticalmente"
+    }
+  },
+  "preview": {
+    "mode": {
+      "group": "Cosa mostrano le annotazioni",
+      "label": "Mostra",
+      "sample": "Esempio",
+      "map": "Mappatura",
+      "data": "Dati",
+      "dataDisabled": "Carica dati di prova per attivare questa vista"
+    },
+    "samples": {
+      "title": "Valori di esempio",
+      "description": "Cosa mostra ogni tipo quando il campo non ha «value» né dati di prova. Evita che una mappatura lunga rompa il layout.",
+      "text": "Testo",
+      "check": "Casella",
+      "radio": "Opzione",
+      "number": "Numero",
+      "hint": "Fino a 12 caratteri.",
+      "reset": "Ripristina",
+      "note": "Salvati in questo browser e validi per tutti i tuoi modelli. Visibili nell'anteprima e nel PDF esportato."
+    },
+    "testData": {
+      "title": "Dati di prova",
+      "description": "Incolla un JSON reale o inventato. Ogni mapField (holder[0].fullname) viene cercato al suo interno e se ne mostra il valore.",
+      "placeholder": "{ \"holder\": [ { \"fullname\": \"Lucía Fernández\" } ] }",
+      "load": "Carica file .json",
+      "clear": "Rimuovi",
+      "resolved": "{{resolved}} campi su {{total}} risolti",
+      "resolvedHint": "I campi senza dato usano il valore di esempio.",
+      "missing": "Senza dato:",
+      "syntaxError": "JSON non valido alla riga {{line}}, colonna {{column}}.",
+      "shapeError": "Il JSON di prova deve essere un oggetto o un elenco.",
+      "tooLarge": "Il file supera i 5 MB.",
+      "readFailed": "Impossibile leggere il file.",
+      "empty": "Nessun dato di prova: si usano i valori di esempio."
     }
   }
 }

@@ -2654,3 +2654,131 @@ kbd {
   background: rgba(94, 234, 212, 0.12);
   border-radius: 2px;
 }
+
+/* Valores de muestra, datos de prueba y modo de vista (pestaña Avanzado y barra superior) */
+.btn--small {
+  padding: 4px 12px;
+  min-height: 32px;
+  font-size: 0.82rem;
+}
+
+.btn.btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0b1f1c;
+}
+
+.preview-mode {
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-mode__label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.preview-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(94, 234, 212, 0.12);
+}
+
+.preview-panel h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.preview-panel .advanced-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.preview-samples__row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+.preview-panel input[type='text'],
+.preview-data__input {
+  width: 100%;
+  background: rgba(30, 30, 47, 0.8);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.preview-panel input[type='text']:focus-visible,
+.preview-data__input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.preview-data__input {
+  font-family: Consolas, monospace;
+  font-size: 0.82rem;
+  resize: vertical;
+}
+
+.preview-data__input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.preview-data__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preview-data__status {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.preview-data__status--error {
+  color: var(--danger);
+}
+
+.preview-data__missing {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+:root.theme-light .btn.btn--active,
+:root.theme-light .btn.btn--active:hover:not(:disabled) {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+:root.theme-light .preview-panel {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+:root.theme-light .preview-panel input[type='text'],
+:root.theme-light .preview-data__input {
+  background: #f6f7fb;
+  border-color: rgba(15, 23, 42, 0.22);
+}

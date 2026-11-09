@@ -1,4 +1,11 @@
 ## Unreleased
+### Added
+- **Sample values**: annotations without `value` now paint a short sample per type instead of the full `mapField` (text `XXXXX`, checkbox and radio `X`, number `00000`), so a long mapping no longer breaks the layout. Editable in *Advanced → Sample values* (global browser setting, up to 12 characters, per-type reset); decimals and appender still apply to numbers. A field's own `value` always wins
+- **Test data**: paste or load a JSON in *Advanced → Test data* and every `mapField` (`holder[0].fullname`, `generalData.month`) is resolved against it; missing data falls back to the sample value. Reports resolved/total fields and the unresolved paths, and shows the line and column of a syntax error
+- **View mode** `Sample / Mapping / Data` in the toolbar (`Mapping` paints the `mapField` as before); the choice is remembered in the browser
+- The exported PDF paints the same text as the preview and warns with a toast when some fields were stamped with sample values
+- Design boards `P-11` to `P-15` (approved) in `design/canvas/`
+
 ### Documentation
 - Context docs for people and agents: `docs/PRODUCT.md`, `DOMAIN.md`, `DECISIONS.md`, `ROADMAP.md`, `TESTING.md` and `WORKFLOW.md` (design-first flow); `PROPUESTA_MEJORAS.md` moved to `docs/archive/`
 - Design canvas created (link in `design/README.md`) with the design tokens board and 1:1 captures of the current app (`V-01` to `V-19`: landing, resumable session, invalid file toast, workspace tabs, saved template, editors, selection, shortcuts, errors, toasts, guides, JSON tree; dark, light and 1280; desktop only) and the batch re-layout proposal boards (`P-01` to `P-10`: upload, list, template, side-by-side and overlay compare, page size mismatch, PDF size/storage, ZIP or loose download), pending approval; plus `design/tools/` to regenerate them. Designs are desktop only (decision 11)
