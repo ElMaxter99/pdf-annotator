@@ -6,6 +6,7 @@
 - Compare view: original, new, side by side (synced scroll) or overlay (opacity slider and outlines of the original), zoom, page navigation, draggable and keyboard-movable fields, misplaced-field detection (overlap with text or outside the page), undo/redo, save and next
 - Download as loose files (JSON with `pages` and annotated PDF named after the original) with an «n of N files» counter, retry of failures and a summary; 25 MB per PDF (provisional)
 - `utils`: `template-text`, `batch-files`, `page-size`, `field-text` (render text, shared with the editor) and `pdfjs-setup` (pdf.js worker setup, now shared by the editor and the batch pages); services `BatchStoreService`, `BatchExportService`, `PdfInfoService`
+- JSON import inherits a template-level `fontSize` for fields that do not set one (it used to force 14)
 - Texts translated in the 7 languages (`batch.*`); unit tests and an e2e suite (`e2e/batch.spec.ts`)
 
 ### Security

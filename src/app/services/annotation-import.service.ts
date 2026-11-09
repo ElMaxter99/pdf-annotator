@@ -51,6 +51,12 @@ export class AnnotationImportService {
     }
 
     const normalized: PageAnnotations[] = [];
+    // A template-level `fontSize` is the default for fields that do not set their own.
+    const globalFontSize = toFiniteNumber((data as { fontSize?: unknown } | null)?.fontSize);
+    const defaultFontSize =
+      !Array.isArray(data) && globalFontSize !== null && globalFontSize > 0
+        ? Math.round(globalFontSize * 100) / 100
+        : 14;
 
     for (const rawPage of pagesData) {
       if (!rawPage || typeof rawPage !== 'object') {
@@ -116,7 +122,7 @@ export class AnnotationImportService {
           fontSize:
             normalizedFontSize && normalizedFontSize > 0
               ? Math.round(normalizedFontSize * 100) / 100
-              : 14,
+              : defaultFontSize,
           color: normalizeColor(normalizedColor),
           type: normalizedType,
         };

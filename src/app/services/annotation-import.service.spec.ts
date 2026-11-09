@@ -20,6 +20,33 @@ describe('AnnotationImportService', () => {
     expect(service.normalizeImportedCoordinates('text', identity)).toBeNull();
   });
 
+  it('inherits the template-level fontSize for fields without their own', () => {
+    const result = service.normalizeImportedCoordinates(
+      {
+        fontSize: 11,
+        pages: [
+          {
+            num: 1,
+            fields: [
+              { x: 1, y: 2, mapField: 'a' },
+              { x: 3, y: 4, mapField: 'b', fontSize: 20 },
+            ],
+          },
+        ],
+      },
+      identity
+    );
+    expect(result?.[0].fields.map((f) => f.fontSize)).toEqual([11, 20]);
+  });
+
+  it('falls back to 14 without a usable template-level fontSize', () => {
+    const result = service.normalizeImportedCoordinates(
+      { fontSize: 'abc', pages: [{ num: 1, fields: [{ x: 1, y: 2, mapField: 'a' }] }] },
+      identity
+    );
+    expect(result?.[0].fields[0].fontSize).toBe(14);
+  });
+
   it('accepts a bare array of pages', () => {
     const result = service.normalizeImportedCoordinates(
       [{ num: 1, fields: [{ x: 1, y: 2, mapField: 'a' }] }],
