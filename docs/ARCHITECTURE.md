@@ -99,4 +99,4 @@ Shell `.app--workspace`: grid `header / sidebar+viewer / footer`, `100dvh`, scro
 - Sin backend: el PDF nunca sale del navegador.
 
 ## 11. Deuda técnica y hoja de ruta
-Ver [`PROPUESTA_MEJORAS.md`](../PROPUESTA_MEJORAS.md): dividir `workspace.page.ts`, extraer `<app-annotation-editor>`, pestañas en el sidebar, persistencia de sesión con IndexedDB, toasts en vez de `alert`.
+Ver [`ROADMAP.md`](ROADMAP.md). Pendiente principal: dividir `workspace.page.ts` (render del PDF, miniaturas y sincronización del JSON).
