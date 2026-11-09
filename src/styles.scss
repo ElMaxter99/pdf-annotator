@@ -182,12 +182,23 @@ body {
   line-height: 1.6;
 }
 
+app-landing-dropzone {
+  display: block;
+  width: 100%;
+  max-width: 960px;
+}
+
+.landing__text .landing__cta {
+  align-self: center;
+  margin-top: 6px;
+}
+
 .landing__drop {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: min(580px, 100%);
+  width: min(960px, 100%);
 }
 
 .landing__dropzone {
@@ -545,6 +556,93 @@ body {
   .landing__dropzone {
     transition: none;
     transform: none;
+  }
+}
+
+.landing__actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.landing__cta--ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 30%, transparent);
+}
+
+:root.theme-light .landing__cta--ghost {
+  color: var(--text);
+}
+
+.landing__dropzone--busy {
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.18);
+  cursor: progress;
+}
+
+.landing__dropzone--error {
+  border-color: var(--danger, #ff4d4d);
+  background: rgba(255, 77, 77, 0.07);
+}
+
+:root.theme-light .landing__dropzone--error {
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.05);
+}
+
+.landing__progress {
+  display: block;
+  width: min(260px, 100%);
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  overflow: hidden;
+}
+
+.landing__progress i {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  animation: landing-progress 1.1s ease-out infinite;
+}
+
+.landing__footer-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.landing__footer-links a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s ease-out;
+}
+
+.landing__footer-links a:hover,
+.landing__footer-links a:focus-visible {
+  color: var(--text);
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.landing__footer-links a.landing__footer-batch {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@keyframes landing-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
   }
 }
 
@@ -2781,4 +2879,16 @@ kbd {
 :root.theme-light .preview-data__input {
   background: #f6f7fb;
   border-color: rgba(15, 23, 42, 0.22);
+}
+
+.shortcuts-dialog__guide {
+  margin: 0;
+  padding: 10px 24px 16px;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.shortcuts-dialog__guide a {
+  color: var(--accent);
+  font-weight: 700;
 }

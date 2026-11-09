@@ -33,5 +33,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/batch/batch-item.page').then((m) => m.BatchItemPageComponent),
   },
+  {
+    path: 'guide',
+    loadComponent: () => import('./pages/guide/guide.page').then((m) => m.GuidePageComponent),
+  },
+  {
+    path: 'guide/:id',
+    loadComponent: () => import('./pages/guide/guide.page').then((m) => m.GuidePageComponent),
+  },
   { path: '**', redirectTo: 'landing' },
 ];

@@ -10,4 +10,5 @@
 - Responde en español salvo que el usuario escriba en otro idioma; el código y los commits siguen el idioma ya usado en `git log`.
 - Puedes abrir PRs y arreglar el CI sin preguntar; no hagas push a ramas distintas de la asignada, no fusiones en `main`, no publiques versiones ni borres cosas sin aprobación.
 - Reglas de diseño y formato de cada actualización (**Estado / Hecho por Claude / Necesito de ti**): `docs/WORKFLOW.md`.
+- Guía: cuando añadas funcionalidades, actualiza `docs/GUIDE.md` y la vista de Guía (textos `guide.*`, captura) en la misma PR.
 - Si cambias texto visible, ejecuta `npm run i18n:check`; si cambias estilos, comprueba el tema claro (`:root.theme-light`).

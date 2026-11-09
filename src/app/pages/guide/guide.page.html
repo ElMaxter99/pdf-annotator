@@ -1,0 +1,152 @@
+<div class="guide">
+  <header class="guide__nav">
+    <a class="guide__brand" routerLink="/landing" [attr.aria-label]="appName">
+      <img src="/logo.svg" alt="" width="36" height="36" />
+      <span class="guide__name">{{ appName }}</span>
+      <span class="guide__version">v{{ version }}</span>
+    </a>
+    <div class="guide__nav-actions">
+      <a class="btn btn--ghost" routerLink="/landing">← {{ 'guide.back' | t }}</a>
+      <a class="guide__current" routerLink="/guide" aria-current="page">{{ 'app.landing.nav.guide' | t }}</a>
+      <app-theme-toggle></app-theme-toggle>
+      <app-language-selector [languages]="languages" [selectedLanguage]="language()" (languageChange)="setLanguage($event)" variant="compact"></app-language-selector>
+    </div>
+  </header>
+
+  <div class="guide__layout">
+    <aside class="guide__side">
+      <label class="guide__search">
+        <span class="guide__sr">{{ 'guide.search.label' | t }}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m20 20-4-4"/></svg>
+        <input type="search" [value]="query()" (input)="onQuery($event)" [placeholder]="'guide.search.placeholder' | t" autocomplete="off" />
+      </label>
+      <nav [attr.aria-label]="'guide.nav' | t">
+        @for (entry of visibleGroups(); track entry.group) {
+          <p class="guide__group">{{ groupLabel(entry.group) | t }}</p>
+          <ul>
+            @for (topic of entry.items; track topic.id) {
+              <li>
+                <a [routerLink]="['/guide', topic.id]" [attr.aria-current]="current()?.id === topic.id ? 'page' : null"
+                  [class.is-active]="current()?.id === topic.id">{{ 'guide.topics.' + topic.id + '.title' | t }}</a>
+              </li>
+            }
+          </ul>
+        }
+      </nav>
+    </aside>
+
+    <main class="guide__main">
+      <nav class="guide__crumb" [attr.aria-label]="'guide.crumb.home' | t">
+        <a routerLink="/landing">{{ 'guide.crumb.home' | t }}</a><span aria-hidden="true">/</span>
+        @if (current(); as topic) {
+          <a routerLink="/guide">{{ 'app.landing.nav.guide' | t }}</a><span aria-hidden="true">/</span>
+          <span>{{ groupLabel(topic.group) | t }}</span>
+        } @else {
+          <span>{{ 'app.landing.nav.guide' | t }}</span>
+        }
+      </nav>
+
+      @if (current(); as topic) {
+        <article class="guide__topic">
+          <h1 #heading tabindex="-1">{{ 'guide.topics.' + topic.id + '.title' | t }}</h1>
+          <p class="guide__lead">{{ 'guide.topics.' + topic.id + '.summary' | t }}</p>
+          <div class="guide__topic-grid">
+            <figure class="guide__shot" [class.guide__shot--diagram]="!topic.shot">
+              @if (shot(topic); as src) {
+                <img [src]="src" [alt]="'guide.shotAlt' | t : { title: ('guide.topics.' + topic.id + '.title' | t) }" loading="lazy" width="1600" height="900" />
+                @for (pin of topic.pins ?? []; track $index) {
+                  <span class="guide__pin" [style.left.%]="pin.x" [style.top.%]="pin.y" aria-hidden="true">{{ $index + 1 }}</span>
+                }
+              } @else {
+                <div class="guide__diagram" role="img" [attr.aria-label]="'guide.noShot' | t">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="icon(topic)"/></svg>
+                  <span>{{ 'guide.noShot' | t }}</span>
+                </div>
+              }
+            </figure>
+            <div class="guide__body">
+              <h2 class="guide__sr">{{ 'guide.steps' | t }}</h2>
+              <ol class="guide__steps">
+                @for (key of stepKeys(topic); track key) {
+                  <li>{{ key | t }}</li>
+                }
+              </ol>
+              <p class="guide__tip"><strong>{{ 'guide.tip' | t }}.</strong> {{ 'guide.topics.' + topic.id + '.tip' | t }}</p>
+              @if (topic.id === 'preview') {
+                <ul class="guide__perks">
+                  @for (perk of perks; track perk.topic) {
+                    <li><a [routerLink]="['/guide', perk.topic]"><strong>{{ 'app.landing.features.' + perk.key + '.title' | t }}</strong><span>{{ 'app.landing.features.' + perk.key + '.text' | t }}</span></a></li>
+                  }
+                </ul>
+              }
+              @if (topic.shortcuts.length) {
+                <p class="guide__keys"><span>{{ 'guide.shortcuts' | t }}:</span>
+                  @for (key of topic.shortcuts; track key) {<kbd>{{ key }}</kbd>}
+                </p>
+              }
+              <div class="guide__cta">
+                <button type="button" class="landing__cta" (click)="tryInApp()" [disabled]="opening()">{{ 'guide.try' | t }}</button>
+              </div>
+            </div>
+          </div>
+          <div class="guide__pn">
+            @if (previous(); as prev) {
+              <a [routerLink]="['/guide', prev.id]"><small>← {{ 'guide.prev' | t }}</small><strong>{{ 'guide.topics.' + prev.id + '.title' | t }}</strong></a>
+            } @else { <span></span> }
+            @if (next(); as nxt) {
+              <a class="guide__pn-next" [routerLink]="['/guide', nxt.id]"><small>{{ 'guide.next' | t }} →</small><strong>{{ 'guide.topics.' + nxt.id + '.title' | t }}</strong></a>
+            }
+          </div>
+        </article>
+      } @else {
+        <section class="guide__overview">
+          <span class="landing__badge">{{ 'guide.badge' | t }}</span>
+          <h1 #heading tabindex="-1">{{ 'guide.heading' | t }}</h1>
+          <p class="guide__lead">{{ 'guide.lead' | t }}</p>
+
+          @if (!searching()) {
+            <div class="guide__paths">
+              <a class="guide__path" [routerLink]="['/guide', 'edit']"><strong>{{ 'guide.paths.editor.title' | t }}</strong><span>{{ 'guide.paths.editor.text' | t }}</span><em>{{ 'guide.read' | t }} →</em></a>
+              <a class="guide__path" [routerLink]="['/guide', 'batch']"><strong>{{ 'guide.paths.batch.title' | t }}</strong><span>{{ 'guide.paths.batch.text' | t }}</span><em>{{ 'guide.read' | t }} →</em></a>
+            </div>
+          }
+
+          @if (searching()) {
+            <p class="guide__count" role="status">
+              @if (results().length) { {{ 'guide.search.results' | t : { count: results().length } }} } @else { {{ 'guide.search.none' | t : { query: query() } }} }
+            </p>
+          }
+
+          @if (results().length) {
+            <ul class="guide__cards">
+              @for (topic of results(); track topic.id) {
+                <li>
+                  <a class="guide__card" [routerLink]="['/guide', topic.id]">
+                    <span class="guide__card-th">
+                      @if (shot(topic); as src) {
+                        <img [src]="src" alt="" loading="lazy" width="1600" height="900" />
+                      } @else {
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="icon(topic)"/></svg>
+                      }
+                    </span>
+                    <span class="guide__card-tag">{{ groupLabel(topic.group) | t }}</span>
+                    <strong>{{ 'guide.topics.' + topic.id + '.title' | t }}</strong>
+                    <span class="guide__card-text">{{ 'guide.topics.' + topic.id + '.summary' | t }}</span>
+                  </a>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="guide__empty">
+              <p>{{ 'guide.search.noneHint' | t }}</p>
+              <div class="guide__empty-actions">
+                <button type="button" class="landing__cta" (click)="clearQuery()">{{ 'guide.search.all' | t }}</button>
+                <button type="button" class="landing__cta landing__cta--ghost" (click)="clearQuery()">{{ 'guide.search.clear' | t }}</button>
+              </div>
+            </div>
+          }
+        </section>
+      }
+    </main>
+  </div>
+</div>

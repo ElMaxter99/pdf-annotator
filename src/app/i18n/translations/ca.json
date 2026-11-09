@@ -13,13 +13,9 @@
       "de": "Alemany"
     },
     "landing": {
-      "badge": "Comença a anotar",
-      "title": "Maqueta coordenades de qualsevol PDF en segons",
-      "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
       "cta": "Selecciona PDF",
       "tryExample": "Prova-ho amb un document d'exemple",
       "previewAlt": "Vista prèvia de l'espai de treball de PDF Annotator",
-      "featuresTitle": "Tot el que necessites per anotar",
       "trust": {
         "browser": "100 % al teu navegador",
         "languages": "7 idiomes",
@@ -44,8 +40,32 @@
         }
       },
       "nav": {
-        "github": "GitHub"
-      }
+        "github": "GitHub",
+        "guide": "Guia"
+      },
+      "drop": {
+        "editorTitle": "Deixa anar per obrir a l'Editor",
+        "editorText": "S'obrirà a l'editor.",
+        "batchTitle": "Deixa anar per obrir a Lots",
+        "batchText": "{{count}} fitxers detectats · s'obrirà el mode Lots."
+      },
+      "busy": {
+        "title": "Obrint {{name}}",
+        "text": "Preparant la pàgina 1…",
+        "many": "{{count}} fitxers"
+      },
+      "error": {
+        "title": "Aquest fitxer no és un PDF",
+        "text": "Prova'n un altre o el document d'exemple.",
+        "again": "Triar-ne un altre"
+      },
+      "footer": {
+        "batch": "Mode Lots"
+      },
+      "badge": "Comença a anotar",
+      "title": "Maqueta coordenades de qualsevol PDF en segons",
+      "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
+      "featuresTitle": "Tot el que necessites per anotar"
     },
     "upload": {
       "title": "Carrega el teu PDF",
@@ -768,6 +788,151 @@
       "tooLarge": "El fitxer supera els 5 MB.",
       "readFailed": "No s'ha pogut llegir el fitxer.",
       "empty": "Sense dades de prova: s'usen els valors de mostra."
+    }
+  },
+  "guide": {
+    "badge": "Guia",
+    "heading": "Tot el que pot fer PDF Annotator",
+    "lead": "Tria per on començar. Cada tema explica una funció amb la captura, els passos i les dreceres relacionades.",
+    "back": "Tornar a l'inici",
+    "nav": "Índex de la guia",
+    "search": {
+      "label": "Cercar a la guia",
+      "placeholder": "Cercar a la guia",
+      "results": "{{count}} resultats",
+      "none": "Res per a «{{query}}»",
+      "noneHint": "Prova amb una altra paraula o mira tots els temes.",
+      "all": "Veure tots els temes",
+      "clear": "Esborrar la cerca"
+    },
+    "paths": {
+      "editor": {
+        "title": "Un PDF: l'Editor",
+        "text": "Col·loques camps a mà i els afines amb el JSON."
+      },
+      "batch": {
+        "title": "Molts PDF: Lots",
+        "text": "Remaquetes de 2 a 50 PDF amb plantilles que ja tens."
+      }
+    },
+    "read": "Llegir",
+    "groups": {
+      "start": "Primers passos",
+      "editor": "Editor",
+      "batch": "Lots",
+      "more": "Més"
+    },
+    "crumb": {
+      "home": "Inici"
+    },
+    "steps": "Passos",
+    "tip": "Consell",
+    "shortcuts": "Dreceres",
+    "try": "Prova-ho a l'app",
+    "prev": "Anterior",
+    "next": "Següent",
+    "shotAlt": "Captura: {{title}}",
+    "noShot": "Esquema",
+    "tryFailed": "No s'ha pogut carregar el document d'exemple.",
+    "link": "Veure la guia",
+    "topics": {
+      "preview": {
+        "title": "Així es veu",
+        "summary": "Un cop d'ull a l'editor abans de començar: PDF al centre, JSON en viu al costat.",
+        "s1": "Obre un PDF i veuràs la pàgina al centre, amb les miniatures a l'esquerra.",
+        "s2": "Cada clic col·loca un camp i el tauler de la dreta mostra el seu JSON a l'instant.",
+        "s3": "Ajusta, exporta el JSON o el PDF anotat i reutilitza la feina com a plantilla.",
+        "tip": "Prem un dels quatre avantatges de sota per llegir el tema complet."
+      },
+      "start": {
+        "title": "Començar",
+        "summary": "Obre un PDF, posa la teva primera anotació i exporta.",
+        "s1": "Deixa un PDF al quadrat central o tria «Provar amb un document d'exemple».",
+        "s2": "Fes clic sobre la pàgina per col·locar la teva primera anotació.",
+        "s3": "Descarrega el JSON o el PDF anotat des de la capçalera.",
+        "tip": "Tot passa al teu navegador: el PDF no es puja mai a cap servidor."
+      },
+      "workspace": {
+        "title": "Espai de treball",
+        "summary": "Capçalera, panell lateral amb quatre pestanyes i visor.",
+        "s1": "Usa la capçalera per canviar de pàgina, fer zoom, desfer o descarregar.",
+        "s2": "Al panell lateral alterna entre Document, Anotacions, Plantilles i Avançat.",
+        "s3": "Fes clic al visor per crear anotacions i arrossega-les per moure-les.",
+        "tip": "Minimitza el panell lateral amb la tecla B per veure més pàgina."
+      },
+      "edit": {
+        "title": "Editar una anotació",
+        "summary": "Text o mapatge, tipus, valor fix, mida, font, color i més.",
+        "s1": "Fes clic sobre el PDF: s'obre l'editor flotant en aquesta posició.",
+        "s2": "Escriu el text o un mapatge com client.nom per lligar-lo a les teves dades.",
+        "s3": "Ajusta tipus, font, mida i color, i confirma amb Intro.",
+        "tip": "Bloqueja una anotació amb el cadenat per no moure-la sense voler."
+      },
+      "selection": {
+        "title": "Selecció i alineació",
+        "summary": "Mou, alinea, distribueix i duplica diverses anotacions alhora.",
+        "s1": "Prem Shift o Ctrl i fes clic en diverses anotacions, o dibuixa un requadre sobre una zona buida.",
+        "s2": "Usa la barra que apareix sobre el visor per alinear o distribuir.",
+        "s3": "Mou-les arrossegant o amb les fletxes; duplica-les o esborra-les d'un cop.",
+        "tip": "Amb tres o més anotacions pots distribuir-les amb buits iguals."
+      },
+      "guides": {
+        "title": "Guies i precisió",
+        "summary": "Quadrícula, regles en punts PDF, imant i línies d'alineació.",
+        "s1": "Obre Avançat i activa «Activar guies i snapping».",
+        "s2": "Tria la quadrícula i els punts als quals s'imanta.",
+        "s3": "Arrossega una anotació: veuràs les línies d'alineació i les regles.",
+        "tip": "Les coordenades són punts PDF amb l'origen a baix a l'esquerra."
+      },
+      "json": {
+        "title": "JSON en viu",
+        "summary": "Text o arbre, sincronitzat amb el visor.",
+        "s1": "Obre la pestanya Anotacions: el JSON reflecteix cada canvi del visor.",
+        "s2": "Edita'l com a text o canvia a la vista d'arbre.",
+        "s3": "Importa, copia o descarrega el JSON quan ho necessitis.",
+        "tip": "En seleccionar una anotació al visor, l'editor enfoca el seu bloc."
+      },
+      "templates": {
+        "title": "Plantilles",
+        "summary": "Desa conjunts d'anotacions i reutilitza'ls en altres PDF.",
+        "s1": "Col·loca les anotacions que vulguis reutilitzar.",
+        "s2": "A la pestanya Plantilles, posa-li un nom i desa-la.",
+        "s3": "Obre un altre PDF i aplica la plantilla amb un clic.",
+        "tip": "Les plantilles es desen només en aquest navegador."
+      },
+      "samples": {
+        "title": "Valors de mostra i dades de prova",
+        "summary": "Previsualitza amb XXXXX, amb el mapatge o amb un JSON de prova.",
+        "s1": "A Avançat edita els valors de mostra que es pinten quan una anotació no té valor.",
+        "s2": "Enganxa o carrega un JSON de prova a Avançat: cada mapatge es resol contra ell.",
+        "s3": "Tria Mostra, Mapatge o Dades a la barra de l'editor.",
+        "tip": "Un valor fix guanya sempre; després les dades de prova i al final la mostra."
+      },
+      "shortcuts": {
+        "title": "Dreceres i tema clar",
+        "summary": "Prem ? per veure totes les dreceres; el tema es canvia a la capçalera.",
+        "s1": "Prem ? dins l'editor per obrir el diàleg de dreceres.",
+        "s2": "Usa les fletxes i les tecles de pàgina per moure't sense ratolí.",
+        "s3": "Canvia entre tema fosc i clar amb el botó de la capçalera.",
+        "tip": "Les dreceres s'ignoren mentre escrius en un camp de text."
+      },
+      "batch": {
+        "title": "Mode Lots",
+        "summary": "De 2 a 50 PDF amb plantilles JSON: carregar, aparellar, comparar i descarregar.",
+        "s1": "Deixa diversos PDF (i plantilles JSON) a l'inici, o usa «Provar el mode Lots».",
+        "s2": "Cada plantilla s'aparella amb el seu PDF pel camp pdfName; el que sigui ambigu el decideixes tu.",
+        "s3": "Obre cada PDF, puja el PDF nou i compara l'original amb el nou.",
+        "tip": "El lot es desa al teu navegador i pots continuar-lo després.",
+        "s4": "Descarrega els resultats com a fitxers solts."
+      },
+      "export": {
+        "title": "Exportar",
+        "summary": "JSON o PDF anotat amb fonts estàndard o pròpies.",
+        "s1": "Descarrega el JSON amb les coordenades des de la pestanya Anotacions.",
+        "s2": "Puja fonts pròpies (.ttf, .otf, .woff, .woff2) a Avançat si les necessites.",
+        "s3": "Prem «Descarregar PDF» a la capçalera per obtenir el PDF anotat.",
+        "tip": "El PDF exportat pinta el mateix que veus al visor."
+      }
     }
   }
 }

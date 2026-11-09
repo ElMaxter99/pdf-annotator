@@ -41,35 +41,8 @@
           </section>
         }
 
-        <section class="landing__modes" aria-labelledby="modes-title">
-          <h2 id="modes-title" class="landing__modes-title">{{ 'batch.modes.title' | t }}</h2>
-          <p class="landing__modes-lead">{{ 'batch.modes.lead' | t }}</p>
-          <div class="landing__modes-grid">
-            <article class="landing__mode">
-              <header><strong>{{ 'batch.modes.editor.title' | t }}</strong><span>{{ 'batch.modes.editor.count' | t }}</span></header>
-              <p>{{ 'batch.modes.editor.text' | t }}</p>
-              <ul>
-                <li>{{ 'batch.modes.editor.p1' | t }}</li>
-                <li>{{ 'batch.modes.editor.p2' | t }}</li>
-                <li>{{ 'batch.modes.editor.p3' | t }}</li>
-              </ul>
-              <button type="button" class="btn btn--ghost" (click)="openPdfFilePicker()">{{ 'batch.modes.editor.cta' | t }}</button>
-            </article>
-            <article class="landing__mode landing__mode--batch">
-              <header><strong>{{ 'batch.modes.batch.title' | t }}</strong><span>{{ 'batch.modes.batch.count' | t }}</span></header>
-              <p>{{ 'batch.modes.batch.text' | t }}</p>
-              <ul>
-                <li>{{ 'batch.modes.batch.p1' | t }}</li>
-                <li>{{ 'batch.modes.batch.p2' | t }}</li>
-                <li>{{ 'batch.modes.batch.p3' | t }}</li>
-              </ul>
-              <button type="button" class="btn btn--ghost" (click)="startBatch()">{{ 'batch.modes.batch.cta' | t }}</button>
-            </article>
-          </div>
-          <p class="landing__modes-lead">{{ 'batch.modes.note' | t }}</p>
-        </section>
-
-        <app-landing-dropzone [fileDropActive]="fileDropActive()" (fileSelected)="onFileSelected($event)"
+        <app-landing-dropzone [fileDropActive]="fileDropActive()" [dragCount]="dragCount()" [busy]="busy()"
+          [busyName]="busyName()" [hasError]="dropError()" (fileSelected)="onFileSelected($event)"
           (fileUploadKeydown)="onFileUploadKeydown($event)" (fileDragOver)="onFileDragOver($event)"
           (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
           (openFilePicker)="openPdfFilePicker()" (tryExample)="loadExampleDocument()"></app-landing-dropzone>
@@ -80,7 +53,6 @@
           <li>💚 {{ 'app.landing.trust.openSource' | t }}</li>
         </ul>
       </div>
-
     </section>
 
     <section class="landing__features" [attr.aria-label]="'app.landing.featuresTitle' | t">
@@ -107,18 +79,6 @@
           <p>{{ 'app.landing.features.privacy.text' | t }}</p>
         </article>
       </div>
-    </section>
-
-    <section class="landing__showcase">
-      <figure class="landing__preview" aria-hidden="false">
-        <div class="landing__window">
-          <div class="landing__window-bar" aria-hidden="true"><span></span><span></span><span></span></div>
-          <img class="landing__preview-img landing__preview-img--dark" src="/assets/landing/preview-dark.webp"
-            [attr.alt]="'app.landing.previewAlt' | t" width="1440" height="860" fetchpriority="high" />
-          <img class="landing__preview-img landing__preview-img--light" src="/assets/landing/preview-light.webp"
-            [attr.alt]="'app.landing.previewAlt' | t" width="1440" height="860" fetchpriority="high" />
-        </div>
-      </figure>
     </section>
   </main>
 
