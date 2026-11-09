@@ -19,6 +19,35 @@ async function startBatch(page: import('@playwright/test').Page) {
   await page.waitForURL('**/batch');
 }
 
+/** Waits until IndexedDB holds `count` re-laid-out items, so a reload cannot lose a pending write. */
+async function waitForSavedLayouts(page: import('@playwright/test').Page, count: number) {
+  await page.waitForFunction(
+    (expected) =>
+      new Promise<boolean>((resolve) => {
+        const open = indexedDB.open('pdf-annotator-batch');
+        open.onerror = () => resolve(false);
+        open.onsuccess = () => {
+          const db = open.result;
+          try {
+            const all = db.transaction('items', 'readonly').objectStore('items').getAll();
+            all.onsuccess = () => {
+              db.close();
+              resolve(all.result.filter((item: { relaid?: boolean }) => item.relaid).length >= expected);
+            };
+            all.onerror = () => {
+              db.close();
+              resolve(false);
+            };
+          } catch {
+            db.close();
+            resolve(false);
+          }
+        };
+      }),
+    count
+  );
+}
+
 test('several files open the batch list and pair JSON by name', async ({ page }) => {
   await startBatch(page);
   await expect(page.getByRole('heading', { name: /Lote · 3 PDF/ })).toBeVisible();
@@ -72,7 +101,7 @@ test('paste a Mongo script, upload the new PDF, compare and save', async ({ page
   await expect(page.getByRole('button', { name: /Deshacer/ })).toBeEnabled();
 
   await page.getByRole('button', { name: 'Guardar y siguiente' }).click();
-  await page.waitForURL(/\/batch\/.+/);
+  await waitForSavedLayouts(page, 1);
   await page.goto('/batch');
   await expect(page.locator('.table [role=row]', { hasText: 'dos.pdf' })).toHaveAttribute('data-status', 'relaid');
 });
@@ -80,10 +109,13 @@ test('paste a Mongo script, upload the new PDF, compare and save', async ({ page
 test('exports the JSON and the annotated PDF as loose files', async ({ page }) => {
   await startBatch(page);
   await page.locator('.table [role=row]', { hasText: 'uno.pdf' }).getByRole('button', { name: 'Subir PDF nuevo' }).click();
-  await page.locator('input[type=file][accept^="application/pdf"]').setInputFiles(pdfFile('uno-nuevo.pdf'));
-  await expect(page.locator('app-batch-compare')).toBeVisible();
+  await expect(page.locator('#template-status')).toContainText('campos');
+  await expect(async () => {
+    await page.locator('input[type=file][accept^="application/pdf"]').setInputFiles(pdfFile('uno-nuevo.pdf'));
+    await expect(page.locator('app-batch-compare')).toBeVisible({ timeout: 3000 });
+  }).toPass({ timeout: 15_000 });
   await page.getByRole('button', { name: 'Guardar y siguiente' }).click();
-  await page.waitForURL(/\/batch(\/.+)?$/);
+  await waitForSavedLayouts(page, 1);
   await page.goto('/batch');
   await page.getByRole('button', { name: /Descargar \(1\)/ }).click();
   const names: string[] = [];
