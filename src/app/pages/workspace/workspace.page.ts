@@ -14,7 +14,7 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { BatchStoreService } from '../../services/batch-store.service';
+import { BatchStoreService, MAX_BATCH_PDF_BYTES } from '../../services/batch-store.service';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import { pdfjsLib } from '../../utils/pdfjs-setup';
@@ -1391,7 +1391,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const rejected = report.rejected[0];
     if (rejected) {
       this.toast.warning(
-        this.translationService.translate(`batch.reject.${rejected.reason}`, { limit: 25 })
+        this.translationService.translate(`batch.reject.${rejected.reason}`, { limit: MAX_BATCH_PDF_BYTES / (1024 * 1024) })
       );
     } else {
       this.toast.show(

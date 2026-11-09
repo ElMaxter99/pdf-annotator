@@ -579,6 +579,19 @@ export class BatchStoreService {
     } catch {
       return { ok: false, reason: 'unreadable' };
     }
+    // The item may have changed while pdf.js was reading the file (pairing, saved layout…).
+    const current = this.get(id);
+    if (!current) return { ok: false, reason: 'missing' };
+    return this.applyNewPdf(current, file, info, strategy);
+  }
+
+  private applyNewPdf(
+    item: BatchItem,
+    file: File,
+    info: { pageCount: number; pageSize: PageSize },
+    strategy?: SizeStrategy
+  ): PdfSwapResult {
+    const id = item.id;
     const differs = pageSizesDiffer(item.pageSize, info.pageSize);
     const rule = differs ? strategy ?? this.sizeRuleFor(item.pageSize, info.pageSize) : 'keep';
     const next: BatchItem = {

@@ -16,6 +16,8 @@ describe('template matching', () => {
     expect(normalizeMatchName('Álbarán_0331.PDF')).toBe('albaran-0331');
     expect(normalizeMatchName('  a  b.pdf ')).toBe('a-b');
     expect(normalizeMatchName('uno.json')).toBe('uno');
+    expect(normalizeMatchName('Счёт_№5.PDF')).toBe('счет-5');
+    expect(normalizeMatchName('請求書 01.pdf')).toBe('請求書-01');
   });
 
   it('pairs by exact pdfName, then by similar name', () => {
