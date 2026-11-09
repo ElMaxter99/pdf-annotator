@@ -16,3 +16,6 @@ La landing de la PR #154 pone dos tarjetas de modo encima de la zona de carga y 
 - Si las R-02 (tarjetas de modo) pasan a la guía o se retiran de la landing sin más.
 - Si `guide:check` (comprueba ids, claves i18n y capturas) entra en el CI.
 - Las capturas de la guía: reutilizar las del README (ahora) o regenerarlas con `design/tools/capture.mjs` en cada versión.
+
+## Actualización: inicio simplificado (P-24 a P-29)
+Tras revisar la primera versión (P-16 a P-23), se rechazó por sobrecargada. Se ofrecieron tres variantes (A, B, C) y se aprobó la **A**: zona «arrastra aquí tu PDF» grande y centrada, cabecera con nombre, versión, idioma y tema, una línea de valores y pie con Modo Lotes, Guía y GitHub. La vista previa del editor y las cuatro ventajas pasaron a la guía como primer tema «Así se ve» (`preview`). P-16, P-17 y P-18 quedan sustituidas.

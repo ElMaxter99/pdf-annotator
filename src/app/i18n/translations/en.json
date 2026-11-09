@@ -13,13 +13,9 @@
       "de": "German"
     },
     "landing": {
-      "badge": "Annotate smarter",
-      "title": "Lay out coordinates on any PDF in seconds",
-      "description": "Upload your document to add JSON-backed annotations, reuse templates and export your work-ready files.",
       "cta": "Select PDF",
       "tryExample": "Try it with a sample document",
       "previewAlt": "Preview of the PDF Annotator workspace",
-      "featuresTitle": "Everything you need to annotate",
       "trust": {
         "browser": "100% in your browser",
         "languages": "7 languages",
@@ -41,21 +37,11 @@
         "privacy": {
           "title": "Private by design",
           "text": "Everything happens in your browser. Your PDF is never uploaded to any server."
-        },
-        "more": "See it in the guide"
+        }
       },
       "nav": {
         "github": "GitHub",
         "guide": "Guide"
-      },
-      "steps": {
-        "one": "Drop your PDF",
-        "two": "Place annotations",
-        "three": "Export JSON or PDF"
-      },
-      "batchNotice": {
-        "text": "Got lots of PDFs with templates?",
-        "cta": "Try Batch mode"
       },
       "drop": {
         "editorTitle": "Drop to open in the Editor",
@@ -72,11 +58,14 @@
         "title": "That file is not a PDF",
         "text": "Try another one or the sample document.",
         "again": "Choose another"
+      },
+      "footer": {
+        "batch": "Batch mode"
       }
     },
     "upload": {
       "title": "Drop your PDF here",
-      "subtitle": "or click to browse your computer. It opens instantly in the editor.",
+      "subtitle": "or click to browse your computer",
       "hint": "PDF only · never leaves your browser",
       "invalidFormat": "Only PDF files are supported."
     },
@@ -843,6 +832,14 @@
     "tryFailed": "The sample document could not be loaded.",
     "link": "See the guide",
     "topics": {
+      "preview": {
+        "title": "What it looks like",
+        "summary": "A quick look at the editor before you start: PDF in the middle, live JSON beside it.",
+        "s1": "Open a PDF and you will see the page in the centre, with its thumbnails on the left.",
+        "s2": "Each click places a field and the right-hand panel shows its JSON instantly.",
+        "s3": "Fine-tune, export the JSON or the annotated PDF, and reuse your work as a template.",
+        "tip": "Click one of the four benefits below to read the full topic."
+      },
       "start": {
         "title": "Getting started",
         "summary": "Open a PDF, place your first annotation and export.",

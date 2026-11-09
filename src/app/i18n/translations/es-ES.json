@@ -13,13 +13,9 @@
       "de": "Alemán"
     },
     "landing": {
-      "badge": "Empieza a anotar",
-      "title": "Maqueta coordenadas de cualquier PDF en segundos",
-      "description": "Sube tu documento para añadir anotaciones vinculadas a JSON, reutilizar plantillas y exportar archivos listos para trabajar.",
       "cta": "Seleccionar PDF",
       "tryExample": "Probar con un documento de ejemplo",
       "previewAlt": "Vista previa del espacio de trabajo de PDF Annotator",
-      "featuresTitle": "Todo lo que necesitas para anotar",
       "trust": {
         "browser": "100 % en tu navegador",
         "languages": "7 idiomas",
@@ -41,21 +37,11 @@
         "privacy": {
           "title": "Privado por diseño",
           "text": "Todo ocurre en tu navegador. Tu PDF nunca se sube a ningún servidor."
-        },
-        "more": "Verlo en la guía"
+        }
       },
       "nav": {
         "github": "GitHub",
         "guide": "Guía"
-      },
-      "steps": {
-        "one": "Suelta tu PDF",
-        "two": "Coloca anotaciones",
-        "three": "Exporta JSON o PDF"
-      },
-      "batchNotice": {
-        "text": "¿Tienes muchos PDF con plantillas?",
-        "cta": "Probar el modo Lotes"
       },
       "drop": {
         "editorTitle": "Suelta para abrir en el Editor",
@@ -72,11 +58,14 @@
         "title": "Ese archivo no es un PDF",
         "text": "Prueba con otro o con el documento de ejemplo.",
         "again": "Elegir otro"
+      },
+      "footer": {
+        "batch": "Modo Lotes"
       }
     },
     "upload": {
       "title": "Arrastra aquí tu PDF",
-      "subtitle": "o haz clic para buscarlo en tu equipo. Se abre al instante en el editor.",
+      "subtitle": "o haz clic para buscarlo en tu equipo",
       "hint": "Solo PDF · no sale de tu navegador",
       "invalidFormat": "Solo se admiten archivos PDF."
     },
@@ -843,6 +832,14 @@
     "tryFailed": "No se pudo cargar el documento de ejemplo.",
     "link": "Ver la guía",
     "topics": {
+      "preview": {
+        "title": "Así se ve",
+        "summary": "Un vistazo al editor antes de empezar: PDF en el centro, JSON en vivo a un lado.",
+        "s1": "Abre un PDF y verás la página en el centro, con sus miniaturas a la izquierda.",
+        "s2": "Cada clic coloca un campo y el panel de la derecha muestra su JSON al instante.",
+        "s3": "Ajusta, exporta el JSON o el PDF anotado y reutiliza el trabajo como plantilla.",
+        "tip": "Pulsa una de las cuatro ventajas de abajo para leer el tema completo."
+      },
       "start": {
         "title": "Empezar",
         "summary": "Abre un PDF, pon tu primera anotación y exporta.",

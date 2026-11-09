@@ -80,7 +80,7 @@ test('several files open the load step and a lone JSON still pairs by file name'
 test('the landing offers Lotes discreetly and the link opens the load step', async ({ page }) => {
   await stubAnalytics(page);
   await page.goto('/landing');
-  await page.getByRole('button', { name: /Probar el modo Lotes/ }).click();
+  await page.getByRole('contentinfo').getByRole('link', { name: 'Modo Lotes' }).click();
   await page.waitForURL('**/batch/load');
   await expect(page.getByRole('navigation', { name: 'Modo de trabajo' })).toBeVisible();
   await page.getByRole('link', { name: 'Editor · 1 PDF' }).click();

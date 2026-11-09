@@ -13,13 +13,9 @@
       "de": "Allemand"
     },
     "landing": {
-      "badge": "Annotez plus vite",
-      "title": "Placez des coordonnées sur n'importe quel PDF en quelques secondes",
-      "description": "Téléversez votre document pour ajouter des annotations reliées à du JSON, réutiliser des modèles et exporter vos fichiers prêts à l'emploi.",
       "cta": "Sélectionner un PDF",
       "tryExample": "Essayer avec un document d'exemple",
       "previewAlt": "Aperçu de l'espace de travail de PDF Annotator",
-      "featuresTitle": "Tout ce qu'il faut pour annoter",
       "trust": {
         "browser": "100 % dans votre navigateur",
         "languages": "7 langues",
@@ -41,21 +37,11 @@
         "privacy": {
           "title": "Privé par conception",
           "text": "Tout se passe dans votre navigateur. Votre PDF n'est jamais envoyé à un serveur."
-        },
-        "more": "Voir dans le guide"
+        }
       },
       "nav": {
         "github": "GitHub",
         "guide": "Guide"
-      },
-      "steps": {
-        "one": "Déposez votre PDF",
-        "two": "Placez des annotations",
-        "three": "Exportez en JSON ou PDF"
-      },
-      "batchNotice": {
-        "text": "Beaucoup de PDF avec des modèles ?",
-        "cta": "Essayer le mode Lots"
       },
       "drop": {
         "editorTitle": "Déposez pour ouvrir dans l'éditeur",
@@ -72,11 +58,14 @@
         "title": "Ce fichier n'est pas un PDF",
         "text": "Essayez-en un autre ou le document d'exemple.",
         "again": "Choisir un autre"
+      },
+      "footer": {
+        "batch": "Mode Lots"
       }
     },
     "upload": {
       "title": "Déposez ici votre PDF",
-      "subtitle": "ou cliquez pour le chercher sur votre ordinateur. Il s'ouvre aussitôt dans l'éditeur.",
+      "subtitle": "ou cliquez pour le chercher sur votre ordinateur",
       "hint": "PDF uniquement · ne quitte pas votre navigateur",
       "invalidFormat": "Seuls les fichiers PDF sont pris en charge."
     },
@@ -843,6 +832,14 @@
     "tryFailed": "Impossible de charger le document d'exemple.",
     "link": "Voir le guide",
     "topics": {
+      "preview": {
+        "title": "Aperçu",
+        "summary": "Un coup d'œil à l'éditeur avant de commencer : PDF au centre, JSON en direct à côté.",
+        "s1": "Ouvrez un PDF : la page s'affiche au centre, avec ses miniatures à gauche.",
+        "s2": "Chaque clic place un champ et le panneau de droite affiche son JSON aussitôt.",
+        "s3": "Ajustez, exportez le JSON ou le PDF annoté et réutilisez votre travail comme modèle.",
+        "tip": "Cliquez sur l'un des quatre atouts ci-dessous pour lire le sujet complet."
+      },
       "start": {
         "title": "Démarrer",
         "summary": "Ouvrez un PDF, placez votre première annotation et exportez.",

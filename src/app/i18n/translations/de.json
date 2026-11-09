@@ -13,13 +13,9 @@
       "de": "Deutsch"
     },
     "landing": {
-      "badge": "Schneller annotieren",
-      "title": "Platzieren Sie in Sekunden Koordinaten auf jedem PDF",
-      "description": "Laden Sie Ihr Dokument hoch, um JSON-gestützte Anmerkungen hinzuzufügen, Vorlagen wiederzuverwenden und exportfertige Dateien zu erstellen.",
       "cta": "PDF auswählen",
       "tryExample": "Mit einem Beispieldokument testen",
       "previewAlt": "Vorschau des PDF-Annotator-Arbeitsbereichs",
-      "featuresTitle": "Alles, was Sie zum Annotieren brauchen",
       "trust": {
         "browser": "100 % in Ihrem Browser",
         "languages": "7 Sprachen",
@@ -41,21 +37,11 @@
         "privacy": {
           "title": "Privat von Grund auf",
           "text": "Alles läuft in Ihrem Browser. Ihr PDF wird nie auf einen Server hochgeladen."
-        },
-        "more": "In der Anleitung ansehen"
+        }
       },
       "nav": {
         "github": "GitHub",
         "guide": "Anleitung"
-      },
-      "steps": {
-        "one": "PDF ablegen",
-        "two": "Anmerkungen setzen",
-        "three": "JSON oder PDF exportieren"
-      },
-      "batchNotice": {
-        "text": "Viele PDFs mit Vorlagen?",
-        "cta": "Stapelmodus ausprobieren"
       },
       "drop": {
         "editorTitle": "Loslassen, um im Editor zu öffnen",
@@ -72,11 +58,14 @@
         "title": "Diese Datei ist kein PDF",
         "text": "Versuche eine andere oder das Beispieldokument.",
         "again": "Andere wählen"
+      },
+      "footer": {
+        "batch": "Stapelmodus"
       }
     },
     "upload": {
       "title": "PDF hierher ziehen",
-      "subtitle": "oder klicken, um es auf deinem Rechner zu suchen. Es öffnet sich sofort im Editor.",
+      "subtitle": "oder klicken, um es auf deinem Rechner zu suchen",
       "hint": "Nur PDF · verlässt deinen Browser nicht",
       "invalidFormat": "Es werden nur PDF-Dateien unterstützt."
     },
@@ -843,6 +832,14 @@
     "tryFailed": "Das Beispieldokument konnte nicht geladen werden.",
     "link": "Anleitung ansehen",
     "topics": {
+      "preview": {
+        "title": "So sieht es aus",
+        "summary": "Ein Blick auf den Editor vor dem Start: PDF in der Mitte, Live-JSON daneben.",
+        "s1": "Öffne ein PDF und du siehst die Seite in der Mitte, die Miniaturen links.",
+        "s2": "Jeder Klick setzt ein Feld, und das rechte Panel zeigt sofort dessen JSON.",
+        "s3": "Feinjustieren, JSON oder annotiertes PDF exportieren und die Arbeit als Vorlage wiederverwenden.",
+        "tip": "Klicke unten auf einen der vier Vorteile, um das ganze Thema zu lesen."
+      },
       "start": {
         "title": "Loslegen",
         "summary": "Öffne ein PDF, setze deine erste Anmerkung und exportiere.",

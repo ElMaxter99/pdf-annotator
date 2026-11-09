@@ -220,6 +220,55 @@
    "h": 900,
    "title": "P-10 Comparar · lado a lado (claro)"
   },
+  "R-01-que-cambia.dc.html": {
+   "x": 0,
+   "y": 16966,
+   "w": 1720,
+   "h": 900,
+   "title": "R-01 Qué cambia en el flujo"
+  },
+  "R-02-landing-dos-modos.dc.html": {
+   "x": 1800,
+   "y": 16966,
+   "w": 1720,
+   "h": 900,
+   "title": "R-02 Landing con dos modos"
+  },
+  "R-03-diferencias-y-cambio-de-modo.dc.html": {
+   "x": 3600,
+   "y": 16966,
+   "w": 1720,
+   "h": 900,
+   "title": "R-03 Diferencias y cambio de modo"
+  },
+  "R-04-cargar-pdf-y-plantillas.dc.html": {
+   "x": 0,
+   "y": 18246,
+   "w": 1720,
+   "h": 900,
+   "title": "R-04 Cargar PDF y plantillas"
+  },
+  "R-05-pegar-plantillas-en-masa.dc.html": {
+   "x": 1800,
+   "y": 18246,
+   "w": 1720,
+   "h": 900,
+   "title": "R-05 Pegar plantillas en masa"
+  },
+  "R-06-emparejar-pdf-y-plantillas.dc.html": {
+   "x": 3600,
+   "y": 18246,
+   "w": 1720,
+   "h": 900,
+   "title": "R-06 Emparejar PDF y plantillas"
+  },
+  "R-07-asignar-a-mano.dc.html": {
+   "x": 0,
+   "y": 19526,
+   "w": 1720,
+   "h": 900,
+   "title": "R-07 Asignar a mano"
+  },
   "P-11-avanzado-valores-de-muestra.dc.html": {
    "x": 0,
    "y": 22126,
@@ -260,21 +309,21 @@
    "y": 24686,
    "w": 1720,
    "h": 1060,
-   "title": "P-16 Inicio"
+   "title": "P-16 Inicio (sustituida por P-24 a P-28)"
   },
   "P-17-inicio-estados.dc.html": {
    "x": 1800,
    "y": 24686,
    "w": 1720,
    "h": 1040,
-   "title": "P-17 Inicio · estados"
+   "title": "P-17 Inicio · estados (sustituida por P-24 a P-28)"
   },
   "P-18-inicio-claro.dc.html": {
    "x": 3600,
    "y": 24686,
    "w": 1720,
    "h": 1060,
-   "title": "P-18 Inicio (claro)"
+   "title": "P-18 Inicio (claro) (sustituida por P-24 a P-28)"
   },
   "P-19-guia-general.dc.html": {
    "x": 0,
@@ -310,6 +359,48 @@
    "w": 1720,
    "h": 960,
    "title": "P-23 Cómo se mantiene la guía"
+  },
+  "P-24-inicio-a.dc.html": {
+   "x": 0,
+   "y": 29166,
+   "w": 1720,
+   "h": 900,
+   "title": "P-24 Inicio · variante A · zona grande"
+  },
+  "P-25-inicio-b.dc.html": {
+   "x": 1800,
+   "y": 29166,
+   "w": 1720,
+   "h": 900,
+   "title": "P-25 Inicio · variante B · tarjeta con modo"
+  },
+  "P-26-inicio-c.dc.html": {
+   "x": 3600,
+   "y": 29166,
+   "w": 1720,
+   "h": 900,
+   "title": "P-26 Inicio · variante C · pantalla entera"
+  },
+  "P-27-inicio-a-estados.dc.html": {
+   "x": 0,
+   "y": 30446,
+   "w": 1720,
+   "h": 900,
+   "title": "P-27 Inicio · variante A · estados"
+  },
+  "P-28-inicio-a-claro.dc.html": {
+   "x": 1800,
+   "y": 30446,
+   "w": 1720,
+   "h": 900,
+   "title": "P-28 Inicio · variante A (claro)"
+  },
+  "P-29-guia-asi-se-ve.dc.html": {
+   "x": 3600,
+   "y": 30446,
+   "w": 1720,
+   "h": 900,
+   "title": "P-29 Guía · «Así se ve» (lo que sale de la inicio)"
   }
  },
  "order": [
@@ -343,6 +434,13 @@
   "P-08-peso-almacenamiento.dc.html",
   "P-09-cierre-descarga.dc.html",
   "P-10-comparar-lado-a-lado-claro.dc.html",
+  "R-01-que-cambia.dc.html",
+  "R-02-landing-dos-modos.dc.html",
+  "R-03-diferencias-y-cambio-de-modo.dc.html",
+  "R-04-cargar-pdf-y-plantillas.dc.html",
+  "R-05-pegar-plantillas-en-masa.dc.html",
+  "R-06-emparejar-pdf-y-plantillas.dc.html",
+  "R-07-asignar-a-mano.dc.html",
   "P-11-avanzado-valores-de-muestra.dc.html",
   "P-12-prioridad-y-comparacion.dc.html",
   "P-13-datos-de-prueba.dc.html",
@@ -355,7 +453,13 @@
   "P-20-guia-tema.dc.html",
   "P-21-guia-estados.dc.html",
   "P-22-guia-tema-claro.dc.html",
-  "P-23-mantenimiento-guia.dc.html"
+  "P-23-mantenimiento-guia.dc.html",
+  "P-24-inicio-a.dc.html",
+  "P-25-inicio-b.dc.html",
+  "P-26-inicio-c.dc.html",
+  "P-27-inicio-a-estados.dc.html",
+  "P-28-inicio-a-claro.dc.html",
+  "P-29-guia-asi-se-ve.dc.html"
  ],
  "notes": {
   "t0": {
@@ -420,6 +524,33 @@
    "kind": "title1",
    "maxW": 5400
   },
+  "r7": {
+   "x": 0,
+   "y": 16666,
+   "text": "Revisión · dos modos y carga masiva (pendiente de aprobación) · qué cambia y landing",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r8": {
+   "x": 0,
+   "y": 17946,
+   "text": "Revisión · cargar, pegar y emparejar plantillas",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "r9": {
+   "x": 0,
+   "y": 19226,
+   "text": "Revisión · asignación manual",
+   "kind": "title1",
+   "maxW": 1720
+  },
+  "rev": {
+   "x": -420,
+   "y": 16966,
+   "w": 340,
+   "text": "Revisión R-01 a R-07: sustituye el paso «Lote» y «Plantilla» de P-02 y P-03. Los pasos de PDF nuevo, comparar, tamaño, peso y descarga (P-04 a P-10) no cambian. Solo escritorio."
+  },
   "s0": {
    "x": 0,
    "y": 21826,
@@ -453,6 +584,26 @@
    "y": 24686,
    "w": 340,
    "text": "P-16 a P-23: la vista inicial recupera el cuadrado central «arrastra aquí» con un aviso discreto a Lotes (sustituye las tarjetas de R-02 en la landing; R-02 sigue valiendo para la explicación de modos dentro de la guía) y una vista de Guía con captura y pasos por tema, alimentada por docs/GUIDE.md. Solo escritorio."
+  },
+  "h0": {
+   "x": 0,
+   "y": 28866,
+   "text": "Propuesta · inicio simple (pendiente de aprobación) · tres variantes",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "h1": {
+   "x": 0,
+   "y": 30146,
+   "text": "Propuesta · inicio simple · estados, claro y lo que pasa a la guía",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "hn": {
+   "x": -420,
+   "y": 29166,
+   "w": 340,
+   "text": "Rediseño del inicio (P-24 a P-29), sustituye a P-16 a P-18. Cada mesa mide 1720 × 900 = una pantalla sin scroll. Fuera: titular, descripción, tarjetas, funciones y vista previa (pasan a la guía, P-29). Arriba solo idioma y tema; Guía, GitHub y Lotes en el pie. A: zona grande (recomendada). B: tarjeta con selector Editor/Lotes. C: pantalla entera como zona de soltar. Los estados (P-27) y el claro (P-28) son de A. Referencias: Squoosh, WeTransfer, Linear."
   }
  },
  "designSystems": []

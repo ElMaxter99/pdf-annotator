@@ -42,21 +42,22 @@ test('language can be switched', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Drop your PDF here' })).toBeVisible();
 });
 
-test('the drop zone keeps a discreet link to Batch mode and the guide is one click away', async ({ page }) => {
+test('the footer keeps the links to Batch mode, the guide and GitHub', async ({ page }) => {
   await page.goto('/landing');
   await expect(page.locator('.landing__mode')).toHaveCount(0);
-  await page.getByRole('button', { name: /Probar el modo Lotes/ }).click();
+  await page.getByRole('contentinfo').getByRole('link', { name: 'Modo Lotes' }).click();
   await page.waitForURL('**/batch/load');
 
   await page.goto('/landing');
-  await page.getByRole('link', { name: 'Guía' }).first().click();
+  await page.getByRole('contentinfo').getByRole('link', { name: 'Guía' }).click();
   await page.waitForURL('**/guide');
   await expect(page.getByRole('heading', { name: 'Todo lo que puede hacer PDF Annotator' })).toBeVisible();
 });
 
-test('a feature on the landing links to its guide topic', async ({ page }) => {
+test('the landing is a single screen without scroll at 1280x720', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/landing');
-  await page.getByRole('link', { name: /Verlo en la guía/ }).nth(2).click();
-  await page.waitForURL('**/guide/templates');
-  await expect(page.getByRole('heading', { name: 'Plantillas', level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Arrastra aquí tu PDF' })).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
+  expect(overflow).toBeLessThanOrEqual(1);
 });

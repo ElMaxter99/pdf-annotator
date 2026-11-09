@@ -77,6 +77,13 @@ export class GuidePageComponent {
     return GUIDE_ICONS[topic.icon];
   }
 
+  readonly perks = [
+    { key: 'precision', topic: 'guides' },
+    { key: 'json', topic: 'json' },
+    { key: 'templates', topic: 'templates' },
+    { key: 'privacy', topic: 'start' },
+  ] as const;
+
   shot(topic: GuideTopic): string | null {
     return topic.shot ? `/assets/guide/${topic.shot}.webp` : null;
   }

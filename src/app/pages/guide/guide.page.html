@@ -72,6 +72,13 @@
                 }
               </ol>
               <p class="guide__tip"><strong>{{ 'guide.tip' | t }}.</strong> {{ 'guide.topics.' + topic.id + '.tip' | t }}</p>
+              @if (topic.id === 'preview') {
+                <ul class="guide__perks">
+                  @for (perk of perks; track perk.topic) {
+                    <li><a [routerLink]="['/guide', perk.topic]"><strong>{{ 'app.landing.features.' + perk.key + '.title' | t }}</strong><span>{{ 'app.landing.features.' + perk.key + '.text' | t }}</span></a></li>
+                  }
+                </ul>
+              }
               @if (topic.shortcuts.length) {
                 <p class="guide__keys"><span>{{ 'guide.shortcuts' | t }}:</span>
                   @for (key of topic.shortcuts; track key) {<kbd>{{ key }}</kbd>}

@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => stubAnalytics(page));
 test('the guide lists every topic and opens one with its steps', async ({ page }) => {
   await page.goto('/guide');
   await expect(page.getByRole('heading', { name: 'Todo lo que puede hacer PDF Annotator' })).toBeVisible();
-  await expect(page.locator('.guide__card')).toHaveCount(11);
+  await expect(page.locator('.guide__card')).toHaveCount(12);
 
   await page.locator('.guide__card', { hasText: 'Editar una anotación' }).click();
   await page.waitForURL('**/guide/edit');
@@ -29,7 +29,7 @@ test('search filters topics, and shows a way out when nothing matches', async ({
   await page.getByRole('searchbox').fill('cuchillo');
   await expect(page.getByRole('status')).toContainText('Nada para «cuchillo»');
   await page.getByRole('button', { name: 'Ver todos los temas' }).click();
-  await expect(page.locator('.guide__card')).toHaveCount(11);
+  await expect(page.locator('.guide__card')).toHaveCount(12);
 });
 
 test('"Probar en la app" opens the sample document in the editor', async ({ page }) => {

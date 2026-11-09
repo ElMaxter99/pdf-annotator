@@ -13,13 +13,9 @@
       "de": "Alemão"
     },
     "landing": {
-      "badge": "Anote mais rápido",
-      "title": "Marque coordenadas em qualquer PDF em segundos",
-      "description": "Envie o seu documento para adicionar anotações ligadas a JSON, reutilizar modelos e exportar ficheiros prontos a usar.",
       "cta": "Selecionar PDF",
       "tryExample": "Experimentar com um documento de exemplo",
       "previewAlt": "Pré-visualização do espaço de trabalho do PDF Annotator",
-      "featuresTitle": "Tudo o que precisa para anotar",
       "trust": {
         "browser": "100 % no seu navegador",
         "languages": "7 idiomas",
@@ -41,21 +37,11 @@
         "privacy": {
           "title": "Privado por conceção",
           "text": "Tudo acontece no seu navegador. O seu PDF nunca é enviado para nenhum servidor."
-        },
-        "more": "Ver no guia"
+        }
       },
       "nav": {
         "github": "GitHub",
         "guide": "Guia"
-      },
-      "steps": {
-        "one": "Solte o seu PDF",
-        "two": "Coloque anotações",
-        "three": "Exporte JSON ou PDF"
-      },
-      "batchNotice": {
-        "text": "Tem muitos PDF com modelos?",
-        "cta": "Experimentar o modo Lotes"
       },
       "drop": {
         "editorTitle": "Solte para abrir no Editor",
@@ -72,11 +58,14 @@
         "title": "Esse ficheiro não é um PDF",
         "text": "Experimente outro ou o documento de exemplo.",
         "again": "Escolher outro"
+      },
+      "footer": {
+        "batch": "Modo Lotes"
       }
     },
     "upload": {
       "title": "Arraste aqui o seu PDF",
-      "subtitle": "ou clique para procurá-lo no seu computador. Abre na hora no editor.",
+      "subtitle": "ou clique para procurá-lo no seu computador",
       "hint": "Só PDF · não sai do seu navegador",
       "invalidFormat": "Apenas ficheiros PDF são suportados."
     },
@@ -843,6 +832,14 @@
     "tryFailed": "Não foi possível carregar o documento de exemplo.",
     "link": "Ver o guia",
     "topics": {
+      "preview": {
+        "title": "Como se vê",
+        "summary": "Uma olhadela ao editor antes de começar: PDF ao centro, JSON em tempo real ao lado.",
+        "s1": "Abra um PDF e verá a página ao centro, com as miniaturas à esquerda.",
+        "s2": "Cada clique coloca um campo e o painel da direita mostra o seu JSON na hora.",
+        "s3": "Ajuste, exporte o JSON ou o PDF anotado e reutilize o trabalho como modelo.",
+        "tip": "Clique numa das quatro vantagens abaixo para ler o tema completo."
+      },
       "start": {
         "title": "Começar",
         "summary": "Abra um PDF, coloque a primeira anotação e exporte.",

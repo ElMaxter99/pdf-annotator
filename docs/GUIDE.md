@@ -25,6 +25,7 @@ Id en `guide.data.ts` · grupo · captura (`public/assets/guide/*.webp`, o esque
 
 | Id | Tema | Grupo | Captura | Componente |
 | --- | --- | --- | --- | --- |
+| `preview` | Así se ve | Primeros pasos | `preview` | `pages/guide` (vista previa y ventajas) |
 | `start` | Empezar | Primeros pasos | `main` | `pages/landing` |
 | `workspace` | Espacio de trabajo | Primeros pasos | `workspace` | `pages/workspace` |
 | `edit` | Editar una anotación (pines 1–3 sobre la captura) | Editor | `editor` | `annotation-editor` |

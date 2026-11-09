@@ -20,6 +20,7 @@ export interface GuideTopic {
 }
 
 export const GUIDE_TOPICS: readonly GuideTopic[] = [
+  { id: 'preview', group: 'start', shot: 'preview', steps: 3, shortcuts: [], icon: 'layout' },
   { id: 'start', group: 'start', shot: 'main', steps: 3, shortcuts: [], icon: 'play' },
   { id: 'workspace', group: 'start', shot: 'workspace', steps: 3, shortcuts: ['B', '← →'], icon: 'layout' },
   {

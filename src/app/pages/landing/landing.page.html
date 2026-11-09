@@ -10,10 +10,8 @@
   </header>
 
   <main class="landing">
-    <section class="landing__hero-grid">
-      <div class="landing__intro">
-        <app-landing-hero></app-landing-hero>
-
+    <section class="landing__stage">
+      <div class="landing__center">
         @if (savedSession(); as saved) {
           <section class="landing__resume" aria-labelledby="resume-title">
             <div class="landing__resume-text">
@@ -47,66 +45,12 @@
           (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
           (openFilePicker)="openPdfFilePicker()" (tryExample)="loadExampleDocument()"></app-landing-dropzone>
 
-        <ol class="landing__steps" [attr.aria-label]="'app.landing.steps.one' | t">
-          <li><b aria-hidden="true">1</b>{{ 'app.landing.steps.one' | t }}</li>
-          <li><b aria-hidden="true">2</b>{{ 'app.landing.steps.two' | t }}</li>
-          <li><b aria-hidden="true">3</b>{{ 'app.landing.steps.three' | t }}</li>
-        </ol>
-
-        <p class="landing__batch">
-          <span>{{ 'app.landing.batchNotice.text' | t }}</span>
-          <button type="button" class="landing__batch-link" (click)="startBatch()">{{ 'app.landing.batchNotice.cta' | t }} →</button>
+        <p class="landing__values">
+          <span>{{ 'app.landing.features.precision.title' | t }}</span>
+          <span>{{ 'app.landing.features.json.title' | t }}</span>
+          <span>{{ 'app.landing.trust.browser' | t }}</span>
         </p>
-
-        <ul class="landing__trust">
-          <li>🔒 {{ 'app.landing.trust.browser' | t }}</li>
-          <li>🌍 {{ 'app.landing.trust.languages' | t }}</li>
-          <li>💚 {{ 'app.landing.trust.openSource' | t }}</li>
-        </ul>
       </div>
-
-    </section>
-
-    <section class="landing__features" [attr.aria-label]="'app.landing.featuresTitle' | t">
-      <h2 class="landing__features-title">{{ 'app.landing.featuresTitle' | t }}</h2>
-      <div class="landing__features-grid">
-        <article class="landing__feature">
-          <span class="landing__feature-icon" aria-hidden="true">🎯</span>
-          <h3>{{ 'app.landing.features.precision.title' | t }}</h3>
-          <p>{{ 'app.landing.features.precision.text' | t }}</p>
-          <a class="landing__feature-more" [routerLink]="['/guide', 'guides']">{{ 'app.landing.features.more' | t }}<span aria-hidden="true"> →</span></a>
-        </article>
-        <article class="landing__feature">
-          <span class="landing__feature-icon" aria-hidden="true">🧾</span>
-          <h3>{{ 'app.landing.features.json.title' | t }}</h3>
-          <p>{{ 'app.landing.features.json.text' | t }}</p>
-          <a class="landing__feature-more" [routerLink]="['/guide', 'json']">{{ 'app.landing.features.more' | t }}<span aria-hidden="true"> →</span></a>
-        </article>
-        <article class="landing__feature">
-          <span class="landing__feature-icon" aria-hidden="true">🧩</span>
-          <h3>{{ 'app.landing.features.templates.title' | t }}</h3>
-          <p>{{ 'app.landing.features.templates.text' | t }}</p>
-          <a class="landing__feature-more" [routerLink]="['/guide', 'templates']">{{ 'app.landing.features.more' | t }}<span aria-hidden="true"> →</span></a>
-        </article>
-        <article class="landing__feature">
-          <span class="landing__feature-icon" aria-hidden="true">🔐</span>
-          <h3>{{ 'app.landing.features.privacy.title' | t }}</h3>
-          <p>{{ 'app.landing.features.privacy.text' | t }}</p>
-          <a class="landing__feature-more" [routerLink]="['/guide', 'start']">{{ 'app.landing.features.more' | t }}<span aria-hidden="true"> →</span></a>
-        </article>
-      </div>
-    </section>
-
-    <section class="landing__showcase">
-      <figure class="landing__preview" aria-hidden="false">
-        <div class="landing__window">
-          <div class="landing__window-bar" aria-hidden="true"><span></span><span></span><span></span></div>
-          <img class="landing__preview-img landing__preview-img--dark" src="/assets/landing/preview-dark.webp"
-            [attr.alt]="'app.landing.previewAlt' | t" width="1440" height="860" fetchpriority="high" />
-          <img class="landing__preview-img landing__preview-img--light" src="/assets/landing/preview-light.webp"
-            [attr.alt]="'app.landing.previewAlt' | t" width="1440" height="860" fetchpriority="high" />
-        </div>
-      </figure>
     </section>
   </main>
 

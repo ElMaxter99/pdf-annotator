@@ -13,13 +13,9 @@
       "de": "Alemany"
     },
     "landing": {
-      "badge": "Comença a anotar",
-      "title": "Maqueta coordenades de qualsevol PDF en segons",
-      "description": "Puja el document per afegir anotacions vinculades a JSON, reutilitzar plantilles i exportar fitxers a punt per treballar.",
       "cta": "Selecciona PDF",
       "tryExample": "Prova-ho amb un document d'exemple",
       "previewAlt": "Vista prèvia de l'espai de treball de PDF Annotator",
-      "featuresTitle": "Tot el que necessites per anotar",
       "trust": {
         "browser": "100 % al teu navegador",
         "languages": "7 idiomes",
@@ -41,21 +37,11 @@
         "privacy": {
           "title": "Privat per disseny",
           "text": "Tot passa al teu navegador. El teu PDF no es puja mai a cap servidor."
-        },
-        "more": "Veure-ho a la guia"
+        }
       },
       "nav": {
         "github": "GitHub",
         "guide": "Guia"
-      },
-      "steps": {
-        "one": "Deixa anar el PDF",
-        "two": "Col·loca anotacions",
-        "three": "Exporta JSON o PDF"
-      },
-      "batchNotice": {
-        "text": "Tens molts PDF amb plantilles?",
-        "cta": "Prova el mode Lots"
       },
       "drop": {
         "editorTitle": "Deixa anar per obrir a l'Editor",
@@ -72,11 +58,14 @@
         "title": "Aquest fitxer no és un PDF",
         "text": "Prova'n un altre o el document d'exemple.",
         "again": "Triar-ne un altre"
+      },
+      "footer": {
+        "batch": "Mode Lots"
       }
     },
     "upload": {
       "title": "Arrossega aquí el teu PDF",
-      "subtitle": "o fes clic per cercar-lo al teu equip. S'obre a l'instant a l'editor.",
+      "subtitle": "o fes clic per cercar-lo al teu equip",
       "hint": "Només PDF · no surt del teu navegador",
       "invalidFormat": "Només s'admeten fitxers PDF."
     },
@@ -843,6 +832,14 @@
     "tryFailed": "No s'ha pogut carregar el document d'exemple.",
     "link": "Veure la guia",
     "topics": {
+      "preview": {
+        "title": "Així es veu",
+        "summary": "Un cop d'ull a l'editor abans de començar: PDF al centre, JSON en viu al costat.",
+        "s1": "Obre un PDF i veuràs la pàgina al centre, amb les miniatures a l'esquerra.",
+        "s2": "Cada clic col·loca un camp i el tauler de la dreta mostra el seu JSON a l'instant.",
+        "s3": "Ajusta, exporta el JSON o el PDF anotat i reutilitza la feina com a plantilla.",
+        "tip": "Prem un dels quatre avantatges de sota per llegir el tema complet."
+      },
       "start": {
         "title": "Començar",
         "summary": "Obre un PDF, posa la teva primera anotació i exporta.",

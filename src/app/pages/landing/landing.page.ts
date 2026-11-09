@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language, TranslationService } from '../../i18n/translation.service';
@@ -12,7 +12,6 @@ import { PendingFileService } from '../../services/pending-file.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone.component';
 import { LandingFooterComponent } from './components/footer/landing-footer.component';
-import { LandingHeroComponent } from './components/hero/landing-hero.component';
 import { LandingLanguageBarComponent } from './components/language-bar/landing-language-bar.component';
 
 @Component({
@@ -23,10 +22,8 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
   imports: [
     CommonModule,
     LandingLanguageBarComponent,
-    LandingHeroComponent,
     LandingDropzoneComponent,
     LandingFooterComponent,
-    RouterLink,
     TranslationPipe,
   ],
 })
