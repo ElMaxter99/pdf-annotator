@@ -57,10 +57,12 @@ test('test data resolves each mapField and falls back to the sample', async ({ p
   await expect(page.getByRole('alert')).toContainText('JSON no válido en la línea');
   await input.fill(JSON.stringify(DATA));
   await expect(page.locator('.preview-data__status')).toContainText('2 de 3 campos resueltos');
-  await mode(page, 'Datos').click();
+  // Valid test data is painted right away, without picking the view by hand.
   await expect
     .poll(() => texts(page))
     .toEqual(['Lucía Fernández', 'XXXXX', 'X', '1284.50 €', 'Pendiente de firma']);
+  await mode(page, 'Muestra').click();
+  await expect.poll(() => texts(page)).toEqual(['XXXXX', 'XXXXX', 'X', '0.00 €', 'Pendiente de firma']);
 });
 
 test('exporting with sample values warns about them', async ({ page }) => {
