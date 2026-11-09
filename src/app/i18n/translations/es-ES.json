@@ -307,7 +307,8 @@
       "outOfPage": "{{count}} anotación(es) fuera de la página",
       "fontSize": "{{count}} tamaño(s) de fuente fuera de 8–72",
       "opacity": "{{count}} opacidad(es) fuera de 0,1–1"
-    }
+    },
+    "exportSampleValues": "El PDF lleva {{count}} campo(s) con valores de muestra en vez de datos reales."
   },
   "session": {
     "title": "Continuar donde lo dejaste",
@@ -731,6 +732,42 @@
       "add": "Añadir al lote",
       "addHint": "Añade este PDF al lote y abre el emparejado. Tu sesión del editor no se pierde.",
       "added": "{{name}} añadido al lote"
+    }
+  },
+  "preview": {
+    "mode": {
+      "group": "Qué se pinta en las anotaciones",
+      "label": "Mostrar",
+      "sample": "Muestra",
+      "map": "Mapeo",
+      "data": "Datos",
+      "dataDisabled": "Carga unos datos de prueba para activar esta vista"
+    },
+    "samples": {
+      "title": "Valores de muestra",
+      "description": "Lo que se pinta en cada tipo cuando el campo no tiene «value» ni dato de prueba. Evita que un mapeo largo rompa el diseño.",
+      "text": "Texto",
+      "check": "Casilla",
+      "radio": "Opción",
+      "number": "Número",
+      "hint": "Hasta 12 caracteres.",
+      "reset": "Restablecer",
+      "note": "Se guardan en este navegador y valen para todas tus plantillas. Se ven en la previsualización y en el PDF exportado."
+    },
+    "testData": {
+      "title": "Datos de prueba",
+      "description": "Pega un JSON real o inventado. Cada mapField (holder[0].fullname) se busca dentro y se pinta su valor.",
+      "placeholder": "{ \"holder\": [ { \"fullname\": \"Lucía Fernández\" } ] }",
+      "load": "Cargar archivo .json",
+      "clear": "Quitar",
+      "resolved": "{{resolved}} de {{total}} campos resueltos",
+      "resolvedHint": "Los campos sin dato usan su valor de muestra.",
+      "missing": "Sin dato:",
+      "syntaxError": "JSON no válido en la línea {{line}}, columna {{column}}.",
+      "shapeError": "El JSON de prueba debe ser un objeto o una lista.",
+      "tooLarge": "El archivo supera los 5 MB.",
+      "readFailed": "No se pudo leer el archivo.",
+      "empty": "Sin datos de prueba: se usan los valores de muestra."
     }
   }
 }

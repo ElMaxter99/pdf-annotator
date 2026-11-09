@@ -45,6 +45,11 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | P-08 Tamaño de PDF y almacenamiento | Peso por PDF, límite y uso del navegador | [`P-08-peso-almacenamiento.dc.html`](canvas/P-08-peso-almacenamiento.dc.html) | nueva página | Propuesta, pendiente de aprobación |
 | P-09 Cierre y descarga | ZIP o sueltos, progreso «26 de 80», lote terminado | [`P-09-cierre-descarga.dc.html`](canvas/P-09-cierre-descarga.dc.html) | nueva página | Propuesta, pendiente de aprobación |
 | P-10 Comparar claro | P-05 en tema claro | [`P-10-comparar-lado-a-lado-claro.dc.html`](canvas/P-10-comparar-lado-a-lado-claro.dc.html) | `viewer` | Propuesta, pendiente de aprobación |
+| P-11 Avanzado · valores de muestra | Valores de muestra por tipo (texto, casilla, opción, número) | [`P-11-avanzado-valores-de-muestra.dc.html`](canvas/P-11-avanzado-valores-de-muestra.dc.html) | `sidebar` (Avanzado) | Aprobada, implementada |
+| P-12 Prioridad | `value` → dato de prueba → valor de muestra; antes y después | [`P-12-prioridad-y-comparacion.dc.html`](canvas/P-12-prioridad-y-comparacion.dc.html) | `workspace.page.ts` | Aprobada, implementada |
+| P-13 Datos de prueba | JSON de datos y modo Muestra / Mapeo / Datos | [`P-13-datos-de-prueba.dc.html`](canvas/P-13-datos-de-prueba.dc.html) | `sidebar`, `header` | Aprobada, implementada |
+| P-14 Datos de prueba · estados | Vacío, error, incompleto y éxito | [`P-14-datos-de-prueba-estados.dc.html`](canvas/P-14-datos-de-prueba-estados.dc.html) | `sidebar` | Aprobada, implementada |
+| P-15 Datos de prueba claro | P-13 en tema claro | [`P-15-datos-de-prueba-claro.dc.html`](canvas/P-15-datos-de-prueba-claro.dc.html) | `sidebar`, `header` | Aprobada, implementada |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

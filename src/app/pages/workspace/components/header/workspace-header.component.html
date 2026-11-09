@@ -50,6 +50,15 @@
         </button>
       </div>
 
+      <div class="toolbar__group preview-mode" role="group" [attr.aria-label]="'preview.mode.group' | t">
+        <span class="preview-mode__label">{{ 'preview.mode.label' | t }}</span>
+        <button type="button" class="btn btn--small" *ngFor="let mode of vm.previewModes"
+          [class.btn--active]="vm.previewSettings.mode() === mode" [attr.aria-pressed]="vm.previewSettings.mode() === mode"
+          [disabled]="!vm.pdfDoc || (mode === 'data' && !vm.previewSettings.hasTestData())"
+          [attr.title]="mode === 'data' && !vm.previewSettings.hasTestData() ? ('preview.mode.dataDisabled' | t) : null"
+          (click)="vm.setPreviewMode(mode)">{{ 'preview.mode.' + mode | t }}</button>
+      </div>
+
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
         <button class="btn btn--icon" (click)="vm.undo()" [disabled]="!vm.canUndo()"
           [attr.title]="('controls.undo' | t) + ' (Ctrl+Z)'">
