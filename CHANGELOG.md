@@ -1,4 +1,8 @@
 ## Unreleased
+### Documentation
+- Context docs for people and agents: `docs/PRODUCT.md`, `DOMAIN.md`, `DECISIONS.md`, `ROADMAP.md`, `TESTING.md` and `WORKFLOW.md` (design-first flow); `PROPUESTA_MEJORAS.md` moved to `docs/archive/`
+- `design/` folder (outside the build and the Docker image) for approved designs; `AGENTS.md` and `CLAUDE.md` updated (real size of `workspace.page.ts`, design-first section)
+
 ### Security
 - `e2e/static-server.mjs` (test/dev helper, not part of the build): listens only on `127.0.0.1`, confines files to the served folder with `path.relative`, answers 400 on malformed URLs and 404 on read errors
 

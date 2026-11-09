@@ -1,6 +1,6 @@
 # Contribuir a PDF Annotator
 
-¡Gracias por querer mejorar el proyecto! Antes de empezar lee [`AGENTS.md`](AGENTS.md) (convenciones, mapa del repo, reglas de seguridad) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+¡Gracias por querer mejorar el proyecto! Si el cambio es visible, diséñalo primero (ver [`docs/WORKFLOW.md`](docs/WORKFLOW.md)). Antes de empezar lee [`AGENTS.md`](AGENTS.md) (convenciones, mapa del repo, reglas de seguridad) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Flujo
 1. Abre un issue (usa las plantillas) o comenta en uno existente.

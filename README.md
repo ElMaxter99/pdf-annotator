@@ -219,7 +219,7 @@ sh scripts/docker-down.sh     # detener
 | `npm run i18n:check` | Claves de los 7 idiomas coherentes |
 | `node scripts/generate-example.mjs` | Regenera el PDF de ejemplo |
 
-Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para personas y agentes de IA) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Hoja de ruta: [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md). Cómo contribuir: [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para personas y agentes de IA) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Hoja de ruta: [`docs/ROADMAP.md`](docs/ROADMAP.md). Cómo contribuir: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## 🧯 Solución de problemas
 | Síntoma | Qué hacer |
@@ -232,7 +232,7 @@ Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para per
 | `ng serve` no encuentra el builder | Ejecuta `npm install` antes de `npm run start:local`. |
 
 ## 🗺️ Roadmap
-Pestañas en el panel lateral, selección múltiple y alineación, validación por esquema de cada campo y refactor del componente principal. Detalle en [`PROPUESTA_MEJORAS.md`](PROPUESTA_MEJORAS.md).
+Pestañas en el panel lateral, selección múltiple y alineación, validación por esquema de cada campo y refactor del componente principal. Detalle en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## 🤝 Contribuir
 Issues y PRs son bienvenidos: usa las plantillas de [`.github/`](.github) y revisa [`CONTRIBUTING.md`](CONTRIBUTING.md).
