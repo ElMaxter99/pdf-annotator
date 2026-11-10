@@ -24,7 +24,7 @@
 .page { position: relative; margin: 0 auto; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.35); canvas { display: block; } &[hidden] { display: none; } }
 .pane__empty { color: var(--muted); text-align: center; padding: 48px 8px; }
 .fld { position: absolute; box-sizing: border-box; border: 2px solid #0f9b8e; background: rgba(15,155,142,.16); border-radius: 3px; color: #0b3b36; line-height: 1; white-space: nowrap; overflow: hidden; display: flex; align-items: flex-end;
-  &--orig { pointer-events: none; &.is-editable { pointer-events: auto; cursor: grab; touch-action: none; &:active { cursor: grabbing; } &:focus-visible, &.is-selected { outline: 2px solid var(--accent); outline-offset: 1px; box-shadow: 0 0 0 4px rgba(94,234,212,.25); } } }
+  &--orig { pointer-events: auto; cursor: pointer; &.is-selected { outline: 2px solid var(--accent); outline-offset: 1px; box-shadow: 0 0 0 4px rgba(94,234,212,.25); } &.is-editable { pointer-events: auto; cursor: grab; touch-action: none; &:active { cursor: grabbing; } &:focus-visible, &.is-selected { outline: 2px solid var(--accent); outline-offset: 1px; box-shadow: 0 0 0 4px rgba(94,234,212,.25); } } }
   &--ghost { border: 2px dashed #dc2626; background: transparent; color: transparent; }
   &--new { &.is-readonly { cursor: default; } cursor: grab; touch-action: none; &:active { cursor: grabbing; } &:focus-visible, &.is-selected { outline: 2px solid var(--accent); outline-offset: 1px; box-shadow: 0 0 0 4px rgba(94,234,212,.25); }
     &.is-bad { border-color: #dc2626; background: rgba(220,38,38,.16); } } }

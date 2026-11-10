@@ -374,3 +374,24 @@ test('a PDF without template can be compared directly with «Comparar sin planti
   await expect(page.locator('app-batch-compare')).toBeVisible();
   await expect(page.locator('.pane:visible')).toHaveCount(1);
 });
+
+test('selecting a field lights it in both versions and A fields can change page', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/batch\/.+/);
+  const twoPages = await PDFDocument.create();
+  twoPages.addPage([595, 842]);
+  twoPages.addPage([595, 842]);
+  await page.locator('#replace-b').setInputFiles({ name: 'uno-b.pdf', mimeType: 'application/pdf', buffer: Buffer.from(await twoPages.save()) });
+  await expect(page.locator('.pane:visible')).toHaveCount(2);
+  await page.getByRole('button', { name: 'Copiar A a B' }).click();
+  await page.locator('.fieldrow').first().click();
+  await expect(page.locator('.fld--new.is-selected')).toHaveCount(1);
+  await expect(page.locator('.fld--orig.is-selected')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Ajustar A' }).click();
+  await page.locator('.fieldrow').first().click();
+  await expect(page.locator('.fld--new.is-selected')).toHaveCount(1);
+  await page.locator('#move-page').selectOption('2');
+  await expect(page.locator('.fieldrow')).toHaveCount(1);
+  await expect(page.locator('.cmp__bar')).toContainText('2 / 2');
+});

@@ -130,7 +130,8 @@ export class BatchCompareComponent implements OnDestroy {
   readonly hasNew = computed(() => !!this.item().newPdf);
   readonly originalFields = computed(() => this.buildFields('orig'));
   readonly newFields = computed(() => this.buildFields('new'));
-  readonly listedFields = computed(() => (this.hasNew() ? this.newFields() : this.originalFields()));
+  /** The fields of the set being adjusted: A until there is a version B and B is chosen. */
+  readonly listedFields = computed(() => (this.hasNew() && this.edit() === 'B' ? this.newFields() : this.originalFields()));
   readonly misplacedCount = computed(() => this.newFields().filter((f) => f.misplaced).length);
   readonly zoomLabel = computed(() => {
     const scales = this.scales();
@@ -213,11 +214,17 @@ export class BatchCompareComponent implements OnDestroy {
 
   private buildFields(pane: Pane): FieldView[] {
     const view = this.views()[pane];
-    if (!view) return [];
     const scale = this.scales()[pane];
     const source = pane === 'orig' ? this.tpl() : this.layout();
     const page = source.find((p) => p.num === this.pageNumber());
     if (!page) return [];
+    if (!view) {
+      // A page this PDF does not have: the fields still list and move, but have nothing to draw on.
+      return page.fields.map((field, index) => ({
+        index, field, text: resolveFieldPreview(field, this.preview.context()).text,
+        left: 0, top: 0, width: 0, height: 0, fontSize: 0, misplaced: false, movedFrom: null,
+      }));
+    }
     const misplaced = pane === 'new' ? this.textBoxes() : [];
     const ctx = this.preview.context();
     const origin = pane === 'new' ? this.templatePageOf() : null;
@@ -293,6 +300,27 @@ export class BatchCompareComponent implements OnDestroy {
 
   private shrink(box: readonly [number, number, number, number]): [number, number, number, number] {
     return [box[0] + 1, box[1] + 1, box[2] - 1, box[3] - 1];
+  }
+
+  /** Index, in the set being adjusted, that a field of either pane stands for (same key, else same place). */
+  private editedIndexOf(pane: Pane, view: FieldView): number {
+    if (this.canEdit(pane)) return view.index;
+    const editedPane: Pane = this.hasNew() && this.edit() === 'B' ? 'new' : 'orig';
+    const source = editedPane === 'orig' ? this.tpl() : this.layout();
+    const fields = source.find((p) => p.num === this.pageNumber())?.fields ?? [];
+    const byKey = view.field.mapField ? fields.findIndex((f) => f.mapField === view.field.mapField) : -1;
+    return byKey >= 0 ? byKey : Math.min(view.index, fields.length - 1);
+  }
+
+  selectFrom(pane: Pane, view: FieldView) {
+    this.selected.set(this.editedIndexOf(pane, view));
+  }
+
+  /** A selected field shines in both versions: the same key (or place) in the other one. */
+  isSelected(pane: Pane, view: FieldView): boolean {
+    const sel = this.selected();
+    if (sel === null) return false;
+    return this.editedIndexOf(pane, view) === sel;
   }
 
   select(index: number | null) {

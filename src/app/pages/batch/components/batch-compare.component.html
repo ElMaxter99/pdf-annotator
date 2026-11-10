@@ -66,10 +66,10 @@
           <div class="page" [style.width.px]="views().orig?.width" [style.height.px]="views().orig?.height" [hidden]="!hasOrigPage()">
             <canvas #origCanvas></canvas>
             @for (f of originalFields(); track f.index) {
-              <div class="fld fld--orig" [class.fld--ghost]="mode() === 'overlay'" [class.is-editable]="canEdit('orig')" [class.is-selected]="canEdit('orig') && selected() === f.index" [hidden]="mode() === 'overlay' && !showOutlines()"
-                [attr.tabindex]="canEdit('orig') ? 0 : null" [attr.role]="canEdit('orig') ? 'button' : null" [attr.aria-label]="canEdit('orig') ? fieldLabel(f) : null"
+              <div class="fld fld--orig" [class.fld--ghost]="mode() === 'overlay'" [class.is-editable]="canEdit('orig')" [class.is-selected]="isSelected('orig', f)" [hidden]="mode() === 'overlay' && !showOutlines()"
+                tabindex="0" role="button" [attr.aria-label]="fieldLabel(f)"
                 [style.left.px]="f.left" [style.top.px]="f.top" [style.width.px]="f.width" [style.height.px]="f.height" [style.font-size.px]="f.fontSize"
-                (pointerdown)="canEdit('orig') && onFieldPointerDown($event, f, 'orig')" (pointermove)="onFieldPointerMove($event)" (pointerup)="onFieldPointerUp()" (pointercancel)="onFieldPointerUp()"
+                (pointerdown)="canEdit('orig') ? onFieldPointerDown($event, f, 'orig') : selectFrom('orig', f)" (pointermove)="onFieldPointerMove($event)" (pointerup)="onFieldPointerUp()" (pointercancel)="onFieldPointerUp()"
                 (keydown)="canEdit('orig') && onFieldKeydown($event, f, 'orig')">{{ f.text }}</div>
             }
           </div>
@@ -85,11 +85,11 @@
           <div class="page" [style.width.px]="views().new?.width" [style.height.px]="views().new?.height" [hidden]="!hasNewPage()">
             <canvas #newCanvas></canvas>
             @for (f of newFields(); track f.index) {
-              <div class="fld fld--new" [class.is-bad]="f.misplaced" [class.is-selected]="selected() === f.index" [class.is-readonly]="!canEdit('new')" tabindex="0" role="button"
+              <div class="fld fld--new" [class.is-bad]="f.misplaced" [class.is-selected]="isSelected('new', f)" [class.is-readonly]="!canEdit('new')" tabindex="0" role="button"
                 [attr.aria-label]="fieldLabel(f)"
                 [style.left.px]="f.left" [style.top.px]="f.top" [style.width.px]="f.width" [style.height.px]="f.height" [style.font-size.px]="f.fontSize"
-                (pointerdown)="canEdit('new') ? onFieldPointerDown($event, f, 'new') : select(f.index)" (pointermove)="onFieldPointerMove($event)" (pointerup)="onFieldPointerUp()" (pointercancel)="onFieldPointerUp()"
-                (focus)="select(f.index)" (keydown)="canEdit('new') && onFieldKeydown($event, f, 'new')">{{ f.text }}</div>
+                (pointerdown)="canEdit('new') ? onFieldPointerDown($event, f, 'new') : selectFrom('new', f)" (pointermove)="onFieldPointerMove($event)" (pointerup)="onFieldPointerUp()" (pointercancel)="onFieldPointerUp()"
+                (focus)="selectFrom('new', f)" (keydown)="canEdit('new') && onFieldKeydown($event, f, 'new')">{{ f.text }}</div>
             }
           </div>
           @if (!hasNewPage()) {
@@ -120,7 +120,7 @@
           <li class="cap">{{ 'batch.compare.noFields' | t }}</li>
         }
       </ul>
-      @if (selected() !== null && (hasNew() ? edit() === 'B' : true) && pageCount() > 1) {
+      @if (selected() !== null && pageCount() > 1) {
         <label class="movepage">
           <span class="cap">{{ 'batch.compare.moveTo' | t }}</span>
           <select id="move-page" class="movepage__sel" [attr.aria-label]="'batch.compare.moveTo' | t" (change)="moveSelectedToPage(+$any($event.target).value); $any($event.target).value = ''">
