@@ -343,3 +343,25 @@ test('coordinates A can be adjusted and version B can start from a copy of A', a
   await page.getByRole('button', { name: 'Ajustar A' }).click();
   await expect(page.getByRole('button', { name: 'Ajustar A' })).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('the work view drops the name list, shows a mini preview and moves a field to another page', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/batch\/.+/);
+  await expect(page.locator('.rail')).toHaveCount(0);
+  const twoPages = await PDFDocument.create();
+  twoPages.addPage([595, 842]);
+  twoPages.addPage([595, 842]);
+  await page.locator('#replace-b').setInputFiles({
+    name: 'uno-b.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from(await twoPages.save()),
+  });
+  await expect(page.locator('.pane:visible')).toHaveCount(2);
+  await expect(page.locator('.mini')).toContainText('páginas');
+  await page.getByRole('button', { name: 'Ajustar B' }).click();
+  await page.locator('.fieldrow').first().click();
+  await page.locator('#move-page').selectOption('2');
+  await expect(page.getByText(/Página 2 de 2|2 \/ 2/).first()).toBeVisible();
+  await expect(page.locator('.fieldrow__moved')).toContainText('p.1 → p.2');
+});

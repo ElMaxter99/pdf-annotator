@@ -84,6 +84,13 @@ export class BatchPageComponent implements OnInit {
   readonly dropActive = signal(false);
   readonly report = signal<AddReport | null>(null);
   readonly confirmRemove = signal(false);
+  readonly removeMode = signal(false);
+
+  setRemoveMode(on: boolean) {
+    this.removeMode.set(on);
+    this.confirmRemove.set(false);
+    if (!on) this.selected.set(new Set());
+  }
   readonly maxMb = MAX_BATCH_PDF_BYTES / (1024 * 1024);
 
   readonly drawer = signal<Drawer>('none');
@@ -306,6 +313,7 @@ export class BatchPageComponent implements OnInit {
     await this.store.remove([...this.selected()]);
     this.selected.set(new Set());
     this.confirmRemove.set(false);
+    this.removeMode.set(false);
   }
 
   // ---- card menu ("⋯") ---------------------------------------------------------------------------

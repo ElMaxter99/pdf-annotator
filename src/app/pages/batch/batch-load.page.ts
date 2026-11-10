@@ -1,3 +1,4 @@
+import { BatchThumbComponent } from './components/batch-thumb.component';
 import { Component, ElementRef, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ModeSwitchComponent } from '../../components/mode-switch/mode-switch.component';
@@ -18,7 +19,7 @@ type Step = 1 | 2 | 3;
 @Component({
   selector: 'app-batch-load-page',
   standalone: true,
-  imports: [RouterLink, TranslationPipe, ModeSwitchComponent],
+  imports: [RouterLink, TranslationPipe, ModeSwitchComponent, BatchThumbComponent],
   templateUrl: './batch-load.page.html',
   styleUrls: ['./batch.page.scss', './batch-flow.scss'],
 })
@@ -46,6 +47,7 @@ export class BatchLoadPageComponent implements OnInit {
   readonly report = signal<AddReport | null>(null);
   readonly maxMb = MAX_BATCH_PDF_BYTES / (1024 * 1024);
   readonly shown = SHOWN_ROWS;
+  readonly previewItems = computed(() => this.store.items().slice(0, 6));
 
   readonly docs = computed(() => splitTemplateDocuments(this.draft()));
   readonly analysis = computed(() => {

@@ -12,6 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
+import { BatchThumbComponent } from './batch-thumb.component';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { TranslationService } from '../../../i18n/translation.service';
 import type { PageAnnotations, PageField } from '../../../models/annotation.model';
@@ -46,6 +47,8 @@ interface FieldView {
   height: number;
   fontSize: number;
   misplaced: boolean;
+  /** Page of the template A where this field sits, when it is another page than here. */
+  movedFrom: number | null;
 }
 
 const MIN_SCALE = 0.4;
@@ -56,7 +59,7 @@ const HISTORY_LIMIT = 100;
 @Component({
   selector: 'app-batch-compare',
   standalone: true,
-  imports: [TranslationPipe],
+  imports: [TranslationPipe, BatchThumbComponent],
   templateUrl: './batch-compare.component.html',
   styleUrls: ['./batch-compare.component.scss'],
 })
@@ -217,6 +220,7 @@ export class BatchCompareComponent implements OnDestroy {
     if (!page) return [];
     const misplaced = pane === 'new' ? this.textBoxes() : [];
     const ctx = this.preview.context();
+    const origin = pane === 'new' ? this.templatePageOf() : null;
     return page.fields.map((field, index) => {
       const text = resolveFieldPreview(field, ctx).text;
       const box = fieldBox(field, text);
@@ -237,8 +241,54 @@ export class BatchCompareComponent implements OnDestroy {
         height: (box[3] - box[1]) * scale,
         fontSize: field.fontSize * scale,
         misplaced: isMisplaced,
+        movedFrom: this.movedFromPage(origin, field, page.num),
       };
     });
+  }
+
+  /** Template A page of each mapped field, to show where a field of B comes from. */
+  private templatePageOf(): Map<string, number> {
+    const map = new Map<string, number>();
+    for (const page of this.tpl()) {
+      for (const f of page.fields) if (f.mapField && !map.has(f.mapField)) map.set(f.mapField, page.num);
+    }
+    return map;
+  }
+
+  private movedFromPage(origin: Map<string, number> | null, field: PageField, here: number): number | null {
+    if (!origin || !field.mapField) return null;
+    const from = origin.get(field.mapField);
+    return from !== undefined && from !== here ? from : null;
+  }
+
+  readonly pageNumbers = computed(() => Array.from({ length: this.pageCount() }, (_, i) => i + 1));
+
+  /** Moves the selected field of the set being adjusted to another page, keeping its position. */
+  moveSelectedToPage(target: number) {
+    const index = this.selected();
+    const here = this.pageNumber();
+    if (index === null || target === here || target < 1) return;
+    const set = this.edit() === 'A' || !this.hasNew() ? this.tpl : this.layout;
+    const field = set().find((p) => p.num === here)?.fields[index];
+    if (!field) return;
+    const before = this.snapshot();
+    set.update((pages) => {
+      const next = cloneAnnotationPages(pages);
+      const from = next.find((p) => p.num === here);
+      from?.fields.splice(index, 1);
+      let dest = next.find((p) => p.num === target);
+      if (!dest) {
+        dest = { num: target, fields: [] };
+        next.push(dest);
+        next.sort((a, b) => a.num - b.num);
+      }
+      dest.fields.push({ ...field });
+      return next;
+    });
+    this.pushHistory(before);
+    this.markDirty('new');
+    this.pageNumber.set(target);
+    this.selected.set(set().find((p) => p.num === target)!.fields.length - 1);
   }
 
   private shrink(box: readonly [number, number, number, number]): [number, number, number, number] {

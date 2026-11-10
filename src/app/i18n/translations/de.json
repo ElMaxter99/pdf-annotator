@@ -414,7 +414,8 @@
       "noResults": "Kein PDF entspricht dem Filter.",
       "nothingPending": "Nichts mehr offen. Gute Arbeit!",
       "keys": "Kürzel: ↑ ↓ bewegen · Enter öffnen · N nächstes offenes",
-      "match": "Zuordnen"
+      "match": "Zuordnen",
+      "removeMode": "PDFs entfernen"
     },
     "filter": {
       "all": "Alle",
@@ -579,7 +580,11 @@
       "editA": "A anpassen",
       "editB": "B anpassen",
       "copyAB": "A nach B kopieren",
-      "backA": "Zurück zu A"
+      "backA": "Zurück zu A",
+      "moveTo": "Auf andere Seite verschieben…",
+      "movedFrom": "S.{{from}} → S.{{to}}",
+      "miniPages": "{{count}} Seiten",
+      "templateFixed": "Vorlage A · fest"
     },
     "export": {
       "title": "Stapel herunterladen",

@@ -1,6 +1,6 @@
 import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { extractPagesCollection } from '../../utils/annotation-fields.utils';
@@ -20,7 +20,7 @@ import { BatchCompareComponent } from './components/batch-compare.component';
 @Component({
   selector: 'app-batch-item-page',
   standalone: true,
-  imports: [RouterLink, TranslationPipe, BatchCompareComponent, BatchTabsComponent],
+  imports: [TranslationPipe, BatchCompareComponent, BatchTabsComponent],
   templateUrl: './batch-item.page.html',
   styleUrls: ['./batch-item.page.scss'],
 })

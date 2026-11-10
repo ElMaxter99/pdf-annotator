@@ -414,7 +414,8 @@
       "noResults": "Aucun PDF ne correspond au filtre.",
       "nothingPending": "Il ne reste rien à faire. Bravo !",
       "keys": "Raccourcis : ↑ ↓ se déplacer · Entrée ouvrir · N prochain en attente",
-      "match": "Associer"
+      "match": "Associer",
+      "removeMode": "Retirer des PDF"
     },
     "filter": {
       "all": "Tous",
@@ -579,7 +580,11 @@
       "editA": "Ajuster A",
       "editB": "Ajuster B",
       "copyAB": "Copier A vers B",
-      "backA": "Revenir à A"
+      "backA": "Revenir à A",
+      "moveTo": "Déplacer vers une autre page…",
+      "movedFrom": "p.{{from}} → p.{{to}}",
+      "miniPages": "{{count}} pages",
+      "templateFixed": "Modèle A · fixe"
     },
     "export": {
       "title": "Télécharger le lot",

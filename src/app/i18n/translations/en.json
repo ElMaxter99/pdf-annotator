@@ -414,7 +414,8 @@
       "noResults": "No PDF matches the filter.",
       "nothingPending": "Nothing left to do. Great work!",
       "keys": "Shortcuts: ↑ ↓ move · Enter open · N next pending",
-      "match": "Match"
+      "match": "Match",
+      "removeMode": "Remove PDFs"
     },
     "filter": {
       "all": "All",
@@ -579,7 +580,11 @@
       "editA": "Adjust A",
       "editB": "Adjust B",
       "copyAB": "Copy A to B",
-      "backA": "Back to A"
+      "backA": "Back to A",
+      "moveTo": "Move to another page…",
+      "movedFrom": "p.{{from}} → p.{{to}}",
+      "miniPages": "{{count}} pages",
+      "templateFixed": "Template A · fixed"
     },
     "export": {
       "title": "Download the batch",

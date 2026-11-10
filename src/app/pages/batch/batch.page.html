@@ -54,22 +54,29 @@
           <input type="search" [placeholder]="'batch.list.search' | t" [value]="query()" (input)="onQuery($event)" />
         </label>
         <div class="seg" role="group" [attr.aria-label]="'batch.panel.view' | t">
-          <button type="button" [class.on]="view() === 'grid'" [attr.aria-pressed]="view() === 'grid'" (click)="setView('grid')">▦ {{ 'batch.panel.grid' | t }}</button>
-          <button type="button" [class.on]="view() === 'table'" [attr.aria-pressed]="view() === 'table'" (click)="setView('table')">☰ {{ 'batch.panel.table' | t }}</button>
+          <button type="button" [class.on]="view() === 'grid'" [attr.aria-pressed]="view() === 'grid'" [attr.aria-label]="'batch.panel.grid' | t" [title]="'batch.panel.grid' | t" (click)="setView('grid')">▦</button>
+          <button type="button" [class.on]="view() === 'table'" [attr.aria-pressed]="view() === 'table'" [attr.aria-label]="'batch.panel.table' | t" [title]="'batch.panel.table' | t" (click)="setView('table')">☰</button>
         </div>
       </div>
-      <div class="toolbar">
-        <span class="cap" aria-live="polite">{{ 'batch.list.selected' | t : { count: selected().size } }}</span>
-        <span class="spacer"></span>
-        <button type="button" class="btn btn--ghost btn--sm" (click)="pickFiles()">{{ 'batch.list.add' | t }}</button>
-        <button type="button" class="btn btn--ghost btn--sm" id="open-templates" (click)="drawer.set('templates')">{{ 'batch.panel.importTemplates' | t }}</button>
-        <button type="button" class="btn btn--ghost btn--sm" id="open-version-b" (click)="drawer.set('versionB')">{{ 'batch.panel.uploadB' | t }}</button>
-        <button type="button" class="btn btn--ghost btn--sm" id="open-test-data" (click)="drawer.set('testData')">{{ 'batch.panel.testData' | t }}</button>
-        <button type="button" class="btn btn--ghost btn--sm" [class.btn--danger]="confirmRemove()" [disabled]="selected().size === 0" (click)="removeSelected()">
-          {{ (confirmRemove() ? 'batch.list.confirmRemove' : 'batch.list.remove') | t : { count: selected().size } }}
-        </button>
-        <button type="button" class="btn btn--ghost btn--sm" id="download-validated" [disabled]="exportable().length === 0" (click)="openExport()">{{ 'batch.panel.download' | t : { count: exportable().length } }}</button>
-        <button type="button" class="btn" (click)="openNext()">{{ 'batch.panel.next' | t }} →</button>
+      <div class="toolbar toolbar--icons">
+        @if (removeMode()) {
+          <span class="cap" aria-live="polite">{{ 'batch.list.selected' | t : { count: selected().size } }}</span>
+          <button type="button" class="ibtn" (click)="toggleAll()" [attr.aria-label]="'batch.list.selectAll' | t" [title]="'batch.list.selectAll' | t">☑</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn--sm" [class.btn--danger]="confirmRemove()" id="remove-selected" [disabled]="selected().size === 0" (click)="removeSelected()">
+            🗑 {{ (confirmRemove() ? 'batch.list.confirmRemove' : 'batch.list.remove') | t : { count: selected().size } }}
+          </button>
+          <button type="button" class="btn btn--ghost btn--sm" id="remove-cancel" (click)="setRemoveMode(false)">{{ 'batch.export.cancel' | t }}</button>
+        } @else {
+          <button type="button" class="ibtn" id="add-pdfs" (click)="pickFiles()" [attr.aria-label]="'batch.list.add' | t" [title]="'batch.list.add' | t">＋<small>PDF</small></button>
+          <button type="button" class="ibtn" id="open-templates" (click)="drawer.set('templates')" [attr.aria-label]="'batch.panel.importTemplates' | t" [title]="'batch.panel.importTemplates' | t">{{ '{ }' }}</button>
+          <button type="button" class="ibtn" id="open-version-b" (click)="drawer.set('versionB')" [attr.aria-label]="'batch.panel.uploadB' | t" [title]="'batch.panel.uploadB' | t">⧉<small>B</small></button>
+          <button type="button" class="ibtn" id="open-test-data" (click)="drawer.set('testData')" [attr.aria-label]="'batch.panel.testData' | t" [title]="'batch.panel.testData' | t">🧪</button>
+          <button type="button" class="ibtn" id="remove-mode" (click)="setRemoveMode(true)" [attr.aria-label]="'batch.list.removeMode' | t" [title]="'batch.list.removeMode' | t">🗑</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn--ghost btn--sm" id="download-validated" [disabled]="exportable().length === 0" (click)="openExport()" [title]="'batch.panel.download' | t : { count: exportable().length }" [attr.aria-label]="'batch.panel.download' | t : { count: exportable().length }">⬇ {{ exportable().length }}</button>
+          <button type="button" class="btn" (click)="openNext()" [attr.aria-label]="'batch.panel.next' | t">→</button>
+        }
       </div>
 
       @if (store.busy(); as busy) {
@@ -98,7 +105,7 @@
         <div class="grid" role="list" [attr.aria-label]="'batch.list.title' | t : { count: store.items().length }">
           @for (row of rows(); track row.item.id) {
             <article class="pcard" role="listitem" [class.is-selected]="selected().has(row.item.id)" [attr.data-status]="row.status">
-              <input class="pcard__chk" type="checkbox" [checked]="selected().has(row.item.id)" (change)="toggle(row.item.id)" [attr.aria-label]="row.item.name" />
+              @if (removeMode()) { <input class="pcard__chk" type="checkbox" [checked]="selected().has(row.item.id)" (change)="toggle(row.item.id)" [attr.aria-label]="row.item.name" /> }
               <button type="button" class="pcard__thumb" (click)="open(row.item.id)" [attr.aria-label]="'batch.panel.openPdf' | t : { name: row.item.name }">
                 <app-batch-thumb [item]="row.item"></app-batch-thumb>
               </button>
@@ -134,7 +141,7 @@
       } @else {
         <div class="table" role="table" [attr.aria-label]="'batch.list.title' | t : { count: store.items().length }">
           <div class="tr tr--head" role="row">
-            <span role="columnheader"><input type="checkbox" [checked]="allSelected()" (change)="toggleAll()" [attr.aria-label]="'batch.list.selectAll' | t" /></span>
+            <span role="columnheader">@if (removeMode()) { <input type="checkbox" [checked]="allSelected()" (change)="toggleAll()" [attr.aria-label]="'batch.list.selectAll' | t" /> }</span>
             <span role="columnheader"></span>
             <span role="columnheader">{{ 'batch.col.pdf' | t }}</span>
             <span role="columnheader">{{ 'batch.col.template' | t }}</span>
@@ -145,7 +152,7 @@
           </div>
           @for (row of rows(); track row.item.id) {
             <div class="tr" role="row" tabindex="0" [class.is-selected]="selected().has(row.item.id)" [attr.data-status]="row.status" (keydown)="onRowKeydown($event, row.item.id)">
-              <span role="cell"><input type="checkbox" [checked]="selected().has(row.item.id)" (change)="toggle(row.item.id)" [attr.aria-label]="row.item.name" /></span>
+              <span role="cell">@if (removeMode()) { <input type="checkbox" [checked]="selected().has(row.item.id)" (change)="toggle(row.item.id)" [attr.aria-label]="row.item.name" /> }</span>
               <span role="cell" class="tthumb"><app-batch-thumb [item]="row.item"></app-batch-thumb></span>
               <span role="cell" class="ellipsis" [title]="row.item.name">{{ row.item.name }}</span>
               <span role="cell" class="ellipsis cap">{{ row.item.templateName || (row.item.template ? '·' : '—') }}</span>

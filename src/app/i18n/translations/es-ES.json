@@ -414,7 +414,8 @@
       "noResults": "Ningún PDF coincide con el filtro.",
       "nothingPending": "No queda nada pendiente. ¡Buen trabajo!",
       "keys": "Atajos: ↑ ↓ moverse · Intro abrir · N siguiente pendiente",
-      "match": "Emparejar"
+      "match": "Emparejar",
+      "removeMode": "Quitar PDF"
     },
     "filter": {
       "all": "Todos",
@@ -579,7 +580,11 @@
       "editA": "Ajustar A",
       "editB": "Ajustar B",
       "copyAB": "Copiar A a B",
-      "backA": "Volver a A"
+      "backA": "Volver a A",
+      "moveTo": "Mover a otra página…",
+      "movedFrom": "p.{{from}} → p.{{to}}",
+      "miniPages": "{{count}} páginas",
+      "templateFixed": "Plantilla A · fija"
     },
     "export": {
       "title": "Descargar el lote",

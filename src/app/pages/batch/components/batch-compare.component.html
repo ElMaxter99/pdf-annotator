@@ -100,6 +100,11 @@
     </div>
 
     <aside class="cmp__fields" [attr.aria-label]="'batch.compare.fields' | t : { page: pageNumber() }">
+      <div class="mini">
+        <div class="mini__thumb"><app-batch-thumb [item]="item()"></app-batch-thumb></div>
+        <div class="mini__txt"><b class="ellipsis" [title]="item().name">{{ item().name }}</b><span class="cap">{{ 'batch.compare.miniPages' | t : { count: item().pageCount } }}</span></div>
+      </div>
+      <span class="tag tplfixed">{{ 'batch.compare.templateFixed' | t }}</span>
       <h3>{{ 'batch.compare.fields' | t : { page: pageNumber() } }}</h3>
       <ul>
         @for (f of listedFields(); track f.index) {
@@ -107,6 +112,7 @@
             <button type="button" class="fieldrow" [class.is-selected]="selected() === f.index" (click)="select(f.index)">
               <span [class]="f.misplaced ? 'bad' : 'good'" aria-hidden="true">{{ f.misplaced ? '!' : '✓' }}</span>
               <span class="fieldrow__name">{{ f.field.mapField || f.text }}</span>
+              @if (f.movedFrom) { <span class="fieldrow__moved" [title]="'batch.compare.movedFrom' | t : { from: f.movedFrom, to: pageNumber() }">p.{{ f.movedFrom }} → p.{{ pageNumber() }}</span> }
               <span class="visually-hidden">{{ (f.misplaced ? 'batch.compare.misplaced' : 'batch.compare.inPlace') | t }}</span>
             </button>
           </li>
@@ -114,6 +120,15 @@
           <li class="cap">{{ 'batch.compare.noFields' | t }}</li>
         }
       </ul>
+      @if (selected() !== null && (hasNew() ? edit() === 'B' : true) && pageCount() > 1) {
+        <label class="movepage">
+          <span class="cap">{{ 'batch.compare.moveTo' | t }}</span>
+          <select id="move-page" class="movepage__sel" [attr.aria-label]="'batch.compare.moveTo' | t" (change)="moveSelectedToPage(+$any($event.target).value); $any($event.target).value = ''">
+            <option value="" selected disabled>—</option>
+            @for (n of pageNumbers(); track n) { @if (n !== pageNumber()) { <option [value]="n">p.{{ n }}</option> } }
+          </select>
+        </label>
+      }
       @if (misplacedCount() > 0) {
         <p class="note note--warn" role="status">⚠ {{ 'batch.compare.misplacedCount' | t : { count: misplacedCount() } }}</p>
       } @else {

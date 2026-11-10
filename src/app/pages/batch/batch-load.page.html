@@ -158,11 +158,22 @@
       @case (3) {
         <section class="card" [attr.aria-label]="'batch.load.summary.title' | t">
           <h2 style="margin: 0; font-size: 20px">{{ 'batch.step.ready' | t }}</h2>
-      <div class="sum"><span>{{ 'batch.load.summary.pdfs' | t }}</span><b>{{ store.items().length }}</b></div>
-      <div class="sum"><span>{{ 'batch.load.summary.templates' | t }}</span><b>{{ validTemplates() }}</b></div>
-          <div class="sum"><span>{{ 'batch.step.summary.paired' | t }}</span><b>{{ pairedCount() }}</b></div>
-          <div class="sum"><span>{{ 'batch.step.summary.noTemplate' | t }}</span><b>{{ store.items().length - pairedCount() }}</b></div>
-          <div class="sum"><span>{{ 'batch.step.summary.unused' | t }}</span><b>{{ store.unusedTemplates().length }}</b></div>
+          <div class="stack-thumbs" aria-hidden="true">
+            @for (item of previewItems(); track item.id; let i = $index) {
+              <div class="stack-thumbs__p" [style.--i]="i"><app-batch-thumb [item]="item"></app-batch-thumb></div>
+            }
+            @if (store.items().length > previewItems().length) { <span class="stack-thumbs__more">+{{ store.items().length - previewItems().length }}</span> }
+          </div>
+          <div class="bigs">
+            <div class="big-n"><b>{{ store.items().length }}</b><span>{{ 'batch.load.summary.pdfs' | t }}</span></div>
+            <div class="big-n big-n--ok"><b>{{ pairedCount() }}</b><span>{{ 'batch.step.summary.paired' | t }}</span></div>
+            <div class="big-n" [class.big-n--warn]="store.items().length - pairedCount() > 0"><b>{{ store.items().length - pairedCount() }}</b><span>{{ 'batch.step.summary.noTemplate' | t }}</span></div>
+            <div class="big-n"><b>{{ store.unusedTemplates().length }}</b><span>{{ 'batch.step.summary.unused' | t }}</span></div>
+          </div>
+          <div class="matchbar" role="img" [attr.aria-label]="('batch.step.summary.paired' | t) + ': ' + pairedCount() + ' / ' + store.items().length">
+            <i class="matchbar__ok" [style.flex-grow]="pairedCount()"></i>
+            <i class="matchbar__no" [style.flex-grow]="store.items().length - pairedCount()"></i>
+          </div>
       @if (report(); as rep) {
         <div class="note note--warn" role="alert">
           <div>

@@ -414,7 +414,8 @@
       "noResults": "Cap PDF coincideix amb el filtre.",
       "nothingPending": "No queda res pendent. Bona feina!",
       "keys": "Dreceres: ↑ ↓ moure's · Intro obrir · N següent pendent",
-      "match": "Aparellar"
+      "match": "Aparellar",
+      "removeMode": "Treure PDF"
     },
     "filter": {
       "all": "Tots",
@@ -579,7 +580,11 @@
       "editA": "Ajusta A",
       "editB": "Ajusta B",
       "copyAB": "Copia A a B",
-      "backA": "Torna a A"
+      "backA": "Torna a A",
+      "moveTo": "Mou a una altra pàgina…",
+      "movedFrom": "p.{{from}} → p.{{to}}",
+      "miniPages": "{{count}} pàgines",
+      "templateFixed": "Plantilla A · fixa"
     },
     "export": {
       "title": "Baixar el lot",

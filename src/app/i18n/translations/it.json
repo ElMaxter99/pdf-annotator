@@ -414,7 +414,8 @@
       "noResults": "Nessun PDF corrisponde al filtro.",
       "nothingPending": "Non resta nulla da fare. Ottimo lavoro!",
       "keys": "Scorciatoie: ↑ ↓ spostarsi · Invio apri · N prossimo in sospeso",
-      "match": "Abbina"
+      "match": "Abbina",
+      "removeMode": "Rimuovi PDF"
     },
     "filter": {
       "all": "Tutti",
@@ -579,7 +580,11 @@
       "editA": "Regola A",
       "editB": "Regola B",
       "copyAB": "Copia A in B",
-      "backA": "Torna ad A"
+      "backA": "Torna ad A",
+      "moveTo": "Sposta in un’altra pagina…",
+      "movedFrom": "p.{{from}} → p.{{to}}",
+      "miniPages": "{{count}} pagine",
+      "templateFixed": "Modello A · fisso"
     },
     "export": {
       "title": "Scarica il lotto",

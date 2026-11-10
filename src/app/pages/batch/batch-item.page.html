@@ -15,19 +15,6 @@
     </header>
 
     <div class="layout">
-    <nav class="rail card" [attr.aria-label]="'batch.item.rail' | t">
-      <span class="lab">{{ 'batch.item.railTitle' | t }}</span>
-      <ul class="rail__list">
-        @for (row of rail(); track row.id) {
-          <li>
-            <a class="rail__link" [routerLink]="['/batch', row.id]" [class.is-current]="row.id === it.id" [attr.aria-current]="row.id === it.id ? 'page' : null">
-              <span class="ellipsis grow">{{ row.name }}</span>
-              <span class="rail__st" [attr.title]="'batch.status.' + row.status | t" [class.is-ok]="row.status === 'validated'">{{ row.mark }}</span>
-            </a>
-          </li>
-        }
-      </ul>
-    </nav>
     <div class="body">
 
     @if (setupMode()) {
