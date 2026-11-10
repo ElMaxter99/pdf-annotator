@@ -440,7 +440,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return this.editing()?.field.mapField ?? null;
   });
   /** The A pane shows only once there is a PDF B to compare it with. */
-  readonly batchShowsA = computed(() => this.batchHasB() && !!this.batchItem()?.template);
+  readonly batchShowsA = computed(() => this.batchHasB());
   readonly batchUsedKeys = computed(() => {
     const keys = new Set<string>();
     for (const page of this.coords()) for (const f of page.fields) if (f.mapField) keys.add(f.mapField);
@@ -482,12 +482,36 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return this.batchUnusedA().length > 0 ? 2 : 3;
   });
   readonly batchMenuOpen = signal(false);
+  /** Drawer «Poner plantilla A» of the A/B editor. */
+  readonly batchTemplateDrawerOpen = signal(false);
   /** The empty-B card was dismissed with «start from scratch»: the page is free to annotate. */
   readonly batchStartDismissed = signal(false);
   readonly batchGuideOpen = signal(true);
 
   batchSetGuideOpen(open: boolean) {
     this.batchGuideOpen.set(open);
+  }
+
+  /** Puts the template of A from the editor (drawer «Poner plantilla A»); B is not touched. */
+  batchSetTemplateText(text: string): boolean {
+    const id = this.batchItemId();
+    if (!id) return false;
+    const result = this.batchStore.setTemplateText(id, text);
+    if (!result.ok) {
+      this.toast.error(this.translationService.translate('batch.template.invalidToast'));
+      return false;
+    }
+    this.batchTemplateDrawerOpen.set(false);
+    return true;
+  }
+
+  async batchSetTemplateFile(file: File) {
+    const id = this.batchItemId();
+    if (!id) return;
+    const outcome = await this.batchStore.applyTemplateFile(id, file);
+    if (outcome === 'tooBig') this.toast.error(this.translationService.translate('batch.reject.tooBigJson'));
+    else if (outcome === 'invalidJson') this.toast.error(this.translationService.translate('batch.template.invalidToast'));
+    else this.batchTemplateDrawerOpen.set(false);
   }
 
   batchOpenDiff() {

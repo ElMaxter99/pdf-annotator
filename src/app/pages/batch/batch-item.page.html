@@ -18,82 +18,114 @@
     <div class="body">
 
     @if (setupMode()) {
-      <div class="grid">
-        <section class="card">
-          <span class="lab">{{ (it.templateIssue ? 'batch.template.labelError' : it.template ? 'batch.template.labelOk' : 'batch.template.label') | t }}</span>
-          <h2>{{ 'batch.template.title' | t }}</h2>
-          <label class="cap" for="template-text">{{ 'batch.template.paste' | t }}</label>
-          <textarea id="template-text" class="ta" spellcheck="false" rows="11" [value]="draft()" (input)="onDraft($event)" [class.ta--error]="draft().trim() && !validation().ok" [attr.aria-invalid]="draft().trim() && !validation().ok ? 'true' : null" [attr.aria-describedby]="'template-status'" placeholder="var pdfTemplate = { pages: [ ... ] };"></textarea>
-          <div id="template-status" role="status" aria-live="polite">
-            @if (!draft().trim()) {
-              @if (it.template && !it.templateIssue) {
-                <p class="note note--ok">✓ <span><b>{{ 'batch.template.found' | t : { pages: pageSummary().length, fields: fieldCount(it.template) } }}</b>@if (it.templateName) {<br />{{ it.templateName }}}</span></p>
-              } @else {
-                <p class="cap">{{ 'batch.template.hint' | t }}</p>
-              }
-            } @else {
-              @let v = validation();
-              @if (v.ok) {
-                <p class="note note--ok">✓ <span><b>{{ 'batch.template.found' | t : { pages: v.pages, fields: v.fields } }}</b><br />{{ 'batch.template.onlyPages' | t }}</span></p>
-              } @else if (v.reason === 'syntax') {
-                <p class="note note--error">⚠ <span><b>{{ (v.line ? 'batch.template.errorAt' : 'batch.template.error') | t : { line: v.line, column: v.column } }}</b><br />{{ 'batch.template.errorHelp' | t }}</span></p>
-              } @else {
-                <p class="note note--error">⚠ <span><b>{{ 'batch.template.noPages' | t }}</b><br />{{ 'batch.template.noPagesHelp' | t }}</span></p>
-              }
-            }
-          </div>
-          @if (!it.template && loose().length) {
-            <div class="row" style="flex-wrap: wrap">
-              <label class="grow cap" for="loose-template">{{ 'batch.item.loose' | t : { count: loose().length } }}</label>
-              <select id="loose-template" class="select" #loosePick>
-                @for (t of loose(); track t.id) {
-                  <option [value]="t.id">{{ store.templateLabelOf(t) }}</option>
+      <div class="vflow">
+        <div class="flow" aria-hidden="true">
+          <div class="fnode" [class.is-on]="!templateDone()"><span class="mini mini--f"></span><span><b>1 · {{ 'batch.setup.flowA' | t }}</b><small>{{ 'batch.setup.flowAd' | t }}</small></span></div>
+          <span class="farrow">→</span>
+          <div class="fnode" [class.is-on]="templateDone() && !it.newPdf"><span class="mini"></span><span><b>2 · {{ 'batch.setup.flowB' | t }}</b><small>{{ 'batch.setup.flowBd' | t }}</small></span></div>
+          <span class="farrow">→</span>
+          <div class="fnode" [class.is-on]="templateDone() && !!it.newPdf"><span class="mini mini--f"></span><span class="lock">🔒</span><span class="mini"></span><span class="lock">✎</span><span><b>3 · {{ 'batch.setup.flowE' | t }}</b><small>{{ 'batch.setup.flowEd' | t }}</small></span></div>
+        </div>
+
+        <section class="vcard" [class.is-on]="!templateDone()" id="setup-step-a">
+          <header class="vh">
+            <span class="gn" [class.is-done]="templateDone()">{{ templateDone() ? '✓' : 1 }}</span>
+            <span class="grow"><b>{{ 'batch.setup.aTitle' | t }}</b><small>{{ 'batch.setup.aSub' | t }}</small></span>
+            <span class="chip chip--status" [class.chip--ok]="templateDone()">{{ (templateDone() ? 'batch.setup.ready' : 'batch.setup.missing') | t }}</span>
+          </header>
+          @if (templateDone()) {
+            <div class="vsum">
+              <span class="mini mini--f" aria-hidden="true"></span>
+              <span class="grow">
+                @if (fieldCount(it.template) > 0) {
+                  <b>✓ {{ 'batch.template.found' | t : { pages: pageSummary().length, fields: fieldCount(it.template) } }}</b>
+                } @else {
+                  <b>{{ 'batch.setup.noTemplate' | t }}</b>
                 }
-              </select>
-              <button type="button" class="btn btn--ghost btn--sm" (click)="assignLoose(loosePick.value)">{{ 'batch.item.looseUse' | t }}</button>
+                @if (it.templateName) { <span class="cap">{{ it.templateName }}</span> }
+              </span>
+              <button type="button" class="btn btn--ghost btn--sm" id="change-template" (click)="editTemplate.set(true)">{{ 'batch.setup.changeTemplate' | t }}</button>
             </div>
-          }
-          <div class="actions">
-            <button type="button" class="btn" [disabled]="!validation().ok" (click)="useTemplate()">{{ 'batch.template.use' | t }}</button>
-            @if (!it.template) {
-              <button type="button" id="compare-without-template" class="btn btn--ghost" (click)="compareWithoutTemplate()">{{ 'batch.template.compareEmpty' | t }}</button>
+          } @else {
+            <div class="seg" role="tablist" [attr.aria-label]="'batch.setup.aTitle' | t">
+              <button type="button" role="tab" [class.on]="tplMode() === 'paste'" [attr.aria-selected]="tplMode() === 'paste'" (click)="tplMode.set('paste')">{{ 'batch.setup.paste' | t }}</button>
+              <button type="button" role="tab" [class.on]="tplMode() === 'file'" [attr.aria-selected]="tplMode() === 'file'" (click)="tplMode.set('file')">{{ 'batch.setup.file' | t }}</button>
+              <button type="button" role="tab" id="compare-without-template" (click)="confirmNone.set(true)">{{ 'batch.setup.none' | t }}</button>
+            </div>
+            @if (tplMode() === 'paste') {
+              <label class="cap" for="template-text">{{ 'batch.template.paste' | t }}</label>
+              <textarea id="template-text" class="ta" spellcheck="false" rows="8" [value]="draft()" (input)="onDraft($event)" [class.ta--error]="draft().trim() && !validation().ok" [attr.aria-invalid]="draft().trim() && !validation().ok ? 'true' : null" [attr.aria-describedby]="'template-status'" placeholder="var pdfTemplate = { pages: [ ... ] };"></textarea>
+              <div id="template-status" role="status" aria-live="polite">
+                @if (!draft().trim()) {
+                  <p class="cap">{{ 'batch.template.hint' | t }}</p>
+                } @else {
+                  @let v = validation();
+                  @if (v.ok) {
+                    <p class="note note--ok">✓ <span><b>{{ 'batch.template.found' | t : { pages: v.pages, fields: v.fields } }}</b><br />{{ 'batch.template.onlyPages' | t }}</span></p>
+                  } @else if (v.reason === 'syntax') {
+                    <p class="note note--error">⚠ <span><b>{{ (v.line ? 'batch.template.errorAt' : 'batch.template.error') | t : { line: v.line, column: v.column } }}</b><br />{{ 'batch.template.errorHelp' | t }}</span></p>
+                  } @else {
+                    <p class="note note--error">⚠ <span><b>{{ 'batch.template.noPages' | t }}</b><br />{{ 'batch.template.noPagesHelp' | t }}</span></p>
+                  }
+                }
+              </div>
+              <div class="actions">
+                <button type="button" class="btn" [disabled]="!validation().ok" (click)="useTemplate()">{{ 'batch.template.use' | t }}</button>
+              </div>
+            } @else {
+              <div class="drop">
+                <p class="cap">{{ 'batch.setup.fileHelp' | t }}</p>
+                <label class="btn file">
+                  {{ 'batch.template.loadFile' | t }}
+                  <input type="file" accept="application/json,.json" hidden (change)="onTemplateFile($event)" />
+                </label>
+              </div>
             }
-            <label class="btn btn--ghost file">
-              {{ 'batch.template.loadFile' | t }}
-              <input type="file" accept="application/json,.json" hidden (change)="onTemplateFile($event)" />
-            </label>
-          </div>
-          @if (pageSummary().length && it.template && !it.templateIssue) {
-            <hr />
-            <h3>{{ 'batch.template.pages' | t }}</h3>
-            @for (p of pageSummary(); track p.num) {
-              <div class="row"><span>{{ 'batch.template.page' | t : { num: p.num } }}</span><span class="cap">{{ 'batch.template.fieldsCount' | t : { count: p.fields } }}</span></div>
+            @if (!it.template && loose().length) {
+              <div class="row" style="flex-wrap: wrap">
+                <label class="grow cap" for="loose-template">{{ 'batch.item.loose' | t : { count: loose().length } }}</label>
+                <select id="loose-template" class="select" #loosePick>
+                  @for (t of loose(); track t.id) {
+                    <option [value]="t.id">{{ store.templateLabelOf(t) }}</option>
+                  }
+                </select>
+                <button type="button" class="btn btn--ghost btn--sm" (click)="assignLoose(loosePick.value)">{{ 'batch.item.looseUse' | t }}</button>
+              </div>
             }
-          }
-          @if (it.templateIssue) {
-            <p class="cap">{{ 'batch.template.errorItem' | t }}</p>
+            @if (it.templateIssue) {
+              <p class="cap">{{ 'batch.template.errorItem' | t }}</p>
+            }
           }
         </section>
 
-        <section class="card">
-          <span class="lab">{{ 'batch.newPdf.label' | t }}</span>
-          <h2>{{ 'batch.newPdf.title' | t : { name: it.name } }}</h2>
-          <p class="cap">{{ 'batch.item.optionalB' | t }}</p>
-          <div class="row"><span aria-hidden="true">📄</span><span class="grow ellipsis">{{ 'batch.newPdf.original' | t }} · {{ it.name }}</span><span class="cap">{{ sizeLabel(it.pageSize) }} · {{ bytes(it.pdf.size) }}</span></div>
-          <div class="drop" [class.drop--active]="dropActive()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
-            <h3>{{ 'batch.newPdf.drop' | t }}</h3>
-            <p class="cap">{{ 'batch.newPdf.limit' | t : { limit: maxMb } }}</p>
-            <label class="btn file" [attr.aria-busy]="uploading()">
-              {{ (it.newPdf ? 'batch.newPdf.change' : 'batch.newPdf.choose') | t }}
-              <input type="file" id="setup-b-file" accept="application/pdf,.pdf" hidden (change)="onNewPdf($event)" />
-            </label>
-          </div>
+        <section class="vcard" [class.is-on]="templateDone() && !bDone()" [class.is-todo]="!templateDone()" id="setup-step-b">
+          <header class="vh">
+            <span class="gn" [class.is-done]="bDone()">{{ bDone() ? '✓' : 2 }}</span>
+            <span class="grow"><b>{{ 'batch.newPdf.label' | t }} (B)</b><small>{{ 'batch.setup.bSub' | t }}</small></span>
+            <span class="chip chip--status" [class.chip--ok]="bDone()">{{ (bDone() ? 'batch.setup.readyM' : 'batch.setup.optional') | t }}</span>
+          </header>
+          @if (bDone()) {
+            <div class="vsum row--sel">
+              <span class="mini" aria-hidden="true"></span>
+              <span class="grow"><b class="ellipsis">✓ {{ it.newName }}</b><span class="cap">{{ it.newPageSize ? sizeLabel(it.newPageSize) : '' }} · {{ bytes(it.newPdf!.size) }}</span></span>
+              <button type="button" class="btn btn--ghost btn--sm" id="change-b" (click)="editB.set(true)">{{ 'batch.setup.changePdf' | t }}</button>
+            </div>
+          } @else {
+            <div class="drop" [class.drop--active]="dropActive()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+              <span class="mini" aria-hidden="true"></span>
+              <h3>{{ 'batch.newPdf.drop' | t }}</h3>
+              <p class="cap">{{ 'batch.newPdf.limit' | t : { limit: maxMb } }}</p>
+              <label class="btn file" [attr.aria-busy]="uploading()">
+                {{ 'batch.newPdf.choose' | t }}
+                <input type="file" id="setup-b-file" accept="application/pdf,.pdf" hidden (change)="onNewPdf($event)" />
+              </label>
+            </div>
+          }
           @if (uploading()) {
             <div class="bar" role="progressbar" aria-busy="true"><i class="bar--indeterminate"></i></div>
             <p class="cap">{{ 'batch.newPdf.reading' | t }}</p>
           }
           @if (it.newPdf && it.newPageSize) {
-            <div class="row row--sel"><span class="ok" aria-hidden="true">✓</span><span class="grow ellipsis">{{ it.newName }}</span><span class="cap">{{ sizeLabel(it.newPageSize) }} · {{ bytes(it.newPdf.size) }}</span></div>
             @if (it.newPageCount !== it.pageCount) {
               <p class="note note--warn">⚠ <span>{{ 'batch.newPdf.pagesDiffer' | t : { orig: it.pageCount, next: it.newPageCount } }}</span></p>
             } @else if (!needsSize()) {
@@ -103,12 +135,34 @@
           @if (sameNotice(); as same) {
             <p class="note note--ok" role="status">ⓘ <span>{{ 'batch.versionB.sameNote' | t : { name: same } }}</span></p>
           }
+        </section>
+
+        <section class="vcard" [class.is-on]="templateDone() && (bDone() || !it.newPdf) && !needsSize()" [class.is-todo]="!templateDone()" id="setup-step-go">
+          <header class="vh">
+            <span class="gn">3</span>
+            <span class="grow"><b>{{ 'batch.setup.goTitle' | t }}</b><small>{{ 'batch.setup.goSub' | t }}</small></span>
+          </header>
+          <p class="note note--ok">✎ <span>{{ 'batch.setup.goNote' | t }}</span></p>
           <div class="actions">
-            <button type="button" class="btn" id="continue-item" [disabled]="!it.template || needsSize() || !!it.templateIssue" (click)="openEditor()">{{ (it.newPdf ? 'batch.newPdf.compare' : 'batch.item.reviewA') | t }} →</button>
+            <button type="button" class="btn" id="continue-item" [disabled]="!it.template || needsSize() || !!it.templateIssue || !templateDone()" (click)="openEditor()">{{ 'batch.setup.open' | t }} →</button>
             <button type="button" class="btn btn--ghost" (click)="skip()">{{ 'batch.item.skip' | t }}</button>
           </div>
         </section>
       </div>
+
+      @if (confirmNone()) {
+        <div class="overlay" role="dialog" aria-modal="true" aria-labelledby="none-title" (keydown.escape)="confirmNone.set(false)">
+          <div class="dialog card">
+            <h2 id="none-title">{{ 'batch.setup.noneTitle' | t }}</h2>
+            <p class="cap">{{ 'batch.setup.noneText' | t }}</p>
+            <p class="note note--ok">↩ <span>{{ 'batch.setup.noneNote' | t }}</span></p>
+            <div class="actions">
+              <button type="button" class="btn btn--ghost" (click)="confirmNone.set(false)">{{ 'batch.setup.noneBack' | t }}</button>
+              <button type="button" class="btn" id="confirm-no-template" (click)="compareWithoutTemplate()">{{ 'batch.setup.noneGo' | t }}</button>
+            </div>
+          </div>
+        </div>
+      }
     }
 
     </div>

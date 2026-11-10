@@ -66,6 +66,15 @@ interface RefBox {
               [style.width.px]="b.width" [style.height.px]="b.height" [style.fontSize.px]="b.fontSize"
               [attr.title]="b.field.mapField || ''" (click)="pick.emit({ field: b.field, pageNum: page() })">{{ b.text }}</button>
           }
+          @if (!hasFields()) {
+            <div class="ref__empty" id="ref-empty">
+              <div class="ref__card">
+                <b>{{ 'batch.editor.noAtitle' | t }}</b>
+                <span>{{ 'batch.editor.noAtext' | t }}</span>
+                <button type="button" class="ref__put" id="ref-put-a" (click)="setTemplate.emit()">{{ 'batch.editor.putA' | t }}</button>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </section>
@@ -81,6 +90,9 @@ interface RefBox {
       &[disabled] { opacity: .4; cursor: default; } &.on { background: var(--accent); color: var(--bg); } &:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; } }
     .ref__scroll { overflow: auto; max-height: calc(100vh - 220px); }
     .ref__page { position: relative; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.35); canvas { display: block; } }
+    .ref__empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 14px; background: rgba(15,23,42,.55); }
+    .ref__card { max-width: 320px; display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; padding: 18px 20px; border-radius: 16px; border: 1px solid var(--accent); background: var(--panel); color: var(--text); box-shadow: 0 12px 40px rgba(0,0,0,.45); b { font-size: 16px; } span { color: var(--muted); font-size: 13px; line-height: 1.4; } }
+    .ref__put { font: inherit; font-weight: 600; font-size: 14px; border: 0; border-radius: 999px; padding: 8px 18px; background: var(--accent); color: var(--bg); cursor: pointer; &:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; } }
     .ref__fld { position: absolute; box-sizing: border-box; border: 2px solid #0f9b8e; background: rgba(15,155,142,.16); border-radius: 3px; color: #0b3b36; line-height: 1; white-space: nowrap; overflow: hidden; display: flex; align-items: flex-end; padding: 0; cursor: pointer; font-family: inherit;
       &.is-unused { border-style: dashed; border-color: #d97706; background: rgba(217,119,6,.14); }
       &.is-focus { outline: 2px solid var(--accent); outline-offset: 1px; box-shadow: 0 0 0 4px rgba(94,234,212,.35); } }
@@ -98,6 +110,8 @@ export class BatchReferenceComponent implements OnDestroy {
   /** mapField names present in B: the rest are A fields not used yet. */
   readonly usedKeys = input<ReadonlySet<string>>(new Set());
   readonly pick = output<ReferencePick>();
+  readonly setTemplate = output<void>();
+  readonly hasFields = computed(() => !!this.item().template?.some((p) => p.fields.length));
 
   private readonly preview = inject(PreviewSettingsService);
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');

@@ -37,6 +37,10 @@ export class BatchItemPageComponent {
   readonly sameNotice = signal('');
   readonly draft = signal('');
   readonly showSetup = signal(false);
+  readonly tplMode = signal<'paste' | 'file'>('paste');
+  readonly editTemplate = signal(false);
+  readonly editB = signal(false);
+  readonly confirmNone = signal(false);
   readonly dropActive = signal(false);
   readonly uploading = signal(false);
   readonly strategy = signal<SizeStrategy>('scale');
@@ -56,6 +60,12 @@ export class BatchItemPageComponent {
     const item = this.item();
     return !!item && (this.showSetup() || !item.template || !!item.templateIssue || this.needsSize());
   });
+  /** Step 1 is shown folded once A has a valid template (also the empty one). */
+  readonly templateDone = computed(() => {
+    const item = this.item();
+    return !!item?.template && !item.templateIssue && !this.editTemplate();
+  });
+  readonly bDone = computed(() => !!this.item()?.newPdf && !this.editB());
   readonly status = computed(() => {
     const item = this.item();
     return item ? batchStatusOf(item) : 'noTemplate';
@@ -125,6 +135,9 @@ export class BatchItemPageComponent {
       .subscribe(([params, query]) => {
       this.itemId.set(params.get('id') ?? '');
       this.showSetup.set(query.has('setup'));
+      this.editTemplate.set(false);
+      this.editB.set(false);
+      this.confirmNone.set(false);
       this.sameNotice.set('');
       void this.store.load().then(() => {
         if (this.item()) this.tabs.add(this.itemId());
@@ -167,14 +180,17 @@ export class BatchItemPageComponent {
       this.toast.error(this.i18n.translate('batch.template.invalidToast'));
       return;
     }
-    this.showSetup.set(false);
+    this.editTemplate.set(false);
+    this.showSetup.set(true);
   }
 
   /** Enters the comparison with an empty template, to review PDFs without any coordinates. */
   compareWithoutTemplate() {
     const result = this.store.setTemplateText(this.itemId(), '{"pages":[]}', this.i18n.translate('batch.template.emptyName'));
+    this.confirmNone.set(false);
     if (!result.ok) return;
-    this.showSetup.set(false);
+    this.editTemplate.set(false);
+    this.showSetup.set(true);
   }
 
   async onTemplateFile(event: Event) {
@@ -188,6 +204,10 @@ export class BatchItemPageComponent {
       return;
     }
     this.draft.set(this.item()?.templateText ?? '');
+    if (outcome === 'ok') {
+      this.editTemplate.set(false);
+      this.showSetup.set(true);
+    }
     if (outcome === 'invalidJson') this.toast.error(this.i18n.translate('batch.template.invalidToast'));
   }
 
@@ -236,6 +256,7 @@ export class BatchItemPageComponent {
         return;
       }
       this.strategy.set('scale');
+      this.editB.set(false);
     } finally {
       this.uploading.set(false);
     }

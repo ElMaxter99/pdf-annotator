@@ -4,12 +4,16 @@
       <div class="toolbar__batch" id="batch-bar">
         <button type="button" class="btn" id="batch-back" (click)="vm.batchBack()">← {{ 'batch.editor.back' | t }}</button>
         <span class="toolbar__batch-name" [attr.title]="vm.batchItem()?.name">{{ vm.batchItem()?.name }}</span>
+        <span class="toolbar__edits" id="batch-edits">{{ (vm.batchHasB() ? 'batch.editor.editsB' : 'batch.editor.editsA') | t }}</span>
         <span class="toolbar__badge" id="batch-state">{{ (vm.batchItem()?.validated ? 'batch.editor.stateOk' : 'batch.editor.step' + vm.batchStep()) | t : { n: vm.batchStep() } }}</span>
         <div class="toolbar__menu">
           <button type="button" class="btn btn--icon" id="batch-menu" aria-haspopup="menu" [attr.aria-expanded]="vm.batchMenuOpen()"
             [attr.aria-label]="'batch.editor.menu' | t" [attr.title]="'batch.editor.menu' | t" (click)="vm.batchMenuOpen.set(!vm.batchMenuOpen())">⋯</button>
           <div class="toolbar__menu-list" role="menu" [hidden]="!vm.batchMenuOpen()">
-            <button type="button" class="btn" role="menuitem" id="batch-setup" (click)="vm.batchMenuOpen.set(false); vm.batchOpenSetup()">⚙ {{ 'batch.editor.settings' | t }}</button>
+            <button type="button" class="btn" role="menuitem" id="batch-setup" (click)="vm.batchMenuOpen.set(false); vm.batchOpenSetup()">← {{ 'batch.editor.backToItem' | t }}<small>{{ 'batch.editor.backToItemHint' | t }}</small></button>
+            @if (vm.batchHasB()) {
+              <button type="button" class="btn" role="menuitem" id="batch-put-a" (click)="vm.batchMenuOpen.set(false); vm.batchTemplateDrawerOpen.set(true)">{{ 'batch.editor.putA' | t }}<small>{{ 'batch.editor.putAHint' | t }}</small></button>
+            }
             <button type="button" class="btn" role="menuitem" id="batch-diff-open" (click)="vm.batchMenuOpen.set(false); vm.batchOpenDiff()"
               [disabled]="!vm.batchHasB()">{{ 'batch.editor.diff' | t }}</button>
           </div>

@@ -270,13 +270,11 @@ async function openEditorWithB(page: import('@playwright/test').Page, b = otherP
   await page.waitForURL(/\/editor/);
   await openBatchMenu(page, '#batch-setup');
   await page.waitForURL(/setup=1/);
+  await page.locator('#change-template').click();
   await page.locator('#template-text').fill(
     '{"pages":[{"num":1,"fields":[{"x":150,"y":722,"mapField":"cliente.nombre","fontSize":12},{"x":150,"y":700,"mapField":"cliente.nif","fontSize":12}]}]}'
   );
   await page.getByRole('button', { name: 'Usar plantilla' }).click();
-  await page.waitForURL(/\/editor/);
-  await openBatchMenu(page, '#batch-setup');
-  await page.waitForURL(/setup=1/);
   await page.locator('#setup-b-file').setInputFiles(await b);
   await expect(page.locator('.row--sel')).toBeVisible();
   // A version B with another page size asks how to adapt the coordinates first.
@@ -297,6 +295,7 @@ test('a PDF with a template opens the single-PDF editor; validate it from there 
   await page.locator('#template-text').fill('db.t.drop();\nvar pdfTemplate = { _id: ObjectId("abc"), pages: [ { num: 1, fields: [ { x: 150, y: 722, mapField: "cliente.nombre", fontSize: 12 } ] } ] };');
   await expect(page.locator('#template-status')).toContainText('1 páginas · 1 campos');
   await page.getByRole('button', { name: 'Usar plantilla' }).click();
+  await page.locator('#continue-item').click();
   await page.waitForURL(/\/editor/);
   // Without B the editor works on template A and there is no A pane yet.
   await expect(page.locator('app-batch-reference')).toHaveCount(0);
@@ -404,9 +403,6 @@ test('with A empty the start offers no copy, only starting from scratch or uploa
   await page.waitForURL(/\/batch\/.+/);
   await page.locator('#template-text').fill('{"pages":[{"num":1,"fields":[]}]}');
   await page.getByRole('button', { name: 'Usar plantilla' }).click();
-  await page.waitForURL(/\/editor/);
-  await openBatchMenu(page, '#batch-setup');
-  await page.waitForURL(/setup=1/);
   await page.locator('#setup-b-file').setInputFiles(await otherPdf('uno-b.pdf'));
   await expect(page.locator('.row--sel')).toBeVisible();
   if (await page.locator('#size-title').isVisible({ timeout: 1500 }).catch(() => false)) {
@@ -423,4 +419,41 @@ test('with A empty the start offers no copy, only starting from scratch or uploa
   await expect(page.locator('#batch-guide')).toHaveCount(1);
   await page.locator('#rel-empty').click();
   await expect(page.locator('#batch-start')).toHaveCount(0);
+});
+
+test('the card is vertical, asks before continuing without a template and the editor can set A later', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'dos.pdf').getByRole('button', { name: 'Pegar plantilla' }).click();
+  await page.waitForURL(/\/batch\/.+/);
+  await expect(page.locator('#setup-step-a')).toBeVisible();
+  await expect(page.locator('#setup-step-b')).toBeVisible();
+  await page.locator('#compare-without-template').click();
+  await expect(page.locator('#none-title')).toBeVisible();
+  await page.getByRole('button', { name: 'Volver y pegar la plantilla' }).click();
+  await expect(page.locator('#none-title')).toHaveCount(0);
+  await page.locator('#compare-without-template').click();
+  await page.locator('#confirm-no-template').click();
+  await expect(page.locator('#change-template')).toBeVisible();
+  await expect(page.locator('#setup-step-a')).toContainText('Sin plantilla de A');
+  await page.locator('#setup-b-file').setInputFiles(await otherPdf('uno-b.pdf'));
+  await expect(page.locator('.row--sel')).toBeVisible();
+  if (await page.locator('#size-title').isVisible({ timeout: 1500 }).catch(() => false)) {
+    await page.locator('.dialog .btn:not(.btn--ghost)').click();
+  } else {
+    await page.locator('#continue-item').click();
+  }
+  await page.waitForURL(/\/editor/);
+  await expect(page.locator('#batch-edits')).toContainText('Editas B');
+  await expect(page.locator('#ref-empty')).toBeVisible();
+  await page.locator('#ref-put-a').click();
+  await page.locator('#batch-template-text').fill(
+    '{"pages":[{"num":1,"fields":[{"x":150,"y":722,"mapField":"cliente.nombre","fontSize":12}]}]}'
+  );
+  await page.locator('#batch-template-apply').click();
+  await expect(page.locator('#ref-empty')).toHaveCount(0);
+  await openSidebarTab(page, 'Anotaciones');
+  await expect(page.locator('#rel-a-unused li')).toHaveCount(1);
+  await openBatchMenu(page, '#batch-setup');
+  await page.waitForURL(/setup=1/);
+  await expect(page.locator('#setup-step-a')).toContainText('1 páginas · 1 campos');
 });
