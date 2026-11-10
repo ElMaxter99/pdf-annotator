@@ -5,9 +5,15 @@
         <button type="button" class="btn" id="batch-back" (click)="vm.batchBack()">← {{ 'batch.editor.back' | t }}</button>
         <span class="toolbar__batch-name" [attr.title]="vm.batchItem()?.name">{{ vm.batchItem()?.name }}</span>
         <span class="toolbar__badge" id="batch-state">{{ (vm.batchItem()?.validated ? 'batch.editor.stateOk' : 'batch.editor.step' + vm.batchStep()) | t : { n: vm.batchStep() } }}</span>
-        <button type="button" class="btn" id="batch-setup" (click)="vm.batchOpenSetup()">⚙ {{ 'batch.editor.settings' | t }}</button>
-        <button type="button" class="btn" id="batch-diff-open" (click)="vm.batchOpenDiff()"
-          [disabled]="!vm.batchHasB()">{{ 'batch.editor.diff' | t }}</button>
+        <div class="toolbar__menu">
+          <button type="button" class="btn btn--icon" id="batch-menu" aria-haspopup="menu" [attr.aria-expanded]="vm.batchMenuOpen()"
+            [attr.aria-label]="'batch.editor.menu' | t" [attr.title]="'batch.editor.menu' | t" (click)="vm.batchMenuOpen.set(!vm.batchMenuOpen())">⋯</button>
+          <div class="toolbar__menu-list" role="menu" [hidden]="!vm.batchMenuOpen()">
+            <button type="button" class="btn" role="menuitem" id="batch-setup" (click)="vm.batchMenuOpen.set(false); vm.batchOpenSetup()">⚙ {{ 'batch.editor.settings' | t }}</button>
+            <button type="button" class="btn" role="menuitem" id="batch-diff-open" (click)="vm.batchMenuOpen.set(false); vm.batchOpenDiff()"
+              [disabled]="!vm.batchHasB()">{{ 'batch.editor.diff' | t }}</button>
+          </div>
+        </div>
         @if (vm.batchItem()?.validated) {
           <button type="button" class="btn" id="batch-unvalidate" (click)="vm.batchUnvalidate()">{{ 'batch.editor.reopen' | t }}</button>
         } @else {

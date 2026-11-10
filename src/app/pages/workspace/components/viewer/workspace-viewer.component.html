@@ -35,15 +35,13 @@
   @if (vm.batchShowsA()) {
     <div class="batch-mid" id="batch-mid">
       <span class="batch-mid__chip">↔ {{ vm.batchLinkedCount() }}</span>
-      <span>{{ 'batch.editor.linked' | t }}</span>
-      <span class="batch-mid__hint">{{ 'batch.editor.linkedHint' | t }}</span>
     </div>
   }
   <div class="bpane" [class.bpane--batch]="!!vm.batchItemId()">
   @if (vm.batchItemId()) {
     <header class="bpane__bar" id="batch-b-bar">
       <span class="bpane__tag">B</span>
-      <span class="bpane__txt"><b>{{ 'batch.editor.bTitle' | t }}</b><small>{{ 'batch.editor.bSub' | t }}</small></span>
+      <span class="bpane__txt"><b>{{ 'batch.editor.bTitle' | t }}</b></span>
       <span class="bpane__nav">
         <button type="button" class="bpane__btn" (click)="vm.prevPage()" [disabled]="vm.pageIndex() <= 1" [attr.aria-label]="'controls.prev' | t">‹</button>
         <span id="b-page">{{ vm.pageIndex() }} / {{ vm.pageCount }}</span>
@@ -72,25 +70,26 @@
       <app-annotation-editor #editEditor [vm]="vm" mode="edit" [field]="e.field"
         [leftPx]="e.field.x * vm.scale()" [topPx]="(pdfCanvas?.height ?? 0) - e.field.y * vm.scale()"></app-annotation-editor>
     }
-    @if (vm.batchItemId() && vm.batchStep() === 1) {
+    @if (vm.batchItemId() && vm.batchStep() === 1 && !vm.batchStartDismissed()) {
       <div class="batch-start" id="batch-start">
-        <b>{{ 'batch.editor.startTitle' | t }}</b>
-        <span class="batch-start__sub">{{ 'batch.editor.startNote' | t }}</span>
-        <div class="batch-start__cards">
-          <div class="batch-start__card batch-start__card--rec">
-            <span class="batch-start__ico">⇪</span><b>{{ 'batch.editor.copyAToB' | t }}</b>
-            <span class="batch-start__rec">{{ 'batch.editor.recommended' | t }}</span>
-            <span class="batch-start__desc">{{ 'batch.editor.copyDesc' | t }}</span>
-            <button type="button" class="btn" id="rel-copy" [disabled]="!vm.batchItem()?.template?.length" (click)="vm.batchCopyAToB(false)">{{ 'batch.editor.copyBtn' | t }}</button>
+        <div class="batch-start__box">
+          <b>{{ 'batch.editor.emptyTitle' | t }}</b>
+          <span class="batch-start__sub">{{ (vm.batchHasAFields() ? 'batch.editor.emptyWithA' : 'batch.editor.emptyNoA') | t }}</span>
+          @if (vm.batchHasAFields()) {
+            <div class="batch-start__opt batch-start__opt--rec">
+              <span class="batch-start__ico">⇪</span>
+              <span class="batch-start__txt"><b>{{ 'batch.editor.copyAToB' | t }}</b><small>{{ 'batch.editor.copyDesc' | t }}</small></span>
+              <button type="button" class="btn" id="rel-copy" (click)="vm.batchCopyAToB(false)">{{ 'batch.editor.copyBtn' | t }}</button>
+            </div>
+          }
+          <div class="batch-start__opt" [class.batch-start__opt--rec]="!vm.batchHasAFields()">
+            <span class="batch-start__ico">✚</span>
+            <span class="batch-start__txt"><b>{{ 'batch.editor.scratchTitle' | t }}</b><small>{{ 'batch.editor.scratchDesc' | t }}</small></span>
+            <button type="button" class="btn" [class.btn--ghost]="vm.batchHasAFields()" id="rel-empty" (click)="vm.batchCopyAToB(true)">{{ 'batch.editor.emptyBtn' | t }}</button>
           </div>
-          <div class="batch-start__card">
-            <span class="batch-start__ico">▢</span><b>{{ 'batch.editor.startEmpty' | t }}</b>
-            <span class="batch-start__desc">{{ 'batch.editor.emptyDesc' | t }}</span>
-            <button type="button" class="btn btn--ghost" id="rel-empty" (click)="vm.batchCopyAToB(true)">{{ 'batch.editor.emptyBtn' | t }}</button>
-          </div>
-          <div class="batch-start__card">
-            <span class="batch-start__ico">⇧</span><b>{{ 'batch.editor.uploadB' | t }}</b>
-            <span class="batch-start__desc">{{ 'batch.editor.uploadDesc' | t }}</span>
+          <div class="batch-start__opt">
+            <span class="batch-start__ico">⇧</span>
+            <span class="batch-start__txt"><b>{{ 'batch.editor.uploadB' | t }}</b><small>{{ 'batch.editor.uploadDesc' | t }}</small></span>
             <button type="button" class="btn btn--ghost" id="rel-upload" (click)="vm.triggerImportCoords()">{{ 'batch.editor.uploadBtn' | t }}</button>
           </div>
         </div>

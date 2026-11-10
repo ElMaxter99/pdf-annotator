@@ -79,11 +79,11 @@
     <button type="button" class="btn" (click)="vm.triggerImportCoords()">
       {{ 'sidebar.importJsonFile' | t }}
     </button>
-    <button type="button" class="btn" (click)="vm.applyCoordsText()">
+    <button type="button" class="btn" (click)="vm.applyCoordsText()" [hidden]="!!vm.batchItemId()">
       {{ 'sidebar.applyJson' | t }}
     </button>
   </div>
-  <section class="json-panel" [class.json-panel--collapsed]="vm.jsonPanelCollapsed()">
+  <section class="json-panel" [class.json-panel--collapsed]="vm.jsonPanelCollapsed()" [hidden]="!!vm.batchItemId()">
     <div class="json-panel__header">
       <h5 class="json-panel__title">{{ 'sidebar.title' | t }}</h5>
       <button type="button" class="json-panel__toggle" (click)="vm.toggleJsonPanelCollapsed()"

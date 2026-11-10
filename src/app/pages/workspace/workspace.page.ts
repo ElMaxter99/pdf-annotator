@@ -472,6 +472,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     for (const page of this.coords()) for (const f of page.fields) if (f.mapField && names.has(f.mapField)) n += 1;
     return n;
   });
+  /** Template A has at least one field, so «copy A to B» makes sense. */
+  readonly batchHasAFields = computed(() => !!this.batchItem()?.template?.some((p) => p.fields.length));
   readonly batchDiffSeen = signal(false);
   /** 0 = no PDF B yet · 1 = start B · 2 = place the fields · 3 = review and validate. */
   readonly batchStep = computed<0 | 1 | 2 | 3>(() => {
@@ -479,6 +481,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (this.batchFieldCount() === 0) return 1;
     return this.batchUnusedA().length > 0 ? 2 : 3;
   });
+  readonly batchMenuOpen = signal(false);
+  /** The empty-B card was dismissed with «start from scratch»: the page is free to annotate. */
+  readonly batchStartDismissed = signal(false);
   readonly batchGuideOpen = signal(true);
 
   batchSetGuideOpen(open: boolean) {
@@ -559,6 +564,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   batchCopyAToB(empty = false) {
     const item = this.batchItem();
     if (!item) return;
+    if (empty) this.batchStartDismissed.set(true);
     const pages = empty ? [] : cloneAnnotationPages(item.template ?? []);
     this.applyCoordsChange(() => this.coords.set(this.snapshotCoords(pages)));
     this.selection.set(null);

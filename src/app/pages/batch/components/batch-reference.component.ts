@@ -43,7 +43,7 @@ interface RefBox {
     <section class="ref" [attr.aria-label]="'batch.editor.refTitle' | t">
       <header class="ref__bar">
         <span class="ref__tag">A</span>
-        <span class="ref__txt"><b>{{ 'batch.editor.aTitle' | t }}</b><small>{{ 'batch.editor.aSub' | t }}</small></span>
+        <span class="ref__txt"><b>{{ 'batch.editor.aTitle' | t }}</b></span>
         <span class="ref__nav">
           <button type="button" class="ref__btn" id="ref-prev" (click)="go(-1)" [disabled]="page() <= 1"
             [attr.aria-label]="'controls.prev' | t">‹</button>

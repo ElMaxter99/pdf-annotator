@@ -215,7 +215,7 @@ test('opened PDFs become tabs of the session and can be closed', async ({ page }
   await startBatch(page);
   await card(page, 'uno.pdf').locator('.pcard__thumb').click();
   await page.waitForURL(/\/editor/);
-  await page.locator('#batch-setup').click();
+  await openBatchMenu(page, '#batch-setup');
   await page.waitForURL(/setup=1/);
   const tabs = page.getByRole('tablist', { name: 'PDF abiertos' });
   await expect(tabs.getByRole('link', { name: 'uno.pdf' })).toBeVisible();
@@ -259,18 +259,23 @@ const twoPagePdf = async (name: string) => {
 };
 
 /** Opens uno.pdf, adds the given version B from the setup and enters the A/B editor. */
+async function openBatchMenu(page: import('@playwright/test').Page, item: string) {
+  await page.locator('#batch-menu').click();
+  await page.locator(item).click();
+}
+
 async function openEditorWithB(page: import('@playwright/test').Page, b = otherPdf('uno-b.pdf')) {
   await startBatch(page);
   await card(page, 'uno.pdf').locator('.pcard__thumb').click();
   await page.waitForURL(/\/editor/);
-  await page.locator('#batch-setup').click();
+  await openBatchMenu(page, '#batch-setup');
   await page.waitForURL(/setup=1/);
   await page.locator('#template-text').fill(
     '{"pages":[{"num":1,"fields":[{"x":150,"y":722,"mapField":"cliente.nombre","fontSize":12},{"x":150,"y":700,"mapField":"cliente.nif","fontSize":12}]}]}'
   );
   await page.getByRole('button', { name: 'Usar plantilla' }).click();
   await page.waitForURL(/\/editor/);
-  await page.locator('#batch-setup').click();
+  await openBatchMenu(page, '#batch-setup');
   await page.waitForURL(/setup=1/);
   await page.locator('#setup-b-file').setInputFiles(await b);
   await expect(page.locator('.row--sel')).toBeVisible();
@@ -332,7 +337,7 @@ test('A fields not used in B are listed and can be added; B-only fields are flag
 
 test('the A to B report counts what stayed, moved or is new', async ({ page }) => {
   await openEditorWithB(page);
-  await page.locator('#batch-diff-open').click();
+  await openBatchMenu(page, '#batch-diff-open');
   await expect(page.locator('#batch-diff')).toContainText('Igual');
   await expect(page.locator('#batch-diff tr[data-kind=same]')).not.toHaveCount(0);
   await page.locator('#batch-diff-close').click();
@@ -391,4 +396,31 @@ test('with B empty the viewer offers how to start it and copying A fills it', as
   await page.locator('#rel-copy').click();
   await expect(page.locator('#batch-start')).toHaveCount(0);
   await expect(page.locator('#rel-b li')).toHaveCount(2);
+});
+
+test('with A empty the start offers no copy, only starting from scratch or uploading B', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'dos.pdf').getByRole('button', { name: 'Pegar plantilla' }).click();
+  await page.waitForURL(/\/batch\/.+/);
+  await page.locator('#template-text').fill('{"pages":[{"num":1,"fields":[]}]}');
+  await page.getByRole('button', { name: 'Usar plantilla' }).click();
+  await page.waitForURL(/\/editor/);
+  await openBatchMenu(page, '#batch-setup');
+  await page.waitForURL(/setup=1/);
+  await page.locator('#setup-b-file').setInputFiles(await otherPdf('uno-b.pdf'));
+  await expect(page.locator('.row--sel')).toBeVisible();
+  if (await page.locator('#size-title').isVisible({ timeout: 1500 }).catch(() => false)) {
+    await page.locator('.dialog .btn:not(.btn--ghost)').click();
+  } else {
+    await page.locator('#continue-item').click();
+  }
+  await page.waitForURL(/\/editor/);
+  await expect(page.locator('#batch-start')).toBeVisible();
+  await expect(page.locator('#rel-copy')).toHaveCount(0);
+  await expect(page.locator('#rel-empty')).toBeVisible();
+  await expect(page.locator('#rel-upload')).toBeVisible();
+  await expect(page.locator('#batch-guide .lab')).toBeVisible();
+  await expect(page.locator('#batch-guide')).toHaveCount(1);
+  await page.locator('#rel-empty').click();
+  await expect(page.locator('#batch-start')).toHaveCount(0);
 });

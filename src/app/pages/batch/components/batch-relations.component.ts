@@ -28,19 +28,13 @@ interface ARow {
   template: `
     <section class="rel" id="batch-relations" [attr.aria-label]="'batch.editor.relTitle' | t">
       @if (vm.batchHasB()) {
-        <div class="znext" id="batch-next">
-          <span class="rel__sub">{{ 'batch.editor.nextTitle' | t }}</span>
-          <div class="zk" [class.ok]="vm.batchStep() > 1" [class.now]="vm.batchStep() === 1"><i>{{ vm.batchStep() > 1 ? '✓' : '●' }}</i><span>{{ 'batch.editor.c1' | t }}</span></div>
-          <div class="zk" [class.ok]="vm.batchStep() > 2" [class.now]="vm.batchStep() === 2"><i>{{ vm.batchStep() > 2 ? '✓' : vm.batchStep() === 2 ? '●' : '' }}</i><span>{{ 'batch.editor.c2' | t }}@if (vm.batchStep() === 2) { · {{ 'batch.editor.missing' | t : { count: vm.batchUnusedA().length } }} }</span></div>
-          <div class="zk" [class.ok]="vm.batchDiffSeen() && vm.batchStep() === 3"><i>{{ vm.batchDiffSeen() && vm.batchStep() === 3 ? '✓' : '' }}</i><span>{{ 'batch.editor.c3' | t }}</span>@if (vm.batchStep() === 3) { <button type="button" class="btn btn--sm" (click)="vm.batchOpenDiff()">{{ 'batch.editor.see' | t }}</button> }</div>
-          <div class="zk" [class.now]="vm.batchStep() === 3"><i>{{ vm.batchStep() === 3 ? '●' : '' }}</i><span>{{ 'batch.editor.c4' | t }}</span></div>
-        </div>
         @if (vm.batchStep() === 3) {
           <div class="rel__sum" id="batch-summary">
             <span class="rel__sub">{{ 'batch.editor.summary' | t }}</span>
             @for (k of kinds; track k) {
               <div class="rel__sumrow"><span>{{ 'batch.editor.kind.' + k | t }}</span><b>{{ vm.batchDiff().counts[k] }}</b></div>
             }
+            <button type="button" class="btn btn--sm rel__see" id="rel-see-diff" (click)="vm.batchOpenDiff()">{{ 'batch.editor.seeDiff' | t }}</button>
           </div>
         }
       }
@@ -48,16 +42,18 @@ interface ARow {
       @if (!vm.batchHasB()) {
         <p class="rel__note" id="rel-no-b">{{ 'batch.editor.noB' | t }}
           <a [routerLink]="['/batch', vm.batchItemId()]" [queryParams]="{ setup: 1 }">{{ 'batch.editor.addB' | t }}</a></p>
-      } @else if (!hasTemplate()) {
-        <p class="rel__note" id="rel-no-template">{{ 'batch.editor.noTemplate' | t }}</p>
       }
 
       @if (duplicates().length) {
         <p class="rel__warn" id="rel-dup">{{ 'batch.editor.duplicates' | t : { names: duplicates().join(', ') } }}</p>
       }
 
+      @if (vm.batchHasB() && !bRows().length) {
+        <h6 class="rel__sub">{{ 'batch.editor.fieldsB' | t }} · 0</h6>
+        <p class="rel__note rel__muted" id="rel-empty-hint">{{ 'batch.editor.hintEmptyB' | t }}</p>
+      }
       @if (bRows().length) {
-        <h6 class="rel__sub">{{ 'batch.editor.fieldsB' | t }}</h6>
+        <h6 class="rel__sub">{{ 'batch.editor.fieldsB' | t }} · {{ bRows().length }}</h6>
         <ul class="rel__list" id="rel-b">
           @for (row of bRows(); track row.pageNum + ':' + row.index) {
             <li>
@@ -77,7 +73,7 @@ interface ARow {
       }
 
       @if (vm.batchHasB() && unusedA().length) {
-        <h6 class="rel__sub">{{ 'batch.editor.unusedA' | t : { count: unusedA().length } }}</h6>
+        <h6 class="rel__sub">{{ 'batch.editor.pending' | t : { count: unusedA().length } }}</h6>
         <ul class="rel__list" id="rel-a-unused">
           @for (row of unusedA(); track $index) {
             <li class="rel__unused">
@@ -117,9 +113,8 @@ interface ARow {
       &--moved { background: color-mix(in srgb, #fbbf24 30%, transparent); } &--only { background: color-mix(in srgb, #a78bfa 30%, transparent); } }
     .rel__move { display: flex; gap: 8px; align-items: center; font-size: 13px; select { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line, rgba(255,255,255,.25)); border-radius: 10px; padding: 6px 10px; } }
     a { color: var(--accent); }
-    .znext { display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid var(--accent); border-radius: 14px; padding: 12px; }
-    .zk { display: flex; gap: 8px; align-items: center; font-size: 13px; span { flex: 1; } i { font-style: normal; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; background: color-mix(in srgb, var(--text) 8%, transparent); border: 1px solid var(--line, rgba(255,255,255,.2)); flex: none; }
-      &.ok i { background: var(--accent); color: var(--bg); border-color: var(--accent); } &.now { font-weight: 700; i { border: 2px solid var(--accent); color: var(--accent); } } }
+    .rel__muted { color: var(--muted); }
+    .rel__see { align-self: flex-start; padding: 5px 14px; }
     .rel__sum { display: flex; flex-direction: column; gap: 4px; }
     .rel__sumrow { display: flex; justify-content: space-between; font-size: 13px; background: color-mix(in srgb, var(--text) 6%, transparent); border-radius: 10px; padding: 6px 10px; }
     .btn { font: inherit; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 10px; cursor: pointer; background: var(--accent); color: var(--bg); border: 0; }
