@@ -1,5 +1,6 @@
 ## Unreleased
 ### Changed
+- **Batch · compare without a template**: the PDF page offers «Comparar sin plantilla» next to «Usar plantilla», which applies an empty template and opens the comparison directly.
 - **Batch redesign (W boards)**: the last stepper step is now visual (thumbnail stack, big numbers and a with/without-template bar); the panel uses icon buttons (add PDF, templates, version B, test data, remove) and checkboxes only appear in the «Quitar PDF» mode; the PDF page drops the name list in favour of a left column with a mini preview, page count and the fixed template A fields, with a «Mover a otra página…» selector and «p.1 → p.2» badges to follow a field across pages.
 - **Batch preparation as a stepper** (`/batch/load`): three steps, Upload PDFs, Templates (optional, can be skipped) and Start, with Previous / Next / Skip and a «Preparation step · no panel yet» label; the old three columns are gone. The last step summarises PDFs read, templates paired and PDFs still without one.
 - **Batch session**: opened PDFs are tabs next to «Panel del lote» (closable); the compare view can adjust coordinates **A** or **B** («Ajustar A / Ajustar B»), copy A to B and go back to A; each panel card has a «⋯» menu (open, upload/replace B, remove B, remove validation, remove from the batch) and the panel has an optional «Datos de prueba» drawer (session only).

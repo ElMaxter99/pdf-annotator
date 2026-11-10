@@ -162,6 +162,13 @@ export class BatchItemPageComponent {
     this.showSetup.set(false);
   }
 
+  /** Enters the comparison with an empty template, to review PDFs without any coordinates. */
+  compareWithoutTemplate() {
+    const result = this.store.setTemplateText(this.itemId(), '{"pages":[]}', this.i18n.translate('batch.template.emptyName'));
+    if (!result.ok) return;
+    this.showSetup.set(false);
+  }
+
   async onTemplateFile(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];

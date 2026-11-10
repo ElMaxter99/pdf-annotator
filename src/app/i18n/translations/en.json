@@ -505,7 +505,9 @@
         "no-object": "no object",
         "syntax": "syntax error",
         "no-pages": "«pages» missing"
-      }
+      },
+      "compareEmpty": "Compare without a template",
+      "emptyName": "No template"
     },
     "newPdf": {
       "label": "New PDF",

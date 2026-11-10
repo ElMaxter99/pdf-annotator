@@ -55,6 +55,9 @@
           }
           <div class="actions">
             <button type="button" class="btn" [disabled]="!validation().ok" (click)="useTemplate()">{{ 'batch.template.use' | t }}</button>
+            @if (!it.template) {
+              <button type="button" id="compare-without-template" class="btn btn--ghost" (click)="compareWithoutTemplate()">{{ 'batch.template.compareEmpty' | t }}</button>
+            }
             <label class="btn btn--ghost file">
               {{ 'batch.template.loadFile' | t }}
               <input type="file" accept="application/json,.json" hidden (change)="onTemplateFile($event)" />

@@ -365,3 +365,12 @@ test('the work view drops the name list, shows a mini preview and moves a field 
   await expect(page.getByText(/Página 2 de 2|2 \/ 2/).first()).toBeVisible();
   await expect(page.locator('.fieldrow__moved')).toContainText('p.1 → p.2');
 });
+
+test('a PDF without template can be compared directly with «Comparar sin plantilla»', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'dos.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/batch\/.+/);
+  await page.locator('#compare-without-template').click();
+  await expect(page.locator('app-batch-compare')).toBeVisible();
+  await expect(page.locator('.pane:visible')).toHaveCount(1);
+});

@@ -505,7 +505,9 @@
         "no-object": "no hi ha objecte",
         "syntax": "error de sintaxi",
         "no-pages": "falta «pages»"
-      }
+      },
+      "compareEmpty": "Comparar sense plantilla",
+      "emptyName": "Sense plantilla"
     },
     "newPdf": {
       "label": "PDF nou",
