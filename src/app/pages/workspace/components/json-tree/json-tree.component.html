@@ -50,6 +50,12 @@
           </span>
         </ng-container>
       </ng-container>
+      <ng-container *ngIf="markOf(node) as mark">
+        <span class="json-tree__mark json-tree__mark--{{ mark.kind }}" [attr.data-mark]="mark.kind">
+          <ng-container *ngIf="mark.kind !== 'was'">{{ 'batch.json.mark.' + mark.kind | t }}</ng-container>
+          <ng-container *ngIf="mark.text"> {{ mark.text }}</ng-container>
+        </span>
+      </ng-container>
     </div>
     <ul *ngIf="node.children?.length && !isCollapsed(node)" class="json-tree__children" role="group">
       <ng-container *ngFor="let child of node.children; trackBy: trackByPath">

@@ -1023,6 +1023,29 @@
       "noneNote": "No es definitivo. Desde el editor podrás poner la plantilla de A cuando quieras («Poner plantilla A») o volver a esta ficha.",
       "noneBack": "Volver y pegar la plantilla",
       "noneGo": "Seguir sin plantilla"
+    },
+    "json": {
+      "sourceLabel": "JSON que se muestra",
+      "sourceB": "B · nuevo ✎",
+      "sourceA": "A · original 🔒",
+      "compare": "⇆ Comparar JSON",
+      "noA": "Este PDF no tiene plantilla A.",
+      "aReadOnly": "Solo lectura: es la plantilla del PDF original.",
+      "vs": "vs A · {{moved}} movidos · {{added}} nuevos · {{missing}} faltan",
+      "vsSame": "vs A · sin diferencias",
+      "onlyA": "Solo en A",
+      "missing": "falta en B",
+      "copyA": "Copiar JSON de A",
+      "copyB": "Copiar JSON de B",
+      "compareTitle": "Comparar JSON · A → B",
+      "cmpA": "Original · solo lectura",
+      "cmpB": "Nuevo · edítalo en el panel",
+      "cmpHint": "Las filas se alinean por «mapField». Las franjas rayadas son huecos: ahí falta algo en ese lado.",
+      "mark": {
+        "moved": "movido",
+        "new": "nuevo en B",
+        "page": "cambió de página"
+      }
     }
   },
   "preview": {
@@ -1192,7 +1215,7 @@
         "summary": "De 2 a 50 PDF con plantillas JSON: cargar, emparejar, comparar y descargar.",
         "s1": "Suelta varios PDF (y plantillas JSON) en el inicio, o usa «Probar el modo Lotes».",
         "s2": "Cada plantilla se empareja con su PDF por el campo pdfName; lo ambiguo lo decides tú.",
-        "s3": "Abre cada PDF: se abre el editor con el PDF A (plantilla fija) al lado del PDF B editable; asocia campos, añade los nuevos y valida con OK.",
+        "s3": "Abre cada PDF: se abre el editor con el PDF A (plantilla fija) al lado del PDF B editable; asocia campos, añade los nuevos y valida con OK. En Anotaciones tienes el JSON de B (árbol o texto) con marcas de lo que cambió respecto a A, el JSON de A en solo lectura y «Comparar JSON».",
         "tip": "El lote se guarda en tu navegador y puedes continuarlo después.",
         "s4": "Descarga los resultados como archivos sueltos."
       },

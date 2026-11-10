@@ -1023,6 +1023,29 @@
       "noneNote": "Das ist nicht endgültig. Im Editor kannst du die Vorlage von A jederzeit setzen («Vorlage A setzen») oder zu dieser Karte zurückkehren.",
       "noneBack": "Zurück und Vorlage einfügen",
       "noneGo": "Ohne Vorlage fortfahren"
+    },
+    "json": {
+      "sourceLabel": "Angezeigtes JSON",
+      "sourceB": "B · neu ✎",
+      "sourceA": "A · Original 🔒",
+      "compare": "⇆ JSON vergleichen",
+      "noA": "Dieses PDF hat keine Vorlage A.",
+      "aReadOnly": "Nur lesbar: das ist die Vorlage des Original-PDFs.",
+      "vs": "vs A · {{moved}} verschoben · {{added}} neu · {{missing}} fehlen",
+      "vsSame": "vs A · keine Unterschiede",
+      "onlyA": "Nur in A",
+      "missing": "fehlt in B",
+      "copyA": "JSON von A kopieren",
+      "copyB": "JSON von B kopieren",
+      "compareTitle": "JSON vergleichen · A → B",
+      "cmpA": "Original · nur lesbar",
+      "cmpB": "Neu · im Bereich bearbeiten",
+      "cmpHint": "Die Zeilen sind nach «mapField» ausgerichtet. Schraffierte Streifen sind Lücken: auf dieser Seite fehlt etwas.",
+      "mark": {
+        "moved": "verschoben",
+        "new": "neu in B",
+        "page": "Seite gewechselt"
+      }
     }
   },
   "preview": {
@@ -1192,7 +1215,7 @@
         "summary": "2 bis 50 PDFs mit JSON-Vorlagen: laden, zuordnen, vergleichen und herunterladen.",
         "s1": "Lege mehrere PDFs (und JSON-Vorlagen) auf der Startseite ab oder nutze „Stapelmodus ausprobieren“.",
         "s2": "Jede Vorlage wird über das Feld pdfName ihrem PDF zugeordnet; Mehrdeutiges entscheidest du.",
-        "s3": "Öffne jedes PDF: Der Editor zeigt PDF A (feste Vorlage) neben dem bearbeitbaren PDF B; verknüpfe Felder, ergänze neue und bestätige mit OK.",
+        "s3": "Öffne jedes PDF: Der Editor zeigt PDF A (feste Vorlage) neben dem bearbeitbaren PDF B; verknüpfe Felder, ergänze neue und bestätige mit OK. Unter Annotationen siehst du das JSON von B (Baum oder Text) mit Markierungen zu dem, was sich gegenüber A geändert hat, das JSON von A nur lesbar und «JSON vergleichen».",
         "tip": "Der Stapel wird in deinem Browser gespeichert; du kannst später weitermachen.",
         "s4": "Lade die Ergebnisse als einzelne Dateien herunter."
       },

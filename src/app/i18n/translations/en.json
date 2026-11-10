@@ -1023,6 +1023,29 @@
       "noneNote": "It is not final. From the editor you can set the template of A whenever you want («Set template A») or come back to this card.",
       "noneBack": "Go back and paste the template",
       "noneGo": "Continue without template"
+    },
+    "json": {
+      "sourceLabel": "JSON shown",
+      "sourceB": "B · new ✎",
+      "sourceA": "A · original 🔒",
+      "compare": "⇆ Compare JSON",
+      "noA": "This PDF has no template A.",
+      "aReadOnly": "Read only: this is the template of the original PDF.",
+      "vs": "vs A · {{moved}} moved · {{added}} new · {{missing}} missing",
+      "vsSame": "vs A · no differences",
+      "onlyA": "Only in A",
+      "missing": "missing in B",
+      "copyA": "Copy A JSON",
+      "copyB": "Copy B JSON",
+      "compareTitle": "Compare JSON · A → B",
+      "cmpA": "Original · read only",
+      "cmpB": "New · edit it in the panel",
+      "cmpHint": "Rows are aligned by «mapField». Striped bands are gaps: something is missing on that side.",
+      "mark": {
+        "moved": "moved",
+        "new": "new in B",
+        "page": "changed page"
+      }
     }
   },
   "preview": {
@@ -1192,7 +1215,7 @@
         "summary": "2 to 50 PDFs with JSON templates: load, pair, compare and download.",
         "s1": "Drop several PDFs (and JSON templates) on the home page, or use “Try Batch mode”.",
         "s2": "Each template is paired with its PDF by the pdfName field; you decide anything ambiguous.",
-        "s3": "Open each PDF: the editor shows PDF A (fixed template) next to the editable PDF B; link fields, add new ones and validate with OK.",
+        "s3": "Open each PDF: the editor shows PDF A (fixed template) next to the editable PDF B; link fields, add new ones and validate with OK. In Annotations you get the JSON of B (tree or text) with marks for what changed from A, the JSON of A read only and «Compare JSON».",
         "tip": "The batch is stored in your browser so you can continue it later.",
         "s4": "Download the results as separate files."
       },

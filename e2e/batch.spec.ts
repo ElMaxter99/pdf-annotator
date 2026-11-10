@@ -457,3 +457,34 @@ test('the card is vertical, asks before continuing without a template and the ed
   await page.waitForURL(/setup=1/);
   await expect(page.locator('#setup-step-a')).toContainText('1 páginas · 1 campos');
 });
+
+test('the Anotaciones tab keeps the JSON of B editable and marks what differs from A', async ({ page }) => {
+  await openEditorWithB(page);
+  await expect(page.locator('#batch-json-vs')).toContainText('sin diferencias');
+  await page.getByRole('button', { name: 'Volver al editor' }).or(page.locator('.json-toolbar__view-toggle-option').first()).click();
+  await page.locator('textarea.json-editor').first().fill(
+    '{"pages":[{"num":1,"fields":[{"x":160,"y":722,"mapField":"cliente.nombre","fontSize":12},{"x":10,"y":10,"mapField":"fecha","fontSize":12}]}]}'
+  );
+  await page.locator('.json-toolbar__view-toggle-option').nth(1).click();
+  await expect(page.locator('.json-tree-container .json-tree__mark--moved')).toHaveCount(1);
+  await expect(page.locator('.json-tree-container .json-tree__mark--new')).toHaveCount(1);
+  await expect(page.locator('.json-tree__mark--was').first()).toContainText('A: 150');
+  await expect(page.locator('#batch-json-onlya')).toContainText('cliente.nif');
+  await expect(page.locator('#batch-json-vs')).toContainText('1 movidos · 1 nuevos · 1 faltan');
+});
+
+test('A shows its JSON read only and the compare dialog lines A up with B', async ({ page }) => {
+  await openEditorWithB(page);
+  await page.locator('#batch-json-a').click();
+  await page.locator('.json-toolbar__view-toggle-option').first().click();
+  const ta = page.locator('#batch-json-a-text');
+  await expect(ta).toHaveAttribute('readonly', '');
+  await expect(ta).toHaveValue(/cliente\.nombre/);
+  await expect(page.locator('#batch-json-a-note')).toBeVisible();
+  await page.locator('#batch-compare-open').click();
+  await expect(page.locator('#batch-compare')).toContainText('cliente.nif');
+  await page.locator('#batch-compare-close').click();
+  await expect(page.locator('#batch-compare')).toHaveCount(0);
+  await page.locator('#batch-json-b').click();
+  await expect(page.locator('textarea.json-editor:not([readonly])').first()).toBeVisible();
+});

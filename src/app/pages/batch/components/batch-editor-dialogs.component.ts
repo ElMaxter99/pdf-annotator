@@ -2,6 +2,7 @@ import { Component, Input, computed, signal } from '@angular/core';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { extractPagesCollection } from '../../../utils/annotation-fields.utils';
 import { parseTemplateText } from '../../../utils/template-text.utils';
+import type { PageField } from '../../../models/annotation.model';
 import type { DiffKind } from '../../../utils/batch-diff.utils';
 import type { WorkspacePageComponent } from '../../workspace/workspace.page';
 
@@ -37,6 +38,39 @@ import type { WorkspacePageComponent } from '../../workspace/workspace.page';
                 }
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    }
+    @if (vm.batchCompareOpen()) {
+      <div class="dialog-backdrop" (click)="vm.batchCompareOpen.set(false)">
+        <div class="dialog dlg dlg--wide" id="batch-compare" role="dialog" aria-modal="true" [attr.aria-label]="'batch.json.compareTitle' | t" (click)="$event.stopPropagation()" (keydown.escape)="vm.batchCompareOpen.set(false)">
+          <div class="dialog__header">
+            <h3 class="dialog__title">{{ 'batch.json.compareTitle' | t }}</h3>
+            <span class="dlg__chips">
+              @for (k of kinds; track k) {
+                @if (k !== 'same') { <span class="chip chip--{{ k }}">{{ 'batch.editor.kind.' + k | t }}: {{ vm.batchDiff().counts[k] }}</span> }
+              }
+            </span>
+            <button type="button" class="btn" id="batch-compare-copy" (click)="vm.copyJSON()">{{ 'batch.json.copyB' | t }}</button>
+            <button type="button" class="btn" id="batch-compare-close" (click)="vm.batchCompareOpen.set(false)" [attr.aria-label]="'batch.editor.cancel' | t">✕</button>
+          </div>
+          <div class="dialog__body">
+            <div class="cmp">
+              <div class="cmp__col">
+                <div class="cmp__head"><b>A</b> {{ 'batch.json.cmpA' | t }}</div>
+                @for (row of rows(); track $index) {
+                  <div class="cmp__line cmp__line--{{ row.kind }}" [class.cmp__line--gap]="!row.a">{{ row.a ?? '' }}</div>
+                }
+              </div>
+              <div class="cmp__col">
+                <div class="cmp__head"><b>B</b> {{ 'batch.json.cmpB' | t }}</div>
+                @for (row of rows(); track $index) {
+                  <div class="cmp__line cmp__line--{{ row.kind }}" [class.cmp__line--gap]="!row.b">{{ row.b ?? '' }}</div>
+                }
+              </div>
+            </div>
+            <p class="dlg__sum">{{ 'batch.json.cmpHint' | t }}</p>
           </div>
         </div>
       </div>
@@ -98,6 +132,16 @@ import type { WorkspacePageComponent } from '../../workspace/workspace.page';
     .dlg-note { margin: 0; padding: 10px 14px; border-radius: 12px; font-size: 13px; background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid var(--accent); }
     .dlg-file { align-self: flex-start; cursor: pointer; }
     .dlg { width: min(720px, 100%); }
+    .dlg--wide { width: min(1100px, 100%); }
+    .dlg--wide .dialog__header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; .dialog__title { margin-right: auto; } }
+    .cmp { display: flex; border: 1px solid color-mix(in srgb, var(--text) 18%, transparent); border-radius: 12px; overflow: auto; max-height: 56vh; }
+    .cmp__col { flex: 1; min-width: 0; & + & { border-left: 1px solid color-mix(in srgb, var(--text) 18%, transparent); } }
+    .cmp__head { padding: 6px 12px; font-size: 13px; background: color-mix(in srgb, var(--text) 8%, transparent); position: sticky; top: 0; }
+    .cmp__line { font-family: Consolas, monospace; font-size: 12px; line-height: 1.7; padding: 0 12px; white-space: pre; overflow: hidden; text-overflow: ellipsis; min-height: 1.7em; }
+    .cmp__line--moved, .cmp__line--page { background: color-mix(in srgb, #fbbf24 16%, transparent); }
+    .cmp__line--new { background: color-mix(in srgb, #60a5fa 18%, transparent); }
+    .cmp__line--missing { background: color-mix(in srgb, var(--danger) 18%, transparent); }
+    .cmp__line--gap { background: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--text) 12%, transparent) 6px 7px); }
     .dlg__sum { margin: 0; color: var(--muted); font-size: 14px; }
     .dlg__chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .dlg__table { width: 100%; border-collapse: collapse; font-size: 13px; td { padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent); } }
@@ -130,6 +174,13 @@ export class BatchEditorDialogsComponent {
     input.value = '';
     if (file) void this.vm.batchSetTemplateFile(file);
   }
+
+  /** One line per field pair: the same row of A and of B, aligned by field name. */
+  readonly rows = computed(() => {
+    const line = (side: { page: number; field: PageField } | undefined) =>
+      side ? `p.${side.page}  ${JSON.stringify({ mapField: side.field.mapField, x: side.field.x, y: side.field.y })}` : null;
+    return this.vm.batchDiff().rows.map((r) => ({ kind: r.kind, a: line(r.a), b: line(r.b) }));
+  });
 
   readonly kinds: readonly DiffKind[] = ['same', 'moved', 'page', 'new', 'missing'];
 }

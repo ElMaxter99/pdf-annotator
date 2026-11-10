@@ -1023,6 +1023,29 @@
       "noneNote": "No és definitiu. Des de l’editor podràs posar la plantilla d’A quan vulguis («Posar plantilla A») o tornar a aquesta fitxa.",
       "noneBack": "Tornar i enganxar la plantilla",
       "noneGo": "Continuar sense plantilla"
+    },
+    "json": {
+      "sourceLabel": "JSON que es mostra",
+      "sourceB": "B · nou ✎",
+      "sourceA": "A · original 🔒",
+      "compare": "⇆ Comparar JSON",
+      "noA": "Aquest PDF no té plantilla A.",
+      "aReadOnly": "Només lectura: és la plantilla del PDF original.",
+      "vs": "vs A · {{moved}} moguts · {{added}} nous · {{missing}} falten",
+      "vsSame": "vs A · sense diferències",
+      "onlyA": "Només a A",
+      "missing": "falta a B",
+      "copyA": "Copia el JSON d’A",
+      "copyB": "Copia el JSON de B",
+      "compareTitle": "Comparar JSON · A → B",
+      "cmpA": "Original · només lectura",
+      "cmpB": "Nou · edita’l al panell",
+      "cmpHint": "Les files s’alineen per «mapField». Les franges ratllades són buits: falta alguna cosa en aquest costat.",
+      "mark": {
+        "moved": "mogut",
+        "new": "nou a B",
+        "page": "ha canviat de pàgina"
+      }
     }
   },
   "preview": {
@@ -1192,7 +1215,7 @@
         "summary": "De 2 a 50 PDF amb plantilles JSON: carregar, aparellar, comparar i descarregar.",
         "s1": "Deixa diversos PDF (i plantilles JSON) a l'inici, o usa «Provar el mode Lots».",
         "s2": "Cada plantilla s'aparella amb el seu PDF pel camp pdfName; el que sigui ambigu el decideixes tu.",
-        "s3": "Obre cada PDF: l’editor mostra el PDF A (plantilla fixa) al costat del PDF B editable; associa camps, afegeix els nous i valida amb OK.",
+        "s3": "Obre cada PDF: l’editor mostra el PDF A (plantilla fixa) al costat del PDF B editable; associa camps, afegeix els nous i valida amb OK. A Anotacions tens el JSON de B (arbre o text) amb marques del que ha canviat respecte d’A, el JSON d’A en només lectura i «Comparar JSON».",
         "tip": "El lot es desa al teu navegador i pots continuar-lo després.",
         "s4": "Descarrega els resultats com a fitxers solts."
       },

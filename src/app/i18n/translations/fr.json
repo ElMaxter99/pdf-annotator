@@ -1023,6 +1023,29 @@
       "noneNote": "Ce n’est pas définitif. Depuis l’éditeur vous pourrez mettre le modèle de A quand vous voulez (« Mettre le modèle A ») ou revenir à cette fiche.",
       "noneBack": "Revenir et coller le modèle",
       "noneGo": "Continuer sans modèle"
+    },
+    "json": {
+      "sourceLabel": "JSON affiché",
+      "sourceB": "B · nouveau ✎",
+      "sourceA": "A · original 🔒",
+      "compare": "⇆ Comparer le JSON",
+      "noA": "Ce PDF n’a pas de modèle A.",
+      "aReadOnly": "Lecture seule : c’est le modèle du PDF d’origine.",
+      "vs": "vs A · {{moved}} déplacés · {{added}} nouveaux · {{missing}} manquants",
+      "vsSame": "vs A · aucune différence",
+      "onlyA": "Seulement dans A",
+      "missing": "absent de B",
+      "copyA": "Copier le JSON de A",
+      "copyB": "Copier le JSON de B",
+      "compareTitle": "Comparer le JSON · A → B",
+      "cmpA": "Original · lecture seule",
+      "cmpB": "Nouveau · à modifier dans le panneau",
+      "cmpHint": "Les lignes sont alignées par « mapField ». Les bandes hachurées sont des trous : il manque quelque chose de ce côté.",
+      "mark": {
+        "moved": "déplacé",
+        "new": "nouveau dans B",
+        "page": "changé de page"
+      }
     }
   },
   "preview": {
@@ -1192,7 +1215,7 @@
         "summary": "2 à 50 PDF avec des modèles JSON : charger, associer, comparer et télécharger.",
         "s1": "Déposez plusieurs PDF (et modèles JSON) sur l'accueil, ou utilisez « Essayer le mode Lots ».",
         "s2": "Chaque modèle est associé à son PDF par le champ pdfName ; vous tranchez ce qui est ambigu.",
-        "s3": "Ouvrez chaque PDF : l’éditeur affiche le PDF A (modèle fixe) à côté du PDF B modifiable ; reliez les champs, ajoutez les nouveaux et validez avec OK.",
+        "s3": "Ouvrez chaque PDF : l’éditeur affiche le PDF A (modèle fixe) à côté du PDF B modifiable ; reliez les champs, ajoutez les nouveaux et validez avec OK. Dans Annotations, vous avez le JSON de B (arbre ou texte) avec des marques de ce qui a changé par rapport à A, le JSON de A en lecture seule et « Comparer le JSON ».",
         "tip": "Le lot est conservé dans votre navigateur ; vous pourrez le reprendre plus tard.",
         "s4": "Téléchargez les résultats sous forme de fichiers séparés."
       },

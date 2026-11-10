@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,12 +20,17 @@ interface JsonTreeNode {
   valueType?: JsonPrimitiveType;
 }
 
+export interface JsonTreeMark {
+  kind: 'moved' | 'new' | 'page' | 'was';
+  text?: string;
+}
+
 type JsonPrimitiveType = 'string' | 'number' | 'boolean' | 'null' | 'unknown';
 
 @Component({
   selector: 'app-json-tree',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslationPipe],
   templateUrl: './json-tree.component.html',
   styleUrls: ['./json-tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,16 +38,19 @@ type JsonPrimitiveType = 'string' | 'number' | 'boolean' | 'null' | 'unknown';
 export class JsonTreeComponent implements OnChanges {
   @Input() value: unknown = null;
   @Input() label: string | null = null;
+  /** Optional marks by node path (A/B comparison in batch mode): a kind chip and/or a short text. */
+  @Input() marks: Readonly<Record<string, JsonTreeMark>> | null = null;
 
   protected rootNode: JsonTreeNode | null = null;
 
+  private knownMarkPaths = new Set<string>();
   private readonly collapsedPaths = signal<Set<string>>(new Set());
   private readonly focusedPath = signal<string | null>(null);
 
   constructor(private readonly host: ElementRef<HTMLElement>) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if ('value' in changes || 'label' in changes) {
+    if ('value' in changes || 'label' in changes || 'marks' in changes) {
       const previousRoot = this.rootNode;
       const previousCollapsed = new Set(this.collapsedPaths());
       const previouslyExpanded = new Set<string>();
@@ -66,8 +75,22 @@ export class JsonTreeComponent implements OnChanges {
         }
       }
 
+      // Newly marked nodes open their ancestors, so a difference is visible without hunting for it.
+      const markPaths = new Set(Object.keys(this.marks ?? {}));
+      for (const path of markPaths) {
+        if (this.knownMarkPaths.has(path)) continue;
+        for (const ancestor of this.collectAncestorPaths(path)) {
+          if (ancestor !== path) collapsed.delete(ancestor);
+        }
+      }
+      this.knownMarkPaths = markPaths;
+
       this.collapsedPaths.set(collapsed);
     }
+  }
+
+  protected markOf(node: JsonTreeNode): JsonTreeMark | null {
+    return this.marks?.[node.path] ?? null;
   }
 
   protected toggleNode(node: JsonTreeNode) {

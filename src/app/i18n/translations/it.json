@@ -1023,6 +1023,29 @@
       "noneNote": "Non è definitivo. Dall’editor potrai mettere il modello di A quando vuoi («Metti modello A») o tornare a questa scheda.",
       "noneBack": "Torna e incolla il modello",
       "noneGo": "Continua senza modello"
+    },
+    "json": {
+      "sourceLabel": "JSON mostrato",
+      "sourceB": "B · nuovo ✎",
+      "sourceA": "A · originale 🔒",
+      "compare": "⇆ Confronta JSON",
+      "noA": "Questo PDF non ha un modello A.",
+      "aReadOnly": "Sola lettura: è il modello del PDF originale.",
+      "vs": "vs A · {{moved}} spostati · {{added}} nuovi · {{missing}} mancanti",
+      "vsSame": "vs A · nessuna differenza",
+      "onlyA": "Solo in A",
+      "missing": "manca in B",
+      "copyA": "Copia il JSON di A",
+      "copyB": "Copia il JSON di B",
+      "compareTitle": "Confronta JSON · A → B",
+      "cmpA": "Originale · sola lettura",
+      "cmpB": "Nuovo · modificalo nel pannello",
+      "cmpHint": "Le righe sono allineate per «mapField». Le fasce tratteggiate sono vuoti: da quel lato manca qualcosa.",
+      "mark": {
+        "moved": "spostato",
+        "new": "nuovo in B",
+        "page": "cambio pagina"
+      }
     }
   },
   "preview": {
@@ -1192,7 +1215,7 @@
         "summary": "Da 2 a 50 PDF con modelli JSON: carica, abbina, confronta e scarica.",
         "s1": "Trascina più PDF (e modelli JSON) nella home, oppure usa «Prova la modalità Lotti».",
         "s2": "Ogni modello viene abbinato al suo PDF dal campo pdfName; i casi ambigui li decidi tu.",
-        "s3": "Apri ogni PDF: l’editor mostra il PDF A (modello fisso) accanto al PDF B modificabile; collega i campi, aggiungi i nuovi e convalida con OK.",
+        "s3": "Apri ogni PDF: l’editor mostra il PDF A (modello fisso) accanto al PDF B modificabile; collega i campi, aggiungi i nuovi e convalida con OK. In Annotazioni trovi il JSON di B (albero o testo) con segni di ciò che è cambiato rispetto ad A, il JSON di A in sola lettura e «Confronta JSON».",
         "tip": "Il lotto viene salvato nel tuo browser e puoi riprenderlo dopo.",
         "s4": "Scarica i risultati come file separati."
       },

@@ -2960,3 +2960,65 @@ kbd {
 :root.theme-light .batch-start__opt--rec, :root.theme-light .batch-start__box { border-color: #0b7a70; }
 :root.theme-light .batch-start__box { background: #fff; }
 :root.theme-light .batch-start { background: rgba(255,255,255,.6); }
+
+/* Batch: Anotaciones panel — B/A switch, fields only in A, compare dialog */
+.json-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.json-source__opt,
+.json-source__compare {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--text) 22%, transparent);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+.json-source__opt--active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.json-source__compare {
+  margin-left: auto;
+}
+.json-editor--readonly {
+  opacity: 0.9;
+  cursor: default;
+}
+.json-onlya {
+  margin-top: 6px;
+  border: 1px dashed #d97706;
+  border-radius: 10px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.json-onlya__title {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.json-onlya__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: Consolas, monospace;
+  font-size: 0.78rem;
+}
+.json-onlya .json-tree__mark--moved {
+  background: color-mix(in srgb, #fbbf24 28%, transparent);
+  border-radius: 999px;
+  padding: 0 8px;
+  font-size: 0.7rem;
+}

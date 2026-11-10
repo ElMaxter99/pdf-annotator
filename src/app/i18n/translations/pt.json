@@ -1023,6 +1023,29 @@
       "noneNote": "Não é definitivo. No editor pode pôr o modelo de A quando quiser («Pôr modelo A») ou voltar a esta ficha.",
       "noneBack": "Voltar e colar o modelo",
       "noneGo": "Continuar sem modelo"
+    },
+    "json": {
+      "sourceLabel": "JSON apresentado",
+      "sourceB": "B · novo ✎",
+      "sourceA": "A · original 🔒",
+      "compare": "⇆ Comparar JSON",
+      "noA": "Este PDF não tem modelo A.",
+      "aReadOnly": "Só leitura: é o modelo do PDF original.",
+      "vs": "vs A · {{moved}} movidos · {{added}} novos · {{missing}} em falta",
+      "vsSame": "vs A · sem diferenças",
+      "onlyA": "Só em A",
+      "missing": "falta em B",
+      "copyA": "Copiar JSON de A",
+      "copyB": "Copiar JSON de B",
+      "compareTitle": "Comparar JSON · A → B",
+      "cmpA": "Original · só leitura",
+      "cmpB": "Novo · edite-o no painel",
+      "cmpHint": "As linhas alinham-se por «mapField». As faixas riscadas são lacunas: falta algo nesse lado.",
+      "mark": {
+        "moved": "movido",
+        "new": "novo em B",
+        "page": "mudou de página"
+      }
     }
   },
   "preview": {
@@ -1192,7 +1215,7 @@
         "summary": "De 2 a 50 PDF com modelos JSON: carregar, emparelhar, comparar e descarregar.",
         "s1": "Solte vários PDF (e modelos JSON) no início, ou use «Experimentar o modo Lotes».",
         "s2": "Cada modelo é emparelhado com o seu PDF pelo campo pdfName; o que for ambíguo decide você.",
-        "s3": "Abra cada PDF: o editor mostra o PDF A (modelo fixo) ao lado do PDF B editável; associe campos, adicione os novos e valide com OK.",
+        "s3": "Abra cada PDF: o editor mostra o PDF A (modelo fixo) ao lado do PDF B editável; associe campos, adicione os novos e valide com OK. Em Anotações tem o JSON de B (árvore ou texto) com marcas do que mudou face a A, o JSON de A só de leitura e «Comparar JSON».",
         "tip": "O lote fica guardado no seu navegador e pode continuá-lo depois.",
         "s4": "Descarregue os resultados como ficheiros separados."
       },

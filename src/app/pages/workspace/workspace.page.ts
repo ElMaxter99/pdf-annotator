@@ -15,7 +15,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BatchStoreService, MAX_BATCH_PDF_BYTES } from '../../services/batch-store.service';
-import { diffTemplates, moveFieldToPage } from '../../utils/batch-diff.utils';
+import { diffTemplates, moveFieldToPage, type DiffReport, type DiffRow } from '../../utils/batch-diff.utils';
+import type { JsonTreeMark } from './components/json-tree/json-tree.component';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import { pdfjsLib } from '../../utils/pdfjs-setup';
@@ -118,6 +119,61 @@ interface JsonTreePreview {
   hasPages?: boolean;
   /** Raw number of field entries across all pages (status `ready`). */
   fieldCount?: number;
+}
+
+export interface BatchJsonView {
+  readonly marks: Readonly<Record<string, JsonTreeMark>>;
+  readonly report: DiffReport | null;
+  /** Fields that A has and B does not. */
+  readonly onlyA: readonly DiffRow[];
+}
+
+const EMPTY_BATCH_JSON: BatchJsonView = { marks: {}, report: null, onlyA: [] };
+
+function numberOf(value: unknown): number {
+  return typeof value === 'number' ? value : Number(value);
+}
+
+/** Compares the JSON text of B (already parsed) with template A and locates each difference by tree path. */
+function buildBatchJsonView(value: unknown, template: readonly PageAnnotations[] | null | undefined): BatchJsonView {
+  if (!template || !value || typeof value !== 'object' || Array.isArray(value)) return EMPTY_BATCH_JSON;
+  const rawPages = (value as { pages?: unknown }).pages;
+  if (!Array.isArray(rawPages)) return EMPTY_BATCH_JSON;
+  const paths = new Map<object, string>();
+  const pages: PageAnnotations[] = [];
+  rawPages.forEach((rawPage, i) => {
+    const rawFields = (rawPage as { fields?: unknown } | null)?.fields;
+    if (!rawPage || typeof rawPage !== 'object' || !Array.isArray(rawFields)) return;
+    const fields: PageField[] = [];
+    rawFields.forEach((rawField, j) => {
+      if (!rawField || typeof rawField !== 'object') return;
+      const f = { ...(rawField as object), x: numberOf((rawField as PageField).x), y: numberOf((rawField as PageField).y) } as PageField;
+      paths.set(f, `root/pages/${i}/fields/${j}`);
+      fields.push(f);
+    });
+    pages.push({ num: numberOf((rawPage as { num?: unknown }).num) || i + 1, fields });
+  });
+  const report = diffTemplates(template, pages);
+  const marks: Record<string, JsonTreeMark> = {};
+  for (const row of report.rows) {
+    if (!row.b || !row.a) continue;
+    const path = paths.get(row.b.field);
+    if (!path) continue;
+    if (row.kind === 'moved') {
+      marks[path] = { kind: 'moved' };
+      if (row.a.field.x !== row.b.field.x) marks[`${path}/x`] = { kind: 'was', text: `A: ${row.a.field.x}` };
+      if (row.a.field.y !== row.b.field.y) marks[`${path}/y`] = { kind: 'was', text: `A: ${row.a.field.y}` };
+    } else if (row.kind === 'page') {
+      marks[path] = { kind: 'page', text: `p.${row.a.page} → p.${row.b.page}` };
+    }
+  }
+  for (const row of report.rows) {
+    if (row.kind === 'new' && row.b) {
+      const path = paths.get(row.b.field);
+      if (path) marks[path] = { kind: 'new' };
+    }
+  }
+  return { marks, report, onlyA: report.rows.filter((r) => r.kind === 'missing') };
 }
 
 const SIDEBAR_TABS = ['document', 'annotations', 'templates', 'advanced'] as const;
@@ -429,6 +485,44 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   });
   readonly batchHasB = computed(() => !!this.batchItem()?.newPdf);
   readonly batchDiff = computed(() => diffTemplates(this.batchItem()?.template, this.store.coords()));
+  /** Which JSON the Anotaciones panel shows in batch mode: B (editable) or A (read only). */
+  readonly batchJsonSource = signal<'b' | 'a'>('b');
+  readonly batchCompareOpen = signal(false);
+  private batchJsonCache: { preview: JsonTreePreview; template: unknown; view: BatchJsonView } | null = null;
+  /** JSON of A as the editor shows it (read only). */
+  readonly batchATextValue = computed(() => {
+    const template = this.batchItem()?.template;
+    return template ? JSON.stringify({ pages: template }, null, 2) : '';
+  });
+  readonly batchATreeValue = computed(() => {
+    const template = this.batchItem()?.template;
+    return template ? { pages: template } : null;
+  });
+
+  /** A/B comparison of the JSON currently in the editor (marks per tree node, fields only in A). */
+  get batchJson(): BatchJsonView {
+    const preview = this.jsonTreePreview;
+    const template = this.batchItem()?.template;
+    const cached = this.batchJsonCache;
+    if (cached && cached.preview === preview && cached.template === template) return cached.view;
+    const view = buildBatchJsonView(preview.status === 'ready' ? preview.value : null, template);
+    this.batchJsonCache = { preview, template, view };
+    return view;
+  }
+
+  batchSetJsonSource(source: 'b' | 'a') {
+    this.batchJsonSource.set(source);
+  }
+
+  batchCopyAJson() {
+    navigator.clipboard.writeText(this.batchATextValue()).catch(() => {});
+  }
+
+  batchOpenCompare() {
+    this.batchDiffSeen.set(true);
+    this.batchCompareOpen.set(true);
+  }
+
   readonly batchDiffOpen = signal(false);
   readonly batchValidateOpen = signal(false);
   /** Name of the field being worked on (selected or open in the editor), to light its pair in A. */
