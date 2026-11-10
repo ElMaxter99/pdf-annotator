@@ -85,7 +85,7 @@
             <p class="cap">{{ 'batch.newPdf.limit' | t : { limit: maxMb } }}</p>
             <label class="btn file" [attr.aria-busy]="uploading()">
               {{ (it.newPdf ? 'batch.newPdf.change' : 'batch.newPdf.choose') | t }}
-              <input type="file" accept="application/pdf,.pdf" hidden (change)="onNewPdf($event)" />
+              <input type="file" id="setup-b-file" accept="application/pdf,.pdf" hidden (change)="onNewPdf($event)" />
             </label>
           </div>
           @if (uploading()) {
@@ -104,57 +104,15 @@
             <p class="note note--ok" role="status">ⓘ <span>{{ 'batch.versionB.sameNote' | t : { name: same } }}</span></p>
           }
           <div class="actions">
-            <button type="button" class="btn" id="continue-item" [disabled]="!it.template || needsSize() || !!it.templateIssue" (click)="showSetup.set(false)">{{ (it.newPdf ? 'batch.newPdf.compare' : 'batch.item.reviewA') | t }} →</button>
+            <button type="button" class="btn" id="continue-item" [disabled]="!it.template || needsSize() || !!it.templateIssue" (click)="openEditor()">{{ (it.newPdf ? 'batch.newPdf.compare' : 'batch.item.reviewA') | t }} →</button>
             <button type="button" class="btn btn--ghost" (click)="skip()">{{ 'batch.item.skip' | t }}</button>
           </div>
         </section>
       </div>
-    } @else {
-      <div class="compare-head">
-        @if (sameNotice(); as same) {
-          <p class="note note--ok" role="status">ⓘ <span>{{ 'batch.versionB.sameNote' | t : { name: same } }}</span></p>
-        }
-        <span class="spacer"></span>
-        <button type="button" class="btn btn--ghost btn--sm" (click)="showSetup.set(true)">✎ {{ 'batch.item.editSetup' | t }}</button>
-        <label class="btn btn--ghost btn--sm">
-          {{ (it.newPdf ? 'batch.item.replaceB' : 'batch.item.addB') | t }}
-          <input type="file" id="replace-b" accept="application/pdf,.pdf" hidden (change)="onNewPdf($event)" />
-        </label>
-        @if (it.newPdf) {
-          <button type="button" class="btn btn--ghost btn--sm" (click)="removeB()">{{ 'batch.item.removeB' | t }}</button>
-        }
-        @if (it.validated) {
-          <span class="chip chip--ok">✓ {{ 'batch.status.validated' | t }}</span>
-          <button type="button" class="btn btn--ghost btn--sm" (click)="unvalidate()">{{ 'batch.item.unvalidate' | t }}</button>
-        } @else {
-          <button type="button" class="btn" id="validate-ok" (click)="confirmValidate.set(true)">OK · {{ 'batch.item.validate' | t }}</button>
-        }
-      </div>
-      <app-batch-compare [item]="it" (saved)="onSaved($event)"></app-batch-compare>
     }
 
     </div>
     </div>
-
-    @if (confirmValidate()) {
-      <div class="overlay" role="dialog" aria-modal="true" aria-labelledby="validate-title" (keydown.escape)="confirmValidate.set(false)">
-        <div class="dialog card">
-          <h2 id="validate-title">{{ 'batch.validate.title' | t : { name: it.name } }}</h2>
-          <p class="cap">{{ 'batch.validate.text' | t }}</p>
-          <div class="row"><span class="ok" aria-hidden="true">✓</span><span class="grow">{{ 'batch.validate.fields' | t : { fields: fieldCount(it.newPdf ? it.layout : it.template), pages: (it.newPdf ? it.layout : it.template)?.length ?? 0 } }}</span></div>
-          @if (warnings() > 0) {
-            <div class="row"><span class="bad" aria-hidden="true">!</span><span class="grow">{{ 'batch.validate.warnings' | t : { count: warnings() } }}</span></div>
-          }
-          @if (dirtyCompare()) {
-            <p class="note note--warn">⚠ <span>{{ 'batch.validate.unsaved' | t }}</span></p>
-          }
-          <div class="actions">
-            <button type="button" class="btn" id="confirm-validate" (click)="validate()">{{ 'batch.validate.confirm' | t }}</button>
-            <button type="button" class="btn btn--ghost" (click)="confirmValidate.set(false)">{{ 'batch.export.cancel' | t }}</button>
-          </div>
-        </div>
-      </div>
-    }
 
     @if (needsSize() && sizeInfo(); as info) {
       <div class="overlay" role="dialog" aria-modal="true" aria-labelledby="size-title" (keydown.escape)="cancelSize()">

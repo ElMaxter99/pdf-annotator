@@ -25,6 +25,12 @@ export const routes: Routes = [
   },
   { path: 'batch/match', redirectTo: 'batch' },
   {
+    path: 'batch/:id/editor',
+    data: { batch: true },
+    loadComponent: () =>
+      import('./pages/workspace/workspace.page').then((m) => m.WorkspacePageComponent),
+  },
+  {
     path: 'batch/:id',
     loadComponent: () =>
       import('./pages/batch/batch-item.page').then((m) => m.BatchItemPageComponent),

@@ -35,7 +35,7 @@ Id en `guide.data.ts` · grupo · captura (`public/assets/guide/*.webp`, o esque
 | `templates` | Plantillas | Editor | esquema | `sidebar` (Plantillas) |
 | `samples` | Valores de muestra y datos de prueba | Editor | esquema | `sidebar` (Avanzado), `preview-values.utils` |
 | `shortcuts` | Atajos y tema claro | Editor | `shortcuts` | `shortcuts-dialog`, `theme-toggle` |
-| `batch` | Modo Lotes (4 pasos) | Lotes | esquema | `pages/batch` |
+| `batch` | Modo Lotes (4 pasos; editor A/B con PDF A de referencia) | Lotes | esquema | `pages/batch` |
 | `export` | Exportar | Más | esquema | `PdfExportService` |
 
 Para regenerar las capturas: `design/tools/capture.mjs` o a mano (1600 × 900, tema oscuro) y convertirlas a `.webp`.

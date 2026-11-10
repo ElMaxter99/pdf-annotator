@@ -1,5 +1,6 @@
-import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { combineLatest } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
@@ -15,12 +16,11 @@ import { parseTemplateText } from '../../utils/template-text.utils';
 import { suggestTemplates } from '../../utils/template-matching.utils';
 import { BatchTabsService } from '../../services/batch-tabs.service';
 import { BatchTabsComponent } from './components/batch-tabs.component';
-import { BatchCompareComponent } from './components/batch-compare.component';
 
 @Component({
   selector: 'app-batch-item-page',
   standalone: true,
-  imports: [TranslationPipe, BatchCompareComponent, BatchTabsComponent],
+  imports: [TranslationPipe, BatchTabsComponent],
   templateUrl: './batch-item.page.html',
   styleUrls: ['./batch-item.page.scss'],
 })
@@ -34,9 +34,7 @@ export class BatchItemPageComponent {
   private readonly tabs = inject(BatchTabsService);
 
   readonly itemId = signal('');
-  readonly confirmValidate = signal(false);
   readonly sameNotice = signal('');
-  private readonly compare = viewChild(BatchCompareComponent);
   readonly draft = signal('');
   readonly showSetup = signal(false);
   readonly dropActive = signal(false);
@@ -63,8 +61,6 @@ export class BatchItemPageComponent {
     return item ? batchStatusOf(item) : 'noTemplate';
   });
   readonly validatedCount = computed(() => this.store.items().filter((i) => !!i.validated).length);
-  readonly warnings = computed(() => this.compare()?.misplacedCount() ?? 0);
-  readonly dirtyCompare = computed(() => !!this.compare()?.dirty());
   /** Templates of the pool that no PDF uses, most similar to this PDF's name first. */
   readonly loose = computed(() => {
     const item = this.item();
@@ -124,16 +120,28 @@ export class BatchItemPageComponent {
 
   constructor() {
     this.metadata.applyDefaultMetadata();
-    this.route.paramMap.pipe(takeUntilDestroyed(inject(DestroyRef))).subscribe((params) => {
+    combineLatest([this.route.paramMap, this.route.queryParamMap])
+      .pipe(takeUntilDestroyed(inject(DestroyRef)))
+      .subscribe(([params, query]) => {
       this.itemId.set(params.get('id') ?? '');
-      this.showSetup.set(false);
-      this.confirmValidate.set(false);
+      this.showSetup.set(query.has('setup'));
       this.sameNotice.set('');
       void this.store.load().then(() => {
         if (this.item()) this.tabs.add(this.itemId());
         this.syncDraft();
       });
     });
+    // Once the PDF is set up (template, version B and size decided) the work happens in the editor.
+    effect(() => {
+      const item = this.item();
+      if (!item || this.setupMode()) return;
+      untracked(() => void this.router.navigate(['/batch', item.id, 'editor'], { replaceUrl: true }));
+    });
+  }
+
+  openEditor() {
+    this.showSetup.set(false);
+    if (this.item() && !this.setupMode()) void this.router.navigate(['/batch', this.itemId(), 'editor']);
   }
 
   private syncDraft() {
@@ -242,21 +250,6 @@ export class BatchItemPageComponent {
     this.sameNotice.set('');
   }
 
-  // ---- validation ----------------------------------------------------------------------------------
-
-  validate() {
-    const compare = this.compare();
-    // Pending moves are saved first: saving removes a previous validation, so confirm afterwards.
-    if (compare?.dirty()) compare.save(false);
-    this.store.setValidated(this.itemId(), true);
-    this.confirmValidate.set(false);
-    this.toast.show(this.i18n.translate('batch.validate.done', { name: this.item()?.name ?? '' }), 'success');
-  }
-
-  unvalidate() {
-    this.store.setValidated(this.itemId(), false);
-  }
-
   applySize() {
     this.store.applySizeStrategy(this.itemId(), this.strategy(), this.rememberRule());
     this.showSetup.set(false);
@@ -278,14 +271,5 @@ export class BatchItemPageComponent {
   skip() {
     const next = this.store.nextPendingId(this.itemId());
     void this.router.navigate(next ? ['/batch', next] : ['/batch']);
-  }
-
-  onSaved(event: { layout: PageAnnotations[] | null; template: PageAnnotations[] | null; next: boolean }) {
-    this.store.saveCoordinates(this.itemId(), event);
-    this.toast.show(this.i18n.translate('batch.compare.savedToast'), 'success');
-    if (event.next) {
-      const next = this.store.nextPendingId(this.itemId());
-      void this.router.navigate(next ? ['/batch', next] : ['/batch']);
-    }
   }
 }

@@ -72,6 +72,9 @@
   </div>
   <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-annotations" aria-labelledby="sidebar-tab-annotations"
     [hidden]="vm.sidebarTab() !== 'annotations'">
+  @if (vm.batchItemId()) {
+    <app-batch-relations [vm]="vm"></app-batch-relations>
+  }
   <div class="sidebar-actions">
     <button type="button" class="btn" (click)="vm.triggerImportCoords()">
       {{ 'sidebar.importJsonFile' | t }}

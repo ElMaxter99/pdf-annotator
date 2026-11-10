@@ -2892,3 +2892,25 @@ kbd {
   color: var(--accent);
   font-weight: 700;
 }
+
+/* A/B editor (batch): reference PDF A next to the editable PDF B */
+.app--workspace .viewer.viewer--batch {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+  .selection-bar { flex: 0 0 100%; }
+}
+.toolbar__batch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.toolbar__batch-name {
+  font-weight: 700;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

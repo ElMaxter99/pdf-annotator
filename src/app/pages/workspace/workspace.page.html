@@ -4,6 +4,9 @@
   <app-workspace-viewer [vm]="vm"></app-workspace-viewer>
   <app-workspace-footer [vm]="vm"></app-workspace-footer>
 </div>
+@if (vm.batchItemId()) {
+  <app-batch-editor-dialogs [vm]="vm"></app-batch-editor-dialogs>
+}
 @if (vm.shortcutsOpen()) {
   <app-shortcuts-dialog (closed)="vm.toggleShortcuts(false)"></app-shortcuts-dialog>
 }

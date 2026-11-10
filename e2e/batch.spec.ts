@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { PDFDocument } from 'pdf-lib';
-import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
+import { EXAMPLE_JSON, EXAMPLE_PDF, openSidebarTab, stubAnalytics } from './helpers';
 
 const pdfBytes = readFileSync(EXAMPLE_PDF);
 const pdfFile = (name: string) => ({ name, mimeType: 'application/pdf', buffer: pdfBytes });
@@ -165,78 +165,6 @@ test('version B: the same content is only a notice, a different file pairs by na
   await expect(card(page, 'uno.pdf')).toContainText('Solo versión A');
 });
 
-test('version B with another name is associated by hand from the PDF page', async ({ page }) => {
-  await startBatch(page);
-  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
-  await page.waitForURL(/\/batch\/.+/);
-  await expect(page.locator('app-batch-compare')).toBeVisible();
-  // Same content, other name: not a new version.
-  await page.locator('#replace-b').setInputFiles(pdfFile('uno final.pdf'));
-  await expect(page.locator('.compare-head .note--ok')).toContainText('uno final.pdf es el mismo PDF');
-  await expect(page.locator('.pane:visible')).toHaveCount(1);
-  // Different content: it becomes version B whatever its name.
-  await page.locator('#replace-b').setInputFiles(await otherPdf('uno final.pdf'));
-  await expect(page.locator('.pane:visible')).toHaveCount(2);
-  await expect(page.locator('.tag--accent')).toContainText('uno final.pdf');
-});
-
-test('review the original, validate it with OK and a confirmation, then download it', async ({ page }) => {
-  await startBatch(page);
-  await card(page, 'dos.pdf').getByRole('button', { name: 'Pegar plantilla' }).click();
-  await page.waitForURL(/\/batch\/.+/);
-  await page.locator('#template-text').fill('db.t.drop();\nvar pdfTemplate = { _id: ObjectId("abc"), pages: [ { num: 1, fields: [ { x: 150, y: 722, mapField: "cliente.nombre", fontSize: 12 } ] } ] };');
-  await expect(page.locator('#template-status')).toContainText('1 páginas · 1 campos');
-  await page.getByRole('button', { name: 'Usar plantilla' }).click();
-  // Without a version B the original is reviewed with its coordinates.
-  await expect(page.locator('app-batch-compare')).toBeVisible();
-  await expect(page.locator('.fld--orig')).toHaveCount(1);
-  await page.locator('#validate-ok').click();
-  await expect(page.getByRole('dialog', { name: /¿Validar dos\.pdf\?/ })).toBeVisible();
-  await page.getByRole('button', { name: 'Cancelar' }).click();
-  await expect(page.locator('#validate-ok')).toBeVisible();
-  await page.locator('#validate-ok').click();
-  await page.locator('#confirm-validate').click();
-  await expect(page.getByText('Validado').first()).toBeVisible();
-
-  await page.getByRole('link', { name: /Panel del lote/ }).click();
-  await expect(card(page, 'dos.pdf')).toHaveAttribute('data-status', 'validated');
-  await expect(page.getByText('1 de 3 validados')).toBeVisible();
-  await page.locator('#download-validated').click();
-  const names: string[] = [];
-  page.on('download', (download) => names.push(download.suggestedFilename()));
-  await page.getByRole('button', { name: /Descargar 2 archivos/ }).click();
-  await expect(page.getByRole('heading', { name: 'Lote descargado' })).toBeVisible({ timeout: 30_000 });
-  expect(names.sort()).toEqual(['dos.json', 'dos.pdf']);
-});
-
-test('add a version B, compare, adjust the coordinates and save', async ({ page }) => {
-  await startBatch(page);
-  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
-  await page.waitForURL(/\/batch\/.+/);
-  await page.locator('#replace-b').setInputFiles(await otherPdf('uno-b.pdf'));
-  await expect(page.locator('.pane')).toHaveCount(2);
-  await expect(page.locator('.fld--new')).not.toHaveCount(0);
-
-  await page.getByRole('button', { name: 'Superpuesto' }).click();
-  await expect(page.locator('.cmp__panes--overlay')).toBeVisible();
-  await page.getByRole('button', { name: 'Lado a lado' }).click();
-
-  const field = page.locator('.fld--new').first();
-  const before = await field.boundingBox();
-  await page.mouse.move(before!.x + 4, before!.y + 4);
-  await page.mouse.down();
-  await page.mouse.move(before!.x + 54, before!.y + 44, { steps: 4 });
-  await page.mouse.up();
-  const after = await field.boundingBox();
-  expect(after!.x).toBeGreaterThan(before!.x + 30);
-  await expect(page.getByRole('button', { name: /Deshacer/ })).toBeEnabled();
-
-  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await waitForSavedLayouts(page, 1);
-  await page.goto('/batch');
-  await expect(card(page, 'uno.pdf')).toHaveAttribute('data-status', 'relaid');
-});
-
 test('a broken template is flagged with its line and does not block the others', async ({ page }) => {
   await startBatch(page);
   await card(page, 'tres.pdf').getByRole('button', { name: 'Pegar plantilla' }).click();
@@ -286,7 +214,9 @@ test('the load step is a three-step stepper and templates can be skipped', async
 test('opened PDFs become tabs of the session and can be closed', async ({ page }) => {
   await startBatch(page);
   await card(page, 'uno.pdf').locator('.pcard__thumb').click();
-  await page.waitForURL(/\/batch\/.+/);
+  await page.waitForURL(/\/editor/);
+  await page.locator('#batch-setup').click();
+  await page.waitForURL(/setup=1/);
   const tabs = page.getByRole('tablist', { name: 'PDF abiertos' });
   await expect(tabs.getByRole('link', { name: 'uno.pdf' })).toBeVisible();
   await tabs.getByRole('link', { name: /Panel del lote/ }).click();
@@ -321,77 +251,95 @@ test('optional test data are pasted in a drawer and last only the session', asyn
   await expect(drawer.getByRole('alert')).toBeVisible();
 });
 
-test('coordinates A can be adjusted and version B can start from a copy of A', async ({ page }) => {
+const twoPagePdf = async (name: string) => {
+  const doc = await PDFDocument.create();
+  doc.addPage([595, 842]);
+  doc.addPage([595, 842]);
+  return { name, mimeType: 'application/pdf', buffer: Buffer.from(await doc.save()) };
+};
+
+/** Opens uno.pdf, adds the given version B from the setup and enters the A/B editor. */
+async function openEditorWithB(page: import('@playwright/test').Page, b = otherPdf('uno-b.pdf')) {
   await startBatch(page);
   await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/editor/);
+  await page.locator('#batch-setup').click();
+  await page.waitForURL(/setup=1/);
+  await page.locator('#template-text').fill(
+    '{"pages":[{"num":1,"fields":[{"x":150,"y":722,"mapField":"cliente.nombre","fontSize":12},{"x":150,"y":700,"mapField":"cliente.nif","fontSize":12}]}]}'
+  );
+  await page.getByRole('button', { name: 'Usar plantilla' }).click();
+  await page.waitForURL(/\/editor/);
+  await page.locator('#batch-setup').click();
+  await page.waitForURL(/setup=1/);
+  await page.locator('#setup-b-file').setInputFiles(await b);
+  await expect(page.locator('.row--sel')).toBeVisible();
+  await page.locator('#continue-item').click();
+  await page.waitForURL(/\/editor/);
+  await expect(page.locator('#batch-bar')).toBeVisible();
+  await openSidebarTab(page, 'Anotaciones');
+}
+
+test('a PDF with a template opens the single-PDF editor; validate it from there and download it', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'dos.pdf').getByRole('button', { name: 'Pegar plantilla' }).click();
   await page.waitForURL(/\/batch\/.+/);
-  // Without a version B only A moves.
-  const a = page.locator('.fld--orig').first();
-  await expect(a).toBeVisible();
-  const before = await a.boundingBox();
-  await page.mouse.move(before!.x + 4, before!.y + 4);
-  await page.mouse.down();
-  await page.mouse.move(before!.x + 44, before!.y + 34, { steps: 4 });
-  await page.mouse.up();
-  const after = await a.boundingBox();
-  expect(after!.x).toBeGreaterThan(before!.x + 25);
-  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await page.locator('#replace-b').setInputFiles(await otherPdf('uno-b.pdf'));
-  await expect(page.locator('.pane:visible')).toHaveCount(2);
-  await expect(page.getByRole('button', { name: 'Ajustar B' })).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('button', { name: 'Copiar A a B' }).click();
-  await page.getByRole('button', { name: 'Ajustar A' }).click();
-  await expect(page.getByRole('button', { name: 'Ajustar A' })).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('#template-text').fill('db.t.drop();\nvar pdfTemplate = { _id: ObjectId("abc"), pages: [ { num: 1, fields: [ { x: 150, y: 722, mapField: "cliente.nombre", fontSize: 12 } ] } ] };');
+  await expect(page.locator('#template-status')).toContainText('1 páginas · 1 campos');
+  await page.getByRole('button', { name: 'Usar plantilla' }).click();
+  await page.waitForURL(/\/editor/);
+  // Without B the editor works on template A and there is no A pane yet.
+  await expect(page.locator('app-batch-reference')).toHaveCount(0);
+  await openSidebarTab(page, 'Anotaciones');
+  await expect(page.locator('#rel-no-b')).toBeVisible();
+  await expect(page.locator('#batch-validate-open')).toBeDisabled();
 });
 
-test('the work view drops the name list, shows a mini preview and moves a field to another page', async ({ page }) => {
-  await startBatch(page);
-  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
-  await page.waitForURL(/\/batch\/.+/);
-  await expect(page.locator('.rail')).toHaveCount(0);
-  const twoPages = await PDFDocument.create();
-  twoPages.addPage([595, 842]);
-  twoPages.addPage([595, 842]);
-  await page.locator('#replace-b').setInputFiles({
-    name: 'uno-b.pdf',
-    mimeType: 'application/pdf',
-    buffer: Buffer.from(await twoPages.save()),
-  });
-  await expect(page.locator('.pane:visible')).toHaveCount(2);
-  await expect(page.locator('.mini')).toContainText('páginas');
-  await page.getByRole('button', { name: 'Ajustar B' }).click();
-  await page.locator('.fieldrow').first().click();
-  await page.locator('#move-page').selectOption('2');
-  await expect(page.getByText(/Página 2 de 2|2 \/ 2/).first()).toBeVisible();
-  await expect(page.locator('.fieldrow__moved')).toContainText('p.1 → p.2');
+test('with a version B the editor shows A next to B and can validate from the editor', async ({ page }) => {
+  await openEditorWithB(page);
+  await expect(page.locator('app-batch-reference')).toBeVisible();
+  await expect(page.locator('#rel-b li')).toHaveCount(2);
+  await page.locator('#batch-validate-open').click();
+  await page.locator('#batch-validate-confirm').click();
+  await page.waitForURL('**/batch');
+  await expect(card(page, 'uno.pdf')).toHaveAttribute('data-status', 'validated');
 });
 
-test('a PDF without template can be compared directly with «Comparar sin plantilla»', async ({ page }) => {
-  await startBatch(page);
-  await card(page, 'dos.pdf').locator('.pcard__thumb').click();
-  await page.waitForURL(/\/batch\/.+/);
-  await page.locator('#compare-without-template').click();
-  await expect(page.locator('app-batch-compare')).toBeVisible();
-  await expect(page.locator('.pane:visible')).toHaveCount(1);
+test('selecting a field in B lights its pair in A and clicking A selects B', async ({ page }) => {
+  await openEditorWithB(page);
+  await page.locator('#rel-b li button').first().click();
+  await expect(page.locator('.ref__fld.is-focus')).toHaveCount(1);
+  await page.locator('#rel-b li button').first().click();
+  await page.locator('.ref__fld').first().click();
+  await expect(page.locator('#rel-b .is-focus')).toHaveCount(1);
 });
 
-test('selecting a field lights it in both versions and A fields can change page', async ({ page }) => {
-  await startBatch(page);
-  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
-  await page.waitForURL(/\/batch\/.+/);
-  const twoPages = await PDFDocument.create();
-  twoPages.addPage([595, 842]);
-  twoPages.addPage([595, 842]);
-  await page.locator('#replace-b').setInputFiles({ name: 'uno-b.pdf', mimeType: 'application/pdf', buffer: Buffer.from(await twoPages.save()) });
-  await expect(page.locator('.pane:visible')).toHaveCount(2);
-  await page.getByRole('button', { name: 'Copiar A a B' }).click();
-  await page.locator('.fieldrow').first().click();
-  await expect(page.locator('.fld--new.is-selected')).toHaveCount(1);
-  await expect(page.locator('.fld--orig.is-selected')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Ajustar A' }).click();
-  await page.locator('.fieldrow').first().click();
-  await expect(page.locator('.fld--new.is-selected')).toHaveCount(1);
-  await page.locator('#move-page').selectOption('2');
-  await expect(page.locator('.fieldrow')).toHaveCount(1);
-  await expect(page.locator('.cmp__bar')).toContainText('2 / 2');
+test('A fields not used in B are listed and can be added; B-only fields are flagged', async ({ page }) => {
+  await openEditorWithB(page);
+  await expect(page.locator('#rel-a-unused li')).toHaveCount(0);
+  await page.locator('#rel-b li button').first().click();
+  await page.locator('.selection-bar__btn--danger').click();
+  await expect(page.locator('#rel-a-unused li')).toHaveCount(1);
+  await page.locator('#rel-a-unused li button').first().click();
+  await expect(page.locator('#rel-a-unused li')).toHaveCount(0);
+  await expect(page.locator('#rel-b li')).toHaveCount(2);
+});
+
+test('the A to B report counts what stayed, moved or is new', async ({ page }) => {
+  await openEditorWithB(page);
+  await page.locator('#batch-diff-open').click();
+  await expect(page.locator('#batch-diff')).toContainText('Igual');
+  await expect(page.locator('#batch-diff tr[data-kind=same]')).not.toHaveCount(0);
+  await page.locator('#batch-diff-close').click();
+  await expect(page.locator('#batch-diff')).toHaveCount(0);
+});
+
+test('a field can move to another page of B and the A and B pages navigate on their own', async ({ page }) => {
+  await openEditorWithB(page, twoPagePdf('uno-b.pdf'));
+  await page.locator('#rel-b li button').first().click();
+  await page.locator('#rel-move-sel').selectOption('2');
+  await expect(page.locator('#rel-b li button').last()).toContainText('B p.2');
+  // A has one page and B two: the pages cannot be linked, each navigates on its own.
+  await expect(page.locator('#ref-link')).toHaveCount(0);
+  await expect(page.locator('#ref-page')).toContainText('1 / 1');
 });

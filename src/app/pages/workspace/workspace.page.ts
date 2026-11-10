@@ -13,8 +13,9 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BatchStoreService, MAX_BATCH_PDF_BYTES } from '../../services/batch-store.service';
+import { diffTemplates, moveFieldToPage } from '../../utils/batch-diff.utils';
 import { FormsModule } from '@angular/forms';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import { pdfjsLib } from '../../utils/pdfjs-setup';
@@ -23,6 +24,8 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
 import '../../array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from '../../models/annotation.model';
+import { BatchEditorDialogsComponent } from '../batch/components/batch-editor-dialogs.component';
+import type { ReferencePick } from '../batch/components/batch-reference.component';
 import { AnnotationTemplatesService, AnnotationTemplate } from '../../annotation-templates.service';
 import {
   DEFAULT_GUIDE_SETTINGS,
@@ -155,6 +158,7 @@ const DEFAULT_OPACITY = 1;
     WorkspaceViewerComponent,
     WorkspaceFooterComponent,
     ShortcutsDialogComponent,
+    BatchEditorDialogsComponent,
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
@@ -203,6 +207,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly toast = inject(ToastService);
   private readonly batchStore = inject(BatchStoreService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly sessionStore = inject(SessionStoreService);
   private readonly store = inject(AnnotationStore);
   private readonly annotationImport = inject(AnnotationImportService);
@@ -383,6 +388,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.store.setFieldComparator((a, b) => this.areFieldsEqual(a, b));
     effect(() => {
       this.store.coords();
+      untracked(() => {
+        if (this.batchItemId()) this.scheduleBatchSave();
+      });
+    });
+    effect(() => {
+      this.store.coords();
       this.pageIndex();
       this.scale();
       untracked(() => this.scheduleSessionSave());
@@ -410,7 +421,175 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  // ---- batch mode (/batch/:id/editor): the editor works on the PDF B of a batch item ------------
+  readonly batchItemId = signal<string | null>(null);
+  readonly batchItem = computed(() => {
+    const id = this.batchItemId();
+    return id ? this.batchStore.items().find((i) => i.id === id) ?? null : null;
+  });
+  readonly batchHasB = computed(() => !!this.batchItem()?.newPdf);
+  readonly batchDiff = computed(() => diffTemplates(this.batchItem()?.template, this.store.coords()));
+  readonly batchDiffOpen = signal(false);
+  readonly batchValidateOpen = signal(false);
+  /** Name of the field being worked on (selected or open in the editor), to light its pair in A. */
+  readonly batchFocusKey = computed(() => {
+    const sel = this.selection();
+    if (sel && sel.fields.length) {
+      return this.coords()[sel.pageIndex]?.fields[sel.fields[0]]?.mapField ?? null;
+    }
+    return this.editing()?.field.mapField ?? null;
+  });
+  /** The A pane shows only once there is a PDF B to compare it with. */
+  readonly batchShowsA = computed(() => this.batchHasB() && !!this.batchItem()?.template);
+  readonly batchUsedKeys = computed(() => {
+    const keys = new Set<string>();
+    for (const page of this.coords()) for (const f of page.fields) if (f.mapField) keys.add(f.mapField);
+    return keys;
+  });
+  private batchBaseline: string | null = null;
+  private batchSaveTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private async initBatch(id: string) {
+    await this.batchStore.load();
+    const item = this.batchStore.items().find((i) => i.id === id);
+    if (!item) {
+      await this.router.navigate(['/batch']);
+      return;
+    }
+    this.batchItemId.set(id);
+    const hasB = !!item.newPdf;
+    const file = new File([item.newPdf ?? item.pdf], item.newName ?? item.name, { type: 'application/pdf' });
+    await this.loadPdfFile(file);
+    const start = hasB ? item.layout ?? item.template ?? [] : item.template ?? [];
+    this.replaceCoords(cloneAnnotationPages(start), { skipHistory: true });
+    this.batchBaseline = JSON.stringify(this.store.coords());
+  }
+
+  private scheduleBatchSave() {
+    if (this.batchSaveTimer) clearTimeout(this.batchSaveTimer);
+    this.batchSaveTimer = setTimeout(() => this.flushBatchSave(), 500);
+  }
+
+  @HostListener('window:pagehide')
+  flushBatchSave() {
+    if (this.batchSaveTimer) {
+      clearTimeout(this.batchSaveTimer);
+      this.batchSaveTimer = null;
+    }
+    const id = this.batchItemId();
+    // Until the PDF's coordinates are loaded there is nothing of the user's to save.
+    if (!id || this.batchBaseline === null) return;
+    const now = JSON.stringify(this.store.coords());
+    if (now === this.batchBaseline) return;
+    this.batchBaseline = now;
+    const coords = this.store.snapshot();
+    this.batchStore.saveCoordinates(
+      id,
+      this.batchHasB() ? { layout: coords, template: null } : { layout: null, template: coords }
+    );
+  }
+
+  /** A click on a field of A selects the field of B with the same name. */
+  batchPickFromA(pick: ReferencePick) {
+    const name = pick.field.mapField;
+    if (!name) return;
+    for (const page of this.coords()) {
+      const index = page.fields.findIndex((f) => f.mapField === name);
+      if (index >= 0) {
+        this.batchGoToField(page.num, index);
+        return;
+      }
+    }
+  }
+
+  /** Starts B from a copy of the template A (or from nothing). */
+  batchCopyAToB(empty = false) {
+    const item = this.batchItem();
+    if (!item) return;
+    const pages = empty ? [] : cloneAnnotationPages(item.template ?? []);
+    this.applyCoordsChange(() => this.coords.set(this.snapshotCoords(pages)));
+    this.selection.set(null);
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
+  }
+
+  /** Adds a field of A to B on the page being shown, keeping its name (and so its link with A). */
+  batchAddFromA(field: PageField) {
+    const num = this.pageIndex();
+    const copy: PageField = { ...field };
+    this.applyCoordsChange(() =>
+      this.coords.update((pages) => {
+        const next = cloneAnnotationPages(pages);
+        let page = next.find((p) => p.num === num);
+        if (!page) {
+          page = { num, fields: [] };
+          next.push(page);
+          next.sort((a, b) => a.num - b.num);
+        }
+        page.fields.push(copy);
+        return next;
+      })
+    );
+    this.syncCoordsTextModel();
+    this.redrawAllForPage();
+  }
+
+  /** Shows a field of B: goes to its page and selects it. */
+  batchGoToField(pageNum: number, fieldIndex: number) {
+    const pageIndex = this.coords().findIndex((p) => p.num === pageNum);
+    if (pageIndex < 0) return;
+    this.pageIndex.set(pageNum);
+    this.selection.set({ pageIndex, fields: [fieldIndex] });
+    void this.render();
+  }
+
+  /** Moves the selected field to another page, keeping its place on the sheet. */
+  batchMoveSelectedToPage(target: number) {
+    const sel = this.selection();
+    if (!sel || sel.fields.length !== 1) return;
+    const page = this.coords()[sel.pageIndex];
+    if (!page || target === page.num) return;
+    this.applyCoordsChange(() =>
+      this.coords.set(moveFieldToPage(this.coords(), page.num, sel.fields[0], target))
+    );
+    this.pageIndex.set(target);
+    const idx = this.coords().findIndex((p) => p.num === target);
+    const last = (this.coords()[idx]?.fields.length ?? 1) - 1;
+    this.selection.set(idx >= 0 ? { pageIndex: idx, fields: [last] } : null);
+    this.syncCoordsTextModel();
+    void this.render().then(() => this.redrawAllForPage());
+  }
+
+  batchValidate() {
+    const id = this.batchItemId();
+    if (!id) return;
+    this.flushBatchSave();
+    this.batchStore.setValidated(id, true);
+    this.batchValidateOpen.set(false);
+    void this.router.navigate(['/batch']);
+  }
+
+  batchUnvalidate() {
+    const id = this.batchItemId();
+    if (id) this.batchStore.setValidated(id, false);
+  }
+
+  batchOpenSetup() {
+    this.flushBatchSave();
+    void this.router.navigate(['/batch', this.batchItemId()], { queryParams: { setup: 1 } });
+  }
+
+  batchBack() {
+    this.flushBatchSave();
+    void this.router.navigate(['/batch']);
+  }
+
   ngOnInit(): void {
+    const batchId = this.route.snapshot.paramMap.get('id');
+    if (batchId && this.route.snapshot.data['batch']) {
+      void this.initBatch(batchId);
+      return;
+    }
     const pendingFile = this.pendingFileService.consumePendingFile();
     const pendingRestore = this.pendingFileService.consumePendingRestore();
     if (pendingFile) {
@@ -421,6 +600,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   ngOnDestroy() {
+    this.flushBatchSave();
     this.revokeThumbnailUrls();
     if (this.autoApplyCoordsTimer) {
       clearTimeout(this.autoApplyCoordsTimer);
@@ -1416,6 +1596,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private scheduleSessionSave() {
+    if (this.batchItemId()) {
+      return;
+    }
     if (this.sessionSaveTimer) {
       clearTimeout(this.sessionSaveTimer);
       this.sessionSaveTimer = null;

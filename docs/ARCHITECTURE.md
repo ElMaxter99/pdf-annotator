@@ -94,6 +94,8 @@ La plantilla "Predeterminada" es sintética y no se puede borrar. Todos los acce
 - Exportación: `BatchExportService` genera `{nombre}.json` (solo `pages`) y `{nombre}.pdf` (con `PdfExportService`); la página los descarga sueltos con contador. No hay ZIP.
 - Las rutas `batch` y `batch/:id` se renderizan solo en cliente (`app.routes.server.ts`).
 
+**Editor A/B (`/batch/:id/editor`)**: la misma `WorkspacePageComponent` en «modo lote» (`route.data.batch`). Carga `item.newPdf ?? item.pdf` y edita `item.layout` (con B) o `item.template` (sin B); guarda con debounce vía `BatchStoreService.saveCoordinates` (solo cuando ya cargó la línea base). `BatchReferenceComponent` pinta el PDF A con su plantilla (solo lectura), `BatchRelationsComponent` es el panel de relaciones (pestaña Anotaciones) y `BatchEditorDialogsComponent` el informe de diferencias y la confirmación de validar. Emparejamiento por `mapField` en `utils/batch-diff.utils.ts` (`diffTemplates`, `moveFieldToPage`).
+
 ## 7. Guías y snapping
 `GuideSettings` (`models/guide-settings.model.ts`): rejilla (`gridSize`), reglas, alineación, *snap* a rejilla/márgenes/centros/puntos personalizados, `snapTolerance`, y modo de coordenadas (PDF o canvas). Se activan en **Opciones avanzadas → Activar guías y snapping**.
 

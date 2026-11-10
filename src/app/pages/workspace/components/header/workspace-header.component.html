@@ -1,5 +1,21 @@
 <header class="header">
   <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
+    @if (vm.batchItemId()) {
+      <div class="toolbar__batch" id="batch-bar">
+        <button type="button" class="btn" id="batch-back" (click)="vm.batchBack()">← {{ 'batch.editor.back' | t }}</button>
+        <span class="toolbar__batch-name" [attr.title]="vm.batchItem()?.name">{{ vm.batchItem()?.name }}</span>
+        <span class="toolbar__badge" id="batch-state">{{ (vm.batchItem()?.validated ? 'batch.editor.stateOk' : vm.batchHasB() ? 'batch.editor.stateWork' : 'batch.editor.stateNoB') | t }}</span>
+        <button type="button" class="btn" id="batch-setup" (click)="vm.batchOpenSetup()">✎ {{ 'batch.item.editSetup' | t }}</button>
+        <button type="button" class="btn" id="batch-diff-open" (click)="vm.batchDiffOpen.set(true)"
+          [disabled]="!vm.batchHasB()">{{ 'batch.editor.diff' | t }}</button>
+        @if (vm.batchItem()?.validated) {
+          <button type="button" class="btn" id="batch-unvalidate" (click)="vm.batchUnvalidate()">{{ 'batch.editor.reopen' | t }}</button>
+        } @else {
+          <button type="button" class="btn btn--primary" id="batch-validate-open" (click)="vm.batchValidateOpen.set(true)"
+            [disabled]="!vm.batchHasB()">{{ 'batch.editor.validate' | t }}</button>
+        }
+      </div>
+    } @else {
     <div class="toolbar__identity">
       <img class="toolbar__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
       <div class="toolbar__brand-text">
@@ -11,6 +27,8 @@
     <app-mode-switch active="editor"></app-mode-switch>
     <button type="button" class="btn" (click)="vm.addToBatch()" [disabled]="!vm.pdfDoc"
       [attr.title]="'batch.editor.addHint' | t">{{ 'batch.editor.add' | t }}</button>
+
+    }
 
     <input #coordsFileInput type="file" accept="application/json" (change)="vm.onCoordsFileSelected($event)" hidden />
 

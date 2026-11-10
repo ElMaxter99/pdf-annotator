@@ -1,4 +1,4 @@
-<main class="viewer" *ngIf="vm.pdfDoc as _">
+<main class="viewer" [class.viewer--batch]="vm.batchShowsA()" *ngIf="vm.pdfDoc as _">
   @if (vm.selectionCount() > 0) {
     <div class="selection-bar" role="toolbar" [attr.aria-label]="'selection.toolbar' | t">
       <span class="selection-bar__count">{{ 'selection.count' | t : { count: vm.selectionCount() } }}</span>
@@ -23,6 +23,11 @@
       <button type="button" class="selection-bar__btn" (click)="vm.clearSelection()"
         [attr.title]="'selection.clear' | t" [attr.aria-label]="'selection.clear' | t">✕</button>
     </div>
+  }
+  @if (vm.batchShowsA() && vm.batchItem(); as item) {
+    <app-batch-reference [item]="item" [scale]="vm.scale()" [focusKey]="vm.batchFocusKey()"
+      [pageB]="vm.pageIndex()" [pagesB]="vm.pageCount" [usedKeys]="vm.batchUsedKeys()"
+      (pick)="vm.batchPickFromA($event)"></app-batch-reference>
   }
   <div class="canvas-container" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
