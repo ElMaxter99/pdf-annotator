@@ -70,9 +70,9 @@ interface RefBox {
     </section>
   `,
   styles: `
-    :host { display: block; flex: 0 0 auto; min-width: 0; max-width: 46%; }
+    :host { display: block; flex: 0 0 auto; min-width: 0; }
     .ref { display: flex; flex-direction: column; gap: 8px; }
-    .ref__bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .ref__bar { min-height: 32px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .ref__tag { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--text) 10%, transparent); }
     .ref__nav { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
     .ref__btn { font: inherit; min-width: 32px; min-height: 32px; border-radius: 10px; border: 1px solid var(--line, rgba(255,255,255,.25)); background: transparent; color: var(--text); cursor: pointer;
@@ -87,6 +87,8 @@ interface RefBox {
 export class BatchReferenceComponent implements OnDestroy {
   readonly item = input.required<BatchItem>();
   readonly scale = input(1.5);
+  /** Width in px of the page of B: A is drawn at the same width whatever its real size. */
+  readonly targetWidth = input(0);
   readonly focusKey = input<string | null>(null);
   /** Page being shown in B, to follow when the pages are linked. */
   readonly pageB = input(1);
@@ -104,13 +106,14 @@ export class BatchReferenceComponent implements OnDestroy {
   readonly pages = signal(1);
   readonly linked = signal(true);
   readonly size = signal({ width: 0, height: 0 });
+  private readonly drawScale = signal(1.5);
   readonly linkable = computed(() => this.pages() === this.pagesB());
   private readonly loaded = signal(0);
 
   readonly boxes = computed<RefBox[]>(() => {
     this.loaded();
     const { width, height } = this.size();
-    const scale = this.scale();
+    const scale = this.drawScale();
     const page = (this.item().template ?? []).find((p) => p.num === this.page());
     if (!page || !width) return [];
     const ctx = this.preview.context();
@@ -142,6 +145,7 @@ export class BatchReferenceComponent implements OnDestroy {
     effect(() => {
       this.page();
       this.scale();
+      this.targetWidth();
       this.loaded();
       void this.render();
     });
@@ -183,7 +187,10 @@ export class BatchReferenceComponent implements OnDestroy {
     const token = ++this.renderToken;
     const page = await doc.getPage(Math.min(this.page(), doc.numPages));
     if (token !== this.renderToken) return;
-    const viewport = page.getViewport({ scale: this.scale() });
+    const base = page.getViewport({ scale: 1 }).width;
+    const target = this.targetWidth();
+    const drawScale = target > 0 && base > 0 ? target / base : this.scale();
+    const viewport = page.getViewport({ scale: drawScale });
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     canvas.width = Math.floor(viewport.width);
@@ -193,6 +200,9 @@ export class BatchReferenceComponent implements OnDestroy {
     } catch {
       return;
     }
-    if (token === this.renderToken) this.size.set({ width: canvas.width, height: canvas.height });
+    if (token === this.renderToken) {
+      this.drawScale.set(drawScale);
+      this.size.set({ width: canvas.width, height: canvas.height });
+    }
   }
 }

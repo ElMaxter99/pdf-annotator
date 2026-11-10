@@ -1,5 +1,6 @@
 ## Unreleased
 ### Changed
+- **Batch · A/B editor sizes**: A and B always sit side by side at the same on-screen width and top, whatever the real size of each PDF (A is drawn at the width of B); «Ajustar» fits both at once. Coordinates stay in each PDF's own space.
 - **Batch · A/B editor (Y boards)**: the work view of a PDF is now the single-PDF editor (`/batch/:id/editor`) with PDF A and its template as a read-only reference pane next to the editable PDF B (own page navigator, «⛓» to link pages, field lit in both versions, click on A selects the B field with the same name). The sidebar lists the B fields with «↔ A p.N» / «Solo B» badges, the A fields not used yet («＋ Añadir a B»), «Copiar A a B», «Empezar vacía» and «Mover a otra página». The header has «Diferencias A → B» (same / moved / changed page / new in B / missing from B) and «OK · validar» with confirmation. The old compare component is removed; template and version B are set up in `/batch/:id` («Cambiar plantilla o PDF nuevo»).
 - **Batch · A/B view**: selecting a field lights it in both versions at once, and the fields of A can also be moved to another page («Mover a otra página…»), listed from the set being adjusted.
 - **Batch · compare without a template**: the PDF page offers «Comparar sin plantilla» next to «Usar plantilla», which applies an empty template and opens the comparison directly.

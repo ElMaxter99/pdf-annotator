@@ -25,7 +25,7 @@
     </div>
   }
   @if (vm.batchShowsA() && vm.batchItem(); as item) {
-    <app-batch-reference [item]="item" [scale]="vm.scale()" [focusKey]="vm.batchFocusKey()"
+    <app-batch-reference [item]="item" [scale]="vm.scale()" [targetWidth]="vm.canvasWidthPx()" [focusKey]="vm.batchFocusKey()"
       [pageB]="vm.pageIndex()" [pagesB]="vm.pageCount" [usedKeys]="vm.batchUsedKeys()"
       (pick)="vm.batchPickFromA($event)"></app-batch-reference>
   }

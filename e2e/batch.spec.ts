@@ -274,7 +274,12 @@ async function openEditorWithB(page: import('@playwright/test').Page, b = otherP
   await page.waitForURL(/setup=1/);
   await page.locator('#setup-b-file').setInputFiles(await b);
   await expect(page.locator('.row--sel')).toBeVisible();
-  await page.locator('#continue-item').click();
+  // A version B with another page size asks how to adapt the coordinates first.
+  if (await page.locator('#size-title').isVisible({ timeout: 1500 }).catch(() => false)) {
+    await page.locator('.dialog .btn:not(.btn--ghost)').click();
+  } else {
+    await page.locator('#continue-item').click();
+  }
   await page.waitForURL(/\/editor/);
   await expect(page.locator('#batch-bar')).toBeVisible();
   await openSidebarTab(page, 'Anotaciones');
@@ -342,4 +347,19 @@ test('a field can move to another page of B and the A and B pages navigate on th
   // A has one page and B two: the pages cannot be linked, each navigates on its own.
   await expect(page.locator('#ref-link')).toHaveCount(0);
   await expect(page.locator('#ref-page')).toContainText('1 / 1');
+});
+
+test('A and B are shown side by side at the same size even when their pages differ in scale', async ({ page }) => {
+  const big = await PDFDocument.create();
+  big.addPage([1190, 1684]); // twice the size of an A4
+  await openEditorWithB(page, Promise.resolve({ name: 'uno-b.pdf', mimeType: 'application/pdf', buffer: Buffer.from(await big.save()) }));
+  await page.getByRole('button', { name: 'Ajustar' }).click();
+  const box = async () => ({
+    a: (await page.locator('.ref__page').boundingBox())!,
+    b: (await page.locator('.canvas-container').boundingBox())!,
+  });
+  await expect.poll(async () => Math.abs((await box()).a.width - (await box()).b.width)).toBeLessThan(3);
+  const { a, b } = await box();
+  expect(Math.abs(a.y - b.y)).toBeLessThan(3);
+  expect(b.x).toBeGreaterThan(a.x + a.width - 1);
 });

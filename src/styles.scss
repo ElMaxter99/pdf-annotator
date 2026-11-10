@@ -2914,3 +2914,7 @@ kbd {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.app--workspace .viewer.viewer--batch .canvas-container {
+  margin: 40px 0 0;
+  flex: none;
+}

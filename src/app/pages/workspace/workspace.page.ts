@@ -463,6 +463,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const start = hasB ? item.layout ?? item.template ?? [] : item.template ?? [];
     this.replaceCoords(cloneAnnotationPages(start), { skipHistory: true });
     this.batchBaseline = JSON.stringify(this.store.coords());
+    if (this.batchShowsA()) void this.fitWidth();
   }
 
   private scheduleBatchSave() {
@@ -1752,6 +1753,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
+    this.canvasWidthPx.set(canvas.width);
 
     await page.render({ canvasContext: ctx, canvas, viewport }).promise;
     this.refreshOverlay();
@@ -3816,6 +3818,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.redrawAllForPage();
   }
 
+  /** Width in px of the page drawn in the viewer (the A pane matches it in batch mode). */
+  readonly canvasWidthPx = signal(0);
+
   async fitWidth() {
     if (!this.pdfDoc) {
       return;
@@ -3830,7 +3835,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const baseWidth = page.getViewport({ scale: 1 }).width;
     const style = getComputedStyle(container);
     const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-    const available = container.clientWidth - padding;
+    let available = container.clientWidth - padding;
+    // With the A pane both PDFs share the row and are shown at the same width.
+    if (this.batchShowsA()) available = (available - 16) / 2 - 8;
     if (!(baseWidth > 0) || !(available > 0)) {
       return;
     }
