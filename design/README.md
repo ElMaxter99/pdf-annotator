@@ -68,7 +68,9 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | P-31 Inicio · referencia (claro) | P-30 en tema claro | [`P-31-inicio-referencia-claro.dc.html`](canvas/P-31-inicio-referencia-claro.dc.html) | `pages/landing` | Pendiente de aprobación (PR #156) |
 | P-32 Inicio · estados | Foco, arrastrando, abriendo, no válido, recuperables | [`P-32-inicio-referencia-estados.dc.html`](canvas/P-32-inicio-referencia-estados.dc.html) | `pages/landing` | Pendiente de aprobación (PR #156) |
 
-Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
+**Dos zonas en el lienzo:** *Definitivo* (izquierda) = solo lo que está en producción o implementado, una versión por vista; *Propuestas* (derecha) = lo pendiente de aprobar o programado sin fusionar. Al aprobar e implementar una propuesta pasa a Definitivo y sustituye a la anterior; si se piden cambios, se rehace en Propuestas; las versiones descartadas o superadas se quitan del lienzo.
+
+Convención: `V-NN` pantallas existentes, `P-NN`/`W-NN`/`Y-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 
 ## Herramientas (`design/tools/`)
 Las mesas `V-NN` no se dibujan a mano: `capture.mjs` abre la app compilada (`npm run build`, servida con `node e2e/static-server.mjs dist/pdf-annotator/browser`) con Playwright, recorre cada estado, convierte el DOM en marcado con estilos en línea y guarda un `*.body.html` por mesa, más el PDF pintado como PNG. `assemble.py` los envuelve en `.dc.html` y genera `canvas.json`; `pboards.py` genera las mesas `P-NN` (propuestas, dibujadas con los mismos tokens). Las imágenes (PDF, logo, previews) se suben como recursos del lienzo y sus ids se anotan en `assemble.py`. Cuando la UI cambia, se regeneran las mesas afectadas.
