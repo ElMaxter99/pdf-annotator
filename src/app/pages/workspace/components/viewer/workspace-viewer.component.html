@@ -1,4 +1,7 @@
-<main class="viewer" [class.viewer--batch]="vm.batchShowsA()" *ngIf="vm.pdfDoc as _">
+<main class="viewer" [class.viewer--batch]="!!vm.batchItemId()" *ngIf="vm.pdfDoc as _">
+  @if (vm.batchItemId()) {
+    <app-batch-guide [vm]="vm"></app-batch-guide>
+  }
   @if (vm.selectionCount() > 0) {
     <div class="selection-bar" role="toolbar" [attr.aria-label]="'selection.toolbar' | t">
       <span class="selection-bar__count">{{ 'selection.count' | t : { count: vm.selectionCount() } }}</span>
@@ -29,6 +32,25 @@
       [pageB]="vm.pageIndex()" [pagesB]="vm.pageCount" [usedKeys]="vm.batchUsedKeys()"
       (pick)="vm.batchPickFromA($event)"></app-batch-reference>
   }
+  @if (vm.batchShowsA()) {
+    <div class="batch-mid" id="batch-mid">
+      <span class="batch-mid__chip">↔ {{ vm.batchLinkedCount() }}</span>
+      <span>{{ 'batch.editor.linked' | t }}</span>
+      <span class="batch-mid__hint">{{ 'batch.editor.linkedHint' | t }}</span>
+    </div>
+  }
+  <div class="bpane" [class.bpane--batch]="!!vm.batchItemId()">
+  @if (vm.batchItemId()) {
+    <header class="bpane__bar" id="batch-b-bar">
+      <span class="bpane__tag">B</span>
+      <span class="bpane__txt"><b>{{ 'batch.editor.bTitle' | t }}</b><small>{{ 'batch.editor.bSub' | t }}</small></span>
+      <span class="bpane__nav">
+        <button type="button" class="bpane__btn" (click)="vm.prevPage()" [disabled]="vm.pageIndex() <= 1" [attr.aria-label]="'controls.prev' | t">‹</button>
+        <span id="b-page">{{ vm.pageIndex() }} / {{ vm.pageCount }}</span>
+        <button type="button" class="bpane__btn" (click)="vm.nextPage()" [disabled]="vm.pageIndex() >= vm.pageCount" [attr.aria-label]="'controls.next' | t">›</button>
+      </span>
+    </header>
+  }
   <div class="canvas-container" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
     <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
@@ -50,5 +72,30 @@
       <app-annotation-editor #editEditor [vm]="vm" mode="edit" [field]="e.field"
         [leftPx]="e.field.x * vm.scale()" [topPx]="(pdfCanvas?.height ?? 0) - e.field.y * vm.scale()"></app-annotation-editor>
     }
+    @if (vm.batchItemId() && vm.batchStep() === 1) {
+      <div class="batch-start" id="batch-start">
+        <b>{{ 'batch.editor.startTitle' | t }}</b>
+        <span class="batch-start__sub">{{ 'batch.editor.startNote' | t }}</span>
+        <div class="batch-start__cards">
+          <div class="batch-start__card batch-start__card--rec">
+            <span class="batch-start__ico">⇪</span><b>{{ 'batch.editor.copyAToB' | t }}</b>
+            <span class="batch-start__rec">{{ 'batch.editor.recommended' | t }}</span>
+            <span class="batch-start__desc">{{ 'batch.editor.copyDesc' | t }}</span>
+            <button type="button" class="btn" id="rel-copy" [disabled]="!vm.batchItem()?.template?.length" (click)="vm.batchCopyAToB(false)">{{ 'batch.editor.copyBtn' | t }}</button>
+          </div>
+          <div class="batch-start__card">
+            <span class="batch-start__ico">▢</span><b>{{ 'batch.editor.startEmpty' | t }}</b>
+            <span class="batch-start__desc">{{ 'batch.editor.emptyDesc' | t }}</span>
+            <button type="button" class="btn btn--ghost" id="rel-empty" (click)="vm.batchCopyAToB(true)">{{ 'batch.editor.emptyBtn' | t }}</button>
+          </div>
+          <div class="batch-start__card">
+            <span class="batch-start__ico">⇧</span><b>{{ 'batch.editor.uploadB' | t }}</b>
+            <span class="batch-start__desc">{{ 'batch.editor.uploadDesc' | t }}</span>
+            <button type="button" class="btn btn--ghost" id="rel-upload" (click)="vm.triggerImportCoords()">{{ 'batch.editor.uploadBtn' | t }}</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
   </div>
 </main>

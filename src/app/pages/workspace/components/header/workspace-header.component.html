@@ -4,9 +4,9 @@
       <div class="toolbar__batch" id="batch-bar">
         <button type="button" class="btn" id="batch-back" (click)="vm.batchBack()">← {{ 'batch.editor.back' | t }}</button>
         <span class="toolbar__batch-name" [attr.title]="vm.batchItem()?.name">{{ vm.batchItem()?.name }}</span>
-        <span class="toolbar__badge" id="batch-state">{{ (vm.batchItem()?.validated ? 'batch.editor.stateOk' : vm.batchHasB() ? 'batch.editor.stateWork' : 'batch.editor.stateNoB') | t }}</span>
-        <button type="button" class="btn" id="batch-setup" (click)="vm.batchOpenSetup()">✎ {{ 'batch.item.editSetup' | t }}</button>
-        <button type="button" class="btn" id="batch-diff-open" (click)="vm.batchDiffOpen.set(true)"
+        <span class="toolbar__badge" id="batch-state">{{ (vm.batchItem()?.validated ? 'batch.editor.stateOk' : 'batch.editor.step' + vm.batchStep()) | t : { n: vm.batchStep() } }}</span>
+        <button type="button" class="btn" id="batch-setup" (click)="vm.batchOpenSetup()">⚙ {{ 'batch.editor.settings' | t }}</button>
+        <button type="button" class="btn" id="batch-diff-open" (click)="vm.batchOpenDiff()"
           [disabled]="!vm.batchHasB()">{{ 'batch.editor.diff' | t }}</button>
         @if (vm.batchItem()?.validated) {
           <button type="button" class="btn" id="batch-unvalidate" (click)="vm.batchUnvalidate()">{{ 'batch.editor.reopen' | t }}</button>
@@ -33,6 +33,7 @@
     <input #coordsFileInput type="file" accept="application/json" (change)="vm.onCoordsFileSelected($event)" hidden />
 
     <div class="toolbar__cluster">
+      @if (!vm.batchItemId()) {
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
         <button class="btn btn--icon" (click)="vm.prevPage()" [disabled]="!vm.pdfDoc || vm.pageIndex()===1"
           [attr.title]="('controls.prev' | t) + ' (←)'" [attr.aria-keyshortcuts]="'ArrowLeft'">
@@ -48,6 +49,7 @@
           <span class="btn__icon" aria-hidden="true">⟩</span>
         </button>
       </div>
+      }
 
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
         <button class="btn btn--icon" (click)="vm.zoomOut()" [disabled]="!vm.pdfDoc"
@@ -88,12 +90,15 @@
           <span class="btn__icon" aria-hidden="true">↻</span>
           <span class="btn__label">{{ 'controls.redo' | t }}</span>
         </button>
+        @if (!vm.batchItemId()) {
         <button class="btn btn--icon btn--danger" (click)="vm.clearAll()" [disabled]="!vm.coords().length">
           <span class="btn__icon" aria-hidden="true">🧹</span>
           <span class="btn__label">{{ 'controls.clear' | t }}</span>
         </button>
+        }
       </div>
 
+      @if (!vm.batchItemId()) {
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
         <button class="btn btn--icon btn--primary" (click)="vm.downloadAnnotatedPDF()"
           [disabled]="!vm.coords().length || !vm.pdfDoc">
@@ -101,8 +106,10 @@
           <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
         </button>
       </div>
+      }
     </div>
 
+    @if (!vm.batchItemId()) {
     <div class="toolbar__group toolbar__group--preferences" role="group" [attr.aria-label]="'controls.preferencesGroup' | t">
       <button class="btn btn--icon btn--ghost" type="button" (click)="vm.toggleShortcuts()"
         [attr.title]="('shortcuts.open' | t) + ' (?)'" [attr.aria-label]="'shortcuts.open' | t"
@@ -115,5 +122,6 @@
         [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
       </app-language-selector>
     </div>
+    }
   </div>
 </header>

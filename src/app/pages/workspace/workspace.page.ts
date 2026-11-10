@@ -446,6 +446,50 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     for (const page of this.coords()) for (const f of page.fields) if (f.mapField) keys.add(f.mapField);
     return keys;
   });
+  readonly batchFieldCount = computed(() =>
+    this.coords().reduce((total, page) => total + page.fields.length, 0)
+  );
+  /** Fields of template A whose name B does not use yet. */
+  readonly batchUnusedA = computed(() => {
+    const used = this.batchUsedKeys();
+    const out: { name: string; pageNum: number; field: PageField }[] = [];
+    for (const page of this.batchItem()?.template ?? []) {
+      for (const field of page.fields) {
+        if (field.mapField && !used.has(field.mapField)) {
+          out.push({ name: field.mapField, pageNum: page.num, field });
+        }
+      }
+    }
+    return out;
+  });
+  /** Fields of B that point at a field of A (same name). */
+  readonly batchLinkedCount = computed(() => {
+    const names = new Set<string>();
+    for (const page of this.batchItem()?.template ?? []) {
+      for (const f of page.fields) if (f.mapField) names.add(f.mapField);
+    }
+    let n = 0;
+    for (const page of this.coords()) for (const f of page.fields) if (f.mapField && names.has(f.mapField)) n += 1;
+    return n;
+  });
+  readonly batchDiffSeen = signal(false);
+  /** 0 = no PDF B yet · 1 = start B · 2 = place the fields · 3 = review and validate. */
+  readonly batchStep = computed<0 | 1 | 2 | 3>(() => {
+    if (!this.batchHasB()) return 0;
+    if (this.batchFieldCount() === 0) return 1;
+    return this.batchUnusedA().length > 0 ? 2 : 3;
+  });
+  readonly batchGuideOpen = signal(true);
+
+  batchSetGuideOpen(open: boolean) {
+    this.batchGuideOpen.set(open);
+  }
+
+  batchOpenDiff() {
+    this.batchDiffSeen.set(true);
+    this.batchDiffOpen.set(true);
+  }
+
   private batchBaseline: string | null = null;
   private batchSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -457,6 +501,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.batchItemId.set(id);
+    try {
+      // Open the first time in a session, folded afterwards.
+      const seen = sessionStorage.getItem('pdfa.batchGuideSeen') === '1';
+      this.batchGuideOpen.set(!seen);
+      sessionStorage.setItem('pdfa.batchGuideSeen', '1');
+    } catch {
+      /* private mode: keep it open */
+    }
     const hasB = !!item.newPdf;
     const file = new File([item.newPdf ?? item.pdf], item.newName ?? item.name, { type: 'application/pdf' });
     await this.loadPdfFile(file);
@@ -3826,7 +3878,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
-    const container = this.pdfViewerRef?.nativeElement.parentElement;
+    const container = this.pdfViewerRef?.nativeElement.closest('.viewer') as HTMLElement | null;
     if (!container) {
       return;
     }
@@ -3837,7 +3889,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
     let available = container.clientWidth - padding;
     // With the A pane both PDFs share the row and are shown at the same width.
-    if (this.batchShowsA()) available = (available - 16) / 2 - 8;
+    if (this.batchShowsA()) available = (available - 140) / 2 - 6;
     if (!(baseWidth > 0) || !(available > 0)) {
       return;
     }

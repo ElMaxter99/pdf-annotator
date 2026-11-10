@@ -4,6 +4,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { AlignMode, DistributeAxis } from '../../../../utils/alignment.utils';
 import { BatchReferenceComponent } from '../../../batch/components/batch-reference.component';
+import { BatchGuideComponent } from '../../../batch/components/batch-guide.component';
 import { AnnotationEditorComponent } from '../annotation-editor/annotation-editor.component';
 
 @Component({
@@ -11,7 +12,7 @@ import { AnnotationEditorComponent } from '../annotation-editor/annotation-edito
   standalone: true,
   templateUrl: './workspace-viewer.component.html',
   styleUrls: ['./workspace-viewer.component.scss'],
-  imports: [CommonModule, AnnotationEditorComponent, BatchReferenceComponent, TranslationPipe],
+  imports: [CommonModule, AnnotationEditorComponent, BatchReferenceComponent, BatchGuideComponent, TranslationPipe],
 })
 export class WorkspaceViewerComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;

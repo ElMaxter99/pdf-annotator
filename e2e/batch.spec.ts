@@ -363,3 +363,32 @@ test('A and B are shown side by side at the same size even when their pages diff
   expect(Math.abs(a.y - b.y)).toBeLessThan(3);
   expect(b.x).toBeGreaterThan(a.x + a.width - 1);
 });
+
+test('the guide band is open the first time, can be folded and stays folded afterwards', async ({ page }) => {
+  await startBatch(page);
+  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/editor/);
+  await expect(page.locator('#batch-guide .guide__main')).toBeVisible();
+  await expect(page.locator('#batch-state')).toContainText('Falta el PDF B');
+  await page.locator('#batch-guide-fold').click();
+  await expect(page.locator('#batch-guide-show')).toBeVisible();
+  await page.locator('#batch-back').click();
+  await page.waitForURL('**/batch');
+  await card(page, 'uno.pdf').locator('.pcard__thumb').click();
+  await page.waitForURL(/\/editor/);
+  await expect(page.locator('#batch-guide-show')).toBeVisible();
+  await page.locator('#batch-guide-show').click();
+  await expect(page.locator('#batch-guide .guide__main')).toBeVisible();
+});
+
+test('with B empty the viewer offers how to start it and copying A fills it', async ({ page }) => {
+  await openEditorWithB(page);
+  await page.locator('#rel-b li button').first().click();
+  await page.locator('.selection-bar__btn--danger').click();
+  await page.locator('#rel-b li button').first().click();
+  await page.locator('.selection-bar__btn--danger').click();
+  await expect(page.locator('#batch-start')).toBeVisible();
+  await page.locator('#rel-copy').click();
+  await expect(page.locator('#batch-start')).toHaveCount(0);
+  await expect(page.locator('#rel-b li')).toHaveCount(2);
+});

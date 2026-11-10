@@ -42,7 +42,8 @@ interface RefBox {
   template: `
     <section class="ref" [attr.aria-label]="'batch.editor.refTitle' | t">
       <header class="ref__bar">
-        <span class="ref__tag">A · {{ 'batch.editor.refFixed' | t }}</span>
+        <span class="ref__tag">A</span>
+        <span class="ref__txt"><b>{{ 'batch.editor.aTitle' | t }}</b><small>{{ 'batch.editor.aSub' | t }}</small></span>
         <span class="ref__nav">
           <button type="button" class="ref__btn" id="ref-prev" (click)="go(-1)" [disabled]="page() <= 1"
             [attr.aria-label]="'controls.prev' | t">‹</button>
@@ -71,9 +72,10 @@ interface RefBox {
   `,
   styles: `
     :host { display: block; flex: 0 0 auto; min-width: 0; }
-    .ref { display: flex; flex-direction: column; gap: 8px; }
-    .ref__bar { min-height: 32px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .ref__tag { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--text) 10%, transparent); }
+    .ref { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line, rgba(255,255,255,.14)); border-radius: 16px; padding: 10px; }
+    .ref__bar { height: 48px; display: flex; align-items: center; gap: 10px; }
+    .ref__tag { width: 28px; height: 28px; display: grid; place-items: center; font-size: 12px; font-weight: 700; border-radius: 999px; background: color-mix(in srgb, var(--text) 12%, transparent); flex: none; }
+    .ref__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; b { font-size: 14px; } small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
     .ref__nav { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
     .ref__btn { font: inherit; min-width: 32px; min-height: 32px; border-radius: 10px; border: 1px solid var(--line, rgba(255,255,255,.25)); background: transparent; color: var(--text); cursor: pointer;
       &[disabled] { opacity: .4; cursor: default; } &.on { background: var(--accent); color: var(--bg); } &:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; } }
