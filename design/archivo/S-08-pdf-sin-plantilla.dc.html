@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>S-08 PDF sin plantilla</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.p{width:1720px;height:900px;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.45}
+.hdr{background:var(--panel);border-radius:16px;padding:12px 20px;display:flex;align-items:center;gap:14px;border:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--accent);margin-right:8px}
+.brand small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.s{min-height:32px;padding:4px 12px;font-size:13px}
+.btn[disabled]{opacity:.45}
+.st{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.st.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.st.done{color:var(--text)}
+.st.err{color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,transparent)}
+.st.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 16px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:var(--inset)}
+.drop.act{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--inset))}
+.ic{width:44px;height:44px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.row.sel{outline:2px solid var(--accent)}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar i.w{background:var(--warn)}.bar i.e{background:var(--danger)}
+.mono{font-family:Consolas,monospace;font-size:13px}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.pane{background:var(--inset);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:9%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.bad{border-color:#dc2626;background:rgba(220,38,38,.14)}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.tag{font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--text)}
+.tbl{display:flex;flex-direction:column;gap:6px}
+.tr{display:grid;gap:14px;align-items:center;padding:7px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sp{flex-grow:1}
+.sk{background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));border-radius:6px;display:inline-block}
+.note{border-radius:12px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.note.w{background:color-mix(in srgb,var(--warn) 14%,transparent);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+.note.e{background:color-mix(in srgb,var(--danger) 12%,transparent);border:1px solid color-mix(in srgb,var(--danger) 60%,transparent)}
+.note.i{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.radio{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1px solid var(--line)}
+.radio.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;margin-top:2px}
+.radio.on .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+.chk.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.ta{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre;overflow:hidden}
+.g2{display:grid;gap:16px}
+.toast{position:absolute;right:24px;bottom:24px;background:var(--panel);border-left:4px solid var(--accent);border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;gap:12px;font-size:14px}
+.toast.e{border-color:var(--danger)}
+
+.chg{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 10px;background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn);white-space:nowrap}
+.chg.n{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.chg.k{background:var(--soft);color:var(--muted)}
+.cols{display:flex;gap:16px;flex-grow:1;min-height:0;align-items:stretch}
+.nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sel2{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:13px;background:var(--inset)}
+.tab{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}
+.tab span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 16px}
+.tab span.on{background:var(--accent);color:var(--ink)}
+.ln2{display:flex;gap:10px}
+.gut{color:var(--muted);text-align:right;min-width:24px;user-select:none}
+ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.dim{position:absolute;inset:0;background:rgba(10,10,20,.62)}
+.dlg{position:absolute;left:210px;right:210px;top:90px;bottom:70px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">S-08 · Rediseño de lotes · pendiente de aprobación</span><h1 style="font-size:26px;font-weight:600">Abrir un PDF que no tiene plantilla</h1><p class="cap" style="max-width:1400px">Nunca es un callejón sin salida: desde la propia pestaña subes la plantilla a mano (pegada o por fichero), eliges una suelta o maquetas desde cero en el Editor individual. Es el caso que antes obligaba a volver atrás.</p></div>
+<div class="hdr"><div class="brand"><img src="/_blob/3b1c7d405f5e428ffa466253ab28e2ae" width="34" height="34" alt=""><div>Pdf Annotator<small>Sesión de lotes</small></div></div><span class="st ">▦ Panel del lote</span><span class="st" style="gap:10px">mifid-cuestionario.pdf <span style="opacity:.7">×</span></span><span class="st on" style="gap:10px">contraste-0108.pdf <span style="opacity:.7">×</span></span><span class="sp"></span><div style="display:flex;flex-direction:column;gap:4px;min-width:200px"><span class="cap" style="font-size:12px">1 de 10 validados</span><div class="bar"><i style="width:10%"></i></div></div><div class="seg" aria-label="Modo"><span>Editor · 1 PDF</span><span class="on">Lotes · varios PDF</span></div></div><div class="cols"><div class="card" style="width:250px;flex-shrink:0;padding:12px;gap:6px"><span class="lab">PDF del lote</span><div class="row sel" style="padding:6px 10px"><div style="width:22px;height:30px;overflow:hidden;flex-shrink:0"><div class="pg" style="width:22px;height:30px"><div class="band"></div><div class="ln" style="top:22%;left:9%;width:70%"></div><div class="ln" style="top:30%;left:9%;width:60%"></div><div class="ln" style="top:40%;left:9%;width:76%"></div><div class="ln" style="top:48%;left:9%;width:64%"></div><div class="ln" style="top:60%;left:9%;width:70%"></div><div class="ln" style="top:68%;left:9%;width:56%"></div><div class="ln" style="top:80%;left:9%;width:40%"></div></div></div><span class="nm" style="flex:1">mifid-cuestionario.pdf</span><span style="color:var(--text)">≈</span></div><div class="row " style="padding:6px 10px"><div style="width:22px;height:30px;overflow:hidden;flex-shrink:0"><div class="pg" style="width:22px;height:30px"><div class="band"></div><div class="ln" style="top:22%;left:9%;width:70%"></div><div class="ln" style="top:30%;left:9%;width:60%"></div><div class="ln" style="top:40%;left:9%;width:76%"></div><div class="ln" style="top:48%;left:9%;width:64%"></div><div class="ln" style="top:60%;left:9%;width:70%"></div><div class="ln" style="top:68%;left:9%;width:56%"></div><div class="ln" style="top:80%;left:9%;width:40%"></div></div></div><span class="nm" style="flex:1">albaran-0331.pdf</span><span style="color:var(--warn)">·</span></div><div class="row " style="padding:6px 10px"><div style="width:22px;height:30px;overflow:hidden;flex-shrink:0"><div class="pg" style="width:22px;height:30px"><div class="band"></div><div class="ln" style="top:22%;left:9%;width:70%"></div><div class="ln" style="top:30%;left:9%;width:60%"></div><div class="ln" style="top:40%;left:9%;width:76%"></div><div class="ln" style="top:48%;left:9%;width:64%"></div><div class="ln" style="top:60%;left:9%;width:70%"></div><div class="ln" style="top:68%;left:9%;width:56%"></div><div class="ln" style="top:80%;left:9%;width:40%"></div></div></div><span class="nm" style="flex:1">albaran-0332.pdf</span><span style="color:var(--accent)">✓</span></div><div class="row " style="padding:6px 10px"><div style="width:22px;height:30px;overflow:hidden;flex-shrink:0"><div class="pg" style="width:22px;height:30px"><div class="band"></div><div class="ln" style="top:22%;left:9%;width:70%"></div><div class="ln" style="top:30%;left:9%;width:60%"></div><div class="ln" style="top:40%;left:9%;width:76%"></div><div class="ln" style="top:48%;left:9%;width:64%"></div><div class="ln" style="top:60%;left:9%;width:70%"></div><div class="ln" style="top:68%;left:9%;width:56%"></div><div class="ln" style="top:80%;left:9%;width:40%"></div></div></div><span class="nm" style="flex:1">contraste-0107.pdf</span><span style="color:var(--text)">≈</span></div><div class="row " style="padding:6px 10px"><div style="width:22px;height:30px;overflow:hidden;flex-shrink:0"><div class="pg" style="width:22px;height:30px"><div class="band"></div><div class="ln" style="top:22%;left:9%;width:70%"></div><div class="ln" style="top:30%;left:9%;width:60%"></div><div class="ln" style="top:40%;left:9%;width:76%"></div><div class="ln" style="top:48%;left:9%;width:64%"></div><div class="ln" style="top:60%;left:9%;width:70%"></div><div class="ln" style="top:68%;left:9%;width:56%"></div><div class="ln" style="top:80%;left:9%;width:40%"></div></div></div><span class="nm" style="flex:1">contraste-0108.pdf</span><span style="color:var(--warn)">·</span></div><div class="row " style="padding:6px 10px"><div style="width:22px;height:30px;overflow:hidden;flex-shrink:0"><div class="pg" style="width:22px;height:30px"><div class="band"></div><div class="ln" style="top:22%;left:9%;width:70%"></div><div class="ln" style="top:30%;left:9%;width:60%"></div><div class="ln" style="top:40%;left:9%;width:76%"></div><div class="ln" style="top:48%;left:9%;width:64%"></div><div class="ln" style="top:60%;left:9%;width:70%"></div><div class="ln" style="top:68%;left:9%;width:56%"></div><div class="ln" style="top:80%;left:9%;width:40%"></div></div></div><span class="nm" style="flex:1">advice-0021.pdf</span><span style="color:var(--danger)">!</span></div></div>
+<div class="card" style="flex:1.2;min-width:0"><div style="display:flex;align-items:center;gap:10px"><h3 style="font-size:20px">contraste-0108.pdf</h3><span class="st warn">Sin plantilla</span></div><p class="cap">Este PDF aún no tiene plantilla. Elige cómo conseguirla; la versión B se puede subir ya o después, o no hace falta si solo validas.</p>
+<div class="radio on"><span class="dot"></span><div style="flex:1"><b>Pegar o subir su JSON</b><div class="cap">Un solo JSON con <span class="mono">pages</span>.</div><div class="ta" style="height:96px;margin-top:8px;color:var(--muted)">{ "pages": [ … ] }</div></div><span class="btn s">Usar plantilla</span></div>
+<div class="radio"><span class="dot"></span><div style="flex:1"><b>Elegir entre las plantillas sueltas</b><div class="cap">4 plantillas del lote sin PDF · «contraste-0108-v2» es la más parecida.</div></div><span class="btn g s">Elegir</span></div>
+<div class="radio"><span class="dot"></span><div style="flex:1"><b>Maquetar desde cero en el Editor</b><div class="cap">Se abre este PDF en el Editor de siempre; al volver, la plantilla queda aquí.</div></div><span class="btn g s">Abrir en el Editor</span></div></div>
+<div class="card" style="flex:1;min-width:0"><span class="lab">PDF</span><div class="pane"><div class="pg" style="width:250px;height:354px"><div class="band"></div><div class="ln" style="top:22%;left:9%;width:70%"></div><div class="ln" style="top:30%;left:9%;width:60%"></div><div class="ln" style="top:40%;left:9%;width:76%"></div><div class="ln" style="top:48%;left:9%;width:64%"></div><div class="ln" style="top:60%;left:9%;width:70%"></div><div class="ln" style="top:68%;left:9%;width:56%"></div><div class="ln" style="top:80%;left:9%;width:40%"></div></div></div><div class="row"><span style="flex:1">Versión A</span><span class="cap">2 págs. · A4 · 2,4 MB</span></div><div class="row"><span style="flex:1">Versión B</span><span class="st" style="padding:3px 10px;font-size:12px">Opcional</span><span class="btn g s">Subir versión B</span></div></div></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
