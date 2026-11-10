@@ -1039,7 +1039,7 @@
       "copyB": "JSON von B kopieren",
       "compareTitle": "JSON vergleichen · A → B",
       "cmpA": "Original · nur lesbar",
-      "cmpB": "Neu · im Bereich bearbeiten",
+      "cmpB": "Neu · bearbeitbar (wird beim Tippen angewendet)",
       "cmpHint": "Die Zeilen sind nach «mapField» ausgerichtet. Schraffierte Streifen sind Lücken: auf dieser Seite fehlt etwas.",
       "mark": {
         "moved": "verschoben",

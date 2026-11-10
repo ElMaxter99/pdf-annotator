@@ -1039,7 +1039,7 @@
       "copyB": "Copy B JSON",
       "compareTitle": "Compare JSON · A → B",
       "cmpA": "Original · read only",
-      "cmpB": "New · edit it in the panel",
+      "cmpB": "New · editable (applies as you type)",
       "cmpHint": "Rows are aligned by «mapField». Striped bands are gaps: something is missing on that side.",
       "mark": {
         "moved": "moved",

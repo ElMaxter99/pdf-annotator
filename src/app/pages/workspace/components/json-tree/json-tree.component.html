@@ -12,6 +12,7 @@
       class="json-tree__row"
       [class.json-tree__row--focused]="isFocused(node)"
       [attr.data-json-path]="node.path"
+      (click)="selectNode(node)"
     >
       <button
         *ngIf="node.children?.length"

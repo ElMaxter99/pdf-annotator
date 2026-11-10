@@ -264,6 +264,18 @@ async function openBatchMenu(page: import('@playwright/test').Page, item: string
   await page.locator(item).click();
 }
 
+/** Selects a field of B from the JSON tree of the Anotaciones tab (the tree selects the field in the PDF). */
+async function selectBField(page: import('@playwright/test').Page, index = 0, pageIndex = 0) {
+  if (!(await page.locator('.json-tree-container').isVisible())) {
+    await page.locator('.json-toolbar__view-toggle-option').nth(1).click();
+  }
+  await page
+    .locator(`.json-tree-container [data-json-path="root/pages/${pageIndex}/fields/${index}"]`)
+    .click({ position: { x: 70, y: 8 } });
+}
+const bFieldRow = (page: import('@playwright/test').Page, index: number, pageIndex = 0) =>
+  page.locator(`.json-tree-container [data-json-path="root/pages/${pageIndex}/fields/${index}"]`);
+
 async function openEditorWithB(page: import('@playwright/test').Page, b = otherPdf('uno-b.pdf')) {
   await startBatch(page);
   await card(page, 'uno.pdf').locator('.pcard__thumb').click();
@@ -307,7 +319,8 @@ test('a PDF with a template opens the single-PDF editor; validate it from there 
 test('with a version B the editor shows A next to B and can validate from the editor', async ({ page }) => {
   await openEditorWithB(page);
   await expect(page.locator('app-batch-reference')).toBeVisible();
-  await expect(page.locator('#rel-b li')).toHaveCount(2);
+  await selectBField(page, 1);
+  await expect(bFieldRow(page, 1)).toBeVisible();
   await page.locator('#batch-validate-open').click();
   await page.locator('#batch-validate-confirm').click();
   await page.waitForURL('**/batch');
@@ -316,22 +329,21 @@ test('with a version B the editor shows A next to B and can validate from the ed
 
 test('selecting a field in B lights its pair in A and clicking A selects B', async ({ page }) => {
   await openEditorWithB(page);
-  await page.locator('#rel-b li button').first().click();
+  await selectBField(page, 0);
   await expect(page.locator('.ref__fld.is-focus')).toHaveCount(1);
-  await page.locator('#rel-b li button').first().click();
   await page.locator('.ref__fld').first().click();
-  await expect(page.locator('#rel-b .is-focus')).toHaveCount(1);
+  await expect(page.locator('.selection-bar')).toBeVisible();
 });
 
 test('A fields not used in B are listed and can be added; B-only fields are flagged', async ({ page }) => {
   await openEditorWithB(page);
-  await expect(page.locator('#rel-a-unused li')).toHaveCount(0);
-  await page.locator('#rel-b li button').first().click();
+  await expect(page.locator('.json-onlya__row')).toHaveCount(0);
+  await selectBField(page, 0);
   await page.locator('.selection-bar__btn--danger').click();
-  await expect(page.locator('#rel-a-unused li')).toHaveCount(1);
-  await page.locator('#rel-a-unused li button').first().click();
-  await expect(page.locator('#rel-a-unused li')).toHaveCount(0);
-  await expect(page.locator('#rel-b li')).toHaveCount(2);
+  await expect(page.locator('.json-onlya__row')).toHaveCount(1);
+  await page.locator('.json-onlya__add').first().click();
+  await expect(page.locator('.json-onlya__row')).toHaveCount(0);
+  await expect(bFieldRow(page, 1)).toBeVisible();
 });
 
 test('the A to B report counts what stayed, moved or is new', async ({ page }) => {
@@ -345,9 +357,9 @@ test('the A to B report counts what stayed, moved or is new', async ({ page }) =
 
 test('a field can move to another page of B and the A and B pages navigate on their own', async ({ page }) => {
   await openEditorWithB(page, twoPagePdf('uno-b.pdf'));
-  await page.locator('#rel-b li button').first().click();
+  await selectBField(page, 0);
   await page.locator('#rel-move-sel').selectOption('2');
-  await expect(page.locator('#rel-b li button').last()).toContainText('B p.2');
+  await expect(bFieldRow(page, 0, 1)).toBeVisible();
   // A has one page and B two: the pages cannot be linked, each navigates on its own.
   await expect(page.locator('#ref-link')).toHaveCount(0);
   await expect(page.locator('#ref-page')).toContainText('1 / 1');
@@ -387,14 +399,14 @@ test('the guide band is open the first time, can be folded and stays folded afte
 
 test('with B empty the viewer offers how to start it and copying A fills it', async ({ page }) => {
   await openEditorWithB(page);
-  await page.locator('#rel-b li button').first().click();
+  await selectBField(page, 0);
   await page.locator('.selection-bar__btn--danger').click();
-  await page.locator('#rel-b li button').first().click();
+  await selectBField(page, 0);
   await page.locator('.selection-bar__btn--danger').click();
   await expect(page.locator('#batch-start')).toBeVisible();
   await page.locator('#rel-copy').click();
   await expect(page.locator('#batch-start')).toHaveCount(0);
-  await expect(page.locator('#rel-b li')).toHaveCount(2);
+  await expect(page.locator('#batch-json-vs')).toContainText('sin diferencias');
 });
 
 test('with A empty the start offers no copy, only starting from scratch or uploading B', async ({ page }) => {
@@ -452,7 +464,7 @@ test('the card is vertical, asks before continuing without a template and the ed
   await page.locator('#batch-template-apply').click();
   await expect(page.locator('#ref-empty')).toHaveCount(0);
   await openSidebarTab(page, 'Anotaciones');
-  await expect(page.locator('#rel-a-unused li')).toHaveCount(1);
+  await expect(page.locator('.json-onlya__row')).toHaveCount(1);
   await openBatchMenu(page, '#batch-setup');
   await page.waitForURL(/setup=1/);
   await expect(page.locator('#setup-step-a')).toContainText('1 páginas · 1 campos');
@@ -487,4 +499,16 @@ test('A shows its JSON read only and the compare dialog lines A up with B', asyn
   await expect(page.locator('#batch-compare')).toHaveCount(0);
   await page.locator('#batch-json-b').click();
   await expect(page.locator('textarea.json-editor:not([readonly])').first()).toBeVisible();
+});
+
+test('Comparar JSON lets B be edited in the dialog and the marks follow', async ({ page }) => {
+  await openEditorWithB(page);
+  await expect(page.locator('#batch-json-vs')).toContainText('sin diferencias');
+  await page.locator('#batch-compare-open').click();
+  await expect(page.locator('#batch-compare-a')).toHaveAttribute('readonly', '');
+  await page.locator('#batch-compare-b').fill(
+    '{"pages":[{"num":1,"fields":[{"x":150,"y":722,"mapField":"cliente.nombre","fontSize":12},{"x":10,"y":10,"mapField":"fecha","fontSize":12}]}]}'
+  );
+  await expect(page.locator('#batch-compare')).toContainText('fecha');
+  await expect(page.locator('#batch-compare .chip--missing')).toContainText('1');
 });

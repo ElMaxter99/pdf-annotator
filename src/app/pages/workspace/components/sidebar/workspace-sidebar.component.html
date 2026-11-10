@@ -123,7 +123,8 @@
       </ng-container>
       <ng-template #jsonTreeView>
         <div *ngIf="vm.jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
-          <app-json-tree #jsonTree [value]="vm.jsonTreePreview.value" [marks]="vm.batchItemId() ? vm.batchJson.marks : null"></app-json-tree>
+          <app-json-tree #jsonTree [value]="vm.jsonTreePreview.value" [marks]="vm.batchItemId() ? vm.batchJson.marks : null"
+            [expandDepth]="vm.batchItemId() ? 4 : 0" (nodeSelected)="vm.batchTreeSelect($event)"></app-json-tree>
         </div>
         <ng-template #jsonTreePlaceholder>
           <div class="json-tree-placeholder">
@@ -159,7 +160,7 @@
           <div class="json-onlya" id="batch-json-onlya">
             <h6 class="json-onlya__title">{{ 'batch.json.onlyA' | t }} · {{ vm.batchJson.onlyA.length }}</h6>
             @for (row of vm.batchJson.onlyA; track $index) {
-              <div class="json-onlya__row" [attr.data-key]="row.key"><span>{{ row.key }} <small>p.{{ row.a?.page }}</small></span><span class="json-tree__mark json-tree__mark--moved">{{ 'batch.json.missing' | t }}</span></div>
+              <div class="json-onlya__row" [attr.data-key]="row.key"><span>{{ row.key }} <small>p.{{ row.a?.page }}</small></span><span class="json-onlya__act"><span class="json-tree__mark json-tree__mark--moved">{{ 'batch.json.missing' | t }}</span> @if (row.a) { <button type="button" class="btn btn--sm json-onlya__add" (click)="vm.batchAddFromA(row.a.field)">＋ {{ 'batch.editor.addToB' | t }}</button> }</span></div>
             }
           </div>
         }

@@ -4,7 +4,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
+  Output,
   OnChanges,
   SimpleChanges,
   signal,
@@ -38,11 +40,16 @@ type JsonPrimitiveType = 'string' | 'number' | 'boolean' | 'null' | 'unknown';
 export class JsonTreeComponent implements OnChanges {
   @Input() value: unknown = null;
   @Input() label: string | null = null;
+  /** Opens, on the first build, every node whose path has at most this many segments (0 = none). */
+  @Input() expandDepth = 0;
+  /** Emits the path of the row the user clicked. */
+  @Output() nodeSelected = new EventEmitter<string>();
   /** Optional marks by node path (A/B comparison in batch mode): a kind chip and/or a short text. */
   @Input() marks: Readonly<Record<string, JsonTreeMark>> | null = null;
 
   protected rootNode: JsonTreeNode | null = null;
 
+  private seenPaths = new Set<string>();
   private knownMarkPaths = new Set<string>();
   private readonly collapsedPaths = signal<Set<string>>(new Set());
   private readonly focusedPath = signal<string | null>(null);
@@ -75,6 +82,13 @@ export class JsonTreeComponent implements OnChanges {
         }
       }
 
+      if (this.expandDepth > 0) {
+        for (const path of interactivePaths) {
+          if (this.seenPaths.has(path)) continue;
+          if (path.split('/').length <= this.expandDepth) collapsed.delete(path);
+        }
+      }
+      for (const path of interactivePaths) this.seenPaths.add(path);
       // Newly marked nodes open their ancestors, so a difference is visible without hunting for it.
       const markPaths = new Set(Object.keys(this.marks ?? {}));
       for (const path of markPaths) {
@@ -87,6 +101,10 @@ export class JsonTreeComponent implements OnChanges {
 
       this.collapsedPaths.set(collapsed);
     }
+  }
+
+  protected selectNode(node: JsonTreeNode) {
+    this.nodeSelected.emit(node.path);
   }
 
   protected markOf(node: JsonTreeNode): JsonTreeMark | null {

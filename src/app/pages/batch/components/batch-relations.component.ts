@@ -49,42 +49,8 @@ interface ARow {
       }
 
       @if (vm.batchHasB() && !bRows().length) {
-        <h6 class="rel__sub">{{ 'batch.editor.fieldsB' | t }} · 0</h6>
         <p class="rel__note rel__muted" id="rel-empty-hint">{{ 'batch.editor.hintEmptyB' | t }}</p>
       }
-      @if (bRows().length) {
-        <h6 class="rel__sub">{{ 'batch.editor.fieldsB' | t }} · {{ bRows().length }}</h6>
-        <ul class="rel__list" id="rel-b">
-          @for (row of bRows(); track row.pageNum + ':' + row.index) {
-            <li>
-              <button type="button" class="rel__row" [class.is-focus]="row.name && row.name === vm.batchFocusKey()"
-                (click)="vm.batchGoToField(row.pageNum, row.index)">
-                <span class="rel__name">{{ row.name || ('batch.editor.unnamed' | t) }}</span>
-                <span class="rel__page">B p.{{ row.pageNum }}</span>
-                @if (row.from !== null) {
-                  <span class="rel__badge" [class.rel__badge--moved]="row.from !== row.pageNum">↔ A p.{{ row.from }}</span>
-                } @else if (hasTemplate()) {
-                  <span class="rel__badge rel__badge--only">{{ 'batch.editor.onlyB' | t }}</span>
-                }
-              </button>
-            </li>
-          }
-        </ul>
-      }
-
-      @if (vm.batchHasB() && unusedA().length) {
-        <h6 class="rel__sub">{{ 'batch.editor.pending' | t : { count: unusedA().length } }}</h6>
-        <ul class="rel__list" id="rel-a-unused">
-          @for (row of unusedA(); track $index) {
-            <li class="rel__unused">
-              <span class="rel__name">{{ row.name || ('batch.editor.unnamed' | t) }}</span>
-              <span class="rel__page">A p.{{ row.pageNum }}</span>
-              <button type="button" class="btn btn--sm" (click)="vm.batchAddFromA(row.field)">＋ {{ 'batch.editor.addToB' | t }}</button>
-            </li>
-          }
-        </ul>
-      }
-
       @if (movable()) {
         <div class="rel__move" id="rel-move">
           <label for="rel-move-sel">{{ 'batch.editor.moveTo' | t }}</label>

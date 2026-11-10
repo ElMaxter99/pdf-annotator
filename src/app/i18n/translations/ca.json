@@ -1039,7 +1039,7 @@
       "copyB": "Copia el JSON de B",
       "compareTitle": "Comparar JSON · A → B",
       "cmpA": "Original · només lectura",
-      "cmpB": "Nou · edita’l al panell",
+      "cmpB": "Nou · editable (s’aplica en escriure)",
       "cmpHint": "Les files s’alineen per «mapField». Les franges ratllades són buits: falta alguna cosa en aquest costat.",
       "mark": {
         "moved": "mogut",

@@ -1039,7 +1039,7 @@
       "copyB": "Copier le JSON de B",
       "compareTitle": "Comparer le JSON · A → B",
       "cmpA": "Original · lecture seule",
-      "cmpB": "Nouveau · à modifier dans le panneau",
+      "cmpB": "Nouveau · modifiable (s’applique à la saisie)",
       "cmpHint": "Les lignes sont alignées par « mapField ». Les bandes hachurées sont des trous : il manque quelque chose de ce côté.",
       "mark": {
         "moved": "déplacé",

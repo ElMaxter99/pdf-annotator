@@ -71,6 +71,12 @@ import type { WorkspacePageComponent } from '../../workspace/workspace.page';
               </div>
             </div>
             <p class="dlg__sum">{{ 'batch.json.cmpHint' | t }}</p>
+            <div class="cmpedit">
+              <label class="cmpedit__col"><span>A · {{ 'batch.json.cmpA' | t }}</span>
+                <textarea id="batch-compare-a" class="dlg-ta" readonly spellcheck="false" [value]="vm.batchATextValue()"></textarea></label>
+              <label class="cmpedit__col"><span>B · {{ 'batch.json.cmpB' | t }}</span>
+                <textarea id="batch-compare-b" class="dlg-ta" spellcheck="false" [value]="vm.coordsTextModel" (input)="vm.onCoordsTextChange($any($event.target).value)" (paste)="vm.onCoordsTextPaste()"></textarea></label>
+            </div>
           </div>
         </div>
       </div>
@@ -134,7 +140,8 @@ import type { WorkspacePageComponent } from '../../workspace/workspace.page';
     .dlg { width: min(720px, 100%); }
     .dlg--wide { width: min(1100px, 100%); }
     .dlg--wide .dialog__header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; .dialog__title { margin-right: auto; } }
-    .cmp { display: flex; border: 1px solid color-mix(in srgb, var(--text) 18%, transparent); border-radius: 12px; overflow: auto; max-height: 56vh; }
+    .cmpedit { display: flex; gap: 12px; } .cmpedit__col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); .dlg-ta { min-height: 200px; height: 24vh; } }
+    .cmp { display: flex; border: 1px solid color-mix(in srgb, var(--text) 18%, transparent); border-radius: 12px; overflow: auto; max-height: 28vh; }
     .cmp__col { flex: 1; min-width: 0; & + & { border-left: 1px solid color-mix(in srgb, var(--text) 18%, transparent); } }
     .cmp__head { padding: 6px 12px; font-size: 13px; background: color-mix(in srgb, var(--text) 8%, transparent); position: sticky; top: 0; }
     .cmp__line { font-family: Consolas, monospace; font-size: 12px; line-height: 1.7; padding: 0 12px; white-space: pre; overflow: hidden; text-overflow: ellipsis; min-height: 1.7em; }

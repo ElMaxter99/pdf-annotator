@@ -510,6 +510,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return view;
   }
 
+  /** A click on a field (or one of its keys) in the JSON tree selects that field in B. */
+  batchTreeSelect(path: string) {
+    if (!this.batchItemId()) return;
+    const m = /^root\/pages\/(\d+)\/fields\/(\d+)/.exec(path);
+    if (!m) return;
+    const page = this.coords()[Number(m[1])];
+    if (page && page.fields[Number(m[2])]) this.batchGoToField(page.num, Number(m[2]));
+  }
+
   batchSetJsonSource(source: 'b' | 'a') {
     this.batchJsonSource.set(source);
   }
