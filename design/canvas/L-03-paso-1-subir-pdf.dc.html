@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>M-04 Bandeja del lote</title>
+<title>L-03 Paso 1 · Subir PDF</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -142,25 +142,39 @@ ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 a{color:var(--accent)}
 .pre{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;white-space:pre;overflow:hidden}
 
+.gc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gc .pv{background:var(--inset);border-radius:10px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gc.sel{outline:2px solid var(--accent)}
+.arrow{color:var(--accent);font-size:22px;align-self:center}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.hl{border-color:var(--accent)}
+.tabs4{display:flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px}
+.tabs4 span{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted);border-radius:999px;padding:6px 4px}
+.tabs4 span.on{background:var(--accent);color:var(--ink)}
+.vp{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage{background:var(--inset);border-radius:14px;display:flex;justify-content:center;overflow:hidden;flex-grow:1}
+.side{width:440px;display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.fr{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;background:var(--soft);font-size:13.5px}
+.fr.sel{outline:2px solid var(--accent)}
+.bd{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.bd.n{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bd.l{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.ico{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.fb{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:10px;color:#064;padding:1px 3px;overflow:hidden;white-space:nowrap}
+.fb.sel{border-color:#7c3aed;background:rgba(124,58,237,.18)}
+.fb.new{border-color:#2563eb;background:rgba(37,99,235,.14)}
+.fb.ghost{border:2px dashed #888;background:transparent;color:#777}
+
 </style>
 </helmet>
 <div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:900px">
-<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-04 · Bandeja</span><h1 style="font-size:26px;font-weight:600">Una lista con una pregunta: qué me falta</h1><p class="cap" style="max-width:1450px">Lista ordenada por necesidad, subida de B por arrastre y un único botón principal.</p></div>
-
-<div class="hdr"><div class="brand">Pdf Annotator<small>Migración de plantillas</small></div><b style="font-size:17px">Lote · 20 PDFs</b><span class="sp"></span><div style="width:260px"><div class="bar"><i style="width:35%"></i></div></div><span class="cap">7 de 20 listos</span><button class="btn g s">Descargar listos (7)</button><button class="btn">Revisar siguiente →</button></div>
-<div class="drop act" style="flex-direction:row;justify-content:center;gap:14px;padding:16px"><span class="ic">⇪</span><div style="text-align:left"><b>Suelta aquí los PDF nuevos (B)</b><br><span class="cap">Se emparejan por nombre con su A. Los que no cuadren quedan «Sin B» para asignarlos.</span></div></div>
-<div class="tbl">
-<div class="tr h" style="grid-template-columns:50px 1.6fr 1.6fr 1.2fr 150px"><span></span><span>Original (A)</span><span>Nuevo (B)</span><span>Estado</span><span></span></div>
-<div class="tr" style="grid-template-columns:50px 1.6fr 1.6fr 1.2fr 150px;padding:8px 14px"><span class="thumb"><i></i></span><span class="nm"><b>factura-0331.pdf</b><br><span class="cap" style="font-size:12px">A · factura-0331.pdf</span></span><span class="nm cap">factura-0331-nuevo.pdf</span><span><span class="st on">Por resolver · 2</span></span><span style="text-align:right"><button class="btn s">Revisar</button></span></div>
-<div class="tr" style="grid-template-columns:50px 1.6fr 1.6fr 1.2fr 150px;padding:8px 14px"><span class="thumb"><i></i></span><span class="nm"><b>factura-0332.pdf</b><br><span class="cap" style="font-size:12px">A · factura-0332.pdf</span></span><span class="nm cap">factura-0332-nuevo.pdf</span><span><span class="st on">Por resolver · 5</span></span><span style="text-align:right"><button class="btn s">Revisar</button></span></div>
-<div class="tr" style="grid-template-columns:50px 1.6fr 1.6fr 1.2fr 150px;padding:8px 14px"><span class="thumb"><i></i></span><span class="nm"><b>albaran-0107.pdf</b><br><span class="cap" style="font-size:12px">A · albaran-0107.pdf</span></span><span class="nm cap">—</span><span><span class="st warn">Sin B</span></span><span style="text-align:right"><button class="btn s">Subir B</button></span></div>
-<div class="tr" style="grid-template-columns:50px 1.6fr 1.6fr 1.2fr 150px;padding:8px 14px"><span class="thumb"><i></i></span><span class="nm"><b>albaran-0108.pdf</b><br><span class="cap" style="font-size:12px">A · albaran-0108.pdf</span></span><span class="nm cap">albaran-0108-v2.pdf</span><span><span class="st on">Por resolver · 1</span></span><span style="text-align:right"><button class="btn s">Revisar</button></span></div>
-<div class="tr" style="grid-template-columns:50px 1.6fr 1.6fr 1.2fr 150px;padding:8px 14px"><span class="thumb"><i></i></span><span class="nm"><b>contrato-0021.pdf</b><br><span class="cap" style="font-size:12px">A · contrato-0021.pdf</span></span><span class="nm cap">contrato-0021-v2.pdf</span><span><span class="st done">Listo</span></span><span style="text-align:right"><button class="btn g s">Abrir</button></span></div>
-<div class="tr" style="grid-template-columns:50px 1.6fr 1.6fr 1.2fr 150px;padding:8px 14px"><span class="thumb"><i></i></span><span class="nm"><b>contrato-0022.pdf</b><br><span class="cap" style="font-size:12px">A · contrato-0022.pdf</span></span><span class="nm cap">contrato-0022-v2.pdf</span><span><span class="st done">Listo</span></span><span style="text-align:right"><button class="btn g s">Abrir</button></span></div>
-<div class="tr" style="grid-template-columns:50px 1.6fr 1.6fr 1.2fr 150px;padding:8px 14px"><span class="thumb"><i></i></span><span class="nm"><b>mifid-cuestionario.pdf</b><br><span class="cap" style="font-size:12px">A · mifid-cuestionario.pdf</span></span><span class="nm cap">mifid-cuestionario-2.pdf</span><span><span class="st done">Listo</span></span><span style="text-align:right"><button class="btn g s">Abrir</button></span></div>
-</div>
-<div class="cols" style="flex-grow:0"><div class="note i">ⓘ<div><b>Orden por necesidad:</b> arriba lo que falta, abajo lo listo. Sin cuadrícula, sin pestañas de filtro: un buscador y ya.</div></div><div class="note i">ⓘ<div><b>Sin JSON de A:</b> el PDF entra igual y B empieza vacía (ver estados).</div></div><div class="note i">ⓘ<div><b>Teclado:</b> ↑ ↓ mover · Intro abrir · N siguiente pendiente.</div></div></div>
-
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">L-03 · Paso 1</span><h1 style="font-size:26px;font-weight:600">Paso 1 · Subir todos los documentos</h1><p class="cap" style="max-width:1450px">Obligatorio. Lista con miniaturas; los archivos no válidos se marcan y no se cuentan.</p></div>
+<div class="hdr"><div class="brand">Pdf Annotator<small>Lote de documentos</small></div><span class="sp"></span><span class="sel2">ES ▾</span><span class="ico">☾</span></div><div class="stp"><div class="s on"><span class="n">1</span><div class="t">Subir PDF<small>Obligatorio</small></div></div><span class="stl "></span><div class="s "><span class="n">2</span><div class="t">Plantillas<small>Opcional</small></div></div><span class="stl "></span><div class="s "><span class="n">3</span><div class="t">Empezar<small>Resumen</small></div></div></div>
+<div class="wiz">
+<div class="card"><h3>1 · Subir los PDF</h3><p class="cap">Todos los documentos que quieres trabajar. Puedes añadir más o quitar alguno.</p>
+<div class="drop" style="padding:14px;flex-direction:row;justify-content:center;gap:12px"><span class="ic">⇪</span><span><b>Suelta más PDFs aquí</b> o <a>elige archivos</a></span></div>
+<div style="display:flex;flex-direction:column;gap:6px"><div class="row"><span class="thumb"><i></i></span><span class="nm" style="flex:1"><b>factura-0331.pdf</b><br><span class="cap" style="font-size:12px">842 KB · 2 págs.</span></span><span class="st done">✓</span><span class="ico">✕</span></div><div class="row"><span class="thumb"><i></i></span><span class="nm" style="flex:1"><b>factura-0332.pdf</b><br><span class="cap" style="font-size:12px">851 KB · 2 págs.</span></span><span class="st done">✓</span><span class="ico">✕</span></div><div class="row"><span class="thumb"><i></i></span><span class="nm" style="flex:1"><b>albaran-0107.pdf</b><br><span class="cap" style="font-size:12px">310 KB · 1 pág.</span></span><span class="st done">✓</span><span class="ico">✕</span></div><div class="row"><span class="thumb"><i></i></span><span class="nm" style="flex:1"><b>contrato-0021.pdf</b><br><span class="cap" style="font-size:12px">1,2 MB · 6 págs.</span></span><span class="st done">✓</span><span class="ico">✕</span></div><div class="row"><span class="thumb"><i></i></span><span class="nm" style="flex:1"><b>contrato-0022.pdf</b><br><span class="cap" style="font-size:12px">1,2 MB · 6 págs.</span></span><span class="st done">✓</span><span class="ico">✕</span></div><div class="row"><span class="thumb"><i></i></span><span class="nm" style="flex:1"><b>notas.docx</b><br><span class="cap" style="font-size:12px">Tipo no admitido</span></span><span class="st err">No es un PDF</span><span class="ico">✕</span></div><div class="cap" style="text-align:center;font-size:13px">… y 15 más · 20 PDFs válidos</div></div></div>
+<div class="foot"><button class="btn g">‹ Cancelar</button><span class="sp"></span><button class="btn">Siguiente: Plantillas →</button></div></div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>M-02 Herramientas similares</title>
+<title>L-10 Diálogos</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -142,21 +142,42 @@ ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 a{color:var(--accent)}
 .pre{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;white-space:pre;overflow:hidden}
 
+.gc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gc .pv{background:var(--inset);border-radius:10px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gc.sel{outline:2px solid var(--accent)}
+.arrow{color:var(--accent);font-size:22px;align-self:center}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.hl{border-color:var(--accent)}
+.tabs4{display:flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px}
+.tabs4 span{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted);border-radius:999px;padding:6px 4px}
+.tabs4 span.on{background:var(--accent);color:var(--ink)}
+.vp{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage{background:var(--inset);border-radius:14px;display:flex;justify-content:center;overflow:hidden;flex-grow:1}
+.side{width:440px;display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.fr{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;background:var(--soft);font-size:13.5px}
+.fr.sel{outline:2px solid var(--accent)}
+.bd{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.bd.n{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bd.l{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.ico{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.fb{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:10px;color:#064;padding:1px 3px;overflow:hidden;white-space:nowrap}
+.fb.sel{border-color:#7c3aed;background:rgba(124,58,237,.18)}
+.fb.new{border-color:#2563eb;background:rgba(37,99,235,.14)}
+.fb.ghost{border:2px dashed #888;background:transparent;color:#777}
+
 </style>
 </helmet>
 <div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:900px">
-<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-02 · Investigación</span><h1 style="font-size:26px;font-weight:600">Qué hacen otras herramientas y qué merece copiarse</h1><p class="cap" style="max-width:1450px">Resumen a partir de documentación pública de cada herramienta; las fuentes están en la respuesta del hilo.</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">L-10 · Reversibilidad</span><h1 style="font-size:26px;font-weight:600">Poner la plantilla A después, volver atrás y marcar listo</h1><p class="cap" style="max-width:1450px">Todo se puede deshacer y nada se pierde al moverte por el lote.</p></div>
 
-<div class="tbl2" style="grid-template-columns:1.1fr 2fr 1.4fr 1.6fr 1.2fr"><div class="c h">Herramienta</div><div class="c h">Qué hace</div><div class="c h">Cómo reutiliza la definición</div><div class="c h">Qué merece copiarse</div><div class="c h">Qué no</div><div class="c"><b>Zonal OCR<br><span class="cap">Docparser, Parseur, Nutrient</span></b></div><div class="c">Se dibuja una zona por dato sobre un documento de muestra y se le pone nombre; la plantilla se aplica a un lote con el mismo diseño.</div><div class="c">Posición fija: si el diseño cambia, falla y los propios artículos lo reconocen como límite.</div><div class="c">Definir una vez, aplicar a muchos. Coordenadas relativas a la página.</div><div class="c">Aplicar sin revisar.</div><div class="c"><b>Zonal con alineación<br><span class="cap">ImageToTable (descripción técnica)</span></b></div><div class="c">Antes de recortar cada zona se alinea la página (escala, inclinación y, a veces, una palabra ancla).</div><div class="c">Ancla de texto o marca para corregir el desplazamiento.</div><div class="c">Sugerir un ajuste a partir de textos que existen en A y B (fase 2).</div><div class="c">Automatismo opaco.</div><div class="c"><b>DocuSign AutoPlace</b></div><div class="c">Los campos se colocan junto a un texto ancla. Si mueves un campo a mano, recuerda el desplazamiento y lo repite en otros documentos.</div><div class="c">Ancla de texto + desplazamiento memorizado.</div><div class="c">«Recuerda mi ajuste y repítelo» (fase 3: propagar al lote).</div><div class="c">Escribir anclas a mano en el documento.</div><div class="c"><b>Acrobat · copiar y alinear campos</b></div><div class="c">Copiar y pegar campos entre PDFs y alinearlos. Los foros de Adobe están llenos de preguntas sobre cómo pasar campos de un PDF a otro.</div><div class="c">Manual, campo a campo.</div><div class="c">Copiar con posición y deshacer fácil.</div><div class="c">Proceso manual sin vista de referencia.</div><div class="c"><b>Azure Document Intelligence Studio</b></div><div class="c">Etiquetado de documentos de muestra: cuadro + nombre de campo, guardado como un JSON junto a cada documento.</div><div class="c">Un modelo entrenado, no coordenadas fijas.</div><div class="c">Un JSON por documento como artefacto de primera clase.</div><div class="c">Entrenar un modelo: aquí hay que clavar coordenadas exactas.</div><div class="c"><b>Comparadores de PDF<br><span class="cap">Draftable, Acrobat Compare, Stirling PDF</span></b></div><div class="c">Dos documentos lado a lado o superpuestos, con lista de cambios.</div><div class="c">No definen campos: solo muestran diferencias.</div><div class="c">Superponer A sobre B y una lista de diferencias como índice.</div><div class="c">Comparar textos: aquí solo importan los campos.</div></div>
-<div class="card" style="gap:8px"><span class="lab">Lo que se repite en todas</span>
-<div style="display:flex;gap:12px">
- <div class="node hl" style="flex:1"><b>1 · Definir una vez, aplicar a muchos</b><span class="cap" style="font-size:13px">La plantilla A se reutiliza; B parte de ella.</span></div>
- <div class="node hl" style="flex:1"><b>2 · Ajustar por anclas, no a ciegas</b><span class="cap" style="font-size:13px">Los textos de la página sirven de referencia.</span></div>
- <div class="node hl" style="flex:1"><b>3 · Recordar el ajuste del usuario</b><span class="cap" style="font-size:13px">Un desplazamiento corregido vale para los demás.</span></div>
- <div class="node hl" style="flex:1"><b>4 · Revisar por excepción</b><span class="cap" style="font-size:13px">Superposición y lista de cambios, no 20 vistas iguales.</span></div>
+<div class="cols" style="flex-grow:0;align-items:flex-start">
+<div class="card" style="flex:1"><span class="lab">Poner plantilla A</span><h3>¿Usar la plantilla de A en este PDF?</h3><p class="cap">Se copian los campos de A tal como están. Los ajustes que hayas hecho en B se pueden recuperar con Deshacer.</p>
+<div class="radio on"><span class="dot"></span><div><b>Solo los que faltan</b><br><span class="cap">Mantiene lo que ya has movido.</span></div></div>
+<div class="radio"><span class="dot"></span><div><b>Reemplazar todos</b><br><span class="cap">Vuelve a la plantilla A completa.</span></div></div>
+<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn g s">Cancelar</button><button class="btn s">Aplicar</button></div></div>
+<div class="card" style="flex:1"><span class="lab">Volver al panel</span><h3>Guardado automático</h3><p class="cap">Cada cambio se guarda en tu navegador. Volver al panel no pierde nada, y el PDF queda en «En edición».</p><div class="note i">ⓘ<div>Si cierras la pestaña, al volver a la landing verás «Continuar el lote anterior».</div></div></div>
+<div class="card" style="flex:1"><span class="lab">Marcar listo</span><h3>Quedan 2 campos por resolver</h3><p class="cap">«total» y «iva» están en A y no en B. Puedes marcar listo igualmente si no los necesitas.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn g s">Seguir editando</button><button class="btn s">Marcar listo igualmente</button></div></div>
 </div>
-<p class="cap" style="font-size:13px">Hueco que ninguna cubre: coordenadas exactas en puntos PDF, editables a mano, con A como capa de referencia y un JSON final por documento. Esa es la oportunidad.</p></div>
-
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>

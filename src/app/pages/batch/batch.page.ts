@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
@@ -20,7 +20,19 @@ import { createZip } from '../../utils/zip.utils';
 
 const MAX_JSON_BYTES = 5 * 1024 * 1024;
 
-type RowState = 'ready' | 'review' | 'noB';
+type RowState = 'ready' | 'review' | 'noTemplate';
+type Step = 'pdfs' | 'templates' | 'start' | 'panel';
+type ViewMode = 'grid' | 'list';
+type Filter = 'all' | 'review' | 'ready' | 'noTemplate';
+
+interface TemplateInfo {
+  readonly name: string;
+  readonly pages: PageAnnotations[];
+  readonly count: number;
+  readonly error: 'json' | 'noPages' | null;
+}
+
+const VIEW_KEY = 'pdf-annotator.batch.view';
 
 interface Row {
   readonly item: BatchItem;
@@ -65,32 +77,96 @@ export class BatchPageComponent implements OnInit {
   readonly activeId = this.store.activeId;
   readonly query = signal('');
   readonly dragActive = signal(false);
-  readonly importing = signal<{ done: number; total: number } | null>(null);
   readonly confirmRemove = signal<string | null>(null);
   private manualTarget: string | null = null;
 
+  readonly step = signal<Step>('pdfs');
+  readonly view = signal<ViewMode>(readView());
+  readonly filter = signal<Filter>('all');
+  readonly versionsMode = signal<'inPlace' | 'versions'>('inPlace');
+  readonly templates = signal<Map<string, TemplateInfo>>(new Map());
+  readonly draft = this.store.draft;
+  readonly draftPdfs = computed(() => this.store.draft()?.pdfs ?? []);
+  readonly expectVersions = this.store.expectVersions;
+
+  readonly stateOf = (item: BatchItem): RowState =>
+    item.status === 'ready'
+      ? 'ready'
+      : !item.bPdf && this.fieldCount(item.aPages) === 0 && !item.bPages
+        ? 'noTemplate'
+        : 'review';
+
+  readonly allRows = computed<Row[]>(() =>
+    this.store.items().map<Row>((item) => ({ item, state: this.stateOf(item) })),
+  );
+  readonly counts = computed(() => {
+    const rows = this.allRows();
+    return {
+      all: rows.length,
+      review: rows.filter((r) => r.state === 'review').length,
+      ready: rows.filter((r) => r.state === 'ready').length,
+      noTemplate: rows.filter((r) => r.state === 'noTemplate').length,
+    };
+  });
   readonly rows = computed<Row[]>(() => {
     const query = this.query().trim().toLowerCase();
-    const rows = this.store
-      .items()
-      .filter((item) => !query || item.name.toLowerCase().includes(query))
-      .map<Row>((item) => ({
-        item,
-        state: !item.bPdf ? 'noB' : item.status === 'ready' ? 'ready' : 'review',
-      }));
-    const rank: Record<RowState, number> = { noB: 0, review: 1, ready: 2 };
-    return rows.sort((a, b) => rank[a.state] - rank[b.state]);
+    const filter = this.filter();
+    const rank: Record<RowState, number> = { noTemplate: 0, review: 1, ready: 2 };
+    return this.allRows()
+      .filter((row) => !query || row.item.name.toLowerCase().includes(query))
+      .filter((row) => filter === 'all' || row.state === filter)
+      .sort((a, b) => rank[a.state] - rank[b.state]);
   });
   readonly total = computed(() => this.store.items().length);
-  readonly readyCount = computed(
-    () => this.store.items().filter((i) => i.bPdf && i.status === 'ready').length,
-  );
+  readonly readyCount = computed(() => this.counts().ready);
   readonly progress = computed(() =>
     this.total() ? Math.round((this.readyCount() / this.total()) * 100) : 0,
   );
   readonly nextPending = computed(
-    () => this.store.items().find((item) => item.bPdf && item.status !== 'ready') ?? null,
+    () => this.allRows().find((row) => row.state !== 'ready')?.item ?? null,
   );
+  readonly templateRows = computed(() => {
+    const infos = this.templates();
+    return this.draftPdfs().map((pdf) => ({
+      pdf,
+      info: infos.get(pairingKey(pdf.name)) ?? null,
+    }));
+  });
+  readonly withTemplate = computed(
+    () => this.templateRows().filter((row) => row.info && !row.info.error).length,
+  );
+
+  constructor() {
+    // The panel needs the batch to be read from IndexedDB before it can decide what to show.
+    effect(() => {
+      if (!this.store.loaded()) {
+        return;
+      }
+      untracked(() => this.decideStep());
+    });
+  }
+
+  private decideStep(): void {
+    if (this.step() === 'panel' && this.total() > 0) {
+      return;
+    }
+    if (this.store.draft()) {
+      this.step.set('pdfs');
+    } else if (this.total() > 0) {
+      this.step.set('panel');
+    } else {
+      void this.router.navigate(['/landing']);
+    }
+  }
+
+  setView(mode: ViewMode): void {
+    this.view.set(mode);
+    try {
+      localStorage.setItem(VIEW_KEY, mode);
+    } catch {
+      /* private mode: the choice is just not remembered */
+    }
+  }
 
   ngOnInit(): void {
     this.metadata.applyDefaultMetadata();
@@ -101,10 +177,6 @@ export class BatchPageComponent implements OnInit {
 
   t(key: string, params?: Record<string, unknown>): string {
     return this.i18n.translate(key, params);
-  }
-
-  bytesLabel(item: BatchItem): string {
-    return item.bName ?? '—';
   }
 
   fieldCount(pages: readonly PageAnnotations[] | null): number {
@@ -133,13 +205,6 @@ export class BatchPageComponent implements OnInit {
     await this.addFiles(Array.from(event.dataTransfer?.files ?? []));
   }
 
-  async onOriginalsSelected(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files ?? []);
-    input.value = '';
-    await this.addOriginals(files);
-  }
-
   async onNewVersionsSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const files = Array.from(input.files ?? []);
@@ -147,41 +212,9 @@ export class BatchPageComponent implements OnInit {
     await this.addNewVersions(files);
   }
 
-  /** Drops go to the originals while the batch is empty and to the new versions afterwards. */
+  /** In the panel, dropped PDFs are new versions (B) paired by name. */
   private async addFiles(files: File[]): Promise<void> {
-    if (this.total() === 0) {
-      await this.addOriginals(files);
-    } else {
-      await this.addNewVersions(files);
-    }
-  }
-
-  private async addOriginals(files: File[]): Promise<void> {
-    const pdfs = files.filter(isPdfFile);
-    const jsons = files.filter((file) => !isPdfFile(file) && isJsonFile(file));
-    const rejected = files.length - pdfs.length - jsons.length;
-    if (rejected > 0) {
-      this.toast.error(this.t('toast.batch.invalidFile', { count: rejected }));
-    }
-    if (!pdfs.length) {
-      return;
-    }
-
-    this.importing.set({ done: 0, total: pdfs.length });
-    for (const pdf of pdfs) {
-      const json = jsons.find((file) => pairingKey(file.name) === pairingKey(pdf.name));
-      const pages = json ? await this.readTemplate(json) : [];
-      this.store.add({ name: pdf.name, aPdf: pdf, aPages: pages });
-      this.importing.update((state) => (state ? { ...state, done: state.done + 1 } : state));
-    }
-    this.importing.set(null);
-
-    const used = new Set(pdfs.map((pdf) => pairingKey(pdf.name)));
-    const orphans = jsons.filter((file) => !used.has(pairingKey(file.name)));
-    if (orphans.length) {
-      this.toast.warning(this.t('toast.batch.jsonWithoutPdf', { count: orphans.length }));
-    }
-    this.notifyNotPersistent();
+    await this.addNewVersions(files);
   }
 
   private async addNewVersions(files: File[]): Promise<void> {
@@ -194,12 +227,9 @@ export class BatchPageComponent implements OnInit {
     }
     const candidates = this.store.items().filter((item) => !item.bPdf);
     const { paired, unpaired } = pairByName(candidates, pdfs);
-    this.importing.set({ done: 0, total: paired.length });
     for (const { a, b } of paired) {
       await this.attachB(a, b);
-      this.importing.update((state) => (state ? { ...state, done: state.done + 1 } : state));
     }
-    this.importing.set(null);
     if (unpaired.length) {
       this.toast.warning(this.t('toast.batch.unpaired', { count: unpaired.length }));
     }
@@ -238,22 +268,25 @@ export class BatchPageComponent implements OnInit {
     this.store.setB(item.id, file);
   }
 
-  private async readTemplate(file: File): Promise<PageAnnotations[]> {
+  private async readTemplate(file: File): Promise<TemplateInfo> {
+    const fail = (error: 'json' | 'noPages'): TemplateInfo => ({
+      name: file.name,
+      pages: [],
+      count: 0,
+      error,
+    });
     if (file.size > MAX_JSON_BYTES) {
-      this.toast.error(this.t('toast.batch.jsonFailed', { name: file.name }));
-      return [];
+      return fail('json');
     }
     try {
       const data = parseLooseJson(await file.text());
       const pages = this.importer.normalizeImportedCoordinates(data, (field) => field);
       if (pages === null) {
-        this.toast.error(this.t('toast.batch.jsonNoPages', { name: file.name }));
-        return [];
+        return fail('noPages');
       }
-      return pages;
+      return { name: file.name, pages, count: this.fieldCount(pages), error: null };
     } catch {
-      this.toast.error(this.t('toast.batch.jsonFailed', { name: file.name }));
-      return [];
+      return fail('json');
     }
   }
 
@@ -266,14 +299,15 @@ export class BatchPageComponent implements OnInit {
   // ---- row actions --------------------------------------------------------------------------
 
   async open(item: BatchItem): Promise<void> {
-    if (!item.bPdf) {
-      return;
-    }
     this.store.activate(item.id);
-    const file = new File([item.bPdf], item.bName ?? item.name, { type: 'application/pdf' });
+    const file = new File([item.bPdf ?? item.aPdf], item.bName ?? item.name, {
+      type: 'application/pdf',
+    });
+    // Without a new version the PDF is edited with its own template.
+    const coords = item.bPages ?? (item.bPdf ? null : item.aPages);
     this.pendingFile.setPendingFile(
       file,
-      item.bPages ? { coords: item.bPages, pageIndex: 1, scale: 0.75 } : null,
+      coords && coords.length ? { coords, pageIndex: 1, scale: 0.75 } : null,
     );
     await this.router.navigate(['/workspace']);
   }
@@ -294,21 +328,113 @@ export class BatchPageComponent implements OnInit {
     this.confirmRemove.set(null);
   }
 
-  removeVersion(id: string): void {
-    this.store.removeB(id);
+  // ---- steps (several PDFs from the landing) --------------------------------------------------
+
+  async onDraftPdfsSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    input.value = '';
+    this.addDraftPdfs(files);
   }
 
-  clearBatch(): void {
-    this.store.clear();
-    this.confirmRemove.set(null);
+  async onDraftDrop(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    this.dragActive.set(false);
+    this.addDraftPdfs(Array.from(event.dataTransfer?.files ?? []));
+  }
+
+  private addDraftPdfs(files: File[]): void {
+    const pdfs = files.filter(isPdfFile);
+    if (pdfs.length < files.length) {
+      this.toast.error(this.t('toast.batch.invalidFile', { count: files.length - pdfs.length }));
+    }
+    const current = this.draft();
+    if (pdfs.length && current) {
+      this.store.draft.set({ ...current, pdfs: [...current.pdfs, ...pdfs] });
+    }
+  }
+
+  removeDraftPdf(index: number): void {
+    const current = this.draft();
+    if (current) {
+      this.store.draft.set({ ...current, pdfs: current.pdfs.filter((_, i) => i !== index) });
+    }
+  }
+
+  cancelDraft(): void {
+    this.store.draft.set(null);
+    void this.router.navigate(['/landing']);
+  }
+
+  goToStep(step: Step): void {
+    if (step === 'templates' && this.draftPdfs().length === 0) {
+      return;
+    }
+    this.step.set(step);
+  }
+
+  async onTemplatesSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    input.value = '';
+    await this.addTemplates(files);
+  }
+
+  async onTemplatesDrop(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    this.dragActive.set(false);
+    await this.addTemplates(Array.from(event.dataTransfer?.files ?? []));
+  }
+
+  private async addTemplates(files: File[]): Promise<void> {
+    const jsons = files.filter((file) => !isPdfFile(file) && isJsonFile(file));
+    if (jsons.length < files.length) {
+      this.toast.error(this.t('toast.batch.invalidFile', { count: files.length - jsons.length }));
+    }
+    const known = new Set(this.draftPdfs().map((pdf) => pairingKey(pdf.name)));
+    const next = new Map(this.templates());
+    let orphans = 0;
+    for (const file of jsons) {
+      const key = pairingKey(file.name);
+      if (!known.has(key)) {
+        orphans++;
+        continue;
+      }
+      next.set(key, await this.readTemplate(file));
+    }
+    this.templates.set(next);
+    if (orphans) {
+      this.toast.warning(this.t('toast.batch.jsonWithoutPdf', { count: orphans }));
+    }
+  }
+
+  removeTemplate(pdf: File): void {
+    const next = new Map(this.templates());
+    next.delete(pairingKey(pdf.name));
+    this.templates.set(next);
+  }
+
+  /** Creates the batch from the draft and shows the panel. */
+  openPanel(): void {
+    const draft = this.draft();
+    if (!draft) {
+      return;
+    }
+    for (const pdf of draft.pdfs) {
+      const info = this.templates().get(pairingKey(pdf.name));
+      this.store.add({ name: pdf.name, aPdf: pdf, aPages: info && !info.error ? info.pages : [] });
+    }
+    this.store.expectVersions.set(this.versionsMode() === 'versions');
+    this.store.draft.set(null);
+    this.templates.set(new Map());
+    this.step.set('panel');
+    this.notifyNotPersistent();
   }
 
   // ---- download -----------------------------------------------------------------------------
 
   downloadReady(): void {
-    const ready = this.store
-      .items()
-      .filter((item) => item.bPdf && item.status === 'ready' && item.bJson);
+    const ready = this.store.items().filter((item) => item.status === 'ready' && item.bJson);
     if (!ready.length) {
       return;
     }
@@ -334,5 +460,13 @@ export class BatchPageComponent implements OnInit {
     });
     const zip = createZip(entries);
     downloadBlob(new Blob([zip as BlobPart], { type: 'application/zip' }), 'plantillas-b.zip');
+  }
+}
+
+function readView(): ViewMode {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'grid';
+  } catch {
+    return 'grid';
   }
 }

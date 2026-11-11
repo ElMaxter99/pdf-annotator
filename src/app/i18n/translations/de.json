@@ -45,8 +45,7 @@
       },
       "nav": {
         "github": "GitHub"
-      },
-      "batchLink": "Mehrere neue Versionen? Vorlagen im Stapel migrieren →"
+      }
     },
     "upload": {
       "title": "Laden Sie Ihr PDF hoch",
@@ -354,50 +353,21 @@
     "readyCount": "{{ready}} von {{total}} fertig",
     "downloadReady": "Fertige herunterladen ({{count}})",
     "reviewNext": "Nächstes prüfen →",
-    "importing": "PDFs werden gelesen… {{done}} von {{total}}",
-    "empty": {
-      "title": "Beginne mit dem Ablegen deiner Original-PDFs (A)",
-      "text": "Falls vorhanden, lege auch die JSON-Dateien mit gleichem Namen ab (rechnung.pdf + rechnung.json). Danach lädst du die neuen Versionen (B) hoch.",
-      "choose": "PDFs und JSON wählen",
-      "privacy": "Alles bleibt in deinem Browser: nichts wird hochgeladen."
-    },
-    "drop": {
-      "title": "Neue PDFs (B) hier ablegen",
-      "text": "Sie werden per Name dem A zugeordnet. Nicht passende weist du mit „B hochladen“ in der Zeile zu.",
-      "choose": "Neue PDFs wählen",
-      "addOriginals": "Weitere Originale (A) hinzufügen"
-    },
     "search": "Nach Namen suchen",
     "notPersistent": "Dieser Browser kann den Stapel nicht speichern: er geht beim Schließen des Tabs verloren.",
-    "clear": "Stapel leeren",
-    "tableLabel": "PDFs im Stapel",
     "col": {
-      "original": "Original (A)",
-      "new": "Neu (B)",
-      "state": "Status"
+      "state": "Status",
+      "document": "Dokument",
+      "version": "B-Version"
     },
-    "fieldsInA": "{{count}} Felder in A",
     "state": {
       "ready": "Fertig",
       "review": "Zu prüfen",
-      "noB": "Ohne B"
-    },
-    "action": {
-      "uploadB": "B hochladen",
-      "open": "Öffnen",
-      "review": "Prüfen",
-      "remove": "{{name}} entfernen",
-      "confirmRemove": "Ja, entfernen",
-      "cancel": "Abbrechen"
-    },
-    "done": {
-      "title": "{{count}} von {{count}} fertig",
-      "text": "Lade pro neuem PDF ein JSON herunter; bei mehreren kommen sie als .zip.",
-      "download": "JSON herunterladen"
+      "noTemplate": "Ohne Vorlage"
     },
     "editor": {
       "regionLabel": "Migration des aktuellen PDFs",
-      "back": "Stapel",
+      "back": "Panel",
       "versionA": "A: {{name}}",
       "editingB": "Version B wird bearbeitet",
       "viewLabel": "A anzeigen",
@@ -431,7 +401,12 @@
         "reopen": "Du kannst es jederzeit wieder öffnen und ändern.",
         "confirm": "Als fertig markieren",
         "keep": "Weiter bearbeiten"
-      }
+      },
+      "plain": "Bearbeitung mit eigener Vorlage",
+      "navLabel": "Durch den Stapel navigieren",
+      "prev": "Vorheriges PDF",
+      "next": "Nächstes PDF",
+      "position": "{{index}} von {{total}}"
     },
     "panel": {
       "title": "Felder von B · {{count}}",
@@ -456,6 +431,85 @@
       "renamed": "Umbenannt",
       "new": "Neu",
       "missing": "Fehlt in B"
-    }
+    },
+    "loading": "Stapel wird geladen…",
+    "cancel": "Abbrechen",
+    "back": "Zurück",
+    "open": "Öffnen",
+    "review": "Prüfen",
+    "remove": "{{name}} entfernen",
+    "removeConfirm": "{{name}} aus dem Stapel entfernen?",
+    "removeYes": "Ja, entfernen",
+    "uploadVersions": "B-Versionen hochladen",
+    "panelHint": "Klicke auf ein Dokument, um es im Editor zu öffnen. Was fehlt, steht zuerst.",
+    "allReady": {
+      "title": "Alles fertig!"
+    },
+    "steps": {
+      "label": "Schritte des Stapels",
+      "pdfs": "PDFs hochladen",
+      "templates": "Vorlagen",
+      "start": "Starten",
+      "required": "Erforderlich",
+      "optional": "Optional",
+      "summary": "Übersicht"
+    },
+    "step1": {
+      "title": "1 · PDFs hochladen",
+      "text": "Alle Dokumente, die du bearbeiten willst. Du kannst weitere hinzufügen oder entfernen.",
+      "drop": "Weitere PDFs hier ablegen",
+      "choose": "Dateien wählen",
+      "remove": "{{name}} entfernen",
+      "next": "Weiter: Vorlagen →"
+    },
+    "step2": {
+      "title": "2 · Vorlagen hochladen (JSON)",
+      "text": "Optional. Ein JSON pro PDF mit demselben Namen (rechnung.json für rechnung.pdf). Ohne Vorlage startet das PDF ohne Anmerkungen.",
+      "drop": "JSON-Dateien hier ablegen",
+      "none": "keine Vorlage",
+      "badJson": "Ungültiges JSON",
+      "noPages": "Keine Seiten",
+      "fields": "{{count}} Felder",
+      "empty": "Leer",
+      "remove": "Vorlage von {{name}} entfernen",
+      "skip": "Diesen Schritt überspringen",
+      "next": "Weiter: Starten →"
+    },
+    "step3": {
+      "title": "3 · Bereit zum Start",
+      "pdfs": "PDFs",
+      "withTemplate": "mit Vorlage",
+      "withoutTemplate": "ohne Vorlage",
+      "inPlace": "Jedes PDF mit seiner Vorlage bearbeiten",
+      "inPlaceText": "Jedes PDF öffnet sich mit seinem JSON und du passt an, was nötig ist.",
+      "versions": "Ich habe neue Versionen (B) dieser PDFs",
+      "versionsText": "Du lädst sie im Panel hoch: Die Vorlage wandert nach B und A bleibt als Referenzebene.",
+      "open": "Panel öffnen →"
+    },
+    "versionsDrop": {
+      "title": "B-Versionen hier ablegen",
+      "text": "Sie werden per Name jedem PDF zugeordnet; der Rest wird von Hand zugewiesen.",
+      "hide": "Ausblenden"
+    },
+    "filter": {
+      "label": "Nach Status filtern",
+      "all": "Alle {{count}}",
+      "review": "Zu prüfen {{count}}",
+      "ready": "Fertig {{count}}",
+      "noTemplate": "Ohne Vorlage {{count}}"
+    },
+    "view": {
+      "label": "Ansichtsart",
+      "grid": "Raster",
+      "list": "Liste"
+    },
+    "resume": {
+      "title": "Gespeicherter Stapel",
+      "text": "Du hast einen Stapel mit {{count}} PDFs in Arbeit.",
+      "continue": "Stapel fortsetzen",
+      "discard": "Verwerfen",
+      "discarded": "Stapel verworfen."
+    },
+    "uploadB": "B hochladen"
   }
 }

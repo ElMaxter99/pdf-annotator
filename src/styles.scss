@@ -2727,6 +2727,18 @@ kbd {
   }
 }
 
+.migration-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.migration-bar__count {
+  color: var(--muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
 .migration-bar__spacer {
   flex: 1 1 auto;
 }

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>M-10 Arquitectura y fases</title>
+<title>L-02 Primera vista</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -142,45 +142,37 @@ ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 a{color:var(--accent)}
 .pre{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;white-space:pre;overflow:hidden}
 
+.gc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gc .pv{background:var(--inset);border-radius:10px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gc.sel{outline:2px solid var(--accent)}
+.arrow{color:var(--accent);font-size:22px;align-self:center}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.hl{border-color:var(--accent)}
+.tabs4{display:flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px}
+.tabs4 span{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted);border-radius:999px;padding:6px 4px}
+.tabs4 span.on{background:var(--accent);color:var(--ink)}
+.vp{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage{background:var(--inset);border-radius:14px;display:flex;justify-content:center;overflow:hidden;flex-grow:1}
+.side{width:440px;display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.fr{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;background:var(--soft);font-size:13.5px}
+.fr.sel{outline:2px solid var(--accent)}
+.bd{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.bd.n{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bd.l{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.ico{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.fb{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:10px;color:#064;padding:1px 3px;overflow:hidden;white-space:nowrap}
+.fb.sel{border-color:#7c3aed;background:rgba(124,58,237,.18)}
+.fb.new{border-color:#2563eb;background:rgba(37,99,235,.14)}
+.fb.ghost{border:2px dashed #888;background:transparent;color:#777}
+
 </style>
 </helmet>
 <div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:900px">
-<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-10 · Arquitectura</span><h1 style="font-size:26px;font-weight:600">Un único editor, un contexto de lote y una capa de referencia</h1><p class="cap" style="max-width:1450px">Menos código nuevo: se reutiliza el editor y se aísla lo propio de migrar.</p></div>
-
-<div class="cols" style="flex-grow:0;align-items:flex-start">
- <div class="card" style="flex:1.2"><span class="lab">Piezas</span>
-  <div style="display:flex;flex-direction:column;gap:8px">
-   <div class="node hl"><b>/lote</b><span class="cap" style="font-size:13px">Bandeja. Sustituye a /batch y a la ficha.</span></div>
-   <div class="node hl"><b>/workspace?lote=ID&amp;doc=N</b><span class="cap" style="font-size:13px">El mismo editor. Solo cambia el contexto: hay un lote y una capa A.</span></div>
-   <div class="node"><b>BatchStore (IndexedDB)</b><span class="cap" style="font-size:13px">Lista de documentos, estado y A/B de cada uno. Extiende la sesión guardada actual.</span></div>
-   <div class="node"><b>MigrationService + migration.utils.ts</b><span class="cap" style="font-size:13px">Emparejar por nombre, calcular estados Igual/Movido/Renombrado/Nuevo/Falta. Funciones puras con tests.</span></div>
-   <div class="node"><b>ReferenceLayer (componente del visor)</b><span class="cap" style="font-size:13px">Dibuja A en solo lectura, sin eventos. No añade código al «dios-componente» workspace.page.ts.</span></div>
-   <div class="node"><b>AnnotationStore · sin cambios</b><span class="cap" style="font-size:13px">Una instancia por documento: historial, selección y JSON como hoy.</span></div>
-  </div>
- </div>
- <div class="card" style="flex:1.1"><span class="lab">Datos</span>
-  <p class="cap" style="font-size:13px">El JSON final no cambia: es el de siempre.</p>
-  <div class="pre">{ "pages": [ { "num": 1,
-    "fields": [ { "name": "fecha", "x": 420, "y": 668 } ] } ] }</div>
-  <p class="cap" style="font-size:13px">La relación A↔B vive aparte, en la sesión, y no se exporta:</p>
-  <div class="pre">{ "docId": "factura-0331",
-  "a": { "hash": "…", "json": {…} },
-  "b": { "hash": "…", "json": {…} },
-  "links": [ { "b": "cliente.direccion", "a": "direccion" } ],
-  "dismissed": [ "total" ],
-  "status": "review" }</div>
-  <p class="cap" style="font-size:13px">Identidad de campo = su nombre. «Renombrado» es un enlace explícito.</p>
- </div>
- <div class="card" style="flex:1"><span class="lab">Fases</span>
-  <div style="display:flex;flex-direction:column;gap:8px">
-   <div class="node hl"><b>Fase 1 · Base útil</b><span class="cap" style="font-size:13px">Bandeja, editor de B con capa A, estados, copiar A→B, listo y descargar. Sin lógica «inteligente».</span></div>
-   <div class="node"><b>Fase 2 · Ajuste por textos</b><span class="cap" style="font-size:13px">Con el texto que ya extrae pdf.js, proponer desplazamiento por página o por campo. Siempre como sugerencia.</span></div>
-   <div class="node"><b>Fase 3 · Propagar al lote</b><span class="cap" style="font-size:13px">«Este ajuste vale para los que tienen la misma maqueta». Depende de cómo sean tus 20 PDFs.</span></div>
-  </div>
-  <span class="lab" style="margin-top:8px">Cómo se haría</span>
-  <ul class="l cap" style="font-size:13.5px"><li>PR nueva desde develop que reutiliza lo útil de #154 (hash, importar, descargar, i18n).</li><li>Las pantallas ficha/comparador/stepper no se portan.</li><li>7 idiomas, tema claro/oscuro, e2e propios.</li></ul>
- </div>
-</div>
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">L-02 · Landing</span><h1 style="font-size:26px;font-weight:600">La primera vista no cambia: la cantidad de PDFs decide el flujo</h1><p class="cap" style="max-width:1450px">1 → editor tradicional · 2 o más → pasos del lote.</p></div>
+<div class="hdr"><div class="brand">Pdf Annotator<small>Anotador de PDFs</small></div><span class="sp"></span><span class="sel2">ES ▾</span><span class="ico">☾</span></div>
+<div style="text-align:center;display:flex;flex-direction:column;gap:6px;margin-top:6px"><h2 style="font-size:30px">Coloca anotaciones sobre tus PDFs</h2><p class="cap">Suelta uno o varios PDFs aquí. Todo ocurre en tu navegador.</p></div>
+<div class="cols" style="flex-grow:0"><div class="card" style="flex:1;gap:14px"><span class="lab">Suelto 1 PDF</span><div class="drop act" style="padding:40px"><span class="ic">⇪</span><b style="font-size:18px">factura-0331.pdf</b><span class="cap">842 KB · 2 páginas</span></div><div class="note i">ⓘ<div><b>1 documento:</b> se abre el editor tradicional al instante.</div></div><div style="text-align:center"><button class="btn">Abrir en el editor →</button></div></div><div class="card" style="flex:1;gap:14px"><span class="lab">Suelto varios PDFs</span><div class="drop act" style="padding:24px"><span class="ic">⇪</span><b style="font-size:18px">20 PDFs seleccionados</b><span class="cap">Se abre el flujo por lotes</span></div><div class="note i">ⓘ<div><b>2 o más documentos:</b> te llevamos al paso «Subir PDF» con ellos ya cargados.</div></div><div style="text-align:center"><button class="btn">Empezar el lote →</button></div></div></div>
+<div class="note i" style="max-width:900px;margin:0 auto">ⓘ<div>Es la landing de hoy. Cambia solo que el selector de archivos admite varios y el texto lo dice. Sin botones ni modos nuevos.</div></div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>

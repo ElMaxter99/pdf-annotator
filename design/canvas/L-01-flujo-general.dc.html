@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>M-09 Estados</title>
+<title>L-01 Flujo general</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -142,21 +142,54 @@ ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 a{color:var(--accent)}
 .pre{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;white-space:pre;overflow:hidden}
 
+.gc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gc .pv{background:var(--inset);border-radius:10px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gc.sel{outline:2px solid var(--accent)}
+.arrow{color:var(--accent);font-size:22px;align-self:center}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.hl{border-color:var(--accent)}
+.tabs4{display:flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px}
+.tabs4 span{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted);border-radius:999px;padding:6px 4px}
+.tabs4 span.on{background:var(--accent);color:var(--ink)}
+.vp{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage{background:var(--inset);border-radius:14px;display:flex;justify-content:center;overflow:hidden;flex-grow:1}
+.side{width:440px;display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.fr{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;background:var(--soft);font-size:13.5px}
+.fr.sel{outline:2px solid var(--accent)}
+.bd{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.bd.n{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bd.l{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.ico{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.fb{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:10px;color:#064;padding:1px 3px;overflow:hidden;white-space:nowrap}
+.fb.sel{border-color:#7c3aed;background:rgba(124,58,237,.18)}
+.fb.new{border-color:#2563eb;background:rgba(37,99,235,.14)}
+.fb.ghost{border:2px dashed #888;background:transparent;color:#777}
+
 </style>
 </helmet>
 <div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:900px">
-<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-09 · Estados</span><h1 style="font-size:26px;font-weight:600">Vacío, cargando, sin B, sin JSON, aviso y todo listo</h1><p class="cap" style="max-width:1450px">Cada situación tiene una respuesta visible; nada deja al usuario sin feedback.</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">L-01 · Propuesta · pendiente de aprobación</span><h1 style="font-size:26px;font-weight:600">Un PDF: el editor de siempre. Varios PDFs: pasos, panel y editor</h1><p class="cap" style="max-width:1450px">Entras siempre por la misma primera vista. No hay selector de modo: lo decide cuántos PDFs sueltas.</p></div>
 
-<div class="g2" style="grid-template-columns:repeat(3,1fr);align-content:start">
-<div class="card" style="gap:8px"><span class="lab">Vacío</span><div class="drop"><span class="ic">⇪</span><b>Empieza soltando tus PDF originales (A)</b><span class="cap">y, si los tienes, sus JSON</span></div><p class="cap" style="font-size:13px">Un solo cuadro de arrastre; sin pasos.</p></div>
-<div class="card" style="gap:8px"><span class="lab">Cargando</span><div class="bar"><i style="width:60%"></i></div><div class="row"><span class="thumb"><i></i></span><span style="flex:1">Leyendo PDFs… 12 de 20</span><span class="cap">8 s</span></div><div class="row"><span class="sk" style="width:36px;height:46px"></span><span class="sk" style="width:60%;height:12px"></span></div><p class="cap" style="font-size:13px">Barra con contador y esqueletos por fila.</p></div>
-<div class="card" style="gap:8px"><span class="lab">Sin B</span><div class="row"><span class="thumb"><i></i></span><span style="flex:1">albaran-0107.pdf</span><span class="st warn">Sin B</span><button class="btn s">Subir B</button></div><p class="cap" style="font-size:13px">Se puede abrir y trabajar solo viendo A; B se añade luego.</p></div>
-<div class="card" style="gap:8px"><span class="lab">Sin JSON de A</span><div class="note i">ⓘ<div><b>Este PDF no tiene JSON.</b> B empieza vacía; puedes pegar uno desde Plantillas.</div></div><p class="cap" style="font-size:13px">No es un error: el editor funciona igual.</p></div>
-<div class="card" style="gap:8px"><span class="lab">Aviso no bloqueante</span><div class="toast" style="position:static"><span>⚠</span><div><b>contrato-0021.json</b> tiene un error en la línea 14. El PDF se cargó sin plantilla.</div></div><p class="cap" style="font-size:13px">Mismo toast que el editor original; nunca alert.</p></div>
-<div class="card" style="gap:8px"><span class="lab">Todo listo</span><div class="card" style="background:var(--inset);gap:8px"><h3>20 de 20 listos</h3><span class="cap">14 con cambios · 6 sin cambios · 3 campos descartados</span><button class="btn">Descargar 20 JSON (.zip)</button></div><p class="cap" style="font-size:13px">Resumen y descarga; también PDF B opcionales.</p></div>
+<div class="card"><span class="lab">Primera vista (la landing de siempre): la cantidad de PDFs decide el flujo</span>
+<div style="display:flex;gap:14px;align-items:stretch">
+ <div class="node hl" style="flex:1"><b>Subo 1 PDF</b><span class="cap" style="font-size:13px">Flujo tradicional, sin cambios: editor, anotaciones, árbol y JSON.</span></div>
+ <span class="arrow" style="align-self:center">|</span>
+ <div class="node hl" style="flex:1"><b>Subo 2 o más PDFs</b><span class="cap" style="font-size:13px">Flujo por lotes: pasos 1 · Subir PDF → 2 · Plantillas → 3 · Empezar.</span></div>
+</div></div>
+<div class="card"><span class="lab">Flujo por lotes</span>
+<div style="display:flex;gap:12px;align-items:stretch">
+ <div class="node hl" style="flex:1"><b>1 · Subir PDF</b><span class="cap" style="font-size:13px">Todos los documentos a la vez. Lista con miniaturas y ✕ para quitar.</span></div><span class="arrow">→</span>
+ <div class="node hl" style="flex:1"><b>2 · Plantillas</b><span class="cap" style="font-size:13px">Opcional: un JSON por PDF, emparejado por nombre. Se puede saltar.</span></div><span class="arrow">→</span>
+ <div class="node hl" style="flex:1"><b>3 · Empezar</b><span class="cap" style="font-size:13px">Resumen y, si quieres, subir ya las versiones B.</span></div><span class="arrow">→</span>
+ <div class="node hl" style="flex:1"><b>Panel</b><span class="cap" style="font-size:13px">Todos los PDFs en cuadrícula o lista. Desde aquí entras a cada uno.</span></div><span class="arrow">→</span>
+ <div class="node hl" style="flex:1"><b>Editor de un PDF</b><span class="cap" style="font-size:13px">El editor de siempre, con ‹ Panel y ‹ 3 de 20 › para moverte entre PDFs.</span></div><span class="arrow">→</span>
+ <div class="node hl" style="flex:1"><b>Descargar</b><span class="cap" style="font-size:13px">Un JSON por PDF listo, o .zip.</span></div>
+</div></div>
+<div class="cols" style="flex-grow:0">
+<div class="card" style="flex:1"><span class="lab">Se conserva del editor original</span><ul class="l cap" style="font-size:14px"><li>Subir PDF, seleccionar y mover anotaciones, multiselección, historial y atajos.</li><li>Pestañas Documento · Anotaciones · Plantillas · Avanzado.</li><li>Árbol y JSON <span class="mono">{pages:[{num,fields}]}</span>, mismo formato, es el producto final.</li></ul></div>
+<div class="card" style="flex:1"><span class="lab">Lo nuevo, solo en lote</span><ul class="l cap" style="font-size:14px"><li>Pasos de subida (PDF y plantillas).</li><li>Panel en cuadrícula o lista con estado por PDF.</li><li>En el editor: barra con ‹ Panel, anterior/siguiente y «Listo».</li><li>Si subes versión B: A queda como capa gris, mismo tamaño que B.</li></ul></div>
+<div class="card" style="flex:1"><span class="lab">Lo que se elimina respecto a la PR anterior</span><ul class="l cap" style="font-size:14px"><li>Ruta y bandeja aparte «/lote».</li><li>Enlace «lote» en la landing: ya no hace falta.</li><li>Ficha del PDF, comparador y demás pantallas extra.</li></ul></div>
 </div>
-<div class="note w">⚠<div><b>Accesibilidad:</b> el estado se dice con texto y forma, no solo con color; foco visible en filas y campos; todo el flujo con teclado (↑ ↓, Intro, N, A para ver A, Ctrl+Z).</div></div>
-
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>

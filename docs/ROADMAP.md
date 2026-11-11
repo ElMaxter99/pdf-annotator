@@ -6,7 +6,7 @@ El histórico de la iteración inicial está en `docs/archive/PROPUESTA_MEJORAS.
 Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEditor`, `PdfExportService`, `FontCatalogService`, `AnnotationStore`, `AnnotationImportService`, sidebar por pestañas, selección múltiple, sesión en IndexedDB, toasts, avisos de importación, e2e y CI.
 
 ## En curso
-- **Remaquetado por lotes, fase 1** (diseño aprobado `M-01`..`M-10`): bandeja `/lote`, editor de B con A como capa de referencia, estados por campo, «Poner plantilla A», «Listo» y descarga. Sin vista dividida todavía (tablero `M-06`).
+- **Lote de documentos y remaquetado, fase 1** (diseño aprobado `L-01`..`L-11`): pasos de subida, panel en cuadrícula o lista, editor de B con A como capa de referencia, estados por campo, «Poner plantilla A», «Listo» y descarga. Sin vista dividida ni miniaturas reales en el panel todavía.
 
 ## Siguiente
 1. **Remaquetado por lotes, fases siguientes:** vista dividida (A y B del mismo tamaño y zoom, scroll ligado), aviso y escalado cuando A y B miden distinto, y «Copiar y ajustar por textos» (proponer el desplazamiento con el texto que ya extrae pdf.js; siempre como sugerencia).

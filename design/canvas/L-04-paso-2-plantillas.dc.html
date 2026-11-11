@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>M-05 Editor de B</title>
+<title>L-04 Paso 2 · Plantillas</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -142,47 +142,47 @@ ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 a{color:var(--accent)}
 .pre{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;white-space:pre;overflow:hidden}
 
+.gc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gc .pv{background:var(--inset);border-radius:10px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gc.sel{outline:2px solid var(--accent)}
+.arrow{color:var(--accent);font-size:22px;align-self:center}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.hl{border-color:var(--accent)}
+.tabs4{display:flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px}
+.tabs4 span{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted);border-radius:999px;padding:6px 4px}
+.tabs4 span.on{background:var(--accent);color:var(--ink)}
+.vp{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage{background:var(--inset);border-radius:14px;display:flex;justify-content:center;overflow:hidden;flex-grow:1}
+.side{width:440px;display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.fr{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;background:var(--soft);font-size:13.5px}
+.fr.sel{outline:2px solid var(--accent)}
+.bd{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.bd.n{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bd.l{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.ico{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.fb{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:10px;color:#064;padding:1px 3px;overflow:hidden;white-space:nowrap}
+.fb.sel{border-color:#7c3aed;background:rgba(124,58,237,.18)}
+.fb.new{border-color:#2563eb;background:rgba(37,99,235,.14)}
+.fb.ghost{border:2px dashed #888;background:transparent;color:#777}
+
 </style>
 </helmet>
-<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:1040px">
-<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-05 · Editor de B</span><h1 style="font-size:26px;font-weight:600">El editor de siempre, con A como capa gris detrás de B</h1><p class="cap" style="max-width:1450px">Todo lo del editor original sigue ahí. Añadido: la barra con modo de vista, «Poner plantilla A», el estado de cada campo y «Listo».</p></div>
-
-<div class="hdr">
- <div class="brand">Pdf Annotator<small>Migración de plantillas</small></div>
- <button class="btn g s">‹ Lote</button>
- <div style="display:flex;flex-direction:column"><b>factura-0331.pdf</b><span class="cap" style="font-size:12px">A: factura-0331 · B: factura-0331-nuevo</span></div>
- <span class="st on">Editando versión B</span>
- <span class="sp"></span>
- <div class="seg" aria-label="Cómo ver A"><span class="on">Encima</span><span class="">Alternar</span><span class="">Dividida</span></div>
- <button class="btn g s">Poner plantilla A ▾</button>
- <span class="ico" title="Deshacer">↶</span><span class="ico" title="Rehacer">↷</span>
- <button class="btn" disabled>Listo · faltan 2</button>
-</div>
-<div class="cols">
- <div class="vp b">
-  <div style="display:flex;align-items:center;gap:10px"><span class="tag" style="background:var(--accent);color:var(--ink)">VERSIÓN B · se edita</span><span class="cap" style="font-size:13px">A4 · 595×842 · igual que A</span><span class="sp"></span><span class="cap" style="font-size:13px">Leyenda: <b style="color:var(--accent)">▬</b> B &nbsp; <b>┅</b> A, solo referencia</span></div>
-  <div class="stage" style="padding:14px"><div class="pg" style="width:600px;height:849px"><div class="band"></div><div class="ln" style="left:61px;top:164px;width:121px"></div><div class="ln" style="left:61px;top:205px;width:61px"></div><div class="ln" style="left:61px;top:245px;width:81px"></div><div class="ln" style="left:61px;top:331px;width:91px"></div><div class="ln" style="left:61px;top:432px;width:151px"></div><div class="ln" style="left:61px;top:482px;width:111px"></div><div class="ln" style="left:61px;top:704px;width:71px"></div><div class="fb ghost" style="left:131px;top:139px;width:202px;height:22px">A</div><div class="fb ghost" style="left:413px;top:139px;width:111px;height:22px">A</div><div class="fb miss" style="left:424px;top:696px;width:111px;height:22px">falta · total</div><div class="fb sel" style="left:131px;top:151px;width:202px;height:22px">cliente.nombre</div><div class="fb " style="left:131px;top:192px;width:141px;height:22px">cliente.nif</div><div class="fb " style="left:424px;top:151px;width:111px;height:22px">fecha</div><div class="fb " style="left:131px;top:232px;width:262px;height:22px">cliente.direccion</div><div class="fb new" style="left:131px;top:565px;width:403px;height:71px">observaciones</div></div></div>
-  <div style="display:flex;align-items:center;gap:10px;justify-content:center"><span class="ico">−</span><span class="cap">100 %</span><span class="ico">+</span><span style="width:24px"></span><span class="ico">‹</span><span class="cap">1 / 1</span><span class="ico">›</span></div>
- </div>
- <div class="side">
-  <div class="tabs4"><span>Documento</span><span class="on">Anotaciones</span><span>Plantillas</span><span>Avanzado</span></div>
-  <div style="display:flex;gap:8px;align-items:center"><b style="font-size:15px">Campos de B · 6</b><span class="sp"></span><span class="st on" style="padding:4px 12px">Por resolver 2</span></div>
-  <div style="display:flex;flex-direction:column;gap:6px"><div class="fr sel"><span class="mono nm" style="flex:1">cliente.nombre</span><span class="bd n">Movido</span></div><div class="fr"><span class="mono nm" style="flex:1">cliente.nif</span><span class="bd o">Igual</span></div><div class="fr"><span class="mono nm" style="flex:1">fecha</span><span class="bd n">Movido</span></div><div class="fr"><span class="mono nm" style="flex:1">cliente.direccion</span><span class="bd r">Renombrado</span></div><div class="fr"><span class="mono nm" style="flex:1">observaciones</span><span class="bd l">Nuevo</span></div><div class="fr"><span class="mono nm" style="flex:1">total</span><span class="bd e">Falta en B</span></div></div>
-  <div class="note i" style="padding:10px 12px;font-size:13px">ⓘ<div><b>Siguiente:</b> «total» está en A y no en B. Colócalo en B o descártalo.<div style="display:flex;gap:8px;margin-top:8px"><button class="btn s">Colocar en B</button><button class="btn g s">Descartar</button></div></div></div>
-  <span class="lab" style="margin-top:4px">JSON de B · se actualiza al mover</span>
-  <div class="pre">{ "pages": [ { "num": 1, "fields": [
-  { "name": "cliente.nombre", "x": 130, "y": 668 },
-  { "name": "cliente.nif",    "x": 130, "y": 628 },
-  { "name": "fecha",          "x": 420, "y": 668 },
-  ...
-] } ] }</div>
-  <div class="cap" style="font-size:12.5px">Árbol y JSON editable: igual que en el editor original (pestaña Avanzado).</div>
- </div>
-</div>
-
+<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:900px">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">L-04 · Paso 2</span><h1 style="font-size:26px;font-weight:600">Paso 2 · Subir las plantillas</h1><p class="cap" style="max-width:1450px">Opcional. Emparejadas por nombre; los errores se explican sin bloquear.</p></div>
+<div class="hdr"><div class="brand">Pdf Annotator<small>Lote de documentos</small></div><span class="sp"></span><span class="sel2">ES ▾</span><span class="ico">☾</span></div><div class="stp"><div class="s done"><span class="n">✓</span><div class="t">Subir PDF<small>Obligatorio</small></div></div><span class="stl done"></span><div class="s on"><span class="n">2</span><div class="t">Plantillas<small>Opcional</small></div></div><span class="stl "></span><div class="s "><span class="n">3</span><div class="t">Empezar<small>Resumen</small></div></div></div>
+<div class="wiz">
+<div class="card"><h3>2 · Subir las plantillas (JSON)</h3><p class="cap">Opcional. Un JSON por PDF, con el mismo nombre (<span class="mono">factura-0331.json</span>). Sin plantilla, el PDF empieza sin anotaciones.</p>
+<div class="drop act" style="padding:14px;flex-direction:row;justify-content:center;gap:12px"><span class="ic">{ }</span><span><b>Suelta los JSON aquí</b> o <a>elige archivos</a> · <a>pegar JSON</a></span></div>
+<div class="tbl"><div class="tr h" style="grid-template-columns:1.4fr 1.4fr 1fr"><span>PDF</span><span>Plantilla</span><span>Estado</span></div>
+<div class="tr" style="grid-template-columns:1.4fr 1.4fr 1fr"><span class="nm">factura-0331.pdf</span><span class="nm mono">factura-0331.json</span><span class="st done">✓ 14 campos</span></div>
+<div class="tr" style="grid-template-columns:1.4fr 1.4fr 1fr"><span class="nm">factura-0332.pdf</span><span class="nm mono">factura-0332.json</span><span class="st done">✓ 14 campos</span></div>
+<div class="tr" style="grid-template-columns:1.4fr 1.4fr 1fr"><span class="nm">albaran-0107.pdf</span><span class="nm cap">sin plantilla</span><span class="st warn">Vacío</span></div>
+<div class="tr" style="grid-template-columns:1.4fr 1.4fr 1fr"><span class="nm">contrato-0021.pdf</span><span class="nm mono">contrato-21.json</span><span class="st err">JSON no válido</span></div></div>
+<div class="note e">⛔<div><b>contrato-21.json:</b> línea 12, falta una coma. Se ignora hasta que lo corrijas; el PDF sigue en el lote.</div></div></div>
+<div class="foot"><button class="btn g">‹ Atrás</button><span class="sp"></span><button class="btn g">Saltar este paso</button><button class="btn">Siguiente: Empezar →</button></div></div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1040}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>
 class Component extends DCLogic {
   renderVals() {
     return {};

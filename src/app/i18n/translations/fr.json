@@ -45,8 +45,7 @@
       },
       "nav": {
         "github": "GitHub"
-      },
-      "batchLink": "Plusieurs nouvelles versions ? Migrez les modèles par lot →"
+      }
     },
     "upload": {
       "title": "Téléversez votre PDF",
@@ -354,50 +353,21 @@
     "readyCount": "{{ready}} sur {{total}} prêts",
     "downloadReady": "Télécharger les prêts ({{count}})",
     "reviewNext": "Réviser le suivant →",
-    "importing": "Lecture des PDF… {{done}} sur {{total}}",
-    "empty": {
-      "title": "Commencez en déposant vos PDF d’origine (A)",
-      "text": "Si vous en avez, déposez aussi leurs JSON du même nom (facture.pdf + facture.json). Vous enverrez ensuite les nouvelles versions (B).",
-      "choose": "Choisir des PDF et JSON",
-      "privacy": "Tout reste dans votre navigateur : rien n’est envoyé."
-    },
-    "drop": {
-      "title": "Déposez ici les nouveaux PDF (B)",
-      "text": "Ils sont appariés par nom avec leur A. Les autres s’assignent avec « Envoyer B » sur leur ligne.",
-      "choose": "Choisir de nouveaux PDF",
-      "addOriginals": "Ajouter des originaux (A)"
-    },
     "search": "Rechercher par nom",
     "notPersistent": "Ce navigateur ne peut pas conserver le lot : il disparaîtra à la fermeture de l’onglet.",
-    "clear": "Vider le lot",
-    "tableLabel": "PDF du lot",
     "col": {
-      "original": "Original (A)",
-      "new": "Nouveau (B)",
-      "state": "État"
+      "state": "État",
+      "document": "Document",
+      "version": "Version B"
     },
-    "fieldsInA": "{{count}} champs dans A",
     "state": {
       "ready": "Prêt",
       "review": "À réviser",
-      "noB": "Sans B"
-    },
-    "action": {
-      "uploadB": "Envoyer B",
-      "open": "Ouvrir",
-      "review": "Réviser",
-      "remove": "Retirer {{name}}",
-      "confirmRemove": "Oui, retirer",
-      "cancel": "Annuler"
-    },
-    "done": {
-      "title": "{{count}} sur {{count}} prêts",
-      "text": "Téléchargez un JSON par nouveau PDF ; à plusieurs, ils arrivent dans un .zip.",
-      "download": "Télécharger les JSON"
+      "noTemplate": "Sans modèle"
     },
     "editor": {
       "regionLabel": "Migration du PDF actuel",
-      "back": "Lot",
+      "back": "Panneau",
       "versionA": "A : {{name}}",
       "editingB": "Édition de la version B",
       "viewLabel": "Comment voir A",
@@ -431,7 +401,12 @@
         "reopen": "Vous pourrez le rouvrir et le modifier à tout moment.",
         "confirm": "Marquer comme terminé",
         "keep": "Continuer à modifier"
-      }
+      },
+      "plain": "Modification avec son modèle",
+      "navLabel": "Parcourir le lot",
+      "prev": "PDF précédent",
+      "next": "PDF suivant",
+      "position": "{{index}} sur {{total}}"
     },
     "panel": {
       "title": "Champs de B · {{count}}",
@@ -456,6 +431,85 @@
       "renamed": "Renommé",
       "new": "Nouveau",
       "missing": "Manquant dans B"
-    }
+    },
+    "loading": "Chargement du lot…",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "open": "Ouvrir",
+    "review": "Réviser",
+    "remove": "Retirer {{name}}",
+    "removeConfirm": "Retirer {{name}} du lot ?",
+    "removeYes": "Oui, retirer",
+    "uploadVersions": "Importer les versions B",
+    "panelHint": "Cliquez sur un document pour l'ouvrir dans l'éditeur. Ce qui manque apparaît en premier.",
+    "allReady": {
+      "title": "Tout est prêt !"
+    },
+    "steps": {
+      "label": "Étapes du lot",
+      "pdfs": "Importer les PDF",
+      "templates": "Modèles",
+      "start": "Commencer",
+      "required": "Obligatoire",
+      "optional": "Facultatif",
+      "summary": "Résumé"
+    },
+    "step1": {
+      "title": "1 · Importer les PDF",
+      "text": "Tous les documents que vous voulez traiter. Vous pouvez en ajouter ou en retirer.",
+      "drop": "Déposez d'autres PDF ici",
+      "choose": "Choisir des fichiers",
+      "remove": "Retirer {{name}}",
+      "next": "Suivant : Modèles →"
+    },
+    "step2": {
+      "title": "2 · Importer les modèles (JSON)",
+      "text": "Facultatif. Un JSON par PDF, avec le même nom (facture.json pour facture.pdf). Sans modèle, le PDF démarre sans annotations.",
+      "drop": "Déposez les JSON ici",
+      "none": "sans modèle",
+      "badJson": "JSON invalide",
+      "noPages": "Aucune page",
+      "fields": "{{count}} champs",
+      "empty": "Vide",
+      "remove": "Retirer le modèle de {{name}}",
+      "skip": "Passer cette étape",
+      "next": "Suivant : Commencer →"
+    },
+    "step3": {
+      "title": "3 · Tout est prêt",
+      "pdfs": "PDF",
+      "withTemplate": "avec modèle",
+      "withoutTemplate": "sans modèle",
+      "inPlace": "Modifier chaque PDF avec son modèle",
+      "inPlaceText": "Chaque PDF s'ouvre avec son JSON et vous ajustez ce qu'il faut.",
+      "versions": "J'ai de nouvelles versions (B) de ces PDF",
+      "versionsText": "Vous les importerez dans le panneau : le modèle passe à B et A reste en calque de référence.",
+      "open": "Ouvrir le panneau →"
+    },
+    "versionsDrop": {
+      "title": "Déposez ici les versions B",
+      "text": "Elles sont associées par nom à chaque PDF ; les autres s'assignent à la main.",
+      "hide": "Masquer"
+    },
+    "filter": {
+      "label": "Filtrer par état",
+      "all": "Tous {{count}}",
+      "review": "À réviser {{count}}",
+      "ready": "Prêts {{count}}",
+      "noTemplate": "Sans modèle {{count}}"
+    },
+    "view": {
+      "label": "Type de vue",
+      "grid": "Grille",
+      "list": "Liste"
+    },
+    "resume": {
+      "title": "Lot enregistré",
+      "text": "Vous avez un lot de {{count}} PDF en cours.",
+      "continue": "Reprendre le lot",
+      "discard": "Abandonner",
+      "discarded": "Lot abandonné."
+    },
+    "uploadB": "Importer B"
   }
 }

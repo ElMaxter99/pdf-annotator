@@ -1,4 +1,4 @@
-@if (vm.migration(); as m) {
+@if (vm.batchCtx(); as ctx) {
   <div class="migration-bar" role="region" [attr.aria-label]="'batch.editor.regionLabel' | t">
     <button
       type="button"
@@ -9,11 +9,24 @@
       ‹ {{ 'batch.editor.back' | t }}
     </button>
     <div class="migration-bar__file">
-      <strong>{{ m.item.bName }}</strong>
-      <small>{{ 'batch.editor.versionA' | t: { name: m.item.name } }}</small>
+      <strong>{{ ctx.item.bName ?? ctx.item.name }}</strong>
+      @if (vm.migration()) {
+        <small>{{ 'batch.editor.versionA' | t: { name: ctx.item.name } }}</small>
+      } @else {
+        <small>{{ 'batch.editor.plain' | t }}</small>
+      }
     </div>
-    <span class="migration-chip migration-chip--on">{{ 'batch.editor.editingB' | t }}</span>
+    @if (vm.migration()) {
+      <span class="migration-chip migration-chip--on">{{ 'batch.editor.editingB' | t }}</span>
+    }
+    <div class="migration-nav" role="group" [attr.aria-label]="'batch.editor.navLabel' | t">
+      <button type="button" class="btn btn--ghost" [disabled]="ctx.index === 0" (click)="vm.goBatchItem(-1)" [attr.aria-label]="'batch.editor.prev' | t" data-testid="batch-prev">‹</button>
+      <span class="migration-bar__count" data-testid="batch-position">{{ 'batch.editor.position' | t: { index: ctx.index + 1, total: ctx.total } }}</span>
+      <button type="button" class="btn btn--ghost" [disabled]="ctx.index === ctx.total - 1" (click)="vm.goBatchItem(1)" [attr.aria-label]="'batch.editor.next' | t" data-testid="batch-next">›</button>
+    </div>
     <span class="migration-bar__spacer"></span>
+
+    @if (vm.migration(); as m) {
 
     <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t">
       <button
@@ -102,22 +115,29 @@
       }
     </div>
 
-    <button
-      type="button"
-      class="btn btn--primary"
-      [disabled]="m.summary.missing > 0"
-      (click)="openReady()"
-      data-testid="mark-ready"
-    >
-      @if (m.summary.missing > 0) {
-        {{ 'batch.editor.readyMissing' | t: { count: m.summary.missing } }}
-      } @else {
+    }
+
+    @if (vm.migration(); as m) {
+      <button
+        type="button"
+        class="btn btn--primary"
+        (click)="openReady()"
+        data-testid="mark-ready"
+      >
+        @if (m.summary.missing > 0) {
+          {{ 'batch.editor.readyMissing' | t: { count: m.summary.missing } }}
+        } @else {
+          {{ 'batch.editor.ready' | t }}
+        }
+      </button>
+    } @else {
+      <button type="button" class="btn btn--primary" (click)="confirmReady()" data-testid="mark-ready">
         {{ 'batch.editor.ready' | t }}
-      }
-    </button>
+      </button>
+    }
   </div>
 
-  @if (readyOpen()) {
+  @if (readyOpen() && vm.migration(); as m) {
     <div class="migration-backdrop" (click)="readyOpen.set(false)"></div>
     <div class="migration-dialog" role="dialog" aria-modal="true" aria-labelledby="ready-title">
       <h2 id="ready-title">{{ 'batch.editor.readyDialog.title' | t: { name: m.item.bName } }}</h2>

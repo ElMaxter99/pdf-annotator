@@ -45,8 +45,7 @@
       },
       "nav": {
         "github": "GitHub"
-      },
-      "batchLink": "Have several new versions? Migrate templates in a batch →"
+      }
     },
     "upload": {
       "title": "Upload your PDF",
@@ -354,50 +353,21 @@
     "readyCount": "{{ready}} of {{total}} ready",
     "downloadReady": "Download ready ({{count}})",
     "reviewNext": "Review next →",
-    "importing": "Reading PDFs… {{done}} of {{total}}",
-    "empty": {
-      "title": "Start by dropping your original PDFs (A)",
-      "text": "If you have them, also drop their JSON files with the same name (invoice.pdf + invoice.json). Then you will upload the new versions (B).",
-      "choose": "Choose PDFs and JSON",
-      "privacy": "Everything stays in your browser: nothing is uploaded."
-    },
-    "drop": {
-      "title": "Drop the new PDFs here (B)",
-      "text": "They are paired by name with their A. Any that do not match are assigned with “Upload B” on their row.",
-      "choose": "Choose new PDFs",
-      "addOriginals": "Add more originals (A)"
-    },
     "search": "Search by name",
     "notPersistent": "This browser cannot store the batch: it will not survive closing the tab.",
-    "clear": "Clear batch",
-    "tableLabel": "Batch PDFs",
     "col": {
-      "original": "Original (A)",
-      "new": "New (B)",
-      "state": "Status"
+      "state": "Status",
+      "document": "Document",
+      "version": "B version"
     },
-    "fieldsInA": "{{count}} fields in A",
     "state": {
       "ready": "Ready",
       "review": "To review",
-      "noB": "No B"
-    },
-    "action": {
-      "uploadB": "Upload B",
-      "open": "Open",
-      "review": "Review",
-      "remove": "Remove {{name}}",
-      "confirmRemove": "Yes, remove",
-      "cancel": "Cancel"
-    },
-    "done": {
-      "title": "{{count}} of {{count}} ready",
-      "text": "Download one JSON per new PDF; with several, they come in a .zip.",
-      "download": "Download JSON"
+      "noTemplate": "No template"
     },
     "editor": {
       "regionLabel": "Migration of the current PDF",
-      "back": "Batch",
+      "back": "Panel",
       "versionA": "A: {{name}}",
       "editingB": "Editing version B",
       "viewLabel": "How to see A",
@@ -431,7 +401,12 @@
         "reopen": "You can reopen and change it at any time.",
         "confirm": "Mark as done",
         "keep": "Keep editing"
-      }
+      },
+      "plain": "Editing with its template",
+      "navLabel": "Move through the batch",
+      "prev": "Previous PDF",
+      "next": "Next PDF",
+      "position": "{{index}} of {{total}}"
     },
     "panel": {
       "title": "Fields of B · {{count}}",
@@ -456,6 +431,85 @@
       "renamed": "Renamed",
       "new": "New",
       "missing": "Missing in B"
-    }
+    },
+    "loading": "Loading the batch…",
+    "cancel": "Cancel",
+    "back": "Back",
+    "open": "Open",
+    "review": "Review",
+    "remove": "Remove {{name}}",
+    "removeConfirm": "Remove {{name}} from the batch?",
+    "removeYes": "Yes, remove",
+    "uploadVersions": "Upload B versions",
+    "panelHint": "Click a document to open it in the editor. What is missing comes first.",
+    "allReady": {
+      "title": "All ready!"
+    },
+    "steps": {
+      "label": "Batch steps",
+      "pdfs": "Upload PDFs",
+      "templates": "Templates",
+      "start": "Start",
+      "required": "Required",
+      "optional": "Optional",
+      "summary": "Summary"
+    },
+    "step1": {
+      "title": "1 · Upload the PDFs",
+      "text": "All the documents you want to work on. You can add more or remove some.",
+      "drop": "Drop more PDFs here",
+      "choose": "Choose files",
+      "remove": "Remove {{name}}",
+      "next": "Next: Templates →"
+    },
+    "step2": {
+      "title": "2 · Upload the templates (JSON)",
+      "text": "Optional. One JSON per PDF with the same name (invoice.json for invoice.pdf). Without a template the PDF starts with no annotations.",
+      "drop": "Drop the JSON files here",
+      "none": "no template",
+      "badJson": "Invalid JSON",
+      "noPages": "No pages",
+      "fields": "{{count}} fields",
+      "empty": "Empty",
+      "remove": "Remove the template of {{name}}",
+      "skip": "Skip this step",
+      "next": "Next: Start →"
+    },
+    "step3": {
+      "title": "3 · Ready to start",
+      "pdfs": "PDFs",
+      "withTemplate": "with template",
+      "withoutTemplate": "without template",
+      "inPlace": "Edit each PDF with its template",
+      "inPlaceText": "Each PDF opens with its JSON and you adjust what is needed.",
+      "versions": "I have new versions (B) of these PDFs",
+      "versionsText": "You will upload them in the panel: the template moves to B and A stays as a reference layer.",
+      "open": "Open the panel →"
+    },
+    "versionsDrop": {
+      "title": "Drop the B versions here",
+      "text": "They are paired by name with each PDF; the rest are assigned by hand.",
+      "hide": "Hide"
+    },
+    "filter": {
+      "label": "Filter by state",
+      "all": "All {{count}}",
+      "review": "To review {{count}}",
+      "ready": "Ready {{count}}",
+      "noTemplate": "No template {{count}}"
+    },
+    "view": {
+      "label": "View type",
+      "grid": "Grid",
+      "list": "List"
+    },
+    "resume": {
+      "title": "Saved batch",
+      "text": "You have a batch of {{count}} PDFs in progress.",
+      "continue": "Continue the batch",
+      "discard": "Discard",
+      "discarded": "Batch discarded."
+    },
+    "uploadB": "Upload B"
   }
 }

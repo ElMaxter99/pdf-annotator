@@ -255,11 +255,20 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly holdingReference = signal(false);
   readonly migration = computed(() => {
     const item = this.batch.activeItem();
-    if (!item) {
-      return null;
+    if (!item || !item.bPdf) {
+      return null; // without a new version there is nothing to compare: plain editing
     }
     const states = computeFieldStates(item.aPages, this.store.coords(), item.links, item.dismissed);
     return { item, states, summary: summarizeStates(states), dismissed: item.dismissed };
+  });
+  /** Position of the open PDF inside the batch (also when it has no B). */
+  readonly batchCtx = computed(() => {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return null;
+    }
+    const items = this.batch.items();
+    return { item, index: items.findIndex((i) => i.id === item.id), total: items.length };
   });
   private batchSaveTimer: ReturnType<typeof setTimeout> | null = null;
   readonly customFontsFeatureEnabled = this.fontCatalog.customFontsFeatureEnabled;
@@ -3120,6 +3129,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.batch.saveB(item.id, pages, json);
+  }
+
+  /** Moves to the previous (-1) or next (+1) PDF of the batch without leaving the editor. */
+  async goBatchItem(delta: number) {
+    const ctx = this.batchCtx();
+    if (!ctx) {
+      return;
+    }
+    const target = this.batch.items()[ctx.index + delta];
+    if (!target) {
+      return;
+    }
+    this.flushBatchSave();
+    this.batch.activate(target.id);
+    this.clearSelection();
+    const file = new File([target.bPdf ?? target.aPdf], target.bName ?? target.name, {
+      type: 'application/pdf',
+    });
+    const coords = target.bPages ?? (target.bPdf ? null : target.aPages);
+    await this.loadPdfFile(file, coords ? { coords, pageIndex: 1, scale: 0.75 } : null);
   }
 
   async backToBatch() {

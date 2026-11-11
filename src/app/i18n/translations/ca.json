@@ -45,8 +45,7 @@
       },
       "nav": {
         "github": "GitHub"
-      },
-      "batchLink": "Tens diverses versions noves? Migra les plantilles per lots →"
+      }
     },
     "upload": {
       "title": "Carrega el teu PDF",
@@ -354,50 +353,21 @@
     "readyCount": "{{ready}} de {{total}} llestos",
     "downloadReady": "Descarrega els llestos ({{count}})",
     "reviewNext": "Revisa el següent →",
-    "importing": "Llegint PDF… {{done}} de {{total}}",
-    "empty": {
-      "title": "Comença deixant anar els PDF originals (A)",
-      "text": "Si els tens, deixa anar també els JSON amb el mateix nom (factura.pdf + factura.json). Després pujaràs les versions noves (B).",
-      "choose": "Tria PDF i JSON",
-      "privacy": "Tot es queda al navegador: no es puja res."
-    },
-    "drop": {
-      "title": "Deixa anar aquí els PDF nous (B)",
-      "text": "S’aparellen pel nom amb la seva A. Els que no quadrin s’assignen amb «Puja B» a la seva fila.",
-      "choose": "Tria PDF nous",
-      "addOriginals": "Afegeix més originals (A)"
-    },
     "search": "Cerca pel nom",
     "notPersistent": "Aquest navegador no pot desar el lot: no sobreviurà al tancament de la pestanya.",
-    "clear": "Buida el lot",
-    "tableLabel": "PDF del lot",
     "col": {
-      "original": "Original (A)",
-      "new": "Nou (B)",
-      "state": "Estat"
+      "state": "Estat",
+      "document": "Document",
+      "version": "Versió B"
     },
-    "fieldsInA": "{{count}} camps a A",
     "state": {
       "ready": "Llest",
       "review": "Per revisar",
-      "noB": "Sense B"
-    },
-    "action": {
-      "uploadB": "Puja B",
-      "open": "Obre",
-      "review": "Revisa",
-      "remove": "Treu {{name}}",
-      "confirmRemove": "Sí, treu",
-      "cancel": "Cancel·la"
-    },
-    "done": {
-      "title": "{{count}} de {{count}} llestos",
-      "text": "Descarrega un JSON per cada PDF nou; si són diversos, venen en un .zip.",
-      "download": "Descarrega JSON"
+      "noTemplate": "Sense plantilla"
     },
     "editor": {
       "regionLabel": "Migració del PDF actual",
-      "back": "Lot",
+      "back": "Tauler",
       "versionA": "A: {{name}}",
       "editingB": "Editant la versió B",
       "viewLabel": "Com veure A",
@@ -431,7 +401,12 @@
         "reopen": "Podràs reobrir-lo i canviar-lo quan vulguis.",
         "confirm": "Marca com a llest",
         "keep": "Continua editant"
-      }
+      },
+      "plain": "Editant amb la seva plantilla",
+      "navLabel": "Moure's pel lot",
+      "prev": "PDF anterior",
+      "next": "PDF següent",
+      "position": "{{index}} de {{total}}"
     },
     "panel": {
       "title": "Camps de B · {{count}}",
@@ -456,6 +431,85 @@
       "renamed": "Reanomenat",
       "new": "Nou",
       "missing": "Falta a B"
-    }
+    },
+    "loading": "Carregant el lot…",
+    "cancel": "Cancel·lar",
+    "back": "Enrere",
+    "open": "Obrir",
+    "review": "Revisar",
+    "remove": "Treure {{name}}",
+    "removeConfirm": "Voleu treure {{name}} del lot?",
+    "removeYes": "Sí, treure",
+    "uploadVersions": "Pujar versions B",
+    "panelHint": "Premeu un document per obrir-lo a l'editor. El que falta apareix primer.",
+    "allReady": {
+      "title": "Tots a punt!"
+    },
+    "steps": {
+      "label": "Passos del lot",
+      "pdfs": "Pujar PDF",
+      "templates": "Plantilles",
+      "start": "Començar",
+      "required": "Obligatori",
+      "optional": "Opcional",
+      "summary": "Resum"
+    },
+    "step1": {
+      "title": "1 · Pujar els PDF",
+      "text": "Tots els documents que voleu treballar. Podeu afegir-ne més o treure'n algun.",
+      "drop": "Deixeu anar més PDF aquí",
+      "choose": "Triar fitxers",
+      "remove": "Treure {{name}}",
+      "next": "Següent: Plantilles →"
+    },
+    "step2": {
+      "title": "2 · Pujar les plantilles (JSON)",
+      "text": "Opcional. Un JSON per PDF, amb el mateix nom (factura.json per a factura.pdf). Sense plantilla, el PDF comença sense anotacions.",
+      "drop": "Deixeu anar els JSON aquí",
+      "none": "sense plantilla",
+      "badJson": "JSON no vàlid",
+      "noPages": "Sense pàgines",
+      "fields": "{{count}} camps",
+      "empty": "Buit",
+      "remove": "Treure la plantilla de {{name}}",
+      "skip": "Saltar aquest pas",
+      "next": "Següent: Començar →"
+    },
+    "step3": {
+      "title": "3 · Tot a punt per començar",
+      "pdfs": "PDF",
+      "withTemplate": "amb plantilla",
+      "withoutTemplate": "sense plantilla",
+      "inPlace": "Editar cada PDF amb la seva plantilla",
+      "inPlaceText": "Cada PDF s'obre amb el seu JSON i ajusteu el que calgui.",
+      "versions": "Tinc noves versions (B) d'aquests PDF",
+      "versionsText": "Les pujareu al tauler: la plantilla passa a B i A queda com a capa de referència.",
+      "open": "Obrir el tauler →"
+    },
+    "versionsDrop": {
+      "title": "Deixeu anar aquí les versions B",
+      "text": "S'aparellen pel nom amb cada PDF; els que no encaixin s'assignen a mà.",
+      "hide": "Amagar"
+    },
+    "filter": {
+      "label": "Filtrar per estat",
+      "all": "Tots {{count}}",
+      "review": "Per revisar {{count}}",
+      "ready": "A punt {{count}}",
+      "noTemplate": "Sense plantilla {{count}}"
+    },
+    "view": {
+      "label": "Tipus de vista",
+      "grid": "Quadrícula",
+      "list": "Llista"
+    },
+    "resume": {
+      "title": "Lot desat",
+      "text": "Teniu un lot de {{count}} PDF a mitges.",
+      "continue": "Continuar el lot",
+      "discard": "Descartar",
+      "discarded": "Lot descartat."
+    },
+    "uploadB": "Pujar B"
   }
 }

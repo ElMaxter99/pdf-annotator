@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>M-06 Modos de vista</title>
+<title>L-09 Editor (claro)</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -142,24 +142,68 @@ ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 a{color:var(--accent)}
 .pre{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;white-space:pre;overflow:hidden}
 
+.gc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gc .pv{background:var(--inset);border-radius:10px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gc.sel{outline:2px solid var(--accent)}
+.arrow{color:var(--accent);font-size:22px;align-self:center}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.hl{border-color:var(--accent)}
+.tabs4{display:flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px}
+.tabs4 span{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted);border-radius:999px;padding:6px 4px}
+.tabs4 span.on{background:var(--accent);color:var(--ink)}
+.vp{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage{background:var(--inset);border-radius:14px;display:flex;justify-content:center;overflow:hidden;flex-grow:1}
+.side{width:440px;display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.fr{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;background:var(--soft);font-size:13.5px}
+.fr.sel{outline:2px solid var(--accent)}
+.bd{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.bd.n{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bd.l{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.ico{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.fb{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:10px;color:#064;padding:1px 3px;overflow:hidden;white-space:nowrap}
+.fb.sel{border-color:#7c3aed;background:rgba(124,58,237,.18)}
+.fb.new{border-color:#2563eb;background:rgba(37,99,235,.14)}
+.fb.ghost{border:2px dashed #888;background:transparent;color:#777}
+
 </style>
 </helmet>
-<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:900px">
-<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-06 · Ver A</span><h1 style="font-size:26px;font-weight:600">A y B siempre al mismo tamaño: encima, alternando o divididas</h1><p class="cap" style="max-width:1450px">Tres modos en un solo selector. Por defecto, A queda como fantasma sobre B.</p></div>
+<div class="p" style="--bg:#f4f5f8;--panel:#ffffff;--accent:#0b7d72;--danger:#c81e1e;--text:#1f2430;--muted:#555c6b;--ink:#ffffff;--line:rgba(0,0,0,.16);--soft:rgba(0,0,0,.05);--warn:#8a5a00;--ok:#0b7d72;--inset:#e9ebf1;width:1720px;height:1040px">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">L-09 · Editor · tema claro</span><h1 style="font-size:26px;font-weight:600">Mismo tablero en tema claro</h1><p class="cap" style="max-width:1450px">Comprobación de contraste de campos, capa A, estados y barra.</p></div>
 
-<div class="cols" style="flex-grow:0;align-items:flex-start">
-<div class="card" style="flex:1;align-items:center;gap:10px"><h3>Encima · por defecto</h3><span class="cap" style="text-align:center;font-size:13px">B editable con A en gris punteado detrás. Lo más rápido para ver movimientos.</span><div class="pg" style="width:300px;height:425px"><div class="band"></div><div class="ln" style="left:30px;top:82px;width:61px"></div><div class="ln" style="left:30px;top:102px;width:30px"></div><div class="ln" style="left:30px;top:123px;width:40px"></div><div class="ln" style="left:30px;top:165px;width:45px"></div><div class="ln" style="left:30px;top:216px;width:76px"></div><div class="ln" style="left:30px;top:241px;width:55px"></div><div class="ln" style="left:30px;top:352px;width:35px"></div><div class="fb ghost" style="left:66px;top:70px;width:101px;height:11px">A</div><div class="fb ghost" style="left:207px;top:70px;width:55px;height:11px">A</div><div class="fb sel" style="left:66px;top:76px;width:101px;height:11px">cliente.nombre</div><div class="fb " style="left:66px;top:96px;width:71px;height:11px">cliente.nif</div><div class="fb " style="left:212px;top:76px;width:55px;height:11px">fecha</div><div class="fb " style="left:66px;top:116px;width:131px;height:11px">cliente.direccion</div></div></div>
-<div class="card" style="flex:1;align-items:center;gap:10px"><h3>Alternar</h3><span class="cap" style="text-align:center;font-size:13px">Mantén la tecla A (o el botón) para ver solo A en el mismo sitio; suelta y vuelves a B. La página no se mueve ni cambia de tamaño.</span><div style="display:flex;gap:12px;align-items:center"><div class="pg" style="width:300px;height:425px"><div class="band"></div><div class="ln" style="left:30px;top:82px;width:61px"></div><div class="ln" style="left:30px;top:102px;width:30px"></div><div class="ln" style="left:30px;top:123px;width:40px"></div><div class="ln" style="left:30px;top:165px;width:45px"></div><div class="ln" style="left:30px;top:216px;width:76px"></div><div class="ln" style="left:30px;top:241px;width:55px"></div><div class="ln" style="left:30px;top:352px;width:35px"></div><div class="fb sel" style="left:66px;top:76px;width:101px;height:11px">cliente.nombre</div><div class="fb " style="left:66px;top:96px;width:71px;height:11px">cliente.nif</div><div class="fb " style="left:212px;top:76px;width:55px;height:11px">fecha</div><div class="fb " style="left:66px;top:116px;width:131px;height:11px">cliente.direccion</div></div><span class="arrow">⇄</span><div class="pg" style="width:300px;height:425px"><div class="band"></div><div class="ln" style="left:30px;top:82px;width:61px"></div><div class="ln" style="left:30px;top:102px;width:30px"></div><div class="ln" style="left:30px;top:123px;width:40px"></div><div class="ln" style="left:30px;top:165px;width:45px"></div><div class="ln" style="left:30px;top:216px;width:76px"></div><div class="ln" style="left:30px;top:241px;width:55px"></div><div class="ln" style="left:30px;top:352px;width:35px"></div><div class="fb ghost" style="left:66px;top:70px;width:101px;height:11px">A</div><div class="fb ghost" style="left:207px;top:70px;width:55px;height:11px">A</div><div class="fb ghost" style="left:66px;top:76px;width:101px;height:11px">A</div><div class="fb ghost" style="left:66px;top:96px;width:71px;height:11px">A</div><div class="fb ghost" style="left:66px;top:116px;width:131px;height:11px">A</div></div></div></div>
-<div class="card" style="flex:1;align-items:center;gap:10px"><h3>Dividida · opcional</h3><span class="cap" style="text-align:center;font-size:13px">Dos páginas del mismo tamaño y zoom, con scroll ligado. B marcada y con foco; A sin controles de edición.</span><div style="display:flex;gap:10px"><div class="pg" style="width:210px;height:297px"><div class="band"></div><div class="ln" style="left:21px;top:58px;width:42px"></div><div class="ln" style="left:21px;top:72px;width:21px"></div><div class="ln" style="left:21px;top:86px;width:28px"></div><div class="ln" style="left:21px;top:116px;width:32px"></div><div class="ln" style="left:21px;top:151px;width:53px"></div><div class="ln" style="left:21px;top:169px;width:39px"></div><div class="ln" style="left:21px;top:246px;width:25px"></div><div class="fb ghost" style="left:46px;top:49px;width:71px;height:8px"></div><div class="fb ghost" style="left:145px;top:49px;width:39px;height:8px"></div><div class="fb ghost" style="left:46px;top:67px;width:49px;height:8px"></div><div class="fb ghost" style="left:46px;top:81px;width:92px;height:8px"></div></div><div class="pg" style="width:210px;height:297px"><div class="band"></div><div class="ln" style="left:21px;top:58px;width:42px"></div><div class="ln" style="left:21px;top:72px;width:21px"></div><div class="ln" style="left:21px;top:86px;width:28px"></div><div class="ln" style="left:21px;top:116px;width:32px"></div><div class="ln" style="left:21px;top:151px;width:53px"></div><div class="ln" style="left:21px;top:169px;width:39px"></div><div class="ln" style="left:21px;top:246px;width:25px"></div><div class="fb sel" style="left:46px;top:53px;width:71px;height:8px">cliente.nombre</div><div class="fb " style="left:46px;top:67px;width:49px;height:8px">cliente.nif</div><div class="fb " style="left:148px;top:53px;width:39px;height:8px">fecha</div><div class="fb " style="left:46px;top:81px;width:92px;height:8px">cliente.direccion</div></div></div></div>
+<div class="hdr">
+ <button class="btn g s">‹ Panel</button>
+ <div style="display:flex;flex-direction:column"><b>factura-0331.pdf</b><span class="cap" style="font-size:12px">Plantilla: factura-0331.json</span></div>
+ <span class="st on">Editando versión B</span>
+ <div style="display:flex;align-items:center;gap:6px"><span class="ico">‹</span><span class="cap">3 de 20</span><span class="ico">›</span></div>
+ <span class="sp"></span>
+ <div class="seg"><span class="on">Encima</span><span class="">Alternar</span></div>
+ <button class="btn g s">Poner plantilla A ▾</button>
+ <span class="ico">↶</span><span class="ico">↷</span>
+ <button class="btn">Marcar listo</button>
 </div>
-<div class="cols" style="flex-grow:0">
-<div class="note w">⚠<div><b>Si A y B miden distinto</b> (p. ej. A4 595×842 frente a Carta 612×792): aviso en la barra y A se escala a B de forma proporcional. Se puede elegir «mantener puntos» sin escalar.</div></div>
-<div class="note i">ⓘ<div><b>Qué cambia respecto a hoy:</b> sin «Ajustar A / Ajustar B», sin pestañas Original / Nuevo, sin scroll sincronizado como interruptor suelto. Tres modos en un selector, B siempre a la vista.</div></div>
-<div class="note i">ⓘ<div><b>Foco claro:</b> la etiqueta «VERSIÓN B · se edita» va en acento y con borde; A lleva «Referencia · solo lectura».</div></div>
+<div class="cols">
+ <div class="vp">
+  <div style="display:flex;align-items:center;gap:10px"><span class="tag" style="background:var(--accent);color:var(--ink)">VERSIÓN B · se edita</span><span class="cap" style="font-size:13px">A4 · 595×842 · mismo tamaño que A</span><span class="sp"></span><span class="cap" style="font-size:13px"><b style="color:var(--accent)">▬</b> B &nbsp; <b>┅</b> A, solo referencia</span></div>
+  <div class="stage" style="padding:14px"><div class="pg" style="width:600px;height:849px"><div class="band"></div><div class="ln" style="left:61px;top:164px;width:121px"></div><div class="ln" style="left:61px;top:205px;width:61px"></div><div class="ln" style="left:61px;top:245px;width:81px"></div><div class="ln" style="left:61px;top:331px;width:91px"></div><div class="ln" style="left:61px;top:432px;width:151px"></div><div class="ln" style="left:61px;top:482px;width:111px"></div><div class="ln" style="left:61px;top:704px;width:71px"></div><div class="fb ghost" style="left:131px;top:139px;width:202px;height:22px">A</div><div class="fb ghost" style="left:413px;top:139px;width:111px;height:22px">A</div><div class="fb miss" style="left:424px;top:696px;width:111px;height:22px">falta · total</div><div class="fb sel" style="left:131px;top:151px;width:202px;height:22px">cliente.nombre</div><div class="fb " style="left:131px;top:192px;width:141px;height:22px">cliente.nif</div><div class="fb " style="left:424px;top:151px;width:111px;height:22px">fecha</div><div class="fb " style="left:131px;top:232px;width:262px;height:22px">cliente.direccion</div><div class="fb new" style="left:131px;top:565px;width:403px;height:71px">observaciones</div></div></div>
+  <div style="display:flex;align-items:center;gap:10px;justify-content:center"><span class="ico">−</span><span class="cap">100 %</span><span class="ico">+</span><span style="width:24px"></span><span class="ico">‹</span><span class="cap">1 / 2</span><span class="ico">›</span></div>
+ </div>
+ <div class="side">
+  <div class="tabs4"><span>Documento</span><span class="on">Anotaciones</span><span>Plantillas</span><span>Avanzado</span></div>
+  <div style="display:flex;gap:8px;align-items:center"><b style="font-size:15px">Campos · 6</b><span class="sp"></span><span class="st on" style="padding:4px 12px">Por resolver 2</span></div>
+  <div style="display:flex;flex-direction:column;gap:6px"><div class="fr sel"><span class="mono nm" style="flex:1">cliente.nombre</span><span class="bd n">Movido</span></div><div class="fr"><span class="mono nm" style="flex:1">cliente.nif</span><span class="bd o">Igual</span></div><div class="fr"><span class="mono nm" style="flex:1">fecha</span><span class="bd n">Movido</span></div><div class="fr"><span class="mono nm" style="flex:1">cliente.direccion</span><span class="bd r">Renombrado</span></div><div class="fr"><span class="mono nm" style="flex:1">observaciones</span><span class="bd l">Nuevo</span></div><div class="fr"><span class="mono nm" style="flex:1">total</span><span class="bd e">Falta en B</span></div></div>
+  <div class="note i" style="padding:10px 12px;font-size:13px">ⓘ<div>«total» está en A y no en B. <div style="display:flex;gap:8px;margin-top:8px"><button class="btn s">Colocar en B</button><button class="btn g s">Descartar</button></div></div></div>
+  <span class="lab">Árbol y JSON · igual que el editor original</span>
+  <div class="pre">{ "pages": [ { "num": 1, "fields": [
+  { "name": "cliente.nombre", "x": 130, "y": 668 },
+  { "name": "cliente.nif",    "x": 130, "y": 628 },
+  { "name": "fecha",          "x": 420, "y": 668 },
+  ...
+] } ] }</div>
+ </div>
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1040}}'>
 class Component extends DCLogic {
   renderVals() {
     return {};

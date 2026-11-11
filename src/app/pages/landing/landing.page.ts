@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language, TranslationService } from '../../i18n/translation.service';
@@ -8,6 +8,7 @@ import { AppMetadataService } from '../../services/app-metadata.service';
 import { SessionStoreService, SavedSessionSummary } from '../../services/session-store.service';
 import { ToastService } from '../../services/toast.service';
 import { PendingFileService } from '../../services/pending-file.service';
+import { BatchStoreService } from '../../services/batch-store.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone.component';
 import { LandingFooterComponent } from './components/footer/landing-footer.component';
@@ -26,7 +27,6 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingDropzoneComponent,
     LandingFooterComponent,
     TranslationPipe,
-    RouterLink,
   ],
 })
 export class LandingPageComponent {
@@ -36,6 +36,8 @@ export class LandingPageComponent {
   private readonly metadataService = inject(AppMetadataService);
   private readonly toast = inject(ToastService);
   private readonly sessionStore = inject(SessionStoreService);
+  private readonly batchStore = inject(BatchStoreService);
+  readonly batchCount = computed(() => this.batchStore.items().length);
   readonly savedSession = signal<SavedSessionSummary | null>(null);
 
   readonly appName = APP_NAME;
@@ -53,6 +55,7 @@ export class LandingPageComponent {
     this.metadataService.applyDefaultMetadata();
     if (typeof window !== 'undefined') {
       void this.sessionStore.summary().then((summary) => this.savedSession.set(summary));
+      void this.batchStore.load();
     }
   }
 
@@ -96,13 +99,13 @@ export class LandingPageComponent {
 
   async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) {
+    const files = Array.from(input.files ?? []);
+    if (!files.length) {
       return;
     }
 
     try {
-      await this.handleFileSelection(file);
+      await this.handleFiles(files);
     } finally {
       input.value = '';
     }
@@ -142,12 +145,12 @@ export class LandingPageComponent {
     event.preventDefault();
     this.fileDropActive.set(false);
 
-    const file = event.dataTransfer?.files?.[0];
-    if (!file) {
+    const files = Array.from(event.dataTransfer?.files ?? []);
+    if (!files.length) {
       return;
     }
 
-    await this.handleFileSelection(file);
+    await this.handleFiles(files);
   }
 
   async loadExampleDocument() {
@@ -163,6 +166,32 @@ export class LandingPageComponent {
     } catch (error) {
       console.error('No se pudo cargar el documento de ejemplo.', error);
     }
+  }
+
+  async continueBatch() {
+    await this.router.navigate(['/lote']);
+  }
+
+  async discardBatch() {
+    this.batchStore.clear();
+    this.toast.show(this.translationService.translate('batch.resume.discarded'), 'info');
+  }
+
+  /** One PDF opens the editor; two or more start the batch flow. */
+  private async handleFiles(files: File[]) {
+    const pdfs = files.filter(isPdfFile);
+    if (pdfs.length < files.length) {
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+    }
+    if (pdfs.length === 0) {
+      return;
+    }
+    if (pdfs.length === 1) {
+      await this.handleFileSelection(pdfs[0]);
+      return;
+    }
+    this.batchStore.startDraft(pdfs);
+    await this.router.navigate(['/lote']);
   }
 
   private async handleFileSelection(file: File) {

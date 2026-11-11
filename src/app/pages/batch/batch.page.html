@@ -5,9 +5,9 @@
       <span class="batch-bar__name">{{ appName }}</span>
       <span class="batch-bar__sub">{{ 'batch.subtitle' | t }}</span>
     </a>
-    <h1 class="batch-bar__title">{{ 'batch.title' | t: { count: total() } }}</h1>
-    <span class="batch-bar__spacer"></span>
-    @if (total() > 0) {
+    @if (step() === 'panel') {
+      <h1 class="batch-bar__title">{{ 'batch.title' | t: { count: total() } }}</h1>
+      <span class="batch-bar__spacer"></span>
       <div class="batch-bar__progress" role="group" [attr.aria-label]="'batch.progressLabel' | t">
         <div
           class="batch-progress"
@@ -22,6 +22,18 @@
           'batch.readyCount' | t: { ready: readyCount(), total: total() }
         }}</span>
       </div>
+      <input
+        #inputB
+        type="file"
+        accept="application/pdf,.pdf"
+        multiple
+        hidden
+        (change)="onNewVersionsSelected($event)"
+        data-testid="input-b"
+      />
+      <button type="button" class="btn" (click)="inputB.click()" data-testid="upload-versions">
+        {{ 'batch.uploadVersions' | t }}
+      </button>
       <button
         type="button"
         class="btn"
@@ -44,81 +56,258 @@
   </header>
 
   <main class="batch">
-    <input
-      #inputA
-      type="file"
-      accept="application/pdf,.pdf,application/json,.json"
-      multiple
-      hidden
-      (change)="onOriginalsSelected($event)"
-      data-testid="input-a"
-    />
-    <input
-      #inputB
-      type="file"
-      accept="application/pdf,.pdf"
-      multiple
-      hidden
-      (change)="onNewVersionsSelected($event)"
-      data-testid="input-b"
-    />
-    <input
-      #inputRow
-      type="file"
-      accept="application/pdf,.pdf"
-      hidden
-      (change)="onRowVersionSelected($event)"
-      data-testid="input-row"
-    />
-
-    @if (importing(); as progressState) {
-      <section class="batch-loading" role="status" aria-live="polite">
-        <div class="batch-progress">
-          <i [style.width.%]="(progressState.done / progressState.total) * 100"></i>
-        </div>
-        <span>{{
-          'batch.importing' | t: { done: progressState.done, total: progressState.total }
-        }}</span>
-      </section>
-    }
-
     @if (!loaded()) {
-      <div class="batch-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
-    } @else if (total() === 0) {
-      <section
-        class="batch-empty"
-        [class.batch-empty--active]="dragActive()"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event)"
-      >
-        <h2>{{ 'batch.empty.title' | t }}</h2>
-        <p>{{ 'batch.empty.text' | t }}</p>
-        <button type="button" class="btn btn--primary" (click)="inputA.click()">
-          {{ 'batch.empty.choose' | t }}
-        </button>
-        <small>{{ 'batch.empty.privacy' | t }}</small>
+      <div class="batch-loading" role="status">{{ 'batch.loading' | t }}</div>
+    } @else if (step() !== 'panel') {
+      <!-- ================= steps ================= -->
+      <ol class="batch-steps" [attr.aria-label]="'batch.steps.label' | t">
+        <li
+          [class.batch-steps__on]="step() === 'pdfs'"
+          [class.batch-steps__done]="step() !== 'pdfs'"
+        >
+          <span class="batch-steps__n">{{ step() === 'pdfs' ? 1 : '✓' }}</span>
+          <span
+            >{{ 'batch.steps.pdfs' | t }}<small>{{ 'batch.steps.required' | t }}</small></span
+          >
+        </li>
+        <li
+          [class.batch-steps__on]="step() === 'templates'"
+          [class.batch-steps__done]="step() === 'start'"
+        >
+          <span class="batch-steps__n">{{ step() === 'start' ? '✓' : 2 }}</span>
+          <span
+            >{{ 'batch.steps.templates' | t }}<small>{{ 'batch.steps.optional' | t }}</small></span
+          >
+        </li>
+        <li [class.batch-steps__on]="step() === 'start'">
+          <span class="batch-steps__n">3</span>
+          <span
+            >{{ 'batch.steps.start' | t }}<small>{{ 'batch.steps.summary' | t }}</small></span
+          >
+        </li>
+      </ol>
+
+      <section class="batch-wizard" [attr.data-step]="step()">
+        @switch (step()) {
+          @case ('pdfs') {
+            <h2>{{ 'batch.step1.title' | t }}</h2>
+            <p class="batch-muted">{{ 'batch.step1.text' | t }}</p>
+            <div
+              class="batch-drop"
+              [class.batch-drop--active]="dragActive()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDraftDrop($event)"
+            >
+              <input
+                #inputPdfs
+                type="file"
+                accept="application/pdf,.pdf"
+                multiple
+                hidden
+                (change)="onDraftPdfsSelected($event)"
+                data-testid="input-pdfs"
+              />
+              <div>
+                <strong>{{ 'batch.step1.drop' | t }}</strong>
+              </div>
+              <button type="button" class="btn" (click)="inputPdfs.click()">
+                {{ 'batch.step1.choose' | t }}
+              </button>
+            </div>
+            <ul class="batch-files" data-testid="draft-pdfs">
+              @for (pdf of draftPdfs(); track $index) {
+                <li>
+                  <span class="batch-thumb" aria-hidden="true"></span>
+                  <span class="batch-row__text">
+                    <strong>{{ pdf.name }}</strong>
+                    <small>{{ pdf.size / 1024 | number: '1.0-0' }} KB</small>
+                  </span>
+                  <button
+                    type="button"
+                    class="btn btn--ghost"
+                    (click)="removeDraftPdf($index)"
+                    [attr.aria-label]="'batch.step1.remove' | t: { name: pdf.name }"
+                  >
+                    ✕
+                  </button>
+                </li>
+              }
+            </ul>
+            <footer class="batch-wizard__foot">
+              <button type="button" class="btn btn--ghost" (click)="cancelDraft()">
+                {{ 'batch.cancel' | t }}
+              </button>
+              <span class="batch-bar__spacer"></span>
+              <button
+                type="button"
+                class="btn btn--primary"
+                [disabled]="draftPdfs().length === 0"
+                (click)="goToStep('templates')"
+                data-testid="next-templates"
+              >
+                {{ 'batch.step1.next' | t }}
+              </button>
+            </footer>
+          }
+          @case ('templates') {
+            <h2>{{ 'batch.step2.title' | t }}</h2>
+            <p class="batch-muted">{{ 'batch.step2.text' | t }}</p>
+            <div
+              class="batch-drop"
+              [class.batch-drop--active]="dragActive()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onTemplatesDrop($event)"
+            >
+              <input
+                #inputJson
+                type="file"
+                accept="application/json,.json"
+                multiple
+                hidden
+                (change)="onTemplatesSelected($event)"
+                data-testid="input-templates"
+              />
+              <div>
+                <strong>{{ 'batch.step2.drop' | t }}</strong>
+              </div>
+              <button type="button" class="btn" (click)="inputJson.click()">
+                {{ 'batch.step1.choose' | t }}
+              </button>
+            </div>
+            <ul class="batch-files" data-testid="template-rows">
+              @for (row of templateRows(); track $index) {
+                <li>
+                  <span class="batch-row__text">
+                    <strong>{{ row.pdf.name }}</strong>
+                    <small>{{ row.info ? row.info.name : ('batch.step2.none' | t) }}</small>
+                  </span>
+                  @if (row.info?.error === 'json') {
+                    <span class="batch-chip batch-chip--err">{{ 'batch.step2.badJson' | t }}</span>
+                  } @else if (row.info?.error === 'noPages') {
+                    <span class="batch-chip batch-chip--err">{{ 'batch.step2.noPages' | t }}</span>
+                  } @else if (row.info) {
+                    <span class="batch-chip batch-chip--ok">{{
+                      'batch.step2.fields' | t: { count: row.info.count }
+                    }}</span>
+                  } @else {
+                    <span class="batch-chip batch-chip--warn">{{ 'batch.step2.empty' | t }}</span>
+                  }
+                  @if (row.info) {
+                    <button
+                      type="button"
+                      class="btn btn--ghost"
+                      (click)="removeTemplate(row.pdf)"
+                      [attr.aria-label]="'batch.step2.remove' | t: { name: row.pdf.name }"
+                    >
+                      ✕
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+            <footer class="batch-wizard__foot">
+              <button type="button" class="btn btn--ghost" (click)="goToStep('pdfs')">
+                ‹ {{ 'batch.back' | t }}
+              </button>
+              <span class="batch-bar__spacer"></span>
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="goToStep('start')"
+                data-testid="skip-templates"
+              >
+                {{ 'batch.step2.skip' | t }}
+              </button>
+              <button
+                type="button"
+                class="btn btn--primary"
+                (click)="goToStep('start')"
+                data-testid="next-start"
+              >
+                {{ 'batch.step2.next' | t }}
+              </button>
+            </footer>
+          }
+          @case ('start') {
+            <h2>{{ 'batch.step3.title' | t }}</h2>
+            <div class="batch-tiles">
+              <div class="batch-tile">
+                <strong>{{ draftPdfs().length }}</strong
+                >{{ 'batch.step3.pdfs' | t }}
+              </div>
+              <div class="batch-tile">
+                <strong>{{ withTemplate() }}</strong
+                >{{ 'batch.step3.withTemplate' | t }}
+              </div>
+              <div class="batch-tile">
+                <strong>{{ draftPdfs().length - withTemplate() }}</strong
+                >{{ 'batch.step3.withoutTemplate' | t }}
+              </div>
+            </div>
+            <label class="batch-radio" [class.batch-radio--on]="versionsMode() === 'inPlace'">
+              <input type="radio" name="mode" value="inPlace" [(ngModel)]="versionsMode" hidden />
+              <span class="batch-radio__dot"></span>
+              <span>
+                <strong>{{ 'batch.step3.inPlace' | t }}</strong>
+                <small>{{ 'batch.step3.inPlaceText' | t }}</small>
+              </span>
+            </label>
+            <label class="batch-radio" [class.batch-radio--on]="versionsMode() === 'versions'">
+              <input type="radio" name="mode" value="versions" [(ngModel)]="versionsMode" hidden />
+              <span class="batch-radio__dot"></span>
+              <span>
+                <strong>{{ 'batch.step3.versions' | t }}</strong>
+                <small>{{ 'batch.step3.versionsText' | t }}</small>
+              </span>
+            </label>
+            <footer class="batch-wizard__foot">
+              <button type="button" class="btn btn--ghost" (click)="goToStep('templates')">
+                ‹ {{ 'batch.back' | t }}
+              </button>
+              <span class="batch-bar__spacer"></span>
+              <button
+                type="button"
+                class="btn btn--primary"
+                (click)="openPanel()"
+                data-testid="open-panel"
+              >
+                {{ 'batch.step3.open' | t }}
+              </button>
+            </footer>
+          }
+        }
       </section>
     } @else {
-      <section
-        class="batch-drop"
-        [class.batch-drop--active]="dragActive()"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event)"
-      >
-        <div>
-          <strong>{{ 'batch.drop.title' | t }}</strong>
-          <span>{{ 'batch.drop.text' | t }}</span>
+      <!-- ================= panel ================= -->
+      @if (expectVersions() && counts().all > 0) {
+        <div
+          class="batch-drop batch-drop--hint"
+          [class.batch-drop--active]="dragActive()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          data-testid="versions-drop"
+        >
+          <div>
+            <strong>{{ 'batch.versionsDrop.title' | t }}</strong>
+            <span>{{ 'batch.versionsDrop.text' | t }}</span>
+          </div>
+          <button type="button" class="btn btn--ghost" (click)="expectVersions.set(false)">
+            {{ 'batch.versionsDrop.hide' | t }}
+          </button>
         </div>
-        <button type="button" class="btn" (click)="inputB.click()">
-          {{ 'batch.drop.choose' | t }}
-        </button>
-        <button type="button" class="btn btn--ghost" (click)="inputA.click()">
-          {{ 'batch.drop.addOriginals' | t }}
-        </button>
-      </section>
+      }
 
+      <input
+        #inputRowB
+        type="file"
+        accept="application/pdf,.pdf"
+        hidden
+        (change)="onRowVersionSelected($event)"
+        data-testid="input-row-b"
+      />
       <div class="batch-tools">
         <input
           type="search"
@@ -128,108 +317,170 @@
           [placeholder]="'batch.search' | t"
           [attr.aria-label]="'batch.search' | t"
         />
-        @if (!persistent()) {
-          <span class="batch-note">{{ 'batch.notPersistent' | t }}</span>
-        }
+        <div class="batch-seg" role="group" [attr.aria-label]="'batch.filter.label' | t">
+          <button
+            type="button"
+            [class.batch-seg__on]="filter() === 'all'"
+            (click)="filter.set('all')"
+          >
+            {{ 'batch.filter.all' | t: { count: counts().all } }}
+          </button>
+          <button
+            type="button"
+            [class.batch-seg__on]="filter() === 'review'"
+            (click)="filter.set('review')"
+          >
+            {{ 'batch.filter.review' | t: { count: counts().review } }}
+          </button>
+          <button
+            type="button"
+            [class.batch-seg__on]="filter() === 'ready'"
+            (click)="filter.set('ready')"
+          >
+            {{ 'batch.filter.ready' | t: { count: counts().ready } }}
+          </button>
+          <button
+            type="button"
+            [class.batch-seg__on]="filter() === 'noTemplate'"
+            (click)="filter.set('noTemplate')"
+          >
+            {{ 'batch.filter.noTemplate' | t: { count: counts().noTemplate } }}
+          </button>
+        </div>
         <span class="batch-bar__spacer"></span>
-        <button
-          type="button"
-          class="btn btn--ghost"
-          (click)="clearBatch()"
-          data-testid="clear-batch"
-        >
-          {{ 'batch.clear' | t }}
-        </button>
+        <div class="batch-seg" role="group" [attr.aria-label]="'batch.view.label' | t">
+          <button
+            type="button"
+            [class.batch-seg__on]="view() === 'grid'"
+            [attr.aria-pressed]="view() === 'grid'"
+            (click)="setView('grid')"
+            data-testid="view-grid"
+          >
+            ▦ {{ 'batch.view.grid' | t }}
+          </button>
+          <button
+            type="button"
+            [class.batch-seg__on]="view() === 'list'"
+            [attr.aria-pressed]="view() === 'list'"
+            (click)="setView('list')"
+            data-testid="view-list"
+          >
+            ☰ {{ 'batch.view.list' | t }}
+          </button>
+        </div>
       </div>
 
-      <div class="batch-table" role="table" [attr.aria-label]="'batch.tableLabel' | t">
-        <div class="batch-row batch-row--head" role="row">
-          <span role="columnheader">{{ 'batch.col.original' | t }}</span>
-          <span role="columnheader">{{ 'batch.col.new' | t }}</span>
-          <span role="columnheader">{{ 'batch.col.state' | t }}</span>
-          <span role="columnheader"></span>
+      @if (total() > 0 && readyCount() === total()) {
+        <div class="batch-done" role="status">
+          <h2>{{ 'batch.allReady.title' | t }}</h2>
+          <button type="button" class="btn btn--primary" (click)="downloadReady()">
+            {{ 'batch.downloadReady' | t: { count: readyCount() } }}
+          </button>
         </div>
-        @for (row of rows(); track row.item.id) {
-          <div
-            class="batch-row"
-            role="row"
-            [class.batch-row--active]="row.item.id === activeId()"
-            data-testid="batch-row"
-          >
-            <span class="batch-row__name" role="cell">
-              <span class="batch-thumb" aria-hidden="true"></span>
-              <span class="batch-row__text">
-                <strong>{{ row.item.name }}</strong>
-                <small>{{ 'batch.fieldsInA' | t: { count: fieldCount(row.item.aPages) } }}</small>
+      }
+
+      @if (view() === 'grid') {
+        <div class="batch-grid" data-testid="panel-grid">
+          @for (row of rows(); track row.item.id) {
+            <button
+              type="button"
+              class="batch-card"
+              [class.batch-row--active]="activeId() === row.item.id"
+              (click)="open(row.item)"
+              data-testid="panel-item"
+            >
+              <span class="batch-card__page" aria-hidden="true"></span>
+              <strong class="batch-card__name">{{ row.item.name }}</strong>
+              <span class="batch-card__meta">
+                <span
+                  class="batch-chip"
+                  [class.batch-chip--ok]="row.state === 'ready'"
+                  [class.batch-chip--warn]="row.state !== 'ready'"
+                  >{{ 'batch.state.' + row.state | t }}</span
+                >
+                @if (row.item.bPdf) {
+                  <span class="batch-chip batch-chip--on">B</span>
+                }
               </span>
-            </span>
-            <span class="batch-row__new" role="cell">{{ bytesLabel(row.item) }}</span>
-            <span role="cell">
-              @switch (row.state) {
-                @case ('ready') {
-                  <span class="batch-chip batch-chip--ok">✓ {{ 'batch.state.ready' | t }}</span>
-                }
-                @case ('review') {
-                  <span class="batch-chip batch-chip--on">{{ 'batch.state.review' | t }}</span>
-                }
-                @default {
-                  <span class="batch-chip batch-chip--warn">{{ 'batch.state.noB' | t }}</span>
-                }
-              }
-            </span>
-            <span class="batch-row__actions" role="cell">
-              @switch (row.state) {
-                @case ('noB') {
-                  <button
-                    type="button"
-                    class="btn btn--primary"
-                    (click)="chooseNewVersion(row.item.id, inputRow)"
-                  >
-                    {{ 'batch.action.uploadB' | t }}
-                  </button>
-                }
-                @case ('ready') {
-                  <button type="button" class="btn" (click)="open(row.item)">
-                    {{ 'batch.action.open' | t }}
-                  </button>
-                }
-                @default {
-                  <button type="button" class="btn btn--primary" (click)="open(row.item)">
-                    {{ 'batch.action.review' | t }}
-                  </button>
-                }
-              }
-              @if (confirmRemove() === row.item.id) {
-                <button type="button" class="btn btn--danger" (click)="remove(row.item.id)">
-                  {{ 'batch.action.confirmRemove' | t }}
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="batch-table" role="table" data-testid="panel-list">
+          <div class="batch-row batch-row--head" role="row">
+            <span role="columnheader">{{ 'batch.col.document' | t }}</span>
+            <span role="columnheader">{{ 'batch.col.version' | t }}</span>
+            <span role="columnheader">{{ 'batch.col.state' | t }}</span>
+            <span role="columnheader"></span>
+          </div>
+          @for (row of rows(); track row.item.id) {
+            <div
+              class="batch-row"
+              role="row"
+              [class.batch-row--active]="activeId() === row.item.id"
+              data-testid="panel-item"
+            >
+              <span class="batch-row__name" role="cell">
+                <span class="batch-thumb" aria-hidden="true"></span>
+                <span class="batch-row__text">
+                  <strong>{{ row.item.name }}</strong>
+                  <small>{{
+                    'batch.step2.fields'
+                      | t: { count: fieldCount(row.item.bPages ?? row.item.aPages) }
+                  }}</small>
+                </span>
+              </span>
+              <span class="batch-row__new" role="cell">{{ row.item.bName ?? '—' }}</span>
+              <span role="cell">
+                <span
+                  class="batch-chip"
+                  [class.batch-chip--ok]="row.state === 'ready'"
+                  [class.batch-chip--warn]="row.state !== 'ready'"
+                  >{{ 'batch.state.' + row.state | t }}</span
+                >
+              </span>
+              <span class="batch-row__actions" role="cell">
+                <button
+                  type="button"
+                  class="btn"
+                  [class.btn--primary]="row.state !== 'ready'"
+                  (click)="open(row.item)"
+                >
+                  {{ (row.state === 'ready' ? 'batch.open' : 'batch.review') | t }}
                 </button>
-                <button type="button" class="btn btn--ghost" (click)="askRemove(row.item.id)">
-                  {{ 'batch.action.cancel' | t }}
+                <button
+                  type="button"
+                  class="btn btn--ghost"
+                  (click)="chooseNewVersion(row.item.id, inputRowB)"
+                  data-testid="row-upload-b"
+                >
+                  {{ 'batch.uploadB' | t }}
                 </button>
-              } @else {
                 <button
                   type="button"
                   class="btn btn--ghost"
                   (click)="askRemove(row.item.id)"
-                  [attr.aria-label]="'batch.action.remove' | t: { name: row.item.name }"
+                  [attr.aria-label]="'batch.remove' | t: { name: row.item.name }"
                 >
-                  {{ 'batch.action.remove' | t: { name: '' } }}
+                  ✕
                 </button>
-              }
-            </span>
-          </div>
-        }
-      </div>
-
-      @if (total() > 0 && readyCount() === total()) {
-        <section class="batch-done" role="status">
-          <h2>{{ 'batch.done.title' | t: { count: total() } }}</h2>
-          <p>{{ 'batch.done.text' | t }}</p>
-          <button type="button" class="btn btn--primary" (click)="downloadReady()">
-            {{ 'batch.done.download' | t }}
-          </button>
-        </section>
+              </span>
+            </div>
+            @if (confirmRemove() === row.item.id) {
+              <div class="batch-confirm" role="alert">
+                {{ 'batch.removeConfirm' | t: { name: row.item.name } }}
+                <button type="button" class="btn btn--danger" (click)="remove(row.item.id)">
+                  {{ 'batch.removeYes' | t }}
+                </button>
+                <button type="button" class="btn btn--ghost" (click)="confirmRemove.set(null)">
+                  {{ 'batch.cancel' | t }}
+                </button>
+              </div>
+            }
+          }
+        </div>
       }
+      <p class="batch-note">{{ 'batch.panelHint' | t }}</p>
     }
   </main>
 </div>

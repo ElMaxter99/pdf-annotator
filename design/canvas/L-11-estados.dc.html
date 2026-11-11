@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>M-03 Propuesta · flujo</title>
+<title>L-11 Estados</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -142,40 +142,42 @@ ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 a{color:var(--accent)}
 .pre{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;white-space:pre;overflow:hidden}
 
+.gc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gc .pv{background:var(--inset);border-radius:10px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gc.sel{outline:2px solid var(--accent)}
+.arrow{color:var(--accent);font-size:22px;align-self:center}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.hl{border-color:var(--accent)}
+.tabs4{display:flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px}
+.tabs4 span{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted);border-radius:999px;padding:6px 4px}
+.tabs4 span.on{background:var(--accent);color:var(--ink)}
+.vp{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stage{background:var(--inset);border-radius:14px;display:flex;justify-content:center;overflow:hidden;flex-grow:1}
+.side{width:440px;display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.fr{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;background:var(--soft);font-size:13.5px}
+.fr.sel{outline:2px solid var(--accent)}
+.bd{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.bd.n{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bd.l{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.ico{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.fb{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:10px;color:#064;padding:1px 3px;overflow:hidden;white-space:nowrap}
+.fb.sel{border-color:#7c3aed;background:rgba(124,58,237,.18)}
+.fb.new{border-color:#2563eb;background:rgba(37,99,235,.14)}
+.fb.ghost{border:2px dashed #888;background:transparent;color:#777}
+
 </style>
 </helmet>
 <div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:900px">
-<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-03 · Propuesta · pendiente de aprobación</span><h1 style="font-size:26px;font-weight:600">Migrar plantillas: subir A, subir B, revisar B con A al fondo, descargar</h1><p class="cap" style="max-width:1450px">Una idea: el editor de un PDF más una capa de referencia. Todo lo demás se simplifica.</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">L-11 · Estados</span><h1 style="font-size:26px;font-weight:600">Carga, errores, todo listo y lote guardado</h1><p class="cap" style="max-width:1450px">Casos límite del flujo por lotes.</p></div>
 
-<div class="card" style="gap:10px"><span class="lab">El flujo, en 4 pasos</span>
-<div style="display:flex;gap:12px;align-items:stretch">
-<div class="node hl" style="flex:1"><b>1 · Subir A</b><span class="cap" style="font-size:13px">Sueltas los PDF originales y sus JSON. Se emparejan por nombre (name.pdf + name.json).</span></div><span class="arrow">→</span>
-<div class="node hl" style="flex:1"><b>2 · Subir B</b><span class="cap" style="font-size:13px">Sueltas los PDF nuevos. Se emparejan con su A por nombre; los dudosos se asignan a mano en una lista.</span></div><span class="arrow">→</span>
-<div class="node hl" style="flex:1"><b>3 · Revisar B</b><span class="cap" style="font-size:13px">«Revisar siguiente» abre el editor de siempre con B y A al fondo. Solo se resuelve lo que no coincide.</span></div><span class="arrow">→</span>
-<div class="node hl" style="flex:1"><b>4 · Descargar</b><span class="cap" style="font-size:13px">Un JSON por PDF B (o .zip), solo de los listos. Es lo que te llevas a tu generador.</span></div>
-</div></div>
-<div class="cols" style="flex-grow:0">
-<div class="card" style="flex:1"><span class="lab">Cada PDF del lote = un editor con tres capas</span>
- <div style="display:flex;gap:18px;align-items:center;justify-content:center;padding:6px 0">
-  <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="pg" style="width:150px;height:212px"><div class="band"></div><div class="ln" style="left:15px;top:41px;width:30px"></div><div class="ln" style="left:15px;top:51px;width:15px"></div><div class="ln" style="left:15px;top:61px;width:20px"></div><div class="ln" style="left:15px;top:83px;width:23px"></div><div class="ln" style="left:15px;top:108px;width:38px"></div><div class="ln" style="left:15px;top:121px;width:28px"></div><div class="ln" style="left:15px;top:176px;width:18px"></div></div><span class="cap" style="font-size:12px">PDF B (base)</span></div><span class="arrow">＋</span>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="pg" style="width:150px;height:212px"><div class="band"></div><div class="fb ghost" style="left:33px;top:35px;width:50px;height:6px"></div><div class="fb ghost" style="left:103px;top:35px;width:28px;height:6px"></div><div class="fb miss" style="left:106px;top:174px;width:28px;height:6px"></div></div><span class="cap" style="font-size:12px">Capa A (gris, solo lectura)</span></div><span class="arrow">＋</span>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="pg" style="width:150px;height:212px"><div class="band"></div><div class="fb " style="left:33px;top:38px;width:50px;height:6px"></div><div class="fb " style="left:106px;top:38px;width:28px;height:6px"></div><div class="fb new" style="left:33px;top:141px;width:101px;height:18px"></div></div><span class="cap" style="font-size:12px">Capa B (editable)</span></div>
- </div>
- <p class="cap" style="font-size:13.5px">A y B comparten tamaño de página siempre: A es una capa sobre B, no otro visor. Si midieran distinto, se avisa y se escala A (proporcional).</p></div>
-<div class="card" style="flex:1"><span class="lab">Cada campo de B tiene un estado, calculado solo</span>
- <div class="g2" style="grid-template-columns:auto 1fr;align-items:center;column-gap:14px;row-gap:10px">
- <span class="bd o">Igual</span><span class="cap">Mismo nombre y posición que en A. No pide atención.</span>
- <span class="bd n">Movido</span><span class="cap">Mismo nombre, otra posición: lo que has ajustado.</span>
- <span class="bd r">Renombrado</span><span class="cap">Nombre distinto enlazado con uno de A.</span>
- <span class="bd l">Nuevo</span><span class="cap">Solo existe en B.</span>
- <span class="bd e">Falta en B</span><span class="cap">Está en A y no en B: colocarlo o descartarlo. Bloquea «Listo».</span>
- </div></div>
-<div class="card" style="flex:1"><span class="lab">Qué desaparece</span>
- <ul class="l cap" style="font-size:14px"><li>El stepper de 3 pasos.</li><li>La ficha del PDF (y sus variantes lista/vertical).</li><li>El comparador como pantalla aparte.</li><li>«Ajustar A / Ajustar B» y pestañas por PDF.</li><li>Tarjetas con 3 chips y 5 filtros.</li></ul>
- <span class="lab" style="margin-top:4px">Qué se reutiliza</span>
- <ul class="l cap" style="font-size:14px"><li>Editor, JSON, árbol, historial, selección.</li><li>Hash SHA-256, importar plantillas, descargar listos.</li></ul></div>
+<div class="cols" style="flex-grow:0;align-items:flex-start">
+<div class="card" style="flex:1"><span class="lab">Cargando PDFs</span><div class="bar"><i style="width:60%"></i></div><p class="cap">Preparando miniaturas · 12 de 20</p></div>
+<div class="card" style="flex:1"><span class="lab">Archivo con error</span><div class="note e">⛔<div><b>informe.pdf</b> no se puede leer (¿protegido con contraseña?). El resto del lote sigue.</div></div></div>
+<div class="card" style="flex:1"><span class="lab">Todos listos</span><div class="note i">✓<div><b>20 de 20 listos.</b></div></div><button class="btn">Descargar todo (.zip)</button></div>
+<div class="card" style="flex:1"><span class="lab">Landing con lote guardado</span><div class="note i">ⓘ<div>Tienes un lote de 20 PDFs a medias.</div></div><div style="display:flex;gap:8px"><button class="btn s">Continuar</button><button class="btn g s">Descartar</button></div></div>
 </div>
-
+<div class="card"><span class="lab">Panel vacío</span><p class="cap">Sin documentos: te devolvemos a la landing con el mensaje «Suelta uno o varios PDFs».</p></div>
+<div class="toast e">⛔ No se pudo leer informe.pdf</div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>

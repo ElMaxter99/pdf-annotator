@@ -45,8 +45,7 @@
       },
       "nav": {
         "github": "GitHub"
-      },
-      "batchLink": "¿Tienes varias versiones nuevas? Migra las plantillas por lotes →"
+      }
     },
     "upload": {
       "title": "Carga tu PDF",
@@ -354,50 +353,21 @@
     "readyCount": "{{ready}} de {{total}} listos",
     "downloadReady": "Descargar listos ({{count}})",
     "reviewNext": "Revisar siguiente →",
-    "importing": "Leyendo PDFs… {{done}} de {{total}}",
-    "empty": {
-      "title": "Empieza soltando tus PDF originales (A)",
-      "text": "Si los tienes, suelta también sus JSON con el mismo nombre (factura.pdf + factura.json). Después subirás las versiones nuevas (B).",
-      "choose": "Elegir PDFs y JSON",
-      "privacy": "Todo se queda en tu navegador: no se sube nada."
-    },
-    "drop": {
-      "title": "Suelta aquí los PDF nuevos (B)",
-      "text": "Se emparejan por nombre con su A. Los que no cuadren se asignan con «Subir B» en su fila.",
-      "choose": "Elegir PDFs nuevos",
-      "addOriginals": "Añadir más originales (A)"
-    },
     "search": "Buscar por nombre",
     "notPersistent": "Este navegador no puede guardar el lote: no sobrevivirá a cerrar la pestaña.",
-    "clear": "Vaciar lote",
-    "tableLabel": "PDFs del lote",
     "col": {
-      "original": "Original (A)",
-      "new": "Nuevo (B)",
-      "state": "Estado"
+      "state": "Estado",
+      "document": "Documento",
+      "version": "Versión B"
     },
-    "fieldsInA": "{{count}} campos en A",
     "state": {
       "ready": "Listo",
       "review": "Por revisar",
-      "noB": "Sin B"
-    },
-    "action": {
-      "uploadB": "Subir B",
-      "open": "Abrir",
-      "review": "Revisar",
-      "remove": "Quitar {{name}}",
-      "confirmRemove": "Sí, quitar",
-      "cancel": "Cancelar"
-    },
-    "done": {
-      "title": "{{count}} de {{count}} listos",
-      "text": "Descarga un JSON por cada PDF nuevo; con varios, vienen en un .zip.",
-      "download": "Descargar JSON"
+      "noTemplate": "Sin plantilla"
     },
     "editor": {
       "regionLabel": "Migración del PDF actual",
-      "back": "Lote",
+      "back": "Panel",
       "versionA": "A: {{name}}",
       "editingB": "Editando versión B",
       "viewLabel": "Cómo ver A",
@@ -431,7 +401,12 @@
         "reopen": "Podrás reabrirlo y cambiarlo cuando quieras.",
         "confirm": "Marcar listo",
         "keep": "Seguir editando"
-      }
+      },
+      "plain": "Editando con su plantilla",
+      "navLabel": "Moverse por el lote",
+      "prev": "PDF anterior",
+      "next": "PDF siguiente",
+      "position": "{{index}} de {{total}}"
     },
     "panel": {
       "title": "Campos de B · {{count}}",
@@ -456,6 +431,85 @@
       "renamed": "Renombrado",
       "new": "Nuevo",
       "missing": "Falta en B"
-    }
+    },
+    "loading": "Cargando el lote…",
+    "cancel": "Cancelar",
+    "back": "Atrás",
+    "open": "Abrir",
+    "review": "Revisar",
+    "remove": "Quitar {{name}}",
+    "removeConfirm": "¿Quitar {{name}} del lote?",
+    "removeYes": "Sí, quitar",
+    "uploadVersions": "Subir versiones B",
+    "panelHint": "Pulsa un documento para abrirlo en el editor. Lo que falta aparece primero.",
+    "allReady": {
+      "title": "¡Todos listos!"
+    },
+    "steps": {
+      "label": "Pasos del lote",
+      "pdfs": "Subir PDF",
+      "templates": "Plantillas",
+      "start": "Empezar",
+      "required": "Obligatorio",
+      "optional": "Opcional",
+      "summary": "Resumen"
+    },
+    "step1": {
+      "title": "1 · Subir los PDF",
+      "text": "Todos los documentos que quieres trabajar. Puedes añadir más o quitar alguno.",
+      "drop": "Suelta más PDFs aquí",
+      "choose": "Elegir archivos",
+      "remove": "Quitar {{name}}",
+      "next": "Siguiente: Plantillas →"
+    },
+    "step2": {
+      "title": "2 · Subir las plantillas (JSON)",
+      "text": "Opcional. Un JSON por PDF, con el mismo nombre (factura.json para factura.pdf). Sin plantilla, el PDF empieza sin anotaciones.",
+      "drop": "Suelta los JSON aquí",
+      "none": "sin plantilla",
+      "badJson": "JSON no válido",
+      "noPages": "Sin páginas",
+      "fields": "{{count}} campos",
+      "empty": "Vacío",
+      "remove": "Quitar la plantilla de {{name}}",
+      "skip": "Saltar este paso",
+      "next": "Siguiente: Empezar →"
+    },
+    "step3": {
+      "title": "3 · Todo listo para empezar",
+      "pdfs": "PDFs",
+      "withTemplate": "con plantilla",
+      "withoutTemplate": "sin plantilla",
+      "inPlace": "Editar cada PDF con su plantilla",
+      "inPlaceText": "Cada PDF se abre con su JSON y ajustas lo que haga falta.",
+      "versions": "Tengo nuevas versiones (B) de estos PDFs",
+      "versionsText": "Las subirás en el panel: la plantilla se lleva a B y A queda como capa de referencia.",
+      "open": "Abrir el panel →"
+    },
+    "versionsDrop": {
+      "title": "Suelta aquí las versiones B",
+      "text": "Se emparejan por nombre con cada PDF; los que no cuadren se asignan a mano.",
+      "hide": "Ocultar"
+    },
+    "filter": {
+      "label": "Filtrar por estado",
+      "all": "Todos {{count}}",
+      "review": "Por revisar {{count}}",
+      "ready": "Listos {{count}}",
+      "noTemplate": "Sin plantilla {{count}}"
+    },
+    "view": {
+      "label": "Tipo de vista",
+      "grid": "Cuadrícula",
+      "list": "Lista"
+    },
+    "resume": {
+      "title": "Lote guardado",
+      "text": "Tienes un lote de {{count}} PDFs a medias.",
+      "continue": "Continuar el lote",
+      "discard": "Descartar",
+      "discarded": "Lote descartado."
+    },
+    "uploadB": "Subir B"
   }
 }
