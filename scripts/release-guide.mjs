@@ -15,13 +15,13 @@ try {
    Abre la PR a ${DEV_BRANCH}, espera a «build-and-test» (Snyk y Codex/CodeRabbit pueden fallar
    por límites de cuenta, no por el código) y fusiónala con aprobación.
 
-2. Release (con la versión ya en ${DEV_BRANCH})
-   git switch ${DEV_BRANCH} && git pull
-   npm run release:deploy                  # simulacro: comprueba y muestra qué haría
-   npm run release:deploy -- --execute     # pide escribir v${v}; alinea ${DEV_BRANCH} y ${MAIN_BRANCH} (avance rápido o,
-                                           # si han divergido, fusiona ${MAIN_BRANCH} en ${DEV_BRANCH}),
+2. Release (con la versión ya fusionada en ${DEV_BRANCH}; vale desde cualquier rama con el árbol limpio)
+   npm run release:deploy                  # cambia a ${DEV_BRANCH}, hace pull, comprueba, pide escribir v${v},
+                                           # alinea ${DEV_BRANCH} y ${MAIN_BRANCH} (avance rápido o merge de ${MAIN_BRANCH} en ${DEV_BRANCH}),
                                            # crea y sube la rama release/v${v} y el tag v${v}
+   npm run release:deploy -- --dry-run     # solo comprueba y cuenta qué haría
    Si ya hay una PR ${DEV_BRANCH} → ${MAIN_BRANCH} abierta, fusiónala antes o ciérrala: el script nunca fuerza pushes.
+   Si npm dice «Missing script», estás en una rama sin los scripts (p. ej. ${MAIN_BRANCH} antigua): git switch ${DEV_BRANCH} && git pull.
 
 3. Desplegar y publicar
    Despliegue en Vercel: a mano.

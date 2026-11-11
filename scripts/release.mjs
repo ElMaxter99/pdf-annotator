@@ -1,13 +1,12 @@
-// npm run release:deploy [-- comando] [opciones]
-//   (sin comando)   Simulacro: comprueba que todo cuadra y enseña qué haría.
-//   --execute       Tras las comprobaciones y escribiendo la versión para confirmar, hace el release:
-//                   alinea develop y master (avance rápido; si han divergido, fusiona master en develop
-//                   con un commit de merge, sin forzar nunca), crea la rama release/vX.Y.Z
-//                   y el tag vX.Y.Z sobre ese commit, y sube las tres cosas a origin.
-//   bump X.Y.Z      Edita package.json, el badge del README y la cabecera del CHANGELOG
-//                   (solo ficheros locales; no hace commit ni push).
-// Parte de que la versión ya está hecha y fusionada en develop (npm run release:guide).
-// El despliegue en Vercel queda a mano. Nunca empuja sin confirmación.
+// npm run release:deploy            Hace el release completo, sin argumentos:
+//   1. Cambia a develop y hace pull (necesita el árbol limpio; no toca nada si no lo está).
+//   2. Comprueba versión, CHANGELOG, README, tag y rama.
+//   3. Te pide escribir vX.Y.Z para confirmar.
+//   4. Alinea develop y master (avance rápido; si han divergido, fusiona master en develop con
+//      un commit de merge; nunca fuerza), crea la rama release/vX.Y.Z y el tag vX.Y.Z y lo sube todo.
+// npm run release:deploy -- --dry-run   Solo comprueba y cuenta qué haría (también cambia a develop y hace pull).
+// npm run release:deploy -- bump X.Y.Z  Edita package.json y el badge del README en local (sin commit).
+// El despliegue en Vercel queda a mano.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -32,6 +31,18 @@ const bump = (raw) => {
   if (changelogSection(v)) console.log('✔ CHANGELOG.md ya tiene la sección.');
   else console.log(`! Añade a mano la cabecera «## [v${v}](${REPO_URL}/tree/v.${v}) - AAAA-MM-DD» en CHANGELOG.md.`);
   console.log('Revisa con git diff, haz commit y abre la PR a develop (npm run release:guide).');
+};
+
+const prepare = () => {
+  if (git('status', '--porcelain')) fail('Hay cambios sin commit: guárdalos o descártalos antes de hacer el release.');
+  const current = git('rev-parse', '--abbrev-ref', 'HEAD');
+  try {
+    if (current !== DEV_BRANCH) { git('switch', DEV_BRANCH); console.log(`✔ Cambiado de ${current} a ${DEV_BRANCH}.`); }
+    git('pull', '--ff-only', 'origin', DEV_BRANCH);
+    console.log(`✔ ${DEV_BRANCH} actualizada (pull).`);
+  } catch (e) {
+    fail(`No se pudo dejar ${DEV_BRANCH} actualizada: ${e.message.split('\n')[0]}`);
+  }
 };
 
 const isAncestor = (a, b) => {
@@ -81,9 +92,10 @@ const check = () => {
 const main = async () => {
   const args = process.argv.slice(2);
   if (args[0] === 'bump') return bump(args[1]);
-  const execute = takeFlag(args, '--execute');
+  const dryRun = takeFlag(args, '--dry-run');
   if (args.length) fail(`Argumento desconocido: ${args.join(' ')}`);
 
+  prepare();
   const { tag, branch, target, align, problems } = check();
   if (problems.length) fail('Resuelve lo anterior antes de hacer el release.');
   const short = target.slice(0, 7);
@@ -93,8 +105,8 @@ const main = async () => {
   console.log(`  ${align ? 2 : 1}. Crear y subir la rama ${branch}.`);
   console.log(`  ${align ? 3 : 2}. Crear y subir el tag anotado ${tag}.`);
   console.log('  Después: desplegar en Vercel a mano y publicar las notas (npm run release:notes).');
-  if (!execute) return console.log('\nSimulacro: no se ha cambiado nada. Usa --execute para continuar con confirmación.');
-  if (!process.stdin.isTTY) fail('--execute necesita una terminal interactiva para confirmar.');
+  if (dryRun) return console.log('\nSimulacro (--dry-run): no se ha subido nada.');
+  if (!process.stdin.isTTY) fail('Hace falta una terminal interactiva para confirmar (o usa --dry-run).');
 
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   const answer = (await rl.question(`Escribe ${tag} para confirmar (otra cosa cancela): `)).trim();
