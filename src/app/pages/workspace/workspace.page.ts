@@ -126,6 +126,8 @@ function supportsModuleWorkers(): boolean {
   }
 }
 
+const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
+
 const workerOptions = (pdfjsLib as any).GlobalWorkerOptions as {
   workerSrc?: string;
   workerType?: string;
@@ -252,7 +254,20 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly coords = this.store.coords;
 
   /** Batch migration: set while a PDF of the batch is open (B is edited, A is the reference). */
-  readonly referenceMode = signal<'overlay' | 'toggle'>('overlay');
+  readonly referenceMode = signal<'overlay' | 'toggle' | 'split'>(this.storedReferenceMode());
+  /** Fields of A in the PDF open in the batch (0 = nothing to show or copy). */
+  readonly templateFieldsA = computed(
+    () => this.batch.activeItem()?.aPages.reduce((sum, page) => sum + page.fields.length, 0) ?? 0,
+  );
+  /** «Dividida» is on: A (read only) on the left, B (edited) on the right. */
+  readonly splitActive = computed(
+    () => !!this.migration() && this.referenceMode() === 'split' && this.templateFieldsA() > 0,
+  );
+  /** A and B have a different page size, so their coordinates do not line up. */
+  readonly splitSizeMismatch = signal(false);
+  private splitDoc: { blob: Blob; doc: PDFDocumentProxy } | null = null;
+  private splitToken = 0;
+  private scaleBeforeSplit: number | null = null;
   readonly holdingReference = signal(false);
   readonly migration = computed(() => {
     const item = this.batch.activeItem();
@@ -347,6 +362,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   get annotationsLayerRef(): ElementRef<HTMLDivElement> | undefined {
     return this.viewerComponent?.annotationsLayerRef;
+  }
+
+  get splitCanvasRef(): ElementRef<HTMLCanvasElement> | undefined {
+    return this.viewerComponent?.splitCanvasRef;
+  }
+
+  get splitLayerRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.viewerComponent?.splitLayerRef;
   }
 
   get pdfViewerRef(): ElementRef<HTMLDivElement> | undefined {
@@ -461,6 +484,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.referenceMode();
       this.holdingReference();
       untracked(() => this.redrawReference());
+    });
+    effect(() => {
+      this.splitActive();
+      this.pageIndex();
+      this.scale();
+      this.batch.activeItem();
+      untracked(() => void this.renderSplit());
     });
     this.vm = this;
     this.setDocumentMetadata();
@@ -2922,7 +2952,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     layer.textContent = '';
     const m = this.migration();
     const canvas = this.pdfCanvasRef?.nativeElement;
-    if (!m || !canvas) {
+    if (!m || !canvas || this.splitActive()) {
       return;
     }
     const onlyA = this.holdingReference();
@@ -2931,41 +2961,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const page = this.pageIndex();
-    const scale = this.scale();
-    const draw = (name: string, x: number, y: number, fontSize: number, missing: boolean) => {
-      const px = Number(x);
-      const py = Number(y);
-      const size = Math.max(6, Number(fontSize) || 12);
-      if (!Number.isFinite(px) || !Number.isFinite(py)) {
-        return;
-      }
-      const el = document.createElement('div');
-      el.className = 'reference-field';
-      el.classList.toggle('reference-field--missing', missing);
-      el.classList.toggle('reference-field--solo', onlyA);
-      el.textContent = name;
-      el.title = name;
-      el.style.left = `${px * scale}px`;
-      el.style.top = `${canvas.height - py * scale - size * scale}px`;
-      el.style.height = `${size * scale * 1.2}px`;
-      el.style.minWidth = `${Math.max(24, name.length * size * 0.55 * scale)}px`;
-      el.style.fontSize = `${Math.max(9, size * scale * 0.8)}px`;
-      layer.appendChild(el);
-    };
+    const draw = (name: string, x: number, y: number, fontSize: number, missing: boolean) =>
+      this.drawReferenceField(layer, canvas.height, name, x, y, fontSize, missing, onlyA);
 
     if (onlyA) {
-      const states = m.states;
-      for (const aPage of m.item.aPages) {
-        if (aPage.num !== page) {
-          continue;
-        }
-        for (const field of aPage.fields) {
-          const name = (field.mapField || field.value || '').trim();
-          const missing = states.some(
-            (state) => state.status === 'missing' && state.page === page && state.name === name,
-          );
-          draw(name, field.x, field.y, field.fontSize, missing);
-        }
+      for (const field of this.fieldsOfA(page)) {
+        draw(field.name, field.x, field.y, field.fontSize, field.missing);
       }
       return;
     }
@@ -2975,6 +2976,169 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         continue;
       }
       draw(state.a.name, state.a.x, state.a.y, state.a.fontSize, state.status === 'missing');
+    }
+  }
+
+  /** Every field of A on a page, flagged when B does not have it yet. */
+  private fieldsOfA(page: number) {
+    const m = this.migration();
+    if (!m) {
+      return [];
+    }
+    const out: { name: string; x: number; y: number; fontSize: number; missing: boolean }[] = [];
+    for (const aPage of m.item.aPages) {
+      if (aPage.num !== page) {
+        continue;
+      }
+      for (const field of aPage.fields) {
+        const name = (field.mapField || field.value || '').trim();
+        const missing = m.states.some(
+          (state) => state.status === 'missing' && state.page === page && state.name === name,
+        );
+        out.push({ name, x: field.x, y: field.y, fontSize: field.fontSize, missing });
+      }
+    }
+    return out;
+  }
+
+  private drawReferenceField(
+    layer: HTMLElement,
+    canvasHeight: number,
+    name: string,
+    x: number,
+    y: number,
+    fontSize: number,
+    missing: boolean,
+    solo: boolean,
+  ) {
+    const scale = this.scale();
+    const px = Number(x);
+    const py = Number(y);
+    const size = Math.max(6, Number(fontSize) || 12);
+    if (!Number.isFinite(px) || !Number.isFinite(py)) {
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'reference-field';
+    el.classList.toggle('reference-field--missing', missing);
+    el.classList.toggle('reference-field--solo', solo);
+    el.textContent = name;
+    el.title = name;
+    el.style.left = `${px * scale}px`;
+    el.style.top = `${canvasHeight - py * scale - size * scale}px`;
+    el.style.height = `${size * scale * 1.2}px`;
+    el.style.minWidth = `${Math.max(24, name.length * size * 0.55 * scale)}px`;
+    el.style.fontSize = `${Math.max(9, size * scale * 0.8)}px`;
+    layer.appendChild(el);
+  }
+
+  private storedReferenceMode(): 'overlay' | 'toggle' | 'split' {
+    try {
+      const value =
+        typeof localStorage !== 'undefined' ? localStorage.getItem(REFERENCE_MODE_KEY) : null;
+      return value === 'toggle' || value === 'split' ? value : 'overlay';
+    } catch {
+      return 'overlay';
+    }
+  }
+
+  /** Changes how A is shown. «Dividida» also fits both pages in the viewer. */
+  async setReferenceMode(mode: 'overlay' | 'toggle' | 'split'): Promise<void> {
+    if (mode === 'split' && this.templateFieldsA() === 0) {
+      return;
+    }
+    this.referenceMode.set(mode);
+    try {
+      localStorage.setItem(REFERENCE_MODE_KEY, mode);
+    } catch {
+      /* storage unavailable */
+    }
+    if (mode === 'split') {
+      await this.fitSplit();
+    } else if (this.scaleBeforeSplit !== null) {
+      this.scale.set(this.scaleBeforeSplit);
+      this.scaleBeforeSplit = null;
+      await this.render();
+      this.redrawAllForPage();
+    }
+  }
+
+  /** Zoom so that two pages fit side by side in the viewer. */
+  private async fitSplit(): Promise<void> {
+    const viewer = this.pdfViewerRef?.nativeElement.closest('.viewer') as HTMLElement | null;
+    if (!viewer || !this.pdfDoc) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve));
+    const page = await this.pdfDoc.getPage(this.pageIndex());
+    const baseWidth = page.getViewport({ scale: 1 }).width;
+    const style = getComputedStyle(viewer);
+    const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const available = (viewer.clientWidth - padding - 24) / 2;
+    if (!(baseWidth > 0) || !(available > 0)) {
+      return;
+    }
+    if (this.scaleBeforeSplit === null) {
+      this.scaleBeforeSplit = this.scale();
+    }
+    this.scale.set(Math.min(4, Math.max(0.25, Math.floor((available / baseWidth) * 100) / 100)));
+    await this.render();
+    this.redrawAllForPage();
+  }
+
+  /** Draws A (its PDF and its fields) in the left pane of «Dividida». */
+  private async renderSplit(): Promise<void> {
+    const token = ++this.splitToken;
+    const item = this.batch.activeItem();
+    if (!this.splitActive() || !item) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve));
+    const canvas = this.splitCanvasRef?.nativeElement;
+    const layer = this.splitLayerRef?.nativeElement;
+    if (!canvas || !layer || token !== this.splitToken) {
+      return;
+    }
+    try {
+      if (!this.splitDoc || this.splitDoc.blob !== item.aPdf) {
+        const bytes = new Uint8Array(await item.aPdf.arrayBuffer());
+        const doc = await pdfjsLib.getDocument({ data: bytes }).promise;
+        this.splitDoc = { blob: item.aPdf, doc };
+      }
+      const doc = this.splitDoc.doc;
+      const pageNumber = Math.min(this.pageIndex(), doc.numPages);
+      const page = await doc.getPage(pageNumber);
+      const viewport = page.getViewport({ scale: this.scale() });
+      const ctx = canvas.getContext('2d');
+      if (!ctx || token !== this.splitToken) {
+        return;
+      }
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      await page.render({ canvasContext: ctx, canvas, viewport }).promise;
+      if (token !== this.splitToken) {
+        return;
+      }
+      layer.textContent = '';
+      for (const field of this.fieldsOfA(this.pageIndex())) {
+        this.drawReferenceField(
+          layer,
+          canvas.height,
+          field.name,
+          field.x,
+          field.y,
+          field.fontSize,
+          field.missing,
+          false,
+        );
+      }
+      const bCanvas = this.pdfCanvasRef?.nativeElement;
+      const bPage = this.pdfDoc ? await this.pdfDoc.getPage(this.pageIndex()) : null;
+      const bWidth = bPage?.getViewport({ scale: 1 }).width ?? 0;
+      const aWidth = page.getViewport({ scale: 1 }).width;
+      this.splitSizeMismatch.set(!!bCanvas && Math.abs(aWidth - bWidth) > 2);
+    } catch (error) {
+      console.warn('No se pudo dibujar la versión A en la vista dividida.', error);
     }
   }
 
@@ -3243,8 +3407,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (pages === null) {
       return 'noPages';
     }
-    this.batch.setTemplate(item.id, pages);
     const count = pages.reduce((sum, page) => sum + page.fields.length, 0);
+    if (count === 0) {
+      return 'noPages';
+    }
+    this.batch.setTemplate(item.id, pages);
     if (!item.bPdf) {
       this.replaceCoords(this.normalizedTemplateA());
     } else {

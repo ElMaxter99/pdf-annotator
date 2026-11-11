@@ -28,23 +28,19 @@
 
     @if (vm.migration(); as m) {
 
-    <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t" [attr.title]="'batch.editor.holdHint' | t">
-      <button
-        type="button"
-        [class.migration-seg__on]="vm.referenceMode() === 'overlay'"
-        [attr.aria-pressed]="vm.referenceMode() === 'overlay'"
-        (click)="vm.referenceMode.set('overlay')"
-      >
-        {{ 'batch.editor.view.overlay' | t }}
-      </button>
-      <button
-        type="button"
-        [class.migration-seg__on]="vm.referenceMode() === 'toggle'"
-        [attr.aria-pressed]="vm.referenceMode() === 'toggle'"
-        (click)="vm.referenceMode.set('toggle')"
-      >
-        {{ 'batch.editor.view.toggle' | t }}
-      </button>
+    <div class="migration-seg" [class.migration-seg--off]="vm.templateFieldsA() === 0" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t" [attr.title]="(vm.templateFieldsA() === 0 ? 'batch.editor.noA.title' : 'batch.editor.holdHint') | t">
+      @for (mode of modes; track mode) {
+        <button
+          type="button"
+          [class.migration-seg__on]="vm.referenceMode() === mode"
+          [attr.aria-pressed]="vm.referenceMode() === mode"
+          [disabled]="vm.templateFieldsA() === 0"
+          (click)="vm.setReferenceMode(mode)"
+          [attr.data-testid]="'mode-' + mode"
+        >
+          {{ 'batch.editor.view.' + mode | t }}
+        </button>
+      }
     </div>
 
     <div class="migration-menu">
@@ -56,6 +52,7 @@
         [attr.title]="'batch.editor.putA.button' | t"
         [attr.aria-expanded]="menuOpen()"
         (click)="toggleMenu()"
+        [disabled]="vm.templateFieldsA() === 0"
         data-testid="put-template-a"
       >
         <span class="migration-put__long">{{ 'batch.editor.putA.button' | t }}</span
@@ -136,6 +133,21 @@
       <button type="button" class="btn btn--primary" (click)="confirmReady()" data-testid="mark-ready">
         {{ 'batch.editor.ready' | t }}
       </button>
+    }
+  </div>
+  <div class="migration-hints">
+    @if (vm.migration() && vm.templateFieldsA() === 0) {
+      <div class="migration-hint migration-hint--warn" role="status" data-testid="no-template-a">
+        <span>{{ 'batch.editor.noA.hint' | t }}</span>
+        <button type="button" class="btn btn--ghost" (click)="vm.setSidebarTab('document')">
+          {{ 'batch.editor.noA.go' | t }}
+        </button>
+      </div>
+    }
+    @if (vm.splitActive() && vm.splitSizeMismatch()) {
+      <div class="migration-hint migration-hint--warn" role="status" data-testid="split-size-mismatch">
+        <span>{{ 'batch.editor.split.sizeMismatch' | t }}</span>
+      </div>
     }
   </div>
 

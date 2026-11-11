@@ -379,7 +379,8 @@
       "viewLabel": "A anzeigen",
       "view": {
         "overlay": "Darüber",
-        "toggle": "Wechseln"
+        "toggle": "Wechseln",
+        "split": "Geteilt"
       },
       "holdHint": "Taste A gedrückt halten, um nur A zu sehen",
       "cancel": "Abbrechen",
@@ -413,7 +414,17 @@
       "navLabel": "Durch den Stapel navigieren",
       "prev": "Vorheriges PDF",
       "next": "Nächstes PDF",
-      "position": "{{index}} von {{total}}"
+      "position": "{{index}} von {{total}}",
+      "split": {
+        "tagA": "A · Original · nur Lesen",
+        "tagB": "B · neue Version · bearbeitet",
+        "sizeMismatch": "A und B haben nicht dieselbe Größe: Die Koordinaten stimmen nicht überein."
+      },
+      "noA": {
+        "title": "Fügen Sie Vorlage A hinzu, um diese Modi zu nutzen.",
+        "hint": "Dieses PDF hat keine Vorlage A: Es gibt nichts anzuzeigen oder zu kopieren.",
+        "go": "Vorlage A hinzufügen (Dokument)"
+      }
     },
     "panel": {
       "title": "Felder von B · {{count}}",

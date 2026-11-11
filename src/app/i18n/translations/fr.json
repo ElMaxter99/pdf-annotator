@@ -379,7 +379,8 @@
       "viewLabel": "Comment voir A",
       "view": {
         "overlay": "Superposé",
-        "toggle": "Alterner"
+        "toggle": "Alterner",
+        "split": "Divisée"
       },
       "holdHint": "Maintenez la touche A pour ne voir que A",
       "cancel": "Annuler",
@@ -413,7 +414,17 @@
       "navLabel": "Parcourir le lot",
       "prev": "PDF précédent",
       "next": "PDF suivant",
-      "position": "{{index}} sur {{total}}"
+      "position": "{{index}} sur {{total}}",
+      "split": {
+        "tagA": "A · original · lecture seule",
+        "tagB": "B · nouvelle version · modifiée",
+        "sizeMismatch": "A et B n’ont pas la même taille : les coordonnées ne correspondent pas."
+      },
+      "noA": {
+        "title": "Ajoutez le modèle A pour utiliser ces modes.",
+        "hint": "Ce PDF n’a pas de modèle A : il n’y a rien à afficher ni à copier.",
+        "go": "Ajouter le modèle A (Document)"
+      }
     },
     "panel": {
       "title": "Champs de B · {{count}}",

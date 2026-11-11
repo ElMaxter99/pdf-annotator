@@ -31,8 +31,11 @@ export class WorkspaceViewerComponent {
 
   @ViewChild('pdfCanvas', { static: false }) pdfCanvasRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('overlayCanvas', { static: false }) overlayCanvasRef?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('annotationsLayer', { static: false }) annotationsLayerRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('annotationsLayer', { static: false })
+  annotationsLayerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('referenceLayer', { static: false }) referenceLayerRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('splitCanvas', { static: false }) splitCanvasRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('splitLayer', { static: false }) splitLayerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('pdfViewer', { static: false }) pdfViewerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('previewEditor', { static: false }) private previewEditor?: AnnotationEditorComponent;
   @ViewChild('editEditor', { static: false }) private editEditor?: AnnotationEditorComponent;

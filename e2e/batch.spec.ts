@@ -356,3 +356,51 @@ test('in a batch «Documento» has no «empezar de cero» and completes the PDF 
   await expect(page.getByTestId('batch-document')).toContainText('otro.pdf');
   await expect(page.locator('.annotation')).toHaveCount(1);
 });
+
+test('without template A the modes are off and explain why; JSON without fields is refused', async ({
+  page,
+}) => {
+  await openPanel(page);
+  await openFirst(page);
+  await page.getByTestId('batch-next').click();
+  await expect(page.getByTestId('batch-position')).toHaveText('2 de 2');
+  await expect(page.locator('.annotation')).toHaveCount(0);
+
+  await page.getByRole('tab', { name: 'Documento' }).click();
+  await page.getByTestId('doc-b-input').setInputFiles(file('x-nuevo.pdf', pdf, 'application/pdf'));
+  await expect(page.locator('.migration-bar')).toContainText('Editando versión B');
+  await expect(page.getByTestId('no-template-a')).toBeVisible();
+  await expect(page.getByTestId('mode-split')).toBeDisabled();
+  await expect(page.getByTestId('put-template-a')).toBeDisabled();
+
+  await page.getByTestId('doc-a-paste').click();
+  await page.getByTestId('doc-a-text').fill('{ "pages": [ { "num": 1, "fields": [] } ] }');
+  await page.getByTestId('doc-a-apply').click();
+  await expect(page.getByTestId('doc-a-error')).toBeVisible();
+  await expect(page.getByTestId('doc-layer-a')).toContainText('Sin plantilla');
+});
+
+test('«Dividida» shows A with its fields on the left and B on the right', async ({ page }) => {
+  await openPanel(page, { versions: true });
+  await page.getByTestId('view-list').click();
+  await attachVersion2(page);
+  await openRow(page);
+
+  await page.getByTestId('mode-split').click();
+  await expect(page.getByTestId('split-a')).toBeVisible();
+  await expect(page.locator('.canvas--pdf')).toBeVisible();
+  await expect(page.getByTestId('split-a').locator('.reference-field')).toHaveCount(FIELDS);
+  await expect(page.getByTestId('split-a').locator('canvas')).toHaveJSProperty(
+    'width',
+    await page.locator('.canvas--pdf').evaluate((el: HTMLCanvasElement) => el.width),
+  );
+
+  // B is edited on the right: put A in and B gets the fields
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-copy').click();
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+  await expect(page.getByTestId('split-a').locator('.reference-field')).toHaveCount(FIELDS);
+
+  await page.getByTestId('mode-overlay').click();
+  await expect(page.getByTestId('split-a')).toHaveCount(0);
+});

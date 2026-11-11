@@ -3492,3 +3492,86 @@ kbd {
     background: #e9ebf1;
   }
 }
+
+/* Batch editor «Dividida»: A (read only) on the left, B (edited) on the right */
+.app--workspace .viewer.viewer--split {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: start;
+  column-gap: 24px;
+  padding-top: 44px;
+}
+
+.viewer.viewer--split .selection-bar {
+  grid-column: 1 / -1;
+}
+
+.viewer.viewer--split .canvas-container {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.split-tag {
+  position: absolute;
+  top: -28px;
+  left: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  color: var(--muted);
+}
+
+.split-tag--b {
+  background: var(--accent);
+  color: #041818;
+}
+
+:root.theme-light .split-tag--b {
+  color: #ffffff;
+}
+
+.canvas-container--split-b {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.migration-seg--off {
+  opacity: 0.45;
+}
+
+.migration-seg button:disabled,
+.migration-menu .btn:disabled {
+  cursor: not-allowed;
+}
+
+.migration-hint {
+  display: flex;
+  flex: 1 0 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.migration-hint--warn {
+  background: color-mix(in srgb, #fbbf24 12%, transparent);
+  border-color: color-mix(in srgb, #fbbf24 45%, transparent);
+}
+
+.migration-hints {
+  display: flex;
+  flex-direction: column;
+}
+
+.migration-hints .migration-hint {
+  margin-top: 8px;
+}

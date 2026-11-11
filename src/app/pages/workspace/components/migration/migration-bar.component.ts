@@ -13,6 +13,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 export class MigrationBarComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
 
+  readonly modes = ['overlay', 'toggle', 'split'] as const;
   readonly menuOpen = signal(false);
   /** Mode waiting for confirmation because B already has fields. */
   readonly confirmMode = signal<'replace' | null>(null);

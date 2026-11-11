@@ -379,7 +379,8 @@
       "viewLabel": "Com veure A",
       "view": {
         "overlay": "Al damunt",
-        "toggle": "Alterna"
+        "toggle": "Alterna",
+        "split": "Dividida"
       },
       "holdHint": "Mantén la tecla A per veure només A",
       "cancel": "Cancel·la",
@@ -413,7 +414,17 @@
       "navLabel": "Moure's pel lot",
       "prev": "PDF anterior",
       "next": "PDF següent",
-      "position": "{{index}} de {{total}}"
+      "position": "{{index}} de {{total}}",
+      "split": {
+        "tagA": "A · original · només lectura",
+        "tagB": "B · versió nova · s’edita",
+        "sizeMismatch": "A i B no tenen la mateixa mida: les coordenades no coincideixen."
+      },
+      "noA": {
+        "title": "Afegeix la plantilla A per usar aquests modes.",
+        "hint": "Aquest PDF no té plantilla A: sense ella no hi ha res per mostrar ni copiar.",
+        "go": "Afegeix la plantilla A (Document)"
+      }
     },
     "panel": {
       "title": "Camps de B · {{count}}",

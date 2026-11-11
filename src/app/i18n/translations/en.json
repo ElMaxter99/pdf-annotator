@@ -379,7 +379,8 @@
       "viewLabel": "How to see A",
       "view": {
         "overlay": "Overlay",
-        "toggle": "Toggle"
+        "toggle": "Toggle",
+        "split": "Split"
       },
       "holdHint": "Hold the A key to see only A",
       "cancel": "Cancel",
@@ -413,7 +414,17 @@
       "navLabel": "Move through the batch",
       "prev": "Previous PDF",
       "next": "Next PDF",
-      "position": "{{index}} of {{total}}"
+      "position": "{{index}} of {{total}}",
+      "split": {
+        "tagA": "A · original · read only",
+        "tagB": "B · new version · edited",
+        "sizeMismatch": "A and B are not the same size: the coordinates do not line up."
+      },
+      "noA": {
+        "title": "Add template A to use these modes.",
+        "hint": "This PDF has no template A: there is nothing to show or copy.",
+        "go": "Add template A (Document)"
+      }
     },
     "panel": {
       "title": "Fields of B · {{count}}",

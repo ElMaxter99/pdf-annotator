@@ -379,7 +379,8 @@
       "viewLabel": "Como ver A",
       "view": {
         "overlay": "Por cima",
-        "toggle": "Alternar"
+        "toggle": "Alternar",
+        "split": "Dividida"
       },
       "holdHint": "Mantenha a tecla A para ver só A",
       "cancel": "Cancelar",
@@ -413,7 +414,17 @@
       "navLabel": "Mover-se pelo lote",
       "prev": "PDF anterior",
       "next": "PDF seguinte",
-      "position": "{{index}} de {{total}}"
+      "position": "{{index}} de {{total}}",
+      "split": {
+        "tagA": "A · original · só leitura",
+        "tagB": "B · nova versão · editada",
+        "sizeMismatch": "A e B não têm o mesmo tamanho: as coordenadas não coincidem."
+      },
+      "noA": {
+        "title": "Adicione o modelo A para usar estes modos.",
+        "hint": "Este PDF não tem modelo A: não há nada para mostrar nem copiar.",
+        "go": "Adicionar o modelo A (Documento)"
+      }
     },
     "panel": {
       "title": "Campos de B · {{count}}",

@@ -379,7 +379,8 @@
       "viewLabel": "Cómo ver A",
       "view": {
         "overlay": "Encima",
-        "toggle": "Alternar"
+        "toggle": "Alternar",
+        "split": "Dividida"
       },
       "holdHint": "Mantén la tecla A para ver solo A",
       "cancel": "Cancelar",
@@ -413,7 +414,17 @@
       "navLabel": "Moverse por el lote",
       "prev": "PDF anterior",
       "next": "PDF siguiente",
-      "position": "{{index}} de {{total}}"
+      "position": "{{index}} de {{total}}",
+      "split": {
+        "tagA": "A · original · solo lectura",
+        "tagB": "B · versión nueva · se edita",
+        "sizeMismatch": "A y B no tienen el mismo tamaño: las coordenadas no coinciden."
+      },
+      "noA": {
+        "title": "Añade la plantilla A para usar estos modos.",
+        "hint": "Este PDF no tiene plantilla A: sin ella no hay nada que mostrar ni copiar.",
+        "go": "Añadir plantilla A (Documento)"
+      }
     },
     "panel": {
       "title": "Campos de B · {{count}}",
