@@ -12,6 +12,7 @@ import {
 const SAMPLES_KEY = 'pdf-annotator.sampleValues';
 const DATA_KEY = 'pdf-annotator.testData';
 const MODE_KEY = 'pdf-annotator.previewMode';
+const BATCH_MODE_KEY = 'pdf-annotator.previewModeBatch';
 const ORIGIN_KEY = 'pdf-annotator.showOrigin';
 export const MAX_TEST_DATA_BYTES = 5 * 1024 * 1024;
 
@@ -29,7 +30,13 @@ export interface TestDataError {
 export class PreviewSettingsService {
   readonly samples = signal<SampleValues>(this.loadSamples());
   readonly testDataText = signal<string>(this.loadText());
-  readonly mode = signal<PreviewMode>(this.loadMode());
+  private readonly editorMode = signal<PreviewMode>(this.loadMode(MODE_KEY, 'sample'));
+  private readonly batchModeValue = signal<PreviewMode>(this.loadMode(BATCH_MODE_KEY, 'map'));
+  /** Set by the workspace while a batch document is being edited: it has its own view, «Mapeo» by default. */
+  readonly inBatch = signal(false);
+  readonly mode = computed<PreviewMode>(() =>
+    this.inBatch() ? this.batchModeValue() : this.editorMode(),
+  );
   readonly showOrigin = signal<boolean>(this.loadFlag(ORIGIN_KEY));
 
   private readonly parsed = computed<{ data: unknown | null; error: TestDataError | null }>(() => {
@@ -68,8 +75,17 @@ export class PreviewSettingsService {
   }));
 
   setMode(mode: PreviewMode): void {
-    this.mode.set(mode);
+    if (this.inBatch()) {
+      this.setBatchMode(mode);
+      return;
+    }
+    this.editorMode.set(mode);
     this.save(MODE_KEY, mode);
+  }
+
+  setBatchMode(mode: PreviewMode): void {
+    this.batchModeValue.set(mode);
+    this.save(BATCH_MODE_KEY, mode);
   }
 
   setShowOrigin(show: boolean): void {
@@ -121,12 +137,12 @@ export class PreviewSettingsService {
     }
   }
 
-  private loadMode(): PreviewMode {
+  private loadMode(key: string, fallback: PreviewMode): PreviewMode {
     try {
-      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(MODE_KEY) : null;
-      return raw === 'map' || raw === 'data' ? raw : 'sample';
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
+      return raw === 'map' || raw === 'data' || raw === 'sample' ? raw : fallback;
     } catch {
-      return 'sample';
+      return fallback;
     }
   }
 

@@ -324,16 +324,15 @@
       "copiedAdjusted": "Champs copiés et ajustés à la taille de B.",
       "adjustApplied": "{{count}} champs copiés, {{moved}} ajustés."
     },
-    "exportSampleValues": "Le PDF contient {{count}} champ(s) avec des valeurs d'exemple au lieu de données réelles.",
     "bell": {
-      "label": "Avis fermés ({count})",
+      "label": "Avis fermés ({{count}})",
       "title": "Avis fermés",
       "showAll": "Tout afficher",
       "show": "Afficher à nouveau",
       "emptyTitle": "Rien à récupérer",
       "emptyHint": "Les avis informatifs que vous fermez apparaissent ici."
     },
-    "noData": "{count} annotations sans donnée dans les données de test : elles affichent leur exemple."
+    "noData": "{{count}} annotations sans donnée dans les données de test : elles affichent leur exemple."
   },
   "session": {
     "title": "Reprendre là où vous en étiez",
@@ -753,5 +752,17 @@
       "mapHint": "La vue Mappage affiche le nom du champ, il n'y a pas d'origine à montrer.",
       "noneResolved": "Aucun mapField ne correspond aux données de test."
     }
+  },
+  "exportSamples": {
+    "title": "{{count}} champs afficheraient une valeur d'exemple",
+    "lead": "Ces champs n'ont ni «value» ni donnée de test. Que faut-il imprimer dans le PDF ?",
+    "optMap": "Valeur ou champ de mappage",
+    "optMapHint": "Comme avant : on imprime la value ou le texte du mapField.",
+    "optSample": "Valeurs d'exemple",
+    "optSampleHint": "On imprime l'exemple du type (XXXXX, X, 00000).",
+    "recommended": "recommandé",
+    "remember": "Mémoriser mon choix pour cette session",
+    "cancel": "Annuler",
+    "continue": "Continuer"
   }
 }

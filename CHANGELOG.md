@@ -5,6 +5,7 @@
 
 ### Added
 - **IA en local, fase 0 (herramienta de prueba, no visible en la app)**: `tools/ai-phase0/` ejecuta `claude -p` o `copilot -p` sobre pares A/B para medir si la IA propone bien las coordenadas de B (anclas por texto, la app calcula x/y). Incluye seis casos sintéticos con solución conocida y `docs/IA-LOCAL.md` (qué se envía, límites, usos y términos de cada proveedor)
+- **Export asks about sample values (Z-01)**: «Descargar PDF» stamps the value or the mapField text by default; when some annotations would paint a sample, a dialog asks whether to stamp the samples instead (with «Recordar mi elección en esta sesión»). It replaces the warning toast after exporting. Batch editing has its own view, «Mapeo» by default (`pdf-annotator.previewModeBatch`)
 - **Origin of what is painted (M-01)**: «Mostrar origen» in the viewer legend puts a chip on each annotation (valor / dato / muestra / sin dato) with per-page counters; the choice is remembered (`pdf-annotator.showOrigin`)
 - **Test data in the batch panel (M-02)**: «Datos de prueba» button (load / remove a JSON) in the `/lote` panel header; the same global settings apply when editing each PDF
 - **Closed notices bell (M-03)**: informative notices (export with sample values, annotations without data) can be shown again from a 🔔 in the editor header; errors have no bell. In batch editing the existing notices bell is used

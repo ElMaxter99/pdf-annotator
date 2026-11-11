@@ -85,6 +85,7 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | M-02 Datos de prueba en el lote | Botón en la cabecera del panel `/lote` | [`M-02-lote-previsualizar-con-datos-de-prueba.dc.html`](canvas/M-02-lote-previsualizar-con-datos-de-prueba.dc.html) | `batch` | Aprobada, implementada |
 | M-03 Campana de avisos | Avisos informativos recuperables | [`M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html`](canvas/M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html) | `header`, `toast` | Aprobada, implementada |
 | M-04 Estados y tema claro | Sin JSON, nada resuelto, Mapeo, claro | [`M-04-origen-estados-claro.dc.html`](canvas/M-04-origen-estados-claro.dc.html) | `viewer` | Aprobada, implementada |
+| Z-01 Export y comparación con muestras | Diálogo al descargar PDF y vista de lote en Mapeo por defecto | [`Z-01-lote-export-y-comparacion-con-muestras.dc.html`](canvas/Z-01-lote-export-y-comparacion-con-muestras.dc.html) | `workspace`, `header` | Aprobada, implementada (sin diálogo de ZIP: el ZIP solo lleva JSON) |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

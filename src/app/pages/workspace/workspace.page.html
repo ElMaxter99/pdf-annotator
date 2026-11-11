@@ -7,3 +7,7 @@
 @if (vm.shortcutsOpen()) {
   <app-shortcuts-dialog (closed)="vm.toggleShortcuts(false)"></app-shortcuts-dialog>
 }
+@if (vm.exportSamplesPrompt() !== null) {
+  <app-export-samples-dialog [count]="vm.exportSamplesPrompt()!" (cancelled)="vm.cancelExportSamples()"
+    (confirmed)="vm.confirmExportSamples($event)"></app-export-samples-dialog>
+}

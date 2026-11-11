@@ -4226,3 +4226,39 @@ kbd {
     padding-inline: 8px;
   }
 }
+
+/* Z-01 · Pregunta al exportar con valores de muestra */
+.dialog--ask {
+  width: min(520px, 100%);
+}
+.dialog__lead {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+.ask-option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 14px;
+  border: 1px solid var(--border, rgba(148, 163, 184, 0.3));
+  border-radius: 12px;
+  cursor: pointer;
+}
+.ask-option--on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.ask-option small {
+  color: var(--muted);
+}
+.ask-remember {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.ask-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

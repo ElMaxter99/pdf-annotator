@@ -65,11 +65,27 @@ test('test data resolves each mapField and falls back to the sample', async ({ p
   await expect.poll(() => texts(page)).toEqual(['XXXXX', 'XXXXX', 'X', '0.00 €', 'Pendiente de firma']);
 });
 
-test('exporting with sample values warns about them', async ({ page }) => {
+test('exporting with sample values asks what to stamp and can remember the choice', async ({ page }) => {
+  const dialog = page.getByTestId('export-samples-dialog');
+  await page.getByRole('button', { name: /Descargar PDF/ }).click();
+  await expect(dialog).toContainText('4 campos pintarían un valor de muestra');
+  await expect(dialog.getByRole('radio').first()).toBeChecked();
+  await dialog.getByLabel('Recordar mi elección en esta sesión').check();
+  const download = page.waitForEvent('download');
+  await page.getByTestId('export-samples-continue').click();
+  await download;
+  const second = page.waitForEvent('download');
+  await page.getByRole('button', { name: /Descargar PDF/ }).click();
+  await second;
+  await expect(dialog).toHaveCount(0);
+});
+
+test('exporting without sample fields downloads straight away', async ({ page }) => {
+  await mode(page, 'Mapeo').click();
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: /Descargar PDF/ }).click();
   await download;
-  await expect(page.locator('.toast--warning')).toContainText('4 campo(s) con valores de muestra');
+  await expect(page.getByTestId('export-samples-dialog')).toHaveCount(0);
 });
 
 test('origin chips label where each text comes from and are remembered', async ({ page }) => {
@@ -87,15 +103,16 @@ test('origin chips label where each text comes from and are remembered', async (
 });
 
 test('closed informative notices can be recovered from the bell', async ({ page }) => {
-  const download = page.waitForEvent('download');
-  await page.getByRole('button', { name: /Descargar PDF/ }).click();
-  await download;
-  const toast = page.locator('.toast--warning');
-  await expect(toast).toBeVisible();
+  await openSidebarTab(page, 'Avanzado');
+  await page.getByRole('textbox', { name: 'Datos de prueba' }).fill(JSON.stringify(DATA));
+  await mode(page, 'Muestra').click();
+  await mode(page, 'Datos').click();
+  const toast = page.locator('.toast--info');
+  await expect(toast).toContainText('sin dato');
   await toast.getByRole('button', { name: /Cerrar/ }).click();
   await expect(toast).toHaveCount(0);
   await expect(page.getByTestId('toast-bell-count')).toHaveText('1');
   await page.getByTestId('toast-bell').click();
   await page.getByTestId('toast-bell-panel').getByRole('button', { name: 'Mostrar de nuevo' }).click();
-  await expect(page.locator('.toast--warning')).toContainText('valores de muestra');
+  await expect(page.locator('.toast--info')).toContainText('sin dato');
 });

@@ -132,6 +132,8 @@ test('a PDF without a new version is edited with its own template and marked rea
   await expect(page.locator('.migration-bar')).toContainText('Editando con su plantilla');
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
   await expect(page.getByTestId('batch-position')).toHaveText('1 de 2');
+  const view = page.getByRole('group', { name: 'Qué se pinta en las anotaciones' });
+  await expect(view.getByRole('button', { name: 'Mapeo' })).toHaveAttribute('aria-pressed', 'true');
 
   await page.getByTestId('batch-next').click();
   await expect(page.getByTestId('batch-position')).toHaveText('2 de 2');

@@ -39,6 +39,7 @@ import {
 import { WorkspaceHeaderComponent } from './components/header/workspace-header.component';
 import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sidebar.component';
 import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
+import { ExportSamplesDialogComponent } from './components/export-samples-dialog/export-samples-dialog.component';
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnail } from '../../models/page-thumbnail.model';
@@ -265,6 +266,7 @@ export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust';
     WorkspaceViewerComponent,
     WorkspaceFooterComponent,
     ShortcutsDialogComponent,
+    ExportSamplesDialogComponent,
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
@@ -667,6 +669,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.fitA();
       this.pageSizesB();
       untracked(() => void this.renderSplit());
+    });
+    effect(() => {
+      this.previewSettings.inBatch.set(!!this.batch.activeItem());
     });
     effect(() => {
       this.previewSettings.context();
@@ -3085,7 +3090,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   inBatchMode(): boolean {
-    return !!this.migration();
+    return !!this.batch.activeItem();
   }
 
   setShowOrigin(show: boolean) {
@@ -5364,11 +5369,47 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return input;
   }
 
+  /** Sample-sourced fields are stamped as the mapField unless the person chose the samples. */
+  private exportText(field: PageField, useSamples: boolean): string {
+    const ctx = this.previewSettings.context();
+    const preview = resolveFieldPreview(field, ctx);
+    if (useSamples || preview.source !== 'sample') {
+      return preview.text;
+    }
+    return resolveFieldPreview(field, { ...ctx, mode: 'map' }).text;
+  }
+
+  readonly exportSamplesPrompt = signal<number | null>(null);
+  private rememberedExportChoice: 'map' | 'sample' | null = null;
+
   async downloadAnnotatedPDF() {
     if (!this.pdfDoc) return;
-
     const sampleFields = this.countSampleFields();
+    if (sampleFields > 0) {
+      if (this.rememberedExportChoice) {
+        await this.runExport(this.rememberedExportChoice === 'sample');
+      } else {
+        this.exportSamplesPrompt.set(sampleFields);
+      }
+      return;
+    }
+    await this.runExport(false);
+  }
 
+  async confirmExportSamples(result: { choice: 'map' | 'sample'; remember: boolean }) {
+    this.exportSamplesPrompt.set(null);
+    if (result.remember) {
+      this.rememberedExportChoice = result.choice;
+    }
+    await this.runExport(result.choice === 'sample');
+  }
+
+  cancelExportSamples() {
+    this.exportSamplesPrompt.set(null);
+  }
+
+  private async runExport(useSamples: boolean) {
+    if (!this.pdfDoc) return;
     try {
       const customFonts = new Map<string, CustomFontEntry>();
       this.customFonts().forEach((fontEntry) => customFonts.set(fontEntry.id, fontEntry));
@@ -5380,18 +5421,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         defaultFontId: DEFAULT_FONT_ID,
         defaultOpacity: DEFAULT_OPACITY,
         styleField: (field) => this.ensureFieldStyle(field),
-        renderText: (field) => this.getFieldRenderValue(field),
+        renderText: (field) => this.exportText(field, useSamples),
         resolveFont: (fontId) => this.fontCatalog.getFontOptionById(fontId),
       });
 
       this.rememberPdfBytes(sourceBytes, 3);
       downloadBlob(new Blob([toArrayBuffer(bytes)], { type: 'application/pdf' }), 'annotated.pdf');
-      if (sampleFields > 0) {
-        this.toast.notice(
-          this.translationService.translate('toast.exportSampleValues', { count: sampleFields }),
-          'warning',
-        );
-      }
     } catch (error) {
       console.error('No se pudo generar el PDF anotado.', error);
       this.toast.error(this.translationService.translate('toast.exportPdfFailed'));
