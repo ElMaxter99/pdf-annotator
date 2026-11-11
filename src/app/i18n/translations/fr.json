@@ -324,7 +324,16 @@
       "copiedAdjusted": "Champs copiés et ajustés à la taille de B.",
       "adjustApplied": "{{count}} champs copiés, {{moved}} ajustés."
     },
-    "exportSampleValues": "Le PDF contient {{count}} champ(s) avec des valeurs d'exemple au lieu de données réelles."
+    "exportSampleValues": "Le PDF contient {{count}} champ(s) avec des valeurs d'exemple au lieu de données réelles.",
+    "bell": {
+      "label": "Avis fermés ({count})",
+      "title": "Avis fermés",
+      "showAll": "Tout afficher",
+      "show": "Afficher à nouveau",
+      "emptyTitle": "Rien à récupérer",
+      "emptyHint": "Les avis informatifs que vous fermez apparaissent ici."
+    },
+    "noData": "{count} annotations sans donnée dans les données de test : elles affichent leur exemple."
   },
   "session": {
     "title": "Reprendre là où vous en étiez",
@@ -661,6 +670,13 @@
         "outlier": "Diverge",
         "repeated": "Répété"
       }
+    },
+    "testData": {
+      "button": "Données de test",
+      "hint": "Chargez un JSON pour voir les vrais textes en éditant chaque PDF",
+      "loaded": "chargées",
+      "remove": "Retirer",
+      "applied": "Données de test chargées : elles serviront à l'édition de chaque PDF du lot."
     }
   },
   "preview": {
@@ -697,6 +713,16 @@
       "tooLarge": "Le fichier dépasse 5 Mo.",
       "readFailed": "Impossible de lire le fichier.",
       "empty": "Pas de données de test : les valeurs d'exemple sont utilisées."
+    },
+    "origin": {
+      "group": "Origine de ce qui est affiché",
+      "show": "Afficher l'origine",
+      "value": "valeur",
+      "data": "donnée",
+      "sample": "exemple",
+      "missing": "sans donnée",
+      "mapHint": "La vue Mappage affiche le nom du champ, il n'y a pas d'origine à montrer.",
+      "noneResolved": "Aucun mapField ne correspond aux données de test."
     }
   }
 }

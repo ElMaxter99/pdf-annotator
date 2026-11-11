@@ -59,8 +59,10 @@ import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
 import { MAX_TEST_DATA_BYTES, PreviewSettingsService } from '../../services/preview-settings.service';
 import {
+  fieldOrigin,
   resolveFieldPreview,
   resolveMapPath,
+  type FieldOrigin,
   type PreviewMode,
   type SampleKind,
 } from '../../utils/preview-values.utils';
@@ -639,6 +641,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     });
     effect(() => {
       this.previewSettings.context();
+      this.previewSettings.showOrigin();
+      this.translationService.language();
       untracked(() => this.redrawAllForPage());
     });
     this.vm = this;
@@ -2997,6 +3001,27 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     el.style.width = `${width}px`;
   }
 
+  /** Origin of what a field paints, per field of the current page, for the legend and the chips. */
+  readonly originCounts = computed(() => {
+    const ctx = this.previewSettings.context();
+    const counts = { value: 0, data: 0, sample: 0, missing: 0 };
+    for (const page of this.coords()) {
+      if (page.num !== this.pageIndex()) continue;
+      for (const field of page.fields) {
+        const origin = fieldOrigin(resolveFieldPreview(field, ctx));
+        if (origin) counts[origin] += 1;
+      }
+    }
+    return counts;
+  });
+
+  readonly originLabelKeys: Record<FieldOrigin, string> = {
+    value: 'preview.origin.value',
+    data: 'preview.origin.data',
+    sample: 'preview.origin.sample',
+    missing: 'preview.origin.missing',
+  };
+
   private getFieldRenderValue(field: PageField): string {
     return resolveFieldPreview(field, this.previewSettings.context()).text;
   }
@@ -3015,11 +3040,31 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return count;
   }
 
+  inBatchMode(): boolean {
+    return !!this.migration();
+  }
+
+  setShowOrigin(show: boolean) {
+    this.previewSettings.setShowOrigin(show);
+  }
+
   setPreviewMode(mode: PreviewMode) {
     if (mode === 'data' && !this.previewSettings.hasTestData()) {
       return;
     }
     this.previewSettings.setMode(mode);
+    if (mode === 'data') {
+      this.announceMissingData();
+    }
+  }
+
+  /** Informative notice (recoverable from the bell) with the annotations the test data does not cover. */
+  private announceMissingData() {
+    const { total, resolved } = this.testDataStats();
+    const count = total - resolved;
+    if (count > 0 && !this.inBatchMode()) {
+      this.toast.notice(this.translationService.translate('toast.noData', { count }), 'info');
+    }
   }
 
   onTestDataChange(text: string) {
@@ -3047,6 +3092,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.previewSettings.setTestDataText(await file.text());
       if (this.previewSettings.hasTestData()) {
         this.previewSettings.setMode('data');
+        this.announceMissingData();
       }
     } catch {
       this.toast.error(this.translationService.translate('preview.testData.readFailed'));
@@ -3104,7 +3150,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
           const el = document.createElement('div');
           el.className = 'annotation';
-          el.textContent = this.getFieldRenderValue(styledField);
+          const preview = resolveFieldPreview(styledField, this.previewSettings.context());
+          el.textContent = preview.text;
+          const origin = fieldOrigin(preview);
+          if (origin && this.previewSettings.showOrigin()) {
+            el.dataset['origin'] = origin;
+            el.dataset['originLabel'] = this.translationService.translate(this.originLabelKeys[origin]);
+          }
           el.style.left = `${left}px`;
           el.style.top = `${top - styledField.fontSize * scale}px`;
           el.style.fontSize = `${styledField.fontSize * scale}px`;
@@ -5132,8 +5184,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.rememberPdfBytes(sourceBytes, 3);
       downloadBlob(new Blob([toArrayBuffer(bytes)], { type: 'application/pdf' }), 'annotated.pdf');
       if (sampleFields > 0) {
-        this.toast.warning(
-          this.translationService.translate('toast.exportSampleValues', { count: sampleFields })
+        this.toast.notice(
+          this.translationService.translate('toast.exportSampleValues', { count: sampleFields }),
+          'warning',
         );
       }
     } catch (error) {

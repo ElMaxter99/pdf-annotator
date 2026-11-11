@@ -324,7 +324,16 @@
       "copiedAdjusted": "Camps copiats i ajustats a la mida de B.",
       "adjustApplied": "{{count}} camps copiats, {{moved}} ajustats."
     },
-    "exportSampleValues": "El PDF porta {{count}} camp(s) amb valors de mostra en lloc de dades reals."
+    "exportSampleValues": "El PDF porta {{count}} camp(s) amb valors de mostra en lloc de dades reals.",
+    "bell": {
+      "label": "Avisos tancats ({count})",
+      "title": "Avisos tancats",
+      "showAll": "Mostra'ls tots",
+      "show": "Mostra de nou",
+      "emptyTitle": "Res a recuperar",
+      "emptyHint": "Aquí apareixen els avisos informatius que tanquis."
+    },
+    "noData": "{count} anotacions sense dada a les dades de prova: es pinten amb la mostra."
   },
   "session": {
     "title": "Continua on ho vas deixar",
@@ -661,6 +670,13 @@
         "outlier": "Discrepa",
         "repeated": "Repetit"
       }
+    },
+    "testData": {
+      "button": "Dades de prova",
+      "hint": "Carrega un JSON per veure els textos reals en editar cada PDF",
+      "loaded": "carregades",
+      "remove": "Treu",
+      "applied": "Dades de prova carregades: s'usaran en editar cada PDF del lot."
     }
   },
   "preview": {
@@ -697,6 +713,16 @@
       "tooLarge": "El fitxer supera els 5 MB.",
       "readFailed": "No s'ha pogut llegir el fitxer.",
       "empty": "Sense dades de prova: s'usen els valors de mostra."
+    },
+    "origin": {
+      "group": "Origen del que es pinta",
+      "show": "Mostra l'origen",
+      "value": "valor",
+      "data": "dada",
+      "sample": "mostra",
+      "missing": "sense dada",
+      "mapHint": "A Mapatge es pinta el nom del camp, no hi ha origen per mostrar.",
+      "noneResolved": "Cap mapField coincideix amb les dades de prova."
     }
   }
 }

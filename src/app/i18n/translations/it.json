@@ -324,7 +324,16 @@
       "copiedAdjusted": "Campi copiati e adattati alle dimensioni di B.",
       "adjustApplied": "{{count}} campi copiati, {{moved}} regolati."
     },
-    "exportSampleValues": "Il PDF contiene {{count}} campo/i con valori di esempio invece di dati reali."
+    "exportSampleValues": "Il PDF contiene {{count}} campo/i con valori di esempio invece di dati reali.",
+    "bell": {
+      "label": "Avvisi chiusi ({count})",
+      "title": "Avvisi chiusi",
+      "showAll": "Mostra tutti",
+      "show": "Mostra di nuovo",
+      "emptyTitle": "Niente da recuperare",
+      "emptyHint": "Qui compaiono gli avvisi informativi che chiudi."
+    },
+    "noData": "{count} annotazioni senza dato nei dati di prova: mostrano il loro esempio."
   },
   "session": {
     "title": "Riprendi da dove avevi lasciato",
@@ -661,6 +670,13 @@
         "outlier": "Discrepa",
         "repeated": "Ripetuto"
       }
+    },
+    "testData": {
+      "button": "Dati di prova",
+      "hint": "Carica un JSON per vedere i testi reali modificando ogni PDF",
+      "loaded": "caricati",
+      "remove": "Rimuovi",
+      "applied": "Dati di prova caricati: saranno usati modificando ogni PDF del lotto."
     }
   },
   "preview": {
@@ -697,6 +713,16 @@
       "tooLarge": "Il file supera i 5 MB.",
       "readFailed": "Impossibile leggere il file.",
       "empty": "Nessun dato di prova: si usano i valori di esempio."
+    },
+    "origin": {
+      "group": "Origine di ciò che viene disegnato",
+      "show": "Mostra origine",
+      "value": "valore",
+      "data": "dato",
+      "sample": "esempio",
+      "missing": "senza dato",
+      "mapHint": "La vista Mappatura mostra il nome del campo, non c'è un'origine da mostrare.",
+      "noneResolved": "Nessun mapField corrisponde ai dati di prova."
     }
   }
 }

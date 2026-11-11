@@ -3510,7 +3510,8 @@ kbd {
   padding-top: 44px;
 }
 
-.viewer.viewer--split .selection-bar {
+.viewer.viewer--split .selection-bar,
+.viewer.viewer--split .origin-legend {
   grid-column: 1 / -1;
 }
 
@@ -3986,4 +3987,83 @@ kbd {
 :root.theme-light .preview-data__input {
   background: #f6f7fb;
   border-color: rgba(15, 23, 42, 0.22);
+}
+
+/* M-01 · Origen de lo que se pinta */
+.origin-legend {
+  position: sticky;
+  top: 0;
+  z-index: 19;
+  align-self: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  width: fit-content;
+  margin: 0 0 8px;
+  padding: 5px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border, rgba(148, 163, 184, 0.3));
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+}
+.origin-legend__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.origin-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+}
+.origin-legend__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--origin-color, #64748b);
+}
+.origin-legend__hint {
+  color: var(--muted);
+  font-style: italic;
+}
+.origin-legend [data-origin='value'],
+.annotation[data-origin='value'] { --origin-color: #3b82f6; }
+.origin-legend [data-origin='data'],
+.annotation[data-origin='data'] { --origin-color: #14b8a6; }
+.origin-legend [data-origin='sample'],
+.annotation[data-origin='sample'] { --origin-color: #64748b; }
+.origin-legend [data-origin='missing'],
+.annotation[data-origin='missing'] { --origin-color: #f59e0b; }
+.annotation[data-origin]::before {
+  content: attr(data-origin-label);
+  position: absolute;
+  left: 0;
+  top: -13px;
+  padding: 0 4px;
+  border-radius: 4px;
+  font: 600 9px/12px system-ui, sans-serif;
+  color: #fff;
+  background: var(--origin-color);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.annotation[data-origin='missing'] {
+  outline: 1px dashed var(--origin-color);
+}
+:root.theme-light .origin-legend {
+  background: #fff;
+  border-color: rgba(15, 23, 42, 0.15);
+}
+
+@media (min-width: 961px) and (max-width: 1400px) {
+  .preview-mode__label {
+    display: none;
+  }
+  .toolbar .migration-bell__btn {
+    padding-inline: 8px;
+  }
 }

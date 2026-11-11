@@ -1,5 +1,8 @@
 ## Unreleased
 ### Added
+- **Origin of what is painted (M-01)**: «Mostrar origen» in the viewer legend puts a chip on each annotation (valor / dato / muestra / sin dato) with per-page counters; the choice is remembered (`pdf-annotator.showOrigin`)
+- **Test data in the batch panel (M-02)**: «Datos de prueba» button (load / remove a JSON) in the `/lote` panel header; the same global settings apply when editing each PDF
+- **Closed notices bell (M-03)**: informative notices (export with sample values, annotations without data) can be shown again from a 🔔 in the editor header; errors have no bell. In batch editing the existing notices bell is used
 - **Release scripts**: `npm run release:notes` (prints the CHANGELOG section of a version for the GitHub release), `npm run release:guide` (step-by-step guide with the commands filled in) and `npm run release:deploy` (no arguments needed: it switches to `develop`, pulls, checks everything, asks you to type the version and then aligns `develop` and `master` (fast-forward, or merging `master` into `develop` when they diverged; never forced), creates and pushes `release/vX.Y.Z` and the tag `vX.Y.Z`; `--dry-run` only checks; `bump X.Y.Z` edits the version files locally). Vercel is still deployed by hand
 
 ## [v1.6.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.6.0) - 2026-11-11

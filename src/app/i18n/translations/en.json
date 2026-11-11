@@ -324,7 +324,16 @@
       "copiedAdjusted": "Fields copied and fitted to B's size.",
       "adjustApplied": "{{count}} fields copied, {{moved}} adjusted."
     },
-    "exportSampleValues": "The PDF has {{count}} field(s) with sample values instead of real data."
+    "exportSampleValues": "The PDF has {{count}} field(s) with sample values instead of real data.",
+    "bell": {
+      "label": "Closed notices ({count})",
+      "title": "Closed notices",
+      "showAll": "Show all",
+      "show": "Show again",
+      "emptyTitle": "Nothing to recover",
+      "emptyHint": "Informative notices you close show up here."
+    },
+    "noData": "{count} annotations have no data in the test data: they paint their sample."
   },
   "session": {
     "title": "Pick up where you left off",
@@ -661,6 +670,13 @@
         "outlier": "Disagrees",
         "repeated": "Repeated"
       }
+    },
+    "testData": {
+      "button": "Test data",
+      "hint": "Load a JSON to see real texts while editing each PDF",
+      "loaded": "loaded",
+      "remove": "Remove",
+      "applied": "Test data loaded: it will be used when editing each PDF in the batch."
     }
   },
   "preview": {
@@ -697,6 +713,16 @@
       "tooLarge": "The file is larger than 5 MB.",
       "readFailed": "The file could not be read.",
       "empty": "No test data: sample values are used."
+    },
+    "origin": {
+      "group": "Where each text comes from",
+      "show": "Show origin",
+      "value": "value",
+      "data": "data",
+      "sample": "sample",
+      "missing": "no data",
+      "mapHint": "Map view paints the field name, so there is no origin to show.",
+      "noneResolved": "No mapField matches the test data."
     }
   }
 }

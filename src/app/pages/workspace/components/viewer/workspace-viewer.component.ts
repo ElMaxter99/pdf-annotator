@@ -15,6 +15,8 @@ import { AnnotationEditorComponent } from '../annotation-editor/annotation-edito
 export class WorkspaceViewerComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
 
+  readonly originKinds = ['value', 'data', 'sample', 'missing'] as const;
+
   readonly alignModes: readonly { id: AlignMode; icon: string }[] = [
     { id: 'left', icon: '⇤' },
     { id: 'center', icon: '↔' },
