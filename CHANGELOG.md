@@ -1,3 +1,7 @@
+## Unreleased
+### Added
+- **Release scripts**: `npm run release:notes` (prints the CHANGELOG section of a version for the GitHub release), `npm run release:guide` (step-by-step guide with the commands filled in) and `npm run release:deploy` (dry run by default; with `--execute` and a typed confirmation it aligns `develop` and `master` by fast-forward, creates and pushes `release/vX.Y.Z` and the tag `vX.Y.Z`; `bump X.Y.Z` edits the version files locally). Vercel is still deployed by hand
+
 ## [v1.6.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.6.0) - 2026-11-11
 ### Fixed
 - **«Alternar» now does something visible**: it shows a «Ver B / Ver A» switch that swaps the page between the PDF of B and the PDF of A (before it only hid the dashed fields of A, which looked like nothing when A had no fields). The three modes have a tooltip explaining them
