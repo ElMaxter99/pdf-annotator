@@ -1,4 +1,4 @@
-## Unreleased
+## [v1.6.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.6.0) - 2026-11-11
 ### Fixed
 - **«Alternar» now does something visible**: it shows a «Ver B / Ver A» switch that swaps the page between the PDF of B and the PDF of A (before it only hid the dashed fields of A, which looked like nothing when A had no fields). The three modes have a tooltip explaining them
 - **A new batch starts from zero**: opening the panel of a new batch now replaces the one saved in the browser instead of adding to it (two new PDFs after an unrecovered batch of two used to show four). «Dividida» also no longer leaves A empty when two renders overlap
