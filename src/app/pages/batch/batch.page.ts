@@ -540,7 +540,7 @@ export class BatchPageComponent implements OnInit {
     try {
       this.previewSettings.setTestDataText(await file.text());
       if (this.previewSettings.hasTestData()) {
-        this.previewSettings.setMode('data');
+        this.previewSettings.setBatchMode('data');
         this.toast.show(this.i18n.translate('batch.testData.applied'), 'info');
       } else {
         this.toast.error(this.i18n.translate('preview.testData.readFailed'));

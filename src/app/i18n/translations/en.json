@@ -324,16 +324,15 @@
       "copiedAdjusted": "Fields copied and fitted to B's size.",
       "adjustApplied": "{{count}} fields copied, {{moved}} adjusted."
     },
-    "exportSampleValues": "The PDF has {{count}} field(s) with sample values instead of real data.",
     "bell": {
-      "label": "Closed notices ({count})",
+      "label": "Closed notices ({{count}})",
       "title": "Closed notices",
       "showAll": "Show all",
       "show": "Show again",
       "emptyTitle": "Nothing to recover",
       "emptyHint": "Informative notices you close show up here."
     },
-    "noData": "{count} annotations have no data in the test data: they paint their sample."
+    "noData": "{{count}} annotations have no data in the test data: they paint their sample."
   },
   "session": {
     "title": "Pick up where you left off",
@@ -753,5 +752,17 @@
       "mapHint": "Map view paints the field name, so there is no origin to show.",
       "noneResolved": "No mapField matches the test data."
     }
+  },
+  "exportSamples": {
+    "title": "{{count}} fields would paint a sample value",
+    "lead": "These fields have no «value» and no test data. What should the PDF contain?",
+    "optMap": "Value or mapping field",
+    "optMapHint": "As before: the value or the mapField text is stamped.",
+    "optSample": "Sample values",
+    "optSampleHint": "The sample for the type is stamped (XXXXX, X, 00000).",
+    "recommended": "recommended",
+    "remember": "Remember my choice in this session",
+    "cancel": "Cancel",
+    "continue": "Continue"
   }
 }

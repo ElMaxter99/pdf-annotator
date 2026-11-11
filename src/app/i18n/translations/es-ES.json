@@ -324,16 +324,15 @@
       "copiedAdjusted": "Campos copiados y ajustados al tamaño de B.",
       "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
     },
-    "exportSampleValues": "El PDF lleva {{count}} campo(s) con valores de muestra en vez de datos reales.",
     "bell": {
-      "label": "Avisos cerrados ({count})",
+      "label": "Avisos cerrados ({{count}})",
       "title": "Avisos cerrados",
       "showAll": "Mostrar todos",
       "show": "Mostrar de nuevo",
       "emptyTitle": "Nada que recuperar",
       "emptyHint": "Aquí aparecen los avisos informativos que cierres."
     },
-    "noData": "{count} anotaciones sin dato en los datos de prueba: se pintan con su muestra."
+    "noData": "{{count}} anotaciones sin dato en los datos de prueba: se pintan con su muestra."
   },
   "session": {
     "title": "Continuar donde lo dejaste",
@@ -753,5 +752,17 @@
       "mapHint": "En Mapeo se pinta el nombre del campo, no hay origen que mostrar.",
       "noneResolved": "Ningún mapField coincide con los datos de prueba."
     }
+  },
+  "exportSamples": {
+    "title": "{{count}} campos pintarían un valor de muestra",
+    "lead": "Estos campos no tienen «value» ni dato de prueba. ¿Qué estampamos en el PDF?",
+    "optMap": "Valor o campo de mapeo",
+    "optMapHint": "Como hasta ahora: se estampa el value o el texto del mapField.",
+    "optSample": "Valores de muestra",
+    "optSampleHint": "Se estampa la muestra del tipo (XXXXX, X, 00000).",
+    "recommended": "recomendado",
+    "remember": "Recordar mi elección en esta sesión",
+    "cancel": "Cancelar",
+    "continue": "Continuar"
   }
 }

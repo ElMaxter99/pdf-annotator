@@ -4,6 +4,7 @@
 - **Better preview of the proposal**: arrow and distance for the field under the pointer or selected; highlight in the list, on A and on B at once; «Original» (or hold `P`) shows the fields where they are in A; five clear looks (proposed, estimated, manual, low reliability, unticked); a card on click with the shift, the texts used and a shift typed by hand; «Ver anclas» pins the texts on both pages; a legend under the bar
 
 ### Added
+- **Export asks about sample values (Z-01)**: «Descargar PDF» stamps the value or the mapField text by default; when some annotations would paint a sample, a dialog asks whether to stamp the samples instead (with «Recordar mi elección en esta sesión»). It replaces the warning toast after exporting. Batch editing has its own view, «Mapeo» by default (`pdf-annotator.previewModeBatch`)
 - **Origin of what is painted (M-01)**: «Mostrar origen» in the viewer legend puts a chip on each annotation (valor / dato / muestra / sin dato) with per-page counters; the choice is remembered (`pdf-annotator.showOrigin`)
 - **Test data in the batch panel (M-02)**: «Datos de prueba» button (load / remove a JSON) in the `/lote` panel header; the same global settings apply when editing each PDF
 - **Closed notices bell (M-03)**: informative notices (export with sample values, annotations without data) can be shown again from a 🔔 in the editor header; errors have no bell. In batch editing the existing notices bell is used

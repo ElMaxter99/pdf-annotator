@@ -324,16 +324,15 @@
       "copiedAdjusted": "Campi copiati e adattati alle dimensioni di B.",
       "adjustApplied": "{{count}} campi copiati, {{moved}} regolati."
     },
-    "exportSampleValues": "Il PDF contiene {{count}} campo/i con valori di esempio invece di dati reali.",
     "bell": {
-      "label": "Avvisi chiusi ({count})",
+      "label": "Avvisi chiusi ({{count}})",
       "title": "Avvisi chiusi",
       "showAll": "Mostra tutti",
       "show": "Mostra di nuovo",
       "emptyTitle": "Niente da recuperare",
       "emptyHint": "Qui compaiono gli avvisi informativi che chiudi."
     },
-    "noData": "{count} annotazioni senza dato nei dati di prova: mostrano il loro esempio."
+    "noData": "{{count}} annotazioni senza dato nei dati di prova: mostrano il loro esempio."
   },
   "session": {
     "title": "Riprendi da dove avevi lasciato",
@@ -753,5 +752,17 @@
       "mapHint": "La vista Mappatura mostra il nome del campo, non c'è un'origine da mostrare.",
       "noneResolved": "Nessun mapField corrisponde ai dati di prova."
     }
+  },
+  "exportSamples": {
+    "title": "{{count}} campi mostrerebbero un valore di esempio",
+    "lead": "Questi campi non hanno «value» né dato di prova. Cosa stampiamo nel PDF?",
+    "optMap": "Valore o campo di mappatura",
+    "optMapHint": "Come finora: si stampa il value o il testo del mapField.",
+    "optSample": "Valori di esempio",
+    "optSampleHint": "Si stampa l'esempio del tipo (XXXXX, X, 00000).",
+    "recommended": "consigliato",
+    "remember": "Ricorda la mia scelta in questa sessione",
+    "cancel": "Annulla",
+    "continue": "Continua"
   }
 }
