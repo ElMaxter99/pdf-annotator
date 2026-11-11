@@ -1,0 +1,62 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 109,
+          "y": 742,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{pedido.ref}}"
+        },
+        {
+          "x": 490,
+          "y": 792,
+          "type": "number",
+          "fontSize": 11,
+          "mapField": "{{pedido.totalcab}}",
+          "decimals": 2
+        },
+        {
+          "x": 91.3,
+          "y": 702,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{pedido.cliente}}"
+        },
+        {
+          "x": 440,
+          "y": 302,
+          "type": "number",
+          "fontSize": 11,
+          "mapField": "{{pedido.subtotal}}",
+          "decimals": 2
+        },
+        {
+          "x": 440,
+          "y": 282,
+          "type": "number",
+          "fontSize": 11,
+          "mapField": "{{pedido.iva}}",
+          "decimals": 2
+        },
+        {
+          "x": 440,
+          "y": 262,
+          "type": "number",
+          "fontSize": 11,
+          "mapField": "{{pedido.total}}",
+          "decimals": 2
+        },
+        {
+          "x": 129.6,
+          "y": 302,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{pedido.obs}}"
+        }
+      ]
+    }
+  ]
+}

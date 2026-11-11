@@ -1,0 +1,77 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 95.8,
+          "y": 677,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{cliente.nombre}}"
+        },
+        {
+          "x": 103,
+          "y": 647,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{cliente.apellidos}}"
+        },
+        {
+          "x": 156.8,
+          "y": 617,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{cliente.nacimiento}}"
+        },
+        {
+          "x": 378.9,
+          "y": 677,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{cliente.tel}}"
+        },
+        {
+          "x": 426.7,
+          "y": 647,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{cliente.email}}"
+        }
+      ]
+    },
+    {
+      "num": 2,
+      "fields": [
+        {
+          "x": 149.1,
+          "y": 702,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{banco.titular}}"
+        },
+        {
+          "x": 82.1,
+          "y": 672,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{banco.iban}}"
+        },
+        {
+          "x": 94.7,
+          "y": 642,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{banco.entidad}}"
+        },
+        {
+          "x": 52,
+          "y": 600,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "acepto"
+        }
+      ]
+    }
+  ]
+}

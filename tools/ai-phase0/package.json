@@ -1,0 +1,16 @@
+{
+  "name": "pdf-annotator-ai-phase0",
+  "private": true,
+  "type": "module",
+  "description": "Fase 0: prueba de calidad de la propuesta de coordenadas A→B con IA (Claude Code y Copilot CLI). No forma parte de la app.",
+  "scripts": {
+    "sample": "node make-samples.mjs",
+    "test": "node --test",
+    "run": "node run.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.70",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "5.4.394"
+  }
+}

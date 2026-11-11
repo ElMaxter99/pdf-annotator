@@ -1,0 +1,58 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 150.3,
+          "y": 702,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{contratante.nombre}}"
+        },
+        {
+          "x": 83.3,
+          "y": 662,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{contratante.dni}}"
+        },
+        {
+          "x": 103,
+          "y": 622,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{contratante.domicilio}}"
+        },
+        {
+          "x": 116.7,
+          "y": 582,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{contratante.tel}}"
+        },
+        {
+          "x": 75,
+          "y": 542,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{contratante.fax}}"
+        },
+        {
+          "x": 85.8,
+          "y": 152,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{firma.lugar}}"
+        },
+        {
+          "x": 458.5,
+          "y": 152,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{firma.fecha}}"
+        }
+      ]
+    }
+  ]
+}
