@@ -296,3 +296,63 @@ test('pasted JSON with a syntax error points to the line and does not block', as
   await expect(page.getByTestId('paste-error')).toContainText('línea 2');
   await expect(page.getByTestId('next-start')).toBeEnabled();
 });
+
+test('in a batch «Documento» has no «empezar de cero» and completes the PDF with layers', async ({
+  page,
+}) => {
+  await openPanel(page);
+  await openFirst(page);
+  await page.getByTestId('batch-next').click(); // factura-0332: no template, no new version
+  await expect(page.locator('.annotation')).toHaveCount(0);
+
+  // «Anotaciones» points to «Documento» while there is no template
+  await expect(page.getByTestId('no-template-note')).toBeVisible();
+  await page.getByTestId('no-template-note').getByRole('button').click();
+
+  await expect(page.getByTestId('batch-document')).toBeVisible();
+  await expect(page.getByText('¿Quieres empezar de cero?')).toHaveCount(0);
+  await expect(page.getByTestId('doc-layer-a')).toContainText('Sin plantilla');
+  await expect(page.getByTestId('doc-layer-b')).toContainText('Sin versión nueva');
+
+  // Template A pasted from text: loaded into the editor
+  await page.getByTestId('doc-a-paste').click();
+  await page
+    .getByTestId('doc-a-text')
+    .fill(
+      '{ "pages": [ { "num": 1, "fields": [ { "type": "text", "x": 100, "y": 700, "mapField": "a.b" } ] } ] }',
+    );
+  await page.getByTestId('doc-a-apply').click();
+  await expect(page.getByTestId('doc-layer-a')).toContainText('1 campos');
+  await expect(page.locator('.annotation')).toHaveCount(1);
+
+  // Wrong JSON shows an error and keeps the template
+  await page.getByTestId('doc-a-paste').click();
+  await page.getByTestId('doc-a-text').fill('{ no es json');
+  await page.getByTestId('doc-a-apply').click();
+  await expect(page.getByTestId('doc-a-error')).toBeVisible();
+  await page.getByTestId('doc-a-paste').click();
+
+  // New version B: annotations stay as template A, B starts empty
+  await page
+    .getByTestId('doc-b-input')
+    .setInputFiles(file('factura-0332-nuevo.pdf', pdf, 'application/pdf'));
+  await expect(page.locator('.migration-bar')).toContainText('Editando versión B');
+  await expect(page.getByTestId('doc-layer-b')).toContainText('factura-0332-nuevo.pdf');
+  await expect(page.locator('.annotation')).toHaveCount(0);
+
+  // Removing B asks first and goes back to the original with its template
+  await page.getByTestId('doc-b-remove').click();
+  await expect(page.getByTestId('doc-b-remove-confirm')).toBeVisible();
+  await page.getByTestId('doc-b-remove-yes').click();
+  await expect(page.locator('.migration-bar')).toContainText('Editando con su plantilla');
+  await expect(page.locator('.annotation')).toHaveCount(1);
+
+  // Replacing the PDF asks first and keeps the annotations
+  await page
+    .getByTestId('doc-replace-input')
+    .setInputFiles(file('otro.pdf', pdf, 'application/pdf'));
+  await expect(page.getByTestId('doc-replace-confirm')).toBeVisible();
+  await page.getByTestId('doc-replace-yes').click();
+  await expect(page.getByTestId('batch-document')).toContainText('otro.pdf');
+  await expect(page.locator('.annotation')).toHaveCount(1);
+});

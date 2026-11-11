@@ -319,7 +319,9 @@
       "jsonWithoutPdf": "{{count}} JSON ohne PDF gleichen Namens: ignoriert.",
       "notPersistent": "Dieser Browser kann den Stapel nicht zwischen Besuchen speichern.",
       "samePdf": "{{name}} ist dasselbe PDF wie das Original: es gibt nichts zu migrieren.",
-      "unpaired": "{{count}} PDF ohne Zuordnung: nutze „B hochladen“ in der passenden Zeile."
+      "unpaired": "{{count}} PDF ohne Zuordnung: nutze „B hochladen“ in der passenden Zeile.",
+      "templateApplied": "Vorlage geladen: {{count}} Felder.",
+      "templateFromAnnotations": "Die Anmerkungen des Originals sind jetzt Vorlage A."
     }
   },
   "session": {
@@ -528,6 +530,47 @@
       "discard": "Verwerfen",
       "discarded": "Stapel verworfen."
     },
-    "uploadB": "B hochladen"
+    "uploadB": "B hochladen",
+    "doc": {
+      "meta": "{{pages}} S. · {{index}} von {{total}} im Stapel",
+      "replace": "Ersetzen…",
+      "replaceConfirm": "Dieses PDF durch „{{name}}“ ersetzen? Die Anmerkungen bleiben erhalten.",
+      "replaceYes": "Ersetzen",
+      "cancel": "Abbrechen",
+      "layers": "PDF-Ebenen",
+      "a": {
+        "title": "① Vorlage des Originals (A)",
+        "none": "Keine Vorlage",
+        "fields": "✓ {{count}} Felder",
+        "hint": "Die Anmerkungen des Original-PDFs. Sie sind die Basis zum Bearbeiten dieses PDFs oder die Referenz für die neue Version.",
+        "upload": "JSON hochladen",
+        "paste": "JSON einfügen",
+        "change": "Ändern",
+        "pasteAnother": "Andere einfügen",
+        "remove": "Entfernen",
+        "pasteLabel": "Fügen Sie hier das Vorlagen-JSON ein",
+        "apply": "Anwenden",
+        "replacesNote": "Ersetzt die aktuellen Anmerkungen (rückgängig machbar).",
+        "error": {
+          "tooBig": "Das JSON ist größer als 5 MB.",
+          "json": "Das JSON ist ungültig.",
+          "noPages": "In diesem JSON wurden keine Seiten mit Feldern gefunden."
+        }
+      },
+      "b": {
+        "title": "② Neue Version des PDFs (B)",
+        "none": "Keine neue Version",
+        "added": "✓ Hinzugefügt",
+        "hint": "Gibt es ein überarbeitetes PDF, fügen Sie es hinzu; bearbeitet wird darauf, mit A als Referenz.",
+        "drop": "Neues PDF ablegen",
+        "dropSub": "oder klicken zum Suchen",
+        "change": "Ändern",
+        "remove": "Entfernen",
+        "removeConfirm": "Version B entfernen? Ihre Anmerkungen gehen verloren und das Original-PDF wird wieder mit seiner Vorlage bearbeitet.",
+        "removeYes": "Version B entfernen"
+      },
+      "noTemplateNote": "Keine Vorlage: Sie können die des Originals laden oder unter Dokument eine neue Version hinzufügen.",
+      "noTemplateGo": "Zu Dokument"
+    }
   }
 }

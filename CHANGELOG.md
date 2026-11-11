@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- **«Documento» in a batch completes the PDF**: inside a batch the tab no longer offers «¿Quieres empezar de cero?» (it swapped the batch's PDF by accident). It shows the PDF card with «Reemplazar…» (asks first, keeps the annotations) and two optional layers: the template of the original (A: upload or paste its JSON) and the new version (B: add, change or remove, with confirmation). Annotations already placed become template A when B is added. «Anotaciones» points to «Documento» while a PDF has no template
 - **PDF thumbnails in the batch**: the first page of each PDF is drawn in step 1 and in the panel (grid and list), with a skeleton while it renders and a generic page icon only if it cannot be drawn
 - **Paste JSON templates** in step 2 of the batch: paste an array, one document or several in a row (e.g. an extraction from Mongo; `ObjectId(..)`/`ISODate(..)` and extra fields are ignored). Each template is matched to its PDF by `pdfName` (then `name`, `fileName`, `type`); the leftovers can be assigned by hand. Syntax errors point to the line
 - **Workspace toolbar redesign**: one row that never wraps (icons with tooltips, only «Descargar PDF» keeps its text), shortcuts/theme/language fold into a ⋯ menu below 1200 px, «Limpiar» asks for confirmation, zoom shows a percentage, and the batch bar is a thin strip under it

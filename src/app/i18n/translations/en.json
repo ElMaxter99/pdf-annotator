@@ -319,7 +319,9 @@
       "jsonWithoutPdf": "{{count}} JSON without a PDF of the same name: ignored.",
       "notPersistent": "This browser cannot keep the batch between visits.",
       "samePdf": "{{name}} is the same PDF as the original: there is nothing to migrate.",
-      "unpaired": "{{count}} PDF(s) without a match: use “Upload B” on the right row."
+      "unpaired": "{{count}} PDF(s) without a match: use “Upload B” on the right row.",
+      "templateApplied": "Template loaded: {{count}} fields.",
+      "templateFromAnnotations": "The original’s annotations became template A."
     }
   },
   "session": {
@@ -528,6 +530,47 @@
       "discard": "Discard",
       "discarded": "Batch discarded."
     },
-    "uploadB": "Upload B"
+    "uploadB": "Upload B",
+    "doc": {
+      "meta": "{{pages}} pg. · {{index}} of {{total}} in the batch",
+      "replace": "Replace…",
+      "replaceConfirm": "Replace this PDF with “{{name}}”? Annotations are kept.",
+      "replaceYes": "Replace",
+      "cancel": "Cancel",
+      "layers": "PDF layers",
+      "a": {
+        "title": "① Template of the original (A)",
+        "none": "No template",
+        "fields": "✓ {{count}} fields",
+        "hint": "The annotations of the original PDF. They are the base to edit this PDF or the reference for the new version.",
+        "upload": "Upload JSON",
+        "paste": "Paste JSON",
+        "change": "Change",
+        "pasteAnother": "Paste another",
+        "remove": "Remove",
+        "pasteLabel": "Paste the template JSON here",
+        "apply": "Apply",
+        "replacesNote": "Replaces the current annotations (can be undone).",
+        "error": {
+          "tooBig": "The JSON is larger than 5 MB.",
+          "json": "The JSON is not valid.",
+          "noPages": "No pages with fields were found in that JSON."
+        }
+      },
+      "b": {
+        "title": "② New version of the PDF (B)",
+        "none": "No new version",
+        "added": "✓ Added",
+        "hint": "If there is a redesigned PDF, add it and you edit on it with A as a reference.",
+        "drop": "Drop the new PDF",
+        "dropSub": "or click to browse",
+        "change": "Change",
+        "remove": "Remove",
+        "removeConfirm": "Remove version B? Its annotations are lost and the original PDF is edited again with its template.",
+        "removeYes": "Remove version B"
+      },
+      "noTemplateNote": "No template: you can load the original’s or add a new version in Document.",
+      "noTemplateGo": "Go to Document"
+    }
   }
 }

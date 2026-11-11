@@ -319,7 +319,9 @@
       "jsonWithoutPdf": "{{count}} JSON sin PDF con el mismo nombre: se han ignorado.",
       "notPersistent": "Este navegador no puede guardar el lote entre visitas.",
       "samePdf": "{{name}} es el mismo PDF que el original: no hay cambios que migrar.",
-      "unpaired": "{{count}} PDF sin pareja: usa «Subir B» en la fila que corresponda."
+      "unpaired": "{{count}} PDF sin pareja: usa «Subir B» en la fila que corresponda.",
+      "templateApplied": "Plantilla cargada: {{count}} campos.",
+      "templateFromAnnotations": "Las anotaciones del original pasan a ser la plantilla A."
     }
   },
   "session": {
@@ -528,6 +530,47 @@
       "discard": "Descartar",
       "discarded": "Lote descartado."
     },
-    "uploadB": "Subir B"
+    "uploadB": "Subir B",
+    "doc": {
+      "meta": "{{pages}} pág. · {{index}} de {{total}} del lote",
+      "replace": "Reemplazar…",
+      "replaceConfirm": "¿Reemplazar este PDF por «{{name}}»? Las anotaciones se conservan.",
+      "replaceYes": "Reemplazar",
+      "cancel": "Cancelar",
+      "layers": "Capas del PDF",
+      "a": {
+        "title": "① Plantilla del original (A)",
+        "none": "Sin plantilla",
+        "fields": "✓ {{count}} campos",
+        "hint": "Las anotaciones del PDF original. Sirven de base para editar este PDF o de referencia para la versión nueva.",
+        "upload": "Subir JSON",
+        "paste": "Pegar JSON",
+        "change": "Cambiar",
+        "pasteAnother": "Pegar otra",
+        "remove": "Quitar",
+        "pasteLabel": "Pega aquí el JSON de la plantilla",
+        "apply": "Aplicar",
+        "replacesNote": "Sustituye las anotaciones actuales (se puede deshacer).",
+        "error": {
+          "tooBig": "El JSON supera los 5 MB.",
+          "json": "El JSON no es válido.",
+          "noPages": "No se han encontrado páginas con campos en ese JSON."
+        }
+      },
+      "b": {
+        "title": "② Versión nueva del PDF (B)",
+        "none": "Sin versión nueva",
+        "added": "✓ Añadida",
+        "hint": "Si hay un PDF rediseñado, añádelo y se edita sobre él con A como referencia.",
+        "drop": "Suelta el PDF nuevo",
+        "dropSub": "o haz clic para buscarlo",
+        "change": "Cambiar",
+        "remove": "Quitar",
+        "removeConfirm": "¿Quitar la versión B? Se pierden sus anotaciones y se vuelve a editar el PDF original con su plantilla.",
+        "removeYes": "Quitar versión B"
+      },
+      "noTemplateNote": "Sin plantilla: puedes cargar la del original o añadir una versión nueva en Documento.",
+      "noTemplateGo": "Ir a Documento"
+    }
   }
 }

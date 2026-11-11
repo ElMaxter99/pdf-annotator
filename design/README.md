@@ -62,6 +62,9 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | N-04 Barra · menú, claro y estados | Menú ⋯, «Limpiar» con confirmación, tooltips | [`N-04-barra-menu-claro-estados.dc.html`](canvas/N-04-barra-menu-claro-estados.dc.html) | `components/header` | Aprobado, implementado |
 | N-05 Paso 2 · pegar JSON | Pestaña «Pegar JSON» y emparejado por `pdfName` | [`N-05-paso-2-pegar-json.dc.html`](canvas/N-05-paso-2-pegar-json.dc.html) | `pages/batch` | Aprobado, implementado |
 | N-06 Pegar JSON · casos | Formatos, emparejado y avisos | [`N-06-pegar-json-casos.dc.html`](canvas/N-06-pegar-json-casos.dc.html) | `pages/batch` | Aprobado, implementado |
+| O-01 Documento en lote · qué falla | «Empezar de cero» y capas A/B que faltan en el editor | [`O-01-documento-en-lote-que-falla.dc.html`](canvas/O-01-documento-en-lote-que-falla.dc.html) | — | Aprobado (documento) |
+| O-02 Propuesta 1 · ficha en Documento | Ficha del PDF y tarjetas de capas (plantilla A, versión B) | [`O-02-propuesta-1-ficha-documento.dc.html`](canvas/O-02-propuesta-1-ficha-documento.dc.html) | `components/batch-document` | Aprobado, implementado |
+| O-05 Comparativa y recomendación | Las tres propuestas lado a lado (se eligió la 1) | [`O-05-comparativa-y-recomendacion.dc.html`](canvas/O-05-comparativa-y-recomendacion.dc.html) | — | Aprobado (documento) |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

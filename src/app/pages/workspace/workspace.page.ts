@@ -61,6 +61,8 @@ import {
 import { PendingFileService, PendingRestore } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import type { BatchItem } from '../../models/batch.model';
+import { matchTemplate, parsePastedTemplates } from '../../utils/template-paste.utils';
 import {
   extractPagesCollection,
   normalizeFieldDecimals,
@@ -174,7 +176,6 @@ type OverlayGuide = {
   highlighted?: boolean;
 };
 
-
 interface FontDropdownUiState {
   readonly open: boolean;
   readonly query: string;
@@ -232,7 +233,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly sidebarMinimized = signal(false);
   readonly sidebarTab = signal<SidebarTab>('document');
   readonly annotationCount = computed(() =>
-    this.store.coords().reduce((total, page) => total + page.fields.length, 0)
+    this.store.coords().reduce((total, page) => total + page.fields.length, 0),
   );
   readonly shortcutsOpen = signal(false);
   private readonly translationService = inject(TranslationService);
@@ -323,7 +324,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     moved: boolean;
     dx: number;
     dy: number;
-    items: { el: HTMLElement; startLeft: number; startTop: number; width: number; fontPx: number }[];
+    items: {
+      el: HTMLElement;
+      startLeft: number;
+      startTop: number;
+      width: number;
+      fontPx: number;
+    }[];
   } | null = null;
 
   @ViewChild(WorkspaceHeaderComponent) private headerComponent?: WorkspaceHeaderComponent;
@@ -397,7 +404,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     event.preventDefault();
     this.setSidebarTab(SIDEBAR_TABS[next]);
     this.runAfterRender(() =>
-      this.document?.getElementById(`sidebar-tab-${SIDEBAR_TABS[next]}`)?.focus()
+      this.document?.getElementById(`sidebar-tab-${SIDEBAR_TABS[next]}`)?.focus(),
     );
   }
 
@@ -436,8 +443,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   get jsonTreeComponent() {
     return this.sidebarComponent?.jsonTreeComponent;
   }
-
-
 
   constructor() {
     this.store.setFieldComparator((a, b) => this.areFieldsEqual(a, b));
@@ -484,7 +489,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const pendingRestore = this.pendingFileService.consumePendingRestore();
     if (pendingFile) {
       this.loadPdfFile(pendingFile, pendingRestore).catch((error) =>
-        console.error('No se pudo cargar el PDF pendiente.', error)
+        console.error('No se pudo cargar el PDF pendiente.', error),
       );
     }
   }
@@ -519,7 +524,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     const normalized = this.fontCatalog.normalizeFontFamily(fontId);
     this.updateWorkingField(mode, (field) =>
-      this.ensureFieldStyle({ ...field, fontFamily: normalized })
+      this.ensureFieldStyle({ ...field, fontFamily: normalized }),
     );
     this.redrawAllForPage();
   }
@@ -660,7 +665,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         ...field,
         opacity:
           normalized ?? (typeof field.opacity === 'number' ? field.opacity : DEFAULT_OPACITY),
-      })
+      }),
     );
     this.redrawAllForPage();
   }
@@ -678,7 +683,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.updateWorkingField(mode, (field) =>
-      this.ensureFieldStyle({ ...field, backgroundColor: normalized })
+      this.ensureFieldStyle({ ...field, backgroundColor: normalized }),
     );
     this.redrawAllForPage();
   }
@@ -691,7 +696,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
     }
     this.updateWorkingField(mode, (field) =>
-      this.ensureFieldStyle({ ...field, backgroundColor: null })
+      this.ensureFieldStyle({ ...field, backgroundColor: null }),
     );
     this.redrawAllForPage();
   }
@@ -802,7 +807,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const removedFonts = this.customFonts();
-    const removedOptionIds = removedFonts.map((font) => this.fontCatalog.toCustomFontOptionId(font.id));
+    const removedOptionIds = removedFonts.map((font) =>
+      this.fontCatalog.toCustomFontOptionId(font.id),
+    );
     this.customFontsFeatureEnabled.set(false);
     if (removedOptionIds.length) {
       this.handleRemovedFontOptions(removedOptionIds);
@@ -821,7 +828,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       | 'snapToMargins'
       | 'snapToCenters'
       | 'snapToCustom',
-    checked: boolean
+    checked: boolean,
   ) {
     this.guideSettings.update((settings) => ({ ...settings, [key]: checked }));
     this.refreshOverlay();
@@ -899,7 +906,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private refreshOverlay(
     activeRect?: { left: number; top: number; width: number; height: number } | null,
-    guides?: OverlayGuide[]
+    guides?: OverlayGuide[],
   ) {
     if (activeRect !== undefined) {
       this.overlayDragRect = activeRect;
@@ -954,7 +961,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     settings: GuideSettings,
     width: number,
     height: number,
-    scale: number
+    scale: number,
   ) {
     if (!settings.showGrid) {
       return;
@@ -991,7 +998,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     settings: GuideSettings,
     width: number,
     height: number,
-    scale: number
+    scale: number,
   ) {
     if (!settings.showRulers) {
       return;
@@ -1058,7 +1065,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     settings: GuideSettings,
     width: number,
     height: number,
-    scale: number
+    scale: number,
   ) {
     ctx.save();
     ctx.lineWidth = 1;
@@ -1126,7 +1133,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     ctx: CanvasRenderingContext2D,
     width: number,
     height: number,
-    showAlignment: boolean
+    showAlignment: boolean,
   ) {
     const rect = this.overlayDragRect;
     if (!rect) {
@@ -1170,7 +1177,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       Math.round(rect.left) + 0.5,
       Math.round(rect.top) + 0.5,
       rect.width,
-      rect.height
+      rect.height,
     );
     ctx.restore();
   }
@@ -1181,7 +1188,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     bounds: { minLeft: number; maxLeft: number; minTop: number; maxTop: number },
     el: HTMLDivElement,
     pdfCanvas: HTMLCanvasElement,
-    fontSizePx: number
+    fontSizePx: number,
   ): { left: number; top: number; guides: OverlayGuide[] } {
     if (!this.guidesFeatureEnabled()) {
       return { left: baseLeft, top: baseTop, guides: [] };
@@ -1289,7 +1296,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const includeGuide = (
       orientation: 'vertical' | 'horizontal',
       cand: Candidate,
-      highlighted: boolean
+      highlighted: boolean,
     ) => {
       const key = `${orientation}-${cand.line.toFixed(2)}`;
       const existing = guideMap.get(key);
@@ -1450,7 +1457,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private applyRestoredSession(restore: PendingRestore) {
     const normalized = this.annotationImport.normalizeImportedCoordinates(
       { pages: restore.coords },
-      (field) => this.prepareFieldForStorage(field)
+      (field) => this.prepareFieldForStorage(field),
     );
     if (normalized === null) {
       this.toast.error(this.translationService.translate('toast.sessionRestoreFailed'));
@@ -1563,7 +1570,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       await this.fitWidth();
     }
     this.generatePageThumbnails().catch((error) =>
-      console.error('No se pudieron generar las miniaturas del documento.', error)
+      console.error('No se pudieron generar las miniaturas del documento.', error),
     );
     this.fileDropActive.set(false);
   }
@@ -1670,7 +1677,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
         const page = await doc.getPage(pageNumber);
         const baseViewport = page.getViewport({ scale: 1 });
-        const viewport = page.getViewport({ scale: this.computeThumbnailScale(baseViewport.width) });
+        const viewport = page.getViewport({
+          scale: this.computeThumbnailScale(baseViewport.width),
+        });
         const width = Math.max(1, Math.round(viewport.width));
         const height = Math.max(1, Math.round(viewport.height));
 
@@ -1686,13 +1695,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
         ctx.clearRect(0, 0, width, height);
 
-        await page
-          .render({
-            canvasContext: ctx as unknown as CanvasRenderingContext2D,
-            canvas: null,
-            viewport,
-          })
-          .promise;
+        await page.render({
+          canvasContext: ctx as unknown as CanvasRenderingContext2D,
+          canvas: null,
+          viewport,
+        }).promise;
 
         const blob = await canvas.convertToBlob({ type: 'image/png' });
         const url = URL.createObjectURL(blob);
@@ -1781,13 +1788,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     });
     this.updatePreviewColorState(defaultColor);
   }
-
-
-
-
-
-
-
 
   private updatePreviewColorState(color: string) {
     const hex = ensureHex(color);
@@ -1892,7 +1892,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const normalizedField = this.prepareFieldForStorage(p.field);
     if (
       this.applyCoordsChange(() =>
-        this.coords.update((pages) => addFieldToPages(p.page, normalizedField, pages))
+        this.coords.update((pages) => addFieldToPages(p.page, normalizedField, pages)),
       )
     ) {
       this.syncCoordsTextModel();
@@ -1917,8 +1917,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       if (
         this.applyCoordsChange(() =>
           this.coords.update((pages) =>
-            updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
-          )
+            updateFieldInPages(pageIndex, fieldIndex, sanitized, pages),
+          ),
         )
       ) {
         this.syncCoordsTextModel();
@@ -1944,8 +1944,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) =>
-          updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
-        )
+          updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages),
+        ),
       )
     ) {
       this.syncCoordsTextModel();
@@ -2187,7 +2187,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!e) return;
     if (
       this.applyCoordsChange(() =>
-        this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages))
+        this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages)),
       )
     ) {
       this.syncCoordsTextModel();
@@ -2342,9 +2342,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-
-
-
   private updateWorkingField(mode: EditorMode, mutator: (field: PageField) => PageField) {
     if (mode === 'preview') {
       this.preview.update((state) => {
@@ -2368,12 +2365,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return nextField === state.field ? state : { ...state, field: nextField };
     });
   }
-
-
-
-
-
-
 
   private normalizeOpacityValue(value: unknown): number | undefined {
     const numeric = toFiniteNumber(value);
@@ -2431,8 +2422,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       hidden,
     };
   }
-
-
 
   private async registerCustomFont(file: File) {
     if (typeof FontFace === 'undefined') {
@@ -2521,8 +2510,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
             return styledField;
           });
           return pageChanged ? { ...page, fields: nextFields } : page;
-        })
-      )
+        }),
+      ),
     );
 
     if (changed) {
@@ -2552,7 +2541,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private computeHorizontalBounds(
     width: number,
-    canvasWidth: number
+    canvasWidth: number,
   ): { minLeft: number; maxLeft: number } {
     const elementWidth = Math.max(width, 0);
     const min = 0;
@@ -2636,7 +2625,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private locateJsonFieldRange(
     pageIndex: number,
     fieldIndex: number,
-    text: string
+    text: string,
   ): { start: number; end: number } | null {
     if (!text) {
       return null;
@@ -2702,7 +2691,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private highlightTextareaRange(
     textarea: HTMLTextAreaElement,
-    range: { start: number; end: number }
+    range: { start: number; end: number },
   ) {
     const { start, end } = range;
     if (start < 0 || end <= start) {
@@ -2829,8 +2818,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     el.style.width = `${width}px`;
   }
 
-
-
   private getFieldRenderValue(field: PageField): string {
     const override =
       typeof field.value === 'string' && field.value.trim() ? field.value : undefined;
@@ -2858,9 +2845,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     return baseText;
   }
-
-
-
 
   redrawAllForPage() {
     const layer = this.annotationsLayerRef?.nativeElement;
@@ -2890,7 +2874,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           el.style.fontSize = `${styledField.fontSize * scale}px`;
           el.style.color = styledField.color;
           el.style.fontFamily = this.fontCatalog.resolveCssFontFamily(
-            styledField.fontFamily ?? DEFAULT_FONT_ID
+            styledField.fontFamily ?? DEFAULT_FONT_ID,
           );
           el.style.opacity = `${styledField.opacity ?? DEFAULT_OPACITY}`;
           el.style.backgroundColor = styledField.backgroundColor ?? 'transparent';
@@ -2978,7 +2962,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         for (const field of aPage.fields) {
           const name = (field.mapField || field.value || '').trim();
           const missing = states.some(
-            (state) => state.status === 'missing' && state.page === page && state.name === name
+            (state) => state.status === 'missing' && state.page === page && state.name === name,
           );
           draw(name, field.x, field.y, field.fontSize, missing);
         }
@@ -3001,7 +2985,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     return (
       this.annotationImport.normalizeImportedCoordinates({ pages: item.aPages }, (field) =>
-        this.prepareFieldForStorage(field)
+        this.prepareFieldForStorage(field),
       ) ?? []
     );
   }
@@ -3016,7 +3000,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.replaceCoords(this.normalizedTemplateA());
       return;
     }
-    this.addMissingFromA(this.migration()?.states.filter((state) => state.status === 'missing') ?? []);
+    this.addMissingFromA(
+      this.migration()?.states.filter((state) => state.status === 'missing') ?? [],
+    );
   }
 
   placeMissing(state: FieldState) {
@@ -3033,7 +3019,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           (field) =>
             (field.mapField || field.value || '').trim() === state.name &&
             field.x === state.a?.x &&
-            field.y === state.a?.y
+            field.y === state.a?.y,
         );
       if (source) {
         toAdd.push({ page: state.page, field: { ...source } });
@@ -3144,11 +3130,136 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.flushBatchSave();
     this.batch.activate(target.id);
     this.clearSelection();
-    const file = new File([target.bPdf ?? target.aPdf], target.bName ?? target.name, {
+    await this.openBatchPdf(target);
+  }
+
+  /** Loads the PDF to edit for a batch item: B when it has one, otherwise A with its template. */
+  private async openBatchPdf(
+    item: BatchItem,
+    coordsOverride: PageAnnotations[] | null = null,
+  ): Promise<void> {
+    const file = new File([item.bPdf ?? item.aPdf], item.bName ?? item.name, {
       type: 'application/pdf',
     });
-    const coords = target.bPages ?? (target.bPdf ? null : target.aPages);
+    const coords = coordsOverride ?? item.bPages ?? (item.bPdf ? null : item.aPages);
     await this.loadPdfFile(file, coords ? { coords, pageIndex: 1, scale: 0.75 } : null);
+  }
+
+  /** «Documento» tab of a batch PDF: swaps the PDF being edited and keeps its annotations. */
+  async batchReplacePdf(file: File): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    if (!isPdfFile(file)) {
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
+    this.flushBatchSave(true);
+    this.batch.replacePdf(item.id, file);
+    this.clearSelection();
+    const updated = this.batch.activeItem();
+    if (updated) {
+      await this.openBatchPdf(updated, this.store.snapshot());
+    }
+  }
+
+  /** Adds the new version (B). Annotations already placed become the template A if it was empty. */
+  async batchAddVersionB(file: File): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    if (!isPdfFile(file)) {
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
+    const placed = this.store.snapshot();
+    if (
+      !item.bPdf &&
+      !item.aPages.some((page) => page.fields.length) &&
+      placed.some((p) => p.fields.length)
+    ) {
+      this.batch.setTemplate(item.id, placed);
+      this.toast.show(this.translationService.translate('toast.batch.templateFromAnnotations'));
+    }
+    this.batch.setB(item.id, file);
+    this.clearSelection();
+    const updated = this.batch.activeItem();
+    if (updated) {
+      await this.openBatchPdf(updated);
+    }
+  }
+
+  /** Drops B and goes back to editing the original PDF with its template. */
+  async batchRemoveVersionB(): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    this.batch.removeB(item.id);
+    this.clearSelection();
+    const updated = this.batch.activeItem();
+    if (updated) {
+      await this.openBatchPdf(updated);
+    }
+  }
+
+  /**
+   * Sets the template A from a JSON file or pasted text. Returns an error key, or `null` when it
+   * worked. Without B the template is also loaded into the editor (one undo step).
+   */
+  async batchSetTemplate(
+    source: { file: File } | { text: string },
+  ): Promise<'tooBig' | 'json' | 'noPages' | null> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return null;
+    }
+    let data: unknown;
+    try {
+      if ('file' in source) {
+        if (source.file.size > 5 * 1024 * 1024) {
+          return 'tooBig';
+        }
+        data = parseLooseJson(await source.file.text());
+      } else {
+        if (source.text.length > 5 * 1024 * 1024) {
+          return 'tooBig';
+        }
+        const { templates, error } = parsePastedTemplates(source.text);
+        if (error) {
+          return 'json';
+        }
+        data = (matchTemplate(item.name, templates, new Set()) ?? templates[0])?.data;
+        if (data === undefined) {
+          return 'noPages';
+        }
+      }
+    } catch {
+      return 'json';
+    }
+    const pages = this.annotationImport.normalizeImportedCoordinates(data, (field) => field);
+    if (pages === null) {
+      return 'noPages';
+    }
+    this.batch.setTemplate(item.id, pages);
+    const count = pages.reduce((sum, page) => sum + page.fields.length, 0);
+    if (!item.bPdf) {
+      this.replaceCoords(this.normalizedTemplateA());
+    } else {
+      this.redrawReference();
+    }
+    this.toast.show(this.translationService.translate('toast.batch.templateApplied', { count }));
+    return null;
+  }
+
+  batchRemoveTemplate(): void {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.setTemplate(item.id, []);
+      this.redrawReference();
+    }
   }
 
   async backToBatch() {
@@ -3199,8 +3310,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (pageIndex < 0) {
       return;
     }
-    const fields = this.coords()[pageIndex].fields
-      .map((field, index) => ({ field, index }))
+    const fields = this.coords()
+      [pageIndex].fields.map((field, index) => ({ field, index }))
       .filter(({ field }) => !field.locked)
       .map(({ index }) => index);
     this.dismissEditors();
@@ -3250,7 +3361,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Rubber-band rectangle (px, relative to the page) while dragging on an empty area. */
   readonly lasso = signal<{ left: number; top: number; width: number; height: number } | null>(
-    null
+    null,
   );
   private lassoDrag: {
     pointerId: number;
@@ -3329,7 +3440,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         const r = el.getBoundingClientRect();
         return r.right >= x1 && r.left <= x2 && r.bottom >= y1 && r.top <= y2;
       })
-      .map((el) => ({ pageIndex: Number(el.dataset['pageIndex']), field: Number(el.dataset['fieldIndex']) }));
+      .map((el) => ({
+        pageIndex: Number(el.dataset['pageIndex']),
+        field: Number(el.dataset['fieldIndex']),
+      }));
 
     const previous = this.selection();
     const pageIndex = hit[0]?.pageIndex ?? previous?.pageIndex ?? 0;
@@ -3354,7 +3468,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         x: this.roundToTwo(this.clamp(field.x + dx, 0, maxX)),
         y: this.roundToTwo(this.clamp(field.y + dy, 0, maxY)),
       }),
-      coalesceKey
+      coalesceKey,
     );
   }
 
@@ -3370,10 +3484,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           .map((page, index) =>
             index === selected.pageIndex
               ? { ...page, fields: page.fields.filter((_, i) => !doomed.has(i)) }
-              : page
+              : page,
           )
-          .filter((page) => page.fields.length > 0)
-      )
+          .filter((page) => page.fields.length > 0),
+      ),
     );
     this.selection.set(null);
     if (changed) {
@@ -3427,7 +3541,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         const existing = pages.find((page) => page.num === pageNum);
         firstIndex = existing ? existing.fields.length : 0;
         return copies.reduce((acc, copy) => addFieldToPages(pageNum, copy, acc), pages);
-      })
+      }),
     );
     if (!changed) {
       return false;
@@ -3456,7 +3570,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Applies `update` to every selected field in a single history step. */
   private updateSelectedFields(
     update: (field: PageField, order: number) => PageField,
-    coalesceKey?: string
+    coalesceKey?: string,
   ): void {
     const selected = this.selection();
     if (!selected) {
@@ -3472,12 +3586,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
               : {
                   ...page,
                   fields: page.fields.map((field, fieldIdx) =>
-                    order.has(fieldIdx) ? update(field, order.get(fieldIdx)!) : field
+                    order.has(fieldIdx) ? update(field, order.get(fieldIdx)!) : field,
                   ),
-                }
-          )
+                },
+          ),
         ),
-      coalesceKey ? { coalesceKey } : undefined
+      coalesceKey ? { coalesceKey } : undefined,
     );
     if (changed) {
       this.syncCoordsTextModel();
@@ -3488,7 +3602,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Rendered width of an annotation in px (falls back to a rough estimate before first paint). */
   private annotationWidthPx(pageIndex: number, fieldIndex: number, field: PageField): number {
     const el = this.annotationsLayerRef?.nativeElement.querySelector<HTMLElement>(
-      `[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`
+      `[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`,
     );
     if (el && el.offsetWidth > 0) {
       return el.offsetWidth;
@@ -3506,9 +3620,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     const items = fields
-      .map((index) =>
-        layer.querySelector<HTMLElement>(`[data-field-index="${index}"]`)
-      )
+      .map((index) => layer.querySelector<HTMLElement>(`[data-field-index="${index}"]`))
       .filter((el): el is HTMLElement => !!el)
       .map((el) => ({
         el,
@@ -3598,7 +3710,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private handleLockedAnnotationPointerDown(
     evt: PointerEvent,
     pageIndex: number,
-    fieldIndex: number
+    fieldIndex: number,
   ) {
     evt.preventDefault();
     evt.stopPropagation();
@@ -3675,7 +3787,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           width: el.offsetWidth,
           height: el.offsetHeight,
         },
-        []
+        [],
       );
     } else {
       this.refreshOverlay(null, []);
@@ -3705,7 +3817,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const horizontalBounds = this.computeHorizontalBounds(elementWidth, pdfCanvas.width);
     const clampedLeft = Math.min(
       Math.max(tentativeLeft, horizontalBounds.minLeft),
-      horizontalBounds.maxLeft
+      horizontalBounds.maxLeft,
     );
     const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
 
@@ -3724,7 +3836,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       { minLeft: horizontalBounds.minLeft, maxLeft: horizontalBounds.maxLeft, minTop, maxTop },
       el,
       pdfCanvas,
-      this.dragInfo.fontSize
+      this.dragInfo.fontSize,
     );
 
     el.style.left = `${snapResult.left}px`;
@@ -3737,7 +3849,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         width: el.offsetWidth,
         height: el.offsetHeight,
       },
-      snapResult.guides
+      snapResult.guides,
     );
   };
 
@@ -3773,7 +3885,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         left,
         top,
         drag.fontSize,
-        drag.width || el.offsetWidth
+        drag.width || el.offsetWidth,
       );
     } else if (evt.type !== 'pointercancel') {
       const page = this.coords()[drag.pageIndex];
@@ -3790,7 +3902,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     leftPx: number,
     topPx: number,
     fontSizePx: number,
-    widthPx: number
+    widthPx: number,
   ) {
     const pdfCanvas = this.pdfCanvasRef?.nativeElement;
     if (!pdfCanvas) return;
@@ -3819,11 +3931,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           const updatedFields = page.fields.map((currentField, fIdx) =>
             fIdx === fieldIndex
               ? this.ensureFieldStyle({ ...currentField, x: newX, y: newY })
-              : currentField
+              : currentField,
           );
           return { ...page, fields: updatedFields };
-        })
-      )
+        }),
+      ),
     );
 
     if (changed) {
@@ -3838,10 +3950,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
-    const clamped = Math.min(
-      this.pdfDoc.numPages,
-      Math.max(1, Math.round(pageNumber))
-    );
+    const clamped = Math.min(this.pdfDoc.numPages, Math.max(1, Math.round(pageNumber)));
 
     if (clamped === this.pageIndex()) {
       return;
@@ -3976,7 +4085,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const normalized = this.annotationImport.normalizeImportedCoordinates(
         parsed,
         (field) => this.prepareFieldForStorage(field),
-        report
+        report,
       );
 
       if (normalized === null) {
@@ -4025,7 +4134,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const normalized = this.annotationImport.normalizeImportedCoordinates(
         parsed,
         (field) => this.prepareFieldForStorage(field),
-        report
+        report,
       );
       if (normalized === null) {
         throw new JsonShapeError();
@@ -4112,7 +4221,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.redrawAllForPage();
   }
 
-
   private ensureCoordsFileInput(): HTMLInputElement | null {
     if (this.coordsFileInputFallback) {
       return this.coordsFileInputFallback;
@@ -4186,7 +4294,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       .map((entry) => entry.bytes.slice());
   }
 
-
   private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
     if (!data) return;
     const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
@@ -4216,9 +4323,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-  private serializePageForJson(
-    page: PageAnnotations
-  ): { num: number; fields: Array<Record<string, unknown>> } {
+  private serializePageForJson(page: PageAnnotations): {
+    num: number;
+    fields: Array<Record<string, unknown>>;
+  } {
     return {
       num: page.num,
       fields: page.fields.map((field) => this.serializeFieldForJson(field)),
@@ -4247,7 +4355,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private replaceCoords(
     newCoords: PageAnnotations[],
-    options?: { skipHistory?: boolean; preserveTextModel?: boolean }
+    options?: { skipHistory?: boolean; preserveTextModel?: boolean },
   ) {
     const snapshot = this.snapshotCoords(newCoords);
     this.selection.set(null);
@@ -4269,7 +4377,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private resetHistory() {
     this.store.resetHistory();
   }
-
 
   private areFieldsEqual(a: PageField, b: PageField): boolean {
     const sanitizedA = this.prepareFieldForStorage(a);
@@ -4335,7 +4442,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         }
         const { width, height } = (await doc.getPage(page.num)).getViewport({ scale: 1 });
         outOfPage += page.fields.filter(
-          (field) => field.x < 0 || field.y < 0 || field.x > width || field.y > height
+          (field) => field.x < 0 || field.y < 0 || field.x > width || field.y > height,
         ).length;
       }
     }
@@ -4364,19 +4471,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         this.translationService.translate('toast.importJsonFailedAt', {
           line: error.line,
           column: error.column,
-        })
+        }),
       );
       return;
     }
 
-    const key = error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
+    const key =
+      error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
     this.toast.error(this.translationService.translate(key));
   }
-
-
-
-
-
 
   private isEditableElement(target: EventTarget | null): boolean {
     const el = target as HTMLElement | null;

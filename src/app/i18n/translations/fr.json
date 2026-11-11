@@ -319,7 +319,9 @@
       "jsonWithoutPdf": "{{count}} JSON sans PDF du même nom : ignoré(s).",
       "notPersistent": "Ce navigateur ne peut pas conserver le lot entre deux visites.",
       "samePdf": "{{name}} est le même PDF que l’original : rien à migrer.",
-      "unpaired": "{{count}} PDF sans correspondance : utilisez « Envoyer B » sur la bonne ligne."
+      "unpaired": "{{count}} PDF sans correspondance : utilisez « Envoyer B » sur la bonne ligne.",
+      "templateApplied": "Modèle chargé : {{count}} champs.",
+      "templateFromAnnotations": "Les annotations de l’original deviennent le modèle A."
     }
   },
   "session": {
@@ -528,6 +530,47 @@
       "discard": "Abandonner",
       "discarded": "Lot abandonné."
     },
-    "uploadB": "Importer B"
+    "uploadB": "Importer B",
+    "doc": {
+      "meta": "{{pages}} p. · {{index}} sur {{total}} du lot",
+      "replace": "Remplacer…",
+      "replaceConfirm": "Remplacer ce PDF par « {{name}} » ? Les annotations sont conservées.",
+      "replaceYes": "Remplacer",
+      "cancel": "Annuler",
+      "layers": "Calques du PDF",
+      "a": {
+        "title": "① Modèle de l’original (A)",
+        "none": "Sans modèle",
+        "fields": "✓ {{count}} champs",
+        "hint": "Les annotations du PDF d’origine. Elles servent de base pour modifier ce PDF ou de référence pour la nouvelle version.",
+        "upload": "Importer un JSON",
+        "paste": "Coller un JSON",
+        "change": "Changer",
+        "pasteAnother": "En coller un autre",
+        "remove": "Retirer",
+        "pasteLabel": "Collez ici le JSON du modèle",
+        "apply": "Appliquer",
+        "replacesNote": "Remplace les annotations actuelles (annulable).",
+        "error": {
+          "tooBig": "Le JSON dépasse 5 Mo.",
+          "json": "Le JSON n’est pas valide.",
+          "noPages": "Aucune page avec des champs trouvée dans ce JSON."
+        }
+      },
+      "b": {
+        "title": "② Nouvelle version du PDF (B)",
+        "none": "Sans nouvelle version",
+        "added": "✓ Ajoutée",
+        "hint": "S’il existe un PDF remanié, ajoutez-le : on le modifie avec A comme référence.",
+        "drop": "Déposez le nouveau PDF",
+        "dropSub": "ou cliquez pour le chercher",
+        "change": "Changer",
+        "remove": "Retirer",
+        "removeConfirm": "Retirer la version B ? Ses annotations sont perdues et le PDF d’origine est de nouveau modifié avec son modèle.",
+        "removeYes": "Retirer la version B"
+      },
+      "noTemplateNote": "Sans modèle : vous pouvez charger celui de l’original ou ajouter une nouvelle version dans Document.",
+      "noTemplateGo": "Aller à Document"
+    }
   }
 }

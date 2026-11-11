@@ -44,7 +44,8 @@
 
   <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-document" aria-labelledby="sidebar-tab-document"
     [hidden]="vm.sidebarTab() !== 'document'">
-  <section class="sidebar-upload" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
+  <app-batch-document *ngIf="vm.batchCtx()" [vm]="vm"></app-batch-document>
+  <section class="sidebar-upload" *ngIf="!vm.batchCtx()" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
     (keydown)="vm.onFileUploadKeydown($event)" (dragover)="vm.onFileDragOver($event)"
     (dragleave)="vm.onFileDragLeave($event)" (drop)="vm.onFileDrop($event)"
     [class.sidebar-upload--active]="vm.fileDropActive()" [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t">
@@ -73,6 +74,12 @@
   <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-annotations" aria-labelledby="sidebar-tab-annotations"
     [hidden]="vm.sidebarTab() !== 'annotations'">
   <app-migration-panel [vm]="vm"></app-migration-panel>
+  <ng-container *ngIf="vm.batchCtx() as ctx">
+    <div class="migration-note" *ngIf="!vm.migration() && !ctx.item.aPages.length && !vm.annotationCount()" data-testid="no-template-note">
+      <p>{{ 'batch.doc.noTemplateNote' | t }}</p>
+      <button type="button" class="btn btn--ghost" (click)="vm.setSidebarTab('document')">{{ 'batch.doc.noTemplateGo' | t }}</button>
+    </div>
+  </ng-container>
   <div class="sidebar-actions">
     <button type="button" class="btn" (click)="vm.triggerImportCoords()">
       {{ 'sidebar.importJsonFile' | t }}

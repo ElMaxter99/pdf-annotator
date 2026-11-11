@@ -319,7 +319,9 @@
       "jsonWithoutPdf": "{{count}} JSON sense PDF amb el mateix nom: s’han ignorat.",
       "notPersistent": "Aquest navegador no pot desar el lot entre visites.",
       "samePdf": "{{name}} és el mateix PDF que l’original: no hi ha res a migrar.",
-      "unpaired": "{{count}} PDF sense parella: usa «Puja B» a la fila corresponent."
+      "unpaired": "{{count}} PDF sense parella: usa «Puja B» a la fila corresponent.",
+      "templateApplied": "Plantilla carregada: {{count}} camps.",
+      "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A."
     }
   },
   "session": {
@@ -528,6 +530,47 @@
       "discard": "Descartar",
       "discarded": "Lot descartat."
     },
-    "uploadB": "Pujar B"
+    "uploadB": "Pujar B",
+    "doc": {
+      "meta": "{{pages}} pàg. · {{index}} de {{total}} del lot",
+      "replace": "Reemplaça…",
+      "replaceConfirm": "Vols reemplaçar aquest PDF per «{{name}}»? Les anotacions es conserven.",
+      "replaceYes": "Reemplaça",
+      "cancel": "Cancel·la",
+      "layers": "Capes del PDF",
+      "a": {
+        "title": "① Plantilla de l’original (A)",
+        "none": "Sense plantilla",
+        "fields": "✓ {{count}} camps",
+        "hint": "Les anotacions del PDF original. Serveixen de base per editar aquest PDF o de referència per a la versió nova.",
+        "upload": "Puja JSON",
+        "paste": "Enganxa JSON",
+        "change": "Canvia",
+        "pasteAnother": "Enganxa’n una altra",
+        "remove": "Treu",
+        "pasteLabel": "Enganxa aquí el JSON de la plantilla",
+        "apply": "Aplica",
+        "replacesNote": "Substitueix les anotacions actuals (es pot desfer).",
+        "error": {
+          "tooBig": "El JSON supera els 5 MB.",
+          "json": "El JSON no és vàlid.",
+          "noPages": "No s’han trobat pàgines amb camps en aquest JSON."
+        }
+      },
+      "b": {
+        "title": "② Versió nova del PDF (B)",
+        "none": "Sense versió nova",
+        "added": "✓ Afegida",
+        "hint": "Si hi ha un PDF redissenyat, afegeix-lo i s’edita sobre ell amb A de referència.",
+        "drop": "Deixa anar el PDF nou",
+        "dropSub": "o fes clic per cercar-lo",
+        "change": "Canvia",
+        "remove": "Treu",
+        "removeConfirm": "Vols treure la versió B? Es perden les seves anotacions i es torna a editar el PDF original amb la seva plantilla.",
+        "removeYes": "Treu la versió B"
+      },
+      "noTemplateNote": "Sense plantilla: pots carregar la de l’original o afegir una versió nova a Document.",
+      "noTemplateGo": "Ves a Document"
+    }
   }
 }

@@ -82,6 +82,15 @@ export class BatchStoreService {
     });
   }
 
+  /** Swaps the PDF being edited (B when there is one, otherwise A) keeping everything else. */
+  replacePdf(id: string, file: File): void {
+    const item = this.find(id);
+    if (!item) {
+      return;
+    }
+    this.patch(id, item.bPdf ? { bPdf: file, bName: file.name } : { aPdf: file, name: file.name });
+  }
+
   removeB(id: string): void {
     this.patch(id, {
       bPdf: null,
