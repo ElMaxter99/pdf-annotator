@@ -319,7 +319,6 @@
       "jsonWithoutPdf": "{{count}} JSON sense PDF amb el mateix nom: s’han ignorat.",
       "notPersistent": "Aquest navegador no pot desar el lot entre visites.",
       "samePdf": "{{name}} és el mateix PDF que l’original: no hi ha res a migrar.",
-      "unpaired": "{{count}} PDF sense parella: usa «Puja B» a la fila corresponent.",
       "templateApplied": "Plantilla carregada: {{count}} camps.",
       "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A."
     }
@@ -467,10 +466,8 @@
       "label": "Passos del lot",
       "pdfs": "Pujar PDF",
       "templates": "Plantilles",
-      "start": "Començar",
       "required": "Obligatori",
-      "optional": "Opcional",
-      "summary": "Resum"
+      "optional": "Opcional"
     },
     "step1": {
       "title": "1 · Pujar els PDF",
@@ -491,7 +488,7 @@
       "empty": "Buit",
       "remove": "Treure la plantilla de {{name}}",
       "skip": "Saltar aquest pas",
-      "next": "Següent: Començar →",
+      "next": "Obrir el tauler →",
       "tabsLabel": "Com pujar les plantilles",
       "tabFiles": "Fitxers",
       "tabPaste": "Enganxar JSON",
@@ -504,23 +501,23 @@
       "pasteError": "JSON no vàlid: reviseu la línia {{line}}.",
       "pasteTooBig": "El text enganxat supera els 5 MB.",
       "assign": "Assignar plantilla a {{name}}",
-      "assignPlaceholder": "Assignar…"
-    },
-    "step3": {
-      "title": "3 · Tot a punt per començar",
+      "assignPlaceholder": "Assignar…",
       "pdfs": "PDF",
       "withTemplate": "amb plantilla",
-      "withoutTemplate": "sense plantilla",
-      "inPlace": "Editar cada PDF amb la seva plantilla",
-      "inPlaceText": "Cada PDF s'obre amb el seu JSON i ajusteu el que calgui.",
-      "versions": "Tinc noves versions (B) d'aquests PDF",
-      "versionsText": "Les pujareu al tauler: la plantilla passa a B i A queda com a capa de referència.",
-      "open": "Obrir el tauler →"
+      "withoutTemplate": "sense plantilla"
     },
     "versionsDrop": {
-      "title": "Deixeu anar aquí les versions B",
-      "text": "S'aparellen pel nom amb cada PDF; els que no encaixin s'assignen a mà.",
-      "hide": "Amagar"
+      "title": "Versions noves (B)",
+      "text": "Tens PDF redissenyats? Deixa'ls aquí i s'aparellen pel nom amb cada PDF del lot.",
+      "choose": "Tria fitxers",
+      "addedTitle": "Versions B afegides: {{count}}",
+      "addedText": "La resta continua sense versió B. Pots deixar-ne més aquí.",
+      "more": "Afegeix-ne més",
+      "unpairedTitle": "Fitxers sense parella: {{count}}",
+      "unpairedText": "No coincideixen amb cap PDF del lot: assigna'ls a mà o descarta'ls.",
+      "assign": "Assigna a…",
+      "assignLabel": "Assigna {{name}} a un PDF",
+      "discard": "Descarta"
     },
     "filter": {
       "label": "Filtrar per estat",

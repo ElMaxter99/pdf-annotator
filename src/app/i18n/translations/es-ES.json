@@ -319,7 +319,6 @@
       "jsonWithoutPdf": "{{count}} JSON sin PDF con el mismo nombre: se han ignorado.",
       "notPersistent": "Este navegador no puede guardar el lote entre visitas.",
       "samePdf": "{{name}} es el mismo PDF que el original: no hay cambios que migrar.",
-      "unpaired": "{{count}} PDF sin pareja: usa «Subir B» en la fila que corresponda.",
       "templateApplied": "Plantilla cargada: {{count}} campos.",
       "templateFromAnnotations": "Las anotaciones del original pasan a ser la plantilla A."
     }
@@ -467,10 +466,8 @@
       "label": "Pasos del lote",
       "pdfs": "Subir PDF",
       "templates": "Plantillas",
-      "start": "Empezar",
       "required": "Obligatorio",
-      "optional": "Opcional",
-      "summary": "Resumen"
+      "optional": "Opcional"
     },
     "step1": {
       "title": "1 · Subir los PDF",
@@ -491,7 +488,7 @@
       "empty": "Vacío",
       "remove": "Quitar la plantilla de {{name}}",
       "skip": "Saltar este paso",
-      "next": "Siguiente: Empezar →",
+      "next": "Abrir el panel →",
       "tabsLabel": "Cómo subir las plantillas",
       "tabFiles": "Archivos",
       "tabPaste": "Pegar JSON",
@@ -504,23 +501,23 @@
       "pasteError": "JSON no válido: revisa la línea {{line}}.",
       "pasteTooBig": "El texto pasado supera los 5 MB.",
       "assign": "Asignar plantilla a {{name}}",
-      "assignPlaceholder": "Asignar…"
-    },
-    "step3": {
-      "title": "3 · Todo listo para empezar",
+      "assignPlaceholder": "Asignar…",
       "pdfs": "PDFs",
       "withTemplate": "con plantilla",
-      "withoutTemplate": "sin plantilla",
-      "inPlace": "Editar cada PDF con su plantilla",
-      "inPlaceText": "Cada PDF se abre con su JSON y ajustas lo que haga falta.",
-      "versions": "Tengo nuevas versiones (B) de estos PDFs",
-      "versionsText": "Las subirás en el panel: la plantilla se lleva a B y A queda como capa de referencia.",
-      "open": "Abrir el panel →"
+      "withoutTemplate": "sin plantilla"
     },
     "versionsDrop": {
-      "title": "Suelta aquí las versiones B",
-      "text": "Se emparejan por nombre con cada PDF; los que no cuadren se asignan a mano.",
-      "hide": "Ocultar"
+      "title": "Versiones nuevas (B)",
+      "text": "¿Tienes PDFs rediseñados? Suéltalos aquí y se emparejan por nombre con cada PDF del lote.",
+      "choose": "Elegir archivos",
+      "addedTitle": "Versiones B añadidas: {{count}}",
+      "addedText": "El resto sigue sin versión B. Puedes soltar más aquí.",
+      "more": "Añadir más",
+      "unpairedTitle": "Archivos sin pareja: {{count}}",
+      "unpairedText": "No coinciden con ningún PDF del lote: asígnalos a mano o descártalos.",
+      "assign": "Asignar a…",
+      "assignLabel": "Asignar {{name}} a un PDF",
+      "discard": "Descartar"
     },
     "filter": {
       "label": "Filtrar por estado",

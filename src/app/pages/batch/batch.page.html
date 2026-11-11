@@ -22,18 +22,6 @@
           'batch.readyCount' | t: { ready: readyCount(), total: total() }
         }}</span>
       </div>
-      <input
-        #inputB
-        type="file"
-        accept="application/pdf,.pdf"
-        multiple
-        hidden
-        (change)="onNewVersionsSelected($event)"
-        data-testid="input-b"
-      />
-      <button type="button" class="btn" (click)="inputB.click()" data-testid="upload-versions">
-        {{ 'batch.uploadVersions' | t }}
-      </button>
       <button
         type="button"
         class="btn"
@@ -70,19 +58,10 @@
             >{{ 'batch.steps.pdfs' | t }}<small>{{ 'batch.steps.required' | t }}</small></span
           >
         </li>
-        <li
-          [class.batch-steps__on]="step() === 'templates'"
-          [class.batch-steps__done]="step() === 'start'"
-        >
-          <span class="batch-steps__n">{{ step() === 'start' ? '✓' : 2 }}</span>
+        <li [class.batch-steps__on]="step() === 'templates'">
+          <span class="batch-steps__n">2</span>
           <span
             >{{ 'batch.steps.templates' | t }}<small>{{ 'batch.steps.optional' | t }}</small></span
-          >
-        </li>
-        <li [class.batch-steps__on]="step() === 'start'">
-          <span class="batch-steps__n">3</span>
-          <span
-            >{{ 'batch.steps.start' | t }}<small>{{ 'batch.steps.summary' | t }}</small></span
           >
         </li>
       </ol>
@@ -287,6 +266,20 @@
                 </li>
               }
             </ul>
+            <div class="batch-tiles" data-testid="draft-summary">
+              <div class="batch-tile">
+                <strong>{{ draftPdfs().length }}</strong
+                >{{ 'batch.step2.pdfs' | t }}
+              </div>
+              <div class="batch-tile">
+                <strong>{{ withTemplate() }}</strong
+                >{{ 'batch.step2.withTemplate' | t }}
+              </div>
+              <div class="batch-tile">
+                <strong>{{ draftPdfs().length - withTemplate() }}</strong
+                >{{ 'batch.step2.withoutTemplate' | t }}
+              </div>
+            </div>
             <footer class="batch-wizard__foot">
               <button type="button" class="btn btn--ghost" (click)="goToStep('pdfs')">
                 ‹ {{ 'batch.back' | t }}
@@ -295,7 +288,7 @@
               <button
                 type="button"
                 class="btn btn--ghost"
-                (click)="goToStep('start')"
+                (click)="openPanel()"
                 data-testid="skip-templates"
               >
                 {{ 'batch.step2.skip' | t }}
@@ -303,57 +296,10 @@
               <button
                 type="button"
                 class="btn btn--primary"
-                (click)="goToStep('start')"
-                data-testid="next-start"
-              >
-                {{ 'batch.step2.next' | t }}
-              </button>
-            </footer>
-          }
-          @case ('start') {
-            <h2>{{ 'batch.step3.title' | t }}</h2>
-            <div class="batch-tiles">
-              <div class="batch-tile">
-                <strong>{{ draftPdfs().length }}</strong
-                >{{ 'batch.step3.pdfs' | t }}
-              </div>
-              <div class="batch-tile">
-                <strong>{{ withTemplate() }}</strong
-                >{{ 'batch.step3.withTemplate' | t }}
-              </div>
-              <div class="batch-tile">
-                <strong>{{ draftPdfs().length - withTemplate() }}</strong
-                >{{ 'batch.step3.withoutTemplate' | t }}
-              </div>
-            </div>
-            <label class="batch-radio" [class.batch-radio--on]="versionsMode() === 'inPlace'">
-              <input type="radio" name="mode" value="inPlace" [(ngModel)]="versionsMode" hidden />
-              <span class="batch-radio__dot"></span>
-              <span>
-                <strong>{{ 'batch.step3.inPlace' | t }}</strong>
-                <small>{{ 'batch.step3.inPlaceText' | t }}</small>
-              </span>
-            </label>
-            <label class="batch-radio" [class.batch-radio--on]="versionsMode() === 'versions'">
-              <input type="radio" name="mode" value="versions" [(ngModel)]="versionsMode" hidden />
-              <span class="batch-radio__dot"></span>
-              <span>
-                <strong>{{ 'batch.step3.versions' | t }}</strong>
-                <small>{{ 'batch.step3.versionsText' | t }}</small>
-              </span>
-            </label>
-            <footer class="batch-wizard__foot">
-              <button type="button" class="btn btn--ghost" (click)="goToStep('templates')">
-                ‹ {{ 'batch.back' | t }}
-              </button>
-              <span class="batch-bar__spacer"></span>
-              <button
-                type="button"
-                class="btn btn--primary"
                 (click)="openPanel()"
                 data-testid="open-panel"
               >
-                {{ 'batch.step3.open' | t }}
+                {{ 'batch.step2.next' | t }}
               </button>
             </footer>
           }
@@ -361,23 +307,71 @@
       </section>
     } @else {
       <!-- ================= panel ================= -->
-      @if (expectVersions() && counts().all > 0) {
+      <input
+        #inputB
+        type="file"
+        accept="application/pdf,.pdf"
+        multiple
+        hidden
+        (change)="onNewVersionsSelected($event)"
+        data-testid="input-b"
+      />
+      @if (counts().all > 0) {
         <div
-          class="batch-drop batch-drop--hint"
+          class="batch-drop batch-drop--hint batch-versions"
           [class.batch-drop--active]="dragActive()"
+          [class.batch-versions--warn]="unpairedB().length > 0"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
           (drop)="onDrop($event)"
           data-testid="versions-drop"
         >
           <div>
-            <strong>{{ 'batch.versionsDrop.title' | t }}</strong>
-            <span>{{ 'batch.versionsDrop.text' | t }}</span>
+            @if (unpairedB().length > 0) {
+              <strong>{{
+                'batch.versionsDrop.unpairedTitle' | t: { count: unpairedB().length }
+              }}</strong>
+              <span>{{ 'batch.versionsDrop.unpairedText' | t }}</span>
+            } @else if (withB() > 0) {
+              <strong>{{ 'batch.versionsDrop.addedTitle' | t: { count: withB() } }}</strong>
+              <span>{{ 'batch.versionsDrop.addedText' | t }}</span>
+            } @else {
+              <strong>{{ 'batch.versionsDrop.title' | t }}</strong>
+              <span>{{ 'batch.versionsDrop.text' | t }}</span>
+            }
           </div>
-          <button type="button" class="btn btn--ghost" (click)="expectVersions.set(false)">
-            {{ 'batch.versionsDrop.hide' | t }}
+          <button
+            type="button"
+            class="btn btn--ghost"
+            (click)="inputB.click()"
+            data-testid="upload-versions"
+          >
+            {{ (withB() > 0 ? 'batch.versionsDrop.more' : 'batch.versionsDrop.choose') | t }}
           </button>
         </div>
+        @if (unpairedB().length > 0) {
+          <ul class="batch-unpaired" data-testid="unpaired-b">
+            @for (file of unpairedB(); track file) {
+              <li>
+                <span class="batch-unpaired__name">{{ file.name }}</span>
+                <select
+                  class="batch-assign"
+                  [attr.aria-label]="'batch.versionsDrop.assignLabel' | t: { name: file.name }"
+                  (change)="assignUnpaired(file, $any($event.target).value)"
+                  data-testid="assign-unpaired"
+                >
+                  <option value="" selected>{{ 'batch.versionsDrop.assign' | t }}</option>
+                  @for (item of withoutB(); track item.id) {
+                    <option [value]="item.id">{{ item.name }}</option>
+                  }
+                </select>
+                <button type="button" class="btn btn--ghost" (click)="discardUnpaired(file)">
+                  {{ 'batch.versionsDrop.discard' | t }}
+                </button>
+              </li>
+            }
+          </ul>
+        }
       }
 
       <input

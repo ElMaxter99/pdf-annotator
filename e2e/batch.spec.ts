@@ -22,18 +22,14 @@ async function startSteps(page: Page) {
   await expect(page.getByRole('heading', { name: '1 · Subir los PDF' })).toBeVisible();
 }
 
-/** Goes through the three steps with one template and opens the panel. */
-async function openPanel(page: Page, options: { versions?: boolean } = {}) {
+/** Goes through the two steps with one template and opens the panel. */
+async function openPanel(page: Page) {
   await startSteps(page);
   await page.getByTestId('next-templates').click();
   await page
     .getByTestId('input-templates')
     .setInputFiles(file('factura-0331.json', json, 'application/json'));
   await expect(page.getByTestId('template-rows')).toContainText(`${FIELDS} campos`);
-  await page.getByTestId('next-start').click();
-  if (options.versions) {
-    await page.getByText('Tengo nuevas versiones (B)').click();
-  }
   await page.getByTestId('open-panel').click();
   await expect(page.getByTestId('panel-item')).toHaveCount(2);
 }
@@ -80,7 +76,6 @@ test('the real first page is shown as a thumbnail in the steps and in the panel'
   await startSteps(page);
   await expect(page.locator('[data-testid="draft-pdfs"] app-pdf-thumb img')).toHaveCount(2);
   await page.getByTestId('next-templates').click();
-  await page.getByTestId('next-start').click();
   await page.getByTestId('open-panel').click();
   await expect(page.locator('[data-testid="panel-item"] app-pdf-thumb img')).toHaveCount(2);
 });
@@ -125,7 +120,7 @@ test('a saved batch is offered on the landing', async ({ page }) => {
 });
 
 test('new versions (B) are paired by name and shown in the list', async ({ page }) => {
-  await openPanel(page, { versions: true });
+  await openPanel(page);
   await expect(page.getByTestId('versions-drop')).toBeVisible();
   await page.getByTestId('view-list').click();
   await page
@@ -139,7 +134,7 @@ test('new versions (B) are paired by name and shown in the list', async ({ page 
 test('B starts empty, A can be put in and the PDF is marked ready and downloaded', async ({
   page,
 }) => {
-  await openPanel(page, { versions: true });
+  await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
@@ -178,7 +173,7 @@ test('B starts empty, A can be put in and the PDF is marked ready and downloaded
 test('missing fields are counted on «Listo» until each one is placed or dismissed', async ({
   page,
 }) => {
-  await openPanel(page, { versions: true });
+  await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
@@ -210,7 +205,7 @@ test('missing fields are counted on «Listo» until each one is placed or dismis
 });
 
 test('a moved field is reported and A can be seen alone by holding the A key', async ({ page }) => {
-  await openPanel(page, { versions: true });
+  await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
@@ -234,7 +229,7 @@ test('a moved field is reported and A can be seen alone by holding the A key', a
 });
 
 test('the batch and B survive a reload of the tray', async ({ page }) => {
-  await openPanel(page, { versions: true });
+  await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
@@ -250,17 +245,47 @@ test('the batch and B survive a reload of the tray', async ({ page }) => {
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 });
 
-test('an unpaired new version is reported and can be assigned from its row', async ({ page }) => {
-  await openPanel(page, { versions: true });
+test('an unpaired new version waits in the strip and is assigned by hand or discarded', async ({
+  page,
+}) => {
+  await openPanel(page);
   await page.getByTestId('view-list').click();
   await page
     .getByTestId('input-b')
-    .setInputFiles(file('otro-documento.pdf', pdf, 'application/pdf'));
-  await expect(page.locator('.toast--warning')).toContainText('sin pareja');
+    .setInputFiles([
+      file('otro-documento.pdf', pdf, 'application/pdf'),
+      file('copia.pdf', pdf, 'application/pdf'),
+    ]);
+  await expect(page.getByTestId('versions-drop')).toContainText('Archivos sin pareja: 2');
+  await page
+    .getByTestId('unpaired-b')
+    .locator('li')
+    .first()
+    .getByTestId('assign-unpaired')
+    .selectOption({ index: 1 });
+  await expect(page.getByTestId('panel-list')).toContainText('otro-documento.pdf');
+  await expect(page.getByTestId('versions-drop')).toContainText('Archivos sin pareja: 1');
+  await page.getByTestId('unpaired-b').getByRole('button', { name: 'Descartar' }).click();
+  await expect(page.getByTestId('unpaired-b')).toHaveCount(0);
+  await expect(page.getByTestId('versions-drop')).toContainText('Versiones B añadidas: 1');
+  // A B can still be assigned from its row, whatever its name.
   const chooser = page.waitForEvent('filechooser');
   await page.getByTestId('row-upload-b').first().click();
   await (await chooser).setFiles(file('cualquier-nombre.pdf', pdf, 'application/pdf'));
   await expect(page.getByTestId('panel-list')).toContainText('cualquier-nombre.pdf');
+});
+
+test('there is no third step: the panel opens from step 2 with the B strip always there', async ({
+  page,
+}) => {
+  await startSteps(page);
+  await expect(page.locator('.batch-steps li')).toHaveCount(2);
+  await page.getByTestId('next-templates').click();
+  await expect(page.getByTestId('draft-summary')).toContainText('2');
+  await expect(page.getByText('Tengo nuevas versiones (B)')).toHaveCount(0);
+  await page.getByTestId('open-panel').click();
+  await expect(page.getByTestId('panel-item')).toHaveCount(2);
+  await expect(page.getByTestId('versions-drop')).toContainText('Versiones nuevas (B)');
 });
 
 test('templates pasted from Mongo are matched to the PDFs by pdfName', async ({ page }) => {
@@ -281,7 +306,6 @@ test('templates pasted from Mongo are matched to the PDFs by pdfName', async ({ 
   await page.getByTestId('assign-pasted').selectOption({ label: 'otro.pdf' });
   await expect(page.getByTestId('template-rows')).toContainText('otro.pdf');
 
-  await page.getByTestId('next-start').click();
   await page.getByTestId('open-panel').click();
   await expect(page.getByTestId('panel-item')).toHaveCount(2);
   await expect(page.getByRole('button', { name: /Sin plantilla/ })).toContainText('0');
@@ -294,7 +318,7 @@ test('pasted JSON with a syntax error points to the line and does not block', as
   await page.getByTestId('paste-text').fill('[\n  { "pdfName": "a.pdf" "pages": [] }\n]');
   await page.getByTestId('paste-match').click();
   await expect(page.getByTestId('paste-error')).toContainText('línea 2');
-  await expect(page.getByTestId('next-start')).toBeEnabled();
+  await expect(page.getByTestId('open-panel')).toBeEnabled();
 });
 
 test('in a batch «Documento» has no «empezar de cero» and completes the PDF with layers', async ({
@@ -381,7 +405,7 @@ test('without template A the modes are off and explain why; JSON without fields 
 });
 
 test('«Dividida» shows A with its fields on the left and B on the right', async ({ page }) => {
-  await openPanel(page, { versions: true });
+  await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);

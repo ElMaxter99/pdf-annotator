@@ -30,7 +30,7 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 ```
 src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
-├─ pages/batch/              Lote (`/lote`): pasos (subir PDF, plantillas, empezar) y panel en cuadrícula o lista; se llega desde la landing al soltar 2 o más PDFs
+├─ pages/batch/              Lote (`/lote`): pasos (subir PDF y plantillas; el resumen está en el paso 2 y «Abrir el panel» crea el lote) y panel con la tira «Versiones nuevas (B)» siempre visible (B sueltas emparejadas por nombre; las que no cuadran esperan en la tira para asignarlas a mano o descartarlas) en cuadrícula o lista; se llega desde la landing al soltar 2 o más PDFs
 ├─ pages/workspace/
 │  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.130 líneas): render del PDF, sincronización del JSON, atajos y UI
 │  └─ components/            header · migration (barra y panel de estados del lote) · sidebar (4 pestañas: Documento, Anotaciones, Plantillas, Avanzado) · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog

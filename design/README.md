@@ -49,7 +49,7 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | L-02 Primera vista | Landing: la cantidad de PDFs decide el flujo | [`L-02-primera-vista.dc.html`](canvas/L-02-primera-vista.dc.html) | `pages/landing` | Aprobado, implementado |
 | L-03 Paso 1 · Subir PDF | Lista con ✕ por archivo y archivos no válidos | [`L-03-paso-1-subir-pdf.dc.html`](canvas/L-03-paso-1-subir-pdf.dc.html) | `pages/batch` | Aprobado, implementado |
 | L-04 Paso 2 · Plantillas | JSON por PDF emparejado por nombre, errores y «Saltar» | [`L-04-paso-2-plantillas.dc.html`](canvas/L-04-paso-2-plantillas.dc.html) | `pages/batch` | Aprobado, implementado |
-| L-05 Paso 3 · Empezar | Resumen y opción de subir versiones B | [`L-05-paso-3-empezar.dc.html`](canvas/L-05-paso-3-empezar.dc.html) | `pages/batch` | Aprobado, implementado |
+| L-05 Paso 3 · Empezar | Resumen y opción de subir versiones B (sustituido por R-01..R-03) | [`L-05-paso-3-empezar.dc.html`](canvas/L-05-paso-3-empezar.dc.html) | `pages/batch` | Aprobado, implementado |
 | L-06 Panel · cuadrícula | Todos los PDFs con estado, buscador y filtros | [`L-06-panel-cuadricula.dc.html`](canvas/L-06-panel-cuadricula.dc.html) | `pages/batch` | Aprobado, implementado |
 | L-07 Panel · lista | Mismos datos en tabla | [`L-07-panel-lista.dc.html`](canvas/L-07-panel-lista.dc.html) | `pages/batch` | Aprobado, implementado |
 | L-08 Editor de un PDF | Editor original con barra del lote y A como capa | [`L-08-editor-de-un-pdf.dc.html`](canvas/L-08-editor-de-un-pdf.dc.html) | `components/migration` | Aprobado, implementado |
@@ -69,6 +69,9 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | Q-02 Dividida · 1650 | A (solo lectura) a la izquierda, B (se edita) a la derecha | [`Q-02-dividida-1650.dc.html`](canvas/Q-02-dividida-1650.dc.html) | `components/viewer`, `components/migration` | Aprobado, implementado |
 | Q-03 Dividida · 1280 y claro | Ajuste de zoom, tema claro y panel plegado | [`Q-03-dividida-1280-claro.dc.html`](canvas/Q-03-dividida-1280-claro.dc.html) | `components/viewer` | Aprobado, implementado |
 | Q-04 Dividida · estados | Sin plantilla A, B vacía y tamaños distintos | [`Q-04-dividida-estados.dc.html`](canvas/Q-04-dividida-estados.dc.html) | `components/migration` | Aprobado, implementado |
+| R-01 Flujo sin paso 3 | Lote en 2 pasos, panel directo | [`R-01-flujo-sin-paso-3.dc.html`](canvas/R-01-flujo-sin-paso-3.dc.html) | `pages/batch` | Aprobado, implementado |
+| R-02 Paso 2 y panel | Resumen en el paso 2 y tira «Versiones nuevas (B)» | [`R-02-paso-2-y-panel.dc.html`](canvas/R-02-paso-2-y-panel.dc.html) | `pages/batch` | Aprobado, implementado |
+| R-03 Tira B · estados | Sin B, con B y archivos sin pareja | [`R-03-tira-b-estados.dc.html`](canvas/R-03-tira-b-estados.dc.html) | `pages/batch` | Aprobado, implementado |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

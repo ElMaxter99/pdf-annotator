@@ -319,7 +319,6 @@
       "jsonWithoutPdf": "{{count}} JSON senza PDF con lo stesso nome: ignorati.",
       "notPersistent": "Questo browser non può conservare il lotto tra le visite.",
       "samePdf": "{{name}} è lo stesso PDF dell’originale: non c’è nulla da migrare.",
-      "unpaired": "{{count}} PDF senza corrispondenza: usa «Carica B» nella riga giusta.",
       "templateApplied": "Modello caricato: {{count}} campi.",
       "templateFromAnnotations": "Le annotazioni dell’originale diventano il modello A."
     }
@@ -467,10 +466,8 @@
       "label": "Passaggi del lotto",
       "pdfs": "Carica PDF",
       "templates": "Modelli",
-      "start": "Inizia",
       "required": "Obbligatorio",
-      "optional": "Facoltativo",
-      "summary": "Riepilogo"
+      "optional": "Facoltativo"
     },
     "step1": {
       "title": "1 · Carica i PDF",
@@ -491,7 +488,7 @@
       "empty": "Vuoto",
       "remove": "Rimuovi il modello di {{name}}",
       "skip": "Salta questo passaggio",
-      "next": "Avanti: Inizia →",
+      "next": "Apri il pannello →",
       "tabsLabel": "Come aggiungere i modelli",
       "tabFiles": "File",
       "tabPaste": "Incolla JSON",
@@ -504,23 +501,23 @@
       "pasteError": "JSON non valido: controlla la riga {{line}}.",
       "pasteTooBig": "Il testo incollato supera i 5 MB.",
       "assign": "Assegna un modello a {{name}}",
-      "assignPlaceholder": "Assegna…"
-    },
-    "step3": {
-      "title": "3 · Tutto pronto per iniziare",
+      "assignPlaceholder": "Assegna…",
       "pdfs": "PDF",
       "withTemplate": "con modello",
-      "withoutTemplate": "senza modello",
-      "inPlace": "Modifica ogni PDF con il suo modello",
-      "inPlaceText": "Ogni PDF si apre con il suo JSON e regoli ciò che serve.",
-      "versions": "Ho nuove versioni (B) di questi PDF",
-      "versionsText": "Le caricherai nel pannello: il modello passa a B e A resta come livello di riferimento.",
-      "open": "Apri il pannello →"
+      "withoutTemplate": "senza modello"
     },
     "versionsDrop": {
-      "title": "Trascina qui le versioni B",
-      "text": "Vengono abbinate per nome a ogni PDF; le altre si assegnano a mano.",
-      "hide": "Nascondi"
+      "title": "Nuove versioni (B)",
+      "text": "Hai PDF ridisegnati? Trascinali qui e vengono abbinati per nome a ogni PDF del lotto.",
+      "choose": "Scegli file",
+      "addedTitle": "Versioni B aggiunte: {{count}}",
+      "addedText": "Gli altri restano senza versione B. Puoi trascinarne altri qui.",
+      "more": "Aggiungi altre",
+      "unpairedTitle": "File senza abbinamento: {{count}}",
+      "unpairedText": "Non corrispondono a nessun PDF del lotto: assegnali a mano o scartali.",
+      "assign": "Assegna a…",
+      "assignLabel": "Assegna {{name}} a un PDF",
+      "discard": "Scarta"
     },
     "filter": {
       "label": "Filtra per stato",

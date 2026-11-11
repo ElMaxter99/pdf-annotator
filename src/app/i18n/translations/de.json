@@ -319,7 +319,6 @@
       "jsonWithoutPdf": "{{count}} JSON ohne PDF gleichen Namens: ignoriert.",
       "notPersistent": "Dieser Browser kann den Stapel nicht zwischen Besuchen speichern.",
       "samePdf": "{{name}} ist dasselbe PDF wie das Original: es gibt nichts zu migrieren.",
-      "unpaired": "{{count}} PDF ohne Zuordnung: nutze „B hochladen“ in der passenden Zeile.",
       "templateApplied": "Vorlage geladen: {{count}} Felder.",
       "templateFromAnnotations": "Die Anmerkungen des Originals sind jetzt Vorlage A."
     }
@@ -467,10 +466,8 @@
       "label": "Schritte des Stapels",
       "pdfs": "PDFs hochladen",
       "templates": "Vorlagen",
-      "start": "Starten",
       "required": "Erforderlich",
-      "optional": "Optional",
-      "summary": "Übersicht"
+      "optional": "Optional"
     },
     "step1": {
       "title": "1 · PDFs hochladen",
@@ -491,7 +488,7 @@
       "empty": "Leer",
       "remove": "Vorlage von {{name}} entfernen",
       "skip": "Diesen Schritt überspringen",
-      "next": "Weiter: Starten →",
+      "next": "Panel öffnen →",
       "tabsLabel": "Wie die Vorlagen hinzufügen",
       "tabFiles": "Dateien",
       "tabPaste": "JSON einfügen",
@@ -504,23 +501,23 @@
       "pasteError": "Ungültiges JSON: prüfe Zeile {{line}}.",
       "pasteTooBig": "Der eingefügte Text ist größer als 5 MB.",
       "assign": "Vorlage für {{name}} zuweisen",
-      "assignPlaceholder": "Zuweisen…"
-    },
-    "step3": {
-      "title": "3 · Bereit zum Start",
+      "assignPlaceholder": "Zuweisen…",
       "pdfs": "PDFs",
       "withTemplate": "mit Vorlage",
-      "withoutTemplate": "ohne Vorlage",
-      "inPlace": "Jedes PDF mit seiner Vorlage bearbeiten",
-      "inPlaceText": "Jedes PDF öffnet sich mit seinem JSON und du passt an, was nötig ist.",
-      "versions": "Ich habe neue Versionen (B) dieser PDFs",
-      "versionsText": "Du lädst sie im Panel hoch: Die Vorlage wandert nach B und A bleibt als Referenzebene.",
-      "open": "Panel öffnen →"
+      "withoutTemplate": "ohne Vorlage"
     },
     "versionsDrop": {
-      "title": "B-Versionen hier ablegen",
-      "text": "Sie werden per Name jedem PDF zugeordnet; der Rest wird von Hand zugewiesen.",
-      "hide": "Ausblenden"
+      "title": "Neue Versionen (B)",
+      "text": "Überarbeitete PDFs? Ziehe sie hierher; sie werden per Name den PDFs des Stapels zugeordnet.",
+      "choose": "Dateien wählen",
+      "addedTitle": "B-Versionen hinzugefügt: {{count}}",
+      "addedText": "Die übrigen haben keine B-Version. Hier kannst du weitere ablegen.",
+      "more": "Mehr hinzufügen",
+      "unpairedTitle": "Dateien ohne Zuordnung: {{count}}",
+      "unpairedText": "Sie passen zu keinem PDF im Stapel: manuell zuordnen oder verwerfen.",
+      "assign": "Zuordnen zu…",
+      "assignLabel": "{{name}} einem PDF zuordnen",
+      "discard": "Verwerfen"
     },
     "filter": {
       "label": "Nach Status filtern",

@@ -25,8 +25,6 @@ export class BatchStoreService {
   readonly persistent = signal(true);
   /** Files chosen in the landing/steps that are not a batch yet (kept in memory only). */
   readonly draft = signal<{ pdfs: File[]; jsons: File[] } | null>(null);
-  /** The user said the PDFs have new versions (B) to upload from the panel. */
-  readonly expectVersions = signal(false);
 
   async load(): Promise<void> {
     if (this.loaded()) {
@@ -41,7 +39,6 @@ export class BatchStoreService {
 
   startDraft(pdfs: File[]): void {
     this.draft.set({ pdfs, jsons: [] });
-    this.expectVersions.set(false);
   }
 
   add(init: { name: string; aPdf: Blob; aPages: PageAnnotations[] }): BatchItem {

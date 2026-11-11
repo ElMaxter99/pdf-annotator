@@ -319,7 +319,6 @@
       "jsonWithoutPdf": "{{count}} JSON without a PDF of the same name: ignored.",
       "notPersistent": "This browser cannot keep the batch between visits.",
       "samePdf": "{{name}} is the same PDF as the original: there is nothing to migrate.",
-      "unpaired": "{{count}} PDF(s) without a match: use “Upload B” on the right row.",
       "templateApplied": "Template loaded: {{count}} fields.",
       "templateFromAnnotations": "The original’s annotations became template A."
     }
@@ -467,10 +466,8 @@
       "label": "Batch steps",
       "pdfs": "Upload PDFs",
       "templates": "Templates",
-      "start": "Start",
       "required": "Required",
-      "optional": "Optional",
-      "summary": "Summary"
+      "optional": "Optional"
     },
     "step1": {
       "title": "1 · Upload the PDFs",
@@ -491,7 +488,7 @@
       "empty": "Empty",
       "remove": "Remove the template of {{name}}",
       "skip": "Skip this step",
-      "next": "Next: Start →",
+      "next": "Open the panel →",
       "tabsLabel": "How to add the templates",
       "tabFiles": "Files",
       "tabPaste": "Paste JSON",
@@ -504,23 +501,23 @@
       "pasteError": "Invalid JSON: check line {{line}}.",
       "pasteTooBig": "The pasted text is over 5 MB.",
       "assign": "Assign a template to {{name}}",
-      "assignPlaceholder": "Assign…"
-    },
-    "step3": {
-      "title": "3 · Ready to start",
+      "assignPlaceholder": "Assign…",
       "pdfs": "PDFs",
       "withTemplate": "with template",
-      "withoutTemplate": "without template",
-      "inPlace": "Edit each PDF with its template",
-      "inPlaceText": "Each PDF opens with its JSON and you adjust what is needed.",
-      "versions": "I have new versions (B) of these PDFs",
-      "versionsText": "You will upload them in the panel: the template moves to B and A stays as a reference layer.",
-      "open": "Open the panel →"
+      "withoutTemplate": "without template"
     },
     "versionsDrop": {
-      "title": "Drop the B versions here",
-      "text": "They are paired by name with each PDF; the rest are assigned by hand.",
-      "hide": "Hide"
+      "title": "New versions (B)",
+      "text": "Got redesigned PDFs? Drop them here and they are paired by name with each PDF in the batch.",
+      "choose": "Choose files",
+      "addedTitle": "B versions added: {{count}}",
+      "addedText": "The rest have no B version. You can drop more here.",
+      "more": "Add more",
+      "unpairedTitle": "Files without a match: {{count}}",
+      "unpairedText": "They do not match any PDF in the batch: assign them by hand or discard them.",
+      "assign": "Assign to…",
+      "assignLabel": "Assign {{name}} to a PDF",
+      "discard": "Discard"
     },
     "filter": {
       "label": "Filter by state",

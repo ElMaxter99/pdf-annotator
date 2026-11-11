@@ -319,7 +319,6 @@
       "jsonWithoutPdf": "{{count}} JSON sem PDF com o mesmo nome: ignorados.",
       "notPersistent": "Este navegador não pode guardar o lote entre visitas.",
       "samePdf": "{{name}} é o mesmo PDF que o original: não há nada a migrar.",
-      "unpaired": "{{count}} PDF sem par: use «Enviar B» na linha correspondente.",
       "templateApplied": "Modelo carregado: {{count}} campos.",
       "templateFromAnnotations": "As anotações do original passam a ser o modelo A."
     }
@@ -467,10 +466,8 @@
       "label": "Passos do lote",
       "pdfs": "Carregar PDF",
       "templates": "Modelos",
-      "start": "Começar",
       "required": "Obrigatório",
-      "optional": "Opcional",
-      "summary": "Resumo"
+      "optional": "Opcional"
     },
     "step1": {
       "title": "1 · Carregar os PDF",
@@ -491,7 +488,7 @@
       "empty": "Vazio",
       "remove": "Remover o modelo de {{name}}",
       "skip": "Saltar este passo",
-      "next": "Seguinte: Começar →",
+      "next": "Abrir o painel →",
       "tabsLabel": "Como adicionar os modelos",
       "tabFiles": "Ficheiros",
       "tabPaste": "Colar JSON",
@@ -504,23 +501,23 @@
       "pasteError": "JSON inválido: reveja a linha {{line}}.",
       "pasteTooBig": "O texto colado excede os 5 MB.",
       "assign": "Atribuir modelo a {{name}}",
-      "assignPlaceholder": "Atribuir…"
-    },
-    "step3": {
-      "title": "3 · Tudo pronto para começar",
+      "assignPlaceholder": "Atribuir…",
       "pdfs": "PDFs",
       "withTemplate": "com modelo",
-      "withoutTemplate": "sem modelo",
-      "inPlace": "Editar cada PDF com o seu modelo",
-      "inPlaceText": "Cada PDF abre com o seu JSON e ajusta o que for preciso.",
-      "versions": "Tenho novas versões (B) destes PDFs",
-      "versionsText": "Vai carregá-las no painel: o modelo passa para B e A fica como camada de referência.",
-      "open": "Abrir o painel →"
+      "withoutTemplate": "sem modelo"
     },
     "versionsDrop": {
-      "title": "Largue aqui as versões B",
-      "text": "São emparelhadas pelo nome com cada PDF; as restantes atribuem-se à mão.",
-      "hide": "Ocultar"
+      "title": "Novas versões (B)",
+      "text": "Tem PDFs redesenhados? Largue-os aqui e são emparelhados por nome com cada PDF do lote.",
+      "choose": "Escolher ficheiros",
+      "addedTitle": "Versões B adicionadas: {{count}}",
+      "addedText": "As restantes continuam sem versão B. Pode largar mais aqui.",
+      "more": "Adicionar mais",
+      "unpairedTitle": "Ficheiros sem par: {{count}}",
+      "unpairedText": "Não coincidem com nenhum PDF do lote: atribua-os à mão ou descarte-os.",
+      "assign": "Atribuir a…",
+      "assignLabel": "Atribuir {{name}} a um PDF",
+      "discard": "Descartar"
     },
     "filter": {
       "label": "Filtrar por estado",

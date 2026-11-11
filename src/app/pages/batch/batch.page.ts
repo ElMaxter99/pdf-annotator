@@ -27,7 +27,7 @@ import { createZip } from '../../utils/zip.utils';
 const MAX_JSON_BYTES = 5 * 1024 * 1024;
 
 type RowState = 'ready' | 'review' | 'noTemplate';
-type Step = 'pdfs' | 'templates' | 'start' | 'panel';
+type Step = 'pdfs' | 'templates' | 'panel';
 type ViewMode = 'grid' | 'list';
 type Filter = 'all' | 'review' | 'ready' | 'noTemplate';
 
@@ -89,7 +89,6 @@ export class BatchPageComponent implements OnInit {
   readonly step = signal<Step>('pdfs');
   readonly view = signal<ViewMode>(readView());
   readonly filter = signal<Filter>('all');
-  readonly versionsMode = signal<'inPlace' | 'versions'>('inPlace');
   readonly templates = signal<Map<string, TemplateInfo>>(new Map());
   readonly templateTab = signal<'files' | 'paste'>('files');
   readonly pasteText = signal('');
@@ -100,7 +99,10 @@ export class BatchPageComponent implements OnInit {
   readonly pastedFound = signal(0);
   readonly draft = this.store.draft;
   readonly draftPdfs = computed(() => this.store.draft()?.pdfs ?? []);
-  readonly expectVersions = this.store.expectVersions;
+  /** New versions (B) dropped in the panel that matched no PDF yet. */
+  readonly unpairedB = signal<File[]>([]);
+  readonly withB = computed(() => this.store.items().filter((item) => item.bPdf).length);
+  readonly withoutB = computed(() => this.store.items().filter((item) => !item.bPdf));
 
   readonly stateOf = (item: BatchItem): RowState =>
     item.status === 'ready'
@@ -244,9 +246,24 @@ export class BatchPageComponent implements OnInit {
       await this.attachB(a, b);
     }
     if (unpaired.length) {
-      this.toast.warning(this.t('toast.batch.unpaired', { count: unpaired.length }));
+      this.unpairedB.update((current) => [...current, ...unpaired]);
     }
     this.notifyNotPersistent();
+  }
+
+  /** Assigns an unpaired B to the PDF chosen in the strip, whatever its name. */
+  async assignUnpaired(file: File, id: string): Promise<void> {
+    const item = id ? this.store.find(id) : undefined;
+    if (!item || item.bPdf) {
+      return;
+    }
+    this.discardUnpaired(file);
+    await this.attachB(item, file);
+    this.notifyNotPersistent();
+  }
+
+  discardUnpaired(file?: File): void {
+    this.unpairedB.update((current) => (file ? current.filter((f) => f !== file) : []));
   }
 
   /** Per-row «Subir B»: assigns the chosen PDF to that row whatever its name. */
@@ -495,7 +512,6 @@ export class BatchPageComponent implements OnInit {
       const info = this.templates().get(pairingKey(pdf.name));
       this.store.add({ name: pdf.name, aPdf: pdf, aPages: info && !info.error ? info.pages : [] });
     }
-    this.store.expectVersions.set(this.versionsMode() === 'versions');
     this.store.draft.set(null);
     this.templates.set(new Map());
     this.step.set('panel');

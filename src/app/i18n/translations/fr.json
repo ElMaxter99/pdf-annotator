@@ -319,7 +319,6 @@
       "jsonWithoutPdf": "{{count}} JSON sans PDF du même nom : ignoré(s).",
       "notPersistent": "Ce navigateur ne peut pas conserver le lot entre deux visites.",
       "samePdf": "{{name}} est le même PDF que l’original : rien à migrer.",
-      "unpaired": "{{count}} PDF sans correspondance : utilisez « Envoyer B » sur la bonne ligne.",
       "templateApplied": "Modèle chargé : {{count}} champs.",
       "templateFromAnnotations": "Les annotations de l’original deviennent le modèle A."
     }
@@ -467,10 +466,8 @@
       "label": "Étapes du lot",
       "pdfs": "Importer les PDF",
       "templates": "Modèles",
-      "start": "Commencer",
       "required": "Obligatoire",
-      "optional": "Facultatif",
-      "summary": "Résumé"
+      "optional": "Facultatif"
     },
     "step1": {
       "title": "1 · Importer les PDF",
@@ -491,7 +488,7 @@
       "empty": "Vide",
       "remove": "Retirer le modèle de {{name}}",
       "skip": "Passer cette étape",
-      "next": "Suivant : Commencer →",
+      "next": "Ouvrir le panneau →",
       "tabsLabel": "Comment ajouter les modèles",
       "tabFiles": "Fichiers",
       "tabPaste": "Coller du JSON",
@@ -504,23 +501,23 @@
       "pasteError": "JSON invalide : vérifiez la ligne {{line}}.",
       "pasteTooBig": "Le texte collé dépasse 5 Mo.",
       "assign": "Attribuer un modèle à {{name}}",
-      "assignPlaceholder": "Attribuer…"
-    },
-    "step3": {
-      "title": "3 · Tout est prêt",
+      "assignPlaceholder": "Attribuer…",
       "pdfs": "PDF",
       "withTemplate": "avec modèle",
-      "withoutTemplate": "sans modèle",
-      "inPlace": "Modifier chaque PDF avec son modèle",
-      "inPlaceText": "Chaque PDF s'ouvre avec son JSON et vous ajustez ce qu'il faut.",
-      "versions": "J'ai de nouvelles versions (B) de ces PDF",
-      "versionsText": "Vous les importerez dans le panneau : le modèle passe à B et A reste en calque de référence.",
-      "open": "Ouvrir le panneau →"
+      "withoutTemplate": "sans modèle"
     },
     "versionsDrop": {
-      "title": "Déposez ici les versions B",
-      "text": "Elles sont associées par nom à chaque PDF ; les autres s'assignent à la main.",
-      "hide": "Masquer"
+      "title": "Nouvelles versions (B)",
+      "text": "Vous avez des PDF redessinés ? Déposez-les ici : ils sont associés par nom à chaque PDF du lot.",
+      "choose": "Choisir des fichiers",
+      "addedTitle": "Versions B ajoutées : {{count}}",
+      "addedText": "Les autres restent sans version B. Vous pouvez en déposer d'autres ici.",
+      "more": "Ajouter",
+      "unpairedTitle": "Fichiers sans correspondance : {{count}}",
+      "unpairedText": "Ils ne correspondent à aucun PDF du lot : associez-les à la main ou écartez-les.",
+      "assign": "Associer à…",
+      "assignLabel": "Associer {{name}} à un PDF",
+      "discard": "Écarter"
     },
     "filter": {
       "label": "Filtrer par état",

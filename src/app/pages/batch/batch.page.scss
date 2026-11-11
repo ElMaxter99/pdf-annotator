@@ -465,6 +465,44 @@
   border-style: solid;
 }
 
+.batch-versions {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.batch-versions--warn {
+  border-color: var(--warn, #b7791f);
+  background: color-mix(in srgb, var(--warn, #b7791f) 10%, transparent);
+}
+
+.batch-unpaired {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--text) 6%, transparent);
+  }
+}
+
+.batch-unpaired__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
 .batch-seg {
   display: inline-flex;
   padding: 4px;
