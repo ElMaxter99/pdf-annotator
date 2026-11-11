@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Fase 0: ¿acierta la IA al recolocar los campos de A en B? Ejecuta los CLI con tu sesión iniciada.
-// Uso:  node run.mjs [--provider claude|copilot|both] [--pair <carpeta>] [--keep-api-key] [--keep-work]
+// Uso:  node run.mjs [--provider claude|copilot|both] [--pair <carpeta>] [--keep-api-key] [--keep-work] [--timeout <segundos>]
 // La carpeta de trabajo (imágenes y textos enviados al CLI) se borra al terminar, salvo con --keep-work.
 // Cada par vive en una carpeta con A.pdf, A.json, B.pdf y (opcional) expected.json con la solución conocida.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
@@ -20,12 +20,14 @@ const providerArg = opt('provider', 'both');
 const providers = providerArg === 'both' ? ['claude', 'copilot'] : [providerArg];
 const keepApiKey = args.includes('--keep-api-key');
 const keepWork = args.includes('--keep-work');
+const timeoutSec = Number(opt('timeout', '300'));
 if (!providers.every((p) => PROVIDERS[p])) {
   console.error('--provider debe ser claude, copilot o both');
   process.exit(1);
 }
 
 const sizes = (pdf) => [...new Set(pdf.pages.map((p) => `${Math.round(p.width)}×${Math.round(p.height)}`))].join(' / ');
+const tail = (s) => String(s ?? '').trim().replace(/\s+/g, ' ').slice(-400) || '(sin salida)';
 const exists = (p) => stat(p).then(() => true, () => false);
 const readJson = async (p) => JSON.parse(await readFile(p, 'utf8'));
 
@@ -74,15 +76,19 @@ async function runPair(pairDir, name) {
   while (attempt < 2) {
     attempt++;
     await writeFile(path.join(work, 'prompt.md'), buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote }));
-    run = await runCli(name, work, { keepApiKey });
+    run = await runCli(name, work, { keepApiKey, timeoutMs: timeoutSec * 1000 });
     seconds += run.seconds;
     await writeFile(path.join(outBase, name, `raw-${attempt}.txt`), `# code ${run.code}\n${run.stdout}\n--- stderr ---\n${run.stderr}`);
     if (!run.ok) {
-      errors = [`El CLI terminó con código ${run.code}: ${run.stderr.trim().split('\n').slice(-3).join(' | ')}`];
+      errors = [`El CLI terminó con código ${run.code}: ${tail(run.stderr || run.stdout)}`];
       break;
     }
     const ex = PROVIDERS[name].extract(run.stdout);
     meta = ex.meta;
+    if (meta.isError) {
+      errors = [`El CLI devolvió un error: ${tail(ex.text)}`];
+      break;
+    }
     const parsed = validateProposals(parseJsonFromText(ex.text), known);
     proposals = parsed.proposals;
     errors = parsed.errors;
@@ -97,7 +103,7 @@ async function runPair(pairDir, name) {
     rows.push({ id: p.id, label: entry.field.mapField, proposal: p, resolved, score: score(resolved, truth?.get(p.id)) });
   }
   if (!keepWork) await rm(work, { recursive: true, force: true });
-  const summary = { provider: name, seconds, attempts: attempt, parseErrors: errors, ...meta, ...summarize(rows) };
+  const summary = { provider: name, seconds, attempts: attempt, parseErrors: errors, ...meta, ...summarize(rows), total: entriesA.length };
   await writeFile(path.join(outBase, name, 'result.json'), JSON.stringify({ summary, rows }, null, 2));
 
   // Propuesta lista para importar en la app como JSON de B.
@@ -127,6 +133,8 @@ for (const pairDir of pairs) {
     try {
       const { summary: s } = await runPair(pairDir, name);
       console.log(`${s.resolved}/${s.total} resueltos, ${s.seconds} s`);
+      for (const w of s.parseErrors.slice(0, 5)) console.log(`   ⚠ ${w}`);
+      if (s.parseErrors.length > 5) console.log(`   ⚠ …y ${s.parseErrors.length - 5} avisos más (ver out/${path.basename(pairDir)}/${name}/result.json)`);
       lines.push(`| ${path.basename(pairDir)} | ${name} | ${s.total} | ${s.resolved} | ${s.scored ? `${s.pageOk}/${s.scored}` : '–'} | ${s.goneTotal ? `${s.goneOk}/${s.goneTotal}` : '–'} | ${fmt(s.medianErrPt)} | ${s.errsMeasured ? `${s.within2}/${s.errsMeasured}` : '–'} | ${s.errsMeasured ? `${s.within5}/${s.errsMeasured}` : '–'} | ${s.seconds} | ${s.parseErrors.length} |`);
     } catch (e) {
       console.log(`falló: ${e.message}`);

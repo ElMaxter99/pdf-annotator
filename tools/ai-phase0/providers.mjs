@@ -1,6 +1,8 @@
 // Lanzadores de los dos CLI. El prompt va SIEMPRE en prompt.md dentro de la carpeta de trabajo:
 // la línea de comandos solo lleva texto fijo, nunca contenido del PDF.
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 
 const INSTRUCTION = 'Lee el archivo prompt.md de esta carpeta y sigue sus instrucciones. Responde solo con el JSON pedido.';
 const win = process.platform === 'win32';
@@ -9,12 +11,12 @@ export const PROVIDERS = {
   claude: {
     label: 'Claude Code (claude -p)',
     cmd: 'claude',
-    args: () => ['-p', quote(INSTRUCTION), '--output-format', 'json', '--allowedTools', 'Read'],
+    args: () => ['-p', INSTRUCTION, '--output-format', 'json', '--allowedTools', 'Read'],
     // Con --output-format json el texto de la respuesta viene en `result`.
     extract(stdout) {
       try {
         const j = JSON.parse(stdout);
-        return { text: typeof j.result === 'string' ? j.result : stdout, meta: { costUsd: j.total_cost_usd, turns: j.num_turns, usage: j.usage } };
+        return { text: typeof j.result === 'string' ? j.result : stdout, meta: { costUsd: j.total_cost_usd, turns: j.num_turns, usage: j.usage, isError: j.is_error === true } };
       } catch {
         return { text: stdout, meta: {} };
       }
@@ -30,33 +32,76 @@ export const PROVIDERS = {
     label: 'Copilot CLI (copilot -p)',
     cmd: 'copilot',
     // Banderas SIN VERIFICAR contra tu versión: si fallan, ajusta con COPILOT_ARGS='["-p","...","--allow-all-tools"]'.
-    args: () => (process.env.COPILOT_ARGS ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? quote(INSTRUCTION) : a)) : ['-p', quote(INSTRUCTION), '--allow-all-tools']),
+    args: () => (process.env.COPILOT_ARGS ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a)) : ['-p', INSTRUCTION, '--allow-all-tools']),
     extract: (stdout) => ({ text: stdout, meta: {} }),
     env: (base) => ({ ...base }),
   },
 };
 
-function quote(s) {
-  return win ? `"${s}"` : s;
+// En Windows las instalaciones por npm dejan `claude.cmd` y los .cmd no se pueden lanzar sin shell. Para no usar
+// `shell: true` (concatena argumentos sin escapar), se busca el ejecutable en el PATH y, si es un .cmd, se llama a
+// `cmd.exe /d /s /c` con una línea de comandos que montamos nosotros. Los argumentos son siempre texto fijo del script.
+export function findExecutable(name, env = process.env) {
+  const dirs = (env.PATH ?? env.Path ?? '').split(path.delimiter).filter(Boolean);
+  const exts = win ? ['.exe', '.com', '.cmd', '.bat'] : [''];
+  for (const dir of dirs) {
+    for (const ext of exts) {
+      const full = path.join(dir, name + ext);
+      if (existsSync(full)) return full;
+    }
+  }
+  return null;
+}
+
+export const quote = (s) => (/[\s&()^%!|<>"]/.test(s) ? `"${String(s).replaceAll('"', '\\"')}"` : s);
+
+export function buildSpawn(exe, args) {
+  if (win && /\.(cmd|bat)$/i.test(exe)) {
+    return { file: process.env.ComSpec || 'cmd.exe', args: ['/d', '/s', '/c', `"${[quote(exe), ...args.map(quote)].join(' ')}"`], options: { windowsVerbatimArguments: true } };
+  }
+  return { file: exe, args, options: {} };
+}
+
+function killTree(child) {
+  if (win && child.pid) spawn('taskkill', ['/pid', String(child.pid), '/t', '/f'], { stdio: 'ignore' });
+  else child.kill();
 }
 
 export function runCli(name, cwd, opts = {}) {
   const p = PROVIDERS[name];
+  const timeoutMs = opts.timeoutMs ?? 5 * 60 * 1000;
   return new Promise((resolve) => {
+    const exe = findExecutable(p.cmd);
+    if (!exe) {
+      resolve({ ok: false, seconds: 0, stdout: '', stderr: `No encuentro «${p.cmd}» en el PATH. Instálalo e inicia sesión una vez a mano (escribe «${p.cmd}» en la terminal).`, code: -1 });
+      return;
+    }
     const started = Date.now();
-    const child = spawn(p.cmd, p.args(), { cwd, env: p.env(process.env, opts), shell: win, stdio: ['ignore', 'pipe', 'pipe'] });
+    const sp = buildSpawn(exe, p.args());
+    const child = spawn(sp.file, sp.args, { cwd, env: p.env(process.env, opts), stdio: ['ignore', 'pipe', 'pipe'], ...sp.options });
     let stdout = '';
     let stderr = '';
-    const timer = setTimeout(() => child.kill(), opts.timeoutMs ?? 10 * 60 * 1000);
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      killTree(child);
+    }, timeoutMs);
+    const beat = setInterval(() => process.stdout.write('.'), 10_000);
     child.stdout.on('data', (d) => (stdout += d));
     child.stderr.on('data', (d) => (stderr += d));
-    child.on('error', (e) => {
+    const done = (res) => {
       clearTimeout(timer);
-      resolve({ ok: false, seconds: 0, stdout, stderr: String(e.message), code: -1 });
-    });
+      clearInterval(beat);
+      resolve(res);
+    };
+    child.on('error', (e) => done({ ok: false, seconds: 0, stdout, stderr: String(e.message), code: -1 }));
     child.on('close', (code) => {
-      clearTimeout(timer);
-      resolve({ ok: code === 0, seconds: Math.round((Date.now() - started) / 100) / 10, stdout, stderr, code });
+      const seconds = Math.round((Date.now() - started) / 100) / 10;
+      if (timedOut) {
+        done({ ok: false, seconds, stdout, code: -2, stderr: `Tiempo agotado: «${p.cmd}» no respondió en ${Math.round(timeoutMs / 1000)} s. Ejecuta «${p.cmd}» a mano, comprueba que la sesión está iniciada y que no pide confirmaciones; sube el límite con --timeout <segundos>.\n${stderr}` });
+        return;
+      }
+      done({ ok: code === 0, seconds, stdout, stderr, code });
     });
   });
 }

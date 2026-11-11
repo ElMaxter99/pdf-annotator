@@ -6,7 +6,7 @@ Herramienta de prueba, **fuera de la app y del build**. Ejecuta `claude -p` y/o 
 - Node 22 y `npm install` dentro de esta carpeta.
 - Para Claude: `claude` instalado y con la sesión de la suscripción iniciada (`claude` una vez a mano). **Sin** `ANTHROPIC_API_KEY` en el entorno.
 - Para Copilot: `copilot` instalado y con sesión iniciada; revisa las banderas (ver `docs/IA-LOCAL.md`).
-- En Windows PowerShell funciona igual (`node run.mjs`); el script usa un shell solo para localizar `claude.cmd`/`copilot.cmd`.
+- En Windows PowerShell funciona igual (`node run.mjs`). El script busca `claude`/`copilot` en el `PATH` y lanza los `.cmd` con `cmd.exe /d /s /c` sin `shell: true`; solo pasa texto fijo. Si el CLI no responde en 300 s corta con un mensaje (cambia el límite con `--timeout <segundos>`). Los avisos de cada ejecución se imprimen en consola con su motivo.
 
 ## Uso
 ```
@@ -16,7 +16,7 @@ node run.mjs --provider claude      # todos los pares de pairs/ y sample/
 node run.mjs --provider copilot --pair sample/factura-desplazada
 node run.mjs --provider both
 ```
-Opciones: `--keep-api-key` (no quitar `ANTHROPIC_API_KEY`), `--keep-work` (no borrar la carpeta con las imágenes enviadas). Resultado: `out/summary.md` y, por par y proveedor, `out/<par>/<proveedor>/` con `result.json`, `B-propuesta.json` (importable en la app) y `raw-*.txt`.
+Opciones: `--timeout <segundos>` (por defecto 300), `--keep-api-key` (no quitar `ANTHROPIC_API_KEY`), `--keep-work` (no borrar la carpeta con las imágenes enviadas). Resultado: `out/summary.md` y, por par y proveedor, `out/<par>/<proveedor>/` con `result.json`, `B-propuesta.json` (importable en la app) y `raw-*.txt`.
 
 ## Casos sintéticos (`sample/`, datos inventados)
 | Caso | Qué prueba |
