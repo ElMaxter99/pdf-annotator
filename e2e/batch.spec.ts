@@ -35,6 +35,39 @@ async function openPanel(page: Page) {
   await expect(page.getByTestId('panel-item')).toHaveCount(2);
 }
 
+/** Waits until the batch is really written to IndexedDB (the write is asynchronous). */
+async function waitForSavedBatch(page: Page, count: number) {
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (name) =>
+          new Promise<number>((resolve) => {
+            const request = indexedDB.open(name);
+            request.onerror = () => resolve(-1);
+            request.onsuccess = () => {
+              const db = request.result;
+              if (!db.objectStoreNames.contains('items')) {
+                db.close();
+                resolve(0);
+                return;
+              }
+              const query = db.transaction('items').objectStore('items').count();
+              query.onsuccess = () => {
+                db.close();
+                resolve(query.result);
+              };
+              query.onerror = () => {
+                db.close();
+                resolve(-1);
+              };
+            };
+          }),
+        'pdf-annotator-batch',
+      ),
+    )
+    .toBe(count);
+}
+
 /** Opens the first PDF of the panel (the one with a template) in the editor. */
 async function openFirst(page: Page, expectB = false) {
   await page.getByTestId('view-list').click();
@@ -113,6 +146,7 @@ test('a PDF without a new version is edited with its own template and marked rea
 
 test('a saved batch is offered on the landing', async ({ page }) => {
   await openPanel(page);
+  await waitForSavedBatch(page, 2);
   await page.goto('/landing');
   await expect(page.getByTestId('resume-batch')).toBeVisible();
   await page.getByTestId('resume-batch').getByRole('button', { name: 'Continuar el lote' }).click();
@@ -478,6 +512,7 @@ test('A and B with a different number of pages say so in the bar', async ({ page
 test('a new batch starts from zero: the saved one is not added to it', async ({ page }) => {
   await openPanel(page);
   await expect(page.getByTestId('panel-item')).toHaveCount(2);
+  await waitForSavedBatch(page, 2);
   await page.goto('/landing');
   await expect(page.getByTestId('resume-batch')).toBeVisible();
   // Without choosing «Continuar», two new PDFs start a new batch.
