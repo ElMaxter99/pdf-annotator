@@ -320,7 +320,8 @@
       "notPersistent": "Aquest navegador no pot desar el lot entre visites.",
       "samePdf": "{{name}} és el mateix PDF que l’original: no hi ha res a migrar.",
       "templateApplied": "Plantilla carregada: {{count}} camps.",
-      "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A."
+      "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A.",
+      "copiedAdjusted": "Camps copiats i ajustats a la mida de B."
     }
   },
   "session": {
@@ -416,8 +417,7 @@
       "position": "{{index}} de {{total}}",
       "split": {
         "tagA": "A · original · només lectura",
-        "tagB": "B · versió nova · s’edita",
-        "sizeMismatch": "A i B no tenen la mateixa mida: les coordenades no coincideixen."
+        "tagB": "B · versió nova · s’edita"
       },
       "noA": {
         "hint": "A no té plantilla: es compara el seu PDF tal qual.",
@@ -433,6 +433,20 @@
         "overlay": "Els camps d'A es dibuixen sobre B (només els que canvien)",
         "toggle": "Canvia entre veure B i veure A, una versió cada cop",
         "split": "A i B costat per costat, amb la mateixa pàgina i zoom"
+      },
+      "fit": {
+        "sizes": "A {{aw}} × {{ah}} · B {{bw}} × {{bh}}",
+        "askTitle": "A i B no tenen la mateixa mida.",
+        "askText": "Les coordenades d'A no cauen al mateix lloc de B.",
+        "yes": "Ajustar les coordenades d'A a B",
+        "no": "Deixar-les com estan",
+        "onTitle": "A es veu ajustada a la mida de B.",
+        "onText": "Les seves coordenades s'escalen ×{{sx}} en horitzontal i ×{{sy}} en vertical només en mostrar-les i copiar-les; el JSON d'A no canvia.",
+        "remove": "Treure l'ajust",
+        "offTitle": "A es mostra tal qual.",
+        "offText": "Sense ajustar, els camps d'A poden quedar fora de la pàgina de B.",
+        "apply": "Ajustar a B",
+        "menu": "Ajustar les coordenades a la mida de B"
       }
     },
     "panel": {

@@ -320,7 +320,8 @@
       "notPersistent": "Questo browser non può conservare il lotto tra le visite.",
       "samePdf": "{{name}} è lo stesso PDF dell’originale: non c’è nulla da migrare.",
       "templateApplied": "Modello caricato: {{count}} campi.",
-      "templateFromAnnotations": "Le annotazioni dell’originale diventano il modello A."
+      "templateFromAnnotations": "Le annotazioni dell’originale diventano il modello A.",
+      "copiedAdjusted": "Campi copiati e adattati alle dimensioni di B."
     }
   },
   "session": {
@@ -416,8 +417,7 @@
       "position": "{{index}} di {{total}}",
       "split": {
         "tagA": "A · originale · sola lettura",
-        "tagB": "B · nuova versione · modificata",
-        "sizeMismatch": "A e B non hanno la stessa dimensione: le coordinate non coincidono."
+        "tagB": "B · nuova versione · modificata"
       },
       "noA": {
         "hint": "A non ha un modello: si confronta il suo PDF così com'è.",
@@ -433,6 +433,20 @@
         "overlay": "I campi di A sono disegnati sopra B (solo quelli che cambiano)",
         "toggle": "Passa da B ad A, una versione alla volta",
         "split": "A e B affiancati, stessa pagina e stesso zoom"
+      },
+      "fit": {
+        "sizes": "A {{aw}} × {{ah}} · B {{bw}} × {{bh}}",
+        "askTitle": "A e B non hanno le stesse dimensioni.",
+        "askText": "Le coordinate di A non cadono nello stesso punto di B.",
+        "yes": "Adatta le coordinate di A a B",
+        "no": "Lasciale come sono",
+        "onTitle": "A è adattata alle dimensioni di B.",
+        "onText": "Le sue coordinate sono scalate ×{{sx}} in orizzontale e ×{{sy}} in verticale solo quando le mostri e le copi; il JSON di A non cambia.",
+        "remove": "Rimuovi l'adattamento",
+        "offTitle": "A è mostrata così com'è.",
+        "offText": "Senza adattamento, i campi di A possono finire fuori dalla pagina di B.",
+        "apply": "Adatta a B",
+        "menu": "Adatta le coordinate alle dimensioni di B"
       }
     },
     "panel": {

@@ -320,7 +320,8 @@
       "notPersistent": "Ce navigateur ne peut pas conserver le lot entre deux visites.",
       "samePdf": "{{name}} est le même PDF que l’original : rien à migrer.",
       "templateApplied": "Modèle chargé : {{count}} champs.",
-      "templateFromAnnotations": "Les annotations de l’original deviennent le modèle A."
+      "templateFromAnnotations": "Les annotations de l’original deviennent le modèle A.",
+      "copiedAdjusted": "Champs copiés et ajustés à la taille de B."
     }
   },
   "session": {
@@ -416,8 +417,7 @@
       "position": "{{index}} sur {{total}}",
       "split": {
         "tagA": "A · original · lecture seule",
-        "tagB": "B · nouvelle version · modifiée",
-        "sizeMismatch": "A et B n’ont pas la même taille : les coordonnées ne correspondent pas."
+        "tagB": "B · nouvelle version · modifiée"
       },
       "noA": {
         "hint": "A n'a pas de modèle : son PDF est comparé tel quel.",
@@ -433,6 +433,20 @@
         "overlay": "Les champs de A sont dessinés sur B (seulement ceux qui changent)",
         "toggle": "Alterne entre B et A, une version à la fois",
         "split": "A et B côte à côte, même page et même zoom"
+      },
+      "fit": {
+        "sizes": "A {{aw}} × {{ah}} · B {{bw}} × {{bh}}",
+        "askTitle": "A et B n'ont pas la même taille.",
+        "askText": "Les coordonnées de A ne tombent pas au même endroit sur B.",
+        "yes": "Ajuster les coordonnées de A à B",
+        "no": "Les laisser telles quelles",
+        "onTitle": "A est ajustée à la taille de B.",
+        "onText": "Ses coordonnées sont mises à l'échelle ×{{sx}} à l'horizontale et ×{{sy}} à la verticale, seulement à l'affichage et à la copie ; le JSON de A ne change pas.",
+        "remove": "Retirer l'ajustement",
+        "offTitle": "A est affichée telle quelle.",
+        "offText": "Sans ajustement, les champs de A peuvent sortir de la page de B.",
+        "apply": "Ajuster à B",
+        "menu": "Ajuster les coordonnées à la taille de B"
       }
     },
     "panel": {

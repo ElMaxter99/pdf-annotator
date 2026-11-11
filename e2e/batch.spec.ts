@@ -530,3 +530,53 @@ test('a new batch starts from zero: the saved one is not added to it', async ({ 
   await page.reload();
   await expect(page.getByTestId('panel-item')).toHaveCount(2);
 });
+
+test('A and B of different size: the notice lets you fit the coordinates of A to B or not', async ({
+  page,
+}) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  const landscape = await PDFDocument.create();
+  landscape.addPage([842, 595]);
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(
+      file('factura-0331-nuevo.pdf', Buffer.from(await landscape.save()), 'application/pdf'),
+    );
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await openRow(page);
+
+  // Asks first, in any mode
+  await expect(page.getByTestId('fit-ask')).toContainText('595 × 842');
+  await expect(page.getByTestId('fit-ask')).toContainText('842 × 595');
+
+  // Leave them: A is shown as it is, and it can be fitted later
+  await page.getByTestId('fit-no').click();
+  await expect(page.getByTestId('fit-off')).toBeVisible();
+  await page.getByTestId('put-template-a').click();
+  await expect(page.getByTestId('put-a-fit').locator('input')).not.toBeChecked();
+  await page.getByTestId('put-a-copy').click();
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+  const plain = await page
+    .locator('.annotation')
+    .first()
+    .evaluate((el: HTMLElement) => el.style.left);
+
+  // Fit: the copy lands scaled in one history step, and the choice is remembered
+  await page.getByTestId('fit-apply').click();
+  await expect(page.getByTestId('fit-on')).toContainText('×1.42');
+  await page.getByTestId('put-template-a').click();
+  await expect(page.getByTestId('put-a-fit').locator('input')).toBeChecked();
+  await page.getByTestId('put-a-copy').click();
+  await page.getByTestId('put-a-confirm').click();
+  await expect(page.locator('.toast')).toContainText('ajustados al tamaño de B');
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+  const fitted = await page
+    .locator('.annotation')
+    .first()
+    .evaluate((el: HTMLElement) => el.style.left);
+  expect(parseFloat(fitted)).toBeGreaterThan(parseFloat(plain) * 1.2);
+
+  await page.getByTestId('fit-remove').click();
+  await expect(page.getByTestId('fit-off')).toBeVisible();
+});

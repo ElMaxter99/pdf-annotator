@@ -320,7 +320,8 @@
       "notPersistent": "Dieser Browser kann den Stapel nicht zwischen Besuchen speichern.",
       "samePdf": "{{name}} ist dasselbe PDF wie das Original: es gibt nichts zu migrieren.",
       "templateApplied": "Vorlage geladen: {{count}} Felder.",
-      "templateFromAnnotations": "Die Anmerkungen des Originals sind jetzt Vorlage A."
+      "templateFromAnnotations": "Die Anmerkungen des Originals sind jetzt Vorlage A.",
+      "copiedAdjusted": "Felder kopiert und an die Größe von B angepasst."
     }
   },
   "session": {
@@ -416,8 +417,7 @@
       "position": "{{index}} von {{total}}",
       "split": {
         "tagA": "A · Original · nur Lesen",
-        "tagB": "B · neue Version · bearbeitet",
-        "sizeMismatch": "A und B haben nicht dieselbe Größe: Die Koordinaten stimmen nicht überein."
+        "tagB": "B · neue Version · bearbeitet"
       },
       "noA": {
         "hint": "A hat keine Vorlage: sein PDF wird unverändert verglichen.",
@@ -433,6 +433,20 @@
         "overlay": "Die Felder von A werden über B gezeichnet (nur die geänderten)",
         "toggle": "Wechselt zwischen B und A, jeweils eine Version",
         "split": "A und B nebeneinander, gleiche Seite und gleicher Zoom"
+      },
+      "fit": {
+        "sizes": "A {{aw}} × {{ah}} · B {{bw}} × {{bh}}",
+        "askTitle": "A und B sind nicht gleich groß.",
+        "askText": "Die Koordinaten von A landen nicht an derselben Stelle auf B.",
+        "yes": "Koordinaten von A an B anpassen",
+        "no": "So lassen",
+        "onTitle": "A ist an die Größe von B angepasst.",
+        "onText": "Ihre Koordinaten werden nur beim Anzeigen und Kopieren horizontal um ×{{sx}} und vertikal um ×{{sy}} skaliert; das JSON von A bleibt unverändert.",
+        "remove": "Anpassung entfernen",
+        "offTitle": "A wird unverändert angezeigt.",
+        "offText": "Ohne Anpassung können Felder von A außerhalb der Seite von B liegen.",
+        "apply": "An B anpassen",
+        "menu": "Koordinaten an die Größe von B anpassen"
       }
     },
     "panel": {

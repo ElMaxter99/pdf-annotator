@@ -22,6 +22,13 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
 import '../../array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from '../../models/annotation.model';
+import {
+  PageSize,
+  pageScaleFactors,
+  scalePagesToSize,
+  sizeOfPage,
+  sizesDiffer,
+} from '../../utils/page-scale.utils';
 import { AnnotationTemplatesService, AnnotationTemplate } from '../../annotation-templates.service';
 import {
   DEFAULT_GUIDE_SETTINGS,
@@ -263,8 +270,36 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly splitActive = computed(
     () => !!this.migration() && this.referenceMode() === 'split',
   );
+  /** Page sizes (points) of A and B, to compare them and scale the coordinates of A. */
+  readonly pageSizesA = signal<PageSize[]>([]);
+  readonly pageSizesB = signal<PageSize[]>([]);
   /** A and B have a different page size, so their coordinates do not line up. */
-  readonly splitSizeMismatch = signal(false);
+  readonly sizeMismatch = computed(
+    () =>
+      !!this.batch.activeItem()?.bPdf && sizesDiffer(this.pageSizesA(), this.pageSizesB()),
+  );
+  /** The coordinates of A are scaled to the page size of B (the person chose «Ajustar»). */
+  readonly fitA = computed(() => this.sizeMismatch() && this.batch.activeItem()?.fitA === true);
+  /** A and B differ in size and the person has not chosen yet. */
+  readonly fitUndecided = computed(
+    () => this.sizeMismatch() && this.batch.activeItem()?.fitA === undefined,
+  );
+  /** Pages of A as shown and copied: scaled to B when «Ajustar» is on. */
+  private readonly aPagesView = computed<PageAnnotations[]>(() => {
+    const pages = this.batch.activeItem()?.aPages ?? [];
+    return this.fitA() ? scalePagesToSize(pages, this.pageSizesA(), this.pageSizesB()) : pages;
+  });
+  /** Factors applied to A on the current page (for the notice). */
+  readonly fitFactors = computed(() =>
+    pageScaleFactors(
+      sizeOfPage(this.pageSizesA(), this.pageIndex()),
+      sizeOfPage(this.pageSizesB(), this.pageIndex()),
+    ),
+  );
+  readonly fitSizes = computed(() => ({
+    a: sizeOfPage(this.pageSizesA(), this.pageIndex()),
+    b: sizeOfPage(this.pageSizesB(), this.pageIndex()),
+  }));
   /** Page counts when A and B do not have the same number of pages (else null). */
   readonly pagesDiffer = signal<{ a: number; b: number } | null>(null);
   private splitDoc: { blob: Blob; doc: Promise<PDFDocumentProxy> } | null = null;
@@ -284,7 +319,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!item || !item.bPdf) {
       return null; // without a new version there is nothing to compare: plain editing
     }
-    const states = computeFieldStates(item.aPages, this.store.coords(), item.links, item.dismissed);
+    const states = computeFieldStates(
+      this.aPagesView(),
+      this.store.coords(),
+      item.links,
+      item.dismissed,
+    );
     return { item, states, summary: summarizeStates(states), dismissed: item.dismissed };
   });
   /** Position of the open PDF inside the batch (also when it has no B). */
@@ -505,6 +545,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.pageIndex();
       this.scale();
       this.batch.activeItem();
+      this.fitA();
+      this.pageSizesB();
       untracked(() => void this.renderSplit());
     });
     this.vm = this;
@@ -3006,17 +3048,19 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const doc = await this.splitDocOf(item.aPdf);
       const page = await doc.getPage(Math.min(this.pageIndex(), doc.numPages));
       const viewport = page.getViewport({ scale: this.scale() });
+      const geometry = this.geometryForA(page);
       const canvas = document.createElement('canvas');
       canvas.className = 'reference-pdf';
-      canvas.width = Math.floor(viewport.width);
-      canvas.height = Math.floor(viewport.height);
+      canvas.width = geometry.width;
+      canvas.height = geometry.height;
       canvas.style.width = `${bCanvas.clientWidth || canvas.width}px`;
       canvas.style.height = `${bCanvas.clientHeight || canvas.height}px`;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         return;
       }
-      await page.render({ canvasContext: ctx, canvas, viewport }).promise;
+      await page.render({ canvasContext: ctx, canvas, viewport, transform: geometry.transform })
+        .promise;
       if (token === this.referencePdfToken && this.showingOnlyA() && layer.isConnected) {
         layer.querySelectorAll('.reference-pdf').forEach((old) => old.remove());
         layer.prepend(canvas);
@@ -3026,18 +3070,71 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  private pageSizesKey: { a: Blob; b: PDFDocumentProxy } | null = null;
+
   private async updatePagesDiffer(aPdf: Blob | null): Promise<void> {
     if (!aPdf) {
       this.pagesDiffer.set(null);
+      this.pageSizesA.set([]);
+      this.pageSizesB.set([]);
       return;
     }
     try {
-      const a = (await this.splitDocOf(aPdf)).numPages;
-      const b = this.pdfDoc?.numPages ?? 0;
+      const docA = await this.splitDocOf(aPdf);
+      const docB = this.pdfDoc;
+      const a = docA.numPages;
+      const b = docB?.numPages ?? 0;
       this.pagesDiffer.set(b > 0 && a !== b ? { a, b } : null);
+      if (docB && (this.pageSizesKey?.a !== aPdf || this.pageSizesKey?.b !== docB)) {
+        this.pageSizesKey = { a: aPdf, b: docB };
+        const sizesOf = async (doc: PDFDocumentProxy) => {
+          const sizes: PageSize[] = [];
+          for (let num = 1; num <= doc.numPages; num++) {
+            const view = (await doc.getPage(num)).getViewport({ scale: 1 });
+            sizes.push({ w: view.width, h: view.height });
+          }
+          return sizes;
+        };
+        const [sizesA, sizesB] = await Promise.all([sizesOf(docA), sizesOf(docB)]);
+        if (this.pageSizesKey?.a === aPdf && this.pageSizesKey?.b === docB) {
+          this.pageSizesA.set(sizesA);
+          this.pageSizesB.set(sizesB);
+        }
+      }
     } catch {
       this.pagesDiffer.set(null);
     }
+  }
+
+  /** «Ajustar» / «Dejarlas como están»: remembers the choice for the open PDF of the batch. */
+  setFitA(fit: boolean | undefined): void {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.setFitA(item.id, fit);
+    }
+  }
+
+  /**
+   * Size and transform to draw the page of A: its own size, or the size of B with the page
+   * stretched to it when the coordinates of A are scaled.
+   */
+  private geometryForA(page: PDFPageProxy): {
+    width: number;
+    height: number;
+    transform: number[] | undefined;
+  } {
+    const scale = this.scale();
+    const own = page.getViewport({ scale });
+    const target = sizeOfPage(this.pageSizesB(), this.pageIndex());
+    if (!this.fitA() || !target) {
+      return { width: Math.floor(own.width), height: Math.floor(own.height), transform: undefined };
+    }
+    const base = page.getViewport({ scale: 1 });
+    return {
+      width: Math.floor(target.w * scale),
+      height: Math.floor(target.h * scale),
+      transform: [target.w / base.width, 0, 0, target.h / base.height, 0, 0],
+    };
   }
 
   private splitDocOf(blob: Blob): Promise<PDFDocumentProxy> {
@@ -3057,7 +3154,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return [];
     }
     const out: { name: string; x: number; y: number; fontSize: number; missing: boolean }[] = [];
-    for (const aPage of m.item.aPages) {
+    for (const aPage of this.aPagesView()) {
       if (aPage.num !== page) {
         continue;
       }
@@ -3234,11 +3331,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       if (!ctx || token !== this.splitToken) {
         return;
       }
-      canvas.width = Math.floor(viewport.width);
-      canvas.height = Math.floor(viewport.height);
+      const geometry = this.geometryForA(page);
+      canvas.width = geometry.width;
+      canvas.height = geometry.height;
       // pdf.js refuses two renders at once on a canvas: the newer one cancels the older.
       this.splitTask?.cancel();
-      const task = page.render({ canvasContext: ctx, canvas, viewport });
+      const task = page.render({
+        canvasContext: ctx,
+        canvas,
+        viewport,
+        transform: geometry.transform,
+      });
       this.splitTask = task;
       try {
         await task.promise;
@@ -3261,11 +3364,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           false,
         );
       }
-      const bCanvas = this.pdfCanvasRef?.nativeElement;
-      const bPage = this.pdfDoc ? await this.pdfDoc.getPage(this.pageIndex()) : null;
-      const bWidth = bPage?.getViewport({ scale: 1 }).width ?? 0;
-      const aWidth = page.getViewport({ scale: 1 }).width;
-      this.splitSizeMismatch.set(!!bCanvas && Math.abs(aWidth - bWidth) > 2);
     } catch (error) {
       console.warn('No se pudo dibujar la versión A en la vista dividida.', error);
     }
@@ -3277,7 +3375,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return [];
     }
     return (
-      this.annotationImport.normalizeImportedCoordinates({ pages: item.aPages }, (field) =>
+      this.annotationImport.normalizeImportedCoordinates({ pages: this.aPagesView() }, (field) =>
         this.prepareFieldForStorage(field),
       ) ?? []
     );
@@ -3291,11 +3389,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     if (mode === 'replace') {
       this.replaceCoords(this.normalizedTemplateA());
-      return;
+    } else {
+      this.addMissingFromA(
+        this.migration()?.states.filter((state) => state.status === 'missing') ?? [],
+      );
     }
-    this.addMissingFromA(
-      this.migration()?.states.filter((state) => state.status === 'missing') ?? [],
-    );
+    if (this.fitA()) {
+      this.toast.show(this.translationService.translate('toast.batch.copiedAdjusted'));
+    }
   }
 
   placeMissing(state: FieldState) {

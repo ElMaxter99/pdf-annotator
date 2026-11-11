@@ -116,6 +116,16 @@
               >
               <small>{{ 'batch.editor.putA.adjustText' | t }}</small>
             </button>
+            @if (vm.sizeMismatch()) {
+              <label class="migration-menu__check" data-testid="put-a-fit">
+                <input
+                  type="checkbox"
+                  [checked]="vm.fitA()"
+                  (change)="vm.setFitA($any($event.target).checked)"
+                />
+                <span>{{ 'batch.editor.fit.menu' | t }}</span>
+              </label>
+            }
           }
         </div>
       }
@@ -159,10 +169,61 @@
         }}</span>
       </div>
     }
-    @if (vm.splitActive() && vm.splitSizeMismatch()) {
-      <div class="migration-hint migration-hint--warn" role="status" data-testid="split-size-mismatch">
-        <span>{{ 'batch.editor.split.sizeMismatch' | t }}</span>
-      </div>
+    @if (vm.sizeMismatch(); as _) {
+      @let sizes = vm.fitSizes();
+      @let factors = vm.fitFactors();
+      @let sizeText =
+        'batch.editor.fit.sizes'
+        | t
+          : {
+              aw: sizes.a?.w | number: '1.0-0',
+              ah: sizes.a?.h | number: '1.0-0',
+              bw: sizes.b?.w | number: '1.0-0',
+              bh: sizes.b?.h | number: '1.0-0',
+            };
+      @if (vm.fitUndecided()) {
+        <div class="migration-hint migration-hint--warn" role="status" data-testid="fit-ask">
+          <span
+            ><strong>{{ 'batch.editor.fit.askTitle' | t }}</strong> {{ sizeText }}
+            {{ 'batch.editor.fit.askText' | t }}</span
+          >
+          <span class="migration-hint__actions">
+            <button type="button" class="btn btn--primary" (click)="vm.setFitA(true)" data-testid="fit-yes">
+              {{ 'batch.editor.fit.yes' | t }}
+            </button>
+            <button type="button" class="btn" (click)="vm.setFitA(false)" data-testid="fit-no">
+              {{ 'batch.editor.fit.no' | t }}
+            </button>
+          </span>
+        </div>
+      } @else if (vm.fitA()) {
+        <div class="migration-hint" role="status" data-testid="fit-on">
+          <span
+            ><strong>{{ 'batch.editor.fit.onTitle' | t }}</strong> {{ sizeText }}
+            {{
+              'batch.editor.fit.onText'
+                | t
+                  : {
+                      sx: factors.sx | number: '1.2-2',
+                      sy: factors.sy | number: '1.2-2'
+                    }
+            }}</span
+          >
+          <button type="button" class="btn btn--ghost" (click)="vm.setFitA(false)" data-testid="fit-remove">
+            {{ 'batch.editor.fit.remove' | t }}
+          </button>
+        </div>
+      } @else {
+        <div class="migration-hint" role="status" data-testid="fit-off">
+          <span
+            ><strong>{{ 'batch.editor.fit.offTitle' | t }}</strong> {{ sizeText }}
+            {{ 'batch.editor.fit.offText' | t }}</span
+          >
+          <button type="button" class="btn btn--ghost" (click)="vm.setFitA(true)" data-testid="fit-apply">
+            {{ 'batch.editor.fit.apply' | t }}
+          </button>
+        </div>
+      }
     }
   </div>
 

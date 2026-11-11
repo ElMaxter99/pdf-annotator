@@ -320,7 +320,8 @@
       "notPersistent": "Este navegador não pode guardar o lote entre visitas.",
       "samePdf": "{{name}} é o mesmo PDF que o original: não há nada a migrar.",
       "templateApplied": "Modelo carregado: {{count}} campos.",
-      "templateFromAnnotations": "As anotações do original passam a ser o modelo A."
+      "templateFromAnnotations": "As anotações do original passam a ser o modelo A.",
+      "copiedAdjusted": "Campos copiados e ajustados ao tamanho de B."
     }
   },
   "session": {
@@ -416,8 +417,7 @@
       "position": "{{index}} de {{total}}",
       "split": {
         "tagA": "A · original · só leitura",
-        "tagB": "B · nova versão · editada",
-        "sizeMismatch": "A e B não têm o mesmo tamanho: as coordenadas não coincidem."
+        "tagB": "B · nova versão · editada"
       },
       "noA": {
         "hint": "A não tem modelo: compara-se o seu PDF tal como está.",
@@ -433,6 +433,20 @@
         "overlay": "Os campos de A são desenhados sobre B (só os que mudam)",
         "toggle": "Alterna entre ver B e ver A, uma versão de cada vez",
         "split": "A e B lado a lado, com a mesma página e zoom"
+      },
+      "fit": {
+        "sizes": "A {{aw}} × {{ah}} · B {{bw}} × {{bh}}",
+        "askTitle": "A e B não têm o mesmo tamanho.",
+        "askText": "As coordenadas de A não caem no mesmo sítio de B.",
+        "yes": "Ajustar as coordenadas de A a B",
+        "no": "Deixá-las como estão",
+        "onTitle": "A está ajustada ao tamanho de B.",
+        "onText": "As suas coordenadas são escaladas ×{{sx}} na horizontal e ×{{sy}} na vertical só ao mostrá-las e copiá-las; o JSON de A não muda.",
+        "remove": "Remover o ajuste",
+        "offTitle": "A é mostrada tal como está.",
+        "offText": "Sem ajuste, os campos de A podem ficar fora da página de B.",
+        "apply": "Ajustar a B",
+        "menu": "Ajustar as coordenadas ao tamanho de B"
       }
     },
     "panel": {

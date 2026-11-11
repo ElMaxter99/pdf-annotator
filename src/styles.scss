@@ -3579,6 +3579,27 @@ kbd {
   margin-top: 8px;
 }
 
+.migration-hint > span:first-child {
+  flex: 1;
+}
+
+.migration-hint__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.migration-menu__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 10px 12px 6px;
+  border-top: 1px solid var(--border, rgba(127, 127, 127, 0.25));
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
 .reference-field--pair {
   border-style: solid;
   border-color: var(--accent);
