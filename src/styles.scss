@@ -3090,3 +3090,233 @@ kbd {
     font-weight: 600;
   }
 }
+
+/* ---- Workspace header v2: one row that never wraps; the batch strip sits under it ---- */
+.app--workspace header.header {
+  position: relative;
+  z-index: 20;
+  overflow: visible;
+  padding: 8px 14px;
+}
+
+.app--workspace .toolbar {
+  flex-wrap: nowrap;
+  gap: 12px;
+  min-height: 44px;
+}
+
+.app--workspace .toolbar__identity {
+  flex: 0 0 auto;
+}
+
+.app--workspace .toolbar__cluster {
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+
+.app--workspace .toolbar__group {
+  flex: 0 0 auto;
+  padding: 3px;
+  gap: 2px;
+  border: 0;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.app--workspace .toolbar__group .btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+}
+
+.app--workspace .toolbar__group .btn:not(.btn--primary) .btn__label {
+  display: none;
+}
+
+.app--workspace .toolbar__cluster > .toolbar__group:last-child {
+  margin-left: auto;
+  padding: 0;
+  background: transparent;
+}
+
+.app--workspace .toolbar__group .btn--primary {
+  padding: 0 16px;
+}
+
+.app--workspace .toolbar__badge {
+  min-width: 54px;
+  padding: 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.app--workspace .toolbar__group--preferences {
+  margin-left: 0;
+}
+
+.toolbar__pop {
+  position: relative;
+  display: inline-flex;
+}
+
+.toolbar__more {
+  display: none;
+}
+
+.toolbar__menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 40;
+  width: 280px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  background: var(--panel);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  white-space: normal;
+
+  p {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+  }
+}
+
+.toolbar__menu-row {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 1200px) {
+  .app--workspace .toolbar__app-name,
+  .app--workspace .toolbar__group .btn--primary .btn__label {
+    display: none;
+  }
+
+  .app--workspace .toolbar__group .btn--primary {
+    padding: 0 8px;
+  }
+
+  .toolbar__more {
+    display: inline-flex;
+  }
+
+  .toolbar__prefs .toolbar__group--preferences {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 40;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    min-width: 240px;
+    padding: 8px;
+    border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+    background: var(--panel);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .toolbar__prefs--open .toolbar__group--preferences {
+    display: flex;
+  }
+
+  .app--workspace .toolbar__prefs--open .toolbar__group--preferences .btn {
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .app--workspace .toolbar__prefs--open .toolbar__group--preferences .btn .btn__label {
+    display: inline;
+  }
+}
+
+/* Batch strip */
+.migration-bar {
+  flex-wrap: nowrap;
+  min-height: 46px;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.migration-bar__file {
+  max-width: 280px;
+}
+
+.migration-bar .btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.migration-put__short {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .migration-put__long {
+    display: none;
+  }
+
+  .migration-put__short {
+    display: inline;
+  }
+
+  .migration-bar__file {
+    max-width: 180px;
+  }
+}
+
+.app--workspace .toolbar__prefs .toolbar__group--preferences {
+  padding: 0;
+  background: transparent;
+  align-items: center;
+}
+
+.app--workspace .toolbar__prefs app-language-selector.header__language-selector {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  min-width: 0;
+  margin-left: 0;
+}
+
+.app--workspace .toolbar__prefs app-language-selector select {
+  padding: 6px 30px 6px 12px !important;
+  border-radius: 10px !important;
+  min-height: 34px;
+  font-size: 0.85rem !important;
+}
+
+@media (max-width: 1200px) {
+  .app--workspace .toolbar__prefs .toolbar__group--preferences {
+    background: var(--panel);
+  }
+}
+
+@media (max-width: 1200px) {
+  .app--workspace .toolbar__prefs--open .toolbar__group--preferences app-theme-toggle,
+  .app--workspace .toolbar__prefs--open .toolbar__group--preferences app-language-selector {
+    display: block;
+    width: 100%;
+  }
+
+  .app--workspace .toolbar__prefs--open .toolbar__group--preferences app-language-selector select {
+    width: 100%;
+  }
+}
+
+/* Phones keep the older wrapping toolbar (the app is designed for desktop). */
+@media (max-width: 960px) {
+  .app--workspace .toolbar,
+  .app--workspace .toolbar__cluster,
+  .app--workspace .migration-bar {
+    flex-wrap: wrap;
+  }
+
+  .app--workspace .toolbar__cluster > .toolbar__group:last-child {
+    margin-left: 0;
+  }
+}

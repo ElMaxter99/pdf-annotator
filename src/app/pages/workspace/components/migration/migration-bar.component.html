@@ -28,7 +28,7 @@
 
     @if (vm.migration(); as m) {
 
-    <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t">
+    <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t" [attr.title]="'batch.editor.holdHint' | t">
       <button
         type="button"
         [class.migration-seg__on]="vm.referenceMode() === 'overlay'"
@@ -46,18 +46,20 @@
         {{ 'batch.editor.view.toggle' | t }}
       </button>
     </div>
-    <span class="migration-bar__hint">{{ 'batch.editor.holdHint' | t }}</span>
 
     <div class="migration-menu">
       <button
         type="button"
         class="btn"
         aria-haspopup="true"
+        [attr.aria-label]="'batch.editor.putA.button' | t"
+        [attr.title]="'batch.editor.putA.button' | t"
         [attr.aria-expanded]="menuOpen()"
         (click)="toggleMenu()"
         data-testid="put-template-a"
       >
-        {{ 'batch.editor.putA.button' | t }} ▾
+        <span class="migration-put__long">{{ 'batch.editor.putA.button' | t }}</span
+        ><span class="migration-put__short" aria-hidden="true">A</span> ▾
       </button>
       @if (menuOpen()) {
         <div class="migration-menu__panel" role="menu">

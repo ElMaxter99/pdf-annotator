@@ -96,7 +96,11 @@
     "historyGroup": "Actions d'historique",
     "exportGroup": "Options d'export",
     "preferencesGroup": "Préférences",
-    "fitWidth": "Ajuster"
+    "fitWidth": "Ajuster",
+    "moreOptions": "Plus d'options",
+    "clearConfirm": "Supprimer toutes les annotations ? Vous pouvez annuler avec Ctrl+Z.",
+    "clearYes": "Tout supprimer",
+    "clearCancel": "Annuler"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -474,7 +478,20 @@
       "empty": "Vide",
       "remove": "Retirer le modèle de {{name}}",
       "skip": "Passer cette étape",
-      "next": "Suivant : Commencer →"
+      "next": "Suivant : Commencer →",
+      "tabsLabel": "Comment ajouter les modèles",
+      "tabFiles": "Fichiers",
+      "tabPaste": "Coller du JSON",
+      "pastePlaceholder": "Collez ici les modèles : un tableau, un document ou plusieurs à la suite (par exemple, ce que vous extrayez de Mongo).",
+      "pasteHint": "L'association se fait par le champ pdfName (ou name, fileName, type). Les champs Mongo sont ignorés ; seul pages compte.",
+      "pasteMatch": "Associer aux PDF",
+      "pasteClear": "Effacer le texte",
+      "pasteFound": "{{count}} modèles reconnus",
+      "pasteUnused": "{{count}} sans PDF",
+      "pasteError": "JSON invalide : vérifiez la ligne {{line}}.",
+      "pasteTooBig": "Le texte collé dépasse 5 Mo.",
+      "assign": "Attribuer un modèle à {{name}}",
+      "assignPlaceholder": "Attribuer…"
     },
     "step3": {
       "title": "3 · Tout est prêt",

@@ -96,7 +96,11 @@
     "historyGroup": "Acciones de historial",
     "exportGroup": "Opciones de exportación",
     "preferencesGroup": "Preferencias",
-    "fitWidth": "Ajustar"
+    "fitWidth": "Ajustar",
+    "moreOptions": "Más opciones",
+    "clearConfirm": "¿Quitar todas las anotaciones? Se puede deshacer con Ctrl+Z.",
+    "clearYes": "Quitar todas",
+    "clearCancel": "Cancelar"
   },
   "sidebar": {
     "title": "Anotaciones (JSON)",
@@ -474,7 +478,20 @@
       "empty": "Vacío",
       "remove": "Quitar la plantilla de {{name}}",
       "skip": "Saltar este paso",
-      "next": "Siguiente: Empezar →"
+      "next": "Siguiente: Empezar →",
+      "tabsLabel": "Cómo subir las plantillas",
+      "tabFiles": "Archivos",
+      "tabPaste": "Pegar JSON",
+      "pastePlaceholder": "Pega aquí las plantillas: un array, un documento o varios seguidos (por ejemplo, lo que extraes de Mongo).",
+      "pasteHint": "Se empareja por el campo pdfName (o name, fileName, type). Los campos de Mongo se ignoran; solo cuenta pages.",
+      "pasteMatch": "Emparejar con los PDF",
+      "pasteClear": "Limpiar texto",
+      "pasteFound": "{{count}} plantillas reconocidas",
+      "pasteUnused": "{{count}} sin PDF",
+      "pasteError": "JSON no válido: revisa la línea {{line}}.",
+      "pasteTooBig": "El texto pasado supera los 5 MB.",
+      "assign": "Asignar plantilla a {{name}}",
+      "assignPlaceholder": "Asignar…"
     },
     "step3": {
       "title": "3 · Todo listo para empezar",

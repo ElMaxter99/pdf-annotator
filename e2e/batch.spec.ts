@@ -251,3 +251,37 @@ test('an unpaired new version is reported and can be assigned from its row', asy
   await (await chooser).setFiles(file('cualquier-nombre.pdf', pdf, 'application/pdf'));
   await expect(page.getByTestId('panel-list')).toContainText('cualquier-nombre.pdf');
 });
+
+test('templates pasted from Mongo are matched to the PDFs by pdfName', async ({ page }) => {
+  await startSteps(page);
+  await page.getByTestId('next-templates').click();
+  await page.getByTestId('tab-paste').click();
+  const pages = JSON.stringify(JSON.parse(json.toString()).pages);
+  const text = `[
+    { _id: ObjectId("65f1c0aa"), pdfName: 'factura-0331.pdf', type: 'T_A', fontSize: 10, pages: ${pages} },
+    { _id: { $oid: "65f1c0ab" }, pdfName: 'otro.pdf', pages: ${pages} }
+  ]`;
+  await page.getByTestId('paste-text').fill(text);
+  await page.getByTestId('paste-match').click();
+  await expect(page.getByTestId('paste-found')).toContainText('2 plantillas');
+  await expect(page.getByTestId('template-rows')).toContainText(`${FIELDS} campos`);
+
+  // The leftover template is assigned by hand to the other PDF.
+  await page.getByTestId('assign-pasted').selectOption({ label: 'otro.pdf' });
+  await expect(page.getByTestId('template-rows')).toContainText('otro.pdf');
+
+  await page.getByTestId('next-start').click();
+  await page.getByTestId('open-panel').click();
+  await expect(page.getByTestId('panel-item')).toHaveCount(2);
+  await expect(page.getByRole('button', { name: /Sin plantilla/ })).toContainText('0');
+});
+
+test('pasted JSON with a syntax error points to the line and does not block', async ({ page }) => {
+  await startSteps(page);
+  await page.getByTestId('next-templates').click();
+  await page.getByTestId('tab-paste').click();
+  await page.getByTestId('paste-text').fill('[\n  { "pdfName": "a.pdf" "pages": [] }\n]');
+  await page.getByTestId('paste-match').click();
+  await expect(page.getByTestId('paste-error')).toContainText('línea 2');
+  await expect(page.getByTestId('next-start')).toBeEnabled();
+});

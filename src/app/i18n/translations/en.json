@@ -96,7 +96,11 @@
     "historyGroup": "History actions",
     "exportGroup": "Export options",
     "preferencesGroup": "Preferences",
-    "fitWidth": "Fit"
+    "fitWidth": "Fit",
+    "moreOptions": "More options",
+    "clearConfirm": "Remove all annotations? You can undo it with Ctrl+Z.",
+    "clearYes": "Remove all",
+    "clearCancel": "Cancel"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -474,7 +478,20 @@
       "empty": "Empty",
       "remove": "Remove the template of {{name}}",
       "skip": "Skip this step",
-      "next": "Next: Start →"
+      "next": "Next: Start →",
+      "tabsLabel": "How to add the templates",
+      "tabFiles": "Files",
+      "tabPaste": "Paste JSON",
+      "pastePlaceholder": "Paste the templates here: an array, one document or several in a row (for example, what you extract from Mongo).",
+      "pasteHint": "They are matched by the pdfName field (or name, fileName, type). Mongo fields are ignored; only pages matters.",
+      "pasteMatch": "Match with the PDFs",
+      "pasteClear": "Clear text",
+      "pasteFound": "{{count}} templates found",
+      "pasteUnused": "{{count}} without a PDF",
+      "pasteError": "Invalid JSON: check line {{line}}.",
+      "pasteTooBig": "The pasted text is over 5 MB.",
+      "assign": "Assign a template to {{name}}",
+      "assignPlaceholder": "Assign…"
     },
     "step3": {
       "title": "3 · Ready to start",

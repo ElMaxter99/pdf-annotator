@@ -83,6 +83,7 @@ test('clear, JSON apply and file import are undoable steps', async ({ page }) =>
   await expect(page.locator('.annotation')).toHaveCount(10);
 
   await clearBtn(page).click();
+  await page.getByTestId('clear-confirm').click();
   await expect(page.locator('.annotation')).toHaveCount(0);
   await page.keyboard.press('Control+z');
   await expect(page.locator('.annotation')).toHaveCount(10);

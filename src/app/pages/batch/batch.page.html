@@ -153,29 +153,97 @@
           @case ('templates') {
             <h2>{{ 'batch.step2.title' | t }}</h2>
             <p class="batch-muted">{{ 'batch.step2.text' | t }}</p>
-            <div
-              class="batch-drop"
-              [class.batch-drop--active]="dragActive()"
-              (dragover)="onDragOver($event)"
-              (dragleave)="onDragLeave($event)"
-              (drop)="onTemplatesDrop($event)"
-            >
-              <input
-                #inputJson
-                type="file"
-                accept="application/json,.json"
-                multiple
-                hidden
-                (change)="onTemplatesSelected($event)"
-                data-testid="input-templates"
-              />
-              <div>
-                <strong>{{ 'batch.step2.drop' | t }}</strong>
-              </div>
-              <button type="button" class="btn" (click)="inputJson.click()">
-                {{ 'batch.step1.choose' | t }}
+            <div class="batch-tabs" role="tablist" [attr.aria-label]="'batch.step2.tabsLabel' | t">
+              <button
+                type="button"
+                role="tab"
+                [attr.aria-selected]="templateTab() === 'files'"
+                [class.batch-tabs__on]="templateTab() === 'files'"
+                (click)="templateTab.set('files')"
+              >
+                {{ 'batch.step2.tabFiles' | t }}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                [attr.aria-selected]="templateTab() === 'paste'"
+                [class.batch-tabs__on]="templateTab() === 'paste'"
+                (click)="templateTab.set('paste')"
+                data-testid="tab-paste"
+              >
+                {{ 'batch.step2.tabPaste' | t }}
               </button>
             </div>
+            @if (templateTab() === 'files') {
+              <div
+                class="batch-drop"
+                [class.batch-drop--active]="dragActive()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onTemplatesDrop($event)"
+              >
+                <input
+                  #inputJson
+                  type="file"
+                  accept="application/json,.json"
+                  multiple
+                  hidden
+                  (change)="onTemplatesSelected($event)"
+                  data-testid="input-templates"
+                />
+                <div>
+                  <strong>{{ 'batch.step2.drop' | t }}</strong>
+                </div>
+                <button type="button" class="btn" (click)="inputJson.click()">
+                  {{ 'batch.step1.choose' | t }}
+                </button>
+              </div>
+            } @else {
+              <textarea
+                class="batch-paste"
+                spellcheck="false"
+                [ngModel]="pasteText()"
+                (ngModelChange)="pasteText.set($event)"
+                [placeholder]="'batch.step2.pastePlaceholder' | t"
+                [attr.aria-label]="'batch.step2.tabPaste' | t"
+                data-testid="paste-text"
+              ></textarea>
+              <div class="batch-paste__bar">
+                @if (pasteError(); as err) {
+                  <span class="batch-chip batch-chip--err" data-testid="paste-error">{{
+                    'batch.step2.pasteError' | t: { line: err.line }
+                  }}</span>
+                } @else if (pasteTooBig()) {
+                  <span class="batch-chip batch-chip--err">{{
+                    'batch.step2.pasteTooBig' | t
+                  }}</span>
+                } @else if (pastedFound() > 0) {
+                  <span class="batch-chip batch-chip--ok" data-testid="paste-found">{{
+                    'batch.step2.pasteFound' | t: { count: pastedFound() }
+                  }}</span>
+                  @if (unusedPasted().length > 0) {
+                    <span class="batch-chip batch-chip--warn">{{
+                      'batch.step2.pasteUnused' | t: { count: unusedPasted().length }
+                    }}</span>
+                  }
+                } @else {
+                  <small class="batch-muted">{{ 'batch.step2.pasteHint' | t }}</small>
+                }
+                <span class="batch-bar__spacer"></span>
+                <button type="button" class="btn btn--ghost" (click)="clearPasted()">
+                  {{ 'batch.step2.pasteClear' | t }}
+                </button>
+                <button
+                  type="button"
+                  class="btn"
+                  [disabled]="!pasteText().trim()"
+                  (click)="matchPasted()"
+                  data-testid="paste-match"
+                >
+                  {{ 'batch.step2.pasteMatch' | t }}
+                </button>
+              </div>
+            }
             <ul class="batch-files" data-testid="template-rows">
               @for (row of templateRows(); track $index) {
                 <li>
@@ -191,6 +259,18 @@
                     <span class="batch-chip batch-chip--ok">{{
                       'batch.step2.fields' | t: { count: row.info.count }
                     }}</span>
+                  } @else if (unusedPasted().length > 0) {
+                    <select
+                      class="batch-assign"
+                      [attr.aria-label]="'batch.step2.assign' | t: { name: row.pdf.name }"
+                      (change)="assignPasted(row.pdf, $any($event.target).value)"
+                      data-testid="assign-pasted"
+                    >
+                      <option value="" selected>{{ 'batch.step2.assignPlaceholder' | t }}</option>
+                      @for (template of unusedPasted(); track $index) {
+                        <option [value]="$index">{{ template.label }}</option>
+                      }
+                    </select>
                   } @else {
                     <span class="batch-chip batch-chip--warn">{{ 'batch.step2.empty' | t }}</span>
                   }

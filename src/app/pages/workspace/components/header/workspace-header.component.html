@@ -4,7 +4,6 @@
       <img class="toolbar__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
       <div class="toolbar__brand-text">
         <span class="toolbar__app-name">{{ vm.appName }}</span>
-        <span class="toolbar__version">v{{ vm.version }}</span>
       </div>
     </div>
 
@@ -12,15 +11,17 @@
 
     <div class="toolbar__cluster">
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
-        <button class="btn btn--icon" (click)="vm.prevPage()" [disabled]="!vm.pdfDoc || vm.pageIndex()===1"
+        <button class="btn btn--icon" (click)="vm.prevPage()" [attr.aria-label]="'controls.prev' | t" [disabled]="!vm.pdfDoc || vm.pageIndex()===1"
           [attr.title]="('controls.prev' | t) + ' (←)'" [attr.aria-keyshortcuts]="'ArrowLeft'">
           <span class="btn__icon" aria-hidden="true">⟨</span>
           <span class="btn__label">{{ 'controls.prev' | t }}</span>
         </button>
-        <span class="toolbar__badge" aria-live="polite">
-          {{ 'controls.pageIndicator' | t : { current: vm.pageIndex(), total: vm.pageCount || 0 } }}
+        <span class="toolbar__badge" aria-live="polite"
+          [attr.aria-label]="'controls.pageIndicator' | t : { current: vm.pageIndex(), total: vm.pageCount || 0 }"
+          [attr.title]="'controls.pageIndicator' | t : { current: vm.pageIndex(), total: vm.pageCount || 0 }">
+          {{ vm.pageIndex() }} / {{ vm.pageCount || 0 }}
         </span>
-        <button class="btn btn--icon" (click)="vm.nextPage()" [disabled]="!vm.pdfDoc || vm.pageIndex()===vm.pageCount"
+        <button class="btn btn--icon" (click)="vm.nextPage()" [attr.aria-label]="'controls.next' | t" [disabled]="!vm.pdfDoc || vm.pageIndex()===vm.pageCount"
           [attr.title]="('controls.next' | t) + ' (→)'" [attr.aria-keyshortcuts]="'ArrowRight'">
           <span class="btn__label">{{ 'controls.next' | t }}</span>
           <span class="btn__icon" aria-hidden="true">⟩</span>
@@ -28,18 +29,18 @@
       </div>
 
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
-        <button class="btn btn--icon" (click)="vm.zoomOut()" [disabled]="!vm.pdfDoc"
+        <button class="btn btn--icon" (click)="vm.zoomOut()" [attr.aria-label]="'controls.zoomOut' | t" [disabled]="!vm.pdfDoc"
           [attr.title]="('controls.zoomOut' | t) + ' (−)'" [attr.aria-keyshortcuts]="'-'">
           <span class="btn__icon" aria-hidden="true">−</span>
           <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
         </button>
-        <span class="toolbar__badge">{{ vm.scale() | number:'1.0-2' }}×</span>
-        <button class="btn btn--icon" (click)="vm.zoomIn()" [disabled]="!vm.pdfDoc"
+        <span class="toolbar__badge">{{ vm.scale() * 100 | number:'1.0-0' }} %</span>
+        <button class="btn btn--icon" (click)="vm.zoomIn()" [attr.aria-label]="'controls.zoomIn' | t" [disabled]="!vm.pdfDoc"
           [attr.title]="('controls.zoomIn' | t) + ' (+)'" [attr.aria-keyshortcuts]="'+'">
           <span class="btn__label">{{ 'controls.zoomIn' | t }}</span>
           <span class="btn__icon" aria-hidden="true">＋</span>
         </button>
-        <button class="btn btn--icon" (click)="vm.fitWidth()" [disabled]="!vm.pdfDoc"
+        <button class="btn btn--icon" (click)="vm.fitWidth()" [attr.aria-label]="'controls.fitWidth' | t" [disabled]="!vm.pdfDoc"
           [attr.title]="('controls.fitWidth' | t) + ' (0)'" [attr.aria-keyshortcuts]="'0'">
           <span class="btn__icon" aria-hidden="true">⤢</span>
           <span class="btn__label">{{ 'controls.fitWidth' | t }}</span>
@@ -47,24 +48,42 @@
       </div>
 
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
-        <button class="btn btn--icon" (click)="vm.undo()" [disabled]="!vm.canUndo()"
+        <button class="btn btn--icon" (click)="vm.undo()" [attr.aria-label]="'controls.undo' | t" [disabled]="!vm.canUndo()"
           [attr.title]="('controls.undo' | t) + ' (Ctrl+Z)'">
           <span class="btn__icon" aria-hidden="true">↺</span>
           <span class="btn__label">{{ 'controls.undo' | t }}</span>
         </button>
-        <button class="btn btn--icon" (click)="vm.redo()" [disabled]="!vm.canRedo()"
+        <button class="btn btn--icon" (click)="vm.redo()" [attr.aria-label]="'controls.redo' | t" [disabled]="!vm.canRedo()"
           [attr.title]="('controls.redo' | t) + ' (Ctrl+Y)'">
           <span class="btn__icon" aria-hidden="true">↻</span>
           <span class="btn__label">{{ 'controls.redo' | t }}</span>
         </button>
-        <button class="btn btn--icon btn--danger" (click)="vm.clearAll()" [disabled]="!vm.coords().length">
-          <span class="btn__icon" aria-hidden="true">🧹</span>
-          <span class="btn__label">{{ 'controls.clear' | t }}</span>
-        </button>
+        <div class="toolbar__pop">
+          <button class="btn btn--icon btn--danger" type="button" (click)="toggleClear($event)"
+            [disabled]="!vm.coords().length" [attr.aria-label]="'controls.clear' | t"
+            [attr.title]="'controls.clear' | t" [attr.aria-expanded]="clearOpen()" aria-haspopup="true">
+            <span class="btn__icon" aria-hidden="true">🧹</span>
+            <span class="btn__label">{{ 'controls.clear' | t }}</span>
+          </button>
+          @if (clearOpen()) {
+            <div class="toolbar__menu toolbar__menu--confirm" role="alertdialog" [attr.aria-label]="'controls.clear' | t">
+              <p>{{ 'controls.clearConfirm' | t }}</p>
+              <div class="toolbar__menu-row">
+                <button type="button" class="btn btn--danger" (click)="confirmClear()" data-testid="clear-confirm" autofocus>
+                  {{ 'controls.clearYes' | t }}
+                </button>
+                <button type="button" class="btn btn--ghost" (click)="clearOpen.set(false)">
+                  {{ 'controls.clearCancel' | t }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
       </div>
 
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
         <button class="btn btn--icon btn--primary" (click)="vm.downloadAnnotatedPDF()"
+          [attr.aria-label]="'controls.downloadPdf' | t" [attr.title]="'controls.downloadPdf' | t"
           [disabled]="!vm.coords().length || !vm.pdfDoc">
           <span class="btn__icon" aria-hidden="true">⬇</span>
           <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
@@ -72,17 +91,24 @@
       </div>
     </div>
 
-    <div class="toolbar__group toolbar__group--preferences" role="group" [attr.aria-label]="'controls.preferencesGroup' | t">
-      <button class="btn btn--icon btn--ghost" type="button" (click)="vm.toggleShortcuts()"
-        [attr.title]="('shortcuts.open' | t) + ' (?)'" [attr.aria-label]="'shortcuts.open' | t"
-        [attr.aria-keyshortcuts]="'?'">
-        <span class="btn__icon" aria-hidden="true">⌨</span>
-        <span class="btn__label">{{ 'shortcuts.openShort' | t }}</span>
+    <div class="toolbar__pop toolbar__prefs" [class.toolbar__prefs--open]="prefsOpen()">
+      <button class="btn btn--icon btn--ghost toolbar__more" type="button" (click)="togglePrefs($event)"
+        [attr.aria-label]="'controls.moreOptions' | t" [attr.title]="'controls.moreOptions' | t"
+        [attr.aria-expanded]="prefsOpen()" aria-haspopup="true" data-testid="more-options">
+        <span class="btn__icon" aria-hidden="true">⋯</span>
       </button>
-      <app-theme-toggle></app-theme-toggle>
-      <app-language-selector class="header__language-selector" [languages]="vm.languages"
-        [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
-      </app-language-selector>
+    <div class="toolbar__group toolbar__group--preferences" role="group" [attr.aria-label]="'controls.preferencesGroup' | t">
+        <button class="btn btn--icon btn--ghost" type="button" (click)="vm.toggleShortcuts()"
+          [attr.title]="('shortcuts.open' | t) + ' (?)'" [attr.aria-label]="'shortcuts.open' | t"
+          [attr.aria-keyshortcuts]="'?'">
+          <span class="btn__icon" aria-hidden="true">⌨</span>
+          <span class="btn__label">{{ 'shortcuts.openShort' | t }}</span>
+        </button>
+        <app-theme-toggle></app-theme-toggle>
+        <app-language-selector class="header__language-selector" [languages]="vm.languages"
+          [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
+        </app-language-selector>
+      </div>
     </div>
   </div>
   <app-migration-bar [vm]="vm"></app-migration-bar>

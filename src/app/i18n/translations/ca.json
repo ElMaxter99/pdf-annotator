@@ -96,7 +96,11 @@
     "historyGroup": "Accions d'historial",
     "exportGroup": "Opcions d'exportació",
     "preferencesGroup": "Preferències",
-    "fitWidth": "Ajusta"
+    "fitWidth": "Ajusta",
+    "moreOptions": "Més opcions",
+    "clearConfirm": "Voleu treure totes les anotacions? Es pot desfer amb Ctrl+Z.",
+    "clearYes": "Treure-les totes",
+    "clearCancel": "Cancel·lar"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
@@ -474,7 +478,20 @@
       "empty": "Buit",
       "remove": "Treure la plantilla de {{name}}",
       "skip": "Saltar aquest pas",
-      "next": "Següent: Començar →"
+      "next": "Següent: Començar →",
+      "tabsLabel": "Com pujar les plantilles",
+      "tabFiles": "Fitxers",
+      "tabPaste": "Enganxar JSON",
+      "pastePlaceholder": "Enganxeu aquí les plantilles: un array, un document o diversos seguits (per exemple, el que extraieu de Mongo).",
+      "pasteHint": "S'aparella pel camp pdfName (o name, fileName, type). Els camps de Mongo s'ignoren; només compta pages.",
+      "pasteMatch": "Aparellar amb els PDF",
+      "pasteClear": "Netejar text",
+      "pasteFound": "{{count}} plantilles reconegudes",
+      "pasteUnused": "{{count}} sense PDF",
+      "pasteError": "JSON no vàlid: reviseu la línia {{line}}.",
+      "pasteTooBig": "El text enganxat supera els 5 MB.",
+      "assign": "Assignar plantilla a {{name}}",
+      "assignPlaceholder": "Assignar…"
     },
     "step3": {
       "title": "3 · Tot a punt per començar",

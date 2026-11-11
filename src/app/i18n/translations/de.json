@@ -96,7 +96,11 @@
     "historyGroup": "Verlauf",
     "exportGroup": "Exportoptionen",
     "preferencesGroup": "Einstellungen",
-    "fitWidth": "Anpassen"
+    "fitWidth": "Anpassen",
+    "moreOptions": "Weitere Optionen",
+    "clearConfirm": "Alle Anmerkungen entfernen? Mit Strg+Z lässt sich das rückgängig machen.",
+    "clearYes": "Alle entfernen",
+    "clearCancel": "Abbrechen"
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",
@@ -474,7 +478,20 @@
       "empty": "Leer",
       "remove": "Vorlage von {{name}} entfernen",
       "skip": "Diesen Schritt überspringen",
-      "next": "Weiter: Starten →"
+      "next": "Weiter: Starten →",
+      "tabsLabel": "Wie die Vorlagen hinzufügen",
+      "tabFiles": "Dateien",
+      "tabPaste": "JSON einfügen",
+      "pastePlaceholder": "Füge hier die Vorlagen ein: ein Array, ein Dokument oder mehrere hintereinander (z. B. dein Mongo-Export).",
+      "pasteHint": "Zuordnung über das Feld pdfName (oder name, fileName, type). Mongo-Felder werden ignoriert; nur pages zählt.",
+      "pasteMatch": "Mit den PDFs abgleichen",
+      "pasteClear": "Text löschen",
+      "pasteFound": "{{count}} Vorlagen erkannt",
+      "pasteUnused": "{{count}} ohne PDF",
+      "pasteError": "Ungültiges JSON: prüfe Zeile {{line}}.",
+      "pasteTooBig": "Der eingefügte Text ist größer als 5 MB.",
+      "assign": "Vorlage für {{name}} zuweisen",
+      "assignPlaceholder": "Zuweisen…"
     },
     "step3": {
       "title": "3 · Bereit zum Start",

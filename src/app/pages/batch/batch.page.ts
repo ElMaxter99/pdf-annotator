@@ -15,6 +15,11 @@ import { ToastService } from '../../services/toast.service';
 import { downloadBlob } from '../../utils/download.utils';
 import { parseLooseJson } from '../../utils/loose-json';
 import { pairByName, pairingKey } from '../../utils/migration.utils';
+import {
+  matchTemplate,
+  parsePastedTemplates,
+  type PastedTemplate,
+} from '../../utils/template-paste.utils';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { createZip } from '../../utils/zip.utils';
 
@@ -85,6 +90,13 @@ export class BatchPageComponent implements OnInit {
   readonly filter = signal<Filter>('all');
   readonly versionsMode = signal<'inPlace' | 'versions'>('inPlace');
   readonly templates = signal<Map<string, TemplateInfo>>(new Map());
+  readonly templateTab = signal<'files' | 'paste'>('files');
+  readonly pasteText = signal('');
+  readonly pasteError = signal<{ line: number } | null>(null);
+  readonly pasteTooBig = signal(false);
+  /** Templates found in the pasted text and not yet linked to a PDF. */
+  readonly unusedPasted = signal<PastedTemplate[]>([]);
+  readonly pastedFound = signal(0);
   readonly draft = this.store.draft;
   readonly draftPdfs = computed(() => this.store.draft()?.pdfs ?? []);
   readonly expectVersions = this.store.expectVersions;
@@ -406,6 +418,64 @@ export class BatchPageComponent implements OnInit {
     if (orphans) {
       this.toast.warning(this.t('toast.batch.jsonWithoutPdf', { count: orphans }));
     }
+  }
+
+  /** Reads the pasted text and links each template to the PDF it belongs to. */
+  matchPasted(): void {
+    const raw = this.pasteText();
+    this.pasteError.set(null);
+    this.pasteTooBig.set(raw.length > MAX_JSON_BYTES);
+    if (raw.length > MAX_JSON_BYTES) {
+      return;
+    }
+    const { templates, error } = parsePastedTemplates(raw);
+    if (error) {
+      this.pasteError.set({ line: error.line });
+      return;
+    }
+    this.pastedFound.set(templates.length);
+    const taken = new Set<PastedTemplate>();
+    const next = new Map(this.templates());
+    for (const pdf of this.draftPdfs()) {
+      const found = matchTemplate(pdf.name, templates, taken);
+      if (!found) {
+        continue;
+      }
+      taken.add(found);
+      const info = this.pastedInfo(found);
+      next.set(pairingKey(pdf.name), info);
+    }
+    this.templates.set(next);
+    this.unusedPasted.set(templates.filter((template) => !taken.has(template)));
+  }
+
+  /** Manual «Asignar»: gives a PDF the pasted template chosen from the list. */
+  assignPasted(pdf: File, index: string): void {
+    const list = this.unusedPasted();
+    const chosen = list[Number(index)];
+    if (!chosen) {
+      return;
+    }
+    const next = new Map(this.templates());
+    next.set(pairingKey(pdf.name), this.pastedInfo(chosen));
+    this.templates.set(next);
+    this.unusedPasted.set(list.filter((template) => template !== chosen));
+  }
+
+  clearPasted(): void {
+    this.pasteText.set('');
+    this.pasteError.set(null);
+    this.pasteTooBig.set(false);
+    this.unusedPasted.set([]);
+    this.pastedFound.set(0);
+  }
+
+  private pastedInfo(template: PastedTemplate): TemplateInfo {
+    const pages = this.importer.normalizeImportedCoordinates(template.data, (field) => field);
+    if (pages === null) {
+      return { name: template.label, pages: [], count: 0, error: 'noPages' };
+    }
+    return { name: template.label, pages, count: this.fieldCount(pages), error: null };
   }
 
   removeTemplate(pdf: File): void {

@@ -56,6 +56,12 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | L-09 Editor (claro) | L-08 en tema claro | [`L-09-editor-claro.dc.html`](canvas/L-09-editor-claro.dc.html) | igual que L-08 | Aprobado, implementado |
 | L-10 Poner plantilla A, volver y listo | Menú, guardado automático y «Listo» | [`L-10-poner-plantilla-volver-listo.dc.html`](canvas/L-10-poner-plantilla-volver-listo.dc.html) | `components/migration` | Aprobado, implementado |
 | L-11 Estados | Carga, error, todo listo y lote guardado | [`L-11-estados.dc.html`](canvas/L-11-estados.dc.html) | `pages/batch` | Aprobado, implementado |
+| N-01 Barra · qué falla hoy | Diagnóstico de la barra superior y principios | [`N-01-barra-que-falla-hoy.dc.html`](canvas/N-01-barra-que-falla-hoy.dc.html) | — | Aprobado (documento) |
+| N-02 Barra · un PDF | Una fila a 1650, 1280 y 1100 px | [`N-02-barra-un-pdf.dc.html`](canvas/N-02-barra-un-pdf.dc.html) | `components/header` | Aprobado, implementado |
+| N-03 Barra · lote | Barra + tira de contexto del lote | [`N-03-barra-lote.dc.html`](canvas/N-03-barra-lote.dc.html) | `components/header`, `components/migration` | Aprobado, implementado |
+| N-04 Barra · menú, claro y estados | Menú ⋯, «Limpiar» con confirmación, tooltips | [`N-04-barra-menu-claro-estados.dc.html`](canvas/N-04-barra-menu-claro-estados.dc.html) | `components/header` | Aprobado, implementado |
+| N-05 Paso 2 · pegar JSON | Pestaña «Pegar JSON» y emparejado por `pdfName` | [`N-05-paso-2-pegar-json.dc.html`](canvas/N-05-paso-2-pegar-json.dc.html) | `pages/batch` | Aprobado, implementado |
+| N-06 Pegar JSON · casos | Formatos, emparejado y avisos | [`N-06-pegar-json-casos.dc.html`](canvas/N-06-pegar-json-casos.dc.html) | `pages/batch` | Aprobado, implementado |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 
