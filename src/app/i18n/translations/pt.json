@@ -324,16 +324,15 @@
       "copiedAdjusted": "Campos copiados e ajustados ao tamanho de B.",
       "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
     },
-    "exportSampleValues": "O PDF tem {{count}} campo(s) com valores de amostra em vez de dados reais.",
     "bell": {
-      "label": "Avisos fechados ({count})",
+      "label": "Avisos fechados ({{count}})",
       "title": "Avisos fechados",
       "showAll": "Mostrar todos",
       "show": "Mostrar de novo",
       "emptyTitle": "Nada a recuperar",
       "emptyHint": "Aqui aparecem os avisos informativos que fechar."
     },
-    "noData": "{count} anotações sem dado nos dados de teste: mostram a sua amostra."
+    "noData": "{{count}} anotações sem dado nos dados de teste: mostram a sua amostra."
   },
   "session": {
     "title": "Continuar onde ficou",
@@ -753,5 +752,17 @@
       "mapHint": "A vista Mapeamento mostra o nome do campo, não há origem a mostrar.",
       "noneResolved": "Nenhum mapField corresponde aos dados de teste."
     }
+  },
+  "exportSamples": {
+    "title": "{{count}} campos mostrariam um valor de amostra",
+    "lead": "Estes campos não têm «value» nem dado de teste. O que estampamos no PDF?",
+    "optMap": "Valor ou campo de mapeamento",
+    "optMapHint": "Como até agora: estampa-se o value ou o texto do mapField.",
+    "optSample": "Valores de amostra",
+    "optSampleHint": "Estampa-se a amostra do tipo (XXXXX, X, 00000).",
+    "recommended": "recomendado",
+    "remember": "Lembrar a minha escolha nesta sessão",
+    "cancel": "Cancelar",
+    "continue": "Continuar"
   }
 }
