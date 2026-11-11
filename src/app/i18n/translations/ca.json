@@ -323,7 +323,8 @@
       "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A.",
       "copiedAdjusted": "Camps copiats i ajustats a la mida de B.",
       "adjustApplied": "{{count}} camps copiats, {{moved}} ajustats."
-    }
+    },
+    "exportSampleValues": "El PDF porta {{count}} camp(s) amb valors de mostra en lloc de dades reals."
   },
   "session": {
     "title": "Continua on ho vas deixar",
@@ -660,6 +661,42 @@
         "outlier": "Discrepa",
         "repeated": "Repetit"
       }
+    }
+  },
+  "preview": {
+    "mode": {
+      "group": "Què es pinta a les anotacions",
+      "label": "Mostra",
+      "sample": "Mostra",
+      "map": "Mapatge",
+      "data": "Dades",
+      "dataDisabled": "Carrega dades de prova per activar aquesta vista"
+    },
+    "samples": {
+      "title": "Valors de mostra",
+      "description": "El que es pinta a cada tipus quan el camp no té «value» ni dada de prova. Evita que un mapatge llarg trenqui el disseny.",
+      "text": "Text",
+      "check": "Casella",
+      "radio": "Opció",
+      "number": "Número",
+      "hint": "Fins a 12 caràcters.",
+      "reset": "Restableix",
+      "note": "Es desen en aquest navegador i valen per a totes les plantilles. Es veuen a la previsualització i al PDF exportat."
+    },
+    "testData": {
+      "title": "Dades de prova",
+      "description": "Enganxa un JSON real o inventat. Cada mapField (holder[0].fullname) es busca a dins i es pinta el seu valor.",
+      "placeholder": "{ \"holder\": [ { \"fullname\": \"Lucía Fernández\" } ] }",
+      "load": "Carrega un fitxer .json",
+      "clear": "Treu",
+      "resolved": "{{resolved}} de {{total}} camps resolts",
+      "resolvedHint": "Els camps sense dada usen el seu valor de mostra.",
+      "missing": "Sense dada:",
+      "syntaxError": "JSON no vàlid a la línia {{line}}, columna {{column}}.",
+      "shapeError": "El JSON de prova ha de ser un objecte o una llista.",
+      "tooLarge": "El fitxer supera els 5 MB.",
+      "readFailed": "No s'ha pogut llegir el fitxer.",
+      "empty": "Sense dades de prova: s'usen els valors de mostra."
     }
   }
 }

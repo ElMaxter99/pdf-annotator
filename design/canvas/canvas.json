@@ -219,6 +219,41 @@
    "w": 1720,
    "h": 900,
    "title": "P-10 Comparar · lado a lado (claro)"
+  },
+  "P-11-avanzado-valores-de-muestra.dc.html": {
+   "x": 0,
+   "y": 22126,
+   "w": 1720,
+   "h": 900,
+   "title": "P-11 Avanzado · valores de muestra"
+  },
+  "P-12-prioridad-y-comparacion.dc.html": {
+   "x": 1800,
+   "y": 22126,
+   "w": 1720,
+   "h": 900,
+   "title": "P-12 Qué se pinta y en qué orden"
+  },
+  "P-13-datos-de-prueba.dc.html": {
+   "x": 3600,
+   "y": 22126,
+   "w": 1720,
+   "h": 900,
+   "title": "P-13 Previsualizar con datos de prueba"
+  },
+  "P-14-datos-de-prueba-estados.dc.html": {
+   "x": 0,
+   "y": 23406,
+   "w": 1720,
+   "h": 900,
+   "title": "P-14 Datos de prueba · estados"
+  },
+  "P-15-datos-de-prueba-claro.dc.html": {
+   "x": 1800,
+   "y": 23406,
+   "w": 1720,
+   "h": 900,
+   "title": "P-15 Datos de prueba (claro)"
   }
  },
  "order": [
@@ -251,7 +286,12 @@
   "P-07-tamano-pagina.dc.html",
   "P-08-peso-almacenamiento.dc.html",
   "P-09-cierre-descarga.dc.html",
-  "P-10-comparar-lado-a-lado-claro.dc.html"
+  "P-10-comparar-lado-a-lado-claro.dc.html",
+  "P-11-avanzado-valores-de-muestra.dc.html",
+  "P-12-prioridad-y-comparacion.dc.html",
+  "P-13-datos-de-prueba.dc.html",
+  "P-14-datos-de-prueba-estados.dc.html",
+  "P-15-datos-de-prueba-claro.dc.html"
  ],
  "notes": {
   "t0": {
@@ -313,6 +353,13 @@
    "x": 0,
    "y": 15346,
    "text": "Propuesta · remaquetado · cierre y tema claro",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "s0": {
+   "x": 0,
+   "y": 21826,
+   "text": "Propuesta · previsualización de anotaciones (pendiente de aprobación) · valores de muestra y datos de prueba",
    "kind": "title1",
    "maxW": 5400
   }
