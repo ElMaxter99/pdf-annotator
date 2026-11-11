@@ -45,7 +45,8 @@
       },
       "nav": {
         "github": "GitHub"
-      }
+      },
+      "batchLink": "Have several new versions? Migrate templates in a batch →"
     },
     "upload": {
       "title": "Upload your PDF",
@@ -307,6 +308,15 @@
       "outOfPage": "{{count}} annotation(s) outside the page",
       "fontSize": "{{count}} font size(s) outside 8–72",
       "opacity": "{{count}} opacity value(s) outside 0.1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} file(s) ignored: only PDF and JSON are accepted.",
+      "jsonFailed": "Could not read {{name}}: it is not valid JSON or it is too large.",
+      "jsonNoPages": "{{name}} has no “pages” collection: the PDF is added without a template.",
+      "jsonWithoutPdf": "{{count}} JSON without a PDF of the same name: ignored.",
+      "notPersistent": "This browser cannot keep the batch between visits.",
+      "samePdf": "{{name}} is the same PDF as the original: there is nothing to migrate.",
+      "unpaired": "{{count}} PDF(s) without a match: use “Upload B” on the right row."
     }
   },
   "session": {
@@ -335,6 +345,117 @@
     "distribute": {
       "horizontal": "Distribute horizontally",
       "vertical": "Distribute vertically"
+    }
+  },
+  "batch": {
+    "subtitle": "Template migration",
+    "title": "Batch · {{count}} PDFs",
+    "progressLabel": "Batch progress",
+    "readyCount": "{{ready}} of {{total}} ready",
+    "downloadReady": "Download ready ({{count}})",
+    "reviewNext": "Review next →",
+    "importing": "Reading PDFs… {{done}} of {{total}}",
+    "empty": {
+      "title": "Start by dropping your original PDFs (A)",
+      "text": "If you have them, also drop their JSON files with the same name (invoice.pdf + invoice.json). Then you will upload the new versions (B).",
+      "choose": "Choose PDFs and JSON",
+      "privacy": "Everything stays in your browser: nothing is uploaded."
+    },
+    "drop": {
+      "title": "Drop the new PDFs here (B)",
+      "text": "They are paired by name with their A. Any that do not match are assigned with “Upload B” on their row.",
+      "choose": "Choose new PDFs",
+      "addOriginals": "Add more originals (A)"
+    },
+    "search": "Search by name",
+    "notPersistent": "This browser cannot store the batch: it will not survive closing the tab.",
+    "clear": "Clear batch",
+    "tableLabel": "Batch PDFs",
+    "col": {
+      "original": "Original (A)",
+      "new": "New (B)",
+      "state": "Status"
+    },
+    "fieldsInA": "{{count}} fields in A",
+    "state": {
+      "ready": "Ready",
+      "review": "To review",
+      "noB": "No B"
+    },
+    "action": {
+      "uploadB": "Upload B",
+      "open": "Open",
+      "review": "Review",
+      "remove": "Remove {{name}}",
+      "confirmRemove": "Yes, remove",
+      "cancel": "Cancel"
+    },
+    "done": {
+      "title": "{{count}} of {{count}} ready",
+      "text": "Download one JSON per new PDF; with several, they come in a .zip.",
+      "download": "Download JSON"
+    },
+    "editor": {
+      "regionLabel": "Migration of the current PDF",
+      "back": "Batch",
+      "versionA": "A: {{name}}",
+      "editingB": "Editing version B",
+      "viewLabel": "How to see A",
+      "view": {
+        "overlay": "Overlay",
+        "toggle": "Toggle"
+      },
+      "holdHint": "Hold the A key to see only A",
+      "cancel": "Cancel",
+      "putA": {
+        "button": "Put template A",
+        "copy": "Copy A’s fields as they are",
+        "copyText": "Same coordinates. The simplest option.",
+        "missing": "Only those missing in B",
+        "missingText": "It does not touch what you have already placed.",
+        "adjust": "Copy and adjust by text",
+        "soon": "soon",
+        "adjustText": "It will suggest the offset using texts from A and B.",
+        "confirmTitle": "B already has fields",
+        "confirmText": "Replace them with A’s or add only those missing? You can undo with Ctrl+Z.",
+        "replace": "Replace all",
+        "addMissing": "Add the missing ones"
+      },
+      "ready": "Done",
+      "readyMissing": "Done · {{count}} missing",
+      "readyDialog": {
+        "title": "Mark {{name}} as done?",
+        "fields": "{{count}} fields in B",
+        "breakdown": "{{same}} same · {{moved}} moved · {{renamed}} renamed · {{added}} new",
+        "dismissed": "{{count}} field(s) of A dismissed",
+        "reopen": "You can reopen and change it at any time.",
+        "confirm": "Mark as done",
+        "keep": "Keep editing"
+      }
+    },
+    "panel": {
+      "title": "Fields of B · {{count}}",
+      "toResolve": "To resolve {{count}}",
+      "allSet": "All resolved",
+      "emptyB": "B is empty. Put A’s template and adjust what changed.",
+      "noTemplate": "This PDF has no JSON for A: B starts empty.",
+      "page": "p. {{page}}",
+      "place": "Place in B",
+      "dismiss": "Dismiss",
+      "renameOf": "It is the rename of…",
+      "renamedFrom": "was: {{name}}",
+      "unlink": "Unlink",
+      "showSame": "Show the {{count}} unchanged",
+      "hideSame": "Hide the {{count}} unchanged",
+      "dismissed": "Dismissed from A ({{count}})",
+      "restore": "Restore"
+    },
+    "status": {
+      "same": "Same",
+      "moved": "Moved",
+      "renamed": "Renamed",
+      "new": "New",
+      "missing": "Missing in B"
     }
   }
 }

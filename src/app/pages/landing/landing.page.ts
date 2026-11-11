@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language, TranslationService } from '../../i18n/translation.service';
@@ -26,6 +26,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingDropzoneComponent,
     LandingFooterComponent,
     TranslationPipe,
+    RouterLink,
   ],
 })
 export class LandingPageComponent {

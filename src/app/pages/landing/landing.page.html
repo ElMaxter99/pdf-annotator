@@ -33,6 +33,10 @@
           (fileDragLeave)="onFileDragLeave($event)" (fileDrop)="onFileDrop($event)"
           (openFilePicker)="openPdfFilePicker()" (tryExample)="loadExampleDocument()"></app-landing-dropzone>
 
+        <p class="landing__batch-link">
+          <a routerLink="/lote">{{ 'app.landing.batchLink' | t }}</a>
+        </p>
+
         <ul class="landing__trust">
           <li>🔒 {{ 'app.landing.trust.browser' | t }}</li>
           <li>🌍 {{ 'app.landing.trust.languages' | t }}</li>

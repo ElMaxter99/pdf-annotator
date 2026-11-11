@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>M-05 Editor de B</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+
+*{box-sizing:border-box}
+body{margin:0}
+.p{width:1720px;height:900px;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.45}
+.hdr{background:var(--panel);border-radius:16px;padding:12px 20px;display:flex;align-items:center;gap:14px;border:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--accent);margin-right:8px}
+.brand small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.s{min-height:32px;padding:4px 12px;font-size:13px}
+.btn[disabled]{opacity:.45}
+.st{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.st.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.st.done{color:var(--text)}
+.st.err{color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,transparent)}
+.st.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 16px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:var(--inset)}
+.drop.act{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--inset))}
+.ic{width:44px;height:44px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.row.sel{outline:2px solid var(--accent)}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar i.w{background:var(--warn)}.bar i.e{background:var(--danger)}
+.mono{font-family:Consolas,monospace;font-size:13px}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.pane{background:var(--inset);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:9%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.bad{border-color:#dc2626;background:rgba(220,38,38,.14)}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.tag{font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--text)}
+.tbl{display:flex;flex-direction:column;gap:6px}
+.tr{display:grid;gap:14px;align-items:center;padding:7px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sp{flex-grow:1}
+.sk{background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));border-radius:6px;display:inline-block}
+.note{border-radius:12px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.note.w{background:color-mix(in srgb,var(--warn) 14%,transparent);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+.note.e{background:color-mix(in srgb,var(--danger) 12%,transparent);border:1px solid color-mix(in srgb,var(--danger) 60%,transparent)}
+.note.i{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.radio{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1px solid var(--line)}
+.radio.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;margin-top:2px}
+.radio.on .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+.chk.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.ta{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre;overflow:hidden}
+.g2{display:grid;gap:16px}
+.toast{position:absolute;right:24px;bottom:24px;background:var(--panel);border-left:4px solid var(--accent);border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;gap:12px;font-size:14px}
+.toast.e{border-color:var(--danger)}
+
+.chg{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 10px;background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn);white-space:nowrap}
+.chg.n{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.chg.k{background:var(--soft);color:var(--muted)}
+.cols{display:flex;gap:16px;flex-grow:1;min-height:0;align-items:stretch}
+.nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sel2{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:13px;background:var(--inset)}
+.tab{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}
+.tab span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 16px}
+.tab span.on{background:var(--accent);color:var(--ink)}
+.ln2{display:flex;gap:10px}
+.gut{color:var(--muted);text-align:right;min-width:24px;user-select:none}
+ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.dim{position:absolute;inset:0;background:rgba(10,10,20,.62)}
+.dlg{position:absolute;left:210px;right:210px;top:90px;bottom:70px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:84px;padding:10px 14px;border-radius:14px;background:var(--soft);border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--text)}
+.tile i{font-style:normal;font-size:22px;line-height:1}
+.tile.acc{background:var(--accent);color:var(--ink);border-color:var(--accent)}
+.tile.sm{min-width:64px;padding:8px 10px}
+.stp{display:flex;align-items:center;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 24px;max-width:980px;margin:0 auto;width:100%}
+.stp .s{display:flex;align-items:center;gap:12px;min-width:0}
+.stp .n{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;border:2px solid var(--line);color:var(--muted);flex-shrink:0}
+.stp .s.on .n{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.stp .s.done .n{border-color:var(--accent);color:var(--accent)}
+.stp .t{font-weight:600}.stp .s:not(.on):not(.done) .t{color:var(--muted)}
+.stp small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.stp .stl{flex:1;height:2px;background:var(--line);margin:0 18px;min-width:30px}.stp .stl.done{background:var(--accent)}
+.wiz{max-width:980px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px;flex-grow:1}
+.foot{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.node{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.hl{border-color:var(--accent)}
+.node b{font-size:15px}
+.arrow{align-self:center;color:var(--muted);font-size:20px}
+.big{font-size:34px;font-weight:700;line-height:1}
+
+.fb{position:absolute;box-sizing:border-box;border:2px solid #0f9b8e;background:rgba(15,155,142,.2);border-radius:3px;font-size:10px;color:#073;display:flex;align-items:flex-end;padding:0 3px;overflow:hidden;white-space:nowrap}
+.fb.sel{outline:2px solid var(--accent);outline-offset:2px;box-shadow:0 0 0 6px rgba(94,234,212,.3);background:rgba(94,234,212,.38)}
+.fb.new{border-color:#e0a100;background:rgba(251,191,36,.26);border-style:dashed}
+.fb.ghost{border-color:#9aa;background:rgba(150,170,170,.16);border-style:dashed}
+.ico{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--soft);border:1px solid var(--line);font-size:14px;flex-shrink:0}
+.ico.on{background:var(--accent);color:var(--ink);border-color:var(--accent)}
+.grp{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:5px 8px;font-size:12px;color:var(--muted)}
+.side{width:370px;flex-shrink:0;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.tabs4{display:flex;gap:2px;border-bottom:1px solid var(--line);padding-bottom:8px}.tabs4 span{flex:1;text-align:center;font-size:12px;font-weight:600;color:var(--muted);padding:6px 4px;border-radius:999px}.tabs4 span.on{background:var(--soft);color:var(--text);outline:1px solid var(--accent)}
+.fr{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;background:var(--soft);font-size:13px;min-width:0}
+.fr.sel{outline:2px solid var(--accent)}
+.bd{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap;flex-shrink:0}
+.bd.l{background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--accent)}
+.bd.n{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--warn)}
+.bd.o{background:var(--soft);color:var(--muted)}
+.vp{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px}
+.vp.b{border-color:var(--accent)}
+.stage{flex:1;display:flex;justify-content:center;align-items:flex-start;background:var(--soft);border-radius:10px;padding:10px;min-height:0;position:relative;overflow:hidden}
+
+.fb.miss{border-color:#dc2626;background:rgba(220,38,38,.08);border-style:dashed;color:#a11}
+.fb.ghost{color:#556;z-index:0}
+.bd.e{background:color-mix(in srgb,var(--danger) 18%,transparent);color:var(--danger)}
+.bd.r{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--text)}
+.tbl2{display:grid;gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel)}
+.tbl2 .c{padding:12px 16px;border-top:1px solid var(--line);font-size:13.5px;line-height:1.45;min-width:0}
+.tbl2 .c.h{border-top:0;background:var(--soft);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tbl2 .c b{display:block;font-size:14.5px;margin-bottom:2px}
+.thumb{width:34px;height:46px;background:#fff;border-radius:3px;position:relative;flex-shrink:0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.thumb i{position:absolute;left:0;right:0;top:0;height:9px;background:#0f9b8e}
+.h2{font-size:20px;font-weight:600}
+.cd2{display:flex;flex-direction:column;gap:6px}
+a{color:var(--accent)}
+.pre{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;line-height:1.55;white-space:pre;overflow:hidden}
+
+</style>
+</helmet>
+<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f;width:1720px;height:1040px">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-05 · Editor de B</span><h1 style="font-size:26px;font-weight:600">El editor de siempre, con A como capa gris detrás de B</h1><p class="cap" style="max-width:1450px">Todo lo del editor original sigue ahí. Añadido: la barra con modo de vista, «Poner plantilla A», el estado de cada campo y «Listo».</p></div>
+
+<div class="hdr">
+ <div class="brand">Pdf Annotator<small>Migración de plantillas</small></div>
+ <button class="btn g s">‹ Lote</button>
+ <div style="display:flex;flex-direction:column"><b>factura-0331.pdf</b><span class="cap" style="font-size:12px">A: factura-0331 · B: factura-0331-nuevo</span></div>
+ <span class="st on">Editando versión B</span>
+ <span class="sp"></span>
+ <div class="seg" aria-label="Cómo ver A"><span class="on">Encima</span><span class="">Alternar</span><span class="">Dividida</span></div>
+ <button class="btn g s">Poner plantilla A ▾</button>
+ <span class="ico" title="Deshacer">↶</span><span class="ico" title="Rehacer">↷</span>
+ <button class="btn" disabled>Listo · faltan 2</button>
+</div>
+<div class="cols">
+ <div class="vp b">
+  <div style="display:flex;align-items:center;gap:10px"><span class="tag" style="background:var(--accent);color:var(--ink)">VERSIÓN B · se edita</span><span class="cap" style="font-size:13px">A4 · 595×842 · igual que A</span><span class="sp"></span><span class="cap" style="font-size:13px">Leyenda: <b style="color:var(--accent)">▬</b> B &nbsp; <b>┅</b> A, solo referencia</span></div>
+  <div class="stage" style="padding:14px"><div class="pg" style="width:600px;height:849px"><div class="band"></div><div class="ln" style="left:61px;top:164px;width:121px"></div><div class="ln" style="left:61px;top:205px;width:61px"></div><div class="ln" style="left:61px;top:245px;width:81px"></div><div class="ln" style="left:61px;top:331px;width:91px"></div><div class="ln" style="left:61px;top:432px;width:151px"></div><div class="ln" style="left:61px;top:482px;width:111px"></div><div class="ln" style="left:61px;top:704px;width:71px"></div><div class="fb ghost" style="left:131px;top:139px;width:202px;height:22px">A</div><div class="fb ghost" style="left:413px;top:139px;width:111px;height:22px">A</div><div class="fb miss" style="left:424px;top:696px;width:111px;height:22px">falta · total</div><div class="fb sel" style="left:131px;top:151px;width:202px;height:22px">cliente.nombre</div><div class="fb " style="left:131px;top:192px;width:141px;height:22px">cliente.nif</div><div class="fb " style="left:424px;top:151px;width:111px;height:22px">fecha</div><div class="fb " style="left:131px;top:232px;width:262px;height:22px">cliente.direccion</div><div class="fb new" style="left:131px;top:565px;width:403px;height:71px">observaciones</div></div></div>
+  <div style="display:flex;align-items:center;gap:10px;justify-content:center"><span class="ico">−</span><span class="cap">100 %</span><span class="ico">+</span><span style="width:24px"></span><span class="ico">‹</span><span class="cap">1 / 1</span><span class="ico">›</span></div>
+ </div>
+ <div class="side">
+  <div class="tabs4"><span>Documento</span><span class="on">Anotaciones</span><span>Plantillas</span><span>Avanzado</span></div>
+  <div style="display:flex;gap:8px;align-items:center"><b style="font-size:15px">Campos de B · 6</b><span class="sp"></span><span class="st on" style="padding:4px 12px">Por resolver 2</span></div>
+  <div style="display:flex;flex-direction:column;gap:6px"><div class="fr sel"><span class="mono nm" style="flex:1">cliente.nombre</span><span class="bd n">Movido</span></div><div class="fr"><span class="mono nm" style="flex:1">cliente.nif</span><span class="bd o">Igual</span></div><div class="fr"><span class="mono nm" style="flex:1">fecha</span><span class="bd n">Movido</span></div><div class="fr"><span class="mono nm" style="flex:1">cliente.direccion</span><span class="bd r">Renombrado</span></div><div class="fr"><span class="mono nm" style="flex:1">observaciones</span><span class="bd l">Nuevo</span></div><div class="fr"><span class="mono nm" style="flex:1">total</span><span class="bd e">Falta en B</span></div></div>
+  <div class="note i" style="padding:10px 12px;font-size:13px">ⓘ<div><b>Siguiente:</b> «total» está en A y no en B. Colócalo en B o descártalo.<div style="display:flex;gap:8px;margin-top:8px"><button class="btn s">Colocar en B</button><button class="btn g s">Descartar</button></div></div></div>
+  <span class="lab" style="margin-top:4px">JSON de B · se actualiza al mover</span>
+  <div class="pre">{ "pages": [ { "num": 1, "fields": [
+  { "name": "cliente.nombre", "x": 130, "y": 668 },
+  { "name": "cliente.nif",    "x": 130, "y": 628 },
+  { "name": "fecha",          "x": 420, "y": 668 },
+  ...
+] } ] }</div>
+  <div class="cap" style="font-size:12.5px">Árbol y JSON editable: igual que en el editor original (pestaña Avanzado).</div>
+ </div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

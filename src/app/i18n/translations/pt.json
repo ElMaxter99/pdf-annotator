@@ -45,7 +45,8 @@
       },
       "nav": {
         "github": "GitHub"
-      }
+      },
+      "batchLink": "Tem várias versões novas? Migre os modelos em lote →"
     },
     "upload": {
       "title": "Carregue o seu PDF",
@@ -307,6 +308,15 @@
       "outOfPage": "{{count}} anotação(ões) fora da página",
       "fontSize": "{{count}} tamanho(s) de letra fora de 8–72",
       "opacity": "{{count}} opacidade(s) fora de 0,1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} ficheiro(s) ignorado(s): só se admitem PDF e JSON.",
+      "jsonFailed": "Não foi possível ler {{name}}: JSON inválido ou demasiado grande.",
+      "jsonNoPages": "{{name}} não tem a coleção «pages»: o PDF entra sem modelo.",
+      "jsonWithoutPdf": "{{count}} JSON sem PDF com o mesmo nome: ignorados.",
+      "notPersistent": "Este navegador não pode guardar o lote entre visitas.",
+      "samePdf": "{{name}} é o mesmo PDF que o original: não há nada a migrar.",
+      "unpaired": "{{count}} PDF sem par: use «Enviar B» na linha correspondente."
     }
   },
   "session": {
@@ -335,6 +345,117 @@
     "distribute": {
       "horizontal": "Distribuir horizontalmente",
       "vertical": "Distribuir verticalmente"
+    }
+  },
+  "batch": {
+    "subtitle": "Migração de modelos",
+    "title": "Lote · {{count}} PDFs",
+    "progressLabel": "Progresso do lote",
+    "readyCount": "{{ready}} de {{total}} prontos",
+    "downloadReady": "Baixar prontos ({{count}})",
+    "reviewNext": "Rever o próximo →",
+    "importing": "Lendo PDFs… {{done}} de {{total}}",
+    "empty": {
+      "title": "Comece soltando os PDFs originais (A)",
+      "text": "Se os tiver, solte também os JSON com o mesmo nome (fatura.pdf + fatura.json). Depois enviará as versões novas (B).",
+      "choose": "Escolher PDFs e JSON",
+      "privacy": "Tudo fica no seu navegador: nada é enviado."
+    },
+    "drop": {
+      "title": "Solte aqui os PDFs novos (B)",
+      "text": "São emparelhados pelo nome com o seu A. Os que não coincidirem atribuem-se com «Enviar B» na linha.",
+      "choose": "Escolher PDFs novos",
+      "addOriginals": "Adicionar mais originais (A)"
+    },
+    "search": "Pesquisar por nome",
+    "notPersistent": "Este navegador não pode guardar o lote: não sobreviverá ao fecho do separador.",
+    "clear": "Esvaziar lote",
+    "tableLabel": "PDFs do lote",
+    "col": {
+      "original": "Original (A)",
+      "new": "Novo (B)",
+      "state": "Estado"
+    },
+    "fieldsInA": "{{count}} campos em A",
+    "state": {
+      "ready": "Pronto",
+      "review": "Por rever",
+      "noB": "Sem B"
+    },
+    "action": {
+      "uploadB": "Enviar B",
+      "open": "Abrir",
+      "review": "Rever",
+      "remove": "Remover {{name}}",
+      "confirmRemove": "Sim, remover",
+      "cancel": "Cancelar"
+    },
+    "done": {
+      "title": "{{count}} de {{count}} prontos",
+      "text": "Baixe um JSON por cada PDF novo; com vários, vêm num .zip.",
+      "download": "Baixar JSON"
+    },
+    "editor": {
+      "regionLabel": "Migração do PDF atual",
+      "back": "Lote",
+      "versionA": "A: {{name}}",
+      "editingB": "A editar a versão B",
+      "viewLabel": "Como ver A",
+      "view": {
+        "overlay": "Por cima",
+        "toggle": "Alternar"
+      },
+      "holdHint": "Mantenha a tecla A para ver só A",
+      "cancel": "Cancelar",
+      "putA": {
+        "button": "Colocar modelo A",
+        "copy": "Copiar os campos de A tal como estão",
+        "copyText": "Mesmas coordenadas. O mais simples.",
+        "missing": "Só os que faltam em B",
+        "missingText": "Não toca no que já colocou.",
+        "adjust": "Copiar e ajustar pelos textos",
+        "soon": "em breve",
+        "adjustText": "Proporá o deslocamento usando textos de A e B.",
+        "confirmTitle": "B já tem campos",
+        "confirmText": "Substituí-los pelos de A ou adicionar só os em falta? Pode desfazer com Ctrl+Z.",
+        "replace": "Substituir tudo",
+        "addMissing": "Adicionar os em falta"
+      },
+      "ready": "Concluído",
+      "readyMissing": "Concluído · faltam {{count}}",
+      "readyDialog": {
+        "title": "Marcar {{name}} como concluído?",
+        "fields": "{{count}} campos em B",
+        "breakdown": "{{same}} iguais · {{moved}} movidos · {{renamed}} renomeados · {{added}} novos",
+        "dismissed": "{{count}} campo(s) de A descartado(s)",
+        "reopen": "Poderá reabri-lo e alterá-lo quando quiser.",
+        "confirm": "Marcar como concluído",
+        "keep": "Continuar a editar"
+      }
+    },
+    "panel": {
+      "title": "Campos de B · {{count}}",
+      "toResolve": "Por resolver {{count}}",
+      "allSet": "Tudo resolvido",
+      "emptyB": "B está vazia. Coloque o modelo de A e ajuste o que mudou.",
+      "noTemplate": "Este PDF não tem JSON de A: B começa vazia.",
+      "page": "pág. {{page}}",
+      "place": "Colocar em B",
+      "dismiss": "Descartar",
+      "renameOf": "É o renome de…",
+      "renamedFrom": "antes: {{name}}",
+      "unlink": "Desassociar",
+      "showSame": "Mostrar os {{count}} iguais",
+      "hideSame": "Ocultar os {{count}} iguais",
+      "dismissed": "Descartados de A ({{count}})",
+      "restore": "Recuperar"
+    },
+    "status": {
+      "same": "Igual",
+      "moved": "Movido",
+      "renamed": "Renomeado",
+      "new": "Novo",
+      "missing": "Falta em B"
     }
   }
 }

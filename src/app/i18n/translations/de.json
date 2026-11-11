@@ -45,7 +45,8 @@
       },
       "nav": {
         "github": "GitHub"
-      }
+      },
+      "batchLink": "Mehrere neue Versionen? Vorlagen im Stapel migrieren →"
     },
     "upload": {
       "title": "Laden Sie Ihr PDF hoch",
@@ -307,6 +308,15 @@
       "outOfPage": "{{count}} Anmerkung(en) außerhalb der Seite",
       "fontSize": "{{count}} Schriftgröße(n) außerhalb von 8–72",
       "opacity": "{{count}} Deckkraftwert(e) außerhalb von 0,1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} Datei(en) ignoriert: nur PDF und JSON werden akzeptiert.",
+      "jsonFailed": "{{name}} konnte nicht gelesen werden: ungültiges oder zu großes JSON.",
+      "jsonNoPages": "{{name}} enthält keine „pages“-Sammlung: das PDF wird ohne Vorlage aufgenommen.",
+      "jsonWithoutPdf": "{{count}} JSON ohne PDF gleichen Namens: ignoriert.",
+      "notPersistent": "Dieser Browser kann den Stapel nicht zwischen Besuchen speichern.",
+      "samePdf": "{{name}} ist dasselbe PDF wie das Original: es gibt nichts zu migrieren.",
+      "unpaired": "{{count}} PDF ohne Zuordnung: nutze „B hochladen“ in der passenden Zeile."
     }
   },
   "session": {
@@ -335,6 +345,117 @@
     "distribute": {
       "horizontal": "Horizontal verteilen",
       "vertical": "Vertikal verteilen"
+    }
+  },
+  "batch": {
+    "subtitle": "Vorlagen-Migration",
+    "title": "Stapel · {{count}} PDFs",
+    "progressLabel": "Fortschritt des Stapels",
+    "readyCount": "{{ready}} von {{total}} fertig",
+    "downloadReady": "Fertige herunterladen ({{count}})",
+    "reviewNext": "Nächstes prüfen →",
+    "importing": "PDFs werden gelesen… {{done}} von {{total}}",
+    "empty": {
+      "title": "Beginne mit dem Ablegen deiner Original-PDFs (A)",
+      "text": "Falls vorhanden, lege auch die JSON-Dateien mit gleichem Namen ab (rechnung.pdf + rechnung.json). Danach lädst du die neuen Versionen (B) hoch.",
+      "choose": "PDFs und JSON wählen",
+      "privacy": "Alles bleibt in deinem Browser: nichts wird hochgeladen."
+    },
+    "drop": {
+      "title": "Neue PDFs (B) hier ablegen",
+      "text": "Sie werden per Name dem A zugeordnet. Nicht passende weist du mit „B hochladen“ in der Zeile zu.",
+      "choose": "Neue PDFs wählen",
+      "addOriginals": "Weitere Originale (A) hinzufügen"
+    },
+    "search": "Nach Namen suchen",
+    "notPersistent": "Dieser Browser kann den Stapel nicht speichern: er geht beim Schließen des Tabs verloren.",
+    "clear": "Stapel leeren",
+    "tableLabel": "PDFs im Stapel",
+    "col": {
+      "original": "Original (A)",
+      "new": "Neu (B)",
+      "state": "Status"
+    },
+    "fieldsInA": "{{count}} Felder in A",
+    "state": {
+      "ready": "Fertig",
+      "review": "Zu prüfen",
+      "noB": "Ohne B"
+    },
+    "action": {
+      "uploadB": "B hochladen",
+      "open": "Öffnen",
+      "review": "Prüfen",
+      "remove": "{{name}} entfernen",
+      "confirmRemove": "Ja, entfernen",
+      "cancel": "Abbrechen"
+    },
+    "done": {
+      "title": "{{count}} von {{count}} fertig",
+      "text": "Lade pro neuem PDF ein JSON herunter; bei mehreren kommen sie als .zip.",
+      "download": "JSON herunterladen"
+    },
+    "editor": {
+      "regionLabel": "Migration des aktuellen PDFs",
+      "back": "Stapel",
+      "versionA": "A: {{name}}",
+      "editingB": "Version B wird bearbeitet",
+      "viewLabel": "A anzeigen",
+      "view": {
+        "overlay": "Darüber",
+        "toggle": "Wechseln"
+      },
+      "holdHint": "Taste A gedrückt halten, um nur A zu sehen",
+      "cancel": "Abbrechen",
+      "putA": {
+        "button": "Vorlage A einsetzen",
+        "copy": "Felder von A unverändert kopieren",
+        "copyText": "Gleiche Koordinaten. Am einfachsten.",
+        "missing": "Nur die in B fehlenden",
+        "missingText": "Berührt nichts, was du schon platziert hast.",
+        "adjust": "Kopieren und nach Texten anpassen",
+        "soon": "bald",
+        "adjustText": "Schlägt den Versatz anhand von Texten aus A und B vor.",
+        "confirmTitle": "B hat schon Felder",
+        "confirmText": "Durch die von A ersetzen oder nur fehlende hinzufügen? Mit Strg+Z rückgängig zu machen.",
+        "replace": "Alles ersetzen",
+        "addMissing": "Fehlende hinzufügen"
+      },
+      "ready": "Fertig",
+      "readyMissing": "Fertig · {{count}} fehlen",
+      "readyDialog": {
+        "title": "{{name}} als fertig markieren?",
+        "fields": "{{count}} Felder in B",
+        "breakdown": "{{same}} gleich · {{moved}} verschoben · {{renamed}} umbenannt · {{added}} neu",
+        "dismissed": "{{count}} Feld(er) von A verworfen",
+        "reopen": "Du kannst es jederzeit wieder öffnen und ändern.",
+        "confirm": "Als fertig markieren",
+        "keep": "Weiter bearbeiten"
+      }
+    },
+    "panel": {
+      "title": "Felder von B · {{count}}",
+      "toResolve": "Zu klären {{count}}",
+      "allSet": "Alles geklärt",
+      "emptyB": "B ist leer. Setze die Vorlage von A ein und passe Änderungen an.",
+      "noTemplate": "Für dieses PDF gibt es kein JSON von A: B beginnt leer.",
+      "page": "S. {{page}}",
+      "place": "In B platzieren",
+      "dismiss": "Verwerfen",
+      "renameOf": "Ist die Umbenennung von…",
+      "renamedFrom": "vorher: {{name}}",
+      "unlink": "Trennen",
+      "showSame": "Die {{count}} gleichen anzeigen",
+      "hideSame": "Die {{count}} gleichen ausblenden",
+      "dismissed": "Von A verworfen ({{count}})",
+      "restore": "Wiederherstellen"
+    },
+    "status": {
+      "same": "Gleich",
+      "moved": "Verschoben",
+      "renamed": "Umbenannt",
+      "new": "Neu",
+      "missing": "Fehlt in B"
     }
   }
 }

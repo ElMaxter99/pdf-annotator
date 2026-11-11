@@ -72,6 +72,7 @@
   </div>
   <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-annotations" aria-labelledby="sidebar-tab-annotations"
     [hidden]="vm.sidebarTab() !== 'annotations'">
+  <app-migration-panel [vm]="vm"></app-migration-panel>
   <div class="sidebar-actions">
     <button type="button" class="btn" (click)="vm.triggerImportCoords()">
       {{ 'sidebar.importJsonFile' | t }}

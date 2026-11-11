@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { LanguageSelectorComponent } from '../../../../components/language-selector/language-selector.component';
+import { MigrationBarComponent } from '../migration/migration-bar.component';
 import { ThemeToggleComponent } from '../../../../components/theme-toggle/theme-toggle.component';
 
 @Component({
@@ -17,6 +18,7 @@ import { ThemeToggleComponent } from '../../../../components/theme-toggle/theme-
     TranslationPipe,
     LanguageSelectorComponent,
     ThemeToggleComponent,
+    MigrationBarComponent,
   ],
 })
 export class WorkspaceHeaderComponent {

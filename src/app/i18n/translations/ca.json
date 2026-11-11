@@ -45,7 +45,8 @@
       },
       "nav": {
         "github": "GitHub"
-      }
+      },
+      "batchLink": "Tens diverses versions noves? Migra les plantilles per lots →"
     },
     "upload": {
       "title": "Carrega el teu PDF",
@@ -307,6 +308,15 @@
       "outOfPage": "{{count}} anotació(ns) fora de la pàgina",
       "fontSize": "{{count}} mida(es) de font fora de 8–72",
       "opacity": "{{count}} opacitat(s) fora de 0,1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} fitxer(s) ignorat(s): només s’admeten PDF i JSON.",
+      "jsonFailed": "No s’ha pogut llegir {{name}}: no és un JSON vàlid o és massa gran.",
+      "jsonNoPages": "{{name}} no té la col·lecció «pages»: el PDF entra sense plantilla.",
+      "jsonWithoutPdf": "{{count}} JSON sense PDF amb el mateix nom: s’han ignorat.",
+      "notPersistent": "Aquest navegador no pot desar el lot entre visites.",
+      "samePdf": "{{name}} és el mateix PDF que l’original: no hi ha res a migrar.",
+      "unpaired": "{{count}} PDF sense parella: usa «Puja B» a la fila corresponent."
     }
   },
   "session": {
@@ -335,6 +345,117 @@
     "distribute": {
       "horizontal": "Distribueix horitzontalment",
       "vertical": "Distribueix verticalment"
+    }
+  },
+  "batch": {
+    "subtitle": "Migració de plantilles",
+    "title": "Lot · {{count}} PDF",
+    "progressLabel": "Progrés del lot",
+    "readyCount": "{{ready}} de {{total}} llestos",
+    "downloadReady": "Descarrega els llestos ({{count}})",
+    "reviewNext": "Revisa el següent →",
+    "importing": "Llegint PDF… {{done}} de {{total}}",
+    "empty": {
+      "title": "Comença deixant anar els PDF originals (A)",
+      "text": "Si els tens, deixa anar també els JSON amb el mateix nom (factura.pdf + factura.json). Després pujaràs les versions noves (B).",
+      "choose": "Tria PDF i JSON",
+      "privacy": "Tot es queda al navegador: no es puja res."
+    },
+    "drop": {
+      "title": "Deixa anar aquí els PDF nous (B)",
+      "text": "S’aparellen pel nom amb la seva A. Els que no quadrin s’assignen amb «Puja B» a la seva fila.",
+      "choose": "Tria PDF nous",
+      "addOriginals": "Afegeix més originals (A)"
+    },
+    "search": "Cerca pel nom",
+    "notPersistent": "Aquest navegador no pot desar el lot: no sobreviurà al tancament de la pestanya.",
+    "clear": "Buida el lot",
+    "tableLabel": "PDF del lot",
+    "col": {
+      "original": "Original (A)",
+      "new": "Nou (B)",
+      "state": "Estat"
+    },
+    "fieldsInA": "{{count}} camps a A",
+    "state": {
+      "ready": "Llest",
+      "review": "Per revisar",
+      "noB": "Sense B"
+    },
+    "action": {
+      "uploadB": "Puja B",
+      "open": "Obre",
+      "review": "Revisa",
+      "remove": "Treu {{name}}",
+      "confirmRemove": "Sí, treu",
+      "cancel": "Cancel·la"
+    },
+    "done": {
+      "title": "{{count}} de {{count}} llestos",
+      "text": "Descarrega un JSON per cada PDF nou; si són diversos, venen en un .zip.",
+      "download": "Descarrega JSON"
+    },
+    "editor": {
+      "regionLabel": "Migració del PDF actual",
+      "back": "Lot",
+      "versionA": "A: {{name}}",
+      "editingB": "Editant la versió B",
+      "viewLabel": "Com veure A",
+      "view": {
+        "overlay": "Al damunt",
+        "toggle": "Alterna"
+      },
+      "holdHint": "Mantén la tecla A per veure només A",
+      "cancel": "Cancel·la",
+      "putA": {
+        "button": "Posa la plantilla A",
+        "copy": "Copia els camps d’A tal qual",
+        "copyText": "Mateixes coordenades. El més simple.",
+        "missing": "Només els que falten a B",
+        "missingText": "No toca el que ja has col·locat.",
+        "adjust": "Copia i ajusta per textos",
+        "soon": "aviat",
+        "adjustText": "Proposarà el desplaçament amb textos d’A i B.",
+        "confirmTitle": "B ja té camps",
+        "confirmText": "Vols substituir-los pels d’A o afegir només els que falten? Es pot desfer amb Ctrl+Z.",
+        "replace": "Substitueix-ho tot",
+        "addMissing": "Afegeix els que falten"
+      },
+      "ready": "Llest",
+      "readyMissing": "Llest · en falten {{count}}",
+      "readyDialog": {
+        "title": "Marcar {{name}} com a llest?",
+        "fields": "{{count}} camps a B",
+        "breakdown": "{{same}} iguals · {{moved}} moguts · {{renamed}} reanomenats · {{added}} nous",
+        "dismissed": "{{count}} camp(s) d’A descartat(s)",
+        "reopen": "Podràs reobrir-lo i canviar-lo quan vulguis.",
+        "confirm": "Marca com a llest",
+        "keep": "Continua editant"
+      }
+    },
+    "panel": {
+      "title": "Camps de B · {{count}}",
+      "toResolve": "Per resoldre {{count}}",
+      "allSet": "Tot resolt",
+      "emptyB": "B és buida. Posa la plantilla d’A i ajusta el que hagi canviat.",
+      "noTemplate": "Aquest PDF no té JSON d’A: B comença buida.",
+      "page": "pàg. {{page}}",
+      "place": "Col·loca a B",
+      "dismiss": "Descarta",
+      "renameOf": "És el canvi de nom de…",
+      "renamedFrom": "abans: {{name}}",
+      "unlink": "Desenllaça",
+      "showSame": "Mostra els {{count}} iguals",
+      "hideSame": "Amaga els {{count}} iguals",
+      "dismissed": "Descartats d’A ({{count}})",
+      "restore": "Recupera"
+    },
+    "status": {
+      "same": "Igual",
+      "moved": "Mogut",
+      "renamed": "Reanomenat",
+      "new": "Nou",
+      "missing": "Falta a B"
     }
   }
 }

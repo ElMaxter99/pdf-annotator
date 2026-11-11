@@ -1,0 +1,235 @@
+<div class="app app--batch">
+  <header class="batch-bar">
+    <a class="batch-bar__brand" routerLink="/landing" [attr.aria-label]="appName">
+      <img src="/logo.svg" alt="" width="32" height="32" />
+      <span class="batch-bar__name">{{ appName }}</span>
+      <span class="batch-bar__sub">{{ 'batch.subtitle' | t }}</span>
+    </a>
+    <h1 class="batch-bar__title">{{ 'batch.title' | t: { count: total() } }}</h1>
+    <span class="batch-bar__spacer"></span>
+    @if (total() > 0) {
+      <div class="batch-bar__progress" role="group" [attr.aria-label]="'batch.progressLabel' | t">
+        <div
+          class="batch-progress"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="progress()"
+        >
+          <i [style.width.%]="progress()"></i>
+        </div>
+        <span class="batch-bar__count">{{
+          'batch.readyCount' | t: { ready: readyCount(), total: total() }
+        }}</span>
+      </div>
+      <button
+        type="button"
+        class="btn"
+        [disabled]="readyCount() === 0"
+        (click)="downloadReady()"
+        data-testid="download-ready"
+      >
+        {{ 'batch.downloadReady' | t: { count: readyCount() } }}
+      </button>
+      <button
+        type="button"
+        class="btn btn--primary"
+        [disabled]="!nextPending()"
+        (click)="reviewNext()"
+        data-testid="review-next"
+      >
+        {{ 'batch.reviewNext' | t }}
+      </button>
+    }
+  </header>
+
+  <main class="batch">
+    <input
+      #inputA
+      type="file"
+      accept="application/pdf,.pdf,application/json,.json"
+      multiple
+      hidden
+      (change)="onOriginalsSelected($event)"
+      data-testid="input-a"
+    />
+    <input
+      #inputB
+      type="file"
+      accept="application/pdf,.pdf"
+      multiple
+      hidden
+      (change)="onNewVersionsSelected($event)"
+      data-testid="input-b"
+    />
+    <input
+      #inputRow
+      type="file"
+      accept="application/pdf,.pdf"
+      hidden
+      (change)="onRowVersionSelected($event)"
+      data-testid="input-row"
+    />
+
+    @if (importing(); as progressState) {
+      <section class="batch-loading" role="status" aria-live="polite">
+        <div class="batch-progress">
+          <i [style.width.%]="(progressState.done / progressState.total) * 100"></i>
+        </div>
+        <span>{{
+          'batch.importing' | t: { done: progressState.done, total: progressState.total }
+        }}</span>
+      </section>
+    }
+
+    @if (!loaded()) {
+      <div class="batch-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+    } @else if (total() === 0) {
+      <section
+        class="batch-empty"
+        [class.batch-empty--active]="dragActive()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <h2>{{ 'batch.empty.title' | t }}</h2>
+        <p>{{ 'batch.empty.text' | t }}</p>
+        <button type="button" class="btn btn--primary" (click)="inputA.click()">
+          {{ 'batch.empty.choose' | t }}
+        </button>
+        <small>{{ 'batch.empty.privacy' | t }}</small>
+      </section>
+    } @else {
+      <section
+        class="batch-drop"
+        [class.batch-drop--active]="dragActive()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <div>
+          <strong>{{ 'batch.drop.title' | t }}</strong>
+          <span>{{ 'batch.drop.text' | t }}</span>
+        </div>
+        <button type="button" class="btn" (click)="inputB.click()">
+          {{ 'batch.drop.choose' | t }}
+        </button>
+        <button type="button" class="btn btn--ghost" (click)="inputA.click()">
+          {{ 'batch.drop.addOriginals' | t }}
+        </button>
+      </section>
+
+      <div class="batch-tools">
+        <input
+          type="search"
+          class="batch-search"
+          [ngModel]="query()"
+          (ngModelChange)="query.set($event)"
+          [placeholder]="'batch.search' | t"
+          [attr.aria-label]="'batch.search' | t"
+        />
+        @if (!persistent()) {
+          <span class="batch-note">{{ 'batch.notPersistent' | t }}</span>
+        }
+        <span class="batch-bar__spacer"></span>
+        <button
+          type="button"
+          class="btn btn--ghost"
+          (click)="clearBatch()"
+          data-testid="clear-batch"
+        >
+          {{ 'batch.clear' | t }}
+        </button>
+      </div>
+
+      <div class="batch-table" role="table" [attr.aria-label]="'batch.tableLabel' | t">
+        <div class="batch-row batch-row--head" role="row">
+          <span role="columnheader">{{ 'batch.col.original' | t }}</span>
+          <span role="columnheader">{{ 'batch.col.new' | t }}</span>
+          <span role="columnheader">{{ 'batch.col.state' | t }}</span>
+          <span role="columnheader"></span>
+        </div>
+        @for (row of rows(); track row.item.id) {
+          <div
+            class="batch-row"
+            role="row"
+            [class.batch-row--active]="row.item.id === activeId()"
+            data-testid="batch-row"
+          >
+            <span class="batch-row__name" role="cell">
+              <span class="batch-thumb" aria-hidden="true"></span>
+              <span class="batch-row__text">
+                <strong>{{ row.item.name }}</strong>
+                <small>{{ 'batch.fieldsInA' | t: { count: fieldCount(row.item.aPages) } }}</small>
+              </span>
+            </span>
+            <span class="batch-row__new" role="cell">{{ bytesLabel(row.item) }}</span>
+            <span role="cell">
+              @switch (row.state) {
+                @case ('ready') {
+                  <span class="batch-chip batch-chip--ok">✓ {{ 'batch.state.ready' | t }}</span>
+                }
+                @case ('review') {
+                  <span class="batch-chip batch-chip--on">{{ 'batch.state.review' | t }}</span>
+                }
+                @default {
+                  <span class="batch-chip batch-chip--warn">{{ 'batch.state.noB' | t }}</span>
+                }
+              }
+            </span>
+            <span class="batch-row__actions" role="cell">
+              @switch (row.state) {
+                @case ('noB') {
+                  <button
+                    type="button"
+                    class="btn btn--primary"
+                    (click)="chooseNewVersion(row.item.id, inputRow)"
+                  >
+                    {{ 'batch.action.uploadB' | t }}
+                  </button>
+                }
+                @case ('ready') {
+                  <button type="button" class="btn" (click)="open(row.item)">
+                    {{ 'batch.action.open' | t }}
+                  </button>
+                }
+                @default {
+                  <button type="button" class="btn btn--primary" (click)="open(row.item)">
+                    {{ 'batch.action.review' | t }}
+                  </button>
+                }
+              }
+              @if (confirmRemove() === row.item.id) {
+                <button type="button" class="btn btn--danger" (click)="remove(row.item.id)">
+                  {{ 'batch.action.confirmRemove' | t }}
+                </button>
+                <button type="button" class="btn btn--ghost" (click)="askRemove(row.item.id)">
+                  {{ 'batch.action.cancel' | t }}
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn btn--ghost"
+                  (click)="askRemove(row.item.id)"
+                  [attr.aria-label]="'batch.action.remove' | t: { name: row.item.name }"
+                >
+                  {{ 'batch.action.remove' | t: { name: '' } }}
+                </button>
+              }
+            </span>
+          </div>
+        }
+      </div>
+
+      @if (total() > 0 && readyCount() === total()) {
+        <section class="batch-done" role="status">
+          <h2>{{ 'batch.done.title' | t: { count: total() } }}</h2>
+          <p>{{ 'batch.done.text' | t }}</p>
+          <button type="button" class="btn btn--primary" (click)="downloadReady()">
+            {{ 'batch.done.download' | t }}
+          </button>
+        </section>
+      }
+    }
+  </main>
+</div>

@@ -9,6 +9,10 @@ export const routes: Routes = [
       import('./pages/landing/landing.page').then((m) => m.LandingPageComponent),
   },
   {
+    path: 'lote',
+    loadComponent: () => import('./pages/batch/batch.page').then((m) => m.BatchPageComponent),
+  },
+  {
     path: 'workspace',
     canActivate: [workspaceGuard],
     loadComponent: () =>

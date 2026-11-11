@@ -14,6 +14,7 @@ import {
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import { Language, TranslationService } from '../../i18n/translation.service';
@@ -50,6 +51,13 @@ import { ToastService } from '../../services/toast.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
 import { SessionStoreService } from '../../services/session-store.service';
+import { BatchStoreService } from '../../services/batch-store.service';
+import {
+  FieldState,
+  computeFieldStates,
+  fieldKey,
+  summarizeStates,
+} from '../../utils/migration.utils';
 import { PendingFileService, PendingRestore } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
@@ -236,9 +244,24 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly toast = inject(ToastService);
   private readonly sessionStore = inject(SessionStoreService);
   private readonly store = inject(AnnotationStore);
+  private readonly router = inject(Router);
+  private readonly batch = inject(BatchStoreService);
   private readonly annotationImport = inject(AnnotationImportService);
   private readonly fontCatalog = inject(FontCatalogService);
   readonly coords = this.store.coords;
+
+  /** Batch migration: set while a PDF of the batch is open (B is edited, A is the reference). */
+  readonly referenceMode = signal<'overlay' | 'toggle'>('overlay');
+  readonly holdingReference = signal(false);
+  readonly migration = computed(() => {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return null;
+    }
+    const states = computeFieldStates(item.aPages, this.store.coords(), item.links, item.dismissed);
+    return { item, states, summary: summarizeStates(states), dismissed: item.dismissed };
+  });
+  private batchSaveTimer: ReturnType<typeof setTimeout> | null = null;
   readonly customFontsFeatureEnabled = this.fontCatalog.customFontsFeatureEnabled;
   readonly customFonts = this.fontCatalog.customFonts;
   readonly fontOptions = this.fontCatalog.fontOptions;
@@ -415,6 +438,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.scale();
       untracked(() => this.scheduleSessionSave());
     });
+    effect(() => {
+      this.store.coords();
+      untracked(() => this.scheduleBatchSave());
+    });
+    effect(() => {
+      this.migration();
+      this.referenceMode();
+      this.holdingReference();
+      untracked(() => this.redrawReference());
+    });
     this.vm = this;
     this.setDocumentMetadata();
     const storedTemplates = this.templatesService.getTemplates();
@@ -435,6 +468,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   ngOnInit(): void {
+    if (this.batch.activeItem()) {
+      this.sidebarTab.set('annotations'); // the state of every field lives there
+    }
     const pendingFile = this.pendingFileService.consumePendingFile();
     const pendingRestore = this.pendingFileService.consumePendingRestore();
     if (pendingFile) {
@@ -445,6 +481,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   ngOnDestroy() {
+    this.flushBatchSave();
+    this.batch.deactivate();
     this.revokeThumbnailUrls();
     if (this.autoApplyCoordsTimer) {
       clearTimeout(this.autoApplyCoordsTimer);
@@ -1425,8 +1463,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const file = this.sessionFile;
-    if (!file || !this.pdfDoc || typeof window === 'undefined') {
-      return;
+    if (!file || !this.pdfDoc || typeof window === 'undefined' || this.batch.activeItem()) {
+      return; // a batch keeps its own copy; do not overwrite the last single-PDF session
     }
 
     const hasAnnotations = this.store.coords().length > 0;
@@ -2873,6 +2911,230 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       });
 
     this.refreshOverlay();
+    this.redrawReference();
+  }
+
+  // ---- batch migration (A = reference layer, B = what is edited) -------------------------------
+
+  get referenceLayerRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.viewerComponent?.referenceLayerRef;
+  }
+
+  /** Paints the fields of A (read only) behind those of B. */
+  private redrawReference() {
+    const layer = this.referenceLayerRef?.nativeElement;
+    if (!layer) {
+      return;
+    }
+    layer.textContent = '';
+    const m = this.migration();
+    const canvas = this.pdfCanvasRef?.nativeElement;
+    if (!m || !canvas) {
+      return;
+    }
+    const onlyA = this.holdingReference();
+    if (!onlyA && this.referenceMode() === 'toggle') {
+      return;
+    }
+
+    const page = this.pageIndex();
+    const scale = this.scale();
+    const draw = (name: string, x: number, y: number, fontSize: number, missing: boolean) => {
+      const px = Number(x);
+      const py = Number(y);
+      const size = Math.max(6, Number(fontSize) || 12);
+      if (!Number.isFinite(px) || !Number.isFinite(py)) {
+        return;
+      }
+      const el = document.createElement('div');
+      el.className = 'reference-field';
+      el.classList.toggle('reference-field--missing', missing);
+      el.classList.toggle('reference-field--solo', onlyA);
+      el.textContent = name;
+      el.title = name;
+      el.style.left = `${px * scale}px`;
+      el.style.top = `${canvas.height - py * scale - size * scale}px`;
+      el.style.height = `${size * scale * 1.2}px`;
+      el.style.minWidth = `${Math.max(24, name.length * size * 0.55 * scale)}px`;
+      el.style.fontSize = `${Math.max(9, size * scale * 0.8)}px`;
+      layer.appendChild(el);
+    };
+
+    if (onlyA) {
+      const states = m.states;
+      for (const aPage of m.item.aPages) {
+        if (aPage.num !== page) {
+          continue;
+        }
+        for (const field of aPage.fields) {
+          const name = (field.mapField || field.value || '').trim();
+          const missing = states.some(
+            (state) => state.status === 'missing' && state.page === page && state.name === name
+          );
+          draw(name, field.x, field.y, field.fontSize, missing);
+        }
+      }
+      return;
+    }
+
+    for (const state of m.states) {
+      if (state.page !== page || !state.a || state.status === 'same') {
+        continue;
+      }
+      draw(state.a.name, state.a.x, state.a.y, state.a.fontSize, state.status === 'missing');
+    }
+  }
+
+  private normalizedTemplateA(): PageAnnotations[] {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return [];
+    }
+    return (
+      this.annotationImport.normalizeImportedCoordinates({ pages: item.aPages }, (field) =>
+        this.prepareFieldForStorage(field)
+      ) ?? []
+    );
+  }
+
+  /** Puts A's template into B: everything (replaces B) or only what B still lacks. One undo step. */
+  applyTemplateA(mode: 'replace' | 'missing') {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    if (mode === 'replace') {
+      this.replaceCoords(this.normalizedTemplateA());
+      return;
+    }
+    this.addMissingFromA(this.migration()?.states.filter((state) => state.status === 'missing') ?? []);
+  }
+
+  placeMissing(state: FieldState) {
+    this.addMissingFromA([state]);
+  }
+
+  private addMissingFromA(states: readonly FieldState[]) {
+    const template = this.normalizedTemplateA();
+    const toAdd: Array<{ page: number; field: PageField }> = [];
+    for (const state of states) {
+      const source = template
+        .find((page) => page.num === state.page)
+        ?.fields.find(
+          (field) =>
+            (field.mapField || field.value || '').trim() === state.name &&
+            field.x === state.a?.x &&
+            field.y === state.a?.y
+        );
+      if (source) {
+        toAdd.push({ page: state.page, field: { ...source } });
+      }
+    }
+    if (!toAdd.length) {
+      return;
+    }
+    const changed = this.applyCoordsChange(() => {
+      let pages = this.coords();
+      for (const { page, field } of toAdd) {
+        pages = addFieldToPages(page, field, pages);
+      }
+      this.coords.set(pages);
+    });
+    if (changed) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
+  }
+
+  dismissMissing(state: FieldState) {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.dismiss(item.id, fieldKey(state.page, state.name));
+    }
+  }
+
+  restoreDismissed(key: string) {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.restore(item.id, key);
+    }
+  }
+
+  dismissedLabel(key: string): string {
+    const separator = key.indexOf('|');
+    return separator >= 0 ? key.slice(separator + 1) : key;
+  }
+
+  linkField(state: FieldState, aName: string) {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.link(item.id, { page: state.page, b: state.name, a: aName });
+    }
+  }
+
+  unlinkField(state: FieldState) {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.unlink(item.id, state.page, state.name);
+    }
+  }
+
+  /** Goes to the field's page and selects it in B (missing fields only change the page). */
+  async focusField(state: FieldState) {
+    if (state.page !== this.pageIndex()) {
+      await this.setPageIndex(state.page);
+    }
+    if (state.b) {
+      this.selection.set({ pageIndex: state.b.pageIndex, fields: [state.b.fieldIndex] });
+      this.redrawAllForPage();
+    }
+  }
+
+  private scheduleBatchSave() {
+    if (this.batchSaveTimer) {
+      clearTimeout(this.batchSaveTimer);
+      this.batchSaveTimer = null;
+    }
+    if (!this.batch.activeItem() || !this.pdfDoc || typeof window === 'undefined') {
+      return;
+    }
+    this.batchSaveTimer = setTimeout(() => {
+      this.batchSaveTimer = null;
+      this.flushBatchSave();
+    }, 300);
+  }
+
+  /** Stores B in the batch. Skips the write when nothing changed so opening never un-validates. */
+  private flushBatchSave(force = false) {
+    if (this.batchSaveTimer) {
+      clearTimeout(this.batchSaveTimer);
+      this.batchSaveTimer = null;
+    }
+    const item = this.batch.activeItem();
+    if (!item || !this.pdfDoc) {
+      return;
+    }
+    const pages = this.store.snapshot();
+    const json = JSON.stringify(this.buildJsonExportPayload(pages), null, 2);
+    if (!force && json === item.bJson) {
+      return;
+    }
+    this.batch.saveB(item.id, pages, json);
+  }
+
+  async backToBatch() {
+    this.flushBatchSave();
+    await this.router.navigate(['/lote']);
+  }
+
+  async markReady() {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    this.flushBatchSave(true);
+    this.batch.setStatus(item.id, 'ready');
+    await this.router.navigate(['/lote']);
   }
 
   isSelected(pageIndex: number, fieldIndex: number): boolean {

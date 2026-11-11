@@ -45,6 +45,16 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | P-08 Tamaño de PDF y almacenamiento | Peso por PDF, límite y uso del navegador | [`P-08-peso-almacenamiento.dc.html`](canvas/P-08-peso-almacenamiento.dc.html) | nueva página | Propuesta, pendiente de aprobación |
 | P-09 Cierre y descarga | ZIP o sueltos, progreso «26 de 80», lote terminado | [`P-09-cierre-descarga.dc.html`](canvas/P-09-cierre-descarga.dc.html) | nueva página | Propuesta, pendiente de aprobación |
 | P-10 Comparar claro | P-05 en tema claro | [`P-10-comparar-lado-a-lado-claro.dc.html`](canvas/P-10-comparar-lado-a-lado-claro.dc.html) | `viewer` | Propuesta, pendiente de aprobación |
+| M-01 Qué falla hoy | Diagnóstico del lote actual y principios nuevos | [`M-01-que-falla-hoy.dc.html`](canvas/M-01-que-falla-hoy.dc.html) | — | Aprobado (documento) |
+| M-02 Herramientas similares | Comparativa y qué copiar | [`M-02-herramientas-similares.dc.html`](canvas/M-02-herramientas-similares.dc.html) | — | Aprobado (documento) |
+| M-03 Propuesta · flujo | Cuatro pasos, capas A/B y estados de campo | [`M-03-propuesta-flujo.dc.html`](canvas/M-03-propuesta-flujo.dc.html) | — | Aprobado (documento) |
+| M-04 Bandeja del lote | Lista por necesidad y subida de B | [`M-04-bandeja-del-lote.dc.html`](canvas/M-04-bandeja-del-lote.dc.html) | `pages/batch` | Aprobado, implementado (fase 1) |
+| M-05 Editor de B | Editor con A al fondo (oscuro) | [`M-05-editor-de-b-con-a-al-fondo.dc.html`](canvas/M-05-editor-de-b-con-a-al-fondo.dc.html) | `components/migration` | Aprobado, implementado (fase 1) |
+| M-06 Modos de vista | Encima, alternar y dividida | [`M-06-modos-de-vista.dc.html`](canvas/M-06-modos-de-vista.dc.html) | `components/migration` | Aprobado; «Dividida» pendiente |
+| M-07 Editor de B claro | M-05 en tema claro | [`M-07-editor-de-b-claro.dc.html`](canvas/M-07-editor-de-b-claro.dc.html) | igual que M-05 | Aprobado, implementado (fase 1) |
+| M-08 Poner plantilla A y volver | Menú, historial y «Listo» | [`M-08-poner-plantilla-a-y-volver.dc.html`](canvas/M-08-poner-plantilla-a-y-volver.dc.html) | `components/migration` | Aprobado, implementado (fase 1) |
+| M-09 Estados | Vacío, cargando, sin B, sin JSON, aviso, todo listo | [`M-09-estados.dc.html`](canvas/M-09-estados.dc.html) | `pages/batch` | Aprobado, implementado (fase 1) |
+| M-10 Arquitectura y fases | Piezas, datos y fases | [`M-10-arquitectura-y-fases.dc.html`](canvas/M-10-arquitectura-y-fases.dc.html) | — | Aprobado (documento) |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

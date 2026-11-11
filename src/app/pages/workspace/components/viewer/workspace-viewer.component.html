@@ -24,9 +24,10 @@
         [attr.title]="'selection.clear' | t" [attr.aria-label]="'selection.clear' | t">✕</button>
     </div>
   }
-  <div class="canvas-container" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
+  <div class="canvas-container" [class.canvas-container--reference-only]="vm.holdingReference() && !!vm.migration()" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
     <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
+    <div #referenceLayer class="reference-layer" aria-hidden="true"></div>
     <div #annotationsLayer class="annotations-layer"></div>
     <div class="hitbox" (click)="vm.onHitboxClick($event)" (pointerdown)="vm.onHitboxPointerDown($event)"
       (pointermove)="vm.onHitboxPointerMove($event)" (pointerup)="vm.onHitboxPointerUp($event)"

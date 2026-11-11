@@ -45,7 +45,8 @@
       },
       "nav": {
         "github": "GitHub"
-      }
+      },
+      "batchLink": "Plusieurs nouvelles versions ? Migrez les modèles par lot →"
     },
     "upload": {
       "title": "Téléversez votre PDF",
@@ -307,6 +308,15 @@
       "outOfPage": "{{count}} annotation(s) hors de la page",
       "fontSize": "{{count}} taille(s) de police hors de 8–72",
       "opacity": "{{count}} opacité(s) hors de 0,1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} fichier(s) ignoré(s) : seuls les PDF et JSON sont acceptés.",
+      "jsonFailed": "Impossible de lire {{name}} : JSON invalide ou trop volumineux.",
+      "jsonNoPages": "{{name}} n’a pas de collection « pages » : le PDF est ajouté sans modèle.",
+      "jsonWithoutPdf": "{{count}} JSON sans PDF du même nom : ignoré(s).",
+      "notPersistent": "Ce navigateur ne peut pas conserver le lot entre deux visites.",
+      "samePdf": "{{name}} est le même PDF que l’original : rien à migrer.",
+      "unpaired": "{{count}} PDF sans correspondance : utilisez « Envoyer B » sur la bonne ligne."
     }
   },
   "session": {
@@ -335,6 +345,117 @@
     "distribute": {
       "horizontal": "Répartir horizontalement",
       "vertical": "Répartir verticalement"
+    }
+  },
+  "batch": {
+    "subtitle": "Migration de modèles",
+    "title": "Lot · {{count}} PDF",
+    "progressLabel": "Progression du lot",
+    "readyCount": "{{ready}} sur {{total}} prêts",
+    "downloadReady": "Télécharger les prêts ({{count}})",
+    "reviewNext": "Réviser le suivant →",
+    "importing": "Lecture des PDF… {{done}} sur {{total}}",
+    "empty": {
+      "title": "Commencez en déposant vos PDF d’origine (A)",
+      "text": "Si vous en avez, déposez aussi leurs JSON du même nom (facture.pdf + facture.json). Vous enverrez ensuite les nouvelles versions (B).",
+      "choose": "Choisir des PDF et JSON",
+      "privacy": "Tout reste dans votre navigateur : rien n’est envoyé."
+    },
+    "drop": {
+      "title": "Déposez ici les nouveaux PDF (B)",
+      "text": "Ils sont appariés par nom avec leur A. Les autres s’assignent avec « Envoyer B » sur leur ligne.",
+      "choose": "Choisir de nouveaux PDF",
+      "addOriginals": "Ajouter des originaux (A)"
+    },
+    "search": "Rechercher par nom",
+    "notPersistent": "Ce navigateur ne peut pas conserver le lot : il disparaîtra à la fermeture de l’onglet.",
+    "clear": "Vider le lot",
+    "tableLabel": "PDF du lot",
+    "col": {
+      "original": "Original (A)",
+      "new": "Nouveau (B)",
+      "state": "État"
+    },
+    "fieldsInA": "{{count}} champs dans A",
+    "state": {
+      "ready": "Prêt",
+      "review": "À réviser",
+      "noB": "Sans B"
+    },
+    "action": {
+      "uploadB": "Envoyer B",
+      "open": "Ouvrir",
+      "review": "Réviser",
+      "remove": "Retirer {{name}}",
+      "confirmRemove": "Oui, retirer",
+      "cancel": "Annuler"
+    },
+    "done": {
+      "title": "{{count}} sur {{count}} prêts",
+      "text": "Téléchargez un JSON par nouveau PDF ; à plusieurs, ils arrivent dans un .zip.",
+      "download": "Télécharger les JSON"
+    },
+    "editor": {
+      "regionLabel": "Migration du PDF actuel",
+      "back": "Lot",
+      "versionA": "A : {{name}}",
+      "editingB": "Édition de la version B",
+      "viewLabel": "Comment voir A",
+      "view": {
+        "overlay": "Superposé",
+        "toggle": "Alterner"
+      },
+      "holdHint": "Maintenez la touche A pour ne voir que A",
+      "cancel": "Annuler",
+      "putA": {
+        "button": "Appliquer le modèle A",
+        "copy": "Copier les champs de A tels quels",
+        "copyText": "Mêmes coordonnées. Le plus simple.",
+        "missing": "Seulement ceux qui manquent dans B",
+        "missingText": "Ne touche pas à ce que vous avez déjà placé.",
+        "adjust": "Copier et ajuster d’après les textes",
+        "soon": "bientôt",
+        "adjustText": "Proposera le décalage à partir des textes de A et B.",
+        "confirmTitle": "B contient déjà des champs",
+        "confirmText": "Les remplacer par ceux de A ou n’ajouter que les manquants ? Annulable avec Ctrl+Z.",
+        "replace": "Tout remplacer",
+        "addMissing": "Ajouter les manquants"
+      },
+      "ready": "Terminé",
+      "readyMissing": "Terminé · {{count}} manquant(s)",
+      "readyDialog": {
+        "title": "Marquer {{name}} comme terminé ?",
+        "fields": "{{count}} champs dans B",
+        "breakdown": "{{same}} identiques · {{moved}} déplacés · {{renamed}} renommés · {{added}} nouveaux",
+        "dismissed": "{{count}} champ(s) de A écarté(s)",
+        "reopen": "Vous pourrez le rouvrir et le modifier à tout moment.",
+        "confirm": "Marquer comme terminé",
+        "keep": "Continuer à modifier"
+      }
+    },
+    "panel": {
+      "title": "Champs de B · {{count}}",
+      "toResolve": "À résoudre {{count}}",
+      "allSet": "Tout est réglé",
+      "emptyB": "B est vide. Appliquez le modèle de A et ajustez ce qui a changé.",
+      "noTemplate": "Ce PDF n’a pas de JSON pour A : B démarre vide.",
+      "page": "p. {{page}}",
+      "place": "Placer dans B",
+      "dismiss": "Écarter",
+      "renameOf": "C’est le renommage de…",
+      "renamedFrom": "avant : {{name}}",
+      "unlink": "Dissocier",
+      "showSame": "Afficher les {{count}} identiques",
+      "hideSame": "Masquer les {{count}} identiques",
+      "dismissed": "Écartés de A ({{count}})",
+      "restore": "Récupérer"
+    },
+    "status": {
+      "same": "Identique",
+      "moved": "Déplacé",
+      "renamed": "Renommé",
+      "new": "Nouveau",
+      "missing": "Manquant dans B"
     }
   }
 }
