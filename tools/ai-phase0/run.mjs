@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildPrompt, flattenFields, nearbyTexts, parseJsonFromText, resolveProposal, score, summarize, validateProposals } from './lib.mjs';
 import { readPdf } from './pdf.mjs';
-import { PROVIDERS, runCli } from './providers.mjs';
+import { PROVIDERS, detectLimit, runCli } from './providers.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -73,12 +73,19 @@ async function runPair(pairDir, name) {
   let run;
   let seconds = 0;
   let meta = {};
+  let limitHit = null;
   while (attempt < 2) {
     attempt++;
     await writeFile(path.join(work, 'prompt.md'), buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote }));
     run = await runCli(name, work, { keepApiKey, timeoutMs: timeoutSec * 1000 });
     seconds += run.seconds;
     await writeFile(path.join(outBase, name, `raw-${attempt}.txt`), `# code ${run.code}\n${run.stdout}\n--- stderr ---\n${run.stderr}`);
+    const limit = detectLimit(run.stdout, run.stderr);
+    if (limit) {
+      errors = [limit];
+      limitHit = limit;
+      break;
+    }
     if (!run.ok) {
       errors = [`El CLI terminó con código ${run.code}: ${tail(run.stderr || run.stdout)}`];
       break;
@@ -103,7 +110,7 @@ async function runPair(pairDir, name) {
     rows.push({ id: p.id, label: entry.field.mapField, proposal: p, resolved, score: score(resolved, truth?.get(p.id)) });
   }
   if (!keepWork) await rm(work, { recursive: true, force: true });
-  const summary = { provider: name, seconds, attempts: attempt, parseErrors: errors, ...meta, ...summarize(rows), total: entriesA.length };
+  const summary = { limitHit, provider: name, seconds, attempts: attempt, parseErrors: errors, ...meta, ...summarize(rows), total: entriesA.length };
   await writeFile(path.join(outBase, name, 'result.json'), JSON.stringify({ summary, rows }, null, 2));
 
   // Propuesta lista para importar en la app como JSON de B.
@@ -127,12 +134,19 @@ if (!pairs.length) {
 }
 
 const lines = ['# Fase 0: resultados', '', '| Par | Proveedor | Campos | Resueltos | Página OK | Ausentes OK | Error mediano (pt) | ≤2 pt | ≤5 pt | Segundos | Avisos |', '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |'];
+let stopped = null;
 for (const pairDir of pairs) {
+  if (stopped) break;
   for (const name of providers) {
+    if (stopped) break;
     process.stdout.write(`→ ${path.basename(pairDir)} con ${PROVIDERS[name].label}… `);
     try {
       const { summary: s } = await runPair(pairDir, name);
       console.log(`${s.resolved}/${s.total} resueltos, ${s.seconds} s`);
+      if (s.limitHit) {
+        stopped = s.limitHit;
+        console.log(`\n⛔ ${s.limitHit}\n   Paro aquí para no gastar más intentos; los casos que faltan no se han ejecutado.`);
+      }
       for (const w of s.parseErrors.slice(0, 5)) console.log(`   ⚠ ${w}`);
       if (s.parseErrors.length > 5) console.log(`   ⚠ …y ${s.parseErrors.length - 5} avisos más (ver out/${path.basename(pairDir)}/${name}/result.json)`);
       lines.push(`| ${path.basename(pairDir)} | ${name} | ${s.total} | ${s.resolved} | ${s.scored ? `${s.pageOk}/${s.scored}` : '–'} | ${s.goneTotal ? `${s.goneOk}/${s.goneTotal}` : '–'} | ${fmt(s.medianErrPt)} | ${s.errsMeasured ? `${s.within2}/${s.errsMeasured}` : '–'} | ${s.errsMeasured ? `${s.within5}/${s.errsMeasured}` : '–'} | ${s.seconds} | ${s.parseErrors.length} |`);
@@ -142,6 +156,7 @@ for (const pairDir of pairs) {
     }
   }
 }
+if (stopped) lines.push('', `**Parado por el límite de la suscripción:** ${stopped}`);
 await mkdir(path.join(here, 'out'), { recursive: true });
 await writeFile(path.join(here, 'out', 'summary.md'), lines.join('\n') + '\n');
 console.log('\n' + lines.join('\n') + '\n\nDetalle en tools/ai-phase0/out/ (result.json, B-propuesta.json, raw-*.txt).');

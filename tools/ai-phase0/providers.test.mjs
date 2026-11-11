@@ -3,7 +3,7 @@ import { chmod, mkdtemp, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { PROVIDERS, buildSpawn, findExecutable, quote, runCli } from './providers.mjs';
+import { PROVIDERS, buildSpawn, detectLimit, findExecutable, quote, runCli } from './providers.mjs';
 
 test('quote entrecomilla solo lo necesario', () => {
   assert.equal(quote('-p'), '-p');
@@ -38,4 +38,13 @@ test('runCli corta con un mensaje claro si el CLI no responde', { skip: process.
   assert.equal(r.ok, false);
   assert.equal(r.code, -2);
   assert.match(r.stderr, /Tiempo agotado/);
+});
+
+test('detectLimit reconoce el límite de la suscripción y la hora de reinicio', () => {
+  const out = '{"is_error":true,"api_error_status":429,"api_error":"usage_limit_reached","result":"You\'ve hit your 5-hour limit · resets 2:30am (Europe/Madrid)","type":"result"}';
+  const msg = detectLimit(out);
+  assert.match(msg, /límite de 5 horas/);
+  assert.match(msg, /2:30am \(Europe\/Madrid\)/);
+  assert.equal(detectLimit('{"is_error":true,"result":"Not logged in"}'), null);
+  assert.match(detectLimit(out.slice(40) /* JSON roto, como un stdout cortado */), /límite/);
 });

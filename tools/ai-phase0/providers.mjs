@@ -105,3 +105,23 @@ export function runCli(name, cwd, opts = {}) {
     });
   });
 }
+
+// Detecta que la suscripción ha llegado a su límite de uso (Claude devuelve 429 `usage_limit_reached`).
+// Devuelve un mensaje claro en español con la hora de reinicio, o null si el error es otro.
+export function detectLimit(stdout, stderr = '') {
+  const text = `${stdout}\n${stderr}`;
+  let result = '';
+  try {
+    const j = JSON.parse(stdout);
+    if (j && (j.api_error === 'usage_limit_reached' || j.api_error_status === 429)) result = String(j.result ?? '');
+    else if (j && /hit your .*limit/i.test(String(j.result ?? ''))) result = String(j.result);
+  } catch {
+    const m = text.match(/"result":"([^"]*limit[^"]*)"/i);
+    if (m) result = m[1];
+    else if (/usage_limit_reached/.test(text)) result = text.match(/You've hit your[^"\n]*/)?.[0] ?? 'limit';
+  }
+  if (!result) return null;
+  const reset = result.match(/resets?\s+(?:at\s+)?(.+)$/i)?.[1]?.trim();
+  const which = /5-hour/i.test(result) ? ' de 5 horas' : /week/i.test(result) ? ' semanal' : '';
+  return `Tu suscripción ha llegado al límite${which}.${reset ? ` Se renueva a las ${reset}.` : ''} Vuelve a ejecutarlo entonces, o prueba con --provider copilot.`;
+}
