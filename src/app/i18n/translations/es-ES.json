@@ -320,7 +320,8 @@
       "notPersistent": "Este navegador no puede guardar el lote entre visitas.",
       "samePdf": "{{name}} es el mismo PDF que el original: no hay cambios que migrar.",
       "templateApplied": "Plantilla cargada: {{count}} campos.",
-      "templateFromAnnotations": "Las anotaciones del original pasan a ser la plantilla A."
+      "templateFromAnnotations": "Las anotaciones del original pasan a ser la plantilla A.",
+      "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
     }
   },
   "session": {
@@ -390,7 +391,6 @@
         "missing": "Solo los que faltan en B",
         "missingText": "No toca lo que ya has colocado.",
         "adjust": "Copiar y ajustar por textos",
-        "soon": "pronto",
         "adjustText": "Propondrá el desplazamiento usando textos de A y B.",
         "confirmTitle": "B ya tiene campos",
         "confirmText": "¿Reemplazarlos por los de A o añadir solo los que faltan? Se puede deshacer con Ctrl+Z.",
@@ -589,6 +589,48 @@
       },
       "noTemplateNote": "Sin plantilla: puedes cargar la del original o añadir una versión nueva en Documento.",
       "noTemplateGo": "Ir a Documento"
+    },
+    "adjust": {
+      "title": "Ajuste por textos",
+      "loading": "Buscando textos…",
+      "page": "Página {{page}} de {{total}}",
+      "common": "{{count}} textos en común hasta ahora",
+      "copyAsIs": "Copiar tal cual",
+      "none": {
+        "title": "No hay textos iguales en A y B.",
+        "text": "Puede que el texto haya cambiado. No se inventa ningún desplazamiento."
+      },
+      "noText": {
+        "title": "Un PDF no tiene texto que leer.",
+        "text": "Parece escaneado, así que no se puede ajustar por textos."
+      },
+      "summary": "{{anchors}} textos iguales en A y B · {{fields}} campos de A",
+      "skipped": "{{count}} campos que B ya tiene se respetan.",
+      "untouched": "B no se ha modificado todavía.",
+      "few": "Solo {{count}} textos en común: la propuesta es orientativa, revisa los campos.",
+      "modeLabel": "Cómo mover los campos",
+      "mode": {
+        "near": "Según los textos cercanos",
+        "global": "Igual para todos"
+      },
+      "tab": {
+        "fields": "Campos · {{count}}",
+        "texts": "Textos · {{count}}"
+      },
+      "noShift": "sin textos con los que calcularlo",
+      "anchorMove": "se movió",
+      "apply": "Aplicar {{count}} cambios",
+      "undoHint": "Un solo paso del historial: Ctrl+Z lo deshace. Los campos desmarcados se copian sin moverse.",
+      "badge": {
+        "high": "Alta",
+        "medium": "Media",
+        "low": "Baja",
+        "estimated": "Estimado",
+        "manual": "Manual",
+        "none": "Sin textos",
+        "outlier": "Discrepa",
+        "repeated": "Repetido"
+      }
     }
   }
 }

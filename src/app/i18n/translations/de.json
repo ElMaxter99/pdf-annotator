@@ -320,7 +320,8 @@
       "notPersistent": "Dieser Browser kann den Stapel nicht zwischen Besuchen speichern.",
       "samePdf": "{{name}} ist dasselbe PDF wie das Original: es gibt nichts zu migrieren.",
       "templateApplied": "Vorlage geladen: {{count}} Felder.",
-      "templateFromAnnotations": "Die Anmerkungen des Originals sind jetzt Vorlage A."
+      "templateFromAnnotations": "Die Anmerkungen des Originals sind jetzt Vorlage A.",
+      "adjustApplied": "{{count}} Felder kopiert, {{moved}} angepasst."
     }
   },
   "session": {
@@ -390,7 +391,6 @@
         "missing": "Nur die in B fehlenden",
         "missingText": "Berührt nichts, was du schon platziert hast.",
         "adjust": "Kopieren und nach Texten anpassen",
-        "soon": "bald",
         "adjustText": "Schlägt den Versatz anhand von Texten aus A und B vor.",
         "confirmTitle": "B hat schon Felder",
         "confirmText": "Durch die von A ersetzen oder nur fehlende hinzufügen? Mit Strg+Z rückgängig zu machen.",
@@ -589,6 +589,48 @@
       },
       "noTemplateNote": "Keine Vorlage: Sie können die des Originals laden oder unter Dokument eine neue Version hinzufügen.",
       "noTemplateGo": "Zu Dokument"
+    },
+    "adjust": {
+      "title": "Anpassung nach Texten",
+      "loading": "Texte werden gesucht …",
+      "page": "Seite {{page}} von {{total}}",
+      "common": "{{count}} gemeinsame Texte bisher",
+      "copyAsIs": "Unverändert kopieren",
+      "none": {
+        "title": "A und B haben keine gleichen Texte.",
+        "text": "Der Text hat sich vielleicht geändert. Es wird kein Versatz erfunden."
+      },
+      "noText": {
+        "title": "Ein PDF enthält keinen lesbaren Text.",
+        "text": "Er wirkt gescannt, daher ist keine Anpassung nach Texten möglich."
+      },
+      "summary": "{{anchors}} gleiche Texte in A und B · {{fields}} Felder aus A",
+      "skipped": "{{count}} Felder, die B schon hat, bleiben erhalten.",
+      "untouched": "B wurde noch nicht geändert.",
+      "few": "Nur {{count}} gemeinsame Texte: Der Vorschlag ist ungefähr, prüfe die Felder.",
+      "modeLabel": "Wie die Felder verschoben werden",
+      "mode": {
+        "near": "Nach nahen Texten",
+        "global": "Für alle gleich"
+      },
+      "tab": {
+        "fields": "Felder · {{count}}",
+        "texts": "Texte · {{count}}"
+      },
+      "noShift": "keine Texte zur Berechnung",
+      "anchorMove": "verschoben um",
+      "apply": "{{count}} Änderungen anwenden",
+      "undoHint": "Ein Verlaufsschritt: Strg+Z macht ihn rückgängig. Abgewählte Felder werden unverschoben kopiert.",
+      "badge": {
+        "high": "Hoch",
+        "medium": "Mittel",
+        "low": "Niedrig",
+        "estimated": "Geschätzt",
+        "manual": "Manuell",
+        "none": "Keine Texte",
+        "outlier": "Weicht ab",
+        "repeated": "Wiederholt"
+      }
     }
   }
 }

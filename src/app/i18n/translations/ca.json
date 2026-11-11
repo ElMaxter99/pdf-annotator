@@ -320,7 +320,8 @@
       "notPersistent": "Aquest navegador no pot desar el lot entre visites.",
       "samePdf": "{{name}} és el mateix PDF que l’original: no hi ha res a migrar.",
       "templateApplied": "Plantilla carregada: {{count}} camps.",
-      "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A."
+      "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A.",
+      "adjustApplied": "{{count}} camps copiats, {{moved}} ajustats."
     }
   },
   "session": {
@@ -390,7 +391,6 @@
         "missing": "Només els que falten a B",
         "missingText": "No toca el que ja has col·locat.",
         "adjust": "Copia i ajusta per textos",
-        "soon": "aviat",
         "adjustText": "Proposarà el desplaçament amb textos d’A i B.",
         "confirmTitle": "B ja té camps",
         "confirmText": "Vols substituir-los pels d’A o afegir només els que falten? Es pot desfer amb Ctrl+Z.",
@@ -589,6 +589,48 @@
       },
       "noTemplateNote": "Sense plantilla: pots carregar la de l’original o afegir una versió nova a Document.",
       "noTemplateGo": "Ves a Document"
+    },
+    "adjust": {
+      "title": "Ajust per textos",
+      "loading": "Cercant textos…",
+      "page": "Pàgina {{page}} de {{total}}",
+      "common": "{{count}} textos en comú fins ara",
+      "copyAsIs": "Copiar tal qual",
+      "none": {
+        "title": "No hi ha textos iguals a A i B.",
+        "text": "Pot ser que el text hagi canviat. No s’inventa cap desplaçament."
+      },
+      "noText": {
+        "title": "Un PDF no té text per llegir.",
+        "text": "Sembla escanejat, així que no es pot ajustar per textos."
+      },
+      "summary": "{{anchors}} textos iguals a A i B · {{fields}} camps d’A",
+      "skipped": "Es respecten {{count}} camps que B ja té.",
+      "untouched": "B encara no s’ha modificat.",
+      "few": "Només {{count}} textos en comú: la proposta és orientativa, revisa els camps.",
+      "modeLabel": "Com moure els camps",
+      "mode": {
+        "near": "Segons els textos propers",
+        "global": "Igual per a tots"
+      },
+      "tab": {
+        "fields": "Camps · {{count}}",
+        "texts": "Textos · {{count}}"
+      },
+      "noShift": "sense textos per calcular-ho",
+      "anchorMove": "es va moure",
+      "apply": "Aplica {{count}} canvis",
+      "undoHint": "Un sol pas de l’historial: Ctrl+Z el desfà. Els camps desmarcats es copien sense moure’s.",
+      "badge": {
+        "high": "Alta",
+        "medium": "Mitjana",
+        "low": "Baixa",
+        "estimated": "Estimat",
+        "manual": "Manual",
+        "none": "Sense textos",
+        "outlier": "Discrepa",
+        "repeated": "Repetit"
+      }
     }
   }
 }

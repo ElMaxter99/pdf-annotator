@@ -320,7 +320,8 @@
       "notPersistent": "This browser cannot keep the batch between visits.",
       "samePdf": "{{name}} is the same PDF as the original: there is nothing to migrate.",
       "templateApplied": "Template loaded: {{count}} fields.",
-      "templateFromAnnotations": "The original’s annotations became template A."
+      "templateFromAnnotations": "The original’s annotations became template A.",
+      "adjustApplied": "{{count}} fields copied, {{moved}} adjusted."
     }
   },
   "session": {
@@ -390,7 +391,6 @@
         "missing": "Only those missing in B",
         "missingText": "It does not touch what you have already placed.",
         "adjust": "Copy and adjust by text",
-        "soon": "soon",
         "adjustText": "It will suggest the offset using texts from A and B.",
         "confirmTitle": "B already has fields",
         "confirmText": "Replace them with A’s or add only those missing? You can undo with Ctrl+Z.",
@@ -589,6 +589,48 @@
       },
       "noTemplateNote": "No template: you can load the original’s or add a new version in Document.",
       "noTemplateGo": "Go to Document"
+    },
+    "adjust": {
+      "title": "Adjust by texts",
+      "loading": "Looking for texts…",
+      "page": "Page {{page}} of {{total}}",
+      "common": "{{count}} texts in common so far",
+      "copyAsIs": "Copy as is",
+      "none": {
+        "title": "There are no matching texts in A and B.",
+        "text": "The text may have changed. No offset is guessed."
+      },
+      "noText": {
+        "title": "A PDF has no text to read.",
+        "text": "It looks scanned, so it cannot be adjusted by texts."
+      },
+      "summary": "{{anchors}} matching texts in A and B · {{fields}} fields from A",
+      "skipped": "{{count}} fields B already has are kept.",
+      "untouched": "B has not been changed yet.",
+      "few": "Only {{count}} texts in common: the proposal is approximate, review the fields.",
+      "modeLabel": "How to move the fields",
+      "mode": {
+        "near": "By nearby texts",
+        "global": "Same for all"
+      },
+      "tab": {
+        "fields": "Fields · {{count}}",
+        "texts": "Texts · {{count}}"
+      },
+      "noShift": "no texts to work it out",
+      "anchorMove": "moved",
+      "apply": "Apply {{count}} changes",
+      "undoHint": "One history step: Ctrl+Z undoes it. Unticked fields are copied without moving.",
+      "badge": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low",
+        "estimated": "Estimated",
+        "manual": "Manual",
+        "none": "No texts",
+        "outlier": "Disagrees",
+        "repeated": "Repeated"
+      }
     }
   }
 }

@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, Input, signal } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { WorkspacePageComponent } from '../../workspace.page';
+import { AdjustReviewComponent } from './adjust-review.component';
 
 /** Top bar of the editor while a PDF of a batch is open: B is edited, A is the reference. */
 @Component({
   selector: 'app-migration-bar',
   standalone: true,
-  imports: [CommonModule, TranslationPipe],
+  imports: [CommonModule, TranslationPipe, AdjustReviewComponent],
   templateUrl: './migration-bar.component.html',
 })
 export class MigrationBarComponent {
@@ -31,6 +32,11 @@ export class MigrationBarComponent {
     }
     this.closeMenu();
     this.vm.applyTemplateA('replace');
+  }
+
+  putAdjust(): void {
+    this.closeMenu();
+    void this.vm.startAdjust();
   }
 
   putMissing(): void {
@@ -60,7 +66,9 @@ export class MigrationBarComponent {
   /** Esc closes the open menu or dialog. */
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.readyOpen()) {
+    if (this.vm.adjust()) {
+      this.vm.cancelAdjust();
+    } else if (this.readyOpen()) {
       this.readyOpen.set(false);
     } else if (this.menuOpen()) {
       this.closeMenu();

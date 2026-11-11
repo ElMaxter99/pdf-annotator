@@ -320,7 +320,8 @@
       "notPersistent": "Ce navigateur ne peut pas conserver le lot entre deux visites.",
       "samePdf": "{{name}} est le même PDF que l’original : rien à migrer.",
       "templateApplied": "Modèle chargé : {{count}} champs.",
-      "templateFromAnnotations": "Les annotations de l’original deviennent le modèle A."
+      "templateFromAnnotations": "Les annotations de l’original deviennent le modèle A.",
+      "adjustApplied": "{{count}} champs copiés, {{moved}} ajustés."
     }
   },
   "session": {
@@ -390,7 +391,6 @@
         "missing": "Seulement ceux qui manquent dans B",
         "missingText": "Ne touche pas à ce que vous avez déjà placé.",
         "adjust": "Copier et ajuster d’après les textes",
-        "soon": "bientôt",
         "adjustText": "Proposera le décalage à partir des textes de A et B.",
         "confirmTitle": "B contient déjà des champs",
         "confirmText": "Les remplacer par ceux de A ou n’ajouter que les manquants ? Annulable avec Ctrl+Z.",
@@ -589,6 +589,48 @@
       },
       "noTemplateNote": "Sans modèle : vous pouvez charger celui de l’original ou ajouter une nouvelle version dans Document.",
       "noTemplateGo": "Aller à Document"
+    },
+    "adjust": {
+      "title": "Ajustement par textes",
+      "loading": "Recherche des textes…",
+      "page": "Page {{page}} sur {{total}}",
+      "common": "{{count}} textes en commun jusqu’ici",
+      "copyAsIs": "Copier tel quel",
+      "none": {
+        "title": "Aucun texte identique dans A et B.",
+        "text": "Le texte a peut-être changé. Aucun décalage n’est inventé."
+      },
+      "noText": {
+        "title": "Un PDF n’a pas de texte à lire.",
+        "text": "Il semble scanné : impossible d’ajuster par textes."
+      },
+      "summary": "{{anchors}} textes identiques dans A et B · {{fields}} champs de A",
+      "skipped": "{{count}} champs déjà présents dans B sont conservés.",
+      "untouched": "B n’a pas encore été modifiée.",
+      "few": "Seulement {{count}} textes en commun : la proposition est indicative, vérifiez les champs.",
+      "modeLabel": "Comment déplacer les champs",
+      "mode": {
+        "near": "Selon les textes proches",
+        "global": "Pareil pour tous"
+      },
+      "tab": {
+        "fields": "Champs · {{count}}",
+        "texts": "Textes · {{count}}"
+      },
+      "noShift": "pas de textes pour le calculer",
+      "anchorMove": "déplacé de",
+      "apply": "Appliquer {{count}} changements",
+      "undoHint": "Une seule étape d’historique : Ctrl+Z l’annule. Les champs décochés sont copiés sans bouger.",
+      "badge": {
+        "high": "Haute",
+        "medium": "Moyenne",
+        "low": "Faible",
+        "estimated": "Estimé",
+        "manual": "Manuel",
+        "none": "Sans textes",
+        "outlier": "Diverge",
+        "repeated": "Répété"
+      }
     }
   }
 }

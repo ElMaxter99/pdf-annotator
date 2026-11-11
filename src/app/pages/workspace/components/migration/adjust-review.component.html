@@ -1,0 +1,117 @@
+@if (vm.adjust(); as s) {
+  <aside class="adjust-review" role="region" [attr.aria-label]="'batch.adjust.title' | t" data-testid="adjust-review">
+    <div class="adjust-review__head">
+      <strong>{{ 'batch.adjust.title' | t }}</strong>
+      <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()" [attr.aria-label]="'batch.editor.cancel' | t">✕</button>
+    </div>
+
+    @switch (s.phase) {
+      @case ('loading') {
+        <div class="adjust-review__box" role="status" data-testid="adjust-loading">
+          <div class="adjust-review__row">
+            <strong>{{ 'batch.adjust.loading' | t }}</strong>
+            <span>{{ 'batch.adjust.page' | t: { page: s.progress.page, total: s.progress.total } }}</span>
+          </div>
+          <progress
+            class="adjust-review__progress"
+            [max]="s.progress.total || 1"
+            [value]="s.progress.page"
+          ></progress>
+          <small>{{ 'batch.adjust.common' | t: { count: s.progress.common } }}</small>
+          <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()">{{ 'batch.editor.cancel' | t }}</button>
+        </div>
+      }
+      @case ('none') {
+        <div class="adjust-review__box migration-hint--warn" role="alert" data-testid="adjust-none">
+          <strong>{{ 'batch.adjust.none.title' | t }}</strong>
+          <small>{{ 'batch.adjust.none.text' | t }}</small>
+          <div class="adjust-review__actions">
+            <button type="button" class="btn" (click)="vm.cancelAdjust(); vm.applyTemplateA('missing')">{{ 'batch.adjust.copyAsIs' | t }}</button>
+            <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()">{{ 'batch.editor.cancel' | t }}</button>
+          </div>
+        </div>
+      }
+      @case ('noText') {
+        <div class="adjust-review__box migration-hint--warn" role="alert" data-testid="adjust-notext">
+          <strong>{{ 'batch.adjust.noText.title' | t }}</strong>
+          <small>{{ 'batch.adjust.noText.text' | t }}</small>
+          <div class="adjust-review__actions">
+            <button type="button" class="btn" (click)="vm.cancelAdjust(); vm.applyTemplateA('missing')">{{ 'batch.adjust.copyAsIs' | t }}</button>
+            <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()">{{ 'batch.editor.cancel' | t }}</button>
+          </div>
+        </div>
+      }
+      @case ('ready') {
+        <p class="adjust-review__summary" data-testid="adjust-summary">
+          {{ 'batch.adjust.summary' | t: { anchors: s.anchors.length, fields: s.fields.length } }}
+          @if (s.skipped > 0) {
+            <br /><small>{{ 'batch.adjust.skipped' | t: { count: s.skipped } }}</small>
+          }
+          <br /><small>{{ 'batch.adjust.untouched' | t }}</small>
+        </p>
+        @if (s.anchors.length < 3) {
+          <div class="adjust-review__box migration-hint--warn" role="status" data-testid="adjust-few">
+            <small>{{ 'batch.adjust.few' | t: { count: s.anchors.length } }}</small>
+          </div>
+        }
+        <div class="migration-seg" role="group" [attr.aria-label]="'batch.adjust.modeLabel' | t">
+          <button type="button" [class.migration-seg__on]="s.mode === 'near'" [attr.aria-pressed]="s.mode === 'near'" (click)="vm.setAdjustMode('near')" data-testid="adjust-mode-near">{{ 'batch.adjust.mode.near' | t }}</button>
+          <button type="button" [class.migration-seg__on]="s.mode === 'global'" [attr.aria-pressed]="s.mode === 'global'" (click)="vm.setAdjustMode('global')" data-testid="adjust-mode-global">{{ 'batch.adjust.mode.global' | t }}</button>
+        </div>
+        <div class="migration-seg" role="tablist">
+          <button type="button" role="tab" [class.migration-seg__on]="s.tab === 'fields'" [attr.aria-selected]="s.tab === 'fields'" (click)="vm.setAdjustTab('fields')">{{ 'batch.adjust.tab.fields' | t: { count: s.fields.length } }}</button>
+          <button type="button" role="tab" [class.migration-seg__on]="s.tab === 'texts'" [attr.aria-selected]="s.tab === 'texts'" (click)="vm.setAdjustTab('texts')" data-testid="adjust-tab-texts">{{ 'batch.adjust.tab.texts' | t: { count: s.anchors.length } }}</button>
+        </div>
+
+        @if (s.tab === 'fields') {
+          <ul class="adjust-review__list" data-testid="adjust-fields">
+            @for (field of s.fields; track field.key) {
+              <li class="adjust-review__item">
+                <label>
+                  <input type="checkbox" [checked]="moved(field)" [disabled]="!field.shift && !field.manual" (change)="vm.toggleAdjustField(field.key)" />
+                  <span class="adjust-review__name">
+                    <b>{{ field.name }}</b>
+                    <small>
+                      p. {{ field.page }} · {{ offset(field) }}
+                      @if (!field.shift && !field.manual) { · {{ 'batch.adjust.noShift' | t }} }
+                    </small>
+                  </span>
+                </label>
+                @if (badge(field); as b) {
+                  <span class="adjust-badge" [ngClass]="b.cls">{{ 'batch.adjust.badge.' + b.key | t }}</span>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <ul class="adjust-review__list" data-testid="adjust-anchors">
+            @for (row of s.anchors; track row.key) {
+              <li class="adjust-review__item">
+                <label>
+                  <input type="checkbox" [checked]="row.on" (change)="vm.toggleAdjustAnchor(row.key)" />
+                  <span class="adjust-review__name">
+                    <b>«{{ row.anchor.text }}»</b>
+                    <small>p. {{ row.page }} · #{{ row.anchor.id }} · {{ 'batch.adjust.anchorMove' | t }} {{ offsetOf(row.anchor.dx, row.anchor.dy) }}</small>
+                  </span>
+                </label>
+                @if (row.outlier) {
+                  <span class="adjust-badge adjust-badge--low">{{ 'batch.adjust.badge.outlier' | t }}</span>
+                } @else if (row.anchor.ambiguous) {
+                  <span class="adjust-badge adjust-badge--medium">{{ 'batch.adjust.badge.repeated' | t }}</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+
+        <div class="adjust-review__actions">
+          <button type="button" class="btn btn--primary" (click)="vm.applyAdjust()" data-testid="adjust-apply">
+            {{ 'batch.adjust.apply' | t: { count: vm.adjustMovedCount() } }}
+          </button>
+          <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()" data-testid="adjust-cancel">{{ 'batch.editor.cancel' | t }}</button>
+        </div>
+        <small>{{ 'batch.adjust.undoHint' | t }}</small>
+      }
+    }
+  </aside>
+}
