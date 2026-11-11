@@ -84,6 +84,9 @@
               <strong>{{ 'batch.editor.notices.name.' + notice.id | t }}</strong>
               <small>
                 @switch (notice.id) {
+                  @case ('adjust') {
+                    {{ 'batch.editor.notices.adjust' | t: { count: vm.adjust()?.fields?.length ?? 0 } }}
+                  }
                   @case ('noTemplate') {
                     {{ 'batch.editor.noA.hint' | t }}
                   }
@@ -99,6 +102,14 @@
                 <button type="button" class="btn btn--ghost" (click)="reopenNotice(notice.id)" [attr.data-testid]="'notice-reopen-' + notice.id">
                   {{ 'batch.editor.notices.reopen' | t }}
                 </button>
+                @if (notice.id === 'adjust') {
+                  <button type="button" class="btn btn--primary" (click)="vm.applyAdjust()" data-testid="notice-adjust-apply">
+                    {{ 'batch.adjust.apply' | t: { count: vm.adjustMovedCount() } }}
+                  </button>
+                  <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()" data-testid="notice-adjust-cancel">
+                    {{ 'batch.adjust.cancelProposal' | t }}
+                  </button>
+                }
                 @if (notice.id === 'fit') {
                   <button type="button" class="btn btn--ghost" (click)="vm.setFitA(!vm.fitA())" data-testid="notice-fit-toggle">
                     {{ (vm.fitA() ? 'batch.editor.fit.remove' : 'batch.editor.fit.apply') | t }}
@@ -222,6 +233,7 @@
     }
   </div>
   <div class="migration-hints">
+    <app-adjust-review [vm]="vm" (closeRequested)="closeNotice('adjust')"></app-adjust-review>
     @if (vm.migration() && vm.templateFieldsA() === 0 && !vm.isNoticeClosed('noTemplate')) {
       <div class="migration-hint" role="status" data-testid="no-template-a">
         <span>{{ 'batch.editor.noA.hint' | t }}</span>
@@ -305,9 +317,7 @@
     }
   </div>
 
-  <app-adjust-review [vm]="vm"></app-adjust-review>
-
-  @if (readyOpen() && vm.migration(); as m) {
+    @if (readyOpen() && vm.migration(); as m) {
     <div class="migration-backdrop" (click)="readyOpen.set(false)"></div>
     <div class="migration-dialog" role="dialog" aria-modal="true" aria-labelledby="ready-title">
       <h2 id="ready-title">{{ 'batch.editor.readyDialog.title' | t: { name: m.item.bName } }}</h2>

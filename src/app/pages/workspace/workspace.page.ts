@@ -108,6 +108,9 @@ import {
   type AdjustField,
   type AdjustMode,
   effectiveShift,
+  fieldVisual,
+  formatShift,
+  hitAdjustField,
   isFieldMoved,
   recomputeFields,
 } from '../../utils/adjust-session.utils';
@@ -212,10 +215,32 @@ export interface AdjustSession {
   readonly skipped: number;
   readonly textsA: number;
   readonly textsB: number;
+  /** «Propuesta» shows B with the fields where the proposal puts them; «Original» where they are in A. */
+  readonly view: 'proposal' | 'original';
+  /** The list of fields and texts is open under the notice. */
+  readonly open: boolean;
+  /** Anchor pins are shown on both pages (always shown in the «Textos» tab). */
+  readonly anchorsShown: boolean;
+  /** Field or anchor under the pointer or the keyboard focus (highlighted on A and B). */
+  readonly hover: string | null;
+  readonly hoverAnchor: string | null;
+  /** Field with its card open, and where the card goes (viewport pixels). */
+  readonly selected: string | null;
+  readonly card: { x: number; y: number } | null;
 }
 
+const ADJUST_UI = {
+  view: 'proposal',
+  open: false,
+  anchorsShown: false,
+  hover: null,
+  hoverAnchor: null,
+  selected: null,
+  card: null,
+} as const;
+
 /** Informative notices of the batch bar that can be closed (and found again in the bell). */
-export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit';
+export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust';
 
 @Component({
   selector: 'app-workspace-page',
@@ -324,6 +349,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     if (this.sizeMismatch() && !this.fitUndecided()) {
       list.push({ id: 'fit', sig: JSON.stringify([this.pageSizesA(), this.pageSizesB()]) });
+    }
+    const adjust = this.adjust();
+    if (adjust && adjust.phase !== 'loading') {
+      list.push({ id: 'adjust', sig: 'adjust' });
     }
     return list;
   });
@@ -1913,6 +1942,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     const coords = this.domToPdfCoords(evt);
     this.cursorPdfCoords.set(coords);
+    if (this.adjust()?.phase === 'ready') {
+      this.setAdjustHover(this.adjustHit(evt)?.key ?? null);
+    }
   }
 
   onViewerMouseLeave() {
@@ -1925,6 +1957,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     if (!this.pdfDoc || this.editing()) return;
+    if (this.adjust()?.phase === 'ready') {
+      const hit = this.adjustHit(evt);
+      if (hit) {
+        this.patchAdjust({
+          selected: hit.key,
+          hover: hit.key,
+          card: { x: evt.clientX, y: evt.clientY },
+        });
+        return;
+      }
+      this.closeAdjustCard();
+    }
     this.clearSelection();
     const pt = this.domToPdfCoords(evt);
     if (!pt) return;
@@ -3511,7 +3555,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       skipped: 0,
       textsA: 0,
       textsB: 0,
+      ...ADJUST_UI,
     });
+    this.reopenNotice('adjust');
     if (this.referenceMode() !== 'split') {
       this.adjustPreviousMode = this.referenceMode();
       await this.setReferenceMode('split');
@@ -3589,6 +3635,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         skipped,
         textsA,
         textsB,
+        ...ADJUST_UI,
       });
       this.redrawAllForPage();
     } catch (error) {
@@ -3612,6 +3659,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   cancelAdjust(): void {
     this.adjustToken += 1;
     this.adjust.set(null);
+    this.holdingOriginal.set(false);
+    this.reopenNotice('adjust');
     const previous = this.adjustPreviousMode;
     this.adjustPreviousMode = null;
     if (previous) {
@@ -3724,23 +3773,133 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     void this.renderSplit();
   }
 
-  /** B layer: the original place of each field (grey) and the proposed one (amber), plus anchor pins. */
+  /** Light update (hover, card): redraws the layers without touching the PDF canvases. */
+  private patchAdjust(patch: Partial<AdjustSession>): void {
+    const current = this.adjust();
+    if (!current) {
+      return;
+    }
+    this.adjust.set({ ...current, ...patch });
+    this.redrawReference();
+    this.markAdjustHoverInSplit();
+  }
+
+  readonly holdingOriginal = signal(false);
+  refreshAdjustPreview(): void {
+    this.redrawReference();
+  }
+
+  /** Original places are shown: the toggle says so, or the P key is held. */
+  readonly adjustShowsOriginal = computed(
+    () => this.adjust()?.view === 'original' || this.holdingOriginal(),
+  );
+
+  setAdjustView(view: 'proposal' | 'original'): void {
+    this.patchAdjust({ view, selected: null, card: null });
+  }
+
+  toggleAdjustOpen(): void {
+    const current = this.adjust();
+    if (current) {
+      this.patchAdjust({ open: !current.open });
+    }
+  }
+
+  toggleAdjustAnchors(): void {
+    const current = this.adjust();
+    if (current) {
+      this.patchAdjust({ anchorsShown: !current.anchorsShown });
+      void this.renderSplit();
+    }
+  }
+
+  setAdjustHover(key: string | null): void {
+    if (this.adjust()?.hover !== key) {
+      this.patchAdjust({ hover: key });
+    }
+  }
+
+  setAdjustHoverAnchor(key: string | null): void {
+    if (this.adjust()?.hoverAnchor !== key) {
+      this.patchAdjust({ hoverAnchor: key });
+    }
+  }
+
+  closeAdjustCard(): void {
+    if (this.adjust()?.card) {
+      this.patchAdjust({ selected: null, card: null });
+    }
+  }
+
+  /** Sets a shift typed by hand (points; up is positive) and ticks the field. */
+  setAdjustManual(key: string, dx: number, dy: number): void {
+    if (!Number.isFinite(dx) || !Number.isFinite(dy)) {
+      return;
+    }
+    this.updateAdjust((current) => ({
+      ...current,
+      fields: current.fields.map((field) =>
+        field.key === key ? { ...field, manual: { dx, dy }, override: true } : field,
+      ),
+    }));
+  }
+
+  resetAdjustManual(key: string): void {
+    this.updateAdjust((current) => ({
+      ...current,
+      fields: current.fields.map((field) =>
+        field.key === key ? { ...field, manual: null, override: null } : field,
+      ),
+    }));
+  }
+
+  adjustField(key: string | null): AdjustField | null {
+    return (key && this.adjust()?.fields.find((field) => field.key === key)) || null;
+  }
+
+  /** Field of the proposal under a pointer position, while the review is open. */
+  private adjustHit(evt: MouseEvent): AdjustField | null {
+    const session = this.adjust();
+    if (!session || session.phase !== 'ready') {
+      return null;
+    }
+    const point = this.domToPdfCoords(evt);
+    return point
+      ? hitAdjustField(
+          session.fields,
+          this.pageIndex(),
+          point,
+          this.scale(),
+          this.adjustShowsOriginal(),
+        )
+      : null;
+  }
+
+  /** B layer: where each field goes (amber), where it was (grey), arrows and anchor pins. */
   private drawAdjustPreview(layer: HTMLElement, canvasHeight: number): void {
     const session = this.adjust();
     if (!session || session.phase !== 'ready') {
       return;
     }
     const page = this.pageIndex();
+    const scale = this.scale();
+    const original = this.adjustShowsOriginal();
+    const flagged = new Set([session.hover, session.selected]);
+    let arrows = '';
     for (const field of session.fields) {
       if (field.page !== page) {
         continue;
       }
-      const { dx, dy } = effectiveShift(field);
-      if (dx !== 0 || dy !== 0) {
+      const visual = original ? 'grey' : fieldVisual(field);
+      const { dx, dy } = original ? { dx: 0, dy: 0 } : effectiveShift(field);
+      const moved = visual === 'proposal' || visual === 'estimated' || visual === 'manual';
+      if (moved) {
         this.drawReferenceField(layer, canvasHeight, field.name, field.x, field.y, field.fontSize, false, false);
         const ghost = layer.lastElementChild as HTMLElement | null;
-        ghost?.classList.add('reference-field--origin');
-        ghost && (ghost.textContent = '');
+        if (ghost) {
+          ghost.classList.add('reference-field--origin');
+          ghost.textContent = '';
+        }
       }
       this.drawReferenceField(
         layer,
@@ -3752,17 +3911,43 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         false,
         false,
       );
-      const proposed = layer.lastElementChild as HTMLElement | null;
-      proposed?.classList.add(
-        field.shift?.confidence === 'estimated' ? 'reference-field--estimated' : 'reference-field--proposal',
-      );
+      const el = layer.lastElementChild as HTMLElement | null;
+      if (el) {
+        el.classList.add(`reference-field--${visual}`);
+        el.classList.toggle('reference-field--hover', flagged.has(field.key));
+        el.dataset['adjustKey'] = field.key;
+      }
+      if (moved && flagged.has(field.key)) {
+        const size = Math.max(6, Number(field.fontSize) || 12);
+        const x1 = field.x * scale;
+        const y1 = canvasHeight - (field.y + size / 2) * scale;
+        const x2 = (field.x + dx) * scale;
+        const y2 = canvasHeight - (field.y + dy + size / 2) * scale;
+        arrows += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#b57600" stroke-width="2" marker-end="url(#adjust-arrow)"/>`;
+        const label = document.createElement('span');
+        label.className = 'adjust-delta';
+        label.textContent = formatShift(dx, dy);
+        label.style.left = `${Math.max(0, x2 + 8)}px`;
+        label.style.top = `${Math.max(0, y2 - 26)}px`;
+        layer.appendChild(label);
+      }
     }
-    this.drawAdjustPins(layer, canvasHeight, 'b');
+    if (arrows) {
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('class', 'adjust-arrows');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.innerHTML = `<defs><marker id="adjust-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b57600"/></marker></defs>${arrows}`;
+      layer.appendChild(svg);
+    }
+    if (!original) {
+      this.drawAdjustPins(layer, canvasHeight, 'b');
+    }
   }
 
   private drawAdjustPins(layer: HTMLElement, canvasHeight: number, side: 'a' | 'b'): void {
     const session = this.adjust();
-    if (!session || session.phase !== 'ready') {
+    if (!session || session.phase !== 'ready' || (!session.anchorsShown && session.tab !== 'texts')) {
       return;
     }
     const scale = this.scale();
@@ -3774,12 +3959,30 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const point = side === 'a' ? row.anchor.a : row.anchor.b;
       const pin = document.createElement('span');
       pin.className = 'adjust-pin';
+      pin.classList.toggle('adjust-pin--hover', session.hoverAnchor === row.key);
       pin.textContent = `${row.anchor.id}`;
       pin.title = row.anchor.text;
+      pin.dataset['anchorKey'] = row.key;
       pin.style.left = `${point.x * scale - 8}px`;
       pin.style.top = `${canvasHeight - point.y * scale - 8}px`;
       layer.appendChild(pin);
     }
+  }
+
+  /** Marks on A (left pane of «Dividida») the field under the pointer on B or in the list. */
+  private markAdjustHoverInSplit(): void {
+    const layer = this.splitLayerRef?.nativeElement;
+    const session = this.adjust();
+    if (!layer || !session) {
+      return;
+    }
+    const wanted = this.adjustField(session.hover ?? session.selected);
+    layer.querySelectorAll<HTMLElement>('.reference-field').forEach((el) => {
+      el.classList.toggle('reference-field--hover', !!wanted && el.dataset['name'] === wanted.name);
+    });
+    layer.querySelectorAll<HTMLElement>('.adjust-pin').forEach((el) => {
+      el.classList.toggle('adjust-pin--hover', el.dataset['anchorKey'] === session.hoverAnchor);
+    });
   }
 
   /** Puts A's template into B: everything (replaces B) or only what B still lacks. One undo step. */
