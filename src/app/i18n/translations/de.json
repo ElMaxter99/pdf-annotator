@@ -447,6 +447,21 @@
         "offText": "Ohne Anpassung können Felder von A außerhalb der Seite von B liegen.",
         "apply": "An B anpassen",
         "menu": "Koordinaten an die Größe von B anpassen"
+      },
+      "notices": {
+        "close": "Hinweis schließen",
+        "bell": "Geschlossene Hinweise, {{count}}",
+        "title": "Geschlossene Hinweise · {{count}}",
+        "showAll": "Alle anzeigen",
+        "reopen": "Wieder anzeigen",
+        "empty": "Du hast keinen Hinweis geschlossen",
+        "emptyText": "Hinweise, die du mit ✕ schließt, bleiben hier, falls du sie wieder sehen willst.",
+        "pages": "A {{a}} Seiten · B {{b}} Seiten",
+        "name": {
+          "noTemplate": "A hat keine Vorlage",
+          "pagesDiffer": "Unterschiedliche Seitenzahl",
+          "fit": "Unterschiedliche Seitengröße"
+        }
       }
     },
     "panel": {

@@ -447,6 +447,21 @@
         "offText": "Sans ajustement, les champs de A peuvent sortir de la page de B.",
         "apply": "Ajuster à B",
         "menu": "Ajuster les coordonnées à la taille de B"
+      },
+      "notices": {
+        "close": "Fermer l’avis",
+        "bell": "Avis fermés, {{count}}",
+        "title": "Avis fermés · {{count}}",
+        "showAll": "Tout afficher",
+        "reopen": "Afficher à nouveau",
+        "empty": "Vous n’avez fermé aucun avis",
+        "emptyText": "Les avis fermés avec ✕ restent ici au cas où vous voudriez les revoir.",
+        "pages": "A {{a}} pages · B {{b}} pages",
+        "name": {
+          "noTemplate": "A n’a pas de modèle",
+          "pagesDiffer": "Nombre de pages différent",
+          "fit": "Taille de page différente"
+        }
       }
     },
     "panel": {

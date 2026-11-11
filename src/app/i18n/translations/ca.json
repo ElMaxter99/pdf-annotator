@@ -447,6 +447,21 @@
         "offText": "Sense ajustar, els camps d'A poden quedar fora de la pàgina de B.",
         "apply": "Ajustar a B",
         "menu": "Ajustar les coordenades a la mida de B"
+      },
+      "notices": {
+        "close": "Tancar l’avís",
+        "bell": "Avisos tancats, {{count}}",
+        "title": "Avisos tancats · {{count}}",
+        "showAll": "Mostrar-los tots",
+        "reopen": "Mostrar de nou",
+        "empty": "No has tancat cap avís",
+        "emptyText": "Els avisos que tanquis amb ✕ queden aquí per si els vols tornar a veure.",
+        "pages": "A {{a}} pàgines · B {{b}} pàgines",
+        "name": {
+          "noTemplate": "A no té plantilla",
+          "pagesDiffer": "Diferent nombre de pàgines",
+          "fit": "Mida de pàgina diferent"
+        }
       }
     },
     "panel": {

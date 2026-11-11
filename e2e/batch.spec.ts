@@ -629,6 +629,50 @@ test('A and B of different size: the notice lets you fit the coordinates of A to
     .evaluate((el: HTMLElement) => el.style.left);
   expect(parseFloat(fitted)).toBeGreaterThan(parseFloat(plain) * 1.2);
 
-  await page.getByTestId('fit-remove').click();
+  // Closing the notice keeps the fit; the bell can still remove it
+  await page.getByTestId('notice-close-fit').click();
+  await expect(page.getByTestId('fit-on')).toHaveCount(0);
+  await page.getByTestId('notices-bell').click();
+  await page.getByTestId('notice-fit-toggle').click();
+  await page.getByTestId('notice-reopen-fit').click();
   await expect(page.getByTestId('fit-off')).toBeVisible();
+});
+
+test('informative notices can be closed and found again in the bell', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  const twoPages = await PDFDocument.create();
+  twoPages.addPage([595, 842]);
+  twoPages.addPage([595, 842]);
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(
+      file('factura-0331-nuevo.pdf', Buffer.from(await twoPages.save()), 'application/pdf'),
+    );
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await openRow(page);
+
+  await expect(page.getByTestId('pages-differ')).toBeVisible();
+  await expect(page.getByTestId('notices-count')).toHaveCount(0);
+  await page.getByTestId('notice-close-pagesDiffer').click();
+  await expect(page.getByTestId('pages-differ')).toHaveCount(0);
+  await expect(page.getByTestId('notices-bell')).toBeFocused();
+  await expect(page.getByTestId('notices-count')).toHaveText('1');
+
+  // The bell lists it, Esc closes the panel and gives the focus back
+  await page.getByTestId('notices-bell').click();
+  await expect(page.getByTestId('notice-row-pagesDiffer')).toContainText('B 2 páginas');
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('notices-panel')).toHaveCount(0);
+  await expect(page.getByTestId('notices-bell')).toBeFocused();
+
+  // «Mostrar de nuevo» puts it back
+  await page.getByTestId('notices-bell').click();
+  await page.getByTestId('notice-reopen-pagesDiffer').click();
+  await expect(page.getByTestId('pages-differ')).toBeVisible();
+  await expect(page.getByTestId('notices-count')).toHaveCount(0);
+
+  // With no closed notice the panel says so
+  await page.getByTestId('notices-bell').click();
+  await expect(page.getByTestId('notices-empty')).toBeVisible();
 });

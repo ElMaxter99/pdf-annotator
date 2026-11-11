@@ -50,6 +50,72 @@
       </div>
     }
 
+    <div class="migration-menu migration-bell">
+      <button
+        #bell
+        type="button"
+        class="btn btn--ghost migration-bell__btn"
+        aria-haspopup="true"
+        [attr.aria-expanded]="bellOpen()"
+        [attr.aria-label]="'batch.editor.notices.bell' | t: { count: vm.closedNoticeList().length }"
+        [attr.title]="'batch.editor.notices.bell' | t: { count: vm.closedNoticeList().length }"
+        (click)="toggleBell()"
+        data-testid="notices-bell"
+      >
+        🔔
+        @if (vm.closedNoticeList().length) {
+          <span class="migration-bell__count" aria-hidden="true" data-testid="notices-count">{{
+            vm.closedNoticeList().length
+          }}</span>
+        }
+      </button>
+      @if (bellOpen()) {
+        <div class="migration-menu__panel migration-bell__panel" role="dialog" [attr.aria-label]="'batch.editor.notices.title' | t: { count: vm.closedNoticeList().length }" data-testid="notices-panel">
+          <div class="migration-bell__head">
+            <strong>{{ 'batch.editor.notices.title' | t: { count: vm.closedNoticeList().length } }}</strong>
+            @if (vm.closedNoticeList().length > 1) {
+              <button type="button" class="btn btn--ghost" (click)="showAllNotices()" data-testid="notices-show-all">
+                {{ 'batch.editor.notices.showAll' | t }}
+              </button>
+            }
+          </div>
+          @for (notice of vm.closedNoticeList(); track notice.id) {
+            <div class="migration-bell__row" [attr.data-testid]="'notice-row-' + notice.id">
+              <strong>{{ 'batch.editor.notices.name.' + notice.id | t }}</strong>
+              <small>
+                @switch (notice.id) {
+                  @case ('noTemplate') {
+                    {{ 'batch.editor.noA.hint' | t }}
+                  }
+                  @case ('pagesDiffer') {
+                    {{ 'batch.editor.notices.pages' | t: { a: vm.pagesDiffer()?.a, b: vm.pagesDiffer()?.b } }}
+                  }
+                  @default {
+                    {{ 'batch.editor.fit.sizes' | t: { aw: vm.fitSizes().a?.w | number: '1.0-0', ah: vm.fitSizes().a?.h | number: '1.0-0', bw: vm.fitSizes().b?.w | number: '1.0-0', bh: vm.fitSizes().b?.h | number: '1.0-0' } }}
+                  }
+                }
+              </small>
+              <span class="migration-bell__acts">
+                <button type="button" class="btn btn--ghost" (click)="reopenNotice(notice.id)" [attr.data-testid]="'notice-reopen-' + notice.id">
+                  {{ 'batch.editor.notices.reopen' | t }}
+                </button>
+                @if (notice.id === 'fit') {
+                  <button type="button" class="btn btn--ghost" (click)="vm.setFitA(!vm.fitA())" data-testid="notice-fit-toggle">
+                    {{ (vm.fitA() ? 'batch.editor.fit.remove' : 'batch.editor.fit.apply') | t }}
+                  </button>
+                }
+              </span>
+            </div>
+          } @empty {
+            <div class="migration-bell__empty" data-testid="notices-empty">
+              <strong>{{ 'batch.editor.notices.empty' | t }}</strong>
+              <small>{{ 'batch.editor.notices.emptyText' | t }}</small>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
     <div class="migration-menu">
       <button
         type="button"
@@ -156,21 +222,26 @@
     }
   </div>
   <div class="migration-hints">
-    @if (vm.migration() && vm.templateFieldsA() === 0) {
+    @if (vm.migration() && vm.templateFieldsA() === 0 && !vm.isNoticeClosed('noTemplate')) {
       <div class="migration-hint" role="status" data-testid="no-template-a">
         <span>{{ 'batch.editor.noA.hint' | t }}</span>
         <button type="button" class="btn btn--ghost" (click)="vm.setSidebarTab('document')">
           {{ 'batch.editor.noA.go' | t }}
         </button>
+          <button type="button" class="migration-hint__close" (click)="closeNotice('noTemplate')" [attr.aria-label]="'batch.editor.notices.close' | t" [attr.title]="'batch.editor.notices.close' | t" data-testid="notice-close-noTemplate">✕</button>
       </div>
     }
     @if (vm.pagesDiffer(); as pages) {
+     @if (!vm.isNoticeClosed('pagesDiffer')) {
       <div class="migration-hint" role="status" data-testid="pages-differ">
         <span>{{
           'batch.editor.pagesDiffer'
             | t: { page: vm.pageIndex(), b: pages.b, pageA: vm.pageIndex() > pages.a ? pages.a : vm.pageIndex(), a: pages.a }
         }}</span>
+
+          <button type="button" class="migration-hint__close" (click)="closeNotice('pagesDiffer')" [attr.aria-label]="'batch.editor.notices.close' | t" [attr.title]="'batch.editor.notices.close' | t" data-testid="notice-close-pagesDiffer">✕</button>
       </div>
+     }
     }
     @if (vm.sizeMismatch(); as _) {
       @let sizes = vm.fitSizes();
@@ -199,6 +270,8 @@
             </button>
           </span>
         </div>
+      } @else if (vm.isNoticeClosed('fit')) {
+        <!-- closed: it is in the bell -->
       } @else if (vm.fitA()) {
         <div class="migration-hint" role="status" data-testid="fit-on">
           <span
@@ -215,6 +288,7 @@
           <button type="button" class="btn btn--ghost" (click)="vm.setFitA(false)" data-testid="fit-remove">
             {{ 'batch.editor.fit.remove' | t }}
           </button>
+          <button type="button" class="migration-hint__close" (click)="closeNotice('fit')" [attr.aria-label]="'batch.editor.notices.close' | t" [attr.title]="'batch.editor.notices.close' | t" data-testid="notice-close-fit">✕</button>
         </div>
       } @else {
         <div class="migration-hint" role="status" data-testid="fit-off">
@@ -225,6 +299,7 @@
           <button type="button" class="btn btn--ghost" (click)="vm.setFitA(true)" data-testid="fit-apply">
             {{ 'batch.editor.fit.apply' | t }}
           </button>
+          <button type="button" class="migration-hint__close" (click)="closeNotice('fit')" [attr.aria-label]="'batch.editor.notices.close' | t" [attr.title]="'batch.editor.notices.close' | t" data-testid="notice-close-fit">✕</button>
         </div>
       }
     }

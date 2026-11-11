@@ -447,6 +447,21 @@
         "offText": "Senza adattamento, i campi di A possono finire fuori dalla pagina di B.",
         "apply": "Adatta a B",
         "menu": "Adatta le coordinate alle dimensioni di B"
+      },
+      "notices": {
+        "close": "Chiudi avviso",
+        "bell": "Avvisi chiusi, {{count}}",
+        "title": "Avvisi chiusi · {{count}}",
+        "showAll": "Mostra tutti",
+        "reopen": "Mostra di nuovo",
+        "empty": "Non hai chiuso nessun avviso",
+        "emptyText": "Gli avvisi che chiudi con ✕ restano qui, se vuoi rivederli.",
+        "pages": "A {{a}} pagine · B {{b}} pagine",
+        "name": {
+          "noTemplate": "A non ha un modello",
+          "pagesDiffer": "Numero di pagine diverso",
+          "fit": "Dimensione di pagina diversa"
+        }
       }
     },
     "panel": {

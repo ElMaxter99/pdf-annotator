@@ -214,6 +214,9 @@ export interface AdjustSession {
   readonly textsB: number;
 }
 
+/** Informative notices of the batch bar that can be closed (and found again in the bell). */
+export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit';
+
 @Component({
   selector: 'app-workspace-page',
   standalone: true,
@@ -306,6 +309,55 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly fitUndecided = computed(
     () => this.sizeMismatch() && this.batch.activeItem()?.fitA === undefined,
   );
+  /** Informative notices of the batch bar that apply now; `sig` says what they are about. */
+  readonly notices = computed(() => {
+    if (!this.migration()) {
+      return [];
+    }
+    const list: { id: NoticeId; sig: string }[] = [];
+    if (this.templateFieldsA() === 0) {
+      list.push({ id: 'noTemplate', sig: '' });
+    }
+    const pages = this.pagesDiffer();
+    if (pages) {
+      list.push({ id: 'pagesDiffer', sig: `${pages.a}/${pages.b}` });
+    }
+    if (this.sizeMismatch() && !this.fitUndecided()) {
+      list.push({ id: 'fit', sig: JSON.stringify([this.pageSizesA(), this.pageSizesB()]) });
+    }
+    return list;
+  });
+  /** Closed notices that still apply: a changed situation (another B) shows them again. */
+  readonly closedNoticeList = computed(() => {
+    const itemId = this.batch.activeItem()?.id;
+    const closed = this.batch.closedNotices();
+    return this.notices().filter((notice) => closed[`${itemId}:${notice.id}`] === notice.sig);
+  });
+  isNoticeClosed(id: NoticeId): boolean {
+    return this.closedNoticeList().some((notice) => notice.id === id);
+  }
+  closeNotice(id: NoticeId): void {
+    const itemId = this.batch.activeItem()?.id;
+    const notice = this.notices().find((n) => n.id === id);
+    if (itemId && notice) {
+      this.batch.closedNotices.update((all) => ({ ...all, [`${itemId}:${id}`]: notice.sig }));
+    }
+  }
+  reopenNotice(id: NoticeId | null): void {
+    const itemId = this.batch.activeItem()?.id;
+    if (!itemId) {
+      return;
+    }
+    this.batch.closedNotices.update((all) => {
+      const next = { ...all };
+      for (const key of Object.keys(next)) {
+        if (key.startsWith(`${itemId}:`) && (!id || key === `${itemId}:${id}`)) {
+          delete next[key];
+        }
+      }
+      return next;
+    });
+  }
   /** Pages of A as shown and copied: scaled to B when «Ajustar» is on. */
   private readonly aPagesView = computed<PageAnnotations[]>(() => {
     const pages = this.batch.activeItem()?.aPages ?? [];

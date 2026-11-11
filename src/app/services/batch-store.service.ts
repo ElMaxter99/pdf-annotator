@@ -160,7 +160,11 @@ export class BatchStoreService {
   }
 
   /** Empties the batch (memory and IndexedDB); resolves once the stored copy is gone too. */
+  /** Notices of the editor that were closed (`itemId:notice` → what they were about). In memory only. */
+  readonly closedNotices = signal<Record<string, string>>({});
+
   async clear(): Promise<void> {
+    this.closedNotices.set({});
     this.items.set([]);
     this.activeId.set(null);
     await this.run('readwrite', (store) => store.clear());

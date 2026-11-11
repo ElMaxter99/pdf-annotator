@@ -447,6 +447,21 @@
         "offText": "Sin ajustar, los campos de A pueden quedar fuera de la página de B.",
         "apply": "Ajustar a B",
         "menu": "Ajustar las coordenadas al tamaño de B"
+      },
+      "notices": {
+        "close": "Cerrar aviso",
+        "bell": "Avisos cerrados, {{count}}",
+        "title": "Avisos cerrados · {{count}}",
+        "showAll": "Mostrar todos",
+        "reopen": "Mostrar de nuevo",
+        "empty": "No has cerrado ningún aviso",
+        "emptyText": "Los avisos que cierres con ✕ quedan aquí por si quieres volver a verlos.",
+        "pages": "A {{a}} páginas · B {{b}} páginas",
+        "name": {
+          "noTemplate": "A no tiene plantilla",
+          "pagesDiffer": "Distinto número de páginas",
+          "fit": "Tamaño de página distinto"
+        }
       }
     },
     "panel": {

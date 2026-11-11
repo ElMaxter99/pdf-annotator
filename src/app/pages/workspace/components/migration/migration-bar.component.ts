@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, Input, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild, signal } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
-import type { WorkspacePageComponent } from '../../workspace.page';
+import type { NoticeId, WorkspacePageComponent } from '../../workspace.page';
 import { AdjustReviewComponent } from './adjust-review.component';
 
 /** Top bar of the editor while a PDF of a batch is open: B is edited, A is the reference. */
@@ -19,6 +19,31 @@ export class MigrationBarComponent {
   /** Mode waiting for confirmation because B already has fields. */
   readonly confirmMode = signal<'replace' | null>(null);
   readonly readyOpen = signal(false);
+  readonly bellOpen = signal(false);
+  @ViewChild('bell') private bellButton?: ElementRef<HTMLButtonElement>;
+
+  toggleBell(): void {
+    this.bellOpen.update((open) => !open);
+  }
+
+  showAllNotices(): void {
+    this.vm.reopenNotice(null);
+    this.bellOpen.set(false);
+  }
+
+  reopenNotice(id: NoticeId): void {
+    this.vm.reopenNotice(id);
+    if (!this.vm.closedNoticeList().length) {
+      this.bellOpen.set(false);
+    }
+  }
+
+  /** Closes a notice and leaves the keyboard focus on the bell, where it can be found again. */
+  closeNotice(id: NoticeId): void {
+    this.vm.closeNotice(id);
+    setTimeout(() => this.bellButton?.nativeElement.focus());
+  }
+
 
   toggleMenu(): void {
     this.confirmMode.set(null);
@@ -70,6 +95,9 @@ export class MigrationBarComponent {
       this.vm.cancelAdjust();
     } else if (this.readyOpen()) {
       this.readyOpen.set(false);
+    } else if (this.bellOpen()) {
+      this.bellOpen.set(false);
+      this.bellButton?.nativeElement.focus();
     } else if (this.menuOpen()) {
       this.closeMenu();
     }

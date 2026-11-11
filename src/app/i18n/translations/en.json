@@ -447,6 +447,21 @@
         "offText": "Without the fit, A's fields may fall outside B's page.",
         "apply": "Fit to B",
         "menu": "Fit the coordinates to B's size"
+      },
+      "notices": {
+        "close": "Close notice",
+        "bell": "Closed notices, {{count}}",
+        "title": "Closed notices · {{count}}",
+        "showAll": "Show all",
+        "reopen": "Show again",
+        "empty": "You have not closed any notice",
+        "emptyText": "Notices you close with ✕ stay here in case you want to see them again.",
+        "pages": "A {{a}} pages · B {{b}} pages",
+        "name": {
+          "noTemplate": "A has no template",
+          "pagesDiffer": "Different number of pages",
+          "fit": "Different page size"
+        }
       }
     },
     "panel": {
