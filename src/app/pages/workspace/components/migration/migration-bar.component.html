@@ -35,12 +35,20 @@
           [class.migration-seg__on]="vm.referenceMode() === mode"
           [attr.aria-pressed]="vm.referenceMode() === mode"
           (click)="vm.setReferenceMode(mode)"
+          [attr.title]="'batch.editor.viewHint.' + mode | t"
           [attr.data-testid]="'mode-' + mode"
         >
           {{ 'batch.editor.view.' + mode | t }}
         </button>
       }
     </div>
+
+    @if (vm.referenceMode() === 'toggle') {
+      <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.toggle.label' | t">
+        <button type="button" [class.migration-seg__on]="!vm.viewingA()" [attr.aria-pressed]="!vm.viewingA()" (click)="vm.viewingA.set(false)" data-testid="toggle-b">{{ 'batch.editor.toggle.b' | t }}</button>
+        <button type="button" [class.migration-seg__on]="vm.viewingA()" [attr.aria-pressed]="vm.viewingA()" (click)="vm.viewingA.set(true)" data-testid="toggle-a">{{ 'batch.editor.toggle.a' | t }}</button>
+      </div>
+    }
 
     <div class="migration-menu">
       <button

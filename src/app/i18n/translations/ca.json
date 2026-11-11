@@ -423,7 +423,17 @@
         "hint": "A no té plantilla: es compara el seu PDF tal qual.",
         "go": "Afegeix la plantilla A (Document)"
       },
-      "pagesDiffer": "Diferent nombre de pàgines: B {{page}} de {{b}} · A {{pageA}} de {{a}}"
+      "pagesDiffer": "Diferent nombre de pàgines: B {{page}} de {{b}} · A {{pageA}} de {{a}}",
+      "toggle": {
+        "label": "Quina versió veure",
+        "b": "Veure B (s'edita)",
+        "a": "Veure A (original)"
+      },
+      "viewHint": {
+        "overlay": "Els camps d'A es dibuixen sobre B (només els que canvien)",
+        "toggle": "Canvia entre veure B i veure A, una versió cada cop",
+        "split": "A i B costat per costat, amb la mateixa pàgina i zoom"
+      }
     },
     "panel": {
       "title": "Camps de B · {{count}}",

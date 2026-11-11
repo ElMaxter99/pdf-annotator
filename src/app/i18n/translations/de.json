@@ -423,7 +423,17 @@
         "hint": "A hat keine Vorlage: sein PDF wird unverändert verglichen.",
         "go": "Vorlage A hinzufügen (Dokument)"
       },
-      "pagesDiffer": "Unterschiedliche Seitenzahl: B {{page}} von {{b}} · A {{pageA}} von {{a}}"
+      "pagesDiffer": "Unterschiedliche Seitenzahl: B {{page}} von {{b}} · A {{pageA}} von {{a}}",
+      "toggle": {
+        "label": "Welche Version anzeigen",
+        "b": "B ansehen (bearbeitet)",
+        "a": "A ansehen (Original)"
+      },
+      "viewHint": {
+        "overlay": "Die Felder von A werden über B gezeichnet (nur die geänderten)",
+        "toggle": "Wechselt zwischen B und A, jeweils eine Version",
+        "split": "A und B nebeneinander, gleiche Seite und gleicher Zoom"
+      }
     },
     "panel": {
       "title": "Felder von B · {{count}}",

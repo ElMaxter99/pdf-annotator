@@ -406,6 +406,14 @@ test('without template A the modes still compare the PDFs; JSON without fields i
     await page.locator('.canvas--pdf').evaluate((el: HTMLCanvasElement) => el.width),
   );
   await page.getByTestId('mode-overlay').click();
+  // «Alternar» switches the page between the PDF of B and the PDF of A.
+  await page.getByTestId('mode-toggle').click();
+  await expect(page.locator('.reference-pdf')).toHaveCount(0);
+  await page.getByTestId('toggle-a').click();
+  await expect(page.locator('.reference-pdf')).toHaveCount(1);
+  await page.getByTestId('toggle-b').click();
+  await expect(page.locator('.reference-pdf')).toHaveCount(0);
+  await page.getByTestId('mode-overlay').click();
   // Holding «A» swaps the page for A's PDF.
   await page.keyboard.down('a');
   await expect(page.locator('.reference-pdf')).toHaveCount(1);

@@ -423,7 +423,17 @@
         "hint": "A não tem modelo: compara-se o seu PDF tal como está.",
         "go": "Adicionar o modelo A (Documento)"
       },
-      "pagesDiffer": "Número de páginas diferente: B {{page}} de {{b}} · A {{pageA}} de {{a}}"
+      "pagesDiffer": "Número de páginas diferente: B {{page}} de {{b}} · A {{pageA}} de {{a}}",
+      "toggle": {
+        "label": "Que versão ver",
+        "b": "Ver B (editada)",
+        "a": "Ver A (original)"
+      },
+      "viewHint": {
+        "overlay": "Os campos de A são desenhados sobre B (só os que mudam)",
+        "toggle": "Alterna entre ver B e ver A, uma versão de cada vez",
+        "split": "A e B lado a lado, com a mesma página e zoom"
+      }
     },
     "panel": {
       "title": "Campos de B · {{count}}",

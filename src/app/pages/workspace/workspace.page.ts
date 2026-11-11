@@ -273,6 +273,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private splitTask: { cancel: () => void } | null = null;
   private scaleBeforeSplit: number | null = null;
   readonly holdingReference = signal(false);
+  /** «Alternar»: A is shown instead of B until the user switches back. */
+  readonly viewingA = signal(false);
+  /** Only A is visible: the A key is held, or «Alternar» is showing A. */
+  readonly showingOnlyA = computed(
+    () => this.holdingReference() || (this.referenceMode() === 'toggle' && this.viewingA()),
+  );
   readonly migration = computed(() => {
     const item = this.batch.activeItem();
     if (!item || !item.bPdf) {
@@ -486,7 +492,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     effect(() => {
       this.migration();
       this.referenceMode();
-      this.holdingReference();
+      this.showingOnlyA();
       untracked(() => this.redrawReference());
     });
     effect(() => {
@@ -2964,7 +2970,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!m || !canvas || this.splitActive()) {
       return;
     }
-    const onlyA = this.holdingReference();
+    const onlyA = this.showingOnlyA();
     if (!onlyA && this.referenceMode() === 'toggle') {
       return;
     }
@@ -3011,7 +3017,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         return;
       }
       await page.render({ canvasContext: ctx, canvas, viewport }).promise;
-      if (token === this.referencePdfToken && this.holdingReference() && layer.isConnected) {
+      if (token === this.referencePdfToken && this.showingOnlyA() && layer.isConnected) {
         layer.querySelectorAll('.reference-pdf').forEach((old) => old.remove());
         layer.prepend(canvas);
       }

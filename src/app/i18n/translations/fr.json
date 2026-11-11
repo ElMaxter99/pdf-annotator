@@ -423,7 +423,17 @@
         "hint": "A n'a pas de modèle : son PDF est comparé tel quel.",
         "go": "Ajouter le modèle A (Document)"
       },
-      "pagesDiffer": "Nombre de pages différent : B {{page}} sur {{b}} · A {{pageA}} sur {{a}}"
+      "pagesDiffer": "Nombre de pages différent : B {{page}} sur {{b}} · A {{pageA}} sur {{a}}",
+      "toggle": {
+        "label": "Quelle version afficher",
+        "b": "Voir B (modifiée)",
+        "a": "Voir A (originale)"
+      },
+      "viewHint": {
+        "overlay": "Les champs de A sont dessinés sur B (seulement ceux qui changent)",
+        "toggle": "Alterne entre B et A, une version à la fois",
+        "split": "A et B côte à côte, même page et même zoom"
+      }
     },
     "panel": {
       "title": "Champs de B · {{count}}",

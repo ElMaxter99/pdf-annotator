@@ -31,7 +31,7 @@
       <div #splitLayer class="reference-layer" aria-hidden="true"></div>
     </div>
   }
-  <div class="canvas-container" [class.canvas-container--split-b]="vm.splitActive()" [class.canvas-container--reference-only]="vm.holdingReference() && !!vm.migration()" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
+  <div class="canvas-container" [class.canvas-container--split-b]="vm.splitActive()" [class.canvas-container--reference-only]="vm.showingOnlyA() && !!vm.migration()" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
     @if (vm.splitActive()) {
       <span class="split-tag split-tag--b">{{ 'batch.editor.split.tagB' | t }}</span>
     }

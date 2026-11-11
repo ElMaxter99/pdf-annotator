@@ -423,7 +423,17 @@
         "hint": "A no tiene plantilla: se compara su PDF tal cual.",
         "go": "Añadir plantilla A (Documento)"
       },
-      "pagesDiffer": "Distinto número de páginas: B {{page}} de {{b}} · A {{pageA}} de {{a}}"
+      "pagesDiffer": "Distinto número de páginas: B {{page}} de {{b}} · A {{pageA}} de {{a}}",
+      "toggle": {
+        "label": "Qué versión ver",
+        "b": "Ver B (se edita)",
+        "a": "Ver A (original)"
+      },
+      "viewHint": {
+        "overlay": "Los campos de A se dibujan encima de B (solo los que cambian)",
+        "toggle": "Cambia entre ver B y ver A, una versión a la vez",
+        "split": "A y B lado a lado, con la misma página y zoom"
+      }
     },
     "panel": {
       "title": "Campos de B · {{count}}",

@@ -423,7 +423,17 @@
         "hint": "A has no template: its PDF is compared as it is.",
         "go": "Add template A (Document)"
       },
-      "pagesDiffer": "Different page counts: B {{page}} of {{b}} · A {{pageA}} of {{a}}"
+      "pagesDiffer": "Different page counts: B {{page}} of {{b}} · A {{pageA}} of {{a}}",
+      "toggle": {
+        "label": "Which version to view",
+        "b": "View B (edited)",
+        "a": "View A (original)"
+      },
+      "viewHint": {
+        "overlay": "The fields of A are drawn over B (only those that changed)",
+        "toggle": "Switch between viewing B and A, one version at a time",
+        "split": "A and B side by side, same page and zoom"
+      }
     },
     "panel": {
       "title": "Fields of B · {{count}}",
