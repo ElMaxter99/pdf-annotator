@@ -26,6 +26,8 @@ export interface BatchItem {
   readonly links: readonly FieldLink[];
   /** Keys (`page|name`) of fields of A deliberately left out of B. */
   readonly dismissed: readonly string[];
+  /** A and B differ in page size: `true` scales A's coordinates to B, `false` keeps them, unset = not chosen yet. */
+  readonly fitA?: boolean;
   readonly status: BatchItemStatus;
   readonly updatedAt: number;
 }

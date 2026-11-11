@@ -3579,6 +3579,27 @@ kbd {
   margin-top: 8px;
 }
 
+.migration-hint > span:first-child {
+  flex: 1;
+}
+
+.migration-hint__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.migration-menu__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 10px 12px 6px;
+  border-top: 1px solid var(--border, rgba(127, 127, 127, 0.25));
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
 .reference-field--pair {
   border-style: solid;
   border-color: var(--accent);
@@ -3751,4 +3772,90 @@ kbd {
 :root.theme-light .adjust-badge--medium,
 :root.theme-light .adjust-badge--low {
   color: #8a5a00;
+}
+
+.migration-hint__close {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.migration-hint__close:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.migration-hint__close:focus-visible,
+.migration-bell__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.migration-bell__btn {
+  position: relative;
+}
+
+.migration-bell__count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #04201c;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 16px;
+  text-align: center;
+}
+
+.migration-bell__panel {
+  right: 0;
+  left: auto;
+  min-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.migration-bell__head,
+.migration-bell__acts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.migration-bell__head {
+  justify-content: space-between;
+}
+
+.migration-bell__row,
+.migration-bell__empty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+
+.migration-bell__row small,
+.migration-bell__empty small {
+  color: var(--muted);
+}
+
+.migration-bell__empty {
+  align-items: center;
+  text-align: center;
+  padding: 16px;
 }

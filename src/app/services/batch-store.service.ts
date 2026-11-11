@@ -66,6 +66,11 @@ export class BatchStoreService {
     this.patch(id, { aPages: pages });
   }
 
+  /** Remembers whether the coordinates of A are scaled to the page size of B. */
+  setFitA(id: string, fit: boolean | undefined): void {
+    this.patch(id, { fitA: fit });
+  }
+
   /** Attaches (or replaces) B. A new B starts empty and needs review again. */
   setB(id: string, file: File): void {
     this.patch(id, {
@@ -75,6 +80,7 @@ export class BatchStoreService {
       bJson: null,
       links: [],
       dismissed: [],
+      fitA: undefined,
       status: 'review',
     });
   }
@@ -85,7 +91,10 @@ export class BatchStoreService {
     if (!item) {
       return;
     }
-    this.patch(id, item.bPdf ? { bPdf: file, bName: file.name } : { aPdf: file, name: file.name });
+    this.patch(
+      id,
+      item.bPdf ? { bPdf: file, bName: file.name, fitA: undefined } : { aPdf: file, name: file.name },
+    );
   }
 
   removeB(id: string): void {
@@ -151,7 +160,11 @@ export class BatchStoreService {
   }
 
   /** Empties the batch (memory and IndexedDB); resolves once the stored copy is gone too. */
+  /** Notices of the editor that were closed (`itemId:notice` → what they were about). In memory only. */
+  readonly closedNotices = signal<Record<string, string>>({});
+
   async clear(): Promise<void> {
+    this.closedNotices.set({});
     this.items.set([]);
     this.activeId.set(null);
     await this.run('readwrite', (store) => store.clear());

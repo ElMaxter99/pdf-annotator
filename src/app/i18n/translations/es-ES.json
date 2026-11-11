@@ -321,6 +321,7 @@
       "samePdf": "{{name}} es el mismo PDF que el original: no hay cambios que migrar.",
       "templateApplied": "Plantilla cargada: {{count}} campos.",
       "templateFromAnnotations": "Las anotaciones del original pasan a ser la plantilla A.",
+      "copiedAdjusted": "Campos copiados y ajustados al tamaño de B.",
       "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
     }
   },
@@ -416,8 +417,7 @@
       "position": "{{index}} de {{total}}",
       "split": {
         "tagA": "A · original · solo lectura",
-        "tagB": "B · versión nueva · se edita",
-        "sizeMismatch": "A y B no tienen el mismo tamaño: las coordenadas no coinciden."
+        "tagB": "B · versión nueva · se edita"
       },
       "noA": {
         "hint": "A no tiene plantilla: se compara su PDF tal cual.",
@@ -433,6 +433,35 @@
         "overlay": "Los campos de A se dibujan encima de B (solo los que cambian)",
         "toggle": "Cambia entre ver B y ver A, una versión a la vez",
         "split": "A y B lado a lado, con la misma página y zoom"
+      },
+      "fit": {
+        "sizes": "A {{aw}} × {{ah}} · B {{bw}} × {{bh}}",
+        "askTitle": "A y B no miden lo mismo.",
+        "askText": "Las coordenadas de A no caen en el mismo sitio de B.",
+        "yes": "Ajustar las coordenadas de A a B",
+        "no": "Dejarlas como están",
+        "onTitle": "A se ve ajustada al tamaño de B.",
+        "onText": "Sus coordenadas se escalan ×{{sx}} en horizontal y ×{{sy}} en vertical solo al mostrarlas y al copiarlas; el JSON de A no cambia.",
+        "remove": "Quitar el ajuste",
+        "offTitle": "A se muestra tal cual.",
+        "offText": "Sin ajustar, los campos de A pueden quedar fuera de la página de B.",
+        "apply": "Ajustar a B",
+        "menu": "Ajustar las coordenadas al tamaño de B"
+      },
+      "notices": {
+        "close": "Cerrar aviso",
+        "bell": "Avisos cerrados, {{count}}",
+        "title": "Avisos cerrados · {{count}}",
+        "showAll": "Mostrar todos",
+        "reopen": "Mostrar de nuevo",
+        "empty": "No has cerrado ningún aviso",
+        "emptyText": "Los avisos que cierres con ✕ quedan aquí por si quieres volver a verlos.",
+        "pages": "A {{a}} páginas · B {{b}} páginas",
+        "name": {
+          "noTemplate": "A no tiene plantilla",
+          "pagesDiffer": "Distinto número de páginas",
+          "fit": "Tamaño de página distinto"
+        }
       }
     },
     "panel": {

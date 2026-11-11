@@ -582,3 +582,97 @@ test('«Copiar y ajustar por textos» proposes the shift, is reviewed and applie
   await page.keyboard.press('Control+z');
   await expect(page.locator('.annotation')).toHaveCount(0);
 });
+
+test('A and B of different size: the notice lets you fit the coordinates of A to B or not', async ({
+  page,
+}) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  const landscape = await PDFDocument.create();
+  landscape.addPage([842, 595]);
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(
+      file('factura-0331-nuevo.pdf', Buffer.from(await landscape.save()), 'application/pdf'),
+    );
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await openRow(page);
+
+  // Asks first, in any mode
+  await expect(page.getByTestId('fit-ask')).toContainText('595 × 842');
+  await expect(page.getByTestId('fit-ask')).toContainText('842 × 595');
+
+  // Leave them: A is shown as it is, and it can be fitted later
+  await page.getByTestId('fit-no').click();
+  await expect(page.getByTestId('fit-off')).toBeVisible();
+  await page.getByTestId('put-template-a').click();
+  await expect(page.getByTestId('put-a-fit').locator('input')).not.toBeChecked();
+  await page.getByTestId('put-a-copy').click();
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+  const plain = await page
+    .locator('.annotation')
+    .first()
+    .evaluate((el: HTMLElement) => el.style.left);
+
+  // Fit: the copy lands scaled in one history step, and the choice is remembered
+  await page.getByTestId('fit-apply').click();
+  await expect(page.getByTestId('fit-on')).toContainText('×1.42');
+  await page.getByTestId('put-template-a').click();
+  await expect(page.getByTestId('put-a-fit').locator('input')).toBeChecked();
+  await page.getByTestId('put-a-copy').click();
+  await page.getByTestId('put-a-confirm').click();
+  await expect(page.locator('.toast')).toContainText('ajustados al tamaño de B');
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+  const fitted = await page
+    .locator('.annotation')
+    .first()
+    .evaluate((el: HTMLElement) => el.style.left);
+  expect(parseFloat(fitted)).toBeGreaterThan(parseFloat(plain) * 1.2);
+
+  // Closing the notice keeps the fit; the bell can still remove it
+  await page.getByTestId('notice-close-fit').click();
+  await expect(page.getByTestId('fit-on')).toHaveCount(0);
+  await page.getByTestId('notices-bell').click();
+  await page.getByTestId('notice-fit-toggle').click();
+  await page.getByTestId('notice-reopen-fit').click();
+  await expect(page.getByTestId('fit-off')).toBeVisible();
+});
+
+test('informative notices can be closed and found again in the bell', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  const twoPages = await PDFDocument.create();
+  twoPages.addPage([595, 842]);
+  twoPages.addPage([595, 842]);
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(
+      file('factura-0331-nuevo.pdf', Buffer.from(await twoPages.save()), 'application/pdf'),
+    );
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await openRow(page);
+
+  await expect(page.getByTestId('pages-differ')).toBeVisible();
+  await expect(page.getByTestId('notices-count')).toHaveCount(0);
+  await page.getByTestId('notice-close-pagesDiffer').click();
+  await expect(page.getByTestId('pages-differ')).toHaveCount(0);
+  await expect(page.getByTestId('notices-bell')).toBeFocused();
+  await expect(page.getByTestId('notices-count')).toHaveText('1');
+
+  // The bell lists it, Esc closes the panel and gives the focus back
+  await page.getByTestId('notices-bell').click();
+  await expect(page.getByTestId('notice-row-pagesDiffer')).toContainText('B 2 páginas');
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('notices-panel')).toHaveCount(0);
+  await expect(page.getByTestId('notices-bell')).toBeFocused();
+
+  // «Mostrar de nuevo» puts it back
+  await page.getByTestId('notices-bell').click();
+  await page.getByTestId('notice-reopen-pagesDiffer').click();
+  await expect(page.getByTestId('pages-differ')).toBeVisible();
+  await expect(page.getByTestId('notices-count')).toHaveCount(0);
+
+  // With no closed notice the panel says so
+  await page.getByTestId('notices-bell').click();
+  await expect(page.getByTestId('notices-empty')).toBeVisible();
+});

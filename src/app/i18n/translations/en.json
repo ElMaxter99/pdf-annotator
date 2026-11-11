@@ -321,6 +321,7 @@
       "samePdf": "{{name}} is the same PDF as the original: there is nothing to migrate.",
       "templateApplied": "Template loaded: {{count}} fields.",
       "templateFromAnnotations": "The original’s annotations became template A.",
+      "copiedAdjusted": "Fields copied and fitted to B's size.",
       "adjustApplied": "{{count}} fields copied, {{moved}} adjusted."
     }
   },
@@ -416,8 +417,7 @@
       "position": "{{index}} of {{total}}",
       "split": {
         "tagA": "A · original · read only",
-        "tagB": "B · new version · edited",
-        "sizeMismatch": "A and B are not the same size: the coordinates do not line up."
+        "tagB": "B · new version · edited"
       },
       "noA": {
         "hint": "A has no template: its PDF is compared as it is.",
@@ -433,6 +433,35 @@
         "overlay": "The fields of A are drawn over B (only those that changed)",
         "toggle": "Switch between viewing B and A, one version at a time",
         "split": "A and B side by side, same page and zoom"
+      },
+      "fit": {
+        "sizes": "A {{aw}} × {{ah}} · B {{bw}} × {{bh}}",
+        "askTitle": "A and B are not the same size.",
+        "askText": "A's coordinates do not land in the same place on B.",
+        "yes": "Fit A's coordinates to B",
+        "no": "Leave them as they are",
+        "onTitle": "A is fitted to B's size.",
+        "onText": "Its coordinates are scaled ×{{sx}} horizontally and ×{{sy}} vertically only when shown and copied; A's JSON does not change.",
+        "remove": "Remove the fit",
+        "offTitle": "A is shown as it is.",
+        "offText": "Without the fit, A's fields may fall outside B's page.",
+        "apply": "Fit to B",
+        "menu": "Fit the coordinates to B's size"
+      },
+      "notices": {
+        "close": "Close notice",
+        "bell": "Closed notices, {{count}}",
+        "title": "Closed notices · {{count}}",
+        "showAll": "Show all",
+        "reopen": "Show again",
+        "empty": "You have not closed any notice",
+        "emptyText": "Notices you close with ✕ stay here in case you want to see them again.",
+        "pages": "A {{a}} pages · B {{b}} pages",
+        "name": {
+          "noTemplate": "A has no template",
+          "pagesDiffer": "Different number of pages",
+          "fit": "Different page size"
+        }
       }
     },
     "panel": {

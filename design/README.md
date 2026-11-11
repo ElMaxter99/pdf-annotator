@@ -73,6 +73,9 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | R-02 Paso 2 y panel | Resumen en el paso 2 y tira «Versiones nuevas (B)» | [`R-02-paso-2-y-panel.dc.html`](canvas/R-02-paso-2-y-panel.dc.html) | `pages/batch` | Aprobado, implementado |
 | R-03 Tira B · estados | Sin B, con B y archivos sin pareja | [`R-03-tira-b-estados.dc.html`](canvas/R-03-tira-b-estados.dc.html) | `pages/batch` | Aprobado, implementado |
 | S-01 Comparar sin plantilla A | Los modos dependen de B, no de la plantilla A (sustituye la regla de Q-04) | [`S-01-comparar-sin-plantilla-a.dc.html`](canvas/S-01-comparar-sin-plantilla-a.dc.html) | `components/migration` | Aprobado, implementado |
+| T-01 Ajustar coordenadas a B | Aviso con elección cuando A y B miden distinto (preguntar, ajustado, tal cual) | [`T-01-ajustar-coordenadas-a-b.dc.html`](canvas/T-01-ajustar-coordenadas-a-b.dc.html) | `components/migration` | Aprobado, implementado |
+| T-02 Poner plantilla con ajuste | Casilla «Ajustar al tamaño de B» en el menú «Poner plantilla A» | [`T-02-poner-plantilla-con-ajuste.dc.html`](canvas/T-02-poner-plantilla-con-ajuste.dc.html) | `components/migration` | Aprobado, implementado |
+| W-01 Avisos cerrables y campana | ✕ en los avisos informativos y campana con el panel de cerrados | [`W-01-avisos-cerrables-y-campana.dc.html`](canvas/W-01-avisos-cerrables-y-campana.dc.html) | `components/migration` | Aprobado, implementado |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 
