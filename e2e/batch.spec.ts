@@ -530,3 +530,55 @@ test('a new batch starts from zero: the saved one is not added to it', async ({ 
   await page.reload();
   await expect(page.getByTestId('panel-item')).toHaveCount(2);
 });
+
+/** The example invoice drawn 20 pt to the right and 30 pt lower: its texts keep their words but move. */
+async function shiftedPdf(dx: number, dy: number): Promise<Buffer> {
+  const source = await PDFDocument.load(pdf);
+  const out = await PDFDocument.create();
+  const [embedded] = await out.embedPdf(source, [0]);
+  const { width, height } = embedded;
+  const sheet = out.addPage([width, height]);
+  sheet.drawPage(embedded, { x: dx, y: dy });
+  return Buffer.from(await out.save());
+}
+
+test('«Copiar y ajustar por textos» proposes the shift, is reviewed and applied in one undo step', async ({
+  page,
+}) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(file('factura-0331-nuevo.pdf', await shiftedPdf(20, -30), 'application/pdf'));
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await openRow(page);
+
+  await page.getByTestId('put-template-a').click();
+  await expect(page.getByTestId('put-a-adjust')).toBeEnabled();
+  await page.getByTestId('put-a-adjust').click();
+
+  const review = page.getByTestId('adjust-review');
+  await expect(review.getByTestId('adjust-apply')).toBeVisible({ timeout: 20000 });
+  await expect(page.getByTestId('split-a')).toBeVisible();
+  // B is not touched until the proposal is applied
+  await expect(page.locator('.annotation')).toHaveCount(0);
+  await expect(review.getByTestId('adjust-fields')).toContainText('→ 20 pt');
+  await expect(review.getByTestId('adjust-fields')).toContainText('↓ 30 pt');
+
+  // Cancel leaves B as it was
+  await review.getByTestId('adjust-cancel').click();
+  await expect(review).toHaveCount(0);
+  await expect(page.locator('.annotation')).toHaveCount(0);
+
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-adjust').click();
+  await review.getByTestId('adjust-tab-texts').click();
+  await expect(review.getByTestId('adjust-anchors').locator('li').first()).toBeVisible();
+  await review.getByTestId('adjust-apply').click();
+  await expect(review).toHaveCount(0);
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+
+  // One undo step takes everything back out
+  await page.keyboard.press('Control+z');
+  await expect(page.locator('.annotation')).toHaveCount(0);
+});

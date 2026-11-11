@@ -320,7 +320,8 @@
       "notPersistent": "Questo browser non può conservare il lotto tra le visite.",
       "samePdf": "{{name}} è lo stesso PDF dell’originale: non c’è nulla da migrare.",
       "templateApplied": "Modello caricato: {{count}} campi.",
-      "templateFromAnnotations": "Le annotazioni dell’originale diventano il modello A."
+      "templateFromAnnotations": "Le annotazioni dell’originale diventano il modello A.",
+      "adjustApplied": "{{count}} campi copiati, {{moved}} regolati."
     }
   },
   "session": {
@@ -390,7 +391,6 @@
         "missing": "Solo quelli mancanti in B",
         "missingText": "Non tocca ciò che hai già posizionato.",
         "adjust": "Copia e adatta in base ai testi",
-        "soon": "presto",
         "adjustText": "Proporrà lo spostamento usando testi di A e B.",
         "confirmTitle": "B ha già dei campi",
         "confirmText": "Sostituirli con quelli di A o aggiungere solo i mancanti? Si può annullare con Ctrl+Z.",
@@ -589,6 +589,48 @@
       },
       "noTemplateNote": "Senza modello: puoi caricare quello dell’originale o aggiungere una nuova versione in Documento.",
       "noTemplateGo": "Vai a Documento"
+    },
+    "adjust": {
+      "title": "Regolazione per testi",
+      "loading": "Ricerca dei testi…",
+      "page": "Pagina {{page}} di {{total}}",
+      "common": "{{count}} testi in comune finora",
+      "copyAsIs": "Copia così com’è",
+      "none": {
+        "title": "Non ci sono testi uguali in A e B.",
+        "text": "Il testo potrebbe essere cambiato. Non si inventa nessuno spostamento."
+      },
+      "noText": {
+        "title": "Un PDF non ha testo da leggere.",
+        "text": "Sembra scansionato, quindi non si può regolare per testi."
+      },
+      "summary": "{{anchors}} testi uguali in A e B · {{fields}} campi di A",
+      "skipped": "{{count}} campi già presenti in B vengono mantenuti.",
+      "untouched": "B non è stata ancora modificata.",
+      "few": "Solo {{count}} testi in comune: la proposta è indicativa, controlla i campi.",
+      "modeLabel": "Come spostare i campi",
+      "mode": {
+        "near": "In base ai testi vicini",
+        "global": "Uguale per tutti"
+      },
+      "tab": {
+        "fields": "Campi · {{count}}",
+        "texts": "Testi · {{count}}"
+      },
+      "noShift": "nessun testo per calcolarlo",
+      "anchorMove": "si è spostato",
+      "apply": "Applica {{count}} modifiche",
+      "undoHint": "Un solo passaggio della cronologia: Ctrl+Z lo annulla. I campi deselezionati vengono copiati senza spostarsi.",
+      "badge": {
+        "high": "Alta",
+        "medium": "Media",
+        "low": "Bassa",
+        "estimated": "Stimato",
+        "manual": "Manuale",
+        "none": "Senza testi",
+        "outlier": "Discrepa",
+        "repeated": "Ripetuto"
+      }
     }
   }
 }

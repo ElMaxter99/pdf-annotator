@@ -95,6 +95,15 @@ import {
   toRgbString,
 } from '../../utils/color.utils';
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
+import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
+import {
+  type AdjustAnchorRow,
+  type AdjustField,
+  type AdjustMode,
+  effectiveShift,
+  isFieldMoved,
+  recomputeFields,
+} from '../../utils/adjust-session.utils';
 
 const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
 const PDF_WORKER_TYPE_MODULE = 'module';
@@ -185,6 +194,19 @@ interface FontDropdownUiState {
 
 const DEFAULT_OPACITY = 1;
 
+export interface AdjustSession {
+  readonly phase: 'loading' | 'ready' | 'none' | 'noText';
+  readonly progress: { page: number; total: number; common: number };
+  readonly mode: AdjustMode;
+  readonly tab: 'fields' | 'texts';
+  readonly fields: AdjustField[];
+  readonly anchors: AdjustAnchorRow[];
+  /** Fields of A that B already has (kept, not copied). */
+  readonly skipped: number;
+  readonly textsA: number;
+  readonly textsB: number;
+}
+
 @Component({
   selector: 'app-workspace-page',
   standalone: true,
@@ -265,6 +287,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   );
   /** A and B have a different page size, so their coordinates do not line up. */
   readonly splitSizeMismatch = signal(false);
+  /** «Copiar y ajustar por textos»: proposal under review (null = not open). Nothing touches B until applied. */
+  readonly adjust = signal<AdjustSession | null>(null);
+  private adjustToken = 0;
+  private adjustPreviousMode: 'overlay' | 'toggle' | 'split' | null = null;
   /** Page counts when A and B do not have the same number of pages (else null). */
   readonly pagesDiffer = signal<{ a: number; b: number } | null>(null);
   private splitDoc: { blob: Blob; doc: Promise<PDFDocumentProxy> } | null = null;
@@ -2967,6 +2993,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     layer.textContent = '';
     const m = this.migration();
     const canvas = this.pdfCanvasRef?.nativeElement;
+    if (this.adjust()?.phase === 'ready' && canvas) {
+      this.drawAdjustPreview(layer, canvas.height);
+      return;
+    }
     if (!m || !canvas || this.splitActive()) {
       return;
     }
@@ -3261,6 +3291,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           false,
         );
       }
+      this.drawAdjustPins(layer, canvas.height, 'a');
       const bCanvas = this.pdfCanvasRef?.nativeElement;
       const bPage = this.pdfDoc ? await this.pdfDoc.getPage(this.pageIndex()) : null;
       const bWidth = bPage?.getViewport({ scale: 1 }).width ?? 0;
@@ -3281,6 +3312,312 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         this.prepareFieldForStorage(field),
       ) ?? []
     );
+  }
+
+
+  // ---- «Copiar y ajustar por textos» -------------------------------------------------------------
+
+  /** Texts of one page with their position in PDF points. */
+  private async pageTexts(doc: PDFDocumentProxy, pageNumber: number): Promise<PageTextItem[]> {
+    const page = await doc.getPage(pageNumber);
+    const content = await page.getTextContent();
+    const out: PageTextItem[] = [];
+    for (const item of content.items) {
+      if (!('str' in item) || !item.str.trim()) {
+        continue;
+      }
+      const x = Number(item.transform?.[4]);
+      const y = Number(item.transform?.[5]);
+      if (Number.isFinite(x) && Number.isFinite(y)) {
+        out.push({ text: item.str, x, y });
+      }
+    }
+    return out;
+  }
+
+  /** Looks for the same texts in A and B and opens the review with a proposal. */
+  async startAdjust(): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item || !this.migration() || !this.pdfDoc || this.templateFieldsA() === 0) {
+      return;
+    }
+    const token = ++this.adjustToken;
+    const template = this.normalizedTemplateA();
+    const existing = new Set<string>();
+    for (const page of this.coords()) {
+      for (const field of page.fields) {
+        existing.add(fieldKey(page.num, (field.mapField || field.value || '').trim()));
+      }
+    }
+    const pages = template.filter((page) => page.fields.length > 0).map((page) => page.num);
+    const progress = { page: 0, total: pages.length, common: 0 };
+    this.adjust.set({
+      phase: 'loading',
+      progress,
+      mode: 'near',
+      tab: 'fields',
+      fields: [],
+      anchors: [],
+      skipped: 0,
+      textsA: 0,
+      textsB: 0,
+    });
+    if (this.referenceMode() !== 'split') {
+      this.adjustPreviousMode = this.referenceMode();
+      await this.setReferenceMode('split');
+    }
+    try {
+      const aDoc = await this.splitDocOf(item.aPdf);
+      const anchors: AdjustAnchorRow[] = [];
+      let textsA = 0;
+      let textsB = 0;
+      for (const num of pages) {
+        if (token !== this.adjustToken) {
+          return;
+        }
+        progress.page += 1;
+        if (num > aDoc.numPages || num > this.pdfDoc.numPages) {
+          continue;
+        }
+        const [aItems, bItems] = await Promise.all([
+          this.pageTexts(aDoc, num),
+          this.pageTexts(this.pdfDoc, num),
+        ]);
+        textsA += aItems.length;
+        textsB += bItems.length;
+        const report = findAnchors(aItems, bItems);
+        for (const anchor of report.anchors) {
+          anchors.push({
+            key: `${num}:${anchor.id}`,
+            page: num,
+            anchor,
+            on: !report.defaultOff.has(anchor.id),
+            outlier: report.outliers.has(anchor.id),
+          });
+        }
+        progress.common = anchors.length;
+        this.adjust.update((current) =>
+          current ? { ...current, progress: { ...progress } } : current,
+        );
+      }
+      if (token !== this.adjustToken) {
+        return;
+      }
+      let skipped = 0;
+      let fields: AdjustField[] = [];
+      for (const page of template) {
+        page.fields.forEach((field, fieldIndex) => {
+          const name = (field.mapField || field.value || '').trim();
+          if (existing.size > 0 && existing.has(fieldKey(page.num, name))) {
+            skipped += 1;
+            return;
+          }
+          fields.push({
+            key: `${page.num}:${fieldIndex}`,
+            page: page.num,
+            fieldIndex,
+            name: name || '—',
+            x: field.x,
+            y: field.y,
+            fontSize: field.fontSize,
+            shift: null,
+            override: null,
+            manual: null,
+          });
+        });
+      }
+      fields = recomputeFields(fields, anchors, 'near');
+      const phase =
+        textsA === 0 || textsB === 0 ? 'noText' : anchors.length === 0 ? 'none' : 'ready';
+      this.adjust.set({
+        phase,
+        progress: { ...progress },
+        mode: 'near',
+        tab: 'fields',
+        fields,
+        anchors,
+        skipped,
+        textsA,
+        textsB,
+      });
+      this.redrawAllForPage();
+    } catch (error) {
+      console.warn('No se pudo leer el texto de los PDFs.', error);
+      this.adjust.update((current) => (current ? { ...current, phase: 'noText' } : current));
+    }
+  }
+
+  cancelAdjust(): void {
+    this.adjustToken += 1;
+    this.adjust.set(null);
+    const previous = this.adjustPreviousMode;
+    this.adjustPreviousMode = null;
+    if (previous) {
+      void this.setReferenceMode(previous);
+    } else {
+      this.redrawAllForPage();
+    }
+  }
+
+  setAdjustMode(mode: AdjustMode): void {
+    this.updateAdjust((current) => ({
+      ...current,
+      mode,
+      fields: recomputeFields(current.fields, current.anchors, mode),
+    }));
+  }
+
+  setAdjustTab(tab: 'fields' | 'texts'): void {
+    this.updateAdjust((current) => ({ ...current, tab }));
+  }
+
+  toggleAdjustField(key: string): void {
+    this.updateAdjust((current) => ({
+      ...current,
+      fields: current.fields.map((field) =>
+        field.key === key ? { ...field, override: !isFieldMoved(field) } : field,
+      ),
+    }));
+  }
+
+  toggleAdjustAnchor(key: string): void {
+    this.updateAdjust((current) => {
+      const anchors = current.anchors.map((row) =>
+        row.key === key ? { ...row, on: !row.on } : row,
+      );
+      return { ...current, anchors, fields: recomputeFields(current.fields, anchors, current.mode) };
+    });
+  }
+
+  /** Fields that will move when the user applies the proposal. */
+  adjustMovedCount(): number {
+    return this.adjust()?.fields.filter((field) => isFieldMoved(field)).length ?? 0;
+  }
+
+  /** Copies A's fields into B with the proposed shift (one undo step). */
+  applyAdjust(): void {
+    const session = this.adjust();
+    const item = this.batch.activeItem();
+    if (!session || session.phase !== 'ready' || !item) {
+      return;
+    }
+    const byKey = new Map(session.fields.map((field) => [field.key, field]));
+    const template = this.normalizedTemplateA();
+    const toAdd: Array<{ page: number; field: PageField }> = [];
+    for (const page of template) {
+      page.fields.forEach((field, fieldIndex) => {
+        const proposal = byKey.get(`${page.num}:${fieldIndex}`);
+        if (!proposal) {
+          return;
+        }
+        const { dx, dy } = effectiveShift(proposal);
+        toAdd.push({
+          page: page.num,
+          field: {
+            ...field,
+            x: Math.max(0, Math.round((field.x + dx) * 100) / 100),
+            y: Math.max(0, Math.round((field.y + dy) * 100) / 100),
+          },
+        });
+      });
+    }
+    const moved = session.fields.filter((field) => isFieldMoved(field)).length;
+    const count = toAdd.length;
+    if (count > 0) {
+      if (this.annotationCount() === 0) {
+        const pages: PageAnnotations[] = [];
+        for (const { page, field } of toAdd) {
+          const target = pages.find((entry) => entry.num === page);
+          if (target) {
+            target.fields.push(field);
+          } else {
+            pages.push({ num: page, fields: [field] });
+          }
+        }
+        this.replaceCoords(pages);
+      } else {
+        const changed = this.applyCoordsChange(() => {
+          let pages = this.coords();
+          for (const { page, field } of toAdd) {
+            pages = addFieldToPages(page, field, pages);
+          }
+          this.coords.set(pages);
+        });
+        if (changed) {
+          this.syncCoordsTextModel();
+        }
+      }
+    }
+    this.cancelAdjust();
+    this.toast.show(this.translationService.translate('toast.batch.adjustApplied', { count, moved }));
+  }
+
+  private updateAdjust(update: (current: AdjustSession) => AdjustSession): void {
+    const current = this.adjust();
+    if (!current) {
+      return;
+    }
+    this.adjust.set(update(current));
+    this.redrawAllForPage();
+    void this.renderSplit();
+  }
+
+  /** B layer: the original place of each field (grey) and the proposed one (amber), plus anchor pins. */
+  private drawAdjustPreview(layer: HTMLElement, canvasHeight: number): void {
+    const session = this.adjust();
+    if (!session || session.phase !== 'ready') {
+      return;
+    }
+    const page = this.pageIndex();
+    for (const field of session.fields) {
+      if (field.page !== page) {
+        continue;
+      }
+      const { dx, dy } = effectiveShift(field);
+      if (dx !== 0 || dy !== 0) {
+        this.drawReferenceField(layer, canvasHeight, field.name, field.x, field.y, field.fontSize, false, false);
+        const ghost = layer.lastElementChild as HTMLElement | null;
+        ghost?.classList.add('reference-field--origin');
+        ghost && (ghost.textContent = '');
+      }
+      this.drawReferenceField(
+        layer,
+        canvasHeight,
+        field.name,
+        field.x + dx,
+        field.y + dy,
+        field.fontSize,
+        false,
+        false,
+      );
+      const proposed = layer.lastElementChild as HTMLElement | null;
+      proposed?.classList.add(
+        field.shift?.confidence === 'estimated' ? 'reference-field--estimated' : 'reference-field--proposal',
+      );
+    }
+    this.drawAdjustPins(layer, canvasHeight, 'b');
+  }
+
+  private drawAdjustPins(layer: HTMLElement, canvasHeight: number, side: 'a' | 'b'): void {
+    const session = this.adjust();
+    if (!session || session.phase !== 'ready') {
+      return;
+    }
+    const scale = this.scale();
+    const page = this.pageIndex();
+    for (const row of session.anchors) {
+      if (row.page !== page || !row.on) {
+        continue;
+      }
+      const point = side === 'a' ? row.anchor.a : row.anchor.b;
+      const pin = document.createElement('span');
+      pin.className = 'adjust-pin';
+      pin.textContent = `${row.anchor.id}`;
+      pin.title = row.anchor.text;
+      pin.style.left = `${point.x * scale - 8}px`;
+      pin.style.top = `${canvasHeight - point.y * scale - 8}px`;
+      layer.appendChild(pin);
+    }
   }
 
   /** Puts A's template into B: everything (replaces B) or only what B still lacks. One undo step. */

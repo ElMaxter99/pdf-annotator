@@ -109,11 +109,14 @@
               <strong>{{ 'batch.editor.putA.missing' | t }}</strong>
               <small>{{ 'batch.editor.putA.missingText' | t }}</small>
             </button>
-            <button type="button" role="menuitem" class="migration-menu__item" disabled>
-              <strong
-                >{{ 'batch.editor.putA.adjust' | t }}
-                <em>{{ 'batch.editor.putA.soon' | t }}</em></strong
-              >
+            <button
+              type="button"
+              role="menuitem"
+              class="migration-menu__item"
+              (click)="putAdjust()"
+              data-testid="put-a-adjust"
+            >
+              <strong>{{ 'batch.editor.putA.adjust' | t }}</strong>
               <small>{{ 'batch.editor.putA.adjustText' | t }}</small>
             </button>
           }
@@ -165,6 +168,8 @@
       </div>
     }
   </div>
+
+  <app-adjust-review [vm]="vm"></app-adjust-review>
 
   @if (readyOpen() && vm.migration(); as m) {
     <div class="migration-backdrop" (click)="readyOpen.set(false)"></div>
