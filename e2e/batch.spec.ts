@@ -1,5 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { PDFDocument } from 'pdf-lib';
 import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
 
 const pdf = readFileSync(EXAMPLE_PDF);
@@ -448,4 +449,41 @@ test('«Dividida» shows A with its fields on the left and B on the right', asyn
 
   await page.getByTestId('mode-overlay').click();
   await expect(page.getByTestId('split-a')).toHaveCount(0);
+});
+
+test('A and B with a different number of pages say so in the bar', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  const twoPages = await PDFDocument.create();
+  twoPages.addPage([595, 842]);
+  twoPages.addPage([595, 842]);
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(
+      file('factura-0331-nuevo.pdf', Buffer.from(await twoPages.save()), 'application/pdf'),
+    );
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await openRow(page);
+  await expect(page.getByTestId('pages-differ')).toContainText('B 1 de 2 · A 1 de 1');
+});
+
+test('a new batch starts from zero: the saved one is not added to it', async ({ page }) => {
+  await openPanel(page);
+  await expect(page.getByTestId('panel-item')).toHaveCount(2);
+  await page.goto('/landing');
+  await expect(page.getByTestId('resume-batch')).toBeVisible();
+  // Without choosing «Continuar», two new PDFs start a new batch.
+  await page
+    .locator('input[type=file]')
+    .setInputFiles([
+      file('nuevo-a.pdf', pdf, 'application/pdf'),
+      file('nuevo-b.pdf', pdf, 'application/pdf'),
+    ]);
+  await page.waitForURL('**/lote');
+  await page.getByTestId('next-templates').click();
+  await page.getByTestId('open-panel').click();
+  await expect(page.getByTestId('panel-item')).toHaveCount(2);
+  await expect(page.getByTestId('panel-grid')).not.toContainText('factura-0331');
+  await page.reload();
+  await expect(page.getByTestId('panel-item')).toHaveCount(2);
 });

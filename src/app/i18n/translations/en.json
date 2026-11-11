@@ -422,7 +422,8 @@
       "noA": {
         "hint": "A has no template: its PDF is compared as it is.",
         "go": "Add template A (Document)"
-      }
+      },
+      "pagesDiffer": "Different page counts: B {{page}} of {{b}} · A {{pageA}} of {{a}}"
     },
     "panel": {
       "title": "Fields of B · {{count}}",

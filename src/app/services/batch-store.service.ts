@@ -150,10 +150,11 @@ export class BatchStoreService {
     void this.run('readwrite', (store) => store.delete(id));
   }
 
-  clear(): void {
+  /** Empties the batch (memory and IndexedDB); resolves once the stored copy is gone too. */
+  async clear(): Promise<void> {
     this.items.set([]);
     this.activeId.set(null);
-    void this.run('readwrite', (store) => store.clear());
+    await this.run('readwrite', (store) => store.clear());
   }
 
   activate(id: string): void {

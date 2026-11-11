@@ -503,16 +503,18 @@ export class BatchPageComponent implements OnInit {
   }
 
   /** Creates the batch from the draft and shows the panel. */
-  openPanel(): void {
+  async openPanel(): Promise<void> {
     const draft = this.draft();
     if (!draft) {
       return;
     }
+    // A new batch starts from zero: whatever was saved from a previous visit is not carried over.
+    this.store.draft.set(null);
+    await this.store.clear();
     for (const pdf of draft.pdfs) {
       const info = this.templates().get(pairingKey(pdf.name));
       this.store.add({ name: pdf.name, aPdf: pdf, aPages: info && !info.error ? info.pages : [] });
     }
-    this.store.draft.set(null);
     this.templates.set(new Map());
     this.step.set('panel');
     this.notifyNotPersistent();

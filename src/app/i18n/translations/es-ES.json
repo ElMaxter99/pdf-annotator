@@ -422,7 +422,8 @@
       "noA": {
         "hint": "A no tiene plantilla: se compara su PDF tal cual.",
         "go": "Añadir plantilla A (Documento)"
-      }
+      },
+      "pagesDiffer": "Distinto número de páginas: B {{page}} de {{b}} · A {{pageA}} de {{a}}"
     },
     "panel": {
       "title": "Campos de B · {{count}}",

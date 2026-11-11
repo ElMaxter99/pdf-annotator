@@ -422,7 +422,8 @@
       "noA": {
         "hint": "A não tem modelo: compara-se o seu PDF tal como está.",
         "go": "Adicionar o modelo A (Documento)"
-      }
+      },
+      "pagesDiffer": "Número de páginas diferente: B {{page}} de {{b}} · A {{pageA}} de {{a}}"
     },
     "panel": {
       "title": "Campos de B · {{count}}",

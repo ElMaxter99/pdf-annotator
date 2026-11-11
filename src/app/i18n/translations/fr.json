@@ -422,7 +422,8 @@
       "noA": {
         "hint": "A n'a pas de modèle : son PDF est comparé tel quel.",
         "go": "Ajouter le modèle A (Document)"
-      }
+      },
+      "pagesDiffer": "Nombre de pages différent : B {{page}} sur {{b}} · A {{pageA}} sur {{a}}"
     },
     "panel": {
       "title": "Champs de B · {{count}}",

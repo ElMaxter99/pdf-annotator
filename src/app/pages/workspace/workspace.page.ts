@@ -265,8 +265,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   );
   /** A and B have a different page size, so their coordinates do not line up. */
   readonly splitSizeMismatch = signal(false);
-  private splitDoc: { blob: Blob; doc: PDFDocumentProxy } | null = null;
+  /** Page counts when A and B do not have the same number of pages (else null). */
+  readonly pagesDiffer = signal<{ a: number; b: number } | null>(null);
+  private splitDoc: { blob: Blob; doc: Promise<PDFDocumentProxy> } | null = null;
   private splitToken = 0;
+  private splitTask: { cancel: () => void } | null = null;
   private scaleBeforeSplit: number | null = null;
   readonly holdingReference = signal(false);
   readonly migration = computed(() => {
@@ -484,6 +487,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.referenceMode();
       this.holdingReference();
       untracked(() => this.redrawReference());
+    });
+    effect(() => {
+      const item = this.migration()?.item;
+      this.pageIndex();
+      untracked(() => void this.updatePagesDiffer(item?.aPdf ?? null));
     });
     effect(() => {
       this.splitActive();
@@ -3009,10 +3017,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  private async splitDocOf(blob: Blob): Promise<PDFDocumentProxy> {
+  private async updatePagesDiffer(aPdf: Blob | null): Promise<void> {
+    if (!aPdf) {
+      this.pagesDiffer.set(null);
+      return;
+    }
+    try {
+      const a = (await this.splitDocOf(aPdf)).numPages;
+      const b = this.pdfDoc?.numPages ?? 0;
+      this.pagesDiffer.set(b > 0 && a !== b ? { a, b } : null);
+    } catch {
+      this.pagesDiffer.set(null);
+    }
+  }
+
+  private splitDocOf(blob: Blob): Promise<PDFDocumentProxy> {
     if (!this.splitDoc || this.splitDoc.blob !== blob) {
-      const bytes = new Uint8Array(await blob.arrayBuffer());
-      this.splitDoc = { blob, doc: await pdfjsLib.getDocument({ data: bytes }).promise };
+      const doc = blob
+        .arrayBuffer()
+        .then((buffer) => pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise);
+      this.splitDoc = { blob, doc };
     }
     return this.splitDoc.doc;
   }
@@ -3203,7 +3227,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       canvas.width = Math.floor(viewport.width);
       canvas.height = Math.floor(viewport.height);
-      await page.render({ canvasContext: ctx, canvas, viewport }).promise;
+      // pdf.js refuses two renders at once on a canvas: the newer one cancels the older.
+      this.splitTask?.cancel();
+      const task = page.render({ canvasContext: ctx, canvas, viewport });
+      this.splitTask = task;
+      try {
+        await task.promise;
+      } catch {
+        return; // cancelled by a newer render, which draws the fields
+      }
       if (token !== this.splitToken) {
         return;
       }

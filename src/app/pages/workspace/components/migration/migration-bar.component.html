@@ -143,6 +143,14 @@
         </button>
       </div>
     }
+    @if (vm.pagesDiffer(); as pages) {
+      <div class="migration-hint" role="status" data-testid="pages-differ">
+        <span>{{
+          'batch.editor.pagesDiffer'
+            | t: { page: vm.pageIndex(), b: pages.b, pageA: vm.pageIndex() > pages.a ? pages.a : vm.pageIndex(), a: pages.a }
+        }}</span>
+      </div>
+    }
     @if (vm.splitActive() && vm.splitSizeMismatch()) {
       <div class="migration-hint migration-hint--warn" role="status" data-testid="split-size-mismatch">
         <span>{{ 'batch.editor.split.sizeMismatch' | t }}</span>

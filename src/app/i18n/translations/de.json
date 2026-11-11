@@ -422,7 +422,8 @@
       "noA": {
         "hint": "A hat keine Vorlage: sein PDF wird unverändert verglichen.",
         "go": "Vorlage A hinzufügen (Dokument)"
-      }
+      },
+      "pagesDiffer": "Unterschiedliche Seitenzahl: B {{page}} von {{b}} · A {{pageA}} von {{a}}"
     },
     "panel": {
       "title": "Felder von B · {{count}}",

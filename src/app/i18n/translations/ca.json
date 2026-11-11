@@ -422,7 +422,8 @@
       "noA": {
         "hint": "A no té plantilla: es compara el seu PDF tal qual.",
         "go": "Afegeix la plantilla A (Document)"
-      }
+      },
+      "pagesDiffer": "Diferent nombre de pàgines: B {{page}} de {{b}} · A {{pageA}} de {{a}}"
     },
     "panel": {
       "title": "Camps de B · {{count}}",
