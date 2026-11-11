@@ -321,7 +321,8 @@
       "samePdf": "{{name}} é o mesmo PDF que o original: não há nada a migrar.",
       "templateApplied": "Modelo carregado: {{count}} campos.",
       "templateFromAnnotations": "As anotações do original passam a ser o modelo A.",
-      "copiedAdjusted": "Campos copiados e ajustados ao tamanho de B."
+      "copiedAdjusted": "Campos copiados e ajustados ao tamanho de B.",
+      "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
     }
   },
   "session": {
@@ -391,7 +392,6 @@
         "missing": "Só os que faltam em B",
         "missingText": "Não toca no que já colocou.",
         "adjust": "Copiar e ajustar pelos textos",
-        "soon": "em breve",
         "adjustText": "Proporá o deslocamento usando textos de A e B.",
         "confirmTitle": "B já tem campos",
         "confirmText": "Substituí-los pelos de A ou adicionar só os em falta? Pode desfazer com Ctrl+Z.",
@@ -603,6 +603,48 @@
       },
       "noTemplateNote": "Sem modelo: pode carregar o do original ou adicionar uma nova versão em Documento.",
       "noTemplateGo": "Ir para Documento"
+    },
+    "adjust": {
+      "title": "Ajuste por textos",
+      "loading": "A procurar textos…",
+      "page": "Página {{page}} de {{total}}",
+      "common": "{{count}} textos em comum até agora",
+      "copyAsIs": "Copiar tal e qual",
+      "none": {
+        "title": "Não há textos iguais em A e B.",
+        "text": "O texto pode ter mudado. Nenhum deslocamento é inventado."
+      },
+      "noText": {
+        "title": "Um PDF não tem texto para ler.",
+        "text": "Parece digitalizado, por isso não se pode ajustar por textos."
+      },
+      "summary": "{{anchors}} textos iguais em A e B · {{fields}} campos de A",
+      "skipped": "{{count}} campos que B já tem são mantidos.",
+      "untouched": "B ainda não foi modificada.",
+      "few": "Só {{count}} textos em comum: a proposta é orientativa, revê os campos.",
+      "modeLabel": "Como mover os campos",
+      "mode": {
+        "near": "Pelos textos próximos",
+        "global": "Igual para todos"
+      },
+      "tab": {
+        "fields": "Campos · {{count}}",
+        "texts": "Textos · {{count}}"
+      },
+      "noShift": "sem textos para o calcular",
+      "anchorMove": "moveu-se",
+      "apply": "Aplicar {{count}} alterações",
+      "undoHint": "Um só passo do histórico: Ctrl+Z desfaz. Os campos desmarcados são copiados sem se mover.",
+      "badge": {
+        "high": "Alta",
+        "medium": "Média",
+        "low": "Baixa",
+        "estimated": "Estimado",
+        "manual": "Manual",
+        "none": "Sem textos",
+        "outlier": "Discrepa",
+        "repeated": "Repetido"
+      }
     }
   }
 }
