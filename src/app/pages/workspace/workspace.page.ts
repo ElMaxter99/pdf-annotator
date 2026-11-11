@@ -269,6 +269,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly pagesDiffer = signal<{ a: number; b: number } | null>(null);
   private splitDoc: { blob: Blob; doc: Promise<PDFDocumentProxy> } | null = null;
   private splitToken = 0;
+  private referencePdfToken = 0;
   private splitTask: { cancel: () => void } | null = null;
   private scaleBeforeSplit: number | null = null;
   readonly holdingReference = signal(false);
@@ -2994,6 +2995,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!item) {
       return;
     }
+    const token = ++this.referencePdfToken;
     try {
       const doc = await this.splitDocOf(item.aPdf);
       const page = await doc.getPage(Math.min(this.pageIndex(), doc.numPages));
@@ -3009,7 +3011,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         return;
       }
       await page.render({ canvasContext: ctx, canvas, viewport }).promise;
-      if (this.holdingReference() && layer.isConnected) {
+      if (token === this.referencePdfToken && this.holdingReference() && layer.isConnected) {
+        layer.querySelectorAll('.reference-pdf').forEach((old) => old.remove());
         layer.prepend(canvas);
       }
     } catch {
