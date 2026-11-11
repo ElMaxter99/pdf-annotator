@@ -14,7 +14,10 @@
     "serve:ssr:pdf-annotator": "node dist/pdf-annotator/server/server.mjs",
     "i18n:check": "node scripts/check-translations.mjs",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCI --karma-config=karma.conf.cjs",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "release:notes": "node scripts/release-notes.mjs",
+    "release:guide": "node scripts/release-guide.mjs",
+    "release:deploy": "node scripts/release.mjs"
   },
   "prettier": {
     "printWidth": 100,
