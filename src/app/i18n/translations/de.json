@@ -420,8 +420,7 @@
         "sizeMismatch": "A und B haben nicht dieselbe Größe: Die Koordinaten stimmen nicht überein."
       },
       "noA": {
-        "title": "Fügen Sie Vorlage A hinzu, um diese Modi zu nutzen.",
-        "hint": "Dieses PDF hat keine Vorlage A: Es gibt nichts anzuzeigen oder zu kopieren.",
+        "hint": "A hat keine Vorlage: sein PDF wird unverändert verglichen.",
         "go": "Vorlage A hinzufügen (Dokument)"
       }
     },

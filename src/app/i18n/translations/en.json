@@ -420,8 +420,7 @@
         "sizeMismatch": "A and B are not the same size: the coordinates do not line up."
       },
       "noA": {
-        "title": "Add template A to use these modes.",
-        "hint": "This PDF has no template A: there is nothing to show or copy.",
+        "hint": "A has no template: its PDF is compared as it is.",
         "go": "Add template A (Document)"
       }
     },

@@ -2663,6 +2663,13 @@ kbd {
   pointer-events: none;
 }
 
+.reference-pdf {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+}
+
 .reference-field {
   position: absolute;
   display: flex;
@@ -3539,10 +3546,6 @@ kbd {
 .canvas-container--split-b {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
-}
-
-.migration-seg--off {
-  opacity: 0.45;
 }
 
 .migration-seg button:disabled,

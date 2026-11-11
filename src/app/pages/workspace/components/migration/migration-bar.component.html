@@ -28,13 +28,12 @@
 
     @if (vm.migration(); as m) {
 
-    <div class="migration-seg" [class.migration-seg--off]="vm.templateFieldsA() === 0" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t" [attr.title]="(vm.templateFieldsA() === 0 ? 'batch.editor.noA.title' : 'batch.editor.holdHint') | t">
+    <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t" [attr.title]="'batch.editor.holdHint' | t">
       @for (mode of modes; track mode) {
         <button
           type="button"
           [class.migration-seg__on]="vm.referenceMode() === mode"
           [attr.aria-pressed]="vm.referenceMode() === mode"
-          [disabled]="vm.templateFieldsA() === 0"
           (click)="vm.setReferenceMode(mode)"
           [attr.data-testid]="'mode-' + mode"
         >
@@ -137,7 +136,7 @@
   </div>
   <div class="migration-hints">
     @if (vm.migration() && vm.templateFieldsA() === 0) {
-      <div class="migration-hint migration-hint--warn" role="status" data-testid="no-template-a">
+      <div class="migration-hint" role="status" data-testid="no-template-a">
         <span>{{ 'batch.editor.noA.hint' | t }}</span>
         <button type="button" class="btn btn--ghost" (click)="vm.setSidebarTab('document')">
           {{ 'batch.editor.noA.go' | t }}

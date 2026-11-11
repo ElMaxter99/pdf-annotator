@@ -72,6 +72,7 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | R-01 Flujo sin paso 3 | Lote en 2 pasos, panel directo | [`R-01-flujo-sin-paso-3.dc.html`](canvas/R-01-flujo-sin-paso-3.dc.html) | `pages/batch` | Aprobado, implementado |
 | R-02 Paso 2 y panel | Resumen en el paso 2 y tira «Versiones nuevas (B)» | [`R-02-paso-2-y-panel.dc.html`](canvas/R-02-paso-2-y-panel.dc.html) | `pages/batch` | Aprobado, implementado |
 | R-03 Tira B · estados | Sin B, con B y archivos sin pareja | [`R-03-tira-b-estados.dc.html`](canvas/R-03-tira-b-estados.dc.html) | `pages/batch` | Aprobado, implementado |
+| S-01 Comparar sin plantilla A | Los modos dependen de B, no de la plantilla A (sustituye la regla de Q-04) | [`S-01-comparar-sin-plantilla-a.dc.html`](canvas/S-01-comparar-sin-plantilla-a.dc.html) | `components/migration` | Aprobado, implementado |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

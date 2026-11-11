@@ -420,8 +420,7 @@
         "sizeMismatch": "A e B non hanno la stessa dimensione: le coordinate non coincidono."
       },
       "noA": {
-        "title": "Aggiungi il modello A per usare queste modalità.",
-        "hint": "Questo PDF non ha il modello A: non c’è nulla da mostrare né da copiare.",
+        "hint": "A non ha un modello: si confronta il suo PDF così com'è.",
         "go": "Aggiungi il modello A (Documento)"
       }
     },

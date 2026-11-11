@@ -381,7 +381,7 @@ test('in a batch «Documento» has no «empezar de cero» and completes the PDF 
   await expect(page.locator('.annotation')).toHaveCount(1);
 });
 
-test('without template A the modes are off and explain why; JSON without fields is refused', async ({
+test('without template A the modes still compare the PDFs; JSON without fields is refused', async ({
   page,
 }) => {
   await openPanel(page);
@@ -394,8 +394,22 @@ test('without template A the modes are off and explain why; JSON without fields 
   await page.getByTestId('doc-b-input').setInputFiles(file('x-nuevo.pdf', pdf, 'application/pdf'));
   await expect(page.locator('.migration-bar')).toContainText('Editando versión B');
   await expect(page.getByTestId('no-template-a')).toBeVisible();
-  await expect(page.getByTestId('mode-split')).toBeDisabled();
+  await expect(page.getByTestId('mode-split')).toBeEnabled();
   await expect(page.getByTestId('put-template-a')).toBeDisabled();
+  // A has no fields, but its PDF is still shown on the left of «Dividida».
+  await page.getByTestId('mode-split').click();
+  await expect(page.getByTestId('split-a')).toBeVisible();
+  await expect(page.getByTestId('split-a').locator('.reference-field')).toHaveCount(0);
+  await expect(page.getByTestId('split-a').locator('canvas')).toHaveJSProperty(
+    'width',
+    await page.locator('.canvas--pdf').evaluate((el: HTMLCanvasElement) => el.width),
+  );
+  await page.getByTestId('mode-overlay').click();
+  // Holding «A» swaps the page for A's PDF.
+  await page.keyboard.down('a');
+  await expect(page.locator('.reference-pdf')).toHaveCount(1);
+  await page.keyboard.up('a');
+  await expect(page.locator('.reference-pdf')).toHaveCount(0);
 
   await page.getByTestId('doc-a-paste').click();
   await page.getByTestId('doc-a-text').fill('{ "pages": [ { "num": 1, "fields": [] } ] }');

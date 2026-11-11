@@ -420,8 +420,7 @@
         "sizeMismatch": "A i B no tenen la mateixa mida: les coordenades no coincideixen."
       },
       "noA": {
-        "title": "Afegeix la plantilla A per usar aquests modes.",
-        "hint": "Aquest PDF no té plantilla A: sense ella no hi ha res per mostrar ni copiar.",
+        "hint": "A no té plantilla: es compara el seu PDF tal qual.",
         "go": "Afegeix la plantilla A (Document)"
       }
     },
