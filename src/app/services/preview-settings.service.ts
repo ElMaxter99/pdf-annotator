@@ -12,6 +12,7 @@ import {
 const SAMPLES_KEY = 'pdf-annotator.sampleValues';
 const DATA_KEY = 'pdf-annotator.testData';
 const MODE_KEY = 'pdf-annotator.previewMode';
+const ORIGIN_KEY = 'pdf-annotator.showOrigin';
 export const MAX_TEST_DATA_BYTES = 5 * 1024 * 1024;
 
 export interface TestDataError {
@@ -29,6 +30,7 @@ export class PreviewSettingsService {
   readonly samples = signal<SampleValues>(this.loadSamples());
   readonly testDataText = signal<string>(this.loadText());
   readonly mode = signal<PreviewMode>(this.loadMode());
+  readonly showOrigin = signal<boolean>(this.loadFlag(ORIGIN_KEY));
 
   private readonly parsed = computed<{ data: unknown | null; error: TestDataError | null }>(() => {
     const text = this.testDataText();
@@ -70,6 +72,11 @@ export class PreviewSettingsService {
     this.save(MODE_KEY, mode);
   }
 
+  setShowOrigin(show: boolean): void {
+    this.showOrigin.set(show);
+    this.save(ORIGIN_KEY, show ? '1' : '0');
+  }
+
   setSample(kind: SampleKind, value: string): void {
     const next = normalizeSampleValues({ ...this.samples(), [kind]: value });
     this.samples.set(next);
@@ -103,6 +110,14 @@ export class PreviewSettingsService {
       return normalizeSampleValues(raw ? JSON.parse(raw) : null);
     } catch {
       return DEFAULT_SAMPLE_VALUES;
+    }
+  }
+
+  private loadFlag(key: string): boolean {
+    try {
+      return typeof localStorage !== 'undefined' && localStorage.getItem(key) === '1';
+    } catch {
+      return false;
     }
   }
 

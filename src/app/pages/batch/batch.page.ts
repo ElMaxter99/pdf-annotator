@@ -11,6 +11,7 @@ import type { BatchItem } from '../../models/batch.model';
 import { AnnotationImportService } from '../../services/annotation-import.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { BatchStoreService } from '../../services/batch-store.service';
+import { MAX_TEST_DATA_BYTES, PreviewSettingsService } from '../../services/preview-settings.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { ToastService } from '../../services/toast.service';
 import { downloadBlob } from '../../utils/download.utils';
@@ -74,6 +75,7 @@ export class BatchPageComponent implements OnInit {
   private readonly pendingFile = inject(PendingFileService);
   private readonly importer = inject(AnnotationImportService);
   private readonly toast = inject(ToastService);
+  readonly previewSettings = inject(PreviewSettingsService);
   private readonly i18n = inject(TranslationService);
   private readonly metadata = inject(AppMetadataService);
 
@@ -521,6 +523,32 @@ export class BatchPageComponent implements OnInit {
   }
 
   // ---- download -----------------------------------------------------------------------------
+
+  async onTestDataFile(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (input) {
+      input.value = '';
+    }
+    if (!file) {
+      return;
+    }
+    if (file.size > MAX_TEST_DATA_BYTES) {
+      this.toast.error(this.i18n.translate('preview.testData.tooLarge'));
+      return;
+    }
+    try {
+      this.previewSettings.setTestDataText(await file.text());
+      if (this.previewSettings.hasTestData()) {
+        this.previewSettings.setMode('data');
+        this.toast.show(this.i18n.translate('batch.testData.applied'), 'info');
+      } else {
+        this.toast.error(this.i18n.translate('preview.testData.readFailed'));
+      }
+    } catch {
+      this.toast.error(this.i18n.translate('preview.testData.readFailed'));
+    }
+  }
 
   downloadReady(): void {
     const ready = this.store.items().filter((item) => item.status === 'ready' && item.bJson);

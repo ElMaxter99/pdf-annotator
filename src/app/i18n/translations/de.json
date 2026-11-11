@@ -324,7 +324,16 @@
       "copiedAdjusted": "Felder kopiert und an die Größe von B angepasst.",
       "adjustApplied": "{{count}} Felder kopiert, {{moved}} angepasst."
     },
-    "exportSampleValues": "Das PDF enthält {{count}} Feld(er) mit Musterwerten statt echter Daten."
+    "exportSampleValues": "Das PDF enthält {{count}} Feld(er) mit Musterwerten statt echter Daten.",
+    "bell": {
+      "label": "Geschlossene Hinweise ({count})",
+      "title": "Geschlossene Hinweise",
+      "showAll": "Alle anzeigen",
+      "show": "Erneut anzeigen",
+      "emptyTitle": "Nichts wiederherzustellen",
+      "emptyHint": "Hier erscheinen die Hinweise, die du schließt."
+    },
+    "noData": "{count} Anmerkungen ohne Daten in den Testdaten: sie zeigen ihr Muster."
   },
   "session": {
     "title": "Dort weitermachen, wo Sie aufgehört haben",
@@ -690,6 +699,13 @@
         "keep": "Lassen, wo es war",
         "use": "Mit dem Vorschlag verschieben"
       }
+    },
+    "testData": {
+      "button": "Testdaten",
+      "hint": "Lade ein JSON, um beim Bearbeiten jedes PDFs echte Texte zu sehen",
+      "loaded": "geladen",
+      "remove": "Entfernen",
+      "applied": "Testdaten geladen: sie werden beim Bearbeiten jedes PDFs im Stapel verwendet."
     }
   },
   "preview": {
@@ -726,6 +742,16 @@
       "tooLarge": "Die Datei ist größer als 5 MB.",
       "readFailed": "Die Datei konnte nicht gelesen werden.",
       "empty": "Keine Testdaten: Musterwerte werden verwendet."
+    },
+    "origin": {
+      "group": "Herkunft des Angezeigten",
+      "show": "Herkunft anzeigen",
+      "value": "Wert",
+      "data": "Daten",
+      "sample": "Muster",
+      "missing": "ohne Daten",
+      "mapHint": "Die Zuordnungsansicht zeigt den Feldnamen, es gibt keine Herkunft anzuzeigen.",
+      "noneResolved": "Kein mapField passt zu den Testdaten."
     }
   }
 }

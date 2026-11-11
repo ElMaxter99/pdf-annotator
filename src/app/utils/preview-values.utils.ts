@@ -102,6 +102,18 @@ export interface PreviewContext {
 export interface PreviewResult {
   readonly text: string;
   readonly source: 'value' | 'data' | 'sample' | 'map';
+  /** Test data is loaded in «Data» view but holds nothing for this field (the sample is used). */
+  readonly unresolved?: boolean;
+}
+
+export type FieldOrigin = 'value' | 'data' | 'sample' | 'missing';
+
+/** What the origin label says; `map` view paints the raw mapField and has no origin. */
+export function fieldOrigin(result: PreviewResult): FieldOrigin | null {
+  if (result.source === 'map') {
+    return null;
+  }
+  return result.unresolved ? 'missing' : result.source;
 }
 
 /** Same as the editor always did: only numeric text gets decimals and the appender. */
@@ -143,5 +155,11 @@ export function resolveFieldPreview(field: PageField, ctx: PreviewContext): Prev
   }
 
   const sample = ctx.samples[type as SampleKind] ?? ctx.samples.text;
-  return { text: type === 'number' ? formatNumber(sample, field) : sample, source: 'sample' };
+  const unresolved =
+    ctx.mode === 'data' && ctx.data !== null && type !== 'check' && type !== 'radio';
+  return {
+    text: type === 'number' ? formatNumber(sample, field) : sample,
+    source: 'sample',
+    ...(unresolved ? { unresolved: true } : {}),
+  };
 }

@@ -71,3 +71,31 @@ test('exporting with sample values warns about them', async ({ page }) => {
   await download;
   await expect(page.locator('.toast--warning')).toContainText('4 campo(s) con valores de muestra');
 });
+
+test('origin chips label where each text comes from and are remembered', async ({ page }) => {
+  await openSidebarTab(page, 'Avanzado');
+  await page.getByRole('textbox', { name: 'Datos de prueba' }).fill(JSON.stringify(DATA));
+  const legend = page.getByRole('group', { name: 'Origen de lo que se pinta' });
+  await expect(page.locator('.annotation[data-origin]')).toHaveCount(0);
+  await legend.getByLabel('Mostrar origen').check();
+  await expect(page.locator('.annotation[data-origin="data"]')).toHaveCount(2);
+  await expect(page.locator('.annotation[data-origin="missing"]')).toHaveCount(1);
+  await expect(page.locator('.annotation[data-origin="value"]')).toHaveCount(1);
+  await expect(legend).toContainText('sin dato · 1');
+  await page.reload();
+  expect(await page.evaluate(() => localStorage.getItem('pdf-annotator.showOrigin'))).toBe('1');
+});
+
+test('closed informative notices can be recovered from the bell', async ({ page }) => {
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: /Descargar PDF/ }).click();
+  await download;
+  const toast = page.locator('.toast--warning');
+  await expect(toast).toBeVisible();
+  await toast.getByRole('button', { name: /Cerrar/ }).click();
+  await expect(toast).toHaveCount(0);
+  await expect(page.getByTestId('toast-bell-count')).toHaveText('1');
+  await page.getByTestId('toast-bell').click();
+  await page.getByTestId('toast-bell-panel').getByRole('button', { name: 'Mostrar de nuevo' }).click();
+  await expect(page.locator('.toast--warning')).toContainText('valores de muestra');
+});

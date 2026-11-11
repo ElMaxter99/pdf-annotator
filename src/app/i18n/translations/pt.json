@@ -324,7 +324,16 @@
       "copiedAdjusted": "Campos copiados e ajustados ao tamanho de B.",
       "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
     },
-    "exportSampleValues": "O PDF tem {{count}} campo(s) com valores de amostra em vez de dados reais."
+    "exportSampleValues": "O PDF tem {{count}} campo(s) com valores de amostra em vez de dados reais.",
+    "bell": {
+      "label": "Avisos fechados ({count})",
+      "title": "Avisos fechados",
+      "showAll": "Mostrar todos",
+      "show": "Mostrar de novo",
+      "emptyTitle": "Nada a recuperar",
+      "emptyHint": "Aqui aparecem os avisos informativos que fechar."
+    },
+    "noData": "{count} anotações sem dado nos dados de teste: mostram a sua amostra."
   },
   "session": {
     "title": "Continuar onde ficou",
@@ -690,6 +699,13 @@
         "keep": "Deixar onde estava",
         "use": "Mover com a proposta"
       }
+    },
+    "testData": {
+      "button": "Dados de teste",
+      "hint": "Carregue um JSON para ver os textos reais ao editar cada PDF",
+      "loaded": "carregados",
+      "remove": "Remover",
+      "applied": "Dados de teste carregados: serão usados ao editar cada PDF do lote."
     }
   },
   "preview": {
@@ -726,6 +742,16 @@
       "tooLarge": "O ficheiro excede 5 MB.",
       "readFailed": "Não foi possível ler o ficheiro.",
       "empty": "Sem dados de teste: usam-se os valores de amostra."
+    },
+    "origin": {
+      "group": "Origem do que é desenhado",
+      "show": "Mostrar origem",
+      "value": "valor",
+      "data": "dado",
+      "sample": "amostra",
+      "missing": "sem dado",
+      "mapHint": "A vista Mapeamento mostra o nome do campo, não há origem a mostrar.",
+      "noneResolved": "Nenhum mapField corresponde aos dados de teste."
     }
   }
 }

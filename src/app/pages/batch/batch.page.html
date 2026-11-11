@@ -22,6 +22,22 @@
           'batch.readyCount' | t: { ready: readyCount(), total: total() }
         }}</span>
       </div>
+      <input #testDataInput type="file" accept=".json,application/json" hidden
+        (change)="onTestDataFile($event)" data-testid="batch-testdata-input" />
+      <button
+        type="button"
+        class="btn"
+        (click)="testDataInput.click()"
+        data-testid="batch-testdata"
+        [attr.title]="'batch.testData.hint' | t"
+      >
+        {{ 'batch.testData.button' | t }}
+        @if (previewSettings.hasTestData()) { · {{ 'batch.testData.loaded' | t }} }
+      </button>
+      @if (previewSettings.hasTestData()) {
+        <button type="button" class="btn btn--ghost" (click)="previewSettings.clearTestData()"
+          data-testid="batch-testdata-clear">{{ 'batch.testData.remove' | t }}</button>
+      }
       <button
         type="button"
         class="btn"

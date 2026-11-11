@@ -3,6 +3,7 @@ import {
   DEFAULT_SAMPLE_VALUES,
   normalizeSampleValues,
   parseMapPath,
+  fieldOrigin,
   resolveFieldPreview,
   resolveMapPath,
   type PreviewContext,
@@ -93,6 +94,7 @@ describe('resolveFieldPreview', () => {
     expect(resolveFieldPreview(field({ mapField: 'holder[0].email' }), ctx('data'))).toEqual({
       text: 'XXXXX',
       source: 'sample',
+      unresolved: true,
     });
   });
 
@@ -103,5 +105,16 @@ describe('resolveFieldPreview', () => {
 
   it('keeps check and radio as the sample even with data', () => {
     expect(resolveFieldPreview(field({ type: 'check' }), ctx('data')).text).toBe('X');
+  });
+});
+
+describe('fieldOrigin', () => {
+  it('tells where each painted text comes from', () => {
+    expect(fieldOrigin(resolveFieldPreview(field({ value: 'x' }), ctx('data')))).toBe('value');
+    expect(fieldOrigin(resolveFieldPreview(field(), ctx('data')))).toBe('data');
+    expect(fieldOrigin(resolveFieldPreview(field({ mapField: 'nope' }), ctx('data')))).toBe('missing');
+    expect(fieldOrigin(resolveFieldPreview(field(), ctx('sample', null)))).toBe('sample');
+    expect(fieldOrigin(resolveFieldPreview(field({ type: 'check' }), ctx('data')))).toBe('sample');
+    expect(fieldOrigin(resolveFieldPreview(field(), ctx('map')))).toBeNull();
   });
 });

@@ -1,4 +1,22 @@
 <main class="viewer" [class.viewer--split]="vm.splitActive()" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc as _">
+  <div class="origin-legend" role="group" [attr.aria-label]="'preview.origin.group' | t">
+    <label class="origin-legend__toggle">
+      <input type="checkbox" [checked]="vm.previewSettings.showOrigin()" (change)="vm.setShowOrigin($any($event.target).checked)" />
+      {{ 'preview.origin.show' | t }}
+    </label>
+    @if (vm.previewSettings.showOrigin()) {
+      @for (kind of originKinds; track kind) {
+        <span class="origin-legend__item" [attr.data-origin]="kind">
+          <i class="origin-legend__dot"></i>{{ ('preview.origin.' + kind) | t }} · {{ vm.originCounts()[kind] }}
+        </span>
+      }
+      @if (vm.previewSettings.mode() === 'map') {
+        <span class="origin-legend__hint">{{ 'preview.origin.mapHint' | t }}</span>
+      } @else if (vm.previewSettings.mode() === 'data' && vm.originCounts().data === 0 && vm.originCounts().missing > 0) {
+        <span class="origin-legend__hint">{{ 'preview.origin.noneResolved' | t }}</span>
+      }
+    }
+  </div>
   @if (vm.selectionCount() > 0) {
     <div class="selection-bar" role="toolbar" [attr.aria-label]="'selection.toolbar' | t">
       <span class="selection-bar__count">{{ 'selection.count' | t : { count: vm.selectionCount() } }}</span>

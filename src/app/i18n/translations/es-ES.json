@@ -324,7 +324,16 @@
       "copiedAdjusted": "Campos copiados y ajustados al tamaño de B.",
       "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
     },
-    "exportSampleValues": "El PDF lleva {{count}} campo(s) con valores de muestra en vez de datos reales."
+    "exportSampleValues": "El PDF lleva {{count}} campo(s) con valores de muestra en vez de datos reales.",
+    "bell": {
+      "label": "Avisos cerrados ({count})",
+      "title": "Avisos cerrados",
+      "showAll": "Mostrar todos",
+      "show": "Mostrar de nuevo",
+      "emptyTitle": "Nada que recuperar",
+      "emptyHint": "Aquí aparecen los avisos informativos que cierres."
+    },
+    "noData": "{count} anotaciones sin dato en los datos de prueba: se pintan con su muestra."
   },
   "session": {
     "title": "Continuar donde lo dejaste",
@@ -690,6 +699,13 @@
         "keep": "Dejar donde estaba",
         "use": "Mover con la propuesta"
       }
+    },
+    "testData": {
+      "button": "Datos de prueba",
+      "hint": "Carga un JSON para ver los textos reales al editar cada PDF",
+      "loaded": "cargados",
+      "remove": "Quitar",
+      "applied": "Datos de prueba cargados: se usarán al editar cada PDF del lote."
     }
   },
   "preview": {
@@ -726,6 +742,16 @@
       "tooLarge": "El archivo supera los 5 MB.",
       "readFailed": "No se pudo leer el archivo.",
       "empty": "Sin datos de prueba: se usan los valores de muestra."
+    },
+    "origin": {
+      "group": "Origen de lo que se pinta",
+      "show": "Mostrar origen",
+      "value": "valor",
+      "data": "dato",
+      "sample": "muestra",
+      "missing": "sin dato",
+      "mapHint": "En Mapeo se pinta el nombre del campo, no hay origen que mostrar.",
+      "noneResolved": "Ningún mapField coincide con los datos de prueba."
     }
   }
 }

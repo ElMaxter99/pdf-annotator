@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>M-03 Avisos de la previsualización y de Copiar / Ajustar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.p{width:1720px;height:900px;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.45}
+.hdr{background:var(--panel);border-radius:16px;padding:12px 20px;display:flex;align-items:center;gap:14px;border:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--accent);margin-right:8px}
+.brand small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.s{min-height:32px;padding:4px 12px;font-size:13px}
+.btn[disabled]{opacity:.45}
+.st{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.st.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.st.done{color:var(--text)}
+.st.err{color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,transparent)}
+.st.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 16px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:var(--inset)}
+.drop.act{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--inset))}
+.ic{width:44px;height:44px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.row.sel{outline:2px solid var(--accent)}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar i.w{background:var(--warn)}.bar i.e{background:var(--danger)}
+.mono{font-family:Consolas,monospace;font-size:13px}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.pane{background:var(--inset);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:9%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.bad{border-color:#dc2626;background:rgba(220,38,38,.14)}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.tag{font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--text)}
+.tbl{display:flex;flex-direction:column;gap:6px}
+.tr{display:grid;gap:14px;align-items:center;padding:7px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sp{flex-grow:1}
+.sk{background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));border-radius:6px;display:inline-block}
+.note{border-radius:12px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.note.w{background:color-mix(in srgb,var(--warn) 14%,transparent);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+.note.e{background:color-mix(in srgb,var(--danger) 12%,transparent);border:1px solid color-mix(in srgb,var(--danger) 60%,transparent)}
+.note.i{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.radio{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1px solid var(--line)}
+.radio.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;margin-top:2px}
+.radio.on .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+.chk.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.ta{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre;overflow:hidden}
+.g2{display:grid;gap:16px}
+.toast{position:absolute;right:24px;bottom:24px;background:var(--panel);border-left:4px solid var(--accent);border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;gap:12px;font-size:14px}
+.toast.e{border-color:var(--danger)}
+
+.bell{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;position:relative}
+.bell i{font-style:normal;font-size:11px;font-weight:700;background:var(--accent);color:var(--ink);border-radius:999px;padding:0 6px}
+.bell.on{border-color:var(--accent)}
+.hint{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.45}
+.hint.w{background:color-mix(in srgb,var(--warn) 14%,transparent);border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.hint.e{background:color-mix(in srgb,var(--danger) 12%,transparent);border-color:color-mix(in srgb,var(--danger) 60%,transparent)}
+.xb{all:unset;cursor:pointer;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;border:1px solid var(--line)}
+.xb.f{outline:2px solid var(--accent);outline-offset:2px}
+.pnl{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;width:420px;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.pnl h4{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
+.pnl .r{background:var(--soft);border-radius:10px;padding:8px 12px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.dotc{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.chip{position:absolute;transform:translateY(-135%);font-family:'Segoe UI',sans-serif;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;background:#0f766e;color:#fff;white-space:nowrap}
+.chip.v{background:#1d4ed8}.chip.m{background:#475569}.chip.n{background:#b45309}
+.wl{font-size:13px;color:var(--muted)}.wl b{color:var(--text)}
+</style>
+</helmet>
+<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">M-03 · Propuesta · pendiente de aprobación</span><h1 style="font-size:26px;font-weight:600">Avisos de la previsualización y de Copiar / Ajustar</h1><p class="cap" style="max-width:1300px">Los avisos nuevos siguen la regla del resto de notificaciones: lo informativo se cierra con ✕ y se recupera desde la campana; lo que pide una decisión o es un error no se cierra.</p></div><div class="hdr" style="padding:8px 16px"><div class="brand"><img src="/_blob/3b1c7d405f5e428ffa466253ab28e2ae" width="32" height="32" alt=""><div>Pdf Annotator<small>factura-ejemplo.pdf</small></div></div><span class="sp"></span><span class="bell">🔔<i>2</i></span></div><div style="display:flex;gap:16px;flex-grow:1;min-height:0"><div class="card" style="flex:1"><span class="lab">1 · Aviso al exportar</span><h3>Con valores de muestra</h3><div class="hint w">⚠<div><b>El PDF lleva 4 campos con valores de muestra.</b><br><span class="cap">Se estamparon «XXXXX», «X» y «0.00 €» en lugar de datos reales.</span><div style="margin-top:6px"><span class="btn g s">Ver cuáles</span></div></div><span class="xb" title="Cerrar aviso">✕</span></div><p class="cap">Informa, no bloquea la descarga: lleva ✕ y, al cerrarlo, queda en la campana.</p><span class="lab" style="margin-top:8px">Campos sin dato</span><div class="hint ">ⓘ<div><b>1 campo sin dato de prueba</b><br><span class="cap">holder[0].email → se usa la muestra.</span></div><span class="xb" title="Cerrar aviso">✕</span></div><span class="lab" style="margin-top:8px">JSON de prueba no válido</span><div class="hint e">⚠<div><b>Falta un valor en la línea 4, columna 28</b><br><span class="cap">Se mantiene la última versión válida.</span></div></div><p class="cap">Un error o un aviso que pide decidir no lleva ✕: se resuelve corrigiendo.</p></div><div class="card" style="flex:1"><span class="lab">2 · Campana</span><h3>Avisos cerrados · 2</h3><div style="display:flex;justify-content:flex-end"><span class="bell on">🔔<i>2</i></span></div><div class="pnl" style="width:100%"><h4><span>Avisos cerrados · 2</span><span class="sp"></span><span class="btn g s">Mostrar todos</span></h4><div class="r"><b>PDF con valores de muestra</b><span class="cap">4 campos · cerrado hace 1 min</span><span class="btn g s" style="align-self:flex-start">Mostrar de nuevo</span></div><div class="r"><b>1 campo sin dato de prueba</b><span class="cap">holder[0].email</span><span class="btn g s" style="align-self:flex-start">Mostrar de nuevo</span></div></div><p class="cap">La misma campana y el mismo panel que el editor de lote: un solo sitio para todos los avisos cerrados.</p></div><div class="card" style="flex:1"><span class="lab">3 · Copiar y ajustar</span><h3>Mismo trato que el resto</h3><div class="hint ">ⓘ<div><b>A se ve ajustada al tamaño de B.</b><br><span class="cap">Sus coordenadas se escalan ×1,42 solo al mostrarlas y al copiarlas.</span></div><span class="xb" title="Cerrar aviso">✕</span></div><div class="hint ">ⓘ<div><b>Copiados 14 campos de A</b><br><span class="cap">Se pueden deshacer con Ctrl+Z.</span></div><span class="xb" title="Cerrar aviso">✕</span></div><div class="hint w">⚠<div><b>A y B no miden lo mismo.</b><br><span class="cap">Elige cómo tratar las coordenadas de A.</span><div style="margin-top:6px;display:flex;gap:8px"><span class="btn s">Ajustar a B</span><span class="btn g s">Dejarlas</span></div></div></div><p class="cap">Los avisos informativos de «Copiar» y «Ajustar» llevan ✕ y van a la campana, como en W-01. El que pide elegir no se puede cerrar.</p></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

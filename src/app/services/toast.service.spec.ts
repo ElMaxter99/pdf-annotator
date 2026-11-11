@@ -28,4 +28,23 @@ describe('ToastService', () => {
     tick(1000);
     expect(service.toasts().length).toBe(0);
   }));
+
+  it('keeps closed recoverable notices and shows them again', () => {
+    const service = new ToastService();
+    const a = service.notice('informativo', 'info', 0);
+    const b = service.show('error', 'error', 0);
+    service.dismiss(a);
+    service.dismiss(b);
+    expect(service.closed().map((t) => t.message)).toEqual(['informativo']);
+    service.reopen(service.closed()[0].id);
+    expect(service.closed().length).toBe(0);
+    expect(service.toasts().map((t) => t.message)).toEqual(['informativo']);
+  });
+
+  it('does not repeat a closed notice with the same text', () => {
+    const service = new ToastService();
+    service.dismiss(service.notice('igual', 'info', 0));
+    service.dismiss(service.notice('igual', 'info', 0));
+    expect(service.closed().length).toBe(1);
+  });
 });

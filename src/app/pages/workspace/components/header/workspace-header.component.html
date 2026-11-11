@@ -56,6 +56,10 @@
           (click)="vm.setPreviewMode(mode)">{{ 'preview.mode.' + mode | t }}</button>
       </div>
 
+      @if (!vm.inBatchMode()) {
+        <app-toast-bell></app-toast-bell>
+      }
+
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.historyGroup' | t">
         <button class="btn btn--icon" (click)="vm.undo()" [attr.aria-label]="'controls.undo' | t" [disabled]="!vm.canUndo()"
           [attr.title]="('controls.undo' | t) + ' (Ctrl+Z)'">
