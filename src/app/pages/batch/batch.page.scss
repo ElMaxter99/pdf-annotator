@@ -249,20 +249,10 @@
 
 .batch-thumb {
   position: relative;
+  display: block;
   flex: 0 0 auto;
-  width: 34px;
-  height: 46px;
-  border-radius: 3px;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 9px;
-    background: #0f9b8e;
-  }
+  width: 44px;
+  height: 58px;
 }
 
 .batch-chip {
@@ -525,33 +515,11 @@
 }
 
 .batch-card__page {
-  position: relative;
-  height: 150px;
+  display: block;
+  height: 170px;
+  padding: 8px;
   border-radius: 10px;
   background: color-mix(in srgb, var(--text) 8%, var(--bg));
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 12px auto 12px 50%;
-    width: 100px;
-    transform: translateX(-50%);
-    background: #fff;
-    border-radius: 3px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 12px;
-    width: 100px;
-    height: 13px;
-    transform: translateX(-50%);
-    background: #0f9b8e;
-    border-radius: 3px 3px 0 0;
-  }
 }
 
 .batch-card__name {
@@ -626,4 +594,23 @@
   font: inherit;
   font-size: 0.85rem;
   max-width: 260px;
+}
+
+.batch-bar {
+  flex-wrap: nowrap;
+}
+
+.batch-bar .btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.batch-progress {
+  width: 160px;
+}
+
+@media (max-width: 1500px) {
+  .batch-bar__sub {
+    display: none;
+  }
 }

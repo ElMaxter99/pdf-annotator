@@ -74,6 +74,17 @@ test('one PDF on the landing opens the traditional editor', async ({ page }) => 
   await expect(page.locator('.migration-bar')).toHaveCount(0);
 });
 
+test('the real first page is shown as a thumbnail in the steps and in the panel', async ({
+  page,
+}) => {
+  await startSteps(page);
+  await expect(page.locator('[data-testid="draft-pdfs"] app-pdf-thumb img')).toHaveCount(2);
+  await page.getByTestId('next-templates').click();
+  await page.getByTestId('next-start').click();
+  await page.getByTestId('open-panel').click();
+  await expect(page.locator('[data-testid="panel-item"] app-pdf-thumb img')).toHaveCount(2);
+});
+
 test('several PDFs go through the steps and end in the panel (grid and list)', async ({ page }) => {
   await openPanel(page);
   await expect(page.getByTestId('panel-grid')).toBeVisible();

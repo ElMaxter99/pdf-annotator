@@ -118,7 +118,7 @@
             <ul class="batch-files" data-testid="draft-pdfs">
               @for (pdf of draftPdfs(); track $index) {
                 <li>
-                  <span class="batch-thumb" aria-hidden="true"></span>
+                  <span class="batch-thumb" aria-hidden="true"><app-pdf-thumb [blob]="pdf" /></span>
                   <span class="batch-row__text">
                     <strong>{{ pdf.name }}</strong>
                     <small>{{ pdf.size / 1024 | number: '1.0-0' }} KB</small>
@@ -469,7 +469,9 @@
               (click)="open(row.item)"
               data-testid="panel-item"
             >
-              <span class="batch-card__page" aria-hidden="true"></span>
+              <span class="batch-card__page" aria-hidden="true"
+                ><app-pdf-thumb [blob]="row.item.bPdf ?? row.item.aPdf"
+              /></span>
               <strong class="batch-card__name">{{ row.item.name }}</strong>
               <span class="batch-card__meta">
                 <span
@@ -501,7 +503,9 @@
               data-testid="panel-item"
             >
               <span class="batch-row__name" role="cell">
-                <span class="batch-thumb" aria-hidden="true"></span>
+                <span class="batch-thumb" aria-hidden="true"
+                  ><app-pdf-thumb [blob]="row.item.bPdf ?? row.item.aPdf"
+                /></span>
                 <span class="batch-row__text">
                   <strong>{{ row.item.name }}</strong>
                   <small>{{

@@ -3,6 +3,7 @@ import { Component, OnInit, computed, effect, inject, signal, untracked } from '
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
+import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import type { PageAnnotations } from '../../models/annotation.model';
@@ -63,7 +64,7 @@ async function sha256(blob: Blob): Promise<string | null> {
 @Component({
   selector: 'app-batch-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslationPipe],
+  imports: [CommonModule, FormsModule, RouterLink, TranslationPipe, PdfThumbComponent],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
 })
