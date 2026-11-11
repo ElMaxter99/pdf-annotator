@@ -79,11 +79,11 @@ test('Escape and outside clicks cancel the editor', async ({ page }) => {
 
 test('keyboard shortcuts: zoom, fit width, sidebar and help dialog', async ({ page }) => {
   const zoom = page.locator('.toolbar__badge').nth(1);
-  await expect(zoom).toHaveText('0.5×'); // 1.5× minus four zoom-out steps
+  await expect(zoom).toHaveText('50 %'); // 1.5× minus four zoom-out steps
   await page.keyboard.press('+');
-  await expect(zoom).toHaveText('0.75×');
+  await expect(zoom).toHaveText('75 %');
   await page.keyboard.press('0'); // fit to width
-  await expect(zoom).not.toHaveText('0.75×');
+  await expect(zoom).not.toHaveText('75 %');
 
   await page.keyboard.press('b');
   await expect(page.locator('.sidebar--minimized')).toHaveCount(1);
@@ -104,11 +104,11 @@ test('single-key shortcuts are ignored while typing', async ({ page }) => {
 
 test('rapid zoom changes leave the page rendered at the final scale', async ({ page }) => {
   const zoom = page.locator('.toolbar__badge').nth(1);
-  await expect(zoom).toHaveText('0.5×');
+  await expect(zoom).toHaveText('50 %');
   await page.keyboard.press('+');
   await page.keyboard.press('+');
   await page.keyboard.press('+');
-  await expect(zoom).toHaveText('1.25×');
+  await expect(zoom).toHaveText('125 %');
   await expect
     .poll(() => page.locator('.canvas--pdf').evaluate((c) => (c as HTMLCanvasElement).width))
     .toBe(Math.floor(595 * 1.25));

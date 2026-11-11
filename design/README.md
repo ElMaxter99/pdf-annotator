@@ -45,6 +45,34 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | P-08 Tamaño de PDF y almacenamiento | Peso por PDF, límite y uso del navegador | [`P-08-peso-almacenamiento.dc.html`](canvas/P-08-peso-almacenamiento.dc.html) | nueva página | Propuesta, pendiente de aprobación |
 | P-09 Cierre y descarga | ZIP o sueltos, progreso «26 de 80», lote terminado | [`P-09-cierre-descarga.dc.html`](canvas/P-09-cierre-descarga.dc.html) | nueva página | Propuesta, pendiente de aprobación |
 | P-10 Comparar claro | P-05 en tema claro | [`P-10-comparar-lado-a-lado-claro.dc.html`](canvas/P-10-comparar-lado-a-lado-claro.dc.html) | `viewer` | Propuesta, pendiente de aprobación |
+| L-01 Flujo general | Una sola entrada: 1 PDF = editor tradicional, 2 o más = pasos, panel y editor | [`L-01-flujo-general.dc.html`](canvas/L-01-flujo-general.dc.html) | — | Aprobado (documento) |
+| L-02 Primera vista | Landing: la cantidad de PDFs decide el flujo | [`L-02-primera-vista.dc.html`](canvas/L-02-primera-vista.dc.html) | `pages/landing` | Aprobado, implementado |
+| L-03 Paso 1 · Subir PDF | Lista con ✕ por archivo y archivos no válidos | [`L-03-paso-1-subir-pdf.dc.html`](canvas/L-03-paso-1-subir-pdf.dc.html) | `pages/batch` | Aprobado, implementado |
+| L-04 Paso 2 · Plantillas | JSON por PDF emparejado por nombre, errores y «Saltar» | [`L-04-paso-2-plantillas.dc.html`](canvas/L-04-paso-2-plantillas.dc.html) | `pages/batch` | Aprobado, implementado |
+| L-05 Paso 3 · Empezar | Resumen y opción de subir versiones B (sustituido por R-01..R-03) | [`L-05-paso-3-empezar.dc.html`](canvas/L-05-paso-3-empezar.dc.html) | `pages/batch` | Aprobado, implementado |
+| L-06 Panel · cuadrícula | Todos los PDFs con estado, buscador y filtros | [`L-06-panel-cuadricula.dc.html`](canvas/L-06-panel-cuadricula.dc.html) | `pages/batch` | Aprobado, implementado |
+| L-07 Panel · lista | Mismos datos en tabla | [`L-07-panel-lista.dc.html`](canvas/L-07-panel-lista.dc.html) | `pages/batch` | Aprobado, implementado |
+| L-08 Editor de un PDF | Editor original con barra del lote y A como capa | [`L-08-editor-de-un-pdf.dc.html`](canvas/L-08-editor-de-un-pdf.dc.html) | `components/migration` | Aprobado, implementado |
+| L-09 Editor (claro) | L-08 en tema claro | [`L-09-editor-claro.dc.html`](canvas/L-09-editor-claro.dc.html) | igual que L-08 | Aprobado, implementado |
+| L-10 Poner plantilla A, volver y listo | Menú, guardado automático y «Listo» | [`L-10-poner-plantilla-volver-listo.dc.html`](canvas/L-10-poner-plantilla-volver-listo.dc.html) | `components/migration` | Aprobado, implementado |
+| L-11 Estados | Carga, error, todo listo y lote guardado | [`L-11-estados.dc.html`](canvas/L-11-estados.dc.html) | `pages/batch` | Aprobado, implementado |
+| N-01 Barra · qué falla hoy | Diagnóstico de la barra superior y principios | [`N-01-barra-que-falla-hoy.dc.html`](canvas/N-01-barra-que-falla-hoy.dc.html) | — | Aprobado (documento) |
+| N-02 Barra · un PDF | Una fila a 1650, 1280 y 1100 px | [`N-02-barra-un-pdf.dc.html`](canvas/N-02-barra-un-pdf.dc.html) | `components/header` | Aprobado, implementado |
+| N-03 Barra · lote | Barra + tira de contexto del lote | [`N-03-barra-lote.dc.html`](canvas/N-03-barra-lote.dc.html) | `components/header`, `components/migration` | Aprobado, implementado |
+| N-04 Barra · menú, claro y estados | Menú ⋯, «Limpiar» con confirmación, tooltips | [`N-04-barra-menu-claro-estados.dc.html`](canvas/N-04-barra-menu-claro-estados.dc.html) | `components/header` | Aprobado, implementado |
+| N-05 Paso 2 · pegar JSON | Pestaña «Pegar JSON» y emparejado por `pdfName` | [`N-05-paso-2-pegar-json.dc.html`](canvas/N-05-paso-2-pegar-json.dc.html) | `pages/batch` | Aprobado, implementado |
+| N-06 Pegar JSON · casos | Formatos, emparejado y avisos | [`N-06-pegar-json-casos.dc.html`](canvas/N-06-pegar-json-casos.dc.html) | `pages/batch` | Aprobado, implementado |
+| O-01 Documento en lote · qué falla | «Empezar de cero» y capas A/B que faltan en el editor | [`O-01-documento-en-lote-que-falla.dc.html`](canvas/O-01-documento-en-lote-que-falla.dc.html) | — | Aprobado (documento) |
+| O-02 Propuesta 1 · ficha en Documento | Ficha del PDF y tarjetas de capas (plantilla A, versión B) | [`O-02-propuesta-1-ficha-documento.dc.html`](canvas/O-02-propuesta-1-ficha-documento.dc.html) | `components/batch-document` | Aprobado, implementado |
+| O-05 Comparativa y recomendación | Las tres propuestas lado a lado (se eligió la 1) | [`O-05-comparativa-y-recomendacion.dc.html`](canvas/O-05-comparativa-y-recomendacion.dc.html) | — | Aprobado (documento) |
+| Q-01 Vista A/B · qué falla | Botones sin efecto sin plantilla A y falta de la vista dividida | [`Q-01-vista-a-b-que-falla.dc.html`](canvas/Q-01-vista-a-b-que-falla.dc.html) | — | Aprobado (documento) |
+| Q-02 Dividida · 1650 | A (solo lectura) a la izquierda, B (se edita) a la derecha | [`Q-02-dividida-1650.dc.html`](canvas/Q-02-dividida-1650.dc.html) | `components/viewer`, `components/migration` | Aprobado, implementado |
+| Q-03 Dividida · 1280 y claro | Ajuste de zoom, tema claro y panel plegado | [`Q-03-dividida-1280-claro.dc.html`](canvas/Q-03-dividida-1280-claro.dc.html) | `components/viewer` | Aprobado, implementado |
+| Q-04 Dividida · estados | Sin plantilla A, B vacía y tamaños distintos | [`Q-04-dividida-estados.dc.html`](canvas/Q-04-dividida-estados.dc.html) | `components/migration` | Aprobado, implementado |
+| R-01 Flujo sin paso 3 | Lote en 2 pasos, panel directo | [`R-01-flujo-sin-paso-3.dc.html`](canvas/R-01-flujo-sin-paso-3.dc.html) | `pages/batch` | Aprobado, implementado |
+| R-02 Paso 2 y panel | Resumen en el paso 2 y tira «Versiones nuevas (B)» | [`R-02-paso-2-y-panel.dc.html`](canvas/R-02-paso-2-y-panel.dc.html) | `pages/batch` | Aprobado, implementado |
+| R-03 Tira B · estados | Sin B, con B y archivos sin pareja | [`R-03-tira-b-estados.dc.html`](canvas/R-03-tira-b-estados.dc.html) | `pages/batch` | Aprobado, implementado |
+| S-01 Comparar sin plantilla A | Los modos dependen de B, no de la plantilla A (sustituye la regla de Q-04) | [`S-01-comparar-sin-plantilla-a.dc.html`](canvas/S-01-comparar-sin-plantilla-a.dc.html) | `components/migration` | Aprobado, implementado |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

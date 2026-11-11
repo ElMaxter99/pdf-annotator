@@ -96,7 +96,11 @@
     "historyGroup": "Verlauf",
     "exportGroup": "Exportoptionen",
     "preferencesGroup": "Einstellungen",
-    "fitWidth": "Anpassen"
+    "fitWidth": "Anpassen",
+    "moreOptions": "Weitere Optionen",
+    "clearConfirm": "Alle Anmerkungen entfernen? Mit Strg+Z lässt sich das rückgängig machen.",
+    "clearYes": "Alle entfernen",
+    "clearCancel": "Abbrechen"
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",
@@ -307,6 +311,16 @@
       "outOfPage": "{{count}} Anmerkung(en) außerhalb der Seite",
       "fontSize": "{{count}} Schriftgröße(n) außerhalb von 8–72",
       "opacity": "{{count}} Deckkraftwert(e) außerhalb von 0,1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} Datei(en) ignoriert: nur PDF und JSON werden akzeptiert.",
+      "jsonFailed": "{{name}} konnte nicht gelesen werden: ungültiges oder zu großes JSON.",
+      "jsonNoPages": "{{name}} enthält keine „pages“-Sammlung: das PDF wird ohne Vorlage aufgenommen.",
+      "jsonWithoutPdf": "{{count}} JSON ohne PDF gleichen Namens: ignoriert.",
+      "notPersistent": "Dieser Browser kann den Stapel nicht zwischen Besuchen speichern.",
+      "samePdf": "{{name}} ist dasselbe PDF wie das Original: es gibt nichts zu migrieren.",
+      "templateApplied": "Vorlage geladen: {{count}} Felder.",
+      "templateFromAnnotations": "Die Anmerkungen des Originals sind jetzt Vorlage A."
     }
   },
   "session": {
@@ -335,6 +349,246 @@
     "distribute": {
       "horizontal": "Horizontal verteilen",
       "vertical": "Vertikal verteilen"
+    }
+  },
+  "batch": {
+    "subtitle": "Vorlagen-Migration",
+    "title": "Stapel · {{count}} PDFs",
+    "progressLabel": "Fortschritt des Stapels",
+    "readyCount": "{{ready}} von {{total}} fertig",
+    "downloadReady": "Fertige herunterladen ({{count}})",
+    "reviewNext": "Nächstes prüfen →",
+    "search": "Nach Namen suchen",
+    "notPersistent": "Dieser Browser kann den Stapel nicht speichern: er geht beim Schließen des Tabs verloren.",
+    "col": {
+      "state": "Status",
+      "document": "Dokument",
+      "version": "B-Version"
+    },
+    "state": {
+      "ready": "Fertig",
+      "review": "Zu prüfen",
+      "noTemplate": "Ohne Vorlage"
+    },
+    "editor": {
+      "regionLabel": "Migration des aktuellen PDFs",
+      "back": "Panel",
+      "versionA": "A: {{name}}",
+      "editingB": "Version B wird bearbeitet",
+      "viewLabel": "A anzeigen",
+      "view": {
+        "overlay": "Darüber",
+        "toggle": "Wechseln",
+        "split": "Geteilt"
+      },
+      "holdHint": "Taste A gedrückt halten, um nur A zu sehen",
+      "cancel": "Abbrechen",
+      "putA": {
+        "button": "Vorlage A einsetzen",
+        "copy": "Felder von A unverändert kopieren",
+        "copyText": "Gleiche Koordinaten. Am einfachsten.",
+        "missing": "Nur die in B fehlenden",
+        "missingText": "Berührt nichts, was du schon platziert hast.",
+        "adjust": "Kopieren und nach Texten anpassen",
+        "soon": "bald",
+        "adjustText": "Schlägt den Versatz anhand von Texten aus A und B vor.",
+        "confirmTitle": "B hat schon Felder",
+        "confirmText": "Durch die von A ersetzen oder nur fehlende hinzufügen? Mit Strg+Z rückgängig zu machen.",
+        "replace": "Alles ersetzen",
+        "addMissing": "Fehlende hinzufügen"
+      },
+      "ready": "Fertig",
+      "readyMissing": "Fertig · {{count}} fehlen",
+      "readyDialog": {
+        "title": "{{name}} als fertig markieren?",
+        "fields": "{{count}} Felder in B",
+        "breakdown": "{{same}} gleich · {{moved}} verschoben · {{renamed}} umbenannt · {{added}} neu",
+        "dismissed": "{{count}} Feld(er) von A verworfen",
+        "reopen": "Du kannst es jederzeit wieder öffnen und ändern.",
+        "confirm": "Als fertig markieren",
+        "keep": "Weiter bearbeiten",
+        "missing": "{{count}} Felder aus A sind noch nicht in B platziert."
+      },
+      "plain": "Bearbeitung mit eigener Vorlage",
+      "navLabel": "Durch den Stapel navigieren",
+      "prev": "Vorheriges PDF",
+      "next": "Nächstes PDF",
+      "position": "{{index}} von {{total}}",
+      "split": {
+        "tagA": "A · Original · nur Lesen",
+        "tagB": "B · neue Version · bearbeitet",
+        "sizeMismatch": "A und B haben nicht dieselbe Größe: Die Koordinaten stimmen nicht überein."
+      },
+      "noA": {
+        "hint": "A hat keine Vorlage: sein PDF wird unverändert verglichen.",
+        "go": "Vorlage A hinzufügen (Dokument)"
+      },
+      "pagesDiffer": "Unterschiedliche Seitenzahl: B {{page}} von {{b}} · A {{pageA}} von {{a}}",
+      "toggle": {
+        "label": "Welche Version anzeigen",
+        "b": "B ansehen (bearbeitet)",
+        "a": "A ansehen (Original)"
+      },
+      "viewHint": {
+        "overlay": "Die Felder von A werden über B gezeichnet (nur die geänderten)",
+        "toggle": "Wechselt zwischen B und A, jeweils eine Version",
+        "split": "A und B nebeneinander, gleiche Seite und gleicher Zoom"
+      }
+    },
+    "panel": {
+      "title": "Felder von B · {{count}}",
+      "toResolve": "Zu klären {{count}}",
+      "allSet": "Alles geklärt",
+      "emptyB": "B ist leer. Setze die Vorlage von A ein und passe Änderungen an.",
+      "noTemplate": "Für dieses PDF gibt es kein JSON von A: B beginnt leer.",
+      "page": "S. {{page}}",
+      "place": "In B platzieren",
+      "dismiss": "Verwerfen",
+      "renameOf": "Ist die Umbenennung von…",
+      "renamedFrom": "vorher: {{name}}",
+      "unlink": "Trennen",
+      "showSame": "Die {{count}} gleichen anzeigen",
+      "hideSame": "Die {{count}} gleichen ausblenden",
+      "dismissed": "Von A verworfen ({{count}})",
+      "restore": "Wiederherstellen"
+    },
+    "status": {
+      "same": "Gleich",
+      "moved": "Verschoben",
+      "renamed": "Umbenannt",
+      "new": "Neu",
+      "missing": "Fehlt in B"
+    },
+    "loading": "Stapel wird geladen…",
+    "cancel": "Abbrechen",
+    "back": "Zurück",
+    "open": "Öffnen",
+    "review": "Prüfen",
+    "remove": "{{name}} entfernen",
+    "removeConfirm": "{{name}} aus dem Stapel entfernen?",
+    "removeYes": "Ja, entfernen",
+    "uploadVersions": "B-Versionen hochladen",
+    "panelHint": "Klicke auf ein Dokument, um es im Editor zu öffnen. Was fehlt, steht zuerst.",
+    "allReady": {
+      "title": "Alles fertig!"
+    },
+    "steps": {
+      "label": "Schritte des Stapels",
+      "pdfs": "PDFs hochladen",
+      "templates": "Vorlagen",
+      "required": "Erforderlich",
+      "optional": "Optional"
+    },
+    "step1": {
+      "title": "1 · PDFs hochladen",
+      "text": "Alle Dokumente, die du bearbeiten willst. Du kannst weitere hinzufügen oder entfernen.",
+      "drop": "Weitere PDFs hier ablegen",
+      "choose": "Dateien wählen",
+      "remove": "{{name}} entfernen",
+      "next": "Weiter: Vorlagen →"
+    },
+    "step2": {
+      "title": "2 · Vorlagen hochladen (JSON)",
+      "text": "Optional. Ein JSON pro PDF mit demselben Namen (rechnung.json für rechnung.pdf). Ohne Vorlage startet das PDF ohne Anmerkungen.",
+      "drop": "JSON-Dateien hier ablegen",
+      "none": "keine Vorlage",
+      "badJson": "Ungültiges JSON",
+      "noPages": "Keine Seiten",
+      "fields": "{{count}} Felder",
+      "empty": "Leer",
+      "remove": "Vorlage von {{name}} entfernen",
+      "skip": "Diesen Schritt überspringen",
+      "next": "Panel öffnen →",
+      "tabsLabel": "Wie die Vorlagen hinzufügen",
+      "tabFiles": "Dateien",
+      "tabPaste": "JSON einfügen",
+      "pastePlaceholder": "Füge hier die Vorlagen ein: ein Array, ein Dokument oder mehrere hintereinander (z. B. dein Mongo-Export).",
+      "pasteHint": "Zuordnung über das Feld pdfName (oder name, fileName, type). Mongo-Felder werden ignoriert; nur pages zählt.",
+      "pasteMatch": "Mit den PDFs abgleichen",
+      "pasteClear": "Text löschen",
+      "pasteFound": "{{count}} Vorlagen erkannt",
+      "pasteUnused": "{{count}} ohne PDF",
+      "pasteError": "Ungültiges JSON: prüfe Zeile {{line}}.",
+      "pasteTooBig": "Der eingefügte Text ist größer als 5 MB.",
+      "assign": "Vorlage für {{name}} zuweisen",
+      "assignPlaceholder": "Zuweisen…",
+      "pdfs": "PDFs",
+      "withTemplate": "mit Vorlage",
+      "withoutTemplate": "ohne Vorlage"
+    },
+    "versionsDrop": {
+      "title": "Neue Versionen (B)",
+      "text": "Überarbeitete PDFs? Ziehe sie hierher; sie werden per Name den PDFs des Stapels zugeordnet.",
+      "choose": "Dateien wählen",
+      "addedTitle": "B-Versionen hinzugefügt: {{count}}",
+      "addedText": "Die übrigen haben keine B-Version. Hier kannst du weitere ablegen.",
+      "more": "Mehr hinzufügen",
+      "unpairedTitle": "Dateien ohne Zuordnung: {{count}}",
+      "unpairedText": "Sie passen zu keinem PDF im Stapel: manuell zuordnen oder verwerfen.",
+      "assign": "Zuordnen zu…",
+      "assignLabel": "{{name}} einem PDF zuordnen",
+      "discard": "Verwerfen"
+    },
+    "filter": {
+      "label": "Nach Status filtern",
+      "all": "Alle {{count}}",
+      "review": "Zu prüfen {{count}}",
+      "ready": "Fertig {{count}}",
+      "noTemplate": "Ohne Vorlage {{count}}"
+    },
+    "view": {
+      "label": "Ansichtsart",
+      "grid": "Raster",
+      "list": "Liste"
+    },
+    "resume": {
+      "title": "Gespeicherter Stapel",
+      "text": "Du hast einen Stapel mit {{count}} PDFs in Arbeit.",
+      "continue": "Stapel fortsetzen",
+      "discard": "Verwerfen",
+      "discarded": "Stapel verworfen."
+    },
+    "uploadB": "B hochladen",
+    "doc": {
+      "meta": "{{pages}} S. · {{index}} von {{total}} im Stapel",
+      "replace": "Ersetzen…",
+      "replaceConfirm": "Dieses PDF durch „{{name}}“ ersetzen? Die Anmerkungen bleiben erhalten.",
+      "replaceYes": "Ersetzen",
+      "cancel": "Abbrechen",
+      "layers": "PDF-Ebenen",
+      "a": {
+        "title": "① Vorlage des Originals (A)",
+        "none": "Keine Vorlage",
+        "fields": "✓ {{count}} Felder",
+        "hint": "Die Anmerkungen des Original-PDFs. Sie sind die Basis zum Bearbeiten dieses PDFs oder die Referenz für die neue Version.",
+        "upload": "JSON hochladen",
+        "paste": "JSON einfügen",
+        "change": "Ändern",
+        "pasteAnother": "Andere einfügen",
+        "remove": "Entfernen",
+        "pasteLabel": "Fügen Sie hier das Vorlagen-JSON ein",
+        "apply": "Anwenden",
+        "replacesNote": "Ersetzt die aktuellen Anmerkungen (rückgängig machbar).",
+        "error": {
+          "tooBig": "Das JSON ist größer als 5 MB.",
+          "json": "Das JSON ist ungültig.",
+          "noPages": "In diesem JSON wurden keine Seiten mit Feldern gefunden."
+        }
+      },
+      "b": {
+        "title": "② Neue Version des PDFs (B)",
+        "none": "Keine neue Version",
+        "added": "✓ Hinzugefügt",
+        "hint": "Gibt es ein überarbeitetes PDF, fügen Sie es hinzu; bearbeitet wird darauf, mit A als Referenz.",
+        "drop": "Neues PDF ablegen",
+        "dropSub": "oder klicken zum Suchen",
+        "change": "Ändern",
+        "remove": "Entfernen",
+        "removeConfirm": "Version B entfernen? Ihre Anmerkungen gehen verloren und das Original-PDF wird wieder mit seiner Vorlage bearbeitet.",
+        "removeYes": "Version B entfernen"
+      },
+      "noTemplateNote": "Keine Vorlage: Sie können die des Originals laden oder unter Dokument eine neue Version hinzufügen.",
+      "noTemplateGo": "Zu Dokument"
     }
   }
 }

@@ -6,10 +6,10 @@ El histórico de la iteración inicial está en `docs/archive/PROPUESTA_MEJORAS.
 Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEditor`, `PdfExportService`, `FontCatalogService`, `AnnotationStore`, `AnnotationImportService`, sidebar por pestañas, selección múltiple, sesión en IndexedDB, toasts, avisos de importación, e2e y CI.
 
 ## En curso
-- **Fase 1 (esta rama):** documentos de contexto y flujo «diseño primero» (`docs/PRODUCT|DOMAIN|DECISIONS|TESTING|WORKFLOW.md`, `design/`).
+- **Lote de documentos y remaquetado, fase 1** (diseño aprobado `L-01`..`L-11`): pasos de subida, panel en cuadrícula o lista, editor de B con A como capa de referencia, estados por campo, «Poner plantilla A», «Listo» y descarga. Sin vista dividida ni miniaturas reales en el panel todavía.
 
 ## Siguiente
-1. **Remaquetado de muchos PDFs** (20–50): subir los PDFs a la vez, asociar a cada uno su objeto `pages`, ver antes y después con el PDF nuevo, remaquetar y pasar al siguiente. Se trabaja en un hilo propio; el diseño pasa por `design/` antes de programarse.
+1. **Remaquetado por lotes, fases siguientes:** vista dividida (A y B del mismo tamaño y zoom, scroll ligado), aviso y escalado cuando A y B miden distinto, y «Copiar y ajustar por textos» (proponer el desplazamiento con el texto que ya extrae pdf.js; siempre como sugerencia).
 2. **Heredar `fontSize` global** al importar (hoy los campos sin tamaño reciben 14). Afecta al formato real del autor.
 3. Dividir `workspace.page.ts` (≈4.130 líneas): render del PDF, miniaturas y sincronización del JSON.
 4. Accesibilidad: trap de foco en diálogos, `aria-live` en coordenadas, contraste en tema claro.

@@ -96,7 +96,11 @@
     "historyGroup": "Actions d'historique",
     "exportGroup": "Options d'export",
     "preferencesGroup": "Préférences",
-    "fitWidth": "Ajuster"
+    "fitWidth": "Ajuster",
+    "moreOptions": "Plus d'options",
+    "clearConfirm": "Supprimer toutes les annotations ? Vous pouvez annuler avec Ctrl+Z.",
+    "clearYes": "Tout supprimer",
+    "clearCancel": "Annuler"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -307,6 +311,16 @@
       "outOfPage": "{{count}} annotation(s) hors de la page",
       "fontSize": "{{count}} taille(s) de police hors de 8–72",
       "opacity": "{{count}} opacité(s) hors de 0,1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} fichier(s) ignoré(s) : seuls les PDF et JSON sont acceptés.",
+      "jsonFailed": "Impossible de lire {{name}} : JSON invalide ou trop volumineux.",
+      "jsonNoPages": "{{name}} n’a pas de collection « pages » : le PDF est ajouté sans modèle.",
+      "jsonWithoutPdf": "{{count}} JSON sans PDF du même nom : ignoré(s).",
+      "notPersistent": "Ce navigateur ne peut pas conserver le lot entre deux visites.",
+      "samePdf": "{{name}} est le même PDF que l’original : rien à migrer.",
+      "templateApplied": "Modèle chargé : {{count}} champs.",
+      "templateFromAnnotations": "Les annotations de l’original deviennent le modèle A."
     }
   },
   "session": {
@@ -335,6 +349,246 @@
     "distribute": {
       "horizontal": "Répartir horizontalement",
       "vertical": "Répartir verticalement"
+    }
+  },
+  "batch": {
+    "subtitle": "Migration de modèles",
+    "title": "Lot · {{count}} PDF",
+    "progressLabel": "Progression du lot",
+    "readyCount": "{{ready}} sur {{total}} prêts",
+    "downloadReady": "Télécharger les prêts ({{count}})",
+    "reviewNext": "Réviser le suivant →",
+    "search": "Rechercher par nom",
+    "notPersistent": "Ce navigateur ne peut pas conserver le lot : il disparaîtra à la fermeture de l’onglet.",
+    "col": {
+      "state": "État",
+      "document": "Document",
+      "version": "Version B"
+    },
+    "state": {
+      "ready": "Prêt",
+      "review": "À réviser",
+      "noTemplate": "Sans modèle"
+    },
+    "editor": {
+      "regionLabel": "Migration du PDF actuel",
+      "back": "Panneau",
+      "versionA": "A : {{name}}",
+      "editingB": "Édition de la version B",
+      "viewLabel": "Comment voir A",
+      "view": {
+        "overlay": "Superposé",
+        "toggle": "Alterner",
+        "split": "Divisée"
+      },
+      "holdHint": "Maintenez la touche A pour ne voir que A",
+      "cancel": "Annuler",
+      "putA": {
+        "button": "Appliquer le modèle A",
+        "copy": "Copier les champs de A tels quels",
+        "copyText": "Mêmes coordonnées. Le plus simple.",
+        "missing": "Seulement ceux qui manquent dans B",
+        "missingText": "Ne touche pas à ce que vous avez déjà placé.",
+        "adjust": "Copier et ajuster d’après les textes",
+        "soon": "bientôt",
+        "adjustText": "Proposera le décalage à partir des textes de A et B.",
+        "confirmTitle": "B contient déjà des champs",
+        "confirmText": "Les remplacer par ceux de A ou n’ajouter que les manquants ? Annulable avec Ctrl+Z.",
+        "replace": "Tout remplacer",
+        "addMissing": "Ajouter les manquants"
+      },
+      "ready": "Terminé",
+      "readyMissing": "Terminé · {{count}} manquant(s)",
+      "readyDialog": {
+        "title": "Marquer {{name}} comme terminé ?",
+        "fields": "{{count}} champs dans B",
+        "breakdown": "{{same}} identiques · {{moved}} déplacés · {{renamed}} renommés · {{added}} nouveaux",
+        "dismissed": "{{count}} champ(s) de A écarté(s)",
+        "reopen": "Vous pourrez le rouvrir et le modifier à tout moment.",
+        "confirm": "Marquer comme terminé",
+        "keep": "Continuer à modifier",
+        "missing": "Il reste {{count}} champs de A non placés dans B."
+      },
+      "plain": "Modification avec son modèle",
+      "navLabel": "Parcourir le lot",
+      "prev": "PDF précédent",
+      "next": "PDF suivant",
+      "position": "{{index}} sur {{total}}",
+      "split": {
+        "tagA": "A · original · lecture seule",
+        "tagB": "B · nouvelle version · modifiée",
+        "sizeMismatch": "A et B n’ont pas la même taille : les coordonnées ne correspondent pas."
+      },
+      "noA": {
+        "hint": "A n'a pas de modèle : son PDF est comparé tel quel.",
+        "go": "Ajouter le modèle A (Document)"
+      },
+      "pagesDiffer": "Nombre de pages différent : B {{page}} sur {{b}} · A {{pageA}} sur {{a}}",
+      "toggle": {
+        "label": "Quelle version afficher",
+        "b": "Voir B (modifiée)",
+        "a": "Voir A (originale)"
+      },
+      "viewHint": {
+        "overlay": "Les champs de A sont dessinés sur B (seulement ceux qui changent)",
+        "toggle": "Alterne entre B et A, une version à la fois",
+        "split": "A et B côte à côte, même page et même zoom"
+      }
+    },
+    "panel": {
+      "title": "Champs de B · {{count}}",
+      "toResolve": "À résoudre {{count}}",
+      "allSet": "Tout est réglé",
+      "emptyB": "B est vide. Appliquez le modèle de A et ajustez ce qui a changé.",
+      "noTemplate": "Ce PDF n’a pas de JSON pour A : B démarre vide.",
+      "page": "p. {{page}}",
+      "place": "Placer dans B",
+      "dismiss": "Écarter",
+      "renameOf": "C’est le renommage de…",
+      "renamedFrom": "avant : {{name}}",
+      "unlink": "Dissocier",
+      "showSame": "Afficher les {{count}} identiques",
+      "hideSame": "Masquer les {{count}} identiques",
+      "dismissed": "Écartés de A ({{count}})",
+      "restore": "Récupérer"
+    },
+    "status": {
+      "same": "Identique",
+      "moved": "Déplacé",
+      "renamed": "Renommé",
+      "new": "Nouveau",
+      "missing": "Manquant dans B"
+    },
+    "loading": "Chargement du lot…",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "open": "Ouvrir",
+    "review": "Réviser",
+    "remove": "Retirer {{name}}",
+    "removeConfirm": "Retirer {{name}} du lot ?",
+    "removeYes": "Oui, retirer",
+    "uploadVersions": "Importer les versions B",
+    "panelHint": "Cliquez sur un document pour l'ouvrir dans l'éditeur. Ce qui manque apparaît en premier.",
+    "allReady": {
+      "title": "Tout est prêt !"
+    },
+    "steps": {
+      "label": "Étapes du lot",
+      "pdfs": "Importer les PDF",
+      "templates": "Modèles",
+      "required": "Obligatoire",
+      "optional": "Facultatif"
+    },
+    "step1": {
+      "title": "1 · Importer les PDF",
+      "text": "Tous les documents que vous voulez traiter. Vous pouvez en ajouter ou en retirer.",
+      "drop": "Déposez d'autres PDF ici",
+      "choose": "Choisir des fichiers",
+      "remove": "Retirer {{name}}",
+      "next": "Suivant : Modèles →"
+    },
+    "step2": {
+      "title": "2 · Importer les modèles (JSON)",
+      "text": "Facultatif. Un JSON par PDF, avec le même nom (facture.json pour facture.pdf). Sans modèle, le PDF démarre sans annotations.",
+      "drop": "Déposez les JSON ici",
+      "none": "sans modèle",
+      "badJson": "JSON invalide",
+      "noPages": "Aucune page",
+      "fields": "{{count}} champs",
+      "empty": "Vide",
+      "remove": "Retirer le modèle de {{name}}",
+      "skip": "Passer cette étape",
+      "next": "Ouvrir le panneau →",
+      "tabsLabel": "Comment ajouter les modèles",
+      "tabFiles": "Fichiers",
+      "tabPaste": "Coller du JSON",
+      "pastePlaceholder": "Collez ici les modèles : un tableau, un document ou plusieurs à la suite (par exemple, ce que vous extrayez de Mongo).",
+      "pasteHint": "L'association se fait par le champ pdfName (ou name, fileName, type). Les champs Mongo sont ignorés ; seul pages compte.",
+      "pasteMatch": "Associer aux PDF",
+      "pasteClear": "Effacer le texte",
+      "pasteFound": "{{count}} modèles reconnus",
+      "pasteUnused": "{{count}} sans PDF",
+      "pasteError": "JSON invalide : vérifiez la ligne {{line}}.",
+      "pasteTooBig": "Le texte collé dépasse 5 Mo.",
+      "assign": "Attribuer un modèle à {{name}}",
+      "assignPlaceholder": "Attribuer…",
+      "pdfs": "PDF",
+      "withTemplate": "avec modèle",
+      "withoutTemplate": "sans modèle"
+    },
+    "versionsDrop": {
+      "title": "Nouvelles versions (B)",
+      "text": "Vous avez des PDF redessinés ? Déposez-les ici : ils sont associés par nom à chaque PDF du lot.",
+      "choose": "Choisir des fichiers",
+      "addedTitle": "Versions B ajoutées : {{count}}",
+      "addedText": "Les autres restent sans version B. Vous pouvez en déposer d'autres ici.",
+      "more": "Ajouter",
+      "unpairedTitle": "Fichiers sans correspondance : {{count}}",
+      "unpairedText": "Ils ne correspondent à aucun PDF du lot : associez-les à la main ou écartez-les.",
+      "assign": "Associer à…",
+      "assignLabel": "Associer {{name}} à un PDF",
+      "discard": "Écarter"
+    },
+    "filter": {
+      "label": "Filtrer par état",
+      "all": "Tous {{count}}",
+      "review": "À réviser {{count}}",
+      "ready": "Prêts {{count}}",
+      "noTemplate": "Sans modèle {{count}}"
+    },
+    "view": {
+      "label": "Type de vue",
+      "grid": "Grille",
+      "list": "Liste"
+    },
+    "resume": {
+      "title": "Lot enregistré",
+      "text": "Vous avez un lot de {{count}} PDF en cours.",
+      "continue": "Reprendre le lot",
+      "discard": "Abandonner",
+      "discarded": "Lot abandonné."
+    },
+    "uploadB": "Importer B",
+    "doc": {
+      "meta": "{{pages}} p. · {{index}} sur {{total}} du lot",
+      "replace": "Remplacer…",
+      "replaceConfirm": "Remplacer ce PDF par « {{name}} » ? Les annotations sont conservées.",
+      "replaceYes": "Remplacer",
+      "cancel": "Annuler",
+      "layers": "Calques du PDF",
+      "a": {
+        "title": "① Modèle de l’original (A)",
+        "none": "Sans modèle",
+        "fields": "✓ {{count}} champs",
+        "hint": "Les annotations du PDF d’origine. Elles servent de base pour modifier ce PDF ou de référence pour la nouvelle version.",
+        "upload": "Importer un JSON",
+        "paste": "Coller un JSON",
+        "change": "Changer",
+        "pasteAnother": "En coller un autre",
+        "remove": "Retirer",
+        "pasteLabel": "Collez ici le JSON du modèle",
+        "apply": "Appliquer",
+        "replacesNote": "Remplace les annotations actuelles (annulable).",
+        "error": {
+          "tooBig": "Le JSON dépasse 5 Mo.",
+          "json": "Le JSON n’est pas valide.",
+          "noPages": "Aucune page avec des champs trouvée dans ce JSON."
+        }
+      },
+      "b": {
+        "title": "② Nouvelle version du PDF (B)",
+        "none": "Sans nouvelle version",
+        "added": "✓ Ajoutée",
+        "hint": "S’il existe un PDF remanié, ajoutez-le : on le modifie avec A comme référence.",
+        "drop": "Déposez le nouveau PDF",
+        "dropSub": "ou cliquez pour le chercher",
+        "change": "Changer",
+        "remove": "Retirer",
+        "removeConfirm": "Retirer la version B ? Ses annotations sont perdues et le PDF d’origine est de nouveau modifié avec son modèle.",
+        "removeYes": "Retirer la version B"
+      },
+      "noTemplateNote": "Sans modèle : vous pouvez charger celui de l’original ou ajouter une nouvelle version dans Document.",
+      "noTemplateGo": "Aller à Document"
     }
   }
 }

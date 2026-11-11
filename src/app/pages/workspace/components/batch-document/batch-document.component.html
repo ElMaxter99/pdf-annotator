@@ -1,0 +1,230 @@
+@if (item(); as it) {
+  <section class="batch-doc" data-testid="batch-document">
+    <div class="batch-doc__card">
+      <div class="batch-doc__file">
+        <div class="batch-doc__thumb"><app-pdf-thumb [blob]="it.bPdf ?? it.aPdf" /></div>
+        <div class="batch-doc__meta">
+          <strong class="batch-doc__name" [title]="it.bName ?? it.name">{{
+            it.bName ?? it.name
+          }}</strong>
+          <small>{{
+            'batch.doc.meta'
+              | t
+                : {
+                    pages: vm.pageCount,
+                    index: (vm.batchCtx()?.index ?? 0) + 1,
+                    total: vm.batchCtx()?.total,
+                  }
+          }}</small>
+        </div>
+        <button
+          type="button"
+          class="btn btn--ghost"
+          (click)="openPicker(replaceInput)"
+          data-testid="doc-replace"
+        >
+          {{ 'batch.doc.replace' | t }}
+        </button>
+        <input
+          #replaceInput
+          type="file"
+          accept="application/pdf"
+          hidden
+          (change)="onReplacePicked($event)"
+          data-testid="doc-replace-input"
+        />
+      </div>
+      @if (pendingReplace(); as file) {
+        <div class="batch-doc__confirm" data-testid="doc-replace-confirm">
+          <p>{{ 'batch.doc.replaceConfirm' | t: { name: file.name } }}</p>
+          <div class="batch-doc__row">
+            <button
+              type="button"
+              class="btn"
+              (click)="confirmReplace()"
+              data-testid="doc-replace-yes"
+            >
+              {{ 'batch.doc.replaceYes' | t }}
+            </button>
+            <button type="button" class="btn btn--ghost" (click)="pendingReplace.set(null)">
+              {{ 'batch.doc.cancel' | t }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <h5 class="batch-doc__title">{{ 'batch.doc.layers' | t }}</h5>
+
+    <div
+      class="batch-doc__card"
+      [class.batch-doc__card--ok]="fieldsA() > 0"
+      data-testid="doc-layer-a"
+    >
+      <div class="batch-doc__head">
+        <strong>{{ 'batch.doc.a.title' | t }}</strong>
+        <span class="migration-chip" [class.migration-chip--on]="fieldsA() > 0">{{
+          fieldsA() > 0
+            ? ('batch.doc.a.fields' | t: { count: fieldsA() })
+            : ('batch.doc.a.none' | t)
+        }}</span>
+      </div>
+      @if (fieldsA() === 0) {
+        <p class="batch-doc__hint">{{ 'batch.doc.a.hint' | t }}</p>
+      }
+      <div class="batch-doc__row">
+        <button
+          type="button"
+          class="btn btn--ghost"
+          (click)="openPicker(templateInput)"
+          data-testid="doc-a-upload"
+        >
+          {{ (fieldsA() ? 'batch.doc.a.change' : 'batch.doc.a.upload') | t }}
+        </button>
+        <button
+          type="button"
+          class="btn btn--ghost"
+          (click)="togglePaste()"
+          data-testid="doc-a-paste"
+        >
+          {{ (fieldsA() ? 'batch.doc.a.pasteAnother' : 'batch.doc.a.paste') | t }}
+        </button>
+        @if (fieldsA() > 0) {
+          <button
+            type="button"
+            class="btn btn--ghost batch-doc__danger"
+            (click)="vm.batchRemoveTemplate()"
+            data-testid="doc-a-remove"
+          >
+            {{ 'batch.doc.a.remove' | t }}
+          </button>
+        }
+        <input
+          #templateInput
+          type="file"
+          accept=".json,application/json"
+          hidden
+          (change)="onTemplateFile($event)"
+          data-testid="doc-a-input"
+        />
+      </div>
+      @if (pasting()) {
+        <label class="batch-doc__paste">
+          <span>{{ 'batch.doc.a.pasteLabel' | t }}</span>
+          <textarea
+            rows="6"
+            spellcheck="false"
+            [value]="pasteText()"
+            (input)="pasteText.set($any($event.target).value)"
+            data-testid="doc-a-text"
+          ></textarea>
+        </label>
+        @if (!it.bPdf && vm.annotationCount() > 0) {
+          <p class="batch-doc__hint">{{ 'batch.doc.a.replacesNote' | t }}</p>
+        }
+        <div class="batch-doc__row">
+          <button
+            type="button"
+            class="btn"
+            [disabled]="!pasteText().trim()"
+            (click)="applyPasted()"
+            data-testid="doc-a-apply"
+          >
+            {{ 'batch.doc.a.apply' | t }}
+          </button>
+          <button type="button" class="btn btn--ghost" (click)="togglePaste()">
+            {{ 'batch.doc.cancel' | t }}
+          </button>
+        </div>
+      }
+      @if (templateError(); as error) {
+        <p class="batch-doc__error" role="alert" data-testid="doc-a-error">
+          {{ 'batch.doc.a.error.' + error | t }}
+        </p>
+      }
+    </div>
+
+    <div class="batch-doc__card" [class.batch-doc__card--ok]="!!it.bPdf" data-testid="doc-layer-b">
+      <div class="batch-doc__head">
+        <strong>{{ 'batch.doc.b.title' | t }}</strong>
+        <span class="migration-chip" [class.migration-chip--on]="!!it.bPdf">{{
+          (it.bPdf ? 'batch.doc.b.added' : 'batch.doc.b.none') | t
+        }}</span>
+      </div>
+      @if (it.bPdf) {
+        <div class="batch-doc__file">
+          <div class="batch-doc__thumb batch-doc__thumb--small">
+            <app-pdf-thumb [blob]="it.bPdf" />
+          </div>
+          <div class="batch-doc__meta">
+            <strong class="batch-doc__name" [title]="it.bName">{{ it.bName }}</strong>
+          </div>
+        </div>
+        <div class="batch-doc__row">
+          <button
+            type="button"
+            class="btn btn--ghost"
+            (click)="openPicker(versionInput)"
+            data-testid="doc-b-change"
+          >
+            {{ 'batch.doc.b.change' | t }}
+          </button>
+          <button
+            type="button"
+            class="btn btn--ghost batch-doc__danger"
+            (click)="confirmRemoveB.set(true)"
+            data-testid="doc-b-remove"
+          >
+            {{ 'batch.doc.b.remove' | t }}
+          </button>
+        </div>
+        @if (confirmRemoveB()) {
+          <div class="batch-doc__confirm" data-testid="doc-b-remove-confirm">
+            <p>{{ 'batch.doc.b.removeConfirm' | t }}</p>
+            <div class="batch-doc__row">
+              <button
+                type="button"
+                class="btn btn--danger"
+                (click)="removeB()"
+                data-testid="doc-b-remove-yes"
+              >
+                {{ 'batch.doc.b.removeYes' | t }}
+              </button>
+              <button type="button" class="btn btn--ghost" (click)="confirmRemoveB.set(false)">
+                {{ 'batch.doc.cancel' | t }}
+              </button>
+            </div>
+          </div>
+        }
+      } @else {
+        <p class="batch-doc__hint">{{ 'batch.doc.b.hint' | t }}</p>
+        <div
+          class="batch-doc__drop"
+          [class.batch-doc__drop--active]="dropActive()"
+          role="button"
+          tabindex="0"
+          (click)="openPicker(versionInput)"
+          (keydown.enter)="openPicker(versionInput)"
+          (dragover)="onDragOver($event)"
+          (dragleave)="dropActive.set(false)"
+          (drop)="onDrop($event)"
+          data-testid="doc-b-drop"
+        >
+          <span aria-hidden="true">⬆</span>
+          <span>
+            <strong>{{ 'batch.doc.b.drop' | t }}</strong>
+            <small>{{ 'batch.doc.b.dropSub' | t }}</small>
+          </span>
+        </div>
+      }
+      <input
+        #versionInput
+        type="file"
+        accept="application/pdf"
+        hidden
+        (change)="onVersionPicked($event)"
+        data-testid="doc-b-input"
+      />
+    </div>
+  </section>
+}

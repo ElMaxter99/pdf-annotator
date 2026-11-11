@@ -96,7 +96,11 @@
     "historyGroup": "History actions",
     "exportGroup": "Export options",
     "preferencesGroup": "Preferences",
-    "fitWidth": "Fit"
+    "fitWidth": "Fit",
+    "moreOptions": "More options",
+    "clearConfirm": "Remove all annotations? You can undo it with Ctrl+Z.",
+    "clearYes": "Remove all",
+    "clearCancel": "Cancel"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -307,6 +311,16 @@
       "outOfPage": "{{count}} annotation(s) outside the page",
       "fontSize": "{{count}} font size(s) outside 8–72",
       "opacity": "{{count}} opacity value(s) outside 0.1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} file(s) ignored: only PDF and JSON are accepted.",
+      "jsonFailed": "Could not read {{name}}: it is not valid JSON or it is too large.",
+      "jsonNoPages": "{{name}} has no “pages” collection: the PDF is added without a template.",
+      "jsonWithoutPdf": "{{count}} JSON without a PDF of the same name: ignored.",
+      "notPersistent": "This browser cannot keep the batch between visits.",
+      "samePdf": "{{name}} is the same PDF as the original: there is nothing to migrate.",
+      "templateApplied": "Template loaded: {{count}} fields.",
+      "templateFromAnnotations": "The original’s annotations became template A."
     }
   },
   "session": {
@@ -335,6 +349,246 @@
     "distribute": {
       "horizontal": "Distribute horizontally",
       "vertical": "Distribute vertically"
+    }
+  },
+  "batch": {
+    "subtitle": "Template migration",
+    "title": "Batch · {{count}} PDFs",
+    "progressLabel": "Batch progress",
+    "readyCount": "{{ready}} of {{total}} ready",
+    "downloadReady": "Download ready ({{count}})",
+    "reviewNext": "Review next →",
+    "search": "Search by name",
+    "notPersistent": "This browser cannot store the batch: it will not survive closing the tab.",
+    "col": {
+      "state": "Status",
+      "document": "Document",
+      "version": "B version"
+    },
+    "state": {
+      "ready": "Ready",
+      "review": "To review",
+      "noTemplate": "No template"
+    },
+    "editor": {
+      "regionLabel": "Migration of the current PDF",
+      "back": "Panel",
+      "versionA": "A: {{name}}",
+      "editingB": "Editing version B",
+      "viewLabel": "How to see A",
+      "view": {
+        "overlay": "Overlay",
+        "toggle": "Toggle",
+        "split": "Split"
+      },
+      "holdHint": "Hold the A key to see only A",
+      "cancel": "Cancel",
+      "putA": {
+        "button": "Put template A",
+        "copy": "Copy A’s fields as they are",
+        "copyText": "Same coordinates. The simplest option.",
+        "missing": "Only those missing in B",
+        "missingText": "It does not touch what you have already placed.",
+        "adjust": "Copy and adjust by text",
+        "soon": "soon",
+        "adjustText": "It will suggest the offset using texts from A and B.",
+        "confirmTitle": "B already has fields",
+        "confirmText": "Replace them with A’s or add only those missing? You can undo with Ctrl+Z.",
+        "replace": "Replace all",
+        "addMissing": "Add the missing ones"
+      },
+      "ready": "Done",
+      "readyMissing": "Done · {{count}} missing",
+      "readyDialog": {
+        "title": "Mark {{name}} as done?",
+        "fields": "{{count}} fields in B",
+        "breakdown": "{{same}} same · {{moved}} moved · {{renamed}} renamed · {{added}} new",
+        "dismissed": "{{count}} field(s) of A dismissed",
+        "reopen": "You can reopen and change it at any time.",
+        "confirm": "Mark as done",
+        "keep": "Keep editing",
+        "missing": "{{count}} fields of A are still not placed in B."
+      },
+      "plain": "Editing with its template",
+      "navLabel": "Move through the batch",
+      "prev": "Previous PDF",
+      "next": "Next PDF",
+      "position": "{{index}} of {{total}}",
+      "split": {
+        "tagA": "A · original · read only",
+        "tagB": "B · new version · edited",
+        "sizeMismatch": "A and B are not the same size: the coordinates do not line up."
+      },
+      "noA": {
+        "hint": "A has no template: its PDF is compared as it is.",
+        "go": "Add template A (Document)"
+      },
+      "pagesDiffer": "Different page counts: B {{page}} of {{b}} · A {{pageA}} of {{a}}",
+      "toggle": {
+        "label": "Which version to view",
+        "b": "View B (edited)",
+        "a": "View A (original)"
+      },
+      "viewHint": {
+        "overlay": "The fields of A are drawn over B (only those that changed)",
+        "toggle": "Switch between viewing B and A, one version at a time",
+        "split": "A and B side by side, same page and zoom"
+      }
+    },
+    "panel": {
+      "title": "Fields of B · {{count}}",
+      "toResolve": "To resolve {{count}}",
+      "allSet": "All resolved",
+      "emptyB": "B is empty. Put A’s template and adjust what changed.",
+      "noTemplate": "This PDF has no JSON for A: B starts empty.",
+      "page": "p. {{page}}",
+      "place": "Place in B",
+      "dismiss": "Dismiss",
+      "renameOf": "It is the rename of…",
+      "renamedFrom": "was: {{name}}",
+      "unlink": "Unlink",
+      "showSame": "Show the {{count}} unchanged",
+      "hideSame": "Hide the {{count}} unchanged",
+      "dismissed": "Dismissed from A ({{count}})",
+      "restore": "Restore"
+    },
+    "status": {
+      "same": "Same",
+      "moved": "Moved",
+      "renamed": "Renamed",
+      "new": "New",
+      "missing": "Missing in B"
+    },
+    "loading": "Loading the batch…",
+    "cancel": "Cancel",
+    "back": "Back",
+    "open": "Open",
+    "review": "Review",
+    "remove": "Remove {{name}}",
+    "removeConfirm": "Remove {{name}} from the batch?",
+    "removeYes": "Yes, remove",
+    "uploadVersions": "Upload B versions",
+    "panelHint": "Click a document to open it in the editor. What is missing comes first.",
+    "allReady": {
+      "title": "All ready!"
+    },
+    "steps": {
+      "label": "Batch steps",
+      "pdfs": "Upload PDFs",
+      "templates": "Templates",
+      "required": "Required",
+      "optional": "Optional"
+    },
+    "step1": {
+      "title": "1 · Upload the PDFs",
+      "text": "All the documents you want to work on. You can add more or remove some.",
+      "drop": "Drop more PDFs here",
+      "choose": "Choose files",
+      "remove": "Remove {{name}}",
+      "next": "Next: Templates →"
+    },
+    "step2": {
+      "title": "2 · Upload the templates (JSON)",
+      "text": "Optional. One JSON per PDF with the same name (invoice.json for invoice.pdf). Without a template the PDF starts with no annotations.",
+      "drop": "Drop the JSON files here",
+      "none": "no template",
+      "badJson": "Invalid JSON",
+      "noPages": "No pages",
+      "fields": "{{count}} fields",
+      "empty": "Empty",
+      "remove": "Remove the template of {{name}}",
+      "skip": "Skip this step",
+      "next": "Open the panel →",
+      "tabsLabel": "How to add the templates",
+      "tabFiles": "Files",
+      "tabPaste": "Paste JSON",
+      "pastePlaceholder": "Paste the templates here: an array, one document or several in a row (for example, what you extract from Mongo).",
+      "pasteHint": "They are matched by the pdfName field (or name, fileName, type). Mongo fields are ignored; only pages matters.",
+      "pasteMatch": "Match with the PDFs",
+      "pasteClear": "Clear text",
+      "pasteFound": "{{count}} templates found",
+      "pasteUnused": "{{count}} without a PDF",
+      "pasteError": "Invalid JSON: check line {{line}}.",
+      "pasteTooBig": "The pasted text is over 5 MB.",
+      "assign": "Assign a template to {{name}}",
+      "assignPlaceholder": "Assign…",
+      "pdfs": "PDFs",
+      "withTemplate": "with template",
+      "withoutTemplate": "without template"
+    },
+    "versionsDrop": {
+      "title": "New versions (B)",
+      "text": "Got redesigned PDFs? Drop them here and they are paired by name with each PDF in the batch.",
+      "choose": "Choose files",
+      "addedTitle": "B versions added: {{count}}",
+      "addedText": "The rest have no B version. You can drop more here.",
+      "more": "Add more",
+      "unpairedTitle": "Files without a match: {{count}}",
+      "unpairedText": "They do not match any PDF in the batch: assign them by hand or discard them.",
+      "assign": "Assign to…",
+      "assignLabel": "Assign {{name}} to a PDF",
+      "discard": "Discard"
+    },
+    "filter": {
+      "label": "Filter by state",
+      "all": "All {{count}}",
+      "review": "To review {{count}}",
+      "ready": "Ready {{count}}",
+      "noTemplate": "No template {{count}}"
+    },
+    "view": {
+      "label": "View type",
+      "grid": "Grid",
+      "list": "List"
+    },
+    "resume": {
+      "title": "Saved batch",
+      "text": "You have a batch of {{count}} PDFs in progress.",
+      "continue": "Continue the batch",
+      "discard": "Discard",
+      "discarded": "Batch discarded."
+    },
+    "uploadB": "Upload B",
+    "doc": {
+      "meta": "{{pages}} pg. · {{index}} of {{total}} in the batch",
+      "replace": "Replace…",
+      "replaceConfirm": "Replace this PDF with “{{name}}”? Annotations are kept.",
+      "replaceYes": "Replace",
+      "cancel": "Cancel",
+      "layers": "PDF layers",
+      "a": {
+        "title": "① Template of the original (A)",
+        "none": "No template",
+        "fields": "✓ {{count}} fields",
+        "hint": "The annotations of the original PDF. They are the base to edit this PDF or the reference for the new version.",
+        "upload": "Upload JSON",
+        "paste": "Paste JSON",
+        "change": "Change",
+        "pasteAnother": "Paste another",
+        "remove": "Remove",
+        "pasteLabel": "Paste the template JSON here",
+        "apply": "Apply",
+        "replacesNote": "Replaces the current annotations (can be undone).",
+        "error": {
+          "tooBig": "The JSON is larger than 5 MB.",
+          "json": "The JSON is not valid.",
+          "noPages": "No pages with fields were found in that JSON."
+        }
+      },
+      "b": {
+        "title": "② New version of the PDF (B)",
+        "none": "No new version",
+        "added": "✓ Added",
+        "hint": "If there is a redesigned PDF, add it and you edit on it with A as a reference.",
+        "drop": "Drop the new PDF",
+        "dropSub": "or click to browse",
+        "change": "Change",
+        "remove": "Remove",
+        "removeConfirm": "Remove version B? Its annotations are lost and the original PDF is edited again with its template.",
+        "removeYes": "Remove version B"
+      },
+      "noTemplateNote": "No template: you can load the original’s or add a new version in Document.",
+      "noTemplateGo": "Go to Document"
     }
   }
 }

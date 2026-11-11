@@ -1,0 +1,121 @@
+@if (vm.migration(); as m) {
+  <section class="migration-panel" [attr.aria-label]="'batch.panel.title' | t">
+    <div class="migration-panel__head">
+      <h5>{{ 'batch.panel.title' | t: { count: vm.annotationCount() } }}</h5>
+      @if (m.summary.missing + m.summary.new > 0) {
+        <span class="migration-chip migration-chip--on">{{
+          'batch.panel.toResolve' | t: { count: m.summary.missing }
+        }}</span>
+      } @else {
+        <span class="migration-chip">✓ {{ 'batch.panel.allSet' | t }}</span>
+      }
+    </div>
+
+    @if (vm.annotationCount() === 0 && m.item.aPages.length) {
+      <div class="migration-note">
+        <p>{{ 'batch.panel.emptyB' | t }}</p>
+        <button
+          type="button"
+          class="btn btn--primary"
+          (click)="vm.applyTemplateA('replace')"
+          data-testid="panel-put-a"
+        >
+          {{ 'batch.editor.putA.copy' | t }}
+        </button>
+      </div>
+    } @else if (!m.item.aPages.length) {
+      <p class="migration-note">{{ 'batch.panel.noTemplate' | t }}</p>
+    }
+
+    <ul class="migration-list" data-testid="migration-list">
+      @for (state of rows(); track rowKey(state)) {
+        <li class="migration-row" [attr.data-status]="state.status">
+          <button
+            type="button"
+            class="migration-row__name"
+            (click)="vm.focusField(state)"
+            [title]="state.name"
+          >
+            <span class="mono">{{ state.name || '—' }}</span>
+            @if (vm.pdfDoc && vm.pageCount > 1) {
+              <small>{{ 'batch.panel.page' | t: { page: state.page } }}</small>
+            }
+          </button>
+          <span class="migration-badge migration-badge--{{ state.status }}">{{
+            'batch.status.' + state.status | t
+          }}</span>
+          @if (state.status === 'missing') {
+            <span class="migration-row__actions">
+              <button
+                type="button"
+                class="btn"
+                (click)="vm.placeMissing(state)"
+                data-testid="place-missing"
+              >
+                {{ 'batch.panel.place' | t }}
+              </button>
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="vm.dismissMissing(state)"
+                data-testid="dismiss-missing"
+              >
+                {{ 'batch.panel.dismiss' | t }}
+              </button>
+            </span>
+          } @else if (state.status === 'new' && missingNames(m).length) {
+            <select
+              class="migration-row__link"
+              (change)="onLink(state, $event)"
+              [attr.aria-label]="'batch.panel.renameOf' | t"
+            >
+              <option value="">{{ 'batch.panel.renameOf' | t }}</option>
+              @for (name of missingNames(m); track name) {
+                <option [value]="name">{{ name }}</option>
+              }
+            </select>
+          } @else if (state.status === 'renamed') {
+            <span class="migration-row__actions">
+              <small class="migration-row__from">{{
+                'batch.panel.renamedFrom' | t: { name: state.a?.name }
+              }}</small>
+              <button type="button" class="btn btn--ghost" (click)="vm.unlinkField(state)">
+                {{ 'batch.panel.unlink' | t }}
+              </button>
+            </span>
+          }
+        </li>
+      }
+    </ul>
+
+    @if (m.summary.same > 0) {
+      <button
+        type="button"
+        class="btn btn--ghost migration-panel__toggle"
+        (click)="showSame.set(!showSame())"
+        [attr.aria-pressed]="showSame()"
+      >
+        {{
+          (showSame() ? 'batch.panel.hideSame' : 'batch.panel.showSame')
+            | t: { count: m.summary.same }
+        }}
+      </button>
+    }
+
+    @if (m.dismissed.length) {
+      <details class="migration-dismissed">
+        <summary>{{ 'batch.panel.dismissed' | t: { count: m.dismissed.length } }}</summary>
+        <ul>
+          @for (key of m.dismissed; track key) {
+            <li>
+              <span class="mono">{{ vm.dismissedLabel(key) }}</span>
+              <button type="button" class="btn btn--ghost" (click)="vm.restoreDismissed(key)">
+                {{ 'batch.panel.restore' | t }}
+              </button>
+            </li>
+          }
+        </ul>
+      </details>
+    }
+  </section>
+}

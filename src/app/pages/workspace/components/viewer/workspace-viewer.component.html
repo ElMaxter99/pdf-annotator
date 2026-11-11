@@ -1,4 +1,4 @@
-<main class="viewer" *ngIf="vm.pdfDoc as _">
+<main class="viewer" [class.viewer--split]="vm.splitActive()" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc as _">
   @if (vm.selectionCount() > 0) {
     <div class="selection-bar" role="toolbar" [attr.aria-label]="'selection.toolbar' | t">
       <span class="selection-bar__count">{{ 'selection.count' | t : { count: vm.selectionCount() } }}</span>
@@ -24,9 +24,20 @@
         [attr.title]="'selection.clear' | t" [attr.aria-label]="'selection.clear' | t">✕</button>
     </div>
   }
-  <div class="canvas-container" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
+  @if (vm.splitActive()) {
+    <div class="canvas-container canvas-container--split-a" data-testid="split-a">
+      <span class="split-tag">{{ 'batch.editor.split.tagA' | t }}</span>
+      <canvas #splitCanvas class="canvas"></canvas>
+      <div #splitLayer class="reference-layer" aria-hidden="true"></div>
+    </div>
+  }
+  <div class="canvas-container" [class.canvas-container--split-b]="vm.splitActive()" [class.canvas-container--reference-only]="vm.showingOnlyA() && !!vm.migration()" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
+    @if (vm.splitActive()) {
+      <span class="split-tag split-tag--b">{{ 'batch.editor.split.tagB' | t }}</span>
+    }
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
     <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
+    <div #referenceLayer class="reference-layer" aria-hidden="true"></div>
     <div #annotationsLayer class="annotations-layer"></div>
     <div class="hitbox" (click)="vm.onHitboxClick($event)" (pointerdown)="vm.onHitboxPointerDown($event)"
       (pointermove)="vm.onHitboxPointerMove($event)" (pointerup)="vm.onHitboxPointerUp($event)"

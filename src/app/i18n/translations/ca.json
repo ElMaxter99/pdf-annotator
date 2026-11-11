@@ -96,7 +96,11 @@
     "historyGroup": "Accions d'historial",
     "exportGroup": "Opcions d'exportació",
     "preferencesGroup": "Preferències",
-    "fitWidth": "Ajusta"
+    "fitWidth": "Ajusta",
+    "moreOptions": "Més opcions",
+    "clearConfirm": "Voleu treure totes les anotacions? Es pot desfer amb Ctrl+Z.",
+    "clearYes": "Treure-les totes",
+    "clearCancel": "Cancel·lar"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
@@ -307,6 +311,16 @@
       "outOfPage": "{{count}} anotació(ns) fora de la pàgina",
       "fontSize": "{{count}} mida(es) de font fora de 8–72",
       "opacity": "{{count}} opacitat(s) fora de 0,1–1"
+    },
+    "batch": {
+      "invalidFile": "{{count}} fitxer(s) ignorat(s): només s’admeten PDF i JSON.",
+      "jsonFailed": "No s’ha pogut llegir {{name}}: no és un JSON vàlid o és massa gran.",
+      "jsonNoPages": "{{name}} no té la col·lecció «pages»: el PDF entra sense plantilla.",
+      "jsonWithoutPdf": "{{count}} JSON sense PDF amb el mateix nom: s’han ignorat.",
+      "notPersistent": "Aquest navegador no pot desar el lot entre visites.",
+      "samePdf": "{{name}} és el mateix PDF que l’original: no hi ha res a migrar.",
+      "templateApplied": "Plantilla carregada: {{count}} camps.",
+      "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A."
     }
   },
   "session": {
@@ -335,6 +349,246 @@
     "distribute": {
       "horizontal": "Distribueix horitzontalment",
       "vertical": "Distribueix verticalment"
+    }
+  },
+  "batch": {
+    "subtitle": "Migració de plantilles",
+    "title": "Lot · {{count}} PDF",
+    "progressLabel": "Progrés del lot",
+    "readyCount": "{{ready}} de {{total}} llestos",
+    "downloadReady": "Descarrega els llestos ({{count}})",
+    "reviewNext": "Revisa el següent →",
+    "search": "Cerca pel nom",
+    "notPersistent": "Aquest navegador no pot desar el lot: no sobreviurà al tancament de la pestanya.",
+    "col": {
+      "state": "Estat",
+      "document": "Document",
+      "version": "Versió B"
+    },
+    "state": {
+      "ready": "Llest",
+      "review": "Per revisar",
+      "noTemplate": "Sense plantilla"
+    },
+    "editor": {
+      "regionLabel": "Migració del PDF actual",
+      "back": "Tauler",
+      "versionA": "A: {{name}}",
+      "editingB": "Editant la versió B",
+      "viewLabel": "Com veure A",
+      "view": {
+        "overlay": "Al damunt",
+        "toggle": "Alterna",
+        "split": "Dividida"
+      },
+      "holdHint": "Mantén la tecla A per veure només A",
+      "cancel": "Cancel·la",
+      "putA": {
+        "button": "Posa la plantilla A",
+        "copy": "Copia els camps d’A tal qual",
+        "copyText": "Mateixes coordenades. El més simple.",
+        "missing": "Només els que falten a B",
+        "missingText": "No toca el que ja has col·locat.",
+        "adjust": "Copia i ajusta per textos",
+        "soon": "aviat",
+        "adjustText": "Proposarà el desplaçament amb textos d’A i B.",
+        "confirmTitle": "B ja té camps",
+        "confirmText": "Vols substituir-los pels d’A o afegir només els que falten? Es pot desfer amb Ctrl+Z.",
+        "replace": "Substitueix-ho tot",
+        "addMissing": "Afegeix els que falten"
+      },
+      "ready": "Llest",
+      "readyMissing": "Llest · en falten {{count}}",
+      "readyDialog": {
+        "title": "Marcar {{name}} com a llest?",
+        "fields": "{{count}} camps a B",
+        "breakdown": "{{same}} iguals · {{moved}} moguts · {{renamed}} reanomenats · {{added}} nous",
+        "dismissed": "{{count}} camp(s) d’A descartat(s)",
+        "reopen": "Podràs reobrir-lo i canviar-lo quan vulguis.",
+        "confirm": "Marca com a llest",
+        "keep": "Continua editant",
+        "missing": "Queden {{count}} camps d'A sense col·locar a B."
+      },
+      "plain": "Editant amb la seva plantilla",
+      "navLabel": "Moure's pel lot",
+      "prev": "PDF anterior",
+      "next": "PDF següent",
+      "position": "{{index}} de {{total}}",
+      "split": {
+        "tagA": "A · original · només lectura",
+        "tagB": "B · versió nova · s’edita",
+        "sizeMismatch": "A i B no tenen la mateixa mida: les coordenades no coincideixen."
+      },
+      "noA": {
+        "hint": "A no té plantilla: es compara el seu PDF tal qual.",
+        "go": "Afegeix la plantilla A (Document)"
+      },
+      "pagesDiffer": "Diferent nombre de pàgines: B {{page}} de {{b}} · A {{pageA}} de {{a}}",
+      "toggle": {
+        "label": "Quina versió veure",
+        "b": "Veure B (s'edita)",
+        "a": "Veure A (original)"
+      },
+      "viewHint": {
+        "overlay": "Els camps d'A es dibuixen sobre B (només els que canvien)",
+        "toggle": "Canvia entre veure B i veure A, una versió cada cop",
+        "split": "A i B costat per costat, amb la mateixa pàgina i zoom"
+      }
+    },
+    "panel": {
+      "title": "Camps de B · {{count}}",
+      "toResolve": "Per resoldre {{count}}",
+      "allSet": "Tot resolt",
+      "emptyB": "B és buida. Posa la plantilla d’A i ajusta el que hagi canviat.",
+      "noTemplate": "Aquest PDF no té JSON d’A: B comença buida.",
+      "page": "pàg. {{page}}",
+      "place": "Col·loca a B",
+      "dismiss": "Descarta",
+      "renameOf": "És el canvi de nom de…",
+      "renamedFrom": "abans: {{name}}",
+      "unlink": "Desenllaça",
+      "showSame": "Mostra els {{count}} iguals",
+      "hideSame": "Amaga els {{count}} iguals",
+      "dismissed": "Descartats d’A ({{count}})",
+      "restore": "Recupera"
+    },
+    "status": {
+      "same": "Igual",
+      "moved": "Mogut",
+      "renamed": "Reanomenat",
+      "new": "Nou",
+      "missing": "Falta a B"
+    },
+    "loading": "Carregant el lot…",
+    "cancel": "Cancel·lar",
+    "back": "Enrere",
+    "open": "Obrir",
+    "review": "Revisar",
+    "remove": "Treure {{name}}",
+    "removeConfirm": "Voleu treure {{name}} del lot?",
+    "removeYes": "Sí, treure",
+    "uploadVersions": "Pujar versions B",
+    "panelHint": "Premeu un document per obrir-lo a l'editor. El que falta apareix primer.",
+    "allReady": {
+      "title": "Tots a punt!"
+    },
+    "steps": {
+      "label": "Passos del lot",
+      "pdfs": "Pujar PDF",
+      "templates": "Plantilles",
+      "required": "Obligatori",
+      "optional": "Opcional"
+    },
+    "step1": {
+      "title": "1 · Pujar els PDF",
+      "text": "Tots els documents que voleu treballar. Podeu afegir-ne més o treure'n algun.",
+      "drop": "Deixeu anar més PDF aquí",
+      "choose": "Triar fitxers",
+      "remove": "Treure {{name}}",
+      "next": "Següent: Plantilles →"
+    },
+    "step2": {
+      "title": "2 · Pujar les plantilles (JSON)",
+      "text": "Opcional. Un JSON per PDF, amb el mateix nom (factura.json per a factura.pdf). Sense plantilla, el PDF comença sense anotacions.",
+      "drop": "Deixeu anar els JSON aquí",
+      "none": "sense plantilla",
+      "badJson": "JSON no vàlid",
+      "noPages": "Sense pàgines",
+      "fields": "{{count}} camps",
+      "empty": "Buit",
+      "remove": "Treure la plantilla de {{name}}",
+      "skip": "Saltar aquest pas",
+      "next": "Obrir el tauler →",
+      "tabsLabel": "Com pujar les plantilles",
+      "tabFiles": "Fitxers",
+      "tabPaste": "Enganxar JSON",
+      "pastePlaceholder": "Enganxeu aquí les plantilles: un array, un document o diversos seguits (per exemple, el que extraieu de Mongo).",
+      "pasteHint": "S'aparella pel camp pdfName (o name, fileName, type). Els camps de Mongo s'ignoren; només compta pages.",
+      "pasteMatch": "Aparellar amb els PDF",
+      "pasteClear": "Netejar text",
+      "pasteFound": "{{count}} plantilles reconegudes",
+      "pasteUnused": "{{count}} sense PDF",
+      "pasteError": "JSON no vàlid: reviseu la línia {{line}}.",
+      "pasteTooBig": "El text enganxat supera els 5 MB.",
+      "assign": "Assignar plantilla a {{name}}",
+      "assignPlaceholder": "Assignar…",
+      "pdfs": "PDF",
+      "withTemplate": "amb plantilla",
+      "withoutTemplate": "sense plantilla"
+    },
+    "versionsDrop": {
+      "title": "Versions noves (B)",
+      "text": "Tens PDF redissenyats? Deixa'ls aquí i s'aparellen pel nom amb cada PDF del lot.",
+      "choose": "Tria fitxers",
+      "addedTitle": "Versions B afegides: {{count}}",
+      "addedText": "La resta continua sense versió B. Pots deixar-ne més aquí.",
+      "more": "Afegeix-ne més",
+      "unpairedTitle": "Fitxers sense parella: {{count}}",
+      "unpairedText": "No coincideixen amb cap PDF del lot: assigna'ls a mà o descarta'ls.",
+      "assign": "Assigna a…",
+      "assignLabel": "Assigna {{name}} a un PDF",
+      "discard": "Descarta"
+    },
+    "filter": {
+      "label": "Filtrar per estat",
+      "all": "Tots {{count}}",
+      "review": "Per revisar {{count}}",
+      "ready": "A punt {{count}}",
+      "noTemplate": "Sense plantilla {{count}}"
+    },
+    "view": {
+      "label": "Tipus de vista",
+      "grid": "Quadrícula",
+      "list": "Llista"
+    },
+    "resume": {
+      "title": "Lot desat",
+      "text": "Teniu un lot de {{count}} PDF a mitges.",
+      "continue": "Continuar el lot",
+      "discard": "Descartar",
+      "discarded": "Lot descartat."
+    },
+    "uploadB": "Pujar B",
+    "doc": {
+      "meta": "{{pages}} pàg. · {{index}} de {{total}} del lot",
+      "replace": "Reemplaça…",
+      "replaceConfirm": "Vols reemplaçar aquest PDF per «{{name}}»? Les anotacions es conserven.",
+      "replaceYes": "Reemplaça",
+      "cancel": "Cancel·la",
+      "layers": "Capes del PDF",
+      "a": {
+        "title": "① Plantilla de l’original (A)",
+        "none": "Sense plantilla",
+        "fields": "✓ {{count}} camps",
+        "hint": "Les anotacions del PDF original. Serveixen de base per editar aquest PDF o de referència per a la versió nova.",
+        "upload": "Puja JSON",
+        "paste": "Enganxa JSON",
+        "change": "Canvia",
+        "pasteAnother": "Enganxa’n una altra",
+        "remove": "Treu",
+        "pasteLabel": "Enganxa aquí el JSON de la plantilla",
+        "apply": "Aplica",
+        "replacesNote": "Substitueix les anotacions actuals (es pot desfer).",
+        "error": {
+          "tooBig": "El JSON supera els 5 MB.",
+          "json": "El JSON no és vàlid.",
+          "noPages": "No s’han trobat pàgines amb camps en aquest JSON."
+        }
+      },
+      "b": {
+        "title": "② Versió nova del PDF (B)",
+        "none": "Sense versió nova",
+        "added": "✓ Afegida",
+        "hint": "Si hi ha un PDF redissenyat, afegeix-lo i s’edita sobre ell amb A de referència.",
+        "drop": "Deixa anar el PDF nou",
+        "dropSub": "o fes clic per cercar-lo",
+        "change": "Canvia",
+        "remove": "Treu",
+        "removeConfirm": "Vols treure la versió B? Es perden les seves anotacions i es torna a editar el PDF original amb la seva plantilla.",
+        "removeYes": "Treu la versió B"
+      },
+      "noTemplateNote": "Sense plantilla: pots carregar la de l’original o afegir una versió nova a Document.",
+      "noTemplateGo": "Ves a Document"
     }
   }
 }

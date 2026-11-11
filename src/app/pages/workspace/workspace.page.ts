@@ -14,6 +14,7 @@ import {
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import { Language, TranslationService } from '../../i18n/translation.service';
@@ -50,9 +51,18 @@ import { ToastService } from '../../services/toast.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
 import { SessionStoreService } from '../../services/session-store.service';
+import { BatchStoreService } from '../../services/batch-store.service';
+import {
+  FieldState,
+  computeFieldStates,
+  fieldKey,
+  summarizeStates,
+} from '../../utils/migration.utils';
 import { PendingFileService, PendingRestore } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import type { BatchItem } from '../../models/batch.model';
+import { matchTemplate, parsePastedTemplates } from '../../utils/template-paste.utils';
 import {
   extractPagesCollection,
   normalizeFieldDecimals,
@@ -116,6 +126,8 @@ function supportsModuleWorkers(): boolean {
   }
 }
 
+const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
+
 const workerOptions = (pdfjsLib as any).GlobalWorkerOptions as {
   workerSrc?: string;
   workerType?: string;
@@ -165,7 +177,6 @@ type OverlayGuide = {
   position: number;
   highlighted?: boolean;
 };
-
 
 interface FontDropdownUiState {
   readonly open: boolean;
@@ -224,7 +235,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly sidebarMinimized = signal(false);
   readonly sidebarTab = signal<SidebarTab>('document');
   readonly annotationCount = computed(() =>
-    this.store.coords().reduce((total, page) => total + page.fields.length, 0)
+    this.store.coords().reduce((total, page) => total + page.fields.length, 0),
   );
   readonly shortcutsOpen = signal(false);
   private readonly translationService = inject(TranslationService);
@@ -236,9 +247,56 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private readonly toast = inject(ToastService);
   private readonly sessionStore = inject(SessionStoreService);
   private readonly store = inject(AnnotationStore);
+  private readonly router = inject(Router);
+  private readonly batch = inject(BatchStoreService);
   private readonly annotationImport = inject(AnnotationImportService);
   private readonly fontCatalog = inject(FontCatalogService);
   readonly coords = this.store.coords;
+
+  /** Batch migration: set while a PDF of the batch is open (B is edited, A is the reference). */
+  readonly referenceMode = signal<'overlay' | 'toggle' | 'split'>(this.storedReferenceMode());
+  /** Fields of A in the PDF open in the batch (0 = nothing to show or copy). */
+  readonly templateFieldsA = computed(
+    () => this.batch.activeItem()?.aPages.reduce((sum, page) => sum + page.fields.length, 0) ?? 0,
+  );
+  /** «Dividida» is on: A (read only) on the left, B (edited) on the right. */
+  readonly splitActive = computed(
+    () => !!this.migration() && this.referenceMode() === 'split',
+  );
+  /** A and B have a different page size, so their coordinates do not line up. */
+  readonly splitSizeMismatch = signal(false);
+  /** Page counts when A and B do not have the same number of pages (else null). */
+  readonly pagesDiffer = signal<{ a: number; b: number } | null>(null);
+  private splitDoc: { blob: Blob; doc: Promise<PDFDocumentProxy> } | null = null;
+  private splitToken = 0;
+  private referencePdfToken = 0;
+  private splitTask: { cancel: () => void } | null = null;
+  private scaleBeforeSplit: number | null = null;
+  readonly holdingReference = signal(false);
+  /** «Alternar»: A is shown instead of B until the user switches back. */
+  readonly viewingA = signal(false);
+  /** Only A is visible: the A key is held, or «Alternar» is showing A. */
+  readonly showingOnlyA = computed(
+    () => this.holdingReference() || (this.referenceMode() === 'toggle' && this.viewingA()),
+  );
+  readonly migration = computed(() => {
+    const item = this.batch.activeItem();
+    if (!item || !item.bPdf) {
+      return null; // without a new version there is nothing to compare: plain editing
+    }
+    const states = computeFieldStates(item.aPages, this.store.coords(), item.links, item.dismissed);
+    return { item, states, summary: summarizeStates(states), dismissed: item.dismissed };
+  });
+  /** Position of the open PDF inside the batch (also when it has no B). */
+  readonly batchCtx = computed(() => {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return null;
+    }
+    const items = this.batch.items();
+    return { item, index: items.findIndex((i) => i.id === item.id), total: items.length };
+  });
+  private batchSaveTimer: ReturnType<typeof setTimeout> | null = null;
   readonly customFontsFeatureEnabled = this.fontCatalog.customFontsFeatureEnabled;
   readonly customFonts = this.fontCatalog.customFonts;
   readonly fontOptions = this.fontCatalog.fontOptions;
@@ -291,7 +349,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     moved: boolean;
     dx: number;
     dy: number;
-    items: { el: HTMLElement; startLeft: number; startTop: number; width: number; fontPx: number }[];
+    items: {
+      el: HTMLElement;
+      startLeft: number;
+      startTop: number;
+      width: number;
+      fontPx: number;
+    }[];
   } | null = null;
 
   @ViewChild(WorkspaceHeaderComponent) private headerComponent?: WorkspaceHeaderComponent;
@@ -308,6 +372,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   get annotationsLayerRef(): ElementRef<HTMLDivElement> | undefined {
     return this.viewerComponent?.annotationsLayerRef;
+  }
+
+  get splitCanvasRef(): ElementRef<HTMLCanvasElement> | undefined {
+    return this.viewerComponent?.splitCanvasRef;
+  }
+
+  get splitLayerRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.viewerComponent?.splitLayerRef;
   }
 
   get pdfViewerRef(): ElementRef<HTMLDivElement> | undefined {
@@ -365,7 +437,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     event.preventDefault();
     this.setSidebarTab(SIDEBAR_TABS[next]);
     this.runAfterRender(() =>
-      this.document?.getElementById(`sidebar-tab-${SIDEBAR_TABS[next]}`)?.focus()
+      this.document?.getElementById(`sidebar-tab-${SIDEBAR_TABS[next]}`)?.focus(),
     );
   }
 
@@ -405,8 +477,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return this.sidebarComponent?.jsonTreeComponent;
   }
 
-
-
   constructor() {
     this.store.setFieldComparator((a, b) => this.areFieldsEqual(a, b));
     effect(() => {
@@ -414,6 +484,28 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.pageIndex();
       this.scale();
       untracked(() => this.scheduleSessionSave());
+    });
+    effect(() => {
+      this.store.coords();
+      untracked(() => this.scheduleBatchSave());
+    });
+    effect(() => {
+      this.migration();
+      this.referenceMode();
+      this.showingOnlyA();
+      untracked(() => this.redrawReference());
+    });
+    effect(() => {
+      const item = this.migration()?.item;
+      this.pageIndex();
+      untracked(() => void this.updatePagesDiffer(item?.aPdf ?? null));
+    });
+    effect(() => {
+      this.splitActive();
+      this.pageIndex();
+      this.scale();
+      this.batch.activeItem();
+      untracked(() => void this.renderSplit());
     });
     this.vm = this;
     this.setDocumentMetadata();
@@ -435,16 +527,21 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   ngOnInit(): void {
+    if (this.batch.activeItem()) {
+      this.sidebarTab.set('annotations'); // the state of every field lives there
+    }
     const pendingFile = this.pendingFileService.consumePendingFile();
     const pendingRestore = this.pendingFileService.consumePendingRestore();
     if (pendingFile) {
       this.loadPdfFile(pendingFile, pendingRestore).catch((error) =>
-        console.error('No se pudo cargar el PDF pendiente.', error)
+        console.error('No se pudo cargar el PDF pendiente.', error),
       );
     }
   }
 
   ngOnDestroy() {
+    this.flushBatchSave();
+    this.batch.deactivate();
     this.revokeThumbnailUrls();
     if (this.autoApplyCoordsTimer) {
       clearTimeout(this.autoApplyCoordsTimer);
@@ -472,7 +569,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     const normalized = this.fontCatalog.normalizeFontFamily(fontId);
     this.updateWorkingField(mode, (field) =>
-      this.ensureFieldStyle({ ...field, fontFamily: normalized })
+      this.ensureFieldStyle({ ...field, fontFamily: normalized }),
     );
     this.redrawAllForPage();
   }
@@ -613,7 +710,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         ...field,
         opacity:
           normalized ?? (typeof field.opacity === 'number' ? field.opacity : DEFAULT_OPACITY),
-      })
+      }),
     );
     this.redrawAllForPage();
   }
@@ -631,7 +728,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.updateWorkingField(mode, (field) =>
-      this.ensureFieldStyle({ ...field, backgroundColor: normalized })
+      this.ensureFieldStyle({ ...field, backgroundColor: normalized }),
     );
     this.redrawAllForPage();
   }
@@ -644,7 +741,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
     }
     this.updateWorkingField(mode, (field) =>
-      this.ensureFieldStyle({ ...field, backgroundColor: null })
+      this.ensureFieldStyle({ ...field, backgroundColor: null }),
     );
     this.redrawAllForPage();
   }
@@ -755,7 +852,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const removedFonts = this.customFonts();
-    const removedOptionIds = removedFonts.map((font) => this.fontCatalog.toCustomFontOptionId(font.id));
+    const removedOptionIds = removedFonts.map((font) =>
+      this.fontCatalog.toCustomFontOptionId(font.id),
+    );
     this.customFontsFeatureEnabled.set(false);
     if (removedOptionIds.length) {
       this.handleRemovedFontOptions(removedOptionIds);
@@ -774,7 +873,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       | 'snapToMargins'
       | 'snapToCenters'
       | 'snapToCustom',
-    checked: boolean
+    checked: boolean,
   ) {
     this.guideSettings.update((settings) => ({ ...settings, [key]: checked }));
     this.refreshOverlay();
@@ -852,7 +951,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private refreshOverlay(
     activeRect?: { left: number; top: number; width: number; height: number } | null,
-    guides?: OverlayGuide[]
+    guides?: OverlayGuide[],
   ) {
     if (activeRect !== undefined) {
       this.overlayDragRect = activeRect;
@@ -907,7 +1006,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     settings: GuideSettings,
     width: number,
     height: number,
-    scale: number
+    scale: number,
   ) {
     if (!settings.showGrid) {
       return;
@@ -944,7 +1043,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     settings: GuideSettings,
     width: number,
     height: number,
-    scale: number
+    scale: number,
   ) {
     if (!settings.showRulers) {
       return;
@@ -1011,7 +1110,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     settings: GuideSettings,
     width: number,
     height: number,
-    scale: number
+    scale: number,
   ) {
     ctx.save();
     ctx.lineWidth = 1;
@@ -1079,7 +1178,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     ctx: CanvasRenderingContext2D,
     width: number,
     height: number,
-    showAlignment: boolean
+    showAlignment: boolean,
   ) {
     const rect = this.overlayDragRect;
     if (!rect) {
@@ -1123,7 +1222,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       Math.round(rect.left) + 0.5,
       Math.round(rect.top) + 0.5,
       rect.width,
-      rect.height
+      rect.height,
     );
     ctx.restore();
   }
@@ -1134,7 +1233,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     bounds: { minLeft: number; maxLeft: number; minTop: number; maxTop: number },
     el: HTMLDivElement,
     pdfCanvas: HTMLCanvasElement,
-    fontSizePx: number
+    fontSizePx: number,
   ): { left: number; top: number; guides: OverlayGuide[] } {
     if (!this.guidesFeatureEnabled()) {
       return { left: baseLeft, top: baseTop, guides: [] };
@@ -1242,7 +1341,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const includeGuide = (
       orientation: 'vertical' | 'horizontal',
       cand: Candidate,
-      highlighted: boolean
+      highlighted: boolean,
     ) => {
       const key = `${orientation}-${cand.line.toFixed(2)}`;
       const existing = guideMap.get(key);
@@ -1403,7 +1502,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private applyRestoredSession(restore: PendingRestore) {
     const normalized = this.annotationImport.normalizeImportedCoordinates(
       { pages: restore.coords },
-      (field) => this.prepareFieldForStorage(field)
+      (field) => this.prepareFieldForStorage(field),
     );
     if (normalized === null) {
       this.toast.error(this.translationService.translate('toast.sessionRestoreFailed'));
@@ -1425,8 +1524,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const file = this.sessionFile;
-    if (!file || !this.pdfDoc || typeof window === 'undefined') {
-      return;
+    if (!file || !this.pdfDoc || typeof window === 'undefined' || this.batch.activeItem()) {
+      return; // a batch keeps its own copy; do not overwrite the last single-PDF session
     }
 
     const hasAnnotations = this.store.coords().length > 0;
@@ -1516,7 +1615,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       await this.fitWidth();
     }
     this.generatePageThumbnails().catch((error) =>
-      console.error('No se pudieron generar las miniaturas del documento.', error)
+      console.error('No se pudieron generar las miniaturas del documento.', error),
     );
     this.fileDropActive.set(false);
   }
@@ -1623,7 +1722,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
         const page = await doc.getPage(pageNumber);
         const baseViewport = page.getViewport({ scale: 1 });
-        const viewport = page.getViewport({ scale: this.computeThumbnailScale(baseViewport.width) });
+        const viewport = page.getViewport({
+          scale: this.computeThumbnailScale(baseViewport.width),
+        });
         const width = Math.max(1, Math.round(viewport.width));
         const height = Math.max(1, Math.round(viewport.height));
 
@@ -1639,13 +1740,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
         ctx.clearRect(0, 0, width, height);
 
-        await page
-          .render({
-            canvasContext: ctx as unknown as CanvasRenderingContext2D,
-            canvas: null,
-            viewport,
-          })
-          .promise;
+        await page.render({
+          canvasContext: ctx as unknown as CanvasRenderingContext2D,
+          canvas: null,
+          viewport,
+        }).promise;
 
         const blob = await canvas.convertToBlob({ type: 'image/png' });
         const url = URL.createObjectURL(blob);
@@ -1734,13 +1833,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     });
     this.updatePreviewColorState(defaultColor);
   }
-
-
-
-
-
-
-
 
   private updatePreviewColorState(color: string) {
     const hex = ensureHex(color);
@@ -1845,7 +1937,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const normalizedField = this.prepareFieldForStorage(p.field);
     if (
       this.applyCoordsChange(() =>
-        this.coords.update((pages) => addFieldToPages(p.page, normalizedField, pages))
+        this.coords.update((pages) => addFieldToPages(p.page, normalizedField, pages)),
       )
     ) {
       this.syncCoordsTextModel();
@@ -1870,8 +1962,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       if (
         this.applyCoordsChange(() =>
           this.coords.update((pages) =>
-            updateFieldInPages(pageIndex, fieldIndex, sanitized, pages)
-          )
+            updateFieldInPages(pageIndex, fieldIndex, sanitized, pages),
+          ),
         )
       ) {
         this.syncCoordsTextModel();
@@ -1897,8 +1989,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) =>
-          updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages)
-        )
+          updateFieldInPages(e.pageIndex, e.fieldIndex, normalized, pages),
+        ),
       )
     ) {
       this.syncCoordsTextModel();
@@ -2140,7 +2232,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!e) return;
     if (
       this.applyCoordsChange(() =>
-        this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages))
+        this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages)),
       )
     ) {
       this.syncCoordsTextModel();
@@ -2295,9 +2387,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-
-
-
   private updateWorkingField(mode: EditorMode, mutator: (field: PageField) => PageField) {
     if (mode === 'preview') {
       this.preview.update((state) => {
@@ -2321,12 +2410,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return nextField === state.field ? state : { ...state, field: nextField };
     });
   }
-
-
-
-
-
-
 
   private normalizeOpacityValue(value: unknown): number | undefined {
     const numeric = toFiniteNumber(value);
@@ -2384,8 +2467,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       hidden,
     };
   }
-
-
 
   private async registerCustomFont(file: File) {
     if (typeof FontFace === 'undefined') {
@@ -2474,8 +2555,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
             return styledField;
           });
           return pageChanged ? { ...page, fields: nextFields } : page;
-        })
-      )
+        }),
+      ),
     );
 
     if (changed) {
@@ -2505,7 +2586,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private computeHorizontalBounds(
     width: number,
-    canvasWidth: number
+    canvasWidth: number,
   ): { minLeft: number; maxLeft: number } {
     const elementWidth = Math.max(width, 0);
     const min = 0;
@@ -2589,7 +2670,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private locateJsonFieldRange(
     pageIndex: number,
     fieldIndex: number,
-    text: string
+    text: string,
   ): { start: number; end: number } | null {
     if (!text) {
       return null;
@@ -2655,7 +2736,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private highlightTextareaRange(
     textarea: HTMLTextAreaElement,
-    range: { start: number; end: number }
+    range: { start: number; end: number },
   ) {
     const { start, end } = range;
     if (start < 0 || end <= start) {
@@ -2782,8 +2863,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     el.style.width = `${width}px`;
   }
 
-
-
   private getFieldRenderValue(field: PageField): string {
     const override =
       typeof field.value === 'string' && field.value.trim() ? field.value : undefined;
@@ -2811,9 +2890,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     return baseText;
   }
-
-
-
 
   redrawAllForPage() {
     const layer = this.annotationsLayerRef?.nativeElement;
@@ -2843,7 +2919,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           el.style.fontSize = `${styledField.fontSize * scale}px`;
           el.style.color = styledField.color;
           el.style.fontFamily = this.fontCatalog.resolveCssFontFamily(
-            styledField.fontFamily ?? DEFAULT_FONT_ID
+            styledField.fontFamily ?? DEFAULT_FONT_ID,
           );
           el.style.opacity = `${styledField.opacity ?? DEFAULT_OPACITY}`;
           el.style.backgroundColor = styledField.backgroundColor ?? 'transparent';
@@ -2873,6 +2949,628 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       });
 
     this.refreshOverlay();
+    this.redrawReference();
+  }
+
+  // ---- batch migration (A = reference layer, B = what is edited) -------------------------------
+
+  get referenceLayerRef(): ElementRef<HTMLDivElement> | undefined {
+    return this.viewerComponent?.referenceLayerRef;
+  }
+
+  /** Paints the fields of A (read only) behind those of B. */
+  private redrawReference() {
+    const layer = this.referenceLayerRef?.nativeElement;
+    if (!layer) {
+      return;
+    }
+    layer.textContent = '';
+    const m = this.migration();
+    const canvas = this.pdfCanvasRef?.nativeElement;
+    if (!m || !canvas || this.splitActive()) {
+      return;
+    }
+    const onlyA = this.showingOnlyA();
+    if (!onlyA && this.referenceMode() === 'toggle') {
+      return;
+    }
+
+    const page = this.pageIndex();
+    const draw = (name: string, x: number, y: number, fontSize: number, missing: boolean) =>
+      this.drawReferenceField(layer, canvas.height, name, x, y, fontSize, missing, onlyA);
+
+    if (onlyA) {
+      void this.drawReferencePdf(layer, canvas);
+      for (const field of this.fieldsOfA(page)) {
+        draw(field.name, field.x, field.y, field.fontSize, field.missing);
+      }
+      return;
+    }
+
+    for (const state of m.states) {
+      if (state.page !== page || !state.a || state.status === 'same') {
+        continue;
+      }
+      draw(state.a.name, state.a.x, state.a.y, state.a.fontSize, state.status === 'missing');
+    }
+  }
+
+  /** Holding «A» swaps the page for the PDF of A, even when A has no template. */
+  private async drawReferencePdf(layer: HTMLElement, bCanvas: HTMLCanvasElement): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    const token = ++this.referencePdfToken;
+    try {
+      const doc = await this.splitDocOf(item.aPdf);
+      const page = await doc.getPage(Math.min(this.pageIndex(), doc.numPages));
+      const viewport = page.getViewport({ scale: this.scale() });
+      const canvas = document.createElement('canvas');
+      canvas.className = 'reference-pdf';
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      canvas.style.width = `${bCanvas.clientWidth || canvas.width}px`;
+      canvas.style.height = `${bCanvas.clientHeight || canvas.height}px`;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        return;
+      }
+      await page.render({ canvasContext: ctx, canvas, viewport }).promise;
+      if (token === this.referencePdfToken && this.showingOnlyA() && layer.isConnected) {
+        layer.querySelectorAll('.reference-pdf').forEach((old) => old.remove());
+        layer.prepend(canvas);
+      }
+    } catch {
+      /* the fields of A are still shown */
+    }
+  }
+
+  private async updatePagesDiffer(aPdf: Blob | null): Promise<void> {
+    if (!aPdf) {
+      this.pagesDiffer.set(null);
+      return;
+    }
+    try {
+      const a = (await this.splitDocOf(aPdf)).numPages;
+      const b = this.pdfDoc?.numPages ?? 0;
+      this.pagesDiffer.set(b > 0 && a !== b ? { a, b } : null);
+    } catch {
+      this.pagesDiffer.set(null);
+    }
+  }
+
+  private splitDocOf(blob: Blob): Promise<PDFDocumentProxy> {
+    if (!this.splitDoc || this.splitDoc.blob !== blob) {
+      const doc = blob
+        .arrayBuffer()
+        .then((buffer) => pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise);
+      this.splitDoc = { blob, doc };
+    }
+    return this.splitDoc.doc;
+  }
+
+  /** Every field of A on a page, flagged when B does not have it yet. */
+  private fieldsOfA(page: number) {
+    const m = this.migration();
+    if (!m) {
+      return [];
+    }
+    const out: { name: string; x: number; y: number; fontSize: number; missing: boolean }[] = [];
+    for (const aPage of m.item.aPages) {
+      if (aPage.num !== page) {
+        continue;
+      }
+      for (const field of aPage.fields) {
+        const name = (field.mapField || field.value || '').trim();
+        const missing = m.states.some(
+          (state) => state.status === 'missing' && state.page === page && state.name === name,
+        );
+        out.push({ name, x: field.x, y: field.y, fontSize: field.fontSize, missing });
+      }
+    }
+    return out;
+  }
+
+  private drawReferenceField(
+    layer: HTMLElement,
+    canvasHeight: number,
+    name: string,
+    x: number,
+    y: number,
+    fontSize: number,
+    missing: boolean,
+    solo: boolean,
+  ) {
+    const scale = this.scale();
+    const px = Number(x);
+    const py = Number(y);
+    const size = Math.max(6, Number(fontSize) || 12);
+    if (!Number.isFinite(px) || !Number.isFinite(py)) {
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'reference-field';
+    el.classList.toggle('reference-field--missing', missing);
+    el.classList.toggle('reference-field--solo', solo);
+    el.textContent = name;
+    el.title = name;
+    el.dataset['name'] = name;
+    el.style.left = `${px * scale}px`;
+    el.style.top = `${canvasHeight - py * scale - size * scale}px`;
+    el.style.height = `${size * scale * 1.2}px`;
+    el.style.minWidth = `${Math.max(24, name.length * size * 0.55 * scale)}px`;
+    el.style.fontSize = `${Math.max(9, size * scale * 0.8)}px`;
+    layer.appendChild(el);
+  }
+
+  private storedReferenceMode(): 'overlay' | 'toggle' | 'split' {
+    try {
+      const value =
+        typeof localStorage !== 'undefined' ? localStorage.getItem(REFERENCE_MODE_KEY) : null;
+      return value === 'toggle' || value === 'split' ? value : 'overlay';
+    } catch {
+      return 'overlay';
+    }
+  }
+
+  /** Changes how A is shown. «Dividida» also fits both pages in the viewer. */
+  async setReferenceMode(mode: 'overlay' | 'toggle' | 'split'): Promise<void> {
+    this.referenceMode.set(mode);
+    try {
+      localStorage.setItem(REFERENCE_MODE_KEY, mode);
+    } catch {
+      /* storage unavailable */
+    }
+    if (mode === 'split') {
+      await this.fitSplit();
+    } else if (this.scaleBeforeSplit !== null) {
+      this.scale.set(this.scaleBeforeSplit);
+      this.scaleBeforeSplit = null;
+      await this.render();
+      this.redrawAllForPage();
+    }
+  }
+
+  /** Zoom so that two pages fit side by side in the viewer. */
+  private async fitSplit(): Promise<void> {
+    const viewer = this.pdfViewerRef?.nativeElement.closest('.viewer') as HTMLElement | null;
+    if (!viewer || !this.pdfDoc) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve));
+    const page = await this.pdfDoc.getPage(this.pageIndex());
+    const baseWidth = page.getViewport({ scale: 1 }).width;
+    const style = getComputedStyle(viewer);
+    const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const available = (viewer.clientWidth - padding - 24) / 2;
+    if (!(baseWidth > 0) || !(available > 0)) {
+      return;
+    }
+    if (this.scaleBeforeSplit === null) {
+      this.scaleBeforeSplit = this.scale();
+    }
+    this.scale.set(Math.min(4, Math.max(0.25, Math.floor((available / baseWidth) * 100) / 100)));
+    await this.render();
+    this.redrawAllForPage();
+  }
+
+  /** «Dividida»: the field under the pointer (in A or in B) is highlighted in both panes. */
+  onSplitHover(event: MouseEvent): void {
+    if (!this.splitActive()) {
+      return;
+    }
+    const aLayer = this.splitLayerRef?.nativeElement;
+    const bLayer = this.annotationsLayerRef?.nativeElement;
+    if (!aLayer || !bLayer) {
+      return;
+    }
+    const hit = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return (
+        event.clientX >= r.left &&
+        event.clientX <= r.right &&
+        event.clientY >= r.top &&
+        event.clientY <= r.bottom
+      );
+    };
+    let name: string | null = null;
+    for (const el of Array.from(aLayer.querySelectorAll<HTMLElement>('.reference-field'))) {
+      if (hit(el)) {
+        name = el.dataset['name'] ?? null;
+        break;
+      }
+    }
+    if (name === null) {
+      const fields = this.coords().find((page) => page.num === this.pageIndex())?.fields ?? [];
+      for (const el of Array.from(bLayer.querySelectorAll<HTMLElement>('.annotation'))) {
+        if (hit(el)) {
+          const field = fields[Number(el.dataset['fieldIndex'])];
+          name = field ? (field.mapField || field.value || '').trim() : null;
+          break;
+        }
+      }
+    }
+    this.markPair(name);
+  }
+
+  clearSplitHover(): void {
+    this.markPair(null);
+  }
+
+  private markPair(name: string | null): void {
+    const aLayer = this.splitLayerRef?.nativeElement;
+    const bLayer = this.annotationsLayerRef?.nativeElement;
+    const fields = this.coords().find((page) => page.num === this.pageIndex())?.fields ?? [];
+    aLayer?.querySelectorAll<HTMLElement>('.reference-field').forEach((el) => {
+      el.classList.toggle('reference-field--pair', !!name && el.dataset['name'] === name);
+    });
+    bLayer?.querySelectorAll<HTMLElement>('.annotation').forEach((el) => {
+      const field = fields[Number(el.dataset['fieldIndex'])];
+      const own = field ? (field.mapField || field.value || '').trim() : '';
+      el.classList.toggle('annotation--pair', !!name && own === name);
+    });
+  }
+
+  /** Draws A (its PDF and its fields) in the left pane of «Dividida». */
+  private async renderSplit(): Promise<void> {
+    const token = ++this.splitToken;
+    const item = this.batch.activeItem();
+    if (!this.splitActive() || !item) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve));
+    const canvas = this.splitCanvasRef?.nativeElement;
+    const layer = this.splitLayerRef?.nativeElement;
+    if (!canvas || !layer || token !== this.splitToken) {
+      return;
+    }
+    try {
+      const doc = await this.splitDocOf(item.aPdf);
+      const pageNumber = Math.min(this.pageIndex(), doc.numPages);
+      const page = await doc.getPage(pageNumber);
+      const viewport = page.getViewport({ scale: this.scale() });
+      const ctx = canvas.getContext('2d');
+      if (!ctx || token !== this.splitToken) {
+        return;
+      }
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      // pdf.js refuses two renders at once on a canvas: the newer one cancels the older.
+      this.splitTask?.cancel();
+      const task = page.render({ canvasContext: ctx, canvas, viewport });
+      this.splitTask = task;
+      try {
+        await task.promise;
+      } catch {
+        return; // cancelled by a newer render, which draws the fields
+      }
+      if (token !== this.splitToken) {
+        return;
+      }
+      layer.textContent = '';
+      for (const field of this.fieldsOfA(this.pageIndex())) {
+        this.drawReferenceField(
+          layer,
+          canvas.height,
+          field.name,
+          field.x,
+          field.y,
+          field.fontSize,
+          field.missing,
+          false,
+        );
+      }
+      const bCanvas = this.pdfCanvasRef?.nativeElement;
+      const bPage = this.pdfDoc ? await this.pdfDoc.getPage(this.pageIndex()) : null;
+      const bWidth = bPage?.getViewport({ scale: 1 }).width ?? 0;
+      const aWidth = page.getViewport({ scale: 1 }).width;
+      this.splitSizeMismatch.set(!!bCanvas && Math.abs(aWidth - bWidth) > 2);
+    } catch (error) {
+      console.warn('No se pudo dibujar la versión A en la vista dividida.', error);
+    }
+  }
+
+  private normalizedTemplateA(): PageAnnotations[] {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return [];
+    }
+    return (
+      this.annotationImport.normalizeImportedCoordinates({ pages: item.aPages }, (field) =>
+        this.prepareFieldForStorage(field),
+      ) ?? []
+    );
+  }
+
+  /** Puts A's template into B: everything (replaces B) or only what B still lacks. One undo step. */
+  applyTemplateA(mode: 'replace' | 'missing') {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    if (mode === 'replace') {
+      this.replaceCoords(this.normalizedTemplateA());
+      return;
+    }
+    this.addMissingFromA(
+      this.migration()?.states.filter((state) => state.status === 'missing') ?? [],
+    );
+  }
+
+  placeMissing(state: FieldState) {
+    this.addMissingFromA([state]);
+  }
+
+  private addMissingFromA(states: readonly FieldState[]) {
+    const template = this.normalizedTemplateA();
+    const toAdd: Array<{ page: number; field: PageField }> = [];
+    for (const state of states) {
+      const source = template
+        .find((page) => page.num === state.page)
+        ?.fields.find(
+          (field) =>
+            (field.mapField || field.value || '').trim() === state.name &&
+            field.x === state.a?.x &&
+            field.y === state.a?.y,
+        );
+      if (source) {
+        toAdd.push({ page: state.page, field: { ...source } });
+      }
+    }
+    if (!toAdd.length) {
+      return;
+    }
+    const changed = this.applyCoordsChange(() => {
+      let pages = this.coords();
+      for (const { page, field } of toAdd) {
+        pages = addFieldToPages(page, field, pages);
+      }
+      this.coords.set(pages);
+    });
+    if (changed) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
+    }
+  }
+
+  dismissMissing(state: FieldState) {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.dismiss(item.id, fieldKey(state.page, state.name));
+    }
+  }
+
+  restoreDismissed(key: string) {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.restore(item.id, key);
+    }
+  }
+
+  dismissedLabel(key: string): string {
+    const separator = key.indexOf('|');
+    return separator >= 0 ? key.slice(separator + 1) : key;
+  }
+
+  linkField(state: FieldState, aName: string) {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.link(item.id, { page: state.page, b: state.name, a: aName });
+    }
+  }
+
+  unlinkField(state: FieldState) {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.unlink(item.id, state.page, state.name);
+    }
+  }
+
+  /** Goes to the field's page and selects it in B (missing fields only change the page). */
+  async focusField(state: FieldState) {
+    if (state.page !== this.pageIndex()) {
+      await this.setPageIndex(state.page);
+    }
+    if (state.b) {
+      this.selection.set({ pageIndex: state.b.pageIndex, fields: [state.b.fieldIndex] });
+      this.redrawAllForPage();
+    }
+  }
+
+  private scheduleBatchSave() {
+    if (this.batchSaveTimer) {
+      clearTimeout(this.batchSaveTimer);
+      this.batchSaveTimer = null;
+    }
+    if (!this.batch.activeItem() || !this.pdfDoc || typeof window === 'undefined') {
+      return;
+    }
+    this.batchSaveTimer = setTimeout(() => {
+      this.batchSaveTimer = null;
+      this.flushBatchSave();
+    }, 300);
+  }
+
+  /** Stores B in the batch. Skips the write when nothing changed so opening never un-validates. */
+  private flushBatchSave(force = false) {
+    if (this.batchSaveTimer) {
+      clearTimeout(this.batchSaveTimer);
+      this.batchSaveTimer = null;
+    }
+    const item = this.batch.activeItem();
+    if (!item || !this.pdfDoc) {
+      return;
+    }
+    const pages = this.store.snapshot();
+    const json = JSON.stringify(this.buildJsonExportPayload(pages), null, 2);
+    if (!force && json === item.bJson) {
+      return;
+    }
+    this.batch.saveB(item.id, pages, json);
+  }
+
+  /** Moves to the previous (-1) or next (+1) PDF of the batch without leaving the editor. */
+  async goBatchItem(delta: number) {
+    const ctx = this.batchCtx();
+    if (!ctx) {
+      return;
+    }
+    const target = this.batch.items()[ctx.index + delta];
+    if (!target) {
+      return;
+    }
+    this.flushBatchSave();
+    this.batch.activate(target.id);
+    this.clearSelection();
+    await this.openBatchPdf(target);
+  }
+
+  /** Loads the PDF to edit for a batch item: B when it has one, otherwise A with its template. */
+  private async openBatchPdf(
+    item: BatchItem,
+    coordsOverride: PageAnnotations[] | null = null,
+  ): Promise<void> {
+    const file = new File([item.bPdf ?? item.aPdf], item.bName ?? item.name, {
+      type: 'application/pdf',
+    });
+    const coords = coordsOverride ?? item.bPages ?? (item.bPdf ? null : item.aPages);
+    await this.loadPdfFile(file, coords ? { coords, pageIndex: 1, scale: 0.75 } : null);
+  }
+
+  /** «Documento» tab of a batch PDF: swaps the PDF being edited and keeps its annotations. */
+  async batchReplacePdf(file: File): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    if (!isPdfFile(file)) {
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
+    this.flushBatchSave(true);
+    this.batch.replacePdf(item.id, file);
+    this.clearSelection();
+    const updated = this.batch.activeItem();
+    if (updated) {
+      await this.openBatchPdf(updated, this.store.snapshot());
+    }
+  }
+
+  /** Adds the new version (B). Annotations already placed become the template A if it was empty. */
+  async batchAddVersionB(file: File): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    if (!isPdfFile(file)) {
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
+    const placed = this.store.snapshot();
+    if (
+      !item.bPdf &&
+      !item.aPages.some((page) => page.fields.length) &&
+      placed.some((p) => p.fields.length)
+    ) {
+      this.batch.setTemplate(item.id, placed);
+      this.toast.show(this.translationService.translate('toast.batch.templateFromAnnotations'));
+    }
+    this.batch.setB(item.id, file);
+    this.clearSelection();
+    const updated = this.batch.activeItem();
+    if (updated) {
+      await this.openBatchPdf(updated);
+    }
+  }
+
+  /** Drops B and goes back to editing the original PDF with its template. */
+  async batchRemoveVersionB(): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    this.batch.removeB(item.id);
+    this.clearSelection();
+    const updated = this.batch.activeItem();
+    if (updated) {
+      await this.openBatchPdf(updated);
+    }
+  }
+
+  /**
+   * Sets the template A from a JSON file or pasted text. Returns an error key, or `null` when it
+   * worked. Without B the template is also loaded into the editor (one undo step).
+   */
+  async batchSetTemplate(
+    source: { file: File } | { text: string },
+  ): Promise<'tooBig' | 'json' | 'noPages' | null> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return null;
+    }
+    let data: unknown;
+    try {
+      if ('file' in source) {
+        if (source.file.size > 5 * 1024 * 1024) {
+          return 'tooBig';
+        }
+        data = parseLooseJson(await source.file.text());
+      } else {
+        if (source.text.length > 5 * 1024 * 1024) {
+          return 'tooBig';
+        }
+        const { templates, error } = parsePastedTemplates(source.text);
+        if (error) {
+          return 'json';
+        }
+        data = (matchTemplate(item.name, templates, new Set()) ?? templates[0])?.data;
+        if (data === undefined) {
+          return 'noPages';
+        }
+      }
+    } catch {
+      return 'json';
+    }
+    const pages = this.annotationImport.normalizeImportedCoordinates(data, (field) => field);
+    if (pages === null) {
+      return 'noPages';
+    }
+    const count = pages.reduce((sum, page) => sum + page.fields.length, 0);
+    if (count === 0) {
+      return 'noPages';
+    }
+    this.batch.setTemplate(item.id, pages);
+    if (!item.bPdf) {
+      this.replaceCoords(this.normalizedTemplateA());
+    } else {
+      this.redrawReference();
+    }
+    this.toast.show(this.translationService.translate('toast.batch.templateApplied', { count }));
+    return null;
+  }
+
+  batchRemoveTemplate(): void {
+    const item = this.batch.activeItem();
+    if (item) {
+      this.batch.setTemplate(item.id, []);
+      this.redrawReference();
+    }
+  }
+
+  async backToBatch() {
+    this.flushBatchSave();
+    await this.router.navigate(['/lote']);
+  }
+
+  async markReady() {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    this.flushBatchSave(true);
+    this.batch.setStatus(item.id, 'ready');
+    await this.router.navigate(['/lote']);
   }
 
   isSelected(pageIndex: number, fieldIndex: number): boolean {
@@ -2908,8 +3606,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (pageIndex < 0) {
       return;
     }
-    const fields = this.coords()[pageIndex].fields
-      .map((field, index) => ({ field, index }))
+    const fields = this.coords()
+      [pageIndex].fields.map((field, index) => ({ field, index }))
       .filter(({ field }) => !field.locked)
       .map(({ index }) => index);
     this.dismissEditors();
@@ -2959,7 +3657,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Rubber-band rectangle (px, relative to the page) while dragging on an empty area. */
   readonly lasso = signal<{ left: number; top: number; width: number; height: number } | null>(
-    null
+    null,
   );
   private lassoDrag: {
     pointerId: number;
@@ -3038,7 +3736,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         const r = el.getBoundingClientRect();
         return r.right >= x1 && r.left <= x2 && r.bottom >= y1 && r.top <= y2;
       })
-      .map((el) => ({ pageIndex: Number(el.dataset['pageIndex']), field: Number(el.dataset['fieldIndex']) }));
+      .map((el) => ({
+        pageIndex: Number(el.dataset['pageIndex']),
+        field: Number(el.dataset['fieldIndex']),
+      }));
 
     const previous = this.selection();
     const pageIndex = hit[0]?.pageIndex ?? previous?.pageIndex ?? 0;
@@ -3063,7 +3764,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         x: this.roundToTwo(this.clamp(field.x + dx, 0, maxX)),
         y: this.roundToTwo(this.clamp(field.y + dy, 0, maxY)),
       }),
-      coalesceKey
+      coalesceKey,
     );
   }
 
@@ -3079,10 +3780,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           .map((page, index) =>
             index === selected.pageIndex
               ? { ...page, fields: page.fields.filter((_, i) => !doomed.has(i)) }
-              : page
+              : page,
           )
-          .filter((page) => page.fields.length > 0)
-      )
+          .filter((page) => page.fields.length > 0),
+      ),
     );
     this.selection.set(null);
     if (changed) {
@@ -3136,7 +3837,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         const existing = pages.find((page) => page.num === pageNum);
         firstIndex = existing ? existing.fields.length : 0;
         return copies.reduce((acc, copy) => addFieldToPages(pageNum, copy, acc), pages);
-      })
+      }),
     );
     if (!changed) {
       return false;
@@ -3165,7 +3866,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Applies `update` to every selected field in a single history step. */
   private updateSelectedFields(
     update: (field: PageField, order: number) => PageField,
-    coalesceKey?: string
+    coalesceKey?: string,
   ): void {
     const selected = this.selection();
     if (!selected) {
@@ -3181,12 +3882,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
               : {
                   ...page,
                   fields: page.fields.map((field, fieldIdx) =>
-                    order.has(fieldIdx) ? update(field, order.get(fieldIdx)!) : field
+                    order.has(fieldIdx) ? update(field, order.get(fieldIdx)!) : field,
                   ),
-                }
-          )
+                },
+          ),
         ),
-      coalesceKey ? { coalesceKey } : undefined
+      coalesceKey ? { coalesceKey } : undefined,
     );
     if (changed) {
       this.syncCoordsTextModel();
@@ -3197,7 +3898,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Rendered width of an annotation in px (falls back to a rough estimate before first paint). */
   private annotationWidthPx(pageIndex: number, fieldIndex: number, field: PageField): number {
     const el = this.annotationsLayerRef?.nativeElement.querySelector<HTMLElement>(
-      `[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`
+      `[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`,
     );
     if (el && el.offsetWidth > 0) {
       return el.offsetWidth;
@@ -3215,9 +3916,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     const items = fields
-      .map((index) =>
-        layer.querySelector<HTMLElement>(`[data-field-index="${index}"]`)
-      )
+      .map((index) => layer.querySelector<HTMLElement>(`[data-field-index="${index}"]`))
       .filter((el): el is HTMLElement => !!el)
       .map((el) => ({
         el,
@@ -3307,7 +4006,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private handleLockedAnnotationPointerDown(
     evt: PointerEvent,
     pageIndex: number,
-    fieldIndex: number
+    fieldIndex: number,
   ) {
     evt.preventDefault();
     evt.stopPropagation();
@@ -3384,7 +4083,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           width: el.offsetWidth,
           height: el.offsetHeight,
         },
-        []
+        [],
       );
     } else {
       this.refreshOverlay(null, []);
@@ -3414,7 +4113,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const horizontalBounds = this.computeHorizontalBounds(elementWidth, pdfCanvas.width);
     const clampedLeft = Math.min(
       Math.max(tentativeLeft, horizontalBounds.minLeft),
-      horizontalBounds.maxLeft
+      horizontalBounds.maxLeft,
     );
     const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
 
@@ -3433,7 +4132,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       { minLeft: horizontalBounds.minLeft, maxLeft: horizontalBounds.maxLeft, minTop, maxTop },
       el,
       pdfCanvas,
-      this.dragInfo.fontSize
+      this.dragInfo.fontSize,
     );
 
     el.style.left = `${snapResult.left}px`;
@@ -3446,7 +4145,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         width: el.offsetWidth,
         height: el.offsetHeight,
       },
-      snapResult.guides
+      snapResult.guides,
     );
   };
 
@@ -3482,7 +4181,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         left,
         top,
         drag.fontSize,
-        drag.width || el.offsetWidth
+        drag.width || el.offsetWidth,
       );
     } else if (evt.type !== 'pointercancel') {
       const page = this.coords()[drag.pageIndex];
@@ -3499,7 +4198,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     leftPx: number,
     topPx: number,
     fontSizePx: number,
-    widthPx: number
+    widthPx: number,
   ) {
     const pdfCanvas = this.pdfCanvasRef?.nativeElement;
     if (!pdfCanvas) return;
@@ -3528,11 +4227,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           const updatedFields = page.fields.map((currentField, fIdx) =>
             fIdx === fieldIndex
               ? this.ensureFieldStyle({ ...currentField, x: newX, y: newY })
-              : currentField
+              : currentField,
           );
           return { ...page, fields: updatedFields };
-        })
-      )
+        }),
+      ),
     );
 
     if (changed) {
@@ -3547,10 +4246,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
-    const clamped = Math.min(
-      this.pdfDoc.numPages,
-      Math.max(1, Math.round(pageNumber))
-    );
+    const clamped = Math.min(this.pdfDoc.numPages, Math.max(1, Math.round(pageNumber)));
 
     if (clamped === this.pageIndex()) {
       return;
@@ -3685,7 +4381,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const normalized = this.annotationImport.normalizeImportedCoordinates(
         parsed,
         (field) => this.prepareFieldForStorage(field),
-        report
+        report,
       );
 
       if (normalized === null) {
@@ -3734,7 +4430,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const normalized = this.annotationImport.normalizeImportedCoordinates(
         parsed,
         (field) => this.prepareFieldForStorage(field),
-        report
+        report,
       );
       if (normalized === null) {
         throw new JsonShapeError();
@@ -3821,7 +4517,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.redrawAllForPage();
   }
 
-
   private ensureCoordsFileInput(): HTMLInputElement | null {
     if (this.coordsFileInputFallback) {
       return this.coordsFileInputFallback;
@@ -3895,7 +4590,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       .map((entry) => entry.bytes.slice());
   }
 
-
   private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
     if (!data) return;
     const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
@@ -3925,9 +4619,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     };
   }
 
-  private serializePageForJson(
-    page: PageAnnotations
-  ): { num: number; fields: Array<Record<string, unknown>> } {
+  private serializePageForJson(page: PageAnnotations): {
+    num: number;
+    fields: Array<Record<string, unknown>>;
+  } {
     return {
       num: page.num,
       fields: page.fields.map((field) => this.serializeFieldForJson(field)),
@@ -3956,7 +4651,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private replaceCoords(
     newCoords: PageAnnotations[],
-    options?: { skipHistory?: boolean; preserveTextModel?: boolean }
+    options?: { skipHistory?: boolean; preserveTextModel?: boolean },
   ) {
     const snapshot = this.snapshotCoords(newCoords);
     this.selection.set(null);
@@ -3978,7 +4673,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private resetHistory() {
     this.store.resetHistory();
   }
-
 
   private areFieldsEqual(a: PageField, b: PageField): boolean {
     const sanitizedA = this.prepareFieldForStorage(a);
@@ -4044,7 +4738,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         }
         const { width, height } = (await doc.getPage(page.num)).getViewport({ scale: 1 });
         outOfPage += page.fields.filter(
-          (field) => field.x < 0 || field.y < 0 || field.x > width || field.y > height
+          (field) => field.x < 0 || field.y < 0 || field.x > width || field.y > height,
         ).length;
       }
     }
@@ -4073,19 +4767,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         this.translationService.translate('toast.importJsonFailedAt', {
           line: error.line,
           column: error.column,
-        })
+        }),
       );
       return;
     }
 
-    const key = error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
+    const key =
+      error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
     this.toast.error(this.translationService.translate(key));
   }
-
-
-
-
-
 
   private isEditableElement(target: EventTarget | null): boolean {
     const el = target as HTMLElement | null;

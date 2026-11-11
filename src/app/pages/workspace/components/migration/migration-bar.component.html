@@ -1,0 +1,213 @@
+@if (vm.batchCtx(); as ctx) {
+  <div class="migration-bar" role="region" [attr.aria-label]="'batch.editor.regionLabel' | t">
+    <button
+      type="button"
+      class="btn btn--ghost"
+      (click)="vm.backToBatch()"
+      data-testid="back-to-batch"
+    >
+      ‹ {{ 'batch.editor.back' | t }}
+    </button>
+    <div class="migration-bar__file">
+      <strong>{{ ctx.item.bName ?? ctx.item.name }}</strong>
+      @if (vm.migration()) {
+        <small>{{ 'batch.editor.versionA' | t: { name: ctx.item.name } }}</small>
+      } @else {
+        <small>{{ 'batch.editor.plain' | t }}</small>
+      }
+    </div>
+    @if (vm.migration()) {
+      <span class="migration-chip migration-chip--on">{{ 'batch.editor.editingB' | t }}</span>
+    }
+    <div class="migration-nav" role="group" [attr.aria-label]="'batch.editor.navLabel' | t">
+      <button type="button" class="btn btn--ghost" [disabled]="ctx.index === 0" (click)="vm.goBatchItem(-1)" [attr.aria-label]="'batch.editor.prev' | t" data-testid="batch-prev">‹</button>
+      <span class="migration-bar__count" data-testid="batch-position">{{ 'batch.editor.position' | t: { index: ctx.index + 1, total: ctx.total } }}</span>
+      <button type="button" class="btn btn--ghost" [disabled]="ctx.index === ctx.total - 1" (click)="vm.goBatchItem(1)" [attr.aria-label]="'batch.editor.next' | t" data-testid="batch-next">›</button>
+    </div>
+    <span class="migration-bar__spacer"></span>
+
+    @if (vm.migration(); as m) {
+
+    <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t" [attr.title]="'batch.editor.holdHint' | t">
+      @for (mode of modes; track mode) {
+        <button
+          type="button"
+          [class.migration-seg__on]="vm.referenceMode() === mode"
+          [attr.aria-pressed]="vm.referenceMode() === mode"
+          (click)="vm.setReferenceMode(mode)"
+          [attr.title]="'batch.editor.viewHint.' + mode | t"
+          [attr.data-testid]="'mode-' + mode"
+        >
+          {{ 'batch.editor.view.' + mode | t }}
+        </button>
+      }
+    </div>
+
+    @if (vm.referenceMode() === 'toggle') {
+      <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.toggle.label' | t">
+        <button type="button" [class.migration-seg__on]="!vm.viewingA()" [attr.aria-pressed]="!vm.viewingA()" (click)="vm.viewingA.set(false)" data-testid="toggle-b">{{ 'batch.editor.toggle.b' | t }}</button>
+        <button type="button" [class.migration-seg__on]="vm.viewingA()" [attr.aria-pressed]="vm.viewingA()" (click)="vm.viewingA.set(true)" data-testid="toggle-a">{{ 'batch.editor.toggle.a' | t }}</button>
+      </div>
+    }
+
+    <div class="migration-menu">
+      <button
+        type="button"
+        class="btn"
+        aria-haspopup="true"
+        [attr.aria-label]="'batch.editor.putA.button' | t"
+        [attr.title]="'batch.editor.putA.button' | t"
+        [attr.aria-expanded]="menuOpen()"
+        (click)="toggleMenu()"
+        [disabled]="vm.templateFieldsA() === 0"
+        data-testid="put-template-a"
+      >
+        <span class="migration-put__long">{{ 'batch.editor.putA.button' | t }}</span
+        ><span class="migration-put__short" aria-hidden="true">A</span> ▾
+      </button>
+      @if (menuOpen()) {
+        <div class="migration-menu__panel" role="menu">
+          @if (confirmMode()) {
+            <p class="migration-menu__confirm">
+              <strong>{{ 'batch.editor.putA.confirmTitle' | t }}</strong
+              ><br />{{ 'batch.editor.putA.confirmText' | t }}
+            </p>
+            <div class="migration-menu__row">
+              <button
+                type="button"
+                class="btn btn--primary"
+                (click)="confirmReplace()"
+                data-testid="put-a-confirm"
+              >
+                {{ 'batch.editor.putA.replace' | t }}
+              </button>
+              <button type="button" class="btn" (click)="putMissing()">
+                {{ 'batch.editor.putA.addMissing' | t }}
+              </button>
+              <button type="button" class="btn btn--ghost" (click)="closeMenu()">
+                {{ 'batch.editor.cancel' | t }}
+              </button>
+            </div>
+          } @else {
+            <button
+              type="button"
+              role="menuitem"
+              class="migration-menu__item"
+              (click)="putCopy()"
+              data-testid="put-a-copy"
+            >
+              <strong>{{ 'batch.editor.putA.copy' | t }}</strong>
+              <small>{{ 'batch.editor.putA.copyText' | t }}</small>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              class="migration-menu__item"
+              (click)="putMissing()"
+              data-testid="put-a-missing"
+            >
+              <strong>{{ 'batch.editor.putA.missing' | t }}</strong>
+              <small>{{ 'batch.editor.putA.missingText' | t }}</small>
+            </button>
+            <button type="button" role="menuitem" class="migration-menu__item" disabled>
+              <strong
+                >{{ 'batch.editor.putA.adjust' | t }}
+                <em>{{ 'batch.editor.putA.soon' | t }}</em></strong
+              >
+              <small>{{ 'batch.editor.putA.adjustText' | t }}</small>
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    }
+
+    @if (vm.migration(); as m) {
+      <button
+        type="button"
+        class="btn btn--primary"
+        (click)="openReady()"
+        data-testid="mark-ready"
+      >
+        @if (m.summary.missing > 0) {
+          {{ 'batch.editor.readyMissing' | t: { count: m.summary.missing } }}
+        } @else {
+          {{ 'batch.editor.ready' | t }}
+        }
+      </button>
+    } @else {
+      <button type="button" class="btn btn--primary" (click)="confirmReady()" data-testid="mark-ready">
+        {{ 'batch.editor.ready' | t }}
+      </button>
+    }
+  </div>
+  <div class="migration-hints">
+    @if (vm.migration() && vm.templateFieldsA() === 0) {
+      <div class="migration-hint" role="status" data-testid="no-template-a">
+        <span>{{ 'batch.editor.noA.hint' | t }}</span>
+        <button type="button" class="btn btn--ghost" (click)="vm.setSidebarTab('document')">
+          {{ 'batch.editor.noA.go' | t }}
+        </button>
+      </div>
+    }
+    @if (vm.pagesDiffer(); as pages) {
+      <div class="migration-hint" role="status" data-testid="pages-differ">
+        <span>{{
+          'batch.editor.pagesDiffer'
+            | t: { page: vm.pageIndex(), b: pages.b, pageA: vm.pageIndex() > pages.a ? pages.a : vm.pageIndex(), a: pages.a }
+        }}</span>
+      </div>
+    }
+    @if (vm.splitActive() && vm.splitSizeMismatch()) {
+      <div class="migration-hint migration-hint--warn" role="status" data-testid="split-size-mismatch">
+        <span>{{ 'batch.editor.split.sizeMismatch' | t }}</span>
+      </div>
+    }
+  </div>
+
+  @if (readyOpen() && vm.migration(); as m) {
+    <div class="migration-backdrop" (click)="readyOpen.set(false)"></div>
+    <div class="migration-dialog" role="dialog" aria-modal="true" aria-labelledby="ready-title">
+      <h2 id="ready-title">{{ 'batch.editor.readyDialog.title' | t: { name: m.item.bName } }}</h2>
+      <ul>
+        <li>{{ 'batch.editor.readyDialog.fields' | t: { count: vm.annotationCount() } }}</li>
+        <li>
+          {{
+            'batch.editor.readyDialog.breakdown'
+              | t
+                : {
+                    same: m.summary.same,
+                    moved: m.summary.moved,
+                    renamed: m.summary.renamed,
+                    added: m.summary.new,
+                  }
+          }}
+        </li>
+        @if (m.summary.missing > 0) {
+          <li class="migration-dialog__warn">
+            {{ 'batch.editor.readyDialog.missing' | t: { count: m.summary.missing } }}
+          </li>
+        }
+        @if (m.dismissed.length) {
+          <li>{{ 'batch.editor.readyDialog.dismissed' | t: { count: m.dismissed.length } }}</li>
+        }
+        <li>{{ 'batch.editor.readyDialog.reopen' | t }}</li>
+      </ul>
+      <div class="migration-menu__row">
+        <button
+          type="button"
+          class="btn btn--primary"
+          (click)="confirmReady()"
+          data-testid="confirm-ready"
+          autofocus
+        >
+          {{ 'batch.editor.readyDialog.confirm' | t }}
+        </button>
+        <button type="button" class="btn" (click)="readyOpen.set(false)">
+          {{ 'batch.editor.readyDialog.keep' | t }}
+        </button>
+      </div>
+    </div>
+  }
+}
