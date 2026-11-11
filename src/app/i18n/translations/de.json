@@ -400,7 +400,8 @@
         "dismissed": "{{count}} Feld(er) von A verworfen",
         "reopen": "Du kannst es jederzeit wieder öffnen und ändern.",
         "confirm": "Als fertig markieren",
-        "keep": "Weiter bearbeiten"
+        "keep": "Weiter bearbeiten",
+        "missing": "{{count}} Felder aus A sind noch nicht in B platziert."
       },
       "plain": "Bearbeitung mit eigener Vorlage",
       "navLabel": "Durch den Stapel navigieren",

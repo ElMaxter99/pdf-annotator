@@ -400,7 +400,8 @@
         "dismissed": "{{count}} campo(s) de A descartado(s)",
         "reopen": "Poderá reabri-lo e alterá-lo quando quiser.",
         "confirm": "Marcar como concluído",
-        "keep": "Continuar a editar"
+        "keep": "Continuar a editar",
+        "missing": "Faltam colocar {{count}} campos de A em B."
       },
       "plain": "A editar com o seu modelo",
       "navLabel": "Mover-se pelo lote",

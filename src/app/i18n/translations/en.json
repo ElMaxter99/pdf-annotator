@@ -400,7 +400,8 @@
         "dismissed": "{{count}} field(s) of A dismissed",
         "reopen": "You can reopen and change it at any time.",
         "confirm": "Mark as done",
-        "keep": "Keep editing"
+        "keep": "Keep editing",
+        "missing": "{{count}} fields of A are still not placed in B."
       },
       "plain": "Editing with its template",
       "navLabel": "Move through the batch",

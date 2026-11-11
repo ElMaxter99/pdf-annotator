@@ -155,6 +155,11 @@
                   }
           }}
         </li>
+        @if (m.summary.missing > 0) {
+          <li class="migration-dialog__warn">
+            {{ 'batch.editor.readyDialog.missing' | t: { count: m.summary.missing } }}
+          </li>
+        }
         @if (m.dismissed.length) {
           <li>{{ 'batch.editor.readyDialog.dismissed' | t: { count: m.dismissed.length } }}</li>
         }

@@ -400,7 +400,8 @@
         "dismissed": "{{count}} campo/i di A scartato/i",
         "reopen": "Potrai riaprirlo e modificarlo quando vuoi.",
         "confirm": "Segna come fatto",
-        "keep": "Continua a modificare"
+        "keep": "Continua a modificare",
+        "missing": "Restano {{count}} campi di A non collocati in B."
       },
       "plain": "Modifica con il suo modello",
       "navLabel": "Spostati nel lotto",

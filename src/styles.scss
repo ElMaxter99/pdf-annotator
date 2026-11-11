@@ -2880,6 +2880,10 @@ kbd {
   z-index: 90;
 }
 
+.migration-dialog__warn {
+  color: var(--danger);
+}
+
 .migration-dialog {
   position: fixed;
   z-index: 100;

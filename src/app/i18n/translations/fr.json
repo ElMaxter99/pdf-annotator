@@ -400,7 +400,8 @@
         "dismissed": "{{count}} champ(s) de A écarté(s)",
         "reopen": "Vous pourrez le rouvrir et le modifier à tout moment.",
         "confirm": "Marquer comme terminé",
-        "keep": "Continuer à modifier"
+        "keep": "Continuer à modifier",
+        "missing": "Il reste {{count}} champs de A non placés dans B."
       },
       "plain": "Modification avec son modèle",
       "navLabel": "Parcourir le lot",

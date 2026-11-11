@@ -400,7 +400,8 @@
         "dismissed": "{{count}} camp(s) d’A descartat(s)",
         "reopen": "Podràs reobrir-lo i canviar-lo quan vulguis.",
         "confirm": "Marca com a llest",
-        "keep": "Continua editant"
+        "keep": "Continua editant",
+        "missing": "Queden {{count}} camps d'A sense col·locar a B."
       },
       "plain": "Editant amb la seva plantilla",
       "navLabel": "Moure's pel lot",

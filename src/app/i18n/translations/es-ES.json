@@ -400,7 +400,8 @@
         "dismissed": "{{count}} campo(s) de A descartado(s)",
         "reopen": "Podrás reabrirlo y cambiarlo cuando quieras.",
         "confirm": "Marcar listo",
-        "keep": "Seguir editando"
+        "keep": "Seguir editando",
+        "missing": "Quedan {{count}} campos de A sin colocar en B."
       },
       "plain": "Editando con su plantilla",
       "navLabel": "Moverse por el lote",
