@@ -1,11 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
-import { effectiveShift, isFieldMoved, type AdjustField } from '../../../../utils/adjust-session.utils';
+import {
+  effectiveShift,
+  formatShift,
+  isFieldMoved,
+  type AdjustField,
+} from '../../../../utils/adjust-session.utils';
 import type { ShiftConfidence } from '../../../../utils/text-anchors.utils';
 import type { WorkspacePageComponent } from '../../workspace.page';
 
-/** Review of «Copiar y ajustar por textos»: fields and anchor texts, applied only on request. */
+/** «Copiar y ajustar por textos»: a notice under the bar with the proposal, never over the PDF. */
 @Component({
   selector: 'app-adjust-review',
   standalone: true,
@@ -14,26 +19,26 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 })
 export class AdjustReviewComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
+  /** ✕ on the notice: it goes to the bell and the proposal stays. */
+  @Output() readonly closeRequested = new EventEmitter<void>();
 
   moved(field: AdjustField): boolean {
     return isFieldMoved(field);
   }
 
-  /** «→ 24 pt · ↓ 32 pt» (PDF y grows upwards, so a negative dy goes down). */
   offset(field: AdjustField): string {
     const { dx, dy } = effectiveShift(field);
-    return AdjustReviewComponent.formatShift(dx, dy);
+    return formatShift(dx, dy);
   }
 
   offsetOf(dx: number, dy: number): string {
-    return AdjustReviewComponent.formatShift(dx, dy);
+    return formatShift(dx, dy);
   }
 
-  static formatShift(dx: number, dy: number): string {
-    const round = (value: number) => Math.round(Math.abs(value));
-    const horizontal = dx === 0 ? '' : `${dx > 0 ? '→' : '←'} ${round(dx)} pt`;
-    const vertical = dy === 0 ? '' : `${dy > 0 ? '↑' : '↓'} ${round(dy)} pt`;
-    return [horizontal, vertical].filter(Boolean).join(' · ') || '0 pt';
+  counts(): { near: number; estimated: number } {
+    const fields = this.vm.adjust()?.fields ?? [];
+    const estimated = fields.filter((f) => f.shift?.confidence === 'estimated').length;
+    return { near: fields.filter((f) => f.shift && f.shift.confidence !== 'estimated').length, estimated };
   }
 
   badge(field: AdjustField): { key: string; cls: string } {
@@ -51,5 +56,31 @@ export class AdjustReviewComponent {
       estimated: 'adjust-badge--estimated',
     };
     return { key: confidence, cls: cls[confidence] };
+  }
+
+  /** Texts that decided the shift of a field, e.g. «Nº», «FACTURA». */
+  anchorTexts(field: AdjustField): string {
+    const ids = new Set(field.shift?.anchorIds ?? []);
+    return (this.vm.adjust()?.anchors ?? [])
+      .filter((row) => row.page === field.page && ids.has(row.anchor.id))
+      .map((row) => `«${row.anchor.text}»`)
+      .join(', ');
+  }
+
+  cardStyle(card: { x: number; y: number }): Record<string, string> {
+    const width = 250;
+    const height = 280;
+    const left = Math.max(8, Math.min(card.x + 14, window.innerWidth - width - 8));
+    const top = Math.max(8, Math.min(card.y + 14, window.innerHeight - height - 8));
+    return { left: `${left}px`, top: `${top}px` };
+  }
+
+  applyManual(key: string, dx: string, dy: string): void {
+    this.vm.setAdjustManual(key, Number(dx), Number(dy));
+  }
+
+  shiftOf(field: AdjustField): { dx: number; dy: number } {
+    const { dx, dy } = effectiveShift(field);
+    return { dx: Math.round(dx * 10) / 10, dy: Math.round(dy * 10) / 10 };
   }
 }

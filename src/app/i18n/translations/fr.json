@@ -461,8 +461,10 @@
         "name": {
           "noTemplate": "A n’a pas de modèle",
           "pagesDiffer": "Nombre de pages différent",
-          "fit": "Taille de page différente"
-        }
+          "fit": "Taille de page différente",
+          "adjust": "Ajustement par textes"
+        },
+        "adjust": "{{count}} champs proposés · B inchangée"
       }
     },
     "panel": {
@@ -660,6 +662,33 @@
         "none": "Sans textes",
         "outlier": "Diverge",
         "repeated": "Répété"
+      },
+      "strip": "{{anchors}} textes identiques · {{fields}} champs proposés ({{near}} par texte proche, {{estimated}} estimés).",
+      "list": "Champs",
+      "cancelProposal": "Annuler la proposition",
+      "view": {
+        "label": "Ce que montre B",
+        "proposal": "Proposition",
+        "original": "Original"
+      },
+      "holdHint": "Maintiens P pour voir l’original",
+      "showAnchors": "Voir les ancres",
+      "legend": {
+        "origin": "Où il était dans A",
+        "proposal": "Proposition",
+        "estimated": "Estimé",
+        "low": "Fiabilité faible (non coché)"
+      },
+      "card": {
+        "close": "Fermer la carte",
+        "by": "D’après {{texts}}",
+        "typical": "Pas de texte proche : décalage typique de la page.",
+        "right": "Points vers la droite",
+        "up": "Points vers le haut",
+        "set": "Appliquer",
+        "reset": "Revenir à la proposition",
+        "keep": "Laisser à sa place",
+        "use": "Déplacer selon la proposition"
       }
     }
   },

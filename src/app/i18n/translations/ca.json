@@ -461,8 +461,10 @@
         "name": {
           "noTemplate": "A no té plantilla",
           "pagesDiffer": "Diferent nombre de pàgines",
-          "fit": "Mida de pàgina diferent"
-        }
+          "fit": "Mida de pàgina diferent",
+          "adjust": "Ajust per textos"
+        },
+        "adjust": "{{count}} camps proposats · B sense modificar"
       }
     },
     "panel": {
@@ -660,6 +662,33 @@
         "none": "Sense textos",
         "outlier": "Discrepa",
         "repeated": "Repetit"
+      },
+      "strip": "{{anchors}} textos iguals · {{fields}} camps proposats ({{near}} per text proper, {{estimated}} estimats).",
+      "list": "Camps",
+      "cancelProposal": "Cancel·la la proposta",
+      "view": {
+        "label": "Què es veu a B",
+        "proposal": "Proposta",
+        "original": "Original"
+      },
+      "holdHint": "Mantén P per veure l’original",
+      "showAnchors": "Mostra les àncores",
+      "legend": {
+        "origin": "On era a A",
+        "proposal": "Proposta",
+        "estimated": "Estimat",
+        "low": "Fiabilitat baixa (sense marcar)"
+      },
+      "card": {
+        "close": "Tanca la targeta",
+        "by": "Per {{texts}}",
+        "typical": "Sense textos a prop: desplaçament típic de la pàgina.",
+        "right": "Punts cap a la dreta",
+        "up": "Punts cap amunt",
+        "set": "Posa",
+        "reset": "Torna a la proposta",
+        "keep": "Deixa-ho on era",
+        "use": "Mou amb la proposta"
       }
     }
   },

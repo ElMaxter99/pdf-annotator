@@ -461,8 +461,10 @@
         "name": {
           "noTemplate": "A no tiene plantilla",
           "pagesDiffer": "Distinto número de páginas",
-          "fit": "Tamaño de página distinto"
-        }
+          "fit": "Tamaño de página distinto",
+          "adjust": "Ajuste por textos"
+        },
+        "adjust": "{{count}} campos propuestos · B sin modificar"
       }
     },
     "panel": {
@@ -660,6 +662,33 @@
         "none": "Sin textos",
         "outlier": "Discrepa",
         "repeated": "Repetido"
+      },
+      "strip": "{{anchors}} textos iguales · {{fields}} campos propuestos ({{near}} por texto cercano, {{estimated}} estimados).",
+      "list": "Campos",
+      "cancelProposal": "Cancelar propuesta",
+      "view": {
+        "label": "Qué se ve en B",
+        "proposal": "Propuesta",
+        "original": "Original"
+      },
+      "holdHint": "Mantén P para ver el original",
+      "showAnchors": "Ver anclas",
+      "legend": {
+        "origin": "Donde estaba en A",
+        "proposal": "Propuesta",
+        "estimated": "Estimado",
+        "low": "Fiabilidad baja (sin marcar)"
+      },
+      "card": {
+        "close": "Cerrar la tarjeta",
+        "by": "Por {{texts}}",
+        "typical": "Sin textos cerca: desplazamiento típico de la página.",
+        "right": "Puntos a la derecha",
+        "up": "Puntos hacia arriba",
+        "set": "Poner",
+        "reset": "Volver a la propuesta",
+        "keep": "Dejar donde estaba",
+        "use": "Mover con la propuesta"
       }
     }
   },

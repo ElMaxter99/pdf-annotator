@@ -461,8 +461,10 @@
         "name": {
           "noTemplate": "A hat keine Vorlage",
           "pagesDiffer": "Unterschiedliche Seitenzahl",
-          "fit": "Unterschiedliche Seitengröße"
-        }
+          "fit": "Unterschiedliche Seitengröße",
+          "adjust": "Anpassung nach Texten"
+        },
+        "adjust": "{{count}} Felder vorgeschlagen · B unverändert"
       }
     },
     "panel": {
@@ -660,6 +662,33 @@
         "none": "Keine Texte",
         "outlier": "Weicht ab",
         "repeated": "Wiederholt"
+      },
+      "strip": "{{anchors}} gleiche Texte · {{fields}} Felder vorgeschlagen ({{near}} nach nahem Text, {{estimated}} geschätzt).",
+      "list": "Felder",
+      "cancelProposal": "Vorschlag verwerfen",
+      "view": {
+        "label": "Was B zeigt",
+        "proposal": "Vorschlag",
+        "original": "Original"
+      },
+      "holdHint": "Halte P, um das Original zu sehen",
+      "showAnchors": "Anker anzeigen",
+      "legend": {
+        "origin": "Wo es in A war",
+        "proposal": "Vorschlag",
+        "estimated": "Geschätzt",
+        "low": "Geringe Zuverlässigkeit (nicht gewählt)"
+      },
+      "card": {
+        "close": "Karte schließen",
+        "by": "Nach {{texts}}",
+        "typical": "Kein Text in der Nähe: typischer Versatz der Seite.",
+        "right": "Punkte nach rechts",
+        "up": "Punkte nach oben",
+        "set": "Setzen",
+        "reset": "Zurück zum Vorschlag",
+        "keep": "Lassen, wo es war",
+        "use": "Mit dem Vorschlag verschieben"
       }
     }
   },

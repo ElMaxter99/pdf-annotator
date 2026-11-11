@@ -1,4 +1,8 @@
 ## Unreleased
+### Changed
+- **«Copiar y ajustar por textos» is a notice like the others**: the floating panel that covered B is gone. The proposal is a strip under the bar (summary, «Propuesta | Original», «Aplicar N cambios», «Campos ▾», «Cancelar», ✕) and the list of fields and texts opens in the flow, pushing the viewer down. ✕ sends the notice to the bell (the proposal stays drawn and can be applied or cancelled from there); Esc closes the notice instead of cancelling
+- **Better preview of the proposal**: arrow and distance for the field under the pointer or selected; highlight in the list, on A and on B at once; «Original» (or hold `P`) shows the fields where they are in A; five clear looks (proposed, estimated, manual, low reliability, unticked); a card on click with the shift, the texts used and a shift typed by hand; «Ver anclas» pins the texts on both pages; a legend under the bar
+
 ### Added
 - **Release scripts**: `npm run release:notes` (prints the CHANGELOG section of a version for the GitHub release), `npm run release:guide` (step-by-step guide with the commands filled in) and `npm run release:deploy` (no arguments needed: it switches to `develop`, pulls, checks everything, asks you to type the version and then aligns `develop` and `master` (fast-forward, or merging `master` into `develop` when they diverged; never forced), creates and pushes `release/vX.Y.Z` and the tag `vX.Y.Z`; `--dry-run` only checks; `bump X.Y.Z` edits the version files locally). Vercel is still deployed by hand
 

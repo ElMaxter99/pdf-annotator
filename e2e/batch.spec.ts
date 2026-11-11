@@ -558,24 +558,27 @@ test('«Copiar y ajustar por textos» proposes the shift, is reviewed and applie
   await page.getByTestId('put-a-adjust').click();
 
   const review = page.getByTestId('adjust-review');
-  await expect(review.getByTestId('adjust-apply')).toBeVisible({ timeout: 20000 });
+  await expect(page.getByTestId('adjust-apply')).toBeVisible({ timeout: 20000 });
   await expect(page.getByTestId('split-a')).toBeVisible();
   // B is not touched until the proposal is applied
   await expect(page.locator('.annotation')).toHaveCount(0);
-  await expect(review.getByTestId('adjust-fields')).toContainText('→ 20 pt');
-  await expect(review.getByTestId('adjust-fields')).toContainText('↓ 30 pt');
+  await page.getByTestId('adjust-toggle-list').click();
+  await expect(page.getByTestId('adjust-fields')).toContainText('→ 20 pt');
+  await expect(page.getByTestId('adjust-fields')).toContainText('↓ 30 pt');
 
   // Cancel leaves B as it was
-  await review.getByTestId('adjust-cancel').click();
-  await expect(review).toHaveCount(0);
+  await page.getByTestId('adjust-cancel').click();
+  await expect(page.getByTestId('adjust-review')).toHaveCount(0);
   await expect(page.locator('.annotation')).toHaveCount(0);
 
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-adjust').click();
-  await review.getByTestId('adjust-tab-texts').click();
-  await expect(review.getByTestId('adjust-anchors').locator('li').first()).toBeVisible();
-  await review.getByTestId('adjust-apply').click();
-  await expect(review).toHaveCount(0);
+  await expect(page.getByTestId('adjust-apply')).toBeVisible({ timeout: 20000 });
+  await page.getByTestId('adjust-toggle-list').click();
+  await page.getByTestId('adjust-tab-texts').click();
+  await expect(page.getByTestId('adjust-anchors').locator('li').first()).toBeVisible();
+  await page.getByTestId('adjust-apply').click();
+  await expect(page.getByTestId('adjust-review')).toHaveCount(0);
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 
   // One undo step takes everything back out
@@ -675,4 +678,100 @@ test('informative notices can be closed and found again in the bell', async ({ p
   // With no closed notice the panel says so
   await page.getByTestId('notices-bell').click();
   await expect(page.getByTestId('notices-empty')).toBeVisible();
+});
+
+async function openAdjust(page: Page) {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(file('factura-0331-nuevo.pdf', await shiftedPdf(20, -30), 'application/pdf'));
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await openRow(page);
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-adjust').click();
+  await expect(page.getByTestId('adjust-apply')).toBeVisible({ timeout: 20000 });
+}
+
+test('the adjustment is a notice under the bar: ✕ sends it to the bell and it never covers B', async ({
+  page,
+}) => {
+  await openAdjust(page);
+  const review = page.getByTestId('adjust-review');
+  const strip = await review.boundingBox();
+  const canvas = await page.locator('.canvas--pdf').boundingBox();
+  expect(strip!.y + strip!.height).toBeLessThanOrEqual(canvas!.y + 1);
+
+  // the list opens in the flow and pushes the viewer down
+  await page.getByTestId('adjust-toggle-list').click();
+  await expect(page.getByTestId('adjust-drawer')).toBeVisible();
+  const drawer = await page.getByTestId('adjust-drawer').boundingBox();
+  const canvasOpen = await page.locator('.canvas--pdf').boundingBox();
+  expect(drawer!.y + drawer!.height).toBeLessThanOrEqual(canvasOpen!.y + 1);
+
+  // ✕ closes the notice but keeps the proposal drawn and applicable
+  await page.getByTestId('notice-close-adjust').click();
+  await expect(page.getByTestId('adjust-review')).toHaveCount(0);
+  await expect(page.getByTestId('notices-count')).toHaveText('1');
+  await expect(page.locator('.reference-field--proposal').first()).toBeVisible();
+  await expect(page.locator('.annotation')).toHaveCount(0);
+
+  await page.getByTestId('notices-bell').click();
+  await expect(page.getByTestId('notice-row-adjust')).toBeVisible();
+  await page.getByTestId('notice-reopen-adjust').click();
+  await expect(page.getByTestId('adjust-review')).toBeVisible();
+
+  // Esc closes the notice (it does not cancel), and the bell applies it
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('adjust-review')).toHaveCount(0);
+  await page.getByTestId('notices-bell').click();
+  await page.getByTestId('notice-adjust-apply').click();
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+});
+
+test('the proposal can be read at a glance: highlight, arrow, original view and field card', async ({
+  page,
+}) => {
+  await openAdjust(page);
+  await page.getByTestId('adjust-toggle-list').click();
+
+  // pointer on a row: highlighted on B (with arrow and distance) and on A
+  await page.getByTestId('adjust-fields').locator('li').first().hover();
+  await expect(page.locator('.reference-field--hover').first()).toBeVisible();
+  await expect(page.locator('.adjust-delta')).toContainText('→ 20 pt');
+  await expect(page.getByTestId('split-a').locator('.reference-field--hover')).toHaveCount(1);
+  await page.mouse.move(2, 2);
+
+  // «Original» (or holding P) puts every field back where it is in A
+  await expect(page.locator('.reference-field--proposal').first()).toBeVisible();
+  await page.getByTestId('adjust-view-original').click();
+  await expect(page.locator('.reference-field--proposal')).toHaveCount(0);
+  await expect(page.locator('.reference-field--grey').first()).toBeVisible();
+  await page.getByTestId('adjust-view-proposal').click();
+  await expect(page.locator('.reference-field--proposal').first()).toBeVisible();
+  await page.locator('body').click({ position: { x: 5, y: 5 } });
+  await page.keyboard.down('p');
+  await expect(page.locator('.reference-field--proposal')).toHaveCount(0);
+  await page.keyboard.up('p');
+  await expect(page.locator('.reference-field--proposal').first()).toBeVisible();
+
+  // anchors pinned on both pages
+  await page.getByTestId('adjust-show-anchors').check();
+  await expect(page.locator('.adjust-pin').first()).toBeVisible();
+  await expect(page.getByTestId('split-a').locator('.adjust-pin').first()).toBeVisible();
+
+  // a click on a proposed field opens its card; a shift typed by hand marks it «Manual»
+  const box = await page.locator('.reference-field--proposal').first().boundingBox();
+  await page.mouse.click(box!.x + box!.width / 2, box!.y + box!.height / 2);
+  const card = page.getByTestId('adjust-card');
+  await expect(card).toBeVisible();
+  await expect(card).toContainText('→ 20 pt');
+  await card.locator('input[type=number]').first().fill('30');
+  await card.getByTestId('adjust-card-manual').click();
+  await expect(page.locator('.reference-field--manual').first()).toBeVisible();
+  await page.getByTestId('adjust-card-close').click();
+  await expect(card).toHaveCount(0);
+
+  await page.getByTestId('adjust-apply').click();
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 });

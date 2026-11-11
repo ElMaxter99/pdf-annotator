@@ -76,3 +76,60 @@ export function recomputeFields(
   }
   return out;
 }
+
+/** Box a field takes on the page in PDF points, as drawn in the reference layer. */
+export function fieldBox(
+  field: Pick<AdjustField, 'name' | 'x' | 'y' | 'fontSize'>,
+  dx: number,
+  dy: number,
+  scale: number,
+): { x0: number; y0: number; x1: number; y1: number } {
+  const size = Math.max(6, Number(field.fontSize) || 12);
+  const width = Math.max(24 / scale, field.name.length * size * 0.55);
+  const x = field.x + dx;
+  const y = field.y + dy;
+  return { x0: x, x1: x + width, y0: y - size * 0.2, y1: y + size };
+}
+
+/** The field of a page under a point (PDF points), at its proposed place; the last one wins. */
+export function hitAdjustField(
+  fields: readonly AdjustField[],
+  page: number,
+  point: { x: number; y: number },
+  scale: number,
+  original = false,
+): AdjustField | null {
+  let hit: AdjustField | null = null;
+  for (const field of fields) {
+    if (field.page !== page) {
+      continue;
+    }
+    const { dx, dy } = original ? { dx: 0, dy: 0 } : effectiveShift(field);
+    const box = fieldBox(field, dx, dy, scale);
+    if (point.x >= box.x0 && point.x <= box.x1 && point.y >= box.y0 && point.y <= box.y1) {
+      hit = field;
+    }
+  }
+  return hit;
+}
+
+/** «→ 24 pt · ↓ 32 pt» (PDF y grows upwards, so a negative dy goes down). */
+export function formatShift(dx: number, dy: number): string {
+  const round = (value: number) => Math.round(Math.abs(value));
+  const horizontal = round(dx) === 0 ? '' : `${dx > 0 ? '→' : '←'} ${round(dx)} pt`;
+  const vertical = round(dy) === 0 ? '' : `${dy > 0 ? '↑' : '↓'} ${round(dy)} pt`;
+  return [horizontal, vertical].filter(Boolean).join(' · ') || '0 pt';
+}
+
+/** How a field is drawn on B: moved by the proposal, estimated, low and left, or left where it was. */
+export type AdjustVisual = 'proposal' | 'estimated' | 'manual' | 'low' | 'grey';
+
+export function fieldVisual(field: AdjustField): AdjustVisual {
+  if (isFieldMoved(field)) {
+    if (field.manual) {
+      return 'manual';
+    }
+    return field.shift?.confidence === 'estimated' ? 'estimated' : 'proposal';
+  }
+  return field.shift?.confidence === 'low' && field.override === null ? 'low' : 'grey';
+}

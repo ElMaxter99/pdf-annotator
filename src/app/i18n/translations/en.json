@@ -461,8 +461,10 @@
         "name": {
           "noTemplate": "A has no template",
           "pagesDiffer": "Different number of pages",
-          "fit": "Different page size"
-        }
+          "fit": "Different page size",
+          "adjust": "Adjust by texts"
+        },
+        "adjust": "{{count}} fields proposed · B unchanged"
       }
     },
     "panel": {
@@ -660,6 +662,33 @@
         "none": "No texts",
         "outlier": "Disagrees",
         "repeated": "Repeated"
+      },
+      "strip": "{{anchors}} matching texts · {{fields}} fields proposed ({{near}} by nearby text, {{estimated}} estimated).",
+      "list": "Fields",
+      "cancelProposal": "Cancel proposal",
+      "view": {
+        "label": "What B shows",
+        "proposal": "Proposal",
+        "original": "Original"
+      },
+      "holdHint": "Hold P to see the original",
+      "showAnchors": "Show anchors",
+      "legend": {
+        "origin": "Where it was in A",
+        "proposal": "Proposal",
+        "estimated": "Estimated",
+        "low": "Low reliability (unticked)"
+      },
+      "card": {
+        "close": "Close the card",
+        "by": "From {{texts}}",
+        "typical": "No texts nearby: typical shift of the page.",
+        "right": "Points to the right",
+        "up": "Points up",
+        "set": "Set",
+        "reset": "Back to the proposal",
+        "keep": "Leave where it was",
+        "use": "Move with the proposal"
       }
     }
   },

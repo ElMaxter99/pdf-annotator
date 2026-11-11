@@ -91,7 +91,12 @@ export class MigrationBarComponent {
   /** Esc closes the open menu or dialog. */
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.vm.adjust()) {
+    const adjust = this.vm.adjust();
+    if (adjust?.card) {
+      this.vm.closeAdjustCard();
+    } else if (adjust?.phase === 'ready' && !this.vm.isNoticeClosed('adjust')) {
+      this.closeNotice('adjust');
+    } else if (adjust && adjust.phase !== 'ready') {
       this.vm.cancelAdjust();
     } else if (this.readyOpen()) {
       this.readyOpen.set(false);
@@ -109,6 +114,10 @@ export class MigrationBarComponent {
     if (this.isReferenceKey(event) && !event.repeat) {
       this.vm.holdingReference.set(true);
     }
+    if (this.isOriginalKey(event) && !event.repeat) {
+      this.vm.holdingOriginal.set(true);
+      this.vm.refreshAdjustPreview();
+    }
   }
 
   @HostListener('document:keyup', ['$event'])
@@ -116,11 +125,32 @@ export class MigrationBarComponent {
     if (event.key.toLowerCase() === 'a') {
       this.vm.holdingReference.set(false);
     }
+    if (event.key.toLowerCase() === 'p' && this.vm.holdingOriginal()) {
+      this.vm.holdingOriginal.set(false);
+      this.vm.refreshAdjustPreview();
+    }
   }
 
   @HostListener('window:blur')
   onBlur(): void {
     this.vm.holdingReference.set(false);
+    if (this.vm.holdingOriginal()) {
+      this.vm.holdingOriginal.set(false);
+      this.vm.refreshAdjustPreview();
+    }
+  }
+
+  /** Holding «P» while the proposal is open shows the fields where they are in A. */
+  private isOriginalKey(event: KeyboardEvent): boolean {
+    if (event.key.toLowerCase() !== 'p' || event.ctrlKey || event.metaKey || event.altKey) {
+      return false;
+    }
+    const target = event.target as HTMLElement | null;
+    const tag = target?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable) {
+      return false;
+    }
+    return this.vm.adjust()?.phase === 'ready' && !this.vm.preview() && !this.vm.editing();
   }
 
   private isReferenceKey(event: KeyboardEvent): boolean {
