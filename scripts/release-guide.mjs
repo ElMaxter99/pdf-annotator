@@ -18,9 +18,10 @@ try {
 2. Release (con la versión ya en ${DEV_BRANCH})
    git switch ${DEV_BRANCH} && git pull
    npm run release:deploy                  # simulacro: comprueba y muestra qué haría
-   npm run release:deploy -- --execute     # pide escribir v${v}; alinea ${DEV_BRANCH} y ${MAIN_BRANCH} (avance rápido),
+   npm run release:deploy -- --execute     # pide escribir v${v}; alinea ${DEV_BRANCH} y ${MAIN_BRANCH} (avance rápido o,
+                                           # si han divergido, fusiona ${MAIN_BRANCH} en ${DEV_BRANCH}),
                                            # crea y sube la rama release/v${v} y el tag v${v}
-   Si ya hay una PR ${DEV_BRANCH} → ${MAIN_BRANCH} abierta, fusiónala antes o ciérrala: el script alinea solo por avance rápido.
+   Si ya hay una PR ${DEV_BRANCH} → ${MAIN_BRANCH} abierta, fusiónala antes o ciérrala: el script nunca fuerza pushes.
 
 3. Desplegar y publicar
    Despliegue en Vercel: a mano.

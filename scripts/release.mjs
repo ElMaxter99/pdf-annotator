@@ -1,7 +1,8 @@
 // npm run release:deploy [-- comando] [opciones]
 //   (sin comando)   Simulacro: comprueba que todo cuadra y enseña qué haría.
 //   --execute       Tras las comprobaciones y escribiendo la versión para confirmar, hace el release:
-//                   alinea develop y master (solo avance rápido, sin forzar), crea la rama release/vX.Y.Z
+//                   alinea develop y master (avance rápido; si han divergido, fusiona master en develop
+//                   con un commit de merge, sin forzar nunca), crea la rama release/vX.Y.Z
 //                   y el tag vX.Y.Z sobre ese commit, y sube las tres cosas a origin.
 //   bump X.Y.Z      Edita package.json, el badge del README y la cabecera del CHANGELOG
 //                   (solo ficheros locales; no hace commit ni push).
@@ -62,7 +63,15 @@ const check = () => {
   if (dev === main) ok(`${DEV_BRANCH} y ${MAIN_BRANCH} ya están alineadas.`);
   else if (isAncestor(main, dev)) { align = MAIN_BRANCH; ok(`${MAIN_BRANCH} se puede avanzar a ${DEV_BRANCH} (avance rápido).`); }
   else if (isAncestor(dev, main)) { align = DEV_BRANCH; target = main; ok(`${DEV_BRANCH} se puede avanzar a ${MAIN_BRANCH} (avance rápido).`); }
-  else bad(`${DEV_BRANCH} y ${MAIN_BRANCH} han divergido: fusiona una en la otra por PR; el script no fuerza nada.`);
+  else {
+    try {
+      git('merge-tree', '--write-tree', `origin/${DEV_BRANCH}`, `origin/${MAIN_BRANCH}`);
+      align = 'merge';
+      ok(`${DEV_BRANCH} y ${MAIN_BRANCH} han divergido; se fusionará ${MAIN_BRANCH} en ${DEV_BRANCH} (sin conflictos).`);
+    } catch {
+      bad(`${DEV_BRANCH} y ${MAIN_BRANCH} han divergido y al fusionarlas hay conflictos: resuélvelos por PR; el script no fuerza nada.`);
+    }
+  }
 
   if (git('tag', '--list', tag)) bad(`El tag ${tag} ya existe.`); else ok(`El tag ${tag} está libre.`);
   if (git('ls-remote', '--heads', 'origin', branch)) bad(`La rama ${branch} ya existe en origin.`); else ok(`La rama ${branch} está libre.`);
@@ -79,7 +88,8 @@ const main = async () => {
   if (problems.length) fail('Resuelve lo anterior antes de hacer el release.');
   const short = target.slice(0, 7);
   console.log(`\nSe haría, sobre ${short}:`);
-  if (align) console.log(`  1. Avanzar ${align} a ${short} (push normal, sin --force).`);
+  if (align === 'merge') console.log(`  1. Fusionar origin/${MAIN_BRANCH} en ${DEV_BRANCH} (commit de merge), subir ${DEV_BRANCH} y avanzar ${MAIN_BRANCH} a ese commit (push normal, sin --force).`);
+  else if (align) console.log(`  1. Avanzar ${align} a ${short} (push normal, sin --force).`);
   console.log(`  ${align ? 2 : 1}. Crear y subir la rama ${branch}.`);
   console.log(`  ${align ? 3 : 2}. Crear y subir el tag anotado ${tag}.`);
   console.log('  Después: desplegar en Vercel a mano y publicar las notas (npm run release:notes).');
@@ -91,9 +101,21 @@ const main = async () => {
   rl.close();
   if (answer !== tag) return console.log('Cancelado. No se ha cambiado nada.');
 
-  if (align) { git('push', 'origin', `${target}:refs/heads/${align}`); console.log(`✔ ${align} avanzada a ${short}.`); }
-  git('push', 'origin', `${target}:refs/heads/${branch}`); console.log(`✔ Rama ${branch} subida.`);
-  git('tag', '-a', tag, target, '-m', `Release ${tag}`);
+  let sha = target;
+  if (align === 'merge') {
+    try {
+      git('merge', '--no-ff', `origin/${MAIN_BRANCH}`, '-m', `Merge ${MAIN_BRANCH} into ${DEV_BRANCH} for release ${tag}`);
+    } catch (e) {
+      try { git('merge', '--abort'); } catch { /* sin merge en curso */ }
+      fail(`No se pudo fusionar ${MAIN_BRANCH} en ${DEV_BRANCH}; no se ha subido nada. ${e.message.split('\n')[0]}`);
+    }
+    sha = git('rev-parse', 'HEAD');
+    git('push', 'origin', `${sha}:refs/heads/${DEV_BRANCH}`);
+    git('push', 'origin', `${sha}:refs/heads/${MAIN_BRANCH}`);
+    console.log(`✔ ${MAIN_BRANCH} fusionada en ${DEV_BRANCH}; ambas en ${sha.slice(0, 7)}.`);
+  } else if (align) { git('push', 'origin', `${target}:refs/heads/${align}`); console.log(`✔ ${align} avanzada a ${short}.`); }
+  git('push', 'origin', `${sha}:refs/heads/${branch}`); console.log(`✔ Rama ${branch} subida.`);
+  git('tag', '-a', tag, sha, '-m', `Release ${tag}`);
   git('push', 'origin', tag); console.log(`✔ Tag ${tag} subido.`);
   console.log(`Listo. Despliega en Vercel a mano y publica la release: ${REPO_URL}/releases/new?tag=${tag}`);
 };
