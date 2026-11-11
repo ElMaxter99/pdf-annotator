@@ -3024,6 +3024,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     el.classList.toggle('reference-field--solo', solo);
     el.textContent = name;
     el.title = name;
+    el.dataset['name'] = name;
     el.style.left = `${px * scale}px`;
     el.style.top = `${canvasHeight - py * scale - size * scale}px`;
     el.style.height = `${size * scale * 1.2}px`;
@@ -3084,6 +3085,63 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.scale.set(Math.min(4, Math.max(0.25, Math.floor((available / baseWidth) * 100) / 100)));
     await this.render();
     this.redrawAllForPage();
+  }
+
+  /** «Dividida»: the field under the pointer (in A or in B) is highlighted in both panes. */
+  onSplitHover(event: MouseEvent): void {
+    if (!this.splitActive()) {
+      return;
+    }
+    const aLayer = this.splitLayerRef?.nativeElement;
+    const bLayer = this.annotationsLayerRef?.nativeElement;
+    if (!aLayer || !bLayer) {
+      return;
+    }
+    const hit = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return (
+        event.clientX >= r.left &&
+        event.clientX <= r.right &&
+        event.clientY >= r.top &&
+        event.clientY <= r.bottom
+      );
+    };
+    let name: string | null = null;
+    for (const el of Array.from(aLayer.querySelectorAll<HTMLElement>('.reference-field'))) {
+      if (hit(el)) {
+        name = el.dataset['name'] ?? null;
+        break;
+      }
+    }
+    if (name === null) {
+      const fields = this.coords().find((page) => page.num === this.pageIndex())?.fields ?? [];
+      for (const el of Array.from(bLayer.querySelectorAll<HTMLElement>('.annotation'))) {
+        if (hit(el)) {
+          const field = fields[Number(el.dataset['fieldIndex'])];
+          name = field ? (field.mapField || field.value || '').trim() : null;
+          break;
+        }
+      }
+    }
+    this.markPair(name);
+  }
+
+  clearSplitHover(): void {
+    this.markPair(null);
+  }
+
+  private markPair(name: string | null): void {
+    const aLayer = this.splitLayerRef?.nativeElement;
+    const bLayer = this.annotationsLayerRef?.nativeElement;
+    const fields = this.coords().find((page) => page.num === this.pageIndex())?.fields ?? [];
+    aLayer?.querySelectorAll<HTMLElement>('.reference-field').forEach((el) => {
+      el.classList.toggle('reference-field--pair', !!name && el.dataset['name'] === name);
+    });
+    bLayer?.querySelectorAll<HTMLElement>('.annotation').forEach((el) => {
+      const field = fields[Number(el.dataset['fieldIndex'])];
+      const own = field ? (field.mapField || field.value || '').trim() : '';
+      el.classList.toggle('annotation--pair', !!name && own === name);
+    });
   }
 
   /** Draws A (its PDF and its fields) in the left pane of «Dividida». */

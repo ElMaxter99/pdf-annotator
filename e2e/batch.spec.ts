@@ -401,6 +401,13 @@ test('«Dividida» shows A with its fields on the left and B on the right', asyn
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
   await expect(page.getByTestId('split-a').locator('.reference-field')).toHaveCount(FIELDS);
 
+  // The pointer on a field of B lights its pair in A (and the other way round)
+  await page.locator('.annotation').first().hover();
+  await expect(page.getByTestId('split-a').locator('.reference-field--pair')).toHaveCount(1);
+  const box = await page.getByTestId('split-a').locator('.reference-field').nth(2).boundingBox();
+  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+  await expect(page.locator('.annotation--pair')).toHaveCount(1);
+
   await page.getByTestId('mode-overlay').click();
   await expect(page.getByTestId('split-a')).toHaveCount(0);
 });

@@ -3575,3 +3575,14 @@ kbd {
 .migration-hints .migration-hint {
   margin-top: 8px;
 }
+
+.reference-field--pair {
+  border-style: solid;
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.annotation--pair {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

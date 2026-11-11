@@ -1,4 +1,4 @@
-<main class="viewer" [class.viewer--split]="vm.splitActive()" *ngIf="vm.pdfDoc as _">
+<main class="viewer" [class.viewer--split]="vm.splitActive()" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc as _">
   @if (vm.selectionCount() > 0) {
     <div class="selection-bar" role="toolbar" [attr.aria-label]="'selection.toolbar' | t">
       <span class="selection-bar__count">{{ 'selection.count' | t : { count: vm.selectionCount() } }}</span>

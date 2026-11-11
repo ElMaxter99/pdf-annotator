@@ -68,7 +68,7 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | Q-01 Vista A/B · qué falla | Botones sin efecto sin plantilla A y falta de la vista dividida | [`Q-01-vista-a-b-que-falla.dc.html`](canvas/Q-01-vista-a-b-que-falla.dc.html) | — | Aprobado (documento) |
 | Q-02 Dividida · 1650 | A (solo lectura) a la izquierda, B (se edita) a la derecha | [`Q-02-dividida-1650.dc.html`](canvas/Q-02-dividida-1650.dc.html) | `components/viewer`, `components/migration` | Aprobado, implementado |
 | Q-03 Dividida · 1280 y claro | Ajuste de zoom, tema claro y panel plegado | [`Q-03-dividida-1280-claro.dc.html`](canvas/Q-03-dividida-1280-claro.dc.html) | `components/viewer` | Aprobado, implementado |
-| Q-04 Dividida · estados | Sin plantilla A, B vacía y tamaños distintos | [`Q-04-dividida-estados.dc.html`](canvas/Q-04-dividida-estados.dc.html) | `components/migration` | Aprobado, implementado (sin resaltado de pareja al pasar el ratón) |
+| Q-04 Dividida · estados | Sin plantilla A, B vacía y tamaños distintos | [`Q-04-dividida-estados.dc.html`](canvas/Q-04-dividida-estados.dc.html) | `components/migration` | Aprobado, implementado |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 
