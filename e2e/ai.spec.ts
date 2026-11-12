@@ -43,7 +43,7 @@ async function openBatchWithB(page: Page, provider: string | null = 'fake') {
     .filter({ hasText: 'factura-0331' })
     .getByRole('button', { name: 'Revisar' })
     .click();
-  await page.waitForURL('**/workspace');
+  await page.waitForURL('**/workspace?lote=*');
   await expect(page.locator('.migration-bar')).toContainText('Editando versión B');
 }
 

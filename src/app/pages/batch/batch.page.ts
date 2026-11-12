@@ -14,6 +14,7 @@ import { BatchStoreService } from '../../services/batch-store.service';
 import { MAX_TEST_DATA_BYTES, PreviewSettingsService } from '../../services/preview-settings.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { ToastService } from '../../services/toast.service';
+import { BATCH_ITEM_PARAM, BATCH_OPEN_VIEW, batchItemOpening } from '../../utils/batch-open.utils';
 import { downloadBlob } from '../../utils/download.utils';
 import { parseLooseJson } from '../../utils/loose-json';
 import { pairByName, pairingKey } from '../../utils/migration.utils';
@@ -332,16 +333,11 @@ export class BatchPageComponent implements OnInit {
 
   async open(item: BatchItem): Promise<void> {
     this.store.activate(item.id);
-    const file = new File([item.bPdf ?? item.aPdf], item.bName ?? item.name, {
-      type: 'application/pdf',
-    });
     // Without a new version the PDF is edited with its own template.
-    const coords = item.bPages ?? (item.bPdf ? null : item.aPages);
-    this.pendingFile.setPendingFile(
-      file,
-      coords && coords.length ? { coords, pageIndex: 1, scale: 0.75 } : null,
-    );
-    await this.router.navigate(['/workspace']);
+    const { file, coords } = batchItemOpening(item);
+    this.pendingFile.setPendingFile(file, coords?.length ? { coords, ...BATCH_OPEN_VIEW } : null);
+    // The id in the URL lets a reload or «Adelante» reopen this same PDF.
+    await this.router.navigate(['/workspace'], { queryParams: { [BATCH_ITEM_PARAM]: item.id } });
   }
 
   async reviewNext(): Promise<void> {

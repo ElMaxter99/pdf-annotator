@@ -88,6 +88,7 @@ export class LandingPageComponent {
 
   async discardSession() {
     await this.sessionStore.clear();
+    this.pendingFileService.forgetLastOpened();
     this.savedSession.set(null);
     this.toast.show(this.translationService.translate('toast.sessionDiscarded'), 'info');
   }

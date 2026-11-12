@@ -12,6 +12,8 @@ export interface PendingRestore {
 export class PendingFileService {
   private readonly pendingFile = signal<File | null>(null);
   private pendingRestore: PendingRestore | null = null;
+  /** The single PDF last open in the workspace in this visit, to reopen it with «Adelante». */
+  private lastOpened: { file: File; restore: PendingRestore } | null = null;
 
   setPendingFile(file: File, restore: PendingRestore | null = null): void {
     this.pendingFile.set(file);
@@ -33,5 +35,23 @@ export class PendingFileService {
     const restore = this.pendingRestore;
     this.pendingRestore = null;
     return restore;
+  }
+
+  /** Remembers what the workspace had open when leaving it (memory only, lost on reload). */
+  rememberLastOpened(file: File, restore: PendingRestore): void {
+    this.lastOpened = { file, restore };
+  }
+
+  forgetLastOpened(): void {
+    this.lastOpened = null;
+  }
+
+  /** Queues the last PDF open in this visit again; false when there is none. */
+  reopenLast(): boolean {
+    if (!this.lastOpened) {
+      return false;
+    }
+    this.setPendingFile(this.lastOpened.file, this.lastOpened.restore);
+    return true;
   }
 }

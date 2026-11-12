@@ -72,6 +72,7 @@
     "switchTo": "Zu {{mode}} wechseln"
   },
   "controls": {
+    "home": "Zum Start",
     "prev": "Zurück",
     "next": "Weiter",
     "pageIndicator": "Seite {{current}} / {{total}}",

@@ -4795,5 +4795,27 @@ body.has-update-card .toast-host {
   .ai-details__pulse {
     animation: none !important;
     transition: none !important;
+/* ---- Logo of the editor: goes back to the start, like the batch bar ---- */
+.toolbar__home {
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 2px 6px 2px 2px;
+  margin-left: -2px;
+  transition: background-color 150ms ease-out;
+}
+
+.toolbar__home:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.toolbar__home:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolbar__home {
+    transition: none;
   }
 }

@@ -72,6 +72,7 @@
     "switchTo": "Canvia a {{mode}}"
   },
   "controls": {
+    "home": "Anar a l'inici",
     "prev": "Anterior",
     "next": "Següent",
     "pageIndicator": "Pàgina {{current}} / {{total}}",

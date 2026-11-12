@@ -90,6 +90,7 @@ import {
 import { PendingFileService, PendingRestore } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { BATCH_ITEM_PARAM, BATCH_OPEN_VIEW, batchItemOpening } from '../../utils/batch-open.utils';
 import type { BatchItem } from '../../models/batch.model';
 import { matchTemplate, parsePastedTemplates } from '../../utils/template-paste.utils';
 import {
@@ -762,6 +763,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   ngOnDestroy() {
     this.flushBatchSave();
+    this.rememberLastOpened();
     this.batch.deactivate();
     this.revokeThumbnailUrls();
     if (this.autoApplyCoordsTimer) {
@@ -1772,6 +1774,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       pageIndex: this.pageIndex(),
       scale: this.scale(),
       savedAt: Date.now(),
+    });
+  }
+
+  /** Lets «Adelante» (or the history) reopen this PDF as it was after leaving the workspace. */
+  private rememberLastOpened() {
+    if (!this.sessionFile || !this.pdfDoc || this.batch.activeItem()) {
+      return;
+    }
+    this.pendingFileService.rememberLastOpened(this.sessionFile, {
+      coords: this.store.snapshot(),
+      pageIndex: this.pageIndex(),
+      scale: this.scale(),
     });
   }
 
@@ -4595,6 +4609,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.flushBatchSave();
     this.batch.activate(target.id);
     this.clearSelection();
+    void this.router.navigate(['/workspace'], {
+      queryParams: { [BATCH_ITEM_PARAM]: target.id },
+      replaceUrl: true,
+    });
     await this.openBatchPdf(target);
   }
 
@@ -4603,11 +4621,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     item: BatchItem,
     coordsOverride: PageAnnotations[] | null = null,
   ): Promise<void> {
-    const file = new File([item.bPdf ?? item.aPdf], item.bName ?? item.name, {
-      type: 'application/pdf',
-    });
-    const coords = coordsOverride ?? item.bPages ?? (item.bPdf ? null : item.aPages);
-    await this.loadPdfFile(file, coords ? { coords, pageIndex: 1, scale: 0.75 } : null);
+    const opening = batchItemOpening(item);
+    const coords = coordsOverride ?? opening.coords;
+    await this.loadPdfFile(opening.file, coords ? { coords, ...BATCH_OPEN_VIEW } : null);
   }
 
   /** «Documento» tab of a batch PDF: swaps the PDF being edited and keeps its annotations. */

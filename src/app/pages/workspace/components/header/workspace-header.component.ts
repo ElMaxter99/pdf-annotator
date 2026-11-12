@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, Input, ViewChild, inject, signal } from '@angular/core';
 import { DesktopUpdateService } from '../../../../services/desktop-update.service';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { LanguageSelectorComponent } from '../../../../components/language-selector/language-selector.component';
@@ -17,6 +18,7 @@ import { ThemeToggleComponent } from '../../../../components/theme-toggle/theme-
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     TranslationPipe,
     LanguageSelectorComponent,
     ThemeToggleComponent,
