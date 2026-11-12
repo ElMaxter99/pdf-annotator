@@ -1,0 +1,51 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 95.8,
+          "y": 742,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{emp.nombre}}"
+        },
+        {
+          "x": 115.4,
+          "y": 702,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{emp.dep}}"
+        },
+        {
+          "x": 366.8,
+          "y": 742,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{parte.fecha}}"
+        },
+        {
+          "x": 419.1,
+          "y": 702,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{parte.horas}}"
+        },
+        {
+          "x": 119.6,
+          "y": 622,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{parte.obs}}"
+        },
+        {
+          "x": 444.1,
+          "y": 122,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{parte.firma}}"
+        }
+      ]
+    }
+  ]
+}

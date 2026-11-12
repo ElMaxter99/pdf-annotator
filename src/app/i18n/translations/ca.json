@@ -322,7 +322,8 @@
       "templateApplied": "Plantilla carregada: {{count}} camps.",
       "templateFromAnnotations": "Les anotacions de l’original passen a ser la plantilla A.",
       "copiedAdjusted": "Camps copiats i ajustats a la mida de B.",
-      "adjustApplied": "{{count}} camps copiats, {{moved}} ajustats."
+      "adjustApplied": "{{count}} camps copiats, {{moved}} ajustats.",
+      "aiApplied": "{{count}} camps copiats amb IA, {{moved}} en una altra pàgina."
     },
     "bell": {
       "label": "Avisos tancats ({{count}})",
@@ -470,7 +471,8 @@
           "noTemplate": "A no té plantilla",
           "pagesDiffer": "Diferent nombre de pàgines",
           "fit": "Mida de pàgina diferent",
-          "adjust": "Ajust per textos"
+          "adjust": "Ajust per textos",
+          "ai": "Adaptació amb IA"
         },
         "adjust": "{{count}} camps proposats · B sense modificar"
       }
@@ -764,5 +766,135 @@
     "remember": "Recorda la meva elecció en aquesta sessió",
     "cancel": "Cancel·la",
     "continue": "Continua"
+  },
+  "ai": {
+    "chip": {
+      "offline": "IA · sense connectar",
+      "checking": "IA · comprovant…",
+      "noCli": "IA · no trobada",
+      "ready": "IA · {{provider}}",
+      "limit": "IA · {{provider}} · límit"
+    },
+    "panel": {
+      "title": "Connexió amb la IA",
+      "state": {
+        "unknown": "Sense comprovar",
+        "checking": "Comprovant…",
+        "offline": "Sense connectar",
+        "noCli": "Programa no trobat",
+        "ready": "Connectada"
+      },
+      "checking": "Cercant l'ajudant i els programes instal·lats.",
+      "pick": "Amb quina IA treballar",
+      "limits": "S'usen els límits de la teva subscripció, no tokens de pagament.",
+      "noCli": "No trobo «{{cmd}}» en aquest ordinador. Instal·la'l, inicia sessió una vegada (escriu el seu nom en un terminal) i torna a comprovar.",
+      "recheck": "Tornar a comprovar",
+      "found": "Instal·lat",
+      "missing": "No trobat",
+      "send": "S'envien a la teva IA les pàgines d'A i B com a imatges, els seus textos i els camps de la plantilla A (nom i posició). Mai els PDF originals.",
+      "offline": {
+        "title": "No trobo l'ajudant.",
+        "text": "La IA necessita un programa petit al teu ordinador. Obre'l i torna a comprovar.",
+        "step1": "Arrenca l'app amb l'ordre de dalt (tanca l'actual).",
+        "step2": "Si ja ho has fet, comprova que el terminal continua obert."
+      },
+      "model": {
+        "claude": "Model de Claude",
+        "badge": "Econòmic per defecte",
+        "haiku": "Haiku · el més lleuger",
+        "sonnet": "Sonnet · recomanat",
+        "opus": "Opus · esgota el límit abans",
+        "copilot": "Model de Copilot",
+        "copilotAuto": "Automàtic (el del CLI)",
+        "copilotHint": "Cada petició descompta de les teves «premium requests» segons el model. Escriu-ne un de concret si ho indica el teu administrador.",
+        "sonnetHint": "Sonnet: suficient per col·locar camps i gasta poc del teu límit."
+      }
+    },
+    "menu": {
+      "title": "Copiar i adaptar amb IA",
+      "new": "Nou",
+      "text": "Entén que un camp canviï de lloc o de pàgina. Usa el teu {{provider}}. Triga uns segons per PDF."
+    },
+    "loading": {
+      "title": "{{provider}} està comparant A i B…",
+      "hint": "Pots seguir editant; B no es toca fins aplicar.",
+      "stage": {
+        "reading": "Preparant pàgines i textos",
+        "asking": "Esperant la IA",
+        "resolving": "Calculant posicions"
+      }
+    },
+    "error": {
+      "offline": {
+        "title": "L'ajudant no respon.",
+        "text": "Continua obert el terminal amb npm run start:ia?"
+      },
+      "limit": {
+        "title": "Límit de la subscripció.",
+        "text": "{{provider}} ha arribat al límit de la teva subscripció. Es renova a les {{reset}}. El ja proposat es conserva."
+      },
+      "timeout": {
+        "title": "La IA no ha respost a temps.",
+        "text": "No s'ha canviat res a B."
+      },
+      "bad_response": {
+        "title": "La resposta no s'entén.",
+        "text": "Ho hem provat una vegada més sense èxit."
+      },
+      "cli_error": {
+        "title": "La IA ha donat un error.",
+        "text": "Revisa el detall i que la sessió continuï iniciada."
+      },
+      "missing": {
+        "title": "Programa no trobat.",
+        "text": "Instal·la'l i inicia sessió una vegada."
+      },
+      "busy": {
+        "title": "L'ajudant està ocupat.",
+        "text": "Ja hi ha una altra petició en curs; espera que acabi."
+      },
+      "error": {
+        "title": "No s'ha pogut demanar la proposta.",
+        "text": "No s'ha canviat res a B."
+      },
+      "aborted": {
+        "title": "Cancel·lat.",
+        "text": "No s'ha canviat res a B."
+      },
+      "switch": "Canviar a {{provider}}",
+      "retry": "Reintentar",
+      "useAdjust": "Usar ajust per textos"
+    },
+    "empty": {
+      "title": "Sense canvis per aplicar.",
+      "text": "La IA no ha col·locat cap camp."
+    },
+    "review": {
+      "title": "Proposta de la IA ({{provider}})",
+      "strip": "{{placed}} de {{total}} camps col·locats",
+      "changePage": "{{count}} canvia(en) de pàgina",
+      "notFound": "{{count}} sense trobar",
+      "untouched": "B encara no s'ha modificat.",
+      "notPlaced": "sense col·locar",
+      "anchor": "ancoratge «{{text}}»",
+      "goto": "Anar a la pàgina",
+      "listHint": "Els de confiança baixa o sense col·locar no s'apliquen fins que els marquis."
+    },
+    "confidence": {
+      "high": "Alta",
+      "medium": "Mitjana",
+      "low": "Baixa",
+      "none": "No trobat"
+    },
+    "consent": {
+      "title": "Enviaràs pàgines a {{provider}}",
+      "intro": "Per comparar A i B, l'ajudant passa al teu {{provider}}:",
+      "pages": "Les pàgines d'A i de B com a imatges i els seus textos.",
+      "fields": "Els camps de la plantilla A (posició i nom).",
+      "not": "No envia els PDF originals. El processa la teva sessió de {{provider}} segons les seves condicions. Usa només PDF que puguis enviar.",
+      "remember": "No tornar a avisar en aquest ordinador",
+      "send": "Enviar a {{provider}}"
+    },
+    "notice": "{{count}} camps proposats per la IA · B sense modificar"
   }
 }

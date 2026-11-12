@@ -322,7 +322,8 @@
       "templateApplied": "Modelo carregado: {{count}} campos.",
       "templateFromAnnotations": "As anotações do original passam a ser o modelo A.",
       "copiedAdjusted": "Campos copiados e ajustados ao tamanho de B.",
-      "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
+      "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados.",
+      "aiApplied": "{{count}} campos copiados com IA, {{moved}} noutra página."
     },
     "bell": {
       "label": "Avisos fechados ({{count}})",
@@ -470,7 +471,8 @@
           "noTemplate": "A não tem modelo",
           "pagesDiffer": "Número de páginas diferente",
           "fit": "Tamanho de página diferente",
-          "adjust": "Ajuste por textos"
+          "adjust": "Ajuste por textos",
+          "ai": "Adaptação com IA"
         },
         "adjust": "{{count}} campos propostos · B sem modificar"
       }
@@ -764,5 +766,135 @@
     "remember": "Lembrar a minha escolha nesta sessão",
     "cancel": "Cancelar",
     "continue": "Continuar"
+  },
+  "ai": {
+    "chip": {
+      "offline": "IA · sem ligação",
+      "checking": "IA · a verificar…",
+      "noCli": "IA · não encontrada",
+      "ready": "IA · {{provider}}",
+      "limit": "IA · {{provider}} · limite"
+    },
+    "panel": {
+      "title": "Ligação à IA",
+      "state": {
+        "unknown": "Sem verificar",
+        "checking": "A verificar…",
+        "offline": "Sem ligação",
+        "noCli": "Programa não encontrado",
+        "ready": "Ligada"
+      },
+      "checking": "A procurar o assistente e os programas instalados.",
+      "pick": "Com que IA trabalhar",
+      "limits": "Usam-se os limites da tua subscrição, não tokens pagos.",
+      "noCli": "Não encontro «{{cmd}}» neste computador. Instala-o, inicia sessão uma vez (escreve o nome num terminal) e verifica de novo.",
+      "recheck": "Verificar de novo",
+      "found": "Instalado",
+      "missing": "Não encontrado",
+      "send": "Enviam-se à tua IA: as páginas de A e B como imagens, os seus textos e os campos do modelo A (nome e posição). Nunca os PDF originais.",
+      "offline": {
+        "title": "Não encontro o assistente.",
+        "text": "A IA precisa de um programa pequeno no teu computador. Abre-o e verifica de novo.",
+        "step1": "Arranca a app com o comando acima (fecha a atual).",
+        "step2": "Se já o fizeste, confirma que o terminal continua aberto."
+      },
+      "model": {
+        "claude": "Modelo do Claude",
+        "badge": "Económico por defeito",
+        "haiku": "Haiku · o mais leve",
+        "sonnet": "Sonnet · recomendado",
+        "opus": "Opus · esgota o limite mais depressa",
+        "copilot": "Modelo do Copilot",
+        "copilotAuto": "Automático (o do CLI)",
+        "copilotHint": "Cada pedido desconta das tuas «premium requests» conforme o modelo. Escreve um concreto se o teu administrador o indicar.",
+        "sonnetHint": "Sonnet: suficiente para colocar campos e gasta pouco do teu limite."
+      }
+    },
+    "menu": {
+      "title": "Copiar e adaptar com IA",
+      "new": "Novo",
+      "text": "Percebe que um campo mude de sítio ou de página. Usa o teu {{provider}}. Demora uns segundos por PDF."
+    },
+    "loading": {
+      "title": "{{provider}} está a comparar A e B…",
+      "hint": "Podes continuar a editar; B não é alterado até aplicares.",
+      "stage": {
+        "reading": "A preparar páginas e textos",
+        "asking": "À espera da IA",
+        "resolving": "A calcular posições"
+      }
+    },
+    "error": {
+      "offline": {
+        "title": "O assistente não responde.",
+        "text": "O terminal com npm run start:ia continua aberto?"
+      },
+      "limit": {
+        "title": "Limite da subscrição.",
+        "text": "{{provider}} atingiu o limite da tua subscrição. Renova às {{reset}}. O que já estava proposto mantém-se."
+      },
+      "timeout": {
+        "title": "A IA não respondeu a tempo.",
+        "text": "Nada foi alterado em B."
+      },
+      "bad_response": {
+        "title": "A resposta não se entende.",
+        "text": "Tentámos mais uma vez sem sucesso."
+      },
+      "cli_error": {
+        "title": "A IA devolveu um erro.",
+        "text": "Vê o detalhe e se a sessão continua iniciada."
+      },
+      "missing": {
+        "title": "Programa não encontrado.",
+        "text": "Instala-o e inicia sessão uma vez."
+      },
+      "busy": {
+        "title": "O assistente está ocupado.",
+        "text": "Já há outro pedido em curso; espera que termine."
+      },
+      "error": {
+        "title": "Não foi possível pedir a proposta.",
+        "text": "Nada foi alterado em B."
+      },
+      "aborted": {
+        "title": "Cancelado.",
+        "text": "Nada foi alterado em B."
+      },
+      "switch": "Mudar para {{provider}}",
+      "retry": "Tentar de novo",
+      "useAdjust": "Usar ajuste por textos"
+    },
+    "empty": {
+      "title": "Sem alterações para aplicar.",
+      "text": "A IA não colocou nenhum campo."
+    },
+    "review": {
+      "title": "Proposta da IA ({{provider}})",
+      "strip": "{{placed}} de {{total}} campos colocados",
+      "changePage": "{{count}} muda(m) de página",
+      "notFound": "{{count}} não encontrado(s)",
+      "untouched": "B ainda não foi modificado.",
+      "notPlaced": "sem colocar",
+      "anchor": "âncora «{{text}}»",
+      "goto": "Ir para a página",
+      "listHint": "Os de confiança baixa ou sem colocar não se aplicam até os marcares."
+    },
+    "confidence": {
+      "high": "Alta",
+      "medium": "Média",
+      "low": "Baixa",
+      "none": "Não encontrado"
+    },
+    "consent": {
+      "title": "Vais enviar páginas para {{provider}}",
+      "intro": "Para comparar A e B, o assistente passa ao teu {{provider}}:",
+      "pages": "As páginas de A e de B como imagens e os seus textos.",
+      "fields": "Os campos do modelo A (posição e nome).",
+      "not": "Não envia os PDF originais. A tua sessão de {{provider}} processa-os segundo as suas condições. Usa apenas PDF que possas enviar.",
+      "remember": "Não voltar a avisar neste computador",
+      "send": "Enviar para {{provider}}"
+    },
+    "notice": "{{count}} campos propostos pela IA · B sem alterações"
   }
 }

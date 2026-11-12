@@ -1,0 +1,86 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 91.3,
+          "y": 722,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{cliente.nombre}}"
+        },
+        {
+          "x": 74.1,
+          "y": 682,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{cliente.nif}}"
+        },
+        {
+          "x": 103.6,
+          "y": 642,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{cliente.direccion}}"
+        },
+        {
+          "x": 436.8,
+          "y": 722,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{factura.fecha}}"
+        },
+        {
+          "x": 425,
+          "y": 802,
+          "type": "text",
+          "fontSize": 14,
+          "mapField": "{{factura.numero}}",
+          "color": "#FFFFFF"
+        },
+        {
+          "x": 104.1,
+          "y": 562,
+          "type": "text",
+          "fontSize": 11,
+          "mapField": "{{linea.concepto}}"
+        },
+        {
+          "x": 131.8,
+          "y": 482,
+          "type": "number",
+          "fontSize": 11,
+          "mapField": "{{base}}",
+          "decimals": 2,
+          "appender": " €"
+        },
+        {
+          "x": 103.3,
+          "y": 442,
+          "type": "number",
+          "fontSize": 11,
+          "mapField": "{{iva}}",
+          "decimals": 2,
+          "appender": " €"
+        },
+        {
+          "x": 81.1,
+          "y": 402,
+          "type": "number",
+          "fontSize": 14,
+          "mapField": "{{total}}",
+          "decimals": 2,
+          "appender": " €"
+        },
+        {
+          "x": 32,
+          "y": 340,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "pagada"
+        }
+      ]
+    }
+  ]
+}

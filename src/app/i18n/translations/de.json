@@ -322,7 +322,8 @@
       "templateApplied": "Vorlage geladen: {{count}} Felder.",
       "templateFromAnnotations": "Die Anmerkungen des Originals sind jetzt Vorlage A.",
       "copiedAdjusted": "Felder kopiert und an die Größe von B angepasst.",
-      "adjustApplied": "{{count}} Felder kopiert, {{moved}} angepasst."
+      "adjustApplied": "{{count}} Felder kopiert, {{moved}} angepasst.",
+      "aiApplied": "{{count}} Felder mit KI kopiert, {{moved}} auf einer anderen Seite."
     },
     "bell": {
       "label": "Geschlossene Hinweise ({{count}})",
@@ -470,7 +471,8 @@
           "noTemplate": "A hat keine Vorlage",
           "pagesDiffer": "Unterschiedliche Seitenzahl",
           "fit": "Unterschiedliche Seitengröße",
-          "adjust": "Anpassung nach Texten"
+          "adjust": "Anpassung nach Texten",
+          "ai": "KI-Anpassung"
         },
         "adjust": "{{count}} Felder vorgeschlagen · B unverändert"
       }
@@ -764,5 +766,135 @@
     "remember": "Meine Wahl in dieser Sitzung merken",
     "cancel": "Abbrechen",
     "continue": "Weiter"
+  },
+  "ai": {
+    "chip": {
+      "offline": "KI · nicht verbunden",
+      "checking": "KI · Prüfung…",
+      "noCli": "KI · nicht gefunden",
+      "ready": "KI · {{provider}}",
+      "limit": "KI · {{provider}} · Limit"
+    },
+    "panel": {
+      "title": "Verbindung zur KI",
+      "state": {
+        "unknown": "Ungeprüft",
+        "checking": "Prüfung…",
+        "offline": "Nicht verbunden",
+        "noCli": "Programm nicht gefunden",
+        "ready": "Verbunden"
+      },
+      "checking": "Suche den Helfer und die installierten Programme.",
+      "pick": "Mit welcher KI arbeiten",
+      "limits": "Es gelten die Limits deines Abos, keine bezahlten Tokens.",
+      "noCli": "Ich finde „{{cmd}}“ auf diesem Computer nicht. Installiere es, melde dich einmal an (Namen im Terminal eingeben) und prüfe erneut.",
+      "recheck": "Erneut prüfen",
+      "found": "Installiert",
+      "missing": "Nicht gefunden",
+      "send": "An deine KI gehen: die Seiten von A und B als Bilder, ihre Texte und die Felder der Vorlage A (Name und Position). Nie die Original-PDFs.",
+      "offline": {
+        "title": "Ich finde den Helfer nicht.",
+        "text": "Die KI braucht ein kleines Programm auf deinem Computer. Starte es und prüfe erneut.",
+        "step1": "Starte die App mit dem Befehl oben (schließe die aktuelle).",
+        "step2": "Falls schon geschehen, prüfe, ob das Terminal noch offen ist."
+      },
+      "model": {
+        "claude": "Claude-Modell",
+        "badge": "Standardmäßig sparsam",
+        "haiku": "Haiku · das leichteste",
+        "sonnet": "Sonnet · empfohlen",
+        "opus": "Opus · verbraucht das Limit schneller",
+        "copilot": "Copilot-Modell",
+        "copilotAuto": "Automatisch (Standard des CLI)",
+        "copilotHint": "Jede Anfrage wird je nach Modell von deinen „Premium Requests“ abgezogen. Gib ein bestimmtes ein, wenn dein Administrator es vorgibt.",
+        "sonnetHint": "Sonnet: genügt zum Platzieren der Felder und schont dein Limit."
+      }
+    },
+    "menu": {
+      "title": "Mit KI kopieren und anpassen",
+      "new": "Neu",
+      "text": "Versteht, dass ein Feld den Platz oder die Seite wechselt. Nutzt dein {{provider}}. Einige Sekunden pro PDF."
+    },
+    "loading": {
+      "title": "{{provider}} vergleicht A und B…",
+      "hint": "Du kannst weiterbearbeiten; B bleibt unverändert, bis du anwendest.",
+      "stage": {
+        "reading": "Seiten und Texte vorbereiten",
+        "asking": "Warte auf die KI",
+        "resolving": "Positionen berechnen"
+      }
+    },
+    "error": {
+      "offline": {
+        "title": "Der Helfer antwortet nicht.",
+        "text": "Ist das Terminal mit npm run start:ia noch offen?"
+      },
+      "limit": {
+        "title": "Abo-Limit.",
+        "text": "{{provider}} hat das Limit deines Abos erreicht. Es erneuert sich um {{reset}}. Bereits Vorgeschlagenes bleibt erhalten."
+      },
+      "timeout": {
+        "title": "Die KI hat nicht rechtzeitig geantwortet.",
+        "text": "In B wurde nichts geändert."
+      },
+      "bad_response": {
+        "title": "Die Antwort ist nicht verständlich.",
+        "text": "Ein weiterer Versuch blieb erfolglos."
+      },
+      "cli_error": {
+        "title": "Die KI hat einen Fehler gemeldet.",
+        "text": "Prüfe die Details und ob die Sitzung noch angemeldet ist."
+      },
+      "missing": {
+        "title": "Programm nicht gefunden.",
+        "text": "Installiere es und melde dich einmal an."
+      },
+      "busy": {
+        "title": "Der Helfer ist beschäftigt.",
+        "text": "Eine andere Anfrage läuft noch; warte, bis sie fertig ist."
+      },
+      "error": {
+        "title": "Der Vorschlag konnte nicht angefordert werden.",
+        "text": "In B wurde nichts geändert."
+      },
+      "aborted": {
+        "title": "Abgebrochen.",
+        "text": "In B wurde nichts geändert."
+      },
+      "switch": "Zu {{provider}} wechseln",
+      "retry": "Erneut versuchen",
+      "useAdjust": "Textabgleich verwenden"
+    },
+    "empty": {
+      "title": "Keine Änderungen anzuwenden.",
+      "text": "Die KI hat kein Feld platziert."
+    },
+    "review": {
+      "title": "KI-Vorschlag ({{provider}})",
+      "strip": "{{placed}} von {{total}} Feldern platziert",
+      "changePage": "{{count}} wechselt/wechseln die Seite",
+      "notFound": "{{count}} nicht gefunden",
+      "untouched": "B wurde noch nicht verändert.",
+      "notPlaced": "nicht platziert",
+      "anchor": "Anker „{{text}}“",
+      "goto": "Zur Seite",
+      "listHint": "Felder mit niedriger Zuverlässigkeit oder ohne Platz werden erst angewendet, wenn du sie ankreuzt."
+    },
+    "confidence": {
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig",
+      "none": "Nicht gefunden"
+    },
+    "consent": {
+      "title": "Du sendest gleich Seiten an {{provider}}",
+      "intro": "Um A und B zu vergleichen, übergibt der Helfer deinem {{provider}}:",
+      "pages": "Die Seiten von A und B als Bilder und ihre Texte.",
+      "fields": "Die Felder der Vorlage A (Position und Name).",
+      "not": "Er sendet nicht die Original-PDFs. Deine {{provider}}-Sitzung verarbeitet sie nach deren Bedingungen. Nutze nur PDFs, die du senden darfst.",
+      "remember": "Auf diesem Computer nicht mehr warnen",
+      "send": "An {{provider}} senden"
+    },
+    "notice": "{{count}} Felder von der KI vorgeschlagen · B unverändert"
   }
 }
