@@ -63,4 +63,7 @@ jobs:
       - name: Desktop app smoke test (Electron)
         run: |
           node node_modules/electron/install.js
+          echo '--- arranque directo (diagnóstico) ---'
+          timeout 20 xvfb-run -a node_modules/.bin/electron --no-sandbox --disable-gpu --disable-dev-shm-usage --enable-logging=stderr desktop 2>&1 | head -60 || true
+          echo '--- prueba de humo ---'
           xvfb-run -a node desktop/smoke.mjs
