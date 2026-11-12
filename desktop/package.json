@@ -4,6 +4,7 @@
   "version": "1.8.0",
   "description": "PDF Annotator: aplicación de escritorio con IA local",
   "author": "AAmoros",
+  "homepage": "https://github.com/ElMaxter99/pdf-annotator",
   "license": "MIT",
   "type": "module",
   "main": "main.mjs",
