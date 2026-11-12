@@ -1,5 +1,9 @@
 ## Unreleased
 
+## [v1.8.3](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.3) - 2026-11-12
+### Fixed
+- La app de escritorio mostraba el icono genérico de Electron (en Linux, Windows y macOS) porque el empaquetado no tenía iconos. Ahora usa el logo de PDF Annotator: PNG de 16 a 1024 px para Linux (`.deb`/`.rpm`/AppImage), `.ico` multitamaño para Windows, icono para macOS y icono en la ventana. También se fija el nombre de escritorio (`desktopName`) para que el sistema asocie la ventana abierta con su icono del lanzador.
+
 ## [v1.8.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.2) - 2026-11-12
 ### Added
 - Opción «Reintentar una vez si la respuesta no sirve» en el panel de la IA, por proveedor: activada con Claude y desactivada con Copilot (un reintento cuenta como otra petición premium).
@@ -10,7 +14,6 @@
 - Guía «Cómo instalar» (`docs/INSTALAR.md`) para Windows, macOS y Linux, enlazada desde el README: qué archivo elegir, avisos de instaladores sin firmar, `libfuse2`, actualizaciones y aviso de que Linux solo tiene paquetes x86_64. Las capturas reales están pendientes (huecos marcados)
 - Carpeta `tools/ai-phase0/sample-plano/` con los casos de prueba de la IA en plano (PDF A/B, JSON y esperado por caso) para probar el lote a mano.
 ### Fixed
-- La app de escritorio mostraba el icono genérico de Electron (en Linux, Windows y macOS) porque el empaquetado no tenía iconos. Ahora usa el logo de PDF Annotator: PNG de 16 a 1024 px para Linux (`.deb`/`.rpm`/AppImage), `.ico` multitamaño para Windows, icono para macOS y icono en la ventana. También se fija el nombre de escritorio (`desktopName`) para que el sistema asocie la ventana abierta con su icono del lanzador.
 - «Ver detalles» de la IA: la prueba de lectura de imágenes ya no da falsos positivos, el consumo se muestra también en peticiones fallidas y «Copiar informe» funciona en la app de escritorio.
 - La release de escritorio creaba dos borradores duplicados (los 4 jobs de empaquetado en paralelo creaban cada uno el suyo y los archivos quedaban repartidos); ahora un job previo crea el borrador una sola vez y todos suben a él.
 
