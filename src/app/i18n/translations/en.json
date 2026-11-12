@@ -895,7 +895,97 @@
       "remember": "Do not warn again on this computer",
       "send": "Send to {{provider}}"
     },
-    "notice": "{{count}} fields proposed by the AI · B unchanged"
+    "notice": "{{count}} fields proposed by the AI · B unchanged",
+    "details": {
+      "open": "View details",
+      "title": "What the AI is doing",
+      "close": "Close",
+      "modelDefault": "CLI default model",
+      "tab": {
+        "summary": "Summary",
+        "steps": "Steps",
+        "sent": "What is sent",
+        "usage": "Usage"
+      },
+      "status": {
+        "running": "Running · {{time}}",
+        "done": "Finished · {{time}}",
+        "doneEmpty": "Finished · {{time}} · no changes",
+        "error": "Failed · {{time}}"
+      },
+      "steps": "Steps",
+      "step": {
+        "prepare": "Prepare the pages",
+        "prepareSub": "Texts extracted: {{textsA}} from A and {{textsB}} from B. Pages: {{pagesA}} of A and {{pagesB}} of B, rendered as images.",
+        "send": "Send to {{provider}}",
+        "sendSub": "Attempt {{n}} of 2",
+        "sendNoSteps": "Attempt {{n}} of 2. {{provider}} does not report its internal steps.",
+        "read": "{{provider}} opens {{file}}",
+        "tool": "{{provider}} uses the {{tool}} tool",
+        "answer": "{{provider}} writes the answer",
+        "answerSub": "{{chars}} characters",
+        "resolve": "Calculate the coordinates",
+        "resolveSub": "The app turns each anchor into x, y from the text positions.",
+        "show": "Show the proposal",
+        "showSub": "You can review it in «Split» before applying anything.",
+        "result": "Result",
+        "resultSub": "{{placed}} of {{total}} fields placed",
+        "resultEmpty": "0 of {{total}} fields placed → no changes",
+        "error": "Error"
+      },
+      "usage": {
+        "title": "Usage",
+        "soFar": "Usage so far",
+        "measured": "Measured by {{provider}}",
+        "tokens": "tokens",
+        "cacheRead": "Read from cache (cheap)",
+        "cacheWrite": "Written to cache",
+        "input": "New input",
+        "output": "Output (what the AI writes)",
+        "cost": "API equivalent",
+        "costNote": "«Equivalent»: what it would cost through the API. With a subscription it is not billed separately: it counts against your limit.",
+        "liveNote": "The numbers come from Claude Code itself while it works. The cost appears at the end.",
+        "waiting": "Waiting for the first usage data.",
+        "limits": "With your subscription it is not billed separately: this counts against your 5-hour and weekly limit. A bigger model uses it up sooner.",
+        "unavailableBadge": "Not measurable",
+        "unavailable": "{{provider}} gives no tokens or cost in this mode. We do not show numbers that are not real.",
+        "requests": "Requests sent",
+        "requestsValue": "{{n}} (max. 2)",
+        "sentSize": "Sent (images + texts)",
+        "estimate": "Approximate tokens",
+        "estimateBadge": "Estimate",
+        "premium": "Premium requests",
+        "premiumValue": "depends on the model",
+        "copilotWarn": "Each request counts against your quota with the multiplier of the model you use. Check «/usage» in Copilot or GitHub billing before and after."
+      },
+      "sent": {
+        "title": "What was sent",
+        "text": "Only names and sizes; the content is not kept in this report. None of it leaves your computer except to {{provider}}.",
+        "counts": "{{fields}} fields · pages: A {{pagesA}} · B {{pagesB}}",
+        "empty": "Nothing has been prepared yet."
+      },
+      "foot": {
+        "live": "It updates by itself while the AI works. Closing it does not stop it.",
+        "done": "It also helps to diagnose: copy the report and paste it where you need (without the content of your PDFs)."
+      },
+      "cancel": "Cancel request",
+      "copy": "Copy report",
+      "copied": "Report copied.",
+      "copyFailed": "Could not copy the report.",
+      "diag": {
+        "title": "Why it ended with «no changes»",
+        "titlePartial": "Why fields are missing",
+        "tryTitle": "What you can try:",
+        "tip": "Use a version with text, or «Copy and adjust by texts» if B does have text.",
+        "no_text_a": "The PDF of A has no readable text (usually a scan or a PDF made of images). The AI sees the pages, but the app needs texts to calculate coordinates.",
+        "no_text_b": "The PDF of B has no readable text (usually a scan or a PDF made of images). The AI sees the pages, but the app needs texts to calculate coordinates.",
+        "permission_denied": "{{provider}} could not open the files it was given (permission denied). Check its session and try again.",
+        "no_valid_answer": "The AI answer was not a valid list with one object per field, not even on the retry.",
+        "anchors_not_found": "The AI proposed anchor texts that do not exist in the PDFs. It usually happens when the wording changed a lot.",
+        "ai_found_nothing": "The AI answered that it cannot place any of the fields.",
+        "partial": "Some fields could not be placed; the review list shows the reason for each one."
+      }
+    }
   },
   "update": {
     "available": {

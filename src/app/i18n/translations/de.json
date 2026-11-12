@@ -895,7 +895,97 @@
       "remember": "Auf diesem Computer nicht mehr warnen",
       "send": "An {{provider}} senden"
     },
-    "notice": "{{count}} Felder von der KI vorgeschlagen · B unverändert"
+    "notice": "{{count}} Felder von der KI vorgeschlagen · B unverändert",
+    "details": {
+      "open": "Details anzeigen",
+      "title": "Was die KI gerade tut",
+      "close": "Schließen",
+      "modelDefault": "Standardmodell der CLI",
+      "tab": {
+        "summary": "Übersicht",
+        "steps": "Schritte",
+        "sent": "Was gesendet wird",
+        "usage": "Verbrauch"
+      },
+      "status": {
+        "running": "Läuft · {{time}}",
+        "done": "Fertig · {{time}}",
+        "doneEmpty": "Fertig · {{time}} · keine Änderungen",
+        "error": "Fehlgeschlagen · {{time}}"
+      },
+      "steps": "Schritte",
+      "step": {
+        "prepare": "Seiten vorbereiten",
+        "prepareSub": "Extrahierte Texte: {{textsA}} aus A und {{textsB}} aus B. Seiten: {{pagesA}} von A und {{pagesB}} von B, als Bilder gerendert.",
+        "send": "An {{provider}} senden",
+        "sendSub": "Versuch {{n}} von 2",
+        "sendNoSteps": "Versuch {{n}} von 2. {{provider}} meldet seine internen Schritte nicht.",
+        "read": "{{provider}} öffnet {{file}}",
+        "tool": "{{provider}} nutzt das Werkzeug {{tool}}",
+        "answer": "{{provider}} schreibt die Antwort",
+        "answerSub": "{{chars}} Zeichen",
+        "resolve": "Koordinaten berechnen",
+        "resolveSub": "Die App wandelt jeden Anker anhand der Textpositionen in x, y um.",
+        "show": "Vorschlag anzeigen",
+        "showSub": "Du kannst ihn in «Geteilt» prüfen, bevor etwas angewendet wird.",
+        "result": "Ergebnis",
+        "resultSub": "{{placed}} von {{total}} Feldern platziert",
+        "resultEmpty": "0 von {{total}} Feldern platziert → keine Änderungen",
+        "error": "Fehler"
+      },
+      "usage": {
+        "title": "Verbrauch",
+        "soFar": "Verbrauch bisher",
+        "measured": "Gemessen von {{provider}}",
+        "tokens": "Tokens",
+        "cacheRead": "Aus dem Cache gelesen (günstig)",
+        "cacheWrite": "In den Cache geschrieben",
+        "input": "Neue Eingabe",
+        "output": "Ausgabe (was die KI schreibt)",
+        "cost": "API-Äquivalent",
+        "costNote": "«Äquivalent»: was es über die API kosten würde. Mit Abo wird nichts extra berechnet: es zählt gegen dein Limit.",
+        "liveNote": "Die Zahlen liefert Claude Code selbst, während es arbeitet. Die Kosten erscheinen am Ende.",
+        "waiting": "Warte auf die ersten Nutzungsdaten.",
+        "limits": "Mit deinem Abo wird nichts extra berechnet: es zählt gegen dein 5-Stunden- und Wochenlimit. Ein größeres Modell verbraucht es schneller.",
+        "unavailableBadge": "Nicht messbar",
+        "unavailable": "{{provider}} liefert in diesem Modus weder Tokens noch Kosten. Wir zeigen keine Zahlen, die nicht echt sind.",
+        "requests": "Gesendete Anfragen",
+        "requestsValue": "{{n}} (max. 2)",
+        "sentSize": "Gesendet (Bilder + Texte)",
+        "estimate": "Ungefähre Tokens",
+        "estimateBadge": "Schätzung",
+        "premium": "Premium requests",
+        "premiumValue": "je nach Modell",
+        "copilotWarn": "Jede Anfrage wird mit dem Multiplikator des verwendeten Modells von deinem Kontingent abgezogen. Prüfe «/usage» in Copilot oder die GitHub-Abrechnung davor und danach."
+      },
+      "sent": {
+        "title": "Was gesendet wurde",
+        "text": "Nur Namen und Größen; der Inhalt wird in diesem Bericht nicht gespeichert. Nichts davon verlässt deinen Computer außer in Richtung {{provider}}.",
+        "counts": "{{fields}} Felder · Seiten: A {{pagesA}} · B {{pagesB}}",
+        "empty": "Noch nichts vorbereitet."
+      },
+      "foot": {
+        "live": "Aktualisiert sich selbst, solange die KI arbeitet. Schließen stoppt sie nicht.",
+        "done": "Dient auch der Diagnose: Bericht kopieren und einfügen, wo du ihn brauchst (ohne den Inhalt deiner PDFs)."
+      },
+      "cancel": "Anfrage abbrechen",
+      "copy": "Bericht kopieren",
+      "copied": "Bericht kopiert.",
+      "copyFailed": "Der Bericht konnte nicht kopiert werden.",
+      "diag": {
+        "title": "Warum «keine Änderungen» herauskam",
+        "titlePartial": "Warum Felder fehlen",
+        "tryTitle": "Das kannst du versuchen:",
+        "tip": "Nutze eine Version mit Text oder «Kopieren und nach Texten anpassen», wenn B Text hat.",
+        "no_text_a": "Das PDF von A hat keinen lesbaren Text (meist ein Scan oder ein PDF aus Bildern). Die KI sieht die Seiten, aber die App braucht Texte, um die Koordinaten zu berechnen.",
+        "no_text_b": "Das PDF von B hat keinen lesbaren Text (meist ein Scan oder ein PDF aus Bildern). Die KI sieht die Seiten, aber die App braucht Texte, um die Koordinaten zu berechnen.",
+        "permission_denied": "{{provider}} konnte die übergebenen Dateien nicht öffnen (Berechtigung verweigert). Prüfe die Sitzung und versuche es erneut.",
+        "no_valid_answer": "Die Antwort der KI war keine gültige Liste mit einem Objekt pro Feld, auch nicht im zweiten Versuch.",
+        "anchors_not_found": "Die KI schlug Ankertexte vor, die in den PDFs nicht vorkommen. Das passiert, wenn sich die Formulierung stark geändert hat.",
+        "ai_found_nothing": "Die KI antwortete, dass sie keines der Felder platzieren kann.",
+        "partial": "Einige Felder konnten nicht platziert werden; die Prüfliste nennt den Grund für jedes."
+      }
+    }
   },
   "update": {
     "available": {

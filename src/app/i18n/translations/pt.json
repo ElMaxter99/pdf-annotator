@@ -895,7 +895,97 @@
       "remember": "Não voltar a avisar neste computador",
       "send": "Enviar para {{provider}}"
     },
-    "notice": "{{count}} campos propostos pela IA · B sem alterações"
+    "notice": "{{count}} campos propostos pela IA · B sem alterações",
+    "details": {
+      "open": "Ver detalhes",
+      "title": "O que a IA está a fazer",
+      "close": "Fechar",
+      "modelDefault": "modelo predefinido do CLI",
+      "tab": {
+        "summary": "Resumo",
+        "steps": "Passos",
+        "sent": "O que é enviado",
+        "usage": "Consumo"
+      },
+      "status": {
+        "running": "Em curso · {{time}}",
+        "done": "Concluído · {{time}}",
+        "doneEmpty": "Concluído · {{time}} · sem alterações",
+        "error": "Com erro · {{time}}"
+      },
+      "steps": "Passos",
+      "step": {
+        "prepare": "Preparar as páginas",
+        "prepareSub": "Textos extraídos: {{textsA}} de A e {{textsB}} de B. Páginas: {{pagesA}} de A e {{pagesB}} de B, convertidas em imagem.",
+        "send": "Enviar para {{provider}}",
+        "sendSub": "Tentativa {{n}} de 2",
+        "sendNoSteps": "Tentativa {{n}} de 2. {{provider}} não informa os seus passos internos.",
+        "read": "{{provider}} abre {{file}}",
+        "tool": "{{provider}} usa a ferramenta {{tool}}",
+        "answer": "{{provider}} escreve a resposta",
+        "answerSub": "{{chars}} carateres",
+        "resolve": "Calcular as coordenadas",
+        "resolveSub": "A app converte cada âncora em x, y a partir das posições do texto.",
+        "show": "Mostrar a proposta",
+        "showSub": "Poderá revê-la em «Dividida» antes de aplicar o que quer que seja.",
+        "result": "Resultado",
+        "resultSub": "{{placed}} de {{total}} campos colocados",
+        "resultEmpty": "0 de {{total}} campos colocados → sem alterações",
+        "error": "Erro"
+      },
+      "usage": {
+        "title": "Consumo",
+        "soFar": "Consumo até agora",
+        "measured": "Medido por {{provider}}",
+        "tokens": "tokens",
+        "cacheRead": "Lidos da cache (baratos)",
+        "cacheWrite": "Escritos na cache",
+        "input": "Entrada nova",
+        "output": "Saída (o que a IA escreve)",
+        "cost": "Equivalente em API",
+        "costNote": "«Equivalente»: o que custaria pela API. Com subscrição não se cobra à parte: conta para o seu limite.",
+        "liveNote": "Os números são dados pelo próprio Claude Code enquanto trabalha. O custo aparece no fim.",
+        "waiting": "À espera do primeiro dado de utilização.",
+        "limits": "Com a sua subscrição não se cobra à parte: isto conta para o seu limite de 5 horas e o semanal. Um modelo maior gasta-o mais depressa.",
+        "unavailableBadge": "Não mensurável",
+        "unavailable": "{{provider}} não dá tokens nem custo neste modo. Não mostramos números que não sejam reais.",
+        "requests": "Pedidos enviados",
+        "requestsValue": "{{n}} (máx. 2)",
+        "sentSize": "Enviado (imagens + textos)",
+        "estimate": "Tokens aproximados",
+        "estimateBadge": "Estimativa",
+        "premium": "Premium requests",
+        "premiumValue": "conforme o modelo",
+        "copilotWarn": "Cada pedido desconta da sua quota com o multiplicador do modelo que usar. Veja «/usage» no Copilot ou a faturação do GitHub antes e depois."
+      },
+      "sent": {
+        "title": "O que foi enviado",
+        "text": "Apenas nomes e tamanhos; o conteúdo não fica guardado neste relatório. Nada disto sai do seu computador exceto para {{provider}}.",
+        "counts": "{{fields}} campos · páginas: A {{pagesA}} · B {{pagesB}}",
+        "empty": "Ainda não foi preparado nada."
+      },
+      "foot": {
+        "live": "Atualiza-se sozinho enquanto a IA trabalha. Fechá-lo não a pára.",
+        "done": "Também serve para diagnosticar: copie o relatório e cole-o onde precisar (sem o conteúdo dos seus PDF)."
+      },
+      "cancel": "Cancelar pedido",
+      "copy": "Copiar relatório",
+      "copied": "Relatório copiado.",
+      "copyFailed": "Não foi possível copiar o relatório.",
+      "diag": {
+        "title": "Porque terminou «sem alterações»",
+        "titlePartial": "Porque faltam campos",
+        "tryTitle": "O que pode experimentar:",
+        "tip": "Use uma versão com texto ou «Copiar e ajustar por textos» se B tiver texto.",
+        "no_text_a": "O PDF de A não tem texto legível (costuma ser uma digitalização ou um PDF feito de imagens). A IA vê as páginas, mas a app precisa de textos para calcular as coordenadas.",
+        "no_text_b": "O PDF de B não tem texto legível (costuma ser uma digitalização ou um PDF feito de imagens). A IA vê as páginas, mas a app precisa de textos para calcular as coordenadas.",
+        "permission_denied": "{{provider}} não conseguiu abrir os ficheiros que lhe são passados (permissão negada). Verifique a sua sessão e tente de novo.",
+        "no_valid_answer": "A resposta da IA não era uma lista válida com um objeto por campo, nem na nova tentativa.",
+        "anchors_not_found": "A IA propôs textos de ancoragem que não existem nos PDF. Costuma acontecer se a redação mudou muito.",
+        "ai_found_nothing": "A IA respondeu que não consegue colocar nenhum dos campos.",
+        "partial": "Alguns campos não puderam ser colocados; a lista de revisão indica o motivo de cada um."
+      }
+    }
   },
   "update": {
     "available": {

@@ -895,7 +895,97 @@
       "remember": "No tornar a avisar en aquest ordinador",
       "send": "Enviar a {{provider}}"
     },
-    "notice": "{{count}} camps proposats per la IA · B sense modificar"
+    "notice": "{{count}} camps proposats per la IA · B sense modificar",
+    "details": {
+      "open": "Veure detalls",
+      "title": "Què està fent la IA",
+      "close": "Tanca",
+      "modelDefault": "model del CLI",
+      "tab": {
+        "summary": "Resum",
+        "steps": "Passos",
+        "sent": "Què s'envia",
+        "usage": "Consum"
+      },
+      "status": {
+        "running": "En curs · {{time}}",
+        "done": "Acabat · {{time}}",
+        "doneEmpty": "Acabat · {{time}} · sense canvis",
+        "error": "Amb error · {{time}}"
+      },
+      "steps": "Passos",
+      "step": {
+        "prepare": "Preparar les pàgines",
+        "prepareSub": "Textos extrets: {{textsA}} d'A i {{textsB}} de B. Pàgines: {{pagesA}} d'A i {{pagesB}} de B, passades a imatge.",
+        "send": "Enviar a {{provider}}",
+        "sendSub": "Intent {{n}} de 2",
+        "sendNoSteps": "Intent {{n}} de 2. {{provider}} no informa dels seus passos interns.",
+        "read": "{{provider}} obre {{file}}",
+        "tool": "{{provider}} fa servir l'eina {{tool}}",
+        "answer": "{{provider}} escriu la resposta",
+        "answerSub": "{{chars}} caràcters",
+        "resolve": "Calcular les coordenades",
+        "resolveSub": "L'app converteix cada àncora en x, y a partir de les posicions del text.",
+        "show": "Mostrar la proposta",
+        "showSub": "La podràs revisar a «Dividida» abans d'aplicar res.",
+        "result": "Resultat",
+        "resultSub": "{{placed}} de {{total}} camps col·locats",
+        "resultEmpty": "0 de {{total}} camps col·locats → sense canvis",
+        "error": "Error"
+      },
+      "usage": {
+        "title": "Consum",
+        "soFar": "Consum fins ara",
+        "measured": "Mesurat per {{provider}}",
+        "tokens": "tokens",
+        "cacheRead": "Llegits de la memòria cau (barats)",
+        "cacheWrite": "Escrits a la memòria cau",
+        "input": "Entrada nova",
+        "output": "Sortida (el que escriu la IA)",
+        "cost": "Equivalent en API",
+        "costNote": "«Equivalent»: el que costaria per API. Amb subscripció no es cobra a part: compta contra el teu límit.",
+        "liveNote": "Els números els dona el propi Claude Code mentre treballa. El cost apareix en acabar.",
+        "waiting": "Esperant la primera dada d'ús.",
+        "limits": "Amb la teva subscripció no es cobra a part: això compta contra el teu límit de 5 hores i el setmanal. Un model més gran el gasta abans.",
+        "unavailableBadge": "No mesurable",
+        "unavailable": "{{provider}} no dona tokens ni cost en aquest mode. No t'ensenyem xifres que no siguin reals.",
+        "requests": "Peticions enviades",
+        "requestsValue": "{{n}} (màx. 2)",
+        "sentSize": "Enviat (imatges + textos)",
+        "estimate": "Tokens aproximats",
+        "estimateBadge": "Estimació",
+        "premium": "Premium requests",
+        "premiumValue": "segons el model",
+        "copilotWarn": "Cada petició descompta de la teva quota amb el multiplicador del model que facis servir. Mira «/usage» a Copilot o la facturació de GitHub abans i després."
+      },
+      "sent": {
+        "title": "Què s'ha enviat",
+        "text": "Només noms i mides; el contingut no es guarda en aquest informe. Res d'això surt del teu ordinador excepte cap a {{provider}}.",
+        "counts": "{{fields}} camps · pàgines: A {{pagesA}} · B {{pagesB}}",
+        "empty": "Encara no s'ha preparat res."
+      },
+      "foot": {
+        "live": "S'actualitza sol mentre la IA treballa. Tancar-ho no l'atura.",
+        "done": "També serveix per diagnosticar: copia l'informe i enganxa'l on el necessitis (sense el contingut dels teus PDF)."
+      },
+      "cancel": "Cancel·lar petició",
+      "copy": "Copiar informe",
+      "copied": "Informe copiat.",
+      "copyFailed": "No s'ha pogut copiar l'informe.",
+      "diag": {
+        "title": "Per què ha sortit «sense canvis»",
+        "titlePartial": "Per què falten camps",
+        "tryTitle": "Què pots provar:",
+        "tip": "Fes servir una versió amb text o «Copiar i ajustar per textos» si B té text.",
+        "no_text_a": "El PDF d'A no té text que es pugui llegir (sol ser un escaneig o un PDF fet d'imatges). La IA veu les pàgines, però l'app necessita textos per calcular les coordenades.",
+        "no_text_b": "El PDF de B no té text que es pugui llegir (sol ser un escaneig o un PDF fet d'imatges). La IA veu les pàgines, però l'app necessita textos per calcular les coordenades.",
+        "permission_denied": "{{provider}} no ha pogut obrir els fitxers que se li passen (permís denegat). Revisa la seva sessió i torna a provar.",
+        "no_valid_answer": "La resposta de la IA no era una llista vàlida amb un objecte per camp, ni en el reintent.",
+        "anchors_not_found": "La IA va proposar textos d'ancoratge que no existeixen als PDF. Sol passar si els textos han canviat molt de redacció.",
+        "ai_found_nothing": "La IA ha respost que no pot col·locar cap dels camps.",
+        "partial": "Alguns camps no s'han pogut col·locar; la llista de la revisió indica el motiu de cadascun."
+      }
+    }
   },
   "update": {
     "available": {

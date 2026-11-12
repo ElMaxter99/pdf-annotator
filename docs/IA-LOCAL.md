@@ -54,3 +54,9 @@ El script (y la futura función) prepara una carpeta temporal y ejecuta el CLI d
 **Variables del ayudante:** `AI_HELPER_PORT`, `AI_HELPER_ORIGINS`, `AI_HELPER_TIMEOUT` (segundos, 300), `AI_HELPER_KEEP_API_KEY=1` (por defecto se quita `ANTHROPIC_API_KEY` para usar la suscripción), `COPILOT_ARGS` (banderas de Copilot sin verificar), `AI_HELPER_FAKE=1` (proveedor simulado para los e2e).
 
 **Seguridad.** El ayudante no entra en Docker ni en el despliegue. La CSP de `nginx.conf` permite `connect-src http://127.0.0.1:4310` solo para que, con el ayudante abierto en tu equipo, la app pueda hablarle; sin él, la opción aparece desactivada y explica cómo arrancarlo.
+
+## Ver detalles y consumo
+El botón «Ver detalles» (barra de la IA, en carga, error, sin cambios y revisión) abre un modal con los pasos, lo enviado y el consumo. El ayudante emite líneas `{event}` durante la petición y `result.details` al terminar (`tools/ai-helper/pipeline.mjs`; en el navegador `utils/ai-proposal.utils.ts` las trata como no confiables).
+- **Claude** corre con `--output-format stream-json --verbose`: da cada paso (qué archivos lee), tokens reales (entrada, salida, caché) y coste equivalente en API. Con suscripción no se cobra aparte.
+- **Copilot** no expone uso en `-p` según su documentación: el modal dice «No medible» y solo enseña peticiones enviadas, tamaño de lo enviado y una **estimación de tokens marcada como tal**. Nunca se muestran cifras inventadas.
+- **Diagnóstico de «sin cambios»** (`diagnose` en `pipeline.mjs`): A o B sin texto extraíble, permiso denegado a la CLI, respuesta no válida, anclas inexistentes o la IA no encuentra nada. El informe copiable no lleva contenido de los PDF.

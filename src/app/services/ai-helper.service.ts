@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { AiResult, parseNdjson } from '../utils/ai-proposal.utils';
+import { AiLiveEvent, AiResult, parseNdjson } from '../utils/ai-proposal.utils';
 import { getDesktopBridge } from './desktop-update.service';
 
 export type AiProvider = 'claude' | 'copilot' | 'fake';
@@ -7,6 +7,7 @@ export type AiConnection = 'unknown' | 'checking' | 'offline' | 'noCli' | 'ready
 
 export interface AiProgress {
   stage: 'reading' | 'asking' | 'resolving';
+  attempt?: number;
 }
 
 export class AiRequestError extends Error {
@@ -170,6 +171,7 @@ export class AiHelperService {
     args: { a: Blob; b: Blob; template: unknown },
     onProgress: (p: AiProgress) => void,
     signal: AbortSignal,
+    onEvent: (event: AiLiveEvent) => void = () => undefined,
   ): Promise<AiResult> {
     const provider = this.provider();
     const body = JSON.stringify({
@@ -214,7 +216,9 @@ export class AiHelperService {
         buffer = parsed.rest;
         for (const message of parsed.messages) {
           if ('stage' in message) {
-            onProgress({ stage: message.stage });
+            onProgress({ stage: message.stage, attempt: message.n });
+          } else if ('event' in message) {
+            onEvent(message.event);
           } else if ('result' in message) {
             return message.result;
           } else {

@@ -103,3 +103,25 @@ test('the model is chosen per provider, cheap by default, and remembered', async
   expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: 'haiku', copilot: 'gpt-5-mini' });
   await expect(page.getByTestId('ai-panel')).not.toContainText('Económico por defecto');
 });
+
+test('«Ver detalles» shows what was sent, the steps and says the simulated provider reports no usage', async ({ page }) => {
+  await openBatchWithB(page);
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-ai').click();
+  await page.getByTestId('ai-consent-ok').click();
+  await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
+
+  await page.getByTestId('ai-details-open').click();
+  const dialog = page.getByTestId('ai-details');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText('Terminado');
+  await expect(page.getByTestId('ai-details-steps')).toContainText('Preparar las páginas');
+  await expect(page.getByTestId('ai-details-steps')).toContainText(`${FIELDS} de ${FIELDS} campos colocados`);
+  await expect(page.getByTestId('ai-details-sent')).toContainText('fields.json');
+  await expect(page.getByTestId('ai-details-usage')).toContainText('No medible');
+  await page.getByTestId('ai-details-tab-sent').click();
+  await expect(page.getByTestId('ai-details-steps')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByTestId('ai-apply')).toBeVisible();
+});

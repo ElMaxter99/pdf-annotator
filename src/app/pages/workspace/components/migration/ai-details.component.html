@@ -1,0 +1,142 @@
+@if (vm.ai(); as s) {
+  <div class="migration-backdrop ai-details__backdrop" (click)="close()" data-testid="ai-details-backdrop"></div>
+  <div
+    class="ai-details"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ai-details-title"
+    data-testid="ai-details"
+    tabindex="-1"
+    (keydown.escape)="close(); $event.stopPropagation()"
+  >
+    <header class="ai-details__head">
+      <h2 id="ai-details-title">{{ 'ai.details.title' | t }}</h2>
+      <span class="ai-details__chip">{{ providerName() }} · {{ modelName() }}</span>
+      <span class="ai-details__status" [ngClass]="statusClass()" role="status">
+        @if (loading()) { <span class="ai-details__pulse" aria-hidden="true"></span> }
+        {{ statusText() }}
+      </span>
+      <span class="ai-details__grow"></span>
+      <button #closeBtn type="button" class="btn btn--ghost" (click)="close()" data-testid="ai-details-close">✕ {{ 'ai.details.close' | t }}</button>
+    </header>
+
+    <div class="ai-details__tabs" role="tablist">
+      @for (name of tabs; track name) {
+        <button type="button" role="tab" [attr.aria-selected]="tab() === name" [class.ai-details__tab--on]="tab() === name" (click)="tab.set(name)" [attr.data-testid]="'ai-details-tab-' + name">{{ 'ai.details.tab.' + name | t }}</button>
+      }
+    </div>
+
+    <div class="ai-details__body">
+      @if (tab() === 'summary' && diagnosis(); as diag) {
+        <div class="ai-details__note" [class.ai-details__note--warn]="diagnosisIsError()" role="note" data-testid="ai-details-diagnosis">
+          <span aria-hidden="true">⚠</span>
+          <div>
+            <b>{{ (diagnosisIsError() ? 'ai.details.diag.title' : 'ai.details.diag.titlePartial') | t }}</b><br />
+            {{ 'ai.details.diag.' + diag | t: { provider: providerName() } }}
+            @if (diag === 'no_text_a' || diag === 'no_text_b') {
+              <br /><b>{{ 'ai.details.diag.tryTitle' | t }}</b> {{ 'ai.details.diag.tip' | t }}
+            }
+          </div>
+        </div>
+      }
+      @if (tab() === 'summary' && s.phase === 'error' && s.error) {
+        <div class="ai-details__note ai-details__note--err" role="note">
+          <span aria-hidden="true">✕</span>
+          <div><b>{{ 'ai.error.' + s.error.code + '.title' | t: { provider: providerName() } }}</b><br />{{ s.error.message }}</div>
+        </div>
+      }
+
+      <div class="ai-details__cols">
+        @if (tab() === 'summary' || tab() === 'steps') {
+          <section class="ai-details__card ai-details__card--wide">
+            <h3>{{ 'ai.details.steps' | t }}</h3>
+            <ol class="ai-details__timeline" data-testid="ai-details-steps">
+              @for (item of timeline(); track $index) {
+                <li class="ai-details__step" [ngClass]="'ai-details__step--' + item.state">
+                  <span class="ai-details__n" aria-hidden="true">{{ item.state === 'done' ? '✓' : item.state === 'err' ? '!' : $index + 1 }}</span>
+                  <span>
+                    {{ item.title }}
+                    @if (item.sub) { <small>{{ item.sub }}</small> }
+                  </span>
+                  <span class="ai-details__time">{{ item.at !== null ? clock(item.at) : '—' }}</span>
+                </li>
+              }
+            </ol>
+          </section>
+        }
+
+        @if (tab() === 'summary' || tab() === 'usage') {
+          <div class="ai-details__side">
+            <section class="ai-details__card" data-testid="ai-details-usage">
+              @if (measured()) {
+                <h3>{{ (loading() ? 'ai.details.usage.soFar' : 'ai.details.usage.title') | t }} <span class="ai-details__badge ai-details__badge--ok">{{ 'ai.details.usage.measured' | t: { provider: providerName() } }}</span></h3>
+                @if (usage(); as u) {
+                  <div class="ai-details__big">{{ num(total()) }} <small>{{ 'ai.details.usage.tokens' | t }}</small></div>
+                  <div class="ai-details__bar" aria-hidden="true">
+                    <i class="ai-details__bar--cache" [style.width.%]="share(u.cacheRead)"></i>
+                    <i class="ai-details__bar--write" [style.width.%]="share(u.cacheWrite)"></i>
+                    <i class="ai-details__bar--rest" [style.width.%]="share(u.input + u.output)"></i>
+                  </div>
+                  <dl class="ai-details__kv">
+                    <div><dt>{{ 'ai.details.usage.cacheRead' | t }}</dt><dd>{{ num(u.cacheRead) }}</dd></div>
+                    <div><dt>{{ 'ai.details.usage.cacheWrite' | t }}</dt><dd>{{ num(u.cacheWrite) }}</dd></div>
+                    <div><dt>{{ 'ai.details.usage.input' | t }}</dt><dd>{{ num(u.input) }}</dd></div>
+                    <div><dt>{{ 'ai.details.usage.output' | t }}</dt><dd>{{ num(u.output) }}</dd></div>
+                    @if (costUsd(); as cost) {
+                      <div><dt>{{ 'ai.details.usage.cost' | t }}</dt><dd>≈ {{ cost.toFixed(2) }} USD</dd></div>
+                    }
+                  </dl>
+                  <p class="ai-details__cap">{{ (loading() ? 'ai.details.usage.liveNote' : 'ai.details.usage.costNote') | t }}</p>
+                } @else {
+                  <p class="ai-details__cap">{{ 'ai.details.usage.waiting' | t }}</p>
+                }
+              } @else {
+                <h3>{{ 'ai.details.usage.title' | t }} <span class="ai-details__badge">{{ 'ai.details.usage.unavailableBadge' | t }}</span></h3>
+                <p><b>{{ 'ai.details.usage.unavailable' | t: { provider: providerName() } }}</b></p>
+                <dl class="ai-details__kv">
+                  <div><dt>{{ 'ai.details.usage.requests' | t }}</dt><dd>{{ 'ai.details.usage.requestsValue' | t: { n: requests() } }}</dd></div>
+                  <div><dt>{{ 'ai.details.usage.sentSize' | t }}</dt><dd>{{ kb(sentBytes()) }}</dd></div>
+                  <div><dt>{{ 'ai.details.usage.estimate' | t }} <span class="ai-details__badge">{{ 'ai.details.usage.estimateBadge' | t }}</span></dt><dd>≈ {{ num(estimate()) }}</dd></div>
+                  <div><dt>{{ 'ai.details.usage.premium' | t }}</dt><dd>{{ 'ai.details.usage.premiumValue' | t }}</dd></div>
+                </dl>
+              }
+            </section>
+            @if (measured()) {
+              <div class="ai-details__note" role="note"><span aria-hidden="true">ⓘ</span><span>{{ 'ai.details.usage.limits' | t }}</span></div>
+            } @else if (s.provider === 'copilot') {
+              <div class="ai-details__note ai-details__note--warn" role="note"><span aria-hidden="true">⚠</span><span>{{ 'ai.details.usage.copilotWarn' | t }}</span></div>
+            }
+          </div>
+        }
+
+        @if (tab() === 'summary' || tab() === 'sent') {
+          <section class="ai-details__card" [class.ai-details__card--wide]="tab() === 'sent'" data-testid="ai-details-sent">
+            <h3>{{ 'ai.details.sent.title' | t }}</h3>
+            <p class="ai-details__cap">{{ 'ai.details.sent.text' | t: { provider: providerName() } }}</p>
+            @if (s.sent; as sent) {
+              <p class="ai-details__cap">{{ 'ai.details.sent.counts' | t: { fields: sent.fields, pagesA: sent.pagesA, pagesB: sent.pagesB } }}</p>
+              <ul class="ai-details__files">
+                @for (file of sentFiles(); track file.name) {
+                  <li><code>{{ file.name }}</code><span>{{ kb(file.bytes) }}</span></li>
+                }
+              </ul>
+            } @else {
+              <p class="ai-details__cap">{{ 'ai.details.sent.empty' | t }}</p>
+            }
+          </section>
+        }
+      </div>
+    </div>
+
+    <footer class="ai-details__foot">
+      <span class="ai-details__cap">{{ (loading() ? 'ai.details.foot.live' : 'ai.details.foot.done') | t }}</span>
+      <span class="ai-details__grow"></span>
+      @if (loading()) {
+        <button type="button" class="btn btn--danger" (click)="vm.cancelAi()" data-testid="ai-details-cancel">{{ 'ai.details.cancel' | t }}</button>
+      } @else {
+        <button type="button" class="btn btn--ghost" (click)="copyReport()" data-testid="ai-details-copy">{{ 'ai.details.copy' | t }}</button>
+      }
+      <button type="button" class="btn btn--primary" (click)="close()">{{ 'ai.details.close' | t }}</button>
+    </footer>
+  </div>
+}

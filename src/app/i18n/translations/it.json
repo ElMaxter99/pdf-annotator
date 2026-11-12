@@ -895,7 +895,97 @@
       "remember": "Non avvisare più su questo computer",
       "send": "Invia a {{provider}}"
     },
-    "notice": "{{count}} campi proposti dall'IA · B invariato"
+    "notice": "{{count}} campi proposti dall'IA · B invariato",
+    "details": {
+      "open": "Vedi dettagli",
+      "title": "Cosa sta facendo l'IA",
+      "close": "Chiudi",
+      "modelDefault": "modello predefinito del CLI",
+      "tab": {
+        "summary": "Riepilogo",
+        "steps": "Passaggi",
+        "sent": "Cosa viene inviato",
+        "usage": "Consumo"
+      },
+      "status": {
+        "running": "In corso · {{time}}",
+        "done": "Terminato · {{time}}",
+        "doneEmpty": "Terminato · {{time}} · nessuna modifica",
+        "error": "Con errore · {{time}}"
+      },
+      "steps": "Passaggi",
+      "step": {
+        "prepare": "Preparare le pagine",
+        "prepareSub": "Testi estratti: {{textsA}} di A e {{textsB}} di B. Pagine: {{pagesA}} di A e {{pagesB}} di B, convertite in immagini.",
+        "send": "Invia a {{provider}}",
+        "sendSub": "Tentativo {{n}} di 2",
+        "sendNoSteps": "Tentativo {{n}} di 2. {{provider}} non riporta i suoi passaggi interni.",
+        "read": "{{provider}} apre {{file}}",
+        "tool": "{{provider}} usa lo strumento {{tool}}",
+        "answer": "{{provider}} scrive la risposta",
+        "answerSub": "{{chars}} caratteri",
+        "resolve": "Calcolare le coordinate",
+        "resolveSub": "L'app converte ogni ancora in x, y a partire dalle posizioni del testo.",
+        "show": "Mostrare la proposta",
+        "showSub": "Potrai rivederla in «Divisa» prima di applicare qualcosa.",
+        "result": "Risultato",
+        "resultSub": "{{placed}} campi su {{total}} posizionati",
+        "resultEmpty": "0 campi su {{total}} posizionati → nessuna modifica",
+        "error": "Errore"
+      },
+      "usage": {
+        "title": "Consumo",
+        "soFar": "Consumo finora",
+        "measured": "Misurato da {{provider}}",
+        "tokens": "token",
+        "cacheRead": "Letti dalla cache (economici)",
+        "cacheWrite": "Scritti nella cache",
+        "input": "Nuovo input",
+        "output": "Output (ciò che scrive l'IA)",
+        "cost": "Equivalente API",
+        "costNote": "«Equivalente»: quanto costerebbe via API. Con l'abbonamento non si paga a parte: conta sul tuo limite.",
+        "liveNote": "I numeri li fornisce Claude Code stesso mentre lavora. Il costo compare alla fine.",
+        "waiting": "In attesa del primo dato di utilizzo.",
+        "limits": "Con il tuo abbonamento non si paga a parte: conta sul tuo limite di 5 ore e su quello settimanale. Un modello più grande lo esaurisce prima.",
+        "unavailableBadge": "Non misurabile",
+        "unavailable": "{{provider}} non fornisce token né costo in questa modalità. Non mostriamo cifre che non siano reali.",
+        "requests": "Richieste inviate",
+        "requestsValue": "{{n}} (max. 2)",
+        "sentSize": "Inviato (immagini + testi)",
+        "estimate": "Token approssimativi",
+        "estimateBadge": "Stima",
+        "premium": "Premium requests",
+        "premiumValue": "secondo il modello",
+        "copilotWarn": "Ogni richiesta scala dalla tua quota con il moltiplicatore del modello usato. Controlla «/usage» in Copilot o la fatturazione di GitHub prima e dopo."
+      },
+      "sent": {
+        "title": "Cosa è stato inviato",
+        "text": "Solo nomi e dimensioni; il contenuto non viene conservato in questo rapporto. Nulla di questo esce dal tuo computer se non verso {{provider}}.",
+        "counts": "{{fields}} campi · pagine: A {{pagesA}} · B {{pagesB}}",
+        "empty": "Non è stato ancora preparato nulla."
+      },
+      "foot": {
+        "live": "Si aggiorna da solo mentre l'IA lavora. Chiuderlo non la ferma.",
+        "done": "Serve anche a diagnosticare: copia il rapporto e incollalo dove ti serve (senza il contenuto dei tuoi PDF)."
+      },
+      "cancel": "Annulla richiesta",
+      "copy": "Copia rapporto",
+      "copied": "Rapporto copiato.",
+      "copyFailed": "Impossibile copiare il rapporto.",
+      "diag": {
+        "title": "Perché è finita con «nessuna modifica»",
+        "titlePartial": "Perché mancano dei campi",
+        "tryTitle": "Cosa puoi provare:",
+        "tip": "Usa una versione con testo o «Copia e adatta per testi» se B ha testo.",
+        "no_text_a": "Il PDF di A non ha testo leggibile (di solito una scansione o un PDF fatto di immagini). L'IA vede le pagine, ma l'app ha bisogno dei testi per calcolare le coordinate.",
+        "no_text_b": "Il PDF di B non ha testo leggibile (di solito una scansione o un PDF fatto di immagini). L'IA vede le pagine, ma l'app ha bisogno dei testi per calcolare le coordinate.",
+        "permission_denied": "{{provider}} non ha potuto aprire i file ricevuti (permesso negato). Controlla la sua sessione e riprova.",
+        "no_valid_answer": "La risposta dell'IA non era una lista valida con un oggetto per campo, nemmeno al secondo tentativo.",
+        "anchors_not_found": "L'IA ha proposto testi di ancoraggio che non esistono nei PDF. Succede quando la formulazione è cambiata molto.",
+        "ai_found_nothing": "L'IA ha risposto che non può posizionare nessuno dei campi.",
+        "partial": "Alcuni campi non si sono potuti posizionare; l'elenco di revisione indica il motivo di ciascuno."
+      }
+    }
   },
   "update": {
     "available": {

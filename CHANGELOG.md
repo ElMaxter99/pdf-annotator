@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- «Ver detalles» en «Copiar y adaptar con IA»: modal con los pasos en vivo, lo enviado, el consumo (tokens y coste equivalente medidos con Claude; con Copilot «No medible» y una estimación marcada) y un diagnóstico cuando la IA no coloca ningún campo (A o B sin texto, permisos, respuesta no válida…). Informe copiable sin contenido de los PDF
 - El ayudante de IA recoge los pasos, el uso real de tokens (Claude), lo enviado y un diagnóstico de por qué no se colocó nada, y lo emite como eventos `event` y `result.details` (sin interfaz todavía). La IA ya no se confunde con listas JSON ajenas (`[1]`) en su respuesta
 - Guía «Cómo instalar» (`docs/INSTALAR.md`) para Windows, macOS y Linux, enlazada desde el README: qué archivo elegir, avisos de instaladores sin firmar, `libfuse2`, actualizaciones y aviso de que Linux solo tiene paquetes x86_64. Las capturas reales están pendientes (huecos marcados)
 ### Fixed

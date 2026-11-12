@@ -895,7 +895,97 @@
       "remember": "Ne plus avertir sur cet ordinateur",
       "send": "Envoyer à {{provider}}"
     },
-    "notice": "{{count}} champs proposés par l'IA · B inchangé"
+    "notice": "{{count}} champs proposés par l'IA · B inchangé",
+    "details": {
+      "open": "Voir les détails",
+      "title": "Ce que fait l'IA",
+      "close": "Fermer",
+      "modelDefault": "modèle par défaut du CLI",
+      "tab": {
+        "summary": "Résumé",
+        "steps": "Étapes",
+        "sent": "Ce qui est envoyé",
+        "usage": "Consommation"
+      },
+      "status": {
+        "running": "En cours · {{time}}",
+        "done": "Terminé · {{time}}",
+        "doneEmpty": "Terminé · {{time}} · sans changement",
+        "error": "En erreur · {{time}}"
+      },
+      "steps": "Étapes",
+      "step": {
+        "prepare": "Préparer les pages",
+        "prepareSub": "Textes extraits : {{textsA}} de A et {{textsB}} de B. Pages : {{pagesA}} de A et {{pagesB}} de B, converties en images.",
+        "send": "Envoyer à {{provider}}",
+        "sendSub": "Tentative {{n}} sur 2",
+        "sendNoSteps": "Tentative {{n}} sur 2. {{provider}} n'indique pas ses étapes internes.",
+        "read": "{{provider}} ouvre {{file}}",
+        "tool": "{{provider}} utilise l'outil {{tool}}",
+        "answer": "{{provider}} écrit la réponse",
+        "answerSub": "{{chars}} caractères",
+        "resolve": "Calculer les coordonnées",
+        "resolveSub": "L'app convertit chaque ancre en x, y à partir des positions du texte.",
+        "show": "Afficher la proposition",
+        "showSub": "Vous pourrez la revoir dans « Divisée » avant d'appliquer quoi que ce soit.",
+        "result": "Résultat",
+        "resultSub": "{{placed}} champs placés sur {{total}}",
+        "resultEmpty": "0 champ placé sur {{total}} → sans changement",
+        "error": "Erreur"
+      },
+      "usage": {
+        "title": "Consommation",
+        "soFar": "Consommation jusqu'ici",
+        "measured": "Mesuré par {{provider}}",
+        "tokens": "tokens",
+        "cacheRead": "Lus depuis le cache (peu chers)",
+        "cacheWrite": "Écrits dans le cache",
+        "input": "Nouvelle entrée",
+        "output": "Sortie (ce que l'IA écrit)",
+        "cost": "Équivalent API",
+        "costNote": "« Équivalent » : ce que cela coûterait via l'API. Avec un abonnement, rien n'est facturé à part : cela compte dans votre limite.",
+        "liveNote": "Les chiffres viennent de Claude Code lui-même pendant son travail. Le coût apparaît à la fin.",
+        "waiting": "En attente de la première donnée d'usage.",
+        "limits": "Avec votre abonnement, rien n'est facturé à part : cela compte dans votre limite de 5 heures et la limite hebdomadaire. Un modèle plus grand l'épuise plus vite.",
+        "unavailableBadge": "Non mesurable",
+        "unavailable": "{{provider}} ne fournit ni tokens ni coût dans ce mode. Nous n'affichons pas de chiffres qui ne seraient pas réels.",
+        "requests": "Requêtes envoyées",
+        "requestsValue": "{{n}} (max. 2)",
+        "sentSize": "Envoyé (images + textes)",
+        "estimate": "Tokens approximatifs",
+        "estimateBadge": "Estimation",
+        "premium": "Premium requests",
+        "premiumValue": "selon le modèle",
+        "copilotWarn": "Chaque requête est décomptée de votre quota avec le multiplicateur du modèle utilisé. Consultez « /usage » dans Copilot ou la facturation GitHub avant et après."
+      },
+      "sent": {
+        "title": "Ce qui a été envoyé",
+        "text": "Seulement des noms et des tailles ; le contenu n'est pas conservé dans ce rapport. Rien de cela ne quitte votre ordinateur, sauf vers {{provider}}.",
+        "counts": "{{fields}} champs · pages: A {{pagesA}} · B {{pagesB}}",
+        "empty": "Rien n'a encore été préparé."
+      },
+      "foot": {
+        "live": "Mise à jour automatique pendant que l'IA travaille. Le fermer ne l'arrête pas.",
+        "done": "Sert aussi au diagnostic : copiez le rapport et collez-le où vous voulez (sans le contenu de vos PDF)."
+      },
+      "cancel": "Annuler la requête",
+      "copy": "Copier le rapport",
+      "copied": "Rapport copié.",
+      "copyFailed": "Impossible de copier le rapport.",
+      "diag": {
+        "title": "Pourquoi le résultat est « sans changement »",
+        "titlePartial": "Pourquoi il manque des champs",
+        "tryTitle": "Ce que vous pouvez essayer :",
+        "tip": "Utilisez une version avec texte, ou « Copier et ajuster par textes » si B a du texte.",
+        "no_text_a": "Le PDF de A n'a pas de texte lisible (souvent un scan ou un PDF fait d'images). L'IA voit les pages, mais l'app a besoin de textes pour calculer les coordonnées.",
+        "no_text_b": "Le PDF de B n'a pas de texte lisible (souvent un scan ou un PDF fait d'images). L'IA voit les pages, mais l'app a besoin de textes pour calculer les coordonnées.",
+        "permission_denied": "{{provider}} n'a pas pu ouvrir les fichiers fournis (permission refusée). Vérifiez sa session et réessayez.",
+        "no_valid_answer": "La réponse de l'IA n'était pas une liste valide avec un objet par champ, même après la nouvelle tentative.",
+        "anchors_not_found": "L'IA a proposé des textes d'ancrage qui n'existent pas dans les PDF. Cela arrive quand la rédaction a beaucoup changé.",
+        "ai_found_nothing": "L'IA a répondu qu'elle ne peut placer aucun des champs.",
+        "partial": "Certains champs n'ont pas pu être placés ; la liste de révision indique la raison de chacun."
+      }
+    }
   },
   "update": {
     "available": {
