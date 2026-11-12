@@ -66,3 +66,13 @@ test('totalUsage suma modelUsage (todos los turnos) y cae a usage si no existe',
   assert.deepEqual(totalUsage(j), { input_tokens: 6, output_tokens: 2000, cache_read_input_tokens: 90000, cache_creation_input_tokens: 30000 });
   assert.deepEqual(totalUsage({ usage: { input_tokens: 1 } }), { input_tokens: 1 });
 });
+
+test('Copilot adjunta las imágenes solo con COPILOT_ATTACH_IMAGES=1', async () => {
+  const { PROVIDERS } = await import('./providers.mjs');
+  const opts = { attachments: ['A-p1.png', 'B-p1.png'] };
+  delete process.env.COPILOT_ATTACH_IMAGES;
+  assert.ok(!PROVIDERS.copilot.args(opts).some((a) => a.startsWith('--attachment')));
+  process.env.COPILOT_ATTACH_IMAGES = '1';
+  assert.deepEqual(PROVIDERS.copilot.args(opts).filter((a) => a.startsWith('--attachment')), ['--attachment=A-p1.png', '--attachment=B-p1.png']);
+  delete process.env.COPILOT_ATTACH_IMAGES;
+});

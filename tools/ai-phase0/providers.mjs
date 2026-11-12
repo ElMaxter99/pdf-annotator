@@ -79,7 +79,11 @@ export const PROVIDERS = {
     label: 'Copilot CLI (copilot -p)',
     cmd: 'copilot',
     // Banderas SIN VERIFICAR contra tu versión: si fallan, ajusta con COPILOT_ARGS='["-p","...","--allow-all-tools"]'.
-    args: (opts = {}) => (process.env.COPILOT_ARGS ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a)) : ['-p', INSTRUCTION, '--allow-all-tools', ...(opts.model ? ['--model', opts.model] : [])]),
+    // `COPILOT_ATTACH_IMAGES=1` adjunta cada PNG con `--attachment=<archivo>` (según la documentación; sin verificar en tu versión).
+    args: (opts = {}) =>
+      process.env.COPILOT_ARGS
+        ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a))
+        : ['-p', INSTRUCTION, '--allow-all-tools', ...(opts.model ? ['--model', opts.model] : []), ...(process.env.COPILOT_ATTACH_IMAGES === '1' ? (opts.attachments ?? []).map((f) => `--attachment=${f}`) : [])],
     extract: (stdout) => ({ text: stdout, meta: {} }),
     env: (base) => ({ ...base }),
   },

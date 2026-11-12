@@ -807,11 +807,11 @@
         "opus": "Opus · esaurisce prima il limite",
         "copilot": "Modello di Copilot",
         "copilotAuto": "Automatico (quello del CLI)",
-        "copilotHint": "Ogni richiesta scala dalle tue «premium requests» in base al modello. Scrivine uno preciso se lo indica il tuo amministratore.",
+        "copilotHint": "Ogni esecuzione consuma crediti IA in base ai token e al modello. Scrivine uno preciso se l'amministratore lo indica.",
         "sonnetHint": "Sonnet: sufficiente per posizionare i campi e leggero sul tuo limite."
       },
       "retryToggle": "Riprova una volta se la risposta non è utilizzabile",
-      "retryHint": "Un nuovo tentativo può raddoppiare il costo: con Copilot conta come un'altra richiesta premium. Per Copilot è disattivato di default."
+      "retryHint": "Un nuovo tentativo può raddoppiare il costo: con Copilot invia di nuovo tutto e consuma più crediti IA. Per Copilot è disattivato di default."
     },
     "menu": {
       "title": "Copia e adatta con l'IA",
@@ -961,9 +961,9 @@
         "sentSize": "Inviato (immagini + testi)",
         "estimate": "Token approssimativi",
         "estimateBadge": "Stima",
-        "premium": "Premium requests",
-        "premiumValue": "secondo il modello",
-        "copilotWarn": "Ogni richiesta scala dalla tua quota con il moltiplicatore del modello usato. Controlla «/usage» in Copilot o la fatturazione di GitHub prima e dopo."
+        "premium": "Crediti IA",
+        "premiumValue": "in base a token e modello",
+        "copilotWarn": "Copilot addebita crediti IA in base ai token (input, output e cache) e al modello. Questa app non può misurarli in questa modalità: controlla il consumo su GitHub prima e dopo."
       },
       "sent": {
         "title": "Cosa è stato inviato",

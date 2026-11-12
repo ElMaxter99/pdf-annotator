@@ -79,6 +79,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
           timeoutMs,
           signal,
           quiet: true,
+          attachments: files.filter((f) => f.name.endsWith('.png')).map((f) => f.name),
           stream: provider === 'claude',
           onLine: provider === 'claude'
             ? (l) => {

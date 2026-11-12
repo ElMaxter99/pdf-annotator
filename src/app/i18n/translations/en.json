@@ -807,11 +807,11 @@
         "opus": "Opus · uses up your limit sooner",
         "copilot": "Copilot model",
         "copilotAuto": "Automatic (the CLI default)",
-        "copilotHint": "Each request counts against your “premium requests” by model. Type a specific one if your administrator says so.",
+        "copilotHint": "Each run spends AI credits based on tokens and model. Type a specific one if your administrator says so.",
         "sonnetHint": "Sonnet: enough to place fields and light on your limit."
       },
       "retryToggle": "Retry once if the answer is unusable",
-      "retryHint": "A retry can double the cost: with Copilot it counts as another premium request. It is off by default for Copilot."
+      "retryHint": "A retry can double the cost: with Copilot it sends everything again and spends more AI credits. It is off by default for Copilot."
     },
     "menu": {
       "title": "Copy and adapt with AI",
@@ -961,9 +961,9 @@
         "sentSize": "Sent (images + texts)",
         "estimate": "Approximate tokens",
         "estimateBadge": "Estimate",
-        "premium": "Premium requests",
-        "premiumValue": "depends on the model",
-        "copilotWarn": "Each request counts against your quota with the multiplier of the model you use. Check «/usage» in Copilot or GitHub billing before and after."
+        "premium": "AI credits",
+        "premiumValue": "by tokens and model",
+        "copilotWarn": "Copilot charges AI credits based on tokens (input, output and cache) and the model. This app cannot measure them in this mode: check your usage on GitHub before and after."
       },
       "sent": {
         "title": "What was sent",
