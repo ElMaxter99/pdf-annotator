@@ -2,6 +2,14 @@
 ### Added
 - **«Trasladar con IA» sobre todo el lote** (plan en `design/propuestas/traslado-masivo-ia.md`, diseños IA-09 a IA-13): botón en el panel con menú (todos / solo los fallidos), confirmación con estimación de pares, campos, peticiones y privacidad, y cola en serie con progreso por fila, pausa, cancelar uno o todos y reintento de los fallidos. Primero intenta el ajuste por textos sin gastar IA (solo si ambos PDF tienen las mismas páginas y tamaño y el desplazamiento es uniforme); si no, pregunta a la IA. Se detiene al llegar al límite de uso, tras dos fallos seguidos iguales o a las 10 peticiones con Copilot (y espera «Continuar»). Cada resultado es una **propuesta guardada** en el lote (`BatchItem.aiProposal`, saneada al leerla) que se revisa PDF por PDF en el editor («Pendientes de revisar», «Siguiente con propuesta»); nunca se aplica en bloque ni «Listo» se marca solo.
 
+## [v1.8.4](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.4) - 2026-11-12
+### Fixed
+- **App de escritorio: los botones del aviso de actualización («Qué hay de nuevo», «Actualizar ahora») no hacían nada.** El proceso principal comprobaba que el mensaje viniera de `app://pdf-annotator` con `new URL(...).origin`, que en Node vale `null` para esquemas propios, así que rechazaba todas las órdenes de la web (también las de nuevo ventana/navegación de enlaces). Ahora se compara esquema y host (`desktop/trusted-origin.mjs`, con tests).
+
+## [v1.8.3](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.3) - 2026-11-12
+### Fixed
+- La app de escritorio mostraba el icono genérico de Electron (en Linux, Windows y macOS) porque el empaquetado no tenía iconos. Ahora usa el logo de PDF Annotator: PNG de 16 a 1024 px para Linux (`.deb`/`.rpm`/AppImage), `.ico` multitamaño para Windows, icono para macOS y icono en la ventana. También se fija el nombre de escritorio (`desktopName`) para que el sistema asocie la ventana abierta con su icono del lanzador.
+
 ## [v1.8.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.2) - 2026-11-12
 ### Added
 - Opción «Reintentar una vez si la respuesta no sirve» en el panel de la IA, por proveedor: activada con Claude y desactivada con Copilot (un reintento cuenta como otra petición premium).

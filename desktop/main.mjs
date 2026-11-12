@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { RELEASES_URL, REPO, isNewer, parseLatestRelease, updateMode } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
+import { isAppUrl } from './trusted-origin.mjs';
 import { goInHistory, historyDirectionForCommand, historyDirectionForKey } from './history-nav.mjs';
 
 const { autoUpdater } = electronUpdater;
@@ -138,11 +139,7 @@ function setupUpdater() {
 }
 
 function trusted(event) {
-  try {
-    return new URL(event.senderFrame.url).origin === ORIGIN;
-  } catch {
-    return false;
-  }
+  return isAppUrl(event.senderFrame?.url, ORIGIN);
 }
 function setupIpc() {
   const handle = (channel, fn) => ipcMain.handle(channel, (event, ...args) => (trusted(event) ? fn(...args) : undefined));
@@ -186,6 +183,7 @@ function createWindow() {
     minHeight: 680,
     backgroundColor: '#1e1e2f',
     title: 'PDF Annotator',
+    icon: path.join(here, 'assets', 'icon.png'),
     webPreferences: { preload: path.join(here, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false },
   });
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -193,7 +191,7 @@ function createWindow() {
     return { action: 'deny' };
   });
   win.webContents.on('will-navigate', (event, url) => {
-    if (new URL(url).origin !== ORIGIN) {
+    if (!isAppUrl(url, ORIGIN)) {
       event.preventDefault();
       if (/^https:\/\//.test(url)) shell.openExternal(url);
     }
