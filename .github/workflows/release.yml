@@ -2,8 +2,8 @@ name: Release
 
 # «Run workflow» (Actions → Release → rama develop) hace el release completo a partir de la versión que ya
 # esté fusionada en develop: alinea develop y master, crea release/vX.Y.Z y la etiqueta, compila los
-# instaladores, pone las notas del CHANGELOG y deja la release en BORRADOR. Publicarla (lo que activa el
-# aviso de actualización de las apps) es un clic tuyo, salvo que marques «publish».
+# instaladores, pone las notas del CHANGELOG y PUBLICA la release (lo que activa el aviso de actualización
+# de las apps). Desmarca «publish» para dejarla en borrador y publicarla tú.
 on:
   workflow_dispatch:
     inputs:
@@ -12,9 +12,9 @@ on:
         type: boolean
         default: false
       publish:
-        description: Publicar la release al terminar (por defecto se queda en borrador)
+        description: Publicar la release al terminar (desmárcalo para dejarla en borrador)
         type: boolean
-        default: false
+        default: true
 
 concurrency:
   group: release

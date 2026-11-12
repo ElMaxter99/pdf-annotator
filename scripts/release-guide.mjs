@@ -17,7 +17,7 @@ try {
 
 2. Release automático (recomendado)
    GitHub → Actions → «Release» → Run workflow (rama ${DEV_BRANCH}). Hace todo lo del paso 2 manual, compila los
-   instaladores y deja la release en borrador con las notas puestas. Solo te queda publicarla.
+   instaladores y publica la release con las notas puestas (desmarca «publish» para dejarla en borrador).
 
 2b. Release a mano (alternativa; con la versión ya fusionada en ${DEV_BRANCH}; vale desde cualquier rama con el árbol limpio)
    npm run release:deploy                  # cambia a ${DEV_BRANCH}, hace pull, comprueba, pide escribir v${v},
