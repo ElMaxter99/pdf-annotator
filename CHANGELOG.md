@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.8.4](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.4) - 2026-11-12
 ### Fixed
 - **App de escritorio: los botones del aviso de actualización («Qué hay de nuevo», «Actualizar ahora») no hacían nada.** El proceso principal comprobaba que el mensaje viniera de `app://pdf-annotator` con `new URL(...).origin`, que en Node vale `null` para esquemas propios, así que rechazaba todas las órdenes de la web (también las de nuevo ventana/navegación de enlaces). Ahora se compara esquema y host (`desktop/trusted-origin.mjs`, con tests).
 
