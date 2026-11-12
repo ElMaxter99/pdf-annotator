@@ -76,3 +76,6 @@ El masivo es **una cola de N peticiones iguales a la de hoy**, orquestada desde 
 - `workspace.page.ts` no debe crecer: la cola va en servicio nuevo y componentes de `components/migration`.
 - La estimación de Copilot es la parte débil (sin medida oficial): por eso se muestra el número de peticiones, no créditos inventados.
 - La IA puede colocar mal: de ahí «propuesta, revisar y aplicar», nunca aplicar a ciegas.
+
+## 9. Diseño (lienzo, zona «Propuestas»)
+IA-09 flujo y confirmación con estimación (Claude y Copilot) · IA-10 cola en marcha · IA-11 paradas, fallos y final · IA-12 revisar una propuesta guardada · IA-13 1280 y claro. Pendientes de aprobar; la interfaz no se programa hasta entonces. La cascada añade una fase `adjusting` («Resuelto sin IA») al motor, que llegará con la interfaz.
