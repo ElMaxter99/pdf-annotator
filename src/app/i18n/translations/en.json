@@ -963,7 +963,10 @@
         "estimateBadge": "Estimate",
         "premium": "AI credits",
         "premiumValue": "by tokens and model",
-        "copilotWarn": "Copilot charges AI credits based on tokens (input, output and cache) and the model. This app cannot measure them in this mode: check your usage on GitHub before and after."
+        "copilotWarn": "Copilot charges AI credits based on tokens (input, output and cache) and the model. This app cannot measure them in this mode: check your usage on GitHub before and after.",
+        "credits": "AI credits",
+        "creditsNote": "Measured by Copilot itself (≈). They are deducted from your GitHub AI credits; the exact total is on your Copilot usage page.",
+        "creditsLimits": "Copilot counts AI credits by tokens (input, output and cache) and model; a larger model spends them faster."
       },
       "sent": {
         "title": "What was sent",

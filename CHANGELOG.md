@@ -10,7 +10,7 @@
 
 ## [v1.8.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.2) - 2026-11-12
 ### Added
-- Copilot: `COPILOT_ATTACH_IMAGES=1` adjunta las páginas con `--attachment` (bandera de la documentación, sin verificar en tu versión). Los textos de consumo de Copilot hablan ya de créditos de IA por tokens, no de peticiones premium.
+- Copilot: las páginas se adjuntan por defecto con `--attachment` (`COPILOT_ATTACH_IMAGES=0` lo desactiva) y el ayudante lee el consumo real del JSON de Copilot (tokens y créditos de IA ≈), que se muestra en «Ver detalles». Los textos de consumo de Copilot hablan de créditos de IA por tokens, no de peticiones premium.
 - Opción «Reintentar una vez si la respuesta no sirve» en el panel de la IA, por proveedor: activada con Claude y desactivada con Copilot (un reintento cuenta como otra petición premium).
 - La IA debe demostrar que ha mirado las imágenes: cada PNG lleva un código aleatorio que la respuesta tiene que devolver; si falta tras dos intentos se descarta con el aviso «La IA no ha leído las imágenes» (en vez de proponer solo con los textos). El informe de «Ver detalles» añade los textos por página, no incluye el mensaje del CLI, el consumo en vivo no cuenta dos veces el mismo mensaje y el modal atrapa el foco y navega las pestañas con las flechas.
 - «Ver detalles» en «Copiar y adaptar con IA»: modal con los pasos en vivo, lo enviado, el consumo (tokens y coste equivalente medidos con Claude; con Copilot «No medible» y una estimación marcada) y un diagnóstico cuando la IA no coloca ningún campo (A o B sin texto, permisos, respuesta no válida…). Informe copiable sin contenido de los PDF

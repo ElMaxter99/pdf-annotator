@@ -100,7 +100,7 @@ describe('ai-proposal.utils', () => {
     const lines = [
       JSON.stringify({ event: { type: 'step', attempt: 1, steps: [{ kind: 'read', file: 'A-p1.png', tool: 'Read' }, { kind: 'x' }], usage: { input: 3, output: 5, cacheRead: 7, cacheWrite: 1 } } }),
       JSON.stringify({ event: { type: 'nope' } }),
-      JSON.stringify({ result: { rows: [], seconds: 1, warnings: [], details: { usageSource: 'measured', diagnosis: 'no_text_a', placed: 0, attempts: [{ n: 1, usage: { input: 1, output: 2, cacheRead: 3, cacheWrite: 4 }, costUsd: 0.01 }] } } }),
+      JSON.stringify({ result: { rows: [], seconds: 1, warnings: [], details: { usageSource: 'measured', diagnosis: 'no_text_a', placed: 0, attempts: [{ n: 1, usage: { input: 1, output: 2, cacheRead: 3, cacheWrite: 4 }, costUsd: 0.01, aiCredits: 6.76, premiumRequests: 1 }] } } }),
       '',
     ].join('\n');
     const { messages } = parseNdjson(lines);
@@ -111,6 +111,7 @@ describe('ai-proposal.utils', () => {
     const res = messages[1] as { result: { details: { diagnosis: string; usageSource: string } } };
     expect(res.result.details.diagnosis).toBe('no_text_a');
     expect(res.result.details.usageSource).toBe('measured');
+    expect((res.result.details as unknown as { attempts: { aiCredits: number }[] }).attempts[0].aiCredits).toBe(6.76);
   });
 
   it('sums usage and estimates tokens only from sizes', () => {

@@ -963,7 +963,10 @@
         "estimateBadge": "Estimativa",
         "premium": "Créditos de IA",
         "premiumValue": "conforme tokens e modelo",
-        "copilotWarn": "O Copilot cobra em créditos de IA conforme os tokens (entrada, saída e cache) e o modelo. Esta app não os consegue medir neste modo: vê o teu consumo no GitHub antes e depois."
+        "copilotWarn": "O Copilot cobra em créditos de IA conforme os tokens (entrada, saída e cache) e o modelo. Esta app não os consegue medir neste modo: vê o teu consumo no GitHub antes e depois.",
+        "credits": "Créditos de IA",
+        "creditsNote": "Medidos pelo próprio Copilot (≈). São descontados dos seus créditos de IA do GitHub; o total exato está na sua página de uso do Copilot.",
+        "creditsLimits": "O Copilot conta créditos de IA conforme os tokens (entrada, saída e cache) e o modelo; um modelo maior gasta-os mais depressa."
       },
       "sent": {
         "title": "O que foi enviado",

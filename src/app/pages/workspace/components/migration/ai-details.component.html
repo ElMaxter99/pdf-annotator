@@ -84,11 +84,14 @@
                     <div><dt>{{ 'ai.details.usage.cacheWrite' | t }}</dt><dd>{{ num(u.cacheWrite) }}</dd></div>
                     <div><dt>{{ 'ai.details.usage.input' | t }}</dt><dd>{{ num(u.input) }}</dd></div>
                     <div><dt>{{ 'ai.details.usage.output' | t }}</dt><dd>{{ num(u.output) }}</dd></div>
+                    @if (aiCredits(); as credits) {
+                      <div><dt>{{ 'ai.details.usage.credits' | t }}</dt><dd>≈ {{ credits.toFixed(2) }}</dd></div>
+                    }
                     @if (costUsd(); as cost) {
                       <div><dt>{{ 'ai.details.usage.cost' | t }}</dt><dd>≈ {{ cost.toFixed(2) }} USD</dd></div>
                     }
                   </dl>
-                  <p class="ai-details__cap">{{ (loading() ? 'ai.details.usage.liveNote' : 'ai.details.usage.costNote') | t }}</p>
+                  <p class="ai-details__cap">{{ (s.provider === 'copilot' ? 'ai.details.usage.creditsNote' : loading() ? 'ai.details.usage.liveNote' : 'ai.details.usage.costNote') | t }}</p>
                 } @else {
                   <p class="ai-details__cap">{{ 'ai.details.usage.waiting' | t }}</p>
                 }
@@ -104,7 +107,7 @@
               }
             </section>
             @if (measured()) {
-              <div class="ai-details__note" role="note"><span aria-hidden="true">ⓘ</span><span>{{ 'ai.details.usage.limits' | t }}</span></div>
+              <div class="ai-details__note" role="note"><span aria-hidden="true">ⓘ</span><span>{{ (s.provider === 'copilot' ? 'ai.details.usage.creditsLimits' : 'ai.details.usage.limits') | t }}</span></div>
             } @else if (s.provider === 'copilot') {
               <div class="ai-details__note ai-details__note--warn" role="note"><span aria-hidden="true">⚠</span><span>{{ 'ai.details.usage.copilotWarn' | t }}</span></div>
             }
