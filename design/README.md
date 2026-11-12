@@ -86,6 +86,11 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | M-03 Campana de avisos | Avisos informativos recuperables | [`M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html`](canvas/M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html) | `header`, `toast` | Aprobada, implementada |
 | M-04 Estados y tema claro | Sin JSON, nada resuelto, Mapeo, claro | [`M-04-origen-estados-claro.dc.html`](canvas/M-04-origen-estados-claro.dc.html) | `viewer` | Aprobada, implementada |
 | Z-01 Export y comparación con muestras | Diálogo al descargar PDF y vista de lote en Mapeo por defecto | [`Z-01-lote-export-y-comparacion-con-muestras.dc.html`](canvas/Z-01-lote-export-y-comparacion-con-muestras.dc.html) | `workspace`, `header` | Aprobada, implementada (sin diálogo de ZIP: el ZIP solo lleva JSON) |
+| IA-01 La IA en el lote | Cómo encaja «Copiar y adaptar con IA» y por qué hace falta un ayudante local | [`IA-01-ia-en-el-lote-flujo.dc.html`](canvas/IA-01-ia-en-el-lote-flujo.dc.html) | — | Aprobada, implementada |
+| IA-02 Conectar la IA | Chip «✦ IA», panel de conexión, proveedor y modelo (Claude o Copilot) | [`IA-02-conectar-la-ia-estados.dc.html`](canvas/IA-02-conectar-la-ia-estados.dc.html) | `components/migration` (`migration-bar`) | Aprobada, implementada |
+| IA-03 Pedir y revisar · 1650 | Opción del menú y franja de revisión con motivo y confianza por campo | [`IA-03-pedir-y-revisar-1650.dc.html`](canvas/IA-03-pedir-y-revisar-1650.dc.html) | `components/migration` (`ai-review`) | Aprobada, implementada |
+| IA-04 Estados de la petición | Privacidad, carga, errores, límite de suscripción y resultado parcial | [`IA-04-estados-de-la-peticion.dc.html`](canvas/IA-04-estados-de-la-peticion.dc.html) | `components/migration` (`ai-review`) | Aprobada, implementada |
+| IA-05 Pedir y revisar · 1280 y claro | IA-03 en 1280 px y tema claro | [`IA-05-1280-claro.dc.html`](canvas/IA-05-1280-claro.dc.html) | igual que IA-03 | Aprobada, implementada |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 
