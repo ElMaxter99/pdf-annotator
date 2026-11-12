@@ -48,6 +48,7 @@ try {
   assert.match(await card.innerText(), /99\.0\.0/);
   await page.screenshot({ path: path.join(process.env.SMOKE_OUT || '/tmp', 'desktop-update.png') });
   await card.locator('.btn--ghost').click();
+  await card.waitFor({ state: 'detached', timeout: 5000 }).catch(() => {});
   assert.equal(await card.count(), 0, '«Más tarde» oculta la tarjeta');
   console.log('OK: app de escritorio');
 } finally {
