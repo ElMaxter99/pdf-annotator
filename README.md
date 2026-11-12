@@ -28,6 +28,7 @@
   <a href="#-empieza-en-1-minuto">Empieza</a> ·
   <a href="#-tour-de-la-interfaz">Tour</a> ·
   <a href="#-flujos-de-trabajo">Flujos</a> ·
+  <a href="#-adaptar-con-ia">Adaptar con IA</a> ·
   <a href="#%EF%B8%8F-atajos-de-teclado">Atajos</a> ·
   <a href="#-formato-json">JSON</a> ·
   <a href="#-despliegue">Despliegue</a> ·
@@ -143,6 +144,55 @@ Alterna entre editor de texto y árbol; al seleccionar una anotación en el viso
 
 ### E · Revisión de un PDF largo
 Miniaturas para saltar de página, `←/→` para navegar, `+/−` para zoom, **Deshacer** (`Ctrl/⌘+Z`) ante cualquier error y **Limpiar** para empezar de cero.
+
+## 🤖 Adaptar con IA
+Cuando llega una **versión nueva (B)** de un PDF del que ya tienes la plantilla (A), «Copiar y adaptar con IA» recoloca los campos de A en B aunque el texto cambie de redacción, un campo se mueva o pase a **otra página**. Usa **tu propio `claude` o `copilot`** con tu suscripción: sin claves de API, sin tokens de pago y **solo en local** (no existe en el despliegue ni en Docker).
+
+### Cómo funciona
+1. Un navegador no puede abrir programas, así que `npm run start:ia` arranca la app **y** un ayudante pequeño (`tools/ai-helper`, `127.0.0.1:4310`). Solo atiende a tu app, en tu equipo, con un token de cada arranque.
+2. En el editor de un PDF del lote que tenga versión B y plantilla A, el chip **«✦ IA»** (junto a la campana) dice si hay conexión. Su panel deja elegir proveedor y modelo.
+3. **«Poner plantilla A ▾» → «Copiar y adaptar con IA»**. La primera vez avisa de lo que se envía.
+4. El ayudante prepara las páginas de A y B (imágenes y textos) y se las pasa a tu CLI. La IA elige, por campo, a qué página va y **junto a qué texto** (el ancla). **La app calcula `x`,`y`** a partir de las posiciones reales de esos textos: la IA nunca da coordenadas.
+5. Se revisa en «Dividida»: motivo y confianza por campo, campos que cambian de página y los que no se encontraron. **B no cambia hasta «Aplicar N cambios»** (un solo paso de deshacer). Los de confianza baja o sin colocar solo se aplican si los marcas.
+6. Si falla (límite, tiempo, respuesta rara, ayudante cerrado), la franja ofrece reintentar, cambiar de proveedor o **«Usar ajuste por textos»**, que no necesita IA.
+
+### Proveedores válidos
+| Proveedor | Programa | Estado | Notas |
+| --- | --- | --- | --- |
+| **Claude** | [Claude Code](https://docs.claude.com/en/docs/claude-code) (`claude`) con sesión iniciada | Probado (`claude -p`) | Modelo por defecto `sonnet` (económico). Se puede elegir `haiku`, `sonnet` u `opus`. Se quita `ANTHROPIC_API_KEY` del entorno para usar la suscripción |
+| **Copilot** | [GitHub Copilot CLI](https://docs.github.com/en/copilot) (`copilot`) con sesión iniciada | Implementado, **sin verificar** contra tu versión | Modelo vacío = el del CLI. Si las banderas no valen, `COPILOT_ARGS` las ajusta. Necesita un modelo con visión |
+| Simulado | — | Solo para tests (`AI_HELPER_FAKE=1`) | Lo usan los e2e; no hace falta |
+
+No hay otros proveedores: la app no llama a ninguna API de pago ni a servicios externos.
+
+### Puesta en marcha
+```bash
+# una vez: instala el CLI y abre sesión (escribe `claude` o `copilot` y entra)
+npm install
+npm run start:ia        # app en http://localhost:4200 + ayudante en 127.0.0.1:4310
+```
+En PowerShell es igual. La primera vez instala las dependencias del ayudante (`tools/ai-phase0`). Deja esa terminal abierta mientras uses la IA; sin el ayudante la app funciona igual y el chip dice «sin conectar» con las instrucciones.
+
+### Modelo, coste y límites
+- Se elige en el panel del chip (Claude: desplegable; Copilot: texto libre) y se recuerda en este ordenador.
+- **Claude**: no hay cobro por token, pero cuenta contra el límite de 5 horas y el semanal de tu plan; un modelo grande lo agota antes. Al llegar al límite la app lo dice con la hora de renovación y ofrece cambiar a Copilot.
+- **Copilot**: cada petición descuenta de tus «premium requests» según el multiplicador del modelo; pasada la cuota puede haber coste extra según tu plan.
+- Una petición tarda unos 15-40 s por PDF y se puede cancelar.
+
+### Privacidad y seguridad
+- Se envía a tu CLI (que lo procesa según las condiciones de tu proveedor): las páginas de A y B como imágenes, sus textos y los campos de la plantilla A (nombre y posición). **No se envían los PDF originales ni los valores de prueba.** Usa solo PDF que puedas enviar.
+- El ayudante solo escucha en `127.0.0.1`, comprueba `Host` y origen, exige token y trabaja en una carpeta temporal que borra al terminar. Nada del PDF va en la línea de comandos y la respuesta de la IA se valida y **nunca se evalúa**.
+- Variables: `AI_HELPER_PORT`, `AI_HELPER_ORIGINS`, `AI_HELPER_TIMEOUT` (s, 300), `AI_HELPER_KEEP_API_KEY=1`, `COPILOT_ARGS`.
+
+### Problemas frecuentes
+| Síntoma | Qué hacer |
+| --- | --- |
+| Chip «sin conectar» | Arranca con `npm run start:ia` y deja la terminal abierta; pulsa «Volver a comprobar» |
+| Chip «no encontrada» | `claude` o `copilot` no está en el PATH: instálalo y abre sesión una vez |
+| «Límite de la suscripción» | Espera a la hora indicada o cambia de proveedor |
+| Respuesta que no se entiende | Reintenta; si se repite, usa «Usar ajuste por textos» |
+
+Detalle técnico y pruebas de calidad: [`docs/IA-LOCAL.md`](docs/IA-LOCAL.md) y [`tools/ai-phase0/README.md`](tools/ai-phase0/README.md).
 
 ## ⌨️ Atajos de teclado
 Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
