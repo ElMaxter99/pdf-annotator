@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // La versión sale solo de package.json: copia ese número a desktop/package.json (lo que lee electron-builder).
-// `--check` solo comprueba (y, con `--tag vX.Y.Z`, que la etiqueta coincida).
+// Sin argumentos copia la versión; `--check` solo comprueba (y, con `--tag vX.Y.Z`, que la etiqueta coincida). Los workflows lo ejecutan antes de empaquetar, así subir la versión en package.json no obliga a tocar desktop/.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
