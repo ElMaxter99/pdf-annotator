@@ -11,7 +11,7 @@ export const PROVIDERS = {
   claude: {
     label: 'Claude Code (claude -p)',
     cmd: 'claude',
-    args: () => ['-p', INSTRUCTION, '--output-format', 'json', '--allowedTools', 'Read'],
+    args: (opts = {}) => ['-p', INSTRUCTION, '--output-format', 'json', '--allowedTools', 'Read', ...(opts.model ? ['--model', opts.model] : [])],
     // Con --output-format json el texto de la respuesta viene en `result`.
     extract(stdout) {
       try {
@@ -32,7 +32,7 @@ export const PROVIDERS = {
     label: 'Copilot CLI (copilot -p)',
     cmd: 'copilot',
     // Banderas SIN VERIFICAR contra tu versión: si fallan, ajusta con COPILOT_ARGS='["-p","...","--allow-all-tools"]'.
-    args: () => (process.env.COPILOT_ARGS ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a)) : ['-p', INSTRUCTION, '--allow-all-tools']),
+    args: (opts = {}) => (process.env.COPILOT_ARGS ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a)) : ['-p', INSTRUCTION, '--allow-all-tools', ...(opts.model ? ['--model', opts.model] : [])]),
     extract: (stdout) => ({ text: stdout, meta: {} }),
     env: (base) => ({ ...base }),
   },
@@ -77,7 +77,7 @@ export function runCli(name, cwd, opts = {}) {
       return;
     }
     const started = Date.now();
-    const sp = buildSpawn(exe, p.args());
+    const sp = buildSpawn(exe, p.args(opts));
     const child = spawn(sp.file, sp.args, { cwd, env: p.env(process.env, opts), stdio: ['ignore', 'pipe', 'pipe'], ...sp.options });
     let stdout = '';
     let stderr = '';
@@ -86,17 +86,31 @@ export function runCli(name, cwd, opts = {}) {
       timedOut = true;
       killTree(child);
     }, timeoutMs);
-    const beat = setInterval(() => process.stdout.write('.'), 10_000);
+    const beat = opts.quiet ? null : setInterval(() => process.stdout.write('.'), 10_000);
+    let aborted = false;
+    const onAbort = () => {
+      aborted = true;
+      killTree(child);
+    };
+    if (opts.signal) {
+      if (opts.signal.aborted) onAbort();
+      else opts.signal.addEventListener('abort', onAbort, { once: true });
+    }
     child.stdout.on('data', (d) => (stdout += d));
     child.stderr.on('data', (d) => (stderr += d));
     const done = (res) => {
       clearTimeout(timer);
-      clearInterval(beat);
+      if (beat) clearInterval(beat);
+      opts.signal?.removeEventListener('abort', onAbort);
       resolve(res);
     };
     child.on('error', (e) => done({ ok: false, seconds: 0, stdout, stderr: String(e.message), code: -1 }));
     child.on('close', (code) => {
       const seconds = Math.round((Date.now() - started) / 100) / 10;
+      if (aborted) {
+        done({ ok: false, seconds, stdout, stderr, code: -3, aborted: true });
+        return;
+      }
       if (timedOut) {
         done({ ok: false, seconds, stdout, code: -2, stderr: `Tiempo agotado: «${p.cmd}» no respondió en ${Math.round(timeoutMs / 1000)} s. Ejecuta «${p.cmd}» a mano, comprueba que la sesión está iniciada y que no pide confirmaciones; sube el límite con --timeout <segundos>.\n${stderr}` });
         return;

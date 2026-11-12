@@ -50,6 +50,83 @@
       </div>
     }
 
+    <div class="migration-menu ai-chip-wrap">
+      <button
+        #aiChip
+        type="button"
+        class="btn btn--ghost ai-chip"
+        [class.ai-chip--on]="chipState() === 'ready'"
+        [class.ai-chip--warn]="chipState() === 'limit' || chipState() === 'noCli'"
+        aria-haspopup="true"
+        [attr.aria-expanded]="vm.aiPanelOpen()"
+        [attr.title]="'ai.chip.' + chipState() | t: { provider: providerName() }"
+        [attr.aria-label]="'ai.chip.' + chipState() | t: { provider: providerName() }"
+        (click)="toggleAiPanel()"
+        data-testid="ai-chip"
+      >
+        <span aria-hidden="true">✦</span>
+        <span class="ai-chip__text">{{ 'ai.chip.' + chipState() | t: { provider: providerName() } }}</span>
+      </button>
+      @if (vm.aiPanelOpen()) {
+        <div class="migration-menu__panel ai-panel" role="dialog" [attr.aria-label]="'ai.panel.title' | t" data-testid="ai-panel">
+          <div class="migration-bell__head">
+            <strong>{{ 'ai.panel.title' | t }}</strong>
+            <span class="ai-panel__state" [class.ai-panel__state--ok]="vm.aiHelper.connection() === 'ready'">
+              {{ 'ai.panel.state.' + vm.aiHelper.connection() | t }}
+            </span>
+          </div>
+          @switch (vm.aiHelper.connection()) {
+            @case ('checking') {
+              <p class="ai-panel__text">{{ 'ai.panel.checking' | t }}</p>
+            }
+            @case ('ready') {
+              <p class="ai-panel__label">{{ 'ai.panel.pick' | t }}</p>
+              <ng-container *ngTemplateOutlet="providers"></ng-container>
+              <p class="ai-panel__text">{{ 'ai.panel.limits' | t }}</p>
+            }
+            @case ('noCli') {
+              <p class="ai-panel__label">{{ 'ai.panel.pick' | t }}</p>
+              <ng-container *ngTemplateOutlet="providers"></ng-container>
+              <p class="ai-panel__text">{{ 'ai.panel.noCli' | t: { cmd: vm.aiHelper.provider() } }}</p>
+              <button type="button" class="btn btn--ghost" (click)="recheckAi()" data-testid="ai-recheck">{{ 'ai.panel.recheck' | t }}</button>
+            }
+            @default {
+              <p class="ai-panel__text"><strong>{{ 'ai.panel.offline.title' | t }}</strong> {{ 'ai.panel.offline.text' | t }}</p>
+              <code class="ai-panel__cmd">npm run start:ia</code>
+              <ol class="ai-panel__steps">
+                <li>{{ 'ai.panel.offline.step1' | t }}</li>
+                <li>{{ 'ai.panel.offline.step2' | t }}</li>
+              </ol>
+              <button type="button" class="btn btn--ghost" (click)="recheckAi()" data-testid="ai-recheck">{{ 'ai.panel.recheck' | t }}</button>
+            }
+          }
+          <p class="ai-panel__text ai-panel__send">{{ 'ai.panel.send' | t }}</p>
+        </div>
+      }
+    </div>
+    <ng-template #providers>
+      @for (name of ['claude', 'copilot']; track name) {
+        <button
+          type="button"
+          class="ai-provider"
+          [class.ai-provider--on]="vm.aiHelper.provider() === name"
+          [disabled]="!vm.aiHelper.found()[name]"
+          [attr.aria-pressed]="vm.aiHelper.provider() === name"
+          (click)="vm.aiHelper.setProvider($any(name))"
+          [attr.data-testid]="'ai-provider-' + name"
+        >
+          <strong>{{ name === 'claude' ? 'Claude Code' : 'Copilot CLI' }}</strong>
+          <small>{{ (vm.aiHelper.found()[name] ? 'ai.panel.found' : 'ai.panel.missing') | t }}</small>
+          @if (vm.aiHelper.provider() === name) { <span aria-hidden="true">✓</span> }
+        </button>
+      }
+      @if (vm.aiHelper.found()['fake']) {
+        <button type="button" class="ai-provider" [class.ai-provider--on]="vm.aiHelper.provider() === 'fake'" (click)="vm.aiHelper.setProvider('fake')" data-testid="ai-provider-fake">
+          <strong>Simulado</strong><small>AI_HELPER_FAKE=1</small>
+        </button>
+      }
+    </ng-template>
+
     <div class="migration-menu migration-bell">
       <button
         #bell
@@ -87,6 +164,9 @@
                   @case ('adjust') {
                     {{ 'batch.editor.notices.adjust' | t: { count: vm.adjust()?.fields?.length ?? 0 } }}
                   }
+                  @case ('ai') {
+                    {{ 'ai.notice' | t: { count: vm.ai()?.rows?.length ?? 0 } }}
+                  }
                   @case ('noTemplate') {
                     {{ 'batch.editor.noA.hint' | t }}
                   }
@@ -107,6 +187,16 @@
                     {{ 'batch.adjust.apply' | t: { count: vm.adjustMovedCount() } }}
                   </button>
                   <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()" data-testid="notice-adjust-cancel">
+                    {{ 'batch.adjust.cancelProposal' | t }}
+                  </button>
+                }
+                @if (notice.id === 'ai') {
+                  @if (vm.ai()?.phase === 'ready') {
+                    <button type="button" class="btn btn--primary" (click)="vm.applyAi()" data-testid="notice-ai-apply">
+                      {{ 'batch.adjust.apply' | t: { count: vm.aiSummary().selected } }}
+                    </button>
+                  }
+                  <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="notice-ai-cancel">
                     {{ 'batch.adjust.cancelProposal' | t }}
                   </button>
                 }
@@ -196,6 +286,16 @@
               <strong>{{ 'batch.editor.putA.adjust' | t }}</strong>
               <small>{{ 'batch.editor.putA.adjustText' | t }}</small>
             </button>
+            <button
+              type="button"
+              role="menuitem"
+              class="migration-menu__item"
+              (click)="putAi()"
+              data-testid="put-a-ai"
+            >
+              <strong>✦ {{ 'ai.menu.title' | t }} <span class="ai-new">{{ 'ai.menu.new' | t }}</span></strong>
+              <small>{{ 'ai.menu.text' | t: { provider: providerName() } }}</small>
+            </button>
             @if (vm.sizeMismatch()) {
               <label class="migration-menu__check" data-testid="put-a-fit">
                 <input
@@ -234,6 +334,7 @@
   </div>
   <div class="migration-hints">
     <app-adjust-review [vm]="vm" (closeRequested)="closeNotice('adjust')"></app-adjust-review>
+    <app-ai-review [vm]="vm" (closeRequested)="closeNotice('ai')"></app-ai-review>
     @if (vm.migration() && vm.templateFieldsA() === 0 && !vm.isNoticeClosed('noTemplate')) {
       <div class="migration-hint" role="status" data-testid="no-template-a">
         <span>{{ 'batch.editor.noA.hint' | t }}</span>
@@ -358,6 +459,27 @@
         <button type="button" class="btn" (click)="readyOpen.set(false)">
           {{ 'batch.editor.readyDialog.keep' | t }}
         </button>
+      </div>
+    </div>
+  }
+
+  @if (vm.aiConsentOpen()) {
+    <div class="migration-backdrop" (click)="vm.aiConsentOpen.set(false)"></div>
+    <div class="migration-dialog" role="dialog" aria-modal="true" aria-labelledby="ai-consent-title" data-testid="ai-consent">
+      <h2 id="ai-consent-title">{{ 'ai.consent.title' | t: { provider: providerName() } }}</h2>
+      <p>{{ 'ai.consent.intro' | t: { provider: providerName() } }}</p>
+      <ul>
+        <li>{{ 'ai.consent.pages' | t }}</li>
+        <li>{{ 'ai.consent.fields' | t }}</li>
+      </ul>
+      <p>{{ 'ai.consent.not' | t: { provider: providerName() } }}</p>
+      <label class="migration-menu__check">
+        <input #remember type="checkbox" checked />
+        <span>{{ 'ai.consent.remember' | t }}</span>
+      </label>
+      <div class="migration-dialog__actions">
+        <button type="button" class="btn btn--primary" (click)="vm.confirmAiConsent(remember.checked)" data-testid="ai-consent-ok">{{ 'ai.consent.send' | t: { provider: providerName() } }}</button>
+        <button type="button" class="btn" (click)="vm.aiConsentOpen.set(false)" data-testid="ai-consent-cancel">{{ 'batch.editor.cancel' | t }}</button>
       </div>
     </div>
   }

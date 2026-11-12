@@ -1,17 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, signal } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { NoticeId, WorkspacePageComponent } from '../../workspace.page';
 import { AdjustReviewComponent } from './adjust-review.component';
+import { AiReviewComponent } from './ai-review.component';
 
 /** Top bar of the editor while a PDF of a batch is open: B is edited, A is the reference. */
 @Component({
   selector: 'app-migration-bar',
   standalone: true,
-  imports: [CommonModule, TranslationPipe, AdjustReviewComponent],
+  imports: [CommonModule, TranslationPipe, AdjustReviewComponent, AiReviewComponent],
   templateUrl: './migration-bar.component.html',
 })
-export class MigrationBarComponent {
+export class MigrationBarComponent implements OnInit {
   @Input({ required: true }) vm!: WorkspacePageComponent;
 
   readonly modes = ['overlay', 'toggle', 'split'] as const;
@@ -21,6 +22,43 @@ export class MigrationBarComponent {
   readonly readyOpen = signal(false);
   readonly bellOpen = signal(false);
   @ViewChild('bell') private bellButton?: ElementRef<HTMLButtonElement>;
+
+  ngOnInit(): void {
+    if (this.vm.aiHelper.connection() === 'unknown') {
+      void this.vm.aiHelper.check();
+    }
+  }
+
+  providerName(): string {
+    const provider = this.vm.aiHelper.provider();
+    return provider === 'copilot' ? 'Copilot' : provider === 'fake' ? 'Simulado' : 'Claude';
+  }
+
+  chipState(): 'unknown' | 'checking' | 'offline' | 'noCli' | 'ready' | 'limit' {
+    const error = this.vm.ai()?.error;
+    if (error?.code === 'limit') {
+      return 'limit';
+    }
+    const state = this.vm.aiHelper.connection();
+    return state === 'unknown' ? 'offline' : state;
+  }
+
+  toggleAiPanel(): void {
+    if (this.vm.aiPanelOpen()) {
+      this.vm.aiPanelOpen.set(false);
+      return;
+    }
+    this.vm.openAiPanel();
+  }
+
+  recheckAi(): void {
+    void this.vm.aiHelper.check();
+  }
+
+  putAi(): void {
+    this.closeMenu();
+    void this.vm.startAi();
+  }
 
   toggleBell(): void {
     this.bellOpen.update((open) => !open);
@@ -91,6 +129,23 @@ export class MigrationBarComponent {
   /** Esc closes the open menu or dialog. */
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.vm.aiConsentOpen()) {
+      this.vm.aiConsentOpen.set(false);
+      return;
+    }
+    if (this.vm.aiPanelOpen()) {
+      this.vm.aiPanelOpen.set(false);
+      return;
+    }
+    const ai = this.vm.ai();
+    if (ai) {
+      if (ai.phase === 'ready' && !this.vm.isNoticeClosed('ai')) {
+        this.closeNotice('ai');
+      } else if (ai.phase !== 'ready') {
+        this.vm.cancelAi();
+      }
+      return;
+    }
     const adjust = this.vm.adjust();
     if (adjust?.card) {
       this.vm.closeAdjustCard();

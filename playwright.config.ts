@@ -20,9 +20,18 @@ export default defineConfig({
       ? { executablePath: process.env['PW_CHROMIUM'] }
       : {},
   },
-  webServer: {
-    command: 'node e2e/static-server.mjs dist/pdf-annotator/browser',
-    url: 'http://127.0.0.1:4300',
-    reuseExistingServer: !process.env['CI'],
-  },
+  webServer: [
+    {
+      command: 'node e2e/static-server.mjs dist/pdf-annotator/browser',
+      url: 'http://127.0.0.1:4300',
+      reuseExistingServer: !process.env['CI'],
+    },
+    {
+      // Local AI helper with the simulated provider (no CLI, no subscription).
+      command: 'node tools/ai-helper/server.mjs',
+      url: 'http://127.0.0.1:4310/health',
+      env: { AI_HELPER_FAKE: '1' },
+      reuseExistingServer: !process.env['CI'],
+    },
+  ],
 });

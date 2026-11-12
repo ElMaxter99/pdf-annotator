@@ -40,3 +40,17 @@ El script (y la futura función) prepara una carpeta temporal y ejecuta el CLI d
 
 ## Cómo medir (fase 0)
 `cd tools/ai-phase0 && npm install && npm run sample && npm test`; después `node run.mjs --provider claude` (Windows PowerShell incluido) y, cuando toque, `--provider copilot` o `both`. Resultados en `out/summary.md`. Detalles y formato de casos en el [README de la herramienta](../tools/ai-phase0/README.md).
+
+## Usarla en la app (lote)
+1. Instala y abre sesión una vez en `claude` (o `copilot`) desde una terminal.
+2. `npm install` y `npm run start:ia`: arranca la app (`http://localhost:4200`) y el ayudante (`127.0.0.1:4310`). La primera vez instala las dependencias de `tools/ai-phase0` (pdf.js y canvas, solo para el ayudante).
+3. En el editor de un PDF del lote con versión B y plantilla A: chip «✦ IA» (debe decir que hay conexión) → «Poner plantilla A ▾» → «Copiar y adaptar con IA».
+4. Revisa en «Dividida» y pulsa «Aplicar N cambios» (un solo paso de deshacer). B no cambia hasta entonces.
+
+**Cómo está montado.** El navegador no puede lanzar programas, así que `tools/ai-helper/server.mjs` hace de puente: escucha solo en `127.0.0.1`, atiende solo a los orígenes de la app (`AI_HELPER_ORIGINS`), comprueba `Host` (contra DNS rebinding) y exige un token que reparte solo a esos orígenes. Recibe los PDF y la plantilla A, prepara imágenes y textos en una carpeta temporal (que borra al terminar), lanza el CLI con una instrucción fija (nada del PDF va en la línea de comandos) y devuelve una fila por campo. La respuesta de la IA nunca se evalúa: se valida y la app calcula x,y a partir de los textos. Atiende una petición a la vez; cancelar en la app mata el CLI.
+
+**Modelo.** Sin elegir, Claude usa `sonnet` (`--model`) y Copilot el modelo por defecto del CLI. Cámbialos desde el almacenamiento local (`pdf-annotator.ai.models`) hasta que el selector del panel esté aprobado en diseño (IA-02). Un modelo mayor agota antes el límite de 5 h/semanal de Claude; en Copilot cada petición descuenta «premium requests» según el multiplicador del modelo (confirmar con tu administrador las cifras de Business/Enterprise).
+
+**Variables del ayudante:** `AI_HELPER_PORT`, `AI_HELPER_ORIGINS`, `AI_HELPER_TIMEOUT` (segundos, 300), `AI_HELPER_KEEP_API_KEY=1` (por defecto se quita `ANTHROPIC_API_KEY` para usar la suscripción), `COPILOT_ARGS` (banderas de Copilot sin verificar), `AI_HELPER_FAKE=1` (proveedor simulado para los e2e).
+
+**Seguridad.** El ayudante no entra en Docker ni en el despliegue. La CSP de `nginx.conf` permite `connect-src http://127.0.0.1:4310` solo para que, con el ayudante abierto en tu equipo, la app pueda hablarle; sin él, la opción aparece desactivada y explica cómo arrancarlo.

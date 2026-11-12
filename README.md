@@ -67,6 +67,7 @@ git clone https://github.com/ElMaxter99/pdf-annotator.git
 cd pdf-annotator
 npm install
 npm run start:local      # → http://localhost:4200
+npm run start:ia         # igual + ayudante de IA local (Claude/Copilot con tu suscripción; ver docs/IA-LOCAL.md)
 ```
 Requisitos: **Node 22.12** y un navegador moderno. ¿Prefieres contenedor? `npm run start:docker` → <http://localhost:4444>.
 

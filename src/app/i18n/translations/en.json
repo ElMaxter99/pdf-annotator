@@ -322,7 +322,8 @@
       "templateApplied": "Template loaded: {{count}} fields.",
       "templateFromAnnotations": "The original’s annotations became template A.",
       "copiedAdjusted": "Fields copied and fitted to B's size.",
-      "adjustApplied": "{{count}} fields copied, {{moved}} adjusted."
+      "adjustApplied": "{{count}} fields copied, {{moved}} adjusted.",
+      "aiApplied": "{{count}} fields copied with AI, {{moved}} on another page."
     },
     "bell": {
       "label": "Closed notices ({{count}})",
@@ -470,7 +471,8 @@
           "noTemplate": "A has no template",
           "pagesDiffer": "Different number of pages",
           "fit": "Different page size",
-          "adjust": "Adjust by texts"
+          "adjust": "Adjust by texts",
+          "ai": "AI adaptation"
         },
         "adjust": "{{count}} fields proposed · B unchanged"
       }
@@ -764,5 +766,124 @@
     "remember": "Remember my choice in this session",
     "cancel": "Cancel",
     "continue": "Continue"
+  },
+  "ai": {
+    "chip": {
+      "offline": "AI · not connected",
+      "checking": "AI · checking…",
+      "noCli": "AI · not found",
+      "ready": "AI · {{provider}}",
+      "limit": "AI · {{provider}} · limit"
+    },
+    "panel": {
+      "title": "Connection to the AI",
+      "state": {
+        "unknown": "Not checked",
+        "checking": "Checking…",
+        "offline": "Not connected",
+        "noCli": "Program not found",
+        "ready": "Connected"
+      },
+      "checking": "Looking for the helper and the installed programs.",
+      "pick": "Which AI to use",
+      "limits": "Your subscription limits apply, not paid tokens.",
+      "noCli": "I cannot find “{{cmd}}” on this computer. Install it, sign in once (type its name in a terminal) and check again.",
+      "recheck": "Check again",
+      "found": "Installed",
+      "missing": "Not found",
+      "send": "Sent to your AI: the pages of A and B as images, their texts and the fields of template A (name and position). Never the original PDFs.",
+      "offline": {
+        "title": "I cannot find the helper.",
+        "text": "The AI needs a small program on your computer. Start it and check again.",
+        "step1": "Start the app with the command above (close the current one).",
+        "step2": "If you already did, make sure the terminal is still open."
+      }
+    },
+    "menu": {
+      "title": "Copy and adapt with AI",
+      "new": "New",
+      "text": "Understands that a field moves or changes page. Uses your {{provider}}. A few seconds per PDF."
+    },
+    "loading": {
+      "title": "{{provider}} is comparing A and B…",
+      "hint": "You can keep editing; B is not touched until you apply.",
+      "stage": {
+        "reading": "Preparing pages and texts",
+        "asking": "Waiting for the AI",
+        "resolving": "Computing positions"
+      }
+    },
+    "error": {
+      "offline": {
+        "title": "The helper does not answer.",
+        "text": "Is the terminal with npm run start:ia still open?"
+      },
+      "limit": {
+        "title": "Subscription limit.",
+        "text": "{{provider}} has reached your subscription limit. It renews at {{reset}}. What was already proposed is kept."
+      },
+      "timeout": {
+        "title": "The AI did not answer in time.",
+        "text": "Nothing has changed in B."
+      },
+      "bad_response": {
+        "title": "The answer is not understood.",
+        "text": "We tried once more without success."
+      },
+      "cli_error": {
+        "title": "The AI returned an error.",
+        "text": "Check the detail and that you are still signed in."
+      },
+      "missing": {
+        "title": "Program not found.",
+        "text": "Install it and sign in once."
+      },
+      "busy": {
+        "title": "The helper is busy.",
+        "text": "Another request is running; wait for it to finish."
+      },
+      "error": {
+        "title": "The proposal could not be requested.",
+        "text": "Nothing has changed in B."
+      },
+      "aborted": {
+        "title": "Cancelled.",
+        "text": "Nothing has changed in B."
+      },
+      "switch": "Switch to {{provider}}",
+      "retry": "Retry",
+      "useAdjust": "Use text adjustment"
+    },
+    "empty": {
+      "title": "No changes to apply.",
+      "text": "The AI did not place any field."
+    },
+    "review": {
+      "title": "AI proposal ({{provider}})",
+      "strip": "{{placed}} of {{total}} fields placed",
+      "changePage": "{{count}} change(s) page",
+      "notFound": "{{count}} not found",
+      "untouched": "B has not been modified yet.",
+      "notPlaced": "not placed",
+      "anchor": "anchor “{{text}}”",
+      "goto": "Go to page",
+      "listHint": "Low-confidence or unplaced fields are not applied until you tick them."
+    },
+    "confidence": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "none": "Not found"
+    },
+    "consent": {
+      "title": "You are about to send pages to {{provider}}",
+      "intro": "To compare A and B, the helper gives your {{provider}}:",
+      "pages": "The pages of A and B as images and their texts.",
+      "fields": "The fields of template A (position and name).",
+      "not": "It does not send the original PDFs. Your {{provider}} session processes them under its own terms. Use only PDFs you may send.",
+      "remember": "Do not warn again on this computer",
+      "send": "Send to {{provider}}"
+    },
+    "notice": "{{count}} fields proposed by the AI · B unchanged"
   }
 }

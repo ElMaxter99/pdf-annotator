@@ -322,7 +322,8 @@
       "templateApplied": "Plantilla cargada: {{count}} campos.",
       "templateFromAnnotations": "Las anotaciones del original pasan a ser la plantilla A.",
       "copiedAdjusted": "Campos copiados y ajustados al tamaño de B.",
-      "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados."
+      "adjustApplied": "{{count}} campos copiados, {{moved}} ajustados.",
+      "aiApplied": "{{count}} campos copiados con IA, {{moved}} en otra página."
     },
     "bell": {
       "label": "Avisos cerrados ({{count}})",
@@ -470,7 +471,8 @@
           "noTemplate": "A no tiene plantilla",
           "pagesDiffer": "Distinto número de páginas",
           "fit": "Tamaño de página distinto",
-          "adjust": "Ajuste por textos"
+          "adjust": "Ajuste por textos",
+          "ai": "Adaptación con IA"
         },
         "adjust": "{{count}} campos propuestos · B sin modificar"
       }
@@ -764,5 +766,124 @@
     "remember": "Recordar mi elección en esta sesión",
     "cancel": "Cancelar",
     "continue": "Continuar"
+  },
+  "ai": {
+    "chip": {
+      "offline": "IA · sin conectar",
+      "checking": "IA · comprobando…",
+      "noCli": "IA · no encontrada",
+      "ready": "IA · {{provider}}",
+      "limit": "IA · {{provider}} · límite"
+    },
+    "panel": {
+      "title": "Conexión con la IA",
+      "state": {
+        "unknown": "Sin comprobar",
+        "checking": "Comprobando…",
+        "offline": "Sin conectar",
+        "noCli": "Programa no encontrado",
+        "ready": "Conectada"
+      },
+      "checking": "Buscando el ayudante y los programas instalados.",
+      "pick": "Con qué IA trabajar",
+      "limits": "Se usan los límites de tu suscripción, no tokens de pago.",
+      "noCli": "No encuentro «{{cmd}}» en este ordenador. Instálalo, inicia sesión una vez (escribe su nombre en una terminal) y vuelve a comprobar.",
+      "recheck": "Volver a comprobar",
+      "found": "Instalado",
+      "missing": "No encontrado",
+      "send": "Se envían a tu IA las páginas de A y B como imágenes, sus textos y los campos de la plantilla A (nombre y posición). Nunca los PDF originales.",
+      "offline": {
+        "title": "No encuentro el ayudante.",
+        "text": "La IA necesita un programa pequeño en tu ordenador. Ábrelo y vuelve a comprobar.",
+        "step1": "Arranca la app con el comando de arriba (cierra la actual).",
+        "step2": "Si ya lo hiciste, comprueba que la terminal sigue abierta."
+      }
+    },
+    "menu": {
+      "title": "Copiar y adaptar con IA",
+      "new": "Nuevo",
+      "text": "Entiende que un campo cambie de sitio o de página. Usa tu {{provider}}. Tarda unos segundos por PDF."
+    },
+    "loading": {
+      "title": "{{provider}} está comparando A y B…",
+      "hint": "Puedes seguir editando; B no se toca hasta aplicar.",
+      "stage": {
+        "reading": "Preparando páginas y textos",
+        "asking": "Esperando a la IA",
+        "resolving": "Calculando posiciones"
+      }
+    },
+    "error": {
+      "offline": {
+        "title": "El ayudante no responde.",
+        "text": "¿Sigue abierta la terminal con npm run start:ia?"
+      },
+      "limit": {
+        "title": "Límite de la suscripción.",
+        "text": "{{provider}} ha alcanzado el límite de tu suscripción. Se renueva a las {{reset}}. Lo ya propuesto se conserva."
+      },
+      "timeout": {
+        "title": "La IA no respondió a tiempo.",
+        "text": "No se ha cambiado nada en B."
+      },
+      "bad_response": {
+        "title": "La respuesta no se entiende.",
+        "text": "Probamos una vez más sin éxito."
+      },
+      "cli_error": {
+        "title": "La IA ha dado un error.",
+        "text": "Revisa el detalle y que la sesión siga iniciada."
+      },
+      "missing": {
+        "title": "Programa no encontrado.",
+        "text": "Instálalo e inicia sesión una vez."
+      },
+      "busy": {
+        "title": "El ayudante está ocupado.",
+        "text": "Ya hay otra petición en curso; espera a que termine."
+      },
+      "error": {
+        "title": "No se pudo pedir la propuesta.",
+        "text": "No se ha cambiado nada en B."
+      },
+      "aborted": {
+        "title": "Cancelado.",
+        "text": "No se ha cambiado nada en B."
+      },
+      "switch": "Cambiar a {{provider}}",
+      "retry": "Reintentar",
+      "useAdjust": "Usar ajuste por textos"
+    },
+    "empty": {
+      "title": "Sin cambios que aplicar.",
+      "text": "La IA no ha colocado ningún campo."
+    },
+    "review": {
+      "title": "Propuesta de la IA ({{provider}})",
+      "strip": "{{placed}} de {{total}} campos colocados",
+      "changePage": "{{count}} cambia(n) de página",
+      "notFound": "{{count}} sin encontrar",
+      "untouched": "B no se ha modificado todavía.",
+      "notPlaced": "sin colocar",
+      "anchor": "ancla «{{text}}»",
+      "goto": "Ir a la página",
+      "listHint": "Los de confianza baja o sin colocar no se aplican hasta que los marques."
+    },
+    "confidence": {
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja",
+      "none": "No encontrado"
+    },
+    "consent": {
+      "title": "Vas a enviar páginas a {{provider}}",
+      "intro": "Para comparar A y B, el ayudante le pasa a tu {{provider}}:",
+      "pages": "Las páginas de A y de B como imágenes y sus textos.",
+      "fields": "Los campos de la plantilla A (posición y nombre).",
+      "not": "No envía los PDF originales. Lo procesa tu sesión de {{provider}} según sus condiciones. Usa solo PDF que puedas enviar.",
+      "remember": "No volver a avisar en este ordenador",
+      "send": "Enviar a {{provider}}"
+    },
+    "notice": "{{count}} campos propuestos por la IA · B sin modificar"
   }
 }

@@ -4262,3 +4262,99 @@ kbd {
   justify-content: flex-end;
   gap: 8px;
 }
+
+/* IA en el lote: chip «✦ IA», su panel y la franja de revisión (la franja reutiliza .adjust-*). */
+.ai-chip-wrap {
+  position: relative;
+}
+.ai-chip {
+  white-space: nowrap;
+}
+.ai-chip--on {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.ai-chip--warn {
+  color: #b57600;
+}
+.ai-panel {
+  width: 380px;
+}
+.ai-panel__state {
+  font-size: 12px;
+  color: var(--muted);
+}
+.ai-panel__state--ok {
+  color: var(--accent);
+}
+.ai-panel__label,
+.ai-panel__text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.ai-panel__send {
+  padding-top: 6px;
+  border-top: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+  font-size: 12px;
+}
+.ai-panel__cmd {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--muted) 14%, transparent);
+  font-size: 13px;
+  user-select: all;
+}
+.ai-panel__steps {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.ai-provider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.ai-provider small {
+  flex: 1;
+  color: var(--muted);
+}
+.ai-provider--on {
+  border-color: var(--accent);
+}
+.ai-provider:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.ai-new {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent);
+}
+.ai-detail {
+  display: block;
+  font-size: 12px;
+  word-break: break-word;
+}
+:root.theme-light .ai-chip--warn {
+  color: #8a5a00;
+}
+/* En 1280 px el chip se queda en «✦» (el estado va en el color y en el título) para que la barra no desborde. */
+@media (max-width: 1400px) {
+  .ai-chip__text {
+    display: none;
+  }
+}

@@ -322,7 +322,8 @@
       "templateApplied": "Modello caricato: {{count}} campi.",
       "templateFromAnnotations": "Le annotazioni dell’originale diventano il modello A.",
       "copiedAdjusted": "Campi copiati e adattati alle dimensioni di B.",
-      "adjustApplied": "{{count}} campi copiati, {{moved}} regolati."
+      "adjustApplied": "{{count}} campi copiati, {{moved}} regolati.",
+      "aiApplied": "{{count}} campi copiati con l'IA, {{moved}} su un'altra pagina."
     },
     "bell": {
       "label": "Avvisi chiusi ({{count}})",
@@ -470,7 +471,8 @@
           "noTemplate": "A non ha un modello",
           "pagesDiffer": "Numero di pagine diverso",
           "fit": "Dimensione di pagina diversa",
-          "adjust": "Regolazione per testi"
+          "adjust": "Regolazione per testi",
+          "ai": "Adattamento con IA"
         },
         "adjust": "{{count}} campi proposti · B non modificata"
       }
@@ -764,5 +766,124 @@
     "remember": "Ricorda la mia scelta in questa sessione",
     "cancel": "Annulla",
     "continue": "Continua"
+  },
+  "ai": {
+    "chip": {
+      "offline": "IA · non connessa",
+      "checking": "IA · verifica…",
+      "noCli": "IA · non trovata",
+      "ready": "IA · {{provider}}",
+      "limit": "IA · {{provider}} · limite"
+    },
+    "panel": {
+      "title": "Connessione con l'IA",
+      "state": {
+        "unknown": "Non verificata",
+        "checking": "Verifica…",
+        "offline": "Non connessa",
+        "noCli": "Programma non trovato",
+        "ready": "Connessa"
+      },
+      "checking": "Cerco l'assistente e i programmi installati.",
+      "pick": "Con quale IA lavorare",
+      "limits": "Si usano i limiti del tuo abbonamento, non token a pagamento.",
+      "noCli": "Non trovo «{{cmd}}» su questo computer. Installalo, accedi una volta (scrivi il suo nome in un terminale) e verifica di nuovo.",
+      "recheck": "Verifica di nuovo",
+      "found": "Installato",
+      "missing": "Non trovato",
+      "send": "Alla tua IA vengono inviati: le pagine di A e B come immagini, i loro testi e i campi del modello A (nome e posizione). Mai i PDF originali.",
+      "offline": {
+        "title": "Non trovo l'assistente.",
+        "text": "L'IA ha bisogno di un piccolo programma sul tuo computer. Avvialo e verifica di nuovo.",
+        "step1": "Avvia l'app con il comando qui sopra (chiudi quella attuale).",
+        "step2": "Se l'hai già fatto, controlla che il terminale sia ancora aperto."
+      }
+    },
+    "menu": {
+      "title": "Copia e adatta con l'IA",
+      "new": "Nuovo",
+      "text": "Capisce che un campo cambi posto o pagina. Usa il tuo {{provider}}. Pochi secondi per PDF."
+    },
+    "loading": {
+      "title": "{{provider}} sta confrontando A e B…",
+      "hint": "Puoi continuare a modificare; B non cambia finché non applichi.",
+      "stage": {
+        "reading": "Preparazione di pagine e testi",
+        "asking": "In attesa dell'IA",
+        "resolving": "Calcolo delle posizioni"
+      }
+    },
+    "error": {
+      "offline": {
+        "title": "L'assistente non risponde.",
+        "text": "Il terminale con npm run start:ia è ancora aperto?"
+      },
+      "limit": {
+        "title": "Limite dell'abbonamento.",
+        "text": "{{provider}} ha raggiunto il limite del tuo abbonamento. Si rinnova alle {{reset}}. Quanto già proposto resta."
+      },
+      "timeout": {
+        "title": "L'IA non ha risposto in tempo.",
+        "text": "Non è cambiato nulla in B."
+      },
+      "bad_response": {
+        "title": "La risposta non è comprensibile.",
+        "text": "Riprovato una volta senza successo."
+      },
+      "cli_error": {
+        "title": "L'IA ha restituito un errore.",
+        "text": "Controlla il dettaglio e che la sessione sia ancora attiva."
+      },
+      "missing": {
+        "title": "Programma non trovato.",
+        "text": "Installalo e accedi una volta."
+      },
+      "busy": {
+        "title": "L'assistente è occupato.",
+        "text": "C'è già un'altra richiesta in corso; attendi che finisca."
+      },
+      "error": {
+        "title": "Impossibile richiedere la proposta.",
+        "text": "Non è cambiato nulla in B."
+      },
+      "aborted": {
+        "title": "Annullato.",
+        "text": "Non è cambiato nulla in B."
+      },
+      "switch": "Passa a {{provider}}",
+      "retry": "Riprova",
+      "useAdjust": "Usa l'adattamento per testi"
+    },
+    "empty": {
+      "title": "Nessuna modifica da applicare.",
+      "text": "L'IA non ha posizionato nessun campo."
+    },
+    "review": {
+      "title": "Proposta dell'IA ({{provider}})",
+      "strip": "{{placed}} campi su {{total}} posizionati",
+      "changePage": "{{count}} cambia(no) pagina",
+      "notFound": "{{count}} non trovato/i",
+      "untouched": "B non è ancora stato modificato.",
+      "notPlaced": "non posizionato",
+      "anchor": "àncora «{{text}}»",
+      "goto": "Vai alla pagina",
+      "listHint": "I campi con bassa affidabilità o non posizionati non vengono applicati finché non li spunti."
+    },
+    "confidence": {
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Bassa",
+      "none": "Non trovato"
+    },
+    "consent": {
+      "title": "Stai per inviare pagine a {{provider}}",
+      "intro": "Per confrontare A e B, l'assistente passa al tuo {{provider}}:",
+      "pages": "Le pagine di A e di B come immagini e i loro testi.",
+      "fields": "I campi del modello A (posizione e nome).",
+      "not": "Non invia i PDF originali. La tua sessione {{provider}} li elabora secondo le sue condizioni. Usa solo PDF che puoi inviare.",
+      "remember": "Non avvisare più su questo computer",
+      "send": "Invia a {{provider}}"
+    },
+    "notice": "{{count}} campi proposti dall'IA · B invariato"
   }
 }
