@@ -797,6 +797,17 @@
         "text": "L'IA a besoin d'un petit programme sur votre ordinateur. Lancez-le et vérifiez à nouveau.",
         "step1": "Lancez l'app avec la commande ci-dessus (fermez l'actuelle).",
         "step2": "Si c'est déjà fait, vérifiez que le terminal est toujours ouvert."
+      },
+      "model": {
+        "claude": "Modèle de Claude",
+        "badge": "Économique par défaut",
+        "haiku": "Haiku · le plus léger",
+        "sonnet": "Sonnet · recommandé",
+        "opus": "Opus · épuise la limite plus vite",
+        "copilot": "Modèle de Copilot",
+        "copilotAuto": "Automatique (celui du CLI)",
+        "copilotHint": "Chaque requête est décomptée de vos « premium requests » selon le modèle. Saisissez-en un précis si votre administrateur l'indique.",
+        "sonnetHint": "Sonnet : suffisant pour placer les champs et léger pour votre limite."
       }
     },
     "menu": {

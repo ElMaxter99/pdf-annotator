@@ -797,6 +797,17 @@
         "text": "La IA necesita un programa pequeño en tu ordenador. Ábrelo y vuelve a comprobar.",
         "step1": "Arranca la app con el comando de arriba (cierra la actual).",
         "step2": "Si ya lo hiciste, comprueba que la terminal sigue abierta."
+      },
+      "model": {
+        "claude": "Modelo de Claude",
+        "badge": "Económico por defecto",
+        "haiku": "Haiku · el más ligero",
+        "sonnet": "Sonnet · recomendado",
+        "opus": "Opus · agota el límite antes",
+        "copilot": "Modelo de Copilot",
+        "copilotAuto": "Automático (el del CLI)",
+        "copilotHint": "Cada petición descuenta de tus «premium requests» según el modelo. Escribe uno concreto si tu administrador lo indica.",
+        "sonnetHint": "Sonnet: suficiente para colocar campos y gasta poco de tu límite."
       }
     },
     "menu": {

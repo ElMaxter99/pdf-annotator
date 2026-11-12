@@ -797,6 +797,17 @@
         "text": "Die KI braucht ein kleines Programm auf deinem Computer. Starte es und prüfe erneut.",
         "step1": "Starte die App mit dem Befehl oben (schließe die aktuelle).",
         "step2": "Falls schon geschehen, prüfe, ob das Terminal noch offen ist."
+      },
+      "model": {
+        "claude": "Claude-Modell",
+        "badge": "Standardmäßig sparsam",
+        "haiku": "Haiku · das leichteste",
+        "sonnet": "Sonnet · empfohlen",
+        "opus": "Opus · verbraucht das Limit schneller",
+        "copilot": "Copilot-Modell",
+        "copilotAuto": "Automatisch (Standard des CLI)",
+        "copilotHint": "Jede Anfrage wird je nach Modell von deinen „Premium Requests“ abgezogen. Gib ein bestimmtes ein, wenn dein Administrator es vorgibt.",
+        "sonnetHint": "Sonnet: genügt zum Platzieren der Felder und schont dein Limit."
       }
     },
     "menu": {

@@ -82,6 +82,7 @@
             @case ('ready') {
               <p class="ai-panel__label">{{ 'ai.panel.pick' | t }}</p>
               <ng-container *ngTemplateOutlet="providers"></ng-container>
+              <ng-container *ngTemplateOutlet="models"></ng-container>
               <p class="ai-panel__text">{{ 'ai.panel.limits' | t }}</p>
             }
             @case ('noCli') {
@@ -104,6 +105,37 @@
         </div>
       }
     </div>
+    <ng-template #models>
+      <span class="ai-panel__label">
+        {{ 'ai.panel.model.claude' | t }}
+        @if (vm.aiHelper.models()['claude'] === 'sonnet') {
+          <span class="ai-new">{{ 'ai.panel.model.badge' | t }}</span>
+        }
+      </span>
+      <select
+        class="ai-panel__select"
+        [value]="vm.aiHelper.models()['claude']"
+        (change)="vm.aiHelper.setModel('claude', $any($event.target).value)"
+        [attr.aria-label]="'ai.panel.model.claude' | t"
+        data-testid="ai-model-claude"
+      >
+        <option value="haiku">{{ 'ai.panel.model.haiku' | t }}</option>
+        <option value="sonnet">{{ 'ai.panel.model.sonnet' | t }}</option>
+        <option value="opus">{{ 'ai.panel.model.opus' | t }}</option>
+      </select>
+      <span class="ai-panel__label">{{ 'ai.panel.model.copilot' | t }}</span>
+      <input
+        class="ai-panel__select"
+        type="text"
+        maxlength="60"
+        [value]="vm.aiHelper.models()['copilot']"
+        [placeholder]="'ai.panel.model.copilotAuto' | t"
+        (change)="vm.aiHelper.setModel('copilot', $any($event.target).value)"
+        [attr.aria-label]="'ai.panel.model.copilot' | t"
+        data-testid="ai-model-copilot"
+      />
+      <small class="ai-panel__text">{{ 'ai.panel.model.copilotHint' | t }}</small>
+    </ng-template>
     <ng-template #providers>
       @for (name of ['claude', 'copilot']; track name) {
         <button

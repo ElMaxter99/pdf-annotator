@@ -797,6 +797,17 @@
         "text": "La IA necessita un programa petit al teu ordinador. Obre'l i torna a comprovar.",
         "step1": "Arrenca l'app amb l'ordre de dalt (tanca l'actual).",
         "step2": "Si ja ho has fet, comprova que el terminal continua obert."
+      },
+      "model": {
+        "claude": "Model de Claude",
+        "badge": "Econòmic per defecte",
+        "haiku": "Haiku · el més lleuger",
+        "sonnet": "Sonnet · recomanat",
+        "opus": "Opus · esgota el límit abans",
+        "copilot": "Model de Copilot",
+        "copilotAuto": "Automàtic (el del CLI)",
+        "copilotHint": "Cada petició descompta de les teves «premium requests» segons el model. Escriu-ne un de concret si ho indica el teu administrador.",
+        "sonnetHint": "Sonnet: suficient per col·locar camps i gasta poc del teu límit."
       }
     },
     "menu": {

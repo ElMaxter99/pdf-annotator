@@ -797,6 +797,17 @@
         "text": "The AI needs a small program on your computer. Start it and check again.",
         "step1": "Start the app with the command above (close the current one).",
         "step2": "If you already did, make sure the terminal is still open."
+      },
+      "model": {
+        "claude": "Claude model",
+        "badge": "Cheap by default",
+        "haiku": "Haiku · the lightest",
+        "sonnet": "Sonnet · recommended",
+        "opus": "Opus · uses up your limit sooner",
+        "copilot": "Copilot model",
+        "copilotAuto": "Automatic (the CLI default)",
+        "copilotHint": "Each request counts against your “premium requests” by model. Type a specific one if your administrator says so.",
+        "sonnetHint": "Sonnet: enough to place fields and light on your limit."
       }
     },
     "menu": {

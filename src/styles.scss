@@ -4358,3 +4358,15 @@ kbd {
     display: none;
   }
 }
+.ai-panel__select {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+.ai-panel__select option {
+  color: #111;
+}

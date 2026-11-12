@@ -90,3 +90,16 @@ test('without the helper the chip says so and the AI option explains how to star
   await expect(page.getByTestId('ai-panel')).toContainText('npm run start:ia');
   await expect(page.locator('.annotation')).toHaveCount(0);
 });
+
+test('the model is chosen per provider, cheap by default, and remembered', async ({ page }) => {
+  await openBatchWithB(page);
+  await page.getByTestId('ai-chip').click();
+  await expect(page.getByTestId('ai-model-claude')).toHaveValue('sonnet');
+  await expect(page.getByTestId('ai-panel')).toContainText('Económico por defecto');
+  await page.getByTestId('ai-model-claude').selectOption('haiku');
+  await page.getByTestId('ai-model-copilot').fill('gpt-5-mini');
+  await page.getByTestId('ai-model-copilot').blur();
+  const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
+  expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: 'haiku', copilot: 'gpt-5-mini' });
+  await expect(page.getByTestId('ai-panel')).not.toContainText('Económico por defecto');
+});
