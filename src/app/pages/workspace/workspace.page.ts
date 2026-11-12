@@ -4,7 +4,11 @@ import {
   isRowSelected,
   rowChangesPage,
   summarizeAi,
+  type AiDetails,
   type AiRow,
+  type AiSent,
+  type AiStep,
+  type AiUsage,
 } from '../../utils/ai-proposal.utils';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
@@ -271,6 +275,16 @@ export interface AiSession {
   open: boolean;
   seconds: number;
   error: { code: string; message: string; reset: string | null } | null;
+  /** Live log for «Ver detalles» (no PDF content, only names and counts). */
+  sent: AiSent | null;
+  attempt: number;
+  /** Milliseconds since `startedAt` when each stage began. */
+  stageLog: Array<{ stage: 'reading' | 'asking' | 'resolving'; attempt: number; at: number }>;
+  stepLog: Array<{ attempt: number; step: AiStep; at: number }>;
+  usage: AiUsage | null;
+  details: AiDetails | null;
+  detailsOpen: boolean;
+  endedAt: number | null;
 }
 
 export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
@@ -3938,6 +3952,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       open: false,
       seconds: 0,
       error: null,
+      sent: null,
+      attempt: 1,
+      stageLog: [{ stage: 'reading', attempt: 1, at: 0 }],
+      stepLog: [],
+      usage: null,
+      details: null,
+      detailsOpen: false,
+      endedAt: null,
     });
     this.reopenNotice('ai');
     if (this.referenceMode() !== 'split') {
@@ -3947,8 +3969,39 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     try {
       const result = await this.aiHelper.propose(
         { a: aPdf, b: bPdf, template: { pages: template } },
-        (progress) => this.patchAi({ stage: progress.stage }),
+        (progress) =>
+          this.ai.update((cur) =>
+            cur
+              ? {
+                  ...cur,
+                  stage: progress.stage,
+                  attempt: progress.attempt ?? cur.attempt,
+                  stageLog: [
+                    ...cur.stageLog,
+                    { stage: progress.stage, attempt: progress.attempt ?? cur.attempt, at: Date.now() - cur.startedAt },
+                  ],
+                }
+              : cur,
+          ),
         abort.signal,
+        (event) =>
+          this.ai.update((cur) => {
+            if (!cur) {
+              return cur;
+            }
+            const at = Date.now() - cur.startedAt;
+            if (event.type === 'sent') {
+              return { ...cur, sent: event.sent };
+            }
+            if (event.type === 'step') {
+              return {
+                ...cur,
+                usage: event.usage ?? cur.usage,
+                stepLog: [...cur.stepLog, ...event.steps.map((step) => ({ attempt: event.attempt, step, at }))].slice(-60),
+              };
+            }
+            return cur;
+          }),
       );
       if (abort !== this.aiAbort) {
         return;
@@ -3958,6 +4011,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         phase: placed === 0 ? 'empty' : 'ready',
         rows: result.rows,
         seconds: result.seconds,
+        details: result.details,
+        endedAt: Date.now(),
         open: result.rows.some((row) => !row.ok),
       });
     } catch (error) {
@@ -3967,7 +4022,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const e = error as AiRequestError;
       this.patchAi({
         phase: 'error',
+        endedAt: Date.now(),
         error: { code: e.code ?? 'error', message: String(e.message ?? e), reset: e.reset ?? null },
+        details: e.details ?? null,
       });
     }
     this.redrawAllForPage();
@@ -4007,6 +4064,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   useAdjustInstead(): void {
     this.cancelAi();
     void this.startAdjust();
+  }
+
+  setAiDetailsOpen(open: boolean): void {
+    this.ai.update((cur) => (cur ? { ...cur, detailsOpen: open } : cur));
   }
 
   setAiView(view: 'proposal' | 'original'): void {

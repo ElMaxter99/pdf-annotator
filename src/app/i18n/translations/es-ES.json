@@ -809,7 +809,9 @@
         "copilotAuto": "Automático (el del CLI)",
         "copilotHint": "Cada petición descuenta de tus «premium requests» según el modelo. Escribe uno concreto si tu administrador lo indica.",
         "sonnetHint": "Sonnet: suficiente para colocar campos y gasta poco de tu límite."
-      }
+      },
+      "retryToggle": "Reintentar una vez si la respuesta no sirve",
+      "retryHint": "Un reintento puede duplicar el gasto: con Copilot cuenta como otra petición premium. Con Copilot viene desactivado."
     },
     "menu": {
       "title": "Copiar y adaptar con IA",
@@ -864,7 +866,11 @@
       },
       "switch": "Cambiar a {{provider}}",
       "retry": "Reintentar",
-      "useAdjust": "Usar ajuste por textos"
+      "useAdjust": "Usar ajuste por textos",
+      "images_not_read": {
+        "title": "La IA no ha leído las imágenes.",
+        "text": "{{provider}} no ha devuelto los códigos de las imágenes tras dos intentos, así que se ha descartado la respuesta: sin ver las páginas no se puede trasladar los campos. Prueba con otro proveedor."
+      }
     },
     "empty": {
       "title": "Sin cambios que aplicar.",
@@ -896,7 +902,98 @@
       "remember": "No volver a avisar en este ordenador",
       "send": "Enviar a {{provider}}"
     },
-    "notice": "{{count}} campos propuestos por la IA · B sin modificar"
+    "notice": "{{count}} campos propuestos por la IA · B sin modificar",
+    "details": {
+      "open": "Ver detalles",
+      "title": "Qué está haciendo la IA",
+      "close": "Cerrar",
+      "modelDefault": "modelo del CLI",
+      "tab": {
+        "summary": "Resumen",
+        "steps": "Pasos",
+        "sent": "Lo que se envía",
+        "usage": "Consumo"
+      },
+      "status": {
+        "running": "En curso · {{time}}",
+        "done": "Terminado · {{time}}",
+        "doneEmpty": "Terminado · {{time}} · sin cambios",
+        "error": "Con error · {{time}}"
+      },
+      "steps": "Pasos",
+      "step": {
+        "prepare": "Preparar las páginas",
+        "prepareSub": "Textos extraídos: {{textsA}} de A y {{textsB}} de B. Páginas: {{pagesA}} de A y {{pagesB}} de B, pasadas a imagen.",
+        "send": "Enviar a {{provider}}",
+        "sendSub": "Intento {{n}} de 2",
+        "sendNoSteps": "Intento {{n}} de 2. {{provider}} no informa de sus pasos internos.",
+        "read": "{{provider}} abre {{file}}",
+        "tool": "{{provider}} usa la herramienta {{tool}}",
+        "answer": "{{provider}} escribe la respuesta",
+        "answerSub": "{{chars}} caracteres",
+        "resolve": "Calcular las coordenadas",
+        "resolveSub": "La app convierte cada ancla en x, y a partir de las posiciones del texto.",
+        "show": "Mostrar la propuesta",
+        "showSub": "Podrás revisarla en «Dividida» antes de aplicar nada.",
+        "result": "Resultado",
+        "resultSub": "{{placed}} de {{total}} campos colocados",
+        "resultEmpty": "0 de {{total}} campos colocados → sin cambios",
+        "error": "Error"
+      },
+      "usage": {
+        "title": "Consumo",
+        "soFar": "Consumo hasta ahora",
+        "measured": "Medido por {{provider}}",
+        "tokens": "tokens",
+        "cacheRead": "Leídos de caché (baratos)",
+        "cacheWrite": "Escritos en caché",
+        "input": "Entrada nueva",
+        "output": "Salida (lo que escribe la IA)",
+        "cost": "Equivalente en API",
+        "costNote": "«Equivalente»: lo que costaría por API. Con suscripción no se cobra aparte: cuenta contra tu límite.",
+        "liveNote": "Los números los da el propio Claude Code mientras trabaja. El coste aparece al terminar.",
+        "waiting": "Esperando el primer dato de uso.",
+        "limits": "Con tu suscripción no se cobra aparte: esto cuenta contra tu límite de 5 horas y el semanal. Un modelo mayor lo gasta antes.",
+        "unavailableBadge": "No medible",
+        "unavailable": "{{provider}} no da tokens ni coste en este modo. No te enseñamos cifras que no sean reales.",
+        "requests": "Peticiones enviadas",
+        "requestsValue": "{{n}} (máx. 2)",
+        "sentSize": "Enviado (imágenes + textos)",
+        "estimate": "Tokens aproximados",
+        "estimateBadge": "Estimación",
+        "premium": "Premium requests",
+        "premiumValue": "según el modelo",
+        "copilotWarn": "Cada petición descuenta de tu cuota con el multiplicador del modelo que uses. Mira «/usage» en Copilot o la facturación de GitHub antes y después."
+      },
+      "sent": {
+        "title": "Lo que se envió",
+        "text": "Solo nombres y tamaños; el contenido no se guarda en este informe. Nada de esto sale de tu ordenador salvo hacia {{provider}}.",
+        "counts": "{{fields}} campos · páginas: A {{pagesA}} · B {{pagesB}}",
+        "empty": "Todavía no se ha preparado nada."
+      },
+      "foot": {
+        "live": "Se actualiza solo mientras la IA trabaja. Cerrarlo no la detiene.",
+        "done": "También sirve para diagnosticar: copia el informe y pégalo donde lo necesites (sin el contenido de tus PDF)."
+      },
+      "cancel": "Cancelar petición",
+      "copy": "Copiar informe",
+      "copied": "Informe copiado.",
+      "copyFailed": "No se pudo copiar el informe.",
+      "diag": {
+        "title": "Por qué ha salido «sin cambios»",
+        "titlePartial": "Por qué faltan campos",
+        "tryTitle": "Qué puedes probar:",
+        "tip": "Usa una versión con texto o «Copiar y ajustar por textos» si B sí tiene texto.",
+        "no_text_a": "El PDF de A no tiene texto que se pueda leer (suele ser un escaneo o un PDF hecho de imágenes). La IA ve las páginas, pero la app necesita textos para calcular las coordenadas.",
+        "no_text_b": "El PDF de B no tiene texto que se pueda leer (suele ser un escaneo o un PDF hecho de imágenes). La IA ve las páginas, pero la app necesita textos para calcular las coordenadas.",
+        "permission_denied": "{{provider}} no ha podido abrir los archivos que se le pasan (permiso denegado). Revisa su sesión y vuelve a probar.",
+        "no_valid_answer": "La respuesta de la IA no era una lista válida con un objeto por campo, ni en el reintento.",
+        "anchors_not_found": "La IA propuso textos de anclaje que no existen en los PDF. Suele pasar si los textos cambiaron mucho de redacción.",
+        "ai_found_nothing": "La IA ha respondido que no puede colocar ninguno de los campos.",
+        "partial": "Algunos campos no se han podido colocar; la lista de la revisión indica el motivo de cada uno."
+      },
+      "copyTexts": "Textos por página"
+    }
   },
   "update": {
     "available": {

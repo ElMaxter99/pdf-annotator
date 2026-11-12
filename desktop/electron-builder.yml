@@ -17,7 +17,7 @@ extraResources:
     to: tools/ai-phase0
     filter:
       - '**/*'
-      - '!sample/**'
+      - '!sample-plano/**'
       - '!out/**'
       - '!pairs/**'
 publish:

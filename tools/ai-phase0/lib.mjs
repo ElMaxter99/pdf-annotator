@@ -34,7 +34,7 @@ export function nearbyTexts(texts, page, field, limit = 6) {
 export const round = (n) => Math.round(n * 10) / 10;
 
 /** Primer objeto/array JSON equilibrado de un texto (admite ```json ... ```). */
-export function parseJsonFromText(text) {
+export function parseJsonFromText(text, accept = () => true) {
   const src = String(text ?? '');
   const starts = [];
   for (let i = 0; i < src.length; i++) if (src[i] === '[' || src[i] === '{') starts.push(i);
@@ -56,14 +56,30 @@ export function parseJsonFromText(text) {
       else if (c === open) depth++;
       else if (c === close && --depth === 0) {
         try {
-          return JSON.parse(src.slice(start, i + 1));
+          const value = JSON.parse(src.slice(start, i + 1));
+          if (accept(value)) return value;
         } catch {
-          break;
+          // no era JSON: se prueba con el siguiente corchete
         }
+        break;
       }
     }
   }
   return null;
+}
+
+/** ¿Parece la lista de propuestas (y no un `[1]` o un `{}` cualquiera del texto de la IA)? */
+export const looksLikeProposals = (v) =>
+  (Array.isArray(v) && v.some((x) => x && typeof x === 'object' && typeof x.id === 'string')) || (!!v && Array.isArray(v.fields));
+
+/** ¿Ha devuelto la IA el código de cada imagen? Devuelve los nombres que faltan o no coinciden. */
+export function missingImageCodes(data, codes) {
+  const raw = data && typeof data === 'object' && !Array.isArray(data) && data.images && typeof data.images === 'object' ? data.images : {};
+  // Admite claves como «A-p1.png» y un carácter mal transcrito (el modelo pequeño confunde letras parecidas).
+  const got = {};
+  for (const [k, v] of Object.entries(raw)) got[String(k).replace(/\.png$/i, '').trim()] = String(v ?? '').trim().toUpperCase();
+  const close = (a, b) => a.length === b.length && [...a].filter((c, i) => c !== b[i]).length <= 1;
+  return Object.entries(codes).filter(([name, code]) => !close(got[name] ?? '', code)).map(([name]) => name);
 }
 
 /** Valida la respuesta. Devuelve `{ proposals, errors }`; descarta entradas mal formadas. */
@@ -165,7 +181,7 @@ export function summarize(rows) {
   };
 }
 
-export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote }) {
+export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes }) {
   const imgs = (prefix, n) => Array.from({ length: n }, (_, i) => `${prefix}-p${i + 1}.png`).join(', ');
   return `# Tarea: trasladar campos de un PDF A a un PDF B
 
@@ -184,8 +200,12 @@ Para cada campo de fields.json:
 
 Mira las imágenes de A y B para confirmar que el ancla es el mismo concepto. No inventes textos: "anchorA" y "anchorB" deben existir literalmente en textsA.json y textsB.json.
 
-Responde SOLO con una lista JSON, sin texto antes ni después, con un objeto por campo:
-[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]
+${codes ? `Cada imagen lleva en la esquina inferior derecha un código de 4 caracteres en un recuadro. Debes abrir TODAS las imágenes y copiar el código de cada una en "images" (${Object.keys(codes).join(', ')}). Sin esos códigos la respuesta se descarta.
+
+Responde SOLO con un objeto JSON, sin texto antes ni después:
+{"images":{"A-p1":"XXXX"},"fields":[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]}
+"fields" lleva un objeto por campo.` : `Responde SOLO con una lista JSON, sin texto antes ni después, con un objeto por campo:
+[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]`}
 "confidence" va de 0 a 1.${retryNote ? `\n\nAVISO: ${retryNote}` : ''}
 `;
 }

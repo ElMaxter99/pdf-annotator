@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Fase 0: ¿acierta la IA al recolocar los campos de A en B? Ejecuta los CLI con tu sesión iniciada.
-// Uso:  node run.mjs [--provider claude|copilot|both] [--pair <carpeta>] [--keep-api-key] [--keep-work] [--timeout <segundos>]
+// Uso:  node run.mjs [--provider claude|copilot|both] [--pair <caso de sample-plano|carpeta>] [--keep-api-key] [--keep-work] [--timeout <segundos>]
 // La carpeta de trabajo (imágenes y textos enviados al CLI) se borra al terminar, salvo con --keep-work.
 // Cada par vive en una carpeta con A.pdf, A.json, B.pdf y (opcional) expected.json con la solución conocida.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
@@ -31,31 +31,46 @@ const tail = (s) => String(s ?? '').trim().replace(/\s+/g, ' ').slice(-400) || '
 const exists = (p) => stat(p).then(() => true, () => false);
 const readJson = async (p) => JSON.parse(await readFile(p, 'utf8'));
 
+// Un par = { name, a, aJson, b, expected }: rutas a A.pdf, A.json, B.pdf y expected.json (opcional).
+const folderPair = (dir) => ({ name: path.basename(dir), a: path.join(dir, 'A.pdf'), aJson: path.join(dir, 'A.json'), b: path.join(dir, 'B.pdf'), expected: path.join(dir, 'expected.json') });
+const flatPair = (dir, name) => ({ name, a: path.join(dir, `A-${name}.pdf`), aJson: path.join(dir, `A-${name}.json`), b: path.join(dir, `B-${name}.pdf`), expected: path.join(dir, `expected-${name}.json`) });
+
 async function listPairs() {
   const given = opt('pair');
-  if (given) return [path.resolve(given)];
+  if (given) {
+    // Un caso de sample-plano/ por su nombre (p. ej. factura-desplazada) o una carpeta con A.pdf, A.json y B.pdf.
+    const flat = path.join(here, 'sample-plano');
+    if (!given.includes('/') && !given.includes('\\') && (await exists(path.join(flat, `A-${given}.pdf`)))) return [flatPair(flat, given)];
+    return [folderPair(path.resolve(given))];
+  }
   const out = [];
-  for (const root of ['pairs', 'sample']) {
-    const dir = path.join(here, root);
-    if (!(await exists(dir))) continue;
-    for (const d of await readdir(dir, { withFileTypes: true })) {
-      if (d.isDirectory() && (await exists(path.join(dir, d.name, 'A.pdf')))) out.push(path.join(dir, d.name));
+  const pairsDir = path.join(here, 'pairs');
+  if (await exists(pairsDir)) {
+    for (const d of await readdir(pairsDir, { withFileTypes: true })) {
+      if (d.isDirectory() && (await exists(path.join(pairsDir, d.name, 'A.pdf')))) out.push(folderPair(path.join(pairsDir, d.name)));
+    }
+  }
+  const flat = path.join(here, 'sample-plano');
+  if (await exists(flat)) {
+    for (const f of (await readdir(flat)).sort()) {
+      const m = /^A-(.+)\.pdf$/.exec(f);
+      if (m) out.push(flatPair(flat, m[1]));
     }
   }
   return out;
 }
 
-async function runPair(pairDir, name) {
-  const outBase = path.join(here, 'out', path.basename(pairDir));
+async function runPair(pair, name) {
+  const outBase = path.join(here, 'out', pair.name);
   const work = path.join(outBase, name, 'work');
   await rm(path.join(outBase, name), { recursive: true, force: true });
   await mkdir(work, { recursive: true });
 
-  const A = await readPdf(path.join(pairDir, 'A.pdf'), { prefix: 'A', outDir: work });
-  const B = await readPdf(path.join(pairDir, 'B.pdf'), { prefix: 'B', outDir: work });
-  const entriesA = flattenFields(await readJson(path.join(pairDir, 'A.json')));
+  const A = await readPdf(pair.a, { prefix: 'A', outDir: work });
+  const B = await readPdf(pair.b, { prefix: 'B', outDir: work });
+  const entriesA = flattenFields(await readJson(pair.aJson));
   // expected.json: solución conocida por campo de A ({ id, page, x, y } o { id, gone: true }).
-  const expectedPath = path.join(pairDir, 'expected.json');
+  const expectedPath = pair.expected;
   const truth = (await exists(expectedPath)) ? new Map((await readJson(expectedPath)).map((e) => [e.id, e.gone ? { gone: true } : { page: e.page, field: { x: e.x, y: e.y } }])) : null;
 
   await writeFile(path.join(work, 'textsA.json'), JSON.stringify(A.texts, null, 1));
@@ -135,24 +150,24 @@ if (!pairs.length) {
 
 const lines = ['# Fase 0: resultados', '', '| Par | Proveedor | Campos | Resueltos | Página OK | Ausentes OK | Error mediano (pt) | ≤2 pt | ≤5 pt | Segundos | Avisos |', '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |'];
 let stopped = null;
-for (const pairDir of pairs) {
+for (const pair of pairs) {
   if (stopped) break;
   for (const name of providers) {
     if (stopped) break;
-    process.stdout.write(`→ ${path.basename(pairDir)} con ${PROVIDERS[name].label}… `);
+    process.stdout.write(`→ ${pair.name} con ${PROVIDERS[name].label}… `);
     try {
-      const { summary: s } = await runPair(pairDir, name);
+      const { summary: s } = await runPair(pair, name);
       console.log(`${s.resolved}/${s.total} resueltos, ${s.seconds} s`);
       if (s.limitHit) {
         stopped = s.limitHit;
         console.log(`\n⛔ ${s.limitHit}\n   Paro aquí para no gastar más intentos; los casos que faltan no se han ejecutado.`);
       }
       for (const w of s.parseErrors.slice(0, 5)) console.log(`   ⚠ ${w}`);
-      if (s.parseErrors.length > 5) console.log(`   ⚠ …y ${s.parseErrors.length - 5} avisos más (ver out/${path.basename(pairDir)}/${name}/result.json)`);
-      lines.push(`| ${path.basename(pairDir)} | ${name} | ${s.total} | ${s.resolved} | ${s.scored ? `${s.pageOk}/${s.scored}` : '–'} | ${s.goneTotal ? `${s.goneOk}/${s.goneTotal}` : '–'} | ${fmt(s.medianErrPt)} | ${s.errsMeasured ? `${s.within2}/${s.errsMeasured}` : '–'} | ${s.errsMeasured ? `${s.within5}/${s.errsMeasured}` : '–'} | ${s.seconds} | ${s.parseErrors.length} |`);
+      if (s.parseErrors.length > 5) console.log(`   ⚠ …y ${s.parseErrors.length - 5} avisos más (ver out/${pair.name}/${name}/result.json)`);
+      lines.push(`| ${pair.name} | ${name} | ${s.total} | ${s.resolved} | ${s.scored ? `${s.pageOk}/${s.scored}` : '–'} | ${s.goneTotal ? `${s.goneOk}/${s.goneTotal}` : '–'} | ${fmt(s.medianErrPt)} | ${s.errsMeasured ? `${s.within2}/${s.errsMeasured}` : '–'} | ${s.errsMeasured ? `${s.within5}/${s.errsMeasured}` : '–'} | ${s.seconds} | ${s.parseErrors.length} |`);
     } catch (e) {
       console.log(`falló: ${e.message}`);
-      lines.push(`| ${path.basename(pairDir)} | ${name} | – | – | – | – | – | – | – | – | ${String(e.message).replaceAll('|', '/')} |`);
+      lines.push(`| ${pair.name} | ${name} | – | – | – | – | – | – | – | – | ${String(e.message).replaceAll('|', '/')} |`);
     }
   }
 }

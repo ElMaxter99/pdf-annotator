@@ -10,13 +10,14 @@ import {
   sortAiRows,
   type AiRow,
 } from '../../../../utils/ai-proposal.utils';
+import { AiDetailsComponent } from './ai-details.component';
 import type { WorkspacePageComponent } from '../../workspace.page';
 
 /** «Copiar y adaptar con IA»: the strip under the bar with progress, errors and the proposal to review. */
 @Component({
   selector: 'app-ai-review',
   standalone: true,
-  imports: [CommonModule, TranslationPipe],
+  imports: [CommonModule, TranslationPipe, AiDetailsComponent],
   templateUrl: './ai-review.component.html',
 })
 export class AiReviewComponent {
