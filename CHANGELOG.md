@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.8.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.2) - 2026-11-12
 ### Added
 - Opción «Reintentar una vez si la respuesta no sirve» en el panel de la IA, por proveedor: activada con Claude y desactivada con Copilot (un reintento cuenta como otra petición premium).
 - La IA debe demostrar que ha mirado las imágenes: cada PNG lleva un código aleatorio que la respuesta tiene que devolver; si falta tras dos intentos se descarta con el aviso «La IA no ha leído las imágenes» (en vez de proponer solo con los textos). El informe de «Ver detalles» añade los textos por página, no incluye el mensaje del CLI, el consumo en vivo no cuenta dos veces el mismo mensaje y el modal atrapa el foco y navega las pestañas con las flechas.
@@ -6,7 +8,9 @@
 - El ayudante de IA recoge los pasos, el uso real de tokens (Claude), lo enviado y un diagnóstico de por qué no se colocó nada, y lo emite como eventos `event` y `result.details` (sin interfaz todavía). La IA ya no se confunde con listas JSON ajenas (`[1]`) en su respuesta
 - **Volver al inicio y Atrás / Adelante en el editor**: el logo de la barra del editor lleva a la landing (como ya hacía el del lote) y el historial funciona en los dos sentidos. Recargar `/workspace` reabre la sesión guardada en vez de mandarte a la landing, «Adelante» reabre el PDF que dejaste en esta visita (aunque no tuviera anotaciones) y cada PDF del lote tiene su URL (`/workspace?lote=<id>`), así que recargar o volver con el historial abre ese mismo PDF. En la app de escritorio: `Alt+←` / `Alt+→` (`⌘[` / `⌘]` en macOS), los botones laterales del ratón y el gesto de deslizar
 - Guía «Cómo instalar» (`docs/INSTALAR.md`) para Windows, macOS y Linux, enlazada desde el README: qué archivo elegir, avisos de instaladores sin firmar, `libfuse2`, actualizaciones y aviso de que Linux solo tiene paquetes x86_64. Las capturas reales están pendientes (huecos marcados)
+- Carpeta `tools/ai-phase0/sample-plano/` con los casos de prueba de la IA en plano (PDF A/B, JSON y esperado por caso) para probar el lote a mano.
 ### Fixed
+- «Ver detalles» de la IA: la prueba de lectura de imágenes ya no da falsos positivos, el consumo se muestra también en peticiones fallidas y «Copiar informe» funciona en la app de escritorio.
 - La release de escritorio creaba dos borradores duplicados (los 4 jobs de empaquetado en paralelo creaban cada uno el suyo y los archivos quedaban repartidos); ahora un job previo crea el borrador una sola vez y todos suben a él.
 
 ## [v1.8.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.1) - 2026-11-12
