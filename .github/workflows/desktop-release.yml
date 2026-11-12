@@ -69,7 +69,7 @@ jobs:
         run: |
           id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.tag_name==\"$TAG\" and .draft) | .id" | head -n1)
           if [ -n "$id" ]; then echo "Ya hay un borrador de $TAG."; exit 0; fi
-          gh api -X POST "repos/$GITHUB_REPOSITORY/releases" -f tag_name="$TAG" -f name="$TAG" -F draft=true --silent
+          gh api -X POST "repos/$GITHUB_REPOSITORY/releases" -f tag_name="$TAG" -f name="${TAG#v}" -F draft=true --silent
           echo "Borrador de $TAG creado."
 
   package:
@@ -127,9 +127,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISH: ${{ inputs.publish && 'true' || 'false' }}
         run: |
-          id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.tag_name==\"$TAG\" and .draft) | .id" | head -n1)
+          ids=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.tag_name==\"$TAG\" and .draft) | .id")
+          [ "$(echo "$ids" | grep -c .)" -le 1 ] || { echo "Hay varios borradores para $TAG; borra los sobrantes y relanza."; exit 1; }
+          id=$(echo "$ids" | head -n1)
           [ -n "$id" ] || { echo "No hay borrador para $TAG"; exit 1; }
-          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F body=@notes.md -f name="$TAG" --silent
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F body=@notes.md -f name="${TAG#v}" --silent
           echo "Notas puestas en el borrador de $TAG."
           if [ "$PUBLISH" = true ]; then
             gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F draft=false --silent
