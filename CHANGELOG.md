@@ -1,4 +1,6 @@
 ## Unreleased
+### Fixed
+- La release de escritorio creaba dos borradores duplicados (los 4 jobs de empaquetado en paralelo creaban cada uno el suyo y los archivos quedaban repartidos); ahora un job previo crea el borrador una sola vez y todos suben a él.
 
 ## [v1.8.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.1) - 2026-11-12
 ### Fixed
