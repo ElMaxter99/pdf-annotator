@@ -124,6 +124,23 @@ export class MigrationBarComponent implements OnInit {
     void this.vm.markReady();
   }
 
+  /** A click outside a menu or panel closes it (clicking another menu's button switches to it). */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const path = event.composedPath();
+    const inside = (selector: string) =>
+      path.some((node) => node instanceof Element && node.matches(selector));
+    if (this.menuOpen() && !inside('.migration-menu--put')) {
+      this.closeMenu();
+    }
+    if (this.bellOpen() && !inside('.migration-bell')) {
+      this.bellOpen.set(false);
+    }
+    if (this.vm.aiPanelOpen() && !inside('.ai-chip-wrap')) {
+      this.vm.aiPanelOpen.set(false);
+    }
+  }
+
   /** Esc closes the open menu or dialog. */
   @HostListener('document:keydown.escape')
   onEscape(): void {

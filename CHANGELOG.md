@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Los menús de la barra del editor por lotes («Poner plantilla A», avisos y panel «✦ IA») se cierran al pulsar fuera.
+
 ## [v1.7.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.7.1) - 2026-11-12
 ### Fixed
 - **No more «local network access» prompt on the deployed site**: the editor probed the local AI helper (127.0.0.1:4310) on load, so Chrome asked public-site users for permission. Now it only probes on its own when the app is served from localhost; elsewhere it waits until the user opens the «✦ IA» panel or asks for «Copiar y adaptar con IA»

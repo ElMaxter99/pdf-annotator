@@ -207,6 +207,25 @@ test('B starts empty, A can be put in and the PDF is marked ready and downloaded
   expect(content.pages[0].fields).toHaveLength(FIELDS);
 });
 
+test('the «Poner plantilla A» menu closes on an outside click and on Escape', async ({
+  page,
+}) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await attachVersion2(page);
+  await openRow(page);
+
+  await page.getByTestId('put-template-a').click();
+  await expect(page.getByTestId('put-a-copy')).toBeVisible();
+  await page.locator('.pdf-viewer, .viewer, body').first().click({ position: { x: 5, y: 300 } });
+  await expect(page.getByTestId('put-a-copy')).toBeHidden();
+
+  await page.getByTestId('put-template-a').click();
+  await expect(page.getByTestId('put-a-copy')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('put-a-copy')).toBeHidden();
+});
+
 test('missing fields are counted on «Listo» until each one is placed or dismissed', async ({
   page,
 }) => {
