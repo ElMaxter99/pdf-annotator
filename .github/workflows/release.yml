@@ -59,16 +59,17 @@ jobs:
       tag: ${{ needs.tag.outputs.tag }}
       publish: ${{ inputs.publish }}
 
-  # Opcional: solo se ejecuta si existe el secreto VERCEL_DEPLOY_HOOK_URL (Deploy Hook de la rama master).
-  web:
+  # La web no se despliega aquí: Vercel construye una vista previa al subirse release/vX.Y.Z; se valida allí
+  # y se promociona a producción a mano (Vercel → Deployments → Promote to Production).
+  web-note:
     needs: tag
     if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Desplegar la web en Vercel
-        env:
-          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
-        run: |
-          if [ -z "$HOOK" ]; then echo "Sin VERCEL_DEPLOY_HOOK_URL: despliegue web a mano (o por la integración Git de Vercel)."; exit 0; fi
-          curl -fsS -X POST "$HOOK"
+      - run: |
+          {
+            echo "### Web (Vercel)"
+            echo "La rama \`release/${{ needs.tag.outputs.tag }}\` ya está subida: Vercel genera su vista previa."
+            echo "Valídala y, si está bien, promociónala a producción desde Vercel (Deployments → Promote to Production)."
+          } >> "$GITHUB_STEP_SUMMARY"

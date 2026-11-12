@@ -28,7 +28,7 @@ try {
    Si npm dice «Missing script», estás en una rama sin los scripts (p. ej. ${MAIN_BRANCH} antigua): git switch ${DEV_BRANCH} && git pull.
 
 3. Desplegar y publicar
-   Despliegue en Vercel: a mano, o automático si existe el secreto VERCEL_DEPLOY_HOOK_URL.
+   Web: al subirse release/v${v}, Vercel hace la vista previa; valídala y promociónala a producción en Vercel (a mano).
    npm run release:notes                   # notas de v${v} desde el CHANGELOG
    ${REPO_URL}/releases/new?tag=v${v}   → pega las notas y publica.
 
