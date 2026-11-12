@@ -15,11 +15,14 @@ await new Promise((r) => api.once('listening', r));
 const apiUrl = `http://127.0.0.1:${api.address().port}/latest`;
 
 const app = await electron.launch({
-  args: [here, '--no-sandbox'],
+  args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', here],
+  timeout: 60000,
   env: { ...process.env, AI_HELPER_FAKE: '1', PDF_ANNOTATOR_RELEASE_API: apiUrl, },
 });
+app.process().stderr?.on('data', (d) => process.stderr.write(`[electron] ${d}`));
+app.process().stdout?.on('data', (d) => process.stdout.write(`[electron] ${d}`));
 try {
-  const page = await app.firstWindow();
+  const page = await app.firstWindow({ timeout: 60000 });
   await page.waitForURL('app://pdf-annotator/landing');
   assert.ok(await page.locator('body').innerText().then((t) => t.length > 20), 'la landing se pinta');
   assert.equal(await page.evaluate(() => window.desktop?.isDesktop), true, 'el puente existe');
