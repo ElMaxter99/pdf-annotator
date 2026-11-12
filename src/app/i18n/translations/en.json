@@ -864,7 +864,11 @@
       },
       "switch": "Switch to {{provider}}",
       "retry": "Retry",
-      "useAdjust": "Use text adjustment"
+      "useAdjust": "Use text adjustment",
+      "images_not_read": {
+        "title": "The AI did not read the images.",
+        "text": "{{provider}} did not return the image codes after two attempts, so the answer was discarded: without seeing the pages the fields cannot be moved. Try another provider."
+      }
     },
     "empty": {
       "title": "No changes to apply.",
@@ -985,7 +989,8 @@
         "anchors_not_found": "The AI proposed anchor texts that do not exist in the PDFs. It usually happens when the wording changed a lot.",
         "ai_found_nothing": "The AI answered that it cannot place any of the fields.",
         "partial": "Some fields could not be placed; the review list shows the reason for each one."
-      }
+      },
+      "copyTexts": "Texts per page"
     }
   },
   "update": {

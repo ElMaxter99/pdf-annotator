@@ -38,7 +38,7 @@ export function describeClaudeEvent(line) {
       else if (c.type === 'text' && c.text) out.push({ kind: 'answer', chars: c.text.length });
     }
     const u = j.message?.usage;
-    return { steps: out, usage: u ? { input: u.input_tokens ?? 0, output: u.output_tokens ?? 0, cacheRead: u.cache_read_input_tokens ?? 0, cacheWrite: u.cache_creation_input_tokens ?? 0 } : null };
+    return { id: typeof j.message?.id === 'string' ? j.message.id : null, steps: out, usage: u ? { input: u.input_tokens ?? 0, output: u.output_tokens ?? 0, cacheRead: u.cache_read_input_tokens ?? 0, cacheWrite: u.cache_creation_input_tokens ?? 0 } : null };
   }
   return null;
 }
@@ -151,6 +151,8 @@ export function runCli(name, cwd, opts = {}) {
     };
     child.on('error', (e) => done({ ok: false, seconds: 0, stdout, stderr: String(e.message), code: -1 }));
     child.on('close', (code) => {
+      if (opts.onLine && lineBuf.trim()) opts.onLine(lineBuf);
+      lineBuf = '';
       const seconds = Math.round((Date.now() - started) / 100) / 10;
       if (aborted) {
         done({ ok: false, seconds, stdout, stderr, code: -3, aborted: true });

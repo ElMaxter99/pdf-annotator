@@ -57,6 +57,36 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
     return this.i18n.translate(key, params);
   }
 
+  /** Tab/Shift+Tab stay inside the modal. */
+  trapFocus(event: KeyboardEvent, root: HTMLElement): void {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null);
+    if (!items.length) {
+      return;
+    }
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || active === root)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  /** Arrow keys move between tabs. */
+  tabKey(event: KeyboardEvent, root: HTMLElement): void {
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (!step) {
+      return;
+    }
+    event.preventDefault();
+    const next = this.tabs[(this.tabs.indexOf(this.tab()) + step + this.tabs.length) % this.tabs.length];
+    this.tab.set(next);
+    queueMicrotask(() => root.querySelector<HTMLElement>(`[data-testid="ai-details-tab-${next}"]`)?.focus());
+  }
+
   close(): void {
     this.vm.setAiDetailsOpen(false);
   }
@@ -240,9 +270,16 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
     }
     const lines = [
       `${this.providerName()} · ${this.modelName()} · ${this.statusText()}`,
-      ...this.timeline().map((i, n) => `${n + 1}. ${i.title}${i.sub ? ` — ${i.sub}` : ''}`),
+      ...this.timeline().map((i, n) => `${n + 1}. ${i.title}${i.sub && i.state !== 'err' ? ` — ${i.sub}` : ''}`),
       `${this.t('ai.details.sent.title')}: ${this.sentFiles().map((f) => `${f.name} (${this.kb(f.bytes)})`).join(', ') || '—'}`,
     ];
+    const sent = s.sent;
+    if (sent?.textsByPageA?.length || sent?.textsByPageB?.length) {
+      lines.push(`${this.t('ai.details.copyTexts')}: A [${(sent.textsByPageA ?? []).join(', ')}] · B [${(sent.textsByPageB ?? []).join(', ')}]`);
+    }
+    if (s.error) {
+      lines.push(`error: ${s.error.code}`);
+    }
     const u = this.usage();
     if (this.measured() && u) {
       lines.push(`tokens: ${this.total()} (in ${u.input}, out ${u.output}, cache read ${u.cacheRead}, cache write ${u.cacheWrite})`);

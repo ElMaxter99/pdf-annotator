@@ -56,3 +56,14 @@ test('parseJsonFromText con predicado salta listas ajenas como [1]', async () =>
   const txt = 'He mirado [1] y [A-p1.png]. Resultado:\n[{"id":"p1-f1","found":false}]';
   assert.deepEqual(parseJsonFromText(txt, looksLikeProposals), [{ id: 'p1-f1', found: false }]);
 });
+
+test('missingImageCodes exige el código de cada imagen y buildPrompt los pide', async () => {
+  const { missingImageCodes, buildPrompt } = await import('./lib.mjs');
+  const codes = { 'A-p1': 'K7F2', 'B-p1': 'QW9X' };
+  assert.deepEqual(missingImageCodes({ images: { 'A-p1': 'k7f2', 'B-p1': 'QW9X' }, fields: [] }, codes), []);
+  assert.deepEqual(missingImageCodes({ images: { 'A-p1': 'K7F2' }, fields: [] }, codes), ['B-p1']);
+  assert.deepEqual(missingImageCodes([{ id: 'x' }], codes), ['A-p1', 'B-p1']);
+  assert.deepEqual(missingImageCodes(null, codes), ['A-p1', 'B-p1']);
+  assert.match(buildPrompt({ pagesA: 1, pagesB: 1, sizeA: '1×1', sizeB: '1×1', codes }), /"images"/);
+  assert.doesNotMatch(buildPrompt({ pagesA: 1, pagesB: 1, sizeA: '1×1', sizeB: '1×1' }), /"images"/);
+});

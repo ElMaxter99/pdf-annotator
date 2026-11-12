@@ -864,7 +864,11 @@
       },
       "switch": "Passa a {{provider}}",
       "retry": "Riprova",
-      "useAdjust": "Usa l'adattamento per testi"
+      "useAdjust": "Usa l'adattamento per testi",
+      "images_not_read": {
+        "title": "L'IA non ha letto le immagini.",
+        "text": "{{provider}} non ha restituito i codici delle immagini dopo due tentativi, quindi la risposta è stata scartata: senza vedere le pagine non si possono spostare i campi. Prova con un altro provider."
+      }
     },
     "empty": {
       "title": "Nessuna modifica da applicare.",
@@ -985,7 +989,8 @@
         "anchors_not_found": "L'IA ha proposto testi di ancoraggio che non esistono nei PDF. Succede quando la formulazione è cambiata molto.",
         "ai_found_nothing": "L'IA ha risposto che non può posizionare nessuno dei campi.",
         "partial": "Alcuni campi non si sono potuti posizionare; l'elenco di revisione indica il motivo di ciascuno."
-      }
+      },
+      "copyTexts": "Testi per pagina"
     }
   },
   "update": {

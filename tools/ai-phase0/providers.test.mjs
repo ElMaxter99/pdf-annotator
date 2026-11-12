@@ -55,6 +55,7 @@ test('finalResultLine encuentra el evento final de stream-json aunque no vaya pr
   assert.equal(JSON.parse(finalResultLine(out)).result, '[]');
   assert.equal(finalResultLine('{"result":"x"}'), '{"result":"x"}');
   const ev = describeClaudeEvent(JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Read', input: { file_path: '/tmp/x/A-p1.png' } }], usage: { input_tokens: 3, output_tokens: 9 } } }));
+  assert.equal(ev.id, null);
   assert.deepEqual(ev.steps, [{ kind: 'read', file: 'A-p1.png', tool: 'Read' }]);
   assert.equal(ev.usage.output, 9);
 });

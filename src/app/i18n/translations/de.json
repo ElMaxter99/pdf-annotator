@@ -864,7 +864,11 @@
       },
       "switch": "Zu {{provider}} wechseln",
       "retry": "Erneut versuchen",
-      "useAdjust": "Textabgleich verwenden"
+      "useAdjust": "Textabgleich verwenden",
+      "images_not_read": {
+        "title": "Die KI hat die Bilder nicht gelesen.",
+        "text": "{{provider}} hat nach zwei Versuchen die Bildcodes nicht zurückgegeben, daher wurde die Antwort verworfen: Ohne die Seiten zu sehen, lassen sich die Felder nicht übertragen. Versuche einen anderen Anbieter."
+      }
     },
     "empty": {
       "title": "Keine Änderungen anzuwenden.",
@@ -985,7 +989,8 @@
         "anchors_not_found": "Die KI schlug Ankertexte vor, die in den PDFs nicht vorkommen. Das passiert, wenn sich die Formulierung stark geändert hat.",
         "ai_found_nothing": "Die KI antwortete, dass sie keines der Felder platzieren kann.",
         "partial": "Einige Felder konnten nicht platziert werden; die Prüfliste nennt den Grund für jedes."
-      }
+      },
+      "copyTexts": "Texte pro Seite"
     }
   },
   "update": {

@@ -34,6 +34,8 @@ export interface AiSent {
   pagesB: number;
   textsA: number;
   textsB: number;
+  textsByPageA?: number[];
+  textsByPageB?: number[];
   imageBytes: number;
 }
 
@@ -141,6 +143,8 @@ export function sanitizeSent(raw: unknown): AiSent | null {
     pagesB: count(r['pagesB']),
     textsA: count(r['textsA']),
     textsB: count(r['textsB']),
+    textsByPageA: (Array.isArray(r['textsByPageA']) ? r['textsByPageA'] : []).slice(0, 200).map(count),
+    textsByPageB: (Array.isArray(r['textsByPageB']) ? r['textsByPageB'] : []).slice(0, 200).map(count),
     imageBytes: count(r['imageBytes']),
   };
 }

@@ -72,6 +72,12 @@ export function parseJsonFromText(text, accept = () => true) {
 export const looksLikeProposals = (v) =>
   (Array.isArray(v) && v.some((x) => x && typeof x === 'object' && typeof x.id === 'string')) || (!!v && Array.isArray(v.fields));
 
+/** ¿Ha devuelto la IA el código de cada imagen? Devuelve los nombres que faltan o no coinciden. */
+export function missingImageCodes(data, codes) {
+  const got = data && typeof data === 'object' && !Array.isArray(data) && data.images && typeof data.images === 'object' ? data.images : {};
+  return Object.entries(codes).filter(([name, code]) => String(got[name] ?? '').trim().toUpperCase() !== code).map(([name]) => name);
+}
+
 /** Valida la respuesta. Devuelve `{ proposals, errors }`; descarta entradas mal formadas. */
 export function validateProposals(data, knownIds) {
   const list = Array.isArray(data) ? data : Array.isArray(data?.fields) ? data.fields : null;
@@ -171,7 +177,7 @@ export function summarize(rows) {
   };
 }
 
-export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote }) {
+export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes }) {
   const imgs = (prefix, n) => Array.from({ length: n }, (_, i) => `${prefix}-p${i + 1}.png`).join(', ');
   return `# Tarea: trasladar campos de un PDF A a un PDF B
 
@@ -190,8 +196,12 @@ Para cada campo de fields.json:
 
 Mira las imágenes de A y B para confirmar que el ancla es el mismo concepto. No inventes textos: "anchorA" y "anchorB" deben existir literalmente en textsA.json y textsB.json.
 
-Responde SOLO con una lista JSON, sin texto antes ni después, con un objeto por campo:
-[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]
+${codes ? `Cada imagen lleva en la esquina inferior derecha un código de 4 caracteres en un recuadro. Debes abrir TODAS las imágenes y copiar el código de cada una en "images" (${Object.keys(codes).join(', ')}). Sin esos códigos la respuesta se descarta.
+
+Responde SOLO con un objeto JSON, sin texto antes ni después:
+{"images":{"A-p1":"XXXX"},"fields":[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]}
+"fields" lleva un objeto por campo.` : `Responde SOLO con una lista JSON, sin texto antes ni después, con un objeto por campo:
+[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]`}
 "confidence" va de 0 a 1.${retryNote ? `\n\nAVISO: ${retryNote}` : ''}
 `;
 }

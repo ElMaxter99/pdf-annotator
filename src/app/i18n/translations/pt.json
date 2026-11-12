@@ -864,7 +864,11 @@
       },
       "switch": "Mudar para {{provider}}",
       "retry": "Tentar de novo",
-      "useAdjust": "Usar ajuste por textos"
+      "useAdjust": "Usar ajuste por textos",
+      "images_not_read": {
+        "title": "A IA não leu as imagens.",
+        "text": "{{provider}} não devolveu os códigos das imagens após duas tentativas, por isso a resposta foi descartada: sem ver as páginas não é possível transferir os campos. Experimenta outro fornecedor."
+      }
     },
     "empty": {
       "title": "Sem alterações para aplicar.",
@@ -985,7 +989,8 @@
         "anchors_not_found": "A IA propôs textos de ancoragem que não existem nos PDF. Costuma acontecer se a redação mudou muito.",
         "ai_found_nothing": "A IA respondeu que não consegue colocar nenhum dos campos.",
         "partial": "Alguns campos não puderam ser colocados; a lista de revisão indica o motivo de cada um."
-      }
+      },
+      "copyTexts": "Textos por página"
     }
   },
   "update": {

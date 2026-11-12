@@ -3,7 +3,7 @@
 import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { buildPrompt, findText, flattenFields, looksLikeProposals, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
+import { buildPrompt, findText, flattenFields, looksLikeProposals, missingImageCodes, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
 import { readPdf } from '../ai-phase0/pdf.mjs';
 import { PROVIDERS, describeClaudeEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
 
@@ -29,8 +29,10 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
     onStage('reading');
     await writeFile(path.join(work, 'A.pdf'), aBytes);
     await writeFile(path.join(work, 'B.pdf'), bBytes);
-    const A = await readPdf(path.join(work, 'A.pdf'), { prefix: 'A', outDir: work });
-    const B = await readPdf(path.join(work, 'B.pdf'), { prefix: 'B', outDir: work });
+    const A = await readPdf(path.join(work, 'A.pdf'), { prefix: 'A', outDir: work, stamp: !fake });
+    const B = await readPdf(path.join(work, 'B.pdf'), { prefix: 'B', outDir: work, stamp: !fake });
+    const codes = fake ? null : { ...A.codes, ...B.codes };
+    const countByPage = (texts, n) => Array.from({ length: n }, (_, i) => texts.filter((t) => t.page === i + 1).length);
     const entries = flattenFields(template);
     if (!entries.length) return { rows: [], seconds: 0, warnings: [], pagesA: A.pages.length, pagesB: B.pages.length, details: null };
     await writeFile(path.join(work, 'textsA.json'), JSON.stringify(A.texts, null, 1));
@@ -49,6 +51,8 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       pagesB: B.pages.length,
       textsA: A.texts.length,
       textsB: B.texts.length,
+      textsByPageA: countByPage(A.texts, A.pages.length),
+      textsByPageB: countByPage(B.texts, B.pages.length),
       imageBytes: files.filter((f) => f.name.endsWith('.png')).reduce((n, f) => n + f.bytes, 0),
     };
     const details = { provider, model: model ?? null, sent, attempts: [], usageSource: fake ? 'none' : provider === 'claude' ? 'measured' : 'unavailable' };
@@ -64,8 +68,9 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
     } else {
       for (let attempt = 1; attempt <= 2; attempt++) {
         onStage('asking', attempt);
-        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote });
+        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote, codes });
         await writeFile(path.join(work, 'prompt.md'), promptText);
+        const usageById = new Map();
         const attemptInfo = { n: attempt, promptChars: promptText.length, steps: [], usage: null, retry: !!retryNote };
         details.attempts.push(attemptInfo);
         const run = await runCli(provider, work, {
@@ -80,7 +85,12 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
                 const ev = describeClaudeEvent(l);
                 if (!ev) return;
                 for (const step of ev.steps) attemptInfo.steps.push(step);
-                if (ev.usage) attemptInfo.usage = { input: (attemptInfo.usage?.input ?? 0) + ev.usage.input, output: (attemptInfo.usage?.output ?? 0) + ev.usage.output, cacheRead: (attemptInfo.usage?.cacheRead ?? 0) + ev.usage.cacheRead, cacheWrite: (attemptInfo.usage?.cacheWrite ?? 0) + ev.usage.cacheWrite };
+                if (ev.usage) {
+                  // Claude repite el mismo mensaje (mismo id) por cada bloque de contenido: se cuenta una vez.
+                  usageById.set(ev.id ?? `anon${usageById.size}`, ev.usage);
+                  const all = [...usageById.values()];
+                  attemptInfo.usage = { input: all.reduce((n, x) => n + x.input, 0), output: all.reduce((n, x) => n + x.output, 0), cacheRead: all.reduce((n, x) => n + x.cacheRead, 0), cacheWrite: all.reduce((n, x) => n + x.cacheWrite, 0) };
+                }
                 onEvent({ type: 'step', attempt, steps: ev.steps, usage: attemptInfo.usage });
               }
             : undefined,
@@ -99,9 +109,19 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
         attemptInfo.turns = ex.meta.turns ?? null;
         attemptInfo.permissionDenials = ex.meta.permissionDenials ?? 0;
         attemptInfo.responseChars = ex.text.length;
-        attemptInfo.rawTail = tail(ex.text);
         if (ex.meta.isError) throw Object.assign(new Error(`El CLI devolvió un error: ${tail(ex.text)}`), { code: 'cli_error' });
-        const parsed = validateProposals(parseJsonFromText(ex.text, looksLikeProposals), known);
+        const data = parseJsonFromText(ex.text, looksLikeProposals);
+        if (codes) {
+          const missing = missingImageCodes(data, codes);
+          attemptInfo.imagesMissing = missing.length;
+          if (missing.length) {
+            // La IA no ha leído las imágenes: no se aprovecha una respuesta hecha solo con los textos.
+            retryNote = 'no has devuelto los códigos de las imágenes. Abre TODAS las imágenes, copia el código de cada una en "images" y vuelve a responder con el objeto JSON pedido.';
+            if (attempt === 2) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer.`), { code: 'images_not_read' });
+            continue;
+          }
+        }
+        const parsed = validateProposals(data, known);
         proposals = parsed.proposals;
         warnings = parsed.errors;
         attemptInfo.parsed = proposals.length;
@@ -137,8 +157,7 @@ export function diagnose({ placed, total, sent, counts, attempts }) {
   if (placed === total) return null;
   if (!sent.textsA) return 'no_text_a';
   if (!sent.textsB) return 'no_text_b';
-  const last = attempts[attempts.length - 1];
-  if (last && (last.permissionDenials ?? 0) > 0 && placed === 0) return 'permission_denied';
+  if (placed === 0 && attempts.some((a) => (a.permissionDenials ?? 0) > 0)) return 'permission_denied';
   if (counts.sin_respuesta === total) return 'no_valid_answer';
   if (placed === 0 && (counts.ancla_A_no_encontrada ?? 0) + (counts.ancla_B_no_encontrada ?? 0) >= total / 2) return 'anchors_not_found';
   if (placed === 0) return 'ai_found_nothing';

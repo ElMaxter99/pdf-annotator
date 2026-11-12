@@ -864,7 +864,11 @@
       },
       "switch": "Passer à {{provider}}",
       "retry": "Réessayer",
-      "useAdjust": "Utiliser l'ajustement par textes"
+      "useAdjust": "Utiliser l'ajustement par textes",
+      "images_not_read": {
+        "title": "L'IA n'a pas lu les images.",
+        "text": "{{provider}} n'a pas renvoyé les codes des images après deux essais, la réponse a donc été écartée : sans voir les pages, les champs ne peuvent pas être déplacés. Essayez un autre fournisseur."
+      }
     },
     "empty": {
       "title": "Aucun changement à appliquer.",
@@ -985,7 +989,8 @@
         "anchors_not_found": "L'IA a proposé des textes d'ancrage qui n'existent pas dans les PDF. Cela arrive quand la rédaction a beaucoup changé.",
         "ai_found_nothing": "L'IA a répondu qu'elle ne peut placer aucun des champs.",
         "partial": "Certains champs n'ont pas pu être placés ; la liste de révision indique la raison de chacun."
-      }
+      },
+      "copyTexts": "Textes par page"
     }
   },
   "update": {

@@ -864,7 +864,11 @@
       },
       "switch": "Canviar a {{provider}}",
       "retry": "Reintentar",
-      "useAdjust": "Usar ajust per textos"
+      "useAdjust": "Usar ajust per textos",
+      "images_not_read": {
+        "title": "La IA no ha llegit les imatges.",
+        "text": "{{provider}} no ha retornat els codis de les imatges després de dos intents, així que s'ha descartat la resposta: sense veure les pàgines no es poden traslladar els camps. Prova amb un altre proveïdor."
+      }
     },
     "empty": {
       "title": "Sense canvis per aplicar.",
@@ -985,7 +989,8 @@
         "anchors_not_found": "La IA va proposar textos d'ancoratge que no existeixen als PDF. Sol passar si els textos han canviat molt de redacció.",
         "ai_found_nothing": "La IA ha respost que no pot col·locar cap dels camps.",
         "partial": "Alguns camps no s'han pogut col·locar; la llista de la revisió indica el motiu de cadascun."
-      }
+      },
+      "copyTexts": "Textos per pàgina"
     }
   },
   "update": {

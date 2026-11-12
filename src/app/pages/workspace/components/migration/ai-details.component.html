@@ -7,7 +7,9 @@
     aria-labelledby="ai-details-title"
     data-testid="ai-details"
     tabindex="-1"
+    #dialog
     (keydown.escape)="close(); $event.stopPropagation()"
+    (keydown.tab)="trapFocus($any($event), dialog)"
   >
     <header class="ai-details__head">
       <h2 id="ai-details-title">{{ 'ai.details.title' | t }}</h2>
@@ -20,9 +22,9 @@
       <button #closeBtn type="button" class="btn btn--ghost" (click)="close()" data-testid="ai-details-close">✕ {{ 'ai.details.close' | t }}</button>
     </header>
 
-    <div class="ai-details__tabs" role="tablist">
+    <div class="ai-details__tabs" role="tablist" (keydown)="tabKey($event, dialog)">
       @for (name of tabs; track name) {
-        <button type="button" role="tab" [attr.aria-selected]="tab() === name" [class.ai-details__tab--on]="tab() === name" (click)="tab.set(name)" [attr.data-testid]="'ai-details-tab-' + name">{{ 'ai.details.tab.' + name | t }}</button>
+        <button type="button" role="tab" [attr.tabindex]="tab() === name ? 0 : -1" [attr.aria-selected]="tab() === name" [class.ai-details__tab--on]="tab() === name" (click)="tab.set(name)" [attr.data-testid]="'ai-details-tab-' + name">{{ 'ai.details.tab.' + name | t }}</button>
       }
     </div>
 
