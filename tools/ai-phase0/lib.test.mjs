@@ -67,3 +67,11 @@ test('missingImageCodes exige el código de cada imagen y buildPrompt los pide',
   assert.match(buildPrompt({ pagesA: 1, pagesB: 1, sizeA: '1×1', sizeB: '1×1', codes }), /"images"/);
   assert.doesNotMatch(buildPrompt({ pagesA: 1, pagesB: 1, sizeA: '1×1', sizeB: '1×1' }), /"images"/);
 });
+
+test('missingImageCodes admite «A-p1.png» y un carácter mal transcrito, pero no una respuesta inventada', async () => {
+  const { missingImageCodes } = await import('./lib.mjs');
+  const codes = { 'A-p1': 'K7F2', 'B-p1': 'QW9X' };
+  assert.deepEqual(missingImageCodes({ images: { 'A-p1.png': 'K7F2', 'B-p1.png': 'QW9Y' }, fields: [] }, codes), []);
+  assert.deepEqual(missingImageCodes({ images: { 'A-p1': 'K7F2', 'B-p1': 'ZZZZ' }, fields: [] }, codes), ['B-p1']);
+  assert.deepEqual(missingImageCodes({ images: { 'A-p1': 'K7', 'B-p1': 'QW9X' }, fields: [] }, codes), ['A-p1']);
+});

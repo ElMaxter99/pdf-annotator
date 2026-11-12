@@ -45,17 +45,17 @@ export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false
       if (stamp) {
         const code = newCode();
         codes[`${prefix}-p${num}`] = code;
-        const w = 150;
-        const h = 44;
+        const w = 200;
+        const h = 64;
         ctx.fillStyle = '#fff';
         ctx.fillRect(canvas.width - w - 6, canvas.height - h - 6, w, h);
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
         ctx.strokeRect(canvas.width - w - 6, canvas.height - h - 6, w, h);
         ctx.fillStyle = '#000';
-        ctx.font = 'bold 30px monospace';
+        ctx.font = 'bold 46px monospace';
         ctx.textBaseline = 'middle';
-        ctx.fillText(code, canvas.width - w + 8, canvas.height - h / 2 - 6);
+        ctx.fillText(code, canvas.width - w + 12, canvas.height - h / 2 - 6);
       }
       await writeFile(path.join(outDir, `${prefix}-p${num}.png`), canvas.toBuffer('image/png'));
     }

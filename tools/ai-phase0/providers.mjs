@@ -43,6 +43,16 @@ export function describeClaudeEvent(line) {
   return null;
 }
 
+/** Uso total de la ejecución: `modelUsage` suma todos los turnos; `usage` puede reflejar solo el último. */
+export function totalUsage(j) {
+  const models = j?.modelUsage && typeof j.modelUsage === 'object' ? Object.values(j.modelUsage) : [];
+  if (models.length) {
+    const sum = (k) => models.reduce((n, m) => n + (Number(m?.[k]) || 0), 0);
+    return { input_tokens: sum('inputTokens'), output_tokens: sum('outputTokens'), cache_read_input_tokens: sum('cacheReadInputTokens'), cache_creation_input_tokens: sum('cacheCreationInputTokens') };
+  }
+  return j?.usage;
+}
+
 export const PROVIDERS = {
   claude: {
     label: 'Claude Code (claude -p)',
@@ -53,7 +63,7 @@ export const PROVIDERS = {
     extract(stdout) {
       try {
         const j = JSON.parse(finalResultLine(stdout));
-        return { text: typeof j.result === 'string' ? j.result : stdout, meta: { costUsd: j.total_cost_usd, turns: j.num_turns, usage: j.usage, isError: j.is_error === true, permissionDenials: Array.isArray(j.permission_denials) ? j.permission_denials.length : 0, stopReason: j.stop_reason ?? j.subtype ?? null } };
+        return { text: typeof j.result === 'string' ? j.result : stdout, meta: { costUsd: j.total_cost_usd, turns: j.num_turns, usage: totalUsage(j), isError: j.is_error === true, permissionDenials: Array.isArray(j.permission_denials) ? j.permission_denials.length : 0, stopReason: j.stop_reason ?? j.subtype ?? null } };
       } catch {
         return { text: stdout, meta: {} };
       }

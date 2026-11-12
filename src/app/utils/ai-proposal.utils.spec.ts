@@ -34,7 +34,16 @@ describe('ai-proposal.utils', () => {
 
   it('ignores garbage lines and keeps errors', () => {
     const out = parseNdjson('nope\n{"error":{"code":"limit","message":"x","reset":"18:40"}}\n');
-    expect(out.messages).toEqual([{ error: { code: 'limit', message: 'x', reset: '18:40' } }]);
+    expect(out.messages).toEqual([{ error: { code: 'limit', message: 'x', reset: '18:40', details: null } }]);
+  });
+
+  it('keeps the attempts of a failed run so the modal can still show the usage', () => {
+    const line = JSON.stringify({
+      error: { code: 'images_not_read', message: 'x', details: { provider: 'claude', attempts: [{ n: 1, usage: { input: 6, output: 900, cacheRead: 10, cacheWrite: 2 } }] } },
+    });
+    const out = parseNdjson(line + '\n');
+    const error = (out.messages[0] as { error: { details: { attempts: Array<{ usage: { output: number } | null }> } | null } }).error;
+    expect(error.details?.attempts[0].usage?.output).toBe(900);
   });
 
   it('sanitizes the result rows', () => {

@@ -88,7 +88,7 @@ const server = createServer(async (req, res) => {
       });
       line({ result });
     } catch (e) {
-      line({ error: { code: e.code || 'error', message: String(e.message || e), reset: e.reset ?? null } });
+      line({ error: { code: e.code || 'error', message: String(e.message || e), reset: e.reset ?? null, details: e.details ?? null } });
     } finally {
       busy = false;
       if (!res.writableEnded) res.end();

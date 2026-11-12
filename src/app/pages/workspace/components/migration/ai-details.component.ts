@@ -262,6 +262,30 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
     return items;
   }
 
+  /** The async API can be refused (desktop app, no focus): fall back to a hidden textarea. */
+  private async writeClipboard(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      /* try the fallback */
+    }
+    try {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+
   /** Plain-text report without any PDF content, to paste into a bug report. */
   async copyReport(): Promise<void> {
     const s = this.vm.ai();
@@ -294,10 +318,10 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
     if (diag) {
       lines.push(this.t('ai.details.diag.' + diag, { provider: this.providerName() }));
     }
-    try {
-      await navigator.clipboard.writeText(lines.join('\n'));
+    const text = lines.join('\n');
+    if (await this.writeClipboard(text)) {
       this.toast.show(this.t('ai.details.copied'));
-    } catch {
+    } else {
       this.toast.warning(this.t('ai.details.copyFailed'));
     }
   }

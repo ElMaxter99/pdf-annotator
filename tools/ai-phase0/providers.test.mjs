@@ -59,3 +59,10 @@ test('finalResultLine encuentra el evento final de stream-json aunque no vaya pr
   assert.deepEqual(ev.steps, [{ kind: 'read', file: 'A-p1.png', tool: 'Read' }]);
   assert.equal(ev.usage.output, 9);
 });
+
+test('totalUsage suma modelUsage (todos los turnos) y cae a usage si no existe', async () => {
+  const { totalUsage } = await import('./providers.mjs');
+  const j = { usage: { input_tokens: 2, output_tokens: 9 }, modelUsage: { a: { inputTokens: 6, outputTokens: 2000, cacheReadInputTokens: 90000, cacheCreationInputTokens: 30000 } } };
+  assert.deepEqual(totalUsage(j), { input_tokens: 6, output_tokens: 2000, cache_read_input_tokens: 90000, cache_creation_input_tokens: 30000 });
+  assert.deepEqual(totalUsage({ usage: { input_tokens: 1 } }), { input_tokens: 1 });
+});

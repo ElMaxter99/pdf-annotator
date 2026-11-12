@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { AiLiveEvent, AiResult, parseNdjson } from '../utils/ai-proposal.utils';
+import { AiDetails, AiLiveEvent, AiResult, parseNdjson } from '../utils/ai-proposal.utils';
 import { getDesktopBridge } from './desktop-update.service';
 
 export type AiProvider = 'claude' | 'copilot' | 'fake';
@@ -15,6 +15,7 @@ export class AiRequestError extends Error {
     readonly code: string,
     message: string,
     readonly reset: string | null = null,
+    readonly details: AiDetails | null = null,
   ) {
     super(message);
   }
@@ -247,7 +248,7 @@ export class AiHelperService {
           } else if ('result' in message) {
             return message.result;
           } else {
-            throw new AiRequestError(message.error.code, message.error.message, message.error.reset);
+            throw new AiRequestError(message.error.code, message.error.message, message.error.reset, message.error.details ?? null);
           }
         }
       }

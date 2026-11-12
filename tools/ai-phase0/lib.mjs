@@ -74,8 +74,12 @@ export const looksLikeProposals = (v) =>
 
 /** ¿Ha devuelto la IA el código de cada imagen? Devuelve los nombres que faltan o no coinciden. */
 export function missingImageCodes(data, codes) {
-  const got = data && typeof data === 'object' && !Array.isArray(data) && data.images && typeof data.images === 'object' ? data.images : {};
-  return Object.entries(codes).filter(([name, code]) => String(got[name] ?? '').trim().toUpperCase() !== code).map(([name]) => name);
+  const raw = data && typeof data === 'object' && !Array.isArray(data) && data.images && typeof data.images === 'object' ? data.images : {};
+  // Admite claves como «A-p1.png» y un carácter mal transcrito (el modelo pequeño confunde letras parecidas).
+  const got = {};
+  for (const [k, v] of Object.entries(raw)) got[String(k).replace(/\.png$/i, '').trim()] = String(v ?? '').trim().toUpperCase();
+  const close = (a, b) => a.length === b.length && [...a].filter((c, i) => c !== b[i]).length <= 1;
+  return Object.entries(codes).filter(([name, code]) => !close(got[name] ?? '', code)).map(([name]) => name);
 }
 
 /** Valida la respuesta. Devuelve `{ proposals, errors }`; descarta entradas mal formadas. */

@@ -100,7 +100,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
         if (run.aborted) throw Object.assign(new Error('Cancelado.'), { code: 'aborted' });
         const limit = detectLimit(finalResultLine(run.stdout), run.stderr);
         if (limit) throw Object.assign(new Error(limit), { code: 'limit', reset: limit.match(/renueva a las (.+?)\./)?.[1] ?? null });
-        if (!run.ok) throw Object.assign(new Error(`El CLI terminó con código ${run.code}: ${tail(run.stderr || run.stdout)}`), { code: run.code === -1 ? 'missing' : run.code === -2 ? 'timeout' : 'cli_error' });
+        if (!run.ok) throw Object.assign(new Error(`El CLI terminó con código ${run.code}: ${tail(run.stderr || run.stdout)}`), { code: run.code === -1 ? 'missing' : run.code === -2 ? 'timeout' : 'cli_error', details });
         const ex = PROVIDERS[provider].extract(run.stdout);
         // Uso real que da el CLI al terminar (Claude). Copilot no lo expone en -p: no se inventa nada.
         const u = ex.meta.usage;
@@ -109,7 +109,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
         attemptInfo.turns = ex.meta.turns ?? null;
         attemptInfo.permissionDenials = ex.meta.permissionDenials ?? 0;
         attemptInfo.responseChars = ex.text.length;
-        if (ex.meta.isError) throw Object.assign(new Error(`El CLI devolvió un error: ${tail(ex.text)}`), { code: 'cli_error' });
+        if (ex.meta.isError) throw Object.assign(new Error(`El CLI devolvió un error: ${tail(ex.text)}`), { code: 'cli_error', details });
         const data = parseJsonFromText(ex.text, looksLikeProposals);
         if (codes) {
           const missing = missingImageCodes(data, codes);
@@ -117,7 +117,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
           if (missing.length) {
             // La IA no ha leído las imágenes: no se aprovecha una respuesta hecha solo con los textos.
             retryNote = 'no has devuelto los códigos de las imágenes. Abre TODAS las imágenes, copia el código de cada una en "images" y vuelve a responder con el objeto JSON pedido.';
-            if (attempt === maxAttempts) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer.`), { code: 'images_not_read' });
+            if (attempt === maxAttempts) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer (${missing.join(', ')}).`), { code: 'images_not_read', details });
             continue;
           }
         }

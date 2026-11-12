@@ -90,7 +90,7 @@ export type AiMessage =
   | { stage: 'reading' | 'asking' | 'resolving'; n?: number }
   | { event: AiLiveEvent }
   | { result: AiResult }
-  | { error: { code: string; message: string; reset: string | null } };
+  | { error: { code: string; message: string; reset: string | null; details?: AiDetails | null } };
 
 const num = (value: unknown, fallback = 0): number =>
   typeof value === 'number' && Number.isFinite(value) ? value : fallback;
@@ -321,6 +321,7 @@ export function parseNdjson(buffer: string): { messages: AiMessage[]; rest: stri
           code: text(e['code'], 30) || 'error',
           message: text(e['message']),
           reset: typeof e['reset'] === 'string' ? e['reset'].slice(0, 40) : null,
+          details: sanitizeDetails(e['details']),
         },
       });
     }

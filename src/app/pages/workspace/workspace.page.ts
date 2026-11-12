@@ -4024,6 +4024,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         phase: 'error',
         endedAt: Date.now(),
         error: { code: e.code ?? 'error', message: String(e.message ?? e), reset: e.reset ?? null },
+        details: e.details ?? null,
       });
     }
     this.redrawAllForPage();
