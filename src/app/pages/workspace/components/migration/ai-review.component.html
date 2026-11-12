@@ -9,6 +9,7 @@
             <em>{{ 'ai.loading.hint' | t }}</em>
           </span>
           <progress class="adjust-strip__progress"></progress>
+          <button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
           <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
         </div>
       }
@@ -22,7 +23,8 @@
             }
           </span>
           <span class="migration-hint__actions">
-            @if (s.error?.code === 'limit' && otherProvider()) {
+            <button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
+          @if (s.error?.code === 'limit' && otherProvider()) {
               <button type="button" class="btn btn--primary" (click)="vm.retryAi(otherProvider()!)" data-testid="ai-switch">{{ 'ai.error.switch' | t: { provider: otherName() } }}</button>
             } @else {
               <button type="button" class="btn btn--primary" (click)="vm.retryAi()" data-testid="ai-retry">{{ 'ai.error.retry' | t }}</button>
@@ -37,7 +39,8 @@
         <div class="migration-hint migration-hint--warn adjust-strip" role="alert" data-testid="ai-empty">
           <span class="adjust-strip__text"><strong>{{ 'ai.empty.title' | t }}</strong> {{ 'ai.empty.text' | t }}</span>
           <span class="migration-hint__actions">
-            <button type="button" class="btn btn--primary" (click)="vm.useAdjustInstead()">{{ 'ai.error.useAdjust' | t }}</button>
+            <button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
+          <button type="button" class="btn btn--primary" (click)="vm.useAdjustInstead()">{{ 'ai.error.useAdjust' | t }}</button>
             <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
           </span>
           <button type="button" class="migration-hint__close" (click)="vm.cancelAi()" [attr.aria-label]="'batch.editor.notices.close' | t">✕</button>
@@ -56,6 +59,7 @@
               <button type="button" [class.migration-seg__on]="s.view === 'proposal'" [attr.aria-pressed]="s.view === 'proposal'" (click)="vm.setAiView('proposal')" data-testid="ai-view-proposal">{{ 'batch.adjust.view.proposal' | t }}</button>
               <button type="button" [class.migration-seg__on]="s.view === 'original'" [attr.aria-pressed]="s.view === 'original'" (click)="vm.setAiView('original')" data-testid="ai-view-original">{{ 'batch.adjust.view.original' | t }}</button>
             </span>
+<button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
             <button type="button" class="btn btn--primary" [disabled]="sum.selected === 0" (click)="vm.applyAi()" data-testid="ai-apply">{{ 'batch.adjust.apply' | t: { count: sum.selected } }}</button>
             <button type="button" class="btn btn--ghost" [attr.aria-expanded]="s.open" (click)="vm.toggleAiOpen()" data-testid="ai-toggle-list">{{ 'batch.adjust.list' | t }} {{ s.open ? '▴' : '▾' }}</button>
             <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
@@ -95,4 +99,7 @@
       }
     }
   }
+}
+@if (vm.ai()?.detailsOpen) {
+  <app-ai-details [vm]="vm"></app-ai-details>
 }

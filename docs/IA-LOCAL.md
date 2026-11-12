@@ -30,6 +30,9 @@ El script (y la futura función) prepara una carpeta temporal y ejecuta el CLI d
 - **Términos (leer antes de ampliar el uso):** la documentación del [Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview) indica que Anthropic no permite a terceros ofrecer el login de claude.ai ni sus límites en sus productos. Este uso es local y personal: la app ejecuta el `claude` que cada persona instaló y con el que inició sesión, y no maneja credenciales. Es razonable pero **no es una autorización expresa**: no distribuir la función con credenciales, no usar la sesión de otra persona y cada persona usa su propia suscripción. Ver la documentación de [`claude -p`](https://code.claude.com/docs/en/headless) y la de [Claude Code con planes Pro/Max](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan).
 - **Imágenes:** el modelo las abre con la herramienta Read desde la carpeta de trabajo (funciona en la fase 0).
 
+## Prueba de lectura de imágenes
+Cada PNG que se deja al CLI lleva un código de 4 caracteres en la esquina inferior derecha y el prompt exige devolverlos en `images`. Si faltan tras dos intentos, el ayudante responde `images_not_read` y no se propone nada: así un modelo que no ve imágenes (posible con Copilot) no coloca campos usando solo los JSON. Cuesta una petición extra solo si el primer intento no los devuelve.
+
 ## Copilot (`copilot -p`) — pendiente de probar
 - **Qué usa:** el CLI de GitHub Copilot con la sesión de GitHub de la persona (credenciales del llavero del sistema, o `COPILOT_GITHUB_TOKEN`/`GH_TOKEN`/`GITHUB_TOKEN`). La documentación de [planes](https://docs.github.com/en/copilot/get-started/plans) dice que todos incluyen el CLI.
 - **Banderas del CLI sin verificar.** El script lanza `copilot -p "<frase fija>" --allow-all-tools` desde la carpeta de trabajo. Si tu versión usa otras, defínelas con la variable `COPILOT_ARGS` (lista JSON; `{{prompt}}` se sustituye por la frase fija), por ejemplo `COPILOT_ARGS='["-p","{{prompt}}","--allow-all-tools"]'`. `--allow-all-tools` da permiso al CLI sobre las herramientas de esa sesión: ejecútalo solo en la carpeta temporal.
@@ -54,3 +57,9 @@ El script (y la futura función) prepara una carpeta temporal y ejecuta el CLI d
 **Variables del ayudante:** `AI_HELPER_PORT`, `AI_HELPER_ORIGINS`, `AI_HELPER_TIMEOUT` (segundos, 300), `AI_HELPER_KEEP_API_KEY=1` (por defecto se quita `ANTHROPIC_API_KEY` para usar la suscripción), `COPILOT_ARGS` (banderas de Copilot sin verificar), `AI_HELPER_FAKE=1` (proveedor simulado para los e2e).
 
 **Seguridad.** El ayudante no entra en Docker ni en el despliegue. La CSP de `nginx.conf` permite `connect-src http://127.0.0.1:4310` solo para que, con el ayudante abierto en tu equipo, la app pueda hablarle; sin él, la opción aparece desactivada y explica cómo arrancarlo.
+
+## Ver detalles y consumo
+El botón «Ver detalles» (barra de la IA, en carga, error, sin cambios y revisión) abre un modal con los pasos, lo enviado y el consumo. El ayudante emite líneas `{event}` durante la petición y `result.details` al terminar (`tools/ai-helper/pipeline.mjs`; en el navegador `utils/ai-proposal.utils.ts` las trata como no confiables).
+- **Claude** corre con `--output-format stream-json --verbose`: da cada paso (qué archivos lee), tokens reales (entrada, salida, caché) y coste equivalente en API. Con suscripción no se cobra aparte.
+- **Copilot** no expone uso en `-p` según su documentación: el modal dice «No medible» y solo enseña peticiones enviadas, tamaño de lo enviado y una **estimación de tokens marcada como tal**. Nunca se muestran cifras inventadas.
+- **Diagnóstico de «sin cambios»** (`diagnose` en `pipeline.mjs`): A o B sin texto extraíble, permiso denegado a la CLI, respuesta no válida, anclas inexistentes o la IA no encuentra nada. El informe copiable no lleva contenido de los PDF.

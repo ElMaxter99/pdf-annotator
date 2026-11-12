@@ -135,6 +135,16 @@
         data-testid="ai-model-copilot"
       />
       <small class="ai-panel__text">{{ 'ai.panel.model.copilotHint' | t }}</small>
+      <label class="ai-panel__check">
+        <input
+          type="checkbox"
+          [checked]="vm.aiHelper.retry()[vm.aiHelper.provider()] !== false"
+          (change)="vm.aiHelper.setRetry(vm.aiHelper.provider(), $any($event.target).checked)"
+          data-testid="ai-retry-toggle"
+        />
+        {{ 'ai.panel.retryToggle' | t }}
+      </label>
+      <small class="ai-panel__text">{{ 'ai.panel.retryHint' | t }}</small>
     </ng-template>
     <ng-template #providers>
       @for (name of ['claude', 'copilot']; track name) {

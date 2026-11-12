@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// Genera pares A/B sintéticos (datos inventados) en sample/<caso>/ con A.pdf, A.json, B.pdf, B.json y expected.json.
+// Genera pares A/B sintéticos (datos inventados) en sample-plano/ (una sola carpeta, caso en el nombre): A-<caso>.pdf, A-<caso>.json, B-<caso>.pdf, B-<caso>.json, expected-<caso>.json y README-<caso>.md.
 // `expected.json` es la solución correcta de cada campo de A en B: { id, page, x, y } o { id, gone: true }.
 // Cada campo se define por la etiqueta a la que acompaña (clave `k`): el valor va tras el texto de la etiqueta si tiene
 // línea de relleno, o a (dx, dy) del inicio de la etiqueta si no. La solución esperada sale de la etiqueta en B.
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { mkdir, writeFile } from 'node:fs/promises';
 
-const OUT = new URL('sample/', import.meta.url);
+const OUT = new URL('sample-plano/', import.meta.url);
 const ink = rgb(0.12, 0.16, 0.22);
 const gray = rgb(0.45, 0.5, 0.58);
 const rule = rgb(0.72, 0.76, 0.82);
@@ -52,8 +52,7 @@ const pos = (pages, k) => {
 const r1 = (n) => Math.round(n * 10) / 10;
 
 async function build(name, c) {
-  const dir = new URL(`${name}/`, OUT);
-  await mkdir(dir, { recursive: true });
+  await mkdir(OUT, { recursive: true });
   const aJson = { pages: c.A.pages.map((_, i) => ({ num: i + 1, fields: [] })) };
   const expected = [];
   const bJson = { pages: c.B.pages.map((_, i) => ({ num: i + 1, fields: [] })) };
@@ -90,12 +89,12 @@ async function build(name, c) {
     bJson.pages[b.page - 1].fields.push({ x: r1(anchorX(b.el, dx)), y: r1(b.y + dy), ...rest });
   }
   void counters;
-  await writeFile(new URL('A.pdf', dir), await render(c.A.size ?? A4, c.A.pages));
-  await writeFile(new URL('B.pdf', dir), await render(c.B.size ?? A4, c.B.pages));
-  await writeFile(new URL('A.json', dir), JSON.stringify(aJson, null, 2) + '\n');
-  await writeFile(new URL('B.json', dir), JSON.stringify(bJson, null, 2) + '\n');
-  await writeFile(new URL('expected.json', dir), JSON.stringify(expected, null, 2) + '\n');
-  await writeFile(new URL('README.md', dir), `# ${name}\n\n${c.about}\n`);
+  await writeFile(new URL(`A-${name}.pdf`, OUT), await render(c.A.size ?? A4, c.A.pages));
+  await writeFile(new URL(`B-${name}.pdf`, OUT), await render(c.B.size ?? A4, c.B.pages));
+  await writeFile(new URL(`A-${name}.json`, OUT), JSON.stringify(aJson, null, 2) + '\n');
+  await writeFile(new URL(`B-${name}.json`, OUT), JSON.stringify(bJson, null, 2) + '\n');
+  await writeFile(new URL(`expected-${name}.json`, OUT), JSON.stringify(expected, null, 2) + '\n');
+  await writeFile(new URL(`README-${name}.md`, OUT), `# ${name}\n\n${c.about}\n`);
   console.log(`✓ ${name} (${expected.length} campos)`);
 }
 
