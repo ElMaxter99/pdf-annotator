@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.7.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.7.0) - 2026-11-12
 ### Changed
 - **«Copiar y ajustar por textos» is a notice like the others**: the floating panel that covered B is gone. The proposal is a strip under the bar (summary, «Propuesta | Original», «Aplicar N cambios», «Campos ▾», «Cancelar», ✕) and the list of fields and texts opens in the flow, pushing the viewer down. ✕ sends the notice to the bell (the proposal stays drawn and can be applied or cancelled from there); Esc closes the notice instead of cancelling
 - **Better preview of the proposal**: arrow and distance for the field under the pointer or selected; highlight in the list, on A and on B at once; «Original» (or hold `P`) shows the fields where they are in A; five clear looks (proposed, estimated, manual, low reliability, unticked); a card on click with the shift, the texts used and a shift typed by hand; «Ver anclas» pins the texts on both pages; a legend under the bar
