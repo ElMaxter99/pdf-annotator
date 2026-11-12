@@ -29,7 +29,17 @@ try {
   assert.ok(await page.locator('body').innerText().then((t) => t.length > 20), 'la landing se pinta');
   assert.equal(await page.evaluate(() => window.desktop?.isDesktop), true, 'el puente existe');
   assert.equal(await page.evaluate(() => typeof require), 'undefined', 'la web no tiene Node');
-  const health = await page.evaluate(async () => (await fetch('http://127.0.0.1:4310/status')).json());
+  // El ayudante arranca en paralelo a la ventana: se espera a que responda.
+  const health = await page.evaluate(async () => {
+    for (let i = 0; i < 40; i++) {
+      try {
+        return await (await fetch('http://127.0.0.1:4310/status')).json();
+      } catch {
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    throw new Error('el ayudante no responde');
+  });
   assert.equal(health.ok, true, 'el ayudante responde a la app');
   assert.ok(health.providers.fake, 'proveedor simulado activo');
   const card = page.locator('[data-testid=update-card]');

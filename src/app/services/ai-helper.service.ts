@@ -117,8 +117,24 @@ export class AiHelperService {
    * calling 127.0.0.1 makes Chrome ask for «local network access», so there it waits for an explicit click.
    */
   checkIfLocal(): void {
-    if (this.connection() === 'unknown' && (isLocalOrigin() || getDesktopBridge() !== null)) {
+    if (this.connection() !== 'unknown') {
+      return;
+    }
+    if (getDesktopBridge() !== null) {
+      void this.checkWhenHelperStarts();
+    } else if (isLocalOrigin()) {
       void this.check();
+    }
+  }
+
+  /** In the desktop app the helper starts together with the window: retry for a few seconds before giving up. */
+  private async checkWhenHelperStarts(): Promise<void> {
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await this.check();
+      if (this.connection() !== 'offline') {
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1500));
     }
   }
 
