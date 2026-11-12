@@ -4,6 +4,7 @@
 //   3. Te pide escribir vX.Y.Z para confirmar.
 //   4. Alinea develop y master (avance rápido; si han divergido, fusiona master en develop con
 //      un commit de merge; nunca fuerza), crea la rama release/vX.Y.Z y el tag vX.Y.Z y lo sube todo.
+// npm run release:deploy -- --yes      Sin pregunta (lo usa .github/workflows/release.yml; la confirmación es pulsar «Run workflow»).
 // npm run release:deploy -- --dry-run   Solo comprueba y cuenta qué haría (también cambia a develop y hace pull).
 // npm run release:deploy -- bump X.Y.Z  Edita package.json y el badge del README en local (sin commit).
 // El despliegue en Vercel queda a mano.
@@ -93,6 +94,7 @@ const main = async () => {
   const args = process.argv.slice(2);
   if (args[0] === 'bump') return bump(args[1]);
   const dryRun = takeFlag(args, '--dry-run');
+  const yes = takeFlag(args, '--yes');
   if (args.length) fail(`Argumento desconocido: ${args.join(' ')}`);
 
   prepare();
@@ -106,12 +108,13 @@ const main = async () => {
   console.log(`  ${align ? 3 : 2}. Crear y subir el tag anotado ${tag}.`);
   console.log('  Después: desplegar en Vercel a mano y publicar las notas (npm run release:notes).');
   if (dryRun) return console.log('\nSimulacro (--dry-run): no se ha subido nada.');
-  if (!process.stdin.isTTY) fail('Hace falta una terminal interactiva para confirmar (o usa --dry-run).');
-
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
-  const answer = (await rl.question(`Escribe ${tag} para confirmar (otra cosa cancela): `)).trim();
-  rl.close();
-  if (answer !== tag) return console.log('Cancelado. No se ha cambiado nada.');
+  if (!yes) {
+    if (!process.stdin.isTTY) fail('Hace falta una terminal interactiva para confirmar (o usa --dry-run).');
+    const rl = createInterface({ input: process.stdin, output: process.stdout });
+    const answer = (await rl.question(`Escribe ${tag} para confirmar (otra cosa cancela): `)).trim();
+    rl.close();
+    if (answer !== tag) return console.log('Cancelado. No se ha cambiado nada.');
+  }
 
   let sha = target;
   if (align === 'merge') {

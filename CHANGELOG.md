@@ -1,4 +1,6 @@
 ## Unreleased
+### Added
+- **Release con un botón**: `.github/workflows/release.yml` («Actions → Release → Run workflow» sobre `develop`) alinea `develop`/`master`, crea `release/vX.Y.Z` y la etiqueta, compila los instaladores (`desktop-release.yml`, ahora también reutilizable), pone las notas del CHANGELOG en el borrador y la publica (desmarca `publish` para dejarla en borrador). La web sigue a mano: Vercel hace la vista previa de `release/vX.Y.Z` y se promociona a producción tras validarla. `npm run release:deploy -- --yes` salta la pregunta
 
 ## [v1.8.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.0) - 2026-11-12
 ### Added

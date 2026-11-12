@@ -6,9 +6,21 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+  # Lo llama release.yml (una etiqueta empujada con GITHUB_TOKEN no dispara otros workflows).
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+      publish:
+        type: boolean
+        default: false
 
 permissions:
   contents: write
+
+env:
+  TAG: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name || '') }}
 
 jobs:
   verify:
@@ -16,11 +28,13 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22.12.0
       - name: Version coincide con la etiqueta
-        run: node scripts/sync-desktop-version.mjs ${{ startsWith(github.ref, 'refs/tags/') && format('--tag {0}', github.ref_name) || '' }}
+        run: node scripts/sync-desktop-version.mjs ${{ env.TAG != '' && format('--tag {0}', env.TAG) || '' }}
       - run: npm install --no-fund --no-audit
       - name: Dependencias del ayudante de IA
         run: npm install --no-fund --no-audit
@@ -45,6 +59,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22.12.0
@@ -62,3 +78,32 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+  # Pone las notas (sección del CHANGELOG) en el borrador. Solo publica si se pidió explícitamente.
+  notes:
+    needs: package
+    if: ${{ inputs.tag != '' || startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+      - name: Notas desde el CHANGELOG
+        run: node scripts/release-notes.mjs "$TAG" --out notes.md
+      - name: Actualizar el borrador
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH: ${{ inputs.publish && 'true' || 'false' }}
+        run: |
+          id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.tag_name==\"$TAG\" and .draft) | .id" | head -n1)
+          [ -n "$id" ] || { echo "No hay borrador para $TAG"; exit 1; }
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F body=@notes.md -f name="$TAG" --silent
+          echo "Notas puestas en el borrador de $TAG."
+          if [ "$PUBLISH" = true ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F draft=false --silent
+            echo "Release $TAG publicada."
+          fi

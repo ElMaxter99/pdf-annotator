@@ -15,7 +15,11 @@ try {
    Abre la PR a ${DEV_BRANCH}, espera a «build-and-test» (Snyk y Codex/CodeRabbit pueden fallar
    por límites de cuenta, no por el código) y fusiónala con aprobación.
 
-2. Release (con la versión ya fusionada en ${DEV_BRANCH}; vale desde cualquier rama con el árbol limpio)
+2. Release automático (recomendado)
+   GitHub → Actions → «Release» → Run workflow (rama ${DEV_BRANCH}). Hace todo lo del paso 2 manual, compila los
+   instaladores y publica la release con las notas puestas (desmarca «publish» para dejarla en borrador).
+
+2b. Release a mano (alternativa; con la versión ya fusionada en ${DEV_BRANCH}; vale desde cualquier rama con el árbol limpio)
    npm run release:deploy                  # cambia a ${DEV_BRANCH}, hace pull, comprueba, pide escribir v${v},
                                            # alinea ${DEV_BRANCH} y ${MAIN_BRANCH} (avance rápido o merge de ${MAIN_BRANCH} en ${DEV_BRANCH}),
                                            # crea y sube la rama release/v${v} y el tag v${v}
@@ -24,7 +28,7 @@ try {
    Si npm dice «Missing script», estás en una rama sin los scripts (p. ej. ${MAIN_BRANCH} antigua): git switch ${DEV_BRANCH} && git pull.
 
 3. Desplegar y publicar
-   Despliegue en Vercel: a mano.
+   Web: al subirse release/v${v}, Vercel hace la vista previa; valídala y promociónala a producción en Vercel (a mano).
    npm run release:notes                   # notas de v${v} desde el CHANGELOG
    ${REPO_URL}/releases/new?tag=v${v}   → pega las notas y publica.
 
