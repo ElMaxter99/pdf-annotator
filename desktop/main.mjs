@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { RELEASES_URL, REPO, isNewer, parseLatestRelease, updateMode } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
+import { isAppUrl } from './trusted-origin.mjs';
 import { goInHistory, historyDirectionForCommand, historyDirectionForKey } from './history-nav.mjs';
 
 const { autoUpdater } = electronUpdater;
@@ -138,11 +139,7 @@ function setupUpdater() {
 }
 
 function trusted(event) {
-  try {
-    return new URL(event.senderFrame.url).origin === ORIGIN;
-  } catch {
-    return false;
-  }
+  return isAppUrl(event.senderFrame?.url, ORIGIN);
 }
 function setupIpc() {
   const handle = (channel, fn) => ipcMain.handle(channel, (event, ...args) => (trusted(event) ? fn(...args) : undefined));
@@ -193,7 +190,7 @@ function createWindow() {
     return { action: 'deny' };
   });
   win.webContents.on('will-navigate', (event, url) => {
-    if (new URL(url).origin !== ORIGIN) {
+    if (!isAppUrl(url, ORIGIN)) {
       event.preventDefault();
       if (/^https:\/\//.test(url)) shell.openExternal(url);
     }

@@ -21,7 +21,7 @@
     "release:deploy": "node scripts/release.mjs",
     "start:desktop": "node scripts/start-desktop.mjs",
     "desktop:pack": "node scripts/sync-desktop-version.mjs && npm run build && cd tools/ai-phase0 && npm install --no-fund --no-audit && cd ../.. && electron-builder --projectDir desktop --publish never",
-    "test:desktop": "node --test desktop/update-logic.test.mjs desktop/shell-path.test.mjs desktop/history-nav.test.mjs"
+    "test:desktop": "node --test desktop/update-logic.test.mjs desktop/shell-path.test.mjs desktop/history-nav.test.mjs desktop/trusted-origin.test.mjs"
   },
   "prettier": {
     "printWidth": 100,
