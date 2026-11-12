@@ -7,16 +7,53 @@ import path from 'node:path';
 const INSTRUCTION = 'Lee el archivo prompt.md de esta carpeta y sigue sus instrucciones. Responde solo con el JSON pedido.';
 const win = process.platform === 'win32';
 
+/** Con stream-json, la línea del evento final `{"type":"result",…}`; con json normal, todo el texto. */
+export function finalResultLine(stdout) {
+  const lines = String(stdout ?? '').trim().split('\n');
+  if (lines.length > 1) {
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (!lines[i].includes('"type":"result"')) continue;
+      try {
+        if (JSON.parse(lines[i])?.type === 'result') return lines[i];
+      } catch {
+        // línea que no es el evento final
+      }
+    }
+  }
+  return String(stdout ?? '');
+}
+
+/** Un evento de stream-json de Claude → paso legible para la persona (o null si no aporta). Nunca incluye contenido de los PDF. */
+export function describeClaudeEvent(line) {
+  let j;
+  try {
+    j = JSON.parse(line);
+  } catch {
+    return null;
+  }
+  if (j?.type === 'assistant') {
+    const out = [];
+    for (const c of j.message?.content ?? []) {
+      if (c.type === 'tool_use') out.push({ kind: 'read', file: String(c.input?.file_path ?? '').split(/[\\/]/).pop().slice(0, 60), tool: String(c.name).slice(0, 30) });
+      else if (c.type === 'text' && c.text) out.push({ kind: 'answer', chars: c.text.length });
+    }
+    const u = j.message?.usage;
+    return { steps: out, usage: u ? { input: u.input_tokens ?? 0, output: u.output_tokens ?? 0, cacheRead: u.cache_read_input_tokens ?? 0, cacheWrite: u.cache_creation_input_tokens ?? 0 } : null };
+  }
+  return null;
+}
+
 export const PROVIDERS = {
   claude: {
     label: 'Claude Code (claude -p)',
     cmd: 'claude',
-    args: (opts = {}) => ['-p', INSTRUCTION, '--output-format', 'json', '--allowedTools', 'Read', ...(opts.model ? ['--model', opts.model] : [])],
-    // Con --output-format json el texto de la respuesta viene en `result`.
+    // `opts.stream` (ayudante de la app): stream-json emite un evento por línea (pasos, lecturas, uso) para verlo en vivo.
+    args: (opts = {}) => ['-p', INSTRUCTION, '--output-format', opts.stream ? 'stream-json' : 'json', ...(opts.stream ? ['--verbose'] : []), '--allowedTools', 'Read', ...(opts.model ? ['--model', opts.model] : [])],
+    // Con --output-format json el texto de la respuesta viene en `result`; con stream-json, en el último evento `result`.
     extract(stdout) {
       try {
-        const j = JSON.parse(stdout);
-        return { text: typeof j.result === 'string' ? j.result : stdout, meta: { costUsd: j.total_cost_usd, turns: j.num_turns, usage: j.usage, isError: j.is_error === true } };
+        const j = JSON.parse(finalResultLine(stdout));
+        return { text: typeof j.result === 'string' ? j.result : stdout, meta: { costUsd: j.total_cost_usd, turns: j.num_turns, usage: j.usage, isError: j.is_error === true, permissionDenials: Array.isArray(j.permission_denials) ? j.permission_denials.length : 0, stopReason: j.stop_reason ?? j.subtype ?? null } };
       } catch {
         return { text: stdout, meta: {} };
       }
@@ -96,7 +133,15 @@ export function runCli(name, cwd, opts = {}) {
       if (opts.signal.aborted) onAbort();
       else opts.signal.addEventListener('abort', onAbort, { once: true });
     }
-    child.stdout.on('data', (d) => (stdout += d));
+    let lineBuf = '';
+    child.stdout.on('data', (d) => {
+      stdout += d;
+      if (!opts.onLine) return;
+      lineBuf += d;
+      const lines = lineBuf.split('\n');
+      lineBuf = lines.pop() ?? '';
+      for (const l of lines) if (l.trim()) opts.onLine(l);
+    });
     child.stderr.on('data', (d) => (stderr += d));
     const done = (res) => {
       clearTimeout(timer);

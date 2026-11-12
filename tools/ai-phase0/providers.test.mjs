@@ -48,3 +48,13 @@ test('detectLimit reconoce el límite de la suscripción y la hora de reinicio',
   assert.equal(detectLimit('{"is_error":true,"result":"Not logged in"}'), null);
   assert.match(detectLimit(out.slice(40) /* JSON roto, como un stdout cortado */), /límite/);
 });
+
+test('finalResultLine encuentra el evento final de stream-json aunque no vaya primero en la línea', async () => {
+  const { finalResultLine, describeClaudeEvent } = await import('./providers.mjs');
+  const out = ['{"type":"system"}', '{"total_cost_usd":0.01,"type":"result","result":"[]"}', '{"type":"system","subtype":"task_summary"}'].join('\n');
+  assert.equal(JSON.parse(finalResultLine(out)).result, '[]');
+  assert.equal(finalResultLine('{"result":"x"}'), '{"result":"x"}');
+  const ev = describeClaudeEvent(JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Read', input: { file_path: '/tmp/x/A-p1.png' } }], usage: { input_tokens: 3, output_tokens: 9 } } }));
+  assert.deepEqual(ev.steps, [{ kind: 'read', file: 'A-p1.png', tool: 'Read' }]);
+  assert.equal(ev.usage.output, 9);
+});

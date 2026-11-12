@@ -34,7 +34,7 @@ export function nearbyTexts(texts, page, field, limit = 6) {
 export const round = (n) => Math.round(n * 10) / 10;
 
 /** Primer objeto/array JSON equilibrado de un texto (admite ```json ... ```). */
-export function parseJsonFromText(text) {
+export function parseJsonFromText(text, accept = () => true) {
   const src = String(text ?? '');
   const starts = [];
   for (let i = 0; i < src.length; i++) if (src[i] === '[' || src[i] === '{') starts.push(i);
@@ -56,15 +56,21 @@ export function parseJsonFromText(text) {
       else if (c === open) depth++;
       else if (c === close && --depth === 0) {
         try {
-          return JSON.parse(src.slice(start, i + 1));
+          const value = JSON.parse(src.slice(start, i + 1));
+          if (accept(value)) return value;
         } catch {
-          break;
+          // no era JSON: se prueba con el siguiente corchete
         }
+        break;
       }
     }
   }
   return null;
 }
+
+/** ¿Parece la lista de propuestas (y no un `[1]` o un `{}` cualquiera del texto de la IA)? */
+export const looksLikeProposals = (v) =>
+  (Array.isArray(v) && v.some((x) => x && typeof x === 'object' && typeof x.id === 'string')) || (!!v && Array.isArray(v.fields));
 
 /** Valida la respuesta. Devuelve `{ proposals, errors }`; descarta entradas mal formadas. */
 export function validateProposals(data, knownIds) {

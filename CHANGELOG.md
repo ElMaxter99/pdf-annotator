@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- El ayudante de IA recoge los pasos, el uso real de tokens (Claude), lo enviado y un diagnóstico de por qué no se colocó nada, y lo emite como eventos `event` y `result.details` (sin interfaz todavía). La IA ya no se confunde con listas JSON ajenas (`[1]`) en su respuesta
 - Guía «Cómo instalar» (`docs/INSTALAR.md`) para Windows, macOS y Linux, enlazada desde el README: qué archivo elegir, avisos de instaladores sin firmar, `libfuse2`, actualizaciones y aviso de que Linux solo tiene paquetes x86_64. Las capturas reales están pendientes (huecos marcados)
 ### Fixed
 - La release de escritorio creaba dos borradores duplicados (los 4 jobs de empaquetado en paralelo creaban cada uno el suyo y los archivos quedaban repartidos); ahora un job previo crea el borrador una sola vez y todos suben a él.

@@ -82,6 +82,7 @@ const server = createServer(async (req, res) => {
         timeoutMs: Number(process.env.AI_HELPER_TIMEOUT || 300) * 1000,
         signal: ac.signal,
         onStage: (stage, n) => line({ stage, n }),
+        onEvent: (event) => line({ event }),
       });
       line({ result });
     } catch (e) {

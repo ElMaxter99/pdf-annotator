@@ -1,11 +1,11 @@
 // Propuesta de coordenadas A→B con IA para la app: mismo flujo que la fase 0, pero recibe los PDF y la plantilla
 // de A en memoria y devuelve una fila por campo. Nunca evalúa la salida de la IA: solo la valida y la convierte.
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { buildPrompt, findText, flattenFields, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
+import { buildPrompt, findText, flattenFields, looksLikeProposals, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
 import { readPdf } from '../ai-phase0/pdf.mjs';
-import { PROVIDERS, detectLimit, runCli } from '../ai-phase0/providers.mjs';
+import { PROVIDERS, describeClaudeEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
 
 const sizes = (pdf) => [...new Set(pdf.pages.map((p) => `${Math.round(p.width)}×${Math.round(p.height)}`))].join(' / ');
 const tail = (s) => String(s ?? '').trim().replace(/\s+/g, ' ').slice(-300) || '(sin salida)';
@@ -21,7 +21,7 @@ function fakeAnswer(entries, A, B) {
   });
 }
 
-export async function runProposal({ provider, model, aBytes, bBytes, template, keepApiKey = false, timeoutMs = 300_000, onStage = () => {}, signal }) {
+export async function runProposal({ provider, model, aBytes, bBytes, template, keepApiKey = false, timeoutMs = 300_000, onStage = () => {}, onEvent = () => {}, signal }) {
   const fake = process.env.AI_HELPER_FAKE === '1' && provider === 'fake';
   if (!fake && !PROVIDERS[provider]) throw Object.assign(new Error('Proveedor desconocido.'), { code: 'bad_provider' });
   const work = await mkdtemp(path.join(os.tmpdir(), 'pdfann-ia-'));
@@ -32,13 +32,27 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
     const A = await readPdf(path.join(work, 'A.pdf'), { prefix: 'A', outDir: work });
     const B = await readPdf(path.join(work, 'B.pdf'), { prefix: 'B', outDir: work });
     const entries = flattenFields(template);
-    if (!entries.length) return { rows: [], seconds: 0, warnings: [], pagesA: A.pages.length, pagesB: B.pages.length };
+    if (!entries.length) return { rows: [], seconds: 0, warnings: [], pagesA: A.pages.length, pagesB: B.pages.length, details: null };
     await writeFile(path.join(work, 'textsA.json'), JSON.stringify(A.texts, null, 1));
     await writeFile(path.join(work, 'textsB.json'), JSON.stringify(B.texts, null, 1));
     await writeFile(
       path.join(work, 'fields.json'),
       JSON.stringify(entries.map((e) => ({ id: e.id, page: e.page, type: e.field.type ?? 'text', label: e.field.mapField, x: e.field.x, y: e.field.y, nearby: nearbyTexts(A.texts, e.page, e.field) })), null, 1),
     );
+    // Lo que se envía: solo nombres y tamaños, nunca el contenido.
+    const files = [];
+    for (const name of await readdir(work)) files.push({ name, bytes: (await stat(path.join(work, name))).size });
+    const sent = {
+      files: files.filter((f) => !/^prompt\.md$/.test(f.name)),
+      fields: entries.length,
+      pagesA: A.pages.length,
+      pagesB: B.pages.length,
+      textsA: A.texts.length,
+      textsB: B.texts.length,
+      imageBytes: files.filter((f) => f.name.endsWith('.png')).reduce((n, f) => n + f.bytes, 0),
+    };
+    const details = { provider, model: model ?? null, sent, attempts: [], usageSource: fake ? 'none' : provider === 'claude' ? 'measured' : 'unavailable' };
+    onEvent({ type: 'sent', sent });
     const known = new Set(entries.map((e) => e.id));
     let proposals = [];
     let warnings = [];
@@ -50,34 +64,84 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
     } else {
       for (let attempt = 1; attempt <= 2; attempt++) {
         onStage('asking', attempt);
-        await writeFile(path.join(work, 'prompt.md'), buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote }));
-        const run = await runCli(provider, work, { model, keepApiKey, timeoutMs, signal, quiet: true });
+        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote });
+        await writeFile(path.join(work, 'prompt.md'), promptText);
+        const attemptInfo = { n: attempt, promptChars: promptText.length, steps: [], usage: null, retry: !!retryNote };
+        details.attempts.push(attemptInfo);
+        const run = await runCli(provider, work, {
+          model,
+          keepApiKey,
+          timeoutMs,
+          signal,
+          quiet: true,
+          stream: provider === 'claude',
+          onLine: provider === 'claude'
+            ? (l) => {
+                const ev = describeClaudeEvent(l);
+                if (!ev) return;
+                for (const step of ev.steps) attemptInfo.steps.push(step);
+                if (ev.usage) attemptInfo.usage = { input: (attemptInfo.usage?.input ?? 0) + ev.usage.input, output: (attemptInfo.usage?.output ?? 0) + ev.usage.output, cacheRead: (attemptInfo.usage?.cacheRead ?? 0) + ev.usage.cacheRead, cacheWrite: (attemptInfo.usage?.cacheWrite ?? 0) + ev.usage.cacheWrite };
+                onEvent({ type: 'step', attempt, steps: ev.steps, usage: attemptInfo.usage });
+              }
+            : undefined,
+        });
         seconds += run.seconds;
+        attemptInfo.seconds = run.seconds;
         if (run.aborted) throw Object.assign(new Error('Cancelado.'), { code: 'aborted' });
-        const limit = detectLimit(run.stdout, run.stderr);
+        const limit = detectLimit(finalResultLine(run.stdout), run.stderr);
         if (limit) throw Object.assign(new Error(limit), { code: 'limit', reset: limit.match(/renueva a las (.+?)\./)?.[1] ?? null });
         if (!run.ok) throw Object.assign(new Error(`El CLI terminó con código ${run.code}: ${tail(run.stderr || run.stdout)}`), { code: run.code === -1 ? 'missing' : run.code === -2 ? 'timeout' : 'cli_error' });
         const ex = PROVIDERS[provider].extract(run.stdout);
+        // Uso real que da el CLI al terminar (Claude). Copilot no lo expone en -p: no se inventa nada.
+        const u = ex.meta.usage;
+        if (u) attemptInfo.usage = { input: u.input_tokens ?? 0, output: u.output_tokens ?? 0, cacheRead: u.cache_read_input_tokens ?? 0, cacheWrite: u.cache_creation_input_tokens ?? 0 };
+        attemptInfo.costUsd = typeof ex.meta.costUsd === 'number' ? ex.meta.costUsd : null;
+        attemptInfo.turns = ex.meta.turns ?? null;
+        attemptInfo.permissionDenials = ex.meta.permissionDenials ?? 0;
+        attemptInfo.responseChars = ex.text.length;
+        attemptInfo.rawTail = tail(ex.text);
         if (ex.meta.isError) throw Object.assign(new Error(`El CLI devolvió un error: ${tail(ex.text)}`), { code: 'cli_error' });
-        const parsed = validateProposals(parseJsonFromText(ex.text), known);
+        const parsed = validateProposals(parseJsonFromText(ex.text, looksLikeProposals), known);
         proposals = parsed.proposals;
         warnings = parsed.errors;
+        attemptInfo.parsed = proposals.length;
+        attemptInfo.warnings = warnings.length;
         if (proposals.length && warnings.length < known.size / 2) break;
         retryNote = 'tu respuesta anterior no era una lista JSON válida con un objeto por campo. Devuelve únicamente esa lista.';
       }
     }
     onStage('resolving');
+    const counts = {};
     const rows = entries.map((e) => {
       const p = proposals.find((x) => x.id === e.id);
-      if (!p) return { id: e.id, page: e.page, index: e.index, ok: false, why: 'sin_respuesta', reason: '' };
+      if (!p) return (counts.sin_respuesta = (counts.sin_respuesta ?? 0) + 1), { id: e.id, page: e.page, index: e.index, ok: false, why: 'sin_respuesta', reason: '' };
       const r = resolveProposal(p, e, A.texts, B.texts);
+      if (!r.ok) counts[r.why] = (counts[r.why] ?? 0) + 1;
       return r.ok
         ? { id: e.id, page: e.page, index: e.index, ok: true, newPage: r.page, x: r.x, y: r.y, confidence: p.confidence, reason: p.reason, anchorA: p.anchorA, anchorB: p.anchorB }
         : { id: e.id, page: e.page, index: e.index, ok: false, why: r.why, reason: p.reason };
     });
-    return { rows, seconds, warnings, pagesA: A.pages.length, pagesB: B.pages.length };
+    details.seconds = seconds;
+    details.placed = rows.filter((r) => r.ok).length;
+    details.notPlaced = counts;
+    details.diagnosis = diagnose({ placed: details.placed, total: rows.length, sent, counts, attempts: details.attempts });
+    onEvent({ type: 'resolved', placed: details.placed, total: rows.length, diagnosis: details.diagnosis });
+    return { rows, seconds, warnings, details, pagesA: A.pages.length, pagesB: B.pages.length };
   } finally {
     await rm(work, { recursive: true, force: true });
   }
+}
+
+/** Por qué no se colocó nada (o casi): una causa probable en código para que el modal la explique. */
+export function diagnose({ placed, total, sent, counts, attempts }) {
+  if (placed === total) return null;
+  if (!sent.textsA) return 'no_text_a';
+  if (!sent.textsB) return 'no_text_b';
+  const last = attempts[attempts.length - 1];
+  if (last && (last.permissionDenials ?? 0) > 0 && placed === 0) return 'permission_denied';
+  if (counts.sin_respuesta === total) return 'no_valid_answer';
+  if (placed === 0 && (counts.ancla_A_no_encontrada ?? 0) + (counts.ancla_B_no_encontrada ?? 0) >= total / 2) return 'anchors_not_found';
+  if (placed === 0) return 'ai_found_nothing';
+  return 'partial';
 }
 export { findText };

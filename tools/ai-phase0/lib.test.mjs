@@ -50,3 +50,9 @@ test('score y summarize', () => {
   assert.deepEqual(s, { pageOk: true, err: 2 });
   assert.equal(summarize([{ resolved: { ok: true }, score: s }]).within2, 1);
 });
+
+test('parseJsonFromText con predicado salta listas ajenas como [1]', async () => {
+  const { looksLikeProposals } = await import('./lib.mjs');
+  const txt = 'He mirado [1] y [A-p1.png]. Resultado:\n[{"id":"p1-f1","found":false}]';
+  assert.deepEqual(parseJsonFromText(txt, looksLikeProposals), [{ id: 'p1-f1', found: false }]);
+});
