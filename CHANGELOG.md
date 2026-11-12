@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.8.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.1) - 2026-11-12
 ### Fixed
 - La compilación del `.deb` de la app de escritorio fallaba en la release por falta de la página del proyecto (`homepage`) en `desktop/package.json`; la CI de PR ahora genera también el `.deb` y el `.rpm`.
 ### Added
