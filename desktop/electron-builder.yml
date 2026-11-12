@@ -6,6 +6,7 @@ directories:
   output: ../release
 artifactName: PDF-Annotator-${version}-${os}-${arch}.${ext}
 asar: true
+icon: icon.png
 afterPack: desktop/after-pack.cjs
 extraResources:
   - from: ../dist/pdf-annotator/browser
@@ -25,6 +26,7 @@ publish:
   repo: pdf-annotator
   releaseType: draft
 win:
+  icon: icon.ico
   target:
     - target: nsis
       arch: [x64]
@@ -33,12 +35,15 @@ nsis:
   perMachine: false
   allowToChangeInstallationDirectory: true
 mac:
+  icon: icon.png
   category: public.app-category.productivity
   target:
     - dmg
     - zip
   notarize: false
 linux:
+  icon: icons
+  syncDesktopName: true
   category: Office
   target:
     - AppImage

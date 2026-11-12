@@ -186,6 +186,7 @@ function createWindow() {
     minHeight: 680,
     backgroundColor: '#1e1e2f',
     title: 'PDF Annotator',
+    icon: path.join(here, 'assets', 'icon.png'),
     webPreferences: { preload: path.join(here, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false },
   });
   win.webContents.setWindowOpenHandler(({ url }) => {
