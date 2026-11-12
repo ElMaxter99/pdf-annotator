@@ -17,8 +17,10 @@ const apiUrl = `http://127.0.0.1:${api.address().port}/latest`;
 const app = await electron.launch({
   args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', here],
   timeout: 60000,
-  env: { ...process.env, AI_HELPER_FAKE: '1', PDF_ANNOTATOR_RELEASE_API: apiUrl, },
+  env: { ...process.env, ELECTRON_ENABLE_LOGGING: '1', AI_HELPER_FAKE: '1', PDF_ANNOTATOR_RELEASE_API: apiUrl, },
 });
+app.process().on('exit', (code, signal) => console.error(`[electron] terminó: código ${code}, señal ${signal}`));
+app.on('window', (w) => console.log('[electron] ventana', w.url()));
 app.process().stderr?.on('data', (d) => process.stderr.write(`[electron] ${d}`));
 app.process().stdout?.on('data', (d) => process.stdout.write(`[electron] ${d}`));
 try {

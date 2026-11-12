@@ -61,4 +61,6 @@ jobs:
           retention-days: 7
 
       - name: Desktop app smoke test (Electron)
-        run: xvfb-run -a node desktop/smoke.mjs
+        run: |
+          node node_modules/electron/install.js
+          xvfb-run -a node desktop/smoke.mjs
