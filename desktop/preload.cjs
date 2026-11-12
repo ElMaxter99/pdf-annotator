@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('desktop', {
   isDesktop: true,
+  helperPort: ipcRenderer.sendSync('desktop:helper-port'),
   getUpdateState: () => ipcRenderer.invoke('desktop:update:get'),
   onUpdateState: (callback) => {
     const listener = (_event, state) => callback(state);

@@ -17,6 +17,8 @@ export interface DesktopUpdateState {
 /** Puente que expone `desktop/preload.cjs` en la app de escritorio (Electron). En la web no existe. */
 export interface DesktopBridge {
   isDesktop: true;
+  /** Puerto del ayudante de IA que lanza la app (4310 si estaba libre). */
+  helperPort?: number;
   getUpdateState(): Promise<DesktopUpdateState>;
   onUpdateState(callback: (state: DesktopUpdateState) => void): () => void;
   checkForUpdates(): Promise<void>;

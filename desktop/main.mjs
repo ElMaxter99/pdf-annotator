@@ -2,6 +2,7 @@
 import { app, BrowserWindow, ipcMain, net, protocol, session, shell, Menu } from 'electron';
 import electronUpdater from 'electron-updater';
 import { spawn } from 'node:child_process';
+import { createServer } from 'node:net';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -11,12 +12,24 @@ import { resolvePath } from './shell-path.mjs';
 const { autoUpdater } = electronUpdater;
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ORIGIN = 'app://pdf-annotator';
-const HELPER_PORT = 4310;
+const PREFERRED_PORT = 4310;
 const CHECK_EVERY_MS = 6 * 60 * 60 * 1000;
 
 const webRoot = process.env.PDF_ANNOTATOR_WEB || (app.isPackaged ? path.join(process.resourcesPath, 'web') : path.join(here, '..', 'dist', 'pdf-annotator', 'browser'));
 const toolsRoot = app.isPackaged ? path.join(process.resourcesPath, 'tools') : path.join(here, '..', 'tools');
 
+/** El puerto 4310 si está libre; si no (otro ayudante, otra app), uno libre que elige el sistema. */
+function freePort(port) {
+  return new Promise((resolve) => {
+    const probe = createServer();
+    probe.once('error', () => resolve(port === 0 ? 0 : freePort(0)));
+    probe.listen(port, '127.0.0.1', () => {
+      const { port: got } = probe.address();
+      probe.close(() => resolve(got));
+    });
+  });
+}
+const HELPER_PORT = await freePort(PREFERRED_PORT);
 const CSP = `default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self' blob: data: http://127.0.0.1:${HELPER_PORT}; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`;
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } }]);
@@ -132,6 +145,9 @@ function trusted(event) {
 }
 function setupIpc() {
   const handle = (channel, fn) => ipcMain.handle(channel, (event, ...args) => (trusted(event) ? fn(...args) : undefined));
+  ipcMain.on('desktop:helper-port', (event) => {
+    event.returnValue = HELPER_PORT;
+  });
   handle('desktop:update:get', () => state);
   handle('desktop:update:check', () => checkForUpdates());
   handle('desktop:update:download', async () => {

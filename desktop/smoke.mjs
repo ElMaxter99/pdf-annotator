@@ -31,9 +31,10 @@ try {
   assert.equal(await page.evaluate(() => typeof require), 'undefined', 'la web no tiene Node');
   // El ayudante arranca en paralelo a la ventana: se espera a que responda.
   const health = await page.evaluate(async () => {
+    const port = window.desktop.helperPort;
     for (let i = 0; i < 40; i++) {
       try {
-        return await (await fetch('http://127.0.0.1:4310/status')).json();
+        return await (await fetch(`http://127.0.0.1:${port}/status`)).json();
       } catch {
         await new Promise((r) => setTimeout(r, 500));
       }
