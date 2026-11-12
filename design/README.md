@@ -91,6 +91,7 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | IA-03 Pedir y revisar · 1650 | Opción del menú y franja de revisión con motivo y confianza por campo | [`IA-03-pedir-y-revisar-1650.dc.html`](canvas/IA-03-pedir-y-revisar-1650.dc.html) | `components/migration` (`ai-review`) | Aprobada, implementada |
 | IA-04 Estados de la petición | Privacidad, carga, errores, límite de suscripción y resultado parcial | [`IA-04-estados-de-la-peticion.dc.html`](canvas/IA-04-estados-de-la-peticion.dc.html) | `components/migration` (`ai-review`) | Aprobada, implementada |
 | IA-05 Pedir y revisar · 1280 y claro | IA-03 en 1280 px y tema claro | [`IA-05-1280-claro.dc.html`](canvas/IA-05-1280-claro.dc.html) | igual que IA-03 | Aprobada, implementada |
+| AC-01 Aviso de actualización (app de escritorio) | Tarjeta de aviso de nueva versión en la app de escritorio | [`AC-01-aviso-de-actualizacion.dc.html`](canvas/AC-01-aviso-de-actualizacion.dc.html) | `components/update-card`, `services/desktop-update.service.ts` | Aprobada, implementada |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 

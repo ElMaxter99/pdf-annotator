@@ -492,6 +492,13 @@
    "w": 1280,
    "h": 820,
    "title": "IA-05 Pedir y revisar · 1280 y claro"
+  },
+  "AC-01-aviso-de-actualizacion.dc.html": {
+   "x": 0,
+   "y": 42100,
+   "w": 1720,
+   "h": 1120,
+   "title": "AC-01 Aviso de actualización (app de escritorio)"
   }
  },
  "order": [
@@ -563,7 +570,8 @@
   "IA-02-conectar-la-ia-estados.dc.html",
   "IA-03-pedir-y-revisar-1650.dc.html",
   "IA-04-estados-de-la-peticion.dc.html",
-  "IA-05-1280-claro.dc.html"
+  "IA-05-1280-claro.dc.html",
+  "AC-01-aviso-de-actualizacion.dc.html"
  ],
  "notes": {
   "t0": {
@@ -681,6 +689,13 @@
    "x": 0,
    "y": 38800,
    "text": "Definitivo · IA en el lote con Claude o Copilot en local (implementado y fusionado en develop, PR #170)",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "g_Definitivo_13": {
+   "x": 0,
+   "y": 41800,
+   "text": "Definitivo · App de escritorio (Electron) y aviso de actualización (implementado y fusionado en develop, PR #175)",
    "kind": "title1",
    "maxW": 5400
   }
