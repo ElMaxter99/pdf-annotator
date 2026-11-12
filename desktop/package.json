@@ -1,0 +1,13 @@
+{
+  "name": "pdf-annotator-desktop",
+  "productName": "PDF Annotator",
+  "version": "1.7.0",
+  "description": "PDF Annotator: aplicación de escritorio con IA local",
+  "author": "AAmoros",
+  "license": "MIT",
+  "type": "module",
+  "main": "main.mjs",
+  "dependencies": {
+    "electron-updater": "6.8.11"
+  }
+}

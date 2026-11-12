@@ -896,5 +896,31 @@
       "send": "Send to {{provider}}"
     },
     "notice": "{{count}} fields proposed by the AI · B unchanged"
+  },
+  "update": {
+    "available": {
+      "title": "A new version is available",
+      "text": "PDF Annotator {{version}} · you have {{current}}",
+      "manual": "PDF Annotator {{version}} · you have {{current}}. On this system it is installed manually."
+    },
+    "now": "Update now",
+    "download": "Download {{version}}",
+    "later": "Later",
+    "notes": "What's new",
+    "downloading": "Downloading version {{version}}…",
+    "cancel": "Cancel",
+    "ready": {
+      "title": "Version {{version}} is ready to install",
+      "text": "Your session is saved and restored on restart. Export first anything you want to keep."
+    },
+    "restartNow": "Restart now",
+    "onQuit": "When I close the app",
+    "error": {
+      "title": "The update could not be downloaded",
+      "text": "Check your connection. Your version {{current}} keeps working."
+    },
+    "retry": "Try again",
+    "close": "Close",
+    "pending": "Version {{version}} available"
   }
 }

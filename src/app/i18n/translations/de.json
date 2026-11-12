@@ -896,5 +896,31 @@
       "send": "An {{provider}} senden"
     },
     "notice": "{{count}} Felder von der KI vorgeschlagen · B unverändert"
+  },
+  "update": {
+    "available": {
+      "title": "Eine neue Version ist verfügbar",
+      "text": "PDF Annotator {{version}} · Sie haben {{current}}",
+      "manual": "PDF Annotator {{version}} · Sie haben {{current}}. Auf diesem System wird manuell installiert."
+    },
+    "now": "Jetzt aktualisieren",
+    "download": "{{version}} herunterladen",
+    "later": "Später",
+    "notes": "Neuigkeiten",
+    "downloading": "Version {{version}} wird heruntergeladen …",
+    "cancel": "Abbrechen",
+    "ready": {
+      "title": "Version {{version}} ist installationsbereit",
+      "text": "Ihre Sitzung wird gespeichert und nach dem Neustart wiederhergestellt. Exportieren Sie vorher, was Sie behalten möchten."
+    },
+    "restartNow": "Jetzt neu starten",
+    "onQuit": "Beim Schließen der App",
+    "error": {
+      "title": "Das Update konnte nicht heruntergeladen werden",
+      "text": "Prüfen Sie Ihre Verbindung. Ihre Version {{current}} funktioniert weiter."
+    },
+    "retry": "Erneut versuchen",
+    "close": "Schließen",
+    "pending": "Version {{version}} verfügbar"
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { AiResult, parseNdjson } from '../utils/ai-proposal.utils';
+import { getDesktopBridge } from './desktop-update.service';
 
 export type AiProvider = 'claude' | 'copilot' | 'fake';
 export type AiConnection = 'unknown' | 'checking' | 'offline' | 'noCli' | 'ready';
@@ -116,7 +117,7 @@ export class AiHelperService {
    * calling 127.0.0.1 makes Chrome ask for «local network access», so there it waits for an explicit click.
    */
   checkIfLocal(): void {
-    if (this.connection() === 'unknown' && isLocalOrigin()) {
+    if (this.connection() === 'unknown' && (isLocalOrigin() || getDesktopBridge() !== null)) {
       void this.check();
     }
   }

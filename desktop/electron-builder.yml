@@ -1,0 +1,47 @@
+# Empaquetado de la app de escritorio. `npm run desktop:pack` (instalador del sistema actual) y .github/workflows/desktop-release.yml.
+appId: com.elmaxter99.pdf-annotator
+productName: PDF Annotator
+electronVersion: 45.3.1
+directories:
+  output: ../release
+artifactName: PDF-Annotator-${version}-${os}-${arch}.${ext}
+asar: true
+afterPack: desktop/after-pack.cjs
+extraResources:
+  - from: ../dist/pdf-annotator/browser
+    to: web
+  - from: ../tools/ai-helper
+    to: tools/ai-helper
+  - from: ../tools/ai-phase0
+    to: tools/ai-phase0
+    filter:
+      - '**/*'
+      - '!sample/**'
+      - '!out/**'
+      - '!pairs/**'
+publish:
+  provider: github
+  owner: ElMaxter99
+  repo: pdf-annotator
+  releaseType: draft
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+mac:
+  category: public.app-category.productivity
+  target:
+    - dmg
+    - zip
+  notarize: false
+linux:
+  category: Office
+  target:
+    - AppImage
+    - deb
+    - rpm
+  maintainer: AAmoros

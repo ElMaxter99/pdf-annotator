@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>AC-01 Aviso de actualización</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.p{width:1720px;height:1120px;position:relative;overflow:hidden;background:#1e1e2f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;font-size:15px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.p h1,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5eead4;font-weight:600}
+.cap{color:#b0b0b0;font-size:14px;line-height:1.45}
+.wlab{display:flex;flex-direction:column;gap:2px;font-size:14px}.wlab span{color:#b0b0b0;font-size:13px}
+.row3{display:flex;gap:20px;align-items:flex-start}
+.win{position:relative;border-radius:14px;overflow:hidden;background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.wh{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+.lg{width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--ink);display:grid;place-items:center;font-size:11px}
+.sp{flex-grow:1}
+.gh{font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--text);white-space:nowrap}
+.ell{position:relative;font-size:18px;border:1px solid var(--line);border-radius:999px;width:32px;height:28px;display:inline-flex;align-items:center;justify-content:center}
+.dotb{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--panel)}.dotb.s{position:static;display:inline-block;margin-right:8px;border:0}
+.wb{padding:14px;display:flex;justify-content:center}.pgx{width:150px;height:190px;background:#fff;border-radius:4px;opacity:.9;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.upd{position:absolute;right:14px;bottom:14px;width:370px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:8px;font-size:14px;animation:up .22s ease-out}
+.upd.e{border-left-color:var(--danger)}
+.uh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.us{color:var(--muted);font-size:13px;line-height:1.4}.us i{font-style:normal;color:var(--text);font-weight:700}
+.ua{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{font-weight:700;border-radius:999px;padding:6px 14px;background:var(--accent);color:var(--ink);font-size:13px}
+.lk{font-size:13px;color:var(--accent);font-weight:600;text-decoration:underline}
+.x{width:24px;height:24px;border-radius:999px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.mn{position:absolute;right:12px;top:42px;width:290px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:13px}
+.mi{padding:7px 10px;border-radius:8px;display:flex;align-items:center}.mi.on{background:var(--soft);font-weight:700;outline:2px solid var(--accent)}.mi.mut{color:var(--muted)}
+.card{background:#2a2a3d;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;flex:1}
+ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;color:#b0b0b0;font-size:14px;line-height:1.45}
+.stp{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.stp span{background:rgba(255,255,255,.06);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600}.stp b{color:#5eead4}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="p">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">AC-01 · Propuesta · pendiente de aprobar</span><h1 style="font-size:26px;font-weight:600">Aviso de actualización en la app de escritorio</h1><p class="cap" style="max-width:1450px">Solo existe en la app instalada (Electron); en la web no aparece. Es una tarjeta pequeña abajo a la derecha, nunca bloquea el trabajo y se puede dejar para más tarde.</p></div>
+<div class="stp"><span><b>1</b> Al abrir y cada 6 h se consulta GitHub</span>›<span><b>2</b> Aparece la tarjeta (1.5.0 → 1.6.0)</span>›<span><b>3</b> «Actualizar ahora» descarga con progreso</span>›<span><b>4</b> «Reiniciar ahora» instala y reabre</span></div>
+<div class="row3"><div style="display:flex;flex-direction:column;gap:8px"><div class="wlab"><b>1 · Hay una versión nueva</b><span>Botón principal, «Más tarde» y enlace a las notas de la release</span></div><div class="win" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f;width:520px;height:300px"><div class="wh"><b class="lg">PA</b><span class="sp"></span><span class="gh">Atajos</span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="upd" role="status"><div class="uh"><b>Hay una versión nueva</b><span class="x" title="Más tarde">✕</span></div><div class="us">PDF Annotator <i>1.6.0</i> · tienes la 1.5.0</div><div class="ua"><span class="btn s">Actualizar ahora</span><span class="gh">Más tarde</span><span class="lk">Qué hay de nuevo ↗</span></div></div></div></div><div style="display:flex;flex-direction:column;gap:8px"><div class="wlab"><b>2 · Descargando</b><span>Barra con porcentaje y tamaño; se puede cancelar</span></div><div class="win" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f;width:520px;height:300px"><div class="wh"><b class="lg">PA</b><span class="sp"></span><span class="gh">Atajos</span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="upd"><div class="uh"><b>Descargando la versión 1.6.0…</b></div><div class="bar"><i style="width:42%"></i></div><div class="us">42 % · 38 de 92 MB</div><div class="ua"><span class="gh">Cancelar</span></div></div></div></div><div style="display:flex;flex-direction:column;gap:8px"><div class="wlab"><b>3 · Lista para instalar</b><span>Reiniciar ahora o al cerrar la app; la sesión no se pierde</span></div><div class="win" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f;width:520px;height:300px"><div class="wh"><b class="lg">PA</b><span class="sp"></span><span class="gh">Atajos</span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="upd"><div class="uh"><b>Versión 1.6.0 lista para instalar</b></div><div class="us">Tu sesión se guarda y se recupera al reiniciar. Exporta antes lo que quieras conservar.</div><div class="ua"><span class="btn s">Reiniciar ahora</span><span class="gh">Al cerrar la app</span></div></div></div></div></div>
+<div class="row3"><div style="display:flex;flex-direction:column;gap:8px"><div class="wlab"><b>4 · Error al descargar</b><span>Mensaje claro, reintentar; la versión instalada sigue funcionando</span></div><div class="win" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f;width:520px;height:300px"><div class="wh"><b class="lg">PA</b><span class="sp"></span><span class="gh">Atajos</span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="upd e"><div class="uh"><b>No se pudo descargar la actualización</b><span class="x">✕</span></div><div class="us">Revisa tu conexión. Tu versión 1.5.0 sigue funcionando.</div><div class="ua"><span class="btn s">Reintentar</span><span class="gh">Cerrar</span></div></div></div></div><div style="display:flex;flex-direction:column;gap:8px"><div class="wlab"><b>5 · Instalación manual</b><span>macOS sin firma y .deb/.rpm: el botón abre la página de descargas</span></div><div class="win" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f;width:520px;height:300px"><div class="wh"><b class="lg">PA</b><span class="sp"></span><span class="gh">Atajos</span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="upd"><div class="uh"><b>Hay una versión nueva</b><span class="x">✕</span></div><div class="us">PDF Annotator <i>1.6.0</i> · tienes la 1.5.0. En este sistema se instala a mano.</div><div class="ua"><span class="btn s">Descargar 1.6.0 ↗</span><span class="gh">Más tarde</span></div></div></div></div><div style="display:flex;flex-direction:column;gap:8px"><div class="wlab"><b>6 · Después de «Más tarde»</b><span>Punto en el menú ⋯: recupera la tarjeta cuando quieras</span></div><div class="win" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f;width:520px;height:300px"><div class="wh"><b class="lg">PA</b><span class="sp"></span><span class="gh">Atajos</span><span class="ell">⋯<span class="dotb"></span></span></div><div class="wb"><div class="pgx"></div></div><div class="mn"><div class="mi">Atajos de teclado</div><div class="mi">Tema</div><div class="mi">Idioma</div><div class="mi on"><span class="dotb s"></span>Versión 1.6.0 disponible · Actualizar</div><div class="mi mut">PDF Annotator 1.5.0</div></div></div></div></div>
+<div class="row3"><div style="display:flex;flex-direction:column;gap:8px"><div class="wlab"><b>7 · Tema claro</b><span>Mismo aviso con los tokens del tema claro</span></div><div class="win" style="--bg:#f3f4f8;--panel:#ffffff;--accent:#0f766e;--danger:#b91c1c;--text:#1e1e2f;--muted:#55556a;--ink:#ffffff;--line:rgba(0,0,0,.16);--soft:rgba(0,0,0,.05);--warn:#92600a;--inset:#e9ebf1;width:520px;height:300px"><div class="wh"><b class="lg">PA</b><span class="sp"></span><span class="gh">Atajos</span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="upd" role="status"><div class="uh"><b>Hay una versión nueva</b><span class="x" title="Más tarde">✕</span></div><div class="us">PDF Annotator <i>1.6.0</i> · tienes la 1.5.0</div><div class="ua"><span class="btn s">Actualizar ahora</span><span class="gh">Más tarde</span><span class="lk">Qué hay de nuevo ↗</span></div></div></div></div>
+<div class="card"><span class="lab">Comportamiento</span><ul class="l"><li>«Más tarde» oculta la tarjeta hasta el próximo arranque; el punto del menú ⋯ sigue.</li><li>Sin conexión o sin versión nueva no se muestra nada.</li><li>Las prereleases y borradores no avisan.</li><li>Al reiniciar se recupera la última sesión (PDF y anotaciones).</li></ul></div>
+<div class="card"><span class="lab">Accesibilidad y textos</span><ul class="l"><li>Botones reales con foco visible; la tarjeta se anuncia con role=status y no roba el foco.</li><li>Animación de 220 ms con ease-out; sin ella con prefers-reduced-motion.</li><li>Textos en los 7 idiomas. Revisar a 1650 y 1280 px.</li></ul></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

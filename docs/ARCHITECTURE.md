@@ -98,5 +98,8 @@ Shell `.app--workspace`: grid `header / sidebar+viewer / footer`, `100dvh`, scro
 - `nginx.conf`: CSP, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `server_tokens off`.
 - Sin backend: el PDF nunca sale del navegador.
 
+## 10b. App de escritorio (Electron)
+`desktop/` (paquete propio con `electron-updater`; la versión se copia de `package.json` con `scripts/sync-desktop-version.mjs`). `main.mjs` sirve `dist/pdf-annotator/browser` con el protocolo `app://pdf-annotator` (fallback SPA a `index.csr.html`, misma CSP que `nginx.conf` más `connect-src` al ayudante), lanza `tools/ai-helper/server.mjs` con `ELECTRON_RUN_AS_NODE=1` (puerto 4310, origen `app://pdf-annotator`, PATH del shell de login para encontrar `claude`/`copilot`) y gestiona las actualizaciones. `preload.cjs` expone solo `window.desktop` (ventana con `contextIsolation` y `sandbox`). En la web, `services/desktop-update.service.ts` + `components/update-card` (diseño AC-01) pintan el aviso; `update-logic.mjs` (puro, con tests) decide versión y modo (`auto`: Windows NSIS y AppImage; `manual`: macOS sin firma y deb/rpm). `after-pack.cjs` copia las `node_modules` del ayudante porque `extraResources` no las incluye. Pruebas: `npm run test:desktop` y `node desktop/smoke.mjs` (Electron real con xvfb en Linux). Releases: `.github/workflows/desktop-release.yml`. Variables de prueba: `PDF_ANNOTATOR_RELEASE_API` y `PDF_ANNOTATOR_UPDATE_URL` (feed alternativo).
+
 ## 11. Deuda técnica y hoja de ruta
 Ver [`ROADMAP.md`](ROADMAP.md). Pendiente principal: dividir `workspace.page.ts` (render del PDF, miniaturas y sincronización del JSON).

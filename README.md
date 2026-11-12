@@ -194,6 +194,13 @@ En PowerShell es igual. La primera vez instala las dependencias del ayudante (`t
 
 Detalle técnico y pruebas de calidad: [`docs/IA-LOCAL.md`](docs/IA-LOCAL.md) y [`tools/ai-phase0/README.md`](tools/ai-phase0/README.md).
 
+## 🖥️ App de escritorio (Windows, macOS y Linux)
+Con la app instalada la IA local funciona sin abrir ninguna terminal: arranca sola el ayudante (sigues necesitando `claude` o `copilot` instalado y con sesión iniciada). Descarga el instalador de tu sistema desde [Releases](https://github.com/ElMaxter99/pdf-annotator/releases): `.exe` (Windows), `.dmg` (macOS), `.AppImage`, `.deb` o `.rpm` (Linux).
+
+- **Sin firmar:** Windows muestra SmartScreen («Más información → Ejecutar de todas formas») y macOS pide abrirla con clic derecho → Abrir (si dice «dañada», `xattr -cr "/Applications/PDF Annotator.app"`).
+- **Actualizaciones:** al abrir y cada 6 h comprueba si hay una versión nueva y muestra un aviso con «Actualizar ahora» / «Más tarde». Windows y AppImage se actualizan solos; en macOS y con `.deb`/`.rpm` el botón abre la página de descargas.
+- **Desarrollo:** `npm run start:desktop` (abre la app con el build) y `npm run desktop:pack` (instalador de tu sistema en `release/`). Versiones: se publican al empujar una etiqueta `vX.Y.Z` (`desktop-release.yml`, release en borrador).
+
 ## ⌨️ Atajos de teclado
 Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 

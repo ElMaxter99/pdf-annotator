@@ -896,5 +896,31 @@
       "send": "Envoyer à {{provider}}"
     },
     "notice": "{{count}} champs proposés par l'IA · B inchangé"
+  },
+  "update": {
+    "available": {
+      "title": "Une nouvelle version est disponible",
+      "text": "PDF Annotator {{version}} · vous avez la {{current}}",
+      "manual": "PDF Annotator {{version}} · vous avez la {{current}}. Sur ce système, l'installation est manuelle."
+    },
+    "now": "Mettre à jour",
+    "download": "Télécharger la {{version}}",
+    "later": "Plus tard",
+    "notes": "Nouveautés",
+    "downloading": "Téléchargement de la version {{version}}…",
+    "cancel": "Annuler",
+    "ready": {
+      "title": "Version {{version}} prête à installer",
+      "text": "Votre session est enregistrée et restaurée au redémarrage. Exportez d'abord ce que vous voulez conserver."
+    },
+    "restartNow": "Redémarrer",
+    "onQuit": "À la fermeture",
+    "error": {
+      "title": "Impossible de télécharger la mise à jour",
+      "text": "Vérifiez votre connexion. Votre version {{current}} continue de fonctionner."
+    },
+    "retry": "Réessayer",
+    "close": "Fermer",
+    "pending": "Version {{version}} disponible"
   }
 }
