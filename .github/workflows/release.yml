@@ -1,0 +1,74 @@
+name: Release
+
+# «Run workflow» (Actions → Release → rama develop) hace el release completo a partir de la versión que ya
+# esté fusionada en develop: alinea develop y master, crea release/vX.Y.Z y la etiqueta, compila los
+# instaladores, pone las notas del CHANGELOG y deja la release en BORRADOR. Publicarla (lo que activa el
+# aviso de actualización de las apps) es un clic tuyo, salvo que marques «publish».
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Solo comprobar y contar qué haría; no sube nada
+        type: boolean
+        default: false
+      publish:
+        description: Publicar la release al terminar (por defecto se queda en borrador)
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+      - name: Identidad de git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - id: version
+        run: echo "tag=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Simulacro
+        if: ${{ inputs.dry_run }}
+        run: node scripts/release.mjs --dry-run
+      - name: Alinear ramas, crear rama release y etiqueta
+        if: ${{ !inputs.dry_run }}
+        run: node scripts/release.mjs --yes
+
+  installers:
+    needs: tag
+    if: ${{ !inputs.dry_run }}
+    uses: ./.github/workflows/desktop-release.yml
+    with:
+      tag: ${{ needs.tag.outputs.tag }}
+      publish: ${{ inputs.publish }}
+
+  # Opcional: solo se ejecuta si existe el secreto VERCEL_DEPLOY_HOOK_URL (Deploy Hook de la rama master).
+  web:
+    needs: tag
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Desplegar la web en Vercel
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "Sin VERCEL_DEPLOY_HOOK_URL: despliegue web a mano (o por la integración Git de Vercel)."; exit 0; fi
+          curl -fsS -X POST "$HOOK"
