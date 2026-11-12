@@ -55,6 +55,8 @@ Instálala como app del sistema y la **IA local funciona sin abrir ninguna termi
 | 🍎 **macOS** | [**Descargar `.dmg`**](https://github.com/ElMaxter99/pdf-annotator/releases/latest) (`arm64` para Apple Silicon, `x64` para Intel) | El aviso abre la descarga |
 | 🐧 **Linux** | [**Descargar `.AppImage`, `.deb` o `.rpm`**](https://github.com/ElMaxter99/pdf-annotator/releases/latest) | AppImage sola; `.deb`/`.rpm` con descarga manual |
 
+**📖 Guías paso a paso (con qué archivo elegir, avisos del sistema y actualizaciones):** [Cómo instalar en Windows](docs/INSTALAR.md#windows) · [en macOS](docs/INSTALAR.md#macos) · [en Linux](docs/INSTALAR.md#linux). En Linux solo hay paquetes **x86_64** (no ARM).
+
 > Mientras no haya una release con instaladores publicada, esa página no los tendrá todavía. La app sigue funcionando en el navegador. Detalles, avisos del sistema (instaladores sin firmar) y desarrollo: [App de escritorio](#%EF%B8%8F-app-de-escritorio-windows-macos-y-linux).
 
 ---

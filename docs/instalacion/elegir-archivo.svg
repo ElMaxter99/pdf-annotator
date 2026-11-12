@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" font-family="system-ui,Segoe UI,Arial,sans-serif" font-size="15">
+  <title>Esquema ilustrativo: qué archivo descargar</title>
+  <rect width="760" height="330" rx="14" fill="#f7f5f0"/>
+  <text x="380" y="30" text-anchor="middle" font-weight="700" font-size="17" fill="#2b2a27">¿Qué archivo descargo? (esquema ilustrativo, no es una captura)</text>
+  <g fill="#fff" stroke="#c9c4b8" stroke-width="1.5">
+    <rect x="20" y="55" width="220" height="250" rx="10"/><rect x="270" y="55" width="220" height="250" rx="10"/><rect x="520" y="55" width="220" height="250" rx="10"/>
+  </g>
+  <g fill="#2b2a27" font-weight="700" text-anchor="middle"><text x="130" y="85">Windows</text><text x="380" y="85">macOS</text><text x="630" y="85">Linux (solo x86_64)</text></g>
+  <g fill="#4a4740" text-anchor="middle">
+    <text x="130" y="130">PDF-Annotator-…-win-x64.exe</text><text x="130" y="165" font-size="13">Un único archivo para todos</text>
+    <text x="380" y="125">Apple Silicon (M1…M4):</text><text x="380" y="148" font-weight="700">…-mac-arm64.dmg</text>
+    <text x="380" y="185">Mac con Intel:</text><text x="380" y="208" font-weight="700">…-mac-x64.dmg</text>
+    <text x="380" y="245" font-size="13"> → Menú  › Acerca de este Mac</text>
+    <text x="630" y="125">Debian, Ubuntu, Mint:</text><text x="630" y="146" font-weight="700">….deb</text>
+    <text x="630" y="178">Fedora, openSUSE, RHEL:</text><text x="630" y="199" font-weight="700">….rpm</text>
+    <text x="630" y="231">Cualquier otra distro:</text><text x="630" y="252" font-weight="700">….AppImage</text>
+    <text x="630" y="287" font-size="13">No hay paquete ARM</text>
+  </g>
+</svg>
