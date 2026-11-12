@@ -8,15 +8,17 @@ export const AI_BATCH_BREAKER = 2;
 
 export type AiBatchPhase =
   | 'queued'
+  | 'adjusting'
   | 'reading'
   | 'asking'
   | 'resolving'
   | 'ready'
+  | 'free'
   | 'partial'
   | 'failed'
   | 'cancelled';
 
-export const AI_BATCH_ACTIVE_PHASES: readonly AiBatchPhase[] = ['reading', 'asking', 'resolving'];
+export const AI_BATCH_ACTIVE_PHASES: readonly AiBatchPhase[] = ['adjusting', 'reading', 'asking', 'resolving'];
 
 export function countTemplateFields(item: Pick<BatchItem, 'aPages'>): number {
   return item.aPages.reduce((n, page) => n + (Array.isArray(page.fields) ? page.fields.length : 0), 0);

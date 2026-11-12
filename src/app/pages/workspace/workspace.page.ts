@@ -265,7 +265,9 @@ const ADJUST_UI = {
 /** Informative notices of the batch bar that can be closed (and found again in the bell). */
 export interface AiSession {
   phase: 'loading' | 'ready' | 'empty' | 'error';
-  provider: AiProvider;
+  provider: AiProvider | 'adjust';
+  /** Proposal saved by the batch queue (not asked for here): accepting or discarding it also clears the saved copy. */
+  saved?: { at: number } | null;
   stage: 'reading' | 'asking' | 'resolving';
   startedAt: number;
   rows: AiRow[];
@@ -1853,6 +1855,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       console.error('No se pudieron generar las miniaturas del documento.', error),
     );
     this.fileDropActive.set(false);
+    if (this.batch.activeItem()?.aiProposal) {
+      await this.loadSavedAi();
+    }
   }
 
   private rendering = false;
@@ -4050,6 +4055,78 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  /** Opens the proposal that the batch queue saved for this PDF, ready to review (nothing is asked again). */
+  private async loadSavedAi(): Promise<void> {
+    const item = this.batch.activeItem();
+    const saved = item?.aiProposal;
+    if (!item || !saved || !item.bPdf || !this.migration()) {
+      return;
+    }
+    this.cancelAi();
+    const template = this.normalizedTemplateA();
+    this.aiTemplate = new Map();
+    for (const page of template) {
+      page.fields.forEach((field, i) => this.aiTemplate.set(`p${page.num}-f${i + 1}`, field));
+    }
+    const rows = saved.rows.filter((row) => this.aiTemplate.has(row.id));
+    if (!rows.length) {
+      this.batch.setAiProposal(item.id, undefined);
+      return;
+    }
+    this.ai.set({
+      phase: 'ready',
+      provider: saved.provider === 'copilot' || saved.provider === 'fake' || saved.provider === 'adjust' ? saved.provider : 'claude',
+      saved: { at: saved.at },
+      stage: 'resolving',
+      startedAt: saved.at,
+      rows: [...rows],
+      overrides: {},
+      view: 'proposal',
+      open: rows.some((row) => !row.ok),
+      seconds: saved.seconds,
+      error: null,
+      sent: saved.details?.sent ?? null,
+      attempt: 1,
+      stageLog: [],
+      stepLog: [],
+      usage: null,
+      details: saved.details,
+      detailsOpen: false,
+      endedAt: saved.at,
+    });
+    this.reopenNotice('ai');
+    if (this.referenceMode() !== 'split') {
+      this.aiPreviousMode = this.referenceMode();
+      await this.setReferenceMode('split');
+    }
+    this.redrawAllForPage();
+  }
+
+  /** Drops the proposal saved by the queue for this PDF and closes the review. */
+  discardAi(): void {
+    const id = this.batch.activeItem()?.id;
+    this.cancelAi();
+    if (id) {
+      this.batch.setAiProposal(id, undefined);
+    }
+  }
+
+  /** Other PDFs of the batch whose AI proposal is waiting for review. */
+  readonly aiPendingOthers = computed(
+    () => this.batch.items().filter((item) => item.aiProposal && item.id !== this.batch.activeId()).length,
+  );
+
+  /** Jumps to the next PDF (after this one, wrapping around) that has a proposal waiting. */
+  async goNextWithProposal(): Promise<void> {
+    const items = this.batch.items();
+    const at = items.findIndex((item) => item.id === this.batch.activeId());
+    const ordered = [...items.slice(at + 1), ...items.slice(0, Math.max(0, at))];
+    const target = ordered.find((item) => item.aiProposal);
+    if (target) {
+      await this.switchBatchItem(target);
+    }
+  }
+
   /** After an error: the same request again, or the same one with the other provider. */
   async retryAi(provider?: AiProvider): Promise<void> {
     if (provider) {
@@ -4135,7 +4212,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     this.insertFields(toAdd);
     const count = toAdd.length;
+    const savedFor = session.saved ? this.batch.activeItem()?.id : undefined;
     this.cancelAi();
+    if (savedFor) {
+      this.batch.setAiProposal(savedFor, undefined);
+    }
     this.toast.show(this.translationService.translate('toast.batch.aiApplied', { count, moved }));
   }
 
@@ -4607,7 +4688,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!target) {
       return;
     }
+    await this.switchBatchItem(target);
+  }
+
+  private async switchBatchItem(target: BatchItem): Promise<void> {
     this.flushBatchSave();
+    this.cancelAi();
     this.batch.activate(target.id);
     this.clearSelection();
     void this.router.navigate(['/workspace'], {

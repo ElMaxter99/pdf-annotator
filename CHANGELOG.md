@@ -1,6 +1,6 @@
 ## Unreleased
 ### Added
-- Motor de «Trasladar con IA» sobre el lote, sin interfaz todavía (plan en `design/propuestas/traslado-masivo-ia.md`): cola en serie (`AiBatchService`) con pausa, cancelación, reanudar y reintento manual de los fallidos; estados por PDF; parada de toda la cola al llegar al límite de uso o fallar dos veces seguidas lo mismo; tope de 10 peticiones por pasada con Copilot; estimación previa de pares, campos y peticiones (`utils/ai-batch.utils.ts`). La propuesta de cada PDF se guarda en el lote (`BatchItem.aiProposal`, saneada al leerla) y nunca se aplica sola.
+- **«Trasladar con IA» sobre todo el lote** (plan en `design/propuestas/traslado-masivo-ia.md`, diseños IA-09 a IA-13): botón en el panel con menú (todos / solo los fallidos), confirmación con estimación de pares, campos, peticiones y privacidad, y cola en serie con progreso por fila, pausa, cancelar uno o todos y reintento de los fallidos. Primero intenta el ajuste por textos sin gastar IA (solo si ambos PDF tienen las mismas páginas y tamaño y el desplazamiento es uniforme); si no, pregunta a la IA. Se detiene al llegar al límite de uso, tras dos fallos seguidos iguales o a las 10 peticiones con Copilot (y espera «Continuar»). Cada resultado es una **propuesta guardada** en el lote (`BatchItem.aiProposal`, saneada al leerla) que se revisa PDF por PDF en el editor («Pendientes de revisar», «Siguiente con propuesta»); nunca se aplica en bloque ni «Listo» se marca solo.
 
 ## [v1.8.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.2) - 2026-11-12
 ### Added

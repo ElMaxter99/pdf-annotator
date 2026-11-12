@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import type { BatchItem } from '../models/batch.model';
 import {
   AI_BATCH_ACTIVE_PHASES,
   AI_BATCH_BREAKER,
@@ -8,8 +9,10 @@ import {
   isEligibleForAiBatch,
 } from '../utils/ai-batch.utils';
 import { AiUsage, sumUsage } from '../utils/ai-proposal.utils';
+import { cascadeAdjust } from '../utils/adjust-cascade.utils';
 import { AiHelperService, AiRequestError } from './ai-helper.service';
 import { BatchStoreService } from './batch-store.service';
+import { PdfTextService } from './pdf-text.service';
 
 export interface AiBatchRow {
   id: string;
@@ -43,6 +46,7 @@ export type AiBatchStart = 'started' | 'nothing' | 'busy' | 'not_ready' | 'no_co
 export class AiBatchService {
   private readonly ai = inject(AiHelperService);
   private readonly batch = inject(BatchStoreService);
+  private readonly texts = inject(PdfTextService);
 
   readonly rows = signal<Record<string, AiBatchRow>>({});
   readonly run = signal<AiBatchRun>('idle');
@@ -60,7 +64,7 @@ export class AiBatchService {
       total: all.length,
       queued: n('queued'),
       active: all.filter((row) => AI_BATCH_ACTIVE_PHASES.includes(row.phase)).length,
-      done: n('ready', 'partial'),
+      done: n('ready', 'free', 'partial'),
       failed: n('failed'),
       cancelled: n('cancelled'),
     };
@@ -71,11 +75,12 @@ export class AiBatchService {
   private abort: AbortController | null = null;
   private generation = 0;
   private pauseRequested = false;
+  private cascade = false;
   private sentInWindow = 0;
   private streak: { kind: string; n: number } = { kind: '', n: 0 };
 
   /** Starts a new run over `ids` (default: every eligible pair). Pairs without B or without fields are skipped. */
-  start(ids?: readonly string[]): AiBatchStart {
+  start(ids?: readonly string[], options: { cascade?: boolean } = {}): AiBatchStart {
     if (this.run() === 'running') {
       return 'busy';
     }
@@ -92,6 +97,7 @@ export class AiBatchService {
     if (!pairs.length) {
       return 'nothing';
     }
+    this.cascade = options.cascade === true;
     this.order.set(pairs.map((item) => item.id));
     this.rows.set(Object.fromEntries(pairs.map((item) => [item.id, emptyRow(item.id)])));
     this.requests.set(0);
@@ -134,6 +140,11 @@ export class AiBatchService {
       ),
     );
     this.run.set(this.order().length ? 'done' : 'idle');
+  }
+
+  /** Aborts only the pair in progress («Cancelar este»); the queue goes on with the next one. */
+  skipCurrent(): void {
+    this.abort?.abort();
   }
 
   /** Manual retry of what failed or was cancelled; never automatic. */
@@ -207,6 +218,31 @@ export class AiBatchService {
   }
 
   /** Runs one pair; returns what the queue must do next when it has to stop. */
+  /** Text-based adjustment first: free, and enough when every field has a confident position. */
+  private async solveWithoutAi(
+    id: string,
+    aPdf: Blob,
+    bPdf: Blob,
+    aPages: BatchItem['aPages'],
+    generation: number,
+  ): Promise<boolean> {
+    this.patchRow(id, { phase: 'adjusting', attempt: 1, startedAt: Date.now(), endedAt: null, error: null });
+    const [a, b] = await Promise.all([this.texts.read(aPdf), this.texts.read(bPdf)]);
+    if (generation !== this.generation) {
+      return true;
+    }
+    if (!a || !b) {
+      return false;
+    }
+    const result = cascadeAdjust(aPages, a, b);
+    if (!result.solved) {
+      return false;
+    }
+    this.batch.setAiProposal(id, { rows: result.rows, details: null, provider: 'adjust', model: null, seconds: 0, at: Date.now() });
+    this.patchRow(id, { phase: 'free', endedAt: Date.now(), placed: result.rows.length, total: result.rows.length });
+    return true;
+  }
+
   private async solve(id: string, generation: number): Promise<{ stop?: AiBatchPause } | null> {
     const item = this.batch.find(id);
     if (!item?.bPdf || !isEligibleForAiBatch(item)) {
@@ -215,6 +251,12 @@ export class AiBatchService {
     }
     const abort = new AbortController();
     this.abort = abort;
+    if (this.cascade && (await this.solveWithoutAi(id, item.aPdf, item.bPdf, item.aPages, generation))) {
+      return null;
+    }
+    if (generation !== this.generation) {
+      return null;
+    }
     this.sentInWindow += 1;
     this.requests.update((n) => n + 1);
     this.patchRow(id, { phase: 'reading', attempt: 1, startedAt: Date.now(), endedAt: null, error: null });

@@ -708,6 +708,95 @@
       "loaded": "carregades",
       "remove": "Treu",
       "applied": "Dades de prova carregades: s'usaran en editar cada PDF del lot."
+    },
+    "ai": {
+      "button": "Traslladar amb IA",
+      "menu": {
+        "all": "Traslladar-los tots ({{count}})",
+        "allHint": "Els que tenen versió B i plantilla A amb camps",
+        "failed": "Només els que han fallat ({{count}})",
+        "skipped": "S'ometen {{count}} PDF sense versió B",
+        "skippedHint": "Puja'n la B des de la tira «Versions noves (B)»"
+      },
+      "confirm": {
+        "title": "Traslladar amb IA · {{count}} PDF",
+        "pairs": "parelles",
+        "fields": "camps",
+        "skipped": "sense B (s'ometen)",
+        "requests": "peticions",
+        "cap": "topall per passada",
+        "retries": "reintents",
+        "estimateClaude": "Consum estimat: de {{min}} a {{max}} peticions ({{max}} si cal reintentar). Amb Claude el consum real es mesura i es veu en directe.",
+        "noMeasure": "Consum no mesurable. Copilot no informa dels crèdits en el mode de l'ajudant: es mostra el nombre de peticions, no crèdits. Cada petició descompta segons el model triat.",
+        "cascade": "Provar abans amb «Ajustar per textos»",
+        "cascadeHint": "Gratuït. La IA només s'usa en els PDF on quedin camps sense col·locar.",
+        "capNote": "Si hi ha més de {{cap}} parelles, la cua s'atura en arribar a {{cap}} i espera el teu «Continuar». Sense reintents automàtics.",
+        "privacy": "Els PDF A i B de cada parella s'envien al teu {{provider}} local, un a un. Res s'aplica sol: revises tu cada proposta.",
+        "remember": "No tornar a preguntar",
+        "start": "Traslladar {{count}} PDF",
+        "cancel": "Cancel·lar",
+        "provider": "Proveïdor"
+      },
+      "connect": {
+        "offline": "No trobo l'ajudant local. Arrenca «npm run start:ia» o obre l'app d'escriptori i torna a comprovar.",
+        "noCli": "L'ajudant no troba «{{provider}}» al PATH.",
+        "recheck": "Tornar a comprovar"
+      },
+      "running": "Traslladant amb IA · {{done}} de {{total}}",
+      "elapsed": "Temps {{time}}",
+      "tokens": "{{count}} tokens · mesurat",
+      "requests": "Peticions enviades: {{sent}} · consum no mesurable",
+      "pause": "Pausar",
+      "pausing": "Pausant en acabar aquest PDF…",
+      "cancel": "Cancel·lar",
+      "skipOne": "Cancel·la aquest",
+      "resume": "Continuar",
+      "state": {
+        "col": "Trasllat amb IA",
+        "queued": "A la cua",
+        "adjusting": "Ajustant per textos",
+        "reading": "Llegint",
+        "asking": "Preguntant · intent {{n}}",
+        "resolving": "Col·locant",
+        "ready": "Llesta per revisar · {{placed}} de {{total}}",
+        "free": "Resolt sense IA · {{placed}} de {{total}}",
+        "partial": "Parcial · {{placed}} de {{total}}",
+        "failed": "Ha fallat",
+        "cancelled": "Cancel·lat",
+        "saved": "Proposta llesta per revisar",
+        "noB": "Sense B · s'omet"
+      },
+      "err": {
+        "images_not_read": "La IA no ha llegit les imatges",
+        "timeout": "Temps esgotat",
+        "cli_error": "Error del CLI",
+        "generic": "No s'ha pogut traslladar",
+        "nothing": "La IA no ha col·locat cap camp"
+      },
+      "paused": {
+        "limit": "Has arribat al límit del teu pla de Claude. La cua està en pausa i {{count}} PDF continuen esperant (no compten com a fallits).",
+        "reset": "Es renova a les {{reset}}.",
+        "breaker": "S'ha aturat després de dos errors seguits ({{code}}). Ho he parat per no gastar més; comprova que el CLI respon i continua.",
+        "cap": "{{sent}} peticions enviades. La cua s'atura aquí per protegir els teus crèdits de Copilot; en queden {{count}} en espera.",
+        "fatal": "No trobo l'ajudant o el CLI. La cua està en pausa; els {{count}} PDF pendents continuen a la cua.",
+        "user": "En pausa. Queden {{count}} PDF a la cua."
+      },
+      "done": {
+        "title": "Acabat en {{time}}",
+        "note": "Encara no s'ha aplicat res: revisa cada proposta.",
+        "review": "{{count}} per revisar",
+        "free": "{{count}} sense IA",
+        "partial": "{{count}} parcial(s)",
+        "failed": "{{count}} han fallat",
+        "first": "Revisar el primer →",
+        "retry": "Reintentar els que han fallat",
+        "close": "Tancar"
+      },
+      "review": "Revisar proposta",
+      "toast": {
+        "busy": "Ja hi ha una passada d'IA en marxa.",
+        "nothing": "No hi ha PDF amb versió B i plantilla A per traslladar."
+      }
     }
   },
   "preview": {
@@ -885,7 +974,12 @@
       "notPlaced": "sense col·locar",
       "anchor": "ancoratge «{{text}}»",
       "goto": "Anar a la pàgina",
-      "listHint": "Els de confiança baixa o sense col·locar no s'apliquen fins que els marquis."
+      "listHint": "Els de confiança baixa o sense col·locar no s'apliquen fins que els marquis.",
+      "saved": "Proposta desada · {{provider}}",
+      "adjustProvider": "Ajust per textos",
+      "discard": "Descartar la proposta",
+      "pending": "Pendents de revisar: {{count}}",
+      "nextWithProposal": "Següent amb proposta ›"
     },
     "confidence": {
       "high": "Alta",

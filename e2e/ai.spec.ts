@@ -135,3 +135,71 @@ test('the retry option is remembered and off by default for Copilot', async ({ p
   const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.retry'));
   expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: true, copilot: false, fake: false });
 });
+
+// ---- «Trasladar con IA» sobre todo el lote -----------------------------------------------------
+
+/** Panel with one pair (0331 + shifted B) and one PDF without B. */
+async function openPanelWithPair(page: Page) {
+  await stubAnalytics(page);
+  await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.provider', 'fake'));
+  await page.goto('/landing');
+  await page
+    .locator('input[type=file]')
+    .setInputFiles([file('factura-0331.pdf', pdf, 'application/pdf'), file('factura-0332.pdf', pdf, 'application/pdf')]);
+  await page.waitForURL('**/lote');
+  await page.getByTestId('next-templates').click();
+  await page.getByTestId('input-templates').setInputFiles(file('factura-0331.json', json, 'application/json'));
+  await page.getByTestId('open-panel').click();
+  await page.getByTestId('view-list').click();
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(file('factura-0331-nuevo.pdf', await shiftedPdf(20, -30), 'application/pdf'));
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+}
+
+test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revisión PDF a PDF', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('ai-batch-button').click();
+  await expect(page.getByTestId('ai-batch-menu')).toContainText('1'); // «Trasladar todos (1)»
+  await page.getByTestId('ai-batch-all').click();
+  await expect(page.getByTestId('ai-batch-dialog')).toBeVisible();
+  await expect(page.getByTestId('ai-batch-estimate')).toContainText('1');
+  await page.getByTestId('ai-batch-cascade').uncheck(); // fuerza el camino de la IA
+  await page.getByTestId('ai-batch-start').click();
+
+  await expect(page.getByTestId('ai-batch-summary')).toBeVisible({ timeout: 30000 });
+  await expect(page.getByTestId('ai-chip-ready')).toBeVisible();
+  // nothing is applied by itself
+  await page.getByTestId('ai-batch-review-first').click();
+  await page.waitForURL('**/workspace?lote=*');
+  await expect(page.getByTestId('ai-review')).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId('ai-saved')).toBeVisible();
+  await expect(page.locator('.annotation')).toHaveCount(0);
+  await page.getByTestId('ai-apply').click();
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+  // accepted: the saved copy is gone, going back to the panel shows no proposal to review
+  await page.goBack();
+  await page.waitForURL('**/lote');
+  await expect(page.getByTestId('ai-review-proposal')).toHaveCount(0);
+});
+
+test('«Trasladar con IA» en lote: el ajuste por textos resuelve sin gastar una petición', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('ai-batch-button').click();
+  await page.getByTestId('ai-batch-all').click();
+  await expect(page.getByTestId('ai-batch-cascade')).toBeChecked();
+  await page.getByTestId('ai-batch-start').click();
+  await expect(page.getByTestId('ai-batch-summary')).toBeVisible({ timeout: 30000 });
+  await expect(page.getByTestId('ai-chip-free')).toBeVisible();
+});
+
+test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.route('http://127.0.0.1:4310/**', (route) => route.abort());
+  await page.getByTestId('ai-batch-button').click();
+  await page.getByTestId('ai-batch-all').click();
+  await expect(page.getByTestId('ai-batch-offline')).toBeVisible();
+  await expect(page.getByTestId('ai-batch-start')).toBeDisabled();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('ai-batch-dialog')).toHaveCount(0);
+});

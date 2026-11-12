@@ -708,6 +708,95 @@
       "loaded": "geladen",
       "remove": "Entfernen",
       "applied": "Testdaten geladen: sie werden beim Bearbeiten jedes PDFs im Stapel verwendet."
+    },
+    "ai": {
+      "button": "Mit KI übertragen",
+      "menu": {
+        "all": "Alle übertragen ({{count}})",
+        "allHint": "Die mit Version B und Vorlage A mit Feldern",
+        "failed": "Nur die fehlgeschlagenen ({{count}})",
+        "skipped": "{{count}} PDFs ohne Version B werden übersprungen",
+        "skippedHint": "Lade ihre B über den Streifen „Neue Versionen (B)“ hoch"
+      },
+      "confirm": {
+        "title": "Mit KI übertragen · {{count}} PDFs",
+        "pairs": "Paare",
+        "fields": "Felder",
+        "skipped": "ohne B (übersprungen)",
+        "requests": "Anfragen",
+        "cap": "Limit pro Durchlauf",
+        "retries": "Wiederholungen",
+        "estimateClaude": "Geschätzter Verbrauch: {{min}} bis {{max}} Anfragen ({{max}}, falls Wiederholungen nötig sind). Bei Claude wird der echte Verbrauch gemessen und live angezeigt.",
+        "noMeasure": "Verbrauch nicht messbar. Copilot meldet im Helfer-Modus keine Credits: Angezeigt wird die Anzahl der Anfragen, nicht die Credits. Jede Anfrage wird je nach gewähltem Modell abgerechnet.",
+        "cascade": "Zuerst «Nach Texten anpassen» versuchen",
+        "cascadeHint": "Kostenlos. Die KI wird nur bei PDFs genutzt, in denen Felder nicht platziert werden konnten.",
+        "capNote": "Bei mehr als {{cap}} Paaren hält die Warteschlange bei {{cap}} an und wartet auf dein «Fortfahren». Keine automatischen Wiederholungen.",
+        "privacy": "Die PDFs A und B jedes Paars werden einzeln an dein lokales {{provider}} gesendet. Nichts wird automatisch angewendet: Du prüfst jeden Vorschlag selbst.",
+        "remember": "Nicht mehr fragen",
+        "start": "{{count}} PDFs übertragen",
+        "cancel": "Abbrechen",
+        "provider": "Anbieter"
+      },
+      "connect": {
+        "offline": "Der lokale Helfer wurde nicht gefunden. Starte «npm run start:ia» oder öffne die Desktop-App und prüfe erneut.",
+        "noCli": "Der Helfer findet «{{provider}}» nicht im PATH.",
+        "recheck": "Erneut prüfen"
+      },
+      "running": "Übertragung mit KI · {{done}} von {{total}}",
+      "elapsed": "Zeit {{time}}",
+      "tokens": "{{count}} Tokens · gemessen",
+      "requests": "Gesendete Anfragen: {{sent}} · Verbrauch nicht messbar",
+      "pause": "Pausieren",
+      "pausing": "Pause nach diesem PDF…",
+      "cancel": "Abbrechen",
+      "skipOne": "Dieses abbrechen",
+      "resume": "Fortfahren",
+      "state": {
+        "col": "KI-Übertragung",
+        "queued": "In Warteschlange",
+        "adjusting": "Anpassung nach Texten",
+        "reading": "Lesen",
+        "asking": "Anfrage · Versuch {{n}}",
+        "resolving": "Platzieren",
+        "ready": "Bereit zur Prüfung · {{placed}} von {{total}}",
+        "free": "Ohne KI gelöst · {{placed}} von {{total}}",
+        "partial": "Teilweise · {{placed}} von {{total}}",
+        "failed": "Fehlgeschlagen",
+        "cancelled": "Abgebrochen",
+        "saved": "Vorschlag zur Prüfung bereit",
+        "noB": "Ohne B · übersprungen"
+      },
+      "err": {
+        "images_not_read": "Die KI hat die Bilder nicht gelesen",
+        "timeout": "Zeitüberschreitung",
+        "cli_error": "CLI-Fehler",
+        "generic": "Übertragung nicht möglich",
+        "nothing": "Die KI hat kein Feld platziert"
+      },
+      "paused": {
+        "limit": "Du hast das Limit deines Claude-Tarifs erreicht. Die Warteschlange pausiert und {{count}} PDFs warten noch (sie zählen nicht als fehlgeschlagen).",
+        "reset": "Es wird um {{reset}} erneuert.",
+        "breaker": "Nach zwei Fehlern in Folge angehalten ({{code}}). Pausiert, um nicht weiter zu verbrauchen; prüfe, ob die CLI antwortet, und mache weiter.",
+        "cap": "{{sent}} Anfragen gesendet. Die Warteschlange hält hier an, um deine Copilot-Credits zu schützen; {{count}} warten.",
+        "fatal": "Helfer oder CLI nicht gefunden. Die Warteschlange pausiert; die {{count}} offenen PDFs bleiben in der Warteschlange.",
+        "user": "Pausiert. {{count}} PDFs in der Warteschlange."
+      },
+      "done": {
+        "title": "Fertig in {{time}}",
+        "note": "Noch wurde nichts angewendet: Prüfe jeden Vorschlag.",
+        "review": "{{count}} zu prüfen",
+        "free": "{{count}} ohne KI",
+        "partial": "{{count}} teilweise",
+        "failed": "{{count}} fehlgeschlagen",
+        "first": "Ersten prüfen →",
+        "retry": "Fehlgeschlagene wiederholen",
+        "close": "Schließen"
+      },
+      "review": "Vorschlag prüfen",
+      "toast": {
+        "busy": "Es läuft bereits ein KI-Durchlauf.",
+        "nothing": "Es gibt keine PDFs mit Version B und Vorlage A zum Übertragen."
+      }
     }
   },
   "preview": {
@@ -885,7 +974,12 @@
       "notPlaced": "nicht platziert",
       "anchor": "Anker „{{text}}“",
       "goto": "Zur Seite",
-      "listHint": "Felder mit niedriger Zuverlässigkeit oder ohne Platz werden erst angewendet, wenn du sie ankreuzt."
+      "listHint": "Felder mit niedriger Zuverlässigkeit oder ohne Platz werden erst angewendet, wenn du sie ankreuzt.",
+      "saved": "Gespeicherter Vorschlag · {{provider}}",
+      "adjustProvider": "Textanpassung",
+      "discard": "Vorschlag verwerfen",
+      "pending": "Zu prüfen: {{count}}",
+      "nextWithProposal": "Nächster mit Vorschlag ›"
     },
     "confidence": {
       "high": "Hoch",

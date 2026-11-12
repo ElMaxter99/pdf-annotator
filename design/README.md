@@ -45,11 +45,11 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | P-08 Tamaño de PDF y almacenamiento | Peso por PDF, límite y uso del navegador | [`P-08-peso-almacenamiento.dc.html`](canvas/P-08-peso-almacenamiento.dc.html) | nueva página | Propuesta, pendiente de aprobación |
 | P-09 Cierre y descarga | ZIP o sueltos, progreso «26 de 80», lote terminado | [`P-09-cierre-descarga.dc.html`](canvas/P-09-cierre-descarga.dc.html) | nueva página | Propuesta, pendiente de aprobación |
 | P-10 Comparar claro | P-05 en tema claro | [`P-10-comparar-lado-a-lado-claro.dc.html`](canvas/P-10-comparar-lado-a-lado-claro.dc.html) | `viewer` | Propuesta, pendiente de aprobación |
-| IA-09 Trasladar con IA en lote · flujo y estimación | Botón en el panel, menú, confirmación con Claude y con Copilot | — (lienzo, zona Propuestas) | `pages/batch`, `components/migration` | Propuesta, pendiente de aprobación |
-| IA-10 La cola en marcha | Estados por fila, tiempo y consumo (lista y cuadrícula) | — (lienzo, zona Propuestas) | `pages/batch` | Propuesta, pendiente de aprobación |
-| IA-11 Paradas, fallos y final | Límite, fallos seguidos, tope de Copilot, interrupción, final | — (lienzo, zona Propuestas) | `pages/batch` | Propuesta, pendiente de aprobación |
-| IA-12 Revisar una propuesta guardada | Editor con la propuesta cargada, sin aplicar en bloque | — (lienzo, zona Propuestas) | `components/migration` | Propuesta, pendiente de aprobación |
-| IA-13 La cola · 1280 y claro | IA-10 a 1280 px en tema claro | — (lienzo, zona Propuestas) | `pages/batch` | Propuesta, pendiente de aprobación |
+| IA-09 Trasladar con IA en lote · flujo y estimación | Botón en el panel, menú, confirmación con Claude y con Copilot | — (lienzo, zona Propuestas) | `pages/batch`, `components/migration` | Aprobada, implementada |
+| IA-10 La cola en marcha | Estados por fila, tiempo y consumo (lista y cuadrícula) | — (lienzo, zona Propuestas) | `pages/batch` | Aprobada, implementada |
+| IA-11 Paradas, fallos y final | Límite, fallos seguidos, tope de Copilot, interrupción, final | — (lienzo, zona Propuestas) | `pages/batch` | Aprobada, implementada |
+| IA-12 Revisar una propuesta guardada | Editor con la propuesta cargada, sin aplicar en bloque | — (lienzo, zona Propuestas) | `components/migration` | Aprobada, implementada |
+| IA-13 La cola · 1280 y claro | IA-10 a 1280 px en tema claro | — (lienzo, zona Propuestas) | `pages/batch` | Aprobada, implementada |
 | L-01 Flujo general | Una sola entrada: 1 PDF = editor tradicional, 2 o más = pasos, panel y editor | [`L-01-flujo-general.dc.html`](canvas/L-01-flujo-general.dc.html) | — | Aprobado (documento) |
 | L-02 Primera vista | Landing: la cantidad de PDFs decide el flujo | [`L-02-primera-vista.dc.html`](canvas/L-02-primera-vista.dc.html) | `pages/landing` | Aprobado, implementado |
 | L-03 Paso 1 · Subir PDF | Lista con ✕ por archivo y archivos no válidos | [`L-03-paso-1-subir-pdf.dc.html`](canvas/L-03-paso-1-subir-pdf.dc.html) | `pages/batch` | Aprobado, implementado |

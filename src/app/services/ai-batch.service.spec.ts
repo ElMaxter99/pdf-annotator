@@ -4,6 +4,7 @@ import type { AiResult, AiRow } from '../utils/ai-proposal.utils';
 import { AiBatchService } from './ai-batch.service';
 import { AiHelperService, AiRequestError } from './ai-helper.service';
 import { BatchStoreService } from './batch-store.service';
+import { PdfTextService } from './pdf-text.service';
 
 const row = (id: string, ok: boolean): AiRow => ({
   id,
@@ -58,6 +59,7 @@ describe('AiBatchService', () => {
   let service: AiBatchService;
   let batch: BatchStoreService;
   let ids: string[];
+  let texts: { read: (blob: Blob) => Promise<unknown> };
 
   const pause = () => new Promise((resolve) => setTimeout(resolve, 0));
   const finished = async () => {
@@ -68,7 +70,13 @@ describe('AiBatchService', () => {
 
   beforeEach(() => {
     helper = new FakeHelper();
-    TestBed.configureTestingModule({ providers: [{ provide: AiHelperService, useValue: helper }] });
+    texts = { read: async () => null };
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: AiHelperService, useValue: helper },
+        { provide: PdfTextService, useValue: texts },
+      ],
+    });
     service = TestBed.inject(AiBatchService);
     batch = TestBed.inject(BatchStoreService);
     ids = [];
@@ -169,5 +177,30 @@ describe('AiBatchService', () => {
     expect(service.run()).toBe('done');
     expect(service.rows()[ids[1]].phase).toBe('cancelled');
     expect(service.rows()[ids[3]].phase).toBe('cancelled');
+  });
+
+  it('with the cascade on, a pair solved by the text adjustment costs no request', async () => {
+    const page = (dy: number) => ({
+      texts: [[
+        { text: 'Nombre completo', x: 100, y: 710 + dy },
+        { text: 'Domicilio fiscal', x: 100, y: 650 + dy },
+        { text: 'Teléfono móvil', x: 100, y: 610 + dy },
+      ]],
+      sizes: [{ w: 595, h: 842 }],
+    });
+    let calls = 0;
+    texts.read = async () => page(calls++ % 2 === 0 ? 0 : -20);
+    const item = batch.add({
+      name: 'solo.pdf',
+      aPdf: new Blob(['a']),
+      aPages: [{ num: 1, fields: [{ mapField: 'x', x: 100, y: 700 } as never, { mapField: 'y', x: 100, y: 600 } as never] }],
+    });
+    batch.setB(item.id, new File(['b'], 'solo-b.pdf'));
+    expect(service.start([item.id], { cascade: true })).toBe('started');
+    await finished();
+    expect(service.rows()[item.id].phase).toBe('free');
+    expect(helper.calls).toBe(0);
+    expect(service.requests()).toBe(0);
+    expect(batch.find(item.id)?.aiProposal?.provider).toBe('adjust');
   });
 });

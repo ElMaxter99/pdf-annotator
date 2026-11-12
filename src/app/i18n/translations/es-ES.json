@@ -708,6 +708,95 @@
       "loaded": "cargados",
       "remove": "Quitar",
       "applied": "Datos de prueba cargados: se usarán al editar cada PDF del lote."
+    },
+    "ai": {
+      "button": "Trasladar con IA",
+      "menu": {
+        "all": "Trasladar todos ({{count}})",
+        "allHint": "Los que tienen versión B y plantilla A con campos",
+        "failed": "Solo los que fallaron ({{count}})",
+        "skipped": "{{count}} PDFs sin versión B se omiten",
+        "skippedHint": "Sube su B desde la tira «Versiones nuevas (B)»"
+      },
+      "confirm": {
+        "title": "Trasladar con IA · {{count}} PDFs",
+        "pairs": "pares",
+        "fields": "campos",
+        "skipped": "sin B (se omiten)",
+        "requests": "peticiones",
+        "cap": "tope por pasada",
+        "retries": "reintentos",
+        "estimateClaude": "Consumo estimado: de {{min}} a {{max}} peticiones ({{max}} si hace falta reintentar). Con Claude el consumo real se mide y se ve en vivo.",
+        "noMeasure": "Consumo no medible. Copilot no informa de los créditos en el modo del ayudante: se muestra el número de peticiones, no créditos. Cada petición descuenta según el modelo elegido.",
+        "cascade": "Probar antes con «Ajustar por textos»",
+        "cascadeHint": "Gratis. La IA solo se usa en los PDFs donde queden campos sin colocar.",
+        "capNote": "Si hay más de {{cap}} pares, la cola se para al llegar a {{cap}} y espera tu «Continuar». Sin reintentos automáticos.",
+        "privacy": "Se envían los PDF A y B de cada par a tu {{provider}} local, uno a uno. Nada se aplica solo: cada propuesta la revisas tú.",
+        "remember": "No volver a preguntar",
+        "start": "Trasladar {{count}} PDFs",
+        "cancel": "Cancelar",
+        "provider": "Proveedor"
+      },
+      "connect": {
+        "offline": "No encuentro el ayudante local. Arranca «npm run start:ia» o abre la app de escritorio y vuelve a comprobar.",
+        "noCli": "El ayudante no encuentra «{{provider}}» en el PATH.",
+        "recheck": "Comprobar de nuevo"
+      },
+      "running": "Trasladando con IA · {{done}} de {{total}}",
+      "elapsed": "Tiempo {{time}}",
+      "tokens": "{{count}} tokens · medido",
+      "requests": "Peticiones enviadas: {{sent}} · consumo no medible",
+      "pause": "Pausar",
+      "pausing": "Pausando al acabar este PDF…",
+      "cancel": "Cancelar",
+      "skipOne": "Cancelar este",
+      "resume": "Continuar",
+      "state": {
+        "col": "Traslado con IA",
+        "queued": "En cola",
+        "adjusting": "Ajustando por textos",
+        "reading": "Leyendo",
+        "asking": "Preguntando · intento {{n}}",
+        "resolving": "Colocando",
+        "ready": "Lista para revisar · {{placed}} de {{total}}",
+        "free": "Resuelto sin IA · {{placed}} de {{total}}",
+        "partial": "Parcial · {{placed}} de {{total}}",
+        "failed": "Falló",
+        "cancelled": "Cancelado",
+        "saved": "Propuesta lista para revisar",
+        "noB": "Sin B · se omite"
+      },
+      "err": {
+        "images_not_read": "La IA no leyó las imágenes",
+        "timeout": "Tiempo agotado",
+        "cli_error": "Error del CLI",
+        "generic": "No se pudo trasladar",
+        "nothing": "La IA no colocó ningún campo"
+      },
+      "paused": {
+        "limit": "Has llegado al límite de tu plan de Claude. La cola está en pausa y {{count}} PDFs siguen esperando (no cuentan como fallidos).",
+        "reset": "Se renueva a las {{reset}}.",
+        "breaker": "Se detuvo tras dos fallos seguidos ({{code}}). He parado para no seguir gastando; comprueba que el CLI responde y continúa.",
+        "cap": "{{sent}} peticiones enviadas. La cola se para aquí para proteger tus créditos de Copilot; quedan {{count}} en espera.",
+        "fatal": "No encuentro el ayudante o el CLI. La cola está en pausa; los {{count}} PDFs pendientes siguen en cola.",
+        "user": "En pausa. Quedan {{count}} PDFs en cola."
+      },
+      "done": {
+        "title": "Terminado en {{time}}",
+        "note": "Nada se ha aplicado todavía: revisa cada propuesta.",
+        "review": "{{count}} para revisar",
+        "free": "{{count}} sin IA",
+        "partial": "{{count}} parcial(es)",
+        "failed": "{{count}} fallaron",
+        "first": "Revisar el primero →",
+        "retry": "Reintentar los que fallaron",
+        "close": "Cerrar"
+      },
+      "review": "Revisar propuesta",
+      "toast": {
+        "busy": "Ya hay una pasada de IA en marcha.",
+        "nothing": "No hay PDFs con versión B y plantilla A para trasladar."
+      }
     }
   },
   "preview": {
@@ -885,7 +974,12 @@
       "notPlaced": "sin colocar",
       "anchor": "ancla «{{text}}»",
       "goto": "Ir a la página",
-      "listHint": "Los de confianza baja o sin colocar no se aplican hasta que los marques."
+      "listHint": "Los de confianza baja o sin colocar no se aplican hasta que los marques.",
+      "saved": "Propuesta guardada · {{provider}}",
+      "adjustProvider": "Ajuste por textos",
+      "discard": "Descartar la propuesta",
+      "pending": "Pendientes de revisar: {{count}}",
+      "nextWithProposal": "Siguiente con propuesta ›"
     },
     "confidence": {
       "high": "Alta",

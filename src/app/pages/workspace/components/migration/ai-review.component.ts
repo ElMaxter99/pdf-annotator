@@ -61,7 +61,13 @@ export class AiReviewComponent {
 
   providerName(): string {
     const provider = this.vm.ai()?.provider;
-    return provider === 'copilot' ? 'Copilot' : provider === 'fake' ? 'Simulado' : 'Claude';
+    return provider === 'adjust'
+      ? this.i18n.translate('ai.review.adjustProvider')
+      : provider === 'copilot'
+        ? 'Copilot'
+        : provider === 'fake'
+          ? 'Simulado'
+          : 'Claude';
   }
 
   seconds(): number {

@@ -24,6 +24,10 @@
       <span class="migration-bar__count" data-testid="batch-position">{{ 'batch.editor.position' | t: { index: ctx.index + 1, total: ctx.total } }}</span>
       <button type="button" class="btn btn--ghost" [disabled]="ctx.index === ctx.total - 1" (click)="vm.goBatchItem(1)" [attr.aria-label]="'batch.editor.next' | t" data-testid="batch-next">›</button>
     </div>
+    @if (vm.aiPendingOthers() > 0) {
+      <span class="migration-bar__count" data-testid="ai-pending">{{ 'ai.review.pending' | t: { count: vm.aiPendingOthers() } }}</span>
+      <button type="button" class="btn btn--ghost" (click)="vm.goNextWithProposal()" data-testid="ai-next-proposal">{{ 'ai.review.nextWithProposal' | t }}</button>
+    }
     <span class="migration-bar__spacer"></span>
 
     @if (vm.migration(); as m) {
