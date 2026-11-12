@@ -32,7 +32,7 @@ jobs:
         run: npm install --no-fund --no-audit
 
       - name: Install AI helper dependencies
-        run: npm ci --no-fund --no-audit --prefix tools/ai-phase0
+        run: npm install --no-fund --no-audit --prefix tools/ai-phase0
 
       - name: AI helper tests
         run: npm test --prefix tools/ai-phase0
