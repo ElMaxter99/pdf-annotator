@@ -499,6 +499,27 @@
    "w": 1720,
    "h": 1120,
    "title": "AC-01 Aviso de actualización (app de escritorio)"
+  },
+  "IA-06-ver-detalles-en-vivo.dc.html": {
+   "x": 0,
+   "y": 43800,
+   "w": 1720,
+   "h": 980,
+   "title": "IA-06 Ver detalles de la IA · en vivo (Claude)"
+  },
+  "IA-07-ver-detalles-sin-cambios.dc.html": {
+   "x": 1800,
+   "y": 43800,
+   "w": 1720,
+   "h": 980,
+   "title": "IA-07 Ver detalles · resultado «sin cambios» y diagnóstico"
+  },
+  "IA-08-ver-detalles-copilot-claro.dc.html": {
+   "x": 0,
+   "y": 44900,
+   "w": 1280,
+   "h": 780,
+   "title": "IA-08 Ver detalles con Copilot · 1280 y claro"
   }
  },
  "order": [
@@ -571,7 +592,10 @@
   "IA-03-pedir-y-revisar-1650.dc.html",
   "IA-04-estados-de-la-peticion.dc.html",
   "IA-05-1280-claro.dc.html",
-  "AC-01-aviso-de-actualizacion.dc.html"
+  "AC-01-aviso-de-actualizacion.dc.html",
+  "IA-06-ver-detalles-en-vivo.dc.html",
+  "IA-07-ver-detalles-sin-cambios.dc.html",
+  "IA-08-ver-detalles-copilot-claro.dc.html"
  ],
  "notes": {
   "t0": {
@@ -696,6 +720,13 @@
    "x": 0,
    "y": 41800,
    "text": "Definitivo · App de escritorio (Electron) y aviso de actualización (implementado y fusionado en develop, PR #175)",
+   "kind": "title1",
+   "maxW": 5400
+  },
+  "g_Definitivo_14": {
+   "x": 0,
+   "y": 43500,
+   "text": "Definitivo · Ver detalles y consumo de la IA (implementado y fusionado en develop, PR #186)",
    "kind": "title1",
    "maxW": 5400
   }

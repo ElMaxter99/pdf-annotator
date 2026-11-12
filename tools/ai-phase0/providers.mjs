@@ -7,16 +7,63 @@ import path from 'node:path';
 const INSTRUCTION = 'Lee el archivo prompt.md de esta carpeta y sigue sus instrucciones. Responde solo con el JSON pedido.';
 const win = process.platform === 'win32';
 
+/** Con stream-json, la línea del evento final `{"type":"result",…}`; con json normal, todo el texto. */
+export function finalResultLine(stdout) {
+  const lines = String(stdout ?? '').trim().split('\n');
+  if (lines.length > 1) {
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (!lines[i].includes('"type":"result"')) continue;
+      try {
+        if (JSON.parse(lines[i])?.type === 'result') return lines[i];
+      } catch {
+        // línea que no es el evento final
+      }
+    }
+  }
+  return String(stdout ?? '');
+}
+
+/** Un evento de stream-json de Claude → paso legible para la persona (o null si no aporta). Nunca incluye contenido de los PDF. */
+export function describeClaudeEvent(line) {
+  let j;
+  try {
+    j = JSON.parse(line);
+  } catch {
+    return null;
+  }
+  if (j?.type === 'assistant') {
+    const out = [];
+    for (const c of j.message?.content ?? []) {
+      if (c.type === 'tool_use') out.push({ kind: 'read', file: String(c.input?.file_path ?? '').split(/[\\/]/).pop().slice(0, 60), tool: String(c.name).slice(0, 30) });
+      else if (c.type === 'text' && c.text) out.push({ kind: 'answer', chars: c.text.length });
+    }
+    const u = j.message?.usage;
+    return { id: typeof j.message?.id === 'string' ? j.message.id : null, steps: out, usage: u ? { input: u.input_tokens ?? 0, output: u.output_tokens ?? 0, cacheRead: u.cache_read_input_tokens ?? 0, cacheWrite: u.cache_creation_input_tokens ?? 0 } : null };
+  }
+  return null;
+}
+
+/** Uso total de la ejecución: `modelUsage` suma todos los turnos; `usage` puede reflejar solo el último. */
+export function totalUsage(j) {
+  const models = j?.modelUsage && typeof j.modelUsage === 'object' ? Object.values(j.modelUsage) : [];
+  if (models.length) {
+    const sum = (k) => models.reduce((n, m) => n + (Number(m?.[k]) || 0), 0);
+    return { input_tokens: sum('inputTokens'), output_tokens: sum('outputTokens'), cache_read_input_tokens: sum('cacheReadInputTokens'), cache_creation_input_tokens: sum('cacheCreationInputTokens') };
+  }
+  return j?.usage;
+}
+
 export const PROVIDERS = {
   claude: {
     label: 'Claude Code (claude -p)',
     cmd: 'claude',
-    args: (opts = {}) => ['-p', INSTRUCTION, '--output-format', 'json', '--allowedTools', 'Read', ...(opts.model ? ['--model', opts.model] : [])],
-    // Con --output-format json el texto de la respuesta viene en `result`.
+    // `opts.stream` (ayudante de la app): stream-json emite un evento por línea (pasos, lecturas, uso) para verlo en vivo.
+    args: (opts = {}) => ['-p', INSTRUCTION, '--output-format', opts.stream ? 'stream-json' : 'json', ...(opts.stream ? ['--verbose'] : []), '--allowedTools', 'Read', ...(opts.model ? ['--model', opts.model] : [])],
+    // Con --output-format json el texto de la respuesta viene en `result`; con stream-json, en el último evento `result`.
     extract(stdout) {
       try {
-        const j = JSON.parse(stdout);
-        return { text: typeof j.result === 'string' ? j.result : stdout, meta: { costUsd: j.total_cost_usd, turns: j.num_turns, usage: j.usage, isError: j.is_error === true } };
+        const j = JSON.parse(finalResultLine(stdout));
+        return { text: typeof j.result === 'string' ? j.result : stdout, meta: { costUsd: j.total_cost_usd, turns: j.num_turns, usage: totalUsage(j), isError: j.is_error === true, permissionDenials: Array.isArray(j.permission_denials) ? j.permission_denials.length : 0, stopReason: j.stop_reason ?? j.subtype ?? null } };
       } catch {
         return { text: stdout, meta: {} };
       }
@@ -96,7 +143,15 @@ export function runCli(name, cwd, opts = {}) {
       if (opts.signal.aborted) onAbort();
       else opts.signal.addEventListener('abort', onAbort, { once: true });
     }
-    child.stdout.on('data', (d) => (stdout += d));
+    let lineBuf = '';
+    child.stdout.on('data', (d) => {
+      stdout += d;
+      if (!opts.onLine) return;
+      lineBuf += d;
+      const lines = lineBuf.split('\n');
+      lineBuf = lines.pop() ?? '';
+      for (const l of lines) if (l.trim()) opts.onLine(l);
+    });
     child.stderr.on('data', (d) => (stderr += d));
     const done = (res) => {
       clearTimeout(timer);
@@ -106,6 +161,8 @@ export function runCli(name, cwd, opts = {}) {
     };
     child.on('error', (e) => done({ ok: false, seconds: 0, stdout, stderr: String(e.message), code: -1 }));
     child.on('close', (code) => {
+      if (opts.onLine && lineBuf.trim()) opts.onLine(lineBuf);
+      lineBuf = '';
       const seconds = Math.round((Date.now() - started) / 100) / 10;
       if (aborted) {
         done({ ok: false, seconds, stdout, stderr, code: -3, aborted: true });
