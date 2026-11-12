@@ -35,3 +35,7 @@ Crea `pairs/<nombre>/` con `A.pdf`, `A.json` (plantilla de A), `B.pdf` y, para m
 
 ## Qué mide
 Campos resueltos, página acertada, error mediano en puntos y cuántos quedan a ≤2 pt y ≤5 pt, ausentes bien detectados, segundos y avisos de formato. Cómo funciona: la IA elige un texto ancla en A y su equivalente en B (con página); el código calcula `x,y = ancla B + (campo A − ancla A) + corrección` con las posiciones de pdf.js.
+
+## Todos los PDF en una sola carpeta
+
+`npm run sample:flat` copia los PDF de `sample/<caso>/` a `sample-plano/` con nombres distintos (`A-<caso>.pdf`, `B-<caso>.pdf`), para subirlos de una vez al lote de la app en pruebas manuales. `sample/` no cambia.

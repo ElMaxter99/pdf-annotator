@@ -5,6 +5,7 @@
   "description": "Fase 0: prueba de calidad de la propuesta de coordenadas A→B con IA (Claude Code y Copilot CLI). No forma parte de la app.",
   "scripts": {
     "sample": "node make-samples.mjs",
+    "sample:flat": "node flatten-samples.mjs",
     "test": "node --test",
     "run": "node run.mjs"
   },
