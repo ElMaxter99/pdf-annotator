@@ -1,11 +1,12 @@
 <header class="header">
   <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
-    <div class="toolbar__identity">
-      <img class="toolbar__logo" src="/logo.svg" [attr.alt]="'Logotipo de ' + vm.appName" />
+    <a class="toolbar__identity toolbar__home" routerLink="/landing"
+      [attr.aria-label]="vm.appName + ' · ' + ('controls.home' | t)" [attr.title]="'controls.home' | t">
+      <img class="toolbar__logo" src="/logo.svg" alt="" />
       <div class="toolbar__brand-text">
         <span class="toolbar__app-name">{{ vm.appName }}</span>
       </div>
-    </div>
+    </a>
 
     <input #coordsFileInput type="file" accept="application/json" (change)="vm.onCoordsFileSelected($event)" hidden />
 

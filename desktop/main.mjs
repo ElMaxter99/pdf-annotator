@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { RELEASES_URL, REPO, isNewer, parseLatestRelease, updateMode } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
+import { goInHistory, historyDirectionForCommand, historyDirectionForKey } from './history-nav.mjs';
 
 const { autoUpdater } = electronUpdater;
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -197,6 +198,13 @@ function createWindow() {
       if (/^https:\/\//.test(url)) shell.openExternal(url);
     }
   });
+  // Atrás / Adelante como en el navegador: teclado, botones laterales del ratón y gesto de deslizar.
+  const go = (direction) => direction !== 0 && goInHistory(win.webContents.navigationHistory, direction);
+  win.webContents.on('before-input-event', (event, input) => {
+    if (go(historyDirectionForKey(input, process.platform))) event.preventDefault();
+  });
+  win.on('app-command', (_event, command) => go(historyDirectionForCommand(command)));
+  win.on('swipe', (_event, direction) => go(historyDirectionForCommand(direction)));
   win.on('closed', () => (win = null));
   win.loadURL(`${ORIGIN}/landing`);
 }
