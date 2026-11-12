@@ -44,6 +44,10 @@ function write(key: string, value: string): void {
   }
 }
 
+export function isLocalOrigin(host: string | undefined = globalThis.location?.hostname): boolean {
+  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '::1';
+}
+
 async function toBase64(blob: Blob): Promise<string> {
   const bytes = new Uint8Array(await blob.arrayBuffer());
   let binary = '';
@@ -104,6 +108,16 @@ export class AiHelperService {
   private refreshConnection(): void {
     if (this.connection() === 'ready' || this.connection() === 'noCli') {
       this.connection.set(this.found()[this.provider()] ? 'ready' : 'noCli');
+    }
+  }
+
+  /**
+   * Silent probe on load: only when the app itself is served from this machine. From a public site,
+   * calling 127.0.0.1 makes Chrome ask for «local network access», so there it waits for an explicit click.
+   */
+  checkIfLocal(): void {
+    if (this.connection() === 'unknown' && isLocalOrigin()) {
+      void this.check();
     }
   }
 

@@ -24,9 +24,7 @@ export class MigrationBarComponent implements OnInit {
   @ViewChild('bell') private bellButton?: ElementRef<HTMLButtonElement>;
 
   ngOnInit(): void {
-    if (this.vm.aiHelper.connection() === 'unknown') {
-      void this.vm.aiHelper.check();
-    }
+    this.vm.aiHelper.checkIfLocal();
   }
 
   providerName(): string {
