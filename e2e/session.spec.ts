@@ -78,17 +78,20 @@ test('opening the workspace without a PDF goes back to the landing page', async 
   await expect(page.getByText('Carga tu PDF')).toBeVisible();
 });
 
-test('reloading the workspace returns to the landing page, where the session can be resumed', async ({ page }) => {
+test('reloading the workspace keeps the PDF open with its annotations', async ({ page }) => {
   await openWorkspace(page);
   await addAnnotation(page, 0.3, 0.3, 'sigo aqui');
   await page.waitForTimeout(1200);
 
   await page.reload();
-  await expect(page).toHaveURL(/\/landing$/);
-  const banner = page.locator('.landing__resume');
-  await expect(banner).toContainText('anotaciones: 1');
-
-  await banner.getByRole('button', { name: 'Continuar' }).click();
-  await page.waitForURL('**/workspace');
+  await expect(page).toHaveURL(/\/workspace$/);
   await expect(page.locator('.annotation')).toHaveText(['sigo aqui']);
+  await expect.poll(() => fieldCount(page)).toBe(1);
+});
+
+test('reloading a workspace with nothing saved goes back to the landing page', async ({ page }) => {
+  await openWorkspace(page);
+  await page.reload();
+  await expect(page).toHaveURL(/\/landing$/);
+  await expect(page.getByText('Carga tu PDF')).toBeVisible();
 });

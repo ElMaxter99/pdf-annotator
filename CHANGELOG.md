@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- **Volver al inicio y Atrás / Adelante en el editor**: el logo de la barra del editor lleva a la landing (como ya hacía el del lote) y el historial funciona en los dos sentidos. Recargar `/workspace` reabre la sesión guardada en vez de mandarte a la landing, «Adelante» reabre el PDF que dejaste en esta visita (aunque no tuviera anotaciones) y cada PDF del lote tiene su URL (`/workspace?lote=<id>`), así que recargar o volver con el historial abre ese mismo PDF. En la app de escritorio: `Alt+←` / `Alt+→` (`⌘[` / `⌘]` en macOS), los botones laterales del ratón y el gesto de deslizar
 - Guía «Cómo instalar» (`docs/INSTALAR.md`) para Windows, macOS y Linux, enlazada desde el README: qué archivo elegir, avisos de instaladores sin firmar, `libfuse2`, actualizaciones y aviso de que Linux solo tiene paquetes x86_64. Las capturas reales están pendientes (huecos marcados)
 ### Fixed
 - La release de escritorio creaba dos borradores duplicados (los 4 jobs de empaquetado en paralelo creaban cada uno el suyo y los archivos quedaban repartidos); ahora un job previo crea el borrador una sola vez y todos suben a él.
