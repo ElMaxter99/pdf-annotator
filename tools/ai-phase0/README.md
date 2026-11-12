@@ -10,15 +10,15 @@ Herramienta de prueba, **fuera de la app y del build**. Ejecuta `claude -p` y/o 
 
 ## Uso
 ```
-npm run sample                      # regenera los casos sintéticos en sample/
+npm run sample                      # regenera los casos sintéticos en sample-plano/
 npm test                            # tests de la lógica pura
-node run.mjs --provider claude      # todos los pares de pairs/ y sample/
-node run.mjs --provider copilot --pair sample/factura-desplazada
+node run.mjs --provider claude      # todos los pares de pairs/ y sample-plano/
+node run.mjs --provider copilot --pair factura-desplazada
 node run.mjs --provider both
 ```
 Opciones: `--timeout <segundos>` (por defecto 300), `--keep-api-key` (no quitar `ANTHROPIC_API_KEY`), `--keep-work` (no borrar la carpeta con las imágenes enviadas). Resultado: `out/summary.md` y, por par y proveedor, `out/<par>/<proveedor>/` con `result.json`, `B-propuesta.json` (importable en la app) y `raw-*.txt`.
 
-## Casos sintéticos (`sample/`, datos inventados)
+## Casos sintéticos (`sample-plano/`, datos inventados)
 | Caso | Qué prueba |
 | --- | --- |
 | `factura-desplazada` | Bloques desplazados en la misma página, etiqueta que cambia de anchura («Base imponible»→«Base») y un campo que pasa a la página 2 |
@@ -28,14 +28,10 @@ Opciones: `--timeout <segundos>` (por defecto 300), `--keep-api-key` (no quitar 
 | `solicitud-portada-nueva` | B tiene una página más al principio (todo pasa a la siguiente) y un campo cambia de sitio |
 | `pedido-totales-repetidos` | El texto «Total» aparece dos veces y los dos bloques se mueven (anclas ambiguas) |
 
-Cada caso trae `A.pdf`, `A.json`, `B.pdf`, `B.json` (la plantilla correcta de B, de referencia) y `expected.json` (la solución por campo de A: `{ id, page, x, y }` o `{ id, gone: true }`). Los campos nuevos de B no se miden.
+Todo está en **una sola carpeta**, con el caso en el nombre del archivo, para poder subir los PDF de golpe al lote de la app. Cada caso trae `A-<caso>.pdf`, `A-<caso>.json`, `B-<caso>.pdf`, `B-<caso>.json` (la plantilla correcta de B, de referencia), `expected-<caso>.json` (la solución por campo de A: `{ id, page, x, y }` o `{ id, gone: true }`) y `README-<caso>.md`. Los campos nuevos de B no se miden.
 
 ## Casos propios
 Crea `pairs/<nombre>/` con `A.pdf`, `A.json` (plantilla de A), `B.pdf` y, para medir, `expected.json`. La carpeta `pairs/` **no se sube a git**. El `id` de un campo es `p<página>-f<posición en esa página>` según `A.json`.
 
 ## Qué mide
 Campos resueltos, página acertada, error mediano en puntos y cuántos quedan a ≤2 pt y ≤5 pt, ausentes bien detectados, segundos y avisos de formato. Cómo funciona: la IA elige un texto ancla en A y su equivalente en B (con página); el código calcula `x,y = ancla B + (campo A − ancla A) + corrección` con las posiciones de pdf.js.
-
-## Todos los PDF en una sola carpeta
-
-`npm run sample:flat` copia los PDF de `sample/<caso>/` a `sample-plano/` con nombres distintos (`A-<caso>.pdf`, `B-<caso>.pdf`), para subirlos de una vez al lote de la app en pruebas manuales. `sample/` no cambia.
