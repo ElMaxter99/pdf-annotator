@@ -30,8 +30,11 @@ const KEYS = {
   provider: 'pdf-annotator.ai.provider',
   models: 'pdf-annotator.ai.models',
   consent: 'pdf-annotator.ai.consent',
+  retry: 'pdf-annotator.ai.retry',
 } as const;
 /** Cheap by default: the task (match labels, move fields) does not need the biggest model. */
+/** A second request doubles the cost with Copilot (premium requests), so it is off there by default. */
+export const DEFAULT_RETRY: Record<string, boolean> = { claude: true, copilot: false, fake: true };
 export const DEFAULT_MODELS: Record<string, string> = { claude: 'sonnet', copilot: '', fake: '' };
 
 function read(key: string): string | null {
@@ -71,6 +74,7 @@ export class AiHelperService {
   readonly found = signal<Record<string, boolean>>({});
   readonly provider = signal<AiProvider>(this.initialProvider());
   readonly models = signal<Record<string, string>>(this.initialModels());
+  readonly retry = signal<Record<string, boolean>>(this.initialRetry());
   readonly consent = signal(read(KEYS.consent) === '1');
   private token = '';
 
@@ -92,6 +96,26 @@ export class AiHelperService {
       /* corrupt value: defaults */
     }
     return models;
+  }
+
+  private initialRetry(): Record<string, boolean> {
+    const retry = { ...DEFAULT_RETRY };
+    try {
+      const stored = JSON.parse(read(KEYS.retry) ?? '{}') as Record<string, unknown>;
+      for (const key of Object.keys(retry)) {
+        if (typeof stored[key] === 'boolean') {
+          retry[key] = stored[key] as boolean;
+        }
+      }
+    } catch {
+      /* corrupt value: defaults */
+    }
+    return retry;
+  }
+
+  setRetry(provider: AiProvider, value: boolean): void {
+    this.retry.update((all) => ({ ...all, [provider]: value }));
+    write(KEYS.retry, JSON.stringify(this.retry()));
   }
 
   setProvider(provider: AiProvider): void {
@@ -177,6 +201,7 @@ export class AiHelperService {
     const body = JSON.stringify({
       provider,
       model: this.models()[provider] || undefined,
+      retry: this.retry()[provider] !== false,
       a: await toBase64(args.a),
       b: await toBase64(args.b),
       template: args.template,

@@ -65,6 +65,7 @@ const server = createServer(async (req, res) => {
     }
     const { provider, a, b, template } = body ?? {};
     const model = typeof body?.model === 'string' && /^[\w.\-:\/\[\]]{1,60}$/.test(body.model) ? body.model : undefined;
+    const maxAttempts = body?.retry === false ? 1 : 2;
     if (typeof a !== 'string' || typeof b !== 'string' || !template || !Array.isArray(template.pages)) return send(res, 400, { error: 'datos' }, cors);
     busy = true;
     const ac = new AbortController();
@@ -75,6 +76,7 @@ const server = createServer(async (req, res) => {
       const result = await runProposal({
         provider,
         model,
+        maxAttempts,
         aBytes: Buffer.from(a, 'base64'),
         bBytes: Buffer.from(b, 'base64'),
         template,

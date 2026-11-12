@@ -125,3 +125,13 @@ test('«Ver detalles» shows what was sent, the steps and says the simulated pro
   await expect(dialog).toHaveCount(0);
   await expect(page.getByTestId('ai-apply')).toBeVisible();
 });
+
+test('the retry option is remembered and off by default for Copilot', async ({ page }) => {
+  await openBatchWithB(page);
+  await page.getByTestId('ai-chip').click();
+  const toggle = page.getByTestId('ai-retry-toggle');
+  await expect(toggle).toBeChecked();
+  await toggle.uncheck();
+  const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.retry'));
+  expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: true, copilot: false, fake: false });
+});

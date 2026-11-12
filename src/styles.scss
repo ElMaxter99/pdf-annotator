@@ -4822,3 +4822,15 @@ body.has-update-card .toast-host {
     transition: none;
   }
 }
+
+.ai-panel__check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ai-panel__check input {
+  accent-color: var(--accent);
+}

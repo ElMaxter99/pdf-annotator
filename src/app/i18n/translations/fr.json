@@ -809,7 +809,9 @@
         "copilotAuto": "Automatique (celui du CLI)",
         "copilotHint": "Chaque requête est décomptée de vos « premium requests » selon le modèle. Saisissez-en un précis si votre administrateur l'indique.",
         "sonnetHint": "Sonnet : suffisant pour placer les champs et léger pour votre limite."
-      }
+      },
+      "retryToggle": "Réessayer une fois si la réponse est inutilisable",
+      "retryHint": "Un nouvel essai peut doubler le coût : avec Copilot, il compte comme une autre requête premium. Désactivé par défaut pour Copilot."
     },
     "menu": {
       "title": "Copier et adapter avec l'IA",

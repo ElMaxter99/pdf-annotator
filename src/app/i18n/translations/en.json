@@ -809,7 +809,9 @@
         "copilotAuto": "Automatic (the CLI default)",
         "copilotHint": "Each request counts against your “premium requests” by model. Type a specific one if your administrator says so.",
         "sonnetHint": "Sonnet: enough to place fields and light on your limit."
-      }
+      },
+      "retryToggle": "Retry once if the answer is unusable",
+      "retryHint": "A retry can double the cost: with Copilot it counts as another premium request. It is off by default for Copilot."
     },
     "menu": {
       "title": "Copy and adapt with AI",

@@ -809,7 +809,9 @@
         "copilotAuto": "Automatisch (Standard des CLI)",
         "copilotHint": "Jede Anfrage wird je nach Modell von deinen „Premium Requests“ abgezogen. Gib ein bestimmtes ein, wenn dein Administrator es vorgibt.",
         "sonnetHint": "Sonnet: genügt zum Platzieren der Felder und schont dein Limit."
-      }
+      },
+      "retryToggle": "Einmal wiederholen, wenn die Antwort unbrauchbar ist",
+      "retryHint": "Eine Wiederholung kann die Kosten verdoppeln: Bei Copilot zählt sie als weitere Premium-Anfrage. Für Copilot ist sie standardmäßig aus."
     },
     "menu": {
       "title": "Mit KI kopieren und anpassen",

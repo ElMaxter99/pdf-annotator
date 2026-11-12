@@ -809,7 +809,9 @@
         "copilotAuto": "Automàtic (el del CLI)",
         "copilotHint": "Cada petició descompta de les teves «premium requests» segons el model. Escriu-ne un de concret si ho indica el teu administrador.",
         "sonnetHint": "Sonnet: suficient per col·locar camps i gasta poc del teu límit."
-      }
+      },
+      "retryToggle": "Reintentar una vegada si la resposta no serveix",
+      "retryHint": "Un reintent pot duplicar la despesa: amb Copilot compta com una altra petició premium. Amb Copilot ve desactivat."
     },
     "menu": {
       "title": "Copiar i adaptar amb IA",

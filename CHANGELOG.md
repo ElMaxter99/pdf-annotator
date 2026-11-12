@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- Opción «Reintentar una vez si la respuesta no sirve» en el panel de la IA, por proveedor: activada con Claude y desactivada con Copilot (un reintento cuenta como otra petición premium).
 - La IA debe demostrar que ha mirado las imágenes: cada PNG lleva un código aleatorio que la respuesta tiene que devolver; si falta tras dos intentos se descarta con el aviso «La IA no ha leído las imágenes» (en vez de proponer solo con los textos). El informe de «Ver detalles» añade los textos por página, no incluye el mensaje del CLI, el consumo en vivo no cuenta dos veces el mismo mensaje y el modal atrapa el foco y navega las pestañas con las flechas.
 - «Ver detalles» en «Copiar y adaptar con IA»: modal con los pasos en vivo, lo enviado, el consumo (tokens y coste equivalente medidos con Claude; con Copilot «No medible» y una estimación marcada) y un diagnóstico cuando la IA no coloca ningún campo (A o B sin texto, permisos, respuesta no válida…). Informe copiable sin contenido de los PDF
 - El ayudante de IA recoge los pasos, el uso real de tokens (Claude), lo enviado y un diagnóstico de por qué no se colocó nada, y lo emite como eventos `event` y `result.details` (sin interfaz todavía). La IA ya no se confunde con listas JSON ajenas (`[1]`) en su respuesta

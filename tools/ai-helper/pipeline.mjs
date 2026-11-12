@@ -21,7 +21,7 @@ function fakeAnswer(entries, A, B) {
   });
 }
 
-export async function runProposal({ provider, model, aBytes, bBytes, template, keepApiKey = false, timeoutMs = 300_000, onStage = () => {}, onEvent = () => {}, signal }) {
+export async function runProposal({ provider, model, aBytes, bBytes, template, keepApiKey = false, timeoutMs = 300_000, onStage = () => {}, onEvent = () => {}, signal, maxAttempts = 2 }) {
   const fake = process.env.AI_HELPER_FAKE === '1' && provider === 'fake';
   if (!fake && !PROVIDERS[provider]) throw Object.assign(new Error('Proveedor desconocido.'), { code: 'bad_provider' });
   const work = await mkdtemp(path.join(os.tmpdir(), 'pdfann-ia-'));
@@ -66,7 +66,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       const parsed = validateProposals(fakeAnswer(entries, A, B), known);
       proposals = parsed.proposals;
     } else {
-      for (let attempt = 1; attempt <= 2; attempt++) {
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         onStage('asking', attempt);
         const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote, codes });
         await writeFile(path.join(work, 'prompt.md'), promptText);
@@ -117,7 +117,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
           if (missing.length) {
             // La IA no ha leído las imágenes: no se aprovecha una respuesta hecha solo con los textos.
             retryNote = 'no has devuelto los códigos de las imágenes. Abre TODAS las imágenes, copia el código de cada una en "images" y vuelve a responder con el objeto JSON pedido.';
-            if (attempt === 2) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer.`), { code: 'images_not_read' });
+            if (attempt === maxAttempts) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer.`), { code: 'images_not_read' });
             continue;
           }
         }

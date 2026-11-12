@@ -809,7 +809,9 @@
         "copilotAuto": "Automático (o do CLI)",
         "copilotHint": "Cada pedido desconta das tuas «premium requests» conforme o modelo. Escreve um concreto se o teu administrador o indicar.",
         "sonnetHint": "Sonnet: suficiente para colocar campos e gasta pouco do teu limite."
-      }
+      },
+      "retryToggle": "Tentar de novo uma vez se a resposta não servir",
+      "retryHint": "Uma nova tentativa pode duplicar o custo: com o Copilot conta como outro pedido premium. Com o Copilot vem desativado."
     },
     "menu": {
       "title": "Copiar e adaptar com IA",
