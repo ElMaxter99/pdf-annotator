@@ -45,3 +45,6 @@ package-lock.json
 # Playwright
 test-results/
 playwright-report/
+
+# Instaladores de escritorio
+release/

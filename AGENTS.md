@@ -43,6 +43,7 @@ src/app/
 ├─ fonts/                    font-catalog.service (fuentes estándar + personalizadas, resolución de nombres del JSON), standard-font-families, font-variant
 ├─ utils/                    pdf-file.utils, loose-json (parser seguro), color.utils, number.utils, download.utils, annotation-pages.utils, annotation-fields.utils, alignment.utils, migration.utils (estados A↔B, emparejado por nombre), zip.utils (puros, con tests)
 └─ annotation-templates.service.ts   plantillas + última sesión en localStorage
+desktop/                    App de escritorio (Electron): main, preload, ayudante de IA integrado, actualizador (`update-logic.mjs`) y `electron-builder.yml`; ver `docs/ARCHITECTURE.md` §10b
 src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
 public/                      logo, favicons, og-image, worker de pdf.js (assets/pdfjs)
 examples/                    PDF y JSON de ejemplo usados en README y capturas

@@ -111,6 +111,12 @@
         <span class="btn__icon" aria-hidden="true">⋯</span>
       </button>
     <div class="toolbar__group toolbar__group--preferences" role="group" [attr.aria-label]="'controls.preferencesGroup' | t">
+        @if (update.pending()) {
+          <button class="btn btn--ghost update-pending" type="button" (click)="update.recover()" data-testid="update-pending">
+            <span class="update-pending__dot" aria-hidden="true"></span>
+            {{ 'update.pending' | t: { version: update.state().version } }}
+          </button>
+        }
         <button class="btn btn--icon btn--ghost" type="button" (click)="vm.toggleShortcuts()"
           [attr.title]="('shortcuts.open' | t) + ' (?)'" [attr.aria-label]="'shortcuts.open' | t"
           [attr.aria-keyshortcuts]="'?'">

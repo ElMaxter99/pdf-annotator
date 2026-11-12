@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { AiResult, parseNdjson } from '../utils/ai-proposal.utils';
+import { getDesktopBridge } from './desktop-update.service';
 
 export type AiProvider = 'claude' | 'copilot' | 'fake';
 export type AiConnection = 'unknown' | 'checking' | 'offline' | 'noCli' | 'ready';
@@ -18,7 +19,12 @@ export class AiRequestError extends Error {
   }
 }
 
-const BASE = 'http://127.0.0.1:4310';
+const DEFAULT_PORT = 4310;
+
+function helperBase(): string {
+  const port = getDesktopBridge()?.helperPort;
+  return `http://127.0.0.1:${Number.isInteger(port) && (port as number) > 0 ? port : DEFAULT_PORT}`;
+}
 const KEYS = {
   provider: 'pdf-annotator.ai.provider',
   models: 'pdf-annotator.ai.models',
@@ -116,8 +122,24 @@ export class AiHelperService {
    * calling 127.0.0.1 makes Chrome ask for «local network access», so there it waits for an explicit click.
    */
   checkIfLocal(): void {
-    if (this.connection() === 'unknown' && isLocalOrigin()) {
+    if (this.connection() !== 'unknown') {
+      return;
+    }
+    if (getDesktopBridge() !== null) {
+      void this.checkWhenHelperStarts();
+    } else if (isLocalOrigin()) {
       void this.check();
+    }
+  }
+
+  /** In the desktop app the helper starts together with the window: retry for a few seconds before giving up. */
+  private async checkWhenHelperStarts(): Promise<void> {
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await this.check();
+      if (this.connection() !== 'offline') {
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1500));
     }
   }
 
@@ -125,7 +147,7 @@ export class AiHelperService {
   async check(): Promise<void> {
     this.connection.set('checking');
     try {
-      const response = await fetch(`${BASE}/status`, { cache: 'no-store' });
+      const response = await fetch(`${helperBase()}/status`, { cache: 'no-store' });
       const data = (await response.json()) as {
         token?: string;
         providers?: Record<string, { found?: boolean }>;
@@ -159,7 +181,7 @@ export class AiHelperService {
     });
     let response: Response;
     try {
-      response = await fetch(`${BASE}/propose`, {
+      response = await fetch(`${helperBase()}/propose`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-ai-token': this.token },
         body,

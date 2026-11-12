@@ -1,4 +1,8 @@
 ## Unreleased
+### Added
+- **App de escritorio (Electron) para Windows, macOS y Linux (AC-01)**: instaladores `.exe` (NSIS), `.dmg`/`.zip` y AppImage/`.deb`/`.rpm` (`desktop/`, `electron-builder`). Lleva la web empaquetada (`app://pdf-annotator`, sin servidor) y arranca sola el ayudante de la IA local, sin terminal; sigue necesitando tu `claude` o `copilot` instalado y con sesión. `npm run start:desktop` la abre en desarrollo y `npm run desktop:pack` genera el instalador de tu sistema
+- **Aviso de actualización en la app instalada**: al abrir y cada 6 h consulta las releases de GitHub; si hay una versión más nueva sale una tarjeta con «Actualizar ahora», «Más tarde» y «Qué hay de nuevo», barra de progreso y «Reiniciar ahora / Al cerrar la app». En macOS (sin firma) y en `.deb`/`.rpm` el botón abre la página de descargas. Un punto en el menú recupera el aviso pospuesto
+- `.github/workflows/desktop-release.yml`: al empujar una etiqueta `vX.Y.Z` verifica, compila en los tres sistemas y sube los instaladores a una release en **borrador** (publicarla activa el aviso)
 
 - Los menús de la barra del editor por lotes («Poner plantilla A», avisos y panel «✦ IA») se cierran al pulsar fuera.
 

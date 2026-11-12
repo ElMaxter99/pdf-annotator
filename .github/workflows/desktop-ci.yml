@@ -1,0 +1,53 @@
+name: Desktop CI
+
+# Empaqueta la app de escritorio (sin instalador, `--dir`) en Windows, macOS y Linux en cada PR que toque algo que pueda
+# romperla, para enterarnos antes de la etiqueta de release. El resto del CI (build, tests, e2e, smoke de Electron) sigue en ci.yml.
+on:
+  pull_request:
+    branches: [develop, master]
+    paths:
+      - 'desktop/**'
+      - 'tools/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'angular.json'
+      - '.github/workflows/desktop-*.yml'
+  push:
+    branches: [develop, master]
+    paths:
+      - 'desktop/**'
+      - 'tools/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/desktop-*.yml'
+
+concurrency:
+  group: desktop-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+      - run: node scripts/sync-desktop-version.mjs
+      - run: npm install --no-fund --no-audit
+      - name: Dependencias del ayudante de IA
+        run: npm install --no-fund --no-audit
+        working-directory: tools/ai-phase0
+      - run: npm run build
+      - run: npm run test:desktop
+      - name: Empaquetar (sin instalador)
+        run: npx electron-builder --projectDir desktop --dir --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Comprobar el contenido del paquete
+        run: node desktop/verify-pack.mjs

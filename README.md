@@ -24,6 +24,7 @@
 </p>
 
 <p align="center">
+  <a href="#%EF%B8%8F-descargar-la-app-de-escritorio">Descargar</a> ·
   <a href="#-qué-es">Qué es</a> ·
   <a href="#-empieza-en-1-minuto">Empieza</a> ·
   <a href="#-tour-de-la-interfaz">Tour</a> ·
@@ -38,6 +39,23 @@
 <p align="center">
   <img src="./screenshots/workspace.png" alt="Espacio de trabajo de PDF Annotator" width="95%" />
 </p>
+
+---
+
+## ⬇️ Descargar la app de escritorio
+<p align="center">
+  <a href="https://github.com/ElMaxter99/pdf-annotator/releases/latest"><img src="https://img.shields.io/github/v/release/ElMaxter99/pdf-annotator?style=for-the-badge&label=%C3%BAltima%20release&color=4dd9c0" alt="Última release" /></a>
+</p>
+
+Instálala como app del sistema y la **IA local funciona sin abrir ninguna terminal**. Los enlaces apuntan siempre a la **última release**; no hay que editar nada aquí al publicar una nueva.
+
+| Sistema | Descarga (en «Assets» de la última release) | Se actualiza |
+| --- | --- | --- |
+| 🪟 **Windows** | [**Descargar `.exe`**](https://github.com/ElMaxter99/pdf-annotator/releases/latest) | Sola, con aviso |
+| 🍎 **macOS** | [**Descargar `.dmg`**](https://github.com/ElMaxter99/pdf-annotator/releases/latest) (`arm64` para Apple Silicon, `x64` para Intel) | El aviso abre la descarga |
+| 🐧 **Linux** | [**Descargar `.AppImage`, `.deb` o `.rpm`**](https://github.com/ElMaxter99/pdf-annotator/releases/latest) | AppImage sola; `.deb`/`.rpm` con descarga manual |
+
+> Mientras no haya una release con instaladores publicada, esa página no los tendrá todavía. La app sigue funcionando en el navegador. Detalles, avisos del sistema (instaladores sin firmar) y desarrollo: [App de escritorio](#%EF%B8%8F-app-de-escritorio-windows-macos-y-linux).
 
 ---
 
@@ -193,6 +211,20 @@ En PowerShell es igual. La primera vez instala las dependencias del ayudante (`t
 | Respuesta que no se entiende | Reintenta; si se repite, usa «Usar ajuste por textos» |
 
 Detalle técnico y pruebas de calidad: [`docs/IA-LOCAL.md`](docs/IA-LOCAL.md) y [`tools/ai-phase0/README.md`](tools/ai-phase0/README.md).
+
+## 🖥️ App de escritorio (Windows, macOS y Linux)
+Con la app instalada la IA local funciona sin abrir ninguna terminal: arranca sola el ayudante (sigues necesitando `claude` o `copilot` instalado y con sesión iniciada). Descarga el instalador de tu sistema desde la [última release](https://github.com/ElMaxter99/pdf-annotator/releases/latest) (arriba, en «Descargar»).
+
+| | |
+| --- | --- |
+| **Formatos** | `.exe` (Windows, NSIS), `.dmg`/`.zip` (macOS `arm64` y `x64`), `.AppImage`, `.deb`, `.rpm` (Linux `x64`) |
+| **Versión** | La de `package.json`; la etiqueta `vX.Y.Z` de la release debe coincidir |
+| **Publicación** | Automática: empujar la etiqueta `vX.Y.Z` compila los tres sistemas y crea una release en **borrador**; al publicarla, los enlaces de «Descargar» y el aviso de las apps instaladas apuntan a ella |
+| **Todas las versiones** | [Releases](https://github.com/ElMaxter99/pdf-annotator/releases) |
+
+- **Sin firmar:** Windows muestra SmartScreen («Más información → Ejecutar de todas formas») y macOS pide abrirla con clic derecho → Abrir (si dice «dañada», `xattr -cr "/Applications/PDF Annotator.app"`).
+- **Actualizaciones:** al abrir y cada 6 h comprueba si hay una versión nueva y muestra un aviso con «Actualizar ahora» / «Más tarde». Windows y AppImage se actualizan solos; en macOS y con `.deb`/`.rpm` el botón abre la página de descargas.
+- **Desarrollo:** `npm run start:desktop` (instala lo que falte, compila y abre la app) y `npm run desktop:pack` (instalador de tu sistema en `release/`). Versiones: se publican al empujar una etiqueta `vX.Y.Z` (`desktop-release.yml`, release en borrador).
 
 ## ⌨️ Atajos de teclado
 Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.

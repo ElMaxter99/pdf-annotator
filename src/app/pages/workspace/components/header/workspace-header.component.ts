@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild, inject, signal } from '@angular/core';
+import { DesktopUpdateService } from '../../../../services/desktop-update.service';
 import { FormsModule } from '@angular/forms';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
@@ -29,6 +30,7 @@ export class WorkspaceHeaderComponent {
   @ViewChild('coordsFileInput', { static: false })
   coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
+  readonly update = inject(DesktopUpdateService);
   readonly prefsOpen = signal(false);
   readonly clearOpen = signal(false);
 

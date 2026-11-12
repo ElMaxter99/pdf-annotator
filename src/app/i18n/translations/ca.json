@@ -896,5 +896,31 @@
       "send": "Enviar a {{provider}}"
     },
     "notice": "{{count}} camps proposats per la IA · B sense modificar"
+  },
+  "update": {
+    "available": {
+      "title": "Hi ha una versió nova",
+      "text": "PDF Annotator {{version}} · tens la {{current}}",
+      "manual": "PDF Annotator {{version}} · tens la {{current}}. En aquest sistema s'instal·la a mà."
+    },
+    "now": "Actualitza ara",
+    "download": "Baixa la {{version}}",
+    "later": "Més tard",
+    "notes": "Què hi ha de nou",
+    "downloading": "Baixant la versió {{version}}…",
+    "cancel": "Cancel·la",
+    "ready": {
+      "title": "Versió {{version}} a punt per instal·lar",
+      "text": "La sessió es desa i es recupera en reiniciar. Exporta abans el que vulguis conservar."
+    },
+    "restartNow": "Reinicia ara",
+    "onQuit": "En tancar l'aplicació",
+    "error": {
+      "title": "No s'ha pogut baixar l'actualització",
+      "text": "Revisa la connexió. La teva versió {{current}} continua funcionant."
+    },
+    "retry": "Torna-ho a provar",
+    "close": "Tanca",
+    "pending": "Versió {{version}} disponible"
   }
 }
