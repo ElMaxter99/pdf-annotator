@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-46 Panel del lote</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.p{--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--line:#3f3f5a;--soft:#34344a;--inset:#252538;--ink:#0b1f1c;--warn:#fbbf24;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.q{background:transparent;color:var(--muted);padding:8px 10px}
+.btn.s{min-height:32px;padding:4px 14px;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.err{background:color-mix(in srgb,var(--danger) 16%,transparent);color:#ff8a8a}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;flex:none}
+.dot.on{background:var(--accent)}.dot.warn{background:var(--warn)}.dot.err{background:var(--danger)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:3px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:5px 14px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.sp{flex-grow:1}
+.mono{font-family:Consolas,monospace;font-size:13px}
+.pin{position:absolute;width:30px;height:30px;border-radius:50%;background:var(--danger);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.pin.g{background:var(--accent);color:var(--ink)}
+.shot{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#000}
+.shot img{display:block;width:100%}
+.find{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.find .pin{position:static;flex:none;width:26px;height:26px;font-size:13px;box-shadow:none}
+.find b{color:var(--text)}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:10%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.fd.prop{border:2px dashed #d99a00;background:rgba(217,154,0,.12)}
+.tip{position:absolute;background:#0f0f1a;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--muted);color:var(--muted);font-size:11px;font-weight:700;flex:none}
+.tbl{display:grid;gap:8px}
+.tr{display:grid;gap:14px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding-top:0;padding-bottom:0}
+.bar{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.ico{width:32px;height:32px;border-radius:10px;background:var(--soft);display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:var(--text);flex:none}
+</style>
+</helmet>
+<div class="p" style="width:1920px;height:1100px">
+<div class="lab">P-46 · Panel del lote</div>
+<h1 style="font-size:34px;margin:6px 0 4px">Un solo botón principal y las acciones donde se usan</h1>
+<p class="cap" style="max-width:1300px">Hoy el panel reparte siete acciones entre la cabecera, un recuadro punteado para las B y cada fila. Propuesta: la cabecera lleva el progreso y «Revisar siguiente»; la tira de B se reduce a una línea; cada fila enseña «Revisar», «Subir B» y quitar al pasar el ratón o al enfocarla; y al marcar varios PDFs aparece una barra flotante con las acciones masivas (trasladar con IA, subir B, quitar), como Gmail o Linear.</p>
+<div style="display:flex;gap:28px;margin-top:20px;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:8px"><span class="chip err">Hoy · 1920×1080</span><div class="shot" style="width:900px;height:506px"><img src="/_blob/9dff8fe8d51ed8f2165cb9d3b9a45b02" alt="Panel hoy"></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span class="chip on">Propuesta · selección múltiple y acciones al pasar el ratón</span><div style="width:900px;height:506px;position:relative;overflow:hidden;border-radius:12px;border:1px solid var(--line);"><div style="transform:scale(0.469);transform-origin:0 0;width:1920px;height:1080px"><div style="width:1920px;height:1080px;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;position:relative">
+<div style="height:56px;margin:10px 12px 0;background:var(--panel);border-radius:14px;display:flex;align-items:center;gap:16px;padding:0 18px;border:1px solid var(--line)"><b style="color:var(--accent)">Pdf Annotator</b><b>Lote · 3 PDFs</b><div style="width:160px"><div class="bar"><i style="width:0%"></i></div></div><span class="cap">0 de 3 listos</span><span class="sp"></span><span class="btn g s">✦ Trasladar con IA ▾</span><span class="btn s">Revisar siguiente →</span><span class="ico">⋯</span></div>
+<div style="padding:18px 210px 0 210px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px;font-size:14px"><span class="chip on">1 versión B añadida</span><span class="cap">Suelta más aquí o</span><span class="btn g s">Añadir más</span><span class="sp"></span></div>
+<div style="display:flex;gap:12px;align-items:center"><span class="btn g" style="min-width:260px;justify-content:flex-start;color:var(--muted)">⌕ Buscar por nombre</span><span class="seg"><span class="on">Todos 3</span><span>Por revisar 1</span><span>Listos 0</span><span>Sin plantilla 2</span></span><span class="sp"></span><span class="seg"><span>Cuadrícula</span><span class="on">Lista</span></span></div>
+<div style="display:grid;grid-template-columns:28px 44px 1fr 220px 150px 230px;gap:14px;align-items:center;padding:8px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 12%,var(--soft))"><input type="checkbox" checked><div style="width:34px;height:44px;background:#fff;border-radius:3px"></div><div><b>factura-0331.pdf</b><div class="cap" style="font-size:12px">10 campos</div></div><span class="cap">factura-0331-nuevo.pdf</span><span class="chip warn"><span class="dot warn"></span>Por revisar</span><span style="display:flex;gap:8px;justify-content:flex-end"><span class="btn s">Revisar</span><span class="btn g s">Subir B</span><span class="ico">✕</span></span></div>
+<div style="display:grid;grid-template-columns:28px 44px 1fr 220px 150px 230px;gap:14px;align-items:center;padding:8px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 12%,var(--soft))"><input type="checkbox" checked><div style="width:34px;height:44px;background:#fff;border-radius:3px"></div><div><b>factura-0332.pdf</b><div class="cap" style="font-size:12px">10 campos</div></div><span class="cap">—</span><span class="chip "><span class="dot "></span>Sin plantilla</span><span style="display:flex;gap:8px;justify-content:flex-end"><span class="cap" style="font-size:12px">…</span></span></div>
+<div style="display:grid;grid-template-columns:28px 44px 1fr 220px 150px 230px;gap:14px;align-items:center;padding:8px 14px;border-radius:12px;background:var(--soft)"><input type="checkbox" ><div style="width:34px;height:44px;background:#fff;border-radius:3px"></div><div><b>factura-0333.pdf</b><div class="cap" style="font-size:12px">10 campos</div></div><span class="cap">—</span><span class="chip "><span class="dot "></span>Sin plantilla</span><span style="display:flex;gap:8px;justify-content:flex-end"><span class="cap" style="font-size:12px">…</span></span></div>
+</div>
+<div style="position:absolute;left:50%;transform:translateX(-50%);bottom:34px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px 12px 10px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 36px rgba(0,0,0,.5)"><b>2 seleccionados</b><span class="btn s">✦ Trasladar con IA</span><span class="btn g s">Subir B</span><span class="btn g s">Quitar</span><span class="ico">✕</span></div></div></div></div></div></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px">
+<div class="card"><h3>Cabecera con progreso</h3><p class="cap">Barra y «0 de 3 listos» siempre visibles; «Descargar listos» pasa a ⋯ hasta que haya alguno.</p></div>
+<div class="card"><h3>Tira de B en una línea</h3><p class="cap">Chip de recuento y «Añadir más»; el borde punteado solo aparece al arrastrar archivos encima (estado «soltar aquí»).</p></div>
+<div class="card"><h3>Estado = punto + palabra</h3><p class="cap">Mismas reglas de color que en el editor: ámbar para lo que pide atención, neutro para lo demás.</p></div>
+<div class="card"><h3>Barra de selección</h3><p class="cap">Aparece con 1 o más marcados; Esc o ✕ la cierra. «Trasladar con IA» usa el mismo popover de P-42.</p></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
