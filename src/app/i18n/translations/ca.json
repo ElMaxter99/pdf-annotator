@@ -999,7 +999,10 @@
     "available": {
       "title": "Hi ha una versió nova",
       "text": "PDF Annotator {{version}} · tens la {{current}}",
-      "manual": "PDF Annotator {{version}} · tens la {{current}}. En aquest sistema s'instal·la a mà."
+      "manual": "PDF Annotator {{version}} · tens la {{current}}. En aquest sistema s'instal·la a mà.",
+      "titleRc": "Hi ha una versió de prova",
+      "titleFinal": "Ja hi ha la versió final",
+      "textFinal": "PDF Annotator {{version}} · tens la {{current}} (prova)"
     },
     "now": "Actualitza ara",
     "download": "Baixa la {{version}}",
@@ -1019,6 +1022,29 @@
     },
     "retry": "Torna-ho a provar",
     "close": "Tanca",
-    "pending": "Versió {{version}} disponible"
+    "pending": "Versió {{version}} disponible",
+    "tag": "Prova",
+    "downloadingRc": "Descarregant la prova {{version}}…",
+    "notesRc": "Notes de la prova",
+    "channel": {
+      "label": "Canal d'actualitzacions",
+      "stable": "Estable",
+      "beta": "Proves",
+      "hintStable": "Només versions finals. És el recomanat.",
+      "hintBeta": "Reps també versions de prova (RC) abans de la final. Poden fallar.",
+      "confirm": {
+        "title": "Rebre versions de prova?",
+        "text": "Les versions de prova (RC) arriben abans que la final perquè es puguin provar de debò. Poden tenir errors. Els teus PDF i anotacions no es toquen, però convé exportar el que sigui important.",
+        "text2": "Per tornar al canal estable, canvia-ho aquí: rebràs la propera versió final.",
+        "yes": "Rebre proves",
+        "cancel": "Cancel·lar"
+      },
+      "back": {
+        "title": "Tornar al canal estable",
+        "text": "Continues amb la {{current}} fins que surti la versió final; llavors se't oferirà. Si vols l'estable ja, instal·la-la a mà des de GitHub.",
+        "github": "Obrir GitHub",
+        "ok": "Entesos"
+      }
+    }
   }
 }

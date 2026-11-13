@@ -999,7 +999,10 @@
     "available": {
       "title": "Há uma nova versão disponível",
       "text": "PDF Annotator {{version}} · você tem a {{current}}",
-      "manual": "PDF Annotator {{version}} · você tem a {{current}}. Neste sistema a instalação é manual."
+      "manual": "PDF Annotator {{version}} · você tem a {{current}}. Neste sistema a instalação é manual.",
+      "titleRc": "Há uma versão de teste",
+      "titleFinal": "Já está a versão final",
+      "textFinal": "PDF Annotator {{version}} · tens a {{current}} (teste)"
     },
     "now": "Atualizar agora",
     "download": "Baixar a {{version}}",
@@ -1019,6 +1022,29 @@
     },
     "retry": "Tentar de novo",
     "close": "Fechar",
-    "pending": "Versão {{version}} disponível"
+    "pending": "Versão {{version}} disponível",
+    "tag": "Teste",
+    "downloadingRc": "A transferir a versão de teste {{version}}…",
+    "notesRc": "Notas da versão de teste",
+    "channel": {
+      "label": "Canal de atualizações",
+      "stable": "Estável",
+      "beta": "Testes",
+      "hintStable": "Apenas versões finais. É o recomendado.",
+      "hintBeta": "Recebes também versões de teste (RC) antes da final. Podem ter falhas.",
+      "confirm": {
+        "title": "Receber versões de teste?",
+        "text": "As versões de teste (RC) chegam antes da final para poderem ser experimentadas a sério. Podem ter falhas. Os teus PDF e anotações não são tocados, mas convém exportar o que for importante.",
+        "text2": "Para voltar ao canal estável, muda-o aqui: receberás a próxima versão final.",
+        "yes": "Receber testes",
+        "cancel": "Cancelar"
+      },
+      "back": {
+        "title": "Voltar ao canal estável",
+        "text": "Continuas com a {{current}} até sair a versão final; então será oferecida. Se quiseres já a estável, instala-a à mão a partir do GitHub.",
+        "github": "Abrir GitHub",
+        "ok": "Percebido"
+      }
+    }
   }
 }

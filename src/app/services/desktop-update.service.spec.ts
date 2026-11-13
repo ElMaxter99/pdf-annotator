@@ -12,6 +12,7 @@ function setup(initial: DesktopUpdateState) {
     },
     checkForUpdates: jasmine.createSpy('check').and.resolveTo(),
     downloadUpdate: jasmine.createSpy('download').and.resolveTo(),
+    setUpdateChannel: jasmine.createSpy('channel').and.resolveTo(),
     cancelUpdate: jasmine.createSpy('cancel').and.resolveTo(),
     installUpdate: jasmine.createSpy('install').and.resolveTo(),
     installOnQuit: jasmine.createSpy('onQuit').and.resolveTo(),
@@ -68,5 +69,22 @@ describe('DesktopUpdateService', () => {
     service.restartOnQuit();
     expect(bridge.installOnQuit).toHaveBeenCalled();
     expect(service.cardVisible()).toBeFalse();
+  });
+
+  it('canal: estable por defecto, setChannel avisa al proceso principal y detecta una prueba instalada', () => {
+    const { service, bridge, push } = setup({
+      status: 'idle',
+      mode: 'auto',
+      current: '1.9.0-rc.1',
+    });
+    push({ status: 'idle', mode: 'auto', current: '1.9.0-rc.1' });
+    expect(service.channel()).toBe('stable');
+    expect(service.currentIsPrerelease()).toBeTrue();
+    service.setChannel('beta');
+    expect(service.channel()).toBe('beta');
+    expect(bridge.setUpdateChannel).toHaveBeenCalledWith('beta');
+    push({ status: 'idle', mode: 'auto', current: '1.8.4', channel: 'stable' });
+    expect(service.channel()).toBe('stable');
+    expect(service.currentIsPrerelease()).toBeFalse();
   });
 });

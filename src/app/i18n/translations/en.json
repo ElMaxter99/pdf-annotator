@@ -999,7 +999,10 @@
     "available": {
       "title": "A new version is available",
       "text": "PDF Annotator {{version}} · you have {{current}}",
-      "manual": "PDF Annotator {{version}} · you have {{current}}. On this system it is installed manually."
+      "manual": "PDF Annotator {{version}} · you have {{current}}. On this system it is installed manually.",
+      "titleRc": "A test version is available",
+      "titleFinal": "The final version is out",
+      "textFinal": "PDF Annotator {{version}} · you have {{current}} (test)"
     },
     "now": "Update now",
     "download": "Download {{version}}",
@@ -1019,6 +1022,29 @@
     },
     "retry": "Try again",
     "close": "Close",
-    "pending": "Version {{version}} available"
+    "pending": "Version {{version}} available",
+    "tag": "Test",
+    "downloadingRc": "Downloading test version {{version}}…",
+    "notesRc": "Test version notes",
+    "channel": {
+      "label": "Update channel",
+      "stable": "Stable",
+      "beta": "Testing",
+      "hintStable": "Final versions only. Recommended.",
+      "hintBeta": "You also get test versions (RC) before the final one. They may have bugs.",
+      "confirm": {
+        "title": "Receive test versions?",
+        "text": "Test versions (RC) arrive before the final one so they can be tried for real. They may have bugs. Your PDFs and annotations are not touched, but export anything important first.",
+        "text2": "To go back to the stable channel, change it here: you will get the next final version.",
+        "yes": "Receive test versions",
+        "cancel": "Cancel"
+      },
+      "back": {
+        "title": "Back to the stable channel",
+        "text": "You stay on {{current}} until the final version is out; it will then be offered to you. If you want the stable one now, install it by hand from GitHub.",
+        "github": "Open GitHub",
+        "ok": "Got it"
+      }
+    }
   }
 }

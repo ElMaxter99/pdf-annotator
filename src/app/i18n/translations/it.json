@@ -999,7 +999,10 @@
     "available": {
       "title": "È disponibile una nuova versione",
       "text": "PDF Annotator {{version}} · hai la {{current}}",
-      "manual": "PDF Annotator {{version}} · hai la {{current}}. Su questo sistema si installa a mano."
+      "manual": "PDF Annotator {{version}} · hai la {{current}}. Su questo sistema si installa a mano.",
+      "titleRc": "C'è una versione di prova",
+      "titleFinal": "C'è la versione finale",
+      "textFinal": "PDF Annotator {{version}} · hai la {{current}} (prova)"
     },
     "now": "Aggiorna ora",
     "download": "Scarica la {{version}}",
@@ -1019,6 +1022,29 @@
     },
     "retry": "Riprova",
     "close": "Chiudi",
-    "pending": "Versione {{version}} disponibile"
+    "pending": "Versione {{version}} disponibile",
+    "tag": "Prova",
+    "downloadingRc": "Download della versione di prova {{version}}…",
+    "notesRc": "Note della versione di prova",
+    "channel": {
+      "label": "Canale di aggiornamento",
+      "stable": "Stabile",
+      "beta": "Prove",
+      "hintStable": "Solo versioni finali. Consigliato.",
+      "hintBeta": "Ricevi anche versioni di prova (RC) prima di quella finale. Possono avere errori.",
+      "confirm": {
+        "title": "Ricevere versioni di prova?",
+        "text": "Le versioni di prova (RC) arrivano prima di quella finale per poterle provare davvero. Possono avere errori. I tuoi PDF e le annotazioni non vengono toccati, ma conviene esportare ciò che è importante.",
+        "text2": "Per tornare al canale stabile, cambialo qui: riceverai la prossima versione finale.",
+        "yes": "Ricevi le prove",
+        "cancel": "Annulla"
+      },
+      "back": {
+        "title": "Tornare al canale stabile",
+        "text": "Resti sulla {{current}} finché non esce la versione finale; allora ti verrà proposta. Se vuoi subito la stabile, installala a mano da GitHub.",
+        "github": "Apri GitHub",
+        "ok": "Ho capito"
+      }
+    }
   }
 }
