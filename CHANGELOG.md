@@ -1,4 +1,6 @@
 ## Unreleased
+### Added
+- **Release candidates**: «Actions → Release candidate → Run workflow» (en `develop`, con la versión X.Y.Z) etiqueta `vX.Y.Z-rc.N` (N sube solo), compila los instaladores de Windows, macOS y Linux y los publica como **pre-release** de GitHub, para probarlos de verdad antes de la versión final. La versión de los instaladores sale de la etiqueta (`sync-desktop-version.mjs --tag`, sin tocar `package.json` en el repo) y las pre-releases no activan el aviso de actualización de las apps estables. Las notas usan la sección de X.Y.Z del CHANGELOG con un aviso de «versión de prueba». La opción dentro de la app para recibir RC queda pendiente de diseño.
 
 ## [v1.8.4](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.8.4) - 2026-11-12
 ### Fixed

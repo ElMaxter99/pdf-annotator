@@ -45,6 +45,7 @@ jobs:
           node-version: 22.12.0
       - name: Version coincide con la etiqueta
         run: node scripts/sync-desktop-version.mjs ${{ env.TAG != '' && format('--tag {0}', env.TAG) || '' }}
+        # (una etiqueta vX.Y.Z-rc.N estampa su versión en package.json solo en este árbol de trabajo)
       - run: npm install --no-fund --no-audit
       - name: Dependencias del ayudante de IA
         run: npm install --no-fund --no-audit
@@ -69,7 +70,8 @@ jobs:
         run: |
           id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --jq ".[] | select(.tag_name==\"$TAG\" and .draft) | .id" | head -n1)
           if [ -n "$id" ]; then echo "Ya hay un borrador de $TAG."; exit 0; fi
-          gh api -X POST "repos/$GITHUB_REPOSITORY/releases" -f tag_name="$TAG" -f name="${TAG#v}" -F draft=true --silent
+          pre=false; case "$TAG" in *-rc.*) pre=true ;; esac
+          gh api -X POST "repos/$GITHUB_REPOSITORY/releases" -f tag_name="$TAG" -f name="${TAG#v}" -F draft=true -F prerelease=$pre --silent
           echo "Borrador de $TAG creado."
 
   package:
@@ -95,7 +97,7 @@ jobs:
       - name: Herramientas de Linux (rpm)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y rpm
-      - run: node scripts/sync-desktop-version.mjs
+      - run: node scripts/sync-desktop-version.mjs ${{ env.TAG != '' && format('--tag {0}', env.TAG) || '' }}
       - run: npm install --no-fund --no-audit
       - name: Dependencias del ayudante de IA
         run: npm install --no-fund --no-audit
@@ -131,7 +133,9 @@ jobs:
           [ "$(echo "$ids" | grep -c .)" -le 1 ] || { echo "Hay varios borradores para $TAG; borra los sobrantes y relanza."; exit 1; }
           id=$(echo "$ids" | head -n1)
           [ -n "$id" ] || { echo "No hay borrador para $TAG"; exit 1; }
-          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F body=@notes.md -f name="${TAG#v}" --silent
+          pre=false; case "$TAG" in *-rc.*) pre=true ;; esac
+          # Una RC siempre es pre-release (nunca «latest»): el aviso de actualización de las apps estables la ignora.
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F body=@notes.md -f name="${TAG#v}" -F prerelease=$pre --silent
           echo "Notas puestas en el borrador de $TAG."
           if [ "$PUBLISH" = true ]; then
             gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F draft=false --silent

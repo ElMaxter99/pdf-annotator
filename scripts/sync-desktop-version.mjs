@@ -10,7 +10,21 @@ const deskUrl = new URL('desktop/package.json', root);
 const desk = JSON.parse(readFileSync(deskUrl, 'utf8'));
 const args = process.argv.slice(2);
 const tagIdx = args.indexOf('--tag');
-if (tagIdx >= 0 && args[tagIdx + 1].replace(/^v/, '') !== rootPkg.version) {
+const tagVersion = tagIdx >= 0 ? args[tagIdx + 1].replace(/^v/, '') : null;
+// Release candidate (vX.Y.Z-rc.N): la versión sale de la etiqueta y se estampa en el árbol de trabajo del CI
+// (package.json y desktop/package.json); nunca se confirma. Así el instalador y el actualizador ven X.Y.Z-rc.N.
+if (tagVersion && /^\d+\.\d+\.\d+-rc\.\d+$/.test(tagVersion)) {
+  if (args.includes('--check')) {
+    console.error('--check no se puede combinar con una etiqueta rc.');
+    process.exit(1);
+  }
+  if (tagVersion.split('-')[0] !== rootPkg.version.split('-')[0]) {
+    console.log(`Aviso: package.json (${rootPkg.version}) no coincide con la base de ${tagVersion}; se usa la de la etiqueta.`);
+  }
+  rootPkg.version = tagVersion;
+  writeFileSync(new URL('package.json', root), JSON.stringify(rootPkg, null, 2) + '\n');
+  console.log(`package.json → ${tagVersion}`);
+} else if (tagVersion && tagVersion !== rootPkg.version) {
   console.error(`La etiqueta ${args[tagIdx + 1]} no coincide con package.json (${rootPkg.version}).`);
   process.exit(1);
 }
