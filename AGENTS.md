@@ -24,6 +24,7 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 | `npm run i18n:check` | Verifica que los 7 JSON de traducción tengan **las mismas claves** que `es-ES` |
 | `node scripts/generate-example.mjs` | Regenera `examples/factura-ejemplo.pdf` |
 | `npm run start:docker` | Imagen NGINX en `http://localhost:4444` |
+| Publicar versión | Ver [`docs/RELEASING.md`](docs/RELEASING.md): subida de versión → release candidate → pruebas → «Release» → Vercel (normalmente lo ejecuta Claude) |
 
 **Antes de dar una tarea por terminada:** `npm run build`, `npm run test:ci` y `npm run e2e` en verde. Si tocas el editor, el historial, la importación JSON, las fuentes o la exportación, **los e2e son tu red de seguridad** (`e2e/*.spec.ts`): ejecútalos antes y después y añade casos para el comportamiento nuevo.
 
