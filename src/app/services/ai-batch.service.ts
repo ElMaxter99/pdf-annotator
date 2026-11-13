@@ -8,7 +8,7 @@ import {
   classifyAiError,
   isEligibleForAiBatch,
 } from '../utils/ai-batch.utils';
-import { AiUsage, sumUsage } from '../utils/ai-proposal.utils';
+import { AiDetails, AiSent, AiStep, AiUsage, sumUsage } from '../utils/ai-proposal.utils';
 import { cascadeAdjust } from '../utils/adjust-cascade.utils';
 import { AiHelperService, AiRequestError } from './ai-helper.service';
 import { BatchStoreService } from './batch-store.service';
@@ -24,6 +24,15 @@ export interface AiBatchRow {
   total: number;
   usage: AiUsage | null;
   error: { code: string; message: string; reset: string | null } | null;
+  /** Live log for «Ver detalles» (names and counts only, never PDF content). Times are ms since `t0`. */
+  t0: number | null;
+  provider: string;
+  sent: AiSent | null;
+  stageLog: Array<{ stage: 'reading' | 'asking' | 'resolving'; attempt: number; at: number }>;
+  stepLog: Array<{ attempt: number; step: AiStep; at: number }>;
+  details: AiDetails | null;
+  /** What the text-based adjustment found (`null` when it was not tried). */
+  cascade: { solved: boolean; why: string | null; fields: number; pagesA: number; pagesB: number; textsA: number; textsB: number; at: number } | null;
 }
 
 export type AiBatchRun = 'idle' | 'running' | 'paused' | 'done';
@@ -54,6 +63,10 @@ export class AiBatchService {
   /** Requests started in this run (shown while the provider reports no tokens). */
   readonly requests = signal(0);
   readonly startedAt = signal<number | null>(null);
+
+  /** «Ver detalles»: open or not, and which PDF (`null` follows the one in progress). */
+  readonly detailsOpen = signal(false);
+  readonly detailsId = signal<string | null>(null);
 
   readonly order = signal<string[]>([]);
   readonly usage = computed(() => sumUsage(Object.values(this.rows()).map((row) => row.usage)));
@@ -106,6 +119,15 @@ export class AiBatchService {
     this.streak = { kind: '', n: 0 };
     void this.loop();
     return 'started';
+  }
+
+  openDetails(id: string | null = null): void {
+    this.detailsId.set(id);
+    this.detailsOpen.set(true);
+  }
+
+  closeDetails(): void {
+    this.detailsOpen.set(false);
   }
 
   /** Stops after the pair in progress; the rest stay queued. */
@@ -226,7 +248,8 @@ export class AiBatchService {
     aPages: BatchItem['aPages'],
     generation: number,
   ): Promise<boolean> {
-    this.patchRow(id, { phase: 'adjusting', attempt: 1, startedAt: Date.now(), endedAt: null, error: null });
+    const t0 = Date.now();
+    this.patchRow(id, { phase: 'adjusting', attempt: 1, startedAt: t0, t0, endedAt: null, error: null, provider: 'adjust', stageLog: [], stepLog: [], sent: null, details: null, cascade: null });
     const [a, b] = await Promise.all([this.texts.read(aPdf), this.texts.read(bPdf)]);
     if (generation !== this.generation) {
       return true;
@@ -235,6 +258,19 @@ export class AiBatchService {
       return false;
     }
     const result = cascadeAdjust(aPages, a, b);
+    const sum = (lists: readonly (readonly unknown[])[]) => lists.reduce((n, list) => n + list.length, 0);
+    this.patchRow(id, {
+      cascade: {
+        solved: result.solved,
+        why: result.why,
+        fields: aPages.reduce((n, page) => n + (Array.isArray(page.fields) ? page.fields.length : 0), 0),
+        pagesA: a.texts.length,
+        pagesB: b.texts.length,
+        textsA: sum(a.texts),
+        textsB: sum(b.texts),
+        at: Date.now() - t0,
+      },
+    });
     if (!result.solved) {
       return false;
     }
@@ -259,19 +295,38 @@ export class AiBatchService {
     }
     this.sentInWindow += 1;
     this.requests.update((n) => n + 1);
-    this.patchRow(id, { phase: 'reading', attempt: 1, startedAt: Date.now(), endedAt: null, error: null });
+    const provider = this.ai.provider();
+    const started = Date.now();
+    const t0 = this.rows()[id]?.t0 ?? started;
+    this.patchRow(id, { phase: 'reading', attempt: 1, startedAt: started, t0, provider, endedAt: null, error: null, stageLog: [{ stage: 'reading', attempt: 1, at: started - t0 }], stepLog: [], sent: null, details: null });
     try {
       const result = await this.ai.propose(
         { a: item.aPdf, b: item.bPdf, template: { pages: item.aPages } },
         (progress) => {
           if (generation === this.generation) {
-            this.patchRow(id, { phase: progress.stage, attempt: progress.attempt ?? this.rows()[id]?.attempt ?? 1 });
+            const row = this.rows()[id];
+            const attempt = progress.attempt ?? row?.attempt ?? 1;
+            this.patchRow(id, {
+              phase: progress.stage,
+              attempt,
+              stageLog: [...(row?.stageLog ?? []), { stage: progress.stage, attempt, at: Date.now() - t0 }],
+            });
           }
         },
         abort.signal,
         (event) => {
-          if (generation === this.generation && event.type === 'step' && event.usage) {
-            this.patchRow(id, { usage: event.usage });
+          if (generation !== this.generation) {
+            return;
+          }
+          const row = this.rows()[id];
+          if (event.type === 'sent') {
+            this.patchRow(id, { sent: event.sent });
+          } else if (event.type === 'step') {
+            const at = Date.now() - t0;
+            this.patchRow(id, {
+              usage: event.usage ?? row?.usage ?? null,
+              stepLog: [...(row?.stepLog ?? []), ...event.steps.map((step) => ({ attempt: event.attempt, step, at }))].slice(-60),
+            });
           }
         },
       );
@@ -289,6 +344,7 @@ export class AiBatchService {
           placed,
           total,
           usage,
+          details: result.details,
           error: { code: result.details?.diagnosis ?? 'ai_found_nothing', message: '', reset: null },
         });
         return null;
@@ -301,7 +357,7 @@ export class AiBatchService {
         seconds: result.seconds,
         at: Date.now(),
       });
-      this.patchRow(id, { phase: placed === total ? 'ready' : 'partial', endedAt: Date.now(), placed, total, usage });
+      this.patchRow(id, { phase: placed === total ? 'ready' : 'partial', endedAt: Date.now(), placed, total, usage, details: result.details });
       return null;
     } catch (error) {
       if (generation !== this.generation) {
@@ -321,7 +377,7 @@ export class AiBatchService {
         this.sentInWindow = Math.max(0, this.sentInWindow - 1);
         return { stop: { kind: kind === 'limit' ? 'limit' : 'fatal', code, reset: info.reset } };
       }
-      this.patchRow(id, { phase: 'failed', endedAt: Date.now(), error: info });
+      this.patchRow(id, { phase: 'failed', endedAt: Date.now(), error: info, details: e?.details ?? this.rows()[id]?.details ?? null });
       if (kind === 'transient') {
         this.streak = { kind: code, n: this.streak.kind === code ? this.streak.n + 1 : 1 };
         if (this.streak.n >= AI_BATCH_BREAKER) {
@@ -340,7 +396,7 @@ export class AiBatchService {
 }
 
 function emptyRow(id: string): AiBatchRow {
-  return { id, phase: 'queued', attempt: 1, startedAt: null, endedAt: null, placed: 0, total: 0, usage: null, error: null };
+  return { id, phase: 'queued', attempt: 1, startedAt: null, endedAt: null, placed: 0, total: 0, usage: null, error: null, t0: null, provider: '', sent: null, stageLog: [], stepLog: [], details: null, cascade: null };
 }
 
 function mapRows(rows: Record<string, AiBatchRow>, fn: (row: AiBatchRow) => AiBatchRow): Record<string, AiBatchRow> {

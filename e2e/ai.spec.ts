@@ -232,3 +232,24 @@ test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido en la
     expect(JSON.parse(after ?? '{}')).toMatchObject({ copilot: 'gpt-5-mini' });
   }
 });
+
+test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos y el consumo del lote', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('ai-batch-button').click();
+  await page.getByTestId('ai-batch-all').click();
+  await page.getByTestId('ai-batch-cascade').uncheck();
+  await page.getByTestId('ai-batch-start').click();
+  await expect(page.getByTestId('ai-batch-details')).toBeVisible();
+  await page.getByTestId('ai-batch-details').click();
+  const dialog = page.getByTestId('ai-bdetails');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(1);
+  await expect(page.getByTestId('ai-bdetails-steps')).toContainText(/\S/);
+  await expect(page.getByTestId('ai-bdetails-batch')).toBeVisible();
+  await page.getByTestId('ai-bdetails-tab-sent').click();
+  await expect(page.getByTestId('ai-bdetails-sent')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  // Once finished, the row keeps a link to what happened.
+  await expect(page.getByTestId('ai-chip-details').first()).toBeVisible();
+});

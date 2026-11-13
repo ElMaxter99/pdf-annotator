@@ -334,6 +334,9 @@
         data-testid="input-b"
       />
       <app-ai-batch-status (reviewFirst)="reviewProposal()" />
+      @if (aiQueue.detailsOpen()) {
+        <app-ai-batch-details />
+      }
       @if (counts().all > 0) {
         <div
           class="batch-drop batch-drop--hint batch-versions"

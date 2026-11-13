@@ -28,6 +28,9 @@
       </div>
       <span class="ai-status__spacer"></span>
       <span class="ai-status__actions">
+        <button type="button" class="btn btn--primary" (click)="queue.openDetails()" data-testid="ai-batch-details">
+          {{ 'batch.ai.details.open' | t }}
+        </button>
         @switch (queue.run()) {
           @case ('running') {
             <button type="button" class="btn btn--ghost" [disabled]="pausing()" (click)="requestPause()" data-testid="ai-batch-pause">

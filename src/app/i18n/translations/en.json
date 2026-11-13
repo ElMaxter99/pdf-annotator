@@ -807,6 +807,43 @@
       "toast": {
         "busy": "An AI run is already in progress.",
         "nothing": "There are no PDFs with a version B and a template A to transfer."
+      },
+      "details": {
+        "title": "What the AI is doing · batch",
+        "run": "{{done}} of {{total}} · {{time}}",
+        "follow": "Follow the PDF in progress",
+        "copyAll": "Copy batch report",
+        "list": "Batch PDFs",
+        "position": "PDF {{n}} of {{total}} · {{time}}",
+        "thisPdf": "This PDF",
+        "allBatch": "Whole batch so far",
+        "requests": "Requests sent",
+        "free": "Solved without AI",
+        "notStarted": "This PDF has not started yet.",
+        "empty": "Nothing to show yet: start the transfer.",
+        "sentNothing": "Nothing was sent to the AI.",
+        "prepare": "{{pagesA}} pages of A and {{pagesB}} of B read, {{textsA}} and {{textsB}} texts extracted",
+        "adjust": "Try the text-based adjustment",
+        "adjustSolved": "No AI: the shift is uniform and all {{fields}} fields have a position",
+        "adjustNot": "The AI is needed: {{why}}",
+        "save": "Save the proposal",
+        "saveSub": "{{placed}} of {{total}} fields placed. Nothing is applied",
+        "saveWait": "The app turns each anchor into x, y. Nothing is applied",
+        "cancelled": "Cancelled",
+        "noSpend": "No request was spent: the text-based adjustment solved it without AI.",
+        "noSpendShort": "text adjustment, 0 requests",
+        "stepOf": "Step {{n}} of {{total}} · {{title}}",
+        "live": "See live",
+        "seeDetails": "See details",
+        "seeDone": "See what it did",
+        "open": "See details",
+        "why": {
+          "sizes": "the pages have different sizes",
+          "pages": "they do not have the same pages",
+          "noText": "A or B has no text",
+          "notUniform": "the shift is not the same across the PDF",
+          "lowConfidence": "there are not enough anchors for every field"
+        }
       }
     }
   },

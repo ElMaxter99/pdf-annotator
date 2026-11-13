@@ -807,6 +807,43 @@
       "toast": {
         "busy": "C'è già un passaggio dell'IA in corso.",
         "nothing": "Non ci sono PDF con versione B e modello A da trasferire."
+      },
+      "details": {
+        "title": "Cosa sta facendo l’IA · lotto",
+        "run": "{{done}} di {{total}} · {{time}}",
+        "follow": "Segui il PDF in corso",
+        "copyAll": "Copia il rapporto del lotto",
+        "list": "PDF del lotto",
+        "position": "PDF {{n}} di {{total}} · {{time}}",
+        "thisPdf": "Questo PDF",
+        "allBatch": "Tutto il lotto finora",
+        "requests": "Richieste inviate",
+        "free": "Risolti senza IA",
+        "notStarted": "Questo PDF non è ancora iniziato.",
+        "empty": "Niente da mostrare per ora: avvia il trasferimento.",
+        "sentNothing": "Non è stato inviato nulla all’IA.",
+        "prepare": "{{pagesA}} pagine di A e {{pagesB}} di B lette, {{textsA}} e {{textsB}} testi estratti",
+        "adjust": "Prova la regolazione per testi",
+        "adjustSolved": "Senza IA: lo spostamento è uniforme e i {{fields}} campi hanno una posizione",
+        "adjustNot": "Serve chiedere all’IA: {{why}}",
+        "save": "Salva la proposta",
+        "saveSub": "{{placed}} campi su {{total}} posizionati. Non viene applicato nulla",
+        "saveWait": "L’app converte ogni ancora in x, y. Non viene applicato nulla",
+        "cancelled": "Annullato",
+        "noSpend": "Nessuna richiesta spesa: la regolazione per testi l’ha risolto senza IA.",
+        "noSpendShort": "regolazione per testi, 0 richieste",
+        "stepOf": "Passo {{n}} di {{total}} · {{title}}",
+        "live": "Vedi in diretta",
+        "seeDetails": "Vedi i dettagli",
+        "seeDone": "Vedi cosa ha fatto",
+        "open": "Vedi i dettagli",
+        "why": {
+          "sizes": "le pagine hanno dimensioni diverse",
+          "pages": "non hanno le stesse pagine",
+          "noText": "manca testo in A o in B",
+          "notUniform": "lo spostamento non è uguale in tutto il PDF",
+          "lowConfidence": "non ci sono abbastanza ancore per tutti i campi"
+        }
       }
     }
   },

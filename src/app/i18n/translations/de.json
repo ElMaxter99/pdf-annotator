@@ -807,6 +807,43 @@
       "toast": {
         "busy": "Es läuft bereits ein KI-Durchlauf.",
         "nothing": "Es gibt keine PDFs mit Version B und Vorlage A zum Übertragen."
+      },
+      "details": {
+        "title": "Was die KI tut · Stapel",
+        "run": "{{done}} von {{total}} · {{time}}",
+        "follow": "Dem laufenden PDF folgen",
+        "copyAll": "Stapelbericht kopieren",
+        "list": "PDFs im Stapel",
+        "position": "PDF {{n}} von {{total}} · {{time}}",
+        "thisPdf": "Dieses PDF",
+        "allBatch": "Gesamter Stapel bisher",
+        "requests": "Gesendete Anfragen",
+        "free": "Ohne KI gelöst",
+        "notStarted": "Dieses PDF hat noch nicht begonnen.",
+        "empty": "Noch nichts zu zeigen: starten Sie die Übertragung.",
+        "sentNothing": "Es wurde nichts an die KI gesendet.",
+        "prepare": "{{pagesA}} Seiten von A und {{pagesB}} von B gelesen, {{textsA}} und {{textsB}} Texte extrahiert",
+        "adjust": "Textbasierte Anpassung testen",
+        "adjustSolved": "Ohne KI: Die Verschiebung ist einheitlich und alle {{fields}} Felder haben eine Position",
+        "adjustNot": "Die KI wird gebraucht: {{why}}",
+        "save": "Vorschlag speichern",
+        "saveSub": "{{placed}} von {{total}} Feldern platziert. Es wird nichts angewendet",
+        "saveWait": "Die App wandelt jeden Anker in x, y um. Es wird nichts angewendet",
+        "cancelled": "Abgebrochen",
+        "noSpend": "Keine Anfrage verbraucht: Die textbasierte Anpassung hat es ohne KI gelöst.",
+        "noSpendShort": "Textanpassung, 0 Anfragen",
+        "stepOf": "Schritt {{n}} von {{total}} · {{title}}",
+        "live": "Live ansehen",
+        "seeDetails": "Details ansehen",
+        "seeDone": "Ansehen, was passiert ist",
+        "open": "Details ansehen",
+        "why": {
+          "sizes": "die Seiten sind unterschiedlich groß",
+          "pages": "sie haben nicht dieselben Seiten",
+          "noText": "in A oder B fehlt Text",
+          "notUniform": "die Verschiebung ist nicht im ganzen PDF gleich",
+          "lowConfidence": "nicht genug Anker für alle Felder"
+        }
       }
     }
   },

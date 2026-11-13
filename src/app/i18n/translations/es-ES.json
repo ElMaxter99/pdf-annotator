@@ -807,6 +807,43 @@
       "toast": {
         "busy": "Ya hay una pasada de IA en marcha.",
         "nothing": "No hay PDFs con versión B y plantilla A para trasladar."
+      },
+      "details": {
+        "title": "Qué está haciendo la IA · lote",
+        "run": "{{done}} de {{total}} · {{time}}",
+        "follow": "Seguir al PDF en curso",
+        "copyAll": "Copiar informe del lote",
+        "list": "PDFs del lote",
+        "position": "PDF {{n}} de {{total}} · {{time}}",
+        "thisPdf": "Este PDF",
+        "allBatch": "Todo el lote hasta ahora",
+        "requests": "Peticiones enviadas",
+        "free": "Resueltos sin IA",
+        "notStarted": "Este PDF aún no ha empezado.",
+        "empty": "Todavía no hay nada que enseñar: lanza el traslado.",
+        "sentNothing": "No se ha enviado nada a la IA.",
+        "prepare": "{{pagesA}} páginas de A y {{pagesB}} de B leídas y {{textsA}} y {{textsB}} textos extraídos",
+        "adjust": "Probar el ajuste por textos",
+        "adjustSolved": "Sin IA: el desplazamiento es uniforme y los {{fields}} campos tienen posición",
+        "adjustNot": "Hace falta preguntar a la IA: {{why}}",
+        "save": "Guardar la propuesta",
+        "saveSub": "{{placed}} de {{total}} campos colocados. Nada se aplica",
+        "saveWait": "La app convierte cada ancla en x, y. Nada se aplica",
+        "cancelled": "Cancelado",
+        "noSpend": "No se ha gastado ninguna petición: el ajuste por textos lo resolvió sin IA.",
+        "noSpendShort": "ajuste por textos, 0 peticiones",
+        "stepOf": "Paso {{n}} de {{total}} · {{title}}",
+        "live": "Ver en vivo",
+        "seeDetails": "Ver detalles",
+        "seeDone": "Ver qué hizo",
+        "open": "Ver detalles",
+        "why": {
+          "sizes": "las páginas miden distinto",
+          "pages": "no tienen las mismas páginas",
+          "noText": "falta texto en A o en B",
+          "notUniform": "el desplazamiento no es igual en todo el PDF",
+          "lowConfidence": "no hay anclas suficientes para todos los campos"
+        }
       }
     }
   },

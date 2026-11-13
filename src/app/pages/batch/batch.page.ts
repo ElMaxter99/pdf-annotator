@@ -5,7 +5,9 @@ import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
 import { AiBatchButtonComponent } from './ai-batch/ai-batch-button.component';
 import { AiBatchChipComponent } from './ai-batch/ai-batch-chip.component';
+import { AiBatchDetailsComponent } from './ai-batch/ai-batch-details.component';
 import { AiBatchStatusComponent } from './ai-batch/ai-batch-status.component';
+import { AiBatchService } from '../../services/ai-batch.service';
 import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
@@ -78,12 +80,14 @@ async function sha256(blob: Blob): Promise<string | null> {
     AiBatchButtonComponent,
     AiBatchChipComponent,
     AiBatchStatusComponent,
+    AiBatchDetailsComponent,
   ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
 })
 export class BatchPageComponent implements OnInit {
   private readonly store = inject(BatchStoreService);
+  readonly aiQueue = inject(AiBatchService);
   private readonly router = inject(Router);
   private readonly pendingFile = inject(PendingFileService);
   private readonly importer = inject(AnnotationImportService);

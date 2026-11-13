@@ -807,6 +807,43 @@
       "toast": {
         "busy": "Ja hi ha una passada d'IA en marxa.",
         "nothing": "No hi ha PDF amb versió B i plantilla A per traslladar."
+      },
+      "details": {
+        "title": "Què està fent la IA · lot",
+        "run": "{{done}} de {{total}} · {{time}}",
+        "follow": "Segueix el PDF en curs",
+        "copyAll": "Copia l’informe del lot",
+        "list": "PDFs del lot",
+        "position": "PDF {{n}} de {{total}} · {{time}}",
+        "thisPdf": "Aquest PDF",
+        "allBatch": "Tot el lot fins ara",
+        "requests": "Peticions enviades",
+        "free": "Resolts sense IA",
+        "notStarted": "Aquest PDF encara no ha començat.",
+        "empty": "Encara no hi ha res a mostrar: llança el trasllat.",
+        "sentNothing": "No s’ha enviat res a la IA.",
+        "prepare": "{{pagesA}} pàgines d’A i {{pagesB}} de B llegides i {{textsA}} i {{textsB}} textos extrets",
+        "adjust": "Provar l’ajust per textos",
+        "adjustSolved": "Sense IA: el desplaçament és uniforme i els {{fields}} camps tenen posició",
+        "adjustNot": "Cal preguntar a la IA: {{why}}",
+        "save": "Desar la proposta",
+        "saveSub": "{{placed}} de {{total}} camps col·locats. No s’aplica res",
+        "saveWait": "L’app converteix cada àncora en x, y. No s’aplica res",
+        "cancelled": "Cancel·lat",
+        "noSpend": "No s’ha gastat cap petició: l’ajust per textos ho ha resolt sense IA.",
+        "noSpendShort": "ajust per textos, 0 peticions",
+        "stepOf": "Pas {{n}} de {{total}} · {{title}}",
+        "live": "Veure en directe",
+        "seeDetails": "Veure detalls",
+        "seeDone": "Veure què ha fet",
+        "open": "Veure detalls",
+        "why": {
+          "sizes": "les pàgines mesuren diferent",
+          "pages": "no tenen les mateixes pàgines",
+          "noText": "falta text a A o a B",
+          "notUniform": "el desplaçament no és igual a tot el PDF",
+          "lowConfidence": "no hi ha prou àncores per a tots els camps"
+        }
       }
     }
   },

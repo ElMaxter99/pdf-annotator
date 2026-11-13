@@ -807,6 +807,43 @@
       "toast": {
         "busy": "Já há uma passagem de IA em curso.",
         "nothing": "Não há PDFs com versão B e modelo A para transferir."
+      },
+      "details": {
+        "title": "O que a IA está a fazer · lote",
+        "run": "{{done}} de {{total}} · {{time}}",
+        "follow": "Seguir o PDF em curso",
+        "copyAll": "Copiar relatório do lote",
+        "list": "PDFs do lote",
+        "position": "PDF {{n}} de {{total}} · {{time}}",
+        "thisPdf": "Este PDF",
+        "allBatch": "Todo o lote até agora",
+        "requests": "Pedidos enviados",
+        "free": "Resolvidos sem IA",
+        "notStarted": "Este PDF ainda não começou.",
+        "empty": "Ainda não há nada para mostrar: inicie a transferência.",
+        "sentNothing": "Nada foi enviado à IA.",
+        "prepare": "{{pagesA}} páginas de A e {{pagesB}} de B lidas, {{textsA}} e {{textsB}} textos extraídos",
+        "adjust": "Tentar o ajuste por textos",
+        "adjustSolved": "Sem IA: o deslocamento é uniforme e os {{fields}} campos têm posição",
+        "adjustNot": "É preciso perguntar à IA: {{why}}",
+        "save": "Guardar a proposta",
+        "saveSub": "{{placed}} de {{total}} campos colocados. Nada é aplicado",
+        "saveWait": "A app converte cada âncora em x, y. Nada é aplicado",
+        "cancelled": "Cancelado",
+        "noSpend": "Nenhum pedido gasto: o ajuste por textos resolveu sem IA.",
+        "noSpendShort": "ajuste por textos, 0 pedidos",
+        "stepOf": "Passo {{n}} de {{total}} · {{title}}",
+        "live": "Ver ao vivo",
+        "seeDetails": "Ver detalhes",
+        "seeDone": "Ver o que fez",
+        "open": "Ver detalhes",
+        "why": {
+          "sizes": "as páginas têm tamanhos diferentes",
+          "pages": "não têm as mesmas páginas",
+          "noText": "falta texto em A ou em B",
+          "notUniform": "o deslocamento não é igual em todo o PDF",
+          "lowConfidence": "não há âncoras suficientes para todos os campos"
+        }
       }
     }
   },

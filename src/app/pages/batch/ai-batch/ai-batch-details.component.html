@@ -1,0 +1,184 @@
+<div class="migration-backdrop ai-details__backdrop" (click)="close()" data-testid="ai-bdetails-backdrop"></div>
+<div
+  class="ai-details ai-bdetails"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="ai-bdetails-title"
+  data-testid="ai-bdetails"
+  tabindex="-1"
+  #dialog
+  (keydown.escape)="close(); $event.stopPropagation()"
+  (keydown.tab)="trapFocus($any($event), dialog)"
+>
+  <header class="ai-details__head">
+    <h2 id="ai-bdetails-title">{{ 'batch.ai.details.title' | t }}</h2>
+    <span class="ai-details__chip">{{ providerLabel() }} · {{ modelName() }}</span>
+    <span class="ai-details__status" role="status">{{ 'batch.ai.details.run' | t: { done: queue.counts().done + queue.counts().failed + queue.counts().cancelled, total: queue.counts().total, time: runElapsed() } }}</span>
+    <span class="ai-details__grow"></span>
+    <label class="ai-bdetails__follow">
+      <input type="checkbox" [checked]="follow()" (change)="follow.set($any($event.target).checked)" data-testid="ai-bdetails-follow" />
+      {{ 'batch.ai.details.follow' | t }}
+    </label>
+    <button type="button" class="btn btn--ghost" (click)="copy(true)" data-testid="ai-bdetails-copy-all">{{ 'batch.ai.details.copyAll' | t }}</button>
+    <button #closeBtn type="button" class="btn btn--ghost" (click)="close()" data-testid="ai-bdetails-close">✕ {{ 'ai.details.close' | t }}</button>
+  </header>
+
+  <div class="ai-bdetails__main">
+    <nav class="ai-bdetails__list" [attr.aria-label]="'batch.ai.details.list' | t">
+      <span class="ai-bdetails__label">{{ 'batch.ai.details.list' | t }}</span>
+      @for (entry of list(); track entry.row.id) {
+        <button
+          type="button"
+          class="ai-bdetails__item"
+          [class.ai-bdetails__item--on]="entry.row.id === selectedId()"
+          [attr.aria-current]="entry.row.id === selectedId() ? 'true' : null"
+          (click)="pick(entry.row.id)"
+          [attr.data-testid]="'ai-bdetails-item-' + entry.row.id"
+        >
+          <span class="ai-bdetails__top">
+            <b>{{ entry.name }}</b>
+            <span class="ai-chip ai-chip--{{ stateOf(entry.row).tone || 'idle' }}">{{ stateOf(entry.row).key | t: stateParams(entry.row) }}</span>
+          </span>
+          <small>{{ rowNote(entry.row) }}</small>
+        </button>
+      }
+    </nav>
+
+    <div class="ai-bdetails__detail">
+      @if (row(); as r) {
+        <div class="ai-bdetails__title">
+          <b>{{ name() }}</b>
+          <span class="ai-details__cap">{{ 'batch.ai.details.position' | t: { n: position().n, total: position().total, time: elapsed() } }}</span>
+          <span class="ai-details__grow"></span>
+          @if (active()) {
+            <button type="button" class="btn btn--danger" (click)="cancelThis()" data-testid="ai-bdetails-cancel">{{ 'batch.ai.skipOne' | t }}</button>
+          } @else {
+            <button type="button" class="btn btn--ghost" (click)="copy(false)" data-testid="ai-bdetails-copy">{{ 'ai.details.copy' | t }}</button>
+          }
+        </div>
+
+        <div class="ai-details__tabs" role="tablist" (keydown)="tabKey($event, dialog)">
+          @for (name of tabs; track name) {
+            <button type="button" role="tab" [attr.tabindex]="tab() === name ? 0 : -1" [attr.aria-selected]="tab() === name" [class.ai-details__tab--on]="tab() === name" (click)="tab.set(name)" [attr.data-testid]="'ai-bdetails-tab-' + name">{{ 'ai.details.tab.' + name | t }}</button>
+          }
+        </div>
+
+        <div class="ai-details__body">
+          @if (r.phase === 'failed' && r.error && tab() === 'summary') {
+            <div class="ai-details__note ai-details__note--err" role="note" data-testid="ai-bdetails-error">
+              <span aria-hidden="true">✕</span>
+              <div>
+                <b>{{ 'ai.error.' + r.error.code + '.title' | t: { provider: providerLabel() } }}</b>
+                @if (r.error.message) {
+                  <br />{{ r.error.message }}
+                }
+                @if (r.details?.diagnosis; as diag) {
+                  <br />{{ 'ai.details.diag.' + diag | t: { provider: providerLabel() } }}
+                }
+              </div>
+            </div>
+          }
+          @if (r.phase === 'free' && tab() === 'summary') {
+            <div class="ai-details__note" role="note" data-testid="ai-bdetails-free">
+              <span aria-hidden="true">ⓘ</span>
+              <div>{{ 'batch.ai.details.noSpend' | t }}</div>
+            </div>
+          }
+
+          <div class="ai-details__cols">
+            @if (tab() === 'summary' || tab() === 'steps') {
+              <section class="ai-details__card ai-details__card--wide">
+                <h3>{{ 'ai.details.steps' | t }}</h3>
+                <ol class="ai-details__timeline" data-testid="ai-bdetails-steps">
+                  @for (item of timeline(); track $index) {
+                    <li class="ai-details__step" [ngClass]="'ai-details__step--' + item.state">
+                      <span class="ai-details__n" aria-hidden="true">{{ item.state === 'done' ? '✓' : item.state === 'err' ? '!' : $index + 1 }}</span>
+                      <span>
+                        {{ item.title }}
+                        @if (item.sub) { <small>{{ item.sub }}</small> }
+                      </span>
+                      <span class="ai-details__time">{{ item.at !== null ? clock(item.at) : '—' }}</span>
+                    </li>
+                  } @empty {
+                    <li class="ai-details__cap">{{ 'batch.ai.details.notStarted' | t }}</li>
+                  }
+                </ol>
+              </section>
+            }
+
+            @if (tab() === 'summary' || tab() === 'usage') {
+              <div class="ai-details__side">
+                <section class="ai-details__card" data-testid="ai-bdetails-usage">
+                  <h3>
+                    {{ 'batch.ai.details.thisPdf' | t }}
+                    @if (measured()) {
+                      <span class="ai-details__badge ai-details__badge--ok">{{ 'ai.details.usage.measured' | t: { provider: providerLabel() } }}</span>
+                    }
+                  </h3>
+                  @if (measured() && usage(); as u) {
+                    <div class="ai-details__big">{{ num(total()) }} <small>{{ 'ai.details.usage.tokens' | t }}</small></div>
+                    <div class="ai-details__bar" aria-hidden="true">
+                      <i class="ai-details__bar--cache" [style.width.%]="share(u.cacheRead)"></i>
+                      <i class="ai-details__bar--write" [style.width.%]="share(u.cacheWrite)"></i>
+                      <i class="ai-details__bar--rest" [style.width.%]="share(u.input + u.output)"></i>
+                    </div>
+                    <dl class="ai-details__kv">
+                      <div><dt>{{ 'ai.details.usage.cacheRead' | t }}</dt><dd>{{ num(u.cacheRead) }}</dd></div>
+                      <div><dt>{{ 'ai.details.usage.input' | t }}</dt><dd>{{ num(u.input) }}</dd></div>
+                      <div><dt>{{ 'ai.details.usage.output' | t }}</dt><dd>{{ num(u.output) }}</dd></div>
+                      @if (credits(); as c) {
+                        <div><dt>{{ 'ai.details.usage.credits' | t }}</dt><dd>≈ {{ c.toFixed(2) }}</dd></div>
+                      }
+                    </dl>
+                  } @else if (r.phase === 'free' || (r.cascade?.solved ?? false)) {
+                    <p class="ai-details__cap">{{ 'batch.ai.details.noSpend' | t }}</p>
+                  } @else if (usedAi()) {
+                    <dl class="ai-details__kv">
+                      <div><dt>{{ 'ai.details.usage.requests' | t }}</dt><dd>{{ 'ai.details.usage.requestsValue' | t: { n: requests() } }}</dd></div>
+                      <div><dt>{{ 'ai.details.usage.estimate' | t }} <span class="ai-details__badge">{{ 'ai.details.usage.estimateBadge' | t }}</span></dt><dd>≈ {{ num(estimate()) }}</dd></div>
+                    </dl>
+                  } @else {
+                    <p class="ai-details__cap">{{ 'ai.details.usage.waiting' | t }}</p>
+                  }
+                </section>
+                <section class="ai-details__card" data-testid="ai-bdetails-batch">
+                  <h3>{{ 'batch.ai.details.allBatch' | t }}</h3>
+                  <div class="ai-details__big">{{ num(batchTokens()) }} <small>{{ 'ai.details.usage.tokens' | t }}</small></div>
+                  <dl class="ai-details__kv">
+                    <div><dt>{{ 'batch.ai.details.requests' | t }}</dt><dd>{{ queue.requests() }}</dd></div>
+                    <div><dt>{{ 'batch.ai.details.free' | t }}</dt><dd>{{ freeCount() }}</dd></div>
+                  </dl>
+                </section>
+              </div>
+            }
+
+            @if (tab() === 'summary' || tab() === 'sent') {
+              <section class="ai-details__card" [class.ai-details__card--wide]="tab() === 'sent'" data-testid="ai-bdetails-sent">
+                <h3>{{ 'ai.details.sent.title' | t }}</h3>
+                @if (r.sent; as sent) {
+                  <p class="ai-details__cap">{{ 'ai.details.sent.text' | t: { provider: providerLabel() } }}</p>
+                  <p class="ai-details__cap">{{ 'ai.details.sent.counts' | t: { fields: sent.fields, pagesA: sent.pagesA, pagesB: sent.pagesB } }}</p>
+                  <ul class="ai-details__files">
+                    @for (file of sentFiles(); track file.name) {
+                      <li><code>{{ file.name }}</code><span>{{ kb(file.bytes) }}</span></li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="ai-details__cap">{{ (r.phase === 'free' ? 'batch.ai.details.sentNothing' : 'ai.details.sent.empty') | t }}</p>
+                }
+              </section>
+            }
+          </div>
+        </div>
+      } @else {
+        <p class="ai-details__cap">{{ 'batch.ai.details.empty' | t }}</p>
+      }
+    </div>
+  </div>
+
+  <footer class="ai-details__foot">
+    <span class="ai-details__cap">{{ 'ai.details.foot.live' | t }}</span>
+    <span class="ai-details__grow"></span>
+    <button type="button" class="btn btn--primary" (click)="close()">{{ 'ai.details.close' | t }}</button>
+  </footer>
+</div>

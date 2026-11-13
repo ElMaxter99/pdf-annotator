@@ -807,6 +807,43 @@
       "toast": {
         "busy": "Un passage de l'IA est déjà en cours.",
         "nothing": "Aucun PDF avec version B et modèle A à transférer."
+      },
+      "details": {
+        "title": "Ce que fait l’IA · lot",
+        "run": "{{done}} sur {{total}} · {{time}}",
+        "follow": "Suivre le PDF en cours",
+        "copyAll": "Copier le rapport du lot",
+        "list": "PDF du lot",
+        "position": "PDF {{n}} sur {{total}} · {{time}}",
+        "thisPdf": "Ce PDF",
+        "allBatch": "Tout le lot jusqu’ici",
+        "requests": "Requêtes envoyées",
+        "free": "Résolus sans IA",
+        "notStarted": "Ce PDF n’a pas encore commencé.",
+        "empty": "Rien à montrer pour l’instant : lancez le transfert.",
+        "sentNothing": "Rien n’a été envoyé à l’IA.",
+        "prepare": "{{pagesA}} pages de A et {{pagesB}} de B lues, {{textsA}} et {{textsB}} textes extraits",
+        "adjust": "Essayer l’ajustement par textes",
+        "adjustSolved": "Sans IA : le décalage est uniforme et les {{fields}} champs ont une position",
+        "adjustNot": "Il faut interroger l’IA : {{why}}",
+        "save": "Enregistrer la proposition",
+        "saveSub": "{{placed}} champs sur {{total}} placés. Rien n’est appliqué",
+        "saveWait": "L’app convertit chaque ancre en x, y. Rien n’est appliqué",
+        "cancelled": "Annulé",
+        "noSpend": "Aucune requête dépensée : l’ajustement par textes l’a résolu sans IA.",
+        "noSpendShort": "ajustement par textes, 0 requête",
+        "stepOf": "Étape {{n}} sur {{total}} · {{title}}",
+        "live": "Voir en direct",
+        "seeDetails": "Voir les détails",
+        "seeDone": "Voir ce qui a été fait",
+        "open": "Voir les détails",
+        "why": {
+          "sizes": "les pages n’ont pas la même taille",
+          "pages": "elles n’ont pas les mêmes pages",
+          "noText": "il manque du texte dans A ou B",
+          "notUniform": "le décalage n’est pas le même dans tout le PDF",
+          "lowConfidence": "pas assez d’ancres pour tous les champs"
+        }
       }
     }
   },
