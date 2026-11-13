@@ -32,14 +32,16 @@ for (const width of [1650, 1280, 1100]) {
   });
 }
 
-test('at 1100px shortcuts, theme and language move into the ⋯ menu', async ({ page }) => {
-  await open(page, 1100);
-  await expect(page.getByRole('button', { name: 'Atajos de teclado' })).toBeHidden();
-  await page.getByTestId('more-options').click();
-  await expect(page.getByRole('button', { name: 'Atajos de teclado' })).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('button', { name: 'Atajos de teclado' })).toBeHidden();
-});
+for (const width of [1920, 1280, 1100]) {
+  test(`at ${width}px shortcuts, theme and language live in the ⋯ menu`, async ({ page }) => {
+    await open(page, width);
+    await expect(page.getByRole('button', { name: 'Atajos de teclado' })).toBeHidden();
+    await page.getByTestId('more-options').click();
+    await expect(page.getByRole('button', { name: 'Atajos de teclado' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('button', { name: 'Atajos de teclado' })).toBeHidden();
+  });
+}
 
 test('«Limpiar» asks before removing the annotations', async ({ page }) => {
   await open(page, 1280);

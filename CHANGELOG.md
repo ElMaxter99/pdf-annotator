@@ -1,4 +1,6 @@
 ## Unreleased
+### Changed
+- **Interfaz más simple a 1080p (mesas P-40 a P-44):** el panel izquierdo del workspace mantiene fijos el botón ⟨ y las pestañas y solo se desplaza su contenido (un único scroll por zona); las coordenadas del cursor pasan al pie; las ayudas fijas bajo botones, casillas y títulos de Avanzado, JSON, plantillas y guías pasan a un icono ⓘ con la explicación al pasar el ratón o con el foco; atajos, tema e idioma van siempre en el menú ⋯ (antes solo por debajo de 1200 px); en el editor del lote la propuesta de la IA flota al pie del visor en vez de apilar una tercera barra y las barras son más bajas; los estados de campo usan un chip neutro con punto de color (ámbar = atención, turquesa = nuevo); «Colocar» y «Descartar» aparecen al pasar el ratón o al enfocar la fila; solo se ve un aviso a la vez, sin repetidos, arriba a la derecha del visor.
 
 ## [v1.9.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.9.1) - 2026-11-13
 ### Fixed

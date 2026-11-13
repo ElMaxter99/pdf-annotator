@@ -1,3 +1,25 @@
 :host {
   display: contents;
 }
+
+.json-coords {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.json-coords__label {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.json-coords__value {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.json-coords__divider {
+  opacity: 0.6;
+}

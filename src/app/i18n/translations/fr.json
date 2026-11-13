@@ -1221,5 +1221,8 @@
         "ok": "Compris"
       }
     }
+  },
+  "hint": {
+    "label": "Plus d'informations"
   }
 }

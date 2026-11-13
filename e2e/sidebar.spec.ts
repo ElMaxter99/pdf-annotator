@@ -81,3 +81,18 @@ test.describe('narrow screens', () => {
     await expect(page.locator('.advanced-panel')).toBeVisible();
   });
 });
+
+test('the sidebar keeps its tabs and the collapse button while the panel scrolls', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 700 });
+  await openWorkspace(page, { tab: 'Avanzado' });
+  const toggle = page.locator('.sidebar-minimize-toggle');
+  await expect(toggle).toBeVisible();
+  await page.locator('.sidebar-scroll').evaluate((el) => (el.scrollTop = el.scrollHeight));
+  await expect(toggle).toBeInViewport();
+  await expect(page.getByRole('tab', { name: /^\s*Avanzado/ })).toBeInViewport();
+  const scrollers = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('.sidebar')].filter((e) => e.scrollHeight > e.clientHeight + 2).length,
+  );
+  expect(scrollers).toBe(0);
+});
