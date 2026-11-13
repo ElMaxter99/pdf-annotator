@@ -1,4 +1,6 @@
 ## Unreleased
+### Changed
+- **Al abrir un PDF se ajusta a la página (mesa P-47):** en escritorio el zoom inicial hace que la página entera quepa en el visor sin scroll (antes 150 %). La sesión recuperada conserva su zoom.
 
 ## [v1.9.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.9.2) - 2026-11-13
 ### Changed

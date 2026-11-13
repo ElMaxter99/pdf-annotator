@@ -5,7 +5,11 @@ export const EXAMPLE_PDF = join(__dirname, '..', 'examples', 'factura-ejemplo.pd
 export const EXAMPLE_JSON = join(__dirname, '..', 'examples', 'anotaciones-ejemplo.json');
 
 /** Blocks Vercel analytics scripts, which do not exist outside Vercel. */
-export async function stubAnalytics(page: Page) {
+export async function stubAnalytics(page: Page, options: { fit?: boolean } = {}) {
+  if (!options.fit) {
+    // Los tests parten del zoom histórico (150 %); el ajuste a la página se prueba aparte.
+    await page.addInitScript(() => ((window as unknown as { __PDFA_NO_FIT__: boolean }).__PDFA_NO_FIT__ = true));
+  }
   await page.route('**/_vercel/**', (route) =>
     route.fulfill({ status: 200, contentType: 'text/javascript', body: '' })
   );

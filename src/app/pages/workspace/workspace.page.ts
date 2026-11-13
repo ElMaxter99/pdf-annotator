@@ -1848,8 +1848,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.render();
     if (restore) {
       this.redrawAllForPage();
-    } else if (typeof window !== 'undefined' && window.innerWidth < 960) {
-      await this.fitWidth();
+    } else if (
+      typeof window !== 'undefined' &&
+      !(window as { __PDFA_NO_FIT__?: boolean }).__PDFA_NO_FIT__
+    ) {
+      await (window.innerWidth < 960 ? this.fitWidth() : this.fitPage());
     }
     this.generatePageThumbnails().catch((error) =>
       console.error('No se pudieron generar las miniaturas del documento.', error),
@@ -5550,6 +5553,39 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   async zoomOut() {
     this.scale.update((s) => Math.max(0.25, +(this.scale() - 0.25).toFixed(2)));
     await this.render();
+    this.redrawAllForPage();
+  }
+
+  async fitPage() {
+    if (!this.pdfDoc) {
+      return;
+    }
+
+    const container = this.pdfViewerRef?.nativeElement.parentElement;
+    if (!container) {
+      return;
+    }
+
+    const page = await this.pdfDoc.getPage(this.pageIndex());
+    const base = page.getViewport({ scale: 1 });
+    const style = getComputedStyle(container);
+    const availableW =
+      container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    const availableH =
+      container.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    if (!(base.width > 0) || !(availableW > 0) || !(availableH > 0)) {
+      return;
+    }
+
+    const fit = Math.min(availableW / base.width, availableH / base.height);
+    this.scale.set(Math.min(4, Math.max(0.25, Math.floor(fit * 100) / 100)));
+    await this.render();
+    const overflow = container.scrollHeight - container.clientHeight;
+    if (overflow > 0) {
+      const adjusted = Math.floor(((base.height * this.scale() - overflow) / base.height) * 100) / 100;
+      this.scale.set(Math.min(4, Math.max(0.25, adjusted)));
+      await this.render();
+    }
     this.redrawAllForPage();
   }
 
