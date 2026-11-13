@@ -208,13 +208,19 @@ test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido en la
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   await page.getByTestId('ai-batch-all').click();
-  await page.getByTestId('ai-batch-provider-claude').click();
-  await expect(page.getByTestId('ai-batch-provider-claude')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByTestId('ai-batch-model-sonnet')).toHaveAttribute('aria-pressed', 'true');
-  await page.getByTestId('ai-batch-model-haiku').click();
-  await expect(page.getByTestId('ai-batch-model-haiku')).toHaveAttribute('aria-pressed', 'true');
-  const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
-  expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: 'haiku' });
+  // Without the real CLIs only the simulated provider is installed: the others show disabled, as in the editor panel.
+  await expect(page.getByTestId('ai-batch-provider-claude')).toBeVisible();
+  await expect(page.getByTestId('ai-batch-provider-copilot')).toBeVisible();
+  await expect(page.getByTestId('ai-batch-provider-fake')).toHaveAttribute('aria-pressed', 'true');
+  const claude = page.getByTestId('ai-batch-provider-claude');
+  if (await claude.isEnabled()) {
+    await claude.click();
+    await expect(page.getByTestId('ai-batch-model-sonnet')).toHaveAttribute('aria-pressed', 'true');
+    await page.getByTestId('ai-batch-model-haiku').click();
+    await expect(page.getByTestId('ai-batch-model-haiku')).toHaveAttribute('aria-pressed', 'true');
+    const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
+    expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: 'haiku' });
+  }
   const copilot = page.getByTestId('ai-batch-provider-copilot');
   if (await copilot.isEnabled()) {
     await copilot.click();
