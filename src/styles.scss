@@ -4394,6 +4394,22 @@ kbd {
 .update-card--error {
   border-left-color: var(--danger);
 }
+.update-card--test {
+  border-left-color: var(--warn, #fbbf24);
+}
+.update-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border: 1px solid var(--warn, #fbbf24);
+  border-radius: 999px;
+  color: var(--warn, #fbbf24);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
 .update-card__head {
   display: flex;
   align-items: center;
@@ -4833,4 +4849,85 @@ body.has-update-card .toast-host {
 
 .ai-panel__check input {
   accent-color: var(--accent);
+}
+
+/* Canal de actualizaciones (app de escritorio): selector Estable / Pruebas y confirmación (diseño RC-01) */
+.update-channel {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.update-channel__row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.update-channel__seg {
+  display: inline-flex;
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.update-channel__seg button {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.update-channel__seg button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--bg);
+}
+.update-channel__seg button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+/* Vive en el pie del editor (no cabe en la barra superior); allí la pista larga sobra */
+.update-channel__hint {
+  display: none;
+}
+.update-channel__veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.45);
+}
+.update-channel__dialog {
+  position: fixed;
+  z-index: 1101;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(440px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+  animation: update-card-in 0.22s ease-out;
+}
+.update-channel__dialog p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.update-channel__dialog .update-card__actions {
+  justify-content: flex-end;
+}
+@media (prefers-reduced-motion: reduce) {
+  .update-channel__dialog {
+    animation: none;
+  }
 }

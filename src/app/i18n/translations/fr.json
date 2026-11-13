@@ -999,7 +999,10 @@
     "available": {
       "title": "Une nouvelle version est disponible",
       "text": "PDF Annotator {{version}} · vous avez la {{current}}",
-      "manual": "PDF Annotator {{version}} · vous avez la {{current}}. Sur ce système, l'installation est manuelle."
+      "manual": "PDF Annotator {{version}} · vous avez la {{current}}. Sur ce système, l'installation est manuelle.",
+      "titleRc": "Une version de test est disponible",
+      "titleFinal": "La version finale est disponible",
+      "textFinal": "PDF Annotator {{version}} · vous avez la {{current}} (test)"
     },
     "now": "Mettre à jour",
     "download": "Télécharger la {{version}}",
@@ -1019,6 +1022,29 @@
     },
     "retry": "Réessayer",
     "close": "Fermer",
-    "pending": "Version {{version}} disponible"
+    "pending": "Version {{version}} disponible",
+    "tag": "Test",
+    "downloadingRc": "Téléchargement de la version de test {{version}}…",
+    "notesRc": "Notes de la version de test",
+    "channel": {
+      "label": "Canal de mises à jour",
+      "stable": "Stable",
+      "beta": "Tests",
+      "hintStable": "Versions finales uniquement. Recommandé.",
+      "hintBeta": "Vous recevez aussi des versions de test (RC) avant la finale. Elles peuvent avoir des bugs.",
+      "confirm": {
+        "title": "Recevoir les versions de test ?",
+        "text": "Les versions de test (RC) arrivent avant la finale pour pouvoir être essayées pour de vrai. Elles peuvent avoir des bugs. Vos PDF et annotations ne sont pas touchés, mais exportez d'abord l'important.",
+        "text2": "Pour revenir au canal stable, changez-le ici : vous recevrez la prochaine version finale.",
+        "yes": "Recevoir les tests",
+        "cancel": "Annuler"
+      },
+      "back": {
+        "title": "Revenir au canal stable",
+        "text": "Vous restez sur la {{current}} jusqu'à la sortie de la version finale ; elle vous sera alors proposée. Pour la stable tout de suite, installez-la à la main depuis GitHub.",
+        "github": "Ouvrir GitHub",
+        "ok": "Compris"
+      }
+    }
   }
 }

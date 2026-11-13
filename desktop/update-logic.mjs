@@ -62,4 +62,29 @@ export function parseLatestRelease(json) {
   return { version, url };
 }
 
+export const CHANNELS = ['stable', 'beta'];
+/** Canal guardado → «stable» o «beta»; cualquier otra cosa (archivo roto, valor raro) es «stable». */
+export const normalizeChannel = (value) => (value === 'beta' ? 'beta' : 'stable');
+
+/**
+ * Respuesta de GitHub (una release o la lista de releases) → { version, url, prerelease } o null.
+ * Estable: solo versiones finales (como parseLatestRelease). Pruebas (`prerelease: true`): además las
+ * pre-releases «X.Y.Z-rc.N»; entre todas gana la mayor, y la final de X.Y.Z gana a sus RC.
+ */
+export function parseReleaseForChannel(json, { prerelease = false } = {}) {
+  const list = Array.isArray(json) ? json : [json];
+  const prefix = `${RELEASES_URL}/`;
+  let best = null;
+  for (const item of list) {
+    if (!item || typeof item !== 'object' || item.draft === true) continue;
+    const parsed = parseVersion(item.tag_name);
+    if (!parsed) continue;
+    if (parsed.pre !== null && !(prerelease && /^rc\.\d+$/.test(parsed.pre))) continue;
+    const version = parsed.nums.join('.') + (parsed.pre ? `-${parsed.pre}` : '');
+    const url = typeof item.html_url === 'string' && item.html_url.startsWith(prefix) ? item.html_url : `${prefix}tag/v${version}`;
+    if (!best || compareVersions(version, best.version) > 0) best = { version, url, prerelease: parsed.pre !== null };
+  }
+  return best;
+}
+
 export const bytesToMb = (n) => Math.round((Number(n) || 0) / 1048576);

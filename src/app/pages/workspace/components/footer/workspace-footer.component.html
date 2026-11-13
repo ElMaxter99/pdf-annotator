@@ -1,5 +1,6 @@
 <footer class="footer">
   <span class="footer__hint"><kbd>?</kbd> {{ 'shortcuts.footerHint' | t }}</span>
+  <app-update-channel class="footer__channel"></app-update-channel>
   <span class="footer__details">
     © {{ vm.currentYear }} {{ vm.appName }} · v{{ vm.version }} · {{ 'app.footer.developedBy' | t : { author: vm.appAuthor } }}
   </span>

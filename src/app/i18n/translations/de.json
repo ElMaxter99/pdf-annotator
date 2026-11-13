@@ -999,7 +999,10 @@
     "available": {
       "title": "Eine neue Version ist verfügbar",
       "text": "PDF Annotator {{version}} · Sie haben {{current}}",
-      "manual": "PDF Annotator {{version}} · Sie haben {{current}}. Auf diesem System wird manuell installiert."
+      "manual": "PDF Annotator {{version}} · Sie haben {{current}}. Auf diesem System wird manuell installiert.",
+      "titleRc": "Eine Testversion ist verfügbar",
+      "titleFinal": "Die endgültige Version ist da",
+      "textFinal": "PDF Annotator {{version}} · du hast {{current}} (Test)"
     },
     "now": "Jetzt aktualisieren",
     "download": "{{version}} herunterladen",
@@ -1019,6 +1022,29 @@
     },
     "retry": "Erneut versuchen",
     "close": "Schließen",
-    "pending": "Version {{version}} verfügbar"
+    "pending": "Version {{version}} verfügbar",
+    "tag": "Test",
+    "downloadingRc": "Testversion {{version}} wird heruntergeladen…",
+    "notesRc": "Hinweise zur Testversion",
+    "channel": {
+      "label": "Update-Kanal",
+      "stable": "Stabil",
+      "beta": "Tests",
+      "hintStable": "Nur endgültige Versionen. Empfohlen.",
+      "hintBeta": "Du erhältst auch Testversionen (RC) vor der endgültigen. Sie können Fehler haben.",
+      "confirm": {
+        "title": "Testversionen erhalten?",
+        "text": "Testversionen (RC) kommen vor der endgültigen, damit man sie echt ausprobieren kann. Sie können Fehler haben. Deine PDFs und Anmerkungen bleiben unberührt, exportiere aber vorher Wichtiges.",
+        "text2": "Um zum stabilen Kanal zurückzukehren, ändere ihn hier: du erhältst die nächste endgültige Version.",
+        "yes": "Tests erhalten",
+        "cancel": "Abbrechen"
+      },
+      "back": {
+        "title": "Zurück zum stabilen Kanal",
+        "text": "Du bleibst bei {{current}}, bis die endgültige Version erscheint; dann wird sie angeboten. Willst du die stabile sofort, installiere sie von Hand über GitHub.",
+        "github": "GitHub öffnen",
+        "ok": "Verstanden"
+      }
+    }
   }
 }

@@ -3,10 +3,10 @@ import { app, BrowserWindow, ipcMain, net, protocol, session, shell, Menu } from
 import electronUpdater from 'electron-updater';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, isNewer, parseLatestRelease, updateMode } from './update-logic.mjs';
+import { RELEASES_URL, REPO, isNewer, normalizeChannel, parseReleaseForChannel, updateMode } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { goInHistory, historyDirectionForCommand, historyDirectionForKey } from './history-nav.mjs';
@@ -90,7 +90,17 @@ const stopHelper = () => {
 
 // ───────── Actualizaciones ─────────
 const mode = updateMode({ platform: process.platform, appImage: Boolean(process.env.APPIMAGE), macSigned: false });
-let state = { status: 'idle', mode, current: app.getVersion() };
+// Canal de actualizaciones («stable» por defecto, «beta» = también versiones de prueba RC). Se guarda en la carpeta de datos de la app.
+const settingsFile = path.join(app.getPath('userData'), 'update-channel.json');
+const loadChannel = () => {
+  try {
+    return normalizeChannel(JSON.parse(readFileSync(settingsFile, 'utf8')).channel);
+  } catch {
+    return 'stable';
+  }
+};
+let channel = loadChannel();
+let state = { status: 'idle', mode, current: app.getVersion(), channel };
 let cancelToken = null;
 const setState = (patch) => {
   state = { ...state, ...patch };
@@ -101,13 +111,16 @@ const setError = (err) => {
   setState({ status: 'error', error: 'update' });
 };
 
-const releaseApi = process.env.PDF_ANNOTATOR_RELEASE_API || `https://api.github.com/repos/${REPO.owner}/${REPO.repo}/releases/latest`;
+const releasesApi = `https://api.github.com/repos/${REPO.owner}/${REPO.repo}/releases`;
+const releaseApi = () => process.env.PDF_ANNOTATOR_RELEASE_API || (channel === 'beta' ? `${releasesApi}?per_page=30` : `${releasesApi}/latest`);
 
 async function checkManual() {
-  const res = await net.fetch(releaseApi, { headers: { accept: 'application/vnd.github+json' } });
+  const res = await net.fetch(releaseApi(), { headers: { accept: 'application/vnd.github+json' } });
   if (!res.ok) throw new Error(`GitHub ${res.status}`);
-  const latest = parseLatestRelease(await res.json());
-  if (latest && isNewer(app.getVersion(), latest.version)) setState({ status: 'available', version: latest.version, notesUrl: latest.url, error: undefined });
+  const latest = parseReleaseForChannel(await res.json(), { prerelease: channel === 'beta' });
+  if (latest && isNewer(app.getVersion(), latest.version)) {
+    setState({ status: 'available', version: latest.version, prerelease: latest.prerelease, notesUrl: latest.url, error: undefined });
+  }
 }
 
 async function checkForUpdates() {
@@ -124,14 +137,14 @@ async function checkForUpdates() {
 function setupUpdater() {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
-  autoUpdater.allowPrerelease = false;
+  autoUpdater.allowPrerelease = channel === 'beta';
   autoUpdater.allowDowngrade = false;
   if (process.env.PDF_ANNOTATOR_UPDATE_URL) {
     autoUpdater.forceDevUpdateConfig = true;
     autoUpdater.setFeedURL({ provider: 'generic', url: process.env.PDF_ANNOTATOR_UPDATE_URL });
   }
   autoUpdater.on('update-available', (info) =>
-    setState({ status: 'available', version: info.version, notesUrl: `${RELEASES_URL}/tag/v${info.version}`, error: undefined }),
+    setState({ status: 'available', version: info.version, prerelease: /-rc\.\d+$/.test(info.version), notesUrl: `${RELEASES_URL}/tag/v${info.version}`, error: undefined }),
   );
   autoUpdater.on('download-progress', (p) => setState({ status: 'downloading', percent: Math.round(p.percent), transferred: p.transferred, total: p.total }));
   autoUpdater.on('update-downloaded', () => setState({ status: 'ready' }));
@@ -161,6 +174,21 @@ function setupIpc() {
     } finally {
       cancelToken = null;
     }
+  });
+  handle('desktop:update:set-channel', (next) => {
+    const value = normalizeChannel(next);
+    if (value === channel) return;
+    channel = value;
+    autoUpdater.allowPrerelease = channel === 'beta';
+    try {
+      writeFileSync(settingsFile, JSON.stringify({ channel }));
+    } catch (e) {
+      console.warn('[desktop] no se pudo guardar el canal:', e?.message || e);
+    }
+    // Una descarga en curso o ya lista sigue su camino; si no, se vuelve a mirar con el canal nuevo.
+    if (['downloading', 'ready'].includes(state.status)) return setState({ channel });
+    setState({ channel, status: 'idle', version: undefined, prerelease: undefined, notesUrl: undefined, error: undefined });
+    return checkForUpdates();
   });
   handle('desktop:update:cancel', () => cancelToken?.cancel());
   handle('desktop:update:install', () => {

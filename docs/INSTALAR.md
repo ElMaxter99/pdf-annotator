@@ -111,3 +111,7 @@ La app instalada arranca sola el ayudante de IA, pero necesitas tener **`claude`
 | Windows o macOS bloquean la app | Es el aviso por no estar firmada; sigue los pasos de tu sistema |
 | El AppImage no se abre | Permiso de ejecución y `libfuse2` |
 | No aparece ningún instalador en la release | Aún no se ha publicado; usa la web mientras tanto |
+
+## Versiones de prueba (RC)
+
+Antes de cada versión final puede haber una *release candidate* (`X.Y.Z-rc.N`), publicada como **pre-release** en [GitHub Releases](https://github.com/ElMaxter99/pdf-annotator/releases). Puedes instalarla a mano igual que cualquier otra, o en la app de escritorio activar «Pruebas» en *Canal de actualizaciones* (pie del editor) para recibirlas como actualización. Pueden fallar: no las uses para trabajo crítico.
