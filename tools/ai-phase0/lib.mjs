@@ -73,17 +73,20 @@ export const looksLikeProposals = (v) =>
   (Array.isArray(v) && v.some((x) => x && typeof x === 'object' && typeof x.id === 'string')) || (!!v && Array.isArray(v.fields));
 
 /** ¿Ha devuelto la IA el código de cada imagen? Devuelve los nombres que faltan o no coinciden. */
-export function missingImageCodes(data, codes) {
-  return describeImageCodes(data, codes).missing;
+export function missingImageCodes(data, codes, opts) {
+  return describeImageCodes(data, codes, opts).missing;
 }
 
 /** Como `missingImageCodes`, y además lo que devolvió la IA por cada imagen que falla (para diagnosticar; los códigos son aleatorios, no contenido del PDF). */
-export function describeImageCodes(data, codes) {
+export function describeImageCodes(data, codes, { minMatch } = {}) {
   const raw = data && typeof data === 'object' && !Array.isArray(data) && data.images && typeof data.images === 'object' ? data.images : {};
   // Admite claves como «A-p1.png» y un carácter mal transcrito (el modelo pequeño confunde letras parecidas).
   const got = {};
   for (const [k, v] of Object.entries(raw)) got[String(k).replace(/\.png$/i, '').trim()] = String(v ?? '').trim().toUpperCase();
-  const close = (a, b) => a.length === b.length && [...a].filter((c, i) => c !== b[i]).length <= 1;
+  // Por defecto, mismo largo y como mucho un carácter distinto. Con `minMatch` (Copilot, que reescala las imágenes y a veces
+  // pone «?» en lo que no distingue) basta con acertar ese número de posiciones: por azar es ~1 entre 200.
+  const close = (a, b) =>
+    minMatch ? [...b].filter((c, i) => a[i] === c).length >= minMatch : a.length === b.length && [...a].filter((c, i) => c !== b[i]).length <= 1;
   const bad = Object.entries(codes).filter(([name, code]) => !close(got[name] ?? '', code));
   return {
     missing: bad.map(([name]) => name),
@@ -212,7 +215,7 @@ ${attached ? 'Las imágenes ya vienen adjuntas a este mensaje: míralas ahí, no
 
 Mira las imágenes de A y B para confirmar que el ancla es el mismo concepto. No inventes textos: "anchorA" y "anchorB" deben existir literalmente en textsA.json y textsB.json.
 
-${codes ? `Cada imagen lleva, en una franja añadida debajo de la página, un código de 4 caracteres muy grande. Debes abrir TODAS las imágenes y copiar el código de cada una en "images" (${Object.keys(codes).join(', ')}). Sin esos códigos la respuesta se descarta.
+${codes ? `Cada imagen lleva, en una franja añadida debajo de la página, un código de 4 caracteres muy grande. Debes abrir TODAS las imágenes y copiar el código de cada una en "images" (si dudas de un carácter escribe tu mejor lectura; nunca "?") (${Object.keys(codes).join(', ')}). Sin esos códigos la respuesta se descarta.
 
 Responde SOLO con un objeto JSON, sin texto antes ni después:
 {"images":{"A-p1":"XXXX"},"fields":[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]}

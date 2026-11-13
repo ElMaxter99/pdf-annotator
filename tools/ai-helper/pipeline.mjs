@@ -81,7 +81,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
             quiet: true,
             attachments: names.map((n) => `${n}.png`),
             stream: true,
-            instruction: `Mira las imágenes adjuntas (${names.join(', ')}). Cada una lleva un código de 4 caracteres muy grande en la franja inferior. No uses herramientas. Responde SOLO con un objeto JSON {"images":{${names.map((n) => `"${n}":"CODIGO"`).join(',')}}}.`,
+            instruction: `Mira las imágenes adjuntas (${names.join(', ')}). Cada una lleva un código de 4 caracteres muy grande en la franja inferior. No uses herramientas. Responde SOLO con un objeto JSON {"images":{${names.map((n) => `"${n}":"XXXX"`).join(',')}}} con los 4 caracteres de cada imagen. Si dudas de un carácter escribe tu mejor lectura, nunca "?".`,
           });
           seconds += probe.seconds ?? 0;
           if (probe.aborted) throw Object.assign(new Error('Cancelado.'), { code: 'aborted' });
@@ -95,7 +95,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
             } catch {
               /* respuesta no JSON: cuenta como no leída */
             }
-            const d = describeImageCodes(data, subset);
+            const d = describeImageCodes(data, subset, { minMatch: 2 });
             ok = d.missing.length === 0;
             details.probe = { ok, seconds: probe.seconds, images: names.length, tokens: ex.meta.usage ? Object.values(ex.meta.usage).reduce((n, x) => n + (Number(x) || 0), 0) : null, aiCredits: ex.meta.aiCredits ?? null };
             if (!ok) throw Object.assign(new Error(`Copilot no lee las imágenes adjuntas (prueba previa con ${names.join(' y ')}): ${d.given.map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}. No se ha lanzado la ejecución completa para no gastar créditos.`), { code: 'images_not_read', details });
@@ -162,7 +162,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
         if (ex.meta.isError) throw Object.assign(new Error(`El CLI devolvió un error: ${tail(ex.text)}`), { code: 'cli_error', details });
         const data = parseJsonFromText(ex.text, looksLikeProposals);
         if (codes) {
-          const { missing, given, returned } = describeImageCodes(data, codes);
+          const { missing, given, returned } = describeImageCodes(data, codes, provider === 'copilot' ? { minMatch: 2 } : undefined);
           attemptInfo.imagesMissing = missing.length;
           if (missing.length) {
             // La IA no ha leído las imágenes: no se aprovecha una respuesta hecha solo con los textos.

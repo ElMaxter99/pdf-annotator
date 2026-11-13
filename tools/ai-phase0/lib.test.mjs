@@ -83,3 +83,11 @@ test('describeImageCodes explica qué devolvió la IA en cada imagen que falla',
   assert.deepEqual(r.given[0], { name: 'A-p1', got: 'ZZZZ', expected: 'ABCD' });
   assert.equal(r.returned, 2);
 });
+
+test('describeImageCodes con minMatch acepta lecturas parciales con «?»', async () => {
+  const { describeImageCodes } = await import('./lib.mjs');
+  const codes = { 'A-p1': 'V62J', 'B-p1': 'CVBH' };
+  assert.deepEqual(describeImageCodes({ images: { 'A-p1': '?62?', 'B-p1': 'CVBH' } }, codes).missing, ['A-p1']);
+  assert.deepEqual(describeImageCodes({ images: { 'A-p1': '?62?', 'B-p1': 'CVBH' } }, codes, { minMatch: 2 }).missing, []);
+  assert.deepEqual(describeImageCodes({ images: { 'A-p1': '????', 'B-p1': 'C???' } }, codes, { minMatch: 2 }).missing, ['A-p1', 'B-p1']);
+});
