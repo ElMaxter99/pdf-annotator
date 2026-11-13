@@ -1,4 +1,6 @@
 ## Unreleased
+### Changed
+- **El modelo de IA se elige de la lista real del CLI (IA-16, IA-16b):** el ayudante local lee los modelos que ofrece cada CLI, igual que su `/model` (nuevo `GET /models`: Claude Code por la petición `initialize` de su modo stream-json, sin gastar tokens; Copilot CLI por su servidor ACP `copilot --acp`), y el panel «✦ IA» del editor y la confirmación de «Trasladar con IA» en el lote lo muestran en un desplegable (Copilot agrupado por proveedor, con «Automático» arriba). Ya no hay campo de texto ni lista fija Haiku/Sonnet/Opus: no se puede escribir un modelo mal. La lista se guarda en este ordenador (sale al instante y se refresca al abrir), con «Actualizar»; si falla (sin sesión, CLI no encontrado, tiempo agotado) se ofrece la última guardada y «Reintentar»; si el CLI no devuelve nada se usa el modelo por defecto/«Automático»; y si el modelo guardado ya no existe se vuelve a uno válido con un aviso. Textos en los 7 idiomas, con tests unitarios, del ayudante y e2e.
 
 ## [v1.9.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.9.0) - 2026-11-13
 ### Added

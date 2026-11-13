@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { AiModelSelectComponent } from '../../../components/ai-model-select/ai-model-select.component';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { AiBatchService } from '../../../services/ai-batch.service';
 import { AiHelperService, type AiProvider } from '../../../services/ai-helper.service';
@@ -15,7 +16,7 @@ type Target = { ids: string[] | undefined; failedOnly: boolean };
 @Component({
   selector: 'app-ai-batch-button',
   standalone: true,
-  imports: [CommonModule, TranslationPipe],
+  imports: [CommonModule, TranslationPipe, AiModelSelectComponent],
   templateUrl: './ai-batch-button.component.html',
   styleUrl: './ai-batch.scss',
 })
@@ -64,16 +65,6 @@ export class AiBatchButtonComponent {
     (['claude', 'copilot', 'fake'] as AiProvider[]).filter((p) => p !== 'fake' || this.helper.found()['fake'] === true),
   );
   readonly busy = this.queue.busy;
-  readonly claudeModels = ['haiku', 'sonnet', 'opus'] as const;
-  readonly claudeModel = computed(() => this.helper.models()['claude']);
-  /** «Elegir…» stays open while a concrete Copilot model is stored; «Automático» is the empty model. */
-  readonly copilotCustom = signal((this.helper.models()['copilot'] ?? '') !== '');
-
-  useCopilotAuto(): void {
-    this.copilotCustom.set(false);
-    this.helper.setModel('copilot', '');
-  }
-
   toggleMenu(): void {
     this.menuOpen.update((open) => !open);
   }

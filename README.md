@@ -180,7 +180,7 @@ Cuando llega una **versión nueva (B)** de un PDF del que ya tienes la plantilla
 ### Proveedores válidos
 | Proveedor | Programa | Estado | Notas |
 | --- | --- | --- | --- |
-| **Claude** | [Claude Code](https://docs.claude.com/en/docs/claude-code) (`claude`) con sesión iniciada | Probado (`claude -p`) | Modelo por defecto `sonnet` (económico). Se puede elegir `haiku`, `sonnet` u `opus`. Se quita `ANTHROPIC_API_KEY` del entorno para usar la suscripción |
+| **Claude** | [Claude Code](https://docs.claude.com/en/docs/claude-code) (`claude`) con sesión iniciada | Probado (`claude -p`) | Modelo por defecto `sonnet` (económico). El modelo se elige de la lista que ofrece el propio CLI (como `/model`). Se quita `ANTHROPIC_API_KEY` del entorno para usar la suscripción |
 | **Copilot** | [GitHub Copilot CLI](https://docs.github.com/en/copilot) (`copilot`) con sesión iniciada | Implementado, **sin verificar** contra tu versión | Modelo vacío = el del CLI. Si las banderas no valen, `COPILOT_ARGS` las ajusta. Necesita un modelo con visión |
 | Simulado | — | Solo para tests (`AI_HELPER_FAKE=1`) | Lo usan los e2e; no hace falta |
 

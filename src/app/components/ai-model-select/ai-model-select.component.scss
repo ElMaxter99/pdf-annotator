@@ -1,0 +1,211 @@
+:host {
+  display: block;
+}
+.ms {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+.ms__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--muted) 35%, transparent);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.ms__toggle:hover,
+.ms__toggle--open {
+  border-color: var(--accent);
+}
+.ms__toggle:focus-visible,
+.ms__opt:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.ms__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ms__chev {
+  color: var(--muted);
+}
+.ms__spin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  border-right-color: transparent;
+  animation: ms-spin 0.9s linear infinite;
+}
+.ms__list {
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--muted) 35%, transparent);
+  background: var(--panel);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  animation: ms-in 0.18s ease-out;
+}
+.ms__group {
+  padding: 8px 12px 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.ms__opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.ms__opt:hover,
+.ms__opt--on {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.ms__name {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.ms__name b {
+  font-weight: 600;
+}
+.ms__name small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.ms__tick {
+  color: var(--accent);
+}
+.ms__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+.ms__skeleton i {
+  display: block;
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--muted) 15%, transparent),
+    color-mix(in srgb, var(--muted) 30%, transparent),
+    color-mix(in srgb, var(--muted) 15%, transparent)
+  );
+  background-size: 200% 100%;
+  animation: ms-shimmer 1.4s ease-out infinite;
+}
+.ms__skeleton i:nth-child(1) {
+  width: 46%;
+}
+.ms__skeleton i:nth-child(2) {
+  width: 72%;
+}
+.ms__skeleton i:nth-child(3) {
+  width: 58%;
+}
+.ms__skeleton i:nth-child(4) {
+  width: 66%;
+}
+.ms__hint,
+.ms__meta {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.ms__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ms__btn {
+  min-height: 28px;
+  padding: 2px 10px;
+  font-size: 12.5px;
+}
+.ms__note {
+  display: flex;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.ms__note p {
+  margin: 0;
+}
+.ms__note b {
+  display: block;
+}
+.ms__note--err {
+  border-color: color-mix(in srgb, var(--danger) 60%, transparent);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+.ms__note--warn {
+  border-color: color-mix(in srgb, #fbbf24 55%, transparent);
+  background: color-mix(in srgb, #fbbf24 14%, transparent);
+}
+:host-context(:root.theme-light) .ms__note--warn {
+  border-color: color-mix(in srgb, #8a5a00 55%, transparent);
+  background: color-mix(in srgb, #8a5a00 12%, transparent);
+}
+@keyframes ms-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ms-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes ms-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ms__list,
+  .ms__spin,
+  .ms__skeleton i {
+    animation: none;
+  }
+}

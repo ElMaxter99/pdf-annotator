@@ -91,17 +91,42 @@ test('without the helper the chip says so and the AI option explains how to star
   await expect(page.locator('.annotation')).toHaveCount(0);
 });
 
-test('the model is chosen per provider, cheap by default, and remembered', async ({ page }) => {
+test('the model is picked from the list the helper reads, never typed, and remembered', async ({ page }) => {
   await openBatchWithB(page);
   await page.getByTestId('ai-chip').click();
-  await expect(page.getByTestId('ai-model-claude')).toHaveValue('sonnet');
-  await expect(page.getByTestId('ai-panel')).toContainText('Económico por defecto');
-  await page.getByTestId('ai-model-claude').selectOption('haiku');
-  await page.getByTestId('ai-model-copilot').fill('gpt-5-mini');
-  await page.getByTestId('ai-model-copilot').blur();
+  const toggle = page.getByTestId('ai-model-toggle');
+  await expect(page.getByTestId('ai-model-refresh')).toBeVisible();
+  await toggle.click();
+  await expect(page.getByTestId('ai-model-opt-fake-small')).toBeVisible();
+  await expect(page.getByTestId('ai-panel').locator('input[type=text]')).toHaveCount(0);
+  await page.getByTestId('ai-model-opt-fake-large').click();
+  await expect(page.getByTestId('ai-model-current')).toContainText('Simulado grande');
   const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
-  expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: 'haiku', copilot: 'gpt-5-mini' });
-  await expect(page.getByTestId('ai-panel')).not.toContainText('Económico por defecto');
+  expect(JSON.parse(stored ?? '{}')).toMatchObject({ fake: 'fake-large' });
+  const lists = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.modelLists'));
+  expect(lists ?? '').not.toContain('fake-large');
+});
+
+test('a saved model the CLI no longer offers goes back to a valid one with a notice', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.models', JSON.stringify({ fake: 'modelo-retirado' })));
+  await openBatchWithB(page);
+  await page.getByTestId('ai-chip').click();
+  await expect(page.getByTestId('ai-model-retired')).toContainText('modelo-retirado');
+  const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
+  expect(JSON.parse(stored ?? '{}')).toMatchObject({ fake: '' });
+});
+
+test('if the helper cannot list the models the error is clear and «Reintentar» is offered', async ({ page }) => {
+  await page.route('**/127.0.0.1:4310/models**', (route) =>
+    route.fulfill({ status: 502, contentType: 'application/json', body: JSON.stringify({ error: { code: 'auth', message: 'x' } }) }),
+  );
+  await openBatchWithB(page);
+  await page.getByTestId('ai-chip').click();
+  await expect(page.getByTestId('ai-model-error')).toContainText('No se pudo leer la lista de modelos');
+  await expect(page.getByTestId('ai-model-retry')).toBeVisible();
+  await page.unroute('**/127.0.0.1:4310/models**');
+  await page.getByTestId('ai-model-retry').click();
+  await expect(page.getByTestId('ai-model-error')).toHaveCount(0);
 });
 
 test('«Ver detalles» shows what was sent, the steps and says the simulated provider reports no usage', async ({ page }) => {
@@ -204,7 +229,7 @@ test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada'
   await expect(page.getByTestId('ai-batch-dialog')).toHaveCount(0);
 });
 
-test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido en la confirmación', async ({ page }) => {
+test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido de la lista', async ({ page }) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   await page.getByTestId('ai-batch-all').click();
@@ -212,25 +237,11 @@ test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido en la
   await expect(page.getByTestId('ai-batch-provider-claude')).toBeVisible();
   await expect(page.getByTestId('ai-batch-provider-copilot')).toBeVisible();
   await expect(page.getByTestId('ai-batch-provider-fake')).toHaveAttribute('aria-pressed', 'true');
-  const claude = page.getByTestId('ai-batch-provider-claude');
-  if (await claude.isEnabled()) {
-    await claude.click();
-    await expect(page.getByTestId('ai-batch-model-sonnet')).toHaveAttribute('aria-pressed', 'true');
-    await page.getByTestId('ai-batch-model-haiku').click();
-    await expect(page.getByTestId('ai-batch-model-haiku')).toHaveAttribute('aria-pressed', 'true');
-    const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
-    expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: 'haiku' });
-  }
-  const copilot = page.getByTestId('ai-batch-provider-copilot');
-  if (await copilot.isEnabled()) {
-    await copilot.click();
-    await expect(page.getByTestId('ai-batch-model-auto')).toHaveAttribute('aria-pressed', 'true');
-    await page.getByTestId('ai-batch-model-pick').click();
-    await page.getByTestId('ai-batch-model-input').fill('gpt-5-mini');
-    await page.getByTestId('ai-batch-model-input').blur();
-    const after = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
-    expect(JSON.parse(after ?? '{}')).toMatchObject({ copilot: 'gpt-5-mini' });
-  }
+  await page.getByTestId('ai-batch-model-toggle').click();
+  await page.getByTestId('ai-batch-model-opt-fake-large').click();
+  await expect(page.getByTestId('ai-batch-model-current')).toContainText('Simulado grande');
+  const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
+  expect(JSON.parse(stored ?? '{}')).toMatchObject({ fake: 'fake-large' });
 });
 
 test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos y el consumo del lote', async ({ page }) => {

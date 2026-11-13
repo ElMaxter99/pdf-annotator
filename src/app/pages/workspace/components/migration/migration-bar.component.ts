@@ -1,3 +1,4 @@
+import { AiModelSelectComponent } from '../../../../components/ai-model-select/ai-model-select.component';
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, signal } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
@@ -9,7 +10,7 @@ import { AiReviewComponent } from './ai-review.component';
 @Component({
   selector: 'app-migration-bar',
   standalone: true,
-  imports: [CommonModule, TranslationPipe, AdjustReviewComponent, AiReviewComponent],
+  imports: [CommonModule, TranslationPipe, AdjustReviewComponent, AiReviewComponent, AiModelSelectComponent],
   templateUrl: './migration-bar.component.html',
 })
 export class MigrationBarComponent implements OnInit {
