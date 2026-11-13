@@ -1,0 +1,208 @@
+<span class="ai-menu-wrap" (keydown.escape)="closeMenu()">
+  <button
+    #menuBtn
+    type="button"
+    class="btn btn--primary"
+    [disabled]="eligible().length === 0 || busy()"
+    [attr.aria-expanded]="menuOpen()"
+    aria-haspopup="menu"
+    [attr.title]="eligible().length === 0 ? ('batch.ai.menu.skippedHint' | t) : null"
+    (click)="toggleMenu()"
+    data-testid="ai-batch-button"
+  >
+    ✦ {{ 'batch.ai.button' | t }} ▾
+  </button>
+  @if (menuOpen()) {
+    <div class="ai-menu" role="menu" data-testid="ai-batch-menu">
+      <button type="button" role="menuitem" class="ai-menu__item" (click)="choose(false)" data-testid="ai-batch-all">
+        <strong>{{ 'batch.ai.menu.all' | t: { count: eligible().length } }}</strong>
+        <small>{{ 'batch.ai.menu.allHint' | t }}</small>
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        class="ai-menu__item"
+        [attr.aria-disabled]="failedIds().length === 0"
+        [disabled]="failedIds().length === 0"
+        (click)="failedIds().length > 0 && choose(true)"
+        data-testid="ai-batch-failed"
+      >
+        <strong>{{ 'batch.ai.menu.failed' | t: { count: failedIds().length } }}</strong>
+      </button>
+      @if (withoutB() > 0) {
+        <span class="ai-menu__item" role="note" aria-disabled="true">
+          <strong>{{ 'batch.ai.menu.skipped' | t: { count: withoutB() } }}</strong>
+          <small>{{ 'batch.ai.menu.skippedHint' | t }}</small>
+        </span>
+      }
+    </div>
+  }
+</span>
+
+@if (target(); as t) {
+  <div class="ai-dim" (click)="closeDialog()" data-testid="ai-batch-dim">
+    <div
+      #dlg
+      class="ai-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-batch-title"
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+      (keydown)="onKeydown($event, dlg)"
+      data-testid="ai-batch-dialog"
+    >
+      <h2 id="ai-batch-title">{{ 'batch.ai.confirm.title' | t: { count: chosen().length } }}</h2>
+
+      <div class="ai-field">
+        <span class="ai-field__label" id="ai-batch-provider-label">{{ 'batch.ai.confirm.provider' | t }}</span>
+        <div class="ai-pcards" role="group" aria-labelledby="ai-batch-provider-label">
+          @for (p of providers(); track p) {
+            <button
+              type="button"
+              class="ai-pcard"
+              [class.ai-pcard--on]="provider() === p"
+              [class.ai-pcard--off]="helper.found()[p] === false"
+              [disabled]="helper.found()[p] === false"
+              [attr.aria-pressed]="provider() === p"
+              (click)="setProvider(p)"
+              [attr.data-testid]="'ai-batch-provider-' + p"
+            >
+              <span class="ai-pcard__radio" aria-hidden="true"></span>
+              <strong>{{ p === 'claude' ? 'Claude Code' : p === 'copilot' ? 'Copilot CLI' : ('batch.ai.confirm.fake' | t) }}</strong>
+              <small>{{ (helper.found()[p] === false ? 'ai.panel.missing' : 'ai.panel.found') | t }}</small>
+              @if (provider() === p) {
+                <span class="ai-pcard__tick" aria-hidden="true">✓</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (provider() === 'claude') {
+        <div class="ai-field">
+          <span class="ai-field__label" id="ai-batch-model-label">{{ 'ai.panel.model.claude' | t }}</span>
+          <div class="ai-seg" role="group" aria-labelledby="ai-batch-model-label" data-testid="ai-batch-model-claude">
+            @for (m of claudeModels; track m) {
+              <button
+                type="button"
+                [class.ai-seg--on]="claudeModel() === m"
+                [attr.aria-pressed]="claudeModel() === m"
+                (click)="helper.setModel('claude', m)"
+                [attr.data-testid]="'ai-batch-model-' + m"
+              >
+                {{ 'batch.ai.confirm.model.' + m | t }}
+                @if (m === 'sonnet') {
+                  <i class="ai-new">{{ 'ai.panel.model.new' | t }}</i>
+                }
+              </button>
+            }
+          </div>
+          <small class="ai-field__hint">{{ 'batch.ai.confirm.model.hintClaude' | t }}</small>
+        </div>
+      } @else if (provider() === 'copilot') {
+        <div class="ai-field">
+          <span class="ai-field__label" id="ai-batch-model-label">{{ 'ai.panel.model.copilot' | t }}</span>
+          <div class="ai-seg" role="group" aria-labelledby="ai-batch-model-label" data-testid="ai-batch-model-copilot">
+            <button type="button" [class.ai-seg--on]="!copilotCustom()" [attr.aria-pressed]="!copilotCustom()" (click)="useCopilotAuto()" data-testid="ai-batch-model-auto">
+              {{ 'batch.ai.confirm.model.auto' | t }}
+            </button>
+            <button type="button" [class.ai-seg--on]="copilotCustom()" [attr.aria-pressed]="copilotCustom()" (click)="copilotCustom.set(true)" data-testid="ai-batch-model-pick">
+              {{ 'batch.ai.confirm.model.pick' | t }}
+            </button>
+          </div>
+          @if (copilotCustom()) {
+            <input
+              class="ai-input"
+              type="text"
+              maxlength="60"
+              [value]="helper.models()['copilot']"
+              [placeholder]="'batch.ai.confirm.model.placeholder' | t"
+              [attr.aria-label]="'ai.panel.model.copilot' | t"
+              (change)="helper.setModel('copilot', $any($event.target).value)"
+              data-testid="ai-batch-model-input"
+            />
+          }
+          <small class="ai-field__hint">{{ 'batch.ai.confirm.model.hintCopilot' | t }}</small>
+        </div>
+      }
+
+      @if (helper.connection() === 'offline' || helper.connection() === 'unknown') {
+        <div class="ai-note ai-note--warn" role="alert" data-testid="ai-batch-offline">
+          <span aria-hidden="true">⚠</span>
+          <p>{{ 'batch.ai.connect.offline' | t }}</p>
+        </div>
+        <div><button type="button" class="btn btn--ghost" (click)="helper.check()">{{ 'batch.ai.connect.recheck' | t }}</button></div>
+      } @else if (helper.connection() === 'noCli') {
+        <div class="ai-note ai-note--warn" role="alert" data-testid="ai-batch-nocli">
+          <span aria-hidden="true">⚠</span>
+          <p>{{ 'batch.ai.connect.noCli' | t: { provider: providerName() } }}</p>
+        </div>
+        <div><button type="button" class="btn btn--ghost" (click)="helper.check()">{{ 'batch.ai.connect.recheck' | t }}</button></div>
+      } @else {
+        <div class="ai-tiles">
+          @if (isCopilot()) {
+            <div class="ai-tile ai-tile--acc"><strong>{{ estimate().maxRequests }}</strong>{{ 'batch.ai.confirm.requests' | t }}</div>
+            <div class="ai-tile"><strong>{{ cap }}</strong>{{ 'batch.ai.confirm.cap' | t }}</div>
+            <div class="ai-tile"><strong>{{ retry() ? 1 : 0 }}</strong>{{ 'batch.ai.confirm.retries' | t }}</div>
+          } @else {
+            <div class="ai-tile"><strong>{{ estimate().pairs }}</strong>{{ 'batch.ai.confirm.pairs' | t }}</div>
+            <div class="ai-tile"><strong>{{ estimate().fields }}</strong>{{ 'batch.ai.confirm.fields' | t }}</div>
+            <div class="ai-tile"><strong>{{ withoutB() }}</strong>{{ 'batch.ai.confirm.skipped' | t }}</div>
+          }
+        </div>
+        @if (isCopilot()) {
+          <div class="ai-note ai-note--warn" data-testid="ai-batch-nomeasure">
+            <span aria-hidden="true">⚠</span>
+            <p>{{ 'batch.ai.confirm.noMeasure' | t }}</p>
+          </div>
+        } @else {
+          <div class="ai-note" data-testid="ai-batch-estimate">
+            <span aria-hidden="true">ⓘ</span>
+            <p>{{ 'batch.ai.confirm.estimateClaude' | t: { min: estimate().minRequests, max: estimate().maxRequests } }}</p>
+          </div>
+        }
+        <label class="ai-check">
+          <input type="checkbox" [checked]="cascade()" (change)="cascade.set($any($event.target).checked)" data-testid="ai-batch-cascade" />
+          <span>
+            <strong>{{ 'batch.ai.confirm.cascade' | t }}</strong>
+            <small>{{ 'batch.ai.confirm.cascadeHint' | t }}</small>
+          </span>
+        </label>
+        @if (isCopilot()) {
+          <div class="ai-note">
+            <span aria-hidden="true">ⓘ</span>
+            <p>{{ 'batch.ai.confirm.capNote' | t: { cap: cap } }}</p>
+          </div>
+        }
+        <div class="ai-note">
+          <span aria-hidden="true">ⓘ</span>
+          <p>{{ 'batch.ai.confirm.privacy' | t: { provider: providerName() } }}</p>
+        </div>
+        @if (!helper.consent()) {
+          <label class="ai-check">
+            <input type="checkbox" [checked]="remember()" (change)="remember.set($any($event.target).checked)" />
+            <span>{{ 'batch.ai.confirm.remember' | t }}</span>
+          </label>
+        }
+      }
+
+      <div class="ai-dialog__foot">
+        <button type="button" class="btn btn--ghost" (click)="closeDialog()" data-testid="ai-batch-cancel">
+          {{ 'batch.ai.confirm.cancel' | t }}
+        </button>
+        <span class="ai-spacer"></span>
+        <button
+          #startBtn
+          type="button"
+          class="btn btn--primary"
+          [disabled]="!ready()"
+          (click)="start()"
+          data-testid="ai-batch-start"
+        >
+          ✦ {{ 'batch.ai.confirm.start' | t: { count: chosen().length } }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

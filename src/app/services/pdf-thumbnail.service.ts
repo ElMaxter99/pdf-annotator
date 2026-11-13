@@ -6,7 +6,7 @@ const THUMB_WIDTH = 160;
 const CONCURRENCY = 2;
 
 /** Shares the worker setup with the editor: set once, never overwritten if already there. */
-function ensureWorker(): void {
+export function ensureWorker(): void {
   const options = (pdfjsLib as any).GlobalWorkerOptions as {
     workerSrc?: string;
     workerType?: string;

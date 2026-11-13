@@ -38,6 +38,7 @@
         <button type="button" class="btn btn--ghost" (click)="previewSettings.clearTestData()"
           data-testid="batch-testdata-clear">{{ 'batch.testData.remove' | t }}</button>
       }
+      <app-ai-batch-button />
       <button
         type="button"
         class="btn"
@@ -332,6 +333,10 @@
         (change)="onNewVersionsSelected($event)"
         data-testid="input-b"
       />
+      <app-ai-batch-status (reviewFirst)="reviewProposal()" />
+      @if (aiQueue.detailsOpen()) {
+        <app-ai-batch-details />
+      }
       @if (counts().all > 0) {
         <div
           class="batch-drop batch-drop--hint batch-versions"
@@ -494,6 +499,7 @@
                   <span class="batch-chip batch-chip--on">B</span>
                 }
               </span>
+              <app-ai-batch-chip [item]="row.item" />
             </button>
           }
         </div>
@@ -532,16 +538,28 @@
                   [class.batch-chip--warn]="row.state !== 'ready'"
                   >{{ 'batch.state.' + row.state | t }}</span
                 >
+                <app-ai-batch-chip [item]="row.item" />
               </span>
               <span class="batch-row__actions" role="cell">
-                <button
-                  type="button"
-                  class="btn"
-                  [class.btn--primary]="row.state !== 'ready'"
-                  (click)="open(row.item)"
-                >
-                  {{ (row.state === 'ready' ? 'batch.open' : 'batch.review') | t }}
-                </button>
+                @if (row.item.aiProposal) {
+                  <button
+                    type="button"
+                    class="btn btn--primary"
+                    (click)="open(row.item)"
+                    data-testid="ai-review-proposal"
+                  >
+                    {{ 'batch.ai.review' | t }}
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="btn"
+                    [class.btn--primary]="row.state !== 'ready'"
+                    (click)="open(row.item)"
+                  >
+                    {{ (row.state === 'ready' ? 'batch.open' : 'batch.review') | t }}
+                  </button>
+                }
                 <button
                   type="button"
                   class="btn btn--ghost"

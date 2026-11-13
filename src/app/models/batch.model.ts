@@ -1,4 +1,16 @@
 import type { PageAnnotations } from './annotation.model';
+import type { AiDetails, AiRow } from '../utils/ai-proposal.utils';
+
+/** The AI answer for one pair, kept until the person reviews it in the editor (never applied by itself). */
+export interface AiSavedProposal {
+  /** Row ids are `p<page>-f<position>` over `aPages` as they were when the request was made. */
+  readonly rows: readonly AiRow[];
+  readonly details: AiDetails | null;
+  readonly provider: string;
+  readonly model: string | null;
+  readonly seconds: number;
+  readonly at: number;
+}
 
 export type BatchItemStatus = 'review' | 'ready';
 
@@ -28,6 +40,8 @@ export interface BatchItem {
   readonly dismissed: readonly string[];
   /** A and B differ in page size: `true` scales A's coordinates to B, `false` keeps them, unset = not chosen yet. */
   readonly fitA?: boolean;
+  /** Last AI proposal for this pair, waiting for review. */
+  readonly aiProposal?: AiSavedProposal;
   readonly status: BatchItemStatus;
   readonly updatedAt: number;
 }

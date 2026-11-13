@@ -708,6 +708,143 @@
       "loaded": "loaded",
       "remove": "Remove",
       "applied": "Test data loaded: it will be used when editing each PDF in the batch."
+    },
+    "ai": {
+      "button": "Transfer with AI",
+      "menu": {
+        "all": "Transfer all ({{count}})",
+        "allHint": "Those with a version B and a template A with fields",
+        "failed": "Only the ones that failed ({{count}})",
+        "skipped": "{{count}} PDFs without a version B are skipped",
+        "skippedHint": "Upload their B from the «New versions (B)» strip"
+      },
+      "confirm": {
+        "title": "Transfer with AI · {{count}} PDFs",
+        "pairs": "pairs",
+        "fields": "fields",
+        "skipped": "without B (skipped)",
+        "requests": "requests",
+        "cap": "limit per run",
+        "retries": "retries",
+        "estimateClaude": "Estimated usage: {{min}} to {{max}} requests ({{max}} if retries are needed). With Claude the real usage is measured and shown live.",
+        "noMeasure": "AI credits per request. The usage shown is what the helper reports (tokens and credits if Copilot returns them). Each request is charged according to the chosen model.",
+        "cascade": "Try «Adjust by texts» first",
+        "cascadeHint": "Free. The AI is only used on PDFs where fields are left unplaced.",
+        "capNote": "If there are more than {{cap}} pairs, the queue stops at {{cap}} and waits for your «Continue». No automatic retries.",
+        "privacy": "The A and B PDFs of each pair are sent to your local {{provider}}, one at a time. Nothing is applied by itself: you review each proposal.",
+        "remember": "Don't ask again",
+        "start": "Transfer {{count}} PDFs",
+        "cancel": "Cancel",
+        "provider": "Provider",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automatic",
+          "pick": "Choose…",
+          "placeholder": "e.g. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet is fine for placing fields; Opus uses far more.",
+          "hintCopilot": "Each request is charged according to the model. «Automatic» lets Copilot choose."
+        },
+        "fake": "Simulated"
+      },
+      "connect": {
+        "offline": "The local helper was not found. Start «npm run start:ia» or open the desktop app and check again.",
+        "noCli": "The helper cannot find «{{provider}}» in the PATH.",
+        "recheck": "Check again"
+      },
+      "running": "Transferring with AI · {{done}} of {{total}}",
+      "elapsed": "Time {{time}}",
+      "tokens": "{{count}} tokens · measured",
+      "requests": "Requests sent: {{sent}} · usage not measurable",
+      "pause": "Pause",
+      "pausing": "Pausing after this PDF…",
+      "cancel": "Cancel",
+      "skipOne": "Cancel this one",
+      "resume": "Continue",
+      "state": {
+        "col": "AI transfer",
+        "queued": "Queued",
+        "adjusting": "Adjusting by texts",
+        "reading": "Reading",
+        "asking": "Asking · attempt {{n}}",
+        "resolving": "Placing",
+        "ready": "Ready to review · {{placed}} of {{total}}",
+        "free": "Solved without AI · {{placed}} of {{total}}",
+        "partial": "Partial · {{placed}} of {{total}}",
+        "failed": "Failed",
+        "cancelled": "Cancelled",
+        "saved": "Proposal ready to review",
+        "noB": "No B · skipped"
+      },
+      "err": {
+        "images_not_read": "The AI did not read the images",
+        "timeout": "Timed out",
+        "cli_error": "CLI error",
+        "generic": "Could not transfer",
+        "nothing": "The AI placed no field"
+      },
+      "paused": {
+        "limit": "You have reached your Claude plan limit. The queue is paused and {{count}} PDFs are still waiting (they do not count as failed).",
+        "reset": "It renews at {{reset}}.",
+        "breaker": "Stopped after two failures in a row ({{code}}). Paused to avoid spending more; check that the CLI responds and continue.",
+        "cap": "{{sent}} requests sent. The queue stops here to protect your Copilot credits; {{count}} are waiting.",
+        "fatal": "The helper or CLI cannot be found. The queue is paused; the {{count}} pending PDFs stay queued.",
+        "user": "Paused. {{count}} PDFs left in the queue."
+      },
+      "done": {
+        "title": "Finished in {{time}}",
+        "note": "Nothing has been applied yet: review each proposal.",
+        "review": "{{count}} to review",
+        "free": "{{count}} without AI",
+        "partial": "{{count}} partial",
+        "failed": "{{count}} failed",
+        "first": "Review the first one →",
+        "retry": "Retry the ones that failed",
+        "close": "Close"
+      },
+      "review": "Review proposal",
+      "toast": {
+        "busy": "An AI run is already in progress.",
+        "nothing": "There are no PDFs with a version B and a template A to transfer."
+      },
+      "details": {
+        "title": "What the AI is doing · batch",
+        "run": "{{done}} of {{total}} · {{time}}",
+        "follow": "Follow the PDF in progress",
+        "copyAll": "Copy batch report",
+        "list": "Batch PDFs",
+        "position": "PDF {{n}} of {{total}} · {{time}}",
+        "thisPdf": "This PDF",
+        "allBatch": "Whole batch so far",
+        "requests": "Requests sent",
+        "free": "Solved without AI",
+        "notStarted": "This PDF has not started yet.",
+        "empty": "Nothing to show yet: start the transfer.",
+        "sentNothing": "Nothing was sent to the AI.",
+        "prepare": "{{pagesA}} pages of A and {{pagesB}} of B read, {{textsA}} and {{textsB}} texts extracted",
+        "adjust": "Try the text-based adjustment",
+        "adjustSolved": "No AI: the shift is uniform and all {{fields}} fields have a position",
+        "adjustNot": "The AI is needed: {{why}}",
+        "save": "Save the proposal",
+        "saveSub": "{{placed}} of {{total}} fields placed. Nothing is applied",
+        "saveWait": "The app turns each anchor into x, y. Nothing is applied",
+        "cancelled": "Cancelled",
+        "noSpend": "No request was spent: the text-based adjustment solved it without AI.",
+        "noSpendShort": "text adjustment, 0 requests",
+        "stepOf": "Step {{n}} of {{total}} · {{title}}",
+        "live": "See live",
+        "seeDetails": "See details",
+        "seeDone": "See what it did",
+        "open": "See details",
+        "why": {
+          "sizes": "the pages have different sizes",
+          "pages": "they do not have the same pages",
+          "noText": "A or B has no text",
+          "notUniform": "the shift is not the same across the PDF",
+          "lowConfidence": "there are not enough anchors for every field"
+        }
+      }
     }
   },
   "preview": {
@@ -808,7 +945,8 @@
         "copilot": "Copilot model",
         "copilotAuto": "Automatic (the CLI default)",
         "copilotHint": "Each run spends AI credits based on tokens and model. Type a specific one if your administrator says so.",
-        "sonnetHint": "Sonnet: enough to place fields and light on your limit."
+        "sonnetHint": "Sonnet: enough to place fields and light on your limit.",
+        "new": "New"
       },
       "retryToggle": "Retry once if the answer is unusable",
       "retryHint": "A retry can double the cost: with Copilot it sends everything again and spends more AI credits. It is off by default for Copilot."
@@ -885,7 +1023,12 @@
       "notPlaced": "not placed",
       "anchor": "anchor “{{text}}”",
       "goto": "Go to page",
-      "listHint": "Low-confidence or unplaced fields are not applied until you tick them."
+      "listHint": "Low-confidence or unplaced fields are not applied until you tick them.",
+      "saved": "Saved proposal · {{provider}}",
+      "adjustProvider": "Text adjustment",
+      "discard": "Discard the proposal",
+      "pending": "Waiting for review: {{count}}",
+      "nextWithProposal": "Next with a proposal ›"
     },
     "confidence": {
       "high": "High",

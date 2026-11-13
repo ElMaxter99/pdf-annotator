@@ -93,7 +93,13 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
 
   providerName(): string {
     const provider = this.vm.ai()?.provider;
-    return provider === 'copilot' ? 'Copilot' : provider === 'fake' ? 'Simulado' : 'Claude';
+    return provider === 'adjust'
+      ? this.t('ai.review.adjustProvider')
+      : provider === 'copilot'
+        ? 'Copilot'
+        : provider === 'fake'
+          ? 'Simulado'
+          : 'Claude';
   }
 
   /** Real usage: Claude always; Copilot when its JSON output reported tokens. Otherwise we show what we know and say so. */

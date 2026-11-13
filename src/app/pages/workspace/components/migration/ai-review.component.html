@@ -51,6 +51,7 @@
         <div class="migration-hint adjust-strip" role="status" data-testid="ai-review">
           <span class="adjust-strip__text" data-testid="ai-summary">
             <strong>{{ 'ai.review.title' | t: { provider: providerName() } }}</strong> ·
+            @if (s.saved) { <em data-testid="ai-saved">{{ 'ai.review.saved' | t: { provider: providerName() } }}</em> · }
             {{ stripText() }}
             <em>{{ 'ai.review.untouched' | t }}</em>
           </span>
@@ -62,6 +63,9 @@
 <button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
             <button type="button" class="btn btn--primary" [disabled]="sum.selected === 0" (click)="vm.applyAi()" data-testid="ai-apply">{{ 'batch.adjust.apply' | t: { count: sum.selected } }}</button>
             <button type="button" class="btn btn--ghost" [attr.aria-expanded]="s.open" (click)="vm.toggleAiOpen()" data-testid="ai-toggle-list">{{ 'batch.adjust.list' | t }} {{ s.open ? '▴' : '▾' }}</button>
+            @if (s.saved) {
+              <button type="button" class="btn btn--ghost" (click)="vm.discardAi()" data-testid="ai-discard">{{ 'ai.review.discard' | t }}</button>
+            }
             <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
           </span>
           <button type="button" class="migration-hint__close" (click)="closeRequested.emit()" [attr.aria-label]="'batch.editor.notices.close' | t" [attr.title]="'batch.editor.notices.close' | t" data-testid="notice-close-ai">✕</button>

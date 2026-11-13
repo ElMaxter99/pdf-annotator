@@ -708,6 +708,143 @@
       "loaded": "chargées",
       "remove": "Retirer",
       "applied": "Données de test chargées : elles serviront à l'édition de chaque PDF du lot."
+    },
+    "ai": {
+      "button": "Transférer avec l'IA",
+      "menu": {
+        "all": "Tout transférer ({{count}})",
+        "allHint": "Ceux qui ont une version B et un modèle A avec des champs",
+        "failed": "Seulement ceux qui ont échoué ({{count}})",
+        "skipped": "{{count}} PDF sans version B sont ignorés",
+        "skippedHint": "Ajoutez leur B depuis la bande « Nouvelles versions (B) »"
+      },
+      "confirm": {
+        "title": "Transférer avec l'IA · {{count}} PDF",
+        "pairs": "paires",
+        "fields": "champs",
+        "skipped": "sans B (ignorés)",
+        "requests": "requêtes",
+        "cap": "plafond par passage",
+        "retries": "relances",
+        "estimateClaude": "Consommation estimée : de {{min}} à {{max}} requêtes ({{max}} s'il faut relancer). Avec Claude, la consommation réelle est mesurée et visible en direct.",
+        "noMeasure": "Crédits d’IA par requête. La consommation affichée est celle que signale l’assistant (tokens et crédits si Copilot les renvoie). Chaque requête est décomptée selon le modèle choisi.",
+        "cascade": "Essayer d'abord « Ajuster par textes »",
+        "cascadeHint": "Gratuit. L'IA n'est utilisée que pour les PDF où il reste des champs non placés.",
+        "capNote": "S'il y a plus de {{cap}} paires, la file s'arrête à {{cap}} et attend votre « Continuer ». Pas de relance automatique.",
+        "privacy": "Les PDF A et B de chaque paire sont envoyés à votre {{provider}} local, un par un. Rien n'est appliqué tout seul : vous relisez chaque proposition.",
+        "remember": "Ne plus demander",
+        "start": "Transférer {{count}} PDF",
+        "cancel": "Annuler",
+        "provider": "Fournisseur",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automatique",
+          "pick": "Choisir…",
+          "placeholder": "p. ex. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet suffit pour placer les champs ; Opus consomme bien plus.",
+          "hintCopilot": "Chaque requête est décomptée selon le modèle. « Automatique » laisse Copilot choisir."
+        },
+        "fake": "Simulé"
+      },
+      "connect": {
+        "offline": "L'assistant local est introuvable. Lancez « npm run start:ia » ou ouvrez l'app de bureau et vérifiez à nouveau.",
+        "noCli": "L'assistant ne trouve pas « {{provider}} » dans le PATH.",
+        "recheck": "Vérifier à nouveau"
+      },
+      "running": "Transfert avec l'IA · {{done}} sur {{total}}",
+      "elapsed": "Durée {{time}}",
+      "tokens": "{{count}} tokens · mesuré",
+      "requests": "Requêtes envoyées : {{sent}} · consommation non mesurable",
+      "pause": "Pause",
+      "pausing": "Pause à la fin de ce PDF…",
+      "cancel": "Annuler",
+      "skipOne": "Annuler celui-ci",
+      "resume": "Continuer",
+      "state": {
+        "col": "Transfert IA",
+        "queued": "En file",
+        "adjusting": "Ajustement par textes",
+        "reading": "Lecture",
+        "asking": "Question en cours · essai {{n}}",
+        "resolving": "Placement",
+        "ready": "Prête à relire · {{placed}} sur {{total}}",
+        "free": "Résolu sans IA · {{placed}} sur {{total}}",
+        "partial": "Partiel · {{placed}} sur {{total}}",
+        "failed": "Échec",
+        "cancelled": "Annulé",
+        "saved": "Proposition prête à relire",
+        "noB": "Sans B · ignoré"
+      },
+      "err": {
+        "images_not_read": "L'IA n'a pas lu les images",
+        "timeout": "Délai dépassé",
+        "cli_error": "Erreur du CLI",
+        "generic": "Transfert impossible",
+        "nothing": "L'IA n'a placé aucun champ"
+      },
+      "paused": {
+        "limit": "Vous avez atteint la limite de votre forfait Claude. La file est en pause et {{count}} PDF attendent encore (ils ne comptent pas comme échoués).",
+        "reset": "Il se renouvelle à {{reset}}.",
+        "breaker": "Arrêt après deux échecs consécutifs ({{code}}). Mis en pause pour ne pas dépenser davantage ; vérifiez que le CLI répond et continuez.",
+        "cap": "{{sent}} requêtes envoyées. La file s'arrête ici pour protéger vos crédits Copilot ; {{count}} attendent.",
+        "fatal": "L'assistant ou le CLI est introuvable. La file est en pause ; les {{count}} PDF en attente restent en file.",
+        "user": "En pause. Il reste {{count}} PDF en file."
+      },
+      "done": {
+        "title": "Terminé en {{time}}",
+        "note": "Rien n'a encore été appliqué : relisez chaque proposition.",
+        "review": "{{count}} à relire",
+        "free": "{{count}} sans IA",
+        "partial": "{{count}} partiel(s)",
+        "failed": "{{count}} échec(s)",
+        "first": "Relire le premier →",
+        "retry": "Relancer ceux qui ont échoué",
+        "close": "Fermer"
+      },
+      "review": "Relire la proposition",
+      "toast": {
+        "busy": "Un passage de l'IA est déjà en cours.",
+        "nothing": "Aucun PDF avec version B et modèle A à transférer."
+      },
+      "details": {
+        "title": "Ce que fait l’IA · lot",
+        "run": "{{done}} sur {{total}} · {{time}}",
+        "follow": "Suivre le PDF en cours",
+        "copyAll": "Copier le rapport du lot",
+        "list": "PDF du lot",
+        "position": "PDF {{n}} sur {{total}} · {{time}}",
+        "thisPdf": "Ce PDF",
+        "allBatch": "Tout le lot jusqu’ici",
+        "requests": "Requêtes envoyées",
+        "free": "Résolus sans IA",
+        "notStarted": "Ce PDF n’a pas encore commencé.",
+        "empty": "Rien à montrer pour l’instant : lancez le transfert.",
+        "sentNothing": "Rien n’a été envoyé à l’IA.",
+        "prepare": "{{pagesA}} pages de A et {{pagesB}} de B lues, {{textsA}} et {{textsB}} textes extraits",
+        "adjust": "Essayer l’ajustement par textes",
+        "adjustSolved": "Sans IA : le décalage est uniforme et les {{fields}} champs ont une position",
+        "adjustNot": "Il faut interroger l’IA : {{why}}",
+        "save": "Enregistrer la proposition",
+        "saveSub": "{{placed}} champs sur {{total}} placés. Rien n’est appliqué",
+        "saveWait": "L’app convertit chaque ancre en x, y. Rien n’est appliqué",
+        "cancelled": "Annulé",
+        "noSpend": "Aucune requête dépensée : l’ajustement par textes l’a résolu sans IA.",
+        "noSpendShort": "ajustement par textes, 0 requête",
+        "stepOf": "Étape {{n}} sur {{total}} · {{title}}",
+        "live": "Voir en direct",
+        "seeDetails": "Voir les détails",
+        "seeDone": "Voir ce qui a été fait",
+        "open": "Voir les détails",
+        "why": {
+          "sizes": "les pages n’ont pas la même taille",
+          "pages": "elles n’ont pas les mêmes pages",
+          "noText": "il manque du texte dans A ou B",
+          "notUniform": "le décalage n’est pas le même dans tout le PDF",
+          "lowConfidence": "pas assez d’ancres pour tous les champs"
+        }
+      }
     }
   },
   "preview": {
@@ -808,7 +945,8 @@
         "copilot": "Modèle de Copilot",
         "copilotAuto": "Automatique (celui du CLI)",
         "copilotHint": "Chaque exécution consomme des crédits IA selon les tokens et le modèle. Indiquez-en un précis si votre administrateur le demande.",
-        "sonnetHint": "Sonnet : suffisant pour placer les champs et léger pour votre limite."
+        "sonnetHint": "Sonnet : suffisant pour placer les champs et léger pour votre limite.",
+        "new": "Nouveau"
       },
       "retryToggle": "Réessayer une fois si la réponse est inutilisable",
       "retryHint": "Un nouvel essai peut doubler le coût : avec Copilot, tout est renvoyé et consomme plus de crédits IA. Désactivé par défaut pour Copilot."
@@ -885,7 +1023,12 @@
       "notPlaced": "non placé",
       "anchor": "ancre « {{text}} »",
       "goto": "Aller à la page",
-      "listHint": "Les champs à faible confiance ou non placés ne sont appliqués que si vous les cochez."
+      "listHint": "Les champs à faible confiance ou non placés ne sont appliqués que si vous les cochez.",
+      "saved": "Proposition enregistrée · {{provider}}",
+      "adjustProvider": "Ajustement par textes",
+      "discard": "Écarter la proposition",
+      "pending": "À relire : {{count}}",
+      "nextWithProposal": "Suivant avec proposition ›"
     },
     "confidence": {
       "high": "Élevée",

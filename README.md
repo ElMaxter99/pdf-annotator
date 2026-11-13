@@ -175,6 +175,7 @@ Cuando llega una **versión nueva (B)** de un PDF del que ya tienes la plantilla
 4. El ayudante prepara las páginas de A y B (imágenes y textos) y se las pasa a tu CLI. La IA elige, por campo, a qué página va y **junto a qué texto** (el ancla). **La app calcula `x`,`y`** a partir de las posiciones reales de esos textos: la IA nunca da coordenadas.
 5. Se revisa en «Dividida»: motivo y confianza por campo, campos que cambian de página y los que no se encontraron. **B no cambia hasta «Aplicar N cambios»** (un solo paso de deshacer). Los de confianza baja o sin colocar solo se aplican si los marcas.
 6. Si falla (límite, tiempo, respuesta rara, ayudante cerrado), la franja ofrece reintentar, cambiar de proveedor o **«Usar ajuste por textos»**, que no necesita IA.
+7. **En todo el lote:** en el panel, **«✦ Trasladar con IA ▾»** lanza el traslado de todos los pares (A con plantilla + B). Antes enseña cuántas peticiones puede costar; la cola va de uno en uno (con pausa y cancelar), prueba antes el ajuste por textos sin IA y se para sola al llegar al límite de uso, tras dos fallos seguidos o a las 10 peticiones con Copilot. Cada resultado queda como propuesta guardada que revisas PDF por PDF; nada se aplica en bloque.
 
 ### Proveedores válidos
 | Proveedor | Programa | Estado | Notas |

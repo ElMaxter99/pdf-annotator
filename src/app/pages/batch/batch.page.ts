@@ -3,6 +3,11 @@ import { Component, OnInit, computed, effect, inject, signal, untracked } from '
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
+import { AiBatchButtonComponent } from './ai-batch/ai-batch-button.component';
+import { AiBatchChipComponent } from './ai-batch/ai-batch-chip.component';
+import { AiBatchDetailsComponent } from './ai-batch/ai-batch-details.component';
+import { AiBatchStatusComponent } from './ai-batch/ai-batch-status.component';
+import { AiBatchService } from '../../services/ai-batch.service';
 import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
@@ -66,12 +71,23 @@ async function sha256(blob: Blob): Promise<string | null> {
 @Component({
   selector: 'app-batch-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslationPipe, PdfThumbComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    TranslationPipe,
+    PdfThumbComponent,
+    AiBatchButtonComponent,
+    AiBatchChipComponent,
+    AiBatchStatusComponent,
+    AiBatchDetailsComponent,
+  ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
 })
 export class BatchPageComponent implements OnInit {
   private readonly store = inject(BatchStoreService);
+  readonly aiQueue = inject(AiBatchService);
   private readonly router = inject(Router);
   private readonly pendingFile = inject(PendingFileService);
   private readonly importer = inject(AnnotationImportService);
@@ -338,6 +354,14 @@ export class BatchPageComponent implements OnInit {
     this.pendingFile.setPendingFile(file, coords?.length ? { coords, ...BATCH_OPEN_VIEW } : null);
     // The id in the URL lets a reload or «Adelante» reopen this same PDF.
     await this.router.navigate(['/workspace'], { queryParams: { [BATCH_ITEM_PARAM]: item.id } });
+  }
+
+  /** Opens the first PDF that has an AI proposal waiting for review. */
+  async reviewProposal(): Promise<void> {
+    const item = this.rows().find((row) => row.item.aiProposal)?.item;
+    if (item) {
+      await this.open(item);
+    }
   }
 
   async reviewNext(): Promise<void> {

@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
-import type { BatchItem, FieldLink } from '../models/batch.model';
+import type { AiSavedProposal, BatchItem, FieldLink } from '../models/batch.model';
+import { sanitizeDetails, sanitizeRow } from '../utils/ai-proposal.utils';
 
 const DB_NAME = 'pdf-annotator-batch';
 const STORE = 'items';
@@ -63,7 +64,12 @@ export class BatchStoreService {
 
   /** Replaces the template of A (used when a JSON is attached after the fact). */
   setTemplate(id: string, pages: PageAnnotations[]): void {
-    this.patch(id, { aPages: pages });
+    this.patch(id, { aPages: pages, aiProposal: undefined });
+  }
+
+  /** Keeps the AI proposal of a pair until it is reviewed. Changing B or A drops it (the ids would no longer match). */
+  setAiProposal(id: string, proposal: AiSavedProposal | undefined): void {
+    this.patch(id, { aiProposal: proposal });
   }
 
   /** Remembers whether the coordinates of A are scaled to the page size of B. */
@@ -81,6 +87,7 @@ export class BatchStoreService {
       links: [],
       dismissed: [],
       fitA: undefined,
+      aiProposal: undefined,
       status: 'review',
     });
   }
@@ -93,7 +100,9 @@ export class BatchStoreService {
     }
     this.patch(
       id,
-      item.bPdf ? { bPdf: file, bName: file.name, fitA: undefined } : { aPdf: file, name: file.name },
+      item.bPdf
+        ? { bPdf: file, bName: file.name, fitA: undefined, aiProposal: undefined }
+        : { aPdf: file, name: file.name, aiProposal: undefined },
     );
   }
 
@@ -105,6 +114,7 @@ export class BatchStoreService {
       bJson: null,
       links: [],
       dismissed: [],
+      aiProposal: undefined,
       status: 'review',
     });
   }
@@ -213,7 +223,7 @@ export class BatchStoreService {
 
   private async readAll(): Promise<BatchItem[]> {
     const values = await this.run<unknown[]>('readonly', (store) => store.getAll());
-    return Array.isArray(values) ? values.filter(isBatchItem) : [];
+    return Array.isArray(values) ? values.filter(isBatchItem).map(withSafeProposal) : [];
   }
 
   private open(): Promise<IDBDatabase | null> {
@@ -276,6 +286,31 @@ function isBatchItem(value: unknown): value is BatchItem {
     (item.status === 'review' || item.status === 'ready') &&
     typeof item.updatedAt === 'number'
   );
+}
+
+/** A stored proposal is untrusted like everything else read back: rebuild it or drop it. */
+function withSafeProposal(item: BatchItem): BatchItem {
+  const raw = (item as { aiProposal?: unknown }).aiProposal as Record<string, unknown> | undefined;
+  if (!raw || typeof raw !== 'object') {
+    return { ...item, aiProposal: undefined };
+  }
+  const rows = (Array.isArray(raw['rows']) ? raw['rows'] : [])
+    .map((row) => sanitizeRow(row))
+    .filter((row): row is NonNullable<typeof row> => row !== null);
+  if (!rows.length) {
+    return { ...item, aiProposal: undefined };
+  }
+  return {
+    ...item,
+    aiProposal: {
+      rows,
+      details: sanitizeDetails(raw['details']),
+      provider: typeof raw['provider'] === 'string' ? raw['provider'].slice(0, 20) : '',
+      model: typeof raw['model'] === 'string' ? raw['model'].slice(0, 60) : null,
+      seconds: typeof raw['seconds'] === 'number' && Number.isFinite(raw['seconds']) ? raw['seconds'] : 0,
+      at: typeof raw['at'] === 'number' && Number.isFinite(raw['at']) ? raw['at'] : 0,
+    },
+  };
 }
 
 function newId(): string {
