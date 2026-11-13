@@ -24,7 +24,7 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 | `npm run i18n:check` | Verifica que los 7 JSON de traducción tengan **las mismas claves** que `es-ES` |
 | `node scripts/generate-example.mjs` | Regenera `examples/factura-ejemplo.pdf` |
 | `npm run start:docker` | Imagen NGINX en `http://localhost:4444` |
-| Publicar versión | Ver [`docs/RELEASING.md`](docs/RELEASING.md): subida de versión → release candidate → pruebas → «Release» → Vercel (normalmente lo ejecuta Claude) |
+| Publicar versión | Ver [`docs/RELEASING.md`](docs/RELEASING.md): subida de versión → release candidate → pruebas → «Release» → Vercel (normalmente lo ejecuta Claude; **lee la Parte B entera antes de sacar una versión**) |
 
 **Antes de dar una tarea por terminada:** `npm run build`, `npm run test:ci` y `npm run e2e` en verde. Si tocas el editor, el historial, la importación JSON, las fuentes o la exportación, **los e2e son tu red de seguridad** (`e2e/*.spec.ts`): ejecútalos antes y después y añade casos para el comportamiento nuevo.
 
@@ -62,6 +62,9 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **Avisos al usuario:** nunca `alert()`/`confirm()`; usa `ToastService.error/warning/show` con una clave i18n (`toast.*`). Los e2e esperan `.toast--error`.
 - **Coordenadas:** `x,y` en puntos PDF. El DOM usa `top = canvas.height − y·scale`. Conversión en `domToPdfCoords`.
 - **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
+
+## 4a. Publicar versiones
+Antes de sacar cualquier versión (RC o final) lee `docs/RELEASING.md`: la Parte A lo explica para personas y la **Parte B es la checklist de la IA**. La versión final y la web (Vercel) solo con el visto bueno explícito de Maxter; las RC, sin pedirlo cuando él haya dicho «saca versión».
 
 ## 4b. Diseño primero
 Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes de programarse** en el lienzo de claude.ai y lo aprueba la persona responsable; **no programes la interfaz hasta que esté aprobada**. Lo invisible (motor, tests, rendimiento, docs) avanza sin esperar. Detalle en [`docs/WORKFLOW.md`](docs/WORKFLOW.md) y [`design/README.md`](design/README.md): lienzo único, mesas `V-NN`/`P-NN`, tokens de `styles.scss`, anchos de escritorio y ambos temas, copia del diseño aprobado en `design/canvas/`. Incluye reglas de estilo, feedback, accesibilidad y autonomía.

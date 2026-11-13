@@ -5,6 +5,7 @@
 - Contexto: `docs/PRODUCT.md` (para qué y para quién), `docs/DOMAIN.md` (glosario y formato JSON), `docs/DECISIONS.md` (no reabras lo ya decidido) y `docs/ROADMAP.md` (qué toca ahora).
 - Cambios visibles: sigue «Diseño primero» (`docs/WORKFLOW.md`, `design/README.md`). Sin diseño aprobado no programes la interfaz; en fase de plan, entrega el plan y espera aprobación.
 - Lee `AGENTS.md` (importado arriba) y `docs/ARCHITECTURE.md` antes de tocar `workspace.page.ts`: es un archivo enorme, busca con `Grep` el método concreto en vez de leerlo entero.
+- **Publicar versión (RC o final):** lee `docs/RELEASING.md` (Parte B = tu checklist) antes de empezar. La final y Vercel requieren el visto bueno de Maxter; las RC no.
 - Para verificar cambios visuales: `npm run build`, sirve `dist/pdf-annotator/browser` (fallback SPA a `index.csr.html`/`index.html`) y usa Playwright con `/opt/pw-browsers/chromium` (no ejecutes `playwright install`). Sube a `/landing`, carga `examples/factura-ejemplo.pdf` y comprueba 1600 px y 1280 px (solo escritorio).
 - Tests en entornos sin sandbox: `CHROME_BIN=<chromium> ng test --watch=false` con un launcher `ChromeHeadless --no-sandbox`.
 - Responde en español salvo que el usuario escriba en otro idioma; el código y los commits siguen el idioma ya usado en `git log`.
