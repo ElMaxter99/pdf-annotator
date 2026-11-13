@@ -9,6 +9,12 @@ Este documento tiene **dos partes**: la **Parte A** explica el flujo en lenguaje
 ## La idea en una frase
 Antes de publicar una versión de verdad (por ejemplo la **1.9.0**) se publica una o varias **versiones de prueba** (**1.9.0-rc.1**, **rc.2**…) para instalarlas y probarlas en Windows, macOS y Linux. Cuando una de ellas sale bien, se publica la versión final con el mismo código.
 
+## ¿Hay que hacer siempre una RC?
+**No.** Una RC no es una versión distinta, es un **ensayo de la misma versión**: `1.9.0-rc.1` y `1.9.0` llevan el mismo código; la RC solo sirve para instalarlo y probarlo antes de publicar la `1.9.0` de verdad. La versión «normal» (1.9.0) es siempre la que se publica al final.
+- **Recomendado (haz RC primero)**: cambios grandes, funcionalidad nueva, cambios en la app de escritorio, el instalador o las actualizaciones. Es el caso de la 1.9.0.
+- **Opcional (puedes ir directo a «Release»)**: arreglos pequeños y de bajo riesgo (un texto, un arreglo de CSS, documentación), siempre que la última versión haya salido bien.
+- Si una RC sale con fallos no se «arregla»: se saca otra (`rc.2`) y, cuando una sale bien, se publica la final con el mismo número.
+
 ## Qué es una *release candidate* (RC)
 Es un ensayo general. «Candidata a versión final». Tiene instaladores reales (los mismos archivos que tendría la final), pero GitHub la marca como **pre-release**: no es «la última versión», y los usuarios normales no reciben aviso de ella. Solo la ve quien la busque en la página de [Releases](https://github.com/ElMaxter99/pdf-annotator/releases) o quien haya activado el canal **Pruebas** en la app de escritorio (pie del editor → «Canal de actualizaciones»).
 
@@ -44,6 +50,7 @@ Repositorio: `ElMaxter99/pdf-annotator`. Ramas: `develop` (trabajo) y `master` (
 ## 0. Antes de empezar
 - [ ] Hay trabajo fusionado en `develop` que justifique versión (`CHANGELOG.md` → *Unreleased* no vacío).
 - [ ] Decide `X.Y.Z` (patch = solo arreglos, minor = funcionalidad) y díselo a Maxter si hay duda.
+- [ ] **¿RC o directo?** Haz RC (pasos 2–4) si hay funcionalidad nueva, cambios en `desktop/` (Electron, instaladores, actualizador), en los workflows de release o en algo que solo se prueba instalando; también si es la primera versión tras un cambio de proceso. Puedes ir directo al paso 5 (con el visto bueno de Maxter) solo para arreglos pequeños y de bajo riesgo, con la versión anterior sana. Si dudas, haz RC y explícaselo a Maxter. Una RC es un ensayo de la **misma** versión: no se sube el número por cada RC.
 - [ ] La rama asignada ya fusionada se reinicia desde `develop` sin forzar: `git fetch origin develop && git switch -C <rama> origin/develop` (un `push --force` puede estar denegado; un push normal avanza si `develop` ya contiene lo viejo).
 
 ## 1. Subir la versión (PR a `develop`)
