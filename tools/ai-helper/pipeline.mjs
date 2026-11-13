@@ -66,9 +66,45 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       const parsed = validateProposals(fakeAnswer(entries, A, B), known);
       proposals = parsed.proposals;
     } else {
+      const attached = provider === 'copilot' && process.env.COPILOT_ATTACH_IMAGES !== '0';
+      // Prueba previa y barata (solo Copilot): dos imágenes adjuntas y nada más. Si no lee sus códigos, se corta aquí
+      // en vez de gastar cientos de miles de tokens en la ejecución completa.
+      if (attached && codes && process.env.COPILOT_PROBE !== '0') {
+        const names = [Object.keys(codes).find((k) => k.startsWith('A-')), Object.keys(codes).find((k) => k.startsWith('B-'))].filter(Boolean);
+        if (names.length) {
+          onStage('asking', 1);
+          const probe = await runCli(provider, work, {
+            model,
+            keepApiKey,
+            timeoutMs: Math.min(timeoutMs ?? 120000, 120000),
+            signal,
+            quiet: true,
+            attachments: names.map((n) => `${n}.png`),
+            stream: true,
+            instruction: `Mira las imágenes adjuntas (${names.join(', ')}). Cada una lleva un código de 4 caracteres en un recuadro, abajo a la derecha. No uses herramientas. Responde SOLO con un objeto JSON {"images":{${names.map((n) => `"${n}":"CODIGO"`).join(',')}}}.`,
+          });
+          seconds += probe.seconds ?? 0;
+          if (probe.aborted) throw Object.assign(new Error('Cancelado.'), { code: 'aborted' });
+          if (probe.ok) {
+            const ex = PROVIDERS[provider].extract(probe.stdout);
+            const subset = Object.fromEntries(names.map((n) => [n, codes[n]]));
+            let ok = false;
+            let data = null;
+            try {
+              data = parseJsonFromText(ex.text, (v) => !!v && typeof v === 'object');
+            } catch {
+              /* respuesta no JSON: cuenta como no leída */
+            }
+            const d = describeImageCodes(data, subset);
+            ok = d.missing.length === 0;
+            details.probe = { ok, seconds: probe.seconds, images: names.length, tokens: ex.meta.usage ? Object.values(ex.meta.usage).reduce((n, x) => n + (Number(x) || 0), 0) : null, aiCredits: ex.meta.aiCredits ?? null };
+            if (!ok) throw Object.assign(new Error(`Copilot no lee las imágenes adjuntas (prueba previa con ${names.join(' y ')}): ${d.given.map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}. No se ha lanzado la ejecución completa para no gastar créditos.`), { code: 'images_not_read', details });
+          }
+        }
+      }
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         onStage('asking', attempt);
-        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote, codes });
+        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote, codes, attached });
         await writeFile(path.join(work, 'prompt.md'), promptText);
         const usageById = new Map();
         const attemptInfo = { n: attempt, promptChars: promptText.length, steps: [], usage: null, retry: !!retryNote };
@@ -131,7 +167,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
           if (missing.length) {
             // La IA no ha leído las imágenes: no se aprovecha una respuesta hecha solo con los textos.
             retryNote = 'no has devuelto los códigos de las imágenes. Abre TODAS las imágenes, copia el código de cada una en "images" y vuelve a responder con el objeto JSON pedido.';
-            if (attempt === maxAttempts) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer (${missing.join(', ')}). La IA devolvió ${returned} códigos; ejemplos: ${given.slice(0, 3).map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}.`), { code: 'images_not_read', details });
+            if (attempt === maxAttempts || provider === 'copilot') throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer (${missing.join(', ')}). La IA devolvió ${returned} códigos; ejemplos: ${given.slice(0, 3).map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}.`), { code: 'images_not_read', details });
             continue;
           }
         }

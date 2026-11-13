@@ -160,7 +160,7 @@ export const PROVIDERS = {
         ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a))
         : [
             '-p',
-            INSTRUCTION,
+            opts.instruction ?? INSTRUCTION,
             '--allow-all-tools',
             // Sin terminal: gastaba decenas de llamadas `bash` explorando y multiplicaba el consumo. La denegación gana a --allow-all-tools; `COPILOT_ALLOW_SHELL=1` la quita.
             ...(process.env.COPILOT_ALLOW_SHELL === '1' ? [] : ['--deny-tool=shell']),

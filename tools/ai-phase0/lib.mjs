@@ -191,7 +191,7 @@ export function summarize(rows) {
   };
 }
 
-export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes }) {
+export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes, attached }) {
   const imgs = (prefix, n) => Array.from({ length: n }, (_, i) => `${prefix}-p${i + 1}.png`).join(', ');
   return `# Tarea: trasladar campos de un PDF A a un PDF B
 
@@ -208,7 +208,7 @@ Para cada campo de fields.json:
 3. La app calculará la posición final: ancla B + desplazamiento que tenía el campo en A. Si en B el campo ya no está en la misma posición relativa respecto a su etiqueta (se ve en las imágenes), estima la corrección en puntos PDF en "dx" y "dy" (si no cambió, 0 y 0). No calcules coordenadas absolutas.
 4. Si no hay forma razonable de colocarlo (por ejemplo, la etiqueta ya no existe en B), devuelve "found": false con el motivo. No fuerces un ancla distinta.
 
-Trabaja solo con las imágenes y los JSON de esta carpeta: abre cada imagen una sola vez, no uses la terminal ni escribas archivos.
+${attached ? 'Las imágenes ya vienen adjuntas a este mensaje: míralas ahí, no las abras con herramientas.\n\n' : ''}Trabaja solo con las imágenes y los JSON de esta carpeta: abre cada imagen una sola vez, no uses la terminal ni escribas archivos.
 
 Mira las imágenes de A y B para confirmar que el ancla es el mismo concepto. No inventes textos: "anchorA" y "anchorB" deben existir literalmente en textsA.json y textsB.json.
 
