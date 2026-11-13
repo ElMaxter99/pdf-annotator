@@ -90,6 +90,7 @@ Repositorio: `ElMaxter99/pdf-annotator`. Ramas: `develop` (trabajo) y `master` (
 ## Problemas conocidos
 - **«Committer identity unknown» en el job `tag`**: faltaba `git config user.name/user.email`; ya corregido en `release-candidate.yml` (PR #198). `release.yml` ya lo traía.
 - **Etiquetas creadas con `GITHUB_TOKEN` no disparan otros workflows**: por eso `release-candidate.yml` y `release.yml` llaman a `desktop-release.yml` con `workflow_call` en vez de depender del evento de etiqueta.
+- **RC publicada como «untagged-…»** (pasó con rc.1: instaladores bien, pero `tag_name` quedó `untagged-…` y el actualizador no la ve): el workflow ya fija `tag_name` al publicar y lo comprueba. Si pasa igual, lo arregla Maxter desde la web (Editar release → elegir la etiqueta existente) o se lanza otra RC.
 - **Borradores «untagged» en Releases**: restos de intentos fallidos o de electron-builder; no son versiones. Borrarlos requiere aprobación de Maxter.
 - **Un push forzado a la rama asignada puede estar denegado**: usar un push normal tras reiniciar la rama desde `develop`.
 - **Instaladores sin firmar**: SmartScreen/Gatekeeper avisan; macOS no se actualiza solo (el aviso lleva a la descarga). Ver `docs/DECISIONS.md` (decisión 13).
