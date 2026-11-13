@@ -1221,5 +1221,8 @@
         "ok": "Ho capito"
       }
     }
+  },
+  "hint": {
+    "label": "Altre informazioni"
   }
 }

@@ -1221,5 +1221,8 @@
         "ok": "Percebido"
       }
     }
+  },
+  "hint": {
+    "label": "Mais informações"
   }
 }

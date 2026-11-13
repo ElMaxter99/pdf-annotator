@@ -108,15 +108,33 @@
   position: relative;
 }
 
+.sidebar-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(94, 234, 212, 0.14);
+}
+
 .sidebar-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
+}
+
+.sidebar-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-top: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sidebar-minimize-toggle {
-  position: sticky;
-  top: 8px;
-  z-index: 2;
-  margin-left: auto;
+  flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -132,6 +150,12 @@
 .sidebar--minimized {
   padding: 10px 8px;
   overflow: hidden;
+}
+
+.sidebar--minimized .sidebar-head {
+  justify-content: center;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .sidebar--minimized .sidebar-minimize-toggle {

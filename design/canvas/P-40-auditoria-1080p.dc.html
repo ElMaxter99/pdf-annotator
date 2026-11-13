@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-40 Auditoría 1080p</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.p{--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--line:#3f3f5a;--soft:#34344a;--inset:#252538;--ink:#0b1f1c;--warn:#fbbf24;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.q{background:transparent;color:var(--muted);padding:8px 10px}
+.btn.s{min-height:32px;padding:4px 14px;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.err{background:color-mix(in srgb,var(--danger) 16%,transparent);color:#ff8a8a}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;flex:none}
+.dot.on{background:var(--accent)}.dot.warn{background:var(--warn)}.dot.err{background:var(--danger)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:3px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:5px 14px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.sp{flex-grow:1}
+.mono{font-family:Consolas,monospace;font-size:13px}
+.pin{position:absolute;width:30px;height:30px;border-radius:50%;background:var(--danger);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.pin.g{background:var(--accent);color:var(--ink)}
+.shot{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#000}
+.shot img{display:block;width:100%}
+.find{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.find .pin{position:static;flex:none;width:26px;height:26px;font-size:13px;box-shadow:none}
+.find b{color:var(--text)}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:10%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.fd.prop{border:2px dashed #d99a00;background:rgba(217,154,0,.12)}
+.tip{position:absolute;background:#0f0f1a;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--muted);color:var(--muted);font-size:11px;font-weight:700;flex:none}
+.tbl{display:grid;gap:8px}
+.tr{display:grid;gap:14px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding-top:0;padding-bottom:0}
+.bar{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.ico{width:32px;height:32px;border-radius:10px;background:var(--soft);display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:var(--text);flex:none}
+</style>
+</helmet>
+<div class="p" style="width:1920px;height:1180px">
+<div class="lab">P-40 · Auditoría de la app real</div>
+<h1 style="font-size:34px;margin:6px 0 4px">Qué pasa hoy a 1920×1080</h1>
+<p class="cap" style="max-width:1200px">Capturas del build de producción (v1.9.1) con un lote de 3 PDFs, la propuesta de la IA y el panel de Avanzado. Mismos recorridos a 1366×768 empeoran: el diálogo de la IA necesita scroll propio y el editor deja ≈480 px al PDF.</p>
+<div style="display:flex;gap:32px;margin-top:20px">
+<div style="display:flex;flex-direction:column;gap:12px"><div class="shot" style="width:1100px;height:619px"><img src="/_blob/5d21c9aa5f592ea6fbaf39495b7dd26e" alt="Editor del lote a 1920×1080"><span class="pin " style="left:489px;top:39px">1</span><span class="pin " style="left:-3px;top:113px">2</span><span class="pin " style="left:113px;top:380px">3</span><span class="pin " style="left:775px;top:36px">4</span><span class="pin " style="left:930px;top:560px">5</span><span class="pin " style="left:282px;top:135px">6</span></div><div class="cap">Editor del lote · «Propuesta de la IA» abierta</div>
+<div style="display:flex;gap:20px;margin-top:8px"><div style="display:flex;flex-direction:column;gap:8px"><div class="shot" style="width:520px;height:292px"><img src="/_blob/53c69786b6e8e0cef2bace5e7ed6b99e" alt="Diálogo de traslado con IA"><span class="pin " style="left:200px;top:120px">7</span></div><div class="cap">Trasladar con IA · diálogo</div></div><div style="display:flex;flex-direction:column;gap:8px"><div class="shot" style="width:520px;height:292px"><img src="/_blob/384354e74e05b82ecc3c2561b7c1aa1c" alt="Detalles de la IA"><span class="pin " style="left:250px;top:40px">8</span></div><div class="cap">«Qué está haciendo la IA» · modal</div></div></div></div>
+<div style="display:flex;flex-direction:column;gap:14px;width:640px"><div class="find"><span class="pin">1</span><div><b>Tres barras apiladas antes del PDF</b><br><span class="cap">Cabecera + tira del lote + banner de la IA = ≈190 px, el 18 % del alto a 1080p (25 % a 768).</span></div></div><div class="find"><span class="pin">2</span><div><b>Dos scrolls y botón de plegar que se va</b><br><span class="cap">El botón ⟨ vive dentro del scroll del panel izquierdo: al bajar desaparece. Junto al scroll del visor hay dos barras verticales.</span></div></div><div class="find"><span class="pin">3</span><div><b>≈80 controles visibles a la vez</b><br><span class="cap">En el editor del lote hay 80–84 elementos interactivos en pantalla; en el resto de vistas, entre 25 y 35.</span></div></div><div class="find"><span class="pin">4</span><div><b>Cuatro colores de estado a la vez</b><br><span class="cap">Turquesa, ámbar, rojo y naranja conviven: «Falta en B» rojo, «Por resolver» turquesa, propuesta ámbar, toast naranja.</span></div></div><div class="find"><span class="pin">5</span><div><b>El aviso tapa y repite</b><br><span class="cap">El toast ámbar tapa el pie y dice lo mismo que la lista («es el mismo PDF»). Sigue ahí al cambiar de pantalla.</span></div></div><div class="find"><span class="pin">6</span><div><b>Se tardan 8 lecturas en pulsar un botón</b><br><span class="cap">Proveedor, modelo, nota de modelo, 3 cifras, consumo, casilla con ayuda, aviso de privacidad y «No volver a preguntar».</span></div></div><div class="find"><span class="pin">7</span><div><b>El detalle de la IA es otra app</b><br><span class="cap">Modal de 1610×950: 4 pestañas, 3 columnas y 5 bloques para ver «10 de 10 colocados».</span></div></div><div class="find"><span class="pin">8</span><div><b>Texto fijo bajo cada grupo</b><br><span class="cap">Avanzado: un párrafo bajo cada bloque y un estado vacío. 89 de 915 textos superan 70 caracteres; 61 son de lote e IA.</span></div></div><div class="find"><span class="pin">9</span><div><b>Pista fija «Mueve el cursor sobre el PDF»</b><br><span class="cap">Ocupa 56 px permanentes en el panel; solo sirve mientras se mueve el ratón.</span></div></div><div class="find"><span class="pin">10</span><div><b>«Mostrar origen» pisa la etiqueta A</b><br><span class="cap">En vista dividida la casilla se superpone a «A · SOLO LECTURA».</span></div></div></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

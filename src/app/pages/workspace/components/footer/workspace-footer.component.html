@@ -1,5 +1,16 @@
 <footer class="footer">
   <span class="footer__hint"><kbd>?</kbd> {{ 'shortcuts.footerHint' | t }}</span>
+  <div class="json-coords" role="status" [attr.aria-label]="'controls.cursorLabel' | t">
+    <ng-container *ngIf="vm.cursorPdfCoords() as cursor; else coordsIdle">
+      <span class="json-coords__label">{{ 'controls.cursorLabel' | t }}</span>
+      <span class="json-coords__value">X: {{ cursor.x | number:'1.0-2' }}</span>
+      <span class="json-coords__divider" aria-hidden="true">·</span>
+      <span class="json-coords__value">Y: {{ cursor.y | number:'1.0-2' }}</span>
+    </ng-container>
+    <ng-template #coordsIdle>
+      <span class="json-coords__idle">{{ 'controls.cursorInactive' | t }}</span>
+    </ng-template>
+  </div>
   <app-update-channel class="footer__channel"></app-update-channel>
   <span class="footer__details">
     © {{ vm.currentYear }} {{ vm.appName }} · v{{ vm.version }} · {{ 'app.footer.developedBy' | t : { author: vm.appAuthor } }}

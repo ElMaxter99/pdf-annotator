@@ -26,6 +26,8 @@ export class ToastService {
     durationMs = DEFAULT_DURATION_MS,
     recoverable = false,
   ): number {
+    const repeated = this.toasts().find((toast) => toast.message === message && toast.kind === kind);
+    if (repeated) return repeated.id;
     const id = this.nextId++;
     this.toasts.update((list) => [...list, { id, kind, message, recoverable }]);
     if (durationMs > 0 && typeof window !== 'undefined') {

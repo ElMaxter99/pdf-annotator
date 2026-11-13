@@ -47,4 +47,12 @@ describe('ToastService', () => {
     service.dismiss(service.notice('igual', 'info', 0));
     expect(service.closed().length).toBe(1);
   });
+
+  it('does not repeat a toast that is already showing', () => {
+    const service = new ToastService();
+    const first = service.show('igual', 'warning');
+    const second = service.show('igual', 'warning');
+    expect(second).toBe(first);
+    expect(service.toasts().length).toBe(1);
+  });
 });

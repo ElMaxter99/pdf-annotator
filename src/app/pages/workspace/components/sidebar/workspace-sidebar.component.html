@@ -1,25 +1,12 @@
 <aside class="sidebar" [class.sidebar--minimized]="vm.sidebarMinimized()">
+  <div class="sidebar-head">
   <button type="button" class="sidebar-minimize-toggle"
     (click)="vm.toggleSidebarMinimized()"
     [attr.aria-label]="(vm.sidebarMinimized() ? 'sidebar.expandSidebar' : 'sidebar.minimizeSidebar') | t"
     [attr.title]="(vm.sidebarMinimized() ? 'sidebar.expandSidebar' : 'sidebar.minimizeSidebar') | t">
     <span aria-hidden="true">{{ vm.sidebarMinimized() ? '⟩' : '⟨' }}</span>
   </button>
-
-  <div class="sidebar-content" *ngIf="!vm.sidebarMinimized()">
-  <div class="json-coords" role="status" [attr.aria-label]="'controls.cursorLabel' | t">
-    <ng-container *ngIf="vm.cursorPdfCoords() as cursor; else coordsIdle">
-      <span class="json-coords__label">{{ 'controls.cursorLabel' | t }}</span>
-      <span class="json-coords__value">X: {{ cursor.x | number:'1.0-2' }}</span>
-      <span class="json-coords__divider" aria-hidden="true">·</span>
-      <span class="json-coords__value">Y: {{ cursor.y | number:'1.0-2' }}</span>
-    </ng-container>
-    <ng-template #coordsIdle>
-      <span class="json-coords__idle">{{ 'controls.cursorInactive' | t }}</span>
-    </ng-template>
-  </div>
-
-  <div class="sidebar-tabs" role="tablist" [attr.aria-label]="'sidebar.tabs.label' | t"
+  <div class="sidebar-tabs" *ngIf="!vm.sidebarMinimized()" role="tablist" [attr.aria-label]="'sidebar.tabs.label' | t"
     (keydown)="vm.onSidebarTabKeydown($event)">
     <button type="button" role="tab" id="sidebar-tab-document" class="sidebar-tab"
       [class.sidebar-tab--active]="vm.sidebarTab() === 'document'" [attr.aria-selected]="vm.sidebarTab() === 'document'"
@@ -41,7 +28,10 @@
       aria-controls="sidebar-panel-advanced" [attr.tabindex]="vm.sidebarTab() === 'advanced' ? 0 : -1"
       (click)="vm.setSidebarTab('advanced')">{{ 'sidebar.tabs.advanced' | t }}</button>
   </div>
+  </div>
 
+  <div class="sidebar-content" *ngIf="!vm.sidebarMinimized()">
+  <div class="sidebar-scroll">
   <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-document" aria-labelledby="sidebar-tab-document"
     [hidden]="vm.sidebarTab() !== 'document'">
   <app-batch-document *ngIf="vm.batchCtx()" [vm]="vm"></app-batch-document>
@@ -90,7 +80,7 @@
   </div>
   <section class="json-panel" [class.json-panel--collapsed]="vm.jsonPanelCollapsed()">
     <div class="json-panel__header">
-      <h5 class="json-panel__title">{{ 'sidebar.title' | t }}</h5>
+      <h5 class="json-panel__title">{{ 'sidebar.title' | t }} <app-info-tip [text]="'sidebar.jsonHint' | t"></app-info-tip></h5>
       <button type="button" class="json-panel__toggle" (click)="vm.toggleJsonPanelCollapsed()"
         [attr.aria-expanded]="!vm.jsonPanelCollapsed()">
         <span>{{ (vm.jsonPanelCollapsed() ? 'sidebar.jsonPanelShow' : 'sidebar.jsonPanelHide') | t }}</span>
@@ -151,7 +141,6 @@
         <button type="button" class="btn" (click)="vm.downloadJSON()"
           [disabled]="!vm.coords().length">{{ 'controls.downloadJson' | t }}</button>
       </div>
-      <small class="sidebar-hint">{{ 'sidebar.jsonHint' | t }}</small>
     </ng-container>
   </section>
   </div>
@@ -210,12 +199,11 @@
           <input type="checkbox" [checked]="vm.customFontsFeatureEnabled()"
             (change)="vm.toggleCustomFontsFeature($event.target.checked)" />
           <span>{{ 'fonts.custom.enableFeature' | t }}</span>
+          <app-info-tip [text]="'fonts.custom.hint' | t"></app-info-tip>
         </label>
-        <small class="advanced-hint">{{ 'fonts.custom.hint' | t }}</small>
 
         <section class="custom-fonts-panel" *ngIf="vm.customFontsFeatureEnabled()">
-          <h5>{{ 'fonts.custom.title' | t }}</h5>
-          <p class="custom-fonts-panel__hint">{{ 'fonts.custom.description' | t }}</p>
+          <h5>{{ 'fonts.custom.title' | t }} <app-info-tip [text]="'fonts.custom.description' | t"></app-info-tip></h5>
           <div class="custom-fonts-panel__actions">
             <button type="button" class="btn" (click)="vm.triggerCustomFontPicker()">
               {{ 'fonts.custom.add' | t }}
@@ -243,18 +231,18 @@
           <input type="checkbox" [checked]="vm.guidesFeatureEnabled()"
             (change)="vm.toggleGuidesFeature($event.target.checked)" />
           <span>{{ 'guides.enableFeature' | t }}</span>
+          <app-info-tip [text]="'sidebar.advancedHint' | t"></app-info-tip>
         </label>
-        <small class="advanced-hint">{{ 'sidebar.advancedHint' | t }}</small>
 
         <label class="advanced-checkbox">
           <input type="checkbox" [checked]="vm.includeAdvancedJsonFields()"
             (change)="vm.toggleIncludeAdvancedJsonFields($event.target.checked)" />
           <span>{{ 'sidebar.includeAdvancedJsonFields' | t }}</span>
+          <app-info-tip [text]="'sidebar.includeAdvancedJsonFieldsHint' | t"></app-info-tip>
         </label>
-        <small class="advanced-hint">{{ 'sidebar.includeAdvancedJsonFieldsHint' | t }}</small>
 
         <section class="guides-panel" *ngIf="vm.guidesFeatureEnabled() && vm.guideSettings() as guides">
-          <h5>{{ 'guides.title' | t }}</h5>
+          <h5>{{ 'guides.title' | t }} <app-info-tip [text]="(guides.usePdfCoordinates ? 'guides.customHint.pdf' : 'guides.customHint.canvas') | t"></app-info-tip></h5>
           <div class="guides-toggles">
             <label>
               <input type="checkbox" [checked]="guides.showGrid"
@@ -340,7 +328,6 @@
               <input type="text" [ngModel]="vm.snapPointsYText()" (ngModelChange)="vm.onSnapPointsInput('y', $event)"
                 [ngModelOptions]="{ standalone: true }" [placeholder]="'guides.customPlaceholder' | t" />
             </label>
-            <small class="guides-hint">{{ (guides.usePdfCoordinates ? 'guides.customHint.pdf' : 'guides.customHint.canvas') | t }}</small>
           </div>
         </section>
       </div>
@@ -348,8 +335,7 @@
   </section>
 
   <section class="preview-panel" aria-labelledby="preview-samples-title">
-    <h4 id="preview-samples-title">{{ 'preview.samples.title' | t }}</h4>
-    <p class="advanced-hint">{{ 'preview.samples.description' | t }}</p>
+    <h4 id="preview-samples-title">{{ 'preview.samples.title' | t }} <app-info-tip [text]="('preview.samples.description' | t) + ' ' + ('preview.samples.hint' | t) + ' ' + ('preview.samples.note' | t)"></app-info-tip></h4>
     <div class="preview-samples">
       <div class="preview-samples__row" *ngFor="let kind of vm.sampleKinds">
         <label [for]="'sample-' + kind">{{ 'preview.samples.' + kind | t }}</label>
@@ -361,12 +347,10 @@
         </button>
       </div>
     </div>
-    <small class="advanced-hint">{{ 'preview.samples.hint' | t }} {{ 'preview.samples.note' | t }}</small>
-  </section>
+      </section>
 
   <section class="preview-panel" aria-labelledby="preview-data-title">
-    <h4 id="preview-data-title">{{ 'preview.testData.title' | t }}</h4>
-    <p class="advanced-hint">{{ 'preview.testData.description' | t }}</p>
+    <h4 id="preview-data-title">{{ 'preview.testData.title' | t }} <app-info-tip [text]="'preview.testData.description' | t"></app-info-tip></h4>
     <textarea class="preview-data__input" rows="8" spellcheck="false"
       [attr.aria-label]="'preview.testData.title' | t" [placeholder]="'preview.testData.placeholder' | t"
       [attr.aria-invalid]="vm.previewSettings.testDataError() ? 'true' : null"
@@ -400,6 +384,7 @@
       </ng-container>
     </ng-template>
   </section>
+  </div>
   </div>
   </div>
 </aside>

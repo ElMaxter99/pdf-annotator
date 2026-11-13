@@ -2102,6 +2102,13 @@ header .logo {
   overscroll-behavior: contain;
 }
 
+/* Un solo scroll por zona: cabecera y pestañas fijas, solo se desplaza el contenido */
+.app--workspace .sidebar {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .app--workspace header.header {
   padding: 10px 14px;
   gap: 0;
@@ -2498,17 +2505,12 @@ kbd {
 
 /* Sidebar tabs */
 .sidebar-tabs {
-  position: sticky;
-  top: -12px;
-  z-index: 3;
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   gap: 2px;
-  margin: 0 -12px 12px;
-  padding: 8px 10px;
   overflow-x: auto;
   scrollbar-width: none;
-  background: var(--panel);
-  border-bottom: 1px solid rgba(94, 234, 212, 0.14);
 }
 
 .sidebar-tab {
@@ -3204,40 +3206,41 @@ kbd {
   .app--workspace .toolbar__group .btn--primary {
     padding: 0 8px;
   }
+}
 
-  .toolbar__more {
-    display: inline-flex;
-  }
+/* Atajos, tema e idioma viven siempre en el menú ⋯ (también a 1080p) */
+.toolbar__more {
+  display: inline-flex;
+}
 
-  .toolbar__prefs .toolbar__group--preferences {
-    display: none;
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    z-index: 40;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
-    min-width: 240px;
-    padding: 8px;
-    border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
-    background: var(--panel);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  }
+.toolbar__prefs .toolbar__group--preferences {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 240px;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  background: var(--panel);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
 
-  .toolbar__prefs--open .toolbar__group--preferences {
-    display: flex;
-  }
+.toolbar__prefs--open .toolbar__group--preferences {
+  display: flex;
+}
 
-  .app--workspace .toolbar__prefs--open .toolbar__group--preferences .btn {
-    justify-content: flex-start;
-    gap: 10px;
-    width: 100%;
-  }
+.app--workspace .toolbar__prefs--open .toolbar__group--preferences .btn {
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+}
 
-  .app--workspace .toolbar__prefs--open .toolbar__group--preferences .btn .btn__label {
-    display: inline;
-  }
+.app--workspace .toolbar__prefs--open .toolbar__group--preferences .btn .btn__label {
+  display: inline;
 }
 
 /* Batch strip */
@@ -3297,22 +3300,18 @@ kbd {
   font-size: 0.85rem !important;
 }
 
-@media (max-width: 1200px) {
-  .app--workspace .toolbar__prefs .toolbar__group--preferences {
-    background: var(--panel);
-  }
+.app--workspace .toolbar__prefs .toolbar__group--preferences {
+  background: var(--panel);
 }
 
-@media (max-width: 1200px) {
-  .app--workspace .toolbar__prefs--open .toolbar__group--preferences app-theme-toggle,
-  .app--workspace .toolbar__prefs--open .toolbar__group--preferences app-language-selector {
-    display: block;
-    width: 100%;
-  }
+.app--workspace .toolbar__prefs--open .toolbar__group--preferences app-theme-toggle,
+.app--workspace .toolbar__prefs--open .toolbar__group--preferences app-language-selector {
+  display: block;
+  width: 100%;
+}
 
-  .app--workspace .toolbar__prefs--open .toolbar__group--preferences app-language-selector select {
-    width: 100%;
-  }
+.app--workspace .toolbar__prefs--open .toolbar__group--preferences app-language-selector select {
+  width: 100%;
 }
 
 /* Phones keep the older wrapping toolbar (the app is designed for desktop). */
@@ -4929,5 +4928,160 @@ body.has-update-card .toast-host {
 @media (prefers-reduced-motion: reduce) {
   .update-channel__dialog {
     animation: none;
+  }
+}
+
+
+/* ---- v1.9.2 · Interfaz simple para 1080p (mesas P-40..P-44) ---- */
+
+/* C · La propuesta de la IA flota al pie del visor en lugar de apilar una tercera barra */
+.app--workspace app-ai-review {
+  display: contents;
+}
+
+.app--workspace app-ai-review .migration-hint {
+  position: fixed;
+  left: calc(max(360px, 33vw) + 28px);
+  right: 28px;
+  bottom: 52px;
+  z-index: 60;
+  width: fit-content;
+  max-width: min(1180px, calc(100vw - max(360px, 33vw) - 56px));
+  margin: 0 auto;
+  background: var(--panel);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(5, 5, 17, 0.45);
+}
+
+.app--workspace.app--sidebar-minimized app-ai-review .migration-hint {
+  left: 100px;
+  max-width: min(1180px, calc(100vw - 128px));
+}
+
+.app--workspace .migration-bar {
+  margin-top: 6px;
+  padding-top: 6px;
+  min-height: 40px;
+}
+
+.app--workspace header.header {
+  padding: 6px 12px;
+}
+
+/* D · El color significa algo: estado neutro + punto de color; ámbar = atención, rojo = error */
+.migration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+}
+
+.migration-badge::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.migration-badge--moved::before,
+.migration-badge--missing::before {
+  background: #fbbf24;
+}
+
+.migration-badge--new::before,
+.migration-badge--renamed::before {
+  background: var(--accent);
+}
+
+:root.theme-light .migration-badge--moved::before,
+:root.theme-light .migration-badge--missing::before {
+  background: #b45309;
+}
+
+.migration-badge--moved,
+.migration-badge--new,
+.migration-badge--missing,
+.migration-badge--renamed {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+}
+
+.toast-host {
+  bottom: 52px;
+}
+
+/* F · Las acciones de cada campo aparecen al pasar el ratón o con el foco del teclado */
+.migration-row {
+  position: relative;
+  min-height: 40px;
+}
+
+.migration-row[data-status='missing'] .migration-row__actions {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  grid-column: auto;
+  padding-left: 24px;
+  transform: translateY(-50%);
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--panel) 24px);
+  transition: opacity 0.15s ease-out;
+}
+
+.migration-row[data-status='missing']:hover .migration-row__actions,
+.migration-row[data-status='missing']:focus-within .migration-row__actions {
+  opacity: 1;
+}
+
+.migration-row[data-status='missing']:hover .migration-badge,
+.migration-row[data-status='missing']:focus-within .migration-badge {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .migration-row[data-status='missing'] .migration-row__actions {
+    transition: none;
+  }
+}
+
+.app--workspace app-ai-review .migration-hint {
+  flex-wrap: nowrap;
+}
+
+.app--workspace app-ai-review .migration-hint > span:first-child {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.app--workspace app-ai-review .migration-hint__close {
+  flex: none;
+}
+
+/* El aviso va arriba a la derecha del visor y no tapa la propuesta de la IA */
+body:has(.app--workspace) .toast-host {
+  top: 132px;
+  bottom: auto;
+}
+
+.app--workspace app-ai-review .migration-hint__actions {
+  flex-wrap: nowrap;
+  align-items: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+  .app--workspace app-ai-review .migration-hint {
+    position: static;
+    max-width: none;
+  }
+
+  .sidebar-head {
+    flex-wrap: wrap;
+  }
+
+  .sidebar-head .sidebar-tabs {
+    flex-basis: 100%;
   }
 }
