@@ -71,7 +71,7 @@ test('Copilot adjunta las imágenes por defecto y COPILOT_ATTACH_IMAGES=0 lo des
   const { PROVIDERS } = await import('./providers.mjs');
   const opts = { attachments: ['A-p1.png', 'B-p1.png'] };
   delete process.env.COPILOT_ATTACH_IMAGES;
-  assert.deepEqual(PROVIDERS.copilot.args(opts).filter((a) => a.startsWith('--attachment')), ['--attachment=A-p1.png', '--attachment=B-p1.png']);
+  { const a = PROVIDERS.copilot.args(opts); assert.deepEqual(a.slice(a.indexOf('--attachment')).filter((x) => x.endsWith('.png') || x === '--attachment'), ['--attachment', 'A-p1.png', '--attachment', 'B-p1.png']); }
   process.env.COPILOT_ATTACH_IMAGES = '0';
   assert.ok(!PROVIDERS.copilot.args(opts).some((a) => a.startsWith('--attachment')));
   delete process.env.COPILOT_ATTACH_IMAGES;

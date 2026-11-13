@@ -154,7 +154,7 @@ export const PROVIDERS = {
     label: 'Copilot CLI (copilot -p)',
     cmd: 'copilot',
     // Banderas SIN VERIFICAR contra tu versión: si fallan, ajusta con COPILOT_ARGS='["-p","...","--allow-all-tools"]'.
-    // Cada PNG se adjunta con `--attachment=<archivo>` (verificado con un PNG; `COPILOT_ATTACH_IMAGES=0` lo desactiva).
+    // Cada PNG se adjunta con `--attachment <ruta absoluta>` (la forma verificada a mano con un PNG; `COPILOT_ATTACH_IMAGES=0` lo desactiva).
     args: (opts = {}) =>
       process.env.COPILOT_ARGS
         ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a))
@@ -166,7 +166,7 @@ export const PROVIDERS = {
             ...(process.env.COPILOT_ALLOW_SHELL === '1' ? [] : ['--deny-tool=shell']),
             ...(opts.stream ? ['--output-format', 'json'] : []),
             ...(opts.model ? ['--model', opts.model] : []),
-            ...(process.env.COPILOT_ATTACH_IMAGES === '0' ? [] : (opts.attachments ?? []).map((f) => `--attachment=${f}`)),
+            ...(process.env.COPILOT_ATTACH_IMAGES === '0' ? [] : (opts.attachments ?? []).flatMap((f) => ['--attachment', f])),
           ],
     // Con --output-format json (ayudante) llega JSONL con el consumo real; sin él, texto plano y sin cifras.
     extract(stdout) {

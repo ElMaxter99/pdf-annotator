@@ -1,6 +1,6 @@
 // Propuesta de coordenadas A→B con IA para la app: mismo flujo que la fase 0, pero recibe los PDF y la plantilla
 // de A en memoria y devuelve una fila por campo. Nunca evalúa la salida de la IA: solo la valida y la convierte.
-import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { buildPrompt, findText, flattenFields, looksLikeProposals, describeImageCodes, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
@@ -66,6 +66,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       const parsed = validateProposals(fakeAnswer(entries, A, B), known);
       proposals = parsed.proposals;
     } else {
+      let probeHint = '';
       const attached = provider === 'copilot' && process.env.COPILOT_ATTACH_IMAGES !== '0';
       // Prueba previa y barata (solo Copilot): dos imágenes adjuntas y nada más. Si no lee sus códigos, se corta aquí
       // en vez de gastar cientos de miles de tokens en la ejecución completa.
@@ -79,7 +80,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
             timeoutMs: Math.min(timeoutMs ?? 120000, 120000),
             signal,
             quiet: true,
-            attachments: names.map((n) => `${n}.png`),
+            attachments: names.map((n) => path.join(work, `${n}.png`)),
             stream: true,
             instruction: `Mira las imágenes adjuntas (${names.join(', ')}). Cada una lleva un código de 4 caracteres muy grande en la franja inferior. No uses herramientas. Responde SOLO con un objeto JSON {"images":{${names.map((n) => `"${n}":"XXXX"`).join(',')}}} con los 4 caracteres de cada imagen. Si dudas de un carácter escribe tu mejor lectura, nunca "?".`,
           });
@@ -98,7 +99,20 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
             const d = describeImageCodes(data, subset, { minMatch: 2 });
             ok = d.missing.length === 0;
             details.probe = { ok, seconds: probe.seconds, images: names.length, tokens: ex.meta.usage ? Object.values(ex.meta.usage).reduce((n, x) => n + (Number(x) || 0), 0) : null, aiCredits: ex.meta.aiCredits ?? null };
-            if (!ok) throw Object.assign(new Error(`Copilot no lee las imágenes adjuntas (prueba previa con ${names.join(' y ')}): ${d.given.map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}. No se ha lanzado la ejecución completa para no gastar créditos.`), { code: 'images_not_read', details });
+            if (!ok) {
+              // Copia local de las dos páginas para repetir la prueba a mano con el mismo PNG (no sale del ordenador).
+              const debugDir = path.join(os.tmpdir(), 'pdf-annotator-ai-debug');
+              let kept = '';
+              try {
+                await mkdir(debugDir, { recursive: true });
+                for (const n of names) await copyFile(path.join(work, `${n}.png`), path.join(debugDir, `${n}.png`));
+                kept = ` Para repetirlo a mano: copilot -p "Dime el código de 4 caracteres de la franja inferior de la imagen" --attachment "${path.join(debugDir, `${names[0]}.png`)}" (códigos esperados: ${names.map((n) => `${n}=${codes[n]}`).join(', ')}).`;
+              } catch {
+                /* sin copia de diagnóstico */
+              }
+              probeHint = kept;
+            }
+            if (!ok) throw Object.assign(new Error(`Copilot no lee las imágenes adjuntas (prueba previa con ${names.join(' y ')}): ${d.given.map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}. No se ha lanzado la ejecución completa para no gastar créditos.${probeHint}`), { code: 'images_not_read', details });
           }
         }
       }
@@ -115,7 +129,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
           timeoutMs,
           signal,
           quiet: true,
-          attachments: files.filter((f) => f.name.endsWith('.png')).map((f) => f.name),
+          attachments: files.filter((f) => f.name.endsWith('.png')).map((f) => path.join(work, f.name)),
           stream: true,
           onLine:
             provider === 'copilot'
