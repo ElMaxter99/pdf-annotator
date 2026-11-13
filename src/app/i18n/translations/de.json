@@ -727,7 +727,7 @@
         "cap": "Limit pro Durchlauf",
         "retries": "Wiederholungen",
         "estimateClaude": "Geschätzter Verbrauch: {{min}} bis {{max}} Anfragen ({{max}}, falls Wiederholungen nötig sind). Bei Claude wird der echte Verbrauch gemessen und live angezeigt.",
-        "noMeasure": "Verbrauch nicht messbar. Copilot meldet im Helfer-Modus keine Credits: Angezeigt wird die Anzahl der Anfragen, nicht die Credits. Jede Anfrage wird je nach gewähltem Modell abgerechnet.",
+        "noMeasure": "KI-Credits pro Anfrage. Angezeigt wird der vom Helfer gemeldete Verbrauch (Tokens und Credits, falls Copilot sie liefert). Jede Anfrage wird je nach gewähltem Modell abgerechnet.",
         "cascade": "Zuerst «Nach Texten anpassen» versuchen",
         "cascadeHint": "Kostenlos. Die KI wird nur bei PDFs genutzt, in denen Felder nicht platziert werden konnten.",
         "capNote": "Bei mehr als {{cap}} Paaren hält die Warteschlange bei {{cap}} an und wartet auf dein «Fortfahren». Keine automatischen Wiederholungen.",
@@ -735,7 +735,18 @@
         "remember": "Nicht mehr fragen",
         "start": "{{count}} PDFs übertragen",
         "cancel": "Abbrechen",
-        "provider": "Anbieter"
+        "provider": "Anbieter",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automatisch",
+          "pick": "Wählen…",
+          "placeholder": "z. B. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet reicht zum Platzieren der Felder; Opus verbraucht deutlich mehr.",
+          "hintCopilot": "Jede Anfrage wird je nach Modell abgerechnet. „Automatisch“ lässt Copilot wählen."
+        },
+        "fake": "Simuliert"
       },
       "connect": {
         "offline": "Der lokale Helfer wurde nicht gefunden. Starte «npm run start:ia» oder öffne die Desktop-App und prüfe erneut.",
@@ -897,7 +908,8 @@
         "copilot": "Copilot-Modell",
         "copilotAuto": "Automatisch (Standard des CLI)",
         "copilotHint": "Jede Anfrage wird je nach Modell von deinen „Premium Requests“ abgezogen. Gib ein bestimmtes ein, wenn dein Administrator es vorgibt.",
-        "sonnetHint": "Sonnet: genügt zum Platzieren der Felder und schont dein Limit."
+        "sonnetHint": "Sonnet: genügt zum Platzieren der Felder und schont dein Limit.",
+        "new": "Neu"
       },
       "retryToggle": "Einmal wiederholen, wenn die Antwort unbrauchbar ist",
       "retryHint": "Eine Wiederholung kann die Kosten verdoppeln: Bei Copilot zählt sie als weitere Premium-Anfrage. Für Copilot ist sie standardmäßig aus."

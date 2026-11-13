@@ -727,7 +727,7 @@
         "cap": "tope por pasada",
         "retries": "reintentos",
         "estimateClaude": "Consumo estimado: de {{min}} a {{max}} peticiones ({{max}} si hace falta reintentar). Con Claude el consumo real se mide y se ve en vivo.",
-        "noMeasure": "Consumo no medible. Copilot no informa de los créditos en el modo del ayudante: se muestra el número de peticiones, no créditos. Cada petición descuenta según el modelo elegido.",
+        "noMeasure": "Créditos de IA por petición. El consumo que se muestra es el que informe el ayudante (tokens y créditos si Copilot los devuelve). Cada petición descuenta según el modelo elegido.",
         "cascade": "Probar antes con «Ajustar por textos»",
         "cascadeHint": "Gratis. La IA solo se usa en los PDFs donde queden campos sin colocar.",
         "capNote": "Si hay más de {{cap}} pares, la cola se para al llegar a {{cap}} y espera tu «Continuar». Sin reintentos automáticos.",
@@ -735,7 +735,18 @@
         "remember": "No volver a preguntar",
         "start": "Trasladar {{count}} PDFs",
         "cancel": "Cancelar",
-        "provider": "Proveedor"
+        "provider": "Proveedor",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automático",
+          "pick": "Elegir…",
+          "placeholder": "p. ej. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet va bien para colocar campos; Opus gasta bastante más.",
+          "hintCopilot": "Cada petición descuenta según el modelo. «Automático» deja que Copilot elija."
+        },
+        "fake": "Simulado"
       },
       "connect": {
         "offline": "No encuentro el ayudante local. Arranca «npm run start:ia» o abre la app de escritorio y vuelve a comprobar.",
@@ -897,7 +908,8 @@
         "copilot": "Modelo de Copilot",
         "copilotAuto": "Automático (el del CLI)",
         "copilotHint": "Cada petición descuenta de tus «premium requests» según el modelo. Escribe uno concreto si tu administrador lo indica.",
-        "sonnetHint": "Sonnet: suficiente para colocar campos y gasta poco de tu límite."
+        "sonnetHint": "Sonnet: suficiente para colocar campos y gasta poco de tu límite.",
+        "new": "Nuevo"
       },
       "retryToggle": "Reintentar una vez si la respuesta no sirve",
       "retryHint": "Un reintento puede duplicar el gasto: con Copilot cuenta como otra petición premium. Con Copilot viene desactivado."

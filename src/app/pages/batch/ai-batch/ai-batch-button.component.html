@@ -54,14 +54,78 @@
     >
       <h2 id="ai-batch-title">{{ 'batch.ai.confirm.title' | t: { count: chosen().length } }}</h2>
 
-      <label class="ai-check" style="align-items: center">
-        <span>{{ 'batch.ai.confirm.provider' | t }}</span>
-        <select [value]="provider()" (change)="setProvider($any($event.target).value)" data-testid="ai-batch-provider">
+      <div class="ai-field">
+        <span class="ai-field__label" id="ai-batch-provider-label">{{ 'batch.ai.confirm.provider' | t }}</span>
+        <div class="ai-pcards" role="group" aria-labelledby="ai-batch-provider-label">
           @for (p of providers(); track p) {
-            <option [value]="p" [selected]="p === provider()">{{ p === 'copilot' ? 'Copilot' : p === 'fake' ? 'Simulado' : 'Claude' }}</option>
+            <button
+              type="button"
+              class="ai-pcard"
+              [class.ai-pcard--on]="provider() === p"
+              [class.ai-pcard--off]="helper.found()[p] === false"
+              [disabled]="helper.found()[p] === false"
+              [attr.aria-pressed]="provider() === p"
+              (click)="setProvider(p)"
+              [attr.data-testid]="'ai-batch-provider-' + p"
+            >
+              <span class="ai-pcard__radio" aria-hidden="true"></span>
+              <strong>{{ p === 'claude' ? 'Claude Code' : p === 'copilot' ? 'Copilot CLI' : ('batch.ai.confirm.fake' | t) }}</strong>
+              <small>{{ (helper.found()[p] === false ? 'ai.panel.missing' : 'ai.panel.found') | t }}</small>
+              @if (provider() === p) {
+                <span class="ai-pcard__tick" aria-hidden="true">✓</span>
+              }
+            </button>
           }
-        </select>
-      </label>
+        </div>
+      </div>
+
+      @if (provider() === 'claude') {
+        <div class="ai-field">
+          <span class="ai-field__label" id="ai-batch-model-label">{{ 'ai.panel.model.claude' | t }}</span>
+          <div class="ai-seg" role="group" aria-labelledby="ai-batch-model-label" data-testid="ai-batch-model-claude">
+            @for (m of claudeModels; track m) {
+              <button
+                type="button"
+                [class.ai-seg--on]="claudeModel() === m"
+                [attr.aria-pressed]="claudeModel() === m"
+                (click)="helper.setModel('claude', m)"
+                [attr.data-testid]="'ai-batch-model-' + m"
+              >
+                {{ 'batch.ai.confirm.model.' + m | t }}
+                @if (m === 'sonnet') {
+                  <i class="ai-new">{{ 'ai.panel.model.new' | t }}</i>
+                }
+              </button>
+            }
+          </div>
+          <small class="ai-field__hint">{{ 'batch.ai.confirm.model.hintClaude' | t }}</small>
+        </div>
+      } @else if (provider() === 'copilot') {
+        <div class="ai-field">
+          <span class="ai-field__label" id="ai-batch-model-label">{{ 'ai.panel.model.copilot' | t }}</span>
+          <div class="ai-seg" role="group" aria-labelledby="ai-batch-model-label" data-testid="ai-batch-model-copilot">
+            <button type="button" [class.ai-seg--on]="!copilotCustom()" [attr.aria-pressed]="!copilotCustom()" (click)="useCopilotAuto()" data-testid="ai-batch-model-auto">
+              {{ 'batch.ai.confirm.model.auto' | t }}
+            </button>
+            <button type="button" [class.ai-seg--on]="copilotCustom()" [attr.aria-pressed]="copilotCustom()" (click)="copilotCustom.set(true)" data-testid="ai-batch-model-pick">
+              {{ 'batch.ai.confirm.model.pick' | t }}
+            </button>
+          </div>
+          @if (copilotCustom()) {
+            <input
+              class="ai-input"
+              type="text"
+              maxlength="60"
+              [value]="helper.models()['copilot']"
+              [placeholder]="'batch.ai.confirm.model.placeholder' | t"
+              [attr.aria-label]="'ai.panel.model.copilot' | t"
+              (change)="helper.setModel('copilot', $any($event.target).value)"
+              data-testid="ai-batch-model-input"
+            />
+          }
+          <small class="ai-field__hint">{{ 'batch.ai.confirm.model.hintCopilot' | t }}</small>
+        </div>
+      }
 
       @if (helper.connection() === 'offline' || helper.connection() === 'unknown') {
         <div class="ai-note ai-note--warn" role="alert" data-testid="ai-batch-offline">

@@ -727,7 +727,7 @@
         "cap": "topall per passada",
         "retries": "reintents",
         "estimateClaude": "Consum estimat: de {{min}} a {{max}} peticions ({{max}} si cal reintentar). Amb Claude el consum real es mesura i es veu en directe.",
-        "noMeasure": "Consum no mesurable. Copilot no informa dels crèdits en el mode de l'ajudant: es mostra el nombre de peticions, no crèdits. Cada petició descompta segons el model triat.",
+        "noMeasure": "Crèdits d’IA per petició. El consum que es mostra és el que informi l’ajudant (tokens i crèdits si Copilot els retorna). Cada petició descompta segons el model triat.",
         "cascade": "Provar abans amb «Ajustar per textos»",
         "cascadeHint": "Gratuït. La IA només s'usa en els PDF on quedin camps sense col·locar.",
         "capNote": "Si hi ha més de {{cap}} parelles, la cua s'atura en arribar a {{cap}} i espera el teu «Continuar». Sense reintents automàtics.",
@@ -735,7 +735,18 @@
         "remember": "No tornar a preguntar",
         "start": "Traslladar {{count}} PDF",
         "cancel": "Cancel·lar",
-        "provider": "Proveïdor"
+        "provider": "Proveïdor",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automàtic",
+          "pick": "Triar…",
+          "placeholder": "p. ex. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet va bé per col·locar camps; Opus gasta molt més.",
+          "hintCopilot": "Cada petició descompta segons el model. «Automàtic» deixa que Copilot triï."
+        },
+        "fake": "Simulat"
       },
       "connect": {
         "offline": "No trobo l'ajudant local. Arrenca «npm run start:ia» o obre l'app d'escriptori i torna a comprovar.",
@@ -897,7 +908,8 @@
         "copilot": "Model de Copilot",
         "copilotAuto": "Automàtic (el del CLI)",
         "copilotHint": "Cada petició descompta de les teves «premium requests» segons el model. Escriu-ne un de concret si ho indica el teu administrador.",
-        "sonnetHint": "Sonnet: suficient per col·locar camps i gasta poc del teu límit."
+        "sonnetHint": "Sonnet: suficient per col·locar camps i gasta poc del teu límit.",
+        "new": "Nou"
       },
       "retryToggle": "Reintentar una vegada si la resposta no serveix",
       "retryHint": "Un reintent pot duplicar la despesa: amb Copilot compta com una altra petició premium. Amb Copilot ve desactivat."

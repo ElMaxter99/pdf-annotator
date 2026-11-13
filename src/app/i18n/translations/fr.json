@@ -727,7 +727,7 @@
         "cap": "plafond par passage",
         "retries": "relances",
         "estimateClaude": "Consommation estimée : de {{min}} à {{max}} requêtes ({{max}} s'il faut relancer). Avec Claude, la consommation réelle est mesurée et visible en direct.",
-        "noMeasure": "Consommation non mesurable. Copilot n'indique pas les crédits en mode assistant : on affiche le nombre de requêtes, pas de crédits. Chaque requête est décomptée selon le modèle choisi.",
+        "noMeasure": "Crédits d’IA par requête. La consommation affichée est celle que signale l’assistant (tokens et crédits si Copilot les renvoie). Chaque requête est décomptée selon le modèle choisi.",
         "cascade": "Essayer d'abord « Ajuster par textes »",
         "cascadeHint": "Gratuit. L'IA n'est utilisée que pour les PDF où il reste des champs non placés.",
         "capNote": "S'il y a plus de {{cap}} paires, la file s'arrête à {{cap}} et attend votre « Continuer ». Pas de relance automatique.",
@@ -735,7 +735,18 @@
         "remember": "Ne plus demander",
         "start": "Transférer {{count}} PDF",
         "cancel": "Annuler",
-        "provider": "Fournisseur"
+        "provider": "Fournisseur",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automatique",
+          "pick": "Choisir…",
+          "placeholder": "p. ex. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet suffit pour placer les champs ; Opus consomme bien plus.",
+          "hintCopilot": "Chaque requête est décomptée selon le modèle. « Automatique » laisse Copilot choisir."
+        },
+        "fake": "Simulé"
       },
       "connect": {
         "offline": "L'assistant local est introuvable. Lancez « npm run start:ia » ou ouvrez l'app de bureau et vérifiez à nouveau.",
@@ -897,7 +908,8 @@
         "copilot": "Modèle de Copilot",
         "copilotAuto": "Automatique (celui du CLI)",
         "copilotHint": "Chaque requête est décomptée de vos « premium requests » selon le modèle. Saisissez-en un précis si votre administrateur l'indique.",
-        "sonnetHint": "Sonnet : suffisant pour placer les champs et léger pour votre limite."
+        "sonnetHint": "Sonnet : suffisant pour placer les champs et léger pour votre limite.",
+        "new": "Nouveau"
       },
       "retryToggle": "Réessayer une fois si la réponse est inutilisable",
       "retryHint": "Un nouvel essai peut doubler le coût : avec Copilot, il compte comme une autre requête premium. Désactivé par défaut pour Copilot."

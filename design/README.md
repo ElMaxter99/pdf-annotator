@@ -50,6 +50,7 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | IA-11 Paradas, fallos y final | Límite, fallos seguidos, tope de Copilot, interrupción, final | — (lienzo, zona Propuestas) | `pages/batch` | Aprobada, implementada |
 | IA-12 Revisar una propuesta guardada | Editor con la propuesta cargada, sin aplicar en bloque | — (lienzo, zona Propuestas) | `components/migration` | Aprobada, implementada |
 | IA-13 La cola · 1280 y claro | IA-10 a 1280 px en tema claro | — (lienzo, zona Propuestas) | `pages/batch` | Aprobada, implementada |
+| IA-14 Proveedor y modelo en la confirmación | Tarjetas de proveedor y modelo (Claude segmentado; Copilot Automático / Elegir…), oscuro y claro | — (lienzo, zona Propuestas) | `pages/batch/ai-batch` | Aprobada, implementada |
 | L-01 Flujo general | Una sola entrada: 1 PDF = editor tradicional, 2 o más = pasos, panel y editor | [`L-01-flujo-general.dc.html`](canvas/L-01-flujo-general.dc.html) | — | Aprobado (documento) |
 | L-02 Primera vista | Landing: la cantidad de PDFs decide el flujo | [`L-02-primera-vista.dc.html`](canvas/L-02-primera-vista.dc.html) | `pages/landing` | Aprobado, implementado |
 | L-03 Paso 1 · Subir PDF | Lista con ✕ por archivo y archivos no válidos | [`L-03-paso-1-subir-pdf.dc.html`](canvas/L-03-paso-1-subir-pdf.dc.html) | `pages/batch` | Aprobado, implementado |

@@ -203,3 +203,26 @@ test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada'
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('ai-batch-dialog')).toHaveCount(0);
 });
+
+test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido en la confirmación', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('ai-batch-button').click();
+  await page.getByTestId('ai-batch-all').click();
+  await page.getByTestId('ai-batch-provider-claude').click();
+  await expect(page.getByTestId('ai-batch-provider-claude')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('ai-batch-model-sonnet')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByTestId('ai-batch-model-haiku').click();
+  await expect(page.getByTestId('ai-batch-model-haiku')).toHaveAttribute('aria-pressed', 'true');
+  const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
+  expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: 'haiku' });
+  const copilot = page.getByTestId('ai-batch-provider-copilot');
+  if (await copilot.isEnabled()) {
+    await copilot.click();
+    await expect(page.getByTestId('ai-batch-model-auto')).toHaveAttribute('aria-pressed', 'true');
+    await page.getByTestId('ai-batch-model-pick').click();
+    await page.getByTestId('ai-batch-model-input').fill('gpt-5-mini');
+    await page.getByTestId('ai-batch-model-input').blur();
+    const after = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
+    expect(JSON.parse(after ?? '{}')).toMatchObject({ copilot: 'gpt-5-mini' });
+  }
+});

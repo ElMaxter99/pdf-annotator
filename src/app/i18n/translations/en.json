@@ -727,7 +727,7 @@
         "cap": "limit per run",
         "retries": "retries",
         "estimateClaude": "Estimated usage: {{min}} to {{max}} requests ({{max}} if retries are needed). With Claude the real usage is measured and shown live.",
-        "noMeasure": "Usage cannot be measured. Copilot does not report credits in helper mode: the number of requests is shown, not credits. Each request is charged according to the chosen model.",
+        "noMeasure": "AI credits per request. The usage shown is what the helper reports (tokens and credits if Copilot returns them). Each request is charged according to the chosen model.",
         "cascade": "Try «Adjust by texts» first",
         "cascadeHint": "Free. The AI is only used on PDFs where fields are left unplaced.",
         "capNote": "If there are more than {{cap}} pairs, the queue stops at {{cap}} and waits for your «Continue». No automatic retries.",
@@ -735,7 +735,18 @@
         "remember": "Don't ask again",
         "start": "Transfer {{count}} PDFs",
         "cancel": "Cancel",
-        "provider": "Provider"
+        "provider": "Provider",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automatic",
+          "pick": "Choose…",
+          "placeholder": "e.g. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet is fine for placing fields; Opus uses far more.",
+          "hintCopilot": "Each request is charged according to the model. «Automatic» lets Copilot choose."
+        },
+        "fake": "Simulated"
       },
       "connect": {
         "offline": "The local helper was not found. Start «npm run start:ia» or open the desktop app and check again.",
@@ -897,7 +908,8 @@
         "copilot": "Copilot model",
         "copilotAuto": "Automatic (the CLI default)",
         "copilotHint": "Each request counts against your “premium requests” by model. Type a specific one if your administrator says so.",
-        "sonnetHint": "Sonnet: enough to place fields and light on your limit."
+        "sonnetHint": "Sonnet: enough to place fields and light on your limit.",
+        "new": "New"
       },
       "retryToggle": "Retry once if the answer is unusable",
       "retryHint": "A retry can double the cost: with Copilot it counts as another premium request. It is off by default for Copilot."

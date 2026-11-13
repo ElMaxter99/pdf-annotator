@@ -316,3 +316,130 @@
 
 app-ai-batch-chip { max-width: 100%; }
 app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
+
+// ---- provider and model (IA-14) ----
+.ai-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-field__label {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.ai-field__hint {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.ai-pcards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-pcard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+
+  small {
+    flex: 1;
+    color: var(--muted);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.ai-pcard--on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.ai-pcard__radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--muted);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.ai-pcard--on .ai-pcard__radio {
+  border-color: var(--accent);
+
+  &::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+}
+
+.ai-pcard__tick {
+  color: var(--accent);
+}
+
+.ai-seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+
+  button {
+    flex: 1;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  button.ai-seg--on {
+    background: var(--panel);
+    color: var(--text);
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+}
+
+.ai-new {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 400;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent);
+}
+
+.ai-input {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+}

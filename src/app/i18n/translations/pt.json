@@ -727,7 +727,7 @@
         "cap": "limite por passagem",
         "retries": "novas tentativas",
         "estimateClaude": "Consumo estimado: de {{min}} a {{max}} pedidos ({{max}} se for preciso repetir). Com o Claude, o consumo real é medido e mostrado em direto.",
-        "noMeasure": "Consumo não mensurável. O Copilot não indica os créditos no modo do assistente: mostra-se o número de pedidos, não créditos. Cada pedido desconta segundo o modelo escolhido.",
+        "noMeasure": "Créditos de IA por pedido. O consumo mostrado é o que o assistente informar (tokens e créditos se o Copilot os devolver). Cada pedido desconta conforme o modelo escolhido.",
         "cascade": "Experimentar primeiro «Ajustar por textos»",
         "cascadeHint": "Grátis. A IA só é usada nos PDFs onde fiquem campos por colocar.",
         "capNote": "Se houver mais de {{cap}} pares, a fila para em {{cap}} e espera o teu «Continuar». Sem novas tentativas automáticas.",
@@ -735,7 +735,18 @@
         "remember": "Não voltar a perguntar",
         "start": "Transferir {{count}} PDFs",
         "cancel": "Cancelar",
-        "provider": "Fornecedor"
+        "provider": "Fornecedor",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automático",
+          "pick": "Escolher…",
+          "placeholder": "p. ex. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet serve para colocar campos; o Opus gasta bastante mais.",
+          "hintCopilot": "Cada pedido desconta conforme o modelo. «Automático» deixa o Copilot escolher."
+        },
+        "fake": "Simulado"
       },
       "connect": {
         "offline": "Não encontro o assistente local. Inicia «npm run start:ia» ou abre a app de ambiente de trabalho e verifica de novo.",
@@ -897,7 +908,8 @@
         "copilot": "Modelo do Copilot",
         "copilotAuto": "Automático (o do CLI)",
         "copilotHint": "Cada pedido desconta das tuas «premium requests» conforme o modelo. Escreve um concreto se o teu administrador o indicar.",
-        "sonnetHint": "Sonnet: suficiente para colocar campos e gasta pouco do teu limite."
+        "sonnetHint": "Sonnet: suficiente para colocar campos e gasta pouco do teu limite.",
+        "new": "Novo"
       },
       "retryToggle": "Tentar de novo uma vez se a resposta não servir",
       "retryHint": "Uma nova tentativa pode duplicar o custo: com o Copilot conta como outro pedido premium. Com o Copilot vem desativado."

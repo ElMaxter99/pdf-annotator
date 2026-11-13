@@ -727,7 +727,7 @@
         "cap": "tetto per passata",
         "retries": "nuovi tentativi",
         "estimateClaude": "Consumo stimato: da {{min}} a {{max}} richieste ({{max}} se serve riprovare). Con Claude il consumo reale viene misurato e mostrato in tempo reale.",
-        "noMeasure": "Consumo non misurabile. Copilot non indica i crediti in modalità assistente: viene mostrato il numero di richieste, non i crediti. Ogni richiesta viene scalata in base al modello scelto.",
+        "noMeasure": "Crediti IA per richiesta. Il consumo mostrato è quello indicato dall’assistente (token e crediti se Copilot li restituisce). Ogni richiesta viene scalata in base al modello scelto.",
         "cascade": "Prova prima con «Adatta per testi»",
         "cascadeHint": "Gratis. L'IA si usa solo nei PDF in cui restano campi non collocati.",
         "capNote": "Se ci sono più di {{cap}} coppie, la coda si ferma a {{cap}} e attende il tuo «Continua». Nessun nuovo tentativo automatico.",
@@ -735,7 +735,18 @@
         "remember": "Non chiedere più",
         "start": "Trasferisci {{count}} PDF",
         "cancel": "Annulla",
-        "provider": "Fornitore"
+        "provider": "Fornitore",
+        "model": {
+          "haiku": "Haiku",
+          "sonnet": "Sonnet",
+          "opus": "Opus",
+          "auto": "Automatico",
+          "pick": "Scegli…",
+          "placeholder": "es. gpt-5 · claude-sonnet-4.5",
+          "hintClaude": "Sonnet va bene per posizionare i campi; Opus consuma molto di più.",
+          "hintCopilot": "Ogni richiesta viene scalata in base al modello. «Automatico» lascia scegliere a Copilot."
+        },
+        "fake": "Simulato"
       },
       "connect": {
         "offline": "Non trovo l'assistente locale. Avvia «npm run start:ia» o apri l'app desktop e controlla di nuovo.",
@@ -897,7 +908,8 @@
         "copilot": "Modello di Copilot",
         "copilotAuto": "Automatico (quello del CLI)",
         "copilotHint": "Ogni richiesta scala dalle tue «premium requests» in base al modello. Scrivine uno preciso se lo indica il tuo amministratore.",
-        "sonnetHint": "Sonnet: sufficiente per posizionare i campi e leggero sul tuo limite."
+        "sonnetHint": "Sonnet: sufficiente per posizionare i campi e leggero sul tuo limite.",
+        "new": "Nuovo"
       },
       "retryToggle": "Riprova una volta se la risposta non è utilizzabile",
       "retryHint": "Un nuovo tentativo può raddoppiare il costo: con Copilot conta come un'altra richiesta premium. Per Copilot è disattivato di default."
