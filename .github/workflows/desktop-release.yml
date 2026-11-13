@@ -138,6 +138,9 @@ jobs:
           gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F body=@notes.md -f name="${TAG#v}" -F prerelease=$pre --silent
           echo "Notas puestas en el borrador de $TAG."
           if [ "$PUBLISH" = true ]; then
-            gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F draft=false --silent
+            # Fijar tag_name al publicar: sin esto GitHub puede dejar la release como «untagged-…» y el actualizador no la encuentra.
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F draft=false -f tag_name="$TAG" --silent
+            got=$(gh api "repos/$GITHUB_REPOSITORY/releases/$id" --jq .tag_name)
+            [ "$got" = "$TAG" ] || { echo "La release quedó con la etiqueta «$got» en vez de «$TAG»."; exit 1; }
             echo "Release $TAG publicada."
           fi
