@@ -1,0 +1,135 @@
+<div class="ms" [attr.data-testid]="testId()">
+  <button
+    #toggle
+    type="button"
+    class="ms__toggle"
+    [class.ms__toggle--open]="open()"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="open()"
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-label]="labelledBy() ? null : ('ai.models.pick' | t)"
+    (click)="toggleOpen()"
+    (keydown)="onToggleKey($event)"
+    [attr.data-testid]="testId() + '-toggle'"
+  >
+    @if (skeleton()) {
+      <span class="ms__spin" aria-hidden="true"></span>
+      <span class="ms__value">{{ 'ai.models.loading' | t: { provider: providerName() } }}</span>
+    } @else {
+      <span class="ms__value" [attr.data-testid]="testId() + '-current'">{{ current() }}</span>
+    }
+    <span class="ms__chev" aria-hidden="true">{{ open() ? '▴' : '▾' }}</span>
+  </button>
+
+  @if (open()) {
+    <div
+      #listbox
+      class="ms__list"
+      role="listbox"
+      [attr.aria-label]="'ai.models.pick' | t"
+      (keydown)="onListKey($event)"
+      [attr.data-testid]="testId() + '-list'"
+    >
+      @if (skeleton()) {
+        <div class="ms__skeleton" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      }
+      @for (row of rows(); track $index) {
+        @if (row.kind === 'group') {
+          <div class="ms__group" role="presentation">{{ row.label }}</div>
+        } @else {
+          <button
+            type="button"
+            role="option"
+            class="ms__opt"
+            [class.ms__opt--on]="selected() === row.id"
+            [attr.aria-selected]="selected() === row.id"
+            (click)="pick(row.id)"
+            [attr.data-testid]="testId() + '-opt-' + (row.id || 'auto')"
+          >
+            <span class="ms__name">
+              <b>{{ row.name }}</b>
+              @if (row.description) {
+                <small>{{ row.description }}</small>
+              }
+            </span>
+            @if (selected() === row.id) {
+              <span class="ms__tick" aria-hidden="true">✓</span>
+            }
+          </button>
+        }
+      }
+    </div>
+  }
+
+  @if (skeleton()) {
+    <small class="ms__hint">{{ 'ai.models.loadingHint' | t }}</small>
+  } @else if (showError()) {
+    <div class="ms__note ms__note--err" role="alert" [attr.data-testid]="testId() + '-error'">
+      <span aria-hidden="true">✕</span>
+      <p>
+        <b>{{ 'ai.models.errorTitle' | t }}</b>
+        {{
+          'ai.models.error.' + list().error
+            | t: { provider: providerName(), command: loginCommand() }
+        }}
+      </p>
+    </div>
+    <div class="ms__meta">
+      <span>{{
+        list().models.length
+          ? ('ai.models.cached' | t: { when: stamp() })
+          : ('ai.models.noList' | t)
+      }}</span>
+      <button
+        type="button"
+        class="btn btn--ghost ms__btn"
+        (click)="refresh()"
+        [disabled]="list().loading"
+        [attr.data-testid]="testId() + '-retry'"
+      >
+        {{ 'ai.models.retry' | t }}
+      </button>
+    </div>
+  } @else if (empty()) {
+    <div class="ms__note" role="status" [attr.data-testid]="testId() + '-empty'">
+      <span aria-hidden="true">ⓘ</span>
+      <p>
+        <b>{{ 'ai.models.emptyTitle' | t: { provider: providerName() } }}</b>
+        {{ (isCopilot() ? 'ai.models.emptyCopilot' : 'ai.models.emptyClaude') | t }}
+      </p>
+    </div>
+    <div class="ms__meta">
+      <span></span>
+      <button
+        type="button"
+        class="btn btn--ghost ms__btn"
+        (click)="refresh()"
+        [disabled]="list().loading"
+      >
+        {{ 'ai.models.retry' | t }}
+      </button>
+    </div>
+  } @else if (list().at !== null) {
+    @if (retired(); as r) {
+      <div class="ms__note ms__note--warn" role="status" [attr.data-testid]="testId() + '-retired'">
+        <span aria-hidden="true">⚠</span>
+        <p>
+          <b>{{ 'ai.models.retiredTitle' | t: { model: r.model } }}</b>
+          {{ 'ai.models.retiredBody' | t: { fallback: r.fallback } }}
+        </p>
+      </div>
+    }
+    <div class="ms__meta">
+      <span>{{ 'ai.models.read' | t: { provider: providerName(), when: stamp() } }}</span>
+      <button
+        type="button"
+        class="btn btn--ghost ms__btn"
+        (click)="refresh()"
+        [disabled]="list().loading"
+        [attr.data-testid]="testId() + '-refresh'"
+      >
+        {{ (list().loading ? 'ai.models.refreshing' : 'ai.models.refresh') | t }}
+      </button>
+    </div>
+  }
+</div>

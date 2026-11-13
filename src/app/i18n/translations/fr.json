@@ -1139,6 +1139,35 @@
         "partial": "Certains champs n'ont pas pu être placés ; la liste de révision indique la raison de chacun."
       },
       "copyTexts": "Textes par page"
+    },
+    "models": {
+      "pick": "Choisir le modèle",
+      "auto": "Automatique",
+      "autoHint": "Copilot choisit le meilleur modèle disponible",
+      "cliDefault": "Par défaut de Claude Code",
+      "loading": "Lecture des modèles de {{provider}}…",
+      "loadingHint": "Cela prend quelques secondes la première fois. Vous pouvez commencer : votre dernier modèle sera utilisé.",
+      "read": "Liste lue depuis {{provider}} · {{when}}",
+      "cached": "Dernière liste enregistrée · {{when}}",
+      "noList": "Aucune liste disponible",
+      "refresh": "Actualiser",
+      "refreshing": "Actualisation…",
+      "retry": "Réessayer",
+      "errorTitle": "Impossible de lire la liste des modèles.",
+      "error": {
+        "auth": "{{provider}} n'est pas connecté. Ouvrez un terminal et exécutez « {{command}} ».",
+        "missing": "Je ne trouve pas {{provider}} sur cet ordinateur.",
+        "timeout": "{{provider}} n'a pas répondu à temps.",
+        "cli_error": "{{provider}} a renvoyé une erreur lors de la demande des modèles.",
+        "aborted": "La lecture a été annulée.",
+        "provider": "Fournisseur inconnu.",
+        "error": "Impossible de lire la liste des modèles de {{provider}}."
+      },
+      "emptyTitle": "{{provider}} n'a renvoyé aucun modèle.",
+      "emptyCopilot": "« Automatique » sera utilisé ; c'est le CLI qui décide.",
+      "emptyClaude": "Le modèle par défaut de Claude Code sera utilisé.",
+      "retiredTitle": "« {{model}} » n'est plus disponible pour votre compte.",
+      "retiredBody": "Nous sommes revenus à {{fallback}} ; vous pouvez en choisir un autre dans la liste."
     }
   },
   "update": {

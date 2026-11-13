@@ -21,6 +21,45 @@ export class AiRequestError extends Error {
   }
 }
 
+/** A model as the CLI itself lists it (the same list as its /model command). */
+export interface AiModel {
+  id: string;
+  name: string;
+  description: string;
+  group: string;
+}
+
+export interface AiModelList {
+  models: AiModel[];
+  /** When the list was read (ms), `null` if never. */
+  at: number | null;
+  loading: boolean;
+  /** `auth`, `missing`, `timeout`, `offline` or `cli_error` when the last read failed. */
+  error: string | null;
+}
+
+const EMPTY_LIST: AiModelList = { models: [], at: null, loading: false, error: null };
+
+/** Lists come from localStorage or the helper: never trusted, always rebuilt field by field. */
+export function normalizeModels(raw: unknown): AiModel[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+  const seen = new Set<string>();
+  const out: AiModel[] = [];
+  for (const item of raw.slice(0, 80)) {
+    const m = (item ?? {}) as Record<string, unknown>;
+    const str = (v: unknown, max: number): string => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+    const id = str(m['id'], 60);
+    if (!id || seen.has(id)) {
+      continue;
+    }
+    seen.add(id);
+    out.push({ id, name: str(m['name'], 60) || id, description: str(m['description'], 120), group: str(m['group'], 30) });
+  }
+  return out;
+}
+
 const DEFAULT_PORT = 4310;
 
 function helperBase(): string {
@@ -32,6 +71,7 @@ const KEYS = {
   models: 'pdf-annotator.ai.models',
   consent: 'pdf-annotator.ai.consent',
   retry: 'pdf-annotator.ai.retry',
+  modelLists: 'pdf-annotator.ai.modelLists',
 } as const;
 /** Cheap by default: the task (match labels, move fields) does not need the biggest model. */
 /** A second request doubles the cost with Copilot (premium requests), so it is off there by default. */
@@ -77,7 +117,101 @@ export class AiHelperService {
   readonly models = signal<Record<string, string>>(this.initialModels());
   readonly retry = signal<Record<string, boolean>>(this.initialRetry());
   readonly consent = signal(read(KEYS.consent) === '1');
+  /** Models each CLI offers, per provider. The last list read is remembered so it shows at once next time. */
+  readonly modelLists = signal<Record<string, AiModelList>>(this.initialModelLists());
+  /** Set when the saved model is no longer offered and the choice went back to a valid one. */
+  readonly modelRetired = signal<{ provider: string; model: string } | null>(null);
   private token = '';
+  private loadingModels = new Map<string, Promise<void>>();
+
+  private initialModelLists(): Record<string, AiModelList> {
+    const lists: Record<string, AiModelList> = {};
+    try {
+      const stored = JSON.parse(read(KEYS.modelLists) ?? '{}') as Record<string, { at?: unknown; models?: unknown }>;
+      for (const key of ['claude', 'copilot']) {
+        const models = normalizeModels(stored[key]?.models);
+        if (models.length) {
+          lists[key] = { ...EMPTY_LIST, models, at: typeof stored[key]?.at === 'number' ? (stored[key].at as number) : null };
+        }
+      }
+    } catch {
+      /* corrupt value: no cache */
+    }
+    return lists;
+  }
+
+  modelList(provider: AiProvider): AiModelList {
+    return this.modelLists()[provider] ?? EMPTY_LIST;
+  }
+
+  private patchList(provider: string, patch: Partial<AiModelList>): void {
+    this.modelLists.update((all) => ({ ...all, [provider]: { ...(all[provider] ?? EMPTY_LIST), ...patch } }));
+  }
+
+  /**
+   * Asks the helper for the models the provider's CLI offers (like its /model). The last known list stays
+   * visible while it reloads or if the read fails. A saved model that is no longer offered goes back to a valid one.
+   */
+  loadModels(provider: AiProvider, force = false): Promise<void> {
+    const running = this.loadingModels.get(provider);
+    if (running) {
+      return running;
+    }
+    const recent = this.modelList(provider).at;
+    if (!force && recent !== null && Date.now() - recent < 30_000) {
+      return Promise.resolve();
+    }
+    const task = this.readModels(provider).finally(() => this.loadingModels.delete(provider));
+    this.loadingModels.set(provider, task);
+    return task;
+  }
+
+  private async readModels(provider: AiProvider): Promise<void> {
+    this.patchList(provider, { loading: true, error: null });
+    try {
+      if (!this.token) {
+        await this.check();
+      }
+      if (!this.token) {
+        throw new AiRequestError('offline', 'offline');
+      }
+      const response = await fetch(`${helperBase()}/models?provider=${provider}`, {
+        headers: { 'x-ai-token': this.token },
+        cache: 'no-store',
+      });
+      const data = (await response.json()) as { models?: unknown; error?: { code?: unknown } };
+      if (!response.ok) {
+        const code = typeof data.error?.code === 'string' ? data.error.code : 'cli_error';
+        throw new AiRequestError(code, code);
+      }
+      const models = normalizeModels(data.models);
+      this.patchList(provider, { models, at: Date.now(), loading: false, error: null });
+      write(
+        KEYS.modelLists,
+        JSON.stringify(
+          Object.fromEntries(
+            Object.entries(this.modelLists())
+              .filter(([key, list]) => key !== 'fake' && list.models.length)
+              .map(([key, list]) => [key, { at: list.at, models: list.models }]),
+          ),
+        ),
+      );
+      this.checkSavedModel(provider, models);
+    } catch (error) {
+      const code = error instanceof AiRequestError ? error.code : 'offline';
+      this.patchList(provider, { loading: false, error: code });
+    }
+  }
+
+  /** The saved model must be one the CLI offers now; «Automático» (empty) is always valid for Copilot. */
+  private checkSavedModel(provider: AiProvider, models: AiModel[]): void {
+    const saved = this.models()[provider] ?? '';
+    if (!models.length || !saved || models.some((m) => m.id === saved)) {
+      return;
+    }
+    this.modelRetired.set({ provider, model: saved });
+    this.setModel(provider, models.some((m) => m.id === DEFAULT_MODELS[provider]) ? DEFAULT_MODELS[provider] : '');
+  }
 
   private initialProvider(): AiProvider {
     const stored = read(KEYS.provider);
