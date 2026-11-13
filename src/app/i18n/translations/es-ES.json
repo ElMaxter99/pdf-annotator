@@ -807,11 +807,11 @@
         "opus": "Opus · agota el límite antes",
         "copilot": "Modelo de Copilot",
         "copilotAuto": "Automático (el del CLI)",
-        "copilotHint": "Cada petición descuenta de tus «premium requests» según el modelo. Escribe uno concreto si tu administrador lo indica.",
+        "copilotHint": "Cada ejecución gasta créditos de IA según los tokens y el modelo. Escribe uno concreto si tu administrador lo indica.",
         "sonnetHint": "Sonnet: suficiente para colocar campos y gasta poco de tu límite."
       },
       "retryToggle": "Reintentar una vez si la respuesta no sirve",
-      "retryHint": "Un reintento puede duplicar el gasto: con Copilot cuenta como otra petición premium. Con Copilot viene desactivado."
+      "retryHint": "Un reintento puede duplicar el gasto: con Copilot vuelve a enviar todo y gasta más créditos de IA. Con Copilot viene desactivado."
     },
     "menu": {
       "title": "Copiar y adaptar con IA",
@@ -961,9 +961,12 @@
         "sentSize": "Enviado (imágenes + textos)",
         "estimate": "Tokens aproximados",
         "estimateBadge": "Estimación",
-        "premium": "Premium requests",
-        "premiumValue": "según el modelo",
-        "copilotWarn": "Cada petición descuenta de tu cuota con el multiplicador del modelo que uses. Mira «/usage» en Copilot o la facturación de GitHub antes y después."
+        "premium": "Créditos de IA",
+        "premiumValue": "según tokens y modelo",
+        "copilotWarn": "Copilot cobra en créditos de IA según los tokens (entrada, salida y caché) y el modelo. Esta app no puede medirlos en este modo: mira tu consumo en GitHub antes y después.",
+        "credits": "Créditos de IA",
+        "creditsNote": "Medidos por el propio Copilot (≈). Se descuentan de tus créditos de IA de GitHub; el total exacto está en tu página de uso de Copilot.",
+        "creditsLimits": "Copilot cuenta créditos de IA según los tokens (entrada, salida y caché) y el modelo; un modelo mayor los gasta antes."
       },
       "sent": {
         "title": "Lo que se envió",

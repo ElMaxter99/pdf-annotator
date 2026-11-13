@@ -807,11 +807,11 @@
         "opus": "Opus · verbraucht das Limit schneller",
         "copilot": "Copilot-Modell",
         "copilotAuto": "Automatisch (Standard des CLI)",
-        "copilotHint": "Jede Anfrage wird je nach Modell von deinen „Premium Requests“ abgezogen. Gib ein bestimmtes ein, wenn dein Administrator es vorgibt.",
+        "copilotHint": "Jeder Durchlauf verbraucht KI-Credits je nach Tokens und Modell. Gib ein bestimmtes an, wenn dein Administrator es vorgibt.",
         "sonnetHint": "Sonnet: genügt zum Platzieren der Felder und schont dein Limit."
       },
       "retryToggle": "Einmal wiederholen, wenn die Antwort unbrauchbar ist",
-      "retryHint": "Eine Wiederholung kann die Kosten verdoppeln: Bei Copilot zählt sie als weitere Premium-Anfrage. Für Copilot ist sie standardmäßig aus."
+      "retryHint": "Eine Wiederholung kann die Kosten verdoppeln: Bei Copilot wird alles erneut gesendet und es werden mehr KI-Credits verbraucht. Für Copilot ist sie standardmäßig aus."
     },
     "menu": {
       "title": "Mit KI kopieren und anpassen",
@@ -961,9 +961,12 @@
         "sentSize": "Gesendet (Bilder + Texte)",
         "estimate": "Ungefähre Tokens",
         "estimateBadge": "Schätzung",
-        "premium": "Premium requests",
-        "premiumValue": "je nach Modell",
-        "copilotWarn": "Jede Anfrage wird mit dem Multiplikator des verwendeten Modells von deinem Kontingent abgezogen. Prüfe «/usage» in Copilot oder die GitHub-Abrechnung davor und danach."
+        "premium": "KI-Credits",
+        "premiumValue": "je nach Tokens und Modell",
+        "copilotWarn": "Copilot berechnet KI-Credits nach Tokens (Eingabe, Ausgabe und Cache) und Modell. Diese App kann sie in diesem Modus nicht messen: Prüfe deinen Verbrauch vorher und nachher auf GitHub.",
+        "credits": "KI-Credits",
+        "creditsNote": "Von Copilot selbst gemessen (≈). Sie werden von Ihren GitHub-KI-Credits abgezogen; die genaue Summe steht auf Ihrer Copilot-Nutzungsseite.",
+        "creditsLimits": "Copilot zählt KI-Credits nach Tokens (Eingabe, Ausgabe und Cache) und Modell; ein größeres Modell verbraucht sie schneller."
       },
       "sent": {
         "title": "Was gesendet wurde",

@@ -807,11 +807,11 @@
         "opus": "Opus · esgota o limite mais depressa",
         "copilot": "Modelo do Copilot",
         "copilotAuto": "Automático (o do CLI)",
-        "copilotHint": "Cada pedido desconta das tuas «premium requests» conforme o modelo. Escreve um concreto se o teu administrador o indicar.",
+        "copilotHint": "Cada execução gasta créditos de IA conforme os tokens e o modelo. Escreve um concreto se o administrador o indicar.",
         "sonnetHint": "Sonnet: suficiente para colocar campos e gasta pouco do teu limite."
       },
       "retryToggle": "Tentar de novo uma vez se a resposta não servir",
-      "retryHint": "Uma nova tentativa pode duplicar o custo: com o Copilot conta como outro pedido premium. Com o Copilot vem desativado."
+      "retryHint": "Uma nova tentativa pode duplicar o custo: com o Copilot volta a enviar tudo e gasta mais créditos de IA. Com o Copilot vem desativado."
     },
     "menu": {
       "title": "Copiar e adaptar com IA",
@@ -961,9 +961,12 @@
         "sentSize": "Enviado (imagens + textos)",
         "estimate": "Tokens aproximados",
         "estimateBadge": "Estimativa",
-        "premium": "Premium requests",
-        "premiumValue": "conforme o modelo",
-        "copilotWarn": "Cada pedido desconta da sua quota com o multiplicador do modelo que usar. Veja «/usage» no Copilot ou a faturação do GitHub antes e depois."
+        "premium": "Créditos de IA",
+        "premiumValue": "conforme tokens e modelo",
+        "copilotWarn": "O Copilot cobra em créditos de IA conforme os tokens (entrada, saída e cache) e o modelo. Esta app não os consegue medir neste modo: vê o teu consumo no GitHub antes e depois.",
+        "credits": "Créditos de IA",
+        "creditsNote": "Medidos pelo próprio Copilot (≈). São descontados dos seus créditos de IA do GitHub; o total exato está na sua página de uso do Copilot.",
+        "creditsLimits": "O Copilot conta créditos de IA conforme os tokens (entrada, saída e cache) e o modelo; um modelo maior gasta-os mais depressa."
       },
       "sent": {
         "title": "O que foi enviado",

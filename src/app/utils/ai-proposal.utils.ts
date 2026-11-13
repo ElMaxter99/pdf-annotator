@@ -53,6 +53,8 @@ export interface AiAttempt {
   seconds: number;
   usage: AiUsage | null;
   costUsd: number | null;
+  aiCredits: number | null;
+  premiumRequests: number | null;
   turns: number | null;
   permissionDenials: number;
   parsed: number;
@@ -171,6 +173,8 @@ export function sanitizeDetails(raw: unknown): AiDetails | null {
       seconds: num(o['seconds']),
       usage: sanitizeUsage(o['usage']),
       costUsd: typeof o['costUsd'] === 'number' && Number.isFinite(o['costUsd']) ? o['costUsd'] : null,
+      aiCredits: typeof o['aiCredits'] === 'number' && Number.isFinite(o['aiCredits']) ? o['aiCredits'] : null,
+      premiumRequests: typeof o['premiumRequests'] === 'number' ? count(o['premiumRequests']) : null,
       turns: typeof o['turns'] === 'number' ? count(o['turns']) : null,
       permissionDenials: count(o['permissionDenials']),
       parsed: count(o['parsed']),

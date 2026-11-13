@@ -53,6 +53,81 @@ export function totalUsage(j) {
   return j?.usage;
 }
 
+/** Líneas JSONL de `copilot --output-format json` → objetos (ignora lo que no sea JSON). */
+function jsonLines(stdout) {
+  const out = [];
+  for (const l of String(stdout ?? '').split('\n')) {
+    const t = l.trim();
+    if (!t.startsWith('{')) continue;
+    try {
+      out.push(JSON.parse(t));
+    } catch {
+      /* línea parcial */
+    }
+  }
+  return out;
+}
+
+/** Consumo acumulado que Copilot anota en `session.usage_checkpoint` (tokens por tipo y AI credits ≈ totalNanoAiu / 1e9). */
+function copilotUsageFrom(d) {
+  if (!d || typeof d !== 'object') return null;
+  const t = d.accountingSnapshot?.tokenDetails ?? {};
+  const n = (k) => Number(t[k]?.tokenCount) || 0;
+  const nano = Number(d.totalNanoAiu);
+  return {
+    usage: { input: n('input'), output: n('output'), cacheRead: n('cache_read'), cacheWrite: n('cache_write') },
+    aiCredits: Number.isFinite(nano) && nano > 0 ? Math.round(nano / 1e6) / 1e3 : null,
+    premiumRequests: Number.isFinite(Number(d.totalPremiumRequests)) ? Number(d.totalPremiumRequests) : null,
+  };
+}
+
+/** Un evento JSONL de Copilot → pasos legibles y consumo acumulado (o null). Nunca incluye contenido de los PDF. */
+export function describeCopilotEvent(line) {
+  let j;
+  try {
+    j = JSON.parse(line);
+  } catch {
+    return null;
+  }
+  if (j?.type === 'assistant.message') {
+    const steps = [];
+    for (const r of j.data?.toolRequests ?? []) {
+      const a = r?.arguments ?? {};
+      const file = String(a.path ?? a.file_path ?? a.filePath ?? '').split(/[\\/]/).pop().slice(0, 60);
+      steps.push({ kind: 'read', file, tool: String(r?.name ?? 'tool').slice(0, 30) });
+    }
+    if (typeof j.data?.content === 'string' && j.data.content) steps.push({ kind: 'answer', chars: j.data.content.length });
+    return steps.length ? { steps, usage: null, cumulative: null } : null;
+  }
+  if (j?.type === 'session.usage_checkpoint') {
+    const u = copilotUsageFrom(j.data);
+    return u ? { steps: [], usage: u.usage, cumulative: u } : null;
+  }
+  return null;
+}
+
+/** Salida completa de `copilot --output-format json`: texto de la respuesta final y consumo real. `null` si no es JSONL de Copilot. */
+export function parseCopilotJsonl(stdout) {
+  const events = jsonLines(stdout);
+  if (!events.some((e) => typeof e?.type === 'string')) return null;
+  let text = '';
+  let cum = null;
+  let result = null;
+  for (const e of events) {
+    if (e.type === 'assistant.message' && typeof e.data?.content === 'string' && e.data.content.trim()) text = e.data.content;
+    else if (e.type === 'session.usage_checkpoint') cum = copilotUsageFrom(e.data) ?? cum;
+    else if (e.type === 'result') result = e;
+  }
+  const prem = Number(result?.usage?.premiumRequests);
+  return {
+    text,
+    usage: cum?.usage ?? null,
+    aiCredits: cum?.aiCredits ?? null,
+    premiumRequests: Number.isFinite(prem) ? prem : cum?.premiumRequests ?? null,
+    exitCode: typeof result?.exitCode === 'number' ? result.exitCode : null,
+  };
+}
+
 export const PROVIDERS = {
   claude: {
     label: 'Claude Code (claude -p)',
@@ -79,8 +154,24 @@ export const PROVIDERS = {
     label: 'Copilot CLI (copilot -p)',
     cmd: 'copilot',
     // Banderas SIN VERIFICAR contra tu versión: si fallan, ajusta con COPILOT_ARGS='["-p","...","--allow-all-tools"]'.
-    args: (opts = {}) => (process.env.COPILOT_ARGS ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a)) : ['-p', INSTRUCTION, '--allow-all-tools', ...(opts.model ? ['--model', opts.model] : [])]),
-    extract: (stdout) => ({ text: stdout, meta: {} }),
+    // Cada PNG se adjunta con `--attachment=<archivo>` (verificado con un PNG; `COPILOT_ATTACH_IMAGES=0` lo desactiva).
+    args: (opts = {}) =>
+      process.env.COPILOT_ARGS
+        ? JSON.parse(process.env.COPILOT_ARGS).map((a) => (a === '{{prompt}}' ? INSTRUCTION : a))
+        : [
+            '-p',
+            INSTRUCTION,
+            '--allow-all-tools',
+            ...(opts.stream ? ['--output-format', 'json'] : []),
+            ...(opts.model ? ['--model', opts.model] : []),
+            ...(process.env.COPILOT_ATTACH_IMAGES === '0' ? [] : (opts.attachments ?? []).map((f) => `--attachment=${f}`)),
+          ],
+    // Con --output-format json (ayudante) llega JSONL con el consumo real; sin él, texto plano y sin cifras.
+    extract(stdout) {
+      const p = parseCopilotJsonl(stdout);
+      if (!p) return { text: stdout, meta: {} };
+      return { text: p.text || stdout, meta: { usage: p.usage ? { input_tokens: p.usage.input, output_tokens: p.usage.output, cache_read_input_tokens: p.usage.cacheRead, cache_creation_input_tokens: p.usage.cacheWrite } : undefined, aiCredits: p.aiCredits, premiumRequests: p.premiumRequests, isError: p.exitCode != null && p.exitCode !== 0 && !p.text } };
+    },
     env: (base) => ({ ...base }),
   },
 };

@@ -807,11 +807,11 @@
         "opus": "Opus · esgota el límit abans",
         "copilot": "Model de Copilot",
         "copilotAuto": "Automàtic (el del CLI)",
-        "copilotHint": "Cada petició descompta de les teves «premium requests» segons el model. Escriu-ne un de concret si ho indica el teu administrador.",
+        "copilotHint": "Cada execució gasta crèdits d'IA segons els tokens i el model. Escriu-ne un de concret si l'administrador ho indica.",
         "sonnetHint": "Sonnet: suficient per col·locar camps i gasta poc del teu límit."
       },
       "retryToggle": "Reintentar una vegada si la resposta no serveix",
-      "retryHint": "Un reintent pot duplicar la despesa: amb Copilot compta com una altra petició premium. Amb Copilot ve desactivat."
+      "retryHint": "Un reintent pot duplicar la despesa: amb Copilot torna a enviar-ho tot i gasta més crèdits d'IA. Amb Copilot ve desactivat."
     },
     "menu": {
       "title": "Copiar i adaptar amb IA",
@@ -961,9 +961,12 @@
         "sentSize": "Enviat (imatges + textos)",
         "estimate": "Tokens aproximats",
         "estimateBadge": "Estimació",
-        "premium": "Premium requests",
-        "premiumValue": "segons el model",
-        "copilotWarn": "Cada petició descompta de la teva quota amb el multiplicador del model que facis servir. Mira «/usage» a Copilot o la facturació de GitHub abans i després."
+        "premium": "Crèdits d'IA",
+        "premiumValue": "segons tokens i model",
+        "copilotWarn": "Copilot cobra en crèdits d'IA segons els tokens (entrada, sortida i memòria cau) i el model. Aquesta app no els pot mesurar en aquest mode: mira el teu consum a GitHub abans i després.",
+        "credits": "Crèdits d'IA",
+        "creditsNote": "Mesurats pel mateix Copilot (≈). Es descompten dels teus crèdits d'IA de GitHub; el total exacte és a la teva pàgina d'ús de Copilot.",
+        "creditsLimits": "Copilot compta crèdits d'IA segons els tokens (entrada, sortida i memòria cau) i el model; un model més gran els gasta abans."
       },
       "sent": {
         "title": "Què s'ha enviat",

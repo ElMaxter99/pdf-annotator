@@ -96,9 +96,16 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
     return provider === 'copilot' ? 'Copilot' : provider === 'fake' ? 'Simulado' : 'Claude';
   }
 
-  /** Real usage is known only for Claude; with anything else we show what we know and say so. */
+  /** Real usage: Claude always; Copilot when its JSON output reported tokens. Otherwise we show what we know and say so. */
   measured(): boolean {
-    return this.vm.ai()?.provider === 'claude';
+    const provider = this.vm.ai()?.provider;
+    return provider === 'claude' || (provider === 'copilot' && this.usage() !== null);
+  }
+
+  /** AI credits that Copilot reports (sum of attempts), or null. */
+  aiCredits(): number | null {
+    const v = (this.vm.ai()?.details?.attempts ?? []).map((a) => a.aiCredits).filter((c): c is number => c !== null);
+    return v.length ? v.reduce((a, b) => a + b, 0) : null;
   }
 
   loading(): boolean {
@@ -307,6 +314,10 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
     const u = this.usage();
     if (this.measured() && u) {
       lines.push(`tokens: ${this.total()} (in ${u.input}, out ${u.output}, cache read ${u.cacheRead}, cache write ${u.cacheWrite})`);
+      const credits = this.aiCredits();
+      if (credits !== null) {
+        lines.push(`${this.t('ai.details.usage.credits')}: ${credits.toFixed(3)}`);
+      }
       const cost = this.costUsd();
       if (cost !== null) {
         lines.push(`${this.t('ai.details.usage.cost')}: ${cost.toFixed(4)} USD`);

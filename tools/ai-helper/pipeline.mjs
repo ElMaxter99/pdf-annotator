@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { buildPrompt, findText, flattenFields, looksLikeProposals, missingImageCodes, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
 import { readPdf } from '../ai-phase0/pdf.mjs';
-import { PROVIDERS, describeClaudeEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
+import { PROVIDERS, describeClaudeEvent, describeCopilotEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
 
 const sizes = (pdf) => [...new Set(pdf.pages.map((p) => `${Math.round(p.width)}×${Math.round(p.height)}`))].join(' / ');
 const tail = (s) => String(s ?? '').trim().replace(/\s+/g, ' ').slice(-300) || '(sin salida)';
@@ -55,7 +55,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       textsByPageB: countByPage(B.texts, B.pages.length),
       imageBytes: files.filter((f) => f.name.endsWith('.png')).reduce((n, f) => n + f.bytes, 0),
     };
-    const details = { provider, model: model ?? null, sent, attempts: [], usageSource: fake ? 'none' : provider === 'claude' ? 'measured' : 'unavailable' };
+    const details = { provider, model: model ?? null, sent, attempts: [], usageSource: fake ? 'none' : 'measured' };
     onEvent({ type: 'sent', sent });
     const known = new Set(entries.map((e) => e.id));
     let proposals = [];
@@ -79,9 +79,22 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
           timeoutMs,
           signal,
           quiet: true,
-          stream: provider === 'claude',
-          onLine: provider === 'claude'
-            ? (l) => {
+          attachments: files.filter((f) => f.name.endsWith('.png')).map((f) => f.name),
+          stream: true,
+          onLine:
+            provider === 'copilot'
+              ? (l) => {
+                  const ev = describeCopilotEvent(l);
+                  if (!ev) return;
+                  for (const step of ev.steps) attemptInfo.steps.push(step);
+                  if (ev.cumulative) {
+                    attemptInfo.usage = ev.usage;
+                    attemptInfo.aiCredits = ev.cumulative.aiCredits;
+                    attemptInfo.premiumRequests = ev.cumulative.premiumRequests;
+                  }
+                  onEvent({ type: 'step', attempt, steps: ev.steps, usage: attemptInfo.usage });
+                }
+              : (l) => {
                 const ev = describeClaudeEvent(l);
                 if (!ev) return;
                 for (const step of ev.steps) attemptInfo.steps.push(step);
@@ -92,8 +105,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
                   attemptInfo.usage = { input: all.reduce((n, x) => n + x.input, 0), output: all.reduce((n, x) => n + x.output, 0), cacheRead: all.reduce((n, x) => n + x.cacheRead, 0), cacheWrite: all.reduce((n, x) => n + x.cacheWrite, 0) };
                 }
                 onEvent({ type: 'step', attempt, steps: ev.steps, usage: attemptInfo.usage });
-              }
-            : undefined,
+              },
         });
         seconds += run.seconds;
         attemptInfo.seconds = run.seconds;
@@ -105,6 +117,8 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
         // Uso real que da el CLI al terminar (Claude). Copilot no lo expone en -p: no se inventa nada.
         const u = ex.meta.usage;
         if (u) attemptInfo.usage = { input: u.input_tokens ?? 0, output: u.output_tokens ?? 0, cacheRead: u.cache_read_input_tokens ?? 0, cacheWrite: u.cache_creation_input_tokens ?? 0 };
+        if (typeof ex.meta.aiCredits === 'number') attemptInfo.aiCredits = ex.meta.aiCredits;
+        if (typeof ex.meta.premiumRequests === 'number') attemptInfo.premiumRequests = ex.meta.premiumRequests;
         attemptInfo.costUsd = typeof ex.meta.costUsd === 'number' ? ex.meta.costUsd : null;
         attemptInfo.turns = ex.meta.turns ?? null;
         attemptInfo.permissionDenials = ex.meta.permissionDenials ?? 0;

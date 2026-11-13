@@ -66,3 +66,40 @@ test('totalUsage suma modelUsage (todos los turnos) y cae a usage si no existe',
   assert.deepEqual(totalUsage(j), { input_tokens: 6, output_tokens: 2000, cache_read_input_tokens: 90000, cache_creation_input_tokens: 30000 });
   assert.deepEqual(totalUsage({ usage: { input_tokens: 1 } }), { input_tokens: 1 });
 });
+
+test('Copilot adjunta las imágenes por defecto y COPILOT_ATTACH_IMAGES=0 lo desactiva', async () => {
+  const { PROVIDERS } = await import('./providers.mjs');
+  const opts = { attachments: ['A-p1.png', 'B-p1.png'] };
+  delete process.env.COPILOT_ATTACH_IMAGES;
+  assert.deepEqual(PROVIDERS.copilot.args(opts).filter((a) => a.startsWith('--attachment')), ['--attachment=A-p1.png', '--attachment=B-p1.png']);
+  process.env.COPILOT_ATTACH_IMAGES = '0';
+  assert.ok(!PROVIDERS.copilot.args(opts).some((a) => a.startsWith('--attachment')));
+  delete process.env.COPILOT_ATTACH_IMAGES;
+  assert.ok(!PROVIDERS.copilot.args(opts).includes('--output-format'));
+  assert.deepEqual(PROVIDERS.copilot.args({ stream: true }).slice(3, 5), ['--output-format', 'json']);
+});
+
+test('Copilot: lee el consumo real y la respuesta del JSONL', async () => {
+  const { PROVIDERS, parseCopilotJsonl, describeCopilotEvent } = await import('./providers.mjs');
+  const ck = { type: 'session.usage_checkpoint', data: { totalNanoAiu: 6755800000, totalPremiumRequests: 1, accountingSnapshot: { tokenDetails: { input: { tokenCount: 100 }, cache_read: { tokenCount: 2000 }, cache_write: { tokenCount: 300 }, output: { tokenCount: 40 } } } } };
+  const out = [
+    { type: 'assistant.message', data: { content: '', toolRequests: [{ name: 'view', arguments: { path: '/tmp/x/A-p1.png' } }] } },
+    { type: 'assistant.message', data: { content: '{"fields":[]}' } },
+    ck,
+    { type: 'result', exitCode: 0, usage: { premiumRequests: 3 } },
+  ].map((e) => JSON.stringify(e)).join('\n');
+  const p = parseCopilotJsonl(out);
+  assert.equal(p.text, '{"fields":[]}');
+  assert.deepEqual(p.usage, { input: 100, output: 40, cacheRead: 2000, cacheWrite: 300 });
+  assert.equal(p.aiCredits, 6.756);
+  assert.equal(p.premiumRequests, 3);
+  const ex = PROVIDERS.copilot.extract(out);
+  assert.equal(ex.text, '{"fields":[]}');
+  assert.equal(ex.meta.aiCredits, 6.756);
+  assert.equal(ex.meta.usage.cache_read_input_tokens, 2000);
+  assert.deepEqual(describeCopilotEvent(JSON.stringify(ck)).usage, { input: 100, output: 40, cacheRead: 2000, cacheWrite: 300 });
+  assert.deepEqual(describeCopilotEvent(JSON.stringify({ type: 'assistant.message', data: { toolRequests: [{ name: 'view', arguments: { path: '/a/b/A-p1.png' } }] } })).steps, [{ kind: 'read', file: 'A-p1.png', tool: 'view' }]);
+  // Texto plano (sin --output-format json): se devuelve tal cual, sin cifras.
+  assert.equal(parseCopilotJsonl('hola'), null);
+  assert.deepEqual(PROVIDERS.copilot.extract('hola'), { text: 'hola', meta: {} });
+});
