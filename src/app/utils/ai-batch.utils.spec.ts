@@ -29,6 +29,7 @@ describe('ai-batch.utils', () => {
     expect(isEligibleForAiBatch(item('a', 3))).toBeTrue();
     expect(isEligibleForAiBatch(item('a', 3, false))).toBeFalse();
     expect(isEligibleForAiBatch(item('a', 0))).toBeFalse();
+    expect(isEligibleForAiBatch({ ...item('a', 3), status: 'ready' })).toBeFalse();
   });
 
   it('estimates pairs, requests and the Copilot cap', () => {

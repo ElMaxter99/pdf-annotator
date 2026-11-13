@@ -24,9 +24,9 @@ export function countTemplateFields(item: Pick<BatchItem, 'aPages'>): number {
   return item.aPages.reduce((n, page) => n + (Array.isArray(page.fields) ? page.fields.length : 0), 0);
 }
 
-/** A pair can be sent when B exists and A has fields to move. */
+/** A pair can be sent when B exists, A has fields to move and the person has not marked it «Listo». */
 export function isEligibleForAiBatch(item: BatchItem): boolean {
-  return !!item.bPdf && countTemplateFields(item) > 0;
+  return !!item.bPdf && item.status !== 'ready' && countTemplateFields(item) > 0;
 }
 
 export interface AiBatchEstimate {

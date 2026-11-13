@@ -212,7 +212,7 @@ ${attached ? 'Las imágenes ya vienen adjuntas a este mensaje: míralas ahí, no
 
 Mira las imágenes de A y B para confirmar que el ancla es el mismo concepto. No inventes textos: "anchorA" y "anchorB" deben existir literalmente en textsA.json y textsB.json.
 
-${codes ? `Cada imagen lleva en la esquina inferior derecha un código de 4 caracteres en un recuadro. Debes abrir TODAS las imágenes y copiar el código de cada una en "images" (${Object.keys(codes).join(', ')}). Sin esos códigos la respuesta se descarta.
+${codes ? `Cada imagen lleva, en una franja añadida debajo de la página, un código de 4 caracteres muy grande. Debes abrir TODAS las imágenes y copiar el código de cada una en "images" (${Object.keys(codes).join(', ')}). Sin esos códigos la respuesta se descarta.
 
 Responde SOLO con un objeto JSON, sin texto antes ni después:
 {"images":{"A-p1":"XXXX"},"fields":[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]}

@@ -31,7 +31,7 @@ El script (y la futura función) prepara una carpeta temporal y ejecuta el CLI d
 - **Imágenes:** el modelo las abre con la herramienta Read desde la carpeta de trabajo (funciona en la fase 0).
 
 ## Prueba de lectura de imágenes
-Cada PNG que se deja al CLI lleva un código de 4 caracteres en la esquina inferior derecha y el prompt exige devolverlos en `images`. Si faltan tras dos intentos, el ayudante responde `images_not_read` y no se propone nada: así un modelo que no ve imágenes (posible con Copilot) no coloca campos usando solo los JSON. Cuesta una petición extra solo si el primer intento no los devuelve.
+Cada PNG que se deja al CLI lleva un código de 4 caracteres enorme en una franja añadida debajo de la página y el prompt exige devolverlos en `images`. Si faltan tras dos intentos, el ayudante responde `images_not_read` y no se propone nada: así un modelo que no ve imágenes (posible con Copilot) no coloca campos usando solo los JSON. Cuesta una petición extra solo si el primer intento no los devuelve.
 
 ## Copilot (`copilot -p`) — pendiente de probar
 - **Qué usa:** el CLI de GitHub Copilot con la sesión de GitHub de la persona (credenciales del llavero del sistema, o `COPILOT_GITHUB_TOKEN`/`GH_TOKEN`/`GITHUB_TOKEN`). La documentación de [planes](https://docs.github.com/en/copilot/get-started/plans) dice que todos incluyen el CLI.

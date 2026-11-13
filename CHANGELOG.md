@@ -1,5 +1,6 @@
 ## Unreleased
 ### Fixed
+- **«Trasladar con IA» en lote se salta los PDFs marcados como «Listo»** (antes los procesaba igual y gastaba la petición). Además, la franja con el código de verificación va ahora añadida debajo de cada página y es enorme (Copilot reescala las imágenes y solo leía parte del código pequeño), el paso ya no dice «de 2» intentos y el informe del lote no muestra «0 tokens · medido» junto a «consumo no medible».
 - **Traslado con IA con Copilot, corte temprano**: antes de la ejecución completa se hace una prueba barata con dos páginas adjuntas (A y B) y, si Copilot no lee sus códigos, se para ahí con un aviso claro en vez de gastar cientos de miles de tokens (`COPILOT_PROBE=0` la desactiva). Con Copilot ya no se reintenta si no lee las imágenes, y el prompt le dice que vienen adjuntas.
 - **Copilot en el traslado con IA**: se le deniega la terminal (`--deny-tool=shell`; `COPILOT_ALLOW_SHELL=1` lo permite) porque exploraba con decenas de llamadas `bash` y multiplicaba el consumo, y el prompt le pide abrir cada imagen una sola vez. El error «La IA no ha leído las imágenes» indica ahora qué código devolvió la IA y cuál se esperaba, para diagnosticar el falso positivo.
 

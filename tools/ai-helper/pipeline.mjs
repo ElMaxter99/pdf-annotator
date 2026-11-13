@@ -81,7 +81,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
             quiet: true,
             attachments: names.map((n) => `${n}.png`),
             stream: true,
-            instruction: `Mira las imágenes adjuntas (${names.join(', ')}). Cada una lleva un código de 4 caracteres en un recuadro, abajo a la derecha. No uses herramientas. Responde SOLO con un objeto JSON {"images":{${names.map((n) => `"${n}":"CODIGO"`).join(',')}}}.`,
+            instruction: `Mira las imágenes adjuntas (${names.join(', ')}). Cada una lleva un código de 4 caracteres muy grande en la franja inferior. No uses herramientas. Responde SOLO con un objeto JSON {"images":{${names.map((n) => `"${n}":"CODIGO"`).join(',')}}}.`,
           });
           seconds += probe.seconds ?? 0;
           if (probe.aborted) throw Object.assign(new Error('Cancelado.'), { code: 'aborted' });

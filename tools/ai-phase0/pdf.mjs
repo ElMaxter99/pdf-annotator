@@ -37,7 +37,7 @@ export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false
     }
     if (outDir) {
       const viewport = page.getViewport({ scale });
-      const canvas = createCanvas(Math.ceil(viewport.width), Math.ceil(viewport.height));
+      let canvas = createCanvas(Math.ceil(viewport.width), Math.ceil(viewport.height));
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#fff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -45,17 +45,22 @@ export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false
       if (stamp) {
         const code = newCode();
         codes[`${prefix}-p${num}`] = code;
-        const w = 200;
-        const h = 64;
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(canvas.width - w - 6, canvas.height - h - 6, w, h);
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(canvas.width - w - 6, canvas.height - h - 6, w, h);
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 46px monospace';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(code, canvas.width - w + 12, canvas.height - h / 2 - 6);
+        // Franja añadida DEBAJO de la página (no tapa contenido) con el código enorme y en alto contraste:
+        // Copilot reescala las imágenes y con un código pequeño solo lee parte de los caracteres.
+        const strip = Math.round(canvas.width * 0.22);
+        const tall = createCanvas(canvas.width, canvas.height + strip);
+        const tctx = tall.getContext('2d');
+        tctx.fillStyle = '#fff';
+        tctx.fillRect(0, 0, tall.width, tall.height);
+        tctx.drawImage(canvas, 0, 0);
+        tctx.fillStyle = '#000';
+        tctx.fillRect(0, canvas.height, tall.width, 6);
+        tctx.fillStyle = '#000';
+        tctx.font = `bold ${Math.round(strip * 0.72)}px monospace`;
+        tctx.textAlign = 'center';
+        tctx.textBaseline = 'middle';
+        tctx.fillText(code, tall.width / 2, canvas.height + strip / 2 + 3);
+        canvas = tall;
       }
       await writeFile(path.join(outDir, `${prefix}-p${num}.png`), canvas.toBuffer('image/png'));
     }
