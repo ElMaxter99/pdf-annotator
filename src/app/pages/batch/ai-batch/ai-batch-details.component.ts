@@ -285,7 +285,8 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     const entries = all ? this.list() : this.list().filter((entry) => entry.row.id === this.selectedId());
     const lines = entries.flatMap((entry, i) => [...(i ? [''] : []), ...this.reportOf(entry.row, entry.name)]);
     if (all) {
-      lines.push('', `${this.t('batch.ai.tokens', { count: this.num(this.batchTokens()) })} · ${this.t('batch.ai.requests', { sent: this.queue.requests() })}`);
+      const requests = this.t('batch.ai.requests', { sent: this.queue.requests() });
+      lines.push('', this.batchTokens() > 0 ? `${this.t('batch.ai.tokens', { count: this.num(this.batchTokens()) })} · ${requests}` : requests);
     }
     if (await this.write(lines.join('\n'))) {
       this.toast.show(this.t('ai.details.copied'));

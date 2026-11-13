@@ -4,6 +4,7 @@
 import { randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { runProposal } from './pipeline.mjs';
+import { listModels } from './models.mjs';
 import { PROVIDERS, findExecutable } from '../ai-phase0/providers.mjs';
 
 const PORT = Number(process.env.AI_HELPER_PORT || 4310);
@@ -53,6 +54,17 @@ const server = createServer(async (req, res) => {
 
   if (req.method === 'GET' && url.pathname === '/status') {
     return send(res, 200, { ok: true, version: 1, token, busy, providers: providersInfo() }, cors);
+  }
+  if (req.method === 'GET' && url.pathname === '/models') {
+    if (req.headers['x-ai-token'] !== token) return send(res, 401, { error: 'token' }, cors);
+    const provider = url.searchParams.get('provider');
+    const ac = new AbortController();
+    res.on('close', () => ac.abort());
+    try {
+      return send(res, 200, await listModels(provider, { signal: ac.signal, keepApiKey: process.env.AI_HELPER_KEEP_API_KEY === '1' }), cors);
+    } catch (e) {
+      return send(res, e.code === 'provider' ? 400 : 502, { error: { code: e.code || 'error', message: String(e.message || e) } }, cors);
+    }
   }
   if (req.method === 'POST' && url.pathname === '/propose') {
     if (req.headers['x-ai-token'] !== token) return send(res, 401, { error: 'token' }, cors);

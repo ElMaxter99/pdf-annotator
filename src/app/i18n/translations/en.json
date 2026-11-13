@@ -1068,8 +1068,8 @@
         "prepare": "Prepare the pages",
         "prepareSub": "Texts extracted: {{textsA}} from A and {{textsB}} from B. Pages: {{pagesA}} of A and {{pagesB}} of B, rendered as images.",
         "send": "Send to {{provider}}",
-        "sendSub": "Attempt {{n}} of 2",
-        "sendNoSteps": "Attempt {{n}} of 2. {{provider}} does not report its internal steps.",
+        "sendSub": "Attempt {{n}}",
+        "sendNoSteps": "Attempt {{n}}. {{provider}} does not report its internal steps.",
         "read": "{{provider}} opens {{file}}",
         "tool": "{{provider}} uses the {{tool}} tool",
         "answer": "{{provider}} writes the answer",
@@ -1139,6 +1139,35 @@
         "partial": "Some fields could not be placed; the review list shows the reason for each one."
       },
       "copyTexts": "Texts per page"
+    },
+    "models": {
+      "pick": "Choose model",
+      "auto": "Automatic",
+      "autoHint": "Copilot picks the best available model",
+      "cliDefault": "Claude Code default",
+      "loading": "Reading the models from {{provider}}…",
+      "loadingHint": "It takes a few seconds the first time. You can start now: your last model will be used.",
+      "read": "List read from {{provider}} · {{when}}",
+      "cached": "Last saved list · {{when}}",
+      "noList": "No list available",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing…",
+      "retry": "Retry",
+      "errorTitle": "Could not read the model list.",
+      "error": {
+        "auth": "{{provider}} is not signed in. Open a terminal and run “{{command}}”.",
+        "missing": "I can't find {{provider}} on this computer.",
+        "timeout": "{{provider}} did not answer in time.",
+        "cli_error": "{{provider}} returned an error when asked for its models.",
+        "aborted": "The read was cancelled.",
+        "provider": "Unknown provider.",
+        "error": "Could not read the model list from {{provider}}."
+      },
+      "emptyTitle": "{{provider}} returned no models.",
+      "emptyCopilot": "“Automatic” will be used; the CLI itself decides.",
+      "emptyClaude": "Claude Code's default model will be used.",
+      "retiredTitle": "“{{model}}” is no longer available for your account.",
+      "retiredBody": "We went back to {{fallback}}; you can pick another one from the list."
     }
   },
   "update": {

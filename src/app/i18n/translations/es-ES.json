@@ -1068,8 +1068,8 @@
         "prepare": "Preparar las páginas",
         "prepareSub": "Textos extraídos: {{textsA}} de A y {{textsB}} de B. Páginas: {{pagesA}} de A y {{pagesB}} de B, pasadas a imagen.",
         "send": "Enviar a {{provider}}",
-        "sendSub": "Intento {{n}} de 2",
-        "sendNoSteps": "Intento {{n}} de 2. {{provider}} no informa de sus pasos internos.",
+        "sendSub": "Intento {{n}}",
+        "sendNoSteps": "Intento {{n}}. {{provider}} no informa de sus pasos internos.",
         "read": "{{provider}} abre {{file}}",
         "tool": "{{provider}} usa la herramienta {{tool}}",
         "answer": "{{provider}} escribe la respuesta",
@@ -1139,6 +1139,35 @@
         "partial": "Algunos campos no se han podido colocar; la lista de la revisión indica el motivo de cada uno."
       },
       "copyTexts": "Textos por página"
+    },
+    "models": {
+      "pick": "Elegir modelo",
+      "auto": "Automático",
+      "autoHint": "Copilot elige el mejor modelo disponible",
+      "cliDefault": "Por defecto de Claude Code",
+      "loading": "Leyendo los modelos de {{provider}}…",
+      "loadingHint": "Tarda unos segundos la primera vez. Puedes empezar ya: se usará tu último modelo.",
+      "read": "Lista leída de {{provider}} · {{when}}",
+      "cached": "Última lista guardada · {{when}}",
+      "noList": "Sin lista disponible",
+      "refresh": "Actualizar",
+      "refreshing": "Actualizando…",
+      "retry": "Reintentar",
+      "errorTitle": "No se pudo leer la lista de modelos.",
+      "error": {
+        "auth": "{{provider}} no tiene la sesión iniciada. Abre una terminal y ejecuta «{{command}}».",
+        "missing": "No encuentro {{provider}} en este equipo.",
+        "timeout": "{{provider}} no respondió a tiempo.",
+        "cli_error": "{{provider}} devolvió un error al pedirle los modelos.",
+        "aborted": "Se canceló la lectura.",
+        "provider": "Proveedor desconocido.",
+        "error": "No se pudo leer la lista de modelos de {{provider}}."
+      },
+      "emptyTitle": "{{provider}} no devolvió ningún modelo.",
+      "emptyCopilot": "Se usará «Automático», que decide el propio CLI.",
+      "emptyClaude": "Se usará el modelo por defecto de Claude Code.",
+      "retiredTitle": "«{{model}}» ya no está disponible para tu cuenta.",
+      "retiredBody": "Hemos vuelto a {{fallback}}; puedes elegir otro en la lista."
     }
   },
   "update": {

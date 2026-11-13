@@ -1,9 +1,9 @@
 // Propuesta de coordenadas A→B con IA para la app: mismo flujo que la fase 0, pero recibe los PDF y la plantilla
 // de A en memoria y devuelve una fila por campo. Nunca evalúa la salida de la IA: solo la valida y la convierte.
-import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { buildPrompt, findText, flattenFields, looksLikeProposals, missingImageCodes, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
+import { buildPrompt, findText, flattenFields, looksLikeProposals, describeImageCodes, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
 import { readPdf } from '../ai-phase0/pdf.mjs';
 import { PROVIDERS, describeClaudeEvent, describeCopilotEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
 
@@ -66,9 +66,59 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       const parsed = validateProposals(fakeAnswer(entries, A, B), known);
       proposals = parsed.proposals;
     } else {
+      let probeHint = '';
+      const attached = provider === 'copilot' && process.env.COPILOT_ATTACH_IMAGES !== '0';
+      // Prueba previa y barata (solo Copilot): dos imágenes adjuntas y nada más. Si no lee sus códigos, se corta aquí
+      // en vez de gastar cientos de miles de tokens en la ejecución completa.
+      if (attached && codes && process.env.COPILOT_PROBE !== '0') {
+        const names = [Object.keys(codes).find((k) => k.startsWith('A-')), Object.keys(codes).find((k) => k.startsWith('B-'))].filter(Boolean);
+        if (names.length) {
+          onStage('asking', 1);
+          const probe = await runCli(provider, work, {
+            model,
+            keepApiKey,
+            timeoutMs: Math.min(timeoutMs ?? 120000, 120000),
+            signal,
+            quiet: true,
+            attachments: names.map((n) => path.join(work, `${n}.png`)),
+            stream: true,
+            instruction: `Mira las imágenes adjuntas (${names.join(', ')}). Cada una lleva un código de 4 caracteres muy grande en la franja inferior. No uses herramientas. Responde SOLO con un objeto JSON {"images":{${names.map((n) => `"${n}":"XXXX"`).join(',')}}} con los 4 caracteres de cada imagen. Si dudas de un carácter escribe tu mejor lectura, nunca "?".`,
+          });
+          seconds += probe.seconds ?? 0;
+          if (probe.aborted) throw Object.assign(new Error('Cancelado.'), { code: 'aborted' });
+          if (probe.ok) {
+            const ex = PROVIDERS[provider].extract(probe.stdout);
+            const subset = Object.fromEntries(names.map((n) => [n, codes[n]]));
+            let ok = false;
+            let data = null;
+            try {
+              data = parseJsonFromText(ex.text, (v) => !!v && typeof v === 'object');
+            } catch {
+              /* respuesta no JSON: cuenta como no leída */
+            }
+            const d = describeImageCodes(data, subset, { minMatch: 2 });
+            ok = d.missing.length === 0;
+            details.probe = { ok, seconds: probe.seconds, images: names.length, tokens: ex.meta.usage ? Object.values(ex.meta.usage).reduce((n, x) => n + (Number(x) || 0), 0) : null, aiCredits: ex.meta.aiCredits ?? null };
+            if (!ok) {
+              // Copia local de las dos páginas para repetir la prueba a mano con el mismo PNG (no sale del ordenador).
+              const debugDir = path.join(os.tmpdir(), 'pdf-annotator-ai-debug');
+              let kept = '';
+              try {
+                await mkdir(debugDir, { recursive: true });
+                for (const n of names) await copyFile(path.join(work, `${n}.png`), path.join(debugDir, `${n}.png`));
+                kept = ` Para repetirlo a mano: copilot -p "Dime el código de 4 caracteres de la franja inferior de la imagen" --attachment "${path.join(debugDir, `${names[0]}.png`)}" (códigos esperados: ${names.map((n) => `${n}=${codes[n]}`).join(', ')}).`;
+              } catch {
+                /* sin copia de diagnóstico */
+              }
+              probeHint = kept;
+            }
+            if (!ok) throw Object.assign(new Error(`Copilot no lee las imágenes adjuntas (prueba previa con ${names.join(' y ')}): ${d.given.map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}. No se ha lanzado la ejecución completa para no gastar créditos.${probeHint}`), { code: 'images_not_read', details });
+          }
+        }
+      }
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         onStage('asking', attempt);
-        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote, codes });
+        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote, codes, attached });
         await writeFile(path.join(work, 'prompt.md'), promptText);
         const usageById = new Map();
         const attemptInfo = { n: attempt, promptChars: promptText.length, steps: [], usage: null, retry: !!retryNote };
@@ -79,7 +129,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
           timeoutMs,
           signal,
           quiet: true,
-          attachments: files.filter((f) => f.name.endsWith('.png')).map((f) => f.name),
+          attachments: files.filter((f) => f.name.endsWith('.png')).map((f) => path.join(work, f.name)),
           stream: true,
           onLine:
             provider === 'copilot'
@@ -126,12 +176,12 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
         if (ex.meta.isError) throw Object.assign(new Error(`El CLI devolvió un error: ${tail(ex.text)}`), { code: 'cli_error', details });
         const data = parseJsonFromText(ex.text, looksLikeProposals);
         if (codes) {
-          const missing = missingImageCodes(data, codes);
+          const { missing, given, returned } = describeImageCodes(data, codes, provider === 'copilot' ? { minMatch: 2 } : undefined);
           attemptInfo.imagesMissing = missing.length;
           if (missing.length) {
             // La IA no ha leído las imágenes: no se aprovecha una respuesta hecha solo con los textos.
             retryNote = 'no has devuelto los códigos de las imágenes. Abre TODAS las imágenes, copia el código de cada una en "images" y vuelve a responder con el objeto JSON pedido.';
-            if (attempt === maxAttempts) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer (${missing.join(', ')}).`), { code: 'images_not_read', details });
+            if (attempt === maxAttempts || provider === 'copilot') throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer (${missing.join(', ')}). La IA devolvió ${returned} códigos; ejemplos: ${given.slice(0, 3).map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}.`), { code: 'images_not_read', details });
             continue;
           }
         }

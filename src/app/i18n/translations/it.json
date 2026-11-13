@@ -1068,8 +1068,8 @@
         "prepare": "Preparare le pagine",
         "prepareSub": "Testi estratti: {{textsA}} di A e {{textsB}} di B. Pagine: {{pagesA}} di A e {{pagesB}} di B, convertite in immagini.",
         "send": "Invia a {{provider}}",
-        "sendSub": "Tentativo {{n}} di 2",
-        "sendNoSteps": "Tentativo {{n}} di 2. {{provider}} non riporta i suoi passaggi interni.",
+        "sendSub": "Tentativo {{n}}",
+        "sendNoSteps": "Tentativo {{n}}. {{provider}} non riporta i suoi passaggi interni.",
         "read": "{{provider}} apre {{file}}",
         "tool": "{{provider}} usa lo strumento {{tool}}",
         "answer": "{{provider}} scrive la risposta",
@@ -1139,6 +1139,35 @@
         "partial": "Alcuni campi non si sono potuti posizionare; l'elenco di revisione indica il motivo di ciascuno."
       },
       "copyTexts": "Testi per pagina"
+    },
+    "models": {
+      "pick": "Scegli il modello",
+      "auto": "Automatico",
+      "autoHint": "Copilot sceglie il miglior modello disponibile",
+      "cliDefault": "Predefinito di Claude Code",
+      "loading": "Lettura dei modelli di {{provider}}…",
+      "loadingHint": "Ci vogliono alcuni secondi la prima volta. Puoi iniziare subito: verrà usato l'ultimo modello.",
+      "read": "Elenco letto da {{provider}} · {{when}}",
+      "cached": "Ultimo elenco salvato · {{when}}",
+      "noList": "Nessun elenco disponibile",
+      "refresh": "Aggiorna",
+      "refreshing": "Aggiornamento…",
+      "retry": "Riprova",
+      "errorTitle": "Impossibile leggere l'elenco dei modelli.",
+      "error": {
+        "auth": "{{provider}} non ha la sessione avviata. Apri un terminale ed esegui «{{command}}».",
+        "missing": "Non trovo {{provider}} su questo computer.",
+        "timeout": "{{provider}} non ha risposto in tempo.",
+        "cli_error": "{{provider}} ha restituito un errore alla richiesta dei modelli.",
+        "aborted": "La lettura è stata annullata.",
+        "provider": "Provider sconosciuto.",
+        "error": "Impossibile leggere l'elenco dei modelli di {{provider}}."
+      },
+      "emptyTitle": "{{provider}} non ha restituito alcun modello.",
+      "emptyCopilot": "Verrà usato «Automatico», che decide il CLI stesso.",
+      "emptyClaude": "Verrà usato il modello predefinito di Claude Code.",
+      "retiredTitle": "«{{model}}» non è più disponibile per il tuo account.",
+      "retiredBody": "Siamo tornati a {{fallback}}; puoi sceglierne un altro dall'elenco."
     }
   },
   "update": {

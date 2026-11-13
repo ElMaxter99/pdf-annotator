@@ -1068,8 +1068,8 @@
         "prepare": "Preparar les pàgines",
         "prepareSub": "Textos extrets: {{textsA}} d'A i {{textsB}} de B. Pàgines: {{pagesA}} d'A i {{pagesB}} de B, passades a imatge.",
         "send": "Enviar a {{provider}}",
-        "sendSub": "Intent {{n}} de 2",
-        "sendNoSteps": "Intent {{n}} de 2. {{provider}} no informa dels seus passos interns.",
+        "sendSub": "Intent {{n}}",
+        "sendNoSteps": "Intent {{n}}. {{provider}} no informa dels seus passos interns.",
         "read": "{{provider}} obre {{file}}",
         "tool": "{{provider}} fa servir l'eina {{tool}}",
         "answer": "{{provider}} escriu la resposta",
@@ -1139,6 +1139,35 @@
         "partial": "Alguns camps no s'han pogut col·locar; la llista de la revisió indica el motiu de cadascun."
       },
       "copyTexts": "Textos per pàgina"
+    },
+    "models": {
+      "pick": "Triar model",
+      "auto": "Automàtic",
+      "autoHint": "Copilot tria el millor model disponible",
+      "cliDefault": "Per defecte de Claude Code",
+      "loading": "Llegint els models de {{provider}}…",
+      "loadingHint": "Triga uns segons la primera vegada. Pots començar ja: s'usarà el teu últim model.",
+      "read": "Llista llegida de {{provider}} · {{when}}",
+      "cached": "Última llista desada · {{when}}",
+      "noList": "Sense llista disponible",
+      "refresh": "Actualitza",
+      "refreshing": "Actualitzant…",
+      "retry": "Torna-ho a provar",
+      "errorTitle": "No s'ha pogut llegir la llista de models.",
+      "error": {
+        "auth": "{{provider}} no té la sessió iniciada. Obre un terminal i executa «{{command}}».",
+        "missing": "No trobo {{provider}} en aquest equip.",
+        "timeout": "{{provider}} no ha respost a temps.",
+        "cli_error": "{{provider}} ha retornat un error en demanar-li els models.",
+        "aborted": "S'ha cancel·lat la lectura.",
+        "provider": "Proveïdor desconegut.",
+        "error": "No s'ha pogut llegir la llista de models de {{provider}}."
+      },
+      "emptyTitle": "{{provider}} no ha retornat cap model.",
+      "emptyCopilot": "S'usarà «Automàtic», que decideix el mateix CLI.",
+      "emptyClaude": "S'usarà el model per defecte de Claude Code.",
+      "retiredTitle": "«{{model}}» ja no està disponible per al teu compte.",
+      "retiredBody": "Hem tornat a {{fallback}}; pots triar-ne un altre de la llista."
     }
   },
   "update": {

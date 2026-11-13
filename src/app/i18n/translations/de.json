@@ -1068,8 +1068,8 @@
         "prepare": "Seiten vorbereiten",
         "prepareSub": "Extrahierte Texte: {{textsA}} aus A und {{textsB}} aus B. Seiten: {{pagesA}} von A und {{pagesB}} von B, als Bilder gerendert.",
         "send": "An {{provider}} senden",
-        "sendSub": "Versuch {{n}} von 2",
-        "sendNoSteps": "Versuch {{n}} von 2. {{provider}} meldet seine internen Schritte nicht.",
+        "sendSub": "Versuch {{n}}",
+        "sendNoSteps": "Versuch {{n}}. {{provider}} meldet seine internen Schritte nicht.",
         "read": "{{provider}} öffnet {{file}}",
         "tool": "{{provider}} nutzt das Werkzeug {{tool}}",
         "answer": "{{provider}} schreibt die Antwort",
@@ -1139,6 +1139,35 @@
         "partial": "Einige Felder konnten nicht platziert werden; die Prüfliste nennt den Grund für jedes."
       },
       "copyTexts": "Texte pro Seite"
+    },
+    "models": {
+      "pick": "Modell wählen",
+      "auto": "Automatisch",
+      "autoHint": "Copilot wählt das beste verfügbare Modell",
+      "cliDefault": "Standard von Claude Code",
+      "loading": "Modelle von {{provider}} werden gelesen…",
+      "loadingHint": "Beim ersten Mal dauert es ein paar Sekunden. Du kannst schon loslegen: Dein letztes Modell wird verwendet.",
+      "read": "Liste von {{provider}} gelesen · {{when}}",
+      "cached": "Zuletzt gespeicherte Liste · {{when}}",
+      "noList": "Keine Liste verfügbar",
+      "refresh": "Aktualisieren",
+      "refreshing": "Wird aktualisiert…",
+      "retry": "Erneut versuchen",
+      "errorTitle": "Die Modellliste konnte nicht gelesen werden.",
+      "error": {
+        "auth": "{{provider}} ist nicht angemeldet. Öffne ein Terminal und führe „{{command}}“ aus.",
+        "missing": "Ich finde {{provider}} auf diesem Computer nicht.",
+        "timeout": "{{provider}} hat nicht rechtzeitig geantwortet.",
+        "cli_error": "{{provider}} hat beim Abrufen der Modelle einen Fehler gemeldet.",
+        "aborted": "Das Lesen wurde abgebrochen.",
+        "provider": "Unbekannter Anbieter.",
+        "error": "Die Modellliste von {{provider}} konnte nicht gelesen werden."
+      },
+      "emptyTitle": "{{provider}} hat keine Modelle geliefert.",
+      "emptyCopilot": "„Automatisch“ wird verwendet; das entscheidet das CLI selbst.",
+      "emptyClaude": "Das Standardmodell von Claude Code wird verwendet.",
+      "retiredTitle": "„{{model}}“ ist für dein Konto nicht mehr verfügbar.",
+      "retiredBody": "Wir sind zu {{fallback}} zurückgekehrt; du kannst in der Liste ein anderes wählen."
     }
   },
   "update": {

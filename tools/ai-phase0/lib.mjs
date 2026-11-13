@@ -73,13 +73,26 @@ export const looksLikeProposals = (v) =>
   (Array.isArray(v) && v.some((x) => x && typeof x === 'object' && typeof x.id === 'string')) || (!!v && Array.isArray(v.fields));
 
 /** ¿Ha devuelto la IA el código de cada imagen? Devuelve los nombres que faltan o no coinciden. */
-export function missingImageCodes(data, codes) {
+export function missingImageCodes(data, codes, opts) {
+  return describeImageCodes(data, codes, opts).missing;
+}
+
+/** Como `missingImageCodes`, y además lo que devolvió la IA por cada imagen que falla (para diagnosticar; los códigos son aleatorios, no contenido del PDF). */
+export function describeImageCodes(data, codes, { minMatch } = {}) {
   const raw = data && typeof data === 'object' && !Array.isArray(data) && data.images && typeof data.images === 'object' ? data.images : {};
   // Admite claves como «A-p1.png» y un carácter mal transcrito (el modelo pequeño confunde letras parecidas).
   const got = {};
   for (const [k, v] of Object.entries(raw)) got[String(k).replace(/\.png$/i, '').trim()] = String(v ?? '').trim().toUpperCase();
-  const close = (a, b) => a.length === b.length && [...a].filter((c, i) => c !== b[i]).length <= 1;
-  return Object.entries(codes).filter(([name, code]) => !close(got[name] ?? '', code)).map(([name]) => name);
+  // Por defecto, mismo largo y como mucho un carácter distinto. Con `minMatch` (Copilot, que reescala las imágenes y a veces
+  // pone «?» en lo que no distingue) basta con acertar ese número de posiciones: por azar es ~1 entre 200.
+  const close = (a, b) =>
+    minMatch ? [...b].filter((c, i) => a[i] === c).length >= minMatch : a.length === b.length && [...a].filter((c, i) => c !== b[i]).length <= 1;
+  const bad = Object.entries(codes).filter(([name, code]) => !close(got[name] ?? '', code));
+  return {
+    missing: bad.map(([name]) => name),
+    given: bad.map(([name, code]) => ({ name, got: (got[name] ?? '').slice(0, 8), expected: code })),
+    returned: Object.keys(got).length,
+  };
 }
 
 /** Valida la respuesta. Devuelve `{ proposals, errors }`; descarta entradas mal formadas. */
@@ -181,7 +194,7 @@ export function summarize(rows) {
   };
 }
 
-export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes }) {
+export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes, attached }) {
   const imgs = (prefix, n) => Array.from({ length: n }, (_, i) => `${prefix}-p${i + 1}.png`).join(', ');
   return `# Tarea: trasladar campos de un PDF A a un PDF B
 
@@ -198,9 +211,11 @@ Para cada campo de fields.json:
 3. La app calculará la posición final: ancla B + desplazamiento que tenía el campo en A. Si en B el campo ya no está en la misma posición relativa respecto a su etiqueta (se ve en las imágenes), estima la corrección en puntos PDF en "dx" y "dy" (si no cambió, 0 y 0). No calcules coordenadas absolutas.
 4. Si no hay forma razonable de colocarlo (por ejemplo, la etiqueta ya no existe en B), devuelve "found": false con el motivo. No fuerces un ancla distinta.
 
+${attached ? 'Las imágenes ya vienen adjuntas a este mensaje: míralas ahí, no las abras con herramientas.\n\n' : ''}Trabaja solo con las imágenes y los JSON de esta carpeta: abre cada imagen una sola vez, no uses la terminal ni escribas archivos.
+
 Mira las imágenes de A y B para confirmar que el ancla es el mismo concepto. No inventes textos: "anchorA" y "anchorB" deben existir literalmente en textsA.json y textsB.json.
 
-${codes ? `Cada imagen lleva en la esquina inferior derecha un código de 4 caracteres en un recuadro. Debes abrir TODAS las imágenes y copiar el código de cada una en "images" (${Object.keys(codes).join(', ')}). Sin esos códigos la respuesta se descarta.
+${codes ? `Cada imagen lleva, en una franja añadida debajo de la página, un código de 4 caracteres muy grande. Debes abrir TODAS las imágenes y copiar el código de cada una en "images" (si dudas de un carácter escribe tu mejor lectura; nunca "?") (${Object.keys(codes).join(', ')}). Sin esos códigos la respuesta se descarta.
 
 Responde SOLO con un objeto JSON, sin texto antes ni después:
 {"images":{"A-p1":"XXXX"},"fields":[{"id":"p1-f1","found":true,"page":1,"anchorA":"Cliente","anchorB":"Cliente","dx":0,"dy":0,"confidence":0.9,"reason":"una frase"}]}

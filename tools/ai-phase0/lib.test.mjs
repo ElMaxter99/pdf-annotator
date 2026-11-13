@@ -75,3 +75,19 @@ test('missingImageCodes admite «A-p1.png» y un carácter mal transcrito, pero 
   assert.deepEqual(missingImageCodes({ images: { 'A-p1': 'K7F2', 'B-p1': 'ZZZZ' }, fields: [] }, codes), ['B-p1']);
   assert.deepEqual(missingImageCodes({ images: { 'A-p1': 'K7', 'B-p1': 'QW9X' }, fields: [] }, codes), ['A-p1']);
 });
+
+test('describeImageCodes explica qué devolvió la IA en cada imagen que falla', async () => {
+  const { describeImageCodes } = await import('./lib.mjs');
+  const r = describeImageCodes({ images: { 'A-p1': 'zzzz', 'B-p1.png': 'wxyz' } }, { 'A-p1': 'ABCD', 'B-p1': 'WXYZ', 'B-p2': 'QRST' });
+  assert.deepEqual(r.missing, ['A-p1', 'B-p2']);
+  assert.deepEqual(r.given[0], { name: 'A-p1', got: 'ZZZZ', expected: 'ABCD' });
+  assert.equal(r.returned, 2);
+});
+
+test('describeImageCodes con minMatch acepta lecturas parciales con «?»', async () => {
+  const { describeImageCodes } = await import('./lib.mjs');
+  const codes = { 'A-p1': 'V62J', 'B-p1': 'CVBH' };
+  assert.deepEqual(describeImageCodes({ images: { 'A-p1': '?62?', 'B-p1': 'CVBH' } }, codes).missing, ['A-p1']);
+  assert.deepEqual(describeImageCodes({ images: { 'A-p1': '?62?', 'B-p1': 'CVBH' } }, codes, { minMatch: 2 }).missing, []);
+  assert.deepEqual(describeImageCodes({ images: { 'A-p1': '????', 'B-p1': 'C???' } }, codes, { minMatch: 2 }).missing, ['A-p1', 'B-p1']);
+});
