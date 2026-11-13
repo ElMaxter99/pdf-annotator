@@ -1,4 +1,6 @@
 ## Unreleased
+### Fixed
+- **Copilot en el traslado con IA**: se le deniega la terminal (`--deny-tool=shell`; `COPILOT_ALLOW_SHELL=1` lo permite) porque exploraba con decenas de llamadas `bash` y multiplicaba el consumo, y el prompt le pide abrir cada imagen una sola vez. El error «La IA no ha leído las imágenes» indica ahora qué código devolvió la IA y cuál se esperaba, para diagnosticar el falso positivo.
 
 ## [v1.9.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.9.0) - 2026-11-13
 ### Added

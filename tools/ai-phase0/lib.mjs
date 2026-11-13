@@ -74,12 +74,22 @@ export const looksLikeProposals = (v) =>
 
 /** ¿Ha devuelto la IA el código de cada imagen? Devuelve los nombres que faltan o no coinciden. */
 export function missingImageCodes(data, codes) {
+  return describeImageCodes(data, codes).missing;
+}
+
+/** Como `missingImageCodes`, y además lo que devolvió la IA por cada imagen que falla (para diagnosticar; los códigos son aleatorios, no contenido del PDF). */
+export function describeImageCodes(data, codes) {
   const raw = data && typeof data === 'object' && !Array.isArray(data) && data.images && typeof data.images === 'object' ? data.images : {};
   // Admite claves como «A-p1.png» y un carácter mal transcrito (el modelo pequeño confunde letras parecidas).
   const got = {};
   for (const [k, v] of Object.entries(raw)) got[String(k).replace(/\.png$/i, '').trim()] = String(v ?? '').trim().toUpperCase();
   const close = (a, b) => a.length === b.length && [...a].filter((c, i) => c !== b[i]).length <= 1;
-  return Object.entries(codes).filter(([name, code]) => !close(got[name] ?? '', code)).map(([name]) => name);
+  const bad = Object.entries(codes).filter(([name, code]) => !close(got[name] ?? '', code));
+  return {
+    missing: bad.map(([name]) => name),
+    given: bad.map(([name, code]) => ({ name, got: (got[name] ?? '').slice(0, 8), expected: code })),
+    returned: Object.keys(got).length,
+  };
 }
 
 /** Valida la respuesta. Devuelve `{ proposals, errors }`; descarta entradas mal formadas. */
@@ -197,6 +207,8 @@ Para cada campo de fields.json:
 2. Busca ese mismo texto, o el equivalente si cambió de redacción, en B y cópialo EXACTO de textsB.json en "anchorB", junto con su página en "page". El texto puede haberse movido a otra página.
 3. La app calculará la posición final: ancla B + desplazamiento que tenía el campo en A. Si en B el campo ya no está en la misma posición relativa respecto a su etiqueta (se ve en las imágenes), estima la corrección en puntos PDF en "dx" y "dy" (si no cambió, 0 y 0). No calcules coordenadas absolutas.
 4. Si no hay forma razonable de colocarlo (por ejemplo, la etiqueta ya no existe en B), devuelve "found": false con el motivo. No fuerces un ancla distinta.
+
+Trabaja solo con las imágenes y los JSON de esta carpeta: abre cada imagen una sola vez, no uses la terminal ni escribas archivos.
 
 Mira las imágenes de A y B para confirmar que el ancla es el mismo concepto. No inventes textos: "anchorA" y "anchorB" deben existir literalmente en textsA.json y textsB.json.
 

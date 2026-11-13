@@ -162,6 +162,8 @@ export const PROVIDERS = {
             '-p',
             INSTRUCTION,
             '--allow-all-tools',
+            // Sin terminal: gastaba decenas de llamadas `bash` explorando y multiplicaba el consumo. La denegación gana a --allow-all-tools; `COPILOT_ALLOW_SHELL=1` la quita.
+            ...(process.env.COPILOT_ALLOW_SHELL === '1' ? [] : ['--deny-tool=shell']),
             ...(opts.stream ? ['--output-format', 'json'] : []),
             ...(opts.model ? ['--model', opts.model] : []),
             ...(process.env.COPILOT_ATTACH_IMAGES === '0' ? [] : (opts.attachments ?? []).map((f) => `--attachment=${f}`)),

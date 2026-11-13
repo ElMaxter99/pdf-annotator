@@ -3,7 +3,7 @@
 import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { buildPrompt, findText, flattenFields, looksLikeProposals, missingImageCodes, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
+import { buildPrompt, findText, flattenFields, looksLikeProposals, describeImageCodes, nearbyTexts, parseJsonFromText, resolveProposal, validateProposals } from '../ai-phase0/lib.mjs';
 import { readPdf } from '../ai-phase0/pdf.mjs';
 import { PROVIDERS, describeClaudeEvent, describeCopilotEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
 
@@ -126,12 +126,12 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
         if (ex.meta.isError) throw Object.assign(new Error(`El CLI devolvió un error: ${tail(ex.text)}`), { code: 'cli_error', details });
         const data = parseJsonFromText(ex.text, looksLikeProposals);
         if (codes) {
-          const missing = missingImageCodes(data, codes);
+          const { missing, given, returned } = describeImageCodes(data, codes);
           attemptInfo.imagesMissing = missing.length;
           if (missing.length) {
             // La IA no ha leído las imágenes: no se aprovecha una respuesta hecha solo con los textos.
             retryNote = 'no has devuelto los códigos de las imágenes. Abre TODAS las imágenes, copia el código de cada una en "images" y vuelve a responder con el objeto JSON pedido.';
-            if (attempt === maxAttempts) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer (${missing.join(', ')}).`), { code: 'images_not_read', details });
+            if (attempt === maxAttempts) throw Object.assign(new Error(`${missing.length} de ${Object.keys(codes).length} imágenes sin leer (${missing.join(', ')}). La IA devolvió ${returned} códigos; ejemplos: ${given.slice(0, 3).map((g) => `${g.name} dio «${g.got}», esperado «${g.expected}»`).join('; ')}.`), { code: 'images_not_read', details });
             continue;
           }
         }
