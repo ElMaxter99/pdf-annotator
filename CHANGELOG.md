@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.9.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.9.1) - 2026-11-13
 ### Fixed
 - **El código de verificación de las imágenes salía como recuadros vacíos en algunos equipos** (la fuente `monospace` no tenía las letras): era lo que hacía fallar la lectura con Copilot aunque viera la imagen. Ahora se dibuja con glifos propios (rectángulos), sin depender de ninguna fuente del sistema, con tests que lo leen de vuelta del PNG.
 - **Copilot: adjuntos con ruta absoluta** (`--attachment <ruta>`, la forma que se verificó a mano) en vez de `--attachment=nombre` relativo. Si la prueba previa falla, el error incluye un comando reproducible y deja las dos páginas en una carpeta temporal local (`pdf-annotator-ai-debug`) para compararlo a mano con Copilot.
