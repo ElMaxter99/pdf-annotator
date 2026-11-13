@@ -7,10 +7,13 @@ import { changelogSection, currentVersion, normalizeVersion, REPO_URL, takeOptio
 try {
   const args = process.argv.slice(2);
   const out = takeOption(args, '--out');
-  const version = normalizeVersion(args[0] ?? currentVersion());
+  const raw = String(args[0] ?? currentVersion());
+  const rc = /-rc\.\d+$/.test(raw);
+  const version = normalizeVersion(raw.replace(/-rc\.\d+$/, ''));
   const section = changelogSection(version);
-  if (!section) throw new Error(`CHANGELOG.md no tiene sección para v${version}.`);
-  const notes = `${section.body}\n\n**Cambios completos**: ${REPO_URL}/blob/master/CHANGELOG.md\n`;
+  if (!section && !rc) throw new Error(`CHANGELOG.md no tiene sección para v${version}.`);
+  const intro = rc ? `> **Versión de prueba (release candidate) de ${version}.** No es estable: pruébala en tu sistema y cuenta cualquier problema antes de la versión final.\n\n` : '';
+  const notes = `${intro}${section ? section.body : '_Aún no hay sección en el CHANGELOG para esta versión._'}\n\n**Cambios completos**: ${REPO_URL}/blob/master/CHANGELOG.md\n`;
   if (out) {
     writeFileSync(out, notes);
     console.error(`Notas de v${version} escritas en ${out}`);

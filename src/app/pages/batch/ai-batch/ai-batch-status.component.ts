@@ -43,7 +43,7 @@ export class AiBatchStatusComponent implements OnInit, OnDestroy {
     return start ? clock(Math.max(0, this.now() - start)) : '0:00';
   });
   readonly tokens = computed(() => usageTotal(this.queue.usage()));
-  readonly measured = computed(() => this.helper.provider() === 'claude' && this.tokens() > 0);
+  readonly measured = computed(() => this.tokens() > 0);
   readonly reviewable = computed(() => this.counts().done);
   readonly freeCount = computed(
     () => Object.values(this.queue.rows()).filter((row) => row.phase === 'free').length,

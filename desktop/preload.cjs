@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('desktop', {
   },
   checkForUpdates: () => ipcRenderer.invoke('desktop:update:check'),
   downloadUpdate: () => ipcRenderer.invoke('desktop:update:download'),
+  setUpdateChannel: (channel) => ipcRenderer.invoke('desktop:update:set-channel', channel),
   cancelUpdate: () => ipcRenderer.invoke('desktop:update:cancel'),
   installUpdate: () => ipcRenderer.invoke('desktop:update:install'),
   installOnQuit: () => ipcRenderer.invoke('desktop:update:install-on-quit'),

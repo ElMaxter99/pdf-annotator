@@ -12,7 +12,16 @@ export interface DesktopUpdateState {
   total?: number;
   notesUrl?: string;
   error?: string;
+  /** Canal elegido: «stable» (solo finales) o «beta» (también versiones de prueba RC). */
+  channel?: UpdateChannel;
+  /** La versión ofrecida es una prueba (X.Y.Z-rc.N). */
+  prerelease?: boolean;
 }
+
+export type UpdateChannel = 'stable' | 'beta';
+
+/** «1.9.0-rc.2» → true. */
+export const isPrereleaseVersion = (version: string | undefined): boolean => /-rc\.\d+$/.test(version ?? '');
 
 /** Puente que expone `desktop/preload.cjs` en la app de escritorio (Electron). En la web no existe. */
 export interface DesktopBridge {
@@ -23,6 +32,7 @@ export interface DesktopBridge {
   onUpdateState(callback: (state: DesktopUpdateState) => void): () => void;
   checkForUpdates(): Promise<void>;
   downloadUpdate(): Promise<void>;
+  setUpdateChannel(channel: UpdateChannel): Promise<void>;
   cancelUpdate(): Promise<void>;
   installUpdate(): Promise<void>;
   installOnQuit(): Promise<void>;
@@ -46,6 +56,9 @@ export class DesktopUpdateService {
   readonly installOnQuitChosen = signal(false);
 
   readonly isDesktop = this.bridge !== null;
+  readonly channel = computed<UpdateChannel>(() => (this.state().channel === 'beta' ? 'beta' : 'stable'));
+  /** La app instalada es una versión de prueba (X.Y.Z-rc.N). */
+  readonly currentIsPrerelease = computed(() => isPrereleaseVersion(this.state().current));
   readonly cardVisible = computed(() => {
     const s = this.state();
     if (s.status === 'available') return this.deferredVersion() !== s.version;
@@ -72,6 +85,11 @@ export class DesktopUpdateService {
       return;
     }
     void this.bridge?.downloadUpdate();
+  }
+  setChannel(channel: UpdateChannel): void {
+    // Optimista: la interfaz cambia al instante y el proceso principal confirma con su estado.
+    this.state.update((s) => ({ ...s, channel }));
+    void this.bridge?.setUpdateChannel(channel);
   }
   cancel(): void {
     void this.bridge?.cancelUpdate();

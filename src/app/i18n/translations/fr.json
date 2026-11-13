@@ -907,12 +907,12 @@
         "opus": "Opus · épuise la limite plus vite",
         "copilot": "Modèle de Copilot",
         "copilotAuto": "Automatique (celui du CLI)",
-        "copilotHint": "Chaque requête est décomptée de vos « premium requests » selon le modèle. Saisissez-en un précis si votre administrateur l'indique.",
+        "copilotHint": "Chaque exécution consomme des crédits IA selon les tokens et le modèle. Indiquez-en un précis si votre administrateur le demande.",
         "sonnetHint": "Sonnet : suffisant pour placer les champs et léger pour votre limite.",
         "new": "Nouveau"
       },
       "retryToggle": "Réessayer une fois si la réponse est inutilisable",
-      "retryHint": "Un nouvel essai peut doubler le coût : avec Copilot, il compte comme une autre requête premium. Désactivé par défaut pour Copilot."
+      "retryHint": "Un nouvel essai peut doubler le coût : avec Copilot, tout est renvoyé et consomme plus de crédits IA. Désactivé par défaut pour Copilot."
     },
     "menu": {
       "title": "Copier et adapter avec l'IA",
@@ -1067,9 +1067,12 @@
         "sentSize": "Envoyé (images + textes)",
         "estimate": "Tokens approximatifs",
         "estimateBadge": "Estimation",
-        "premium": "Premium requests",
-        "premiumValue": "selon le modèle",
-        "copilotWarn": "Chaque requête est décomptée de votre quota avec le multiplicateur du modèle utilisé. Consultez « /usage » dans Copilot ou la facturation GitHub avant et après."
+        "premium": "Crédits IA",
+        "premiumValue": "selon tokens et modèle",
+        "copilotWarn": "Copilot facture en crédits IA selon les tokens (entrée, sortie et cache) et le modèle. Cette app ne peut pas les mesurer dans ce mode : consultez votre consommation sur GitHub avant et après.",
+        "credits": "Crédits d'IA",
+        "creditsNote": "Mesurés par Copilot lui-même (≈). Ils sont déduits de vos crédits d'IA GitHub ; le total exact figure sur votre page d'utilisation de Copilot.",
+        "creditsLimits": "Copilot compte les crédits d'IA selon les tokens (entrée, sortie et cache) et le modèle ; un modèle plus grand les consomme plus vite."
       },
       "sent": {
         "title": "Ce qui a été envoyé",
@@ -1105,7 +1108,10 @@
     "available": {
       "title": "Une nouvelle version est disponible",
       "text": "PDF Annotator {{version}} · vous avez la {{current}}",
-      "manual": "PDF Annotator {{version}} · vous avez la {{current}}. Sur ce système, l'installation est manuelle."
+      "manual": "PDF Annotator {{version}} · vous avez la {{current}}. Sur ce système, l'installation est manuelle.",
+      "titleRc": "Une version de test est disponible",
+      "titleFinal": "La version finale est disponible",
+      "textFinal": "PDF Annotator {{version}} · vous avez la {{current}} (test)"
     },
     "now": "Mettre à jour",
     "download": "Télécharger la {{version}}",
@@ -1125,6 +1131,29 @@
     },
     "retry": "Réessayer",
     "close": "Fermer",
-    "pending": "Version {{version}} disponible"
+    "pending": "Version {{version}} disponible",
+    "tag": "Test",
+    "downloadingRc": "Téléchargement de la version de test {{version}}…",
+    "notesRc": "Notes de la version de test",
+    "channel": {
+      "label": "Canal de mises à jour",
+      "stable": "Stable",
+      "beta": "Tests",
+      "hintStable": "Versions finales uniquement. Recommandé.",
+      "hintBeta": "Vous recevez aussi des versions de test (RC) avant la finale. Elles peuvent avoir des bugs.",
+      "confirm": {
+        "title": "Recevoir les versions de test ?",
+        "text": "Les versions de test (RC) arrivent avant la finale pour pouvoir être essayées pour de vrai. Elles peuvent avoir des bugs. Vos PDF et annotations ne sont pas touchés, mais exportez d'abord l'important.",
+        "text2": "Pour revenir au canal stable, changez-le ici : vous recevrez la prochaine version finale.",
+        "yes": "Recevoir les tests",
+        "cancel": "Annuler"
+      },
+      "back": {
+        "title": "Revenir au canal stable",
+        "text": "Vous restez sur la {{current}} jusqu'à la sortie de la version finale ; elle vous sera alors proposée. Pour la stable tout de suite, installez-la à la main depuis GitHub.",
+        "github": "Ouvrir GitHub",
+        "ok": "Compris"
+      }
+    }
   }
 }

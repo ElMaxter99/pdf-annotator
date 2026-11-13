@@ -51,7 +51,7 @@ export class AiBatchService {
   readonly rows = signal<Record<string, AiBatchRow>>({});
   readonly run = signal<AiBatchRun>('idle');
   readonly pause = signal<AiBatchPause | null>(null);
-  /** Requests started in this run (Copilot cannot measure credits, so this is what is shown there). */
+  /** Requests started in this run (shown while the provider reports no tokens). */
   readonly requests = signal(0);
   readonly startedAt = signal<number | null>(null);
 

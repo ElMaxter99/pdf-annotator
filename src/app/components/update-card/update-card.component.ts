@@ -11,15 +11,20 @@ const MB = 1048576;
   imports: [TranslationPipe],
   template: `
     @if (update.cardVisible()) {
-      <div class="update-card" [class.update-card--error]="state().status === 'error'" role="status" aria-live="polite" data-testid="update-card">
+      <div class="update-card" [class.update-card--error]="state().status === 'error'" [class.update-card--test]="state().prerelease === true && state().status !== 'error'" role="status" aria-live="polite" data-testid="update-card">
         @switch (state().status) {
           @case ('available') {
             <div class="update-card__head">
-              <strong>{{ 'update.available.title' | t }}</strong>
+              <strong>
+                {{ titleKey() | t }}
+                @if (state().prerelease) {
+                  <span class="update-tag" data-testid="update-tag">{{ 'update.tag' | t }}</span>
+                }
+              </strong>
               <button type="button" class="update-card__close" (click)="update.later()" [attr.aria-label]="'update.later' | t" [attr.title]="'update.later' | t">✕</button>
             </div>
             <p class="update-card__text">
-              {{ (state().mode === 'manual' ? 'update.available.manual' : 'update.available.text') | t: { version: state().version, current: state().current } }}
+              {{ textKey() | t: { version: state().version, current: state().current } }}
             </p>
             <div class="update-card__actions">
               <button type="button" class="btn btn--primary" (click)="update.download()">
@@ -27,12 +32,12 @@ const MB = 1048576;
               </button>
               <button type="button" class="btn btn--ghost" (click)="update.later()">{{ 'update.later' | t }}</button>
               @if (state().mode === 'auto') {
-                <button type="button" class="update-card__link" (click)="update.openNotes()">{{ 'update.notes' | t }} ↗</button>
+                <button type="button" class="update-card__link" (click)="update.openNotes()">{{ (state().prerelease ? 'update.notesRc' : 'update.notes') | t }} ↗</button>
               }
             </div>
           }
           @case ('downloading') {
-            <div class="update-card__head"><strong>{{ 'update.downloading' | t: { version: state().version } }}</strong></div>
+            <div class="update-card__head"><strong>{{ (state().prerelease ? 'update.downloadingRc' : 'update.downloading') | t: { version: state().version } }}</strong></div>
             <div class="update-card__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="state().percent ?? 0">
               <i [style.width.%]="state().percent ?? 0"></i>
             </div>
@@ -68,6 +73,16 @@ const MB = 1048576;
 export class UpdateCardComponent {
   readonly update = inject(DesktopUpdateService);
   readonly state = this.update.state;
+  readonly titleKey = computed(() => {
+    const s = this.state();
+    if (s.prerelease) return 'update.available.titleRc';
+    return this.update.currentIsPrerelease() ? 'update.available.titleFinal' : 'update.available.title';
+  });
+  readonly textKey = computed(() => {
+    const s = this.state();
+    if (s.mode === 'manual') return 'update.available.manual';
+    return this.update.currentIsPrerelease() && !s.prerelease ? 'update.available.textFinal' : 'update.available.text';
+  });
   readonly progressText = computed(() => {
     const s = this.state();
     const total = Math.round((s.total ?? 0) / MB);

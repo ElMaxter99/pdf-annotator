@@ -907,12 +907,12 @@
         "opus": "Opus · uses up your limit sooner",
         "copilot": "Copilot model",
         "copilotAuto": "Automatic (the CLI default)",
-        "copilotHint": "Each request counts against your “premium requests” by model. Type a specific one if your administrator says so.",
+        "copilotHint": "Each run spends AI credits based on tokens and model. Type a specific one if your administrator says so.",
         "sonnetHint": "Sonnet: enough to place fields and light on your limit.",
         "new": "New"
       },
       "retryToggle": "Retry once if the answer is unusable",
-      "retryHint": "A retry can double the cost: with Copilot it counts as another premium request. It is off by default for Copilot."
+      "retryHint": "A retry can double the cost: with Copilot it sends everything again and spends more AI credits. It is off by default for Copilot."
     },
     "menu": {
       "title": "Copy and adapt with AI",
@@ -1067,9 +1067,12 @@
         "sentSize": "Sent (images + texts)",
         "estimate": "Approximate tokens",
         "estimateBadge": "Estimate",
-        "premium": "Premium requests",
-        "premiumValue": "depends on the model",
-        "copilotWarn": "Each request counts against your quota with the multiplier of the model you use. Check «/usage» in Copilot or GitHub billing before and after."
+        "premium": "AI credits",
+        "premiumValue": "by tokens and model",
+        "copilotWarn": "Copilot charges AI credits based on tokens (input, output and cache) and the model. This app cannot measure them in this mode: check your usage on GitHub before and after.",
+        "credits": "AI credits",
+        "creditsNote": "Measured by Copilot itself (≈). They are deducted from your GitHub AI credits; the exact total is on your Copilot usage page.",
+        "creditsLimits": "Copilot counts AI credits by tokens (input, output and cache) and model; a larger model spends them faster."
       },
       "sent": {
         "title": "What was sent",
@@ -1105,7 +1108,10 @@
     "available": {
       "title": "A new version is available",
       "text": "PDF Annotator {{version}} · you have {{current}}",
-      "manual": "PDF Annotator {{version}} · you have {{current}}. On this system it is installed manually."
+      "manual": "PDF Annotator {{version}} · you have {{current}}. On this system it is installed manually.",
+      "titleRc": "A test version is available",
+      "titleFinal": "The final version is out",
+      "textFinal": "PDF Annotator {{version}} · you have {{current}} (test)"
     },
     "now": "Update now",
     "download": "Download {{version}}",
@@ -1125,6 +1131,29 @@
     },
     "retry": "Try again",
     "close": "Close",
-    "pending": "Version {{version}} available"
+    "pending": "Version {{version}} available",
+    "tag": "Test",
+    "downloadingRc": "Downloading test version {{version}}…",
+    "notesRc": "Test version notes",
+    "channel": {
+      "label": "Update channel",
+      "stable": "Stable",
+      "beta": "Testing",
+      "hintStable": "Final versions only. Recommended.",
+      "hintBeta": "You also get test versions (RC) before the final one. They may have bugs.",
+      "confirm": {
+        "title": "Receive test versions?",
+        "text": "Test versions (RC) arrive before the final one so they can be tried for real. They may have bugs. Your PDFs and annotations are not touched, but export anything important first.",
+        "text2": "To go back to the stable channel, change it here: you will get the next final version.",
+        "yes": "Receive test versions",
+        "cancel": "Cancel"
+      },
+      "back": {
+        "title": "Back to the stable channel",
+        "text": "You stay on {{current}} until the final version is out; it will then be offered to you. If you want the stable one now, install it by hand from GitHub.",
+        "github": "Open GitHub",
+        "ok": "Got it"
+      }
+    }
   }
 }

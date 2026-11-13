@@ -907,12 +907,12 @@
         "opus": "Opus · agota el límite antes",
         "copilot": "Modelo de Copilot",
         "copilotAuto": "Automático (el del CLI)",
-        "copilotHint": "Cada petición descuenta de tus «premium requests» según el modelo. Escribe uno concreto si tu administrador lo indica.",
+        "copilotHint": "Cada ejecución gasta créditos de IA según los tokens y el modelo. Escribe uno concreto si tu administrador lo indica.",
         "sonnetHint": "Sonnet: suficiente para colocar campos y gasta poco de tu límite.",
         "new": "Nuevo"
       },
       "retryToggle": "Reintentar una vez si la respuesta no sirve",
-      "retryHint": "Un reintento puede duplicar el gasto: con Copilot cuenta como otra petición premium. Con Copilot viene desactivado."
+      "retryHint": "Un reintento puede duplicar el gasto: con Copilot vuelve a enviar todo y gasta más créditos de IA. Con Copilot viene desactivado."
     },
     "menu": {
       "title": "Copiar y adaptar con IA",
@@ -1067,9 +1067,12 @@
         "sentSize": "Enviado (imágenes + textos)",
         "estimate": "Tokens aproximados",
         "estimateBadge": "Estimación",
-        "premium": "Premium requests",
-        "premiumValue": "según el modelo",
-        "copilotWarn": "Cada petición descuenta de tu cuota con el multiplicador del modelo que uses. Mira «/usage» en Copilot o la facturación de GitHub antes y después."
+        "premium": "Créditos de IA",
+        "premiumValue": "según tokens y modelo",
+        "copilotWarn": "Copilot cobra en créditos de IA según los tokens (entrada, salida y caché) y el modelo. Esta app no puede medirlos en este modo: mira tu consumo en GitHub antes y después.",
+        "credits": "Créditos de IA",
+        "creditsNote": "Medidos por el propio Copilot (≈). Se descuentan de tus créditos de IA de GitHub; el total exacto está en tu página de uso de Copilot.",
+        "creditsLimits": "Copilot cuenta créditos de IA según los tokens (entrada, salida y caché) y el modelo; un modelo mayor los gasta antes."
       },
       "sent": {
         "title": "Lo que se envió",
@@ -1105,7 +1108,10 @@
     "available": {
       "title": "Hay una versión nueva",
       "text": "PDF Annotator {{version}} · tienes la {{current}}",
-      "manual": "PDF Annotator {{version}} · tienes la {{current}}. En este sistema se instala a mano."
+      "manual": "PDF Annotator {{version}} · tienes la {{current}}. En este sistema se instala a mano.",
+      "titleRc": "Hay una versión de prueba",
+      "titleFinal": "Ya está la versión final",
+      "textFinal": "PDF Annotator {{version}} · tienes la {{current}} (prueba)"
     },
     "now": "Actualizar ahora",
     "download": "Descargar {{version}}",
@@ -1125,6 +1131,29 @@
     },
     "retry": "Reintentar",
     "close": "Cerrar",
-    "pending": "Versión {{version}} disponible"
+    "pending": "Versión {{version}} disponible",
+    "tag": "Prueba",
+    "downloadingRc": "Descargando la prueba {{version}}…",
+    "notesRc": "Notas de la prueba",
+    "channel": {
+      "label": "Canal de actualizaciones",
+      "stable": "Estable",
+      "beta": "Pruebas",
+      "hintStable": "Solo versiones finales. Es lo recomendado.",
+      "hintBeta": "Recibes también versiones de prueba (RC) antes de la final. Pueden fallar.",
+      "confirm": {
+        "title": "¿Recibir versiones de prueba?",
+        "text": "Las versiones de prueba (RC) llegan antes que la final para que se puedan probar de verdad. Pueden tener fallos. Tus PDF y anotaciones no se tocan, pero conviene exportar lo importante.",
+        "text2": "Para volver al canal estable, cámbialo aquí: recibirás la próxima versión final.",
+        "yes": "Recibir pruebas",
+        "cancel": "Cancelar"
+      },
+      "back": {
+        "title": "Volver al canal estable",
+        "text": "Sigues con la {{current}} hasta que salga la versión final; entonces se te ofrecerá. Si quieres la estable ya, instálala a mano desde GitHub.",
+        "github": "Abrir GitHub",
+        "ok": "Entendido"
+      }
+    }
   }
 }
