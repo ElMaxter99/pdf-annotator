@@ -62,7 +62,10 @@
       "developedBy": "Developed by {{author}}",
       "license": "MIT License",
       "changelog": "Changelog",
-      "openSource": "Open source project"
+      "openSource": "Open source project",
+      "savedSeconds": "Saved {{n}} s ago",
+      "savedMinutes": "Saved {{n}} min ago",
+      "fitPage": "Fit the page to the viewer"
     }
   },
   "theme": {
@@ -1224,5 +1227,10 @@
   },
   "hint": {
     "label": "More information"
+  },
+  "about": {
+    "open": "About",
+    "title": "About {{app}}",
+    "close": "Close"
   }
 }

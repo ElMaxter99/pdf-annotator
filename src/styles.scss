@@ -2252,6 +2252,39 @@ kbd {
   color: var(--muted);
 }
 
+.footer__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer__zoom,
+.footer__version,
+.footer__saved {
+  font-variant-numeric: tabular-nums;
+}
+
+.footer__fit {
+  background: transparent;
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 1px 8px;
+}
+
+.footer__fit:hover:not(:disabled),
+.footer__fit:focus-visible {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.footer__fit:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 /* Shortcuts dialog */
 .dialog-backdrop {
   position: fixed;

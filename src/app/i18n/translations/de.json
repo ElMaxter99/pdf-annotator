@@ -62,7 +62,10 @@
       "developedBy": "Entwickelt von {{author}}",
       "license": "MIT-Lizenz",
       "changelog": "Neuigkeiten",
-      "openSource": "Open-Source-Projekt"
+      "openSource": "Open-Source-Projekt",
+      "savedSeconds": "Gespeichert vor {{n}} s",
+      "savedMinutes": "Gespeichert vor {{n}} min",
+      "fitPage": "Seite an Ansicht anpassen"
     }
   },
   "theme": {
@@ -1224,5 +1227,10 @@
   },
   "hint": {
     "label": "Mehr Informationen"
+  },
+  "about": {
+    "open": "Info",
+    "title": "Über {{app}}",
+    "close": "Schließen"
   }
 }

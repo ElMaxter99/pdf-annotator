@@ -62,7 +62,10 @@
       "developedBy": "Desenvolupat per {{author}}",
       "license": "Llicència MIT",
       "changelog": "Novetats",
-      "openSource": "Projecte de codi obert"
+      "openSource": "Projecte de codi obert",
+      "savedSeconds": "Desat fa {{n}} s",
+      "savedMinutes": "Desat fa {{n}} min",
+      "fitPage": "Ajusta la pàgina al visor"
     }
   },
   "theme": {
@@ -1224,5 +1227,10 @@
   },
   "hint": {
     "label": "Més informació"
+  },
+  "about": {
+    "open": "Quant a",
+    "title": "Quant a {{app}}",
+    "close": "Tanca"
   }
 }
