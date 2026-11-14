@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.10.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.10.0) - 2026-11-14
 ### Fixed
 - **La IA ya no aparece en la web pública (Vercel):** el botón «Trasladar con IA», el chip «✦ IA» del editor, «Copiar y adaptar con IA» y sus paneles solo se ven en local (`localhost`) y en la app de escritorio, porque la IA depende de la CLI (`claude`/`copilot`) de cada persona. Test e2e incluido.
 - **Ubuntu/Fedora: el aviso de actualización instala desde la propia tarjeta** (antes, con el `.deb` o el `.rpm`, decía «Descargar» y solo abría la página de descargas). Ahora funciona como en Windows: «Actualizar ahora», barra de progreso y «Reiniciar ahora»; al instalar, el sistema pide la contraseña con su diálogo. Solo cae en manual un Linux sin AppImage/deb/rpm reconocible.
