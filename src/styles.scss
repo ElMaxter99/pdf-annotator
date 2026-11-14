@@ -1486,6 +1486,7 @@ header .logo {
 
 .viewer {
   grid-area: viewer;
+  position: relative;
   background: var(--panel);
   border-radius: 12px;
   overflow: auto;

@@ -35,4 +35,11 @@ export class WorkspaceSidebarComponent {
   get jsonEditorElement(): HTMLTextAreaElement | null {
     return this.jsonEditorRef?.nativeElement ?? null;
   }
+
+  /** «Pegar JSON» of the empty state: opens the text editor and puts the cursor in it. */
+  pasteJson(): void {
+    this.vm.jsonPanelCollapsed.set(false);
+    this.vm.setJsonViewMode('text');
+    setTimeout(() => this.jsonEditorRef?.nativeElement.focus());
+  }
 }

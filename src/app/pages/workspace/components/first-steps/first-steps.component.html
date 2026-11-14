@@ -1,0 +1,32 @@
+@if (stepsVisible) {
+  <section class="first-steps" role="region" [attr.aria-label]="'firstSteps.title' | t" data-testid="first-steps">
+    <header class="first-steps__head">
+      <h2>{{ 'firstSteps.title' | t }}</h2>
+      <button type="button" class="first-steps__x" (click)="closeSteps()" [attr.aria-label]="'firstSteps.close' | t" data-testid="first-steps-close">✕</button>
+    </header>
+    <ol class="first-steps__list">
+      @for (n of [1, 2, 3]; track n) {
+        <li>
+          <span class="first-steps__n" aria-hidden="true">{{ n }}</span>
+          <span>
+            <b>{{ 'firstSteps.step' + n + '.title' | t }}</b>
+            <small>{{ 'firstSteps.step' + n + '.text' | t }}</small>
+          </span>
+        </li>
+      }
+    </ol>
+    <div class="first-steps__foot">
+      <button type="button" class="btn btn--small" (click)="importJson()" data-testid="first-steps-import">{{ 'firstSteps.import' | t }}</button>
+      <button type="button" class="btn btn--small btn--ghost" (click)="closeSteps()" data-testid="first-steps-never">{{ 'firstSteps.never' | t }}</button>
+    </div>
+  </section>
+}
+@if (hintOpen()) {
+  <aside class="first-hint" role="status" data-testid="first-hint">
+    <b>{{ 'firstSteps.hint.title' | t }}</b>
+    <span>
+      {{ 'firstSteps.hint.drag' | t }} · <kbd>Supr</kbd> {{ 'firstSteps.hint.delete' | t }} · <kbd>Ctrl+Z</kbd> {{ 'firstSteps.hint.undo' | t }}
+    </span>
+    <button type="button" class="first-steps__x" (click)="closeHint()" [attr.aria-label]="'firstSteps.close' | t">✕</button>
+  </aside>
+}

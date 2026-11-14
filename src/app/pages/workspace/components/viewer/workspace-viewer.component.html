@@ -1,4 +1,5 @@
 <main class="viewer" [class.viewer--split]="vm.splitActive()" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc as _">
+  <app-first-steps [vm]="vm"></app-first-steps>
   <div class="origin-legend" role="group" [attr.aria-label]="'preview.origin.group' | t">
     <label class="origin-legend__toggle">
       <input type="checkbox" [checked]="vm.previewSettings.showOrigin()" (change)="vm.setShowOrigin($any($event.target).checked)" />
