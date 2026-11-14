@@ -276,8 +276,23 @@ test('en una web pública (no local) no hay rastro de la IA', async ({ page }) =
   await page.getByTestId('next-templates').click();
   await page.getByTestId('input-templates').setInputFiles(file('a.json', json, 'application/json'));
   await page.getByTestId('open-panel').click();
-  await expect(page.getByTestId('download-ready')).toBeVisible();
+  await expect(page.getByTestId('batch-more')).toBeVisible();
   await expect(page.getByTestId('ai-batch-button')).toHaveCount(0);
   await page.getByText('a.pdf').first().click();
   await expect(page.getByTestId('ai-chip')).toHaveCount(0);
+});
+
+test('panel del lote compacto: ⋯ guarda las acciones raras y las acciones de fila salen al pasar el ratón', async ({ page }) => {
+  await openPanelWithPair(page);
+  await expect(page.getByTestId('download-ready')).toHaveCount(0); // aparece en la cabecera cuando hay listos
+  await page.getByTestId('batch-more').click();
+  await expect(page.getByTestId('batch-testdata')).toBeVisible();
+  await expect(page.getByTestId('download-ready')).toBeDisabled();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('batch-more-menu')).toHaveCount(0);
+
+  const actions = page.locator('.batch-row__actions').first();
+  await expect(actions).toHaveCSS('opacity', '0');
+  await page.getByTestId('panel-item').first().hover();
+  await expect(actions).toHaveCSS('opacity', '1');
 });

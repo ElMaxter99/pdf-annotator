@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
@@ -87,6 +87,14 @@ async function sha256(blob: Blob): Promise<string | null> {
 export class BatchPageComponent implements OnInit {
   private readonly store = inject(BatchStoreService);
   readonly aiQueue = inject(AiBatchService);
+  readonly moreOpen = signal(false);
+
+  @HostListener('document:mousedown', ['$event'])
+  closeMoreOnOutside(event: MouseEvent): void {
+    if (this.moreOpen() && !(event.target as HTMLElement | null)?.closest('.batch-more')) {
+      this.moreOpen.set(false);
+    }
+  }
   readonly aiHelper = inject(AiHelperService);
   private readonly router = inject(Router);
   private readonly pendingFile = inject(PendingFileService);

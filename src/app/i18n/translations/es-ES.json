@@ -866,7 +866,8 @@
         "keepRunning": "Puedes cerrar este panel: el trabajo sigue.",
         "open": "Abrir"
       }
-    }
+    },
+    "more": "Más acciones"
   },
   "preview": {
     "mode": {
