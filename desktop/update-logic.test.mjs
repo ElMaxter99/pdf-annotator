@@ -24,9 +24,12 @@ test('isNewer: instalada 1.5 y publicada 1.6 avisa; igual o inválida no', () =>
   assert.equal(isNewer('1.6.0', 'basura'), false);
 });
 
-test('updateMode: automático en Windows y AppImage, manual en macOS sin firma y deb/rpm', () => {
+test('updateMode: automático en Windows, AppImage, deb y rpm; manual en macOS sin firma y Linux sin formato', () => {
   assert.equal(updateMode({ platform: 'win32' }), 'auto');
   assert.equal(updateMode({ platform: 'linux', appImage: true }), 'auto');
+  assert.equal(updateMode({ platform: 'linux', packageType: 'deb' }), 'auto');
+  assert.equal(updateMode({ platform: 'linux', packageType: 'rpm' }), 'auto');
+  assert.equal(updateMode({ platform: 'linux', packageType: 'pacman' }), 'manual');
   assert.equal(updateMode({ platform: 'linux', appImage: false }), 'manual');
   assert.equal(updateMode({ platform: 'darwin' }), 'manual');
   assert.equal(updateMode({ platform: 'darwin', macSigned: true }), 'auto');

@@ -41,13 +41,14 @@ export const isNewer = (current, candidate) => {
 };
 
 /**
- * «auto»: la app descarga e instala sola (Windows NSIS y Linux AppImage).
- * «manual»: el botón abre la página de descargas (macOS sin firmar, .deb y .rpm).
+ * «auto»: la app descarga e instala sola (Windows NSIS, Linux AppImage, .deb y .rpm; estos dos piden la
+ * contraseña con el diálogo del sistema al instalar).
+ * «manual»: el botón abre la página de descargas (macOS sin firmar y Linux sin formato reconocido).
  */
-export function updateMode({ platform, appImage = false, macSigned = false }) {
+export function updateMode({ platform, appImage = false, packageType = null, macSigned = false }) {
   if (platform === 'win32') return 'auto';
   if (platform === 'darwin') return macSigned ? 'auto' : 'manual';
-  if (platform === 'linux') return appImage ? 'auto' : 'manual';
+  if (platform === 'linux') return appImage || packageType === 'deb' || packageType === 'rpm' ? 'auto' : 'manual';
   return 'manual';
 }
 

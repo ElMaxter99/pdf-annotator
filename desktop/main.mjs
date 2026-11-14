@@ -89,7 +89,15 @@ const stopHelper = () => {
 };
 
 // ───────── Actualizaciones ─────────
-const mode = updateMode({ platform: process.platform, appImage: Boolean(process.env.APPIMAGE), macSigned: false });
+// electron-builder deja «package-type» («deb», «rpm»…) en los recursos de los paquetes de Linux; electron-updater lo usa para instalar.
+const packageType = (() => {
+  try {
+    return readFileSync(path.join(process.resourcesPath, 'package-type'), 'utf8').trim();
+  } catch {
+    return null;
+  }
+})();
+const mode = updateMode({ platform: process.platform, appImage: Boolean(process.env.APPIMAGE), packageType, macSigned: false });
 // Canal de actualizaciones («stable» por defecto, «beta» = también versiones de prueba RC). Se guarda en la carpeta de datos de la app.
 const settingsFile = path.join(app.getPath('userData'), 'update-channel.json');
 const loadChannel = () => {

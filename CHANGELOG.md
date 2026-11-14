@@ -1,4 +1,7 @@
 ## Unreleased
+### Fixed
+- **Ubuntu/Fedora: el aviso de actualización instala desde la propia tarjeta** (antes, con el `.deb` o el `.rpm`, decía «Descargar» y solo abría la página de descargas). Ahora funciona como en Windows: «Actualizar ahora», barra de progreso y «Reiniciar ahora»; al instalar, el sistema pide la contraseña con su diálogo. Solo cae en manual un Linux sin AppImage/deb/rpm reconocible.
+
 ### Changed
 - **Pie de estado y «Acerca de» (mesa P-47):** el pie del editor enseña ahora «Guardado hace N s», el zoom y un botón «Ajustar» (página entera), con la versión y el canal; los créditos («© … Desarrollado por…», licencia) pasan al menú ⋯ → «Acerca de».
 - **Al abrir un PDF se ajusta a la página (mesa P-47):** en escritorio el zoom inicial hace que la página entera quepa en el visor sin scroll (antes 150 %). La sesión recuperada conserva su zoom.
