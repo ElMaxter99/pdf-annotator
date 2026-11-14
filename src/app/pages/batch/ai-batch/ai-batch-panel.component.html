@@ -1,0 +1,170 @@
+@if (queue.run() !== 'idle') {
+  @if (queue.panelOpen()) {
+    <aside class="ai-panel" role="complementary" [attr.aria-label]="'batch.ai.panel.title' | t" data-testid="ai-batch-status">
+      <header class="ai-panel__head">
+        <h2>{{ 'batch.ai.panel.title' | t }}</h2>
+        <span class="ai-panel__provider">{{ provider() }}</span>
+        <span class="ai-panel__grow"></span>
+        <button type="button" class="ai-panel__x" (click)="close()" [attr.aria-label]="'batch.ai.panel.close' | t" data-testid="ai-batch-panel-close">✕</button>
+      </header>
+
+      <div class="ai-panel__body">
+        <div class="ai-panel__prog">
+          <div class="ai-kpi">
+            <strong>{{ 'batch.ai.panel.count' | t: { done: finished(), total: counts().total } }}</strong>
+            <small>{{ (queue.run() === 'done' ? 'batch.ai.done.title' : 'batch.ai.elapsed') | t: { time: elapsed() } }}</small>
+          </div>
+          <div class="ai-status__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent()">
+            <i [style.width.%]="percent()"></i>
+          </div>
+          <small class="ai-panel__usage" aria-live="polite">
+            @if (measured()) {
+              {{ 'batch.ai.tokens' | t: { count: tokens() } }}
+            } @else {
+              {{ 'batch.ai.requests' | t: { sent: queue.requests() } }}
+            }
+          </small>
+        </div>
+
+        @if (queue.run() === 'running') {
+          <div class="ai-panel__state" data-testid="ai-batch-running">
+            @if (current(); as c) {
+              <b class="ai-panel__file">{{ c.name }}</b>
+              <small>{{ stateOf(c.row).key | t: stateParams(c.row) }}</small>
+            }
+            <span class="ai-panel__actions">
+              <button type="button" class="btn btn--ghost" [disabled]="pausing()" (click)="requestPause()" data-testid="ai-batch-pause">
+                ❚❚ {{ (pausing() ? 'batch.ai.pausing' : 'batch.ai.pause') | t }}
+              </button>
+              <button type="button" class="btn btn--danger" (click)="cancel()" data-testid="ai-batch-cancel-run">
+                {{ 'batch.ai.panel.stop' | t }}
+              </button>
+            </span>
+          </div>
+        }
+
+        @if (queue.run() === 'paused') {
+          <div class="ai-panel__state">
+            @if (queue.pause(); as why) {
+              <div class="ai-note ai-note--warn" role="alert" data-testid="ai-batch-paused">
+                <span aria-hidden="true">⏸</span>
+                <p>
+                  @switch (why.kind) {
+                    @case ('limit') {
+                      {{ 'batch.ai.paused.limit' | t: { count: waiting() } }}
+                      @if (why.reset) {
+                        {{ 'batch.ai.paused.reset' | t: { reset: why.reset } }}
+                      }
+                    }
+                    @case ('breaker') {
+                      {{ 'batch.ai.paused.breaker' | t: { code: why.code ?? '' } }}
+                    }
+                    @case ('cap') {
+                      {{ 'batch.ai.paused.cap' | t: { sent: queue.requests(), count: waiting() } }}
+                    }
+                    @case ('fatal') {
+                      {{ 'batch.ai.paused.fatal' | t: { count: waiting() } }}
+                    }
+                    @default {
+                      {{ 'batch.ai.paused.user' | t: { count: waiting() } }}
+                    }
+                  }
+                </p>
+              </div>
+            }
+            <span class="ai-panel__actions">
+              <button type="button" class="btn btn--primary" (click)="resume()" data-testid="ai-batch-resume">{{ 'batch.ai.resume' | t }}</button>
+              <button type="button" class="btn btn--danger" (click)="cancel()" data-testid="ai-batch-cancel-run">{{ 'batch.ai.panel.stop' | t }}</button>
+            </span>
+          </div>
+        }
+
+        @if (queue.run() === 'done') {
+          <div class="ai-panel__state" data-testid="ai-batch-summary">
+            <span class="ai-status__chips">
+              @if (readyCount() > 0) {
+                <span class="ai-chip ai-chip--ok">{{ 'batch.ai.done.review' | t: { count: readyCount() } }}</span>
+              }
+              @if (freeCount() > 0) {
+                <span class="ai-chip ai-chip--ok">{{ 'batch.ai.done.free' | t: { count: freeCount() } }}</span>
+              }
+              @if (partialCount() > 0) {
+                <span class="ai-chip ai-chip--warn">{{ 'batch.ai.done.partial' | t: { count: partialCount() } }}</span>
+              }
+              @if (counts().failed > 0) {
+                <span class="ai-chip ai-chip--err">{{ 'batch.ai.done.failed' | t: { count: counts().failed } }}</span>
+              }
+            </span>
+            <span class="ai-panel__actions">
+              @if (counts().done > 0) {
+                <button type="button" class="btn btn--primary" (click)="reviewFirst.emit()" data-testid="ai-batch-review-first">
+                  {{ 'batch.ai.done.first' | t }}
+                </button>
+              }
+              @if (retryCount() > 0) {
+                <button type="button" class="btn btn--ghost" (click)="retryFailed()" data-testid="ai-batch-retry">
+                  {{ 'batch.ai.panel.retry' | t: { count: retryCount() } }}
+                </button>
+              }
+              <button type="button" class="btn btn--ghost" (click)="dismiss()" data-testid="ai-batch-close">
+                {{ 'batch.ai.done.close' | t }}
+              </button>
+            </span>
+          </div>
+        }
+
+        @if (offline() && queue.run() !== 'running') {
+          <div class="ai-note ai-note--warn" role="alert" data-testid="ai-batch-offline-panel">
+            <span aria-hidden="true">⚠</span>
+            <p>{{ 'batch.ai.connect.offline' | t }}</p>
+          </div>
+        }
+
+        <ul class="ai-panel__list" [attr.aria-label]="'batch.ai.details.list' | t">
+          @for (entry of list(); track entry.row.id) {
+            <li>
+              <button
+                type="button"
+                class="ai-panel__row"
+                [class.ai-panel__row--on]="entry.row.id === selectedId()"
+                [attr.aria-pressed]="entry.row.id === selectedId()"
+                (click)="queue.pickDetails(entry.row.id); queue.detailsOpen() || queue.openDetails(entry.row.id)"
+                [attr.data-testid]="'ai-bdetails-item-' + entry.row.id"
+              >
+                <span class="ai-panel__top">
+                  <b>{{ entry.name }}</b>
+                  <span class="ai-chip ai-chip--{{ stateOf(entry.row).tone || 'idle' }}">{{ stateOf(entry.row).key | t: stateParams(entry.row) }}</span>
+                </span>
+                @if (rowNote(entry.row); as note) {
+                  <small>{{ note }}</small>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+
+        <button
+          type="button"
+          class="ai-panel__toggle"
+          [attr.aria-expanded]="queue.detailsOpen()"
+          (click)="toggleDetails()"
+          data-testid="ai-batch-details"
+        >
+          {{ 'batch.ai.panel.details' | t }} {{ queue.detailsOpen() ? '▴' : '▾' }}
+        </button>
+        @if (queue.detailsOpen()) {
+          <app-ai-batch-details />
+        }
+      </div>
+
+      <footer class="ai-panel__foot">
+        <small>{{ 'batch.ai.panel.note' | t }}</small>
+        <small>{{ 'batch.ai.panel.keepRunning' | t }}</small>
+      </footer>
+    </aside>
+  } @else {
+    <button type="button" class="ai-panel-pill" (click)="queue.openPanel()" data-testid="ai-batch-panel-open">
+      ✦ {{ 'batch.ai.panel.count' | t: { done: finished(), total: counts().total } }} · {{ 'batch.ai.panel.open' | t }}
+    </button>
+  }
+}

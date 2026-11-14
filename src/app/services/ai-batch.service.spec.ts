@@ -203,4 +203,20 @@ describe('AiBatchService', () => {
     expect(service.requests()).toBe(0);
     expect(batch.find(item.id)?.aiProposal?.provider).toBe('adjust');
   });
+
+  it('opens the side panel on start; closing it keeps the run and forgetting the run closes it', async () => {
+    expect(service.panelOpen()).toBe(false);
+    service.start(ids.slice(0, 1));
+    expect(service.panelOpen()).toBe(true);
+    service.closePanel();
+    expect(service.panelOpen()).toBe(false);
+    expect(service.run()).toBe('running');
+    await finished();
+    service.openDetails(ids[0]);
+    expect(service.panelOpen()).toBe(true);
+    expect(service.detailsFollow()).toBe(false);
+    service.reset();
+    expect(service.panelOpen()).toBe(false);
+    expect(service.detailsOpen()).toBe(false);
+  });
 });

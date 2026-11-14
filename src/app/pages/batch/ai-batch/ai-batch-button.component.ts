@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, inject, signal } from '@angular/core';
+import { InfoTipComponent } from '../../../components/info-tip/info-tip.component';
 import { AiModelSelectComponent } from '../../../components/ai-model-select/ai-model-select.component';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { AiBatchService } from '../../../services/ai-batch.service';
@@ -10,13 +11,11 @@ import { ToastService } from '../../../services/toast.service';
 import { TranslationService } from '../../../i18n/translation.service';
 import { AI_BATCH_COPILOT_CAP, estimateAiBatch, isEligibleForAiBatch } from '../../../utils/ai-batch.utils';
 
-type Target = { ids: string[] | undefined; failedOnly: boolean };
-
-/** «✦ Trasladar con IA»: the button of the panel header, its menu and the confirmation with the estimate. */
+/** «✦ Trasladar con IA»: the button of the panel header and its one-decision popover (estimate, provider folded under «Cambiar»). */
 @Component({
   selector: 'app-ai-batch-button',
   standalone: true,
-  imports: [CommonModule, TranslationPipe, AiModelSelectComponent],
+  imports: [CommonModule, TranslationPipe, AiModelSelectComponent, InfoTipComponent],
   templateUrl: './ai-batch-button.component.html',
   styleUrl: './ai-batch.scss',
 })
@@ -26,66 +25,63 @@ export class AiBatchButtonComponent {
   private readonly store = inject(BatchStoreService);
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(TranslationService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   @ViewChild('startBtn') startBtn?: ElementRef<HTMLButtonElement>;
   @ViewChild('menuBtn') menuBtn?: ElementRef<HTMLButtonElement>;
-  /** Focus goes into the dialog as soon as it exists, so Escape and Tab work from the keyboard. */
+  /** Focus goes into the popover as soon as it exists, so Escape and Tab work from the keyboard. */
   @ViewChild('dlg') set dialogRoot(el: ElementRef<HTMLElement> | undefined) {
     if (el) {
-      queueMicrotask(() => (el.nativeElement.querySelector<HTMLElement>('.ai-pcard--on') ?? el.nativeElement).focus());
+      queueMicrotask(() => (el.nativeElement.querySelector<HTMLElement>('[data-testid="ai-batch-start"]:not([disabled])') ?? el.nativeElement).focus());
     }
   }
 
   readonly cap = AI_BATCH_COPILOT_CAP;
-  readonly menuOpen = signal(false);
-  readonly target = signal<Target | null>(null);
+  readonly open = signal(false);
+  readonly changing = signal(false);
   readonly cascade = signal(true);
   readonly remember = signal(false);
 
   readonly eligible = computed(() => this.store.items().filter(isEligibleForAiBatch));
   readonly withoutB = computed(() => this.store.items().filter((item) => !item.bPdf).length);
-  readonly failedIds = computed(() =>
-    Object.values(this.queue.rows())
-      .filter((row) => row.phase === 'failed')
-      .map((row) => row.id),
-  );
   readonly provider = this.helper.provider;
   readonly providerName = computed(() => providerName(this.provider()));
   readonly retry = computed(() => this.helper.retry()[this.provider()] !== false);
-  readonly chosen = computed(() => {
-    const target = this.target();
-    if (!target) {
-      return [];
-    }
-    return target.ids ? this.eligible().filter((item) => target.ids?.includes(item.id)) : this.eligible();
-  });
+  readonly chosen = this.eligible;
   readonly estimate = computed(() => estimateAiBatch(this.chosen(), this.provider(), this.retry()));
   readonly isCopilot = computed(() => this.provider() === 'copilot');
   readonly providers = computed(() =>
     (['claude', 'copilot', 'fake'] as AiProvider[]).filter((p) => p !== 'fake' || this.helper.found()['fake'] === true),
   );
   readonly busy = this.queue.busy;
-  toggleMenu(): void {
-    this.menuOpen.update((open) => !open);
-  }
+  readonly modelLabel = computed(
+    () => (this.helper.models()[this.provider()] ?? '').trim() || this.i18n.translate('ai.details.modelDefault'),
+  );
 
-  closeMenu(): void {
-    if (this.menuOpen()) {
-      this.menuOpen.set(false);
-      queueMicrotask(() => this.menuBtn?.nativeElement.focus());
+  toggle(): void {
+    if (this.open()) {
+      this.closeDialog();
+      return;
     }
-  }
-
-  choose(failedOnly: boolean): void {
-    this.menuOpen.set(false);
-    this.target.set({ ids: failedOnly ? this.failedIds() : undefined, failedOnly });
     this.cascade.set(true);
+    this.changing.set(false);
+    this.open.set(true);
     void this.helper.check();
   }
 
   closeDialog(): void {
-    this.target.set(null);
-    queueMicrotask(() => this.menuBtn?.nativeElement.focus());
+    if (this.open()) {
+      this.open.set(false);
+      queueMicrotask(() => this.menuBtn?.nativeElement.focus());
+    }
+  }
+
+  /** Click outside the popover closes it (it is not modal, so the list stays usable). */
+  @HostListener('document:mousedown', ['$event'])
+  onOutside(event: MouseEvent): void {
+    if (this.open() && !this.host.nativeElement.contains(event.target as Node)) {
+      this.open.set(false);
+    }
   }
 
   setProvider(value: string): void {
@@ -123,8 +119,7 @@ export class AiBatchButtonComponent {
   }
 
   start(): void {
-    const target = this.target();
-    if (!target || !this.ready()) {
+    if (!this.open() || !this.ready()) {
       return;
     }
     if (!this.helper.consent()) {
@@ -135,7 +130,7 @@ export class AiBatchButtonComponent {
       { cascade: this.cascade() },
     );
     if (result === 'started') {
-      this.target.set(null);
+      this.open.set(false);
       return;
     }
     const key = toastKey(result);

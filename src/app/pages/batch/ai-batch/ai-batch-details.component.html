@@ -1,61 +1,26 @@
-<div class="migration-backdrop ai-details__backdrop" (click)="close()" data-testid="ai-bdetails-backdrop"></div>
-<div
-  class="ai-details ai-bdetails"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="ai-bdetails-title"
-  data-testid="ai-bdetails"
-  tabindex="-1"
-  #dialog
-  (keydown.escape)="close(); $event.stopPropagation()"
-  (keydown.tab)="trapFocus($any($event), dialog)"
->
-  <header class="ai-details__head">
-    <h2 id="ai-bdetails-title">{{ 'batch.ai.details.title' | t }}</h2>
+<section class="ai-bdetails ai-bdetails--inline" aria-live="polite" data-testid="ai-bdetails" #dialog>
+  <header class="ai-bdetails__bar">
     <span class="ai-details__chip">{{ providerLabel() }} · {{ modelName() }}</span>
-    <span class="ai-details__status" role="status">{{ 'batch.ai.details.run' | t: { done: queue.counts().done + queue.counts().failed + queue.counts().cancelled, total: queue.counts().total, time: runElapsed() } }}</span>
     <span class="ai-details__grow"></span>
     <label class="ai-bdetails__follow">
-      <input type="checkbox" [checked]="follow()" (change)="follow.set($any($event.target).checked)" data-testid="ai-bdetails-follow" />
+      <input type="checkbox" [checked]="follow()" (change)="setFollow($any($event.target).checked)" data-testid="ai-bdetails-follow" />
       {{ 'batch.ai.details.follow' | t }}
     </label>
     <button type="button" class="btn btn--ghost" (click)="copy(true)" data-testid="ai-bdetails-copy-all">{{ 'batch.ai.details.copyAll' | t }}</button>
-    <button #closeBtn type="button" class="btn btn--ghost" (click)="close()" data-testid="ai-bdetails-close">✕ {{ 'ai.details.close' | t }}</button>
   </header>
 
-  <div class="ai-bdetails__main">
-    <nav class="ai-bdetails__list" [attr.aria-label]="'batch.ai.details.list' | t">
-      <span class="ai-bdetails__label">{{ 'batch.ai.details.list' | t }}</span>
-      @for (entry of list(); track entry.row.id) {
-        <button
-          type="button"
-          class="ai-bdetails__item"
-          [class.ai-bdetails__item--on]="entry.row.id === selectedId()"
-          [attr.aria-current]="entry.row.id === selectedId() ? 'true' : null"
-          (click)="pick(entry.row.id)"
-          [attr.data-testid]="'ai-bdetails-item-' + entry.row.id"
-        >
-          <span class="ai-bdetails__top">
-            <b>{{ entry.name }}</b>
-            <span class="ai-chip ai-chip--{{ stateOf(entry.row).tone || 'idle' }}">{{ stateOf(entry.row).key | t: stateParams(entry.row) }}</span>
-          </span>
-          <small>{{ rowNote(entry.row) }}</small>
-        </button>
-      }
-    </nav>
-
-    <div class="ai-bdetails__detail">
-      @if (row(); as r) {
-        <div class="ai-bdetails__title">
-          <b>{{ name() }}</b>
-          <span class="ai-details__cap">{{ 'batch.ai.details.position' | t: { n: position().n, total: position().total, time: elapsed() } }}</span>
-          <span class="ai-details__grow"></span>
-          @if (active()) {
-            <button type="button" class="btn btn--danger" (click)="cancelThis()" data-testid="ai-bdetails-cancel">{{ 'batch.ai.skipOne' | t }}</button>
-          } @else {
-            <button type="button" class="btn btn--ghost" (click)="copy(false)" data-testid="ai-bdetails-copy">{{ 'ai.details.copy' | t }}</button>
-          }
-        </div>
+  <div class="ai-bdetails__detail">
+    @if (row(); as r) {
+      <div class="ai-bdetails__title">
+        <b>{{ name() }}</b>
+        <span class="ai-details__cap">{{ 'batch.ai.details.position' | t: { n: position().n, total: position().total, time: elapsed() } }}</span>
+        <span class="ai-details__grow"></span>
+        @if (active()) {
+          <button type="button" class="btn btn--danger" (click)="cancelThis()" data-testid="ai-bdetails-cancel">{{ 'batch.ai.skipOne' | t }}</button>
+        } @else {
+          <button type="button" class="btn btn--ghost" (click)="copy(false)" data-testid="ai-bdetails-copy">{{ 'ai.details.copy' | t }}</button>
+        }
+      </div>
 
         <div class="ai-details__tabs" role="tablist" (keydown)="tabKey($event, dialog)">
           @for (name of tabs; track name) {
@@ -173,12 +138,5 @@
       } @else {
         <p class="ai-details__cap">{{ 'batch.ai.details.empty' | t }}</p>
       }
-    </div>
   </div>
-
-  <footer class="ai-details__foot">
-    <span class="ai-details__cap">{{ 'ai.details.foot.live' | t }}</span>
-    <span class="ai-details__grow"></span>
-    <button type="button" class="btn btn--primary" (click)="close()">{{ 'ai.details.close' | t }}</button>
-  </footer>
-</div>
+</section>

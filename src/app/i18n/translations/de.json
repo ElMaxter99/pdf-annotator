@@ -736,7 +736,7 @@
         "capNote": "Bei mehr als {{cap}} Paaren hält die Warteschlange bei {{cap}} an und wartet auf dein «Fortfahren». Keine automatischen Wiederholungen.",
         "privacy": "Die PDFs A und B jedes Paars werden einzeln an dein lokales {{provider}} gesendet. Nichts wird automatisch angewendet: Du prüfst jeden Vorschlag selbst.",
         "remember": "Nicht mehr fragen",
-        "start": "{{count}} PDFs übertragen",
+        "start": "{{count}} PDF übertragen",
         "cancel": "Abbrechen",
         "provider": "Anbieter",
         "model": {
@@ -847,6 +847,24 @@
           "notUniform": "die Verschiebung ist nicht im ganzen PDF gleich",
           "lowConfidence": "nicht genug Anker für alle Felder"
         }
+      },
+      "pop": {
+        "summary": "{{count}} PDF mit A und B · {{fields}} Felder",
+        "requests": "{{min}} bis {{max}} Anfragen an die KI",
+        "requestsCopilot": "Bis zu {{max}} Anfragen (Limit {{cap}})",
+        "change": "Ändern",
+        "sent": "Was gesendet wird"
+      },
+      "panel": {
+        "title": "Übertragung mit KI",
+        "close": "Panel schließen",
+        "count": "{{done}} von {{total}} PDFs",
+        "stop": "Stoppen",
+        "retry": "{{count}} wiederholen",
+        "details": "Details",
+        "note": "Nichts wird von selbst angewendet: Sie prüfen jeden Vorschlag.",
+        "keepRunning": "Sie können dieses Panel schließen: die Arbeit läuft weiter.",
+        "open": "Öffnen"
       }
     }
   },
