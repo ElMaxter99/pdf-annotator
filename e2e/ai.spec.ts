@@ -264,3 +264,24 @@ test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos
   // Once finished, the row keeps a link to what happened.
   await expect(page.getByTestId('ai-chip-details').first()).toBeVisible();
 });
+
+test('en una web pública (no local) no hay rastro de la IA', async ({ page }) => {
+  await stubAnalytics(page);
+  await page.route('http://app.test/**', async (route) => {
+    const url = new URL(route.request().url());
+    const response = await route.fetch({ url: `http://127.0.0.1:4300${url.pathname}${url.search}` });
+    await route.fulfill({ response });
+  });
+  await page.goto('http://app.test/landing');
+  await page
+    .locator('input[type=file]')
+    .setInputFiles([file('a.pdf', pdf, 'application/pdf'), file('b.pdf', pdf, 'application/pdf')]);
+  await page.waitForURL('**/lote');
+  await page.getByTestId('next-templates').click();
+  await page.getByTestId('input-templates').setInputFiles(file('a.json', json, 'application/json'));
+  await page.getByTestId('open-panel').click();
+  await expect(page.getByTestId('download-ready')).toBeVisible();
+  await expect(page.getByTestId('ai-batch-button')).toHaveCount(0);
+  await page.getByText('a.pdf').first().click();
+  await expect(page.getByTestId('ai-chip')).toHaveCount(0);
+});

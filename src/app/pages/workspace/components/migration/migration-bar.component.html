@@ -24,7 +24,7 @@
       <span class="migration-bar__count" data-testid="batch-position">{{ 'batch.editor.position' | t: { index: ctx.index + 1, total: ctx.total } }}</span>
       <button type="button" class="btn btn--ghost" [disabled]="ctx.index === ctx.total - 1" (click)="vm.goBatchItem(1)" [attr.aria-label]="'batch.editor.next' | t" data-testid="batch-next">›</button>
     </div>
-    @if (vm.aiPendingOthers() > 0) {
+    @if (vm.aiHelper.available && vm.aiPendingOthers() > 0) {
       <span class="migration-bar__count" data-testid="ai-pending">{{ 'ai.review.pending' | t: { count: vm.aiPendingOthers() } }}</span>
       <button type="button" class="btn btn--ghost" (click)="vm.goNextWithProposal()" data-testid="ai-next-proposal">{{ 'ai.review.nextWithProposal' | t }}</button>
     }
@@ -54,6 +54,7 @@
       </div>
     }
 
+    @if (vm.aiHelper.available) {
     <div class="migration-menu ai-chip-wrap">
       <button
         #aiChip
@@ -109,6 +110,7 @@
         </div>
       }
     </div>
+    }
     <ng-template #models>
       <span class="ai-panel__label" id="ai-panel-model-label">
         {{ (vm.aiHelper.provider() === 'copilot' ? 'ai.panel.model.copilot' : 'ai.panel.model.claude') | t }}
@@ -314,6 +316,7 @@
               <strong>{{ 'batch.editor.putA.adjust' | t }}</strong>
               <small>{{ 'batch.editor.putA.adjustText' | t }}</small>
             </button>
+            @if (vm.aiHelper.available) {
             <button
               type="button"
               role="menuitem"
@@ -324,6 +327,7 @@
               <strong>✦ {{ 'ai.menu.title' | t }} <span class="ai-new">{{ 'ai.menu.new' | t }}</span></strong>
               <small>{{ 'ai.menu.text' | t: { provider: providerName() } }}</small>
             </button>
+            }
             @if (vm.sizeMismatch()) {
               <label class="migration-menu__check" data-testid="put-a-fit">
                 <input
@@ -362,7 +366,9 @@
   </div>
   <div class="migration-hints">
     <app-adjust-review [vm]="vm" (closeRequested)="closeNotice('adjust')"></app-adjust-review>
-    <app-ai-review [vm]="vm" (closeRequested)="closeNotice('ai')"></app-ai-review>
+    @if (vm.aiHelper.available) {
+      <app-ai-review [vm]="vm" (closeRequested)="closeNotice('ai')"></app-ai-review>
+    }
     @if (vm.migration() && vm.templateFieldsA() === 0 && !vm.isNoticeClosed('noTemplate')) {
       <div class="migration-hint" role="status" data-testid="no-template-a">
         <span>{{ 'batch.editor.noA.hint' | t }}</span>
