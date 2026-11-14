@@ -22,34 +22,14 @@
           'batch.readyCount' | t: { ready: readyCount(), total: total() }
         }}</span>
       </div>
-      <input #testDataInput type="file" accept=".json,application/json" hidden
-        (change)="onTestDataFile($event)" data-testid="batch-testdata-input" />
-      <button
-        type="button"
-        class="btn"
-        (click)="testDataInput.click()"
-        data-testid="batch-testdata"
-        [attr.title]="'batch.testData.hint' | t"
-      >
-        {{ 'batch.testData.button' | t }}
-        @if (previewSettings.hasTestData()) { · {{ 'batch.testData.loaded' | t }} }
-      </button>
-      @if (previewSettings.hasTestData()) {
-        <button type="button" class="btn btn--ghost" (click)="previewSettings.clearTestData()"
-          data-testid="batch-testdata-clear">{{ 'batch.testData.remove' | t }}</button>
-      }
       @if (aiHelper.available) {
         <app-ai-batch-button />
       }
-      <button
-        type="button"
-        class="btn"
-        [disabled]="readyCount() === 0"
-        (click)="downloadReady()"
-        data-testid="download-ready"
-      >
-        {{ 'batch.downloadReady' | t: { count: readyCount() } }}
-      </button>
+      @if (readyCount() > 0) {
+        <button type="button" class="btn" (click)="downloadReady()" data-testid="download-ready">
+          {{ 'batch.downloadReady' | t: { count: readyCount() } }}
+        </button>
+      }
       <button
         type="button"
         class="btn btn--primary"
@@ -59,6 +39,52 @@
       >
         {{ 'batch.reviewNext' | t }}
       </button>
+      <input #testDataInput type="file" accept=".json,application/json" hidden
+        (change)="onTestDataFile($event)" data-testid="batch-testdata-input" />
+      <span class="batch-more" (keydown.escape)="moreOpen.set(false)">
+        <button
+          type="button"
+          class="btn btn--ghost batch-more__btn"
+          [attr.aria-expanded]="moreOpen()"
+          aria-haspopup="menu"
+          [attr.aria-label]="'batch.more' | t"
+          (click)="moreOpen.set(!moreOpen())"
+          data-testid="batch-more"
+        >
+          ⋯
+        </button>
+        @if (moreOpen()) {
+          <div class="batch-more__menu" role="menu" data-testid="batch-more-menu">
+            @if (readyCount() === 0) {
+              <button type="button" role="menuitem" class="batch-more__item" disabled data-testid="download-ready">
+                {{ 'batch.downloadReady' | t: { count: readyCount() } }}
+              </button>
+            }
+            <button
+              type="button"
+              role="menuitem"
+              class="batch-more__item"
+              (click)="moreOpen.set(false); testDataInput.click()"
+              [attr.title]="'batch.testData.hint' | t"
+              data-testid="batch-testdata"
+            >
+              {{ 'batch.testData.button' | t }}
+              @if (previewSettings.hasTestData()) { · {{ 'batch.testData.loaded' | t }} }
+            </button>
+            @if (previewSettings.hasTestData()) {
+              <button
+                type="button"
+                role="menuitem"
+                class="batch-more__item"
+                (click)="moreOpen.set(false); previewSettings.clearTestData()"
+                data-testid="batch-testdata-clear"
+              >
+                {{ 'batch.testData.remove' | t }}
+              </button>
+            }
+          </div>
+        }
+      </span>
     }
   </header>
 
@@ -340,7 +366,7 @@
       }
       @if (counts().all > 0) {
         <div
-          class="batch-drop batch-drop--hint batch-versions"
+          class="batch-drop batch-drop--hint batch-versions batch-versions--line"
           [class.batch-drop--active]="dragActive()"
           [class.batch-versions--warn]="unpairedB().length > 0"
           (dragover)="onDragOver($event)"
@@ -356,10 +382,8 @@
               <span>{{ 'batch.versionsDrop.unpairedText' | t }}</span>
             } @else if (withB() > 0) {
               <strong>{{ 'batch.versionsDrop.addedTitle' | t: { count: withB() } }}</strong>
-              <span>{{ 'batch.versionsDrop.addedText' | t }}</span>
             } @else {
               <strong>{{ 'batch.versionsDrop.title' | t }}</strong>
-              <span>{{ 'batch.versionsDrop.text' | t }}</span>
             }
           </div>
           <button
@@ -491,9 +515,9 @@
               <strong class="batch-card__name">{{ row.item.name }}</strong>
               <span class="batch-card__meta">
                 <span
-                  class="batch-chip"
-                  [class.batch-chip--ok]="row.state === 'ready'"
-                  [class.batch-chip--warn]="row.state !== 'ready'"
+                  class="batch-state"
+                  [class.batch-state--ok]="row.state === 'ready'"
+                  [class.batch-state--warn]="row.state !== 'ready'"
                   >{{ 'batch.state.' + row.state | t }}</span
                 >
                 @if (row.item.bPdf) {
@@ -536,9 +560,9 @@
               <span class="batch-row__new" role="cell">{{ row.item.bName ?? '—' }}</span>
               <span role="cell">
                 <span
-                  class="batch-chip"
-                  [class.batch-chip--ok]="row.state === 'ready'"
-                  [class.batch-chip--warn]="row.state !== 'ready'"
+                  class="batch-state"
+                  [class.batch-state--ok]="row.state === 'ready'"
+                  [class.batch-state--warn]="row.state !== 'ready'"
                   >{{ 'batch.state.' + row.state | t }}</span
                 >
                 @if (aiHelper.available) {

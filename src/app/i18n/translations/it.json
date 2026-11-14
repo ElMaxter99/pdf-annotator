@@ -866,7 +866,8 @@
         "keepRunning": "Puoi chiudere questo pannello: il lavoro continua.",
         "open": "Apri"
       }
-    }
+    },
+    "more": "Altre azioni"
   },
   "preview": {
     "mode": {

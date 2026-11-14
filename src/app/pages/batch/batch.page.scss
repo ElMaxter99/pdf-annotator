@@ -668,3 +668,119 @@ app-ai-batch-chip {
   display: block;
   margin-top: 6px;
 }
+
+// ---- Panel del lote compacto (P-46) ----
+.batch-more {
+  position: relative;
+  display: inline-flex;
+}
+
+.batch-more__btn {
+  min-width: 40px;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.batch-more__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.batch-more__item {
+  all: unset;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+// B strip: one line; the dashed border only shows while dragging files over it
+.batch-versions--line {
+  padding: 8px 16px;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--text) 14%, transparent);
+  background: transparent;
+
+  &.batch-drop--active {
+    border-style: dashed;
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+
+  &.batch-versions--warn {
+    border-color: var(--warn, #b7791f);
+    background: color-mix(in srgb, var(--warn, #b7791f) 10%, transparent);
+  }
+}
+
+// State = dot + word (amber asks for attention, accent is done)
+.batch-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text);
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+}
+
+.batch-state--ok::before {
+  background: var(--accent);
+}
+
+.batch-state--warn::before {
+  background: #fbbf24;
+}
+
+:host-context(:root.theme-light) .batch-state--warn::before {
+  background: #b45309;
+}
+
+// Row actions show on hover or focus (and on the active row)
+.batch-row:not(.batch-row--head) .batch-row__actions {
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.batch-row:hover .batch-row__actions,
+.batch-row:focus-within .batch-row__actions,
+.batch-row--active .batch-row__actions {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .batch-row:not(.batch-row--head) .batch-row__actions {
+    transition: none;
+  }
+}

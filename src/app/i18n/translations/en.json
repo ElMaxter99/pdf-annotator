@@ -866,7 +866,8 @@
         "keepRunning": "You can close this panel: the work goes on.",
         "open": "Open"
       }
-    }
+    },
+    "more": "More actions"
   },
   "preview": {
     "mode": {
