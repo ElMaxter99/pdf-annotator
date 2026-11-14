@@ -128,7 +128,6 @@
       "title": "Miniatures",
       "pageLabel": "Pàgina {{index}}"
     },
-    "jsonHint": "Enganxa les coordenades o importa-les des d'un fitxer JSON amb el mateix format que l'exportat.",
     "advancedTitle": "Opcions avançades",
     "advancedHint": "Activa les guies i el snapping només quan necessitis més precisió.",
     "includeAdvancedJsonFields": "Inclou propietats avançades al JSON",
@@ -148,6 +147,11 @@
       "annotations": "Anotacions",
       "templates": "Plantilles",
       "advanced": "Avançat"
+    },
+    "empty": {
+      "title": "Encara no hi ha anotacions",
+      "text": "Fes clic al PDF per col·locar la primera, o porta les d'una altra feina.",
+      "paste": "Enganxa JSON"
     }
   },
   "guides": {
@@ -867,7 +871,13 @@
         "open": "Obre"
       }
     },
-    "more": "Més accions"
+    "more": "Més accions",
+    "how": {
+      "title": "Com funciona",
+      "step1": "Puja els PDF del lot (la versió actual, A).",
+      "step2": "Afegeix-ne les plantilles en JSON o enganxa-les.",
+      "step3": "Puja les versions noves (B), trasllada els camps i revisa cada PDF."
+    }
   },
   "preview": {
     "mode": {
@@ -901,8 +911,7 @@
       "syntaxError": "JSON no vàlid a la línia {{line}}, columna {{column}}.",
       "shapeError": "El JSON de prova ha de ser un objecte o una llista.",
       "tooLarge": "El fitxer supera els 5 MB.",
-      "readFailed": "No s'ha pogut llegir el fitxer.",
-      "empty": "Sense dades de prova: s'usen els valors de mostra."
+      "readFailed": "No s'ha pogut llegir el fitxer."
     },
     "origin": {
       "group": "Origen del que es pinta",
@@ -1251,5 +1260,29 @@
     "open": "Quant a",
     "title": "Quant a {{app}}",
     "close": "Tanca"
+  },
+  "firstSteps": {
+    "title": "Tres passos per començar",
+    "close": "Tanca",
+    "step1": {
+      "title": "Fes clic al PDF",
+      "text": "Col·loca un camp on anirà el text."
+    },
+    "step2": {
+      "title": "Posa-li nom i mida",
+      "text": "Només es desa al JSON."
+    },
+    "step3": {
+      "title": "Descarrega el PDF o el JSON",
+      "text": "Quan acabis, des de la barra."
+    },
+    "import": "Importa un JSON",
+    "never": "No tornis a mostrar",
+    "hint": {
+      "title": "Primer camp col·locat",
+      "drag": "Arrossega'l per moure'l",
+      "delete": "l'esborra",
+      "undo": "desfà"
+    }
   }
 }

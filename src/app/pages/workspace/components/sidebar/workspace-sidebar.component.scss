@@ -163,3 +163,24 @@
   width: 36px;
   height: 36px;
 }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px;
+  text-align: center;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+}
+
+.empty-state__icon {
+  font-size: 1.9rem;
+}

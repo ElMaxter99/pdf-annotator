@@ -70,17 +70,31 @@
       <button type="button" class="btn btn--ghost" (click)="vm.setSidebarTab('document')">{{ 'batch.doc.noTemplateGo' | t }}</button>
     </div>
   </ng-container>
-  <div class="sidebar-actions">
-    <button type="button" class="btn" (click)="vm.triggerImportCoords()">
-      {{ 'sidebar.importJsonFile' | t }}
-    </button>
-    <button type="button" class="btn" (click)="vm.applyCoordsText()">
-      {{ 'sidebar.applyJson' | t }}
-    </button>
-  </div>
+  @if (vm.annotationCount() === 0 && !vm.migration()) {
+    <div class="empty-state" data-testid="annotations-empty">
+      <span class="empty-state__icon" aria-hidden="true">🗂️</span>
+      <b>{{ 'sidebar.empty.title' | t }}</b>
+      <p>{{ 'sidebar.empty.text' | t }}</p>
+      <button type="button" class="btn" (click)="vm.triggerImportCoords()" data-testid="empty-import">
+        {{ 'sidebar.importJsonFile' | t }}
+      </button>
+      <button type="button" class="btn btn--ghost btn--small" (click)="pasteJson()" data-testid="empty-paste">
+        {{ 'sidebar.empty.paste' | t }}
+      </button>
+    </div>
+  } @else {
+    <div class="sidebar-actions">
+      <button type="button" class="btn" (click)="vm.triggerImportCoords()">
+        {{ 'sidebar.importJsonFile' | t }}
+      </button>
+      <button type="button" class="btn" (click)="vm.applyCoordsText()">
+        {{ 'sidebar.applyJson' | t }}
+      </button>
+    </div>
+  }
   <section class="json-panel" [class.json-panel--collapsed]="vm.jsonPanelCollapsed()">
     <div class="json-panel__header">
-      <h5 class="json-panel__title">{{ 'sidebar.title' | t }} <app-info-tip [text]="'sidebar.jsonHint' | t"></app-info-tip></h5>
+      <h5 class="json-panel__title">{{ 'sidebar.title' | t }}</h5>
       <button type="button" class="json-panel__toggle" (click)="vm.toggleJsonPanelCollapsed()"
         [attr.aria-expanded]="!vm.jsonPanelCollapsed()">
         <span>{{ (vm.jsonPanelCollapsed() ? 'sidebar.jsonPanelShow' : 'sidebar.jsonPanelHide') | t }}</span>
@@ -372,7 +386,6 @@
       </p>
     </ng-container>
     <ng-template #dataStatus>
-      <p class="preview-data__status" *ngIf="!vm.previewSettings.hasTestData()">{{ 'preview.testData.empty' | t }}</p>
       <ng-container *ngIf="vm.previewSettings.hasTestData() && vm.testDataStats() as stats">
         <p class="preview-data__status" role="status">
           {{ 'preview.testData.resolved' | t: { resolved: stats.resolved, total: stats.total } }}

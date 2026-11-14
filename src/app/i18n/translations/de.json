@@ -128,7 +128,6 @@
       "title": "Miniaturen",
       "pageLabel": "Seite {{index}}"
     },
-    "jsonHint": "Fügen Sie Koordinaten ein oder importieren Sie sie aus einer JSON-Datei mit demselben Format wie die exportierten Daten.",
     "advancedTitle": "Erweiterte Optionen",
     "advancedHint": "Aktivieren Sie Hilfslinien und Einrast-Hilfen nur bei Bedarf für mehr Präzision.",
     "includeAdvancedJsonFields": "Erweiterte Eigenschaften in JSON einschließen",
@@ -148,6 +147,11 @@
       "annotations": "Anmerkungen",
       "templates": "Vorlagen",
       "advanced": "Erweitert"
+    },
+    "empty": {
+      "title": "Noch keine Anmerkungen",
+      "text": "Klicken Sie auf das PDF, um die erste zu setzen, oder holen Sie sie aus einer anderen Arbeit.",
+      "paste": "JSON einfügen"
     }
   },
   "guides": {
@@ -867,7 +871,13 @@
         "open": "Öffnen"
       }
     },
-    "more": "Weitere Aktionen"
+    "more": "Weitere Aktionen",
+    "how": {
+      "title": "So funktioniert's",
+      "step1": "Laden Sie die PDFs des Stapels hoch (die aktuelle Version, A).",
+      "step2": "Fügen Sie deren Vorlagen als JSON hinzu oder fügen Sie sie ein.",
+      "step3": "Laden Sie die neuen Versionen (B) hoch, übertragen Sie die Felder und prüfen Sie jedes PDF."
+    }
   },
   "preview": {
     "mode": {
@@ -901,8 +911,7 @@
       "syntaxError": "Ungültiges JSON in Zeile {{line}}, Spalte {{column}}.",
       "shapeError": "Das Test-JSON muss ein Objekt oder eine Liste sein.",
       "tooLarge": "Die Datei ist größer als 5 MB.",
-      "readFailed": "Die Datei konnte nicht gelesen werden.",
-      "empty": "Keine Testdaten: Musterwerte werden verwendet."
+      "readFailed": "Die Datei konnte nicht gelesen werden."
     },
     "origin": {
       "group": "Herkunft des Angezeigten",
@@ -1251,5 +1260,29 @@
     "open": "Info",
     "title": "Über {{app}}",
     "close": "Schließen"
+  },
+  "firstSteps": {
+    "title": "Drei Schritte zum Start",
+    "close": "Schließen",
+    "step1": {
+      "title": "Klicken Sie auf das PDF",
+      "text": "Setzen Sie ein Feld dorthin, wo der Text stehen soll."
+    },
+    "step2": {
+      "title": "Name und Größe festlegen",
+      "text": "Wird nur im JSON gespeichert."
+    },
+    "step3": {
+      "title": "PDF oder JSON herunterladen",
+      "text": "Wenn Sie fertig sind, über die Leiste."
+    },
+    "import": "JSON importieren",
+    "never": "Nicht mehr anzeigen",
+    "hint": {
+      "title": "Erstes Feld gesetzt",
+      "drag": "Zum Verschieben ziehen",
+      "delete": "löscht es",
+      "undo": "macht rückgängig"
+    }
   }
 }

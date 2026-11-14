@@ -128,7 +128,6 @@
       "title": "Miniaturas",
       "pageLabel": "Página {{index}}"
     },
-    "jsonHint": "Pega las coordenadas o impórtalas desde un JSON con el mismo formato que el archivo exportado.",
     "advancedTitle": "Opciones avanzadas",
     "advancedHint": "Activa las guías y el snapping solo cuando necesites más precisión.",
     "includeAdvancedJsonFields": "Incluir propiedades avanzadas en el JSON",
@@ -148,6 +147,11 @@
       "annotations": "Anotaciones",
       "templates": "Plantillas",
       "advanced": "Avanzado"
+    },
+    "empty": {
+      "title": "Aún no hay anotaciones",
+      "text": "Haz clic en el PDF para colocar la primera, o trae las de otro trabajo.",
+      "paste": "Pegar JSON"
     }
   },
   "guides": {
@@ -867,7 +871,13 @@
         "open": "Abrir"
       }
     },
-    "more": "Más acciones"
+    "more": "Más acciones",
+    "how": {
+      "title": "Cómo funciona",
+      "step1": "Sube los PDF del lote (la versión actual, A).",
+      "step2": "Añade sus plantillas en JSON o pégalas.",
+      "step3": "Sube las versiones nuevas (B), traslada los campos y revisa cada PDF."
+    }
   },
   "preview": {
     "mode": {
@@ -901,8 +911,7 @@
       "syntaxError": "JSON no válido en la línea {{line}}, columna {{column}}.",
       "shapeError": "El JSON de prueba debe ser un objeto o una lista.",
       "tooLarge": "El archivo supera los 5 MB.",
-      "readFailed": "No se pudo leer el archivo.",
-      "empty": "Sin datos de prueba: se usan los valores de muestra."
+      "readFailed": "No se pudo leer el archivo."
     },
     "origin": {
       "group": "Origen de lo que se pinta",
@@ -1251,5 +1260,29 @@
     "open": "Acerca de",
     "title": "Acerca de {{app}}",
     "close": "Cerrar"
+  },
+  "firstSteps": {
+    "title": "Tres pasos para empezar",
+    "close": "Cerrar",
+    "step1": {
+      "title": "Haz clic en el PDF",
+      "text": "Coloca un campo donde irá el texto."
+    },
+    "step2": {
+      "title": "Ponle nombre y tamaño",
+      "text": "Se guarda solo en el JSON."
+    },
+    "step3": {
+      "title": "Descarga el PDF o el JSON",
+      "text": "Cuando termines, desde la barra."
+    },
+    "import": "Importar un JSON",
+    "never": "No volver a mostrar",
+    "hint": {
+      "title": "Primer campo colocado",
+      "drag": "Arrástralo para moverlo",
+      "delete": "lo borra",
+      "undo": "deshace"
+    }
   }
 }

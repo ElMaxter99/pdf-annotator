@@ -139,6 +139,16 @@
                 {{ 'batch.step1.choose' | t }}
               </button>
             </div>
+            @if (draftPdfs().length === 0) {
+              <details class="batch-how" data-testid="batch-how">
+                <summary>{{ 'batch.how.title' | t }}</summary>
+                <ol>
+                  <li>{{ 'batch.how.step1' | t }}</li>
+                  <li>{{ 'batch.how.step2' | t }}</li>
+                  <li>{{ 'batch.how.step3' | t }}</li>
+                </ol>
+              </details>
+            }
             <ul class="batch-files" data-testid="draft-pdfs">
               @for (pdf of draftPdfs(); track $index) {
                 <li>

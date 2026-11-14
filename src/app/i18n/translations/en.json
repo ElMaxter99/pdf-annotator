@@ -128,7 +128,6 @@
       "title": "Thumbnails",
       "pageLabel": "Page {{index}}"
     },
-    "jsonHint": "Paste coordinates or import them from a JSON file following the same format as the exported data.",
     "advancedTitle": "Advanced options",
     "advancedHint": "Toggle guides and snapping helpers when you need extra precision.",
     "includeAdvancedJsonFields": "Include advanced properties in JSON",
@@ -148,6 +147,11 @@
       "annotations": "Annotations",
       "templates": "Templates",
       "advanced": "Advanced"
+    },
+    "empty": {
+      "title": "No annotations yet",
+      "text": "Click on the PDF to place the first one, or bring them from another job.",
+      "paste": "Paste JSON"
     }
   },
   "guides": {
@@ -867,7 +871,13 @@
         "open": "Open"
       }
     },
-    "more": "More actions"
+    "more": "More actions",
+    "how": {
+      "title": "How it works",
+      "step1": "Upload the batch's PDFs (the current version, A).",
+      "step2": "Add their templates as JSON or paste them.",
+      "step3": "Upload the new versions (B), move the fields over and review each PDF."
+    }
   },
   "preview": {
     "mode": {
@@ -901,8 +911,7 @@
       "syntaxError": "Invalid JSON at line {{line}}, column {{column}}.",
       "shapeError": "The test JSON must be an object or a list.",
       "tooLarge": "The file is larger than 5 MB.",
-      "readFailed": "The file could not be read.",
-      "empty": "No test data: sample values are used."
+      "readFailed": "The file could not be read."
     },
     "origin": {
       "group": "Where each text comes from",
@@ -1251,5 +1260,29 @@
     "open": "About",
     "title": "About {{app}}",
     "close": "Close"
+  },
+  "firstSteps": {
+    "title": "Three steps to get started",
+    "close": "Close",
+    "step1": {
+      "title": "Click on the PDF",
+      "text": "Place a field where the text will go."
+    },
+    "step2": {
+      "title": "Give it a name and size",
+      "text": "It is only saved in the JSON."
+    },
+    "step3": {
+      "title": "Download the PDF or the JSON",
+      "text": "When you finish, from the bar."
+    },
+    "import": "Import a JSON",
+    "never": "Don't show again",
+    "hint": {
+      "title": "First field placed",
+      "drag": "Drag it to move it",
+      "delete": "deletes it",
+      "undo": "undoes"
+    }
   }
 }

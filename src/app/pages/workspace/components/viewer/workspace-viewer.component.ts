@@ -3,6 +3,7 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { AlignMode, DistributeAxis } from '../../../../utils/alignment.utils';
+import { FirstStepsComponent } from '../first-steps/first-steps.component';
 import { AnnotationEditorComponent } from '../annotation-editor/annotation-editor.component';
 
 @Component({
@@ -10,7 +11,7 @@ import { AnnotationEditorComponent } from '../annotation-editor/annotation-edito
   standalone: true,
   templateUrl: './workspace-viewer.component.html',
   styleUrls: ['./workspace-viewer.component.scss'],
-  imports: [CommonModule, AnnotationEditorComponent, TranslationPipe],
+  imports: [CommonModule, AnnotationEditorComponent, FirstStepsComponent, TranslationPipe],
 })
 export class WorkspaceViewerComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
