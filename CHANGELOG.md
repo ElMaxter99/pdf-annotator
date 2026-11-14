@@ -1,4 +1,7 @@
 ## Unreleased
+### Changed
+- **Pie de estado y «Acerca de» (mesa P-47):** el pie del editor enseña ahora «Guardado hace N s», el zoom y un botón «Ajustar» (página entera), con la versión y el canal; los créditos («© … Desarrollado por…», licencia) pasan al menú ⋯ → «Acerca de».
+- **Al abrir un PDF se ajusta a la página (mesa P-47):** en escritorio el zoom inicial hace que la página entera quepa en el visor sin scroll (antes 150 %). La sesión recuperada conserva su zoom.
 
 ## [v1.9.2](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.9.2) - 2026-11-13
 ### Changed

@@ -52,6 +52,7 @@ import { WorkspaceHeaderComponent } from './components/header/workspace-header.c
 import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sidebar.component';
 import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
 import { ExportSamplesDialogComponent } from './components/export-samples-dialog/export-samples-dialog.component';
+import { AboutDialogComponent } from './components/about-dialog/about-dialog.component';
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnail } from '../../models/page-thumbnail.model';
@@ -305,6 +306,7 @@ export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
     WorkspaceViewerComponent,
     WorkspaceFooterComponent,
     ShortcutsDialogComponent,
+    AboutDialogComponent,
     ExportSamplesDialogComponent,
   ],
 })
@@ -345,6 +347,20 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.store.coords().reduce((total, page) => total + page.fields.length, 0),
   );
   readonly shortcutsOpen = signal(false);
+  readonly aboutOpen = signal(false);
+  /** Last time the session was written (null = nothing saved yet) and a slow clock for «hace N s». */
+  private readonly lastSavedAt = signal<number | null>(null);
+  private readonly savedNow = signal(Date.now());
+  readonly savedAgo = computed(() => {
+    const at = this.lastSavedAt();
+    if (at === null) {
+      return null;
+    }
+    const seconds = Math.max(0, Math.round((this.savedNow() - at) / 1000));
+    return seconds < 60
+      ? { key: 'app.footer.savedSeconds', n: seconds }
+      : { key: 'app.footer.savedMinutes', n: Math.floor(seconds / 60) };
+  });
   private readonly translationService = inject(TranslationService);
   private readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
@@ -751,6 +767,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   ngOnInit(): void {
+    if (typeof window !== 'undefined') {
+      this.savedClock = setInterval(() => this.savedNow.set(Date.now()), 5000);
+    }
     if (this.batch.activeItem()) {
       this.sidebarTab.set('annotations'); // the state of every field lives there
     }
@@ -763,7 +782,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  private savedClock: ReturnType<typeof setInterval> | null = null;
+
   ngOnDestroy() {
+    if (this.savedClock) {
+      clearInterval(this.savedClock);
+    }
     this.flushBatchSave();
     this.rememberLastOpened();
     this.batch.deactivate();
@@ -1769,6 +1793,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       void this.sessionStore.clear();
       return;
     }
+    this.lastSavedAt.set(Date.now());
+    this.savedNow.set(Date.now());
     void this.sessionStore.save({
       name: file.name,
       pdf: file,
@@ -1848,8 +1874,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.render();
     if (restore) {
       this.redrawAllForPage();
-    } else if (typeof window !== 'undefined' && window.innerWidth < 960) {
-      await this.fitWidth();
+    } else if (
+      typeof window !== 'undefined' &&
+      !(window as { __PDFA_NO_FIT__?: boolean }).__PDFA_NO_FIT__
+    ) {
+      await (window.innerWidth < 960 ? this.fitWidth() : this.fitPage());
     }
     this.generatePageThumbnails().catch((error) =>
       console.error('No se pudieron generar las miniaturas del documento.', error),
@@ -2329,6 +2358,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private handlePlainShortcut(event: KeyboardEvent, key: string) {
     if (event.altKey || event.defaultPrevented) {
+      return;
+    }
+
+    if (key === 'escape' && this.aboutOpen()) {
+      event.preventDefault();
+      this.toggleAbout(false);
       return;
     }
 
@@ -5553,6 +5588,39 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.redrawAllForPage();
   }
 
+  async fitPage() {
+    if (!this.pdfDoc) {
+      return;
+    }
+
+    const container = this.pdfViewerRef?.nativeElement.parentElement;
+    if (!container) {
+      return;
+    }
+
+    const page = await this.pdfDoc.getPage(this.pageIndex());
+    const base = page.getViewport({ scale: 1 });
+    const style = getComputedStyle(container);
+    const availableW =
+      container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    const availableH =
+      container.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    if (!(base.width > 0) || !(availableW > 0) || !(availableH > 0)) {
+      return;
+    }
+
+    const fit = Math.min(availableW / base.width, availableH / base.height);
+    this.scale.set(Math.min(4, Math.max(0.25, Math.floor(fit * 100) / 100)));
+    await this.render();
+    const overflow = container.scrollHeight - container.clientHeight;
+    if (overflow > 0) {
+      const adjusted = Math.floor(((base.height * this.scale() - overflow) / base.height) * 100) / 100;
+      this.scale.set(Math.min(4, Math.max(0.25, adjusted)));
+      await this.render();
+    }
+    this.redrawAllForPage();
+  }
+
   async fitWidth() {
     if (!this.pdfDoc) {
       return;
@@ -5575,6 +5643,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.scale.set(Math.min(4, Math.max(0.25, Math.floor((available / baseWidth) * 100) / 100)));
     await this.render();
     this.redrawAllForPage();
+  }
+
+  toggleAbout(open = !this.aboutOpen()) {
+    this.aboutOpen.set(open);
   }
 
   toggleShortcuts(open = !this.shortcutsOpen()) {

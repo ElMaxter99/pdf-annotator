@@ -124,6 +124,10 @@
           <span class="btn__icon" aria-hidden="true">⌨</span>
           <span class="btn__label">{{ 'shortcuts.openShort' | t }}</span>
         </button>
+        <button class="btn btn--ghost" type="button" (click)="vm.toggleAbout(true)" data-testid="about-open">
+          <span class="btn__icon" aria-hidden="true">ⓘ</span>
+          <span class="btn__label">{{ 'about.open' | t }}</span>
+        </button>
         <app-theme-toggle></app-theme-toggle>
         <app-language-selector class="header__language-selector" [languages]="vm.languages"
           [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">
