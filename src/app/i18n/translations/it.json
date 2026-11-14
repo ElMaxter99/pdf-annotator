@@ -847,6 +847,24 @@
           "notUniform": "lo spostamento non è uguale in tutto il PDF",
           "lowConfidence": "non ci sono abbastanza ancore per tutti i campi"
         }
+      },
+      "pop": {
+        "summary": "{{count}} PDF con A e B · {{fields}} campi",
+        "requests": "Da {{min}} a {{max}} richieste all'IA",
+        "requestsCopilot": "Fino a {{max}} richieste (limite {{cap}})",
+        "change": "Cambia",
+        "sent": "Cosa viene inviato"
+      },
+      "panel": {
+        "title": "Trasferimento con IA",
+        "close": "Chiudi il pannello",
+        "count": "{{done}} di {{total}} PDF",
+        "stop": "Ferma",
+        "retry": "Riprova {{count}}",
+        "details": "Dettagli",
+        "note": "Nulla viene applicato da solo: controlli tu ogni proposta.",
+        "keepRunning": "Puoi chiudere questo pannello: il lavoro continua.",
+        "open": "Apri"
       }
     }
   },

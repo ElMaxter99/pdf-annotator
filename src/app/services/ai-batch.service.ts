@@ -67,6 +67,10 @@ export class AiBatchService {
   /** «Ver detalles»: open or not, and which PDF (`null` follows the one in progress). */
   readonly detailsOpen = signal(false);
   readonly detailsId = signal<string | null>(null);
+  /** Detail view follows the PDF in progress until one is picked from the list. */
+  readonly detailsFollow = signal(true);
+  /** Side panel of the run (non-modal): closing it hides it, the work goes on. */
+  readonly panelOpen = signal(false);
 
   readonly order = signal<string[]>([]);
   readonly usage = computed(() => sumUsage(Object.values(this.rows()).map((row) => row.usage)));
@@ -117,17 +121,35 @@ export class AiBatchService {
     this.startedAt.set(Date.now());
     this.sentInWindow = 0;
     this.streak = { kind: '', n: 0 };
+    this.detailsFollow.set(true);
+    this.detailsId.set(null);
+    this.panelOpen.set(true);
     void this.loop();
     return 'started';
   }
 
   openDetails(id: string | null = null): void {
     this.detailsId.set(id);
+    this.detailsFollow.set(id === null);
     this.detailsOpen.set(true);
+    this.panelOpen.set(true);
   }
 
   closeDetails(): void {
     this.detailsOpen.set(false);
+  }
+
+  pickDetails(id: string): void {
+    this.detailsId.set(id);
+    this.detailsFollow.set(false);
+  }
+
+  openPanel(): void {
+    this.panelOpen.set(true);
+  }
+
+  closePanel(): void {
+    this.panelOpen.set(false);
   }
 
   /** Stops after the pair in progress; the rest stay queued. */
@@ -184,6 +206,7 @@ export class AiBatchService {
     this.sentInWindow = 0;
     this.streak = { kind: '', n: 0 };
     this.pause.set(null);
+    this.panelOpen.set(true);
     void this.loop();
     return 'started';
   }
@@ -197,6 +220,8 @@ export class AiBatchService {
     this.order.set([]);
     this.pause.set(null);
     this.run.set('idle');
+    this.panelOpen.set(false);
+    this.detailsOpen.set(false);
   }
 
   private async loop(): Promise<void> {

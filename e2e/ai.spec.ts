@@ -185,8 +185,6 @@ async function openPanelWithPair(page: Page) {
 test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revisión PDF a PDF', async ({ page }) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
-  await expect(page.getByTestId('ai-batch-menu')).toContainText('1'); // «Trasladar todos (1)»
-  await page.getByTestId('ai-batch-all').click();
   await expect(page.getByTestId('ai-batch-dialog')).toBeVisible();
   await expect(page.getByTestId('ai-batch-estimate')).toContainText('1');
   await page.getByTestId('ai-batch-cascade').uncheck(); // fuerza el camino de la IA
@@ -211,7 +209,6 @@ test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revi
 test('«Trasladar con IA» en lote: el ajuste por textos resuelve sin gastar una petición', async ({ page }) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
-  await page.getByTestId('ai-batch-all').click();
   await expect(page.getByTestId('ai-batch-cascade')).toBeChecked();
   await page.getByTestId('ai-batch-start').click();
   await expect(page.getByTestId('ai-batch-summary')).toBeVisible({ timeout: 30000 });
@@ -222,7 +219,6 @@ test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada'
   await openPanelWithPair(page);
   await page.route('http://127.0.0.1:4310/**', (route) => route.abort());
   await page.getByTestId('ai-batch-button').click();
-  await page.getByTestId('ai-batch-all').click();
   await expect(page.getByTestId('ai-batch-offline')).toBeVisible();
   await expect(page.getByTestId('ai-batch-start')).toBeDisabled();
   await page.keyboard.press('Escape');
@@ -232,7 +228,7 @@ test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada'
 test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido de la lista', async ({ page }) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
-  await page.getByTestId('ai-batch-all').click();
+  await page.getByTestId('ai-batch-change').click();
   // Without the real CLIs only the simulated provider is installed: the others show disabled, as in the editor panel.
   await expect(page.getByTestId('ai-batch-provider-claude')).toBeVisible();
   await expect(page.getByTestId('ai-batch-provider-copilot')).toBeVisible();
@@ -247,19 +243,19 @@ test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido de la
 test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos y el consumo del lote', async ({ page }) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
-  await page.getByTestId('ai-batch-all').click();
   await page.getByTestId('ai-batch-cascade').uncheck();
   await page.getByTestId('ai-batch-start').click();
   await expect(page.getByTestId('ai-batch-details')).toBeVisible();
   await page.getByTestId('ai-batch-details').click();
   const dialog = page.getByTestId('ai-bdetails');
   await expect(dialog).toBeVisible();
-  await expect(dialog.locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(1);
+  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(1);
   await expect(page.getByTestId('ai-bdetails-steps')).toContainText(/\S/);
   await expect(page.getByTestId('ai-bdetails-batch')).toBeVisible();
   await page.getByTestId('ai-bdetails-tab-sent').click();
   await expect(page.getByTestId('ai-bdetails-sent')).toBeVisible();
-  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape'); // closes the side panel; the work goes on
+  await expect(page.getByTestId('ai-batch-status')).toHaveCount(0);
   await expect(dialog).toHaveCount(0);
   // Once finished, the row keeps a link to what happened.
   await expect(page.getByTestId('ai-chip-details').first()).toBeVisible();

@@ -736,7 +736,7 @@
         "capNote": "Se houver mais de {{cap}} pares, a fila para em {{cap}} e espera o teu «Continuar». Sem novas tentativas automáticas.",
         "privacy": "Os PDFs A e B de cada par são enviados ao teu {{provider}} local, um a um. Nada é aplicado sozinho: és tu que revês cada proposta.",
         "remember": "Não voltar a perguntar",
-        "start": "Transferir {{count}} PDFs",
+        "start": "Transferir {{count}} PDF",
         "cancel": "Cancelar",
         "provider": "Fornecedor",
         "model": {
@@ -847,6 +847,24 @@
           "notUniform": "o deslocamento não é igual em todo o PDF",
           "lowConfidence": "não há âncoras suficientes para todos os campos"
         }
+      },
+      "pop": {
+        "summary": "{{count}} PDF com A e B · {{fields}} campos",
+        "requests": "De {{min}} a {{max}} pedidos à IA",
+        "requestsCopilot": "Até {{max}} pedidos (limite {{cap}})",
+        "change": "Alterar",
+        "sent": "O que é enviado"
+      },
+      "panel": {
+        "title": "Transferência com IA",
+        "close": "Fechar painel",
+        "count": "{{done}} de {{total}} PDF",
+        "stop": "Parar",
+        "retry": "Tentar de novo {{count}}",
+        "details": "Detalhes",
+        "note": "Nada é aplicado sozinho: você revisa cada proposta.",
+        "keepRunning": "Pode fechar este painel: o trabalho continua.",
+        "open": "Abrir"
       }
     }
   },

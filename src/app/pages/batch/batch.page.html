@@ -1,4 +1,4 @@
-<div class="app app--batch">
+<div class="app app--batch" [class.app--ai-panel]="aiHelper.available && aiQueue.panelOpen() && aiQueue.run() !== 'idle'">
   <header class="batch-bar">
     <a class="batch-bar__brand" routerLink="/landing" [attr.aria-label]="appName">
       <img src="/logo.svg" alt="" width="32" height="32" />
@@ -336,10 +336,7 @@
         data-testid="input-b"
       />
       @if (aiHelper.available) {
-        <app-ai-batch-status (reviewFirst)="reviewProposal()" />
-      }
-      @if (aiHelper.available && aiQueue.detailsOpen()) {
-        <app-ai-batch-details />
+        <app-ai-batch-panel (reviewFirst)="reviewProposal()" />
       }
       @if (counts().all > 0) {
         <div

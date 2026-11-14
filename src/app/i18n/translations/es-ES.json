@@ -736,7 +736,7 @@
         "capNote": "Si hay más de {{cap}} pares, la cola se para al llegar a {{cap}} y espera tu «Continuar». Sin reintentos automáticos.",
         "privacy": "Se envían los PDF A y B de cada par a tu {{provider}} local, uno a uno. Nada se aplica solo: cada propuesta la revisas tú.",
         "remember": "No volver a preguntar",
-        "start": "Trasladar {{count}} PDFs",
+        "start": "Trasladar {{count}} PDF",
         "cancel": "Cancelar",
         "provider": "Proveedor",
         "model": {
@@ -847,6 +847,24 @@
           "notUniform": "el desplazamiento no es igual en todo el PDF",
           "lowConfidence": "no hay anclas suficientes para todos los campos"
         }
+      },
+      "pop": {
+        "summary": "{{count}} PDF con A y B · {{fields}} campos",
+        "requests": "De {{min}} a {{max}} peticiones a la IA",
+        "requestsCopilot": "Hasta {{max}} peticiones (tope {{cap}})",
+        "change": "Cambiar",
+        "sent": "Qué se envía"
+      },
+      "panel": {
+        "title": "Traslado con IA",
+        "close": "Cerrar panel",
+        "count": "{{done}} de {{total}} PDF",
+        "stop": "Parar",
+        "retry": "Reintentar {{count}}",
+        "details": "Detalles",
+        "note": "Nada se aplica solo: tú revisas cada propuesta.",
+        "keepRunning": "Puedes cerrar este panel: el trabajo sigue.",
+        "open": "Abrir"
       }
     }
   },

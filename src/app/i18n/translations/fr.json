@@ -847,6 +847,24 @@
           "notUniform": "le décalage n’est pas le même dans tout le PDF",
           "lowConfidence": "pas assez d’ancres pour tous les champs"
         }
+      },
+      "pop": {
+        "summary": "{{count}} PDF avec A et B · {{fields}} champs",
+        "requests": "De {{min}} à {{max}} requêtes à l'IA",
+        "requestsCopilot": "Jusqu'à {{max}} requêtes (plafond {{cap}})",
+        "change": "Modifier",
+        "sent": "Ce qui est envoyé"
+      },
+      "panel": {
+        "title": "Transfert avec l'IA",
+        "close": "Fermer le panneau",
+        "count": "{{done}} sur {{total}} PDF",
+        "stop": "Arrêter",
+        "retry": "Réessayer {{count}}",
+        "details": "Détails",
+        "note": "Rien n'est appliqué tout seul : vous vérifiez chaque proposition.",
+        "keepRunning": "Vous pouvez fermer ce panneau : le travail continue.",
+        "open": "Ouvrir"
       }
     }
   },

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { TranslationService } from '../../../i18n/translation.service';
 import { AiBatchService, type AiBatchRow } from '../../../services/ai-batch.service';
@@ -28,15 +28,11 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
   private readonly i18n = inject(TranslationService);
   private readonly toast = inject(ToastService);
 
-  @ViewChild('closeBtn', { static: true }) closeBtn?: ElementRef<HTMLButtonElement>;
-
   readonly tabs: BatchDetailsTab[] = ['summary', 'steps', 'sent', 'usage'];
   readonly tab = signal<BatchDetailsTab>('summary');
-  readonly follow = signal(true);
-  readonly picked = signal<string | null>(null);
+  readonly follow = this.queue.detailsFollow;
   readonly now = signal(Date.now());
   private timer: ReturnType<typeof setInterval> | null = null;
-  private opener: Element | null = null;
 
   /** Rows in queue order, with the file name. */
   readonly list = computed(() =>
@@ -56,7 +52,7 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     );
   });
   readonly selectedId = computed(() => {
-    const wanted = this.follow() ? null : this.picked() ?? this.queue.detailsId();
+    const wanted = this.follow() ? null : this.queue.detailsId();
     return wanted && this.queue.rows()[wanted] ? wanted : this.current()?.id ?? null;
   });
   readonly row = computed(() => {
@@ -84,21 +80,13 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
   readonly sentFiles = computed(() => (this.row()?.sent?.files ?? []).filter((f) => !f.name.endsWith('.pdf')));
 
   ngOnInit(): void {
-    this.opener = typeof document === 'undefined' ? null : document.activeElement;
-    const id = this.queue.detailsId();
-    if (id) {
-      this.follow.set(false);
-      this.picked.set(id);
-    }
     this.timer = setInterval(() => this.now.set(Date.now()), 1000);
-    queueMicrotask(() => this.closeBtn?.nativeElement.focus());
   }
 
   ngOnDestroy(): void {
     if (this.timer) {
       clearInterval(this.timer);
     }
-    (this.opener as HTMLElement | null)?.focus?.();
   }
 
   private t(key: string, params?: Record<string, string | number>): string {
@@ -199,36 +187,12 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     return tokens ? this.t('batch.ai.tokens', { count: this.num(tokens) }) : '—';
   }
 
-  pick(id: string): void {
-    this.follow.set(false);
-    this.picked.set(id);
-  }
-
-  close(): void {
-    this.queue.closeDetails();
+  setFollow(on: boolean): void {
+    this.queue.detailsFollow.set(on);
   }
 
   cancelThis(): void {
     this.queue.skipCurrent();
-  }
-
-  trapFocus(event: KeyboardEvent, root: HTMLElement): void {
-    const items = Array.from(root.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter(
-      (el) => !el.hasAttribute('disabled') && el.offsetParent !== null,
-    );
-    if (!items.length) {
-      return;
-    }
-    const first = items[0];
-    const last = items[items.length - 1];
-    const active = document.activeElement;
-    if (event.shiftKey && (active === first || active === root)) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && active === last) {
-      event.preventDefault();
-      first.focus();
-    }
   }
 
   tabKey(event: KeyboardEvent, root: HTMLElement): void {

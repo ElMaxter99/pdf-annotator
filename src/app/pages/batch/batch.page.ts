@@ -5,8 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
 import { AiBatchButtonComponent } from './ai-batch/ai-batch-button.component';
 import { AiBatchChipComponent } from './ai-batch/ai-batch-chip.component';
-import { AiBatchDetailsComponent } from './ai-batch/ai-batch-details.component';
-import { AiBatchStatusComponent } from './ai-batch/ai-batch-status.component';
+import { AiBatchPanelComponent } from './ai-batch/ai-batch-panel.component';
 import { AiBatchService } from '../../services/ai-batch.service';
 import { AiHelperService } from '../../services/ai-helper.service';
 import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
@@ -80,8 +79,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     PdfThumbComponent,
     AiBatchButtonComponent,
     AiBatchChipComponent,
-    AiBatchStatusComponent,
-    AiBatchDetailsComponent,
+    AiBatchPanelComponent,
   ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],

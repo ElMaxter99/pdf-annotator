@@ -847,6 +847,24 @@
           "notUniform": "el desplaçament no és igual a tot el PDF",
           "lowConfidence": "no hi ha prou àncores per a tots els camps"
         }
+      },
+      "pop": {
+        "summary": "{{count}} PDF amb A i B · {{fields}} camps",
+        "requests": "De {{min}} a {{max}} peticions a la IA",
+        "requestsCopilot": "Fins a {{max}} peticions (topall {{cap}})",
+        "change": "Canvia",
+        "sent": "Què s'envia"
+      },
+      "panel": {
+        "title": "Trasllat amb IA",
+        "close": "Tanca el panell",
+        "count": "{{done}} de {{total}} PDF",
+        "stop": "Atura",
+        "retry": "Reintenta {{count}}",
+        "details": "Detalls",
+        "note": "No s'aplica res soles: tu revises cada proposta.",
+        "keepRunning": "Pots tancar aquest panell: la feina continua.",
+        "open": "Obre"
       }
     }
   },

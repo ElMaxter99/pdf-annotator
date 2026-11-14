@@ -736,7 +736,7 @@
         "capNote": "If there are more than {{cap}} pairs, the queue stops at {{cap}} and waits for your «Continue». No automatic retries.",
         "privacy": "The A and B PDFs of each pair are sent to your local {{provider}}, one at a time. Nothing is applied by itself: you review each proposal.",
         "remember": "Don't ask again",
-        "start": "Transfer {{count}} PDFs",
+        "start": "Transfer {{count}} PDF",
         "cancel": "Cancel",
         "provider": "Provider",
         "model": {
@@ -847,6 +847,24 @@
           "notUniform": "the shift is not the same across the PDF",
           "lowConfidence": "there are not enough anchors for every field"
         }
+      },
+      "pop": {
+        "summary": "{{count}} PDF with A and B · {{fields}} fields",
+        "requests": "{{min}} to {{max}} requests to the AI",
+        "requestsCopilot": "Up to {{max}} requests (cap {{cap}})",
+        "change": "Change",
+        "sent": "What is sent"
+      },
+      "panel": {
+        "title": "AI transfer",
+        "close": "Close panel",
+        "count": "{{done}} of {{total}} PDFs",
+        "stop": "Stop",
+        "retry": "Retry {{count}}",
+        "details": "Details",
+        "note": "Nothing is applied on its own: you review each proposal.",
+        "keepRunning": "You can close this panel: the work goes on.",
+        "open": "Open"
       }
     }
   },

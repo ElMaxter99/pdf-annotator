@@ -10,6 +10,17 @@
   gap: 16px;
   background: var(--bg);
   color: var(--text);
+  transition: padding-right 200ms ease-out;
+}
+
+.app--ai-panel {
+  padding-right: 424px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app--batch {
+    transition: none;
+  }
 }
 
 .batch-bar {
