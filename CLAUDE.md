@@ -16,3 +16,4 @@
 ## Directivas permanentes de Maxter (no negociables)
 - **Nunca fusiones (merge) en `develop` ni en `main`/`master`**, ni PRs tuyas ni de otros, ni siquiera de una release. Abre la PR y avisa a Maxter para que revise y fusione él.
 - **Nunca publiques una versión (RC, final o promoción de Vercel) por tu cuenta.** Solo cuando Maxter lo pida expresamente para esa versión. Que apruebe un diseño, un cambio o una PR **no** cuenta como permiso para publicar. Disparar `release-candidate.yml` o `release.yml` es publicar.
+  **Excepción:** el workflow «Release» (`release.yml`), que alinea `master` con `develop`, lo lanza Claude, y solo cuando Maxter lo pide expresamente para esa versión. Fuera de eso, nada de fusionar.

@@ -64,7 +64,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
 
 ## 4a. Publicar versiones
-> **Directiva de Maxter:** ningún agente fusiona en `develop` ni en `main`/`master`, y ninguno publica una versión (RC, final, Vercel) sin que Maxter lo pida expresamente para esa versión. Aprobar un diseño o una PR no es permiso para publicar. Abre la PR y pide a Maxter que revise y fusione.
+> **Directiva de Maxter:** ningún agente fusiona en `develop` ni en `main`/`master`, y ninguno publica una versión (RC, final, Vercel) sin que Maxter lo pida expresamente para esa versión. Aprobar un diseño o una PR no es permiso para publicar. Abre la PR y pide a Maxter que revise y fusione. **Excepción:** el workflow «Release» (`release.yml`) lo lanza Claude solo cuando Maxter lo pide expresamente para esa versión.
 
 Antes de sacar cualquier versión (RC o final) lee `docs/RELEASING.md`: la Parte A lo explica para personas y la **Parte B es la checklist de la IA**. La versión final y la web (Vercel) solo con el visto bueno explícito de Maxter; las RC, sin pedirlo cuando él haya dicho «saca versión».
 
