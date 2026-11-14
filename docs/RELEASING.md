@@ -43,6 +43,8 @@ Es un ensayo general. «Candidata a versión final». Tiene instaladores reales 
 
 # Parte B · Checklist para la IA (Claude)
 
+> **Directivas permanentes de Maxter (prevalecen sobre el resto de este archivo):** (1) no fusionar nunca en `develop` ni en `master`: se abre la PR y se pide a Maxter que revise y fusione; donde abajo dice «Fusionar», léase «pedir a Maxter que fusione». (2) No lanzar `release-candidate.yml` ni `release.yml` ni promocionar en Vercel sin que Maxter lo pida expresamente para esa versión; aprobar un diseño o un cambio no cuenta.
+>
 > Lee esto **entero antes de sacar una versión**. Aprobación de Maxter: **solo** para la versión final (paso 7) y la promoción de la web en Vercel (paso 8); las RC se pueden lanzar sin pedirla cuando Maxter ha dicho «saca versión». Nunca fusionar en `master` a mano, ni borrar etiquetas/releases sin aprobación, ni saltarse comprobaciones.
 
 Repositorio: `ElMaxter99/pdf-annotator`. Ramas: `develop` (trabajo) y `master` (estable; la alinea el workflow «Release»). Variable: `X.Y.Z` = versión (solo dígitos).
