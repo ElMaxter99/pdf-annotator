@@ -38,7 +38,9 @@
         <button type="button" class="btn btn--ghost" (click)="previewSettings.clearTestData()"
           data-testid="batch-testdata-clear">{{ 'batch.testData.remove' | t }}</button>
       }
-      <app-ai-batch-button />
+      @if (aiHelper.available) {
+        <app-ai-batch-button />
+      }
       <button
         type="button"
         class="btn"
@@ -333,8 +335,10 @@
         (change)="onNewVersionsSelected($event)"
         data-testid="input-b"
       />
-      <app-ai-batch-status (reviewFirst)="reviewProposal()" />
-      @if (aiQueue.detailsOpen()) {
+      @if (aiHelper.available) {
+        <app-ai-batch-status (reviewFirst)="reviewProposal()" />
+      }
+      @if (aiHelper.available && aiQueue.detailsOpen()) {
         <app-ai-batch-details />
       }
       @if (counts().all > 0) {
@@ -499,7 +503,9 @@
                   <span class="batch-chip batch-chip--on">B</span>
                 }
               </span>
-              <app-ai-batch-chip [item]="row.item" />
+              @if (aiHelper.available) {
+                <app-ai-batch-chip [item]="row.item" />
+              }
             </button>
           }
         </div>
@@ -538,7 +544,9 @@
                   [class.batch-chip--warn]="row.state !== 'ready'"
                   >{{ 'batch.state.' + row.state | t }}</span
                 >
+                @if (aiHelper.available) {
                 <app-ai-batch-chip [item]="row.item" />
+              }
               </span>
               <span class="batch-row__actions" role="cell">
                 @if (row.item.aiProposal) {

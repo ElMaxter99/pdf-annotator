@@ -111,6 +111,8 @@ async function toBase64(blob: Blob): Promise<string> {
 /** Talks to the local helper (`npm run start:ia`) that runs the user's own `claude` or `copilot`. Never a remote service. */
 @Injectable({ providedIn: 'root' })
 export class AiHelperService {
+  /** The AI only exists with a local CLI: on the desktop app or when served from this machine, never on the public web. */
+  readonly available = getDesktopBridge() !== null || isLocalOrigin();
   readonly connection = signal<AiConnection>('unknown');
   readonly found = signal<Record<string, boolean>>({});
   readonly provider = signal<AiProvider>(this.initialProvider());
