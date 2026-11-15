@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { applyJsonText, jsonEditor, openWorkspace, renderedAnnotations } from './helpers';
+import { applyJsonText, jsonEditor, openWorkspace, readJson, renderedAnnotations } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await openWorkspace(page);
@@ -35,6 +35,27 @@ test('normalizes messy JSON: coerces values, skips invalid fields and pages', as
   expect(rendered.map((r) => r.text)).toEqual(['a.b[0]', 'X', 'X', '42', 'true']);
   expect(rendered[3].fontFamily).toContain('Times New Roman');
   expect(rendered[4].fontFamily).toContain('Verdana');
+});
+
+test('fields without fontSize inherit the global fontSize of the JSON', async ({ page }) => {
+  await applyJsonText(page, {
+    fontSize: 20,
+    pages: [
+      {
+        num: 1,
+        fields: [
+          { x: 50, y: 700, mapField: 'hereda' },
+          { x: 50, y: 650, mapField: 'propio', fontSize: 30 },
+        ],
+      },
+    ],
+  });
+  const rendered = await renderedAnnotations(page);
+  const [inherited, own] = rendered.map((r) => parseFloat(r.fontSize));
+  expect(rendered.map((r) => r.text)).toEqual(['hereda', 'propio']);
+  expect(own / inherited).toBeCloseTo(1.5, 1);
+  const json = await readJson(page);
+  expect(json.fontSize).toBe(20);
 });
 
 test('accepts a bare array, loose JSON syntax and ignores unusable documents', async ({ page }) => {
