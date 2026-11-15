@@ -877,6 +877,36 @@
       "step1": "Carica i PDF del lotto (la versione attuale, A).",
       "step2": "Aggiungi i loro modelli in JSON o incollali.",
       "step3": "Carica le nuove versioni (B), trasferisci i campi e controlla ogni PDF."
+    },
+    "select": {
+      "row": "Seleziona {{name}}",
+      "all": "Seleziona tutti i PDF visibili",
+      "allShort": "Seleziona tutto",
+      "none": "Annulla la selezione"
+    },
+    "bulk": {
+      "toolbar": "Azioni su {{count}} PDF selezionati",
+      "selected": "{{count}} selezionati",
+      "selectAll": "Seleziona tutti i {{count}}",
+      "download": "Scarica",
+      "ready": "Segna Fatto",
+      "remove": "Rimuovi",
+      "clear": "Annulla la selezione",
+      "noneDownload": "Nessuno dei PDF selezionati è convalidato",
+      "noneReady": "Nessuno dei PDF selezionati può essere segnato Fatto",
+      "aiSkipped": "{{count}} dei selezionati vengono saltati: senza versione B, senza campi o già Fatto.",
+      "readyTitle": "Segna {{count}} PDF come Fatto",
+      "readyText": "Salta la revisione nell’editor. I campi restano così come sono.",
+      "readySkipped": "{{count}} senza modello vengono saltati.",
+      "readyYes": "Segna {{count}}",
+      "removeTitle": "Rimuovi {{count}} PDF dal lotto",
+      "removeText": "Vengono eliminati da questo browser insieme ai modelli e alle versioni B. I tuoi file originali non vengono toccati.",
+      "removeYes": "Rimuovi {{count}}",
+      "removed": "{{count}} PDF rimossi",
+      "readyDone": "{{count}} PDF segnati come Fatto",
+      "undo": "Annulla",
+      "downloaded": "Download pronto · {{count}} file JSON",
+      "downloadedSkipped": "Download pronto · {{count}} file JSON · {{skipped}} non convalidati esclusi"
     }
   },
   "preview": {

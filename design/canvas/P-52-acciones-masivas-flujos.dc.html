@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-52 Acciones masivas: flujos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+
+*{box-sizing:border-box}
+body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--acct);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;cursor:pointer}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:var(--danger);color:#fff}
+.btn.dg{background:transparent;color:var(--dangert);border:1px solid color-mix(in srgb,var(--danger) 50%,transparent)}
+.btn.q{background:transparent;color:var(--muted);padding:8px 10px}
+.btn.s{min-height:34px;padding:4px 14px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.focus{outline:2px solid var(--text);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--acct)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warnt)}
+.chip.err{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--dangert)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;flex:none}
+.dot.on{background:var(--accent)}.dot.warn{background:var(--warn)}.dot.err{background:var(--danger)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:3px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:5px 14px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:17px;font-weight:600}
+.card>.chip{align-self:flex-start}
+.sp{flex-grow:1}
+.bar{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.ico{width:34px;height:34px;border-radius:10px;background:var(--soft);display:inline-flex;align-items:center;justify-content:center;color:var(--text);flex:none}
+.kbd{display:inline-block;font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;background:var(--inset);color:var(--text)}
+.pin{width:26px;height:26px;border-radius:50%;background:var(--danger);color:#fff;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.find{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.find b{color:var(--text)}
+.frame{background:var(--bg);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.top{height:60px;margin:10px 12px 0;background:var(--panel);border-radius:14px;display:flex;align-items:center;gap:16px;padding:0 18px;border:1px solid var(--line)}
+.tr{display:grid;grid-template-columns:28px 44px minmax(0,1fr) 230px 170px 250px;gap:14px;align-items:center;padding:8px 14px;border-radius:12px;background:var(--soft);font-size:14px;border:1px solid transparent}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding-top:0;padding-bottom:0}
+.tr.sel{background:color-mix(in srgb,var(--accent) 14%,var(--soft));border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+.tr.foc{outline:2px solid var(--text);outline-offset:1px}
+.th{width:34px;height:44px;background:#fff;border-radius:3px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.th:before{content:"";position:absolute;left:0;right:0;top:0;height:9px;background:#0f9b8e}
+.th:after{content:"";position:absolute;left:5px;right:5px;top:16px;height:3px;background:#cfd2da;box-shadow:0 6px 0 #cfd2da,0 12px 0 #cfd2da}
+input.c{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.selbar{position:absolute;left:50%;transform:translateX(-50%);bottom:26px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:10px 12px 10px 22px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 36px var(--shadow);white-space:nowrap}
+.selbar b{font-size:15px}
+.sub{font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;background:color-mix(in srgb,var(--ink) 18%,transparent)}
+.btn.g .sub{background:var(--soft);color:var(--muted)}
+.pop{background:var(--pop);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 12px 36px var(--shadow);display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--pop);border:1px solid var(--line);border-radius:14px;padding:10px 12px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 36px var(--shadow);font-size:14px}
+.step{display:flex;flex-direction:column;gap:8px}
+.step .t{font-size:13px;font-weight:600;color:var(--acct);display:flex;gap:8px;align-items:center}
+.mini{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;min-height:300px}
+.mr{display:grid;grid-template-columns:20px 28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 10px;border-radius:10px;background:var(--soft);font-size:13px}
+.mr.sel{background:color-mix(in srgb,var(--accent) 14%,var(--soft))}
+.mr .th{width:24px;height:32px}
+.mr .th:before{height:6px}.mr .th:after{left:4px;right:4px;top:11px;height:2px;box-shadow:0 4px 0 #cfd2da,0 8px 0 #cfd2da}
+.sk{background:linear-gradient(90deg,var(--soft),color-mix(in srgb,var(--text) 10%,var(--soft)),var(--soft));background-size:200% 100%;border-radius:8px;animation:sk 1.4s ease-out infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none}}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);display:inline-block;flex:none}
+.pad{padding:18px 20px}
+
+</style>
+</helmet>
+<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--acct:#5eead4;--danger:#ff4d4d;--dangert:#ff8a8a;--text:#f5f5f5;--muted:#b0b0b0;--line:#3f3f5a;--soft:#34344a;--inset:#252538;--ink:#0b1f1c;--warn:#fbbf24;--warnt:#fbbf24;--pop:#0f0f1a;--shadow:rgba(0,0,0,.5);width:1920px;height:2010px">
+<div class="lab">P-52 · Acciones masivas</div><h1 style="font-size:32px;margin:6px 0 6px">Cuatro acciones, cada una con confirmación, progreso y resultado</h1><p class="cap" style="max-width:1400px">Flujo paso a paso, oscuro. Los datos son de ejemplo y siguen los de P-51.</p><div style="display:flex;flex-direction:column;gap:16px;margin-top:22px"><div class="card" style="gap:14px"><div style="display:flex;align-items:baseline;gap:14px"><h3 style="font-size:20px">A · Trasladar con IA</h3><span class="cap">Misma cola, estimación y límites que P-42; la novedad es elegir a qué PDF se aplica.</span></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px"><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">1</span>Pulsar «Trasladar con IA» en la barra</div><div class="mini" style="min-height:340px">
+<div class="pop"><b>Trasladar con IA</b>
+<p style="font-size:14px"><b>4 pares</b> · 36 campos · 7 páginas</p>
+<span class="cap" style="font-size:13px">1 de 5 marcados se omite: no tiene versión B.</span>
+<div style="display:flex;gap:8px;align-items:center"><span class="chip on">Claude</span><span class="chip">Modelo automático</span></div>
+<span class="cap" style="font-size:12px">Con Copilot: tope de 10 peticiones por pasada y «Continuar».</span>
+<div style="display:flex;gap:8px;justify-content:flex-end"><span class="btn g s">Cancelar</span><span class="btn s focus">Empezar con 4</span></div></div>
+<div style="margin-top:auto;align-self:center" class="toast"><b>5 seleccionados</b><span class="btn s"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.6 4.4 4.4 1.6-4.4 1.6L8 13.5 6.4 9.1 2 7.5l4.4-1.6z"/></svg> Trasladar con IA <span class="sub">4 de 5</span></span></div></div></div><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">2</span>En marcha: progreso con contador y estado por fila</div><div class="mini" style="min-height:340px">
+<div style="display:flex;align-items:center;gap:10px"><b>Trasladando 2 de 4</b><div class="bar" style="flex:1"><i style="width:50%"></i></div><span class="btn g s">Cancelar</span></div>
+<div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0331.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0331.pdf</b><span class="chip on"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>Propuesta lista</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0332.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0332.pdf</b><span class="chip on"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>Propuesta lista</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0334.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0334.pdf</b><span class="chip on"><span class="spin"></span>Trasladando…</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0335.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0335.pdf</b><span class="chip"><span class="dot"></span>En cola</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar advice-0021.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">advice-0021.pdf</b><span class="chip">Omitido · sin B</span></div>
+<span class="cap" style="font-size:12px">La selección queda bloqueada; «Cancelar» detiene la cola y conserva las propuestas ya hechas.</span></div></div><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">3</span>Terminado: revisar una a una</div><div class="mini" style="min-height:340px">
+<div class="toast" style="flex-direction:column;align-items:flex-start;gap:8px"><b>4 propuestas listas · ninguna aplicada</b><span class="cap" style="font-size:13px">Se revisan en el editor, PDF a PDF, y solo entonces se aplican.</span><span class="btn s">Revisar la primera →</span></div>
+<div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0331.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0331.pdf</b><span class="chip on"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>Propuesta lista</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0332.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0332.pdf</b><span class="chip on"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>Propuesta lista</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0334.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0334.pdf</b><span class="chip on"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>Propuesta lista</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0335.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0335.pdf</b><span class="chip on"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>Propuesta lista</span></div></div></div></div></div><div class="card" style="gap:14px"><div style="display:flex;align-items:baseline;gap:14px"><h3 style="font-size:20px">B · Descargar</h3><span class="cap">Solo validados, como «Descargar validados» hoy; con un solo PDF baja el JSON suelto.</span></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px"><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">1</span>Descargar lo marcado</div><div class="mini" style="min-height:340px">
+<div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0331.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0331.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar mifid-cuestionario.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">mifid-cuestionario.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0335.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0335.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0334.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0334.pdf</b><span class="chip warn"><span class="dot warn"></span>Por revisar</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar advice-0021.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">advice-0021.pdf</b><span class="chip"><span class="dot"></span>Sin plantilla</span></div>
+<span class="cap" style="font-size:12px">3 de 5 se descargan; 2 sin validar se omiten y se dicen.</span>
+<div style="margin-top:auto;align-self:center" class="toast"><b>5 seleccionados</b><span class="btn s focus"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/></svg> Descargar <span class="sub">3 de 5</span></span></div></div></div><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">2</span>Preparando el ZIP</div><div class="mini" style="min-height:340px">
+<div class="toast" style="flex-direction:column;align-items:stretch;gap:8px"><div style="display:flex;gap:10px;align-items:center"><span class="spin"></span><b>Preparando el ZIP · 2 de 3</b><span class="sp"></span><span class="btn g s">Cancelar</span></div><div class="bar"><i style="width:66%"></i></div></div>
+<div class="mr"><input class="c" type="checkbox"  aria-label="Seleccionar factura-0331.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0331.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar mifid-cuestionario.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">mifid-cuestionario.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0335.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0335.pdf</b><span class="chip"><span class="dot"></span>En cola</span></div></div></div><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">3</span>Listo, con aviso claro</div><div class="mini" style="min-height:340px">
+<div class="toast"><span style="color:var(--acct)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span><b>ZIP descargado</b><br><span class="cap" style="font-size:13px">3 archivos JSON · 2 sin validar no se incluyeron</span></span><span class="sp"></span><span class="btn g s">Ver los 2</span></div>
+<span class="cap" style="font-size:13px">«Ver los 2» filtra el panel por «Por revisar» y deja marcados esos dos.</span></div></div></div></div><div class="card" style="gap:14px"><div style="display:flex;align-items:baseline;gap:14px"><h3 style="font-size:20px">C · Marcar «Listo»</h3><span class="cap">El paso que el plan de IA dejó «aparte»: ahora se hace en bloque, sin saltarse ningún aviso.</span></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px"><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">1</span>Confirmar «Marcar Listo»</div><div class="mini" style="min-height:300px">
+<div class="pop"><b>Marcar 4 PDF como Listo</b>
+<span class="cap" style="font-size:13px">Se salta la revisión en el editor. Los campos se quedan tal como están.</span>
+<span class="chip warn" style="align-self:flex-start">1 sin plantilla se omite</span>
+<div style="display:flex;gap:8px;justify-content:flex-end"><span class="btn g s">Cancelar</span><span class="btn s focus">Marcar 4</span></div></div></div></div><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">2</span>Las filas cambian de estado</div><div class="mini" style="min-height:300px">
+<div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0331.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0331.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0332.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0332.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0334.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0334.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0335.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0335.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div><div class="mr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar advice-0021.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">advice-0021.pdf</b><span class="chip"><span class="dot"></span>Sin plantilla</span></div>
+<span class="cap" style="font-size:12px">Cambio instantáneo; el progreso del lote sube a «7 de 8». Con reduced-motion no hay transición.</span></div></div><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">3</span>Aviso con «Deshacer»</div><div class="mini" style="min-height:300px">
+<div class="toast"><span style="color:var(--acct)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><b>4 PDF marcados como Listo</b><span class="sp"></span><span class="btn g s"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3L2.5 5.5 5 8M2.5 5.5H9a4 4 0 010 8H6"/></svg> Deshacer</span></div>
+<div class="bar" style="width:60%"><i style="width:70%;background:var(--muted)"></i></div><span class="cap" style="font-size:12px">Caduca en 10 s; Ctrl+Z también lo deshace mientras el aviso está visible.</span></div></div></div></div><div class="card" style="gap:14px"><div style="display:flex;align-items:baseline;gap:14px"><h3 style="font-size:20px">D · Quitar</h3><span class="cap">Hoy solo hay un diálogo por PDF; en bloque añade «Deshacer» porque un error cuesta más.</span></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px"><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">1</span>Confirmar con el recuento exacto</div><div class="mini" style="min-height:300px">
+<div class="pop"><b>Quitar 3 PDF del lote</b>
+<span class="cap" style="font-size:13px">Se borran de este navegador junto con sus plantillas y versiones B. Tus archivos originales no se tocan.</span>
+<div style="display:flex;gap:8px;justify-content:flex-end"><span class="btn g s">Cancelar</span><span class="btn d s focus"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5"/></svg> Quitar 3</span></div></div></div></div><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">2</span>Quitados, con 10 s para volver atrás</div><div class="mini" style="min-height:300px">
+<div class="mr"><input class="c" type="checkbox"  aria-label="Seleccionar factura-0334.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">factura-0334.pdf</b><span class="chip warn"><span class="dot warn"></span>Por revisar</span></div><div class="mr"><input class="c" type="checkbox"  aria-label="Seleccionar albaran-0335.pdf" style="width:16px;height:16px"><div class="th"></div><b style="font-weight:600">albaran-0335.pdf</b><span class="chip on"><span class="dot on"></span>Validado</span></div>
+<div class="toast" style="margin-top:auto"><b>3 PDF quitados</b><span class="sp"></span><span class="btn g s"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3L2.5 5.5 5 8M2.5 5.5H9a4 4 0 010 8H6"/></svg> Deshacer</span></div>
+<div class="bar"><i style="width:60%;background:var(--muted)"></i></div></div></div><div class="step"><div class="t"><span class="pin" style="background:var(--accent);color:var(--ink)">3</span>Después de 10 s, definitivo</div><div class="mini" style="min-height:300px">
+<div style="margin:auto;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center"><b>Quedan 5 PDF</b><span class="cap" style="font-size:13px">Si quitas todos, el panel vuelve al paso 1 con el estado vacío (P-53, D).</span></div></div></div></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":2010}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

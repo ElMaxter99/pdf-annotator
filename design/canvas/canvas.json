@@ -1,735 +1,936 @@
 {
- "v": 3,
- "createdOnFiles": {
-  "v": 1,
-  "at": "2026-11-09T15:35:00Z"
- },
- "title": "PDF Annotator · Diseño de la interfaz",
- "launch": {
-  "view": "canvas"
- },
- "pages": [],
- "boards": {
-  "Main.dc.html": {
-   "x": 0,
-   "y": 0,
-   "w": 1280,
-   "h": 760,
-   "title": "Tokens de diseño"
-  },
-  "V-01-landing.dc.html": {
-   "x": 0,
-   "y": 1140,
-   "w": 1720,
-   "h": 1697,
-   "title": "V-01 Landing"
-  },
-  "V-02-landing-claro.dc.html": {
-   "x": 1800,
-   "y": 1140,
-   "w": 1720,
-   "h": 1697,
-   "title": "V-02 Landing claro"
-  },
-  "V-03-landing-con-sesion-recuperable.dc.html": {
-   "x": 3600,
-   "y": 1140,
-   "w": 1720,
-   "h": 1829,
-   "title": "V-03 Landing con sesión recuperable"
-  },
-  "V-19-landing-archivo-no-valido-aviso.dc.html": {
-   "x": 0,
-   "y": 3269,
-   "w": 1720,
-   "h": 1697,
-   "title": "V-19 Landing · archivo no válido (aviso)"
-  },
-  "V-04-workspace-anotaciones.dc.html": {
-   "x": 0,
-   "y": 5766,
-   "w": 1720,
-   "h": 900,
-   "title": "V-04 Workspace · Anotaciones"
-  },
-  "V-05-workspace-documento.dc.html": {
-   "x": 1800,
-   "y": 5766,
-   "w": 1720,
-   "h": 900,
-   "title": "V-05 Workspace · Documento"
-  },
-  "V-06-workspace-plantillas.dc.html": {
-   "x": 3600,
-   "y": 5766,
-   "w": 1720,
-   "h": 900,
-   "title": "V-06 Workspace · Plantillas"
-  },
-  "V-07-workspace-avanzado.dc.html": {
-   "x": 0,
-   "y": 6966,
-   "w": 1720,
-   "h": 900,
-   "title": "V-07 Workspace · Avanzado"
-  },
-  "V-08-workspace-anotaciones-claro.dc.html": {
-   "x": 1800,
-   "y": 6966,
-   "w": 1720,
-   "h": 900,
-   "title": "V-08 Workspace · Anotaciones (claro)"
-  },
-  "V-09-workspace-1280.dc.html": {
-   "x": 3600,
-   "y": 6966,
-   "w": 1280,
-   "h": 800,
-   "title": "V-09 Workspace 1280"
-  },
-  "V-10-workspace-plantillas-con-plantilla-guardada.dc.html": {
-   "x": 0,
-   "y": 8166,
-   "w": 1720,
-   "h": 900,
-   "title": "V-10 Workspace · Plantillas con plantilla guardada"
-  },
-  "V-11-crear-anotacion-editor-flotante.dc.html": {
-   "x": 0,
-   "y": 9866,
-   "w": 1720,
-   "h": 900,
-   "title": "V-11 Crear anotación (editor flotante)"
-  },
-  "V-12-editar-anotacion-editor-flotante.dc.html": {
-   "x": 1800,
-   "y": 9866,
-   "w": 1720,
-   "h": 900,
-   "title": "V-12 Editar anotación (editor flotante)"
-  },
-  "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html": {
-   "x": 3600,
-   "y": 9866,
-   "w": 1720,
-   "h": 900,
-   "title": "V-13 Selección múltiple y barra de alineación"
-  },
-  "V-14-dialogo-de-atajos.dc.html": {
-   "x": 0,
-   "y": 11566,
-   "w": 1720,
-   "h": 900,
-   "title": "V-14 Diálogo de atajos"
-  },
-  "V-15-json-con-error-de-sintaxis.dc.html": {
-   "x": 1800,
-   "y": 11566,
-   "w": 1720,
-   "h": 900,
-   "title": "V-15 JSON con error de sintaxis"
-  },
-  "V-16-aviso-de-importacion-toast.dc.html": {
-   "x": 3600,
-   "y": 11566,
-   "w": 1720,
-   "h": 900,
-   "title": "V-16 Aviso de importación (toast)"
-  },
-  "V-17-guias-y-rejilla-activas.dc.html": {
-   "x": 0,
-   "y": 12766,
-   "w": 1720,
-   "h": 900,
-   "title": "V-17 Guías y rejilla activas"
-  },
-  "V-18-arbol-json.dc.html": {
-   "x": 1800,
-   "y": 12766,
-   "w": 1720,
-   "h": 900,
-   "title": "V-18 Árbol JSON"
-  },
-  "P-11-avanzado-valores-de-muestra.dc.html": {
-   "x": 0,
-   "y": 14466,
-   "w": 1720,
-   "h": 900,
-   "title": "P-11 Avanzado · valores de muestra"
-  },
-  "P-12-prioridad-y-comparacion.dc.html": {
-   "x": 1800,
-   "y": 14466,
-   "w": 1720,
-   "h": 900,
-   "title": "P-12 Qué se pinta y en qué orden"
-  },
-  "P-13-datos-de-prueba.dc.html": {
-   "x": 3600,
-   "y": 14466,
-   "w": 1720,
-   "h": 900,
-   "title": "P-13 Previsualizar con datos de prueba"
-  },
-  "P-14-datos-de-prueba-estados.dc.html": {
-   "x": 0,
-   "y": 15666,
-   "w": 1720,
-   "h": 900,
-   "title": "P-14 Datos de prueba · estados"
-  },
-  "P-15-datos-de-prueba-claro.dc.html": {
-   "x": 1800,
-   "y": 15666,
-   "w": 1720,
-   "h": 900,
-   "title": "P-15 Datos de prueba (claro)"
-  },
-  "P-30-inicio-referencia.dc.html": {
-   "x": 0,
-   "y": 17366,
-   "w": 1720,
-   "h": 1180,
-   "title": "P-30 Inicio · como la referencia"
-  },
-  "P-31-inicio-referencia-claro.dc.html": {
-   "x": 1800,
-   "y": 17366,
-   "w": 1720,
-   "h": 1180,
-   "title": "P-31 Inicio · como la referencia (claro)"
-  },
-  "P-32-inicio-referencia-estados.dc.html": {
-   "x": 3600,
-   "y": 17366,
-   "w": 1720,
-   "h": 900,
-   "title": "P-32 Inicio · estados de la zona"
-  },
-  "P-19-guia-general.dc.html": {
-   "x": 0,
-   "y": 18846,
-   "w": 1720,
-   "h": 1150,
-   "title": "P-19 Guía · vista general"
-  },
-  "P-20-guia-tema.dc.html": {
-   "x": 1800,
-   "y": 18846,
-   "w": 1720,
-   "h": 1130,
-   "title": "P-20 Guía · tema"
-  },
-  "P-21-guia-estados.dc.html": {
-   "x": 3600,
-   "y": 18846,
-   "w": 1720,
-   "h": 1010,
-   "title": "P-21 Guía · estados"
-  },
-  "P-22-guia-tema-claro.dc.html": {
-   "x": 0,
-   "y": 20296,
-   "w": 1720,
-   "h": 1130,
-   "title": "P-22 Guía · tema (claro)"
-  },
-  "P-23-mantenimiento-guia.dc.html": {
-   "x": 1800,
-   "y": 20296,
-   "w": 1720,
-   "h": 960,
-   "title": "P-23 Cómo se mantiene la guía"
-  },
-  "P-29-guia-asi-se-ve.dc.html": {
-   "x": 3600,
-   "y": 20296,
-   "w": 1720,
-   "h": 900,
-   "title": "P-29 Guía · «Así se ve» (lo que sale de la inicio)"
-  },
-  "L-02-primera-vista.dc.html": {
-   "x": 0,
-   "y": 22100,
-   "w": 1720,
-   "h": 900,
-   "title": "L-02 Primera vista"
-  },
-  "L-03-paso-1-subir-pdf.dc.html": {
-   "x": 1800,
-   "y": 22100,
-   "w": 1720,
-   "h": 900,
-   "title": "L-03 Paso 1 · Subir PDF"
-  },
-  "N-02-barra-un-pdf.dc.html": {
-   "x": 1800,
-   "y": 23180,
-   "w": 1720,
-   "h": 900,
-   "title": "N-02 Barra · un PDF"
-  },
-  "N-03-barra-lote.dc.html": {
-   "x": 3600,
-   "y": 23180,
-   "w": 1720,
-   "h": 1040,
-   "title": "N-03 Barra · lote"
-  },
-  "N-04-barra-menu-claro-estados.dc.html": {
-   "x": 5400,
-   "y": 23180,
-   "w": 1720,
-   "h": 900,
-   "title": "N-04 Barra · menú, claro y estados"
-  },
-  "N-05-paso-2-pegar-json.dc.html": {
-   "x": 0,
-   "y": 24300,
-   "w": 1720,
-   "h": 1000,
-   "title": "N-05 Paso 2 · pegar JSON"
-  },
-  "N-06-pegar-json-casos.dc.html": {
-   "x": 1800,
-   "y": 24300,
-   "w": 1720,
-   "h": 900,
-   "title": "N-06 Pegar JSON · casos"
-  },
-  "O-02-propuesta-1-ficha-documento.dc.html": {
-   "x": 3600,
-   "y": 24300,
-   "w": 1720,
-   "h": 1020,
-   "title": "O-02 Propuesta 1 · ficha en Documento"
-  },
-  "Q-02-dividida-1650.dc.html": {
-   "x": 5400,
-   "y": 24300,
-   "w": 1720,
-   "h": 900,
-   "title": "Q-02 Dividida · 1650 px"
-  },
-  "Q-03-dividida-1280-claro.dc.html": {
-   "x": 0,
-   "y": 25400,
-   "w": 1720,
-   "h": 1460,
-   "title": "Q-03 Dividida · 1280 y claro"
-  },
-  "R-01-flujo-sin-paso-3.dc.html": {
-   "x": 3600,
-   "y": 22100,
-   "w": 1720,
-   "h": 620,
-   "title": "R-01 Flujo sin paso 3"
-  },
-  "R-02-paso-2-y-panel.dc.html": {
-   "x": 5400,
-   "y": 22100,
-   "w": 1720,
-   "h": 1000,
-   "title": "R-02 Paso 2 y panel"
-  },
-  "R-03-tira-b-estados.dc.html": {
-   "x": 0,
-   "y": 23180,
-   "w": 1720,
-   "h": 740,
-   "title": "R-03 Tira B · estados"
-  },
-  "S-01-comparar-sin-plantilla-a.dc.html": {
-   "x": 1800,
-   "y": 25400,
-   "w": 1720,
-   "h": 1220,
-   "title": "S-01 Comparar sin plantilla A"
-  },
-  "T-01-ajustar-coordenadas-a-b.dc.html": {
-   "x": 0,
-   "y": 30000,
-   "w": 1720,
-   "h": 1340,
-   "title": "T-01 Ajustar coordenadas a B"
-  },
-  "T-02-poner-plantilla-con-ajuste.dc.html": {
-   "x": 1800,
-   "y": 30000,
-   "w": 1720,
-   "h": 520,
-   "title": "T-02 Poner plantilla con ajuste"
-  },
-  "U-01-ajustar-por-textos-flujo.dc.html": {
-   "x": 0,
-   "y": 27300,
-   "w": 1720,
-   "h": 860,
-   "title": "U-01 Ajustar por textos · flujo"
-  },
-  "U-02-ajustar-por-textos-revision-1650.dc.html": {
-   "x": 1800,
-   "y": 27300,
-   "w": 1720,
-   "h": 860,
-   "title": "U-02 Ajustar por textos · revisión 1650"
-  },
-  "U-03-ajustar-por-textos-revision-1280-claro.dc.html": {
-   "x": 0,
-   "y": 28400,
-   "w": 1280,
-   "h": 720,
-   "title": "U-03 Ajustar por textos · 1280 claro"
-  },
-  "U-04-ajustar-por-textos-estados.dc.html": {
-   "x": 1800,
-   "y": 28400,
-   "w": 1720,
-   "h": 1080,
-   "title": "U-04 Ajustar por textos · estados"
-  },
-  "W-01-avisos-cerrables-y-campana.dc.html": {
-   "x": 3600,
-   "y": 30000,
-   "w": 1720,
-   "h": 1060,
-   "title": "W-01 Avisos cerrables y campana"
-  },
-  "X-01-ajuste-como-aviso-1650.dc.html": {
-   "x": 0,
-   "y": 31700,
-   "w": 1720,
-   "h": 1000,
-   "title": "X-01 Ajuste por textos como aviso · 1650"
-  },
-  "X-02-ajuste-aviso-cerrado-campana-1280-claro.dc.html": {
-   "x": 1800,
-   "y": 31700,
-   "w": 1280,
-   "h": 820,
-   "title": "X-02 Aviso cerrado y campana · 1280 claro"
-  },
-  "X-03-ajuste-mejoras-previsualizacion.dc.html": {
-   "x": 0,
-   "y": 32900,
-   "w": 1720,
-   "h": 1160,
-   "title": "X-03 Mejoras de previsualización"
-  },
-  "X-04-ajuste-aviso-estados.dc.html": {
-   "x": 1800,
-   "y": 32900,
-   "w": 1720,
-   "h": 1060,
-   "title": "X-04 Estados del aviso"
-  },
-  "M-01-previsualizacion-origen-de-cada-campo.dc.html": {
-   "x": 0,
-   "y": 34600,
-   "w": 1720,
-   "h": 900,
-   "title": "M-01 Previsualización · origen de cada campo"
-  },
-  "M-02-lote-previsualizar-con-datos-de-prueba.dc.html": {
-   "x": 1800,
-   "y": 34600,
-   "w": 1720,
-   "h": 900,
-   "title": "M-02 Lote · previsualizar con datos de prueba"
-  },
-  "M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html": {
-   "x": 0,
-   "y": 35700,
-   "w": 1720,
-   "h": 900,
-   "title": "M-03 Avisos de la previsualización y de Copiar / Ajustar"
-  },
-  "M-04-origen-estados-claro.dc.html": {
-   "x": 1800,
-   "y": 35700,
-   "w": 1720,
-   "h": 900,
-   "title": "M-04 Origen de cada campo · estados (claro)"
-  },
-  "Z-01-lote-export-y-comparacion-con-muestras.dc.html": {
-   "x": 0,
-   "y": 37200,
-   "w": 1720,
-   "h": 960,
-   "title": "Z-01 Export con valores de muestra (el diálogo del ZIP no aplica: solo lleva JSON)"
-  },
-  "IA-01-ia-en-el-lote-flujo.dc.html": {
-   "x": 0,
-   "y": 39100,
-   "w": 1720,
-   "h": 940,
-   "title": "IA-01 La IA dentro del lote: cómo encaja y por qué un ayudante local"
-  },
-  "IA-02-conectar-la-ia-estados.dc.html": {
-   "x": 1800,
-   "y": 39100,
-   "w": 1720,
-   "h": 1240,
-   "title": "IA-02 Conectar la IA: chip, ayudante y elegir Claude o Copilot"
-  },
-  "IA-03-pedir-y-revisar-1650.dc.html": {
-   "x": 3600,
-   "y": 39100,
-   "w": 1720,
-   "h": 1780,
-   "title": "IA-03 Pedir y revisar la propuesta de la IA · 1650"
-  },
-  "IA-04-estados-de-la-peticion.dc.html": {
-   "x": 0,
-   "y": 40400,
-   "w": 1720,
-   "h": 1160,
-   "title": "IA-04 Estados de la petición: privacidad, carga, errores y límite"
-  },
-  "IA-05-1280-claro.dc.html": {
-   "x": 1800,
-   "y": 40400,
-   "w": 1280,
-   "h": 820,
-   "title": "IA-05 Pedir y revisar · 1280 y claro"
-  },
-  "AC-01-aviso-de-actualizacion.dc.html": {
-   "x": 0,
-   "y": 42100,
-   "w": 1720,
-   "h": 1120,
-   "title": "AC-01 Aviso de actualización (app de escritorio)"
-  },
-  "IA-06-ver-detalles-en-vivo.dc.html": {
-   "x": 0,
-   "y": 43800,
-   "w": 1720,
-   "h": 980,
-   "title": "IA-06 Ver detalles de la IA · en vivo (Claude)"
-  },
-  "IA-07-ver-detalles-sin-cambios.dc.html": {
-   "x": 1800,
-   "y": 43800,
-   "w": 1720,
-   "h": 980,
-   "title": "IA-07 Ver detalles · resultado «sin cambios» y diagnóstico"
-  },
-  "IA-08-ver-detalles-copilot-claro.dc.html": {
-   "x": 0,
-   "y": 44900,
-   "w": 1280,
-   "h": 780,
-   "title": "IA-08 Ver detalles con Copilot · 1280 y claro"
-  }
- },
- "order": [
-  "Main.dc.html",
-  "V-01-landing.dc.html",
-  "V-02-landing-claro.dc.html",
-  "V-03-landing-con-sesion-recuperable.dc.html",
-  "V-19-landing-archivo-no-valido-aviso.dc.html",
-  "V-04-workspace-anotaciones.dc.html",
-  "V-05-workspace-documento.dc.html",
-  "V-06-workspace-plantillas.dc.html",
-  "V-07-workspace-avanzado.dc.html",
-  "V-08-workspace-anotaciones-claro.dc.html",
-  "V-09-workspace-1280.dc.html",
-  "V-10-workspace-plantillas-con-plantilla-guardada.dc.html",
-  "V-11-crear-anotacion-editor-flotante.dc.html",
-  "V-12-editar-anotacion-editor-flotante.dc.html",
-  "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html",
-  "V-14-dialogo-de-atajos.dc.html",
-  "V-15-json-con-error-de-sintaxis.dc.html",
-  "V-16-aviso-de-importacion-toast.dc.html",
-  "V-17-guias-y-rejilla-activas.dc.html",
-  "V-18-arbol-json.dc.html",
-  "P-11-avanzado-valores-de-muestra.dc.html",
-  "P-12-prioridad-y-comparacion.dc.html",
-  "P-13-datos-de-prueba.dc.html",
-  "P-14-datos-de-prueba-estados.dc.html",
-  "P-15-datos-de-prueba-claro.dc.html",
-  "P-30-inicio-referencia.dc.html",
-  "P-31-inicio-referencia-claro.dc.html",
-  "P-32-inicio-referencia-estados.dc.html",
-  "P-19-guia-general.dc.html",
-  "P-20-guia-tema.dc.html",
-  "P-21-guia-estados.dc.html",
-  "P-22-guia-tema-claro.dc.html",
-  "P-23-mantenimiento-guia.dc.html",
-  "P-29-guia-asi-se-ve.dc.html",
-  "L-02-primera-vista.dc.html",
-  "L-03-paso-1-subir-pdf.dc.html",
-  "N-02-barra-un-pdf.dc.html",
-  "N-03-barra-lote.dc.html",
-  "N-04-barra-menu-claro-estados.dc.html",
-  "N-05-paso-2-pegar-json.dc.html",
-  "N-06-pegar-json-casos.dc.html",
-  "O-02-propuesta-1-ficha-documento.dc.html",
-  "Q-02-dividida-1650.dc.html",
-  "Q-03-dividida-1280-claro.dc.html",
-  "R-01-flujo-sin-paso-3.dc.html",
-  "R-02-paso-2-y-panel.dc.html",
-  "R-03-tira-b-estados.dc.html",
-  "S-01-comparar-sin-plantilla-a.dc.html",
-  "T-01-ajustar-coordenadas-a-b.dc.html",
-  "T-02-poner-plantilla-con-ajuste.dc.html",
-  "U-01-ajustar-por-textos-flujo.dc.html",
-  "U-02-ajustar-por-textos-revision-1650.dc.html",
-  "U-03-ajustar-por-textos-revision-1280-claro.dc.html",
-  "U-04-ajustar-por-textos-estados.dc.html",
-  "W-01-avisos-cerrables-y-campana.dc.html",
-  "X-01-ajuste-como-aviso-1650.dc.html",
-  "X-02-ajuste-aviso-cerrado-campana-1280-claro.dc.html",
-  "X-03-ajuste-mejoras-previsualizacion.dc.html",
-  "X-04-ajuste-aviso-estados.dc.html",
-  "M-01-previsualizacion-origen-de-cada-campo.dc.html",
-  "M-02-lote-previsualizar-con-datos-de-prueba.dc.html",
-  "M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html",
-  "M-04-origen-estados-claro.dc.html",
-  "Z-01-lote-export-y-comparacion-con-muestras.dc.html",
-  "IA-01-ia-en-el-lote-flujo.dc.html",
-  "IA-02-conectar-la-ia-estados.dc.html",
-  "IA-03-pedir-y-revisar-1650.dc.html",
-  "IA-04-estados-de-la-peticion.dc.html",
-  "IA-05-1280-claro.dc.html",
-  "AC-01-aviso-de-actualizacion.dc.html",
-  "IA-06-ver-detalles-en-vivo.dc.html",
-  "IA-07-ver-detalles-sin-cambios.dc.html",
-  "IA-08-ver-detalles-copilot-claro.dc.html"
- ],
- "notes": {
-  "t0": {
-   "x": 0,
-   "y": -300,
-   "text": "Referencia · tokens",
-   "kind": "title1",
-   "maxW": 1280
-  },
-  "convencion": {
-   "x": -420,
-   "y": 0,
-   "w": 340,
-   "text": "Dos zonas. DEFINITIVO (izquierda): solo lo que está en producción o implementado, una versión por vista (V-NN = capturas 1:1 del DOM real; P-NN aprobadas y ya en la app). PROPUESTAS (derecha): lo pendiente de aprobar y lo programado sin fusionar. Cuando una propuesta se aprueba e implementa, pasa a Definitivo y sustituye a la anterior; si se piden cambios, se rehace en Propuestas. Las versiones descartadas o superadas se quitan del lienzo (archivadas fuera). Solo escritorio.\n\nRegla: todo diseño nuevo se queda en PROPUESTAS hasta que se promociona a producción; entonces pasa a DEFINITIVO y se queda para siempre. Lo superado se retira solo cuando la persona responsable lo pide."
-  },
-  "z_Definitivo": {
-   "x": 0,
-   "y": 540,
-   "text": "DEFINITIVO",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_0": {
-   "x": 0,
-   "y": 840,
-   "text": "Definitivo · Landing (v1.5.0)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_1": {
-   "x": 0,
-   "y": 5466,
-   "text": "Definitivo · Workspace · pestañas y temas",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_2": {
-   "x": 0,
-   "y": 9566,
-   "text": "Definitivo · Workspace · editores y selección",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_3": {
-   "x": 0,
-   "y": 11266,
-   "text": "Definitivo · Workspace · atajos, avisos y vistas",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_4": {
-   "x": 0,
-   "y": 14166,
-   "text": "Definitivo · Avanzado y datos de prueba",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_5": {
-   "x": 0,
-   "y": 17066,
-   "text": "Definitivo · Inicio y Guía",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "z_Propuestas": {
-   "x": 7400,
-   "y": 540,
-   "text": "PROPUESTAS",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_6": {
-   "x": 0,
-   "y": 21800,
-   "text": "Definitivo · Lote de documentos (implementado y fusionado en develop, PR #157)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_7": {
-   "x": 0,
-   "y": 27000,
-   "text": "Definitivo · Copiar y ajustar por textos (implementado y fusionado en develop, PR #159)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_8": {
-   "x": 0,
-   "y": 29700,
-   "text": "Definitivo · Ajustar A a B y avisos cerrables (implementado y fusionado en develop, PR #160)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_9": {
-   "x": 0,
-   "y": 31400,
-   "text": "Definitivo · Ajuste por textos como aviso y mejoras de previsualización (implementado y fusionado en develop, PR #167)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_10": {
-   "x": 0,
-   "y": 34300,
-   "text": "Definitivo · Origen de cada campo, datos de prueba en el lote y campana de avisos (implementado y fusionado en develop, PR #168)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_11": {
-   "x": 0,
-   "y": 36900,
-   "text": "Definitivo · Export con valores de muestra y vista del lote en Mapeo (implementado y fusionado en develop, PR #169)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_12": {
-   "x": 0,
-   "y": 38800,
-   "text": "Definitivo · IA en el lote con Claude o Copilot en local (implementado y fusionado en develop, PR #170)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_13": {
-   "x": 0,
-   "y": 41800,
-   "text": "Definitivo · App de escritorio (Electron) y aviso de actualización (implementado y fusionado en develop, PR #175)",
-   "kind": "title1",
-   "maxW": 5400
-  },
-  "g_Definitivo_14": {
-   "x": 0,
-   "y": 43500,
-   "text": "Definitivo · Ver detalles y consumo de la IA (implementado y fusionado en develop, PR #186)",
-   "kind": "title1",
-   "maxW": 5400
-  }
- },
- "designSystems": []
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-09T15:35:00Z"
+  },
+  "title": "PDF Annotator · Diseño de la interfaz",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 760,
+      "title": "Tokens de diseño"
+    },
+    "V-01-landing.dc.html": {
+      "x": 0,
+      "y": 1140,
+      "w": 1720,
+      "h": 1697,
+      "title": "V-01 Landing"
+    },
+    "V-02-landing-claro.dc.html": {
+      "x": 1800,
+      "y": 1140,
+      "w": 1720,
+      "h": 1697,
+      "title": "V-02 Landing claro"
+    },
+    "V-03-landing-con-sesion-recuperable.dc.html": {
+      "x": 3600,
+      "y": 1140,
+      "w": 1720,
+      "h": 1829,
+      "title": "V-03 Landing con sesión recuperable"
+    },
+    "V-19-landing-archivo-no-valido-aviso.dc.html": {
+      "x": 0,
+      "y": 3269,
+      "w": 1720,
+      "h": 1697,
+      "title": "V-19 Landing · archivo no válido (aviso)"
+    },
+    "V-04-workspace-anotaciones.dc.html": {
+      "x": 0,
+      "y": 5766,
+      "w": 1720,
+      "h": 900,
+      "title": "V-04 Workspace · Anotaciones"
+    },
+    "V-05-workspace-documento.dc.html": {
+      "x": 1800,
+      "y": 5766,
+      "w": 1720,
+      "h": 900,
+      "title": "V-05 Workspace · Documento"
+    },
+    "V-06-workspace-plantillas.dc.html": {
+      "x": 3600,
+      "y": 5766,
+      "w": 1720,
+      "h": 900,
+      "title": "V-06 Workspace · Plantillas"
+    },
+    "V-07-workspace-avanzado.dc.html": {
+      "x": 0,
+      "y": 6966,
+      "w": 1720,
+      "h": 900,
+      "title": "V-07 Workspace · Avanzado"
+    },
+    "V-08-workspace-anotaciones-claro.dc.html": {
+      "x": 1800,
+      "y": 6966,
+      "w": 1720,
+      "h": 900,
+      "title": "V-08 Workspace · Anotaciones (claro)"
+    },
+    "V-09-workspace-1280.dc.html": {
+      "x": 3600,
+      "y": 6966,
+      "w": 1280,
+      "h": 800,
+      "title": "V-09 Workspace 1280"
+    },
+    "V-10-workspace-plantillas-con-plantilla-guardada.dc.html": {
+      "x": 0,
+      "y": 8166,
+      "w": 1720,
+      "h": 900,
+      "title": "V-10 Workspace · Plantillas con plantilla guardada"
+    },
+    "V-11-crear-anotacion-editor-flotante.dc.html": {
+      "x": 0,
+      "y": 9866,
+      "w": 1720,
+      "h": 900,
+      "title": "V-11 Crear anotación (editor flotante)"
+    },
+    "V-12-editar-anotacion-editor-flotante.dc.html": {
+      "x": 1800,
+      "y": 9866,
+      "w": 1720,
+      "h": 900,
+      "title": "V-12 Editar anotación (editor flotante)"
+    },
+    "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html": {
+      "x": 3600,
+      "y": 9866,
+      "w": 1720,
+      "h": 900,
+      "title": "V-13 Selección múltiple y barra de alineación"
+    },
+    "V-14-dialogo-de-atajos.dc.html": {
+      "x": 0,
+      "y": 11566,
+      "w": 1720,
+      "h": 900,
+      "title": "V-14 Diálogo de atajos"
+    },
+    "V-15-json-con-error-de-sintaxis.dc.html": {
+      "x": 1800,
+      "y": 11566,
+      "w": 1720,
+      "h": 900,
+      "title": "V-15 JSON con error de sintaxis"
+    },
+    "V-16-aviso-de-importacion-toast.dc.html": {
+      "x": 3600,
+      "y": 11566,
+      "w": 1720,
+      "h": 900,
+      "title": "V-16 Aviso de importación (toast)"
+    },
+    "V-17-guias-y-rejilla-activas.dc.html": {
+      "x": 0,
+      "y": 12766,
+      "w": 1720,
+      "h": 900,
+      "title": "V-17 Guías y rejilla activas"
+    },
+    "V-18-arbol-json.dc.html": {
+      "x": 1800,
+      "y": 12766,
+      "w": 1720,
+      "h": 900,
+      "title": "V-18 Árbol JSON"
+    },
+    "P-11-avanzado-valores-de-muestra.dc.html": {
+      "x": 0,
+      "y": 14466,
+      "w": 1720,
+      "h": 900,
+      "title": "P-11 Avanzado · valores de muestra"
+    },
+    "P-12-prioridad-y-comparacion.dc.html": {
+      "x": 1800,
+      "y": 14466,
+      "w": 1720,
+      "h": 900,
+      "title": "P-12 Qué se pinta y en qué orden"
+    },
+    "P-13-datos-de-prueba.dc.html": {
+      "x": 3600,
+      "y": 14466,
+      "w": 1720,
+      "h": 900,
+      "title": "P-13 Previsualizar con datos de prueba"
+    },
+    "P-14-datos-de-prueba-estados.dc.html": {
+      "x": 0,
+      "y": 15666,
+      "w": 1720,
+      "h": 900,
+      "title": "P-14 Datos de prueba · estados"
+    },
+    "P-15-datos-de-prueba-claro.dc.html": {
+      "x": 1800,
+      "y": 15666,
+      "w": 1720,
+      "h": 900,
+      "title": "P-15 Datos de prueba (claro)"
+    },
+    "P-30-inicio-referencia.dc.html": {
+      "x": 0,
+      "y": 17366,
+      "w": 1720,
+      "h": 1180,
+      "title": "P-30 Inicio · como la referencia"
+    },
+    "P-31-inicio-referencia-claro.dc.html": {
+      "x": 1800,
+      "y": 17366,
+      "w": 1720,
+      "h": 1180,
+      "title": "P-31 Inicio · como la referencia (claro)"
+    },
+    "P-32-inicio-referencia-estados.dc.html": {
+      "x": 3600,
+      "y": 17366,
+      "w": 1720,
+      "h": 900,
+      "title": "P-32 Inicio · estados de la zona"
+    },
+    "P-19-guia-general.dc.html": {
+      "x": 0,
+      "y": 18846,
+      "w": 1720,
+      "h": 1150,
+      "title": "P-19 Guía · vista general"
+    },
+    "P-20-guia-tema.dc.html": {
+      "x": 1800,
+      "y": 18846,
+      "w": 1720,
+      "h": 1130,
+      "title": "P-20 Guía · tema"
+    },
+    "P-21-guia-estados.dc.html": {
+      "x": 3600,
+      "y": 18846,
+      "w": 1720,
+      "h": 1010,
+      "title": "P-21 Guía · estados"
+    },
+    "P-22-guia-tema-claro.dc.html": {
+      "x": 0,
+      "y": 20296,
+      "w": 1720,
+      "h": 1130,
+      "title": "P-22 Guía · tema (claro)"
+    },
+    "P-23-mantenimiento-guia.dc.html": {
+      "x": 1800,
+      "y": 20296,
+      "w": 1720,
+      "h": 960,
+      "title": "P-23 Cómo se mantiene la guía"
+    },
+    "P-29-guia-asi-se-ve.dc.html": {
+      "x": 3600,
+      "y": 20296,
+      "w": 1720,
+      "h": 900,
+      "title": "P-29 Guía · «Así se ve» (lo que sale de la inicio)"
+    },
+    "L-02-primera-vista.dc.html": {
+      "x": 0,
+      "y": 22100,
+      "w": 1720,
+      "h": 900,
+      "title": "L-02 Primera vista"
+    },
+    "L-03-paso-1-subir-pdf.dc.html": {
+      "x": 1800,
+      "y": 22100,
+      "w": 1720,
+      "h": 900,
+      "title": "L-03 Paso 1 · Subir PDF"
+    },
+    "N-02-barra-un-pdf.dc.html": {
+      "x": 1800,
+      "y": 23180,
+      "w": 1720,
+      "h": 900,
+      "title": "N-02 Barra · un PDF"
+    },
+    "N-03-barra-lote.dc.html": {
+      "x": 3600,
+      "y": 23180,
+      "w": 1720,
+      "h": 1040,
+      "title": "N-03 Barra · lote"
+    },
+    "N-04-barra-menu-claro-estados.dc.html": {
+      "x": 5400,
+      "y": 23180,
+      "w": 1720,
+      "h": 900,
+      "title": "N-04 Barra · menú, claro y estados"
+    },
+    "N-05-paso-2-pegar-json.dc.html": {
+      "x": 0,
+      "y": 24300,
+      "w": 1720,
+      "h": 1000,
+      "title": "N-05 Paso 2 · pegar JSON"
+    },
+    "N-06-pegar-json-casos.dc.html": {
+      "x": 1800,
+      "y": 24300,
+      "w": 1720,
+      "h": 900,
+      "title": "N-06 Pegar JSON · casos"
+    },
+    "O-02-propuesta-1-ficha-documento.dc.html": {
+      "x": 3600,
+      "y": 24300,
+      "w": 1720,
+      "h": 1020,
+      "title": "O-02 Propuesta 1 · ficha en Documento"
+    },
+    "Q-02-dividida-1650.dc.html": {
+      "x": 5400,
+      "y": 24300,
+      "w": 1720,
+      "h": 900,
+      "title": "Q-02 Dividida · 1650 px"
+    },
+    "Q-03-dividida-1280-claro.dc.html": {
+      "x": 0,
+      "y": 25400,
+      "w": 1720,
+      "h": 1460,
+      "title": "Q-03 Dividida · 1280 y claro"
+    },
+    "R-01-flujo-sin-paso-3.dc.html": {
+      "x": 3600,
+      "y": 22100,
+      "w": 1720,
+      "h": 620,
+      "title": "R-01 Flujo sin paso 3"
+    },
+    "R-02-paso-2-y-panel.dc.html": {
+      "x": 5400,
+      "y": 22100,
+      "w": 1720,
+      "h": 1000,
+      "title": "R-02 Paso 2 y panel"
+    },
+    "R-03-tira-b-estados.dc.html": {
+      "x": 0,
+      "y": 23180,
+      "w": 1720,
+      "h": 740,
+      "title": "R-03 Tira B · estados"
+    },
+    "S-01-comparar-sin-plantilla-a.dc.html": {
+      "x": 1800,
+      "y": 25400,
+      "w": 1720,
+      "h": 1220,
+      "title": "S-01 Comparar sin plantilla A"
+    },
+    "T-01-ajustar-coordenadas-a-b.dc.html": {
+      "x": 0,
+      "y": 30000,
+      "w": 1720,
+      "h": 1340,
+      "title": "T-01 Ajustar coordenadas a B"
+    },
+    "T-02-poner-plantilla-con-ajuste.dc.html": {
+      "x": 1800,
+      "y": 30000,
+      "w": 1720,
+      "h": 520,
+      "title": "T-02 Poner plantilla con ajuste"
+    },
+    "U-01-ajustar-por-textos-flujo.dc.html": {
+      "x": 0,
+      "y": 27300,
+      "w": 1720,
+      "h": 860,
+      "title": "U-01 Ajustar por textos · flujo"
+    },
+    "U-02-ajustar-por-textos-revision-1650.dc.html": {
+      "x": 1800,
+      "y": 27300,
+      "w": 1720,
+      "h": 860,
+      "title": "U-02 Ajustar por textos · revisión 1650"
+    },
+    "U-03-ajustar-por-textos-revision-1280-claro.dc.html": {
+      "x": 0,
+      "y": 28400,
+      "w": 1280,
+      "h": 720,
+      "title": "U-03 Ajustar por textos · 1280 claro"
+    },
+    "U-04-ajustar-por-textos-estados.dc.html": {
+      "x": 1800,
+      "y": 28400,
+      "w": 1720,
+      "h": 1080,
+      "title": "U-04 Ajustar por textos · estados"
+    },
+    "W-01-avisos-cerrables-y-campana.dc.html": {
+      "x": 3600,
+      "y": 30000,
+      "w": 1720,
+      "h": 1060,
+      "title": "W-01 Avisos cerrables y campana"
+    },
+    "X-01-ajuste-como-aviso-1650.dc.html": {
+      "x": 0,
+      "y": 31700,
+      "w": 1720,
+      "h": 1000,
+      "title": "X-01 Ajuste por textos como aviso · 1650"
+    },
+    "X-02-ajuste-aviso-cerrado-campana-1280-claro.dc.html": {
+      "x": 1800,
+      "y": 31700,
+      "w": 1280,
+      "h": 820,
+      "title": "X-02 Aviso cerrado y campana · 1280 claro"
+    },
+    "X-03-ajuste-mejoras-previsualizacion.dc.html": {
+      "x": 0,
+      "y": 32900,
+      "w": 1720,
+      "h": 1160,
+      "title": "X-03 Mejoras de previsualización"
+    },
+    "X-04-ajuste-aviso-estados.dc.html": {
+      "x": 1800,
+      "y": 32900,
+      "w": 1720,
+      "h": 1060,
+      "title": "X-04 Estados del aviso"
+    },
+    "M-01-previsualizacion-origen-de-cada-campo.dc.html": {
+      "x": 0,
+      "y": 34600,
+      "w": 1720,
+      "h": 900,
+      "title": "M-01 Previsualización · origen de cada campo"
+    },
+    "M-02-lote-previsualizar-con-datos-de-prueba.dc.html": {
+      "x": 1800,
+      "y": 34600,
+      "w": 1720,
+      "h": 900,
+      "title": "M-02 Lote · previsualizar con datos de prueba"
+    },
+    "M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html": {
+      "x": 0,
+      "y": 35700,
+      "w": 1720,
+      "h": 900,
+      "title": "M-03 Avisos de la previsualización y de Copiar / Ajustar"
+    },
+    "M-04-origen-estados-claro.dc.html": {
+      "x": 1800,
+      "y": 35700,
+      "w": 1720,
+      "h": 900,
+      "title": "M-04 Origen de cada campo · estados (claro)"
+    },
+    "Z-01-lote-export-y-comparacion-con-muestras.dc.html": {
+      "x": 0,
+      "y": 37200,
+      "w": 1720,
+      "h": 960,
+      "title": "Z-01 Export con valores de muestra (el diálogo del ZIP no aplica: solo lleva JSON)"
+    },
+    "IA-01-ia-en-el-lote-flujo.dc.html": {
+      "x": 0,
+      "y": 39100,
+      "w": 1720,
+      "h": 940,
+      "title": "IA-01 La IA dentro del lote: cómo encaja y por qué un ayudante local"
+    },
+    "IA-02-conectar-la-ia-estados.dc.html": {
+      "x": 1800,
+      "y": 39100,
+      "w": 1720,
+      "h": 1240,
+      "title": "IA-02 Conectar la IA: chip, ayudante y elegir Claude o Copilot"
+    },
+    "IA-03-pedir-y-revisar-1650.dc.html": {
+      "x": 3600,
+      "y": 39100,
+      "w": 1720,
+      "h": 1780,
+      "title": "IA-03 Pedir y revisar la propuesta de la IA · 1650"
+    },
+    "IA-04-estados-de-la-peticion.dc.html": {
+      "x": 0,
+      "y": 40400,
+      "w": 1720,
+      "h": 1160,
+      "title": "IA-04 Estados de la petición: privacidad, carga, errores y límite"
+    },
+    "IA-05-1280-claro.dc.html": {
+      "x": 1800,
+      "y": 40400,
+      "w": 1280,
+      "h": 820,
+      "title": "IA-05 Pedir y revisar · 1280 y claro"
+    },
+    "AC-01-aviso-de-actualizacion.dc.html": {
+      "x": 0,
+      "y": 42100,
+      "w": 1720,
+      "h": 1120,
+      "title": "AC-01 Aviso de actualización (app de escritorio)"
+    },
+    "IA-06-ver-detalles-en-vivo.dc.html": {
+      "x": 0,
+      "y": 43800,
+      "w": 1720,
+      "h": 980,
+      "title": "IA-06 Ver detalles de la IA · en vivo (Claude)"
+    },
+    "IA-07-ver-detalles-sin-cambios.dc.html": {
+      "x": 1800,
+      "y": 43800,
+      "w": 1720,
+      "h": 980,
+      "title": "IA-07 Ver detalles · resultado «sin cambios» y diagnóstico"
+    },
+    "IA-08-ver-detalles-copilot-claro.dc.html": {
+      "x": 0,
+      "y": 44900,
+      "w": 1280,
+      "h": 780,
+      "title": "IA-08 Ver detalles con Copilot · 1280 y claro"
+    },
+    "IA-12-revisar-propuesta-guardada.dc.html": {
+      "x": 3600,
+      "y": 46200,
+      "w": 1720,
+      "h": 720,
+      "title": "IA-12 Revisar una propuesta guardada"
+    },
+    "IA-14-proveedor-y-modelo.dc.html": {
+      "x": 3600,
+      "y": 47500,
+      "w": 1720,
+      "h": 760,
+      "title": "IA-14 Proveedor y modelo (oscuro)"
+    },
+    "IA-14b-proveedor-y-modelo-claro.dc.html": {
+      "x": 0,
+      "y": 48900,
+      "w": 1720,
+      "h": 760,
+      "title": "IA-14b Proveedor y modelo (claro)"
+    },
+    "RC-01-canal-de-actualizaciones.dc.html": {
+      "x": 1800,
+      "y": 42100,
+      "w": 1720,
+      "h": 1360,
+      "title": "RC-01 Canal de actualizaciones y aviso de prueba"
+    },
+    "RC-02-canal-estados-y-claro.dc.html": {
+      "x": 3600,
+      "y": 42100,
+      "w": 1720,
+      "h": 1000,
+      "title": "RC-02 Canal de actualizaciones · claro y estados"
+    },
+    "IA-16-modelo-de-lista-real.dc.html": {
+      "x": 0,
+      "y": 51000,
+      "w": 1720,
+      "h": 1000,
+      "title": "IA-16 Modelo desde una lista real (oscuro)"
+    },
+    "IA-16b-modelo-de-lista-real-claro.dc.html": {
+      "x": 1800,
+      "y": 51000,
+      "w": 1720,
+      "h": 900,
+      "title": "IA-16b Errores y casos límite (claro)"
+    },
+    "P-40-auditoria-1080p.dc.html": {
+      "x": 7400,
+      "y": 900,
+      "w": 1920,
+      "h": 1180
+    },
+    "P-41-editor-lote-antes-despues.dc.html": {
+      "x": 7400,
+      "y": 2260,
+      "w": 1920,
+      "h": 1230
+    },
+    "P-42-traslado-ia-panel-unico.dc.html": {
+      "x": 0,
+      "y": 52600,
+      "w": 1920,
+      "h": 1180
+    },
+    "P-43-reglas-y-prioridades.dc.html": {
+      "x": 7400,
+      "y": 4910,
+      "w": 1920,
+      "h": 1130
+    },
+    "P-44-editor-lote-claro-y-1280.dc.html": {
+      "x": 7400,
+      "y": 6260,
+      "w": 1920,
+      "h": 780
+    },
+    "P-45-paleta-de-comandos.dc.html": {
+      "x": 7400,
+      "y": 7160,
+      "w": 1920,
+      "h": 1330
+    },
+    "P-46-panel-del-lote.dc.html": {
+      "x": 2000,
+      "y": 52600,
+      "w": 1920,
+      "h": 1100
+    },
+    "P-47-pie-de-estado-y-enfoque.dc.html": {
+      "x": 7400,
+      "y": 9830,
+      "w": 1920,
+      "h": 1280
+    },
+    "P-48-primeros-pasos-y-estados-vacios.dc.html": {
+      "x": 4000,
+      "y": 52600,
+      "w": 1920,
+      "h": 1330
+    },
+    "P-49-prioridades-siguiente-tanda.dc.html": {
+      "x": 7400,
+      "y": 12680,
+      "w": 1920,
+      "h": 1000
+    },
+    "P-50-seleccion-multiple-reglas.dc.html": {
+      "x": 7400,
+      "y": 14300,
+      "w": 1920,
+      "h": 1100,
+      "title": "P-50 Selección múltiple · reglas y decisiones"
+    },
+    "P-51-panel-con-seleccion.dc.html": {
+      "x": 9400,
+      "y": 14300,
+      "w": 1920,
+      "h": 1100,
+      "title": "P-51 Panel con selección"
+    },
+    "P-53-seleccion-estados.dc.html": {
+      "x": 11400,
+      "y": 14300,
+      "w": 1920,
+      "h": 960,
+      "title": "P-53 Selección · estados"
+    },
+    "P-52-acciones-masivas-flujos.dc.html": {
+      "x": 7400,
+      "y": 15520,
+      "w": 1920,
+      "h": 2010,
+      "title": "P-52 Acciones masivas · flujos"
+    },
+    "P-54-seleccion-cuadricula-1280-claro.dc.html": {
+      "x": 9400,
+      "y": 15520,
+      "w": 1920,
+      "h": 940,
+      "title": "P-54 Selección · cuadrícula, 1280 y claro"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "V-01-landing.dc.html",
+    "V-02-landing-claro.dc.html",
+    "V-03-landing-con-sesion-recuperable.dc.html",
+    "V-19-landing-archivo-no-valido-aviso.dc.html",
+    "V-04-workspace-anotaciones.dc.html",
+    "V-05-workspace-documento.dc.html",
+    "V-06-workspace-plantillas.dc.html",
+    "V-07-workspace-avanzado.dc.html",
+    "V-08-workspace-anotaciones-claro.dc.html",
+    "V-09-workspace-1280.dc.html",
+    "V-10-workspace-plantillas-con-plantilla-guardada.dc.html",
+    "V-11-crear-anotacion-editor-flotante.dc.html",
+    "V-12-editar-anotacion-editor-flotante.dc.html",
+    "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html",
+    "V-14-dialogo-de-atajos.dc.html",
+    "V-15-json-con-error-de-sintaxis.dc.html",
+    "V-16-aviso-de-importacion-toast.dc.html",
+    "V-17-guias-y-rejilla-activas.dc.html",
+    "V-18-arbol-json.dc.html",
+    "P-11-avanzado-valores-de-muestra.dc.html",
+    "P-12-prioridad-y-comparacion.dc.html",
+    "P-13-datos-de-prueba.dc.html",
+    "P-14-datos-de-prueba-estados.dc.html",
+    "P-15-datos-de-prueba-claro.dc.html",
+    "P-30-inicio-referencia.dc.html",
+    "P-31-inicio-referencia-claro.dc.html",
+    "P-32-inicio-referencia-estados.dc.html",
+    "P-19-guia-general.dc.html",
+    "P-20-guia-tema.dc.html",
+    "P-21-guia-estados.dc.html",
+    "P-22-guia-tema-claro.dc.html",
+    "P-23-mantenimiento-guia.dc.html",
+    "P-29-guia-asi-se-ve.dc.html",
+    "L-02-primera-vista.dc.html",
+    "L-03-paso-1-subir-pdf.dc.html",
+    "N-02-barra-un-pdf.dc.html",
+    "N-03-barra-lote.dc.html",
+    "N-04-barra-menu-claro-estados.dc.html",
+    "N-05-paso-2-pegar-json.dc.html",
+    "N-06-pegar-json-casos.dc.html",
+    "O-02-propuesta-1-ficha-documento.dc.html",
+    "Q-02-dividida-1650.dc.html",
+    "Q-03-dividida-1280-claro.dc.html",
+    "R-01-flujo-sin-paso-3.dc.html",
+    "R-02-paso-2-y-panel.dc.html",
+    "R-03-tira-b-estados.dc.html",
+    "S-01-comparar-sin-plantilla-a.dc.html",
+    "T-01-ajustar-coordenadas-a-b.dc.html",
+    "T-02-poner-plantilla-con-ajuste.dc.html",
+    "U-01-ajustar-por-textos-flujo.dc.html",
+    "U-02-ajustar-por-textos-revision-1650.dc.html",
+    "U-03-ajustar-por-textos-revision-1280-claro.dc.html",
+    "U-04-ajustar-por-textos-estados.dc.html",
+    "W-01-avisos-cerrables-y-campana.dc.html",
+    "X-01-ajuste-como-aviso-1650.dc.html",
+    "X-02-ajuste-aviso-cerrado-campana-1280-claro.dc.html",
+    "X-03-ajuste-mejoras-previsualizacion.dc.html",
+    "X-04-ajuste-aviso-estados.dc.html",
+    "M-01-previsualizacion-origen-de-cada-campo.dc.html",
+    "M-02-lote-previsualizar-con-datos-de-prueba.dc.html",
+    "M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html",
+    "M-04-origen-estados-claro.dc.html",
+    "Z-01-lote-export-y-comparacion-con-muestras.dc.html",
+    "IA-01-ia-en-el-lote-flujo.dc.html",
+    "IA-02-conectar-la-ia-estados.dc.html",
+    "IA-03-pedir-y-revisar-1650.dc.html",
+    "IA-04-estados-de-la-peticion.dc.html",
+    "IA-05-1280-claro.dc.html",
+    "AC-01-aviso-de-actualizacion.dc.html",
+    "IA-06-ver-detalles-en-vivo.dc.html",
+    "IA-07-ver-detalles-sin-cambios.dc.html",
+    "IA-08-ver-detalles-copilot-claro.dc.html",
+    "IA-12-revisar-propuesta-guardada.dc.html",
+    "IA-14-proveedor-y-modelo.dc.html",
+    "IA-14b-proveedor-y-modelo-claro.dc.html",
+    "RC-01-canal-de-actualizaciones.dc.html",
+    "RC-02-canal-estados-y-claro.dc.html",
+    "IA-16-modelo-de-lista-real.dc.html",
+    "IA-16b-modelo-de-lista-real-claro.dc.html",
+    "P-40-auditoria-1080p.dc.html",
+    "P-41-editor-lote-antes-despues.dc.html",
+    "P-42-traslado-ia-panel-unico.dc.html",
+    "P-43-reglas-y-prioridades.dc.html",
+    "P-44-editor-lote-claro-y-1280.dc.html",
+    "P-45-paleta-de-comandos.dc.html",
+    "P-46-panel-del-lote.dc.html",
+    "P-47-pie-de-estado-y-enfoque.dc.html",
+    "P-48-primeros-pasos-y-estados-vacios.dc.html",
+    "P-49-prioridades-siguiente-tanda.dc.html",
+    "P-50-seleccion-multiple-reglas.dc.html",
+    "P-51-panel-con-seleccion.dc.html",
+    "P-53-seleccion-estados.dc.html",
+    "P-52-acciones-masivas-flujos.dc.html",
+    "P-54-seleccion-cuadricula-1280-claro.dc.html"
+  ],
+  "notes": {
+    "t0": {
+      "x": 0,
+      "y": -300,
+      "text": "Referencia · tokens",
+      "kind": "title1",
+      "maxW": 1280
+    },
+    "convencion": {
+      "x": -420,
+      "y": 0,
+      "w": 340,
+      "text": "Dos zonas. DEFINITIVO (izquierda): solo lo que está en producción o implementado, una versión por vista (V-NN = capturas 1:1 del DOM real; P-NN aprobadas y ya en la app). PROPUESTAS (derecha): lo pendiente de aprobar y lo programado sin fusionar. Cuando una propuesta se aprueba e implementa, pasa a Definitivo y sustituye a la anterior; si se piden cambios, se rehace en Propuestas. Las versiones descartadas o superadas se quitan del lienzo (archivadas fuera). Solo escritorio.\n\nRegla: todo diseño nuevo se queda en PROPUESTAS hasta que se promociona a producción; entonces pasa a DEFINITIVO y se queda para siempre. Lo superado se retira solo cuando la persona responsable lo pide."
+    },
+    "z_Definitivo": {
+      "x": 0,
+      "y": 540,
+      "text": "DEFINITIVO",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_0": {
+      "x": 0,
+      "y": 840,
+      "text": "Definitivo · Landing (v1.5.0)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_1": {
+      "x": 0,
+      "y": 5466,
+      "text": "Definitivo · Workspace · pestañas y temas",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_2": {
+      "x": 0,
+      "y": 9566,
+      "text": "Definitivo · Workspace · editores y selección",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_3": {
+      "x": 0,
+      "y": 11266,
+      "text": "Definitivo · Workspace · atajos, avisos y vistas",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_4": {
+      "x": 0,
+      "y": 14166,
+      "text": "Definitivo · Avanzado y datos de prueba",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_5": {
+      "x": 0,
+      "y": 17066,
+      "text": "Definitivo · Inicio y Guía",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "z_Propuestas": {
+      "x": 7400,
+      "y": 540,
+      "text": "PROPUESTAS",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_6": {
+      "x": 0,
+      "y": 21800,
+      "text": "Definitivo · Lote de documentos (implementado y fusionado en develop, PR #157)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_7": {
+      "x": 0,
+      "y": 27000,
+      "text": "Definitivo · Copiar y ajustar por textos (implementado y fusionado en develop, PR #159)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_8": {
+      "x": 0,
+      "y": 29700,
+      "text": "Definitivo · Ajustar A a B y avisos cerrables (implementado y fusionado en develop, PR #160)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_9": {
+      "x": 0,
+      "y": 31400,
+      "text": "Definitivo · Ajuste por textos como aviso y mejoras de previsualización (implementado y fusionado en develop, PR #167)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_10": {
+      "x": 0,
+      "y": 34300,
+      "text": "Definitivo · Origen de cada campo, datos de prueba en el lote y campana de avisos (implementado y fusionado en develop, PR #168)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_11": {
+      "x": 0,
+      "y": 36900,
+      "text": "Definitivo · Export con valores de muestra y vista del lote en Mapeo (implementado y fusionado en develop, PR #169)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_12": {
+      "x": 0,
+      "y": 38800,
+      "text": "Definitivo · IA en el lote con Claude o Copilot en local (implementado y fusionado en develop, PR #170)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_13": {
+      "x": 0,
+      "y": 41800,
+      "text": "Definitivo · App de escritorio (Electron) y aviso de actualización (implementado y fusionado en develop, PR #175)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_14": {
+      "x": 0,
+      "y": 43500,
+      "text": "Definitivo · Ver detalles y consumo de la IA (implementado y fusionado en develop, PR #186)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_15": {
+      "x": 0,
+      "y": 45900,
+      "text": "Definitivo · Trasladar con IA en todo el lote: cola, estimación, detalle en vivo y proveedor/modelo (implementado y fusionado en develop, PR #189)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Definitivo_16": {
+      "x": 0,
+      "y": 50700,
+      "text": "Definitivo · Elegir el modelo de una lista real (implementado y fusionado en develop, PR #201)",
+      "kind": "title1",
+      "maxW": 5400
+    },
+    "g_Propuestas_1080": {
+      "x": 7400,
+      "y": 600,
+      "text": "Propuestas · Simplificar la interfaz para 1080p (v1.9.2, pendiente de aprobación)",
+      "kind": "title1",
+      "maxW": 1920
+    },
+    "g_Definitivo_17": {
+      "x": 0,
+      "y": 52300,
+      "text": "Definitivo · Panel único de la IA (P-42, PR #210), panel del lote compacto (P-46, PR #211) y primeros pasos con estados vacíos (P-48, PR #212), implementados y fusionados en develop",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "g_Propuestas_seleccion": {
+      "x": 7400,
+      "y": 14000,
+      "text": "Propuestas · Selección múltiple en el panel del lote (v1.11, pendiente de aprobación)",
+      "kind": "title1",
+      "maxW": 5920
+    }
+  },
+  "designSystems": []
 }

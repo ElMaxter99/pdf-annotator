@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-50 Selección múltiple: reglas y decisiones</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+
+*{box-sizing:border-box}
+body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--acct);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;cursor:pointer}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:var(--danger);color:#fff}
+.btn.dg{background:transparent;color:var(--dangert);border:1px solid color-mix(in srgb,var(--danger) 50%,transparent)}
+.btn.q{background:transparent;color:var(--muted);padding:8px 10px}
+.btn.s{min-height:34px;padding:4px 14px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.focus{outline:2px solid var(--text);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--acct)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warnt)}
+.chip.err{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--dangert)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;flex:none}
+.dot.on{background:var(--accent)}.dot.warn{background:var(--warn)}.dot.err{background:var(--danger)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:3px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:5px 14px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:17px;font-weight:600}
+.card>.chip{align-self:flex-start}
+.sp{flex-grow:1}
+.bar{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.ico{width:34px;height:34px;border-radius:10px;background:var(--soft);display:inline-flex;align-items:center;justify-content:center;color:var(--text);flex:none}
+.kbd{display:inline-block;font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;background:var(--inset);color:var(--text)}
+.pin{width:26px;height:26px;border-radius:50%;background:var(--danger);color:#fff;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.find{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.find b{color:var(--text)}
+.frame{background:var(--bg);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.top{height:60px;margin:10px 12px 0;background:var(--panel);border-radius:14px;display:flex;align-items:center;gap:16px;padding:0 18px;border:1px solid var(--line)}
+.tr{display:grid;grid-template-columns:28px 44px minmax(0,1fr) 230px 170px 250px;gap:14px;align-items:center;padding:8px 14px;border-radius:12px;background:var(--soft);font-size:14px;border:1px solid transparent}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding-top:0;padding-bottom:0}
+.tr.sel{background:color-mix(in srgb,var(--accent) 14%,var(--soft));border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+.tr.foc{outline:2px solid var(--text);outline-offset:1px}
+.th{width:34px;height:44px;background:#fff;border-radius:3px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.th:before{content:"";position:absolute;left:0;right:0;top:0;height:9px;background:#0f9b8e}
+.th:after{content:"";position:absolute;left:5px;right:5px;top:16px;height:3px;background:#cfd2da;box-shadow:0 6px 0 #cfd2da,0 12px 0 #cfd2da}
+input.c{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.selbar{position:absolute;left:50%;transform:translateX(-50%);bottom:26px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:10px 12px 10px 22px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 36px var(--shadow);white-space:nowrap}
+.selbar b{font-size:15px}
+.sub{font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;background:color-mix(in srgb,var(--ink) 18%,transparent)}
+.btn.g .sub{background:var(--soft);color:var(--muted)}
+.pop{background:var(--pop);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 12px 36px var(--shadow);display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--pop);border:1px solid var(--line);border-radius:14px;padding:10px 12px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 36px var(--shadow);font-size:14px}
+.step{display:flex;flex-direction:column;gap:8px}
+.step .t{font-size:13px;font-weight:600;color:var(--acct);display:flex;gap:8px;align-items:center}
+.mini{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;min-height:300px}
+.mr{display:grid;grid-template-columns:20px 28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 10px;border-radius:10px;background:var(--soft);font-size:13px}
+.mr.sel{background:color-mix(in srgb,var(--accent) 14%,var(--soft))}
+.mr .th{width:24px;height:32px}
+.mr .th:before{height:6px}.mr .th:after{left:4px;right:4px;top:11px;height:2px;box-shadow:0 4px 0 #cfd2da,0 8px 0 #cfd2da}
+.sk{background:linear-gradient(90deg,var(--soft),color-mix(in srgb,var(--text) 10%,var(--soft)),var(--soft));background-size:200% 100%;border-radius:8px;animation:sk 1.4s ease-out infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none}}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);display:inline-block;flex:none}
+.pad{padding:18px 20px}
+
+</style>
+</helmet>
+<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--acct:#5eead4;--danger:#ff4d4d;--dangert:#ff8a8a;--text:#f5f5f5;--muted:#b0b0b0;--line:#3f3f5a;--soft:#34344a;--inset:#252538;--ink:#0b1f1c;--warn:#fbbf24;--warnt:#fbbf24;--pop:#0f0f1a;--shadow:rgba(0,0,0,.5);width:1920px;height:1100px">
+<div class="lab">P-50 · Selección múltiple del lote</div><h1 style="font-size:32px;margin:6px 0 6px">Marcar varios PDF y actuar sobre todos a la vez</h1><p class="cap" style="max-width:1400px">Qué se puede hacer, cómo se marca con ratón y teclado, qué pasa con los PDF que no pueden recibir la acción y cuatro decisiones por tomar. Parte de la barra flotante aprobada en P-46.</p>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px">
+<div class="card"><h3>Marcar</h3>
+<p class="cap"><b style="color:var(--text)">Ratón:</b> casilla en cada fila y tarjeta (siempre visible en la lista; en la cuadrícula aparece al pasar el ratón y se queda al marcar).</p>
+<p class="cap"><b style="color:var(--text)">Rango:</b> <span class="kbd">Mayús</span> <span class="kbd">clic</span> marca desde el último. <b style="color:var(--text)">Suma:</b> <span class="kbd">Ctrl</span> <span class="kbd">clic</span> (⌘ en Mac).</p>
+<p class="cap"><b style="color:var(--text)">Teclado:</b> <span class="kbd">Espacio</span> marca la fila enfocada; <span class="kbd">Mayús</span> <span class="kbd">↑</span> <span class="kbd">Mayús</span> <span class="kbd">↓</span> amplía; <span class="kbd">Enter</span> sigue abriendo el PDF.</p></div>
+<div class="card"><h3>Todo o nada</h3>
+<p class="cap">Casilla de la cabecera de la lista (tres estados: vacía, mixta, completa) y enlace «Seleccionar los 8» en la barra cuando hay marcados.</p>
+<p class="cap"><span class="kbd">Ctrl</span> <span class="kbd">A</span> marca todos los PDF <b style="color:var(--text)">visibles</b> (respeta filtro y buscador). <span class="kbd">Esc</span> o ✕ quitan la selección.</p></div>
+<div class="card"><h3>Dónde aparece la barra</h3>
+<p class="cap">Flotante, centrada al pie del panel, con 1 o más marcados (decisión ya aprobada en P-46). Es un <b style="color:var(--text)">toolbar</b> accesible; el recuento se anuncia con <span class="kbd">aria-live="polite"</span>.</p>
+<p class="cap">Con la barra visible, «Revisar», «Subir B» y quitar de cada fila se atenúan para que haya un único sitio donde actuar.</p></div></div>
+<div style="display:grid;grid-template-columns:1.45fr 1fr;gap:28px;margin-top:22px;align-items:start">
+<div class="card"><h3>Qué hace cada acción de la barra</h3><div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:grid;grid-template-columns:210px 1.1fr 1.1fr 1.2fr;gap:14px;padding:0 14px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em"><span>Acción</span><span>Se aplica a…</span><span>Los demás</span><span>Confirmación y feedback</span></div>
+<div style="display:grid;grid-template-columns:210px 1.1fr 1.1fr 1.2fr;gap:14px;padding:12px 14px;border-radius:12px;background:var(--soft);font-size:14px;align-items:start"><b>Trasladar con IA</b><span>Pares con B y con campos en A, aún sin propuesta</span><span class="cap">Se omiten y se cuentan: «2 de 5 omitidos · sin B»</span><span class="cap">Popover de P-42 con estimación; progreso «2 de 4»; estado por fila; nunca se aplica en bloque (se revisa PDF a PDF)</span></div>
+<div style="display:grid;grid-template-columns:210px 1.1fr 1.1fr 1.2fr;gap:14px;padding:12px 14px;border-radius:12px;background:var(--soft);font-size:14px;align-items:start"><b>Descargar</b><span>Solo PDF validados (hoy «Descargar validados»)</span><span class="cap">Se omiten y se cuentan: «3 de 5 sin validar»</span><span class="cap">ZIP con los JSON (1 solo = JSON suelto); progreso «Preparando 8 de 12»; aviso al terminar</span></div>
+<div style="display:grid;grid-template-columns:210px 1.1fr 1.1fr 1.2fr;gap:14px;padding:12px 14px;border-radius:12px;background:var(--soft);font-size:14px;align-items:start"><b>Marcar «Listo»</b><span>PDF por revisar con plantilla y, si lo hay, B</span><span class="cap">Sin plantilla: se omiten y se cuentan</span><span class="cap">Diálogo corto: avisa de que salta la revisión; aviso con «Deshacer» durante 10 s</span></div>
+<div style="display:grid;grid-template-columns:210px 1.1fr 1.1fr 1.2fr;gap:14px;padding:12px 14px;border-radius:12px;background:var(--soft);font-size:14px;align-items:start"><b>Quitar</b><span>Todos los marcados</span><span class="cap">—</span><span class="cap">Diálogo con recuento exacto; aviso con «Deshacer» durante 10 s (hoy solo hay confirmación)</span></div></div></div>
+<div class="card"><h3>Reglas</h3><div style="display:flex;flex-direction:column;gap:12px">
+<div class="find"><span class="pin">1</span><span><b>Las acciones nunca fallan en silencio.</b> Cada botón de la barra muestra «N de M» cuando no todos los marcados son aptos; si ninguno lo es, el botón queda desactivado con su motivo en el tooltip.</span></div>
+<div class="find"><span class="pin">2</span><span><b>La selección es de lo que ves.</b> Al cambiar filtro o buscador se quitan de la selección los PDF que dejan de verse; así «Quitar 3» nunca borra algo oculto.</span></div>
+<div class="find"><span class="pin">3</span><span><b>Una cosa a la vez.</b> Mientras corre una acción larga (IA o ZIP) la selección queda bloqueada y la barra pasa a mostrar el progreso con «Cancelar».</span></div>
+<div class="find"><span class="pin">4</span><span><b>Una selección por visita.</b> No se guarda al recargar ni al abrir un PDF: al volver del editor al panel parte vacía.</span></div>
+<div class="find"><span class="pin">5</span><span><b>Accesible.</b> Foco visible de 2 px en filas y barra, casillas nativas con nombre («Seleccionar factura-0331.pdf»), Tab recorre la lista y luego la barra, y el movimiento respeta <i>prefers-reduced-motion</i>.</span></div></div></div></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:22px">
+<div class="card" style="border-color:var(--accent)"><span class="chip on">Recomendado</span><h3>1 · Barra flotante o en la cabecera</h3><p class="cap">Flotante al pie (como P-46, ya aprobada): no desplaza la lista y queda junto a los dedos. Alternativa: sustituir la cabecera mientras hay selección (Gmail), que tapa el progreso del lote.</p></div>
+<div class="card" style="border-color:var(--accent)"><span class="chip on">Recomendado</span><h3>2 · Quitar con «Deshacer»</h3><p class="cap">Diálogo con recuento y aviso con «Deshacer» 10 s; los datos se borran de IndexedDB al caducar. Alternativa: solo el diálogo, como hoy.</p></div>
+<div class="card" style="border-color:var(--accent)"><span class="chip on">Recomendado</span><h3>3 · «Listo» en bloque, con aviso</h3><p class="cap">Permitido para los que tengan plantilla, avisando de que se salta la revisión. Alternativa: solo los que ya se abrieron en el editor.</p></div>
+<div class="card" style="border-color:var(--accent)"><span class="chip on">Recomendado</span><h3>4 · Filtrar vacía lo oculto</h3><p class="cap">La selección sigue a lo visible. Alternativa: conservarla y avisar «1 oculto por el filtro», más flexible pero más fácil de equivocarse.</p></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

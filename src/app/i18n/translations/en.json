@@ -877,6 +877,36 @@
       "step1": "Upload the batch's PDFs (the current version, A).",
       "step2": "Add their templates as JSON or paste them.",
       "step3": "Upload the new versions (B), move the fields over and review each PDF."
+    },
+    "select": {
+      "row": "Select {{name}}",
+      "all": "Select all visible PDFs",
+      "allShort": "Select all",
+      "none": "Clear selection"
+    },
+    "bulk": {
+      "toolbar": "Actions on {{count}} selected PDFs",
+      "selected": "{{count}} selected",
+      "selectAll": "Select all {{count}}",
+      "download": "Download",
+      "ready": "Mark Done",
+      "remove": "Remove",
+      "clear": "Clear selection",
+      "noneDownload": "None of the selected PDFs is validated",
+      "noneReady": "None of the selected PDFs can be marked Done",
+      "aiSkipped": "{{count}} of the selected are skipped: no version B, no fields or already Done.",
+      "readyTitle": "Mark {{count}} PDFs as Done",
+      "readyText": "This skips the review in the editor. Fields stay exactly as they are.",
+      "readySkipped": "{{count}} without a template are skipped.",
+      "readyYes": "Mark {{count}}",
+      "removeTitle": "Remove {{count}} PDFs from the batch",
+      "removeText": "They are deleted from this browser together with their templates and B versions. Your original files are not touched.",
+      "removeYes": "Remove {{count}}",
+      "removed": "{{count}} PDFs removed",
+      "readyDone": "{{count}} PDFs marked as Done",
+      "undo": "Undo",
+      "downloaded": "Download ready · {{count}} JSON files",
+      "downloadedSkipped": "Download ready · {{count}} JSON files · {{skipped}} not validated were left out"
     }
   },
   "preview": {

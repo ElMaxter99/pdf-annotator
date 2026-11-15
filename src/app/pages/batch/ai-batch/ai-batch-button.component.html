@@ -11,11 +11,15 @@
     data-testid="ai-batch-button"
   >
     ✦ {{ 'batch.ai.button' | t }}
+    @if (ids()) {
+      <span class="batch-sub">{{ eligible().length }} / {{ ids()!.length }}</span>
+    }
   </button>
   @if (open()) {
     <div
       #dlg
       class="ai-menu ai-pop"
+      [class.ai-menu--up]="up()"
       role="dialog"
       aria-labelledby="ai-batch-title"
       tabindex="-1"
@@ -33,6 +37,12 @@
           }
         </small>
       </p>
+
+      @if (skipped() > 0) {
+        <p class="ai-pop__skipped" data-testid="ai-batch-skipped">
+          {{ 'batch.bulk.aiSkipped' | t: { count: skipped() } }}
+        </p>
+      }
 
       <div class="ai-pop__row">
         <span class="ai-pop__provider" data-testid="ai-batch-current">{{ providerName() }} · {{ modelLabel() }}</span>

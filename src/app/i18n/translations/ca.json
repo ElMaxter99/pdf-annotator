@@ -877,6 +877,36 @@
       "step1": "Puja els PDF del lot (la versió actual, A).",
       "step2": "Afegeix-ne les plantilles en JSON o enganxa-les.",
       "step3": "Puja les versions noves (B), trasllada els camps i revisa cada PDF."
+    },
+    "select": {
+      "row": "Selecciona {{name}}",
+      "all": "Selecciona tots els PDF visibles",
+      "allShort": "Selecciona-ho tot",
+      "none": "Treu la selecció"
+    },
+    "bulk": {
+      "toolbar": "Accions sobre {{count}} PDF seleccionats",
+      "selected": "{{count}} seleccionats",
+      "selectAll": "Selecciona els {{count}}",
+      "download": "Descarrega",
+      "ready": "Marca Fet",
+      "remove": "Treu",
+      "clear": "Treu la selecció",
+      "noneDownload": "Cap dels marcats està validat",
+      "noneReady": "Cap dels marcats es pot marcar com a Fet",
+      "aiSkipped": "{{count}} dels marcats s’ometen: sense versió B, sense camps o ja Fet.",
+      "readyTitle": "Marca {{count}} PDF com a Fet",
+      "readyText": "Salta la revisió a l’editor. Els camps es queden tal com estan.",
+      "readySkipped": "{{count}} sense plantilla s’ometen.",
+      "readyYes": "Marca {{count}}",
+      "removeTitle": "Treu {{count}} PDF del lot",
+      "removeText": "S’esborren d’aquest navegador amb les plantilles i les versions B. Els teus fitxers originals no es toquen.",
+      "removeYes": "Treu {{count}}",
+      "removed": "{{count}} PDF retirats",
+      "readyDone": "{{count}} PDF marcats com a Fet",
+      "undo": "Desfés",
+      "downloaded": "Descàrrega a punt · {{count}} fitxers JSON",
+      "downloadedSkipped": "Descàrrega a punt · {{count}} fitxers JSON · {{skipped}} sense validar no s’han inclòs"
     }
   },
   "preview": {

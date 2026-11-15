@@ -29,6 +29,7 @@ import {
   type PastedTemplate,
 } from '../../utils/template-paste.utils';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { planBulk, pruneSelection, rangeBetween } from '../../utils/batch-selection.utils';
 import { createZip } from '../../utils/zip.utils';
 
 const MAX_JSON_BYTES = 5 * 1024 * 1024;
@@ -178,7 +179,196 @@ export class BatchPageComponent implements OnInit {
     () => this.templateRows().filter((row) => row.info && !row.info.error).length,
   );
 
+  // ---- multiple selection ------------------------------------------------------------------------
+  readonly selected = signal<ReadonlySet<string>>(new Set());
+  private anchor: string | null = null;
+  readonly visibleIds = computed(() => this.rows().map((row) => row.item.id));
+  /** Marked PDFs that are visible, in the order of the panel. */
+  readonly selectedItems = computed(() => {
+    const marked = this.selected();
+    return this.rows()
+      .filter((row) => marked.has(row.item.id))
+      .map((row) => row.item);
+  });
+  readonly selectedIds = computed(() => this.selectedItems().map((item) => item.id));
+  readonly selectionCount = computed(() => this.selectedItems().length);
+  readonly allSelected = computed(
+    () => this.visibleIds().length > 0 && this.selectionCount() === this.visibleIds().length,
+  );
+  readonly plan = computed(() => planBulk(this.selectedItems(), (item) => this.stateOf(item) === 'noTemplate'));
+  readonly dialog = signal<'ready' | 'remove' | null>(null);
+  readonly undoNotice = signal<{ kind: 'removed' | 'ready'; count: number } | null>(null);
+  private undoFn: (() => void) | null = null;
+  private undoTimer: number | null = null;
+
+  isSelected(id: string): boolean {
+    return this.selected().has(id);
+  }
+
+  /** Click on a checkbox: Shift = range from the last one, Ctrl/⌘ or plain = toggle. */
+  onCheck(id: string, event: MouseEvent): void {
+    const next = new Set(this.selected());
+    if (event.shiftKey && this.anchor) {
+      for (const other of rangeBetween(this.visibleIds(), this.anchor, id)) {
+        next.add(other);
+      }
+    } else if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    this.anchor = id;
+    this.selected.set(next);
+    (event.target as HTMLInputElement).checked = next.has(id);
+  }
+
+  /** Ctrl/⌘+click on a card or row name toggles it without opening the PDF. */
+  onCardClick(item: BatchItem, event: MouseEvent): void {
+    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+      event.preventDefault();
+      this.onCheck(item.id, event);
+      return;
+    }
+    void this.open(item);
+  }
+
+  /** Shift+↑/↓ on a checkbox extends the selection and moves the focus. */
+  onCheckKey(id: string, event: KeyboardEvent): void {
+    if (!event.shiftKey || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) {
+      return;
+    }
+    event.preventDefault();
+    const ids = this.visibleIds();
+    const next = ids[ids.indexOf(id) + (event.key === 'ArrowDown' ? 1 : -1)];
+    if (!next) {
+      return;
+    }
+    this.selected.update((set) => new Set(set).add(id).add(next));
+    this.anchor = next;
+    queueMicrotask(() =>
+      document
+        .querySelector<HTMLInputElement>(`input[data-select-id="${CSS.escape(next)}"]`)
+        ?.focus(),
+    );
+  }
+
+  toggleAll(): void {
+    this.selected.set(this.allSelected() ? new Set() : new Set(this.visibleIds()));
+  }
+
+  selectAllVisible(): void {
+    this.selected.set(new Set(this.visibleIds()));
+  }
+
+  clearSelection(): void {
+    this.selected.set(new Set());
+    this.anchor = null;
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKey(event: KeyboardEvent): void {
+    if (this.step() !== 'panel') {
+      return;
+    }
+    const target = event.target as HTMLElement | null;
+    const typing = !!target?.closest('input[type="search"], input[type="text"], textarea, select');
+    const key = event.key.toLowerCase();
+    if (event.key === 'Escape' && !event.defaultPrevented) {
+      if (this.dialog()) {
+        this.dialog.set(null);
+      } else if (this.selectionCount() > 0) {
+        this.clearSelection();
+      }
+    } else if ((event.ctrlKey || event.metaKey) && key === 'a' && !typing) {
+      event.preventDefault();
+      this.selectAllVisible();
+    } else if ((event.ctrlKey || event.metaKey) && key === 'z' && !typing && this.undoFn) {
+      event.preventDefault();
+      this.undo();
+    }
+  }
+
+  readonly bulkBusy = computed(() => this.aiQueue.busy());
+
+  askBulk(kind: 'ready' | 'remove'): void {
+    if (kind === 'ready' ? this.plan().ready > 0 : this.plan().total > 0) {
+      this.dialog.set(kind);
+    }
+  }
+
+  /** Marks the marked PDFs that have a template as «Listo» and offers to undo it. */
+  confirmReady(): void {
+    const ids = this.selectedItems()
+      .filter((item) => item.status !== 'ready' && this.stateOf(item) !== 'noTemplate')
+      .map((item) => item.id);
+    this.dialog.set(null);
+    if (!ids.length) {
+      return;
+    }
+    this.store.setStatusMany(ids, 'ready');
+    this.offerUndo('ready', ids.length, () => this.store.setStatusMany(ids, 'review'));
+  }
+
+  confirmRemoveSelected(): void {
+    const ids = this.selectedIds();
+    this.dialog.set(null);
+    if (!ids.length) {
+      return;
+    }
+    const removed = this.store.removeMany(ids);
+    this.clearSelection();
+    this.confirmRemove.set(null);
+    this.offerUndo('removed', removed.length, () => this.store.reinsert(removed));
+  }
+
+  private offerUndo(kind: 'removed' | 'ready', count: number, restore: () => void): void {
+    this.dropUndo();
+    this.undoFn = restore;
+    this.undoNotice.set({ kind, count });
+    if (typeof window !== 'undefined') {
+      this.undoTimer = window.setTimeout(() => this.dropUndo(), 10000);
+    }
+  }
+
+  undo(): void {
+    const restore = this.undoFn;
+    this.dropUndo();
+    restore?.();
+  }
+
+  dropUndo(): void {
+    if (this.undoTimer !== null) {
+      window.clearTimeout(this.undoTimer);
+      this.undoTimer = null;
+    }
+    this.undoFn = null;
+    this.undoNotice.set(null);
+  }
+
+  downloadSelected(): void {
+    const chosen = this.selectedItems();
+    const files = this.downloadItems(
+      chosen.filter((item) => item.status === 'ready' && !!item.bJson),
+    );
+    if (!files) {
+      return;
+    }
+    const skipped = chosen.length - files;
+    this.toast.show(
+      this.i18n.translate(skipped > 0 ? 'batch.bulk.downloadedSkipped' : 'batch.bulk.downloaded', {
+        count: files,
+        skipped,
+      }),
+      'success',
+    );
+  }
+
   constructor() {
+    // Only what is visible stays marked: «Quitar 3» never touches a hidden PDF.
+    effect(() => {
+      const visible = this.visibleIds();
+      untracked(() => this.selected.update((set) => pruneSelection(set, visible)));
+    });
     // The panel needs the batch to be read from IndexedDB before it can decide what to show.
     effect(() => {
       if (!this.store.loaded()) {
@@ -579,9 +769,15 @@ export class BatchPageComponent implements OnInit {
   }
 
   downloadReady(): void {
-    const ready = this.store.items().filter((item) => item.status === 'ready' && item.bJson);
+    this.downloadItems(
+      this.store.items().filter((item) => item.status === 'ready' && item.bJson),
+    );
+  }
+
+  /** Downloads the JSON of `ready` (one file, or a ZIP); returns how many files it holds. */
+  private downloadItems(ready: BatchItem[]): number {
     if (!ready.length) {
-      return;
+      return 0;
     }
     const jsonName = (item: BatchItem) =>
       `${(item.bName ?? item.name).replace(/\.[^./\\]+$/, '')}.json`;
@@ -590,7 +786,7 @@ export class BatchPageComponent implements OnInit {
         new Blob([ready[0].bJson as string], { type: 'application/json' }),
         jsonName(ready[0]),
       );
-      return;
+      return 1;
     }
     const encoder = new TextEncoder();
     const used = new Map<string, number>();
@@ -605,6 +801,7 @@ export class BatchPageComponent implements OnInit {
     });
     const zip = createZip(entries);
     downloadBlob(new Blob([zip as BlobPart], { type: 'application/zip' }), 'plantillas-b.zip');
+    return ready.length;
   }
 }
 

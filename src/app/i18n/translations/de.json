@@ -877,6 +877,36 @@
       "step1": "Laden Sie die PDFs des Stapels hoch (die aktuelle Version, A).",
       "step2": "Fügen Sie deren Vorlagen als JSON hinzu oder fügen Sie sie ein.",
       "step3": "Laden Sie die neuen Versionen (B) hoch, übertragen Sie die Felder und prüfen Sie jedes PDF."
+    },
+    "select": {
+      "row": "{{name}} auswählen",
+      "all": "Alle sichtbaren PDFs auswählen",
+      "allShort": "Alle auswählen",
+      "none": "Auswahl aufheben"
+    },
+    "bulk": {
+      "toolbar": "Aktionen für {{count}} ausgewählte PDFs",
+      "selected": "{{count}} ausgewählt",
+      "selectAll": "Alle {{count}} auswählen",
+      "download": "Herunterladen",
+      "ready": "Als Fertig markieren",
+      "remove": "Entfernen",
+      "clear": "Auswahl aufheben",
+      "noneDownload": "Keines der ausgewählten PDFs ist validiert",
+      "noneReady": "Keines der ausgewählten PDFs kann als Fertig markiert werden",
+      "aiSkipped": "{{count}} der ausgewählten werden übersprungen: ohne Version B, ohne Felder oder bereits Fertig.",
+      "readyTitle": "{{count}} PDFs als Fertig markieren",
+      "readyText": "Die Prüfung im Editor wird übersprungen. Die Felder bleiben unverändert.",
+      "readySkipped": "{{count}} ohne Vorlage werden übersprungen.",
+      "readyYes": "{{count}} markieren",
+      "removeTitle": "{{count}} PDFs aus dem Stapel entfernen",
+      "removeText": "Sie werden samt Vorlagen und B-Versionen aus diesem Browser gelöscht. Ihre Originaldateien bleiben unberührt.",
+      "removeYes": "{{count}} entfernen",
+      "removed": "{{count}} PDFs entfernt",
+      "readyDone": "{{count}} PDFs als Fertig markiert",
+      "undo": "Rückgängig",
+      "downloaded": "Download bereit · {{count}} JSON-Dateien",
+      "downloadedSkipped": "Download bereit · {{count}} JSON-Dateien · {{skipped}} nicht validierte ausgelassen"
     }
   },
   "preview": {

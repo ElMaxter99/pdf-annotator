@@ -1,4 +1,6 @@
 ## Unreleased
+### Added
+- **Selección múltiple en el panel del lote (mesas P-50 a P-54):** casilla en cada fila (lista) y tarjeta (cuadrícula), casilla de cabecera con estado mixto, Mayús+clic para rangos, Ctrl/⌘+clic, Mayús+↑/↓, Ctrl+A y Esc. Con PDFs marcados aparece una barra flotante con recuentos «N / M»: **Trasladar con IA** (solo los marcados aptos; el popover avisa de los omitidos), **Descargar** (solo validados), **Marcar Listo** (con aviso de que salta la revisión) y **Quitar** (con recuento exacto). «Marcar Listo» y «Quitar» ofrecen **Deshacer** durante 10 s (también con Ctrl+Z). La selección sigue a lo visible: filtrar o buscar quita de la marcada lo que deja de verse.
 
 ## [v1.10.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.10.0) - 2026-11-14
 ### Fixed

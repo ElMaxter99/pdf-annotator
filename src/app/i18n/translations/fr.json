@@ -877,6 +877,36 @@
       "step1": "Ajoutez les PDF du lot (la version actuelle, A).",
       "step2": "Ajoutez leurs modèles en JSON ou collez-les.",
       "step3": "Ajoutez les nouvelles versions (B), transférez les champs et vérifiez chaque PDF."
+    },
+    "select": {
+      "row": "Sélectionner {{name}}",
+      "all": "Sélectionner tous les PDF visibles",
+      "allShort": "Tout sélectionner",
+      "none": "Effacer la sélection"
+    },
+    "bulk": {
+      "toolbar": "Actions sur {{count}} PDF sélectionnés",
+      "selected": "{{count}} sélectionnés",
+      "selectAll": "Sélectionner les {{count}}",
+      "download": "Télécharger",
+      "ready": "Marquer Terminé",
+      "remove": "Retirer",
+      "clear": "Effacer la sélection",
+      "noneDownload": "Aucun des PDF sélectionnés n’est validé",
+      "noneReady": "Aucun des PDF sélectionnés ne peut être marqué Terminé",
+      "aiSkipped": "{{count}} des PDF sélectionnés sont ignorés : sans version B, sans champs ou déjà Terminé.",
+      "readyTitle": "Marquer {{count}} PDF comme Terminé",
+      "readyText": "La revue dans l’éditeur est sautée. Les champs restent tels quels.",
+      "readySkipped": "{{count}} sans modèle sont ignorés.",
+      "readyYes": "Marquer {{count}}",
+      "removeTitle": "Retirer {{count}} PDF du lot",
+      "removeText": "Ils sont supprimés de ce navigateur avec leurs modèles et versions B. Vos fichiers d’origine ne sont pas touchés.",
+      "removeYes": "Retirer {{count}}",
+      "removed": "{{count}} PDF retirés",
+      "readyDone": "{{count}} PDF marqués Terminé",
+      "undo": "Annuler",
+      "downloaded": "Téléchargement prêt · {{count}} fichiers JSON",
+      "downloadedSkipped": "Téléchargement prêt · {{count}} fichiers JSON · {{skipped}} non validés exclus"
     }
   },
   "preview": {

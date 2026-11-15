@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, inject, input, signal } from '@angular/core';
 import { InfoTipComponent } from '../../../components/info-tip/info-tip.component';
 import { AiModelSelectComponent } from '../../../components/ai-model-select/ai-model-select.component';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
@@ -42,7 +42,18 @@ export class AiBatchButtonComponent {
   readonly cascade = signal(true);
   readonly remember = signal(false);
 
-  readonly eligible = computed(() => this.store.items().filter(isEligibleForAiBatch));
+  /** Limits the run to these PDFs (the marked ones); `null` = the whole batch. */
+  readonly ids = input<readonly string[] | null>(null);
+  /** Opens the popover upwards (button in the selection bar at the bottom). */
+  readonly up = input(false);
+
+  readonly eligible = computed(() => {
+    const only = this.ids();
+    const pool = only ? this.store.items().filter((item) => only.includes(item.id)) : this.store.items();
+    return pool.filter(isEligibleForAiBatch);
+  });
+  /** Marked PDFs the run leaves out (no B, no fields or already «Listo»). */
+  readonly skipped = computed(() => (this.ids() ? this.ids()!.length - this.eligible().length : 0));
   readonly withoutB = computed(() => this.store.items().filter((item) => !item.bPdf).length);
   readonly provider = this.helper.provider;
   readonly providerName = computed(() => providerName(this.provider()));
