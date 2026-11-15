@@ -1,3 +1,4 @@
+import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
 import { Component, ElementRef, EventEmitter, Output, ViewChild, AfterViewInit } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
@@ -14,7 +15,7 @@ interface ShortcutGroup {
   selector: 'app-shortcuts-dialog',
   standalone: true,
   templateUrl: './shortcuts-dialog.component.html',
-  imports: [TranslationPipe],
+  imports: [FocusTrapDirective, TranslationPipe],
 })
 export class ShortcutsDialogComponent implements AfterViewInit {
   @Output() closed = new EventEmitter<void>();

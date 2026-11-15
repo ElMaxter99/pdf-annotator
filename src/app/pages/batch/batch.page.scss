@@ -38,7 +38,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
   text-decoration: none;
 }
@@ -278,7 +278,7 @@
 
 .batch-chip--on {
   background: color-mix(in srgb, var(--accent) 18%, transparent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .batch-chip--ok {
@@ -355,7 +355,7 @@
 
 .batch-steps__done .batch-steps__n {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .batch-wizard {
@@ -792,7 +792,7 @@ app-ai-batch-chip {
   summary {
     cursor: pointer;
     width: fit-content;
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 600;
 
     &:focus-visible {

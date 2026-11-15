@@ -114,3 +114,17 @@ test('rapid zoom changes leave the page rendered at the final scale', async ({ p
     .toBe(Math.floor(595 * 1.25));
   await expect(page.locator('.canvas--pdf')).toBeVisible();
 });
+
+test('dialogs trap focus and give it back on close', async ({ page }) => {
+  await page.keyboard.press('Shift+?');
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  for (let i = 0; i < 4; i++) {
+    await page.keyboard.press('Tab');
+    expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+  }
+  await page.keyboard.press('Shift+Tab');
+  expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+});
