@@ -10,10 +10,9 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 
 ## Siguiente
 1. **Remaquetado por lotes, fases siguientes:** vista dividida (A y B del mismo tamaño y zoom, scroll ligado), aviso y escalado cuando A y B miden distinto, y «Copiar y ajustar por textos» (proponer el desplazamiento con el texto que ya extrae pdf.js; siempre como sugerencia).
-2. **Heredar `fontSize` global** al importar (hoy los campos sin tamaño reciben 14). Afecta al formato real del autor.
-3. Dividir `workspace.page.ts` (≈4.130 líneas): render del PDF, miniaturas y sincronización del JSON.
-4. Accesibilidad: trap de foco en diálogos, `aria-live` en coordenadas, contraste en tema claro.
-5. Rendimiento: miniaturas bajo demanda, `OnPush`.
+2. Dividir `workspace.page.ts` (≈4.130 líneas): render del PDF, miniaturas y sincronización del JSON.
+3. Accesibilidad: trap de foco en diálogos, `aria-live` en coordenadas, contraste en tema claro.
+4. Rendimiento: miniaturas bajo demanda, `OnPush`.
 6. Dockerfile: `nginx-unprivileged`, `npm ci`; `npm audit` y Dependabot en CI.
 7. Más tests: atajos y normalización de coordenadas.
 

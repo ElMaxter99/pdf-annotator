@@ -20,6 +20,36 @@ describe('AnnotationImportService', () => {
     expect(service.normalizeImportedCoordinates('text', identity)).toBeNull();
   });
 
+  it('inherits the global fontSize for fields without their own', () => {
+    const result = service.normalizeImportedCoordinates(
+      {
+        fontSize: 11,
+        pages: [
+          {
+            num: 1,
+            fields: [
+              { x: 1, y: 2, mapField: 'a' },
+              { x: 1, y: 2, mapField: 'b', fontSize: 20 },
+              { x: 1, y: 2, mapField: 'c', fontSize: -3 },
+            ],
+          },
+        ],
+      },
+      identity
+    );
+    expect(result![0].fields.map((f) => f.fontSize)).toEqual([11, 20, 11]);
+  });
+
+  it('falls back to 14 without a valid global fontSize', () => {
+    for (const fontSize of [undefined, 0, -5, 'x']) {
+      const result = service.normalizeImportedCoordinates(
+        { fontSize, pages: [{ num: 1, fields: [{ x: 1, y: 2, mapField: 'a' }] }] },
+        identity
+      );
+      expect(result![0].fields[0].fontSize).toBe(14);
+    }
+  });
+
   it('accepts a bare array of pages', () => {
     const result = service.normalizeImportedCoordinates(
       [{ num: 1, fields: [{ x: 1, y: 2, mapField: 'a' }] }],

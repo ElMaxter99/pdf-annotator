@@ -1,4 +1,6 @@
 ## Unreleased
+### Fixed
+- **Importar JSON respeta el tamaño de letra global:** los campos sin `fontSize` heredan el `fontSize` global del JSON (antes se quedaban en 14 y cambiaban el formato del autor). Tests unitario y e2e incluidos.
 
 ## [v1.10.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.10.0) - 2026-11-14
 ### Fixed
