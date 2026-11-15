@@ -50,6 +50,11 @@ export class AnnotationImportService {
       return null;
     }
 
+    const globalFontSize = Array.isArray(data)
+      ? null
+      : toFiniteNumber((data as { fontSize?: unknown }).fontSize);
+    const defaultFontSize = globalFontSize && globalFontSize > 0 ? globalFontSize : 14;
+
     const normalized: PageAnnotations[] = [];
 
     for (const rawPage of pagesData) {
@@ -102,8 +107,9 @@ export class AnnotationImportService {
           continue;
         }
 
-        const normalizedFontSize = toFiniteNumber(fontSize);
-        if (normalizedFontSize !== null && (normalizedFontSize < 8 || normalizedFontSize > 72)) {
+        const ownFontSize = toFiniteNumber(fontSize);
+        const normalizedFontSize = ownFontSize && ownFontSize > 0 ? ownFontSize : defaultFontSize;
+        if (ownFontSize !== null && (ownFontSize < 8 || ownFontSize > 72)) {
           report.fontSizeOutOfRange += 1;
         }
         const normalizedColor =
@@ -113,10 +119,7 @@ export class AnnotationImportService {
           x: Math.round(normalizedX * 100) / 100,
           y: Math.round(normalizedY * 100) / 100,
           mapField: normalizedMapField ?? '',
-          fontSize:
-            normalizedFontSize && normalizedFontSize > 0
-              ? Math.round(normalizedFontSize * 100) / 100
-              : 14,
+          fontSize: Math.round(normalizedFontSize * 100) / 100,
           color: normalizeColor(normalizedColor),
           type: normalizedType,
         };

@@ -29,4 +29,4 @@
 - Una anotación fuera del tamaño real de la página genera un aviso al importar de forma explícita.
 
 ## Diferencias conocidas con el formato del autor
-Las plantillas reales del autor traen un `fontSize` global fuera de `pages` y campos sin `fontSize`. El importador actual pone **14** a los campos sin tamaño e ignora el global; está anotado en `docs/ROADMAP.md`.
+Las plantillas reales del autor traen un `fontSize` global fuera de `pages` y campos sin `fontSize`. El importador hace que esos campos hereden el global (si falta o no es válido, 14).

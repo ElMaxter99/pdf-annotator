@@ -81,6 +81,7 @@ export async function renderedAnnotations(page: Page) {
     [...document.querySelectorAll<HTMLElement>('.annotation')].map((el) => ({
       text: el.textContent,
       fontFamily: el.style.fontFamily,
+      fontSize: el.style.fontSize,
     }))
   );
 }
