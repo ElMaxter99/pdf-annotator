@@ -1,3 +1,4 @@
+import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
@@ -5,7 +6,7 @@ import { TranslationPipe } from '../../../../i18n/translation.pipe';
   selector: 'app-about-dialog',
   standalone: true,
   templateUrl: './about-dialog.component.html',
-  imports: [TranslationPipe],
+  imports: [FocusTrapDirective, TranslationPipe],
 })
 export class AboutDialogComponent implements AfterViewInit {
   @Input({ required: true }) appName = '';

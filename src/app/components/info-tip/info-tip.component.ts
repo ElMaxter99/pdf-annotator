@@ -40,7 +40,7 @@ import { TranslationPipe } from '../../i18n/translation.pipe';
       }
       .info-tip__btn:hover,
       .info-tip__btn:focus-visible {
-        color: var(--accent);
+        color: var(--accent-text);
         border-color: var(--accent);
       }
       .info-tip__btn:focus-visible {

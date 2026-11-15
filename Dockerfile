@@ -16,7 +16,11 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve the compiled app with NGINX
-FROM nginx:1.27-alpine AS runner
+FROM nginxinc/nginx-unprivileged:1.27-alpine AS runner
+
+# The unprivileged image runs as the non-root `nginx` user (UID 101) and listens on 8080.
+# Switch to root only for the build-time file edits, then back.
+USER root
 
 # Remove the default nginx static assets
 RUN rm -rf /usr/share/nginx/html/*
@@ -30,6 +34,8 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy the built Angular assets
 COPY --from=build /app/dist/pdf-annotator/browser /usr/share/nginx/html
 
-EXPOSE 80
+USER nginx
+
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]

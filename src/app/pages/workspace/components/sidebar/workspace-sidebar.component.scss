@@ -13,7 +13,7 @@
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .sidebar-thumbnails__list {
@@ -44,7 +44,7 @@
 }
 
 .json-coords__label {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 
@@ -80,7 +80,7 @@
 
 .json-panel__title {
   margin: 0;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 1rem;
 }
 
@@ -93,7 +93,7 @@
   border-radius: 999px;
   padding: 4px 10px;
   background: rgba(94, 234, 212, 0.1);
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
@@ -143,7 +143,7 @@
   border-radius: 999px;
   border: 1px solid rgba(94, 234, 212, 0.35);
   background: rgba(94, 234, 212, 0.1);
-  color: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
 }
 

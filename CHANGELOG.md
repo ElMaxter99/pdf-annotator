@@ -1,4 +1,11 @@
 ## Unreleased
+### Security
+- **CI y contenedor más seguros:** `npm audit` (dependencias de producción, nivel alto) en el CI, Dependabot semanal (npm, escritorio, Actions y Docker) y la imagen Docker pasa a `nginx-unprivileged` (usuario sin privilegios, puerto 8080 dentro del contenedor; el puerto 4444 de `start:docker` no cambia).
+
+### Accessibility
+- **Foco atrapado en los diálogos:** Tab/Shift+Tab no salen de «Acerca de», «Atajos», exportar con ejemplos, «Listo» y consentimiento de IA, y el foco vuelve al botón que lo abrió (`FocusTrapDirective`).
+- **Coordenadas del cursor sin ruido:** ya no se anuncian en cada movimiento del ratón; «Guardado hace…» se anuncia con `aria-live="polite"`.
+- **Contraste del tema claro:** el texto en color de acento usa `--accent-text` (#0b7d72, 5,0:1 sobre blanco; antes 3,4:1).
 ### Fixed
 - **Importar JSON respeta el tamaño de letra global:** los campos sin `fontSize` heredan el `fontSize` global del JSON (antes se quedaban en 14 y cambiaban el formato del autor). Tests unitario y e2e incluidos.
 
