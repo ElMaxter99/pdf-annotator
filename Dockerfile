@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve the compiled app with NGINX
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS runner
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS runner
 
 # The unprivileged image runs as the non-root `nginx` user (UID 101) and listens on 8080.
 # Switch to root only for the build-time file edits, then back.
