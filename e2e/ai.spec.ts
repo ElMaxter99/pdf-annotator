@@ -265,8 +265,14 @@ test('en una web pública (no local) no hay rastro de la IA', async ({ page }) =
   await stubAnalytics(page);
   await page.route('http://app.test/**', async (route) => {
     const url = new URL(route.request().url());
-    const response = await route.fetch({ url: `http://127.0.0.1:4300${url.pathname}${url.search}` });
-    await route.fulfill({ response });
+    try {
+      const response = await route.fetch({ url: `http://127.0.0.1:4300${url.pathname}${url.search}` });
+      await route.fulfill({ response });
+    } catch {
+      // A request still in flight when the page navigates or the test ends loses its response
+      // («Fetch response has been disposed»): nothing is waiting for it any more.
+      await route.abort().catch(() => undefined);
+    }
   });
   await page.goto('http://app.test/landing');
   await page
