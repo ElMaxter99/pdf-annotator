@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-66 Cola del ayudante estados claro 1280</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--atext);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:13px;font-weight:600;border:0;border-radius:999px;padding:4px 14px;min-height:32px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.q{background:transparent;color:var(--muted);padding:4px 10px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--atext)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--wtext)}
+.chip.err{background:color-mix(in srgb,var(--danger) 14%,transparent);color:var(--dtext)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;flex:none}
+.dot.on{background:var(--accent)}.dot.warn{background:var(--warn)}.dot.err{background:var(--danger)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.sp{flex-grow:1}
+.bar{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar.s i{background:var(--warn)}
+.sk{border-radius:8px;background:linear-gradient(90deg,var(--soft),color-mix(in srgb,var(--line) 70%,transparent),var(--soft));height:14px}
+.ico{width:32px;height:32px;border-radius:10px;background:var(--soft);display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:var(--text);flex:none}
+.tr{display:grid;grid-template-columns:44px 1fr 210px 96px;gap:14px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.pdf{width:36px;height:46px;background:var(--page);border-radius:3px;border:1px solid var(--line)}
+.mock{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.top{height:56px;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.side{position:absolute;right:0;top:56px;bottom:0;background:var(--panel);border-left:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:12px}
+.pin{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.find{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.ban{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 14%,transparent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);font-size:14px}
+@media (prefers-reduced-motion:no-preference){.run{animation:pulse 1.4s ease-out infinite}@keyframes pulse{50%{opacity:.45}}}
+</style>
+</helmet>
+<div class="p" style="--bg:#f6f7fb;--panel:#ffffff;--accent:#0f9b8e;--atext:#0b7d72;--danger:#dc2626;--dtext:#b91c1c;--text:#0f172a;--muted:#475569;--line:#d5dbe6;--soft:#eef1f7;--ink:#ffffff;--warn:#b45309;--wtext:#92400e;--page:#fff;width:1280px;height:1380px">
+<div class="lab">P-66 · Cola en el ayudante · estados · 1280 y claro</div><h1 style="font-size:30px;margin:6px 0 4px">Qué se ve cuando algo se corta</h1><p class="cap" style="max-width:1100px">Mismo panel que P-65 en tema claro a 1280 px, y los seis estados que no son «todo va bien». Siempre hay una salida con un botón y ningún estado deja la cola en silencio.</p><div style="margin-top:20px"><div class="mock" style="width:1216px;height:520px"><div class="top"><b style="color:var(--atext)">Pdf Annotator</b><b>Lote · 6 PDFs</b><span class="sp"></span><span class="cap">0 de 6 listos</span><button type="button" class="btn g">✦ Trasladar con IA</button><span class="ico" aria-hidden="true">⋯</span></div><div style="padding:16px;display:flex;flex-direction:column;gap:8px;width:820px"><div class="tr"><div class="pdf"></div><div><b>factura-0331.pdf</b><div class="cap" style="font-size:12px">10 campos · B: factura-0331-nuevo.pdf</div></div><span class="chip on">Lista · 10 de 10</span><span style="text-align:right"><button type="button" class="btn g">Revisar</button></span></div><div class="tr"><div class="pdf"></div><div><b>factura-0332.pdf</b><div class="cap" style="font-size:12px">9 campos · B: factura-0332-nuevo.pdf</div></div><span class="chip on">Lista · 8 de 9</span><span style="text-align:right"><button type="button" class="btn g">Revisar</button></span></div><div class="tr"><div class="pdf"></div><div><b>contrato-12.pdf</b><div class="cap" style="font-size:12px">4 campos · B: contrato-12-v2.pdf</div></div><span class="chip on">Lista · 4 de 4</span><span style="text-align:right"><button type="button" class="btn g">Revisar</button></span></div><div class="tr"><div class="pdf"></div><div><b>albaran-77.pdf</b><div class="cap" style="font-size:12px">12 campos · B: albaran-77-v2.pdf</div></div><span class="chip warn">Preguntando · intento 1</span><span style="text-align:right"></span></div><div class="tr"><div class="pdf"></div><div><b>albaran-78.pdf</b><div class="cap" style="font-size:12px">7 campos · B: albaran-78-v2.pdf</div></div><span class="chip warn">Leyendo</span><span style="text-align:right"></span></div><div class="tr"><div class="pdf"></div><div><b>albaran-79.pdf</b><div class="cap" style="font-size:12px">7 campos · B: albaran-79-v2.pdf</div></div><span class="chip ">En cola</span><span style="text-align:right"></span></div></div><div class="side" style="width:396px"><div style="display:flex;align-items:center;gap:8px"><b style="font-size:16px">Traslado con IA</b><span class="chip on">Claude Code</span><span class="sp"></span><button type="button" class="ico" aria-label="Cerrar panel">✕</button></div><div style="display:flex;gap:8px;align-items:center"><span class="chip on"><span class="dot on"></span> En el ayudante</span><span class="chip ">2 a la vez</span></div><div><div style="display:flex;justify-content:space-between;font-size:13px"><span>3 de 6 PDFs</span><span class="cap">0:48</span></div><div class="bar" style="margin-top:6px"><i style="width:50%"></i></div></div><div class="row"><span class="dot warn run"></span><b>albaran-77.pdf</b><span class="sp"></span><span class="chip warn">Preguntando · intento 1</span></div><div class="row"><span class="dot warn run"></span><b>albaran-78.pdf</b><span class="sp"></span><span class="chip warn">Leyendo</span></div><div class="cap" style="font-size:13px">Nada se aplica solo: cada propuesta se revisa PDF a PDF. Con Copilot irían de una en una.</div><span class="sp"></span><div style="display:flex;gap:8px"><button type="button" class="btn g">Parar todo</button><button type="button" class="btn g">Detalles ▾</button></div><div class="cap" style="font-size:12px">Puedes cerrar la pestaña o recargar: la cola sigue mientras el ayudante esté abierto.</div></div></div></div><div style="margin-top:24px"><span class="chip on">Estados del panel</span></div><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:12px"><div class="card" style="gap:10px"><div style="display:flex;align-items:center;gap:8px"><b>Reconectando</b><span class="sp"></span><span class="chip ">Un momento</span></div><div class="sk" style="width:80%"></div><div class="sk" style="width:55%"></div><div class="cap" style="font-size:13px">Buscando la cola en el ayudante… Nada se envía mientras tanto.</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn g">Cancelar</button></div></div><div class="card" style="gap:10px"><div style="display:flex;align-items:center;gap:8px"><b>El ayudante se cerró</b><span class="sp"></span><span class="chip err">Cola perdida</span></div><div class="cap" style="font-size:13px">3 PDFs ya tenían su propuesta guardada y se conservan. Los otros 3 no llegaron a terminar.</div><div class="bar"><i style="width:50%"></i></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn ">Volver a lanzar los 3 que faltan</button><button type="button" class="btn g">Cómo conectarlo</button></div></div><div class="card" style="gap:10px"><div style="display:flex;align-items:center;gap:8px"><b>En pausa por el límite</b><span class="sp"></span><span class="chip warn">Pausa</span></div><div class="cap" style="font-size:13px">Claude ha alcanzado el límite de uso. Se renueva a las 18:30. Quedan 3 PDFs en cola.</div><div class="bar s"><i style="width:50%"></i></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn ">Reanudar</button><button type="button" class="btn g">Cancelar</button></div></div><div class="card" style="gap:10px"><div style="display:flex;align-items:center;gap:8px"><b>En pausa por fallos</b><span class="sp"></span><span class="chip err">2 fallos iguales</span></div><div class="cap" style="font-size:13px">albaran-77.pdf y albaran-78.pdf no se trasladaron: la IA tardó demasiado.</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn ">Reintentar los 2 y seguir</button><button type="button" class="btn g">Seguir sin ellos</button></div></div><div class="card" style="gap:10px"><div style="display:flex;align-items:center;gap:8px"><b>Cancelada</b><span class="sp"></span><span class="chip ">Parada</span></div><div class="cap" style="font-size:13px">Has parado la cola. Se conservan las 3 propuestas hechas; las otras 3 siguen sin trasladar.</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn g">Volver a lanzar los 3 que faltan</button></div></div><div class="card" style="gap:10px"><div style="display:flex;align-items:center;gap:8px"><b>Terminada</b><span class="sp"></span><span class="chip on">6 de 6</span></div><div class="cap" style="font-size:13px">Todo trasladado: 5 listos para revisar, 1 con aviso. Nada se ha aplicado.</div><div class="bar"><i style="width:100%"></i></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn ">Revisar el primero →</button></div></div></div><p class="cap" style="margin-top:16px;max-width:1100px">Movimiento: la barra y el punto «Preguntando» pulsan suave (150–300 ms, ease-out); con «reducir movimiento» quedan fijos. Foco visible y todo con teclado: Tab recorre filas y botones, Esc cierra el panel sin parar la cola.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1380}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

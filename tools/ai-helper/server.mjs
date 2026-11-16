@@ -1,17 +1,40 @@
 #!/usr/bin/env node
 // Ayudante local de la IA: la app (navegador) no puede lanzar `claude` ni `copilot`, así que lo hace este proceso,
 // solo en 127.0.0.1, solo para los orígenes de la app y con un token de cada arranque. Nunca va en el despliegue.
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
 import { runProposal } from './pipeline.mjs';
 import { listModels } from './models.mjs';
 import { PROVIDERS, findExecutable } from '../ai-phase0/providers.mjs';
+import { createBatchQueue, createSlots, validItemId } from './queue.mjs';
 
 const PORT = Number(process.env.AI_HELPER_PORT || 4310);
 const ORIGINS = new Set((process.env.AI_HELPER_ORIGINS || 'http://localhost:4200,http://127.0.0.1:4200,http://localhost:4300,http://127.0.0.1:4300').split(','));
 const MAX_BODY = 60 * 1024 * 1024;
 const token = randomBytes(24).toString('hex');
-let busy = false;
+const slots = createSlots();
+const keepApiKey = () => process.env.AI_HELPER_KEEP_API_KEY === '1';
+const KNOWN_PROVIDERS = () => (process.env.AI_HELPER_FAKE === '1' ? ['claude', 'copilot', 'fake'] : ['claude', 'copilot']);
+const cleanModel = (m) => (typeof m === 'string' && /^[\w.\-:\/\[\]]{1,60}$/.test(m) ? m : undefined);
+const queue = createBatchQueue({
+  slots,
+  newId: () => randomUUID(),
+  run: ({ provider, model, retry, payload }, { signal, onStage, onEvent }) =>
+    runProposal({
+      provider,
+      model,
+      maxAttempts: retry === false ? 1 : 2,
+      aBytes: Buffer.from(payload.a, 'base64'),
+      bBytes: Buffer.from(payload.b, 'base64'),
+      template: payload.template,
+      keepApiKey: keepApiKey(),
+      timeoutMs: Number(process.env.AI_HELPER_TIMEOUT || 300) * 1000,
+      signal,
+      onStage,
+      onEvent,
+    }),
+});
+const busyNow = (provider) => slots.used(provider) >= slots.max(provider);
 
 const providersInfo = () => ({
   claude: { label: PROVIDERS.claude.label, found: !!findExecutable('claude') },
@@ -53,7 +76,15 @@ const server = createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
 
   if (req.method === 'GET' && url.pathname === '/status') {
-    return send(res, 200, { ok: true, version: 1, token, busy, providers: providersInfo() }, cors);
+    return send(res, 200, { ok: true, version: 2,
+      token,
+      // `busy` se mantiene por compatibilidad: true si algún proveedor no admite más peticiones ahora mismo.
+      busy: ['claude', 'copilot'].some(busyNow),
+      queue: true,
+      slots: { claude: { used: slots.used('claude'), max: slots.max('claude') }, copilot: { used: slots.used('copilot'), max: slots.max('copilot') } },
+      batches: queue.activeCount(),
+      providers: providersInfo(),
+    }, cors);
   }
   if (req.method === 'GET' && url.pathname === '/models') {
     if (req.headers['x-ai-token'] !== token) return send(res, 401, { error: 'token' }, cors);
@@ -68,7 +99,6 @@ const server = createServer(async (req, res) => {
   }
   if (req.method === 'POST' && url.pathname === '/propose') {
     if (req.headers['x-ai-token'] !== token) return send(res, 401, { error: 'token' }, cors);
-    if (busy) return send(res, 409, { error: 'busy' }, cors);
     let body;
     try {
       body = JSON.parse(await readBody(req));
@@ -79,7 +109,8 @@ const server = createServer(async (req, res) => {
     const model = typeof body?.model === 'string' && /^[\w.\-:\/\[\]]{1,60}$/.test(body.model) ? body.model : undefined;
     const maxAttempts = body?.retry === false ? 1 : 2;
     if (typeof a !== 'string' || typeof b !== 'string' || !template || !Array.isArray(template.pages)) return send(res, 400, { error: 'datos' }, cors);
-    busy = true;
+    const release = slots.acquire(provider);
+    if (!release) return send(res, 409, { error: 'busy' }, cors);
     const ac = new AbortController();
     res.on('close', () => ac.abort());
     res.writeHead(200, { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-store', ...cors });
@@ -102,13 +133,63 @@ const server = createServer(async (req, res) => {
     } catch (e) {
       line({ error: { code: e.code || 'error', message: String(e.message || e), reset: e.reset ?? null, details: e.details ?? null } });
     } finally {
-      busy = false;
+      release();
       if (!res.writableEnded) res.end();
     }
     return;
   }
+  if (url.pathname === '/batch' || url.pathname.startsWith('/batch/')) {
+    if (req.headers['x-ai-token'] !== token) return send(res, 401, { error: 'token' }, cors);
+    const parts = url.pathname.split('/').filter(Boolean); // ['batch', id?, 'items'|'resume'|'cancel'|'close'?, itemId?]
+    const readJson = async () => {
+      try {
+        return JSON.parse((await readBody(req)) || '{}');
+      } catch {
+        return undefined;
+      }
+    };
+    if (parts.length === 1 && req.method === 'POST') {
+      const body = await readJson();
+      if (!body) return send(res, 400, { error: 'json' }, cors);
+      if (!KNOWN_PROVIDERS().includes(body.provider)) return send(res, 400, { error: 'bad_provider' }, cors);
+      return send(res, 201, queue.create({ provider: body.provider, model: cleanModel(body.model), retry: body.retry !== false }), cors);
+    }
+    if (parts.length === 1 && req.method === 'GET') return send(res, 200, { batches: queue.list() }, cors);
+    const id = parts[1];
+    if (parts.length === 2 && req.method === 'GET') {
+      const snap = queue.get(id);
+      return snap ? send(res, 200, snap, cors) : send(res, 404, { error: 'not_found' }, cors);
+    }
+    if (parts.length === 2 && req.method === 'DELETE') return send(res, queue.remove(id) ? 200 : 404, { ok: true }, cors);
+    if (parts.length === 3 && parts[2] === 'items' && req.method === 'POST') {
+      let body;
+      try {
+        body = JSON.parse(await readBody(req));
+      } catch {
+        return send(res, 400, { error: 'json' }, cors);
+      }
+      const { itemId, a, b, template } = body ?? {};
+      if (!validItemId(itemId) || typeof a !== 'string' || typeof b !== 'string' || !template || !Array.isArray(template.pages)) return send(res, 400, { error: 'datos' }, cors);
+      const r = queue.add(id, itemId, { a, b, template }, { last: body.last === true });
+      if (r.error === 'not_found') return send(res, 404, r, cors);
+      if (r.error) return send(res, 409, r, cors);
+      return send(res, 202, queue.get(id), cors);
+    }
+    if (parts.length === 4 && parts[2] === 'items' && req.method === 'GET') {
+      const item = queue.getItem(id, parts[3]);
+      return item ? send(res, 200, item, cors) : send(res, 404, { error: 'not_found' }, cors);
+    }
+    if (parts.length === 3 && req.method === 'POST' && ['resume', 'cancel', 'close'].includes(parts[2])) {
+      const body = parts[2] === 'resume' ? await readJson() : {};
+      const snap = parts[2] === 'resume' ? queue.resume(id, { retryFailed: body?.retryFailed === true }) : parts[2] === 'cancel' ? queue.cancel(id) : queue.close(id);
+      return snap ? send(res, 200, snap, cors) : send(res, 404, { error: 'not_found' }, cors);
+    }
+    return send(res, 404, { error: 'ruta' }, cors);
+  }
   return send(res, 404, { error: 'ruta' }, cors);
 });
+
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => (queue.shutdown(), process.exit(0)));
 
 server.listen(PORT, '127.0.0.1', () => {
   const p = providersInfo();

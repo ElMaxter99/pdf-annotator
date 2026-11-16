@@ -71,6 +71,7 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
   /** The PDF in progress, if any. */
   readonly current = computed(() => this.list().find((entry) => AI_BATCH_ACTIVE_PHASES.includes(entry.row.phase)) ?? null);
   readonly retryCount = computed(() => this.counts().failed + this.counts().cancelled);
+  readonly lost = computed(() => this.queue.pause()?.kind === 'lost');
   readonly provider = computed(() => providerName(this.helper.provider()));
   readonly readyCount = computed(() => this.list().filter((e) => e.row.phase === 'ready').length);
   readonly freeCount = computed(() => this.list().filter((e) => e.row.phase === 'free').length);

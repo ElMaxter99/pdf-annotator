@@ -884,6 +884,16 @@
         "note": "Nulla viene applicato da solo: controlli tu ogni proposta.",
         "keepRunning": "Puoi chiudere questo pannello: il lavoro continua.",
         "open": "Apri"
+      },
+      "queue": {
+        "badge": "Nell'assistente",
+        "parallel": "{{n}} alla volta",
+        "serial": "Uno alla volta",
+        "reconnected": "Riconnesso. La coda era ancora in corso: {{done}} su {{total}} completati.",
+        "dismiss": "Ho capito",
+        "keepRunning": "Puoi chiudere la scheda o ricaricare: la coda continua finché l'assistente è aperto.",
+        "lost": "L'assistente è stato chiuso e la coda è andata persa. {{kept}} PDF conservano la proposta; {{lost}} non sono stati completati.",
+        "relaunch": "Rilancia i {{count}} mancanti"
       }
     },
     "more": "Altre azioni",

@@ -37,6 +37,9 @@ jobs:
       - name: AI helper tests
         run: npm test --prefix tools/ai-phase0
 
+      - name: AI helper queue tests
+        run: npm run test:helper
+
       - name: Desktop tests
         run: npm run test:desktop
 

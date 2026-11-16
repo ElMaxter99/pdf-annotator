@@ -884,6 +884,16 @@
         "note": "Nichts wird von selbst angewendet: Sie prüfen jeden Vorschlag.",
         "keepRunning": "Sie können dieses Panel schließen: die Arbeit läuft weiter.",
         "open": "Öffnen"
+      },
+      "queue": {
+        "badge": "Im Helfer",
+        "parallel": "{{n}} gleichzeitig",
+        "serial": "Einzeln nacheinander",
+        "reconnected": "Wieder verbunden. Die Warteschlange lief weiter: {{done}} von {{total}} erledigt.",
+        "dismiss": "Verstanden",
+        "keepRunning": "Du kannst den Tab schließen oder neu laden: Die Warteschlange läuft weiter, solange der Helfer geöffnet ist.",
+        "lost": "Der Helfer wurde geschlossen und die Warteschlange ging verloren. {{kept}} PDFs behalten ihren Vorschlag; {{lost}} wurden nicht fertig.",
+        "relaunch": "Die {{count}} fehlenden erneut starten"
       }
     },
     "more": "Weitere Aktionen",

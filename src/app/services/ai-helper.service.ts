@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { AiDetails, AiLiveEvent, AiResult, parseNdjson } from '../utils/ai-proposal.utils';
+import { AiRemoteSnapshot, parseSnapshot } from '../utils/ai-queue.utils';
 import { getDesktopBridge } from './desktop-update.service';
 
 export type AiProvider = 'claude' | 'copilot' | 'fake';
@@ -119,6 +120,10 @@ export class AiHelperService {
   readonly models = signal<Record<string, string>>(this.initialModels());
   readonly retry = signal<Record<string, boolean>>(this.initialRetry());
   readonly consent = signal(read(KEYS.consent) === '1');
+  /** The helper keeps the queue itself (version 2): it survives reloads and Claude runs two at a time. */
+  readonly queueSupported = signal(false);
+  /** How many requests at once the helper accepts per provider (Claude 2, Copilot 1). */
+  readonly slots = signal<Record<string, number>>({});
   /** Models each CLI offers, per provider. The last list read is remembered so it shows at once next time. */
   readonly modelLists = signal<Record<string, AiModelList>>(this.initialModelLists());
   /** Set when the saved model is no longer offered and the choice went back to a valid one. */
@@ -312,6 +317,8 @@ export class AiHelperService {
       const response = await fetch(`${helperBase()}/status`, { cache: 'no-store' });
       const data = (await response.json()) as {
         token?: string;
+        queue?: boolean;
+        slots?: Record<string, { max?: number }>;
         providers?: Record<string, { found?: boolean }>;
       };
       this.token = typeof data.token === 'string' ? data.token : '';
@@ -320,12 +327,93 @@ export class AiHelperService {
         found[key] = value?.found === true;
       }
       this.found.set(found);
+      this.queueSupported.set(data.queue === true);
+      const slots: Record<string, number> = {};
+      for (const [key, value] of Object.entries(data.slots ?? {})) {
+        const max = value?.max;
+        slots[key] = typeof max === 'number' && max >= 1 ? Math.min(2, Math.trunc(max)) : 1;
+      }
+      this.slots.set(slots);
       this.connection.set(found[this.provider()] ? 'ready' : 'noCli');
     } catch {
       this.token = '';
+      this.queueSupported.set(false);
       this.found.set({});
       this.connection.set('offline');
     }
+  }
+
+  private async queueCall(path: string, method = 'GET', body?: unknown): Promise<{ status: number; json: unknown }> {
+    if (!this.token) {
+      await this.check();
+    }
+    try {
+      const response = await fetch(`${helperBase()}${path}`, {
+        method,
+        headers: { 'x-ai-token': this.token, ...(body === undefined ? {} : { 'content-type': 'application/json' }) },
+        body: body === undefined ? undefined : JSON.stringify(body),
+        cache: 'no-store',
+      });
+      return { status: response.status, json: await response.json().catch(() => null) };
+    } catch {
+      throw new AiRequestError('offline', 'offline');
+    }
+  }
+
+  /** Creates the helper-side queue for the current provider and model. Returns its id. */
+  async createQueue(): Promise<string> {
+    const provider = this.provider();
+    const { status, json } = await this.queueCall('/batch', 'POST', {
+      provider,
+      model: this.models()[provider] || undefined,
+      retry: this.retry()[provider] !== false,
+    });
+    const id = (json as { id?: unknown } | null)?.id;
+    if (status !== 201 || typeof id !== 'string') {
+      throw new AiRequestError(status === 400 ? 'bad_provider' : 'cli_error', `El ayudante respondió ${status}.`);
+    }
+    return id;
+  }
+
+  /** Adds one pair; `last` closes the queue so it can finish. Pairs go one by one to keep memory low. */
+  async addToQueue(batchId: string, itemId: string, args: { a: Blob; b: Blob; template: unknown }, last: boolean): Promise<void> {
+    const { status } = await this.queueCall(`/batch/${encodeURIComponent(batchId)}/items`, 'POST', {
+      itemId,
+      a: await toBase64(args.a),
+      b: await toBase64(args.b),
+      template: args.template,
+      last,
+    });
+    if (status === 404 || status === 401) {
+      throw new AiRequestError('queue_lost', 'queue_lost');
+    }
+    if (status !== 202) {
+      throw new AiRequestError('cli_error', `El ayudante respondió ${status}.`);
+    }
+  }
+
+  /** `null` when the helper no longer knows the queue (it was restarted or the token changed). */
+  async readQueue(batchId: string): Promise<AiRemoteSnapshot | null> {
+    const { status, json } = await this.queueCall(`/batch/${encodeURIComponent(batchId)}`);
+    return status === 200 ? parseSnapshot(json) : null;
+  }
+
+  async readQueueItem(batchId: string, itemId: string): Promise<AiResult | null> {
+    const { status, json } = await this.queueCall(`/batch/${encodeURIComponent(batchId)}/items/${encodeURIComponent(itemId)}`);
+    const result = (json as { result?: unknown } | null)?.result;
+    return status === 200 && result && typeof result === 'object' && Array.isArray((result as AiResult).rows) ? (result as AiResult) : null;
+  }
+
+  async resumeQueue(batchId: string): Promise<void> {
+    await this.queueCall(`/batch/${encodeURIComponent(batchId)}/resume`, 'POST', {});
+  }
+
+  async cancelQueue(batchId: string): Promise<void> {
+    await this.queueCall(`/batch/${encodeURIComponent(batchId)}/cancel`, 'POST', {});
+  }
+
+  async forgetQueue(batchId: string): Promise<void> {
+    await this.queueCall(`/batch/${encodeURIComponent(batchId)}`, 'DELETE');
   }
 
   async propose(

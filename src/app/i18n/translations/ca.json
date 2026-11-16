@@ -884,6 +884,16 @@
         "note": "No s'aplica res soles: tu revises cada proposta.",
         "keepRunning": "Pots tancar aquest panell: la feina continua.",
         "open": "Obre"
+      },
+      "queue": {
+        "badge": "A l'ajudant",
+        "parallel": "{{n}} alhora",
+        "serial": "D'un en un",
+        "reconnected": "Reconnectat. La cua seguia en marxa: {{done}} de {{total}} fets.",
+        "dismiss": "Entesos",
+        "keepRunning": "Pots tancar la pestanya o recarregar: la cua continua mentre l'ajudant estigui obert.",
+        "lost": "L'ajudant s'ha tancat i la cua s'ha perdut. {{kept}} PDF conserven la proposta; {{lost}} no han acabat.",
+        "relaunch": "Tornar a llançar els {{count}} que falten"
       }
     },
     "more": "Més accions",

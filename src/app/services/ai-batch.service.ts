@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import type { BatchItem } from '../models/batch.model';
 import {
   AI_BATCH_ACTIVE_PHASES,
@@ -8,7 +8,8 @@ import {
   classifyAiError,
   isEligibleForAiBatch,
 } from '../utils/ai-batch.utils';
-import { AiDetails, AiSent, AiStep, AiUsage, sumUsage } from '../utils/ai-proposal.utils';
+import { AiDetails, AiResult, AiSent, AiStep, AiUsage, sumUsage } from '../utils/ai-proposal.utils';
+import { AiQueueInfo, AiQueueTaken, AiRemoteSnapshot, parseQueueInfo, phaseOfRemote, remoteItemId } from '../utils/ai-queue.utils';
 import { cascadeAdjust } from '../utils/adjust-cascade.utils';
 import { AiHelperService, AiRequestError } from './ai-helper.service';
 import { BatchStoreService } from './batch-store.service';
@@ -39,10 +40,37 @@ export type AiBatchRun = 'idle' | 'running' | 'paused' | 'done';
 
 /** Why the queue is paused: the person asked, or it stopped by itself to protect the quota. */
 export interface AiBatchPause {
-  kind: 'user' | 'limit' | 'breaker' | 'fatal' | 'cap';
+  kind: 'user' | 'limit' | 'breaker' | 'fatal' | 'cap' | 'lost';
   code?: string;
   reset?: string | null;
 }
+
+const QUEUE_KEY = 'pdf-annotator.ai.queue';
+
+function readStore(): string | null {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage.getItem(QUEUE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeStore(value: string | null): void {
+  try {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+    if (value === null) {
+      localStorage.removeItem(QUEUE_KEY);
+    } else {
+      localStorage.setItem(QUEUE_KEY, value);
+    }
+  } catch {
+    /* private mode: the queue just cannot be found again after a reload */
+  }
+}
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export type AiBatchStart = 'started' | 'nothing' | 'busy' | 'not_ready' | 'no_consent';
 
@@ -86,6 +114,12 @@ export class AiBatchService {
       cancelled: n('cancelled'),
     };
   });
+  /** The queue runs inside the helper (it survives a reload) instead of in this tab. */
+  readonly viaHelper = signal(false);
+  /** Requests the helper runs at once: 2 with Claude, 1 with Copilot. */
+  readonly concurrency = signal(1);
+  /** Set for a few seconds after a reload found the queue still running. */
+  readonly reconnected = signal<{ done: number; total: number } | null>(null);
   /** True while the helper is in use, so the single-pair button must wait. */
   readonly busy = computed(() => this.run() === 'running');
 
@@ -95,6 +129,22 @@ export class AiBatchService {
   private cascade = false;
   private sentInWindow = 0;
   private streak: { kind: string; n: number } = { kind: '', n: 0 };
+  private queueId: string | null = null;
+  private queueMap: Record<string, string> = {};
+  private taken: Record<string, AiQueueTaken> = {};
+  private fetching = new Set<string>();
+  private recovering = false;
+  private queueProvider: string | null = null;
+
+  constructor() {
+    // After a reload (or a new tab) the queue may still be running in the helper: find it again.
+    effect(() => {
+      const ready = this.ai.connection() === 'ready' && this.batch.items().length > 0;
+      if (ready) {
+        untracked(() => void this.recover());
+      }
+    });
+  }
 
   /** Starts a new run over `ids` (default: every eligible pair). Pairs without B or without fields are skipped. */
   start(ids?: readonly string[], options: { cascade?: boolean } = {}): AiBatchStart {
@@ -124,8 +174,23 @@ export class AiBatchService {
     this.detailsFollow.set(true);
     this.detailsId.set(null);
     this.panelOpen.set(true);
-    void this.loop();
+    this.launch(pairs.map((item) => item.id));
     return 'started';
+  }
+
+  /** The helper's own queue when it has one (Copilot keeps the browser loop beyond its cap of 10 requests). */
+  private useHelperQueue(count: number): boolean {
+    const copilotCap = this.ai.provider() === 'copilot' && count > AI_BATCH_COPILOT_CAP;
+    return this.ai.queueSupported?.() === true && !copilotCap;
+  }
+
+  private launch(ids: readonly string[]): void {
+    if (this.useHelperQueue(ids.length)) {
+      void this.runRemote([...ids]);
+    } else {
+      this.viaHelper.set(false);
+      void this.loop();
+    }
   }
 
   openDetails(id: string | null = null): void {
@@ -154,7 +219,8 @@ export class AiBatchService {
 
   /** Stops after the pair in progress; the rest stay queued. */
   requestPause(): void {
-    if (this.run() === 'running') {
+    // The helper's queue has no manual pause (mesa P-65, decisión B): «Parar» cancels it and what is done stays.
+    if (this.run() === 'running' && !this.viaHelper()) {
       this.pauseRequested = true;
     }
   }
@@ -166,6 +232,17 @@ export class AiBatchService {
     }
     this.sentInWindow = 0;
     this.streak = { kind: '', n: 0 };
+    if (this.viaHelper()) {
+      if (this.queueId) {
+        this.pause.set(null);
+        this.run.set('running');
+        void this.ai.resumeQueue(this.queueId).catch(() => undefined);
+      } else {
+        // The pairs never reached the helper (it was off): send what is still queued.
+        void this.runRemote(this.order().filter((id) => this.rows()[id]?.phase === 'queued'));
+      }
+      return;
+    }
     void this.loop();
   }
 
@@ -174,6 +251,7 @@ export class AiBatchService {
     this.generation++;
     this.abort?.abort();
     this.abort = null;
+    this.dropQueue(true);
     this.pauseRequested = false;
     this.pause.set(null);
     this.rows.update((rows) =>
@@ -207,7 +285,7 @@ export class AiBatchService {
     this.streak = { kind: '', n: 0 };
     this.pause.set(null);
     this.panelOpen.set(true);
-    void this.loop();
+    this.launch(this.order().filter((id) => this.rows()[id]?.phase === 'queued'));
     return 'started';
   }
 
@@ -216,12 +294,289 @@ export class AiBatchService {
     if (this.run() === 'running') {
       return;
     }
+    this.dropQueue(false);
+    this.viaHelper.set(false);
+    this.reconnected.set(null);
     this.rows.set({});
     this.order.set([]);
     this.pause.set(null);
     this.run.set('idle');
     this.panelOpen.set(false);
     this.detailsOpen.set(false);
+  }
+
+  // ---- Queue inside the helper (mesas P-65 y P-66) ----
+
+  /** Cascade first (free, in this tab), then every remaining pair goes to the helper, which runs and remembers them. */
+  private async runRemote(ids: string[]): Promise<void> {
+    const generation = ++this.generation;
+    this.viaHelper.set(true);
+    this.run.set('running');
+    this.pause.set(null);
+    this.reconnected.set(null);
+    this.queueProvider = this.ai.provider();
+    this.queueId = null;
+    const send: BatchItem[] = [];
+    for (const id of ids) {
+      const item = this.batch.find(id);
+      if (!item?.bPdf || !isEligibleForAiBatch(item)) {
+        this.patchRow(id, { phase: 'failed', endedAt: Date.now(), error: { code: 'not_eligible', message: '', reset: null } });
+        continue;
+      }
+      if (this.cascade && (await this.solveWithoutAi(id, item.aPdf, item.bPdf, item.aPages, generation))) {
+        continue;
+      }
+      if (generation !== this.generation) {
+        return;
+      }
+      send.push(item);
+    }
+    if (!send.length) {
+      this.finishRemote();
+      return;
+    }
+    let batchId = '';
+    try {
+      batchId = await this.ai.createQueue();
+      this.queueId = batchId;
+      this.queueMap = Object.fromEntries(send.map((item, index) => [remoteItemId(index), item.id]));
+      this.persistQueue();
+      for (const [index, item] of send.entries()) {
+        await this.ai.addToQueue(batchId, remoteItemId(index), { a: item.aPdf, b: item.bPdf as Blob, template: { pages: item.aPages } }, index === send.length - 1);
+        if (generation !== this.generation) {
+          return;
+        }
+        this.requests.update((n) => n + 1);
+      }
+    } catch (error) {
+      if (generation !== this.generation) {
+        return;
+      }
+      const code = (error as AiRequestError)?.code;
+      if (batchId) {
+        void this.ai.cancelQueue(batchId).catch(() => undefined);
+      }
+      this.dropQueue(false);
+      this.stop({ kind: code === 'busy' || code === 'offline' || code === 'queue_lost' ? 'fatal' : 'breaker', code });
+      return;
+    }
+    void this.pollQueue(generation, batchId);
+  }
+
+  private async pollQueue(generation: number, batchId: string): Promise<void> {
+    let failures = 0;
+    let finishTries = 0;
+    for (;;) {
+      await sleep(1000);
+      if (generation !== this.generation) {
+        return;
+      }
+      let snap: AiRemoteSnapshot | null;
+      try {
+        snap = await this.ai.readQueue(batchId);
+        failures = 0;
+      } catch {
+        // The helper may be busy for a moment: keep asking for a minute before giving the queue up.
+        if (++failures >= 60) {
+          this.markLost();
+          return;
+        }
+        continue;
+      }
+      if (generation !== this.generation) {
+        return;
+      }
+      if (!snap) {
+        this.markLost();
+        return;
+      }
+      await this.applySnapshot(snap, generation);
+      if (generation !== this.generation) {
+        return;
+      }
+      const unread = snap.items.filter((item) => item.state === 'done' && this.rows()[this.queueMap[item.id]]?.phase === 'resolving').length;
+      if (snap.state !== 'active' && (unread === 0 || ++finishTries > 5)) {
+        this.finishRemote();
+        return;
+      }
+    }
+  }
+
+  private async applySnapshot(snap: AiRemoteSnapshot, generation: number): Promise<void> {
+    this.concurrency.set(snap.concurrency);
+    for (const item of snap.items) {
+      const id = this.queueMap[item.id];
+      const row = id ? this.rows()[id] : undefined;
+      if (!id || !row || this.taken[id]) {
+        continue;
+      }
+      if (item.state === 'done') {
+        await this.takeResult(id, item.id);
+      } else if (item.state === 'failed') {
+        this.patchRow(id, { phase: 'failed', endedAt: row.endedAt ?? Date.now(), error: item.error ?? { code: 'error', message: '', reset: null } });
+      } else {
+        const phase = phaseOfRemote(item);
+        const attempt = item.attempt ?? row.attempt;
+        if (phase !== row.phase || attempt !== row.attempt) {
+          const now = Date.now();
+          this.patchRow(id, {
+            phase,
+            attempt,
+            provider: this.queueProvider ?? '',
+            startedAt: phase === 'queued' ? null : (row.startedAt ?? now),
+            t0: row.t0 ?? (phase === 'queued' ? null : now),
+            endedAt: phase === 'cancelled' ? now : null,
+          });
+        }
+      }
+      if (generation !== this.generation) {
+        return;
+      }
+    }
+    if (snap.paused) {
+      this.pause.set({ kind: snap.paused.reason, code: snap.paused.code ?? undefined, reset: snap.paused.reset });
+      this.run.set('paused');
+    } else if (this.run() === 'paused' && (this.pause()?.kind === 'limit' || this.pause()?.kind === 'breaker')) {
+      this.pause.set(null);
+      this.run.set('running');
+    }
+  }
+
+  private async takeResult(id: string, remoteId: string): Promise<void> {
+    if (this.fetching.has(id) || !this.queueId) {
+      return;
+    }
+    this.fetching.add(id);
+    try {
+      const result = await this.ai.readQueueItem(this.queueId, remoteId);
+      if (result) {
+        this.acceptResult(id, result);
+      } else {
+        this.patchRow(id, { phase: 'failed', endedAt: Date.now(), error: { code: 'bad_response', message: '', reset: null } });
+      }
+    } catch {
+      /* the next poll asks again */
+    } finally {
+      this.fetching.delete(id);
+    }
+  }
+
+  private finishRemote(): void {
+    this.dropQueue(false);
+    this.rows.update((rows) =>
+      mapRows(rows, (row) => (row.phase === 'queued' || AI_BATCH_ACTIVE_PHASES.includes(row.phase) ? { ...row, phase: 'cancelled', endedAt: Date.now() } : row)),
+    );
+    this.run.set('done');
+  }
+
+  /** The helper no longer knows the queue (it was closed): what already has a proposal stays, the rest can be launched again. */
+  private markLost(): void {
+    this.dropQueue(false);
+    this.rows.update((rows) =>
+      mapRows(rows, (row) => (row.phase === 'queued' || AI_BATCH_ACTIVE_PHASES.includes(row.phase) ? { ...row, phase: 'cancelled', endedAt: Date.now() } : row)),
+    );
+    this.pause.set({ kind: 'lost' });
+    this.run.set('done');
+    this.panelOpen.set(true);
+  }
+
+  private markTaken(id: string, phase: AiQueueTaken['phase'], placed: number, total: number): void {
+    if (!this.viaHelper()) {
+      return;
+    }
+    this.taken = { ...this.taken, [id]: { phase, placed, total } };
+    this.persistQueue();
+  }
+
+  private persistQueue(): void {
+    if (!this.queueId) {
+      return;
+    }
+    const info: AiQueueInfo = {
+      batchId: this.queueId,
+      provider: this.queueProvider ?? '',
+      startedAt: this.startedAt() ?? Date.now(),
+      order: this.order(),
+      map: this.queueMap,
+      taken: this.taken,
+    };
+    writeStore(JSON.stringify(info));
+  }
+
+  /** Forgets the helper queue here; with `stopIt` the helper is told to abort what is running. */
+  private dropQueue(stopIt: boolean): void {
+    const id = this.queueId;
+    if (id) {
+      void (stopIt ? this.ai.cancelQueue(id) : this.ai.forgetQueue(id)).catch(() => undefined);
+    }
+    this.queueId = null;
+    this.queueMap = {};
+    this.taken = {};
+    this.fetching.clear();
+    writeStore(null);
+  }
+
+  /** After a reload: if the helper still has this tab's queue, show it again and keep following it. */
+  private async recover(): Promise<void> {
+    if (this.recovering || this.run() !== 'idle' || this.ai.queueSupported?.() !== true) {
+      return;
+    }
+    const info = parseQueueInfo(readStore());
+    if (!info) {
+      return;
+    }
+    this.recovering = true;
+    try {
+      let snap: AiRemoteSnapshot | null = null;
+      try {
+        snap = await this.ai.readQueue(info.batchId);
+      } catch {
+        return;
+      }
+      const known = new Set(this.batch.items().map((item) => item.id));
+      const order = info.order.filter((id) => known.has(id));
+      if (!order.length || this.run() !== 'idle') {
+        writeStore(null);
+        return;
+      }
+      const rows: Record<string, AiBatchRow> = {};
+      for (const id of order) {
+        const taken = info.taken[id];
+        rows[id] = taken
+          ? { ...emptyRow(id), phase: taken.phase, placed: taken.placed, total: taken.total, provider: taken.phase === 'free' ? 'adjust' : info.provider }
+          : emptyRow(id);
+      }
+      this.order.set(order);
+      this.rows.set(rows);
+      this.requests.set(Object.keys(info.map).length);
+      this.startedAt.set(info.startedAt || Date.now());
+      this.detailsFollow.set(true);
+      this.detailsId.set(null);
+      this.panelOpen.set(true);
+      this.viaHelper.set(true);
+      this.queueProvider = info.provider || null;
+      this.queueId = info.batchId;
+      this.queueMap = { ...info.map };
+      this.taken = { ...info.taken };
+      if (!snap) {
+        this.markLost();
+        return;
+      }
+      const generation = ++this.generation;
+      this.run.set('running');
+      const hereBefore = Object.keys(this.taken).length;
+      await this.applySnapshot(snap, generation);
+      const done = Object.keys(this.taken).length;
+      this.reconnected.set({ done: Math.max(done, hereBefore), total: order.length });
+      setTimeout(() => this.reconnected.set(null), 8000);
+      if (snap.state !== 'active') {
+        this.finishRemote();
+      } else {
+        void this.pollQueue(generation, info.batchId);
+      }
+    } finally {
+      this.recovering = false;
+    }
   }
 
   private async loop(): Promise<void> {
@@ -264,6 +619,37 @@ export class AiBatchService {
     this.rows.update((rows) => (rows[id] ? { ...rows, [id]: { ...rows[id], ...patch } } : rows));
   }
 
+  /** Stores one finished answer: a proposal to review (never applied) or a failure when nothing could be placed. */
+  private acceptResult(id: string, result: AiResult): void {
+    const placed = result.rows.filter((row) => row.ok).length;
+    const total = result.rows.length;
+    const usage = sumUsage(result.details?.attempts.map((a) => a.usage) ?? []) ?? this.rows()[id]?.usage ?? null;
+    this.streak = { kind: '', n: 0 };
+    if (placed === 0) {
+      this.patchRow(id, {
+        phase: 'failed',
+        endedAt: Date.now(),
+        placed,
+        total,
+        usage,
+        details: result.details,
+        error: { code: result.details?.diagnosis ?? 'ai_found_nothing', message: '', reset: null },
+      });
+      return;
+    }
+    this.batch.setAiProposal(id, {
+      rows: result.rows,
+      details: result.details,
+      provider: this.queueProvider ?? this.ai.provider(),
+      model: result.details?.model ?? null,
+      seconds: result.seconds,
+      at: Date.now(),
+    });
+    const phase = placed === total ? 'ready' : 'partial';
+    this.patchRow(id, { phase, endedAt: Date.now(), placed, total, usage, details: result.details });
+    this.markTaken(id, phase, placed, total);
+  }
+
   /** Runs one pair; returns what the queue must do next when it has to stop. */
   /** Text-based adjustment first: free, and enough when every field has a confident position. */
   private async solveWithoutAi(
@@ -301,6 +687,7 @@ export class AiBatchService {
     }
     this.batch.setAiProposal(id, { rows: result.rows, details: null, provider: 'adjust', model: null, seconds: 0, at: Date.now() });
     this.patchRow(id, { phase: 'free', endedAt: Date.now(), placed: result.rows.length, total: result.rows.length });
+    this.markTaken(id, 'free', result.rows.length, result.rows.length);
     return true;
   }
 
@@ -358,31 +745,7 @@ export class AiBatchService {
       if (generation !== this.generation) {
         return null;
       }
-      const placed = result.rows.filter((row) => row.ok).length;
-      const total = result.rows.length;
-      const usage = sumUsage(result.details?.attempts.map((a) => a.usage) ?? []) ?? this.rows()[id]?.usage ?? null;
-      this.streak = { kind: '', n: 0 };
-      if (placed === 0) {
-        this.patchRow(id, {
-          phase: 'failed',
-          endedAt: Date.now(),
-          placed,
-          total,
-          usage,
-          details: result.details,
-          error: { code: result.details?.diagnosis ?? 'ai_found_nothing', message: '', reset: null },
-        });
-        return null;
-      }
-      this.batch.setAiProposal(id, {
-        rows: result.rows,
-        details: result.details,
-        provider: this.ai.provider(),
-        model: result.details?.model ?? null,
-        seconds: result.seconds,
-        at: Date.now(),
-      });
-      this.patchRow(id, { phase: placed === total ? 'ready' : 'partial', endedAt: Date.now(), placed, total, usage, details: result.details });
+      this.acceptResult(id, result);
       return null;
     } catch (error) {
       if (generation !== this.generation) {

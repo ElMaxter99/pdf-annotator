@@ -884,6 +884,16 @@
         "note": "Rien n'est appliqué tout seul : vous vérifiez chaque proposition.",
         "keepRunning": "Vous pouvez fermer ce panneau : le travail continue.",
         "open": "Ouvrir"
+      },
+      "queue": {
+        "badge": "Dans l'assistant",
+        "parallel": "{{n}} à la fois",
+        "serial": "Un par un",
+        "reconnected": "Reconnecté. La file était toujours en cours : {{done}} sur {{total}} terminés.",
+        "dismiss": "Compris",
+        "keepRunning": "Vous pouvez fermer l'onglet ou recharger : la file continue tant que l'assistant est ouvert.",
+        "lost": "L'assistant a été fermé et la file est perdue. {{kept}} PDF gardent leur proposition ; {{lost}} n'ont pas été terminés.",
+        "relaunch": "Relancer les {{count}} manquants"
       }
     },
     "more": "Plus d'actions",
