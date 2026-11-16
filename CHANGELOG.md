@@ -6,6 +6,7 @@
 - **Guion para medir créditos reales de Copilot:** `tools/ai-phase0/credits-report.mjs` resume lo medido por el CLI y lo compara con el consumo que marca GitHub (ver `docs/IA-LOCAL.md`).
 
 ### Changed
+- **Deuda técnica, parte 3 (sin cambios visibles):** las reglas de la sesión guardada (cuándo guardar, qué escala y página se aceptan al restaurar) salen de `workspace.page.ts` a `utils/session-restore.utils.ts`, con tests.
 - **Deuda técnica, parte 2 (sin cambios visibles):** importar JSON (al escribir, pegar o abrir un archivo) pasa por `AnnotationImportService.importFromText` en lugar de repetir el parseo en `workspace.page.ts`, y la construcción del JSON exportado sale a `utils/json-export.utils.ts`; ambos con tests.
 - **Deuda técnica (sin cambios visibles):** la generación de miniaturas sale de `workspace.page.ts` a `PageThumbnailGenerator` y la escala de miniatura pasa a `utils/thumbnail-scale.utils.ts`, con tests. `docs/ROADMAP.md` corregido (líneas del archivo, numeración, punto del Dockerfile ya hecho en la 1.11).
 - **README al día con la v1.12:** capturas nuevas (bienvenida, editor, editar una anotación, árbol JSON, guías, atajos, tema claro) y dos nuevas del lote (panel con versiones B y editor en «Dividida»); se quita la captura móvil (la app es solo de escritorio). Textos de la cabecera, el pie, las guías y una sección y un flujo nuevos para el lote; insignias de Angular 22 y TypeScript 6.0. `node scripts/screenshots.mjs` regenera todas las capturas desde el build.

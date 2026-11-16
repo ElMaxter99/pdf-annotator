@@ -164,6 +164,11 @@ import {
   distributeBoxes,
 } from '../../utils/alignment.utils';
 import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
+import {
+  clampRestoredPage,
+  shouldScheduleSessionSave,
+  validRestoredScale,
+} from '../../utils/session-restore.utils';
 import { buildJsonExportPayload, jsonExportText } from '../../utils/json-export.utils';
 import {
   ensureHex,
@@ -1443,11 +1448,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     this.replaceCoords(normalized, { skipHistory: true });
-    if (Number.isFinite(restore.scale) && restore.scale >= 0.25 && restore.scale <= 8) {
-      this.scale.set(restore.scale);
+    const restoredScale = validRestoredScale(restore.scale);
+    if (restoredScale !== null) {
+      this.scale.set(restoredScale);
     }
-    const lastPage = this.pdfDoc?.numPages ?? 1;
-    this.pageIndex.set(Math.min(lastPage, Math.max(1, Math.round(restore.pageIndex) || 1)));
+    this.pageIndex.set(clampRestoredPage(restore.pageIndex, this.pdfDoc?.numPages ?? 1));
   }
 
   private scheduleSessionSave() {
@@ -1457,13 +1462,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const file = this.sessionFile;
-    if (!file || !this.pdfDoc || typeof window === 'undefined' || this.batch.activeItem()) {
-      return; // a batch keeps its own copy; do not overwrite the last single-PDF session
-    }
-
-    const hasAnnotations = this.store.coords().length > 0;
-    if (!hasAnnotations && !this.store.canUndo()) {
-      return; // nothing worth keeping yet: do not overwrite a previous session
+    if (
+      !file ||
+      !shouldScheduleSessionSave({
+        hasFile: true,
+        hasDocument: !!this.pdfDoc,
+        hasBrowser: typeof window !== 'undefined',
+        batchActive: !!this.batch.activeItem(),
+        hasAnnotations: this.store.coords().length > 0,
+        canUndo: this.store.canUndo(),
+      })
+    ) {
+      return;
     }
 
     this.sessionSaveTimer = setTimeout(() => {
