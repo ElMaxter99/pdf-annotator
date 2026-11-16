@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, ViewChild, computed, inject, input, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, inject, input, output, signal } from '@angular/core';
 import { InfoTipComponent } from '../../../components/info-tip/info-tip.component';
 import { AiModelSelectComponent } from '../../../components/ai-model-select/ai-model-select.component';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
@@ -9,6 +9,7 @@ import { BatchStoreService } from '../../../services/batch-store.service';
 import { toastKey } from './ai-batch.helpers';
 import { ToastService } from '../../../services/toast.service';
 import { TranslationService } from '../../../i18n/translation.service';
+import { buildAiBreakdown } from '../../../utils/batch-summary.utils';
 import { AI_BATCH_COPILOT_CAP, estimateAiBatch, isEligibleForAiBatch } from '../../../utils/ai-batch.utils';
 
 /** «✦ Trasladar con IA»: the button of the panel header and its one-decision popover (estimate, provider folded under «Cambiar»). */
@@ -46,6 +47,18 @@ export class AiBatchButtonComponent {
   readonly ids = input<readonly string[] | null>(null);
   /** Opens the popover upwards (button in the selection bar at the bottom). */
   readonly up = input(false);
+
+  /** «Ver cuáles»: the panel filters by the reason a PDF stays out. */
+  readonly showReason = output<'noB' | 'noFields'>();
+  /** Why PDFs stay out; only shown for the whole batch (not for a marked selection). */
+  readonly breakdown = computed(() => buildAiBreakdown(this.store.items()));
+
+  readonly totalCount = computed(() => this.store.items().length);
+
+  see(reason: 'noB' | 'noFields'): void {
+    this.showReason.emit(reason);
+    this.closeDialog();
+  }
 
   readonly eligible = computed(() => {
     const only = this.ids();

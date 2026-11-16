@@ -8,6 +8,7 @@ import { AiBatchChipComponent } from './ai-batch/ai-batch-chip.component';
 import { AiBatchPanelComponent } from './ai-batch/ai-batch-panel.component';
 import { AiBatchService } from '../../services/ai-batch.service';
 import { AiHelperService } from '../../services/ai-helper.service';
+import { InfoTipComponent } from '../../components/info-tip/info-tip.component';
 import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
@@ -29,6 +30,7 @@ import {
   type PastedTemplate,
 } from '../../utils/template-paste.utils';
 import { isPdfFile } from '../../utils/pdf-file.utils';
+import { buildFunnel, matchesKind, aiReasonOf, type AiReason, type KindFilter } from '../../utils/batch-summary.utils';
 import { planBulk, pruneSelection, rangeBetween } from '../../utils/batch-selection.utils';
 import { createZip } from '../../utils/zip.utils';
 
@@ -37,7 +39,7 @@ const MAX_JSON_BYTES = 5 * 1024 * 1024;
 type RowState = 'ready' | 'review' | 'noTemplate';
 type Step = 'pdfs' | 'templates' | 'panel';
 type ViewMode = 'grid' | 'list';
-type Filter = 'all' | 'review' | 'ready' | 'noTemplate';
+type Filter = 'all' | 'review' | 'ready';
 
 interface TemplateInfo {
   readonly name: string;
@@ -78,6 +80,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     RouterLink,
     TranslationPipe,
     PdfThumbComponent,
+    InfoTipComponent,
     AiBatchButtonComponent,
     AiBatchChipComponent,
     AiBatchPanelComponent,
@@ -117,6 +120,8 @@ export class BatchPageComponent implements OnInit {
   readonly step = signal<Step>('pdfs');
   readonly view = signal<ViewMode>(readView());
   readonly filter = signal<Filter>('all');
+  /** «What they have» filter (and the funnel steps); combines with the state filter. */
+  readonly kind = signal<KindFilter>('any');
   readonly templates = signal<Map<string, TemplateInfo>>(new Map());
   readonly templateTab = signal<'files' | 'paste'>('files');
   readonly pasteText = signal('');
@@ -154,12 +159,17 @@ export class BatchPageComponent implements OnInit {
   readonly rows = computed<Row[]>(() => {
     const query = this.query().trim().toLowerCase();
     const filter = this.filter();
+    const kind = this.kind();
     const rank: Record<RowState, number> = { noTemplate: 0, review: 1, ready: 2 };
     return this.allRows()
       .filter((row) => !query || row.item.name.toLowerCase().includes(query))
       .filter((row) => filter === 'all' || row.state === filter)
+      .filter((row) => matchesKind(row.item, kind))
       .sort((a, b) => rank[a.state] - rank[b.state]);
   });
+  readonly funnel = computed(() => buildFunnel(this.store.items()));
+  readonly filtering = computed(() => this.filter() !== 'all' || this.kind() !== 'any' || this.query().trim() !== '');
+  readonly aiReason = (item: BatchItem): AiReason => aiReasonOf(item);
   readonly total = computed(() => this.store.items().length);
   readonly readyCount = computed(() => this.counts().ready);
   readonly progress = computed(() =>
@@ -200,6 +210,30 @@ export class BatchPageComponent implements OnInit {
   readonly undoNotice = signal<{ kind: 'removed' | 'ready'; count: number } | null>(null);
   private undoFn: (() => void) | null = null;
   private undoTimer: number | null = null;
+
+  /** «Ver cuáles» of the AI popover: shows the PDFs that stay out for that reason. */
+  showAiReason(reason: 'noB' | 'noFields'): void {
+    this.query.set('');
+    this.filter.set('all');
+    this.kind.set(reason === 'noFields' ? 'onlyB' : 'onlyA');
+  }
+
+  setKind(kind: KindFilter): void {
+    this.kind.set(this.kind() === kind ? 'any' : kind);
+  }
+
+  /** A funnel step: shows exactly the PDFs it counts. */
+  showStep(step: 'all' | 'withA' | 'withB' | 'ai' | 'ready'): void {
+    this.query.set('');
+    this.filter.set(step === 'ready' ? 'ready' : 'all');
+    this.kind.set(step === 'all' || step === 'ready' ? 'any' : step);
+  }
+
+  clearFilters(): void {
+    this.query.set('');
+    this.filter.set('all');
+    this.kind.set('any');
+  }
 
   isSelected(id: string): boolean {
     return this.selected().has(id);

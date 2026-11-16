@@ -387,7 +387,7 @@
     },
     "state": {
       "ready": "Listo",
-      "review": "Por revisar",
+      "review": "Pendientes",
       "noTemplate": "Sin plantilla"
     },
     "editor": {
@@ -582,9 +582,12 @@
     "filter": {
       "label": "Filtrar por estado",
       "all": "Todos {{count}}",
-      "review": "Por revisar {{count}}",
+      "review": "Pendientes {{count}}",
       "ready": "Listos {{count}}",
-      "noTemplate": "Sin plantilla {{count}}"
+      "noTemplate": "Sin plantilla {{count}}",
+      "reviewTip": "Pendientes: tienen plantilla o versión B y aún no los has marcado «Listo». Los que no tienen nada van en «Sin plantilla».",
+      "showing": "Mostrando {{shown}} de {{total}}",
+      "clear": "Quitar filtros"
     },
     "view": {
       "label": "Tipo de vista",
@@ -857,7 +860,14 @@
         "requests": "De {{min}} a {{max}} peticiones a la IA",
         "requestsCopilot": "Hasta {{max}} peticiones (tope {{cap}})",
         "change": "Cambiar",
-        "sent": "Qué se envía"
+        "sent": "Qué se envía",
+        "breakdown": {
+          "title": "{{eligible}} de {{withB}} con versión B se enviarán. Se quedan fuera:",
+          "noFields": "Plantilla A sin campos",
+          "ready": "Ya marcados «Listo»",
+          "noB": "Sin versión B",
+          "see": "Ver cuáles"
+        }
       },
       "panel": {
         "title": "Traslado con IA",
@@ -907,6 +917,31 @@
       "undo": "Deshacer",
       "downloaded": "Descarga lista · {{count}} archivos JSON",
       "downloadedSkipped": "Descarga lista · {{count}} archivos JSON · {{skipped}} sin validar no se incluyeron"
+    },
+    "funnel": {
+      "label": "Resumen del lote",
+      "s1": "1 · Subidos",
+      "s1out": "{{count}} sin plantilla ni B",
+      "s2": "2 · Con plantilla A",
+      "s2out": "{{count}} aún sin versión B",
+      "s3": "3 · Con versión B",
+      "s3out": "{{count}} con B pero sin campos en A",
+      "s4": "4 · Listos para trasladar",
+      "s4out": "Lo que envía «Trasladar con IA»",
+      "s5": "5 · Listos",
+      "s5out": "{{count}} pendientes"
+    },
+    "kind": {
+      "label": "Qué tienen",
+      "onlyA": "Solo plantilla A {{count}}",
+      "aPlusB": "Plantilla A + B {{count}}",
+      "onlyB": "Solo B {{count}}"
+    },
+    "why": {
+      "eligible": "Va a la IA",
+      "ready": "Ya está Listo",
+      "noB": "Falta la versión B",
+      "noFields": "Su plantilla A no tiene campos"
     }
   },
   "preview": {

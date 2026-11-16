@@ -387,7 +387,7 @@
     },
     "state": {
       "ready": "Ready",
-      "review": "To review",
+      "review": "Pending",
       "noTemplate": "No template"
     },
     "editor": {
@@ -582,9 +582,12 @@
     "filter": {
       "label": "Filter by state",
       "all": "All {{count}}",
-      "review": "To review {{count}}",
+      "review": "Pending {{count}}",
       "ready": "Ready {{count}}",
-      "noTemplate": "No template {{count}}"
+      "noTemplate": "No template {{count}}",
+      "reviewTip": "Pending: they have a template or a version B and you have not marked them «Done» yet. Those with nothing go under «No template».",
+      "showing": "Showing {{shown}} of {{total}}",
+      "clear": "Clear filters"
     },
     "view": {
       "label": "View type",
@@ -857,7 +860,14 @@
         "requests": "{{min}} to {{max}} requests to the AI",
         "requestsCopilot": "Up to {{max}} requests (cap {{cap}})",
         "change": "Change",
-        "sent": "What is sent"
+        "sent": "What is sent",
+        "breakdown": {
+          "title": "{{eligible}} of {{withB}} with version B will be sent. Left out:",
+          "noFields": "Template A without fields",
+          "ready": "Already marked «Done»",
+          "noB": "No version B",
+          "see": "Show which"
+        }
       },
       "panel": {
         "title": "AI transfer",
@@ -907,6 +917,31 @@
       "undo": "Undo",
       "downloaded": "Download ready · {{count}} JSON files",
       "downloadedSkipped": "Download ready · {{count}} JSON files · {{skipped}} not validated were left out"
+    },
+    "funnel": {
+      "label": "Batch summary",
+      "s1": "1 · Uploaded",
+      "s1out": "{{count}} with no template or B",
+      "s2": "2 · With template A",
+      "s2out": "{{count}} still without version B",
+      "s3": "3 · With version B",
+      "s3out": "{{count}} with B but no fields in A",
+      "s4": "4 · Ready to transfer",
+      "s4out": "What «Transfer with AI» sends",
+      "s5": "5 · Done",
+      "s5out": "{{count}} pending"
+    },
+    "kind": {
+      "label": "What they have",
+      "onlyA": "Only template A {{count}}",
+      "aPlusB": "Template A + B {{count}}",
+      "onlyB": "Only B {{count}}"
+    },
+    "why": {
+      "eligible": "Goes to the AI",
+      "ready": "Already done",
+      "noB": "Version B missing",
+      "noFields": "Its template A has no fields"
     }
   },
   "preview": {

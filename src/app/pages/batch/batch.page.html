@@ -23,7 +23,7 @@
         }}</span>
       </div>
       @if (aiHelper.available) {
-        <app-ai-batch-button />
+        <app-ai-batch-button (showReason)="showAiReason($event)" />
       }
       @if (readyCount() > 0) {
         <button type="button" class="btn" (click)="downloadReady()" data-testid="download-ready">
@@ -448,35 +448,17 @@
           [attr.aria-label]="'batch.search' | t"
         />
         <div class="batch-seg" role="group" [attr.aria-label]="'batch.filter.label' | t">
-          <button
-            type="button"
-            [class.batch-seg__on]="filter() === 'all'"
-            (click)="filter.set('all')"
-          >
+          <button type="button" [class.batch-seg__on]="filter() === 'all'" (click)="filter.set('all')">
             {{ 'batch.filter.all' | t: { count: counts().all } }}
           </button>
-          <button
-            type="button"
-            [class.batch-seg__on]="filter() === 'review'"
-            (click)="filter.set('review')"
-          >
+          <button type="button" [class.batch-seg__on]="filter() === 'review'" (click)="filter.set('review')">
             {{ 'batch.filter.review' | t: { count: counts().review } }}
           </button>
-          <button
-            type="button"
-            [class.batch-seg__on]="filter() === 'ready'"
-            (click)="filter.set('ready')"
-          >
+          <button type="button" [class.batch-seg__on]="filter() === 'ready'" (click)="filter.set('ready')">
             {{ 'batch.filter.ready' | t: { count: counts().ready } }}
           </button>
-          <button
-            type="button"
-            [class.batch-seg__on]="filter() === 'noTemplate'"
-            (click)="filter.set('noTemplate')"
-          >
-            {{ 'batch.filter.noTemplate' | t: { count: counts().noTemplate } }}
-          </button>
         </div>
+        <app-info-tip [text]="'batch.filter.reviewTip' | t" />
         <span class="batch-bar__spacer"></span>
         @if (view() === 'grid' && rows().length > 0) {
           <button type="button" class="btn btn--ghost" (click)="toggleAll()" data-testid="select-all-grid">
@@ -504,6 +486,57 @@
           </button>
         </div>
       </div>
+
+      @if (total() > 0) {
+        <section class="batch-funnel" [attr.aria-label]="'batch.funnel.label' | t" data-testid="batch-funnel">
+          <button type="button" class="batch-funnel__step" (click)="showStep('all')" data-testid="funnel-all">
+            <small>{{ 'batch.funnel.s1' | t }}</small>
+            <strong>{{ funnel().total }}</strong>
+            <span>{{ 'batch.funnel.s1out' | t: { count: funnel().none } }}</span>
+          </button>
+          <button type="button" class="batch-funnel__step" (click)="showStep('withA')" data-testid="funnel-a">
+            <small>{{ 'batch.funnel.s2' | t }}</small>
+            <strong>{{ funnel().withA }}</strong>
+            <span>{{ 'batch.funnel.s2out' | t: { count: funnel().onlyA } }}</span>
+          </button>
+          <button type="button" class="batch-funnel__step" (click)="showStep('withB')" data-testid="funnel-b">
+            <small>{{ 'batch.funnel.s3' | t }}</small>
+            <strong>{{ funnel().withB }}</strong>
+            <span>{{ 'batch.funnel.s3out' | t: { count: funnel().onlyB } }}</span>
+          </button>
+          <button type="button" class="batch-funnel__step batch-funnel__step--ai" (click)="showStep('ai')" data-testid="funnel-ai">
+            <small>{{ 'batch.funnel.s4' | t }}</small>
+            <strong>{{ funnel().ai }}</strong>
+            <span>{{ 'batch.funnel.s4out' | t }}</span>
+          </button>
+          <button type="button" class="batch-funnel__step" (click)="showStep('ready')" data-testid="funnel-ready">
+            <small>{{ 'batch.funnel.s5' | t }}</small>
+            <strong>{{ funnel().ready }}</strong>
+            <span>{{ 'batch.funnel.s5out' | t: { count: funnel().pending } }}</span>
+          </button>
+        </section>
+        <div class="batch-kinds" role="group" [attr.aria-label]="'batch.kind.label' | t">
+          <span class="batch-kinds__label">{{ 'batch.kind.label' | t }}</span>
+          <button type="button" class="batch-kind" [class.batch-kind--on]="kind() === 'none'" [attr.aria-pressed]="kind() === 'none'" (click)="setKind('none')">
+            {{ 'batch.filter.noTemplate' | t: { count: funnel().none } }}
+          </button>
+          <button type="button" class="batch-kind" [class.batch-kind--on]="kind() === 'onlyA'" [attr.aria-pressed]="kind() === 'onlyA'" (click)="setKind('onlyA')">
+            {{ 'batch.kind.onlyA' | t: { count: funnel().onlyA } }}
+          </button>
+          <button type="button" class="batch-kind" [class.batch-kind--on]="kind() === 'aPlusB'" [attr.aria-pressed]="kind() === 'aPlusB'" (click)="setKind('aPlusB')">
+            {{ 'batch.kind.aPlusB' | t: { count: funnel().aPlusB } }}
+          </button>
+          <button type="button" class="batch-kind" [class.batch-kind--on]="kind() === 'onlyB'" [attr.aria-pressed]="kind() === 'onlyB'" (click)="setKind('onlyB')">
+            {{ 'batch.kind.onlyB' | t: { count: funnel().onlyB } }}
+          </button>
+        </div>
+        @if (filtering()) {
+          <p class="batch-showing" role="status" data-testid="batch-showing">
+            {{ 'batch.filter.showing' | t: { shown: rows().length, total: total() } }}
+            <button type="button" class="btn btn--ghost" (click)="clearFilters()">{{ 'batch.filter.clear' | t }}</button>
+          </p>
+        }
+      }
 
       @if (total() > 0 && readyCount() === total()) {
         <div class="batch-done" role="status">
@@ -620,6 +653,7 @@
                   [class.batch-state--warn]="row.state !== 'ready'"
                   >{{ 'batch.state.' + row.state | t }}</span
                 >
+                <small class="batch-why" [class.batch-why--ok]="aiReason(row.item) === 'eligible'" data-testid="row-why">{{ 'batch.why.' + aiReason(row.item) | t }}</small>
                 @if (aiHelper.available) {
                 <app-ai-batch-chip [item]="row.item" />
               }

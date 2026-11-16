@@ -387,7 +387,7 @@
     },
     "state": {
       "ready": "Fertig",
-      "review": "Zu prüfen",
+      "review": "Ausstehend",
       "noTemplate": "Ohne Vorlage"
     },
     "editor": {
@@ -582,9 +582,12 @@
     "filter": {
       "label": "Nach Status filtern",
       "all": "Alle {{count}}",
-      "review": "Zu prüfen {{count}}",
+      "review": "Ausstehend {{count}}",
       "ready": "Fertig {{count}}",
-      "noTemplate": "Ohne Vorlage {{count}}"
+      "noTemplate": "Ohne Vorlage {{count}}",
+      "reviewTip": "Ausstehend: Sie haben eine Vorlage oder Version B und wurden noch nicht als „Fertig“ markiert. Die ohne alles stehen unter „Ohne Vorlage“.",
+      "showing": "{{shown}} von {{total}} angezeigt",
+      "clear": "Filter entfernen"
     },
     "view": {
       "label": "Ansichtsart",
@@ -857,7 +860,14 @@
         "requests": "{{min}} bis {{max}} Anfragen an die KI",
         "requestsCopilot": "Bis zu {{max}} Anfragen (Limit {{cap}})",
         "change": "Ändern",
-        "sent": "Was gesendet wird"
+        "sent": "Was gesendet wird",
+        "breakdown": {
+          "title": "{{eligible}} von {{withB}} mit Version B werden gesendet. Ausgeschlossen:",
+          "noFields": "Vorlage A ohne Felder",
+          "ready": "Bereits als „Fertig“ markiert",
+          "noB": "Ohne Version B",
+          "see": "Anzeigen"
+        }
       },
       "panel": {
         "title": "Übertragung mit KI",
@@ -907,6 +917,31 @@
       "undo": "Rückgängig",
       "downloaded": "Download bereit · {{count}} JSON-Dateien",
       "downloadedSkipped": "Download bereit · {{count}} JSON-Dateien · {{skipped}} nicht validierte ausgelassen"
+    },
+    "funnel": {
+      "label": "Übersicht des Stapels",
+      "s1": "1 · Hochgeladen",
+      "s1out": "{{count}} ohne Vorlage und B",
+      "s2": "2 · Mit Vorlage A",
+      "s2out": "{{count}} noch ohne Version B",
+      "s3": "3 · Mit Version B",
+      "s3out": "{{count}} mit B, aber ohne Felder in A",
+      "s4": "4 · Bereit zur Übertragung",
+      "s4out": "Was „Mit KI übertragen“ sendet",
+      "s5": "5 · Fertig",
+      "s5out": "{{count}} ausstehend"
+    },
+    "kind": {
+      "label": "Was sie haben",
+      "onlyA": "Nur Vorlage A {{count}}",
+      "aPlusB": "Vorlage A + B {{count}}",
+      "onlyB": "Nur B {{count}}"
+    },
+    "why": {
+      "eligible": "Geht an die KI",
+      "ready": "Bereits fertig",
+      "noB": "Version B fehlt",
+      "noFields": "Seine Vorlage A hat keine Felder"
     }
   },
   "preview": {
