@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, ViewChild, computed, inject, input, output, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { InfoTipComponent } from '../../../components/info-tip/info-tip.component';
 import { AiModelSelectComponent } from '../../../components/ai-model-select/ai-model-select.component';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
@@ -14,6 +14,7 @@ import { AI_BATCH_COPILOT_CAP, estimateAiBatch, isEligibleForAiBatch } from '../
 
 /** «✦ Trasladar con IA»: the button of the panel header and its one-decision popover (estimate, provider folded under «Cambiar»). */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-ai-batch-button',
   standalone: true,
   imports: [CommonModule, TranslationPipe, AiModelSelectComponent, InfoTipComponent],

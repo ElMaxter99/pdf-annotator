@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ViewChild, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
@@ -17,6 +17,7 @@ import { LandingHeroComponent } from './components/hero/landing-hero.component';
 import { LandingLanguageBarComponent } from './components/language-bar/landing-language-bar.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-landing-page',
   standalone: true,
   templateUrl: './landing.page.html',

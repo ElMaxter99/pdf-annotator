@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, inject } from '@angular/core';
+import { Component, ElementRef, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { VersionChipComponent } from '../../../../components/version-chip/version-chip.component';
 import type { WorkspacePageComponent } from '../../workspace.page';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-workspace-footer',
   standalone: true,
   templateUrl: './workspace-footer.component.html',

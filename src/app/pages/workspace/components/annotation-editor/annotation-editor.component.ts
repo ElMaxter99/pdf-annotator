@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { PageField } from '../../../../models/annotation.model';
@@ -8,6 +8,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 export type AnnotationEditorMode = 'preview' | 'edit';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-annotation-editor',
   standalone: true,
   templateUrl: './annotation-editor.component.html',

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationService } from '../../../../i18n/translation.service';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import {
@@ -15,6 +15,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 
 /** «Copiar y adaptar con IA»: the strip under the bar with progress, errors and the proposal to review. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-ai-review',
   standalone: true,
   imports: [CommonModule, TranslationPipe, AiDetailsComponent],

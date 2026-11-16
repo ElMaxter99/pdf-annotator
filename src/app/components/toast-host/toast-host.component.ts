@@ -1,8 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-toast-host',
   standalone: true,
   imports: [TranslationPipe],

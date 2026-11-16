@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, computed, signal } from '@angular/core';
+import { Component, Input, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { PdfThumbComponent } from '../../../../components/pdf-thumb/pdf-thumb.component';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { WorkspacePageComponent } from '../../workspace.page';
@@ -11,6 +11,7 @@ type TemplateError = 'tooBig' | 'json' | 'noPages';
  * template of the original (A) and the new version (B). Replaces the «upload another PDF» zone.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-batch-document',
   standalone: true,
   imports: [CommonModule, TranslationPipe, PdfThumbComponent],

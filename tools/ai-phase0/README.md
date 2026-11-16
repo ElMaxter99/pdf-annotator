@@ -3,7 +3,7 @@
 Herramienta de prueba, **fuera de la app y del build**. Ejecuta `claude -p` y/o `copilot -p` sobre pares A/B y mide el acierto contra una solución conocida. Contexto, datos enviados, límites y términos: [`docs/IA-LOCAL.md`](../../docs/IA-LOCAL.md).
 
 ## Requisitos
-- Node 22 y `npm install` dentro de esta carpeta.
+- Node 26 y `npm install` dentro de esta carpeta.
 - Para Claude: `claude` instalado y con la sesión de la suscripción iniciada (`claude` una vez a mano). **Sin** `ANTHROPIC_API_KEY` en el entorno.
 - Para Copilot: `copilot` instalado y con sesión iniciada; revisa las banderas (ver `docs/IA-LOCAL.md`).
 - En Windows PowerShell funciona igual (`node run.mjs`). El script busca `claude`/`copilot` en el `PATH` y lanza los `.cmd` con `cmd.exe /d /s /c` sin `shell: true`; solo pasa texto fijo. Si el CLI no responde en 300 s corta con un mensaje (cambia el límite con `--timeout <segundos>`). Los avisos de cada ejecución se imprimen en consola con su motivo.

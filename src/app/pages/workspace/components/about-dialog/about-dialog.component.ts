@@ -1,8 +1,9 @@
 import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-about-dialog',
   standalone: true,
   templateUrl: './about-dialog.component.html',
