@@ -202,7 +202,7 @@
 
 .batch-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.6fr) 170px minmax(260px, auto);
+  grid-template-columns: 28px minmax(0, 1.6fr) minmax(0, 1.6fr) 170px minmax(260px, auto);
   align-items: center;
   gap: 14px;
   padding: 8px 14px;
@@ -808,4 +808,204 @@ app-ai-batch-chip {
     flex-direction: column;
     gap: 4px;
   }
+}
+
+
+// ---- multiple selection (P-50..P-54) ----
+.batch-check {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+  }
+}
+
+.batch-row--sel {
+  background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.batch-row:focus-within:not(.batch-row--head) {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+
+.batch-table--selecting .batch-row:not(.batch-row--head) .batch-row__actions {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.batch-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  .batch-card {
+    flex: 1;
+  }
+}
+
+.batch-check--card {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.batch-cell:hover .batch-check--card,
+.batch-cell:focus-within .batch-check--card,
+.batch-cell--selecting .batch-check--card,
+.batch-cell--sel .batch-check--card {
+  opacity: 1;
+}
+
+.batch-cell--sel .batch-card {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.batch-selbar {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 22px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+  background: var(--panel);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  max-width: calc(100vw - 32px);
+}
+
+.batch-selbar__count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.batch-selbar__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.78rem;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+  }
+}
+
+.batch-selbar .btn {
+  white-space: nowrap;
+}
+
+.btn--danger-ghost {
+  color: #ff8a8a;
+  border-color: rgba(255, 77, 77, 0.5);
+}
+
+:host-context(:root.theme-light) .btn--danger-ghost {
+  color: #b91c1c;
+}
+
+.batch-selbar__close {
+  padding-inline: 12px;
+}
+
+@media (max-width: 1400px) {
+  .batch-selbar {
+    gap: 6px;
+    padding-left: 16px;
+  }
+}
+
+.batch-sub {
+  margin-left: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.batch-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.batch-dialog {
+  width: min(440px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  border-radius: 16px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+  }
+}
+
+.batch-dialog__warn {
+  color: #fbbf24 !important;
+}
+
+:host-context(:root.theme-light) .batch-dialog__warn {
+  color: #8a5a00 !important;
+}
+
+.batch-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.batch-undo {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px 10px 18px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
 }

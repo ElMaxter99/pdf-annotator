@@ -478,6 +478,11 @@
           </button>
         </div>
         <span class="batch-bar__spacer"></span>
+        @if (view() === 'grid' && rows().length > 0) {
+          <button type="button" class="btn btn--ghost" (click)="toggleAll()" data-testid="select-all-grid">
+            {{ (allSelected() ? 'batch.select.none' : 'batch.select.allShort') | t }}
+          </button>
+        }
         <div class="batch-seg" role="group" [attr.aria-label]="'batch.view.label' | t">
           <button
             type="button"
@@ -512,11 +517,26 @@
       @if (view() === 'grid') {
         <div class="batch-grid" data-testid="panel-grid">
           @for (row of rows(); track row.item.id) {
+            <div
+              class="batch-cell"
+              [class.batch-cell--sel]="isSelected(row.item.id)"
+              [class.batch-cell--selecting]="selectionCount() > 0"
+            >
+            <input
+              type="checkbox"
+              class="batch-check batch-check--card"
+              [checked]="isSelected(row.item.id)"
+              [attr.data-select-id]="row.item.id"
+              [attr.aria-label]="'batch.select.row' | t: { name: row.item.name }"
+              (click)="onCheck(row.item.id, $event)"
+              (keydown)="onCheckKey(row.item.id, $event)"
+              data-testid="select-item"
+            />
             <button
               type="button"
               class="batch-card"
               [class.batch-row--active]="activeId() === row.item.id"
-              (click)="open(row.item)"
+              (click)="onCardClick(row.item, $event)"
               data-testid="panel-item"
             >
               <span class="batch-card__page" aria-hidden="true"
@@ -538,11 +558,23 @@
                 <app-ai-batch-chip [item]="row.item" />
               }
             </button>
+            </div>
           }
         </div>
       } @else {
-        <div class="batch-table" role="table" data-testid="panel-list">
+        <div class="batch-table" [class.batch-table--selecting]="selectionCount() > 0" role="table" data-testid="panel-list">
           <div class="batch-row batch-row--head" role="row">
+            <span role="columnheader" class="batch-row__check">
+              <input
+                type="checkbox"
+                class="batch-check"
+                [checked]="allSelected()"
+                [indeterminate]="selectionCount() > 0 && !allSelected()"
+                [attr.aria-label]="'batch.select.all' | t"
+                (change)="toggleAll()"
+                data-testid="select-all"
+              />
+            </span>
             <span role="columnheader">{{ 'batch.col.document' | t }}</span>
             <span role="columnheader">{{ 'batch.col.version' | t }}</span>
             <span role="columnheader">{{ 'batch.col.state' | t }}</span>
@@ -553,8 +585,21 @@
               class="batch-row"
               role="row"
               [class.batch-row--active]="activeId() === row.item.id"
+              [class.batch-row--sel]="isSelected(row.item.id)"
               data-testid="panel-item"
             >
+              <span class="batch-row__check" role="cell">
+                <input
+                  type="checkbox"
+                  class="batch-check"
+                  [checked]="isSelected(row.item.id)"
+                  [attr.data-select-id]="row.item.id"
+                  [attr.aria-label]="'batch.select.row' | t: { name: row.item.name }"
+                  (click)="onCheck(row.item.id, $event)"
+                  (keydown)="onCheckKey(row.item.id, $event)"
+                  data-testid="select-item"
+                />
+              </span>
               <span class="batch-row__name" role="cell">
                 <span class="batch-thumb" aria-hidden="true"
                   ><app-pdf-thumb [blob]="row.item.bPdf ?? row.item.aPdf"
@@ -632,6 +677,129 @@
         </div>
       }
       <p class="batch-note">{{ 'batch.panelHint' | t }}</p>
+
+      @if (selectionCount() > 0) {
+        <div
+          class="batch-selbar"
+          role="toolbar"
+          [attr.aria-label]="'batch.bulk.toolbar' | t: { count: selectionCount() }"
+          data-testid="selection-bar"
+        >
+          <div class="batch-selbar__count">
+            <strong role="status" aria-live="polite">{{
+              'batch.bulk.selected' | t: { count: selectionCount() }
+            }}</strong>
+            @if (!allSelected()) {
+              <button type="button" class="batch-selbar__link" (click)="selectAllVisible()" data-testid="select-all-visible">
+                {{ 'batch.bulk.selectAll' | t: { count: visibleIds().length } }}
+              </button>
+            }
+          </div>
+          @if (aiHelper.available) {
+            <app-ai-batch-button [ids]="selectedIds()" [up]="true" />
+          }
+          <button
+            type="button"
+            class="btn btn--ghost"
+            [disabled]="plan().download === 0 || bulkBusy()"
+            [attr.title]="plan().download === 0 ? ('batch.bulk.noneDownload' | t) : null"
+            (click)="downloadSelected()"
+            data-testid="bulk-download"
+          >
+            ⤓ {{ 'batch.bulk.download' | t }}
+            <span class="batch-sub">{{ plan().download }} / {{ plan().total }}</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn--ghost"
+            [disabled]="plan().ready === 0 || bulkBusy()"
+            [attr.title]="plan().ready === 0 ? ('batch.bulk.noneReady' | t) : null"
+            (click)="askBulk('ready')"
+            data-testid="bulk-ready"
+          >
+            ✓ {{ 'batch.bulk.ready' | t }}
+            <span class="batch-sub">{{ plan().ready }} / {{ plan().total }}</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn--danger-ghost"
+            [disabled]="bulkBusy()"
+            (click)="askBulk('remove')"
+            data-testid="bulk-remove"
+          >
+            {{ 'batch.bulk.remove' | t }} <span class="batch-sub">{{ plan().total }}</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn--ghost batch-selbar__close"
+            [attr.aria-label]="'batch.bulk.clear' | t"
+            (click)="clearSelection()"
+            data-testid="selection-clear"
+          >
+            ✕
+          </button>
+        </div>
+      }
+
+      @if (dialog(); as kind) {
+        <div class="batch-backdrop">
+          <div
+            class="batch-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="bulk-title"
+            data-testid="bulk-dialog"
+          >
+            @if (kind === 'ready') {
+              <h2 id="bulk-title">{{ 'batch.bulk.readyTitle' | t: { count: plan().ready } }}</h2>
+              <p>{{ 'batch.bulk.readyText' | t }}</p>
+              @if (plan().total - plan().ready > 0) {
+                <p class="batch-dialog__warn">
+                  {{ 'batch.bulk.readySkipped' | t: { count: plan().total - plan().ready } }}
+                </p>
+              }
+            } @else {
+              <h2 id="bulk-title">{{ 'batch.bulk.removeTitle' | t: { count: plan().total } }}</h2>
+              <p>{{ 'batch.bulk.removeText' | t }}</p>
+            }
+            <div class="batch-dialog__actions">
+              <button type="button" class="btn btn--ghost" (click)="dialog.set(null)">
+                {{ 'batch.cancel' | t }}
+              </button>
+              @if (kind === 'ready') {
+                <button
+                  type="button"
+                  class="btn btn--primary"
+                  autofocus
+                  (click)="confirmReady()"
+                  data-testid="bulk-confirm"
+                >
+                  {{ 'batch.bulk.readyYes' | t: { count: plan().ready } }}
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn btn--danger"
+                  autofocus
+                  (click)="confirmRemoveSelected()"
+                  data-testid="bulk-confirm"
+                >
+                  {{ 'batch.bulk.removeYes' | t: { count: plan().total } }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (undoNotice(); as notice) {
+        <div class="batch-undo" role="status" data-testid="bulk-undo">
+          <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
+          <button type="button" class="btn btn--ghost" (click)="undo()" data-testid="bulk-undo-btn">
+            ↶ {{ 'batch.bulk.undo' | t }}
+          </button>
+        </div>
+      }
     }
   </main>
 </div>

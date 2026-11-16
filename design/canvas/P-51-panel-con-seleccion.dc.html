@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-51 Panel con selección</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+
+*{box-sizing:border-box}
+body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--acct);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;cursor:pointer}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:var(--danger);color:#fff}
+.btn.dg{background:transparent;color:var(--dangert);border:1px solid color-mix(in srgb,var(--danger) 50%,transparent)}
+.btn.q{background:transparent;color:var(--muted);padding:8px 10px}
+.btn.s{min-height:34px;padding:4px 14px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.focus{outline:2px solid var(--text);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--acct)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warnt)}
+.chip.err{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--dangert)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;flex:none}
+.dot.on{background:var(--accent)}.dot.warn{background:var(--warn)}.dot.err{background:var(--danger)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:3px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:5px 14px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:17px;font-weight:600}
+.card>.chip{align-self:flex-start}
+.sp{flex-grow:1}
+.bar{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.ico{width:34px;height:34px;border-radius:10px;background:var(--soft);display:inline-flex;align-items:center;justify-content:center;color:var(--text);flex:none}
+.kbd{display:inline-block;font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;background:var(--inset);color:var(--text)}
+.pin{width:26px;height:26px;border-radius:50%;background:var(--danger);color:#fff;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.find{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.find b{color:var(--text)}
+.frame{background:var(--bg);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.top{height:60px;margin:10px 12px 0;background:var(--panel);border-radius:14px;display:flex;align-items:center;gap:16px;padding:0 18px;border:1px solid var(--line)}
+.tr{display:grid;grid-template-columns:28px 44px minmax(0,1fr) 230px 170px 250px;gap:14px;align-items:center;padding:8px 14px;border-radius:12px;background:var(--soft);font-size:14px;border:1px solid transparent}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding-top:0;padding-bottom:0}
+.tr.sel{background:color-mix(in srgb,var(--accent) 14%,var(--soft));border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+.tr.foc{outline:2px solid var(--text);outline-offset:1px}
+.th{width:34px;height:44px;background:#fff;border-radius:3px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.th:before{content:"";position:absolute;left:0;right:0;top:0;height:9px;background:#0f9b8e}
+.th:after{content:"";position:absolute;left:5px;right:5px;top:16px;height:3px;background:#cfd2da;box-shadow:0 6px 0 #cfd2da,0 12px 0 #cfd2da}
+input.c{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.selbar{position:absolute;left:50%;transform:translateX(-50%);bottom:26px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:10px 12px 10px 22px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 36px var(--shadow);white-space:nowrap}
+.selbar b{font-size:15px}
+.sub{font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;background:color-mix(in srgb,var(--ink) 18%,transparent)}
+.btn.g .sub{background:var(--soft);color:var(--muted)}
+.pop{background:var(--pop);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 12px 36px var(--shadow);display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--pop);border:1px solid var(--line);border-radius:14px;padding:10px 12px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 36px var(--shadow);font-size:14px}
+.step{display:flex;flex-direction:column;gap:8px}
+.step .t{font-size:13px;font-weight:600;color:var(--acct);display:flex;gap:8px;align-items:center}
+.mini{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;min-height:300px}
+.mr{display:grid;grid-template-columns:20px 28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 10px;border-radius:10px;background:var(--soft);font-size:13px}
+.mr.sel{background:color-mix(in srgb,var(--accent) 14%,var(--soft))}
+.mr .th{width:24px;height:32px}
+.mr .th:before{height:6px}.mr .th:after{left:4px;right:4px;top:11px;height:2px;box-shadow:0 4px 0 #cfd2da,0 8px 0 #cfd2da}
+.sk{background:linear-gradient(90deg,var(--soft),color-mix(in srgb,var(--text) 10%,var(--soft)),var(--soft));background-size:200% 100%;border-radius:8px;animation:sk 1.4s ease-out infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none}}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);display:inline-block;flex:none}
+.pad{padding:18px 20px}
+
+</style>
+</helmet>
+<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--acct:#5eead4;--danger:#ff4d4d;--dangert:#ff8a8a;--text:#f5f5f5;--muted:#b0b0b0;--line:#3f3f5a;--soft:#34344a;--inset:#252538;--ink:#0b1f1c;--warn:#fbbf24;--warnt:#fbbf24;--pop:#0f0f1a;--shadow:rgba(0,0,0,.5);width:1920px;height:1100px">
+<div class="lab">P-51 · Panel con selección</div><h1 style="font-size:32px;margin:6px 0 6px">Lista con tres PDF marcados y barra de acciones</h1><p class="cap" style="max-width:1400px">Oscuro, escritorio a 1650 px de pantalla útil. Todos los datos son de ejemplo.</p>
+<div style="display:flex;gap:28px;margin-top:22px;align-items:flex-start"><div class="frame" style="width:1380px;height:880px">
+<div class="top"><b style="color:var(--acct)">Pdf Annotator</b><b>Lote · 8 PDFs</b><div style="width:160px"><div class="bar"><i style="width:37%"></i></div></div><span class="cap">3 de 8 listos</span><span class="sp"></span><span class="btn g s"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.6 4.4 4.4 1.6-4.4 1.6L8 13.5 6.4 9.1 2 7.5l4.4-1.6z"/></svg> Trasladar con IA</span><span class="btn s">Revisar siguiente →</span><span class="ico"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="3.5" cy="8" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="12.5" cy="8" r="1"/></svg></span></div>
+<div style="padding:16px 120px 0;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:center;gap:12px;font-size:14px"><span class="chip on">6 versiones B añadidas</span><span class="cap">Suelta más aquí o</span><span class="btn g s">Añadir más</span></div>
+<div style="display:flex;gap:12px;align-items:center"><span class="btn g" style="min-width:260px;justify-content:flex-start;color:var(--muted)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></svg> Buscar por nombre</span><span class="seg"><span class="on">Todos 8</span><span class="">Por revisar 3</span><span class="">Validados 3</span><span class="">Sin plantilla 1</span></span><span class="sp"></span><span class="seg"><span class="">Cuadrícula</span><span class="on">Lista</span></span></div>
+<div class="tr h"><input class="c" type="checkbox" aria-label="Seleccionar todo (selección parcial)" style="accent-color:var(--accent)" checked><span></span><span>Documento</span><span>Versión B</span><span>Estado</span><span></span></div><div class="tr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar factura-0331.pdf"><div class="th"></div><div><b>factura-0331.pdf</b><div class="cap" style="font-size:12px">10 campos · 2 págs</div></div><span class="cap">factura-0331-nuevo.pdf</span><span class="chip warn"><span class="dot warn"></span>Por revisar</span><span style="display:flex;gap:8px;justify-content:flex-end"></span></div><div class="tr sel foc"><input class="c" type="checkbox" checked aria-label="Seleccionar albaran-0332.pdf"><div class="th"></div><div><b>albaran-0332.pdf</b><div class="cap" style="font-size:12px">8 campos · 1 pág</div></div><span class="cap">albaran-0332-nuevo.pdf</span><span class="chip warn"><span class="dot warn"></span>Por revisar</span><span style="display:flex;gap:8px;justify-content:flex-end"></span></div><div class="tr sel"><input class="c" type="checkbox" checked aria-label="Seleccionar contraste-0107.pdf"><div class="th"></div><div><b>contraste-0107.pdf</b><div class="cap" style="font-size:12px">14 campos · 3 págs</div></div><span class="cap">contraste-0107-nuevo.pdf</span><span class="chip on"><span class="dot on"></span>Validado</span><span style="display:flex;gap:8px;justify-content:flex-end"></span></div><div class="tr"><input class="c" type="checkbox"  aria-label="Seleccionar contraste-0108.pdf"><div class="th"></div><div><b>contraste-0108.pdf</b><div class="cap" style="font-size:12px">14 campos · 3 págs</div></div><span class="cap">—</span><span class="chip"><span class="dot"></span>Solo versión A</span><span style="display:flex;gap:8px;justify-content:flex-end"></span></div><div class="tr"><input class="c" type="checkbox"  aria-label="Seleccionar mifid-cuestionario.pdf"><div class="th"></div><div><b>mifid-cuestionario.pdf</b><div class="cap" style="font-size:12px">22 campos · 6 págs</div></div><span class="cap">mifid-cuestionario-nuevo.pdf</span><span class="chip on"><span class="dot on"></span>Validado</span><span style="display:flex;gap:8px;justify-content:flex-end"></span></div><div class="tr"><input class="c" type="checkbox"  aria-label="Seleccionar advice-0021.pdf"><div class="th"></div><div><b>advice-0021.pdf</b><div class="cap" style="font-size:12px">—</div></div><span class="cap">—</span><span class="chip"><span class="dot"></span>Sin plantilla</span><span style="display:flex;gap:8px;justify-content:flex-end"></span></div><div class="tr"><input class="c" type="checkbox"  aria-label="Seleccionar factura-0334.pdf"><div class="th"></div><div><b>factura-0334.pdf</b><div class="cap" style="font-size:12px">10 campos · 2 págs</div></div><span class="cap">factura-0334-nuevo.pdf</span><span class="chip warn"><span class="dot warn"></span>Por revisar</span><span style="display:flex;gap:8px;justify-content:flex-end"></span></div><div class="tr"><input class="c" type="checkbox"  aria-label="Seleccionar albaran-0335.pdf"><div class="th"></div><div><b>albaran-0335.pdf</b><div class="cap" style="font-size:12px">8 campos · 1 pág</div></div><span class="cap">albaran-0335-nuevo.pdf</span><span class="chip on"><span class="dot on"></span>Validado</span><span style="display:flex;gap:8px;justify-content:flex-end"></span></div>
+</div>
+<div class="selbar" role="toolbar" aria-label="Acciones sobre 3 PDF seleccionados"><div style="display:flex;flex-direction:column"><b>3 seleccionados</b><span class="cap" style="font-size:12px">Seleccionar los 8</span></div><span class="btn s"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.6 4.4 4.4 1.6-4.4 1.6L8 13.5 6.4 9.1 2 7.5l4.4-1.6z"/></svg> Trasladar con IA <span class="sub">2 de 3</span></span><span class="btn g s"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/></svg> Descargar <span class="sub">1 de 3</span></span><span class="btn g s"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg> Marcar Listo <span class="sub">2 de 3</span></span><span class="btn dg s"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5"/></svg> Quitar <span class="sub">3</span></span><span class="ico" aria-label="Quitar la selección"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></span></div>
+</div><div style="display:flex;flex-direction:column;gap:16px;flex:1">
+<div class="card"><h3>Lista con 3 marcados</h3>
+<div class="find"><span class="pin">1</span><span><b>Casilla de cabecera en estado mixto</b> (3 de 8). Un clic marca los 8 visibles; otro clic los desmarca.</span></div>
+<div class="find"><span class="pin">2</span><span><b>Fila marcada:</b> fondo y borde en acento, además de la casilla (no solo color). La fila enfocada con el teclado lleva anillo blanco de 2 px.</span></div>
+<div class="find"><span class="pin">3</span><span><b>Acciones por fila ocultas</b> mientras hay selección; el estado se queda como punto + palabra.</span></div>
+<div class="find"><span class="pin">4</span><span><b>Barra con recuentos «N de M»:</b> de los 3 marcados, 2 se pueden trasladar (el tercero ya está validado), 1 se puede descargar y 2 marcar «Listo» (uno ya lo está).</span></div>
+<div class="find"><span class="pin">5</span><span><b>«Seleccionar los 8»</b> bajo el contador amplía a todos los visibles; con 8 marcados cambia a «Quitar la selección».</span></div></div>
+<div class="card"><h3>Sin selección</h3><p class="cap">Todo como hoy: acciones «Revisar», «Subir B» y quitar al pasar el ratón o enfocar la fila (P-46), y ninguna barra. Nada nuevo molesta a quien trabaja PDF a PDF.</p></div>
+<div class="card"><h3>Cuadrícula</h3><p class="cap">Misma lógica con la casilla en la esquina de la tarjeta, y la barra es la misma. Dibujada en P-54 (claro y 1280).</p></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

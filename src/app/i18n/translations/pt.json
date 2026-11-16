@@ -877,6 +877,36 @@
       "step1": "Carregue os PDF do lote (a versão atual, A).",
       "step2": "Adicione os respetivos modelos em JSON ou cole-os.",
       "step3": "Carregue as novas versões (B), transfira os campos e reveja cada PDF."
+    },
+    "select": {
+      "row": "Selecionar {{name}}",
+      "all": "Selecionar todos os PDF visíveis",
+      "allShort": "Selecionar tudo",
+      "none": "Limpar a seleção"
+    },
+    "bulk": {
+      "toolbar": "Ações sobre {{count}} PDF selecionados",
+      "selected": "{{count}} selecionados",
+      "selectAll": "Selecionar os {{count}}",
+      "download": "Transferir",
+      "ready": "Marcar Pronto",
+      "remove": "Remover",
+      "clear": "Limpar a seleção",
+      "noneDownload": "Nenhum dos PDF selecionados está validado",
+      "noneReady": "Nenhum dos PDF selecionados pode ser marcado como Pronto",
+      "aiSkipped": "{{count}} dos selecionados são ignorados: sem versão B, sem campos ou já Pronto.",
+      "readyTitle": "Marcar {{count}} PDF como Pronto",
+      "readyText": "Salta a revisão no editor. Os campos ficam como estão.",
+      "readySkipped": "{{count}} sem modelo são ignorados.",
+      "readyYes": "Marcar {{count}}",
+      "removeTitle": "Remover {{count}} PDF do lote",
+      "removeText": "São apagados deste navegador junto com os modelos e as versões B. Os seus ficheiros originais não são tocados.",
+      "removeYes": "Remover {{count}}",
+      "removed": "{{count}} PDF removidos",
+      "readyDone": "{{count}} PDF marcados como Pronto",
+      "undo": "Anular",
+      "downloaded": "Transferência pronta · {{count}} ficheiros JSON",
+      "downloadedSkipped": "Transferência pronta · {{count}} ficheiros JSON · {{skipped}} não validados ficaram de fora"
     }
   },
   "preview": {

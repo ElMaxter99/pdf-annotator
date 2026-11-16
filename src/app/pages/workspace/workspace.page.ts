@@ -3726,6 +3726,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         );
       }
       this.drawAdjustPins(layer, canvas.height, 'a');
+      // A is drawn asynchronously: a hover that started before it finished is applied now.
+      this.markAdjustHoverInSplit();
     } catch (error) {
       console.warn('No se pudo dibujar la versión A en la vista dividida.', error);
     }

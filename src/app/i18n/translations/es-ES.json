@@ -877,6 +877,36 @@
       "step1": "Sube los PDF del lote (la versión actual, A).",
       "step2": "Añade sus plantillas en JSON o pégalas.",
       "step3": "Sube las versiones nuevas (B), traslada los campos y revisa cada PDF."
+    },
+    "select": {
+      "row": "Seleccionar {{name}}",
+      "all": "Seleccionar todos los PDF visibles",
+      "allShort": "Seleccionar todo",
+      "none": "Quitar la selección"
+    },
+    "bulk": {
+      "toolbar": "Acciones sobre {{count}} PDF seleccionados",
+      "selected": "{{count}} seleccionados",
+      "selectAll": "Seleccionar los {{count}}",
+      "download": "Descargar",
+      "ready": "Marcar Listo",
+      "remove": "Quitar",
+      "clear": "Quitar la selección",
+      "noneDownload": "Ninguno de los marcados está validado",
+      "noneReady": "Ninguno de los marcados se puede marcar como Listo",
+      "aiSkipped": "{{count}} de los marcados se omiten: sin versión B, sin campos o ya Listo.",
+      "readyTitle": "Marcar {{count}} PDF como Listo",
+      "readyText": "Se salta la revisión en el editor. Los campos se quedan tal como están.",
+      "readySkipped": "{{count}} sin plantilla se omiten.",
+      "readyYes": "Marcar {{count}}",
+      "removeTitle": "Quitar {{count}} PDF del lote",
+      "removeText": "Se borran de este navegador junto con sus plantillas y versiones B. Tus archivos originales no se tocan.",
+      "removeYes": "Quitar {{count}}",
+      "removed": "{{count}} PDF quitados",
+      "readyDone": "{{count}} PDF marcados como Listo",
+      "undo": "Deshacer",
+      "downloaded": "Descarga lista · {{count}} archivos JSON",
+      "downloadedSkipped": "Descarga lista · {{count}} archivos JSON · {{skipped}} sin validar no se incluyeron"
     }
   },
   "preview": {

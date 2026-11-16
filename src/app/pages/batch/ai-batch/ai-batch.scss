@@ -766,3 +766,24 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
     animation: none;
   }
 }
+
+.ai-menu--up {
+  top: auto;
+  bottom: calc(100% + 10px);
+  right: auto;
+  left: 0;
+}
+
+.ai-pop__skipped {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.batch-sub {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}

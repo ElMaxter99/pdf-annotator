@@ -169,6 +169,36 @@ export class BatchStoreService {
     void this.run('readwrite', (store) => store.delete(id));
   }
 
+  /** Removes several items at once; `reinsert` puts them back (used by «Deshacer»). */
+  removeMany(ids: readonly string[]): BatchItem[] {
+    const gone = new Set(ids);
+    const removed = this.items().filter((item) => gone.has(item.id));
+    this.items.update((items) => items.filter((item) => !gone.has(item.id)));
+    const active = this.activeId();
+    if (active && gone.has(active)) {
+      this.activeId.set(null);
+    }
+    for (const item of removed) {
+      void this.run('readwrite', (store) => store.delete(item.id));
+    }
+    return removed;
+  }
+
+  reinsert(removed: readonly BatchItem[]): void {
+    const known = new Set(this.items().map((item) => item.id));
+    const back = removed.filter((item) => !known.has(item.id));
+    this.items.update((items) => [...items, ...back]);
+    for (const item of back) {
+      this.persist(item);
+    }
+  }
+
+  setStatusMany(ids: readonly string[], status: BatchItem['status']): void {
+    for (const id of ids) {
+      this.patch(id, { status });
+    }
+  }
+
   /** Empties the batch (memory and IndexedDB); resolves once the stored copy is gone too. */
   /** Notices of the editor that were closed (`itemId:notice` → what they were about). In memory only. */
   readonly closedNotices = signal<Record<string, string>>({});
