@@ -1,4 +1,6 @@
 ## Unreleased
+### Added
+- **Gestos de lienzo en el visor (mesas P-58 a P-60):** `Ctrl/⌘ + rueda` y el pellizco del trackpad hacen zoom hacia el cursor (25–400 %, con indicador flotante y aviso ámbar en los límites); `Ctrl/⌘ + +`/`−`/`0` acercan, alejan y ponen el 100 %, `⇧1` ajusta a la página; mantener `Espacio` (o el botón central) y arrastrar mueve el lienzo sin crear ni mover anotaciones; el «117 %» del pie abre un menú de zoom (50–200 %, ajustar al ancho o a la página). En el lote el zoom y el desplazamiento de A y B ya van enlazados (comparten visor). En la web solo se captura el gesto sobre el visor (el zoom del navegador sigue fuera) y se avisa una vez. En la app de escritorio se fija el zoom visual de la ventana y el menú «View» de macOS mueve el zoom del PDF en lugar del de la página. Textos en los 7 idiomas.
 
 ## [v1.11.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.11.0) - 2026-11-16
 ### Fixed

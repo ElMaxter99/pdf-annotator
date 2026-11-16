@@ -300,7 +300,12 @@
       "selectCopy": "Copier / coller la sélection",
       "selectDuplicate": "Dupliquer la sélection",
       "selectClear": "Désélectionner",
-      "selectLasso": "Faites glisser sur une zone vide pour sélectionner avec un cadre (Maj pour ajouter)"
+      "selectLasso": "Faites glisser sur une zone vide pour sélectionner avec un cadre (Maj pour ajouter)",
+      "zoomWheel": "Zoom avec la molette ou le pincement",
+      "zoomKeys": "Zoom avant / arrière sur le PDF",
+      "zoomActual": "Taille réelle (100 %)",
+      "fitPage": "Ajuster à la page",
+      "panCanvas": "Déplacer le canevas (maintenir)"
     }
   },
   "toast": {
@@ -1314,5 +1319,23 @@
       "delete": "le supprime",
       "undo": "annule"
     }
+  },
+  "zoom": {
+    "hud": {
+      "value": "{{percent}} %",
+      "max": "{{percent}} % · maximum",
+      "min": "{{percent}} % · minimum"
+    },
+    "menu": {
+      "label": "Zoom du PDF",
+      "fitPage": "Ajuster à la page",
+      "fitWidth": "Ajuster à la largeur"
+    },
+    "pan": {
+      "title": "Déplacer",
+      "key": "Espace",
+      "hint": "glissez · relâchez pour annoter"
+    },
+    "hintWeb": "Zoom du PDF : Ctrl + molette. Le zoom du navigateur reste actif sur le reste de l’écran."
   }
 }
