@@ -1,6 +1,7 @@
 <footer class="footer">
   <span class="footer__hint"><kbd>?</kbd> {{ 'shortcuts.footerHint' | t }}</span>
-  <div class="json-coords" role="status" [attr.aria-label]="'controls.cursorLabel' | t">
+  <div class="json-coords">
+    <span class="json-coords__cursor" role="group" aria-live="off" [attr.aria-label]="'controls.cursorLabel' | t">
     <ng-container *ngIf="vm.cursorPdfCoords() as cursor; else coordsIdle">
       <span class="json-coords__label">{{ 'controls.cursorLabel' | t }}</span>
       <span class="json-coords__value">X: {{ cursor.x | number:'1.0-2' }}</span>
@@ -10,9 +11,10 @@
     <ng-template #coordsIdle>
       <span class="json-coords__idle">{{ 'controls.cursorInactive' | t }}</span>
     </ng-template>
+    </span>
     @if (vm.savedAgo(); as saved) {
       <span class="json-coords__divider" aria-hidden="true">·</span>
-      <span class="footer__saved" data-testid="saved-ago">{{ saved.key | t : { n: saved.n } }}</span>
+      <span class="footer__saved" role="status" aria-live="polite" aria-atomic="true" data-testid="saved-ago">{{ saved.key | t : { n: saved.n } }}</span>
     }
   </div>
   <span class="footer__status">

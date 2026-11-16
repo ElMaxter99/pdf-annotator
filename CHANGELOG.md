@@ -2,6 +2,14 @@
 ### Added
 - **Selección múltiple en el panel del lote (mesas P-50 a P-54):** casilla en cada fila (lista) y tarjeta (cuadrícula), casilla de cabecera con estado mixto, Mayús+clic para rangos, Ctrl/⌘+clic, Mayús+↑/↓, Ctrl+A y Esc. Con PDFs marcados aparece una barra flotante con recuentos «N / M»: **Trasladar con IA** (solo los marcados aptos; el popover avisa de los omitidos), **Descargar** (solo validados), **Marcar Listo** (con aviso de que salta la revisión) y **Quitar** (con recuento exacto). «Marcar Listo» y «Quitar» ofrecen **Deshacer** durante 10 s (también con Ctrl+Z). La selección sigue a lo visible: filtrar o buscar quita de la marcada lo que deja de verse.
 
+### Security
+- **CI y contenedor más seguros:** `npm audit` (dependencias de producción, nivel alto) en el CI, Dependabot semanal (npm, escritorio, Actions y Docker) y la imagen Docker pasa a `nginx-unprivileged` (usuario sin privilegios, puerto 8080 dentro del contenedor; el puerto 4444 de `start:docker` no cambia).
+
+### Accessibility
+- **Foco atrapado en los diálogos:** Tab/Shift+Tab no salen de «Acerca de», «Atajos», exportar con ejemplos, «Listo» y consentimiento de IA, y el foco vuelve al botón que lo abrió (`FocusTrapDirective`).
+- **Coordenadas del cursor sin ruido:** ya no se anuncian en cada movimiento del ratón; «Guardado hace…» se anuncia con `aria-live="polite"`.
+- **Contraste del tema claro:** el texto en color de acento usa `--accent-text` (#0b7d72, 5,0:1 sobre blanco; antes 3,4:1).
+
 ### Fixed
 - **Importar JSON respeta el tamaño de letra global:** los campos sin `fontSize` heredan el `fontSize` global del JSON (antes se quedaban en 14 y cambiaban el formato del autor). Tests unitario y e2e incluidos.
 

@@ -1,3 +1,4 @@
+import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, signal } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
@@ -7,10 +8,10 @@ export type ExportSamplesChoice = 'map' | 'sample';
 @Component({
   selector: 'app-export-samples-dialog',
   standalone: true,
-  imports: [TranslationPipe],
+  imports: [FocusTrapDirective, TranslationPipe],
   template: `
     <div class="dialog-backdrop" (click)="cancelled.emit()" (keydown.escape)="cancelled.emit()">
-      <div class="dialog dialog--ask" role="dialog" aria-modal="true" aria-labelledby="export-samples-title"
+      <div appFocusTrap class="dialog dialog--ask" role="dialog" aria-modal="true" aria-labelledby="export-samples-title"
         data-testid="export-samples-dialog" (click)="$event.stopPropagation()">
         <header class="dialog__header">
           <h2 id="export-samples-title" class="dialog__title">{{ 'exportSamples.title' | t: { count: count } }}</h2>

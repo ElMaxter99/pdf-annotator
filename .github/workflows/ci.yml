@@ -40,6 +40,9 @@ jobs:
       - name: Desktop tests
         run: npm run test:desktop
 
+      - name: Audit dependencies (production, high severity)
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Build (includes i18n check)
         run: npm run build
 

@@ -24,7 +24,7 @@
 }
 
 .ai-chip--on {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .ai-chip--warn {
@@ -362,7 +362,7 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
 }
 
 .ai-pcard__tick {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .ai-seg {
@@ -401,7 +401,7 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
   font-style: normal;
   font-weight: 400;
   background: color-mix(in srgb, var(--accent) 22%, transparent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .ai-input {
@@ -426,7 +426,7 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
   border: 0;
   padding: 0;
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font: inherit;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -505,7 +505,7 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
 .ai-pop__link {
   all: unset;
   cursor: pointer;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: underline;
@@ -693,7 +693,7 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
   all: unset;
   cursor: pointer;
   align-self: flex-start;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.88rem;
   font-weight: 600;
 

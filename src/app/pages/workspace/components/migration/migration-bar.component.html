@@ -454,7 +454,7 @@
 
     @if (readyOpen() && vm.migration(); as m) {
     <div class="migration-backdrop" (click)="readyOpen.set(false)"></div>
-    <div class="migration-dialog" role="dialog" aria-modal="true" aria-labelledby="ready-title">
+    <div appFocusTrap class="migration-dialog" role="dialog" aria-modal="true" aria-labelledby="ready-title">
       <h2 id="ready-title">{{ 'batch.editor.readyDialog.title' | t: { name: m.item.bName } }}</h2>
       <ul>
         <li>{{ 'batch.editor.readyDialog.fields' | t: { count: vm.annotationCount() } }}</li>
@@ -499,7 +499,7 @@
 
   @if (vm.aiConsentOpen()) {
     <div class="migration-backdrop" (click)="vm.aiConsentOpen.set(false)"></div>
-    <div class="migration-dialog" role="dialog" aria-modal="true" aria-labelledby="ai-consent-title" data-testid="ai-consent">
+    <div appFocusTrap class="migration-dialog" role="dialog" aria-modal="true" aria-labelledby="ai-consent-title" data-testid="ai-consent">
       <h2 id="ai-consent-title">{{ 'ai.consent.title' | t: { provider: providerName() } }}</h2>
       <p>{{ 'ai.consent.intro' | t: { provider: providerName() } }}</p>
       <ul>
