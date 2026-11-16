@@ -678,66 +678,78 @@
       }
       <p class="batch-note">{{ 'batch.panelHint' | t }}</p>
 
-      @if (selectionCount() > 0) {
-        <div
-          class="batch-selbar"
-          role="toolbar"
-          [attr.aria-label]="'batch.bulk.toolbar' | t: { count: selectionCount() }"
-          data-testid="selection-bar"
-        >
-          <div class="batch-selbar__count">
-            <strong role="status" aria-live="polite">{{
-              'batch.bulk.selected' | t: { count: selectionCount() }
-            }}</strong>
-            @if (!allSelected()) {
-              <button type="button" class="batch-selbar__link" (click)="selectAllVisible()" data-testid="select-all-visible">
-                {{ 'batch.bulk.selectAll' | t: { count: visibleIds().length } }}
-              </button>
-            }
+      @if (selectionCount() > 0 || undoNotice()) {
+        <div class="batch-dock">
+        @if (undoNotice(); as notice) {
+          <div class="batch-undo" role="status" data-testid="bulk-undo">
+            <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
+            <button type="button" class="btn btn--ghost" (click)="undo()" data-testid="bulk-undo-btn">
+              ↶ {{ 'batch.bulk.undo' | t }}
+            </button>
           </div>
-          @if (aiHelper.available) {
-            <app-ai-batch-button [ids]="selectedIds()" [up]="true" />
-          }
-          <button
-            type="button"
-            class="btn btn--ghost"
-            [disabled]="plan().download === 0 || bulkBusy()"
-            [attr.title]="plan().download === 0 ? ('batch.bulk.noneDownload' | t) : null"
-            (click)="downloadSelected()"
-            data-testid="bulk-download"
+        }
+        @if (selectionCount() > 0) {
+          <div
+            class="batch-selbar"
+            role="toolbar"
+            [attr.aria-label]="'batch.bulk.toolbar' | t: { count: selectionCount() }"
+            data-testid="selection-bar"
           >
-            ⤓ {{ 'batch.bulk.download' | t }}
-            <span class="batch-sub">{{ plan().download }} / {{ plan().total }}</span>
-          </button>
-          <button
-            type="button"
-            class="btn btn--ghost"
-            [disabled]="plan().ready === 0 || bulkBusy()"
-            [attr.title]="plan().ready === 0 ? ('batch.bulk.noneReady' | t) : null"
-            (click)="askBulk('ready')"
-            data-testid="bulk-ready"
-          >
-            ✓ {{ 'batch.bulk.ready' | t }}
-            <span class="batch-sub">{{ plan().ready }} / {{ plan().total }}</span>
-          </button>
-          <button
-            type="button"
-            class="btn btn--danger-ghost"
-            [disabled]="bulkBusy()"
-            (click)="askBulk('remove')"
-            data-testid="bulk-remove"
-          >
-            {{ 'batch.bulk.remove' | t }} <span class="batch-sub">{{ plan().total }}</span>
-          </button>
-          <button
-            type="button"
-            class="btn btn--ghost batch-selbar__close"
-            [attr.aria-label]="'batch.bulk.clear' | t"
-            (click)="clearSelection()"
-            data-testid="selection-clear"
-          >
-            ✕
-          </button>
+            <div class="batch-selbar__count">
+              <strong role="status" aria-live="polite">{{
+                'batch.bulk.selected' | t: { count: selectionCount() }
+              }}</strong>
+              @if (!allSelected()) {
+                <button type="button" class="batch-selbar__link" (click)="selectAllVisible()" data-testid="select-all-visible">
+                  {{ 'batch.bulk.selectAll' | t: { count: visibleIds().length } }}
+                </button>
+              }
+            </div>
+            @if (aiHelper.available) {
+              <app-ai-batch-button [ids]="selectedIds()" [up]="true" />
+            }
+            <button
+              type="button"
+              class="btn btn--ghost"
+              [disabled]="plan().download === 0 || bulkBusy()"
+              [attr.title]="plan().download === 0 ? ('batch.bulk.noneDownload' | t) : null"
+              (click)="downloadSelected()"
+              data-testid="bulk-download"
+            >
+              ⤓ {{ 'batch.bulk.download' | t }}
+              <span class="batch-sub">{{ plan().download }} / {{ plan().total }}</span>
+            </button>
+            <button
+              type="button"
+              class="btn btn--ghost"
+              [disabled]="plan().ready === 0 || bulkBusy()"
+              [attr.title]="plan().ready === 0 ? ('batch.bulk.noneReady' | t) : null"
+              (click)="askBulk('ready')"
+              data-testid="bulk-ready"
+            >
+              ✓ {{ 'batch.bulk.ready' | t }}
+              <span class="batch-sub">{{ plan().ready }} / {{ plan().total }}</span>
+            </button>
+            <button
+              type="button"
+              class="btn btn--danger-ghost"
+              [disabled]="bulkBusy()"
+              (click)="askBulk('remove')"
+              data-testid="bulk-remove"
+            >
+              {{ 'batch.bulk.remove' | t }} <span class="batch-sub">{{ plan().total }}</span>
+            </button>
+            <button
+              type="button"
+              class="btn btn--ghost batch-selbar__close"
+              [attr.aria-label]="'batch.bulk.clear' | t"
+              (click)="clearSelection()"
+              data-testid="selection-clear"
+            >
+              ✕
+            </button>
+          </div>
+        }
         </div>
       }
 
@@ -792,14 +804,6 @@
         </div>
       }
 
-      @if (undoNotice(); as notice) {
-        <div class="batch-undo" role="status" data-testid="bulk-undo">
-          <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
-          <button type="button" class="btn btn--ghost" (click)="undo()" data-testid="bulk-undo-btn">
-            ↶ {{ 'batch.bulk.undo' | t }}
-          </button>
-        </div>
-      }
     }
   </main>
 </div>

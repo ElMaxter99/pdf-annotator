@@ -68,6 +68,23 @@ test('«Marcar Listo» skips PDFs without a template and can be undone', async (
   await expect(page.locator('.batch-bar__count')).toContainText('0 de 3 listos');
 });
 
+test('the «Deshacer» notice sits above the selection bar and never covers it', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('select-all').check();
+  await page.getByTestId('bulk-ready').click();
+  await page.getByTestId('bulk-confirm').click();
+  const undo = page.getByTestId('bulk-undo');
+  const bar = page.getByTestId('selection-bar');
+  await expect(undo).toBeVisible();
+  await expect(bar).toBeVisible();
+  const [u, b] = await Promise.all([undo.boundingBox(), bar.boundingBox()]);
+  expect(u!.y + u!.height).toBeLessThanOrEqual(b!.y);
+  await expect(page.getByTestId('bulk-ready')).toBeVisible();
+  await page.getByTestId('bulk-undo-btn').click();
+  await expect(undo).toHaveCount(0);
+  await expect(bar).toBeVisible();
+});
+
 test('«Quitar» asks for the exact count and «Deshacer» brings the PDFs back', async ({ page }) => {
   await openPanel(page);
   await checkbox(page, 'factura-0332.pdf').check();
