@@ -300,7 +300,12 @@
       "selectCopy": "Copia / enganxa la selecció",
       "selectDuplicate": "Duplica la selecció",
       "selectClear": "Treu la selecció",
-      "selectLasso": "Arrossega en una zona buida per seleccionar amb un requadre (amb Shift, afegeix)"
+      "selectLasso": "Arrossega en una zona buida per seleccionar amb un requadre (amb Shift, afegeix)",
+      "zoomWheel": "Zoom amb la roda o el pessic",
+      "zoomKeys": "Apropa / allunya el PDF",
+      "zoomActual": "Mida real (100 %)",
+      "fitPage": "Ajusta a la pàgina",
+      "panCanvas": "Mou el llenç (mantén)"
     }
   },
   "toast": {
@@ -1349,5 +1354,23 @@
       "delete": "l'esborra",
       "undo": "desfà"
     }
+  },
+  "zoom": {
+    "hud": {
+      "value": "{{percent}} %",
+      "max": "{{percent}} % · màxim",
+      "min": "{{percent}} % · mínim"
+    },
+    "menu": {
+      "label": "Zoom del PDF",
+      "fitPage": "Ajusta a la pàgina",
+      "fitWidth": "Ajusta a l’ample"
+    },
+    "pan": {
+      "title": "Mou",
+      "key": "Espai",
+      "hint": "arrossega · deixa anar per anotar"
+    },
+    "hintWeb": "Zoom del PDF: Ctrl + roda. El zoom del navegador continua a la resta de la pantalla."
   }
 }

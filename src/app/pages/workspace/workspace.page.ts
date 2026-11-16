@@ -30,6 +30,14 @@ import {
   parseNumericList,
   serializeFieldForJson,
 } from '../../utils/json-text.utils';
+import {
+  ZOOM_PRESETS,
+  clampScale,
+  stepScale,
+  wheelZoomFactor,
+  zoomLimitFor,
+  type ZoomLimit,
+} from '../../utils/zoom.utils';
 import { AiHelperService, AiRequestError, type AiProvider } from '../../services/ai-helper.service';
 import {
   confidenceLevel,
@@ -285,6 +293,22 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly vm: WorkspacePageComponent;
   pageIndex = signal(1);
   scale = signal(1.5);
+  /** Floating zoom indicator (P-59); `limit` is set when the request hit 25 % or 400 %. */
+  readonly zoomHud = signal<{ percent: number; limit: ZoomLimit } | null>(null);
+  readonly zoomMenuOpen = signal(false);
+  readonly zoomPresets = ZOOM_PRESETS;
+  /** Space is held: dragging moves the canvas instead of annotating. */
+  readonly panReady = signal(false);
+  readonly panning = signal(false);
+  private zoomHudTimer: ReturnType<typeof setTimeout> | null = null;
+  private zoomPending: { requested: number; anchor: { clientX: number; clientY: number } | null } | null = null;
+  private zoomBusy = false;
+  private panDrag: { x: number; y: number; left: number; top: number; viewer: HTMLElement } | null = null;
+  private readonly panDownHandler = (evt: PointerEvent) => this.onPanPointerDown(evt);
+  private readonly panMoveHandler = (evt: PointerEvent) => this.onPanPointerMove(evt);
+  private readonly panUpHandler = () => this.endPan();
+  private readonly windowBlurHandler = () => this.panReady.set(false);
+  private removeZoomCommandListener: (() => void) | null = null;
   cursorPdfCoords = signal<{ x: number; y: number } | null>(null);
   readonly pageThumbnails = signal<readonly PageThumbnail[]>([]);
   private thumbnailObjectUrls: string[] = [];
@@ -673,6 +697,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   constructor() {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointerdown', this.panDownHandler, true);
+      window.addEventListener('blur', this.windowBlurHandler);
+    }
     this.store.setFieldComparator((a, b) => this.areFieldsEqual(a, b));
     effect(() => {
       this.store.coords();
@@ -733,6 +761,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   ngOnInit(): void {
+    const bridge = (typeof window !== 'undefined'
+      ? (window as unknown as { desktop?: { onZoomCommand?: (cb: (c: string) => void) => () => void } }).desktop
+      : undefined);
+    this.removeZoomCommandListener =
+      bridge?.onZoomCommand?.((command) => {
+        if (command === 'in') void this.zoomIn();
+        else if (command === 'out') void this.zoomOut();
+        else if (command === 'reset') void this.zoomActualSize();
+      }) ?? null;
     if (typeof window !== 'undefined') {
       this.savedClock = setInterval(() => this.savedNow.set(Date.now()), 5000);
     }
@@ -751,6 +788,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private savedClock: ReturnType<typeof setInterval> | null = null;
 
   ngOnDestroy() {
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('pointerdown', this.panDownHandler, true);
+      window.removeEventListener('blur', this.windowBlurHandler);
+    }
+    this.endPan();
+    this.removeZoomCommandListener?.();
+    if (this.zoomHudTimer) clearTimeout(this.zoomHudTimer);
     if (this.savedClock) {
       clearInterval(this.savedClock);
     }
@@ -1927,7 +1971,31 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
+    if (this.handleZoomShortcut(event, key)) {
+      return;
+    }
+
     this.handleSelectionShortcut(event, key);
+  }
+
+  /** Ctrl/⌘ + / − / 0 zoom the PDF (never the browser page) while the editor has the focus. */
+  private handleZoomShortcut(event: KeyboardEvent, key: string): boolean {
+    if (!this.pdfDoc || isEditableElement(event.target) || this.aboutOpen() || this.shortcutsOpen()) {
+      return false;
+    }
+    if (key === '+' || key === '=') {
+      event.preventDefault();
+      void this.zoomIn();
+    } else if (key === '-' || key === '_') {
+      event.preventDefault();
+      void this.zoomOut();
+    } else if (key === '0') {
+      event.preventDefault();
+      void this.zoomActualSize();
+    } else {
+      return false;
+    }
+    return true;
   }
 
   /** Ctrl/⌘+A, C, V and D work on the annotation selection (never while typing in a field). */
@@ -1970,6 +2038,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (key === 'escape' && this.aboutOpen()) {
       event.preventDefault();
       this.toggleAbout(false);
+      return;
+    }
+
+    if (key === 'escape' && this.zoomMenuOpen()) {
+      event.preventDefault();
+      this.zoomMenuOpen.set(false);
       return;
     }
 
@@ -2017,6 +2091,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const needsDocument = () => !!this.pdfDoc;
+    if (key === ' ' && needsDocument() && !this.preview() && !this.editing()) {
+      event.preventDefault();
+      this.panReady.set(true);
+      return;
+    }
+    if (event.code === 'Digit1' && event.shiftKey && needsDocument()) {
+      event.preventDefault();
+      void this.fitPage();
+      return;
+    }
     switch (key) {
       case '?':
         event.preventDefault();
@@ -2077,6 +2161,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  @HostListener('document:keyup', ['$event'])
+  onGlobalKeyup(event: KeyboardEvent) {
+    if (event.key === ' ') {
+      this.panReady.set(false);
+    }
+  }
+
   @HostListener('document:mousedown', ['$event'])
   onDocumentMouseDown(event: MouseEvent) {
     const editState = this.editing();
@@ -2098,6 +2189,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const target = event.target as Node | null;
     if (target) {
       this.handleFontDropdownOutsideClick(target);
+      if (this.zoomMenuOpen() && !(target as HTMLElement).closest?.('.footer__zoomwrap')) {
+        this.zoomMenuOpen.set(false);
+      }
     }
 
     if (!this.preview() && !this.editing()) {
@@ -5015,15 +5109,142 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   async zoomIn() {
-    this.scale.update((s) => +(s + 0.25).toFixed(2));
-    await this.render();
-    this.redrawAllForPage();
+    await this.zoomToScale(stepScale(this.zoomBase(), 1), this.viewerCenter());
   }
 
   async zoomOut() {
-    this.scale.update((s) => Math.max(0.25, +(this.scale() - 0.25).toFixed(2)));
-    await this.render();
-    this.redrawAllForPage();
+    await this.zoomToScale(stepScale(this.zoomBase(), -1), this.viewerCenter());
+  }
+
+  /** Real size (100 %), centred on the viewer. */
+  async zoomActualSize() {
+    await this.zoomToScale(1, this.viewerCenter());
+  }
+
+  /** Zoom picked from the footer menu. */
+  async setZoomPercent(percent: number) {
+    this.zoomMenuOpen.set(false);
+    await this.zoomToScale(percent / 100, this.viewerCenter());
+  }
+
+  /** Ctrl/⌘ + wheel and trackpad pinch (they arrive as wheel events with Ctrl) zoom towards the cursor. */
+  onViewerWheel(evt: WheelEvent): void {
+    if ((!evt.ctrlKey && !evt.metaKey) || !this.pdfDoc) {
+      return;
+    }
+    evt.preventDefault();
+    const requested = this.zoomBase() * wheelZoomFactor(evt.deltaY, evt.deltaMode);
+    void this.zoomToScale(requested, { clientX: evt.clientX, clientY: evt.clientY });
+  }
+
+  private zoomBase(): number {
+    return clampScale(this.zoomPending?.requested ?? this.scale());
+  }
+
+  private viewerCenter(): { clientX: number; clientY: number } | null {
+    const container = this.pdfViewerRef?.nativeElement.parentElement;
+    if (!container) return null;
+    const rect = container.getBoundingClientRect();
+    return { clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 };
+  }
+
+  /**
+   * Zooms keeping the point under `anchor` fixed. Requests that arrive while a render is
+   * running are merged into the latest one, so a fast wheel never queues stale renders.
+   */
+  async zoomToScale(requested: number, anchor: { clientX: number; clientY: number } | null = null) {
+    if (!this.pdfDoc) return;
+    this.zoomPending = { requested, anchor };
+    if (this.zoomBusy) return;
+    this.zoomBusy = true;
+    try {
+      while (this.zoomPending) {
+        const { requested: wanted, anchor: at } = this.zoomPending;
+        this.zoomPending = null;
+        const next = clampScale(wanted);
+        this.showZoomHud(next, zoomLimitFor(wanted));
+        const previous = this.scale();
+        if (next === previous) continue;
+        const canvas = this.pdfCanvasRef?.nativeElement;
+        const container = this.pdfViewerRef?.nativeElement.parentElement;
+        const before = canvas?.getBoundingClientRect();
+        this.scale.set(next);
+        await this.render();
+        this.redrawAllForPage();
+        if (at && canvas && container && before) {
+          const after = canvas.getBoundingClientRect();
+          const ux = (at.clientX - before.left) / previous;
+          const uy = (at.clientY - before.top) / previous;
+          container.scrollLeft += after.left + ux * next - at.clientX;
+          container.scrollTop += after.top + uy * next - at.clientY;
+        }
+      }
+    } finally {
+      this.zoomBusy = false;
+    }
+  }
+
+  private showZoomHud(scale: number, limit: ZoomLimit) {
+    this.zoomHud.set({ percent: Math.round(scale * 100), limit });
+    if (this.zoomHudTimer) clearTimeout(this.zoomHudTimer);
+    this.zoomHudTimer = setTimeout(() => this.zoomHud.set(null), 1200);
+    this.maybeShowWebZoomHint();
+  }
+
+  /** On the web, the browser zoom keeps working outside the viewer: say so once. */
+  private maybeShowWebZoomHint() {
+    if (typeof window === 'undefined' || (window as unknown as { desktop?: unknown }).desktop) return;
+    try {
+      if (localStorage.getItem('pdf-annotator.zoomHint') === '1') return;
+      localStorage.setItem('pdf-annotator.zoomHint', '1');
+    } catch {
+      return;
+    }
+    this.toast.show(this.translationService.translate('zoom.hintWeb'), 'info', 10000);
+  }
+
+  private onPanPointerDown(evt: PointerEvent) {
+    if (!this.pdfDoc || this.panDrag) return;
+    const target = evt.target as HTMLElement | null;
+    const viewer = target?.closest?.('.viewer') as HTMLElement | null;
+    const wanted = evt.button === 1 || (evt.button === 0 && this.panReady());
+    if (!viewer || !wanted || isEditableElement(target)) return;
+    evt.preventDefault();
+    evt.stopPropagation();
+    this.panDrag = {
+      x: evt.clientX,
+      y: evt.clientY,
+      left: viewer.scrollLeft,
+      top: viewer.scrollTop,
+      viewer,
+    };
+    this.panning.set(true);
+    window.addEventListener('pointermove', this.panMoveHandler);
+    window.addEventListener('pointerup', this.panUpHandler);
+    window.addEventListener('pointercancel', this.panUpHandler);
+  }
+
+  private onPanPointerMove(evt: PointerEvent) {
+    const drag = this.panDrag;
+    if (!drag) return;
+    drag.viewer.scrollLeft = drag.left - (evt.clientX - drag.x);
+    drag.viewer.scrollTop = drag.top - (evt.clientY - drag.y);
+  }
+
+  private endPan() {
+    if (!this.panDrag) return;
+    this.panDrag = null;
+    this.panning.set(false);
+    window.removeEventListener('pointermove', this.panMoveHandler);
+    window.removeEventListener('pointerup', this.panUpHandler);
+    window.removeEventListener('pointercancel', this.panUpHandler);
+    // The click that follows a drag must not place or select an annotation.
+    const swallow = (e: Event) => {
+      e.stopPropagation();
+      e.preventDefault();
+    };
+    document.addEventListener('click', swallow, true);
+    setTimeout(() => document.removeEventListener('click', swallow, true), 0);
   }
 
   async fitPage() {

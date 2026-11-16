@@ -300,7 +300,12 @@
       "selectCopy": "Copy / paste the selection",
       "selectDuplicate": "Duplicate the selection",
       "selectClear": "Clear the selection",
-      "selectLasso": "Drag on an empty area to select with a box (hold Shift to add)"
+      "selectLasso": "Drag on an empty area to select with a box (hold Shift to add)",
+      "zoomWheel": "Zoom with the wheel or pinch",
+      "zoomKeys": "Zoom the PDF in / out",
+      "zoomActual": "Actual size (100 %)",
+      "fitPage": "Fit to page",
+      "panCanvas": "Move the canvas (hold)"
     }
   },
   "toast": {
@@ -1349,5 +1354,23 @@
       "delete": "deletes it",
       "undo": "undoes"
     }
+  },
+  "zoom": {
+    "hud": {
+      "value": "{{percent}} %",
+      "max": "{{percent}} % · maximum",
+      "min": "{{percent}} % · minimum"
+    },
+    "menu": {
+      "label": "PDF zoom",
+      "fitPage": "Fit to page",
+      "fitWidth": "Fit to width"
+    },
+    "pan": {
+      "title": "Move",
+      "key": "Space",
+      "hint": "drag · release to annotate"
+    },
+    "hintWeb": "PDF zoom: Ctrl + wheel. Browser zoom still works in the rest of the screen."
   }
 }

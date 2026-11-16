@@ -222,6 +222,8 @@ function createWindow() {
     icon: path.join(here, 'assets', 'icon.png'),
     webPreferences: { preload: path.join(here, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false },
   });
+  // El pellizco no debe escalar la interfaz: el zoom es el del PDF (lo gestiona la web).
+  win.webContents.setVisualZoomLevelLimits(1, 1);
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (/^https:\/\//.test(url)) shell.openExternal(url);
     return { action: 'deny' };
@@ -255,9 +257,30 @@ app.on('activate', () => {
   if (!win) createWindow();
 });
 
+// Sin los roles de zoom de página: «Acercar/Alejar/Tamaño real» mueven el zoom del PDF.
+// `registerAccelerator: false` deja que la tecla llegue a la web; el clic en el menú usa el IPC.
+function viewMenu() {
+  const zoom = (command) => () => win?.webContents.send('desktop:zoom', command);
+  const item = (label, accelerator, command) => ({ label, accelerator, registerAccelerator: false, click: zoom(command) });
+  return {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forceReload' },
+      { role: 'toggleDevTools' },
+      { type: 'separator' },
+      item('Actual Size', 'CmdOrCtrl+0', 'reset'),
+      item('Zoom In', 'CmdOrCtrl+Plus', 'in'),
+      item('Zoom Out', 'CmdOrCtrl+-', 'out'),
+      { type: 'separator' },
+      { role: 'togglefullscreen' },
+    ],
+  };
+}
+
 app.whenReady().then(async () => {
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
-  Menu.setApplicationMenu(process.platform === 'darwin' ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }, { role: 'viewMenu' }, { role: 'windowMenu' }]) : null);
+  Menu.setApplicationMenu(process.platform === 'darwin' ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }, viewMenu(), { role: 'windowMenu' }]) : null);
   registerWebProtocol();
   setupUpdater();
   setupIpc();

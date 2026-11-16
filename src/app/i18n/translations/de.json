@@ -300,7 +300,12 @@
       "selectCopy": "Auswahl kopieren / einfügen",
       "selectDuplicate": "Auswahl duplizieren",
       "selectClear": "Auswahl aufheben",
-      "selectLasso": "Auf einer leeren Fläche ziehen, um mit einem Rahmen auszuwählen (mit Umschalt hinzufügen)"
+      "selectLasso": "Auf einer leeren Fläche ziehen, um mit einem Rahmen auszuwählen (mit Umschalt hinzufügen)",
+      "zoomWheel": "Zoom mit Mausrad oder Pinch-Geste",
+      "zoomKeys": "PDF vergrößern / verkleinern",
+      "zoomActual": "Originalgröße (100 %)",
+      "fitPage": "An Seite anpassen",
+      "panCanvas": "Arbeitsfläche verschieben (halten)"
     }
   },
   "toast": {
@@ -1349,5 +1354,23 @@
       "delete": "löscht es",
       "undo": "macht rückgängig"
     }
+  },
+  "zoom": {
+    "hud": {
+      "value": "{{percent}} %",
+      "max": "{{percent}} % · Maximum",
+      "min": "{{percent}} % · Minimum"
+    },
+    "menu": {
+      "label": "PDF-Zoom",
+      "fitPage": "An Seite anpassen",
+      "fitWidth": "An Breite anpassen"
+    },
+    "pan": {
+      "title": "Verschieben",
+      "key": "Leertaste",
+      "hint": "ziehen · loslassen zum Annotieren"
+    },
+    "hintWeb": "PDF-Zoom: Strg + Mausrad. Der Browser-Zoom gilt weiterhin im Rest des Bildschirms."
   }
 }

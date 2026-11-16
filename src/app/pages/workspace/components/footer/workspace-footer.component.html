@@ -18,7 +18,29 @@
     }
   </div>
   <span class="footer__status">
-    <span class="footer__zoom" data-testid="footer-zoom">{{ vm.scale() * 100 | number:'1.0-0' }} %</span>
+    <span class="footer__zoomwrap">
+      <button type="button" class="footer__zoom footer__zoom--btn" data-testid="footer-zoom" [disabled]="!vm.pdfDoc"
+        aria-haspopup="menu" [attr.aria-expanded]="vm.zoomMenuOpen()" [attr.aria-label]="'zoom.menu.label' | t"
+        (click)="toggleZoomMenu()">{{ vm.scale() * 100 | number:'1.0-0' }} %</button>
+      @if (vm.zoomMenuOpen()) {
+        <div class="zoom-menu" role="menu" [attr.aria-label]="'zoom.menu.label' | t" (keydown)="onZoomMenuKey($event)" data-testid="zoom-menu">
+          @for (p of vm.zoomPresets; track p) {
+            <button type="button" role="menuitemradio" class="zoom-menu__item" [class.zoom-menu__item--on]="vm.scale() === p"
+              [attr.aria-checked]="vm.scale() === p" (click)="vm.setZoomPercent(p * 100)">
+              {{ p * 100 }} %
+              @if (p === 1) { <kbd>Ctrl/⌘ 0</kbd> }
+            </button>
+          }
+          <hr class="zoom-menu__sep" />
+          <button type="button" role="menuitem" class="zoom-menu__item" (click)="vm.zoomMenuOpen.set(false); vm.fitWidth()">
+            {{ 'zoom.menu.fitWidth' | t }}<kbd>0</kbd>
+          </button>
+          <button type="button" role="menuitem" class="zoom-menu__item" (click)="vm.zoomMenuOpen.set(false); vm.fitPage()">
+            {{ 'zoom.menu.fitPage' | t }}<kbd>⇧ 1</kbd>
+          </button>
+        </div>
+      }
+    </span>
     <button type="button" class="footer__fit" (click)="vm.fitPage()" [disabled]="!vm.pdfDoc"
       [attr.title]="'app.footer.fitPage' | t">{{ 'controls.fitWidth' | t }}</button>
     <span class="footer__version">v{{ vm.version }}</span>
