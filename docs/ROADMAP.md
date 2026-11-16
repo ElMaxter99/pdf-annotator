@@ -18,6 +18,7 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 4. Rendimiento: miniaturas bajo demanda, `OnPush`.
 6. Dockerfile: `nginx-unprivileged`, `npm ci`; `npm audit` y Dependabot en CI.
 7. Más tests: atajos y normalización de coordenadas.
+8. **Subir a Node 26 en todo el proyecto**, como parte de una feature de la siguiente versión (decisión de Maxter): `Dockerfile` (`node:22.12.0-alpine` → `26.x-alpine`, PR #221 de Dependabot como referencia), `node-version` en `ci.yml`, `release.yml`, `desktop-ci.yml` y `desktop-release.yml`, y la mención de Node 22.12 en `AGENTS.md`. Comprobar build, tests, e2e y el empaquetado de escritorio antes de fusionar.
 
 ## Ideas sin priorizar
 Exportación en ZIP de varias plantillas.
