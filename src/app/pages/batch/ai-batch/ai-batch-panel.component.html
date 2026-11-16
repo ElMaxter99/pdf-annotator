@@ -9,6 +9,19 @@
       </header>
 
       <div class="ai-panel__body">
+        @if (queue.viaHelper()) {
+          <div class="ai-panel__chips">
+            <span class="ai-chip ai-chip--ok" data-testid="ai-batch-via-helper"><i class="ai-dot" aria-hidden="true"></i>{{ 'batch.ai.queue.badge' | t }}</span>
+            <span class="ai-chip" data-testid="ai-batch-concurrency">{{ (queue.concurrency() > 1 ? 'batch.ai.queue.parallel' : 'batch.ai.queue.serial') | t: { n: queue.concurrency() } }}</span>
+          </div>
+        }
+        @if (queue.reconnected(); as back) {
+          <div class="ai-note ai-panel__back" role="status" data-testid="ai-batch-reconnected">
+            <i class="ai-dot" aria-hidden="true"></i>
+            <p>{{ 'batch.ai.queue.reconnected' | t: { done: back.done, total: back.total } }}</p>
+            <button type="button" class="btn btn--ghost" (click)="queue.reconnected.set(null)">{{ 'batch.ai.queue.dismiss' | t }}</button>
+          </div>
+        }
         <div class="ai-panel__prog">
           <div class="ai-kpi">
             <strong>{{ 'batch.ai.panel.count' | t: { done: finished(), total: counts().total } }}</strong>
@@ -33,9 +46,11 @@
               <small>{{ stateOf(c.row).key | t: stateParams(c.row) }}</small>
             }
             <span class="ai-panel__actions">
-              <button type="button" class="btn btn--ghost" [disabled]="pausing()" (click)="requestPause()" data-testid="ai-batch-pause">
-                ❚❚ {{ (pausing() ? 'batch.ai.pausing' : 'batch.ai.pause') | t }}
-              </button>
+              @if (!queue.viaHelper()) {
+                <button type="button" class="btn btn--ghost" [disabled]="pausing()" (click)="requestPause()" data-testid="ai-batch-pause">
+                  ❚❚ {{ (pausing() ? 'batch.ai.pausing' : 'batch.ai.pause') | t }}
+                </button>
+              }
               <button type="button" class="btn btn--danger" (click)="cancel()" data-testid="ai-batch-cancel-run">
                 {{ 'batch.ai.panel.stop' | t }}
               </button>
@@ -81,6 +96,12 @@
 
         @if (queue.run() === 'done') {
           <div class="ai-panel__state" data-testid="ai-batch-summary">
+            @if (lost()) {
+              <div class="ai-note ai-note--err" role="alert" data-testid="ai-batch-lost">
+                <span aria-hidden="true">⚠</span>
+                <p>{{ 'batch.ai.queue.lost' | t: { kept: counts().done, lost: retryCount() } }}</p>
+              </div>
+            }
             <span class="ai-status__chips">
               @if (readyCount() > 0) {
                 <span class="ai-chip ai-chip--ok">{{ 'batch.ai.done.review' | t: { count: readyCount() } }}</span>
@@ -103,7 +124,7 @@
               }
               @if (retryCount() > 0) {
                 <button type="button" class="btn btn--ghost" (click)="retryFailed()" data-testid="ai-batch-retry">
-                  {{ 'batch.ai.panel.retry' | t: { count: retryCount() } }}
+                  {{ (lost() ? 'batch.ai.queue.relaunch' : 'batch.ai.panel.retry') | t: { count: retryCount() } }}
                 </button>
               }
               <button type="button" class="btn btn--ghost" (click)="dismiss()" data-testid="ai-batch-close">
@@ -159,7 +180,7 @@
 
       <footer class="ai-panel__foot">
         <small>{{ 'batch.ai.panel.note' | t }}</small>
-        <small>{{ 'batch.ai.panel.keepRunning' | t }}</small>
+        <small>{{ (queue.viaHelper() ? 'batch.ai.queue.keepRunning' : 'batch.ai.panel.keepRunning') | t }}</small>
       </footer>
     </aside>
   } @else {

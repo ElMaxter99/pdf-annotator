@@ -16,6 +16,7 @@ const need = [
   'web/index.html',
   'tools/ai-helper/server.mjs',
   'tools/ai-helper/models.mjs',
+  'tools/ai-helper/queue.mjs',
   'tools/ai-phase0/providers.mjs',
   'tools/ai-phase0/node_modules/pdfjs-dist',
   'tools/ai-phase0/node_modules/@napi-rs/canvas',
