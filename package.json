@@ -61,7 +61,7 @@
     "@angular/compiler-cli": "^20.2.0",
     "@playwright/test": "1.56.1",
     "@types/express": "^5.0.1",
-    "@types/jasmine": "~5.1.0",
+    "@types/jasmine": "~7.0.0",
     "@types/node": "^20.17.19",
     "@types/pdfjs-dist": "^2.10.377",
     "electron": "^45.3.1",
