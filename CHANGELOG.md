@@ -2,6 +2,9 @@
 ### Added
 - **Selección múltiple en el panel del lote (mesas P-50 a P-54):** casilla en cada fila (lista) y tarjeta (cuadrícula), casilla de cabecera con estado mixto, Mayús+clic para rangos, Ctrl/⌘+clic, Mayús+↑/↓, Ctrl+A y Esc. Con PDFs marcados aparece una barra flotante con recuentos «N / M»: **Trasladar con IA** (solo los marcados aptos; el popover avisa de los omitidos), **Descargar** (solo validados), **Marcar Listo** (con aviso de que salta la revisión) y **Quitar** (con recuento exacto). «Marcar Listo» y «Quitar» ofrecen **Deshacer** durante 10 s (también con Ctrl+Z). La selección sigue a lo visible: filtrar o buscar quita de la marcada lo que deja de verse.
 
+### Changed
+- **Ajuste por dos anclas en «Trasladar con IA» (sin IA primero):** cuando A y B miden distinto, la cascada ya no pasa el par a la IA sin intentarlo; ajusta traslación + escala por eje con los textos comunes (las dos anclas que más textos respaldan, refinado con todas las coincidentes) y lo da por resuelto solo si al menos el 80 % de las anclas de cada página con campos concuerda. Ahorra peticiones cuando solo cambia la escala. Solo lógica interna.
+
 ### Security
 - **CI y contenedor más seguros:** `npm audit` (dependencias de producción, nivel alto) en el CI, Dependabot semanal (npm, escritorio, Actions y Docker) y la imagen Docker pasa a `nginx-unprivileged` (usuario sin privilegios, puerto 8080 dentro del contenedor; el puerto 4444 de `start:docker` no cambia).
 
