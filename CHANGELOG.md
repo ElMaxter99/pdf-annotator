@@ -4,6 +4,7 @@
 
 ### Changed
 - **Interno, sin cambios visibles:** `workspace.page.ts` baja de ~6.200 a ~5.600 líneas. El dibujo de rejillas, reglas y guías y el cálculo del ajuste magnético pasan a `utils/guides.utils.ts`; el estilo y la normalización de campos a `utils/field-style.utils.ts`; el texto JSON (vista previa del árbol, sangrado, altura de línea) a `utils/json-text.utils.ts`; y la configuración del worker de pdf.js a `pdf-worker.setup.ts`. Con tests unitarios nuevos.
+- **Ajuste por dos anclas en «Trasladar con IA» (sin IA primero):** cuando A y B miden distinto, la cascada ya no pasa el par a la IA sin intentarlo; ajusta traslación + escala por eje con los textos comunes (las dos anclas que más textos respaldan, refinado con todas las coincidentes) y lo da por resuelto solo si al menos el 80 % de las anclas de cada página con campos concuerda. Ahorra peticiones cuando solo cambia la escala. Solo lógica interna.
 
 ### Security
 - **CI y contenedor más seguros:** `npm audit` (dependencias de producción, nivel alto) en el CI, Dependabot semanal (npm, escritorio, Actions y Docker) y la imagen Docker pasa a `nginx-unprivileged` (usuario sin privilegios, puerto 8080 dentro del contenedor; el puerto 4444 de `start:docker` no cambia).

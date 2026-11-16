@@ -26,7 +26,29 @@ describe('cascadeAdjust', () => {
 
   it('leaves the pair to the AI when the page count or size differ', () => {
     expect(cascadeAdjust(template, pdf([labels]), pdf([moved(0), moved(0)])).why).toBe('pages');
-    expect(cascadeAdjust(template, pdf([labels]), pdf([moved(0)], { w: 612, h: 792 })).why).toBe('sizes');
+  });
+
+  it('solves a pair whose page changed size when the texts follow one scale and offset', () => {
+    const scaled = labels.map(([t, x, y]) => [t, x * 1.2 + 10, y * 0.9 - 5] as [string, number, number]);
+    const wide: Array<[string, number, number]> = [...scaled, ['Código postal', 400 * 1.2 + 10, 500 * 0.9 - 5]];
+    const base: Array<[string, number, number]> = [...labels, ['Código postal', 400, 500]];
+    const result = cascadeAdjust(template, pdf([base]), pdf([wide], { w: 714, h: 758 }));
+    expect(result.solved).toBeTrue();
+    expect(result.rows.map((r) => [r.x, r.y])).toEqual([
+      [130, 625],
+      [130, 535],
+    ]);
+  });
+
+  it('hands a resized pair to the AI when the texts do not agree on one scale', () => {
+    const mess: Array<[string, number, number]> = [
+      ['Nombre completo', 20, 100],
+      ['Domicilio fiscal', 300, 500],
+      ['Teléfono móvil', 150, 50],
+    ];
+    const result = cascadeAdjust(template, pdf([labels]), pdf([mess], { w: 612, h: 792 }));
+    expect(result.solved).toBeFalse();
+    expect(result.why).toBe('sizes');
   });
 
   it('hands the pair to the AI when the layout did not just move as a whole', () => {

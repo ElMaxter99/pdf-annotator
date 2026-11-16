@@ -233,3 +233,73 @@ export function proposeShifts(
     };
   });
 }
+
+/** One axis of the two-anchor fit: `b = scale * a + offset`. */
+export interface AxisFit {
+  readonly scale: number;
+  readonly offset: number;
+  readonly inliers: number;
+  readonly total: number;
+}
+
+export interface TwoAnchorFit {
+  readonly x: AxisFit;
+  readonly y: AxisFit;
+}
+
+/** Two anchors closer than this (points) on an axis say nothing about the scale. */
+export const MIN_ANCHOR_SPAN = 40;
+/** An anchor within this many points of the fitted line agrees with it. */
+export const FIT_TOLERANCE = 3;
+export const MIN_FIT_SCALE = 0.5;
+export const MAX_FIT_SCALE = 2;
+const MAX_FIT_SAMPLE = 120;
+
+function fitAxis(pairs: ReadonlyArray<readonly [number, number]>): AxisFit | null {
+  const sample = pairs.length > MAX_FIT_SAMPLE ? pairs.slice(0, MAX_FIT_SAMPLE) : pairs;
+  let best: { scale: number; offset: number; inliers: number } | null = null;
+  for (let i = 0; i < sample.length; i++) {
+    for (let j = i + 1; j < sample.length; j++) {
+      const span = sample[j][0] - sample[i][0];
+      if (Math.abs(span) < MIN_ANCHOR_SPAN) {
+        continue;
+      }
+      const scale = (sample[j][1] - sample[i][1]) / span;
+      if (scale < MIN_FIT_SCALE || scale > MAX_FIT_SCALE) {
+        continue;
+      }
+      const offset = sample[i][1] - scale * sample[i][0];
+      const inliers = pairs.filter(
+        ([a, b]) => Math.abs(scale * a + offset - b) <= FIT_TOLERANCE,
+      ).length;
+      if (!best || inliers > best.inliers) {
+        best = { scale, offset, inliers };
+      }
+    }
+  }
+  if (!best) {
+    return null;
+  }
+  const inside = pairs.filter(([a, b]) => Math.abs(best!.scale * a + best!.offset - b) <= FIT_TOLERANCE);
+  const n = inside.length;
+  const meanA = inside.reduce((s, [a]) => s + a, 0) / n;
+  const meanB = inside.reduce((s, [, b]) => s + b, 0) / n;
+  const varA = inside.reduce((s, [a]) => s + (a - meanA) ** 2, 0);
+  if (varA === 0) {
+    return null;
+  }
+  const scale = inside.reduce((s, [a, b]) => s + (a - meanA) * (b - meanB), 0) / varA;
+  return { scale, offset: meanB - scale * meanA, inliers: n, total: pairs.length };
+}
+
+/**
+ * Fits translation + scale per axis (x and y apart) from the anchors of a page, built with
+ * `findAnchors(a, b)` without pre-scaling. It picks the two anchors whose line agrees with most of
+ * the others, then refines with all those that agree. Returns null when no pair of anchors is far
+ * enough apart to say anything.
+ */
+export function fitTwoAnchors(anchors: readonly TextAnchor[]): TwoAnchorFit | null {
+  const x = fitAxis(anchors.map((anchor) => [anchor.a.x, anchor.b.x] as const));
+  const y = fitAxis(anchors.map((anchor) => [anchor.a.y, anchor.b.y] as const));
+  return x && y ? { x, y } : null;
+}
