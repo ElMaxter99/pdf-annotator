@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-64 Rueda al borde claro y ajuste</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.p{--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--line:#3f3f5a;--soft:#34344a;--inset:#252538;--ink:#0b1f1c;--warn:#fbbf24;--tip:#0f0f1a;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px}
+.p.light{--bg:#f6f7fb;--panel:#ffffff;--accent:#0f9b8e;--danger:#dc2626;--text:#0f172a;--muted:#475569;--line:#cbd5e1;--soft:#eef1f6;--inset:#e6e9f0;--ink:#ffffff;--warn:#92400e;--tip:#0f172a}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.s{min-height:32px;padding:4px 14px;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.err{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;flex:none}
+.dot.on{background:var(--accent)}.dot.warn{background:var(--warn)}.dot.err{background:var(--danger)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:17px;font-weight:600}
+.sp{flex-grow:1}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;color:var(--text);background:var(--soft);white-space:nowrap}
+.tbl{display:grid;gap:6px}
+.tr{display:grid;gap:16px;align-items:center;padding:10px 16px;border-radius:12px;background:var(--soft);font-size:14px;line-height:1.4}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding-top:0;padding-bottom:0}
+.tr b{font-weight:600}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:10%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.view{position:relative;overflow:hidden;background:var(--inset);border:1px solid var(--line);border-radius:14px}
+.hud{position:absolute;left:50%;transform:translateX(-50%);top:14px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 16px;font-size:14px;font-weight:600;display:flex;gap:10px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.hud.warn{border-color:var(--warn);color:var(--warn)}
+.menu{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:2px;font-size:13px}
+.menu .it{display:flex;align-items:center;gap:12px;padding:7px 12px;border-radius:8px;min-height:32px}
+.menu .it.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);font-weight:600}
+.menu .sep{height:1px;background:var(--line);margin:4px 0}
+.foot{height:34px;background:var(--panel);border-radius:10px;display:flex;align-items:center;gap:18px;padding:0 14px;font-size:13px;color:var(--muted);border:1px solid var(--line)}
+.toast{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;display:flex;gap:10px;align-items:center;box-shadow:0 12px 32px rgba(0,0,0,.4);max-width:520px;line-height:1.4}
+.col{display:flex;flex-direction:column;gap:8px}
+.lab2{font-size:13px;font-weight:600;color:var(--text)}
+
+.sw{width:40px;height:22px;border-radius:999px;background:var(--line);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--text)}
+.sw.on{background:var(--accent)}.sw.on::after{left:21px;background:var(--ink)}
+.focus{outline:2px solid var(--accent);outline-offset:3px}
+.lnk{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:5px 14px 5px 10px;font-size:13px;font-weight:600;background:var(--panel);border:1px solid var(--line);color:var(--text);box-shadow:0 6px 18px rgba(0,0,0,.28);white-space:nowrap}
+.lnk.on{border-color:var(--accent);color:var(--accent)}
+.lnk.off{border-color:var(--warn);color:var(--warn)}
+.tag{position:absolute;top:10px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:color-mix(in srgb,var(--text) 12%,transparent);color:var(--muted)}
+.tag.b{background:var(--accent);color:var(--ink)}
+.zb{position:absolute;bottom:10px;padding:2px 10px;border-radius:8px;font-size:12px;font-weight:600;background:var(--panel);border:1px solid var(--line);color:var(--text)}
+.edge{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--line)}
+.edge i{display:block;height:100%;background:var(--accent)}
+</style>
+</helmet>
+<div class="p light" style="width:1920px;height:880px">
+<div class="lab">P-64 · Rueda al borde · claro, 1280 px y ajuste en ⋯</div>
+<h1 style="font-size:34px;margin:6px 0 4px">El ajuste vive en el menú ⋯, igual de claro a 1280</h1>
+<p class="cap" style="max-width:1500px">Variante clara a 1280 px (escala 66 %) con el indicador a medio llenar y el interruptor en el menú ⋯.</p>
+<div style="display:flex;gap:28px;margin-top:20px"><div style="width:844px;height:540px;position:relative;overflow:hidden;border-radius:12px;border:1px solid var(--line);flex:none"><div style="transform:scale(0.66);transform-origin:0 0;width:1280px;height:818px;position:relative;background:var(--bg);display:flex;flex-direction:column">
+<div style="height:52px;margin:10px 12px 0;background:var(--panel);border-radius:14px;display:flex;align-items:center;gap:14px;padding:0 16px;border:1px solid var(--line)"><b style="color:var(--accent)">Pdf Annotator</b><span class="cap">2 / 5</span><span class="sp"></span><span class="btn g s">⋯</span></div>
+<div style="flex:1;display:flex;gap:12px;padding:12px;min-height:0"><div style="width:280px;background:var(--panel);border-radius:14px;border:1px solid var(--line)"></div><div class="view" style="flex:1"><div style="position:absolute;left:230px;top:-300px"><div class="pg" style="width:560px;height:740px"><div class="band"></div><div class="ln" style="left:45px;top:133px;width:101px"></div><div class="ln" style="left:179px;top:133px;width:224px"></div><div class="fd" style="left:179px;top:127px;width:196px;height:33px"></div><div class="ln" style="left:45px;top:189px;width:101px"></div><div class="ln" style="left:179px;top:189px;width:224px"></div><div class="fd" style="left:179px;top:183px;width:196px;height:33px"></div><div class="ln" style="left:45px;top:244px;width:101px"></div><div class="ln" style="left:179px;top:244px;width:224px"></div><div class="fd" style="left:179px;top:238px;width:196px;height:33px"></div><div class="ln" style="left:45px;top:300px;width:101px"></div><div class="ln" style="left:179px;top:300px;width:224px"></div><div class="fd" style="left:179px;top:294px;width:196px;height:33px"></div><div class="ln" style="left:45px;top:355px;width:101px"></div><div class="ln" style="left:179px;top:355px;width:224px"></div><div class="fd" style="left:179px;top:349px;width:196px;height:33px"></div><div class="ln" style="left:45px;top:411px;width:101px"></div><div class="ln" style="left:179px;top:411px;width:224px"></div><div class="fd" style="left:179px;top:405px;width:196px;height:33px"></div><div class="ln" style="left:45px;top:466px;width:101px"></div><div class="ln" style="left:179px;top:466px;width:224px"></div><div class="fd" style="left:179px;top:460px;width:196px;height:33px"></div></div></div><div class="hud" style="top:auto;bottom:18px;font-size:16px"><span>Sigue para ir a la página 3 ↓</span></div><div style="position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--line)"><i style="display:block;height:100%;width:60%;background:var(--accent)"></i></div></div></div>
+<div class="foot" style="margin:0 12px 10px"><span><span class="kbd">?</span> Atajos</span><span class="sp"></span><span style="color:var(--accent);font-weight:600;border:1px solid var(--accent);border-radius:8px;padding:2px 10px">100 % ▾</span><span>v1.13.0</span></div><div class="menu" style="position:absolute;right:16px;top:64px;width:360px;z-index:3"><div class="it" style="justify-content:space-between"><span>Atajos de teclado</span><span class="kbd">?</span></div><div class="it">Acerca de</div><div class="sep"></div><div class="it focus" style="justify-content:space-between"><span>Pasar de página con la rueda</span><span class="sw on"></span></div><div class="it">Tema claro</div><div class="it">Idioma · Español</div></div></div></div><div class="col" style="flex:1;gap:14px"><div class="card" style="flex:1"><h3>Ajuste en el menú ⋯</h3><p class="cap">Va con atajos, tema e idioma en <span class="kbd">.toolbar__prefs</span>: es una preferencia de lectura, no una acción frecuente. Interruptor con texto, <span class="kbd">role="switch"</span> y <span class="kbd">aria-checked</span>; sin color como única señal (la posición del botón y «Activado/Desactivado» a la derecha para lectores de pantalla). Se guarda en <span class="kbd">localStorage</span> por navegador; se lee como no confiable (solo <span class="kbd">true/false</span>).</p></div><div class="card" style="flex:1"><h3>Atajo y textos</h3><p class="cap">Sin atajo propio: es un ajuste, no una acción. Textos nuevos en los 7 idiomas: «Pasar de página con la rueda», «Sigue para ir a la página {n}», «Última página» y «Primera página». La tabla del diálogo de atajos y el README añaden una línea de explicación del gesto (la rueda al borde, con Ctrl/⌘ zoom).</p></div><div class="card" style="flex:1"><h3>Qué necesito de ti</h3><p class="cap">Dos decisiones: (1) rueda al borde, <b>activado</b> o desactivado por defecto; (2) desenlace de A/B, <b>hasta reenlazar</b> o hasta cambiar de página. Con tu visto bueno programo ambas en una PR y la dejo abierta para que la revises.</p></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":880}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

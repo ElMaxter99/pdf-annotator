@@ -15,6 +15,19 @@ import { AnnotationEditorComponent } from '../annotation-editor/annotation-edito
   imports: [CommonModule, AnnotationEditorComponent, FirstStepsComponent, TranslationPipe],
 })
 export class WorkspaceViewerComponent {
+  /** «Dividida»: the zoom indicator sits over the pane it refers to, above the link chip (P-61). */
+  splitHudLeft(side?: 'A' | 'B'): number | null {
+    const box = this.vm.splitActive() ? this.vm.splitBox() : null;
+    if (!box) return null;
+    const x = side === 'A' ? 0.25 : side === 'B' ? 0.75 : 0.5;
+    return box.left + box.width * x;
+  }
+
+  splitHudTop(): number | null {
+    const box = this.vm.splitActive() ? this.vm.splitBox() : null;
+    return box ? box.top + box.height - 104 : null;
+  }
+
   @Input({ required: true }) vm!: WorkspacePageComponent;
 
   readonly originKinds = ['value', 'data', 'sample', 'missing'] as const;

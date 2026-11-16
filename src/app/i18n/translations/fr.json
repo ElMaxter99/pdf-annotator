@@ -104,7 +104,8 @@
     "moreOptions": "Plus d'options",
     "clearConfirm": "Supprimer toutes les annotations ? Vous pouvez annuler avec Ctrl+Z.",
     "clearYes": "Tout supprimer",
-    "clearCancel": "Annuler"
+    "clearCancel": "Annuler",
+    "wheelPaging": "Changer de page avec la molette"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -265,7 +266,14 @@
     }
   },
   "viewer": {
-    "emptyMessage": "Téléversez un PDF et cliquez n'importe où pour ajouter des annotations. Modifiez-les dans l'aperçu avant de valider ✅."
+    "emptyMessage": "Téléversez un PDF et cliquez n'importe où pour ajouter des annotations. Modifiez-les dans l'aperçu avant de valider ✅.",
+    "wheelPage": {
+      "next": "Continuez pour aller à la page {{page}} ↓",
+      "prev": "Continuez pour aller à la page {{page}} ↑",
+      "last": "Dernière page",
+      "first": "Première page",
+      "now": "Page {{page}} / {{total}}"
+    }
   },
   "shortcuts": {
     "title": "Raccourcis clavier",
@@ -305,7 +313,9 @@
       "zoomKeys": "Zoom avant / arrière sur le PDF",
       "zoomActual": "Taille réelle (100 %)",
       "fitPage": "Ajuster à la page",
-      "panCanvas": "Déplacer le canevas (maintenir)"
+      "panCanvas": "Déplacer le canevas (maintenir)",
+      "splitLink": "Lier ou dissocier A et B (Divisée)",
+      "wheelPage": "Continuer avec la molette au bord de la feuille : change de page"
     }
   },
   "toast": {
@@ -440,7 +450,13 @@
       "position": "{{index}} sur {{total}}",
       "split": {
         "tagA": "A · original · lecture seule",
-        "tagB": "B · nouvelle version · modifiée"
+        "tagB": "B · nouvelle version · modifiée",
+        "linked": "Lié",
+        "unlinked": "Dissocié",
+        "linkTitle": "Lier ou dissocier le zoom et le défilement de A et B",
+        "linkedToast": "A et B de nouveau liés sur B · {{percent}} %",
+        "unlinkedToast": "A et B dissociés : chacun a son zoom et son défilement",
+        "footer": "A et B dissociés"
       },
       "noA": {
         "hint": "A n'a pas de modèle : son PDF est comparé tel quel.",
@@ -1395,7 +1411,10 @@
     "hud": {
       "value": "{{percent}} %",
       "max": "{{percent}} % · maximum",
-      "min": "{{percent}} % · minimum"
+      "min": "{{percent}} % · minimum",
+      "side": "{{side}} · {{percent}} %",
+      "onlyA": "seul A bouge",
+      "onlyB": "seul B bouge"
     },
     "menu": {
       "label": "Zoom du PDF",

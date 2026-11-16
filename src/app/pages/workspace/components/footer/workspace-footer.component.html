@@ -21,7 +21,7 @@
     <span class="footer__zoomwrap">
       <button type="button" class="footer__zoom footer__zoom--btn" data-testid="footer-zoom" [disabled]="!vm.pdfDoc"
         aria-haspopup="menu" [attr.aria-expanded]="vm.zoomMenuOpen()" [attr.aria-label]="'zoom.menu.label' | t"
-        (click)="toggleZoomMenu()">{{ vm.scale() * 100 | number:'1.0-0' }} %</button>
+        (click)="toggleZoomMenu()">{{ vm.unlinkedSplit() ? 'B · ' : '' }}{{ vm.scale() * 100 | number:'1.0-0' }} %</button>
       @if (vm.zoomMenuOpen()) {
         <div class="zoom-menu" role="menu" [attr.aria-label]="'zoom.menu.label' | t" (keydown)="onZoomMenuKey($event)" data-testid="zoom-menu">
           @for (p of vm.zoomPresets; track p) {
@@ -41,6 +41,9 @@
         </div>
       }
     </span>
+    @if (vm.unlinkedSplit()) {
+      <span class="footer__fit footer__unlinked" data-testid="footer-unlinked">{{ 'batch.editor.split.footer' | t }}</span>
+    }
     <button type="button" class="footer__fit" (click)="vm.fitPage()" [disabled]="!vm.pdfDoc"
       [attr.title]="'app.footer.fitPage' | t">{{ 'controls.fitWidth' | t }}</button>
     <app-version-chip class="footer__version" [version]="vm.version"></app-version-chip>

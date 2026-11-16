@@ -8,6 +8,8 @@ export interface Toast {
   readonly message: string;
   /** Informative notices can be shown again from the bell once they are closed. */
   readonly recoverable?: boolean;
+  /** Optional button (e.g. «Deshacer»); running it also closes the notice. */
+  readonly action?: { readonly label: string; readonly run: () => void };
 }
 
 const DEFAULT_DURATION_MS = 6000;
@@ -25,11 +27,12 @@ export class ToastService {
     kind: ToastKind = 'info',
     durationMs = DEFAULT_DURATION_MS,
     recoverable = false,
+    action?: Toast['action'],
   ): number {
     const repeated = this.toasts().find((toast) => toast.message === message && toast.kind === kind);
     if (repeated) return repeated.id;
     const id = this.nextId++;
-    this.toasts.update((list) => [...list, { id, kind, message, recoverable }]);
+    this.toasts.update((list) => [...list, { id, kind, message, recoverable, action }]);
     if (durationMs > 0 && typeof window !== 'undefined') {
       window.setTimeout(() => this.dismiss(id), durationMs);
     }

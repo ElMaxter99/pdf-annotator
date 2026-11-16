@@ -104,7 +104,8 @@
     "moreOptions": "More options",
     "clearConfirm": "Remove all annotations? You can undo it with Ctrl+Z.",
     "clearYes": "Remove all",
-    "clearCancel": "Cancel"
+    "clearCancel": "Cancel",
+    "wheelPaging": "Turn the page with the wheel"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -265,7 +266,14 @@
     }
   },
   "viewer": {
-    "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅."
+    "emptyMessage": "Upload a PDF and click anywhere to add annotations. Edit them in the preview before confirming ✅.",
+    "wheelPage": {
+      "next": "Keep going to reach page {{page}} ↓",
+      "prev": "Keep going to reach page {{page}} ↑",
+      "last": "Last page",
+      "first": "First page",
+      "now": "Page {{page}} / {{total}}"
+    }
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",
@@ -305,7 +313,9 @@
       "zoomKeys": "Zoom the PDF in / out",
       "zoomActual": "Actual size (100 %)",
       "fitPage": "Fit to page",
-      "panCanvas": "Move the canvas (hold)"
+      "panCanvas": "Move the canvas (hold)",
+      "splitLink": "Link or unlink A and B (Split)",
+      "wheelPage": "Keep scrolling at the edge of the sheet: changes page"
     }
   },
   "toast": {
@@ -440,7 +450,13 @@
       "position": "{{index}} of {{total}}",
       "split": {
         "tagA": "A · original · read only",
-        "tagB": "B · new version · edited"
+        "tagB": "B · new version · edited",
+        "linked": "Linked",
+        "unlinked": "Unlinked",
+        "linkTitle": "Link or unlink the zoom and scroll of A and B",
+        "linkedToast": "A and B linked again at B · {{percent}} %",
+        "unlinkedToast": "A and B unlinked: each has its own zoom and scroll",
+        "footer": "A and B unlinked"
       },
       "noA": {
         "hint": "A has no template: its PDF is compared as it is.",
@@ -1395,7 +1411,10 @@
     "hud": {
       "value": "{{percent}} %",
       "max": "{{percent}} % · maximum",
-      "min": "{{percent}} % · minimum"
+      "min": "{{percent}} % · minimum",
+      "side": "{{side}} · {{percent}} %",
+      "onlyA": "only A moves",
+      "onlyB": "only B moves"
     },
     "menu": {
       "label": "PDF zoom",

@@ -123,6 +123,11 @@
           <span class="btn__icon" aria-hidden="true">ⓘ</span>
           <span class="btn__label">{{ 'about.open' | t }}</span>
         </button>
+        <button class="btn btn--ghost" type="button" role="switch" [attr.aria-checked]="vm.wheelPaging()"
+          (click)="vm.setWheelPaging(!vm.wheelPaging())" data-testid="wheel-paging">
+          <span class="btn__icon" aria-hidden="true">{{ vm.wheelPaging() ? '☑' : '☐' }}</span>
+          <span class="btn__label">{{ 'controls.wheelPaging' | t }}</span>
+        </button>
         <app-theme-toggle></app-theme-toggle>
         <app-language-selector class="header__language-selector" [languages]="vm.languages"
           [selectedLanguage]="vm.languageModel" (languageChange)="vm.onLanguageChange($event)" variant="compact">

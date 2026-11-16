@@ -258,6 +258,8 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | `+` / `−` | Acercar / alejar |
 | `0` | Ajustar el PDF al ancho disponible |
 | `B` | Mostrar u ocultar la barra lateral |
+| `L` | Enlazar o desenlazar el zoom y el desplazamiento de A y B (lote, vista «Dividida») |
+| Rueda al borde de la hoja | Pasa a la página siguiente o anterior (umbral anti-saltos; se apaga en el menú ⋯) |
 | `Enter` | Confirmar la anotación en curso |
 | `Esc` | Cancelar la tarjeta activa / cerrar la ayuda |
 | `Ctrl/⌘ + rueda` · pellizco | Zoom del PDF hacia el cursor |

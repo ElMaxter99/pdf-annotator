@@ -796,3 +796,46 @@ test('the proposal can be read at a glance: highlight, arrow, original view and 
   await page.getByTestId('adjust-apply').click();
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 });
+
+test('«Dividida»: the chip unlinks the zoom of A and B and links them again', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await attachVersion2(page);
+  await openRow(page);
+  await page.getByTestId('mode-split').click();
+  await expect(page.getByTestId('split-a')).toBeVisible();
+
+  const chip = page.getByTestId('split-link');
+  await expect(chip).toContainText('Enlazado');
+  await expect(chip).toHaveAttribute('aria-pressed', 'false');
+  const widthB = () => page.locator('.canvas--pdf').evaluate((el: HTMLCanvasElement) => el.width);
+  const widthA = () =>
+    page.getByTestId('split-a').locator('canvas').evaluate((el: HTMLCanvasElement) => el.width);
+  expect(await widthA()).toBe(await widthB());
+
+  await chip.click();
+  await expect(chip).toContainText('Desenlazado');
+  await expect(chip).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('footer-unlinked')).toBeVisible();
+
+  const b0 = await widthB();
+  const box = await page.getByTestId('split-a').boundingBox();
+  if (!box) throw new Error('no A pane');
+  await page.mouse.move(box.x + 60, box.y + 60);
+  await page.keyboard.down('Control');
+  await page.mouse.wheel(0, -100);
+  await page.keyboard.up('Control');
+  await expect.poll(widthA).toBeGreaterThan(b0);
+  expect(await widthB()).toBe(b0);
+
+  // «L» links them again and A takes the zoom of B.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('l');
+  await expect(chip).toContainText('Enlazado');
+  await expect.poll(widthA).toBe(await widthB());
+
+  // «Deshacer» in the notice gives A its own zoom back.
+  await page.getByTestId('toast-action').click();
+  await expect(chip).toContainText('Desenlazado');
+  await expect.poll(widthA).toBeGreaterThan(await widthB());
+});

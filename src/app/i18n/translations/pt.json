@@ -104,7 +104,8 @@
     "moreOptions": "Mais opções",
     "clearConfirm": "Remover todas as anotações? Pode anular com Ctrl+Z.",
     "clearYes": "Remover todas",
-    "clearCancel": "Cancelar"
+    "clearCancel": "Cancelar",
+    "wheelPaging": "Mudar de página com a roda"
   },
   "sidebar": {
     "title": "Anotações (JSON)",
@@ -265,7 +266,14 @@
     }
   },
   "viewer": {
-    "emptyMessage": "Carregue um PDF e clique em qualquer ponto para adicionar anotações. Edite-as na pré-visualização antes de confirmar ✅."
+    "emptyMessage": "Carregue um PDF e clique em qualquer ponto para adicionar anotações. Edite-as na pré-visualização antes de confirmar ✅.",
+    "wheelPage": {
+      "next": "Continue para ir à página {{page}} ↓",
+      "prev": "Continue para ir à página {{page}} ↑",
+      "last": "Última página",
+      "first": "Primeira página",
+      "now": "Página {{page}} / {{total}}"
+    }
   },
   "shortcuts": {
     "title": "Atalhos de teclado",
@@ -305,7 +313,9 @@
       "zoomKeys": "Aproximar / afastar o PDF",
       "zoomActual": "Tamanho real (100 %)",
       "fitPage": "Ajustar à página",
-      "panCanvas": "Mover a tela (manter premido)"
+      "panCanvas": "Mover a tela (manter premido)",
+      "splitLink": "Ligar ou desligar A e B (Dividida)",
+      "wheelPage": "Continuar com a roda na borda da folha: muda de página"
     }
   },
   "toast": {
@@ -440,7 +450,13 @@
       "position": "{{index}} de {{total}}",
       "split": {
         "tagA": "A · original · só leitura",
-        "tagB": "B · nova versão · editada"
+        "tagB": "B · nova versão · editada",
+        "linked": "Ligado",
+        "unlinked": "Desligado",
+        "linkTitle": "Ligar ou desligar o zoom e o deslocamento de A e B",
+        "linkedToast": "A e B ligados outra vez em B · {{percent}} %",
+        "unlinkedToast": "A e B desligados: cada um com o seu zoom e o seu deslocamento",
+        "footer": "A e B desligados"
       },
       "noA": {
         "hint": "A não tem modelo: compara-se o seu PDF tal como está.",
@@ -1395,7 +1411,10 @@
     "hud": {
       "value": "{{percent}} %",
       "max": "{{percent}} % · máximo",
-      "min": "{{percent}} % · mínimo"
+      "min": "{{percent}} % · mínimo",
+      "side": "{{side}} · {{percent}} %",
+      "onlyA": "só A se move",
+      "onlyB": "só B se move"
     },
     "menu": {
       "label": "Zoom do PDF",

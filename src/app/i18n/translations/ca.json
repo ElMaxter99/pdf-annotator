@@ -104,7 +104,8 @@
     "moreOptions": "Més opcions",
     "clearConfirm": "Voleu treure totes les anotacions? Es pot desfer amb Ctrl+Z.",
     "clearYes": "Treure-les totes",
-    "clearCancel": "Cancel·lar"
+    "clearCancel": "Cancel·lar",
+    "wheelPaging": "Passar de pàgina amb la roda"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
@@ -265,7 +266,14 @@
     }
   },
   "viewer": {
-    "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅."
+    "emptyMessage": "Puja un PDF i fes clic on vulguis afegir anotacions. Edita-les a la previsualització abans de confirmar ✅.",
+    "wheelPage": {
+      "next": "Continua per anar a la pàgina {{page}} ↓",
+      "prev": "Continua per anar a la pàgina {{page}} ↑",
+      "last": "Última pàgina",
+      "first": "Primera pàgina",
+      "now": "Pàgina {{page}} / {{total}}"
+    }
   },
   "shortcuts": {
     "title": "Dreceres de teclat",
@@ -305,7 +313,9 @@
       "zoomKeys": "Apropa / allunya el PDF",
       "zoomActual": "Mida real (100 %)",
       "fitPage": "Ajusta a la pàgina",
-      "panCanvas": "Mou el llenç (mantén)"
+      "panCanvas": "Mou el llenç (mantén)",
+      "splitLink": "Enllaçar o desenllaçar A i B (Dividida)",
+      "wheelPage": "Continuar amb la roda a la vora del full: canvia de pàgina"
     }
   },
   "toast": {
@@ -440,7 +450,13 @@
       "position": "{{index}} de {{total}}",
       "split": {
         "tagA": "A · original · només lectura",
-        "tagB": "B · versió nova · s’edita"
+        "tagB": "B · versió nova · s’edita",
+        "linked": "Enllaçat",
+        "unlinked": "Desenllaçat",
+        "linkTitle": "Enllaçar o desenllaçar el zoom i el desplaçament d'A i B",
+        "linkedToast": "A i B enllaçats una altra vegada a B · {{percent}} %",
+        "unlinkedToast": "A i B desenllaçats: cadascun amb el seu zoom i el seu desplaçament",
+        "footer": "A i B desenllaçats"
       },
       "noA": {
         "hint": "A no té plantilla: es compara el seu PDF tal qual.",
@@ -1395,7 +1411,10 @@
     "hud": {
       "value": "{{percent}} %",
       "max": "{{percent}} % · màxim",
-      "min": "{{percent}} % · mínim"
+      "min": "{{percent}} % · mínim",
+      "side": "{{side}} · {{percent}} %",
+      "onlyA": "només es mou A",
+      "onlyB": "només es mou B"
     },
     "menu": {
       "label": "Zoom del PDF",
