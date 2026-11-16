@@ -12,7 +12,7 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 - Remaquetado por lotes: vista dividida, aviso y escalado cuando A y B miden distinto, «Copiar y ajustar por textos», «Trasladar con IA» en cola, selección múltiple en el panel y ajuste por dos anclas (traslación + escala) en la cascada previa a la IA.
 
 ## Siguiente
-1. **Remaquetado por lotes, pendiente:** ayudante con cola propia que sobreviva a recargas y concurrencia 2 con Claude (fase 4 de `plan-traslado-masivo-ia`), y medir créditos reales con Copilot.
+1. **Remaquetado por lotes, pendiente:** ayudante con cola propia: **hecho el lado del ayudante** (`/batch`, concurrencia 2 con Claude y 1 con Copilot); falta que el panel del lote la use (reenganche tras recargar, chip «en el ayudante»; necesita mesa en «Propuestas») y medir créditos reales con Copilot (guion en `docs/IA-LOCAL.md`, necesita la cuenta de Maxter).
 2. Dividir `workspace.page.ts` (≈4.130 líneas): render del PDF, miniaturas y sincronización del JSON.
 3. Accesibilidad: trap de foco en diálogos, `aria-live` en coordenadas, contraste en tema claro.
 4. Rendimiento: miniaturas bajo demanda, `OnPush`.

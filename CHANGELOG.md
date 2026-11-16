@@ -1,4 +1,7 @@
 ## Unreleased
+### Added
+- **Ayudante de IA con cola propia (invisible):** `tools/ai-helper` lleva ahora el lote en su proceso (`POST /batch`, estado por par, reanudar y cancelar) con un semáforo por proveedor: **2 peticiones a la vez con Claude** y **siempre 1 con Copilot**. Un límite de uso pausa el lote y deja los pendientes en cola; 2 fallos seguidos del mismo tipo técnico activan el cortacircuitos. `/propose` comparte los huecos. Tests (`npm run test:helper`, también en CI). La app sigue usando su cola en el navegador hasta que se apruebe el diseño del panel.
+- **Guion para medir créditos reales de Copilot:** `tools/ai-phase0/credits-report.mjs` resume lo medido por el CLI y lo compara con el consumo que marca GitHub (ver `docs/IA-LOCAL.md`).
 
 ## [v1.12.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.12.0) - 2026-11-16
 ### Added
