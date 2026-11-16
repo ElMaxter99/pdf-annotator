@@ -1,5 +1,8 @@
 ## Unreleased
 
+### Changed
+- **Dependencias de desarrollo:** `@playwright/test` 1.56.1 → 1.65.0 (solo tests e2e).
+
 ## [v1.11.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.11.0) - 2026-11-16
 ### Fixed
 - **Panel del lote en resolución normal:** el botón «Descargar» ya no se corta en la barra superior (la barra pasa a varias líneas por debajo de 1400 px o con el panel de IA abierto) y la tabla ya no se sale de la vista al redimensionar (columna de acciones ajustada al contenido).
