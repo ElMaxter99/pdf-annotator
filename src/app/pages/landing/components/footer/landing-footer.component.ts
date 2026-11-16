@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-landing-footer',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

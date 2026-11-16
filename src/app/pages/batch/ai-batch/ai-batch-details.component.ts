@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { TranslationService } from '../../../i18n/translation.service';
 import { AiBatchService, type AiBatchRow } from '../../../services/ai-batch.service';
@@ -15,6 +15,7 @@ export type BatchDetailsTab = 'summary' | 'steps' | 'sent' | 'usage';
 
 /** «Qué está haciendo la IA · lote»: the single-PDF «Ver detalles» for each PDF of the queue, plus the whole-batch usage. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-ai-batch-details',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

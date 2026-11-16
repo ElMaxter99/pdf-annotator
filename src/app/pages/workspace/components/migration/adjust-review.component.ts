@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import {
   effectiveShift,
@@ -12,6 +12,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 
 /** «Copiar y ajustar por textos»: a notice under the bar with the proposal, never over the PDF. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-adjust-review',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

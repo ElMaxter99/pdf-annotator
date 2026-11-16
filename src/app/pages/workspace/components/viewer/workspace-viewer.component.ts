@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { AlignMode, DistributeAxis } from '../../../../utils/alignment.utils';
@@ -7,6 +7,7 @@ import { FirstStepsComponent } from '../first-steps/first-steps.component';
 import { AnnotationEditorComponent } from '../annotation-editor/annotation-editor.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-workspace-viewer',
   standalone: true,
   templateUrl: './workspace-viewer.component.html',

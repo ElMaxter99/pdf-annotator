@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, computed, effect, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, computed, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { DesktopUpdateService } from '../../services/desktop-update.service';
@@ -11,6 +11,7 @@ const MB = 1048576;
  * desde el chip de versión de cualquier pantalla y desde el menú Ayuda. Solo existe dentro de Electron.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-update-panel',
   standalone: true,
   imports: [TranslationPipe, UpdateChannelComponent],

@@ -64,6 +64,7 @@ import {
   OnDestroy,
   OnInit,
   inject,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -271,6 +272,7 @@ export interface AiSession {
 export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-workspace-page',
   standalone: true,
   templateUrl: './workspace.page.html',

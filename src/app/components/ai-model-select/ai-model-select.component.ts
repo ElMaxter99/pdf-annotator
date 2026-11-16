@@ -8,6 +8,7 @@ import {
   input,
   signal,
   untracked,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
@@ -19,6 +20,7 @@ type Row =
 
 /** Model picker fed with the list the CLI itself offers (its /model): nothing is typed by hand. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-ai-model-select',
   standalone: true,
   imports: [TranslationPipe],

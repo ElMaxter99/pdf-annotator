@@ -1,4 +1,6 @@
 ## Unreleased
+### Changed
+- **Node 26 y Angular 22 (sin cambios visibles):** el proyecto pasa a Node 26 (`Dockerfile`, workflows de CI/release/escritorio, `engines`, README y AGENTS.md) y Angular 20 → 22 (vía 21) con TypeScript 6.0, `zone.js` 0.16, `jasmine-core` 7, `karma-jasmine-html-reporter` 2.3 y `@types/node` 26. Los componentes mantienen la detección de cambios clásica (`ChangeDetectionStrategy.Eager`), `tsconfig` sin `baseUrl`/`lib` y `main.server.ts` usa `BootstrapContext`.
 
 ## [v1.12.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.12.0) - 2026-11-16
 ### Added

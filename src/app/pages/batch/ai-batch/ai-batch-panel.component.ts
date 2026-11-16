@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostListener, OnDestroy, OnInit, Output, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnDestroy, OnInit, Output, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { TranslationService } from '../../../i18n/translation.service';
 import { AiBatchService, type AiBatchRow } from '../../../services/ai-batch.service';
@@ -15,6 +15,7 @@ import { providerName } from './ai-batch-button.component';
  * details accordion). It replaces the old status bar, the toasts and the full-screen «Qué está haciendo la IA».
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-ai-batch-panel',
   standalone: true,
   imports: [CommonModule, TranslationPipe, AiBatchDetailsComponent],

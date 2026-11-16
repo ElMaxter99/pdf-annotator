@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild, signal, ChangeDetectionStrategy } from '@angular/core';
 import { VersionChipComponent } from '../../../../components/version-chip/version-chip.component';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -11,6 +11,7 @@ import { MigrationBarComponent } from '../migration/migration-bar.component';
 import { ThemeToggleComponent } from '../../../../components/theme-toggle/theme-toggle.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-workspace-header',
   standalone: true,
   templateUrl: './workspace-header.component.html',

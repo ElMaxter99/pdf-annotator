@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, computed, inject, signal } from '@angular/core';
+import { Component, Input, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import type { BatchItem } from '../../../models/batch.model';
 import { AiBatchService } from '../../../services/ai-batch.service';
@@ -13,6 +13,7 @@ const NOTHING = ['no_text_a', 'no_text_b', 'permission_denied', 'no_valid_answer
 
 /** State of one PDF in the AI queue (or its saved proposal, once the queue is gone). */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-ai-batch-chip',
   standalone: true,
   imports: [CommonModule, TranslationPipe],
