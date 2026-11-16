@@ -3,8 +3,9 @@
     <a class="landing-nav__brand" href="/" [attr.aria-label]="appName">
       <img class="landing-nav__logo" src="/logo.svg" alt="" width="36" height="36" />
       <span class="landing-nav__name">{{ appName }}</span>
-      <span class="landing-nav__version">v{{ version }}</span>
+      
     </a>
+    <app-version-chip class="landing-nav__version" [version]="version"></app-version-chip>
     <app-landing-language-bar [languages]="languages" [selectedLanguage]="languageModel"
       (languageChange)="onLanguageChange($event)"></app-landing-language-bar>
   </header>

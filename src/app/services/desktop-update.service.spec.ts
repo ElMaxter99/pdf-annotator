@@ -32,15 +32,54 @@ describe('DesktopUpdateService', () => {
     expect(service.cardVisible()).toBeFalse();
   });
 
-  it('muestra la tarjeta al haber versión nueva y «Más tarde» la oculta pero la deja recuperar', () => {
+  it('muestra la tarjeta al haber versión nueva y «Más tarde» la oculta pero deja el punto del chip', () => {
     const { service, push } = setup({ status: 'idle', mode: 'auto', current: '1.5.0' });
     push({ status: 'available', mode: 'auto', current: '1.5.0', version: '1.6.0' });
     expect(service.cardVisible()).toBeTrue();
     service.later();
     expect(service.cardVisible()).toBeFalse();
-    expect(service.pending()).toBeTrue();
-    service.recover();
-    expect(service.cardVisible()).toBeTrue();
+    expect(service.chipDot()).toBe('accent');
+    service.openPanel();
+    expect(service.panelOpen()).toBeTrue();
+    service.closePanel();
+    expect(service.panelOpen()).toBeFalse();
+  });
+
+  it('con el panel abierto la tarjeta se oculta y el punto cambia según el estado', () => {
+    const { service, push } = setup({ status: 'idle', mode: 'auto', current: '1.5.0' });
+    expect(service.chipDot()).toBe('');
+    push({ status: 'available', mode: 'auto', current: '1.5.0', version: '1.6.0' });
+    service.openPanel();
+    expect(service.cardVisible()).toBeFalse();
+    push({ status: 'downloading', mode: 'auto', current: '1.5.0', version: '1.6.0' });
+    expect(service.chipDot()).toBe('warn');
+    push({ status: 'error', mode: 'auto', current: '1.5.0' });
+    expect(service.chipDot()).toBe('danger');
+  });
+
+  it('«Buscar ahora» comprueba una vez y se ignora mientras ya se está comprobando', () => {
+    const { service, bridge, push } = setup({ status: 'idle', mode: 'auto', current: '1.5.0' });
+    service.checkNow();
+    expect(bridge.checkForUpdates).toHaveBeenCalledTimes(1);
+    push({ status: 'idle', mode: 'auto', current: '1.5.0', checking: true });
+    service.checkNow();
+    expect(bridge.checkForUpdates).toHaveBeenCalledTimes(1);
+  });
+
+  it('el menú nativo abre el panel y, si lo pide, busca ahora', () => {
+    let open: (e: { check: boolean }) => void = () => undefined;
+    (window as unknown as { desktop?: unknown }).desktop = {
+      isDesktop: true,
+      getUpdateState: () => Promise.resolve({ status: 'idle', mode: 'auto', current: '1.5.0' }),
+      onUpdateState: () => () => undefined,
+      onOpenUpdates: (cb: (e: { check: boolean }) => void) => ((open = cb), () => undefined),
+      checkForUpdates: jasmine.createSpy('check').and.resolveTo(),
+    };
+    const service = TestBed.inject(DesktopUpdateService);
+    open({ check: false });
+    expect(service.panelOpen()).toBeTrue();
+    open({ check: true });
+    expect((window as unknown as { desktop: DesktopBridge }).desktop.checkForUpdates).toHaveBeenCalled();
   });
 
   it('una versión aún más nueva vuelve a avisar aunque se pospusiera la anterior', () => {

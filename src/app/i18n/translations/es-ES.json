@@ -1316,6 +1316,32 @@
         "github": "Abrir GitHub",
         "ok": "Entendido"
       }
+    },
+    "panel": {
+      "title": "Versión y actualizaciones",
+      "chipLabel": "Versión {{version}}. Abrir actualizaciones",
+      "checkNow": "Buscar ahora",
+      "lastChecked": "Última comprobación: {{when}}",
+      "never": "Aún no se ha comprobado",
+      "ago": {
+        "now": "hace un momento",
+        "min": "hace {{n}} min",
+        "hour": "hace {{n}} h",
+        "day": "hace {{n}} d"
+      },
+      "status": {
+        "upToDate": "Estás al día",
+        "never": "Sin comprobar todavía",
+        "checking": "Buscando actualizaciones…",
+        "available": "Hay una versión nueva: {{version}}",
+        "availableRc": "Hay una versión de prueba: {{version}}",
+        "downloading": "Descargando {{version}}…",
+        "ready": "{{version}} lista para instalar",
+        "error": "No se pudo comprobar"
+      },
+      "readyText": "Reiniciar instala la nueva versión.",
+      "onQuitText": "Se instalará al cerrar la app. Tus anotaciones se guardan solas.",
+      "manualText": "PDF Annotator {{version}} · tienes la {{current}}. En este sistema se instala a mano: se abre la página de descargas."
     }
   },
   "hint": {

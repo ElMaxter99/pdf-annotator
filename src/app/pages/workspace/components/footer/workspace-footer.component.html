@@ -21,7 +21,6 @@
     <span class="footer__zoom" data-testid="footer-zoom">{{ vm.scale() * 100 | number:'1.0-0' }} %</span>
     <button type="button" class="footer__fit" (click)="vm.fitPage()" [disabled]="!vm.pdfDoc"
       [attr.title]="'app.footer.fitPage' | t">{{ 'controls.fitWidth' | t }}</button>
-    <span class="footer__version">v{{ vm.version }}</span>
-    <app-update-channel class="footer__channel"></app-update-channel>
+    <app-version-chip class="footer__version" [version]="vm.version"></app-version-chip>
   </span>
 </footer>

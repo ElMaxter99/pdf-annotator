@@ -1316,6 +1316,32 @@
         "github": "Obrir GitHub",
         "ok": "Entesos"
       }
+    },
+    "panel": {
+      "title": "Versió i actualitzacions",
+      "chipLabel": "Versió {{version}}. Obrir actualitzacions",
+      "checkNow": "Cerca ara",
+      "lastChecked": "Última comprovació: {{when}}",
+      "never": "Encara no s'ha comprovat",
+      "ago": {
+        "now": "fa un moment",
+        "min": "fa {{n}} min",
+        "hour": "fa {{n}} h",
+        "day": "fa {{n}} d"
+      },
+      "status": {
+        "upToDate": "Estàs al dia",
+        "never": "Encara sense comprovar",
+        "checking": "Cercant actualitzacions…",
+        "available": "Hi ha una versió nova: {{version}}",
+        "availableRc": "Hi ha una versió de prova: {{version}}",
+        "downloading": "Baixant {{version}}…",
+        "ready": "{{version}} a punt per instal·lar",
+        "error": "No s'ha pogut comprovar"
+      },
+      "readyText": "Reiniciar instal·la la nova versió.",
+      "onQuitText": "S'instal·larà en tancar l'app. Les teves anotacions es desen soles.",
+      "manualText": "PDF Annotator {{version}} · tens la {{current}}. En aquest sistema s'instal·la a mà: s'obre la pàgina de descàrregues."
     }
   },
   "hint": {

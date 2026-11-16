@@ -11,6 +11,7 @@ import { AiHelperService } from '../../services/ai-helper.service';
 import { InfoTipComponent } from '../../components/info-tip/info-tip.component';
 import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
 import { TranslationPipe } from '../../i18n/translation.pipe';
+import { VersionChipComponent } from '../../components/version-chip/version-chip.component';
 import { TranslationService } from '../../i18n/translation.service';
 import type { PageAnnotations } from '../../models/annotation.model';
 import type { BatchItem } from '../../models/batch.model';
@@ -79,6 +80,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     FormsModule,
     RouterLink,
     TranslationPipe,
+    VersionChipComponent,
     PdfThumbComponent,
     InfoTipComponent,
     AiBatchButtonComponent,

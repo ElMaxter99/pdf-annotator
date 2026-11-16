@@ -1,4 +1,7 @@
 ## Unreleased
+### Added
+- **App de escritorio: versión y actualizaciones desde cualquier pantalla (mesas AC-10 a AC-12):** chip de versión en el inicio, el lote y el editor (con punto cuando hay una versión nueva, aunque se haya pospuesto) que abre un único panel con el estado (al día, buscando, disponible, descargando, lista, error), «Buscar ahora» con la hora de la última comprobación, el canal Estable/Pruebas y las notas. Nuevo menú Ayuda (Buscar actualizaciones…, Acerca de) también en Windows y Linux. «Instalar al cerrar» queda explicado en el panel. El selector de canal y el botón «Hay versión X» salen del pie y del menú ⋯ del editor. Textos en los 7 idiomas, con tests (servicio y e2e).
+
 ### Changed
 - **Panel del lote más claro (mesas P-56 y P-57):** resumen en embudo encima de la lista (subidos → con plantilla A → con versión B → listos para trasladar → listos; cada paso filtra la lista y el número de «listos para trasladar» es el mismo que usa el botón «Trasladar con IA»). Los filtros pasan a dos filas: *estado* (Todos / **Pendientes** / Listos; «Por revisar» pasa a llamarse «Pendientes») y *qué tienen* (Sin plantilla, Solo plantilla A, Plantilla A + B, Solo B). Franja «Mostrando N de M · Quitar filtros». La lista dice por qué cada PDF va o no a la IA y el popover de «Trasladar con IA» desglosa los que se quedan fuera (plantilla A sin campos, ya «Listo», sin versión B) con «Ver cuáles».
 

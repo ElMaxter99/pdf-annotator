@@ -5,6 +5,7 @@
       <span class="batch-bar__name">{{ appName }}</span>
       <span class="batch-bar__sub">{{ 'batch.subtitle' | t }}</span>
     </a>
+    <app-version-chip class="batch-bar__version"></app-version-chip>
     @if (step() === 'panel') {
       <h1 class="batch-bar__title">{{ 'batch.title' | t: { count: total() } }}</h1>
       <span class="batch-bar__spacer"></span>
