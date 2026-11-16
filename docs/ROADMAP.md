@@ -14,7 +14,7 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 
 ## Siguiente
 1. **Remaquetado por lotes, pendiente:** ayudante con cola propia: **hecho** (`/batch`, concurrencia 2 con Claude y 1 con Copilot, y el panel del lote la usa con reenganche tras recargar, mesas P-65 y P-66); falta medir créditos reales con Copilot (guion en `docs/IA-LOCAL.md`, necesita la cuenta de Maxter).
-2. Dividir `workspace.page.ts` (≈5.780 líneas) en módulos, por partes pequeñas: ya salen la generación de miniaturas y el parseo/exportación del JSON; ya salen también las reglas de la sesión guardada; faltan fuentes y render del PDF.
+2. Dividir `workspace.page.ts` (≈5.780 líneas) en módulos, por partes pequeñas: ya salen la generación de miniaturas y el parseo/exportación del JSON; ya salen también las reglas de la sesión guardada; y el estado del desplegable de fuentes; falta el render del PDF.
 3. Accesibilidad: trap de foco en diálogos, `aria-live` en coordenadas, contraste en tema claro.
 4. Rendimiento: miniaturas bajo demanda, `OnPush`.
 5. Más tests: atajos y normalización de coordenadas.
