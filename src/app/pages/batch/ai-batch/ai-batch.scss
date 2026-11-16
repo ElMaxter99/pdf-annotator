@@ -817,3 +817,48 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
     }
   }
 }
+
+.ai-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.ai-panel__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-panel__back {
+  align-items: center;
+
+  .ai-dot {
+    color: var(--accent);
+  }
+
+  p {
+    flex: 1;
+  }
+
+  .btn {
+    min-height: 32px;
+    padding: 4px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ai-panel__back {
+    animation: ai-back-in 200ms ease-out;
+  }
+
+  @keyframes ai-back-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+}

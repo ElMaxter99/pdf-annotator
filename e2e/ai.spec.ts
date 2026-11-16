@@ -302,3 +302,16 @@ test('panel del lote compacto: ⋯ guarda las acciones raras y las acciones de f
   await page.getByTestId('panel-item').first().hover();
   await expect(actions).toHaveCSS('opacity', '1');
 });
+
+test('«Trasladar con IA» en lote: la cola vive en el ayudante y el panel lo dice', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('ai-batch-button').click();
+  await page.getByTestId('ai-batch-cascade').uncheck();
+  await page.getByTestId('ai-batch-start').click();
+  await expect(page.getByTestId('ai-batch-via-helper')).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId('ai-batch-concurrency')).toContainText('2 a la vez');
+  await expect(page.getByTestId('ai-batch-summary')).toBeVisible({ timeout: 30000 });
+  // a finished queue is forgotten: nothing to recover after a reload
+  expect(await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.queue'))).toBeNull();
+  await expect(page.getByTestId('ai-batch-pause')).toHaveCount(0);
+});

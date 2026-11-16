@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- **«Trasladar con IA» sigue aunque recargues o cierres la pestaña (mesas P-65 y P-66):** con el ayudante actualizado, el panel manda los pares a la cola del ayudante y la sigue; al volver muestra «Reconectado» y lo hecho. Chip «En el ayudante» y «2 a la vez» (Claude) o «De uno en uno» (Copilot); sin botón «Pausar» manual (se mantiene «Parar»). Si el ayudante se cierra, lo ya trasladado se conserva y «Volver a lanzar los N que faltan» envía el resto. Con Copilot y más de 10 PDFs se mantiene la cola del navegador (tope de 10 con «Continuar»). Textos en los 7 idiomas, tests y e2e.
 - **Ayudante de IA con cola propia (invisible):** `tools/ai-helper` lleva ahora el lote en su proceso (`POST /batch`, estado por par, reanudar y cancelar) con un semáforo por proveedor: **2 peticiones a la vez con Claude** y **siempre 1 con Copilot**. Un límite de uso pausa el lote y deja los pendientes en cola; 2 fallos seguidos del mismo tipo técnico activan el cortacircuitos. `/propose` comparte los huecos. Tests (`npm run test:helper`, también en CI). La app sigue usando su cola en el navegador hasta que se apruebe el diseño del panel.
 - **Guion para medir créditos reales de Copilot:** `tools/ai-phase0/credits-report.mjs` resume lo medido por el CLI y lo compara con el consumo que marca GitHub (ver `docs/IA-LOCAL.md`).
 
