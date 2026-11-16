@@ -11,6 +11,7 @@
 - **Contraste del tema claro:** el texto en color de acento usa `--accent-text` (#0b7d72, 5,0:1 sobre blanco; antes 3,4:1).
 
 ### Fixed
+- **«Dividida» con el ajuste por textos:** el resalte de un campo en A ya no se pierde si el puntero llega antes de que A termine de dibujarse (el e2e `the proposal can be read at a glance` fallaba en CI por esa carrera).
 - **Importar JSON respeta el tamaño de letra global:** los campos sin `fontSize` heredan el `fontSize` global del JSON (antes se quedaban en 14 y cambiaban el formato del autor). Tests unitario y e2e incluidos.
 
 ## [v1.10.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.10.0) - 2026-11-14
