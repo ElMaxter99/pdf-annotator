@@ -1,4 +1,6 @@
 ## Unreleased
+### Changed
+- **Deuda técnica (sin cambios visibles):** la generación de miniaturas sale de `workspace.page.ts` a `PageThumbnailGenerator` y la escala de miniatura pasa a `utils/thumbnail-scale.utils.ts`, con tests. `docs/ROADMAP.md` corregido (líneas del archivo, numeración, punto del Dockerfile ya hecho en la 1.11).
 
 ## [v1.12.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.12.0) - 2026-11-16
 ### Added
