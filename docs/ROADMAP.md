@@ -8,8 +8,11 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 ## En curso
 - **Lote de documentos y remaquetado, fase 1** (diseño aprobado `L-01`..`L-11`): pasos de subida, panel en cuadrícula o lista, editor de B con A como capa de referencia, estados por campo, «Poner plantilla A», «Listo» y descarga. Sin vista dividida ni miniaturas reales en el panel todavía.
 
+## Hecho tras v1.5.0
+- Remaquetado por lotes: vista dividida, aviso y escalado cuando A y B miden distinto, «Copiar y ajustar por textos», «Trasladar con IA» en cola, selección múltiple en el panel y ajuste por dos anclas (traslación + escala) en la cascada previa a la IA.
+
 ## Siguiente
-1. **Remaquetado por lotes, fases siguientes:** vista dividida (A y B del mismo tamaño y zoom, scroll ligado), aviso y escalado cuando A y B miden distinto, y «Copiar y ajustar por textos» (proponer el desplazamiento con el texto que ya extrae pdf.js; siempre como sugerencia).
+1. **Remaquetado por lotes, pendiente:** ayudante con cola propia que sobreviva a recargas y concurrencia 2 con Claude (fase 4 de `plan-traslado-masivo-ia`), y medir créditos reales con Copilot.
 2. Dividir `workspace.page.ts` (≈4.130 líneas): render del PDF, miniaturas y sincronización del JSON.
 3. Accesibilidad: trap de foco en diálogos, `aria-live` en coordenadas, contraste en tema claro.
 4. Rendimiento: miniaturas bajo demanda, `OnPush`.
@@ -17,4 +20,4 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 7. Más tests: atajos y normalización de coordenadas.
 
 ## Ideas sin priorizar
-Ajuste por dos anclas (traslación + escala) entre PDF viejo y nuevo; exportación en ZIP de varias plantillas.
+Exportación en ZIP de varias plantillas.
