@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { PageField } from '../models/annotation.model';
+import { JsonShapeError } from '../utils/json-text.utils';
 import {
   AnnotationImportService,
   emptyImportReport,
@@ -13,6 +14,26 @@ describe('AnnotationImportService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(AnnotationImportService);
+  });
+
+  describe('importFromText', () => {
+    it('parses loose JSON and returns pages plus the report', () => {
+      const { pages, report } = service.importFromText(
+        "{ pages: [{ num: 1, fields: [{ x: 1, y: 2, mapField: 'a' }] }] }",
+        identity,
+      );
+      expect(pages.length).toBe(1);
+      expect(pages[0].fields.length).toBe(1);
+      expect(hasImportIssues(report)).toBeFalse();
+    });
+
+    it('throws JsonShapeError when there is no pages list', () => {
+      expect(() => service.importFromText('{ "foo": 1 }', identity)).toThrowError(JsonShapeError);
+    });
+
+    it('throws a parse error for broken syntax', () => {
+      expect(() => service.importFromText('{ pages: [', identity)).toThrow();
+    });
   });
 
   it('returns null when there is no pages collection', () => {
