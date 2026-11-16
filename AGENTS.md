@@ -23,6 +23,7 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 | `npm run e2e` | Playwright sobre el build de producción (`npm run build` antes; `PW_CHROMIUM=<ruta>` para usar un Chromium ya instalado) |
 | `npm run i18n:check` | Verifica que los 7 JSON de traducción tengan **las mismas claves** que `es-ES` |
 | `node scripts/generate-example.mjs` | Regenera `examples/factura-ejemplo.pdf` |
+| `node scripts/screenshots.mjs` | Regenera las capturas del README (`screenshots/`) desde el build; `PW_CHROMIUM=<ruta>` para un Chromium ya instalado |
 | `npm run start:docker` | Imagen NGINX en `http://localhost:4444` |
 | Publicar versión | Ver [`docs/RELEASING.md`](docs/RELEASING.md): subida de versión → release candidate → pruebas → «Release» → Vercel (normalmente lo ejecuta Claude; **lee la Parte B entera antes de sacar una versión**) |
 

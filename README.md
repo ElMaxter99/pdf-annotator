@@ -12,12 +12,12 @@
 <p align="center">
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.12.0-4dd9c0?style=for-the-badge" alt="Versión 1.12.0" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="Licencia MIT" /></a>
-  <img src="https://img.shields.io/badge/Angular-20-dd0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 20" />
+  <img src="https://img.shields.io/badge/Angular-22-dd0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 22" />
   <img src="https://img.shields.io/badge/Node-26-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node 26" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/TypeScript-6.0-3178c6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Docker-ready-2496ed?logo=docker&logoColor=white" alt="Docker" />
   <img src="https://img.shields.io/badge/i18n-ES%20·%20EN%20·%20CA%20·%20FR%20·%20IT%20·%20PT%20·%20DE-ff9f43" alt="Idiomas" />
   <a href="https://github.com/ElMaxter99/pdf-annotator/stargazers"><img src="https://img.shields.io/github/stars/ElMaxter99/pdf-annotator?style=flat&logo=github" alt="Stars" /></a>
@@ -96,7 +96,7 @@ Requisitos: **Node 26** y un navegador moderno. ¿Prefieres contenedor? `npm run
 
 ## 🧭 Tour de la interfaz
 ### 1 · Pantalla de bienvenida
-Arrastra un PDF o haz clic para seleccionarlo. El idioma se cambia arriba a la derecha.
+Arrastra un PDF o haz clic para seleccionarlo; con **dos o más PDFs** empieza un [lote](#7--lote-de-pdfs-y-versiones-nuevas). ¿Sin PDF a mano? **Probar con un documento de ejemplo**. Si dejaste trabajo a medias, aquí aparece **Continuar donde lo dejaste**. Tema e idioma, arriba a la derecha.
 
 <p align="center"><img src="./screenshots/main.png" alt="Pantalla de bienvenida" width="85%" /></p>
 
@@ -105,10 +105,12 @@ Arrastra un PDF o haz clic para seleccionarlo. El idioma se cambia arriba a la d
 
 | Zona | Qué hay |
 | --- | --- |
-| **Cabecera** (una fila) | Página anterior/siguiente · zoom `−`/`+`/**Ajustar** · deshacer/rehacer/limpiar · **Descargar PDF** · **Atajos** · tema · idioma. |
-| **Panel lateral** (4 pestañas) | Cursor en coordenadas PDF siempre visible, y debajo: **Documento** (cambiar de PDF, miniaturas) · **Anotaciones** (editor JSON en texto o árbol, importar/aplicar, copiar, descargar; con contador) · **Plantillas** · **Avanzado** (fuentes, guías, campos extra del JSON, valores de muestra y datos de prueba). Se navega con ratón o flechas ←/→. Se minimiza con `B`. |
-| **Visor** | Página con capa de anotaciones. Clic para crear, clic sobre una anotación para editarla, arrastrar para moverla. Scroll propio. |
-| **Pie** | Recordatorio de `?` y versión. |
+| **Cabecera** (una fila) | Logo (vuelve al inicio) y versión · página anterior/siguiente · zoom `−`/`+`/**Ajustar al ancho** · **Mostrar** *Muestra* / *Mapeo* / *Datos* (qué se pinta en cada anotación) · avisos 🔔 · deshacer/rehacer/limpiar · **Descargar PDF** · menú **⋯** (atajos, acerca de, tema e idioma). |
+| **Panel lateral** (4 pestañas) | **Documento** (cambiar de PDF, miniaturas) · **Anotaciones** (editor JSON en texto o árbol, importar/aplicar, copiar, descargar; con contador) · **Plantillas** · **Avanzado** (fuentes, guías, campos extra del JSON, valores de muestra y datos de prueba). Se navega con ratón o flechas ←/→. Se minimiza con `B`. |
+| **Visor** | Página con capa de anotaciones. Clic para crear, clic sobre una anotación para editarla, arrastrar para moverla. `Ctrl/⌘ + rueda` o pellizco para el zoom, `Espacio` + arrastrar para mover el lienzo. **Mostrar origen** marca si cada texto sale del valor, de los datos de prueba o de una muestra. |
+| **Pie** | `?` (atajos) · cursor en coordenadas PDF · «Guardado hace N s» · menú de zoom y **Ajustar** (página entera) · versión. |
+
+Tu trabajo se guarda solo en el navegador: si recargas, el editor vuelve a abrir el PDF con sus anotaciones, y **Atrás / Adelante** te llevan entre el inicio y el PDF.
 
 ### 3 · Edita cada anotación
 Texto (`mapField`), tipo, bloqueo/ocultar, valor fijo, decimales y sufijo (números), tamaño, opacidad, fuente (buscador), fondo y color. Los botones permiten **duplicar** ⧉, **borrar** 🗑️, confirmar ✅ o cancelar ❌.
@@ -116,7 +118,7 @@ Texto (`mapField`), tipo, bloqueo/ocultar, valor fijo, decimales y sufijo (núme
 <p align="center"><img src="./screenshots/example_use.png" alt="Editor de anotación" width="90%" /></p>
 
 ### 4 · Guías y precisión
-En **Opciones avanzadas → Activar guías y snapping** aparecen rejilla, reglas en puntos PDF y líneas de alineación.
+En la pestaña **Avanzado → Opciones avanzadas → Activar guías y snapping** aparecen rejilla, reglas en puntos PDF y líneas de alineación, con imán a rejilla, márgenes, centros o coordenadas propias.
 
 <p align="center"><img src="./screenshots/guides.png" alt="Guías, reglas y rejilla" width="90%" /></p>
 
@@ -125,12 +127,22 @@ Alterna entre editor de texto y árbol; al seleccionar una anotación en el viso
 
 <p align="center"><img src="./screenshots/json-tree.png" alt="JSON en árbol" width="90%" /></p>
 
-### 6 · Atajos, tema claro y móvil
+### 6 · Atajos y tema claro
+Pulsa `?` para ver todos los atajos. El tema claro y el idioma están en el menú **⋯** de la cabecera (y en la pantalla de bienvenida).
+
 <p align="center">
   <img src="./screenshots/shortcuts.png" alt="Diálogo de atajos" width="48%" />
   <img src="./screenshots/light.png" alt="Tema claro" width="48%" />
 </p>
-<p align="center"><img src="./screenshots/mobile.png" alt="Vista móvil" width="26%" /></p>
+
+### 7 · Lote de PDFs y versiones nuevas
+Suelta **dos o más PDFs** en la bienvenida: dos pasos (subir los PDF y sus plantillas JSON, emparejadas por nombre o pegadas desde Mongo) y llegas al **panel del lote**. Ahí añades las **versiones nuevas (B)**, que se emparejan solas por nombre, y ves de un vistazo qué tiene cada PDF y qué falta, en lista o cuadrícula, con filtros y selección múltiple.
+
+<p align="center"><img src="./screenshots/batch-panel.png" alt="Panel del lote con versiones B" width="95%" /></p>
+
+Cada PDF se abre en el mismo editor: editas **B** con la plantilla **A** como referencia, **Encima**, **Alternar** o **Dividida** (A a la izquierda, solo lectura; B a la derecha). **Poner plantilla A ▾** copia los campos tal cual, los **ajusta por textos** si la página se ha movido o, en local y en la app de escritorio, los **adapta con IA**. Cada campo dice si está igual, movido o falta, y **Listo** lo marca como terminado para descargarlo.
+
+<p align="center"><img src="./screenshots/batch-split.png" alt="Editor del lote en vista dividida" width="95%" /></p>
 
 ## 🔄 Flujos de trabajo
 ### A · Mapear una factura para tu backend
@@ -164,6 +176,12 @@ Alterna entre editor de texto y árbol; al seleccionar una anotación en el viso
 
 ### E · Revisión de un PDF largo
 Miniaturas para saltar de página, `←/→` para navegar, `+/−` para zoom, **Deshacer** (`Ctrl/⌘+Z`) ante cualquier error y **Limpiar** para empezar de cero.
+
+### F · Llevar plantillas a versiones nuevas de los PDF
+1. Suelta los PDF originales (A) en la bienvenida y, en el paso 2, sus plantillas JSON.
+2. En el panel, **Añadir más** con los PDF nuevos (B); se emparejan por nombre.
+3. **Revisar siguiente** → **Poner plantilla A ▾ → Copiar y ajustar por textos** → revisa en **Dividida** → **Aplicar N cambios** → **Listo**.
+4. **Descargar listos**: el JSON de cada B (en un ZIP si son varios).
 
 ## 🤖 Adaptar con IA
 Cuando llega una **versión nueva (B)** de un PDF del que ya tienes la plantilla (A), «Copiar y adaptar con IA» recoloca los campos de A en B aunque el texto cambie de redacción, un campo se mueva o pase a **otra página**. Usa **tu propio `claude` o `copilot`** con tu suscripción: sin claves de API, sin tokens de pago y **solo en local** (no existe en el despliegue ni en Docker).
@@ -283,7 +301,7 @@ Se acepta también un array directo de páginas. Detalle del modelo en [`docs/AR
 ## 🧰 Stack
 | Frontend | PDF | Calidad |
 | --- | --- | --- |
-| Angular 20 · signals · standalone · SCSS | `pdfjs-dist` (render) · `pdf-lib` + `fontkit` (export) | Karma/Jasmine · i18n check · Prettier |
+| Angular 22 · signals · standalone · SCSS | `pdfjs-dist` (render) · `pdf-lib` + `fontkit` (export) | Karma/Jasmine · Playwright · i18n check · Prettier |
 
 ## 🐳 Despliegue
 ```bash
@@ -308,6 +326,7 @@ sh scripts/docker-down.sh     # detener
 | `npm run e2e` | Pruebas end-to-end con Playwright sobre el build de producción |
 | `npm run i18n:check` | Claves de los 7 idiomas coherentes |
 | `node scripts/generate-example.mjs` | Regenera el PDF de ejemplo |
+| `node scripts/screenshots.mjs` | Regenera las capturas del README (`screenshots/`) desde el build (`npm run build` antes) |
 
 Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para personas y agentes de IA) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Hoja de ruta: [`docs/ROADMAP.md`](docs/ROADMAP.md). Cómo contribuir: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
@@ -322,7 +341,7 @@ Estructura, convenciones y trampas conocidas: [`AGENTS.md`](AGENTS.md) (para per
 | `ng serve` no encuentra el builder | Ejecuta `npm install` antes de `npm run start:local`. |
 
 ## 🗺️ Roadmap
-Pestañas en el panel lateral, selección múltiple y alineación, validación por esquema de cada campo y refactor del componente principal. Detalle en [`docs/ROADMAP.md`](docs/ROADMAP.md).
+Más traslado masivo con IA (cola que sobreviva a recargas), dividir el componente principal del editor, rendimiento y más tests. Detalle en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## 🤝 Contribuir
 Issues y PRs son bienvenidos: usa las plantillas de [`.github/`](.github) y revisa [`CONTRIBUTING.md`](CONTRIBUTING.md).
