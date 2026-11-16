@@ -11,6 +11,11 @@ contextBridge.exposeInMainWorld('desktop', {
     ipcRenderer.on('desktop:update:state', listener);
     return () => ipcRenderer.removeListener('desktop:update:state', listener);
   },
+  onOpenUpdates: (callback) => {
+    const listener = (_event, payload) => callback({ check: payload?.check === true });
+    ipcRenderer.on('desktop:update:open-panel', listener);
+    return () => ipcRenderer.removeListener('desktop:update:open-panel', listener);
+  },
   checkForUpdates: () => ipcRenderer.invoke('desktop:update:check'),
   downloadUpdate: () => ipcRenderer.invoke('desktop:update:download'),
   setUpdateChannel: (channel) => ipcRenderer.invoke('desktop:update:set-channel', channel),

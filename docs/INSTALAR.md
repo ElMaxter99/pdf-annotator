@@ -114,4 +114,4 @@ La app instalada arranca sola el ayudante de IA, pero necesitas tener **`claude`
 
 ## Versiones de prueba (RC)
 
-Antes de cada versión final puede haber una *release candidate* (`X.Y.Z-rc.N`), publicada como **pre-release** en [GitHub Releases](https://github.com/ElMaxter99/pdf-annotator/releases). Puedes instalarla a mano igual que cualquier otra, o en la app de escritorio activar «Pruebas» en *Canal de actualizaciones* (pie del editor) para recibirlas como actualización. Pueden fallar: no las uses para trabajo crítico.
+Antes de cada versión final puede haber una *release candidate* (`X.Y.Z-rc.N`), publicada como **pre-release** en [GitHub Releases](https://github.com/ElMaxter99/pdf-annotator/releases). Puedes instalarla a mano igual que cualquier otra, o en la app de escritorio activar «Pruebas» en *Canal de actualizaciones* (pulsa la versión, arriba a la izquierda o en el pie, o Ayuda → Buscar actualizaciones) para recibirlas como actualización. Pueden fallar: no las uses para trabajo crítico.

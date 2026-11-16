@@ -3,6 +3,7 @@ import { Component, ViewChild, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
+import { VersionChipComponent } from '../../components/version-chip/version-chip.component';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { SessionStoreService, SavedSessionSummary } from '../../services/session-store.service';
@@ -27,6 +28,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingDropzoneComponent,
     LandingFooterComponent,
     TranslationPipe,
+    VersionChipComponent,
   ],
 })
 export class LandingPageComponent {

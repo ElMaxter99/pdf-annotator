@@ -16,7 +16,7 @@ Antes de publicar una versión de verdad (por ejemplo la **1.9.0**) se publica u
 - Si una RC sale con fallos no se «arregla»: se saca otra (`rc.2`) y, cuando una sale bien, se publica la final con el mismo número.
 
 ## Qué es una *release candidate* (RC)
-Es un ensayo general. «Candidata a versión final». Tiene instaladores reales (los mismos archivos que tendría la final), pero GitHub la marca como **pre-release**: no es «la última versión», y los usuarios normales no reciben aviso de ella. Solo la ve quien la busque en la página de [Releases](https://github.com/ElMaxter99/pdf-annotator/releases) o quien haya activado el canal **Pruebas** en la app de escritorio (pie del editor → «Canal de actualizaciones»).
+Es un ensayo general. «Candidata a versión final». Tiene instaladores reales (los mismos archivos que tendría la final), pero GitHub la marca como **pre-release**: no es «la última versión», y los usuarios normales no reciben aviso de ella. Solo la ve quien la busque en la página de [Releases](https://github.com/ElMaxter99/pdf-annotator/releases) o quien haya activado el canal **Pruebas** en la app de escritorio (pulsa la versión → «Canal de actualizaciones», o Ayuda → «Buscar actualizaciones…»).
 
 ## Los pasos, de principio a fin
 1. **Decidir la versión.** Se sube de versión cuando hay cosas nuevas que enseñar. Si solo hay arreglos, se sube el último número (1.9.0 → 1.9.1); si hay funcionalidad nueva, el del medio (1.9.0 → 1.10.0).

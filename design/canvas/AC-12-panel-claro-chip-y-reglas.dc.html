@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>AC-12 Panel claro, chip y reglas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{width:1720px;position:relative;overflow:hidden;background:#1e1e2f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;font-size:15px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.p h1,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5eead4;font-weight:600}
+.cap{color:#b0b0b0;font-size:14px;line-height:1.45}
+.wlab{display:flex;flex-direction:column;gap:2px;font-size:14px}.wlab span{color:#b0b0b0;font-size:13px}
+.row{display:flex;gap:20px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:8px}
+.win{position:relative;border-radius:14px;overflow:hidden;background:var(--bg);color:var(--text);border:1px solid var(--line);width:540px;height:300px;font-size:13px}
+.win.t{height:380px}
+.wh{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+.lg{width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--ink);display:grid;place-items:center;font-size:11px}
+.sp{flex-grow:1}
+.gh{font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--text);white-space:nowrap}
+.ell{font-size:18px;border:1px solid var(--line);border-radius:999px;width:32px;height:28px;display:inline-flex;align-items:center;justify-content:center}
+.wb{padding:14px;display:flex;justify-content:center}.pgx{width:130px;height:150px;background:#fff;border-radius:4px;opacity:.9;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.ln{height:8px;border-radius:4px;background:var(--soft);margin:8px 14px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap;background:transparent}
+.chip.on{color:var(--text);border-color:var(--accent);outline:2px solid var(--accent);outline-offset:2px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.dot.w{background:var(--warn)}.dot.d{background:var(--danger)}
+.tag{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--warn);color:var(--warn);border-radius:999px;padding:1px 7px;white-space:nowrap}
+.ft{position:absolute;left:10px;right:10px;bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);border-radius:10px;padding:5px 10px;font-size:11px;color:var(--muted)}
+.veil{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.mod{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:440px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--text)}
+.mod.big{width:520px;font-size:14px}
+.mh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.ver{font-size:22px;font-weight:700}
+.st{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:10px;padding:9px 12px;font-weight:600}
+.st.ok{color:var(--accent)}.st.w{color:var(--warn)}.st.e{color:var(--danger)}
+.us{color:var(--muted);font-size:13px;line-height:1.4}.us i{font-style:normal;color:var(--text);font-weight:700}
+.ua{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{font-weight:700;border-radius:999px;padding:6px 14px;background:var(--accent);color:var(--ink);font-size:13px}
+.lk{font-size:13px;color:var(--accent);font-weight:600;text-decoration:underline}
+.x{width:24px;height:24px;border-radius:999px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.hr{height:1px;background:var(--line)}
+.rw{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-weight:600;font-size:12px}.seg span{padding:4px 12px}.seg .on{background:var(--accent);color:var(--ink)}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:sp 1s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.mn{position:absolute;left:12px;top:42px;width:250px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:12px}
+.mi{padding:6px 10px;border-radius:8px;display:flex;justify-content:space-between}.mi.on{background:var(--soft);font-weight:700;outline:2px solid var(--accent)}
+.menubar{display:flex;gap:14px;padding:6px 12px;background:var(--inset);border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.menubar b{color:var(--text)}
+.card{background:#2a2a3d;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;flex:1}
+ul.l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;color:#b0b0b0;font-size:14px;line-height:1.45}
+.no{color:#ff8a8a;font-weight:700}.yes{color:#5eead4;font-weight:700}
+.upd{position:absolute;right:12px;bottom:12px;width:300px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:10px 12px;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:6px;font-size:12px}
+</style>
+</helmet>
+<div class="p" style="height:1180px">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">AC-12 · Propuesta</span><h1 style="font-size:26px;font-weight:600">Panel · claro, chip de versión y reglas</h1><p class="cap" style="max-width:1450px">Completa AC-10 y AC-11: estados del chip, tema claro, versión de prueba y reglas de movimiento y teclado.</p></div>
+<div class="row"><div class="card" style="flex:none;width:540px"><span class="lab">El chip · estados</span><div style="display:flex;flex-direction:column;gap:10px;--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f"><div class="rw" style="max-width:400px"><span class="us">Al día</span><span class="chip">v1.11.0</span></div><div class="rw" style="max-width:400px"><span class="us">Versión nueva</span><span class="chip"><i class="dot"></i>v1.11.0</span></div><div class="rw" style="max-width:400px"><span class="us">Descargando</span><span class="chip"><i class="dot w"></i>v1.11.0</span></div><div class="rw" style="max-width:400px"><span class="us">Instalar al cerrar</span><span class="chip"><i class="dot w"></i>v1.11.0</span></div><div class="rw" style="max-width:400px"><span class="us">Error de comprobación</span><span class="chip"><i class="dot d"></i>v1.11.0</span></div><div class="rw" style="max-width:400px"><span class="us">Versión de prueba (RC)</span><span class="chip">v1.12.0-rc.1<span class="tag">Prueba</span></span></div><div class="rw" style="max-width:400px"><span class="us">Foco de teclado</span><span class="chip on">v1.11.0</span></div><div class="rw" style="max-width:400px"><span class="us">Web (PWA): solo texto</span><span class=us>v1.11.0</span></div></div></div><div class="card" style="flex:none;width:540px"><span class="lab">Reglas</span><ul class="l"><li>El punto no parpadea; el color distingue: acento = nueva, ámbar = en curso o pendiente, rojo = error.</li><li>Cada estado también se dice con texto en el panel (no solo con color).</li><li>Teclado: el chip es un botón; Esc cierra el panel y devuelve el foco al chip.</li><li>Animación del panel 150 ms ease-out; sin animación con prefers-reduced-motion.</li><li>Abrir el panel no cierra la tarjeta AC-01 si estaba visible; si hay panel abierto la tarjeta se oculta.</li></ul></div><div class="card" style="flex:none;width:540px"><span class="lab">1280 px</span><p class="cap">En escritorio estrecho el diálogo mantiene 500 px de ancho y se centra; el chip pasa a mostrar solo «v1.11.0» + punto (la insignia «Prueba» se conserva). El lote y el editor ya llevan el chip en su barra sin saltar de línea.</p></div></div><div class="row"><div class="col"><div class="wlab"><b>9 · Hay versión nueva · claro</b><span>Tokens de :root.theme-light</span></div><div class="win" style="--bg:#f3f4f8;--panel:#ffffff;--accent:#0f766e;--danger:#b91c1c;--text:#1e1e2f;--muted:#55556a;--ink:#ffffff;--line:rgba(0,0,0,.16);--soft:rgba(0,0,0,.05);--warn:#92600a;--inset:#e9ebf1;height:470px;width:560px"><div class="wh"><b class="lg">PA</b><span class="chip">v1.11.0</span><span class="sp"></span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="veil"></div><div style="position:absolute;inset:0;display:grid;place-items:center"><div class="mod big" style="position:static;transform:none;width:500px;--bg:#f3f4f8;--panel:#ffffff;--accent:#0f766e;--danger:#b91c1c;--text:#1e1e2f;--muted:#55556a;--ink:#ffffff;--line:rgba(0,0,0,.16);--soft:rgba(0,0,0,.05);--warn:#92600a;--inset:#e9ebf1" role="dialog" ><div class="mh"><div><div class="us">PDF Annotator</div><div class="ver">v1.11.0 </div></div><span class="x">✕</span></div><div class="st w"><i class="dot w"></i> Hay una versión nueva: 1.12.0</div><div class="us">Notas: mejoras del lote y arreglos. Tu versión: <i>1.11.0</i>.</div><div class="ua"><span class="btn">Actualizar ahora</span><span class="gh">Más tarde</span><span class="lk">Notas de la versión ↗</span></div><div class="hr"></div><div class="rw"><span><b>Canal</b><br><span class="us">Solo versiones finales.</span></span><span class="seg"><span class="on">Estable</span><span class="">Pruebas</span></span></div><div class="hr"></div><div class="rw"><span class="us">Última comprobación: hace un momento</span><span class="gh">Buscar ahora</span></div></div></div></div></div><div class="col"><div class="wlab"><b>10 · Prueba instalada, canal Pruebas</b><span>Insignia «Prueba» junto a la versión</span></div><div class="win" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f;height:470px;width:560px"><div class="wh"><b class="lg">PA</b><span class="chip">v1.11.0</span><span class="sp"></span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="veil"></div><div style="position:absolute;inset:0;display:grid;place-items:center"><div class="mod big" style="position:static;transform:none;width:500px;--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1e1e2f" role="dialog" ><div class="mh"><div><div class="us">PDF Annotator</div><div class="ver">v1.12.0-rc.1 <span class="tag">Prueba</span></div></div><span class="x">✕</span></div><div class="st ok">✓ Estás al día</div><div class="hr"></div><div class="rw"><span><b>Canal</b><br><span class="us">También recibes versiones de prueba (RC).</span></span><span class="seg"><span class="">Estable</span><span class="on">Pruebas</span></span></div><div class="hr"></div><div class="rw"><span class="us">Última comprobación: hace 5 min</span><span class="gh">Buscar ahora</span></div></div></div></div></div><div class="col"><div class="wlab"><b>11 · Descargando · claro</b><span></span></div><div class="win" style="--bg:#f3f4f8;--panel:#ffffff;--accent:#0f766e;--danger:#b91c1c;--text:#1e1e2f;--muted:#55556a;--ink:#ffffff;--line:rgba(0,0,0,.16);--soft:rgba(0,0,0,.05);--warn:#92600a;--inset:#e9ebf1;height:470px;width:560px"><div class="wh"><b class="lg">PA</b><span class="chip">v1.11.0</span><span class="sp"></span><span class="ell">⋯</span></div><div class="wb"><div class="pgx"></div></div><div class="veil"></div><div style="position:absolute;inset:0;display:grid;place-items:center"><div class="mod big" style="position:static;transform:none;width:500px;--bg:#f3f4f8;--panel:#ffffff;--accent:#0f766e;--danger:#b91c1c;--text:#1e1e2f;--muted:#55556a;--ink:#ffffff;--line:rgba(0,0,0,.16);--soft:rgba(0,0,0,.05);--warn:#92600a;--inset:#e9ebf1" role="dialog" ><div class="mh"><div><div class="us">PDF Annotator</div><div class="ver">v1.11.0 </div></div><span class="x">✕</span></div><div class="st"><i class="spin"></i> Descargando 1.12.0…</div><div class="bar"><i style="width:42%"></i></div><div class="us">42 % · 38 de 92 MB</div><div class="ua"><span class="gh">Cancelar</span></div><div class="hr"></div><div class="rw"><span><b>Canal</b><br><span class="us">Solo versiones finales.</span></span><span class="seg"><span class="on">Estable</span><span class="">Pruebas</span></span></div><div class="hr"></div><div class="rw"><span class="us">Última comprobación: hace un momento</span><span class="gh">Buscar ahora</span></div></div></div></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

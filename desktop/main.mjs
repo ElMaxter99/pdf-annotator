@@ -132,13 +132,17 @@ async function checkManual() {
 }
 
 async function checkForUpdates() {
-  if (['downloading', 'ready'].includes(state.status)) return;
+  if (['downloading', 'ready'].includes(state.status) || state.checking) return;
   if (!app.isPackaged && !process.env.PDF_ANNOTATOR_UPDATE_URL && !process.env.PDF_ANNOTATOR_RELEASE_API) return;
+  setState({ checking: true });
   try {
     if (mode === 'manual') await checkManual();
     else await autoUpdater.checkForUpdates();
+    setState({ lastChecked: Date.now() });
   } catch (e) {
     console.warn('[desktop] comprobación de versión:', e?.message || e); // sin red: sin ruido
+  } finally {
+    setState({ checking: false });
   }
 }
 
@@ -205,9 +209,43 @@ function setupIpc() {
     autoUpdater.quitAndInstall(false, true);
   });
   handle('desktop:update:install-on-quit', () => {
-    if (state.status === 'ready') autoUpdater.autoInstallOnAppQuit = true;
+    if (state.status !== 'ready') return;
+    autoUpdater.autoInstallOnAppQuit = true;
+    setState({ installOnQuit: true });
   });
   handle('desktop:update:open-release', () => shell.openExternal(state.notesUrl?.startsWith(RELEASES_URL) ? state.notesUrl : RELEASES_URL));
+}
+
+// ───────── Menú ─────────
+// Ayuda → «Buscar actualizaciones…» y «Acerca de» abren el panel de versión en la pantalla actual (también en Windows y Linux).
+const MENU_TEXT = {
+  es: { file: 'Archivo', quit: 'Salir', edit: 'Edición', help: 'Ayuda', about: 'Acerca de PDF Annotator', check: 'Buscar actualizaciones…', notes: 'Notas de la versión' },
+  en: { file: 'File', quit: 'Quit', edit: 'Edit', help: 'Help', about: 'About PDF Annotator', check: 'Check for updates…', notes: 'Release notes' },
+};
+function buildMenu() {
+  const t = MENU_TEXT[app.getLocale().toLowerCase().startsWith('es') ? 'es' : 'en'];
+  const openPanel = (check) => {
+    if (!win || win.isDestroyed()) return;
+    if (win.isMinimized()) win.restore();
+    win.focus();
+    win.webContents.send('desktop:update:open-panel', { check });
+  };
+  const help = {
+    label: t.help,
+    role: 'help',
+    submenu: [
+      { label: t.about, click: () => openPanel(false) },
+      { label: t.check, accelerator: 'CmdOrCtrl+U', click: () => openPanel(true) },
+      { label: t.notes, click: () => shell.openExternal(RELEASES_URL) },
+    ],
+  };
+  const mac = process.platform === 'darwin';
+  return Menu.buildFromTemplate([
+    ...(mac ? [{ role: 'appMenu' }] : [{ label: t.file, submenu: [{ label: t.quit, role: 'quit' }] }]),
+    { label: t.edit, role: 'editMenu' },
+    ...(mac ? [viewMenu(), { role: 'windowMenu' }] : []),
+    help,
+  ]);
 }
 
 // ───────── Ventana ─────────
@@ -280,7 +318,7 @@ function viewMenu() {
 
 app.whenReady().then(async () => {
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
-  Menu.setApplicationMenu(process.platform === 'darwin' ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }, viewMenu(), { role: 'windowMenu' }]) : null);
+  Menu.setApplicationMenu(buildMenu());
   registerWebProtocol();
   setupUpdater();
   setupIpc();

@@ -16,7 +16,16 @@ export interface DesktopUpdateState {
   channel?: UpdateChannel;
   /** La versión ofrecida es una prueba (X.Y.Z-rc.N). */
   prerelease?: boolean;
+  /** Se está comprobando si hay versión nueva. */
+  checking?: boolean;
+  /** Última comprobación terminada (ms desde 1970); sin valor = aún no se ha comprobado en esta sesión. */
+  lastChecked?: number;
+  /** Ya se eligió instalar la versión descargada al cerrar la app. */
+  installOnQuit?: boolean;
 }
+
+/** Color del punto del chip de versión: nueva versión (accent), en curso o pendiente (warn) o fallo (danger). */
+export type ChipDot = '' | 'accent' | 'warn' | 'danger';
 
 export type UpdateChannel = 'stable' | 'beta';
 
@@ -29,6 +38,8 @@ export interface DesktopBridge {
   /** Puerto del ayudante de IA que lanza la app (4310 si estaba libre). */
   helperPort?: number;
   getUpdateState(): Promise<DesktopUpdateState>;
+  /** El menú nativo (Ayuda) pide abrir el panel; `check` = además buscar ahora. */
+  onOpenUpdates?(callback: (event: { check: boolean }) => void): () => void;
   onUpdateState(callback: (state: DesktopUpdateState) => void): () => void;
   checkForUpdates(): Promise<void>;
   downloadUpdate(): Promise<void>;
@@ -53,25 +64,52 @@ export class DesktopUpdateService {
   /** «Más tarde»: versión cuyo aviso se ha dejado para el próximo arranque (solo en memoria). */
   private readonly deferredVersion = signal<string | null>(null);
   private readonly errorHidden = signal(false);
-  readonly installOnQuitChosen = signal(false);
+  private readonly installOnQuitLocal = signal(false);
+  /** Panel «Versión y actualizaciones» abierto (lo abre el chip de versión o el menú Ayuda). */
+  readonly panelOpen = signal(false);
 
   readonly isDesktop = this.bridge !== null;
   readonly channel = computed<UpdateChannel>(() => (this.state().channel === 'beta' ? 'beta' : 'stable'));
   /** La app instalada es una versión de prueba (X.Y.Z-rc.N). */
   readonly currentIsPrerelease = computed(() => isPrereleaseVersion(this.state().current));
+  readonly installOnQuitChosen = computed(() => this.installOnQuitLocal() || this.state().installOnQuit === true);
   readonly cardVisible = computed(() => {
+    if (this.panelOpen()) return false;
     const s = this.state();
     if (s.status === 'available') return this.deferredVersion() !== s.version;
     if (s.status === 'error') return !this.errorHidden();
     return s.status === 'downloading' || (s.status === 'ready' && !this.installOnQuitChosen());
   });
-  /** Hay versión nueva que el usuario dejó para más tarde: se recupera desde el menú. */
-  readonly pending = computed(() => this.state().status === 'available' && this.deferredVersion() === this.state().version);
+  /** Punto del chip de versión: sigue encendido aunque se haya pospuesto el aviso. */
+  readonly chipDot = computed<ChipDot>(() => {
+    const s = this.state();
+    if (s.status === 'available') return 'accent';
+    if (s.status === 'downloading' || s.status === 'ready') return 'warn';
+    return s.status === 'error' ? 'danger' : '';
+  });
 
   constructor() {
     if (!this.bridge) return;
     this.bridge.getUpdateState().then((s) => this.apply(s)).catch(() => undefined);
     this.bridge.onUpdateState((s) => this.apply(s));
+    this.bridge.onOpenUpdates?.((e) => {
+      this.openPanel();
+      if (e.check) this.checkNow();
+    });
+  }
+
+  openPanel(): void {
+    if (this.isDesktop) this.panelOpen.set(true);
+  }
+  closePanel(): void {
+    this.panelOpen.set(false);
+  }
+  /** «Buscar ahora»: ignora si ya hay una comprobación o una descarga en curso. */
+  checkNow(): void {
+    const s = this.state();
+    if (s.checking || s.status === 'downloading') return;
+    this.errorHidden.set(false);
+    void this.bridge?.checkForUpdates();
   }
 
   private apply(next: DesktopUpdateState): void {
@@ -97,9 +135,6 @@ export class DesktopUpdateService {
   later(): void {
     this.deferredVersion.set(this.state().version ?? null);
   }
-  recover(): void {
-    this.deferredVersion.set(null);
-  }
   dismissError(): void {
     this.errorHidden.set(true);
   }
@@ -111,7 +146,7 @@ export class DesktopUpdateService {
     void this.bridge?.installUpdate();
   }
   restartOnQuit(): void {
-    this.installOnQuitChosen.set(true);
+    this.installOnQuitLocal.set(true);
     void this.bridge?.installOnQuit();
   }
   openNotes(): void {

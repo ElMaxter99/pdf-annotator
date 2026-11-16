@@ -114,6 +114,7 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | IA-07 Ver detalles · sin cambios | Resultado «sin cambios» con diagnóstico y lo enviado | [`IA-07-ver-detalles-sin-cambios.dc.html`](canvas/IA-07-ver-detalles-sin-cambios.dc.html) | `components/migration/ai-details` | Aprobada, implementada |
 | IA-08 Ver detalles · Copilot | Consumo no medible (peticiones y estimación marcada), 1280 y claro | [`IA-08-ver-detalles-copilot-claro.dc.html`](canvas/IA-08-ver-detalles-copilot-claro.dc.html) | `components/migration/ai-details` | Aprobada, implementada |
 | AC-01 Aviso de actualización (app de escritorio) | Tarjeta de aviso de nueva versión en la app de escritorio | [`AC-01-aviso-de-actualizacion.dc.html`](canvas/AC-01-aviso-de-actualizacion.dc.html) | `components/update-card`, `services/desktop-update.service.ts` | Aprobada, implementada |
+| AC-10 a AC-12 Versión y actualizaciones | Chip de versión en todas las pantallas, panel único (estados, claro, reglas) y menú Ayuda | [`AC-10`](canvas/AC-10-actualizaciones-donde-viven.dc.html), [`AC-11`](canvas/AC-11-panel-de-actualizaciones-estados.dc.html), [`AC-12`](canvas/AC-12-panel-claro-chip-y-reglas.dc.html) | `components/version-chip`, `components/update-panel`, `services/desktop-update.service.ts`, `desktop/main.mjs` | Aprobada, implementada (PR pendiente de fusionar) |
 
 Convención: `V-NN` pantallas existentes, `P-NN` propuestas. Anchos de escritorio (≥1650 y ~1280 px) y tema oscuro/claro cuando cambie el layout.
 
