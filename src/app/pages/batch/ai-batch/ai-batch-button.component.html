@@ -38,6 +38,29 @@
         </small>
       </p>
 
+      @if (!ids() && breakdown().eligible < totalCount()) {
+        <div class="ai-pop__why" data-testid="ai-batch-breakdown">
+          <p>{{ 'batch.ai.pop.breakdown.title' | t: { eligible: breakdown().eligible, withB: breakdown().withB } }}</p>
+          <ul>
+            @if (breakdown().noFields > 0) {
+              <li>
+                <span>{{ 'batch.ai.pop.breakdown.noFields' | t }}</span><b>{{ breakdown().noFields }}</b>
+                <button type="button" class="ai-pop__link" (click)="see('noFields')">{{ 'batch.ai.pop.breakdown.see' | t }}</button>
+              </li>
+            }
+            @if (breakdown().ready > 0) {
+              <li><span>{{ 'batch.ai.pop.breakdown.ready' | t }}</span><b>{{ breakdown().ready }}</b></li>
+            }
+            @if (breakdown().noB > 0) {
+              <li>
+                <span>{{ 'batch.ai.pop.breakdown.noB' | t }}</span><b>{{ breakdown().noB }}</b>
+                <button type="button" class="ai-pop__link" (click)="see('noB')">{{ 'batch.ai.pop.breakdown.see' | t }}</button>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
       @if (skipped() > 0) {
         <p class="ai-pop__skipped" data-testid="ai-batch-skipped">
           {{ 'batch.bulk.aiSkipped' | t: { count: skipped() } }}

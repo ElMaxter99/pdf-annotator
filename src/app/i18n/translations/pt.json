@@ -387,7 +387,7 @@
     },
     "state": {
       "ready": "Pronto",
-      "review": "Por rever",
+      "review": "Pendentes",
       "noTemplate": "Sem modelo"
     },
     "editor": {
@@ -582,9 +582,12 @@
     "filter": {
       "label": "Filtrar por estado",
       "all": "Todos {{count}}",
-      "review": "Por rever {{count}}",
+      "review": "Pendentes {{count}}",
       "ready": "Prontos {{count}}",
-      "noTemplate": "Sem modelo {{count}}"
+      "noTemplate": "Sem modelo {{count}}",
+      "reviewTip": "Pendentes: têm modelo ou versão B e ainda não os marcou «Pronto». Os que não têm nada ficam em «Sem modelo».",
+      "showing": "A mostrar {{shown}} de {{total}}",
+      "clear": "Limpar filtros"
     },
     "view": {
       "label": "Tipo de vista",
@@ -857,7 +860,14 @@
         "requests": "De {{min}} a {{max}} pedidos à IA",
         "requestsCopilot": "Até {{max}} pedidos (limite {{cap}})",
         "change": "Alterar",
-        "sent": "O que é enviado"
+        "sent": "O que é enviado",
+        "breakdown": {
+          "title": "{{eligible}} de {{withB}} com versão B serão enviados. Ficam de fora:",
+          "noFields": "Modelo A sem campos",
+          "ready": "Já marcados «Pronto»",
+          "noB": "Sem versão B",
+          "see": "Ver quais"
+        }
       },
       "panel": {
         "title": "Transferência com IA",
@@ -907,6 +917,31 @@
       "undo": "Anular",
       "downloaded": "Transferência pronta · {{count}} ficheiros JSON",
       "downloadedSkipped": "Transferência pronta · {{count}} ficheiros JSON · {{skipped}} não validados ficaram de fora"
+    },
+    "funnel": {
+      "label": "Resumo do lote",
+      "s1": "1 · Carregados",
+      "s1out": "{{count}} sem modelo nem B",
+      "s2": "2 · Com modelo A",
+      "s2out": "{{count}} ainda sem versão B",
+      "s3": "3 · Com versão B",
+      "s3out": "{{count}} com B mas sem campos em A",
+      "s4": "4 · Prontos para transferir",
+      "s4out": "O que envia «Transferir com IA»",
+      "s5": "5 · Prontos",
+      "s5out": "{{count}} pendentes"
+    },
+    "kind": {
+      "label": "O que têm",
+      "onlyA": "Só modelo A {{count}}",
+      "aPlusB": "Modelo A + B {{count}}",
+      "onlyB": "Só B {{count}}"
+    },
+    "why": {
+      "eligible": "Vai para a IA",
+      "ready": "Já está pronto",
+      "noB": "Falta a versão B",
+      "noFields": "O seu modelo A não tem campos"
     }
   },
   "preview": {
