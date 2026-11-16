@@ -202,7 +202,7 @@
 
 .batch-row {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1.6fr) minmax(0, 1.6fr) 170px minmax(260px, auto);
+  grid-template-columns: 28px minmax(0, 1.6fr) minmax(0, 1.2fr) minmax(120px, 170px) max-content;
   align-items: center;
   gap: 14px;
   padding: 8px 14px;
@@ -254,8 +254,22 @@
 
 .batch-row__actions {
   display: flex;
+  flex-wrap: nowrap;
   justify-content: flex-end;
   gap: 8px;
+
+  .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+.app--ai-panel .batch-row {
+  grid-template-columns: 28px minmax(0, 1fr) minmax(120px, 170px) max-content;
+
+  > :nth-child(3) {
+    display: none;
+  }
 }
 
 .batch-thumb {
@@ -655,13 +669,46 @@
 }
 
 .batch-progress {
+  flex: 0 1 160px;
   width: 160px;
+  min-width: 60px;
+}
+
+.batch-bar__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batch-bar__progress {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.batch-bar__count {
+  white-space: nowrap;
+}
+
+.batch {
+  min-width: 0;
 }
 
 @media (max-width: 1500px) {
   .batch-bar__sub {
     display: none;
   }
+}
+
+// Never clip the actions (Descargar…): wrap when space runs out
+@media (max-width: 1400px) {
+  .batch-bar {
+    flex-wrap: wrap;
+  }
+}
+
+.app--ai-panel .batch-bar {
+  flex-wrap: wrap;
 }
 
 app-ai-batch-chip {
