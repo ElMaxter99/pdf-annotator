@@ -1,7 +1,7 @@
 import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
 import { AiModelSelectComponent } from '../../../../components/ai-model-select/ai-model-select.component';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { NoticeId, WorkspacePageComponent } from '../../workspace.page';
 import { AdjustReviewComponent } from './adjust-review.component';
@@ -9,6 +9,7 @@ import { AiReviewComponent } from './ai-review.component';
 
 /** Top bar of the editor while a PDF of a batch is open: B is edited, A is the reference. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-migration-bar',
   standalone: true,
   imports: [FocusTrapDirective, CommonModule, TranslationPipe, AdjustReviewComponent, AiReviewComponent, AiModelSelectComponent],

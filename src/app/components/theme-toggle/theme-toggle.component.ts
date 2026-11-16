@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-theme-toggle',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

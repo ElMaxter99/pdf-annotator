@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { Language } from '../../i18n/translation.service';
@@ -21,6 +21,7 @@ function getLanguageFlag(language: Language): string {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-language-selector',
   standalone: true,
   imports: [CommonModule, FormsModule, TranslationPipe],

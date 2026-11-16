@@ -13,7 +13,7 @@
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.12.0-4dd9c0?style=for-the-badge" alt="Versión 1.12.0" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="Licencia MIT" /></a>
   <img src="https://img.shields.io/badge/Angular-20-dd0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 20" />
-  <img src="https://img.shields.io/badge/Node-22.12-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node 22" />
+  <img src="https://img.shields.io/badge/Node-26-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node 26" />
 </p>
 
 <p align="center">
@@ -90,7 +90,7 @@ npm install
 npm run start:local      # → http://localhost:4200
 npm run start:ia         # igual + ayudante de IA local (Claude/Copilot con tu suscripción; ver docs/IA-LOCAL.md)
 ```
-Requisitos: **Node 22.12** y un navegador moderno. ¿Prefieres contenedor? `npm run start:docker` → <http://localhost:4444>.
+Requisitos: **Node 26** y un navegador moderno. ¿Prefieres contenedor? `npm run start:docker` → <http://localhost:4444>.
 
 > 💡 **Pruébalo ya con los ejemplos incluidos:** carga [`examples/factura-ejemplo.pdf`](examples/factura-ejemplo.pdf) y luego **Importar desde archivo** → [`examples/anotaciones-ejemplo.json`](examples/anotaciones-ejemplo.json).
 

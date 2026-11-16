@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { InfoTipComponent } from '../../../../components/info-tip/info-tip.component';
@@ -10,6 +10,7 @@ import { MigrationPanelComponent } from '../migration/migration-panel.component'
 import { PageThumbnailsComponent } from '../page-thumbnails/page-thumbnails.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-workspace-sidebar',
   standalone: true,
   templateUrl: './workspace-sidebar.component.html',

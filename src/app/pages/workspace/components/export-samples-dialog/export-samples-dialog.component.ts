@@ -1,11 +1,12 @@
 import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
 export type ExportSamplesChoice = 'map' | 'sample';
 
 /** Asks what to stamp when some annotations would paint a sample value. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-export-samples-dialog',
   standalone: true,
   imports: [FocusTrapDirective, TranslationPipe],
