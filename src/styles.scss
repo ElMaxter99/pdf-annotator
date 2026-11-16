@@ -5293,6 +5293,9 @@ button.version-chip:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .update-panel,
   .update-panel__spin {
+    animation: none;
+  }
+}
 
 /* Zoom y mover el lienzo (P-58 a P-60) */
 .zoom-hud {
