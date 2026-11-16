@@ -900,6 +900,16 @@
         "note": "Nothing is applied on its own: you review each proposal.",
         "keepRunning": "You can close this panel: the work goes on.",
         "open": "Open"
+      },
+      "queue": {
+        "badge": "In the helper",
+        "parallel": "{{n}} at a time",
+        "serial": "One at a time",
+        "reconnected": "Reconnected. The queue was still running: {{done}} of {{total}} done.",
+        "dismiss": "Got it",
+        "keepRunning": "You can close the tab or reload: the queue keeps going while the helper is open.",
+        "lost": "The helper was closed and the queue was lost. {{kept}} PDFs keep their proposal; {{lost}} did not finish.",
+        "relaunch": "Launch the {{count}} missing again"
       }
     },
     "more": "More actions",

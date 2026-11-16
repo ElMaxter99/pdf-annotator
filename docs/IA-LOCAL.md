@@ -47,6 +47,16 @@ Cada PNG que se deja al CLI lleva un código de 4 caracteres enorme en una franj
 - **Políticas de empresa:** los administradores pueden activar o desactivar superficies de Copilot por organización. El cliente da por permitido el CLI con modelos con visión; **confirmar la política vigente el día que se use** y qué retención de datos aplica a lo enviado (el contenido de las páginas).
 - **Compatibilidad:** el CLI y el SDK evolucionan rápido (algunas APIs del SDK son experimentales); el adaptador está aislado en `providers.mjs`.
 
+## Medir los créditos reales de Copilot (guion)
+Objetivo: poder decir «≈ X créditos por PDF, medido en nuestra prueba» sin inventar cifras. Necesita la cuenta de Copilot de quien lo ejecuta; no puede hacerlo un agente en la nube.
+1. Instala y abre sesión en `copilot`; `cd tools/ai-phase0 && npm install && npm run sample`.
+2. Apunta el consumo actual de «AI credits» en GitHub → Settings → Copilot → Usage (**antes**).
+3. `node run.mjs --provider copilot` (los 6 casos de `sample-plano/`; una petición por par, sin reintento; añade `--timeout 600` si hace falta).
+4. Espera unos minutos a que GitHub actualice y apunta el consumo (**después**).
+5. `node credits-report.mjs --github-before <antes> --github-after <después>`: tabla por caso con los tokens y créditos que dio el propio CLI, el total y el cociente GitHub/CLI (si ≈ 1, la cifra del CLI es fiable y la app puede mostrarla).
+6. Pega la tabla en el hilo del proyecto; con ese dato se cambia el texto del diálogo de «Trasladar con IA» (clave `batch.ai.*`, etiquetado «medido en nuestra prueba») en una PR aparte, con diseño si cambia algo visible.
+No mezcles otro uso de Copilot durante la medida, o el «después» no será comparable.
+
 ## Cómo medir (fase 0)
 `cd tools/ai-phase0 && npm install && npm run sample && npm test`; después `node run.mjs --provider claude` (Windows PowerShell incluido) y, cuando toque, `--provider copilot` o `both`. Resultados en `out/summary.md`. Detalles y formato de casos en el [README de la herramienta](../tools/ai-phase0/README.md).
 
@@ -56,7 +66,21 @@ Cada PNG que se deja al CLI lleva un código de 4 caracteres enorme en una franj
 3. En el editor de un PDF del lote con versión B y plantilla A: chip «✦ IA» (debe decir que hay conexión) → «Poner plantilla A ▾» → «Copiar y adaptar con IA».
 4. Revisa en «Dividida» y pulsa «Aplicar N cambios» (un solo paso de deshacer). B no cambia hasta entonces.
 
-**Cómo está montado.** El navegador no puede lanzar programas, así que `tools/ai-helper/server.mjs` hace de puente: escucha solo en `127.0.0.1`, atiende solo a los orígenes de la app (`AI_HELPER_ORIGINS`), comprueba `Host` (contra DNS rebinding) y exige un token que reparte solo a esos orígenes. Recibe los PDF y la plantilla A, prepara imágenes y textos en una carpeta temporal (que borra al terminar), lanza el CLI con una instrucción fija (nada del PDF va en la línea de comandos) y devuelve una fila por campo. La respuesta de la IA nunca se evalúa: se valida y la app calcula x,y a partir de los textos. Atiende una petición a la vez; cancelar en la app mata el CLI.
+**Cómo está montado.** El navegador no puede lanzar programas, así que `tools/ai-helper/server.mjs` hace de puente: escucha solo en `127.0.0.1`, atiende solo a los orígenes de la app (`AI_HELPER_ORIGINS`), comprueba `Host` (contra DNS rebinding) y exige un token que reparte solo a esos orígenes. Recibe los PDF y la plantilla A, prepara imágenes y textos en una carpeta temporal (que borra al terminar), lanza el CLI con una instrucción fija (nada del PDF va en la línea de comandos) y devuelve una fila por campo. La respuesta de la IA nunca se evalúa: se valida y la app calcula x,y a partir de los textos. Cancelar en la app mata el CLI.
+
+**Cola propia y concurrencia.** El ayudante lleva un semáforo por proveedor: **2 peticiones a la vez con Claude** (`AI_HELPER_CONCURRENCY=1` lo baja a 1; nunca más de 2) y **siempre 1 con Copilot**, para no provocar picos de créditos. `/propose` y el lote comparten los huecos; con todos ocupados `/propose` responde 409 `busy`. `GET /status` añade `slots`, `batches` y `queue: true` (versión 2).
+
+**Lote en el ayudante (`/batch`, todo con `x-ai-token`).** La cola vive en el proceso del ayudante, así que sigue aunque el navegador se recargue o se cierre (hasta que se pare el ayudante; los lotes terminados caducan a las 2 h):
+| Ruta | Qué hace |
+| --- | --- |
+| `POST /batch` `{provider, model?, retry?}` | Crea el lote y devuelve su `id` |
+| `POST /batch/:id/items` `{itemId, a, b, template, last?}` | Añade un par (uno a uno, para no cargar todos los PDF en una sola petición); `last: true` cierra el lote |
+| `GET /batch/:id` · `GET /batch` | Estado: recuentos y estado/etapa por par; `rev` sube con cada cambio |
+| `GET /batch/:id/items/:itemId` | Estado del par y su propuesta (`result`) |
+| `POST /batch/:id/resume` `{retryFailed?}` | Reanuda tras un límite o el cortacircuitos; opcionalmente reencola los fallidos |
+| `POST /batch/:id/cancel` · `DELETE /batch/:id` | Cancela (aborta los CLI en curso) / olvida el lote |
+
+Reglas: un **límite de uso** pausa el lote entero y deja los pendientes «en cola» (no fallidos), con la hora de renovación; **2 fallos seguidos del mismo tipo** (`cli_error`, `timeout`, `missing`) pausan también; un fallo propio del PDF (`images_not_read`…) solo marca ese par. La respuesta de la IA se sigue tratando como no confiable en la app (`sanitizeRow`). La app la usa por defecto (`AiBatchService.runRemote`): sube los pares uno a uno, sondea cada segundo y guarda en `localStorage` (`pdf-annotator.ai.queue`, no confiable) lo necesario para reengancharse tras recargar. Con Copilot y más de 10 PDFs se mantiene la cola del navegador por el tope de peticiones. Pruebas: `npm run test:helper` y los tests de `ai-batch.service.spec.ts`.
 
 **Modelo.** Sin elegir, Claude usa `sonnet` (`--model`) y Copilot el modelo por defecto del CLI. Se eligen en un desplegable (panel del chip «✦ IA» y confirmación del lote) con la **lista real de cada CLI**, que el ayudante lee con `GET /models`: Claude Code por la petición de control `initialize` del modo stream-json (la misma lista que `/model`, sin gastar tokens) y Copilot CLI por su servidor ACP (`copilot --acp`, respuesta de `session/new`). No se escribe a mano. La lista se guarda en este ordenador y se refresca al abrir; si falla, se ofrece la última guardada. Para Copilot hace falta tener la sesión iniciada (`copilot login`). Se recuerda la elección en este ordenador. Un modelo mayor agota antes el límite de 5 h/semanal de Claude; en Copilot cada petición descuenta «premium requests» según el multiplicador del modelo (confirmar con tu administrador las cifras de Business/Enterprise).
 

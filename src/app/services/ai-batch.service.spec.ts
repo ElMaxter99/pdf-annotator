@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import type { AiResult, AiRow } from '../utils/ai-proposal.utils';
+import type { AiRemoteSnapshot } from '../utils/ai-queue.utils';
 import { AiBatchService } from './ai-batch.service';
 import { AiHelperService, AiRequestError } from './ai-helper.service';
 import { BatchStoreService } from './batch-store.service';
@@ -218,5 +219,165 @@ describe('AiBatchService', () => {
     service.reset();
     expect(service.panelOpen()).toBe(false);
     expect(service.detailsOpen()).toBe(false);
+  });
+});
+
+
+/** The helper keeps the queue: the tab only uploads the pairs, follows the helper and picks up the proposals. */
+describe('AiBatchService with the helper queue', () => {
+  const pause = () => new Promise((resolve) => setTimeout(resolve, 0));
+  const until = async (condition: () => boolean) => {
+    for (let i = 0; i < 80 && !condition(); i++) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+  };
+
+  class QueueHelper {
+    readonly connection = signal('ready');
+    readonly provider = signal('claude');
+    readonly consent = signal(true);
+    readonly queueSupported = signal(true);
+    added: string[] = [];
+    resumed = 0;
+    cancelled = 0;
+    lost = false;
+    snapshot: AiRemoteSnapshot = { id: 'q1', rev: 0, state: 'active', concurrency: 2, paused: null, items: [] };
+    async createQueue() {
+      return 'q1';
+    }
+    async addToQueue(_id: string, itemId: string) {
+      this.added.push(itemId);
+    }
+    async readQueue() {
+      return this.lost ? null : this.snapshot;
+    }
+    async readQueueItem() {
+      return result(true);
+    }
+    async resumeQueue() {
+      this.resumed++;
+    }
+    async cancelQueue() {
+      this.cancelled++;
+    }
+    async forgetQueue() {
+      return;
+    }
+  }
+
+  let helper: QueueHelper;
+  let service: AiBatchService;
+  let batch: BatchStoreService;
+  let ids: string[];
+
+  beforeEach(() => {
+    localStorage.removeItem('pdf-annotator.ai.queue');
+    helper = new QueueHelper();
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: AiHelperService, useValue: helper },
+        { provide: PdfTextService, useValue: { read: async () => null } },
+      ],
+    });
+    service = TestBed.inject(AiBatchService);
+    batch = TestBed.inject(BatchStoreService);
+    ids = [];
+    for (let i = 0; i < 3; i++) {
+      const item = batch.add({ name: `d${i}.pdf`, aPdf: new Blob(['a']), aPages: [{ num: 1, fields: [{ mapField: 'x', x: 1, y: 1 } as never] }] });
+      batch.setB(item.id, new File(['b'], `d${i}-b.pdf`));
+      ids.push(item.id);
+    }
+  });
+
+  afterEach(() => {
+    service.cancel();
+    localStorage.removeItem('pdf-annotator.ai.queue');
+  });
+
+  const items = (...states: Array<'queued' | 'running' | 'done' | 'failed'>): AiRemoteSnapshot['items'] =>
+    states.map((state, i) => ({ id: `i${i}`, state, stage: state === 'running' ? 'asking' : null, attempt: 1, error: state === 'failed' ? { code: 'timeout', message: 'x', reset: null } : null }));
+
+  it('uploads every pair once and follows the helper until it finishes', async () => {
+    expect(service.start()).toBe('started');
+    await until(() => helper.added.length === 3);
+    expect(helper.added).toEqual(['i0', 'i1', 'i2']);
+    expect(service.viaHelper()).toBe(true);
+    expect(service.run()).toBe('running');
+    expect(localStorage.getItem('pdf-annotator.ai.queue')).toContain('q1');
+
+    helper.snapshot = { ...helper.snapshot, items: items('done', 'running', 'queued') };
+    await until(() => service.rows()[ids[0]].phase === 'ready');
+    expect(service.rows()[ids[1]].phase).toBe('asking');
+    expect(service.rows()[ids[2]].phase).toBe('queued');
+    expect(service.concurrency()).toBe(2);
+    expect(batch.find(ids[0])?.aiProposal?.rows.length).toBe(1);
+
+    helper.snapshot = { ...helper.snapshot, state: 'done', items: items('done', 'done', 'failed') };
+    await until(() => service.run() === 'done');
+    expect(ids.map((id) => service.rows()[id].phase)).toEqual(['ready', 'ready', 'failed']);
+    expect(localStorage.getItem('pdf-annotator.ai.queue')).toBeNull();
+  });
+
+  it('shows a usage limit as a pause and resumes through the helper', async () => {
+    service.start();
+    await until(() => helper.added.length === 3);
+    helper.snapshot = { ...helper.snapshot, paused: { reason: 'limit', reset: '18:30', code: null }, items: items('done', 'queued', 'queued') };
+    await until(() => service.run() === 'paused');
+    expect(service.pause()).toEqual({ kind: 'limit', code: undefined, reset: '18:30' });
+    service.resume();
+    expect(helper.resumed).toBe(1);
+    expect(service.run()).toBe('running');
+  });
+
+  it('has no manual pause and cancel aborts the helper queue', async () => {
+    service.start();
+    await until(() => helper.added.length === 3);
+    service.requestPause();
+    await pause();
+    expect(service.pause()).toBeNull();
+    service.cancel();
+    expect(helper.cancelled).toBe(1);
+    expect(service.run()).toBe('done');
+    expect(localStorage.getItem('pdf-annotator.ai.queue')).toBeNull();
+  });
+
+  it('when the helper forgot the queue, keeps what is done and offers to launch the rest again', async () => {
+    service.start();
+    await until(() => helper.added.length === 3);
+    helper.snapshot = { ...helper.snapshot, items: items('done', 'running', 'queued') };
+    await until(() => service.rows()[ids[0]].phase === 'ready');
+    helper.lost = true;
+    await until(() => service.run() === 'done');
+    expect(service.pause()?.kind).toBe('lost');
+    expect(ids.map((id) => service.rows()[id].phase)).toEqual(['ready', 'cancelled', 'cancelled']);
+    expect(service.counts().cancelled).toBe(2);
+  });
+
+  it('finds the queue again after a reload', async () => {
+    localStorage.setItem(
+      'pdf-annotator.ai.queue',
+      JSON.stringify({ batchId: 'q1', provider: 'claude', startedAt: Date.now() - 5000, order: ids, map: { i0: ids[0], i1: ids[1] }, taken: { [ids[2]]: { phase: 'free', placed: 2, total: 2 } } }),
+    );
+    helper.snapshot = { ...helper.snapshot, items: items('done', 'running') };
+    helper.connection.set('ready');
+    // A fresh service (as after a reload) picks the stored queue up as soon as the batch is loaded.
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: AiHelperService, useValue: helper },
+        { provide: PdfTextService, useValue: { read: async () => null } },
+      ],
+    });
+    const again = TestBed.inject(AiBatchService);
+    const store = TestBed.inject(BatchStoreService);
+    store.items.set(batch.items());
+    TestBed.tick();
+    await until(() => again.run() === 'running');
+    expect(again.viaHelper()).toBe(true);
+    expect(again.reconnected()?.total).toBe(3);
+    expect(again.rows()[ids[2]].phase).toBe('free');
+    await until(() => again.rows()[ids[0]].phase === 'ready');
+    expect(again.rows()[ids[1]].phase).toBe('asking');
+    again.cancel();
   });
 });

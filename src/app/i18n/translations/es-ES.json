@@ -900,6 +900,16 @@
         "note": "Nada se aplica solo: tú revisas cada propuesta.",
         "keepRunning": "Puedes cerrar este panel: el trabajo sigue.",
         "open": "Abrir"
+      },
+      "queue": {
+        "badge": "En el ayudante",
+        "parallel": "{{n}} a la vez",
+        "serial": "De uno en uno",
+        "reconnected": "Reconectado. La cola seguía en marcha: {{done}} de {{total}} hechos.",
+        "dismiss": "Entendido",
+        "keepRunning": "Puedes cerrar la pestaña o recargar: la cola sigue mientras el ayudante esté abierto.",
+        "lost": "El ayudante se cerró y la cola se perdió. {{kept}} PDFs conservan su propuesta; {{lost}} no llegaron a terminar.",
+        "relaunch": "Volver a lanzar los {{count}} que faltan"
       }
     },
     "more": "Más acciones",

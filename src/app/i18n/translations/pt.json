@@ -900,6 +900,16 @@
         "note": "Nada é aplicado sozinho: você revisa cada proposta.",
         "keepRunning": "Pode fechar este painel: o trabalho continua.",
         "open": "Abrir"
+      },
+      "queue": {
+        "badge": "No assistente",
+        "parallel": "{{n}} de cada vez",
+        "serial": "Um de cada vez",
+        "reconnected": "Reconectado. A fila continuava em curso: {{done}} de {{total}} concluídos.",
+        "dismiss": "Entendido",
+        "keepRunning": "Pode fechar o separador ou recarregar: a fila continua enquanto o assistente estiver aberto.",
+        "lost": "O assistente foi fechado e a fila perdeu-se. {{kept}} PDF mantêm a proposta; {{lost}} não chegaram a terminar.",
+        "relaunch": "Relançar os {{count}} em falta"
       }
     },
     "more": "Mais ações",
