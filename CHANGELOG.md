@@ -1,4 +1,6 @@
 ## Unreleased
+### Added
+- **Pulido del visor (mesas P-61 a P-64):** en la vista «Dividida» del lote, el chip «Enlazado / Desenlazado» (atajo `L`) separa el zoom y el desplazamiento de A y B para compararlos a distinta escala o zona; con A y B desenlazados, `Ctrl/⌘ + rueda`, el pellizco y la mano actúan solo sobre el panel bajo el cursor, el pie muestra el zoom de B y un chip «A y B desenlazados», y al cambiar de página cada panel vuelve a «ajustar» sin reenlazarse. Reenlazar avisa con «A y B enlazados otra vez». Además, seguir girando la rueda al llegar al borde de la hoja cambia de página (activado por defecto; se apaga en el menú ⋯): hay que tocar el borde, hacer una pausa y empujar ≈300 px, hay 0,6 s de bloqueo tras cambiar y el impulso del trackpad se descarta; con indicador de progreso y avisos de primera y última página. Textos en los 7 idiomas, con tests unitarios y e2e.
 
 ## [v1.12.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.12.0) - 2026-11-16
 ### Added

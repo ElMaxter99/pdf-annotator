@@ -5457,7 +5457,115 @@ button.version-chip:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .zoom-hud,
-  .zoom-menu {
+  .zoom-menu,
+  .wheel-edge,
+  .split-link {
     animation: none;
+    transition: none;
   }
+}
+
+/* Rueda al borde de la hoja pasa de página (P-63) */
+.wheel-edge {
+  position: fixed;
+  z-index: 25;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  animation: zoom-hud-in 150ms ease-out;
+}
+
+.wheel-edge__label {
+  box-sizing: border-box;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.18));
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(5, 5, 17, 0.35);
+}
+
+.wheel-edge__bar {
+  position: fixed;
+  z-index: 25;
+  height: 5px;
+  background: var(--accent);
+  pointer-events: none;
+  transition: width 120ms ease-out;
+}
+
+/* «Dividida»: chip enlazado / desenlazado (P-61) */
+.viewer.viewer--split .split-link {
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 14px 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--panel);
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(5, 5, 17, 0.3);
+}
+
+.viewer.viewer--split .split-link--off {
+  border-color: var(--warn, #fbbf24);
+  color: var(--warn, #fbbf24);
+}
+
+:root.theme-light .viewer.viewer--split .split-link--off {
+  color: #92400e;
+  border-color: #92400e;
+}
+
+.viewer.viewer--split .split-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.viewer.viewer--unlinked {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.viewer.viewer--unlinked .canvas-container--split-a {
+  position: sticky;
+  top: 0;
+  max-height: var(--split-h, 70vh);
+  overflow: auto;
+  min-width: 0;
+}
+
+.viewer.viewer--unlinked .split-tag:not(.split-tag--b) {
+  top: 6px;
+  left: 6px;
+  z-index: 3;
+}
+
+.footer__unlinked {
+  color: var(--warn, #fbbf24);
+  border-color: var(--warn, #fbbf24);
+  cursor: default;
+}
+
+:root.theme-light .footer__unlinked {
+  color: #92400e;
+  border-color: #92400e;
+}
+
+.viewer.viewer--split .zoom-hud {
+  grid-column: 1 / -1;
+  justify-self: center;
 }

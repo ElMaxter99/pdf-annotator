@@ -104,7 +104,8 @@
     "moreOptions": "Weitere Optionen",
     "clearConfirm": "Alle Anmerkungen entfernen? Mit Strg+Z lässt sich das rückgängig machen.",
     "clearYes": "Alle entfernen",
-    "clearCancel": "Abbrechen"
+    "clearCancel": "Abbrechen",
+    "wheelPaging": "Mit dem Rad die Seite wechseln"
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",
@@ -265,7 +266,14 @@
     }
   },
   "viewer": {
-    "emptyMessage": "Laden Sie ein PDF hoch und klicken Sie irgendwo, um Anmerkungen hinzuzufügen. Bearbeiten Sie sie in der Vorschau, bevor Sie bestätigen ✅."
+    "emptyMessage": "Laden Sie ein PDF hoch und klicken Sie irgendwo, um Anmerkungen hinzuzufügen. Bearbeiten Sie sie in der Vorschau, bevor Sie bestätigen ✅.",
+    "wheelPage": {
+      "next": "Weiter für Seite {{page}} ↓",
+      "prev": "Weiter für Seite {{page}} ↑",
+      "last": "Letzte Seite",
+      "first": "Erste Seite",
+      "now": "Seite {{page}} / {{total}}"
+    }
   },
   "shortcuts": {
     "title": "Tastenkürzel",
@@ -305,7 +313,9 @@
       "zoomKeys": "PDF vergrößern / verkleinern",
       "zoomActual": "Originalgröße (100 %)",
       "fitPage": "An Seite anpassen",
-      "panCanvas": "Arbeitsfläche verschieben (halten)"
+      "panCanvas": "Arbeitsfläche verschieben (halten)",
+      "splitLink": "A und B verknüpfen oder trennen (Geteilt)",
+      "wheelPage": "Am Blattrand weiterscrollen: wechselt die Seite"
     }
   },
   "toast": {
@@ -440,7 +450,13 @@
       "position": "{{index}} von {{total}}",
       "split": {
         "tagA": "A · Original · nur Lesen",
-        "tagB": "B · neue Version · bearbeitet"
+        "tagB": "B · neue Version · bearbeitet",
+        "linked": "Verknüpft",
+        "unlinked": "Getrennt",
+        "linkTitle": "Zoom und Scrollen von A und B verknüpfen oder trennen",
+        "linkedToast": "A und B wieder verknüpft bei B · {{percent}} %",
+        "unlinkedToast": "A und B getrennt: jeweils eigener Zoom und eigenes Scrollen",
+        "footer": "A und B getrennt"
       },
       "noA": {
         "hint": "A hat keine Vorlage: sein PDF wird unverändert verglichen.",
@@ -1385,7 +1401,8 @@
     "hud": {
       "value": "{{percent}} %",
       "max": "{{percent}} % · Maximum",
-      "min": "{{percent}} % · Minimum"
+      "min": "{{percent}} % · Minimum",
+      "side": "{{side}} · {{percent}} %"
     },
     "menu": {
       "label": "PDF-Zoom",

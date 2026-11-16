@@ -1,9 +1,10 @@
-<main class="viewer" [class.viewer--split]="vm.splitActive()" [class.viewer--pan-ready]="vm.panReady()" [class.viewer--panning]="vm.panning()" (wheel)="vm.onViewerWheel($event)" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc as _">
+<main class="viewer" [class.viewer--split]="vm.splitActive()" [class.viewer--unlinked]="vm.unlinkedSplit()" [style.--split-h.px]="vm.splitHeight()" [class.viewer--pan-ready]="vm.panReady()" [class.viewer--panning]="vm.panning()" (wheel)="vm.onViewerWheel($event)" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc as _">
   <app-first-steps [vm]="vm"></app-first-steps>
   @if (vm.zoomHud(); as z) {
     <div class="zoom-hud" [class.zoom-hud--limit]="z.limit" role="status" aria-live="polite" data-testid="zoom-hud">
       @if (z.limit === 'max') { {{ 'zoom.hud.max' | t: { percent: z.percent } }} }
       @else if (z.limit === 'min') { {{ 'zoom.hud.min' | t: { percent: z.percent } }} }
+      @else if (z.side) { {{ 'zoom.hud.side' | t: { side: z.side, percent: z.percent } }} }
       @else { {{ 'zoom.hud.value' | t: { percent: z.percent } }} }
     </div>
   }
@@ -12,6 +13,24 @@
       {{ 'zoom.pan.title' | t }} <kbd>{{ 'zoom.pan.key' | t }}</kbd>
       <span class="zoom-hud__hint">{{ 'zoom.pan.hint' | t }}</span>
     </div>
+  }
+  @if (vm.wheelEdge(); as e) {
+    <div class="wheel-edge" role="status" aria-live="polite" data-testid="wheel-edge"
+      [style.left.px]="e.left" [style.width.px]="e.width" [style.top.px]="e.top + e.height - 52">
+      <span class="wheel-edge__label">
+        @switch (e.kind) {
+          @case ('next') { {{ 'viewer.wheelPage.next' | t: { page: e.page } }} }
+          @case ('prev') { {{ 'viewer.wheelPage.prev' | t: { page: e.page } }} }
+          @case ('last') { {{ 'viewer.wheelPage.last' | t }} }
+          @case ('first') { {{ 'viewer.wheelPage.first' | t }} }
+          @default { {{ 'viewer.wheelPage.now' | t: { page: e.page, total: e.total } }} }
+        }
+      </span>
+    </div>
+    @if (e.kind === 'next' || e.kind === 'prev') {
+      <div class="wheel-edge__bar" [style.left.px]="e.left" [style.width.px]="e.width * e.progress"
+        [style.top.px]="e.top + e.height - 5"></div>
+    }
   }
   <div class="origin-legend" role="group" [attr.aria-label]="'preview.origin.group' | t">
     <label class="origin-legend__toggle">
@@ -62,6 +81,19 @@
       <canvas #splitCanvas class="canvas"></canvas>
       <div #splitLayer class="reference-layer" aria-hidden="true"></div>
     </div>
+  }
+  @if (vm.splitActive() && vm.splitBox(); as box) {
+    <button type="button" class="split-link" [style.left.px]="box.left + box.width / 2" [style.top.px]="box.top + box.height - 52" [class.split-link--off]="!vm.splitLinked()"
+      [attr.aria-pressed]="!vm.splitLinked()" aria-keyshortcuts="L" data-testid="split-link"
+      [attr.title]="('batch.editor.split.linkTitle' | t) + ' (L)'" (click)="vm.toggleSplitLink()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" />
+        <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" />
+        @if (!vm.splitLinked()) { <path d="M3 3l18 18" /> }
+      </svg>
+      {{ (vm.splitLinked() ? 'batch.editor.split.linked' : 'batch.editor.split.unlinked') | t }}
+    </button>
   }
   <div class="canvas-container" [class.canvas-container--split-b]="vm.splitActive()" [class.canvas-container--reference-only]="vm.showingOnlyA() && !!vm.migration()" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
     @if (vm.splitActive()) {

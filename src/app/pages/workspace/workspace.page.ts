@@ -38,6 +38,11 @@ import {
   zoomLimitFor,
   type ZoomLimit,
 } from '../../utils/zoom.utils';
+import {
+  initialWheelPageState,
+  wheelEdgeStep,
+  type WheelPageState,
+} from '../../utils/wheel-page.utils';
 import { AiHelperService, AiRequestError, type AiProvider } from '../../services/ai-helper.service';
 import {
   confidenceLevel,
@@ -184,6 +189,18 @@ import {
 } from '../../utils/adjust-session.utils';
 
 const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
+const WHEEL_PAGING_KEY = 'pdf-annotator.wheelPaging';
+
+interface WheelEdgeIndicator {
+  kind: 'next' | 'prev' | 'last' | 'first' | 'now';
+  progress: number;
+  page: number;
+  total: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
 
 type PreviewState = { page: number; field: PageField } | null;
 
@@ -294,8 +311,22 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   pageIndex = signal(1);
   scale = signal(1.5);
   /** Floating zoom indicator (P-59); `limit` is set when the request hit 25 % or 400 %. */
-  readonly zoomHud = signal<{ percent: number; limit: ZoomLimit } | null>(null);
+  readonly zoomHud = signal<{ percent: number; limit: ZoomLimit; side?: 'A' | 'B' } | null>(null);
+  /** «Dividida»: A and B share zoom and scroll (default) or each goes its own way (P-61). */
+  readonly splitLinked = signal(true);
+  readonly scaleA = signal(1);
+  /** Height of the A pane while unlinked (it scrolls on its own). */
+  readonly splitHeight = signal(600);
+  /** Screen box of the viewer while «Dividida» is active (the link chip is fixed over its bottom edge). */
+  readonly splitBox = signal<{ left: number; top: number; width: number; height: number } | null>(null);
+  private splitResizeObserver: ResizeObserver | null = null;
   readonly zoomMenuOpen = signal(false);
+  /** The wheel past the edge of the sheet changes page (P-63); on by default, switched off in ⋯. */
+  readonly wheelPaging = signal(this.storedWheelPaging());
+  /** Edge indicator while pushing the wheel at the top or bottom of the sheet. */
+  readonly wheelEdge = signal<WheelEdgeIndicator | null>(null);
+  private wheelState: WheelPageState = initialWheelPageState();
+  private wheelEdgeTimer: ReturnType<typeof setTimeout> | null = null;
   readonly zoomPresets = ZOOM_PRESETS;
   /** Space is held: dragging moves the canvas instead of annotating. */
   readonly panReady = signal(false);
@@ -795,6 +826,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.endPan();
     this.removeZoomCommandListener?.();
     if (this.zoomHudTimer) clearTimeout(this.zoomHudTimer);
+    if (this.wheelEdgeTimer) clearTimeout(this.wheelEdgeTimer);
+    this.splitResizeObserver?.disconnect();
     if (this.savedClock) {
       clearInterval(this.savedClock);
     }
@@ -2156,6 +2189,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         event.preventDefault();
         this.toggleSidebarMinimized();
         break;
+      case 'l':
+        if (this.splitActive()) {
+          event.preventDefault();
+          void this.toggleSplitLink();
+        }
+        break;
       default:
         break;
     }
@@ -2985,7 +3024,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     height: number;
     transform: number[] | undefined;
   } {
-    const scale = this.scale();
+    const scale = this.scaleOfA();
     const own = page.getViewport({ scale });
     const target = sizeOfPage(this.pageSizesB(), this.pageIndex());
     if (!this.fitA() || !target) {
@@ -3040,8 +3079,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     fontSize: number,
     missing: boolean,
     solo: boolean,
+    scale = this.scale(),
   ) {
-    const scale = this.scale();
     const px = Number(x);
     const py = Number(y);
     const size = Math.max(6, Number(fontSize) || 12);
@@ -3076,6 +3115,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Changes how A is shown. «Dividida» also fits both pages in the viewer. */
   async setReferenceMode(mode: 'overlay' | 'toggle' | 'split'): Promise<void> {
     this.referenceMode.set(mode);
+    if (mode !== 'split') {
+      this.splitLinked.set(true);
+    }
     try {
       localStorage.setItem(REFERENCE_MODE_KEY, mode);
     } catch {
@@ -3088,6 +3130,89 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.scaleBeforeSplit = null;
       await this.render();
       this.redrawAllForPage();
+    }
+  }
+
+  /** True while «Dividida» is active and A has its own zoom and scroll (P-61). */
+  unlinkedSplit(): boolean {
+    return this.splitActive() && !this.splitLinked();
+  }
+
+  /** Scale used to draw A: its own while unlinked, otherwise B's. */
+  private scaleOfA(): number {
+    return this.unlinkedSplit() ? this.scaleA() : this.scale();
+  }
+
+  private splitAPane(): HTMLElement | null {
+    return (this.splitLayerRef?.nativeElement.parentElement as HTMLElement | null) ?? null;
+  }
+
+  private isOverSplitA(evt: { clientX: number; clientY: number }): boolean {
+    const pane = this.splitAPane();
+    if (!pane) return false;
+    const r = pane.getBoundingClientRect();
+    return evt.clientX >= r.left && evt.clientX <= r.right && evt.clientY >= r.top && evt.clientY <= r.bottom;
+  }
+
+  /** Chip «Enlazado / Desenlazado»: A and B stop (or start again) sharing zoom and scroll. */
+  async toggleSplitLink(): Promise<void> {
+    if (!this.splitActive()) return;
+    if (this.splitLinked()) {
+      this.scaleA.set(this.scale());
+      this.splitLinked.set(false);
+      this.updateSplitHeight();
+      this.toast.show(this.translationService.translate('batch.editor.split.unlinkedToast'), 'info', 4000);
+    } else {
+      this.splitLinked.set(true);
+      const pane = this.splitAPane();
+      if (pane) {
+        pane.scrollLeft = 0;
+        pane.scrollTop = 0;
+      }
+      this.toast.show(
+        this.translationService.translate('batch.editor.split.linkedToast', {
+          percent: Math.round(this.scale() * 100),
+        }),
+        'info',
+        4000,
+      );
+    }
+    await this.renderSplit();
+  }
+
+  @HostListener('window:resize')
+  updateSplitHeight(): void {
+    const viewer = this.pdfViewerRef?.nativeElement.closest('.viewer') as HTMLElement | null;
+    if (!viewer) {
+      return;
+    }
+    this.splitHeight.set(Math.max(200, viewer.clientHeight - 44));
+    const r = viewer.getBoundingClientRect();
+    this.splitBox.set({ left: r.left, top: r.top, width: r.width, height: r.height });
+    if (!this.splitResizeObserver && typeof ResizeObserver !== 'undefined') {
+      this.splitResizeObserver = new ResizeObserver(() => this.updateSplitHeight());
+      this.splitResizeObserver.observe(viewer);
+    }
+  }
+
+  /** Zoom of A alone (unlinked «Dividida»), keeping the point under the cursor. */
+  async zoomSplitA(requested: number, anchor: { clientX: number; clientY: number } | null) {
+    const pane = this.splitAPane();
+    const canvas = this.splitCanvasRef?.nativeElement;
+    const next = clampScale(requested);
+    this.showZoomHud(next, zoomLimitFor(requested), 'A');
+    const previous = this.scaleA();
+    if (next === previous || !pane || !canvas) return;
+    const before = canvas.getBoundingClientRect();
+    this.scaleA.set(next);
+    await this.renderSplit();
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    if (anchor) {
+      const after = canvas.getBoundingClientRect();
+      const ux = (anchor.clientX - before.left) / previous;
+      const uy = (anchor.clientY - before.top) / previous;
+      pane.scrollLeft += after.left + ux * next - anchor.clientX;
+      pane.scrollTop += after.top + uy * next - anchor.clientY;
     }
   }
 
@@ -3173,6 +3298,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Draws A (its PDF and its fields) in the left pane of «Dividida». */
   private async renderSplit(): Promise<void> {
+    this.updateSplitHeight();
     const token = ++this.splitToken;
     const item = this.batch.activeItem();
     if (!this.splitActive() || !item) {
@@ -3188,7 +3314,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const doc = await this.splitDocOf(item.aPdf);
       const pageNumber = Math.min(this.pageIndex(), doc.numPages);
       const page = await doc.getPage(pageNumber);
-      const viewport = page.getViewport({ scale: this.scale() });
+      const viewport = page.getViewport({ scale: this.scaleOfA() });
       const ctx = canvas.getContext('2d');
       if (!ctx || token !== this.splitToken) {
         return;
@@ -3224,6 +3350,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           field.fontSize,
           field.missing,
           false,
+          this.scaleOfA(),
         );
       }
       this.drawAdjustPins(layer, canvas.height, 'a');
@@ -4080,7 +4207,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     ) {
       return;
     }
-    const scale = this.scale();
+    const scale = side === 'a' ? this.scaleOfA() : this.scale();
     const page = this.pageIndex();
     for (const row of session.anchors) {
       if (row.page !== page || !row.on) {
@@ -5098,6 +5225,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.pageIndex.set(clamped);
     await this.render();
     this.redrawAllForPage();
+    if (this.unlinkedSplit()) {
+      // Each pane goes back to «fit» on the new page; they stay unlinked.
+      await this.fitSplit();
+      this.scaleA.set(this.scale());
+      const pane = this.splitAPane();
+      if (pane) {
+        pane.scrollLeft = 0;
+        pane.scrollTop = 0;
+      }
+      await this.renderSplit();
+    }
   }
 
   async prevPage() {
@@ -5127,14 +5265,114 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.zoomToScale(percent / 100, this.viewerCenter());
   }
 
-  /** Ctrl/⌘ + wheel and trackpad pinch (they arrive as wheel events with Ctrl) zoom towards the cursor. */
+  /**
+   * Ctrl/⌘ + wheel and trackpad pinch (they arrive as wheel events with Ctrl) zoom towards the
+   * cursor. A plain wheel at the edge of the sheet may change page (P-63).
+   */
   onViewerWheel(evt: WheelEvent): void {
-    if ((!evt.ctrlKey && !evt.metaKey) || !this.pdfDoc) {
+    if (!this.pdfDoc) {
+      return;
+    }
+    if (!evt.ctrlKey && !evt.metaKey) {
+      this.onWheelEdge(evt);
       return;
     }
     evt.preventDefault();
+    if (this.splitActive() && !this.splitLinked() && this.isOverSplitA(evt)) {
+      void this.zoomSplitA(this.scaleA() * wheelZoomFactor(evt.deltaY, evt.deltaMode), evt);
+      return;
+    }
     const requested = this.zoomBase() * wheelZoomFactor(evt.deltaY, evt.deltaMode);
     void this.zoomToScale(requested, { clientX: evt.clientX, clientY: evt.clientY });
+  }
+
+  setWheelPaging(on: boolean): void {
+    this.wheelPaging.set(on);
+    this.wheelState = initialWheelPageState();
+    this.wheelEdge.set(null);
+    try {
+      localStorage.setItem(WHEEL_PAGING_KEY, on ? '1' : '0');
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  private storedWheelPaging(): boolean {
+    try {
+      return typeof localStorage === 'undefined' || localStorage.getItem(WHEEL_PAGING_KEY) !== '0';
+    } catch {
+      return true;
+    }
+  }
+
+  private onWheelEdge(evt: WheelEvent): void {
+    const viewer = evt.currentTarget as HTMLElement | null;
+    if (
+      !this.wheelPaging() ||
+      !viewer ||
+      !this.pdfDoc ||
+      this.pdfDoc.numPages < 1 ||
+      this.preview() ||
+      this.editing() ||
+      this.panReady() ||
+      this.panning() ||
+      this.lasso() ||
+      evt.shiftKey ||
+      Math.abs(evt.deltaX) > Math.abs(evt.deltaY) ||
+      isEditableElement(document.activeElement as HTMLElement | null) ||
+      (this.splitActive() && !this.splitLinked() && this.isOverSplitA(evt))
+    ) {
+      return;
+    }
+    const pixels =
+      evt.deltaMode === 1 ? evt.deltaY * 33 : evt.deltaMode === 2 ? evt.deltaY * 400 : evt.deltaY;
+    const page = this.pageIndex();
+    const total = this.pdfDoc.numPages;
+    const step = wheelEdgeStep(this.wheelState, {
+      deltaY: pixels,
+      now: performance.now(),
+      atTop: viewer.scrollTop <= 0,
+      atBottom: viewer.scrollTop + viewer.clientHeight >= viewer.scrollHeight - 1,
+      hasPrev: page > 1,
+      hasNext: page < total,
+    });
+    this.wheelState = step.state;
+    const rect = viewer.getBoundingClientRect();
+    const place = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+    if (step.change) {
+      const target = page + step.change;
+      this.showWheelEdge({ kind: 'now', progress: 1, page: target, total, ...place }, 900);
+      void this.setPageIndex(target).then(() => {
+        viewer.scrollTop = step.change > 0 ? 0 : viewer.scrollHeight;
+      });
+      return;
+    }
+    if (step.limit) {
+      this.showWheelEdge(
+        { kind: pixels > 0 ? 'last' : 'first', progress: 0, page, total, ...place },
+        900,
+      );
+    } else if (step.progress > 0) {
+      const dir = pixels > 0 ? 1 : -1;
+      this.showWheelEdge(
+        {
+          kind: dir > 0 ? 'next' : 'prev',
+          progress: step.progress,
+          page: page + dir,
+          total,
+          ...place,
+        },
+        500,
+      );
+    } else if (this.wheelEdge()?.kind === 'next' || this.wheelEdge()?.kind === 'prev') {
+      this.wheelEdge.set(null);
+    }
+  }
+
+  private showWheelEdge(value: WheelEdgeIndicator, ms: number): void {
+    this.wheelEdge.set(value);
+    if (this.wheelEdgeTimer) clearTimeout(this.wheelEdgeTimer);
+    this.wheelEdgeTimer = setTimeout(() => this.wheelEdge.set(null), ms);
   }
 
   private zoomBase(): number {
@@ -5162,7 +5400,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         const { requested: wanted, anchor: at } = this.zoomPending;
         this.zoomPending = null;
         const next = clampScale(wanted);
-        this.showZoomHud(next, zoomLimitFor(wanted));
+        this.showZoomHud(next, zoomLimitFor(wanted), this.unlinkedSplit() ? 'B' : undefined);
         const previous = this.scale();
         if (next === previous) continue;
         const canvas = this.pdfCanvasRef?.nativeElement;
@@ -5184,8 +5422,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  private showZoomHud(scale: number, limit: ZoomLimit) {
-    this.zoomHud.set({ percent: Math.round(scale * 100), limit });
+  private showZoomHud(scale: number, limit: ZoomLimit, side?: 'A' | 'B') {
+    this.zoomHud.set({ percent: Math.round(scale * 100), limit, side });
     if (this.zoomHudTimer) clearTimeout(this.zoomHudTimer);
     this.zoomHudTimer = setTimeout(() => this.zoomHud.set(null), 1200);
     this.maybeShowWebZoomHint();
@@ -5206,7 +5444,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private onPanPointerDown(evt: PointerEvent) {
     if (!this.pdfDoc || this.panDrag) return;
     const target = evt.target as HTMLElement | null;
-    const viewer = target?.closest?.('.viewer') as HTMLElement | null;
+    const viewer =
+      this.unlinkedSplit() && this.isOverSplitA(evt)
+        ? this.splitAPane()
+        : (target?.closest?.('.viewer') as HTMLElement | null);
     const wanted = evt.button === 1 || (evt.button === 0 && this.panReady());
     if (!viewer || !wanted || isEditableElement(target)) return;
     evt.preventDefault();
