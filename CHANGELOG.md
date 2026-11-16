@@ -1,5 +1,6 @@
 ## Unreleased
 ### Changed
+- **README al día con la v1.12:** capturas nuevas (bienvenida, editor, editar una anotación, árbol JSON, guías, atajos, tema claro) y dos nuevas del lote (panel con versiones B y editor en «Dividida»); se quita la captura móvil (la app es solo de escritorio). Textos de la cabecera, el pie, las guías y una sección y un flujo nuevos para el lote; insignias de Angular 22 y TypeScript 6.0. `node scripts/screenshots.mjs` regenera todas las capturas desde el build.
 - **Node 26 y Angular 22 (sin cambios visibles):** el proyecto pasa a Node 26 (`Dockerfile`, workflows de CI/release/escritorio, `engines`, README y AGENTS.md) y Angular 20 → 22 (vía 21) con TypeScript 6.0, `zone.js` 0.16, `jasmine-core` 7, `karma-jasmine-html-reporter` 2.3 y `@types/node` 26. Los componentes mantienen la detección de cambios clásica (`ChangeDetectionStrategy.Eager`), `tsconfig` sin `baseUrl`/`lib` y `main.server.ts` usa `BootstrapContext`.
 
 ## [v1.12.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.12.0) - 2026-11-16
