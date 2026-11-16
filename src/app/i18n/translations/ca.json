@@ -1402,7 +1402,9 @@
       "value": "{{percent}} %",
       "max": "{{percent}} % · màxim",
       "min": "{{percent}} % · mínim",
-      "side": "{{side}} · {{percent}} %"
+      "side": "{{side}} · {{percent}} %",
+      "onlyA": "només es mou A",
+      "onlyB": "només es mou B"
     },
     "menu": {
       "label": "Zoom del PDF",

@@ -12,6 +12,10 @@ import { ToastService } from '../../services/toast.service';
       @for (toast of visible(); track toast.id) {
         <div class="toast" [class]="'toast toast--' + toast.kind" [attr.role]="toast.kind === 'error' ? 'alert' : 'status'">
           <span class="toast__message">{{ toast.message }}</span>
+          @if (toast.action; as action) {
+            <button type="button" class="toast__action" data-testid="toast-action"
+              (click)="action.run(); toasts.dismiss(toast.id)">{{ action.label }}</button>
+          }
           <button type="button" class="toast__close" (click)="toasts.dismiss(toast.id)"
             [attr.aria-label]="'toast.close' | t">✕</button>
         </div>

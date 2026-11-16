@@ -1402,7 +1402,9 @@
       "value": "{{percent}} %",
       "max": "{{percent}} % · massimo",
       "min": "{{percent}} % · minimo",
-      "side": "{{side}} · {{percent}} %"
+      "side": "{{side}} · {{percent}} %",
+      "onlyA": "si muove solo A",
+      "onlyB": "si muove solo B"
     },
     "menu": {
       "label": "Zoom del PDF",

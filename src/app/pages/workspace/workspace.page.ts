@@ -3165,8 +3165,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.updateSplitHeight();
       this.toast.show(this.translationService.translate('batch.editor.split.unlinkedToast'), 'info', 4000);
     } else {
-      this.splitLinked.set(true);
       const pane = this.splitAPane();
+      const before = { scale: this.scaleA(), left: pane?.scrollLeft ?? 0, top: pane?.scrollTop ?? 0 };
+      this.splitLinked.set(true);
       if (pane) {
         pane.scrollLeft = 0;
         pane.scrollTop = 0;
@@ -3177,9 +3178,29 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         }),
         'info',
         4000,
+        false,
+        {
+          label: this.translationService.translate('controls.undo'),
+          run: () => void this.undoSplitLink(before),
+        },
       );
     }
     await this.renderSplit();
+  }
+
+  /** «Deshacer» of the relink notice: A goes back to its own zoom and position. */
+  private async undoSplitLink(before: { scale: number; left: number; top: number }): Promise<void> {
+    if (!this.splitActive() || !this.splitLinked()) return;
+    this.scaleA.set(before.scale);
+    this.splitLinked.set(false);
+    this.updateSplitHeight();
+    await this.renderSplit();
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    const pane = this.splitAPane();
+    if (pane) {
+      pane.scrollLeft = before.left;
+      pane.scrollTop = before.top;
+    }
   }
 
   @HostListener('window:resize')

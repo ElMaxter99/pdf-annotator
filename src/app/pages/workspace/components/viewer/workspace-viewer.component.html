@@ -1,10 +1,11 @@
 <main class="viewer" [class.viewer--split]="vm.splitActive()" [class.viewer--unlinked]="vm.unlinkedSplit()" [style.--split-h.px]="vm.splitHeight()" [class.viewer--pan-ready]="vm.panReady()" [class.viewer--panning]="vm.panning()" (wheel)="vm.onViewerWheel($event)" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc as _">
   <app-first-steps [vm]="vm"></app-first-steps>
   @if (vm.zoomHud(); as z) {
-    <div class="zoom-hud" [class.zoom-hud--limit]="z.limit" role="status" aria-live="polite" data-testid="zoom-hud">
+    <div class="zoom-hud" [class.zoom-hud--limit]="z.limit" [class.zoom-hud--split]="vm.splitActive() && !!vm.splitBox()"
+      [style.left.px]="splitHudLeft(z.side)" [style.top.px]="splitHudTop()" role="status" aria-live="polite" data-testid="zoom-hud">
       @if (z.limit === 'max') { {{ 'zoom.hud.max' | t: { percent: z.percent } }} }
       @else if (z.limit === 'min') { {{ 'zoom.hud.min' | t: { percent: z.percent } }} }
-      @else if (z.side) { {{ 'zoom.hud.side' | t: { side: z.side, percent: z.percent } }} }
+      @else if (z.side) { {{ 'zoom.hud.side' | t: { side: z.side, percent: z.percent } }} <span class="zoom-hud__hint">{{ (z.side === 'A' ? 'zoom.hud.onlyA' : 'zoom.hud.onlyB') | t }}</span> }
       @else { {{ 'zoom.hud.value' | t: { percent: z.percent } }} }
     </div>
   }

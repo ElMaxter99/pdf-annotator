@@ -833,4 +833,9 @@ test('«Dividida»: the chip unlinks the zoom of A and B and links them again', 
   await page.keyboard.press('l');
   await expect(chip).toContainText('Enlazado');
   await expect.poll(widthA).toBe(await widthB());
+
+  // «Deshacer» in the notice gives A its own zoom back.
+  await page.getByTestId('toast-action').click();
+  await expect(chip).toContainText('Desenlazado');
+  await expect.poll(widthA).toBeGreaterThan(await widthB());
 });
