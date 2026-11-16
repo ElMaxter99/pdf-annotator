@@ -1,3 +1,35 @@
+import {
+  OverlayGuide,
+  OverlayRect,
+  SnapBounds,
+  computeSnapping,
+  drawActiveGuides,
+  drawGrid,
+  drawRulers,
+  drawStaticGuides,
+} from '../../utils/guides.utils';
+import {
+  DEFAULT_OPACITY,
+  areFieldsEqual,
+  ensureFieldStyle,
+  fieldHasRenderableContent,
+  normalizeBackgroundColor,
+  normalizeOpacityValue,
+  prepareFieldForForm,
+  prepareFieldForStorage,
+} from '../../utils/field-style.utils';
+import {
+  JsonShapeError,
+  JsonTreePreview,
+  buildJsonTreePath,
+  buildJsonTreePreview,
+  countLineBreaks,
+  getTextareaLineHeight,
+  indentJsonBlock,
+  isEditableElement,
+  parseNumericList,
+  serializeFieldForJson,
+} from '../../utils/json-text.utils';
 import { AiHelperService, AiRequestError, type AiProvider } from '../../services/ai-helper.service';
 import {
   confidenceLevel,
@@ -29,6 +61,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import './pdf-worker.setup';
 import { Language, TranslationService } from '../../i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
@@ -71,7 +104,10 @@ import {
 import { ToastService } from '../../services/toast.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
-import { MAX_TEST_DATA_BYTES, PreviewSettingsService } from '../../services/preview-settings.service';
+import {
+  MAX_TEST_DATA_BYTES,
+  PreviewSettingsService,
+} from '../../services/preview-settings.service';
 import {
   fieldOrigin,
   resolveFieldPreview,
@@ -139,50 +175,7 @@ import {
   recomputeFields,
 } from '../../utils/adjust-session.utils';
 
-const PDF_WORKER_MODULE_SRC = '/assets/pdfjs/pdf.worker.entry.mjs';
-const PDF_WORKER_TYPE_MODULE = 'module';
-
-function supportsModuleWorkers(): boolean {
-  if (
-    typeof Worker === 'undefined' ||
-    typeof Blob === 'undefined' ||
-    typeof URL === 'undefined' ||
-    typeof URL.createObjectURL !== 'function'
-  ) {
-    return false;
-  }
-
-  let url: string | null = null;
-
-  try {
-    const blob = new Blob([''], { type: 'application/javascript' });
-    url = URL.createObjectURL(blob);
-    const tester = new Worker(url, { type: 'module' });
-    tester.terminate();
-    return true;
-  } catch {
-    return false;
-  } finally {
-    if (url) {
-      URL.revokeObjectURL(url);
-    }
-  }
-}
-
 const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
-
-const workerOptions = (pdfjsLib as any).GlobalWorkerOptions as {
-  workerSrc?: string;
-  workerType?: string;
-};
-
-if (supportsModuleWorkers()) {
-  workerOptions.workerSrc = PDF_WORKER_MODULE_SRC;
-  workerOptions.workerType = PDF_WORKER_TYPE_MODULE;
-} else {
-  workerOptions.workerSrc = undefined;
-  workerOptions.workerType = undefined;
-}
 
 type PreviewState = { page: number; field: PageField } | null;
 
@@ -192,41 +185,18 @@ type JsonViewMode = 'text' | 'tree';
 
 type EditorMode = 'preview' | 'edit';
 
-type JsonTreePreviewStatus = 'empty' | 'ready' | 'error';
-
-interface JsonTreePreview {
-  status: JsonTreePreviewStatus;
-  value: unknown | null;
-  /** Position of the syntax error (status `error`). */
-  errorAt?: { line: number; column: number };
-  /** Whether the document has a usable `pages` list (status `ready`). */
-  hasPages?: boolean;
-  /** Raw number of field entries across all pages (status `ready`). */
-  fieldCount?: number;
-}
-
 const SIDEBAR_TABS = ['document', 'annotations', 'templates', 'advanced'] as const;
 type SidebarTab = (typeof SIDEBAR_TABS)[number];
 
 const AUTO_APPLY_JSON_DELAY_MS = 300;
 const SESSION_SAVE_DELAY_MS = 800;
 
-/** The JSON parsed fine but has no `pages` list. */
-class JsonShapeError extends Error {}
 const MAX_JSON_IMPORT_BYTES = 5 * 1024 * 1024;
-
-type OverlayGuide = {
-  orientation: 'horizontal' | 'vertical';
-  position: number;
-  highlighted?: boolean;
-};
 
 interface FontDropdownUiState {
   readonly open: boolean;
   readonly query: string;
 }
-
-const DEFAULT_OPACITY = 1;
 
 export interface AdjustSession {
   readonly phase: 'loading' | 'ready' | 'none' | 'noText';
@@ -326,7 +296,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
   coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
-  jsonTreePreview: JsonTreePreview = this.buildJsonTreePreview(this.coordsTextModel);
+  jsonTreePreview: JsonTreePreview = buildJsonTreePreview(this.coordsTextModel);
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
   includeAdvancedJsonFields = signal(false);
@@ -387,16 +357,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     () => this.batch.activeItem()?.aPages.reduce((sum, page) => sum + page.fields.length, 0) ?? 0,
   );
   /** «Dividida» is on: A (read only) on the left, B (edited) on the right. */
-  readonly splitActive = computed(
-    () => !!this.migration() && this.referenceMode() === 'split',
-  );
+  readonly splitActive = computed(() => !!this.migration() && this.referenceMode() === 'split');
   /** Page sizes (points) of A and B, to compare them and scale the coordinates of A. */
   readonly pageSizesA = signal<PageSize[]>([]);
   readonly pageSizesB = signal<PageSize[]>([]);
   /** A and B have a different page size, so their coordinates do not line up. */
   readonly sizeMismatch = computed(
-    () =>
-      !!this.batch.activeItem()?.bPdf && sizesDiffer(this.pageSizesA(), this.pageSizesB()),
+    () => !!this.batch.activeItem()?.bPdf && sizesDiffer(this.pageSizesA(), this.pageSizesB()),
   );
   /** The coordinates of A are scaled to the page size of B (the person chose «Ajustar»). */
   readonly fitA = computed(() => this.sizeMismatch() && this.batch.activeItem()?.fitA === true);
@@ -562,8 +529,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private sessionFile: File | null = null;
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
-  private overlayDragRect: { left: number; top: number; width: number; height: number } | null =
-    null;
+  private overlayDragRect: OverlayRect | null = null;
   private overlayGuides: OverlayGuide[] = [];
   private clipboard: PageField | null = null;
 
@@ -953,7 +919,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         return;
       }
     }
-    const normalized = this.normalizeOpacityValue(value);
+    const normalized = normalizeOpacityValue(value);
     this.updateWorkingField(mode, (field) =>
       this.ensureFieldStyle({
         ...field,
@@ -971,7 +937,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         return;
       }
     }
-    const normalized = this.normalizeBackgroundColor(value);
+    const normalized = normalizeBackgroundColor(value);
     if (!normalized) {
       this.clearFieldBackground(mode);
       return;
@@ -1173,7 +1139,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   onSnapPointsInput(axis: 'x' | 'y', rawValue: string) {
-    const parsed = this.parseNumericList(rawValue);
+    const parsed = parseNumericList(rawValue);
     if (axis === 'x') {
       this.snapPointsXText.set(rawValue);
       this.guideSettings.update((settings) => ({ ...settings, snapPointsX: parsed }));
@@ -1186,16 +1152,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private setDocumentMetadata() {
     this.metadataService.applyDefaultMetadata();
-  }
-
-  private parseNumericList(value: string): number[] {
-    return value
-      .split(/[\s,;]+/)
-      .map((token) => toFiniteNumber(token))
-      .filter((num): num is number => num !== null && num >= 0)
-      .map((num) => +num.toFixed(2))
-      .filter((num, index, arr) => arr.indexOf(num) === index)
-      .sort((a, b) => a - b);
   }
 
   private refreshOverlay(
@@ -1232,254 +1188,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const settings = this.guideSettings();
     const scale = this.scale();
 
-    this.drawGrid(ctx, settings, overlay.width, overlay.height, scale);
-    this.drawRulers(ctx, settings, overlay.width, overlay.height, scale);
-    this.drawStaticGuides(ctx, settings, overlay.width, overlay.height, scale);
+    drawGrid(ctx, settings, overlay.width, overlay.height, scale);
+    drawRulers(ctx, settings, overlay.width, overlay.height, scale);
+    drawStaticGuides(ctx, settings, overlay.width, overlay.height, scale);
 
     if (this.overlayDragRect) {
-      this.drawActiveGuides(ctx, overlay.width, overlay.height, settings.showAlignment);
+      drawActiveGuides(
+        ctx,
+        overlay.width,
+        overlay.height,
+        settings.showAlignment,
+        this.overlayDragRect,
+        this.overlayGuides,
+      );
     }
-  }
-
-  private projectYPoint(point: number, height: number, scale: number, usePdfCoordinates: boolean) {
-    const pdfHeight = height / scale;
-    const clamped = Math.max(0, Math.min(point, pdfHeight));
-    if (usePdfCoordinates) {
-      return height - clamped * scale;
-    }
-    return clamped * scale;
-  }
-
-  private drawGrid(
-    ctx: CanvasRenderingContext2D,
-    settings: GuideSettings,
-    width: number,
-    height: number,
-    scale: number,
-  ) {
-    if (!settings.showGrid) {
-      return;
-    }
-
-    const spacingPx = Math.max(settings.gridSize, 0.1) * scale;
-    if (spacingPx < 4) {
-      return;
-    }
-
-    ctx.save();
-    ctx.strokeStyle = 'rgba(94, 234, 212, 0.09)';
-    ctx.lineWidth = 1;
-
-    for (let x = spacingPx; x < width; x += spacingPx) {
-      ctx.beginPath();
-      ctx.moveTo(Math.round(x) + 0.5, 0);
-      ctx.lineTo(Math.round(x) + 0.5, height);
-      ctx.stroke();
-    }
-
-    for (let y = spacingPx; y < height; y += spacingPx) {
-      ctx.beginPath();
-      ctx.moveTo(0, Math.round(y) + 0.5);
-      ctx.lineTo(width, Math.round(y) + 0.5);
-      ctx.stroke();
-    }
-
-    ctx.restore();
-  }
-
-  private drawRulers(
-    ctx: CanvasRenderingContext2D,
-    settings: GuideSettings,
-    width: number,
-    height: number,
-    scale: number,
-  ) {
-    if (!settings.showRulers) {
-      return;
-    }
-
-    const rulerSize = 22;
-    const majorStep = Math.max(50 * scale, 40);
-    const minorStep = Math.max(10 * scale, 8);
-    const usePdfCoordinates = settings.usePdfCoordinates;
-    const pdfHeight = height / scale;
-    const formatValue = (value: number) => (Math.round(value * 10) / 10).toString();
-
-    ctx.save();
-
-    ctx.fillStyle = 'rgba(10, 10, 18, 0.55)';
-    ctx.fillRect(0, 0, width, rulerSize);
-    ctx.fillRect(0, 0, rulerSize, height);
-
-    ctx.strokeStyle = 'rgba(94, 234, 212, 0.35)';
-    ctx.lineWidth = 1;
-
-    for (let x = 0; x <= width; x += minorStep) {
-      const isMajor = Math.abs(x % majorStep) < 1e-6;
-      const tickHeight = isMajor ? rulerSize : rulerSize * 0.6;
-      ctx.beginPath();
-      ctx.moveTo(Math.round(x) + 0.5, 0);
-      ctx.lineTo(Math.round(x) + 0.5, tickHeight);
-      ctx.stroke();
-    }
-
-    for (let y = 0; y <= height; y += minorStep) {
-      const isMajor = Math.abs(y % majorStep) < 1e-6;
-      const tickWidth = isMajor ? rulerSize : rulerSize * 0.6;
-      ctx.beginPath();
-      ctx.moveTo(0, Math.round(y) + 0.5);
-      ctx.lineTo(tickWidth, Math.round(y) + 0.5);
-      ctx.stroke();
-    }
-
-    ctx.fillStyle = 'rgba(245, 245, 245, 0.7)';
-    ctx.font = '10px "Segoe UI", sans-serif';
-    ctx.textBaseline = 'top';
-
-    for (let x = majorStep; x < width; x += majorStep) {
-      const value = x / scale;
-      ctx.fillText(formatValue(value), x + 4, 4);
-    }
-
-    ctx.save();
-    ctx.rotate(-Math.PI / 2);
-    for (let y = majorStep; y < height; y += majorStep) {
-      const rawUnits = usePdfCoordinates ? (height - y) / scale : y / scale;
-      ctx.fillText(formatValue(rawUnits), -y - 24, 4);
-    }
-    ctx.fillText(formatValue(usePdfCoordinates ? pdfHeight : 0), -24, 4);
-    ctx.fillText(formatValue(usePdfCoordinates ? 0 : pdfHeight), -height - 24, 4);
-    ctx.restore();
-
-    ctx.restore();
-  }
-
-  private drawStaticGuides(
-    ctx: CanvasRenderingContext2D,
-    settings: GuideSettings,
-    width: number,
-    height: number,
-    scale: number,
-  ) {
-    ctx.save();
-    ctx.lineWidth = 1;
-    ctx.setLineDash([6, 6]);
-    ctx.strokeStyle = 'rgba(94, 234, 212, 0.25)';
-
-    if (settings.snapToMargins) {
-      const marginPx = Math.max(settings.marginSize, 0) * scale;
-      if (marginPx > 0 && marginPx < width) {
-        ctx.beginPath();
-        ctx.moveTo(Math.round(marginPx) + 0.5, 0);
-        ctx.lineTo(Math.round(marginPx) + 0.5, height);
-        ctx.moveTo(Math.round(width - marginPx) + 0.5, 0);
-        ctx.lineTo(Math.round(width - marginPx) + 0.5, height);
-        ctx.stroke();
-      }
-
-      if (marginPx > 0 && marginPx < height) {
-        ctx.beginPath();
-        ctx.moveTo(0, Math.round(marginPx) + 0.5);
-        ctx.lineTo(width, Math.round(marginPx) + 0.5);
-        ctx.moveTo(0, Math.round(height - marginPx) + 0.5);
-        ctx.lineTo(width, Math.round(height - marginPx) + 0.5);
-        ctx.stroke();
-      }
-    }
-
-    if (settings.snapToCenters) {
-      const centerX = width / 2;
-      const centerY = height / 2;
-      ctx.beginPath();
-      ctx.moveTo(Math.round(centerX) + 0.5, 0);
-      ctx.lineTo(Math.round(centerX) + 0.5, height);
-      ctx.moveTo(0, Math.round(centerY) + 0.5);
-      ctx.lineTo(width, Math.round(centerY) + 0.5);
-      ctx.stroke();
-    }
-
-    if (settings.snapToCustom) {
-      settings.snapPointsX.forEach((point) => {
-        const linePx = point * scale;
-        if (linePx >= 0 && linePx <= width) {
-          ctx.beginPath();
-          ctx.moveTo(Math.round(linePx) + 0.5, 0);
-          ctx.lineTo(Math.round(linePx) + 0.5, height);
-          ctx.stroke();
-        }
-      });
-
-      settings.snapPointsY.forEach((point) => {
-        const linePx = this.projectYPoint(point, height, scale, settings.usePdfCoordinates);
-        if (linePx >= 0 && linePx <= height) {
-          ctx.beginPath();
-          ctx.moveTo(0, Math.round(linePx) + 0.5);
-          ctx.lineTo(width, Math.round(linePx) + 0.5);
-          ctx.stroke();
-        }
-      });
-    }
-
-    ctx.restore();
-  }
-
-  private drawActiveGuides(
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    height: number,
-    showAlignment: boolean,
-  ) {
-    const rect = this.overlayDragRect;
-    if (!rect) {
-      return;
-    }
-
-    const guides = this.overlayGuides;
-
-    ctx.save();
-    ctx.lineWidth = 1;
-
-    guides.forEach((guide) => {
-      if (!showAlignment && !guide.highlighted) {
-        return;
-      }
-      const color = guide.highlighted ? 'rgba(94, 234, 212, 0.85)' : 'rgba(94, 234, 212, 0.35)';
-      ctx.strokeStyle = color;
-      ctx.setLineDash(guide.highlighted ? [4, 4] : [8, 6]);
-      if (guide.orientation === 'vertical') {
-        const x = Math.min(Math.max(guide.position, 0), width);
-        ctx.beginPath();
-        ctx.moveTo(Math.round(x) + 0.5, 0);
-        ctx.lineTo(Math.round(x) + 0.5, height);
-        ctx.stroke();
-      } else {
-        const y = Math.min(Math.max(guide.position, 0), height);
-        ctx.beginPath();
-        ctx.moveTo(0, Math.round(y) + 0.5);
-        ctx.lineTo(width, Math.round(y) + 0.5);
-        ctx.stroke();
-      }
-    });
-
-    ctx.restore();
-
-    ctx.save();
-    ctx.strokeStyle = 'rgba(94, 234, 212, 0.75)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([6, 4]);
-    ctx.strokeRect(
-      Math.round(rect.left) + 0.5,
-      Math.round(rect.top) + 0.5,
-      rect.width,
-      rect.height,
-    );
-    ctx.restore();
   }
 
   private applySnapping(
     baseLeft: number,
     baseTop: number,
-    bounds: { minLeft: number; maxLeft: number; minTop: number; maxTop: number },
+    bounds: SnapBounds,
     el: HTMLDivElement,
     pdfCanvas: HTMLCanvasElement,
     fontSizePx: number,
@@ -1488,140 +1216,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return { left: baseLeft, top: baseTop, guides: [] };
     }
 
-    const settings = this.guideSettings();
-    const tolerance = Math.max(settings.snapTolerance, 0);
-    const scale = this.scale();
-    const width = pdfCanvas.width;
-    const height = pdfCanvas.height;
-    const elementWidth = el.offsetWidth;
-    const elementHeight = el.offsetHeight;
-    const usePdfCoordinates = settings.usePdfCoordinates;
-    const baselineOffset = Number.isFinite(fontSizePx) ? fontSizePx : 0;
-    const pdfBaselineOffset = usePdfCoordinates ? baselineOffset : 0;
-
-    type Candidate = { candidate: number; line: number; delta: number };
-
-    const verticalCandidates: Candidate[] = [];
-    const horizontalCandidates: Candidate[] = [];
-
-    const pushVertical = (candidate: number, line: number) => {
-      if (!Number.isFinite(candidate) || !Number.isFinite(line)) {
-        return;
-      }
-      const clampedCandidate = Math.min(Math.max(candidate, bounds.minLeft), bounds.maxLeft);
-      const clampedLine = Math.min(Math.max(line, 0), width);
-      verticalCandidates.push({
-        candidate: clampedCandidate,
-        line: clampedLine,
-        delta: Math.abs(clampedCandidate - baseLeft),
-      });
-    };
-
-    const pushHorizontal = (candidate: number, line: number) => {
-      if (!Number.isFinite(candidate) || !Number.isFinite(line)) {
-        return;
-      }
-      const clampedCandidate = Math.min(Math.max(candidate, bounds.minTop), bounds.maxTop);
-      const clampedLine = Math.min(Math.max(line, 0), height);
-      horizontalCandidates.push({
-        candidate: clampedCandidate,
-        line: clampedLine,
-        delta: Math.abs(clampedCandidate - baseTop),
-      });
-    };
-
-    if (settings.snapToMargins) {
-      const marginPx = Math.max(settings.marginSize, 0) * scale;
-      if (marginPx > 0) {
-        pushVertical(marginPx, marginPx);
-        pushVertical(width - marginPx - elementWidth, width - marginPx);
-        pushHorizontal(marginPx, marginPx);
-        pushHorizontal(height - marginPx - elementHeight, height - marginPx);
-      }
-    }
-
-    if (settings.snapToCenters) {
-      const centerX = width / 2;
-      const centerY = height / 2;
-      pushVertical(centerX - elementWidth / 2, centerX);
-      pushHorizontal(centerY - elementHeight / 2, centerY);
-    }
-
-    if (settings.snapToGrid) {
-      const spacingPx = Math.max(settings.gridSize, 0.1) * scale;
-      if (spacingPx >= 2) {
-        const snappedLeft = Math.round(baseLeft / spacingPx) * spacingPx;
-        const snappedTop = Math.round(baseTop / spacingPx) * spacingPx;
-        pushVertical(snappedLeft, snappedLeft);
-        pushHorizontal(snappedTop, snappedTop);
-      }
-    }
-
-    if (settings.snapToCustom) {
-      settings.snapPointsX.forEach((point) => {
-        const linePx = point * scale;
-        pushVertical(linePx, linePx);
-      });
-      settings.snapPointsY.forEach((point) => {
-        const linePx = this.projectYPoint(point, height, scale, usePdfCoordinates);
-        const candidateTop = linePx - pdfBaselineOffset;
-        pushHorizontal(candidateTop, linePx);
-      });
-    }
-
-    let snappedLeft = Math.min(Math.max(baseLeft, bounds.minLeft), bounds.maxLeft);
-    let snappedTop = Math.min(Math.max(baseTop, bounds.minTop), bounds.maxTop);
-
-    const bestVertical = verticalCandidates
-      .filter((cand) => cand.delta <= tolerance)
-      .sort((a, b) => a.delta - b.delta)[0];
-    if (bestVertical) {
-      snappedLeft = bestVertical.candidate;
-    }
-
-    const bestHorizontal = horizontalCandidates
-      .filter((cand) => cand.delta <= tolerance)
-      .sort((a, b) => a.delta - b.delta)[0];
-    if (bestHorizontal) {
-      snappedTop = bestHorizontal.candidate;
-    }
-
-    const guideMap = new Map<string, OverlayGuide>();
-    const includeGuide = (
-      orientation: 'vertical' | 'horizontal',
-      cand: Candidate,
-      highlighted: boolean,
-    ) => {
-      const key = `${orientation}-${cand.line.toFixed(2)}`;
-      const existing = guideMap.get(key);
-      if (existing && existing.highlighted) {
-        return;
-      }
-      if (!highlighted && !settings.showAlignment) {
-        return;
-      }
-      if (!highlighted && cand.delta > tolerance * 1.5) {
-        return;
-      }
-      guideMap.set(key, {
-        orientation,
-        position: cand.line,
-        highlighted,
-      });
-    };
-
-    verticalCandidates.forEach((cand) => {
-      const highlighted = !!bestVertical && Math.abs(cand.candidate - bestVertical.candidate) < 0.5;
-      includeGuide('vertical', cand, highlighted);
+    return computeSnapping({
+      baseLeft,
+      baseTop,
+      bounds,
+      settings: this.guideSettings(),
+      scale: this.scale(),
+      width: pdfCanvas.width,
+      height: pdfCanvas.height,
+      elementWidth: el.offsetWidth,
+      elementHeight: el.offsetHeight,
+      fontSizePx,
     });
-
-    horizontalCandidates.forEach((cand) => {
-      const highlighted =
-        !!bestHorizontal && Math.abs(cand.candidate - bestHorizontal.candidate) < 0.5;
-      includeGuide('horizontal', cand, highlighted);
-    });
-
-    return { left: snappedLeft, top: snappedTop, guides: Array.from(guideMap.values()) };
   }
 
   ngAfterViewChecked() {
@@ -2213,7 +1819,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   confirmPreview() {
     const p = this.preview();
-    if (!p || !this.fieldHasRenderableContent(p.field)) {
+    if (!p || !fieldHasRenderableContent(p.field)) {
       this.preview.set(null);
       this.closeFontDropdown('preview');
       return;
@@ -2264,7 +1870,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
-    if (!this.fieldHasRenderableContent(e.field)) {
+    if (!fieldHasRenderableContent(e.field)) {
       this.editing.set(null);
       this.closeFontDropdown('edit');
       return;
@@ -2326,7 +1932,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Ctrl/⌘+A, C, V and D work on the annotation selection (never while typing in a field). */
   private handleSelectionShortcut(event: KeyboardEvent, key: string) {
-    if (!this.pdfDoc || this.isEditableElement(event.target) || this.preview() || this.editing()) {
+    if (!this.pdfDoc || isEditableElement(event.target) || this.preview() || this.editing()) {
       return;
     }
 
@@ -2606,75 +2212,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.pasteAnnotation(pageNum);
   }
 
-  private fieldHasRenderableContent(field: PageField): boolean {
-    const valueText = typeof field.value === 'string' ? field.value.trim() : '';
-    if (valueText) {
-      return true;
-    }
-
-    const type = normalizeFieldType(field.type);
-    if (type === 'check' || type === 'radio') {
-      return true;
-    }
-
-    return field.mapField.trim().length > 0;
-  }
-
   private fieldRequiresStorageUpdate(original: PageField, sanitized: PageField): boolean {
     return !this.areFieldsEqual(original, sanitized);
   }
 
   private prepareFieldForStorage(field: PageField): PageField {
-    const styled = this.ensureFieldStyle(field);
-    const type = normalizeFieldType(styled.type);
-    const base: PageField = {
-      x: styled.x,
-      y: styled.y,
-      mapField: typeof styled.mapField === 'string' ? styled.mapField : '',
-      fontSize: styled.fontSize,
-      color: normalizeColor(styled.color),
-      type,
-      fontFamily: styled.fontFamily ?? DEFAULT_FONT_ID,
-      opacity: styled.opacity ?? DEFAULT_OPACITY,
-      backgroundColor: styled.backgroundColor ?? null,
-      locked: !!styled.locked,
-      hidden: !!styled.hidden,
-    };
-
-    const value = sanitizeTextPreservingSpacing(styled.value);
-    if (value !== undefined) {
-      base.value = value;
-    }
-
-    if (type === 'number') {
-      const decimals = normalizeFieldDecimals(styled.decimals);
-      if (decimals !== undefined) {
-        base.decimals = decimals;
-      }
-      const appender = sanitizeOptionalAppender(styled.appender);
-      if (appender !== undefined) {
-        base.appender = appender;
-      }
-    }
-
-    return base;
+    return prepareFieldForStorage(field, (f) => this.fontCatalog.normalizeFontFamily(f));
   }
 
   private prepareFieldForForm(field: PageField): PageField {
-    const styled = this.ensureFieldStyle(field);
-    const decimals =
-      typeof styled.decimals === 'number' && Number.isFinite(styled.decimals)
-        ? Math.max(0, Math.round(styled.decimals))
-        : null;
-
-    return {
-      ...styled,
-      value: typeof styled.value === 'string' ? styled.value : '',
-      appender: typeof styled.appender === 'string' ? styled.appender : '',
-      decimals,
-      locked: !!styled.locked,
-      hidden: !!styled.hidden,
-    };
+    return prepareFieldForForm(field, (f) => this.fontCatalog.normalizeFontFamily(f));
   }
 
   private updateWorkingField(mode: EditorMode, mutator: (field: PageField) => PageField) {
@@ -2701,61 +2248,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     });
   }
 
-  private normalizeOpacityValue(value: unknown): number | undefined {
-    const numeric = toFiniteNumber(value);
-    if (numeric === null) {
-      return undefined;
-    }
-    const clamped = Math.min(Math.max(numeric, 0), 1);
-    return Math.round(clamped * 100) / 100;
-  }
-
-  private normalizeBackgroundColor(value: unknown): string | undefined {
-    if (typeof value !== 'string') {
-      return undefined;
-    }
-    const trimmed = value.trim();
-    if (!trimmed || trimmed.toLowerCase() === 'transparent') {
-      return undefined;
-    }
-    return normalizeColor(trimmed);
-  }
-
   private ensureFieldStyle(field: PageField): PageField {
-    const fontFamily = this.fontCatalog.normalizeFontFamily(field.fontFamily);
-    const opacity = this.normalizeOpacityValue(field.opacity) ?? DEFAULT_OPACITY;
-    const background = this.normalizeBackgroundColor(field.backgroundColor) ?? null;
-    const locked = !!field.locked;
-    const hidden = !!field.hidden;
-    const legacyField = field as PageField & {
-      fontWeight?: unknown;
-      textAlign?: unknown;
-    };
-    const hasLegacyWeight = Object.prototype.hasOwnProperty.call(legacyField, 'fontWeight');
-    const hasLegacyAlign = Object.prototype.hasOwnProperty.call(legacyField, 'textAlign');
-
-    if (
-      field.fontFamily === fontFamily &&
-      (field.opacity ?? DEFAULT_OPACITY) === opacity &&
-      (field.backgroundColor ?? null) === background &&
-      (field.locked ?? false) === locked &&
-      (field.hidden ?? false) === hidden &&
-      !hasLegacyWeight &&
-      !hasLegacyAlign
-    ) {
-      return field;
-    }
-
-    const { fontWeight: _legacyWeight, textAlign: _legacyAlign, ...rest } = legacyField;
-
-    return {
-      ...rest,
-      fontFamily,
-      opacity,
-      backgroundColor: background,
-      locked,
-      hidden,
-    };
+    return ensureFieldStyle(field, (f) => this.fontCatalog.normalizeFontFamily(f));
   }
 
   private async registerCustomFont(file: File) {
@@ -2867,13 +2361,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.closeFontDropdown('edit');
   }
 
-  private createRuntimeId(prefix: string): string {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-      return `${prefix}-${crypto.randomUUID()}`;
-    }
-    return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  }
-
   private computeHorizontalBounds(
     width: number,
     canvasWidth: number,
@@ -2926,11 +2413,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
-    component.focusPath(this.buildJsonTreePath(pageIndex, fieldIndex), { smooth: true });
-  }
-
-  private buildJsonTreePath(pageIndex: number, fieldIndex: number): string {
-    return `root/pages/${pageIndex}/fields/${fieldIndex}`;
+    component.focusPath(buildJsonTreePath(pageIndex, fieldIndex), { smooth: true });
   }
 
   private focusJsonTextRange(pageIndex: number, fieldIndex: number) {
@@ -3011,17 +2494,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private buildPageJsonBlock(page: PageAnnotations): string {
-    return JSON.stringify(this.serializePageForJson(page), null, 2)
-      .split('\n')
-      .map((line) => `    ${line}`)
-      .join('\n');
+    return indentJsonBlock(this.serializePageForJson(page), '    ');
   }
 
   private buildFieldJsonBlock(field: PageField): string {
-    return JSON.stringify(this.serializeFieldForJson(field), null, 2)
-      .split('\n')
-      .map((line) => `        ${line}`)
-      .join('\n');
+    return indentJsonBlock(this.serializeFieldForJson(field), '        ');
   }
 
   private highlightTextareaRange(
@@ -3050,9 +2527,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       // Ignore selection errors in unsupported environments.
     }
 
-    const lineHeight = this.getTextareaLineHeight(textarea);
+    const lineHeight = getTextareaLineHeight(textarea, this.document);
     const precedingText = textarea.value.slice(0, start);
-    const lineIndex = this.countLineBreaks(precedingText);
+    const lineIndex = countLineBreaks(precedingText);
     const desiredTop = Math.max(lineIndex - 2, 0) * lineHeight;
     const maxScrollTop = Math.max(textarea.scrollHeight - textarea.clientHeight, 0);
     const top = Math.min(desiredTop, maxScrollTop);
@@ -3072,78 +2549,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         }
       });
     }
-  }
-
-  private getTextareaLineHeight(textarea: HTMLTextAreaElement): number {
-    if (typeof window === 'undefined' || typeof getComputedStyle !== 'function') {
-      return 20;
-    }
-
-    const computed = getComputedStyle(textarea);
-    const rawLineHeight = parseFloat(computed.lineHeight);
-    if (Number.isFinite(rawLineHeight) && rawLineHeight > 0) {
-      return rawLineHeight;
-    }
-
-    const measured = this.measureLineHeightFromElement(computed);
-    if (measured !== null) {
-      return measured;
-    }
-
-    const fontSize = parseFloat(computed.fontSize);
-    if (Number.isFinite(fontSize) && fontSize > 0) {
-      return fontSize * 1.4;
-    }
-
-    return 20;
-  }
-
-  private measureLineHeightFromElement(computed: CSSStyleDeclaration): number | null {
-    const doc = this.document as Document | null;
-    if (!doc) {
-      return null;
-    }
-
-    const body = doc.body ?? null;
-    if (!body) {
-      return null;
-    }
-
-    const probe = doc.createElement('span');
-    probe.textContent = 'M';
-    probe.style.position = 'absolute';
-    probe.style.visibility = 'hidden';
-    probe.style.whiteSpace = 'pre';
-    probe.style.fontFamily = computed.fontFamily;
-    probe.style.fontSize = computed.fontSize;
-    probe.style.fontWeight = computed.fontWeight;
-    probe.style.fontStyle = computed.fontStyle;
-    probe.style.letterSpacing = computed.letterSpacing;
-    probe.style.padding = '0';
-    probe.style.margin = '0';
-    probe.style.border = '0';
-    probe.style.lineHeight = computed.lineHeight;
-
-    body.appendChild(probe);
-    const height = probe.getBoundingClientRect().height;
-    body.removeChild(probe);
-
-    return Number.isFinite(height) && height > 0 ? height : null;
-  }
-
-  private countLineBreaks(value: string): number {
-    if (!value) {
-      return 0;
-    }
-
-    let count = 0;
-    for (let i = 0; i < value.length; i += 1) {
-      if (value.charCodeAt(i) === 10) {
-        count += 1;
-      }
-    }
-
-    return count;
   }
 
   private updateAnnotationLeft(el: HTMLDivElement, field: PageField, scale: number) {
@@ -3307,7 +2712,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           const origin = fieldOrigin(preview);
           if (origin && this.previewSettings.showOrigin()) {
             el.dataset['origin'] = origin;
-            el.dataset['originLabel'] = this.translationService.translate(this.originLabelKeys[origin]);
+            el.dataset['originLabel'] = this.translationService.translate(
+              this.originLabelKeys[origin],
+            );
           }
           el.style.left = `${left}px`;
           el.style.top = `${top - styledField.fontSize * scale}px`;
@@ -3745,7 +3152,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     );
   }
 
-
   // ---- «Copiar y ajustar por textos» -------------------------------------------------------------
 
   /** Texts of one page with their position in PDF points. */
@@ -3907,7 +3313,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-
   /** Adds fields to B (replacing nothing): the first ones go straight in, later ones are one undo step. */
   private insertFields(toAdd: Array<{ page: number; field: PageField }>): void {
     if (toAdd.length === 0) {
@@ -4020,7 +3425,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
                   attempt: progress.attempt ?? cur.attempt,
                   stageLog: [
                     ...cur.stageLog,
-                    { stage: progress.stage, attempt: progress.attempt ?? cur.attempt, at: Date.now() - cur.startedAt },
+                    {
+                      stage: progress.stage,
+                      attempt: progress.attempt ?? cur.attempt,
+                      at: Date.now() - cur.startedAt,
+                    },
                   ],
                 }
               : cur,
@@ -4039,7 +3448,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
               return {
                 ...cur,
                 usage: event.usage ?? cur.usage,
-                stepLog: [...cur.stepLog, ...event.steps.map((step) => ({ attempt: event.attempt, step, at }))].slice(-60),
+                stepLog: [
+                  ...cur.stepLog,
+                  ...event.steps.map((step) => ({ attempt: event.attempt, step, at })),
+                ].slice(-60),
               };
             }
             return cur;
@@ -4112,7 +3524,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     this.ai.set({
       phase: 'ready',
-      provider: saved.provider === 'copilot' || saved.provider === 'fake' || saved.provider === 'adjust' ? saved.provider : 'claude',
+      provider:
+        saved.provider === 'copilot' || saved.provider === 'fake' || saved.provider === 'adjust'
+          ? saved.provider
+          : 'claude',
       saved: { at: saved.at },
       stage: 'resolving',
       startedAt: saved.at,
@@ -4150,7 +3565,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Other PDFs of the batch whose AI proposal is waiting for review. */
   readonly aiPendingOthers = computed(
-    () => this.batch.items().filter((item) => item.aiProposal && item.id !== this.batch.activeId()).length,
+    () =>
+      this.batch.items().filter((item) => item.aiProposal && item.id !== this.batch.activeId())
+        .length,
   );
 
   /** Jumps to the next PDF (after this one, wrapping around) that has a proposal waiting. */
@@ -4320,7 +3737,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const anchors = current.anchors.map((row) =>
         row.key === key ? { ...row, on: !row.on } : row,
       );
-      return { ...current, anchors, fields: recomputeFields(current.fields, anchors, current.mode) };
+      return {
+        ...current,
+        anchors,
+        fields: recomputeFields(current.fields, anchors, current.mode),
+      };
     });
   }
 
@@ -4360,7 +3781,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const count = toAdd.length;
     this.insertFields(toAdd);
     this.cancelAdjust();
-    this.toast.show(this.translationService.translate('toast.batch.adjustApplied', { count, moved }));
+    this.toast.show(
+      this.translationService.translate('toast.batch.adjustApplied', { count, moved }),
+    );
   }
 
   private updateAdjust(update: (current: AdjustSession) => AdjustSession): void {
@@ -4494,7 +3917,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const { dx, dy } = original ? { dx: 0, dy: 0 } : effectiveShift(field);
       const moved = visual === 'proposal' || visual === 'estimated' || visual === 'manual';
       if (moved) {
-        this.drawReferenceField(layer, canvasHeight, field.name, field.x, field.y, field.fontSize, false, false);
+        this.drawReferenceField(
+          layer,
+          canvasHeight,
+          field.name,
+          field.x,
+          field.y,
+          field.fontSize,
+          false,
+          false,
+        );
         const ghost = layer.lastElementChild as HTMLElement | null;
         if (ghost) {
           ghost.classList.add('reference-field--origin');
@@ -4547,7 +3979,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private drawAdjustPins(layer: HTMLElement, canvasHeight: number, side: 'a' | 'b'): void {
     const session = this.adjust();
-    if (!session || session.phase !== 'ready' || (!session.anchorsShown && session.tab !== 'texts')) {
+    if (
+      !session ||
+      session.phase !== 'ready' ||
+      (!session.anchorsShown && session.tab !== 'texts')
+    ) {
       return;
     }
     const scale = this.scale();
@@ -5616,7 +5052,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.render();
     const overflow = container.scrollHeight - container.clientHeight;
     if (overflow > 0) {
-      const adjusted = Math.floor(((base.height * this.scale() - overflow) / base.height) * 100) / 100;
+      const adjusted =
+        Math.floor(((base.height * this.scale() - overflow) / base.height) * 100) / 100;
       this.scale.set(Math.min(4, Math.max(0.25, adjusted)));
       await this.render();
     }
@@ -6017,19 +5454,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private serializeFieldForJson(field: PageField): Record<string, unknown> {
-    const sanitized = this.prepareFieldForStorage(field);
-
-    if (this.includeAdvancedJsonFields()) {
-      return { ...sanitized };
-    }
-
-    return {
-      x: sanitized.x,
-      y: sanitized.y,
-      mapField: sanitized.mapField,
-      fontSize: sanitized.fontSize,
-      type: sanitized.type,
-    };
+    return serializeFieldForJson(
+      this.prepareFieldForStorage(field),
+      this.includeAdvancedJsonFields(),
+    );
   }
 
   private applyCoordsChange(mutator: () => void, options?: { coalesceKey?: string }): boolean {
@@ -6062,51 +5490,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private areFieldsEqual(a: PageField, b: PageField): boolean {
-    const sanitizedA = this.prepareFieldForStorage(a);
-    const sanitizedB = this.prepareFieldForStorage(b);
-
-    return (
-      sanitizedA.x === sanitizedB.x &&
-      sanitizedA.y === sanitizedB.y &&
-      sanitizedA.mapField === sanitizedB.mapField &&
-      sanitizedA.fontSize === sanitizedB.fontSize &&
-      sanitizedA.color === sanitizedB.color &&
-      sanitizedA.type === sanitizedB.type &&
-      (sanitizedA.value ?? undefined) === (sanitizedB.value ?? undefined) &&
-      (sanitizedA.appender ?? undefined) === (sanitizedB.appender ?? undefined) &&
-      (sanitizedA.decimals ?? undefined) === (sanitizedB.decimals ?? undefined) &&
-      (sanitizedA.fontFamily ?? DEFAULT_FONT_ID) === (sanitizedB.fontFamily ?? DEFAULT_FONT_ID) &&
-      (sanitizedA.opacity ?? DEFAULT_OPACITY) === (sanitizedB.opacity ?? DEFAULT_OPACITY) &&
-      (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null) &&
-      (sanitizedA.locked ?? false) === (sanitizedB.locked ?? false) &&
-      (sanitizedA.hidden ?? false) === (sanitizedB.hidden ?? false)
-    );
+    return areFieldsEqual(a, b, (f) => this.fontCatalog.normalizeFontFamily(f));
   }
 
   private refreshJsonPreview() {
-    this.jsonTreePreview = this.buildJsonTreePreview(this.coordsTextModel);
-  }
-
-  private buildJsonTreePreview(text: string): JsonTreePreview {
-    if (!text.trim()) {
-      return { status: 'empty', value: null };
-    }
-
-    try {
-      const parsed = parseLooseJson(text);
-      const pages = extractPagesCollection(parsed);
-      const fieldCount = Array.isArray(pages)
-        ? pages.reduce<number>((total, page) => {
-            const fields = (page as { fields?: unknown } | null)?.fields;
-            return total + (Array.isArray(fields) ? fields.length : 0);
-          }, 0)
-        : 0;
-      return { status: 'ready', value: parsed, hasPages: Array.isArray(pages), fieldCount };
-    } catch (error) {
-      const errorAt =
-        error instanceof LooseJsonError ? { line: error.line, column: error.column } : undefined;
-      return { status: 'error', value: null, errorAt };
-    }
+    this.jsonTreePreview = buildJsonTreePreview(this.coordsTextModel);
   }
 
   /**
@@ -6162,39 +5550,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const key =
       error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
     this.toast.error(this.translationService.translate(key));
-  }
-
-  private isEditableElement(target: EventTarget | null): boolean {
-    const el = target as HTMLElement | null;
-    if (!el) {
-      return false;
-    }
-
-    if (el.isContentEditable) {
-      return true;
-    }
-
-    const tag = el.tagName?.toLowerCase();
-    if (tag === 'textarea' || tag === 'select') {
-      return true;
-    }
-
-    if (tag === 'input') {
-      const input = el as HTMLInputElement;
-      const type = input.type?.toLowerCase();
-      const nonEditableTypes = new Set([
-        'button',
-        'checkbox',
-        'radio',
-        'range',
-        'color',
-        'submit',
-        'reset',
-      ]);
-      return !nonEditableTypes.has(type);
-    }
-
-    return false;
   }
 
   private roundToTwo(value: number): number {
