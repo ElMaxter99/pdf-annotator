@@ -2,6 +2,9 @@
 ### Added
 - **Gestos de lienzo en el visor (mesas P-58 a P-60):** `Ctrl/⌘ + rueda` y el pellizco del trackpad hacen zoom hacia el cursor (25–400 %, con indicador flotante y aviso ámbar en los límites); `Ctrl/⌘ + +`/`−`/`0` acercan, alejan y ponen el 100 %, `⇧1` ajusta a la página; mantener `Espacio` (o el botón central) y arrastrar mueve el lienzo sin crear ni mover anotaciones; el «117 %» del pie abre un menú de zoom (50–200 %, ajustar al ancho o a la página). En el lote el zoom y el desplazamiento de A y B ya van enlazados (comparten visor). En la web solo se captura el gesto sobre el visor (el zoom del navegador sigue fuera) y se avisa una vez. En la app de escritorio se fija el zoom visual de la ventana y el menú «View» de macOS mueve el zoom del PDF en lugar del de la página. Textos en los 7 idiomas.
 
+### Changed
+- **Panel del lote más claro (mesas P-56 y P-57):** resumen en embudo encima de la lista (subidos → con plantilla A → con versión B → listos para trasladar → listos; cada paso filtra la lista y el número de «listos para trasladar» es el mismo que usa el botón «Trasladar con IA»). Los filtros pasan a dos filas: *estado* (Todos / **Pendientes** / Listos; «Por revisar» pasa a llamarse «Pendientes») y *qué tienen* (Sin plantilla, Solo plantilla A, Plantilla A + B, Solo B). Franja «Mostrando N de M · Quitar filtros». La lista dice por qué cada PDF va o no a la IA y el popover de «Trasladar con IA» desglosa los que se quedan fuera (plantilla A sin campos, ya «Listo», sin versión B) con «Ver cuáles».
+
 ## [v1.11.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.11.0) - 2026-11-16
 ### Fixed
 - **Panel del lote en resolución normal:** el botón «Descargar» ya no se corta en la barra superior (la barra pasa a varias líneas por debajo de 1400 px o con el panel de IA abierto) y la tabla ya no se sale de la vista al redimensionar (columna de acciones ajustada al contenido).

@@ -392,7 +392,7 @@
     },
     "state": {
       "ready": "Llest",
-      "review": "Per revisar",
+      "review": "Pendents",
       "noTemplate": "Sense plantilla"
     },
     "editor": {
@@ -587,9 +587,12 @@
     "filter": {
       "label": "Filtrar per estat",
       "all": "Tots {{count}}",
-      "review": "Per revisar {{count}}",
+      "review": "Pendents {{count}}",
       "ready": "A punt {{count}}",
-      "noTemplate": "Sense plantilla {{count}}"
+      "noTemplate": "Sense plantilla {{count}}",
+      "reviewTip": "Pendents: tenen plantilla o versió B i encara no els has marcat «Llest». Els que no tenen res van a «Sense plantilla».",
+      "showing": "Mostrant {{shown}} de {{total}}",
+      "clear": "Treure filtres"
     },
     "view": {
       "label": "Tipus de vista",
@@ -862,7 +865,14 @@
         "requests": "De {{min}} a {{max}} peticions a la IA",
         "requestsCopilot": "Fins a {{max}} peticions (topall {{cap}})",
         "change": "Canvia",
-        "sent": "Què s'envia"
+        "sent": "Què s'envia",
+        "breakdown": {
+          "title": "{{eligible}} de {{withB}} amb versió B s'enviaran. Queden fora:",
+          "noFields": "Plantilla A sense camps",
+          "ready": "Ja marcats «Llest»",
+          "noB": "Sense versió B",
+          "see": "Veure quins"
+        }
       },
       "panel": {
         "title": "Trasllat amb IA",
@@ -912,6 +922,31 @@
       "undo": "Desfés",
       "downloaded": "Descàrrega a punt · {{count}} fitxers JSON",
       "downloadedSkipped": "Descàrrega a punt · {{count}} fitxers JSON · {{skipped}} sense validar no s’han inclòs"
+    },
+    "funnel": {
+      "label": "Resum del lot",
+      "s1": "1 · Pujats",
+      "s1out": "{{count}} sense plantilla ni B",
+      "s2": "2 · Amb plantilla A",
+      "s2out": "{{count}} encara sense versió B",
+      "s3": "3 · Amb versió B",
+      "s3out": "{{count}} amb B però sense camps a A",
+      "s4": "4 · Llestos per traslladar",
+      "s4out": "Què envia «Traslladar amb IA»",
+      "s5": "5 · Llestos",
+      "s5out": "{{count}} pendents"
+    },
+    "kind": {
+      "label": "Què tenen",
+      "onlyA": "Només plantilla A {{count}}",
+      "aPlusB": "Plantilla A + B {{count}}",
+      "onlyB": "Només B {{count}}"
+    },
+    "why": {
+      "eligible": "Va a la IA",
+      "ready": "Ja està llest",
+      "noB": "Falta la versió B",
+      "noFields": "La seva plantilla A no té camps"
     }
   },
   "preview": {

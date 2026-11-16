@@ -105,6 +105,21 @@ test('a filter drops the hidden PDFs from the selection', async ({ page }) => {
   await expect(page.getByTestId('selection-bar')).toContainText('3 seleccionados');
   await page.getByRole('button', { name: /Sin plantilla/ }).click();
   await expect(page.getByTestId('selection-bar')).toContainText('2 seleccionados');
-  await page.getByRole('button', { name: /^Por revisar/ }).click();
+  await page.getByRole('button', { name: /^Pendientes/ }).click();
   await expect(page.getByTestId('selection-bar')).toHaveCount(0);
+});
+
+test('the funnel counts the batch and its steps filter the list', async ({ page }) => {
+  await openPanel(page);
+  const funnel = page.getByTestId('batch-funnel');
+  await expect(page.getByTestId('funnel-all')).toContainText('3');
+  await expect(page.getByTestId('funnel-a')).toContainText('1');
+  await expect(page.getByTestId('funnel-ai')).toContainText('0');
+  await page.getByTestId('funnel-a').click();
+  await expect(page.getByTestId('panel-item')).toHaveCount(1);
+  await expect(page.getByTestId('batch-showing')).toContainText('1 de 3');
+  await page.getByRole('button', { name: 'Quitar filtros' }).click();
+  await expect(page.getByTestId('panel-item')).toHaveCount(3);
+  await expect(funnel).toBeVisible();
+  await expect(page.getByTestId('row-why').first()).toBeVisible();
 });

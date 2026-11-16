@@ -392,7 +392,7 @@
     },
     "state": {
       "ready": "Prêt",
-      "review": "À réviser",
+      "review": "En attente",
       "noTemplate": "Sans modèle"
     },
     "editor": {
@@ -587,9 +587,12 @@
     "filter": {
       "label": "Filtrer par état",
       "all": "Tous {{count}}",
-      "review": "À réviser {{count}}",
+      "review": "En attente {{count}}",
       "ready": "Prêts {{count}}",
-      "noTemplate": "Sans modèle {{count}}"
+      "noTemplate": "Sans modèle {{count}}",
+      "reviewTip": "En attente : ils ont un modèle ou une version B et vous ne les avez pas encore marqués « Prêt ». Ceux qui n'ont rien sont dans « Sans modèle ».",
+      "showing": "{{shown}} affichés sur {{total}}",
+      "clear": "Effacer les filtres"
     },
     "view": {
       "label": "Type de vue",
@@ -862,7 +865,14 @@
         "requests": "De {{min}} à {{max}} requêtes à l'IA",
         "requestsCopilot": "Jusqu'à {{max}} requêtes (plafond {{cap}})",
         "change": "Modifier",
-        "sent": "Ce qui est envoyé"
+        "sent": "Ce qui est envoyé",
+        "breakdown": {
+          "title": "{{eligible}} sur {{withB}} avec version B seront envoyés. Exclus :",
+          "noFields": "Modèle A sans champs",
+          "ready": "Déjà marqués « Prêt »",
+          "noB": "Sans version B",
+          "see": "Voir lesquels"
+        }
       },
       "panel": {
         "title": "Transfert avec l'IA",
@@ -912,6 +922,31 @@
       "undo": "Annuler",
       "downloaded": "Téléchargement prêt · {{count}} fichiers JSON",
       "downloadedSkipped": "Téléchargement prêt · {{count}} fichiers JSON · {{skipped}} non validés exclus"
+    },
+    "funnel": {
+      "label": "Résumé du lot",
+      "s1": "1 · Importés",
+      "s1out": "{{count}} sans modèle ni B",
+      "s2": "2 · Avec modèle A",
+      "s2out": "{{count}} encore sans version B",
+      "s3": "3 · Avec version B",
+      "s3out": "{{count}} avec B mais sans champs dans A",
+      "s4": "4 · Prêts à transférer",
+      "s4out": "Ce qu'envoie « Transférer avec l'IA »",
+      "s5": "5 · Prêts",
+      "s5out": "{{count}} en attente"
+    },
+    "kind": {
+      "label": "Ce qu'ils ont",
+      "onlyA": "Modèle A seul {{count}}",
+      "aPlusB": "Modèle A + B {{count}}",
+      "onlyB": "B seul {{count}}"
+    },
+    "why": {
+      "eligible": "Va à l'IA",
+      "ready": "Déjà prêt",
+      "noB": "Version B manquante",
+      "noFields": "Son modèle A n'a pas de champs"
     }
   },
   "preview": {

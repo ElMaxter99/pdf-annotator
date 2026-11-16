@@ -392,7 +392,7 @@
     },
     "state": {
       "ready": "Pronto",
-      "review": "Da rivedere",
+      "review": "In sospeso",
       "noTemplate": "Senza modello"
     },
     "editor": {
@@ -587,9 +587,12 @@
     "filter": {
       "label": "Filtra per stato",
       "all": "Tutti {{count}}",
-      "review": "Da rivedere {{count}}",
+      "review": "In sospeso {{count}}",
       "ready": "Pronti {{count}}",
-      "noTemplate": "Senza modello {{count}}"
+      "noTemplate": "Senza modello {{count}}",
+      "reviewTip": "In sospeso: hanno un modello o una versione B e non li hai ancora segnati «Pronto». Quelli senza nulla vanno in «Senza modello».",
+      "showing": "{{shown}} di {{total}}",
+      "clear": "Rimuovi filtri"
     },
     "view": {
       "label": "Tipo di vista",
@@ -862,7 +865,14 @@
         "requests": "Da {{min}} a {{max}} richieste all'IA",
         "requestsCopilot": "Fino a {{max}} richieste (limite {{cap}})",
         "change": "Cambia",
-        "sent": "Cosa viene inviato"
+        "sent": "Cosa viene inviato",
+        "breakdown": {
+          "title": "{{eligible}} di {{withB}} con versione B verranno inviati. Esclusi:",
+          "noFields": "Modello A senza campi",
+          "ready": "Già segnati «Pronto»",
+          "noB": "Senza versione B",
+          "see": "Mostra quali"
+        }
       },
       "panel": {
         "title": "Trasferimento con IA",
@@ -912,6 +922,31 @@
       "undo": "Annulla",
       "downloaded": "Download pronto · {{count}} file JSON",
       "downloadedSkipped": "Download pronto · {{count}} file JSON · {{skipped}} non convalidati esclusi"
+    },
+    "funnel": {
+      "label": "Riepilogo del lotto",
+      "s1": "1 · Caricati",
+      "s1out": "{{count}} senza modello né B",
+      "s2": "2 · Con modello A",
+      "s2out": "{{count}} ancora senza versione B",
+      "s3": "3 · Con versione B",
+      "s3out": "{{count}} con B ma senza campi in A",
+      "s4": "4 · Pronti da trasferire",
+      "s4out": "Cosa invia «Trasferisci con IA»",
+      "s5": "5 · Pronti",
+      "s5out": "{{count}} in sospeso"
+    },
+    "kind": {
+      "label": "Cosa hanno",
+      "onlyA": "Solo modello A {{count}}",
+      "aPlusB": "Modello A + B {{count}}",
+      "onlyB": "Solo B {{count}}"
+    },
+    "why": {
+      "eligible": "Va all'IA",
+      "ready": "Già pronto",
+      "noB": "Manca la versione B",
+      "noFields": "Il suo modello A non ha campi"
     }
   },
   "preview": {
