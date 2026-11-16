@@ -6,6 +6,9 @@
 ### Changed
 - **Panel del lote más claro (mesas P-56 y P-57):** resumen en embudo encima de la lista (subidos → con plantilla A → con versión B → listos para trasladar → listos; cada paso filtra la lista y el número de «listos para trasladar» es el mismo que usa el botón «Trasladar con IA»). Los filtros pasan a dos filas: *estado* (Todos / **Pendientes** / Listos; «Por revisar» pasa a llamarse «Pendientes») y *qué tienen* (Sin plantilla, Solo plantilla A, Plantilla A + B, Solo B). Franja «Mostrando N de M · Quitar filtros». La lista dice por qué cada PDF va o no a la IA y el popover de «Trasladar con IA» desglosa los que se quedan fuera (plantilla A sin campos, ya «Listo», sin versión B) con «Ver cuáles».
 
+### Changed
+- **Dependencias de desarrollo:** `@playwright/test` 1.56.1 → 1.65.0 (solo tests e2e).
+
 ## [v1.11.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.11.0) - 2026-11-16
 ### Fixed
 - **Panel del lote en resolución normal:** el botón «Descargar» ya no se corta en la barra superior (la barra pasa a varias líneas por debajo de 1400 px o con el panel de IA abierto) y la tabla ya no se sale de la vista al redimensionar (columna de acciones ajustada al contenido).
