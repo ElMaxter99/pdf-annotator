@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, inject, signal } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { PdfThumbnailService } from '../../services/pdf-thumbnail.service';
 
 /**
@@ -6,6 +6,7 @@ import { PdfThumbnailService } from '../../services/pdf-thumbnail.service';
  * generic page icon when it cannot be drawn. Only renders once it scrolls into view.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-pdf-thumb',
   standalone: true,
   template: `

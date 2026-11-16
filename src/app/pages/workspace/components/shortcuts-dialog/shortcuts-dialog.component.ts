@@ -1,5 +1,5 @@
 import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
-import { Component, ElementRef, EventEmitter, Output, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, ViewChild, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
 interface ShortcutGroup {
@@ -12,6 +12,7 @@ interface ShortcutGroup {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-shortcuts-dialog',
   standalone: true,
   templateUrl: './shortcuts-dialog.component.html',

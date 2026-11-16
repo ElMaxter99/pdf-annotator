@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, effect, signal, untracked } from '@angular/core';
+import { Component, Input, effect, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { guideSeen, markGuideSeen } from '../../../../utils/first-run.utils';
 import type { WorkspacePageComponent } from '../../workspace.page';
@@ -9,6 +9,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
  * campo, una pista única. Se cierra con ✕ o «No volver a mostrar» y no vuelve (localStorage, con try/catch).
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-first-steps',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

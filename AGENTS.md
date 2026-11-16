@@ -14,7 +14,7 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 ## 2. Comandos
 | Comando | Uso |
 | --- | --- |
-| `npm install` | Instala dependencias (Node 22.12) |
+| `npm install` | Instala dependencias (Node 26) |
 | `npm run start:local` | Dev server en `http://localhost:4200` |
 | `npm run start:ia` | Dev server + ayudante de IA local (`tools/ai-helper`, 127.0.0.1:4310); ver `docs/IA-LOCAL.md` |
 | `npm run build` | `i18n:check` + `ng build` (producción, prerender SSR de rutas) |

@@ -6,6 +6,7 @@ import {
   computed,
   inject,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-update.service';
@@ -16,6 +17,7 @@ import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-upda
  * que no se baja de versión (se espera a la siguiente final). Solo existe dentro de Electron.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-update-channel',
   standalone: true,
   imports: [TranslationPipe],

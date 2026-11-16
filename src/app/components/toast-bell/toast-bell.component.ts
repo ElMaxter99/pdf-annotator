@@ -1,9 +1,10 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { ToastService } from '../../services/toast.service';
 
 /** Bell with the informative notices the user closed (or that expired), to show them again. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-toast-bell',
   standalone: true,
   imports: [TranslationPipe],

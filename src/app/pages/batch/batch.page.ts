@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
@@ -73,6 +73,7 @@ async function sha256(blob: Blob): Promise<string | null> {
 
 /** Batch tray: every PDF to migrate, with what is still missing for each. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-batch-page',
   standalone: true,
   imports: [
