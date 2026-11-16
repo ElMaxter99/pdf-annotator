@@ -27,7 +27,7 @@ jobs:
     outputs:
       tag: ${{ steps.rc.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: develop
           fetch-depth: 0
