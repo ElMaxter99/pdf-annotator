@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationService } from '../../../../i18n/translation.service';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { ToastService } from '../../../../services/toast.service';
@@ -22,6 +22,7 @@ interface TimelineItem {
 
 /** «Ver detalles» of «Copiar y adaptar con IA»: what is sent, the steps and the real usage (only what the provider reports). */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-ai-details',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

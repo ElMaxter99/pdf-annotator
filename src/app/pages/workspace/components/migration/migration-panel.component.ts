@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, computed, signal } from '@angular/core';
+import { Component, Input, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { FieldState, FieldStatus } from '../../../../utils/migration.utils';
 import type { WorkspacePageComponent } from '../../workspace.page';
@@ -8,6 +8,7 @@ const ORDER: Record<FieldStatus, number> = { missing: 0, new: 1, moved: 2, renam
 
 /** Fields of B with their state against A, at the top of the «Anotaciones» tab. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-migration-panel',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

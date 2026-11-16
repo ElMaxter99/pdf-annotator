@@ -42,7 +42,7 @@ jobs:
           ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v7
         with:
-          node-version: 22.12.0
+          node-version: 26
       - name: Version coincide con la etiqueta
         run: node scripts/sync-desktop-version.mjs ${{ env.TAG != '' && format('--tag {0}', env.TAG) || '' }}
         # (una etiqueta vX.Y.Z-rc.N estampa su versión en package.json solo en este árbol de trabajo)
@@ -93,7 +93,7 @@ jobs:
           ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v7
         with:
-          node-version: 22.12.0
+          node-version: 26
       - name: Herramientas de Linux (rpm)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y rpm
@@ -121,7 +121,7 @@ jobs:
           ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v7
         with:
-          node-version: 22.12.0
+          node-version: 26
       - name: Notas desde el CHANGELOG
         run: node scripts/release-notes.mjs "$TAG" --out notes.md
       - name: Actualizar el borrador

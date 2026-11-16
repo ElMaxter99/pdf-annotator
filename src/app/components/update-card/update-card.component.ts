@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { DesktopUpdateService } from '../../services/desktop-update.service';
 
@@ -6,6 +6,7 @@ const MB = 1048576;
 
 /** Tarjeta de actualización de la app de escritorio (diseño AC-01). Solo aparece dentro de Electron. */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-update-card',
   standalone: true,
   imports: [TranslationPipe],

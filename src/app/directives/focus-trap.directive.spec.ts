@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FocusTrapDirective } from './focus-trap.directive';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
   imports: [FocusTrapDirective],
   template: `<div appFocusTrap id="d"><button id="a">A</button><button id="b">B</button></div>`,

@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { DesktopUpdateService, isPrereleaseVersion } from '../../services/desktop-update.service';
@@ -8,6 +8,7 @@ import { DesktopUpdateService, isPrereleaseVersion } from '../../services/deskto
  * actualizaciones» desde cualquier pantalla y lleva un punto cuando hay novedad; en la web es solo texto.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-version-chip',
   standalone: true,
   imports: [TranslationPipe],
