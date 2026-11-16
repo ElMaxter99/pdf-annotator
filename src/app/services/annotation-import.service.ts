@@ -9,6 +9,8 @@ import {
   normalizeFieldType,
   sanitizeOptionalAppender,
 } from '../utils/annotation-fields.utils';
+import { JsonShapeError } from '../utils/json-text.utils';
+import { parseLooseJson } from '../utils/loose-json';
 import { toFiniteNumber } from '../utils/number.utils';
 
 /** What looked wrong in imported data. Nothing here changes the imported result. */
@@ -35,6 +37,22 @@ export function hasImportIssues(report: ImportReport): boolean {
 @Injectable({ providedIn: 'root' })
 export class AnnotationImportService {
   private readonly fontCatalog = inject(FontCatalogService);
+
+  /**
+   * Parses annotation JSON text (loose syntax allowed) and normalises it. Throws the parser's error
+   * for invalid syntax and `JsonShapeError` when there is no pages collection.
+   */
+  importFromText(
+    text: string,
+    prepareField: (field: PageField) => PageField,
+  ): { pages: PageAnnotations[]; report: ImportReport } {
+    const report = emptyImportReport();
+    const pages = this.normalizeImportedCoordinates(parseLooseJson(text), prepareField, report);
+    if (pages === null) {
+      throw new JsonShapeError();
+    }
+    return { pages, report };
+  }
 
   /**
    * Returns `null` when the data has no pages collection. Invalid pages/fields are skipped.

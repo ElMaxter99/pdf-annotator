@@ -112,7 +112,6 @@ import {
 import { FontVariantDescriptor } from '../../fonts/font-variant';
 import {
   AnnotationImportService,
-  emptyImportReport,
   ImportReport,
 } from '../../services/annotation-import.service';
 import { ToastService } from '../../services/toast.service';
@@ -165,6 +164,7 @@ import {
   distributeBoxes,
 } from '../../utils/alignment.utils';
 import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
+import { buildJsonExportPayload, jsonExportText } from '../../utils/json-export.utils';
 import {
   ensureHex,
   hexToRgbComponents,
@@ -2529,7 +2529,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private buildPageJsonBlock(page: PageAnnotations): string {
-    return indentJsonBlock(this.serializePageForJson(page), '    ');
+    return indentJsonBlock(
+      buildJsonExportPayload([page], (field) => this.serializeFieldForJson(field)).pages[0],
+      '    ',
+    );
   }
 
   private buildFieldJsonBlock(field: PageField): string {
@@ -4288,7 +4291,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     const pages = this.store.snapshot();
-    const json = JSON.stringify(this.buildJsonExportPayload(pages), null, 2);
+    const json = jsonExportText(
+      buildJsonExportPayload(pages, (field) => this.serializeFieldForJson(field)),
+    );
     if (!force && json === item.bJson) {
       return;
     }
@@ -5547,21 +5552,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     try {
-      const parsed = parseLooseJson(text);
-      const report = emptyImportReport();
-      const normalized = this.annotationImport.normalizeImportedCoordinates(
-        parsed,
-        (field) => this.prepareFieldForStorage(field),
-        report,
+      const { pages, report } = this.annotationImport.importFromText(text, (field) =>
+        this.prepareFieldForStorage(field),
       );
 
-      if (normalized === null) {
-        throw new JsonShapeError();
-      }
-
-      this.replaceCoords(normalized, { preserveTextModel: true });
+      this.replaceCoords(pages, { preserveTextModel: true });
       if (!options.silent) {
-        void this.reportImportIssues(report, normalized);
+        void this.reportImportIssues(report, pages);
       }
       return true;
     } catch (error) {
@@ -5596,19 +5593,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         throw new Error('El archivo JSON supera el tamaño máximo permitido');
       }
       const text = await file.text();
-      const parsed = parseLooseJson(text);
-      const report = emptyImportReport();
-      const normalized = this.annotationImport.normalizeImportedCoordinates(
-        parsed,
-        (field) => this.prepareFieldForStorage(field),
-        report,
+      const { pages, report } = this.annotationImport.importFromText(text, (field) =>
+        this.prepareFieldForStorage(field),
       );
-      if (normalized === null) {
-        throw new JsonShapeError();
-      }
 
-      this.replaceCoords(normalized, { preserveTextModel: false });
-      void this.reportImportIssues(report, normalized);
+      this.replaceCoords(pages, { preserveTextModel: false });
+      void this.reportImportIssues(report, pages);
     } catch (error) {
       console.error('No se pudo importar el JSON de anotaciones.', error);
       this.reportJsonImportError(error);
@@ -5812,30 +5802,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private syncCoordsTextModel() {
-    this.coordsTextModel = JSON.stringify(this.buildJsonExportPayload(this.coords()), null, 2);
+    this.coordsTextModel = jsonExportText(
+      buildJsonExportPayload(this.coords(), (field) => this.serializeFieldForJson(field)),
+    );
     this.refreshJsonPreview();
   }
 
   private snapshotCoords(pages: PageAnnotations[] = this.coords()): PageAnnotations[] {
     return this.store.snapshot(pages);
-  }
-
-  private buildJsonExportPayload(pages: PageAnnotations[]): {
-    pages: Array<{ num: number; fields: Array<Record<string, unknown>> }>;
-  } {
-    return {
-      pages: pages.map((page) => this.serializePageForJson(page)),
-    };
-  }
-
-  private serializePageForJson(page: PageAnnotations): {
-    num: number;
-    fields: Array<Record<string, unknown>>;
-  } {
-    return {
-      num: page.num,
-      fields: page.fields.map((field) => this.serializeFieldForJson(field)),
-    };
   }
 
   private serializeFieldForJson(field: PageField): Record<string, unknown> {
