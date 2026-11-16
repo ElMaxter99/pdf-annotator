@@ -34,7 +34,7 @@ src/app/
 ├─ pages/landing/            Landing (hero, dropzone, footer, selector de idioma)
 ├─ pages/batch/              Lote (`/lote`): pasos (subir PDF y plantillas; el resumen está en el paso 2 y «Abrir el panel» crea el lote) y panel con la tira «Versiones nuevas (B)» siempre visible (B sueltas emparejadas por nombre; las que no cuadran esperan en la tira para asignarlas a mano o descartarlas) en cuadrícula o lista; se llega desde la landing al soltar 2 o más PDFs
 ├─ pages/workspace/
-│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~4.130 líneas): render del PDF, sincronización del JSON, atajos y UI
+│  ├─ workspace.page.ts      ⚠️ "Dios-componente" (~5.600 líneas): render del PDF, sincronización del JSON, atajos y UI
 │  └─ components/            header · migration (barra y panel de estados del lote) · sidebar (4 pestañas: Documento, Anotaciones, Plantillas, Avanzado) · viewer · annotation-editor · footer · page-thumbnails · json-tree · shortcuts-dialog
 ├─ components/               language-selector, theme-toggle, toast-host (avisos globales)
 ├─ services/                 theme, pending-file (traspaso landing→workspace), app-metadata (SEO/OG), pdf-export (estampa anotaciones con pdf-lib), annotation-store (anotaciones + deshacer/rehacer, una instancia por página de workspace), annotation-import (normaliza JSON importado → anotaciones), toast (avisos no bloqueantes), session-store (última sesión en IndexedDB: PDF + anotaciones + página y zoom), batch-store (lote en IndexedDB, base propia `pdf-annotator-batch`; borrador de archivos en memoria)
@@ -42,7 +42,7 @@ src/app/
 ├─ i18n/                     translation.service + pipe `t` + translations/*.json
 ├─ models/                   annotation.model, guide-settings.model, page-thumbnail.model
 ├─ fonts/                    font-catalog.service (fuentes estándar + personalizadas, resolución de nombres del JSON), standard-font-families, font-variant
-├─ utils/                    pdf-file.utils, loose-json (parser seguro), color.utils, number.utils, download.utils, annotation-pages.utils, annotation-fields.utils, alignment.utils, migration.utils (estados A↔B, emparejado por nombre), zip.utils (puros, con tests)
+├─ utils/                    pdf-file.utils, loose-json (parser seguro), color.utils, number.utils, download.utils, annotation-pages.utils, annotation-fields.utils, field-style.utils, json-text.utils, guides.utils (rejillas, reglas y ajuste magnético), alignment.utils, migration.utils (estados A↔B, emparejado por nombre), zip.utils (puros, con tests)
 └─ annotation-templates.service.ts   plantillas + última sesión en localStorage
 desktop/                    App de escritorio (Electron): main, preload, ayudante de IA integrado, actualizador (`update-logic.mjs`) y `electron-builder.yml`; ver `docs/ARCHITECTURE.md` §10b
 src/styles.scss             Estilos globales (header, toolbar, sidebar, viewer, diálogos, temas)
