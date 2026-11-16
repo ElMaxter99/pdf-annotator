@@ -22,5 +22,10 @@ contextBridge.exposeInMainWorld('desktop', {
   cancelUpdate: () => ipcRenderer.invoke('desktop:update:cancel'),
   installUpdate: () => ipcRenderer.invoke('desktop:update:install'),
   installOnQuit: () => ipcRenderer.invoke('desktop:update:install-on-quit'),
+  onZoomCommand: (callback) => {
+    const listener = (_event, command) => callback(command);
+    ipcRenderer.on('desktop:zoom', listener);
+    return () => ipcRenderer.removeListener('desktop:zoom', listener);
+  },
   openReleasePage: () => ipcRenderer.invoke('desktop:update:open-release'),
 });

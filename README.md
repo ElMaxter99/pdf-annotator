@@ -242,6 +242,9 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | `B` | Mostrar u ocultar la barra lateral |
 | `Enter` | Confirmar la anotación en curso |
 | `Esc` | Cancelar la tarjeta activa / cerrar la ayuda |
+| `Ctrl/⌘ + rueda` · pellizco | Zoom del PDF hacia el cursor |
+| `Ctrl/⌘ + +` · `−` · `0` | Acercar · alejar · 100 % (`0` solo = ajustar al ancho, `⇧1` = ajustar a la página) |
+| `Espacio` (mantener) · botón central | Mover el lienzo arrastrando |
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
 | `Ctrl/⌘ + S` | Aplicar el JSON del editor |
 | `Shift + clic` | Añadir o quitar una anotación de la selección |
