@@ -20,6 +20,7 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 5. Más tests: atajos y normalización de coordenadas.
 6. **Subir a Node 26 en todo el proyecto**, como parte de una feature de la siguiente versión (decisión de Maxter): `Dockerfile` (`node:22.12.0-alpine` → `26.x-alpine`, PR #221 de Dependabot como referencia), `node-version` en `ci.yml`, `release.yml`, `desktop-ci.yml` y `desktop-release.yml`, y la mención de Node 22.12 en `AGENTS.md`. Comprobar build, tests, e2e y el empaquetado de escritorio antes de fusionar.
 7. **Migrar a Angular 22 de una sola vez**, también para la siguiente versión (decisión de Maxter): `ng update` de todos los paquetes `@angular/*` a la vez (referencias: PRs #227 y #228 de Dependabot, que no se pueden subir por separado), `zone.js` 0.15 → 0.16 (#240; Angular 20 exige `~0.15`) y `jasmine-core` 5 → 7 con un `karma-jasmine-html-reporter` compatible (#226). Dejar las cuatro PRs abiertas como referencia hasta hacerlo; después, `npm run build`, `npm run test:ci` y `npm run e2e` en verde.
+8. **Navegar las páginas de A en el traslado (objetivo de la 1.14, diseño pendiente de aprobar):** hoy solo se navega por las páginas de B y, con A de 2 páginas y B de 1, la página 2 de A no se ve. Propuesta en las mesas P-74 a P-77 y en `design/propuestas/navegar-paginas-de-a.md`: rango máx(A, B) con panel sin página y chip «Páginas enlazadas / libres» junto al de zoom. No se programa hasta que Maxter apruebe el diseño.
 
 ## Ideas sin priorizar
 Exportación en ZIP de varias plantillas.
