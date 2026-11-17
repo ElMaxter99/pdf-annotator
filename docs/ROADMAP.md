@@ -54,4 +54,6 @@ Brainstorming de Maxter (2026-11-17). **No hay diseño ni código todavía:** ca
 - **Tope por proyecto:** hoy un PDF del lote admite hasta 40 MB (`MAX_BATCH_PDF_BYTES`). Se propone mantenerlo y añadir **200 PDFs y 2 GB por proyecto**, con aviso suave a partir de 1 GB y de 100 PDFs (Maxter ya trabaja con ≈90). Es un tope de la app, ajustable en una constante, no del disco.
 - **Cifrado futuro, sin pedir contraseña siempre:** (a) opcional por proyecto, activado desde sus ajustes («Proteger con contraseña»), nunca obligatorio; (b) la clave se guarda en el almacén seguro del sistema (Keychain, Credential Manager, libsecret) para no teclearla cada vez; (c) solo se pide al abrir el proyecto en un equipo nuevo; (d) al exportar (fase 2) se ofrece cifrar el archivo con contraseña y esa sí se pide en el momento.
 
+**Hecho (renombrar, mesas P-97 a P-99):** «Renombrar…» en el menú ⋯ de la tarjeta (nombre visible y, opcional, carpeta; en sincronizados solo el nombre).
+
 **Pendiente de diseño (fase 1):** pantalla de proyectos, crear/abrir/renombrar/quitar, qué ve un equipo que no tiene el bloqueo, migración de la «última sesión» y del lote actual, y cómo se llega desde la landing sin molestar a quien solo anota un PDF. Mesas en «Propuestas» del lienzo; no se programa hasta que Maxter las apruebe.

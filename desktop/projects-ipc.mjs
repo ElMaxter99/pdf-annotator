@@ -36,6 +36,7 @@ import {
   forgetProject,
   listProjects,
   lockState,
+  moveProjectFolder,
   readItems,
   releaseLock,
   removeItem,
@@ -320,9 +321,30 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow, safeSt
     'projects:rename',
     guarded((input) => {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
-      assertHeld(ref, dir);
-      renameProject(dir, asText(input?.name, 80));
-      return { ok: true };
+      // Abierto en el editor de este equipo o subiendo en segundo plano: no se toca la carpeta.
+      if (held.has(ref)) throw new ProjectError('in-use-local');
+      if (pushing.has(ref)) throw new ProjectError('busy');
+      const lock = acquireLock(dir, host, token);
+      if (!lock.ok) return { locked: lock.holder };
+      let current = dir;
+      let newRef = ref;
+      let folderKept = false;
+      try {
+        const name = asText(input?.name, 80);
+        // Primero la carpeta (si falla, nada ha cambiado) y después el nombre visible.
+        if (input?.folder === true) {
+          // La ruta es la clave de la sincronización: vinculado (aunque esté en pausa), la carpeta no cambia.
+          if (link && readState(dir)) folderKept = true;
+          else {
+            newRef = moveProjectFolder(root, ref, name).ref;
+            current = resolveRef(root, newRef).dir;
+          }
+        }
+        renameProject(current, name);
+      } finally {
+        releaseLock(current, token);
+      }
+      return { ok: true, ref: newRef, folderKept };
     }),
   );
   /** «Quitar de la lista»: deja los PDFs en el disco y solo borra la marca del proyecto. */

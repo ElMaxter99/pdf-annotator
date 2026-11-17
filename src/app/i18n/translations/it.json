@@ -1740,7 +1740,8 @@
       "in-use": "Il progetto è in uso su un altro computer.",
       "disk-full": "Spazio su disco esaurito.",
       "not-synced": "Questo progetto non viene sincronizzato.",
-      "bad-action": "Azione non valida."
+      "bad-action": "Azione non valida.",
+      "in-use-local": "Qualcosa tiene aperta la cartella (Esplora risorse, un antivirus o il client cloud). Chiudilo e riprova. Il progetto non è cambiato."
     },
     "transfer": {
       "import": "Importa progetto",
@@ -2133,6 +2134,29 @@
         "create": "Crea cartella",
         "other": "Sceglierne un’altra"
       }
+    },
+    "rename": {
+      "menu": "Rinomina…",
+      "menuOther": "Rinomina… · in uso su un altro computer",
+      "menuOpen": "Rinomina… · chiudilo prima",
+      "title": "Rinomina progetto",
+      "empty": "Scrivi un nome per il progetto.",
+      "folderCheck": "Rinomina anche la cartella",
+      "folderHint": "La cartella del progetto cambia con il nome.",
+      "folderOff": "Deselezionata perché la cartella «{{folder}}» non si chiama come il progetto. Cambia solo il nome che vedi nell’app.",
+      "folderSynced": "Non disponibile finché il progetto è sincronizzato: il percorso è la chiave della sincronizzazione. Cambia solo il nome che vedi nell’app.",
+      "previewLabel": "Cartella sul disco",
+      "keepParent": "Cambia solo l’ultimo tratto: «{{parent}}» resta com’è.",
+      "folderStays": "La cartella resta uguale.",
+      "warnChars": "I caratteri non validi vengono rimossi dal nome della cartella: diventa «{{folder}}».",
+      "warnReserved": "«{{name}}» è un nome riservato di Windows. La cartella si chiamerà «{{folder}}»; il nome visibile non cambia.",
+      "caseOnly": "Su questo sistema le due grafie sono la stessa cartella; viene rinominata comunque.",
+      "clash": "In «{{parent}}» esiste già una cartella «{{folder}}». Scegli un altro nome o deseleziona la casella per cambiare solo il nome visibile.",
+      "confirm": "Rinomina",
+      "working": "Rinomina in corso…",
+      "done": "Progetto rinominato in «{{name}}».",
+      "doneKept": "Nome cambiato. La cartella resta «{{folder}}» perché il progetto è sincronizzato.",
+      "locked": "{{host}} ha aperto il progetto mentre scrivevi. Non è stato rinominato nulla."
     }
   },
   "templatesExport": {

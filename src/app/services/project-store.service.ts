@@ -126,6 +126,25 @@ export class ProjectStoreService {
     return result.project;
   }
 
+  /** Renombra el nombre visible y, si se pide, la carpeta. `locked` = otro equipo lo tiene abierto. */
+  async rename(
+    ref: string,
+    name: string,
+    folder: boolean,
+  ): Promise<
+    { ref: string; folderKept: boolean } | { locked: ProjectLockInfo } | ProjectErrorCode
+  > {
+    const result = await this.bridge()?.rename({ ref, name, folder });
+    if (!result) {
+      return 'io';
+    }
+    if ('error' in result) {
+      return result.error;
+    }
+    await this.refresh();
+    return 'locked' in result ? { locked: result.locked } : result;
+  }
+
   /** Opens a project: loads its batch and starts mirroring changes to its folder. */
   async open(
     ref: string,

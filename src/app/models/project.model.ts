@@ -297,7 +297,13 @@ export interface ProjectsBridge {
   removeItem(input: { ref: string; id: string }): Promise<{ ok: true } | ProjectFailure>;
   renew(input: { ref: string }): Promise<{ ok: boolean } | ProjectFailure>;
   release(input: { ref: string }): Promise<{ ok: true } | ProjectFailure>;
-  rename(input: { ref: string; name: string }): Promise<{ ok: true } | ProjectFailure>;
+  rename(input: {
+    ref: string;
+    name: string;
+    folder?: boolean;
+  }): Promise<
+    { ok: true; ref: string; folderKept: boolean } | { locked: ProjectLockInfo } | ProjectFailure
+  >;
   forget(input: { ref: string }): Promise<{ ok: true } | ProjectFailure>;
   exportInfo(input: { ref: string }): Promise<ProjectExportInfo | ProjectFailure>;
   exportProject(input: {
