@@ -576,7 +576,8 @@
         "preview": "Riga scelta",
         "summary": "{{matched}} righe su {{total}} con equivalente",
         "cancel": "Annulla",
-        "apply": "Applica"
+        "apply": "Applica",
+        "noticeMapped": "Pagine abbinate con la tabella · A {{a}} pagine · B {{b}} pagine"
       }
     },
     "panel": {

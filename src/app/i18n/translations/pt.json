@@ -576,7 +576,8 @@
         "preview": "Linha escolhida",
         "summary": "{{matched}} de {{total}} linhas com equivalente",
         "cancel": "Cancelar",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "noticeMapped": "Páginas emparelhadas com a tabela · A {{a}} págs · B {{b}} págs"
       }
     },
     "panel": {

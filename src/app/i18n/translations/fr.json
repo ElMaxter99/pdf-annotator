@@ -576,7 +576,8 @@
         "preview": "Ligne choisie",
         "summary": "{{matched}} lignes sur {{total}} ont un équivalent",
         "cancel": "Annuler",
-        "apply": "Appliquer"
+        "apply": "Appliquer",
+        "noticeMapped": "Pages appariées avec le tableau · A {{a}} pages · B {{b}} pages"
       }
     },
     "panel": {

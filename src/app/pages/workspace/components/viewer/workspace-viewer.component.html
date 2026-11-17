@@ -130,7 +130,7 @@
           aria-haspopup="menu" [attr.aria-expanded]="vm.pagesMenuOpen()" [attr.aria-label]="'batch.editor.pageMap.menu' | t"
           [attr.title]="'batch.editor.pageMap.menu' | t" (click)="vm.pagesMenuOpen.set(!vm.pagesMenuOpen())">▾</button>
         @if (vm.pagesMenuOpen()) {
-          <div class="split-menu" role="menu" data-testid="pages-menu-list">
+          <div class="split-menu" role="menu" data-testid="pages-menu-list" (mousedown)="$event.preventDefault()">
             <button type="button" role="menuitemradio" [attr.aria-checked]="vm.pagesLinked()" (click)="vm.setPagesLinked(true)">
               {{ (vm.pagesLinked() ? '✓ ' : '') }}{{ (vm.pageMap() ? 'batch.editor.pageMap.menuMapped' : 'batch.editor.pages.linked') | t }}
             </button>

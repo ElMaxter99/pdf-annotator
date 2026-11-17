@@ -576,7 +576,8 @@
         "preview": "Fila elegida",
         "summary": "{{matched}} de {{total}} filas con equivalente",
         "cancel": "Cancelar",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "noticeMapped": "Páginas emparejadas con la tabla · A {{a}} págs · B {{b}} págs"
       }
     },
     "panel": {

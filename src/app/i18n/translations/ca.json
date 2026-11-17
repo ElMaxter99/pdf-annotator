@@ -576,7 +576,8 @@
         "preview": "Fila triada",
         "summary": "{{matched}} de {{total}} files amb equivalent",
         "cancel": "Cancel·lar",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "noticeMapped": "Pàgines emparellades amb la taula · A {{a}} pàgs · B {{b}} pàgs"
       }
     },
     "panel": {

@@ -1964,6 +1964,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   @HostListener('document:keydown', ['$event'])
   onGlobalKeydown(event: KeyboardEvent) {
+    if (this.pageMapOpen()) {
+      return; // the dialog «Emparejar páginas» owns the keyboard (Esc and Ctrl+Enter are its own)
+    }
     const key = event.key.toLowerCase();
     const hasPrimaryModifier = event.ctrlKey || event.metaKey;
 

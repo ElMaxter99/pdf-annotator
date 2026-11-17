@@ -323,7 +323,8 @@ export class AiBatchService {
         this.patchRow(id, { phase: 'failed', endedAt: Date.now(), error: { code: 'not_eligible', message: '', reset: null } });
         continue;
       }
-      if (this.cascade && (await this.solveWithoutAi(id, item.aPdf, item.bPdf, item.aPages, generation))) {
+      // With a page table the cascade (it pairs pages by number) would compare the wrong pages: the AI goes first.
+    if (this.cascade && !item.pageMap && (await this.solveWithoutAi(id, item.aPdf, item.bPdf, item.aPages, generation))) {
         continue;
       }
       if (generation !== this.generation) {

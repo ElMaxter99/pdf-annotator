@@ -576,7 +576,8 @@
         "preview": "Selected row",
         "summary": "{{matched}} of {{total}} rows have a match",
         "cancel": "Cancel",
-        "apply": "Apply"
+        "apply": "Apply",
+        "noticeMapped": "Pages matched with the table · A {{a}} pages · B {{b}} pages"
       }
     },
     "panel": {

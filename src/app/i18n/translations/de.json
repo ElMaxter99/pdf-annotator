@@ -576,7 +576,8 @@
         "preview": "Gewählte Zeile",
         "summary": "{{matched}} von {{total}} Zeilen mit Entsprechung",
         "cancel": "Abbrechen",
-        "apply": "Anwenden"
+        "apply": "Anwenden",
+        "noticeMapped": "Seiten mit der Tabelle zugeordnet · A {{a}} Seiten · B {{b}} Seiten"
       }
     },
     "panel": {

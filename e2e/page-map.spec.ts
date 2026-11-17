@@ -95,3 +95,24 @@ test('page table: a repeated page warns and cancelling leaves the table alone', 
   await expect(page.getByTestId('page-map-dialog')).toHaveCount(0);
   await expect(page.getByTestId('pages-link')).toContainText('Páginas enlazadas');
 });
+
+test('page table: it survives a reload and the notice says the pages are matched', async ({
+  page,
+}) => {
+  await openWithCover(page);
+  await page.getByTestId('notice-pages-map').click();
+  await page.getByTestId('pm-shift-back').click();
+  await page.getByTestId('pm-apply').click();
+  await expect(page.getByTestId('pages-link')).toContainText('Páginas emparejadas');
+
+  // The notice now says the pages are matched with the table.
+  await expect(page.getByTestId('pages-differ')).toContainText('emparejadas con la tabla');
+
+  await page.reload();
+  await page.getByTestId('mode-split').click();
+  await expect(page.getByTestId('pages-link')).toContainText('Páginas emparejadas');
+  await page.getByTestId('pages-menu').click();
+  await page.getByTestId('pages-menu-map').click();
+  await expect(page.getByTestId('pm-row-1').locator('select')).toHaveValue('');
+  await expect(page.getByTestId('pm-row-2').locator('select')).toHaveValue('1');
+});
