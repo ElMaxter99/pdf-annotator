@@ -3281,7 +3281,8 @@ kbd {
 
 /* Batch strip */
 .migration-bar {
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  min-width: 0;
   min-height: 46px;
   margin-top: 8px;
   padding-top: 8px;
@@ -3294,6 +3295,20 @@ kbd {
 .migration-bar .btn {
   flex: 0 0 auto;
   white-space: nowrap;
+}
+
+/* Left group + tools: if they do not fit in one line, the tools go to a second line on the right */
+.migration-bar__spacer {
+  display: none;
+}
+
+.migration-bar__tools {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-left: auto;
 }
 
 .migration-put__short {
@@ -5503,7 +5518,7 @@ button.version-chip:focus-visible {
 .viewer.viewer--split .split-link {
   position: fixed;
   transform: translateX(-50%);
-  z-index: 20;
+  z-index: 19;
   display: inline-flex;
   align-items: center;
   gap: 8px;

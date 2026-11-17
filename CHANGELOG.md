@@ -1,4 +1,6 @@
 ## Unreleased
+### Fixed
+- **Barra del traslado A/B desbordada (1.13.0-rc.1):** en 1280 px, con «Pendientes de revisar» y «Siguiente con propuesta» (o la IA), la barra no se partía: medía más que la cabecera, sacaba fuera «Poner plantilla A» y «Listo · faltan N» y estiraba el aviso de «Distinto número de páginas». Ahora los controles de la derecha forman un grupo que pasa a una segunda línea cuando no caben. Además el chip «Enlazado» ya no tapa la franja de la IA. Nuevo e2e a 1280 px.
 
 ## [v1.13.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.13.0) - 2026-11-17
 ### Added
