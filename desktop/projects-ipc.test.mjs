@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
@@ -195,4 +195,71 @@ test('importar exige haber revisado un archivo, rechaza lo que no es un proyecto
   assert.equal(existsSync(file) || existsSync(`${file}.part`), false);
   rmSync(docs, { recursive: true, force: true });
   rmSync(out, { recursive: true, force: true });
+});
+
+test('sincronizar con una carpeta enlazada entre dos equipos: vincular, subir, bajar, bloqueo y subida al cerrar', async () => {
+  const tmp = mkdtempSync(path.join(os.tmpdir(), 'pa-sync-'));
+  const cloud = path.join(tmp, 'nube');
+  mkdirSync(cloud);
+  const mk = (name) => {
+    const docs = path.join(tmp, name);
+    mkdirSync(docs);
+    return boot(docs, mkdtempSync(path.join(tmp, `ud-${name}-`)), { open: cloud });
+  };
+  const a = mk('a');
+  const b = mk('b');
+  assert.deepEqual(await a.call('sync:status'), { linked: false });
+  assert.equal((await a.call('sync:link', { accepted: true })).error, 'not-linked');
+  const { project } = await a.call('projects:create', { name: 'Cliente', subpath: 'Álvaro/c1' });
+  await a.call('projects:open', { ref: project.ref });
+  await a.call('projects:save-item', { ref: project.ref, id: 'i1', meta: { name: 'i1.pdf' }, a: pdf(10) });
+  await a.call('projects:release', { ref: project.ref });
+
+  const picked = await a.call('sync:choose');
+  assert.equal(picked.folder, cloud);
+  assert.equal((await a.call('sync:link', { accepted: false })).error, 'not-linked');
+  assert.equal((await a.call('sync:link', { accepted: true })).folder, cloud);
+  const up = await a.call('sync:all', { mode: 'both' });
+  assert.deepEqual([up.synced, up.failed.length, up.conflicts.length], [1, 0, 0]);
+  assert.equal((await a.call('sync:status')).statuses[project.ref].state, 'sync');
+
+  await b.call('sync:choose');
+  await b.call('sync:link', { accepted: true });
+  const seen = await b.call('sync:status');
+  assert.deepEqual(seen.available.map((r) => [r.ref, r.pdfs]), [[project.ref, 1]]);
+  assert.equal((await b.call('sync:all', { mode: 'down' })).synced, 1);
+  assert.equal((await b.call('sync:status')).available.length, 0);
+
+  const bOpen = await b.call('projects:open', { ref: project.ref });
+  assert.equal(bOpen.items.length, 1);
+  const blocked = await a.call('projects:open', { ref: project.ref });
+  assert.equal(blocked.locked.state, 'other');
+  assert.equal(blocked.remote, true);
+
+  await b.call('projects:save-item', { ref: project.ref, id: 'i2', meta: { name: 'i2.pdf' }, a: pdf(20) });
+  await b.call('projects:release', { ref: project.ref });
+  await new Promise((resolve) => {
+    const t = setInterval(() => {
+      if (b.sent.some(([c, p]) => c === 'projects:sync-event' && p.state === 'done')) {
+        clearInterval(t);
+        resolve();
+      }
+    }, 20);
+  });
+  assert.ok(!existsSync(path.join(cloud, project.ref, '.sync', 'lock.json')));
+  assert.equal((await a.call('sync:status')).statuses[project.ref].state, 'pull');
+  const pulled = await a.call('sync:project', { ref: project.ref, action: 'sync' });
+  assert.equal(pulled.action, 'pull');
+  assert.equal((await a.call('projects:open', { ref: project.ref })).items.length, 2);
+
+  assert.equal((await a.call('sync:project', { ref: project.ref, action: 'pause' })).ok, true);
+  assert.equal((await a.call('sync:status')).statuses[project.ref].state, 'paused');
+  assert.equal((await a.call('sync:project', { ref: project.ref, action: 'stop' })).ok, true);
+  assert.equal((await a.call('sync:status')).statuses[project.ref].state, 'none');
+  assert.equal((await a.call('sync:project', { ref: '../fuera', action: 'sync' })).error, 'bad-ref');
+  assert.deepEqual(await a.call('sync:unlink'), { ok: true });
+  assert.deepEqual(await a.call('sync:status'), { linked: false });
+  a.api.releaseAll();
+  b.api.releaseAll();
+  rmSync(tmp, { recursive: true, force: true });
 });

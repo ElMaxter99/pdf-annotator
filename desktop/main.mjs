@@ -200,6 +200,7 @@ function setupIpc() {
   projects = setupProjectsIpc({ handle, app, dialog, shell, getWindow: () => win });
   // El bloqueo de cada proyecto abierto se renueva cada minuto (caduca a los 10 sin señales).
   setInterval(() => projects?.renewAll(), 60 * 1000).unref();
+  setInterval(() => projects?.syncHeld(), 3 * 60 * 1000).unref();
   ipcMain.on('desktop:helper-port', (event) => {
     event.returnValue = HELPER_PORT;
   });

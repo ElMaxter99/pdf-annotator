@@ -47,6 +47,18 @@ contextBridge.exposeInMainWorld('desktop', {
     importInspect: (input) => ipcRenderer.invoke('projects:import-inspect', input),
     importRun: (input) => ipcRenderer.invoke('projects:import-run', input),
     cancel: () => ipcRenderer.invoke('projects:cancel'),
+    syncStatus: () => ipcRenderer.invoke('sync:status'),
+    syncChoose: () => ipcRenderer.invoke('sync:choose'),
+    syncLink: (input) => ipcRenderer.invoke('sync:link', input),
+    syncUnlink: () => ipcRenderer.invoke('sync:unlink'),
+    syncAll: (input) => ipcRenderer.invoke('sync:all', input),
+    syncProject: (input) => ipcRenderer.invoke('sync:project', input),
+    syncReveal: (input) => ipcRenderer.invoke('sync:reveal', input),
+    onSyncEvent: (callback) => {
+      const listener = (_event, payload) => callback(payload);
+      ipcRenderer.on('projects:sync-event', listener);
+      return () => ipcRenderer.removeListener('projects:sync-event', listener);
+    },
     pathForFile: (file) => {
       try {
         return webUtils.getPathForFile(file) || '';

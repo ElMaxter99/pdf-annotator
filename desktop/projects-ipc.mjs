@@ -1,6 +1,6 @@
 // Puente IPC de los proyectos locales: valida todo lo que llega de la web y delega en `projects.mjs`.
 import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -12,6 +12,20 @@ import {
   isArchiveFile,
   replaceImpact,
 } from './project-archive.mjs';
+import {
+  acquireRemoteLock,
+  folderReachable,
+  listRemote,
+  localDirty,
+  projectStatus,
+  readState,
+  releaseRemoteLock,
+  remoteDirOf,
+  renewRemoteLock,
+  syncProject,
+  validateFolder,
+  writeState,
+} from './project-sync.mjs';
 import {
   LIMITS,
   ProjectError,
@@ -50,6 +64,26 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
     return defaultRoot();
   };
   let root = loadRoot();
+  // Carpeta enlazada (fase 3): se guarda solo la ruta; lo que contiene se trata como no confiable.
+  const linkFile = path.join(app.getPath('userData'), 'projects-sync.json');
+  const loadLink = () => {
+    try {
+      const saved = JSON.parse(readFileSync(linkFile, 'utf8')).folder;
+      if (typeof saved === 'string' && path.isAbsolute(saved)) return saved;
+    } catch {
+      /* sin carpeta enlazada */
+    }
+    return null;
+  };
+  let link = loadLink();
+  /** Última carpeta que el usuario eligió y se comprobó: «Vincular» actúa sobre ella, no sobre una ruta de la web. */
+  let chosen = null;
+  /** Subidas en segundo plano (al cerrar un proyecto o cada pocos minutos) que están en curso. */
+  const pushing = new Set();
+  const isSynced = (dir) => {
+    const state = link ? readState(dir) : null;
+    return state && !state.paused ? state : null;
+  };
   const ensureRoot = () => {
     if (!existsSync(root) && root === defaultRoot()) mkdirSync(root, { recursive: true });
   };
@@ -146,17 +180,35 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
   );
   handle(
     'projects:open',
-    guarded((input) => {
+    guarded(async (input) => {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
       const readOnly = input?.readOnly === true;
+      let offline = false;
       if (!readOnly) {
         const lock = acquireLock(dir, host, token, { force: input?.force === true });
         if (!lock.ok) return { locked: lock.holder };
+        if (isSynced(dir)) {
+          if (folderReachable(link)) {
+            const rdir = remoteDirOf(link, ref);
+            const remote = await acquireRemoteLock(rdir, host, token, { force: input?.force === true });
+            if (!remote.ok) {
+              releaseLock(dir, token);
+              return { locked: remote.holder, remote: true };
+            }
+            // Si otro equipo subió una revisión y aquí no hay cambios, se baja antes de editar.
+            try {
+              if (projectStatus(link, ref, dir, token).state === 'pull')
+                await syncProject(link, root, ref, { host, token });
+            } catch {
+              /* se abre con lo que hay; la tarjeta mostrará el estado */
+            }
+          } else offline = true;
+        }
         held.add(ref);
       }
       const project = summarize(root, dir, ref, token);
       if (!project) throw new ProjectError('not-a-project');
-      return { project, readOnly, items: readItems(dir) };
+      return { project, readOnly, offline, items: readItems(dir) };
     }),
   );
   handle(
@@ -184,7 +236,14 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
     guarded((input) => {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
       if (!held.has(ref)) return { ok: false };
-      const ok = renewLock(dir, host, token);
+      let ok = renewLock(dir, host, token);
+      if (ok && isSynced(dir) && folderReachable(link)) {
+        try {
+          ok = renewRemoteLock(remoteDirOf(link, ref), host, token);
+        } catch {
+          /* la carpeta no responde: se sigue con el bloqueo local */
+        }
+      }
       if (!ok) held.delete(ref);
       return { ok };
     }),
@@ -195,6 +254,7 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
       releaseLock(dir, token);
       held.delete(ref);
+      if (isSynced(dir)) void backgroundPush(ref, dir, true);
       return { ok: true };
     }),
   );
@@ -215,6 +275,7 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       if (held.has(ref)) releaseLock(dir, token);
       held.delete(ref);
       forgetProject(dir);
+      rmSync(path.join(dir, '.sync.json'), { force: true });
       return { ok: true };
     }),
   );
@@ -317,16 +378,213 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       return out;
     }),
   );
+
+  // ───────────── Sincronizar con una carpeta enlazada (fase 3) ─────────────
+  const notify = (payload) => {
+    try {
+      getWindow()?.webContents?.send('projects:sync-event', payload);
+    } catch {
+      /* la ventana se cerró */
+    }
+  };
+  const errorOf = (error) =>
+    error instanceof ProjectError
+      ? { error: error.code, ...(error.detail === undefined ? {} : { detail: error.detail }) }
+      : { error: error?.code === 'ENOSPC' ? 'disk-full' : 'io' };
+  /** Sube en segundo plano; si `release` es true suelta después el bloqueo remoto. No bloquea el cierre del proyecto. */
+  const backgroundPush = async (ref, dir, release) => {
+    if (!link || pushing.has(ref)) return;
+    pushing.add(ref);
+    try {
+      if (!folderReachable(link)) throw new ProjectError('folder-missing');
+      if (localDirty(dir, readState(dir)) && !running) {
+        running = { op: 'sync', cancel: false };
+        try {
+          await syncProject(link, root, ref, { host, token, held: !release });
+        } finally {
+          running = null;
+        }
+      }
+      notify({ ref, state: 'done' });
+    } catch (error) {
+      notify({ ref, state: 'error', ...errorOf(error) });
+    } finally {
+      pushing.delete(ref);
+      if (release && link && folderReachable(link)) {
+        try {
+          releaseRemoteLock(remoteDirOf(link, ref), token);
+        } catch {
+          /* se queda para que caduque */
+        }
+      }
+    }
+  };
+
+  const localProjects = () => {
+    try {
+      return listProjects(root, token);
+    } catch {
+      return [];
+    }
+  };
+  handle(
+    'sync:status',
+    guarded(() => {
+      if (!link) return { linked: false };
+      const reachable = folderReachable(link);
+      const projects = localProjects();
+      const statuses = {};
+      for (const project of projects) {
+        const { dir } = resolveRef(root, project.ref);
+        statuses[project.ref] = projectStatus(link, project.ref, dir, token);
+        if (pushing.has(project.ref)) statuses[project.ref] = { ...statuses[project.ref], busy: true };
+      }
+      const local = new Set(projects.map((p) => p.ref));
+      const available = reachable ? listRemote(link).filter((r) => !local.has(r.ref)) : [];
+      return { linked: true, folder: link, reachable, statuses, available };
+    }),
+  );
+  handle(
+    'sync:choose',
+    guarded(async () => {
+      const result = await dialog.showOpenDialog(getWindow() ?? undefined, {
+        properties: ['openDirectory', 'createDirectory'],
+        defaultPath: link ?? app.getPath('home'),
+      });
+      if (result.canceled || !result.filePaths[0]) return { canceled: true };
+      chosen = null;
+      const checked = validateFolder(result.filePaths[0], root);
+      chosen = checked.folder;
+      const projects = localProjects();
+      const remote = listRemote(chosen);
+      const local = new Set(projects.map((p) => p.ref));
+      return {
+        folder: chosen,
+        free: checked.free,
+        local: projects.length,
+        remote: remote.filter((r) => !local.has(r.ref)).length,
+        bytes: projects.reduce((sum, p) => sum + p.bytes, 0),
+      };
+    }),
+  );
+  handle(
+    'sync:link',
+    guarded((input) => {
+      if (input?.accepted !== true || !chosen) throw new ProjectError('not-linked');
+      validateFolder(chosen, root);
+      link = chosen;
+      writeFileSync(linkFile, JSON.stringify({ folder: link }));
+      return { folder: link };
+    }),
+  );
+  handle(
+    'sync:unlink',
+    guarded(() => {
+      link = null;
+      chosen = null;
+      rmSync(linkFile, { force: true });
+      return { ok: true };
+    }),
+  );
+  /** Primera sincronización: sube los proyectos de este equipo y/o baja los de la carpeta. */
+  handle(
+    'sync:all',
+    guarded(async (input) => {
+      if (!link) throw new ProjectError('not-linked');
+      const mode = ['both', 'down', 'manual', 'sync'].includes(input?.mode) ? input.mode : 'manual';
+      if (mode === 'manual') return { synced: 0, failed: [], conflicts: [] };
+      const projects = localProjects();
+      const local = new Set(projects.map((p) => p.ref));
+      const jobs = [];
+      for (const project of projects) {
+        const { dir } = resolveRef(root, project.ref);
+        const synced = !!readState(dir);
+        if ((mode === 'both' && !synced) || (mode === 'sync' && synced && !readState(dir).paused))
+          jobs.push({ ref: project.ref, name: project.name });
+      }
+      if (mode !== 'sync') {
+        for (const remote of listRemote(link)) if (!local.has(remote.ref)) jobs.push({ ref: remote.ref, name: remote.name });
+      }
+      const out = { synced: 0, failed: [], conflicts: [] };
+      await exclusive('sync', async () => {
+        let done = 0;
+        for (const job of jobs) {
+          send({ op: 'sync', done, total: jobs.length, name: job.name });
+          if (running?.cancel) throw new ProjectError('canceled');
+          try {
+            const result = await syncProject(link, root, job.ref, { host, token, held: held.has(job.ref) }, { shouldCancel: () => running?.cancel === true });
+            if (result.conflict) out.conflicts.push(job.ref);
+            else out.synced += 1;
+          } catch (error) {
+            if (error instanceof ProjectError && error.code === 'canceled') throw error;
+            out.failed.push({ ref: job.ref, ...errorOf(error) });
+          }
+          done += 1;
+        }
+        send({ op: 'sync', done, total: jobs.length });
+      });
+      return out;
+    }),
+  );
+  /** `sync` (también para descargar), `pause`, `resume` o `stop` (dejar de sincronizar este proyecto). */
+  handle(
+    'sync:project',
+    guarded(async (input) => {
+      if (!link) throw new ProjectError('not-linked');
+      const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
+      const action = asText(input?.action, 12);
+      if (action === 'stop') {
+        if (held.has(ref) && isSynced(dir)) releaseRemoteLock(remoteDirOf(link, ref), token);
+        rmSync(path.join(dir, '.sync.json'), { force: true });
+        return { ok: true };
+      }
+      if (action === 'pause' || action === 'resume') {
+        const state = readState(dir);
+        if (!state) throw new ProjectError('not-synced');
+        writeState(dir, { ...state, paused: action === 'pause' });
+        return { ok: true };
+      }
+      if (action !== 'sync') throw new ProjectError('bad-action');
+      const resolution = ['mine', 'theirs', 'later'].includes(input?.resolution) ? input.resolution : undefined;
+      const out = await exclusive('sync', () =>
+        syncProject(link, root, ref, { host, token, held: held.has(ref), resolution }, hooksFor('sync')),
+      );
+      return out;
+    }),
+  );
+  handle(
+    'sync:reveal',
+    guarded((input) => {
+      if (!link) throw new ProjectError('not-linked');
+      const rdir = remoteDirOf(link, asText(input?.ref, 300));
+      if (existsSync(rdir)) shell?.showItemInFolder?.(rdir);
+      return { ok: true };
+    }),
+  );
+
   handle('projects:cancel', () => {
     if (running) running.cancel = true;
     return { ok: true };
   });
 
   return {
+    /** Cada pocos minutos: sube los cambios de los proyectos abiertos que se sincronizan. */
+    syncHeld() {
+      for (const ref of held) {
+        try {
+          const { dir } = resolveRef(root, ref);
+          if (isSynced(dir) && localDirty(dir, readState(dir))) void backgroundPush(ref, dir, false);
+        } catch {
+          /* ya no está */
+        }
+      }
+    },
     releaseAll() {
       for (const ref of held) {
         try {
-          releaseLock(resolveRef(root, ref).dir, token);
+          const { dir } = resolveRef(root, ref);
+          if (link && readState(dir) && folderReachable(link)) releaseRemoteLock(remoteDirOf(link, ref), token);
+          releaseLock(dir, token);
         } catch {
           /* ya no está */
         }
