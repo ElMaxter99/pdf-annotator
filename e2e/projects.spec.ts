@@ -40,9 +40,15 @@ async function withDesktopProjects(page: Page) {
     shell: { showItemInFolder: (file: string) => revealed.push(file) },
     getWindow: () => ({
       webContents: {
-        send: (_channel: string, payload: unknown) => {
+        send: (channel: string, payload: unknown) => {
           void page
-            .evaluate((p) => (window as any).__emitProgress?.(p), payload)
+            .evaluate(
+              ([c, p]) =>
+                c === 'projects:sync-event'
+                  ? (window as any).__emitSync?.(p)
+                  : (window as any).__emitProgress?.(p),
+              [channel, payload] as const,
+            )
             .catch(() => undefined);
         },
       },
@@ -92,6 +98,19 @@ async function withDesktopProjects(page: Page) {
         importInspect: (i: unknown) => call('projects:import-inspect', i),
         importRun: (i: unknown) => call('projects:import-run', i),
         cancel: () => call('projects:cancel'),
+        syncStatus: () => call('sync:status'),
+        syncChoose: () => call('sync:choose'),
+        syncLink: (i: unknown) => call('sync:link', i),
+        syncUnlink: () => call('sync:unlink'),
+        syncAll: (i: unknown) => call('sync:all', i),
+        syncProject: (i: unknown) => call('sync:project', i),
+        syncReveal: (i: unknown) => call('sync:reveal', i),
+        onSyncEvent: (cb: (p: unknown) => void) => {
+          w['__emitSync'] = cb;
+          return () => {
+            w['__emitSync'] = undefined;
+          };
+        },
         pathForFile: (file: File) => (window as any).__dropPaths?.[file.name] ?? '',
         onProgress: (cb: (p: unknown) => void) => {
           w['__emitProgress'] = cb;
@@ -300,4 +319,90 @@ test('dropping a file that is not a project explains why, and an empty project c
     '«factura.pdf» no es un archivo de proyecto',
   );
   expect(readdirSync(root).sort()).toEqual(['Vacío']);
+});
+
+test('sync with a linked folder: link, upload, download from another computer, conflict', async ({
+  page,
+}) => {
+  const { root, picks, projects } = await withDesktopProjects(page);
+  const sync = await import('../desktop/project-sync.mjs');
+  const cloud = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-cloud-'));
+  const otherRoot = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-other-'));
+  const other = { host: 'PORTATIL-ALVARO', token: 'otro' };
+  const mine = seedProject(projects, root, 'Cliente 1', 'c1', false);
+  picks.open = cloud;
+
+  await page.goto('/proyectos');
+  await expect(page.getByTestId('project-card')).toHaveCount(1);
+  await expect(page.getByTestId('sync-chip')).toHaveCount(0);
+
+  // Link: the folder is checked, the warning must be accepted, then the plan is asked.
+  await page.getByTestId('sync-link').click();
+  await page.getByTestId('sync-choose').click();
+  await expect(page.getByTestId('sync-checked')).toBeVisible();
+  await expect(page.getByTestId('sync-link-confirm')).toBeDisabled();
+  await page.getByTestId('sync-accept').check();
+  await page.getByTestId('sync-link-confirm').click();
+  await expect(page.getByTestId('plan-both')).toBeChecked();
+  await page.getByTestId('plan-go').click();
+  await expect(page.getByTestId('sync-chip')).toContainText('Sincronizado');
+  expect(existsSync(path.join(cloud, 'c1', '.sync', 'rev.json'))).toBe(true);
+  await expect(page.getByTestId('sync-footer')).toContainText(cloud);
+
+  // Another computer uploads a new project: it shows up as available and can be downloaded.
+  const theirs = seedProject(projects, otherRoot, 'Cliente 2', 'c2', false);
+  await sync.syncProject(cloud, otherRoot, theirs.ref, other);
+  await page.getByTestId('sync-now').click();
+  await expect(page.getByTestId('sync-available-row')).toHaveCount(1);
+  await page.getByTestId('sync-download-available').click();
+  await expect(page.getByTestId('project-card')).toHaveCount(2);
+  await expect(page.getByTestId('sync-available')).toHaveCount(0);
+  expect(existsSync(path.join(root, 'c2', 'batch', 'a1.a.pdf'))).toBe(true);
+
+  // A local change waits to be uploaded; the menu and the card button upload it.
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  projects.writeItem(
+    mine.dir,
+    'a3',
+    { name: 'tres.pdf', status: 'ready' },
+    { a: readFileSync(EXAMPLE_PDF) },
+  );
+  await page.getByTestId('sync-now').click();
+  await expect(page.getByTestId('project-card').first()).toContainText('Sincronizado');
+
+  await expect
+    .poll(() => JSON.parse(readFileSync(path.join(cloud, 'c1', '.sync', 'rev.json'), 'utf8')).rev)
+    .toBe(2);
+
+  // Both computers change the same project: nothing is overwritten until the person decides.
+  const base = path.join(otherRoot, 'c1');
+  await sync.syncProject(cloud, otherRoot, 'c1', other);
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  projects.writeItem(
+    base,
+    'a1',
+    { name: 'uno.pdf', status: 'ready' },
+    { a: readFileSync(EXAMPLE_PDF) },
+  );
+  await sync.syncProject(cloud, otherRoot, 'c1', other);
+  projects.writeItem(
+    mine.dir,
+    'a2',
+    { name: 'dos-local.pdf', status: 'ready' },
+    { a: readFileSync(EXAMPLE_PDF) },
+  );
+  await page.getByTestId('sync-now').click();
+  await expect(page.locator('[data-testid=sync-chip]', { hasText: 'Conflicto' })).toBeVisible();
+  await page.getByTestId('sync-resolve').click();
+  await expect(page.getByTestId('sconf-theirs')).toBeChecked();
+  await page.getByTestId('sconf-continue').click();
+  await expect(page.getByTestId('project-card')).toHaveCount(3);
+  expect(readdirSync(root).some((name) => name.startsWith('c1-conflicto-'))).toBe(true);
+  expect(readFileSync(path.join(mine.dir, 'batch', 'a2.json'), 'utf8')).toContain('"dos.pdf"');
+
+  // Unlink keeps every project.
+  await page.getByTestId('sync-manage').click();
+  await page.getByTestId('sync-unlink').click();
+  await expect(page.getByTestId('sync-footer')).toHaveCount(0);
+  await expect(page.getByTestId('project-card')).toHaveCount(3);
 });

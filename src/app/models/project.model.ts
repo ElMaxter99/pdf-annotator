@@ -53,7 +53,17 @@ export type ProjectErrorCode =
   | 'unsafe'
   | 'newer-format'
   | 'in-use'
-  | 'disk-full';
+  | 'disk-full'
+  | 'folder-missing'
+  | 'folder-readonly'
+  | 'folder-overlaps'
+  | 'remote-incomplete'
+  | 'cloud-pending'
+  | 'ref-taken'
+  | 'in-use-local'
+  | 'not-linked'
+  | 'not-synced'
+  | 'bad-action';
 
 export interface ProjectStoredItem {
   readonly id: string;
@@ -105,9 +115,88 @@ export interface ProjectConflict extends ProjectSummary {
 }
 
 export interface ProjectProgress {
-  readonly op: 'export' | 'inspect' | 'import';
+  readonly op: 'export' | 'inspect' | 'import' | 'sync';
   readonly done: number;
   readonly total: number;
+  /** Solo con `op: 'sync'` en una sincronización de varios proyectos: el que se está haciendo. */
+  readonly name?: string;
+}
+
+/** Estado de sincronización de un proyecto con la carpeta enlazada (fase 3). */
+export type SyncState = 'none' | 'sync' | 'pend' | 'pull' | 'other' | 'conflict' | 'off' | 'paused';
+
+export interface SyncStatus {
+  readonly state: SyncState;
+  readonly rev?: number;
+  readonly lastSync?: number;
+  /** Archivos de la carpeta que no son del proyecto (copias en conflicto del servicio de sincronización). */
+  readonly duplicates?: string[];
+  readonly holder?: ProjectLockInfo;
+  readonly kind?: 'both' | 'ref-taken';
+  readonly remoteRev?: number;
+  readonly by?: string;
+  readonly at?: number;
+  readonly busy?: boolean;
+}
+
+/** Proyecto que está en la carpeta enlazada y todavía no en este equipo. */
+export interface SyncAvailable {
+  readonly ref: string;
+  readonly id: string;
+  readonly name: string;
+  readonly rev: number;
+  readonly by: string;
+  readonly at: number;
+  readonly pdfs: number;
+  readonly bytes: number;
+}
+
+export type SyncInfo =
+  | { readonly linked: false }
+  | {
+      readonly linked: true;
+      readonly folder: string;
+      readonly reachable: boolean;
+      readonly statuses: Record<string, SyncStatus>;
+      readonly available: SyncAvailable[];
+    };
+
+export interface SyncPicked {
+  readonly folder: string;
+  readonly free: number | null;
+  readonly local: number;
+  readonly remote: number;
+  readonly bytes: number;
+}
+
+export interface SyncConflictInfo {
+  readonly kind: 'both' | 'ref-taken';
+  readonly remoteRev: number;
+  readonly by: string;
+  readonly at: number;
+  readonly mine: number;
+  readonly theirs: number;
+  readonly both: number;
+}
+
+export type SyncResolution = 'mine' | 'theirs' | 'later';
+export type SyncPlan = 'both' | 'down' | 'manual' | 'sync';
+
+export type SyncResult =
+  | { action: 'push' | 'pull' | 'none' | 'later'; rev?: number; copy?: string }
+  | { conflict: SyncConflictInfo };
+
+export interface SyncAllResult {
+  readonly synced: number;
+  readonly failed: { ref: string; error: ProjectErrorCode; detail?: unknown }[];
+  readonly conflicts: string[];
+}
+
+export interface SyncEvent {
+  readonly ref: string;
+  readonly state: 'done' | 'error';
+  readonly error?: ProjectErrorCode;
+  readonly detail?: unknown;
 }
 
 export type ImportMode = 'copy' | 'replace';
@@ -126,8 +215,8 @@ export interface ProjectsBridge {
     force?: boolean;
     readOnly?: boolean;
   }): Promise<
-    | { project: ProjectSummary; readOnly: boolean; items: ProjectStoredItem[] }
-    | { locked: ProjectLockInfo }
+    | { project: ProjectSummary; readOnly: boolean; offline?: boolean; items: ProjectStoredItem[] }
+    | { locked: ProjectLockInfo; remote?: boolean }
     | ProjectFailure
   >;
   saveItem(input: {
@@ -172,6 +261,19 @@ export interface ProjectsBridge {
   /** Ruta de un archivo soltado en la ventana (solo escritorio). */
   pathForFile(file: File): string;
   onProgress(callback: (progress: ProjectProgress) => void): () => void;
+  // Carpeta enlazada (fase 3)
+  syncStatus(): Promise<SyncInfo | ProjectFailure>;
+  syncChoose(): Promise<SyncPicked | { canceled: true } | ProjectFailure>;
+  syncLink(input: { accepted: boolean }): Promise<{ folder: string } | ProjectFailure>;
+  syncUnlink(): Promise<{ ok: true } | ProjectFailure>;
+  syncAll(input: { mode: SyncPlan }): Promise<SyncAllResult | { canceled: true } | ProjectFailure>;
+  syncProject(input: {
+    ref: string;
+    action: 'sync' | 'pause' | 'resume' | 'stop';
+    resolution?: SyncResolution;
+  }): Promise<SyncResult | { ok: true } | { canceled: true } | ProjectFailure>;
+  syncReveal(input: { ref: string }): Promise<{ ok: true } | ProjectFailure>;
+  onSyncEvent(callback: (event: SyncEvent) => void): () => void;
 }
 
 export interface ActiveProject {

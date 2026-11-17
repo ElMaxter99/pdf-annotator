@@ -190,7 +190,9 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
         if (isSynced(dir)) {
           if (folderReachable(link)) {
             const rdir = remoteDirOf(link, ref);
-            const remote = await acquireRemoteLock(rdir, host, token, { force: input?.force === true });
+            const remote = await acquireRemoteLock(rdir, host, token, {
+              force: input?.force === true,
+            });
             if (!remote.ok) {
               releaseLock(dir, token);
               return { locked: remote.holder, remote: true };
@@ -437,7 +439,8 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       for (const project of projects) {
         const { dir } = resolveRef(root, project.ref);
         statuses[project.ref] = projectStatus(link, project.ref, dir, token);
-        if (pushing.has(project.ref)) statuses[project.ref] = { ...statuses[project.ref], busy: true };
+        if (pushing.has(project.ref))
+          statuses[project.ref] = { ...statuses[project.ref], busy: true };
       }
       const local = new Set(projects.map((p) => p.ref));
       const available = reachable ? listRemote(link).filter((r) => !local.has(r.ref)) : [];
@@ -503,7 +506,8 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
           jobs.push({ ref: project.ref, name: project.name });
       }
       if (mode !== 'sync') {
-        for (const remote of listRemote(link)) if (!local.has(remote.ref)) jobs.push({ ref: remote.ref, name: remote.name });
+        for (const remote of listRemote(link))
+          if (!local.has(remote.ref)) jobs.push({ ref: remote.ref, name: remote.name });
       }
       const out = { synced: 0, failed: [], conflicts: [] };
       await exclusive('sync', async () => {
@@ -512,7 +516,13 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
           send({ op: 'sync', done, total: jobs.length, name: job.name });
           if (running?.cancel) throw new ProjectError('canceled');
           try {
-            const result = await syncProject(link, root, job.ref, { host, token, held: held.has(job.ref) }, { shouldCancel: () => running?.cancel === true });
+            const result = await syncProject(
+              link,
+              root,
+              job.ref,
+              { host, token, held: held.has(job.ref) },
+              { shouldCancel: () => running?.cancel === true },
+            );
             if (result.conflict) out.conflicts.push(job.ref);
             else out.synced += 1;
           } catch (error) {
@@ -545,9 +555,17 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
         return { ok: true };
       }
       if (action !== 'sync') throw new ProjectError('bad-action');
-      const resolution = ['mine', 'theirs', 'later'].includes(input?.resolution) ? input.resolution : undefined;
+      const resolution = ['mine', 'theirs', 'later'].includes(input?.resolution)
+        ? input.resolution
+        : undefined;
       const out = await exclusive('sync', () =>
-        syncProject(link, root, ref, { host, token, held: held.has(ref), resolution }, hooksFor('sync')),
+        syncProject(
+          link,
+          root,
+          ref,
+          { host, token, held: held.has(ref), resolution },
+          hooksFor('sync'),
+        ),
       );
       return out;
     }),
@@ -573,7 +591,8 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       for (const ref of held) {
         try {
           const { dir } = resolveRef(root, ref);
-          if (isSynced(dir) && localDirty(dir, readState(dir))) void backgroundPush(ref, dir, false);
+          if (isSynced(dir) && localDirty(dir, readState(dir)))
+            void backgroundPush(ref, dir, false);
         } catch {
           /* ya no está */
         }
@@ -583,7 +602,8 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       for (const ref of held) {
         try {
           const { dir } = resolveRef(root, ref);
-          if (link && readState(dir) && folderReachable(link)) releaseRemoteLock(remoteDirOf(link, ref), token);
+          if (link && readState(dir) && folderReachable(link))
+            releaseRemoteLock(remoteDirOf(link, ref), token);
           releaseLock(dir, token);
         } catch {
           /* ya no está */

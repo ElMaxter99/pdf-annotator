@@ -1733,7 +1733,9 @@
       "unsafe": "El fitxer no és segur.",
       "newer-format": "El fitxer és d'una versió més nova de l'app.",
       "in-use": "El projecte està en ús en un altre equip.",
-      "disk-full": "No hi ha espai al disc."
+      "disk-full": "No hi ha espai al disc.",
+      "not-synced": "Aquest projecte no se sincronitza.",
+      "bad-action": "Acció no vàlida."
     },
     "transfer": {
       "import": "Importa projecte",
@@ -1830,6 +1832,146 @@
         "diskFullTitle": "No hi ha espai al disc",
         "diskFullText": "S'ha esborrat el que s'havia escrit a mitges; la teva carpeta de projectes està com abans. Allibera espai i torna-ho a provar.",
         "diskFullExport": "No s'ha deixat cap fitxer a mitges. Allibera espai o tria una altra unitat i torna-ho a provar."
+      }
+    },
+    "sync": {
+      "linkButton": "Sincronitza amb una altra carpeta…",
+      "folder": "Carpeta enllaçada:",
+      "now": "Sincronitza ara",
+      "manage": "Canvia o desvincula",
+      "footOk": "Sincronitzada",
+      "footOff": "No es troba la carpeta",
+      "footPend": "{{count}} projectes amb canvis pendents",
+      "upload": "Puja ara",
+      "pull": "Baixa els canvis",
+      "resolve": "Resol…",
+      "canceled": "Sincronització cancel·lada.",
+      "bgError": "No s’ha pogut pujar «{{name}}»: {{reason}}",
+      "chip": {
+        "sync": "✓ Sincronitzat",
+        "pend": "Pendent de pujar",
+        "pull": "Hi ha canvis nous",
+        "conflict": "Conflicte",
+        "off": "Sense connexió",
+        "paused": "En pausa"
+      },
+      "meta": {
+        "pend": "Canvis sense pujar a la carpeta enllaçada.",
+        "pull": "{{by}} ha pujat la revisió {{rev}}. Pots baixar-la.",
+        "synced": "Sincronitzat · revisió {{rev}} · {{when}}"
+      },
+      "menu": {
+        "now": "Sincronitza ara",
+        "start": "Sincronitza aquest projecte",
+        "pause": "Atura la sincronització",
+        "resume": "Reprèn la sincronització",
+        "stop": "Deixa de sincronitzar aquest projecte…"
+      },
+      "dups": {
+        "link": "Hi ha fitxers duplicats a la carpeta",
+        "title": "Hi ha fitxers duplicats a la carpeta",
+        "text": "El servei que sincronitza la carpeta ha creat còpies en conflicte. L’app no les utilitza ni les esborra:",
+        "reveal": "Mostra a la carpeta",
+        "ok": "Entesos"
+      },
+      "avail": {
+        "title": "Disponibles a la carpeta enllaçada",
+        "sub": "no són en aquest equip",
+        "meta": "{{ref}} · {{pdfs}} PDFs · {{size}} · pujat {{when}} per {{by}}",
+        "download": "Descarrega"
+      },
+      "link": {
+        "title": "Sincronitza amb una carpeta",
+        "intro": "Tria una carpeta que ja sincronitzis (Google Drive, OneDrive, Dropbox…) o una carpeta de xarxa. L’app hi desarà una còpia dels teus projectes perquè els puguis obrir en un altre equip.",
+        "field": "Carpeta",
+        "choose": "Tria la carpeta…",
+        "checked": "Carpeta comprovada: es pot llegir i escriure · {{free}} lliures",
+        "checkedNoFree": "Carpeta comprovada: es pot llegir i escriure",
+        "warnTitle": "Abans de vincular",
+        "warnText": "Els PDFs sortiran d’aquest equip cap a aquesta carpeta i viatjaran pel servei que la sincronitza. L’app no els xifra. Utilitza només carpetes de confiança.",
+        "accept": "Entenc que els PDFs i les seves dades es copiaran a aquesta carpeta",
+        "button": "Vincula"
+      },
+      "plan": {
+        "title": "Què cal pujar a la carpeta enllaçada?",
+        "intro": "Hi ha {{local}} projectes en aquest equip i {{remote}} a la carpeta que no tens aquí.",
+        "both": "Puja els meus projectes i baixa els de la carpeta",
+        "bothHint": "Si algun nom coincideix, es pregunta abans de tocar res. Els teus projectes sumen {{size}}.",
+        "down": "Només baixa els de la carpeta",
+        "downHint": "Els teus projectes es queden en aquest equip fins que en pugis cadascun.",
+        "manual": "Tria projecte per projecte",
+        "manualHint": "Es vincula i no es puja ni baixa res fins que ho demanis des del menú ⋯ de cada targeta."
+      },
+      "progress": {
+        "title": "Sincronitzant «{{name}}»",
+        "titleAll": "Sincronitzant projectes",
+        "files": "Fitxer {{done}} de {{total}}",
+        "projects": "Projecte {{done}} de {{total}}: «{{name}}»",
+        "starting": "Preparant…",
+        "note": "Només es pugen o baixen els fitxers que han canviat. Pots cancel·lar: la revisió anterior queda intacta."
+      },
+      "done": {
+        "up": "«{{name}}» pujat (revisió {{rev}}). Pot tardar uns minuts a veure’s en altres equips.",
+        "down": "«{{name}}» actualitzat a la revisió {{rev}}.",
+        "none": "«{{name}}» ja estava al dia.",
+        "all": "Sincronització acabada: {{count}} projectes.",
+        "allIssues": "Sincronització acabada amb avisos: {{failed}} projectes no s’han pogut sincronitzar i {{conflicts}} demanen decidir.",
+        "copy": "La teva versió s’ha desat com a «{{name}}».",
+        "linked": "Carpeta enllaçada. Els projectes que sincronitzis es pujaran en tancar-los i cada pocs minuts.",
+        "paused": "Sincronització en pausa per a aquest projecte.",
+        "resumed": "Sincronització represa.",
+        "stopped": "«{{name}}» ja no se sincronitza. Continua en aquest equip.",
+        "unlinked": "Carpeta desvinculada. Els teus projectes continuen aquí."
+      },
+      "conflict": {
+        "title": "«{{name}}» ha canviat a la carpeta",
+        "text": "{{by}} ha pujat la revisió {{rev}} i aquí tens canvis sense pujar. L’app no trepitja res sense que ho decideixis.",
+        "takenTitle": "Ja hi ha un altre projecte amb aquesta ruta a la carpeta",
+        "takenText": "«{{name}}» i el de la carpeta tenen el mateix nom però són projectes diferents.",
+        "mine": "Els teus canvis",
+        "theirs": "Canvis de l’altre equip",
+        "both": "En tots dos",
+        "count": "{{count}} PDFs",
+        "optTheirs": "Quedar-me amb la versió de la carpeta i desar la meva com a còpia",
+        "optTheirsHint": "El teu treball es conserva com a projecte apart i s’obre la revisió {{rev}}.",
+        "optMine": "Puja la meva i substitueix la de la carpeta",
+        "optMineHint": "La revisió {{rev}} se substitueix per la teva. Abans es desa a la carpeta una còpia del que se substitueix, per si de cas.",
+        "optLater": "Decidir més tard",
+        "optLaterHint": "El projecte continua com està i sense sincronitzar fins que triïs."
+      },
+      "offline": {
+        "title": "No es troba la carpeta enllaçada",
+        "text": "«{{folder}}» no respon (xarxa caiguda, servei sense obrir o disc desconnectat?). Pots continuar treballant: els canvis quedaran com a «Pendents de pujar» i es pujaran en tornar.",
+        "retry": "Reintenta",
+        "other": "Tria una altra carpeta",
+        "continue": "Continua sense connexió"
+      },
+      "stop": {
+        "title": "Vols deixar de sincronitzar «{{name}}»?",
+        "text": "El projecte es queda en aquest equip tal qual i deixa de pujar-se i baixar-se.",
+        "noteTitle": "Què passa amb la còpia de la carpeta",
+        "noteText": "El que ja has pujat es queda allà i l’app no ho esborra. Si ho vols treure, fes-ho des del teu sistema (Explorador o Finder).",
+        "button": "Deixa de sincronitzar"
+      },
+      "unlink": {
+        "title": "Vols desvincular la carpeta?",
+        "text": "Se suprimeix l’enllaç amb «{{folder}}». Els teus projectes continuen aquí; el que ja has pujat es queda a la carpeta i l’app no ho esborra.",
+        "change": "Tria una altra carpeta",
+        "button": "Desvincula"
+      },
+      "err": {
+        "title": "No s’ha pogut sincronitzar",
+        "folder-missing": "No es troba la carpeta enllaçada.",
+        "folder-readonly": "No es pot escriure en aquesta carpeta. Sembla de només lectura: tria’n una altra o canvia’n els permisos.",
+        "folder-overlaps": "Aquesta carpeta no serveix: no pot estar dins de la carpeta de projectes ni contenir-la.",
+        "remote-incomplete": "Falten fitxers a la carpeta («{{detail}}»). És normal si l’altre equip encara està pujant: torna-ho a provar d’aquí a uns minuts.",
+        "cloud-pending": "«{{detail}}» encara s’està baixant del núvol. Obre la carpeta, prem «Mantén sempre en aquest dispositiu» (o espera que acabi) i torna-ho a provar.",
+        "ref-taken": "Ja hi ha un altre projecte amb aquesta ruta a la carpeta.",
+        "in-use-local": "Tanca’l abans de baixar els canvis d’un altre equip.",
+        "in-use": "{{detail}} el té obert. Es podrà pujar quan el tanqui.",
+        "disk-full": "No hi ha espai: falten uns {{detail}} MB. No s’ha escrit res a mitges.",
+        "not-linked": "Primer vincula una carpeta.",
+        "newer-format": "Aquesta carpeta la fa servir una versió més recent de l’app. Actualitza i torna-ho a provar."
       }
     }
   }

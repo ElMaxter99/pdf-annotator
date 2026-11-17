@@ -19,651 +19,932 @@
     },
     "V-01-landing.dc.html": {
       "x": 0,
-      "y": 1140,
+      "y": 1500,
       "w": 1720,
       "h": 1697,
       "title": "V-01 Landing"
     },
     "V-02-landing-claro.dc.html": {
       "x": 1800,
-      "y": 1140,
+      "y": 1500,
       "w": 1720,
       "h": 1697,
       "title": "V-02 Landing claro"
     },
     "V-03-landing-con-sesion-recuperable.dc.html": {
       "x": 3600,
-      "y": 1140,
+      "y": 1500,
       "w": 1720,
       "h": 1829,
       "title": "V-03 Landing con sesión recuperable"
     },
     "V-19-landing-archivo-no-valido-aviso.dc.html": {
       "x": 0,
-      "y": 3269,
+      "y": 3449,
       "w": 1720,
       "h": 1697,
       "title": "V-19 Landing · archivo no válido (aviso)"
     },
     "V-04-workspace-anotaciones.dc.html": {
       "x": 0,
-      "y": 5766,
+      "y": 5706,
       "w": 1720,
       "h": 900,
       "title": "V-04 Workspace · Anotaciones"
     },
     "V-05-workspace-documento.dc.html": {
       "x": 1800,
-      "y": 5766,
+      "y": 5706,
       "w": 1720,
       "h": 900,
       "title": "V-05 Workspace · Documento"
     },
     "V-06-workspace-plantillas.dc.html": {
       "x": 3600,
-      "y": 5766,
+      "y": 5706,
       "w": 1720,
       "h": 900,
       "title": "V-06 Workspace · Plantillas"
     },
     "V-07-workspace-avanzado.dc.html": {
       "x": 0,
-      "y": 6966,
+      "y": 6726,
       "w": 1720,
       "h": 900,
       "title": "V-07 Workspace · Avanzado"
     },
     "V-08-workspace-anotaciones-claro.dc.html": {
       "x": 1800,
-      "y": 6966,
+      "y": 6726,
       "w": 1720,
       "h": 900,
       "title": "V-08 Workspace · Anotaciones (claro)"
     },
     "V-09-workspace-1280.dc.html": {
       "x": 3600,
-      "y": 6966,
+      "y": 6726,
       "w": 1280,
       "h": 800,
       "title": "V-09 Workspace 1280"
     },
     "V-10-workspace-plantillas-con-plantilla-guardada.dc.html": {
       "x": 0,
-      "y": 8166,
+      "y": 7746,
       "w": 1720,
       "h": 900,
       "title": "V-10 Workspace · Plantillas con plantilla guardada"
     },
     "V-11-crear-anotacion-editor-flotante.dc.html": {
       "x": 0,
-      "y": 9866,
+      "y": 9206,
       "w": 1720,
       "h": 900,
       "title": "V-11 Crear anotación (editor flotante)"
     },
     "V-12-editar-anotacion-editor-flotante.dc.html": {
       "x": 1800,
-      "y": 9866,
+      "y": 9206,
       "w": 1720,
       "h": 900,
       "title": "V-12 Editar anotación (editor flotante)"
     },
     "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html": {
       "x": 3600,
-      "y": 9866,
+      "y": 9206,
       "w": 1720,
       "h": 900,
       "title": "V-13 Selección múltiple y barra de alineación"
     },
     "V-14-dialogo-de-atajos.dc.html": {
       "x": 0,
-      "y": 11566,
+      "y": 10666,
       "w": 1720,
       "h": 900,
       "title": "V-14 Diálogo de atajos"
     },
     "V-15-json-con-error-de-sintaxis.dc.html": {
       "x": 1800,
-      "y": 11566,
+      "y": 10666,
       "w": 1720,
       "h": 900,
       "title": "V-15 JSON con error de sintaxis"
     },
     "V-16-aviso-de-importacion-toast.dc.html": {
       "x": 3600,
-      "y": 11566,
+      "y": 10666,
       "w": 1720,
       "h": 900,
       "title": "V-16 Aviso de importación (toast)"
     },
     "V-17-guias-y-rejilla-activas.dc.html": {
       "x": 0,
-      "y": 12766,
+      "y": 11686,
       "w": 1720,
       "h": 900,
       "title": "V-17 Guías y rejilla activas"
     },
     "V-18-arbol-json.dc.html": {
       "x": 1800,
-      "y": 12766,
+      "y": 11686,
       "w": 1720,
       "h": 900,
       "title": "V-18 Árbol JSON"
     },
     "P-11-avanzado-valores-de-muestra.dc.html": {
       "x": 0,
-      "y": 14466,
+      "y": 13146,
       "w": 1720,
       "h": 900,
       "title": "P-11 Avanzado · valores de muestra"
     },
     "P-12-prioridad-y-comparacion.dc.html": {
       "x": 1800,
-      "y": 14466,
+      "y": 13146,
       "w": 1720,
       "h": 900,
       "title": "P-12 Qué se pinta y en qué orden"
     },
     "P-13-datos-de-prueba.dc.html": {
       "x": 3600,
-      "y": 14466,
+      "y": 13146,
       "w": 1720,
       "h": 900,
       "title": "P-13 Previsualizar con datos de prueba"
     },
     "P-14-datos-de-prueba-estados.dc.html": {
       "x": 0,
-      "y": 15666,
+      "y": 14166,
       "w": 1720,
       "h": 900,
       "title": "P-14 Datos de prueba · estados"
     },
     "P-15-datos-de-prueba-claro.dc.html": {
       "x": 1800,
-      "y": 15666,
+      "y": 14166,
       "w": 1720,
       "h": 900,
       "title": "P-15 Datos de prueba (claro)"
     },
     "P-30-inicio-referencia.dc.html": {
       "x": 0,
-      "y": 17366,
+      "y": 15626,
       "w": 1720,
       "h": 1180,
       "title": "P-30 Inicio · como la referencia"
     },
     "P-31-inicio-referencia-claro.dc.html": {
       "x": 1800,
-      "y": 17366,
+      "y": 15626,
       "w": 1720,
       "h": 1180,
       "title": "P-31 Inicio · como la referencia (claro)"
     },
     "P-32-inicio-referencia-estados.dc.html": {
       "x": 3600,
-      "y": 17366,
+      "y": 15626,
       "w": 1720,
       "h": 900,
       "title": "P-32 Inicio · estados de la zona"
     },
     "P-19-guia-general.dc.html": {
-      "x": 0,
-      "y": 18846,
+      "x": 2000,
+      "y": 16926,
       "w": 1720,
       "h": 1150,
       "title": "P-19 Guía · vista general"
     },
     "P-20-guia-tema.dc.html": {
-      "x": 1800,
-      "y": 18846,
+      "x": 3800,
+      "y": 16926,
       "w": 1720,
       "h": 1130,
       "title": "P-20 Guía · tema"
     },
     "P-21-guia-estados.dc.html": {
-      "x": 3600,
-      "y": 18846,
+      "x": 0,
+      "y": 18376,
       "w": 1720,
       "h": 1010,
       "title": "P-21 Guía · estados"
     },
     "P-22-guia-tema-claro.dc.html": {
-      "x": 0,
-      "y": 20296,
+      "x": 1800,
+      "y": 18376,
       "w": 1720,
       "h": 1130,
       "title": "P-22 Guía · tema (claro)"
     },
     "P-23-mantenimiento-guia.dc.html": {
-      "x": 1800,
-      "y": 20296,
+      "x": 3600,
+      "y": 18376,
       "w": 1720,
       "h": 960,
       "title": "P-23 Cómo se mantiene la guía"
     },
     "P-29-guia-asi-se-ve.dc.html": {
-      "x": 3600,
-      "y": 20296,
+      "x": 0,
+      "y": 19626,
       "w": 1720,
       "h": 900,
       "title": "P-29 Guía · «Así se ve» (lo que sale de la inicio)"
     },
     "L-02-primera-vista.dc.html": {
       "x": 0,
-      "y": 22100,
+      "y": 32936,
       "w": 1720,
       "h": 900,
       "title": "L-02 Primera vista"
     },
     "L-03-paso-1-subir-pdf.dc.html": {
       "x": 1800,
-      "y": 22100,
+      "y": 32936,
       "w": 1720,
       "h": 900,
       "title": "L-03 Paso 1 · Subir PDF"
     },
     "N-02-barra-un-pdf.dc.html": {
-      "x": 1800,
-      "y": 23180,
+      "x": 3600,
+      "y": 33956,
       "w": 1720,
       "h": 900,
       "title": "N-02 Barra · un PDF"
     },
     "N-03-barra-lote.dc.html": {
-      "x": 3600,
-      "y": 23180,
+      "x": 0,
+      "y": 35076,
       "w": 1720,
       "h": 1040,
       "title": "N-03 Barra · lote"
     },
     "N-04-barra-menu-claro-estados.dc.html": {
-      "x": 5400,
-      "y": 23180,
+      "x": 1800,
+      "y": 35076,
       "w": 1720,
       "h": 900,
       "title": "N-04 Barra · menú, claro y estados"
     },
     "N-05-paso-2-pegar-json.dc.html": {
-      "x": 0,
-      "y": 24300,
+      "x": 3600,
+      "y": 35076,
       "w": 1720,
       "h": 1000,
       "title": "N-05 Paso 2 · pegar JSON"
     },
     "N-06-pegar-json-casos.dc.html": {
-      "x": 1800,
-      "y": 24300,
+      "x": 0,
+      "y": 36236,
       "w": 1720,
       "h": 900,
       "title": "N-06 Pegar JSON · casos"
     },
     "O-02-propuesta-1-ficha-documento.dc.html": {
-      "x": 3600,
-      "y": 24300,
+      "x": 1800,
+      "y": 36236,
       "w": 1720,
       "h": 1020,
       "title": "O-02 Propuesta 1 · ficha en Documento"
     },
     "Q-02-dividida-1650.dc.html": {
-      "x": 5400,
-      "y": 24300,
+      "x": 0,
+      "y": 43406,
       "w": 1720,
       "h": 900,
       "title": "Q-02 Dividida · 1650 px"
     },
     "Q-03-dividida-1280-claro.dc.html": {
-      "x": 0,
-      "y": 25400,
+      "x": 1800,
+      "y": 43406,
       "w": 1720,
       "h": 1460,
       "title": "Q-03 Dividida · 1280 y claro"
     },
     "R-01-flujo-sin-paso-3.dc.html": {
       "x": 3600,
-      "y": 22100,
+      "y": 32936,
       "w": 1720,
       "h": 620,
       "title": "R-01 Flujo sin paso 3"
     },
     "R-02-paso-2-y-panel.dc.html": {
-      "x": 5400,
-      "y": 22100,
+      "x": 0,
+      "y": 33956,
       "w": 1720,
       "h": 1000,
       "title": "R-02 Paso 2 y panel"
     },
     "R-03-tira-b-estados.dc.html": {
-      "x": 0,
-      "y": 23180,
+      "x": 1800,
+      "y": 33956,
       "w": 1720,
       "h": 740,
       "title": "R-03 Tira B · estados"
     },
     "S-01-comparar-sin-plantilla-a.dc.html": {
-      "x": 1800,
-      "y": 25400,
+      "x": 3600,
+      "y": 43406,
       "w": 1720,
       "h": 1220,
       "title": "S-01 Comparar sin plantilla A"
     },
     "T-01-ajustar-coordenadas-a-b.dc.html": {
       "x": 0,
-      "y": 30000,
+      "y": 45426,
       "w": 1720,
       "h": 1340,
       "title": "T-01 Ajustar coordenadas a B"
     },
     "T-02-poner-plantilla-con-ajuste.dc.html": {
       "x": 1800,
-      "y": 30000,
+      "y": 45426,
       "w": 1720,
       "h": 520,
       "title": "T-02 Poner plantilla con ajuste"
     },
     "U-01-ajustar-por-textos-flujo.dc.html": {
-      "x": 0,
-      "y": 27300,
+      "x": 3600,
+      "y": 45426,
       "w": 1720,
       "h": 860,
       "title": "U-01 Ajustar por textos · flujo"
     },
     "U-02-ajustar-por-textos-revision-1650.dc.html": {
-      "x": 1800,
-      "y": 27300,
+      "x": 0,
+      "y": 46886,
       "w": 1720,
       "h": 860,
       "title": "U-02 Ajustar por textos · revisión 1650"
     },
     "U-03-ajustar-por-textos-revision-1280-claro.dc.html": {
-      "x": 0,
-      "y": 28400,
+      "x": 1800,
+      "y": 46886,
       "w": 1280,
       "h": 720,
       "title": "U-03 Ajustar por textos · 1280 claro"
     },
     "U-04-ajustar-por-textos-estados.dc.html": {
-      "x": 1800,
-      "y": 28400,
+      "x": 3160,
+      "y": 46886,
       "w": 1720,
       "h": 1080,
       "title": "U-04 Ajustar por textos · estados"
     },
     "W-01-avisos-cerrables-y-campana.dc.html": {
-      "x": 3600,
-      "y": 30000,
+      "x": 0,
+      "y": 48086,
       "w": 1720,
       "h": 1060,
       "title": "W-01 Avisos cerrables y campana"
     },
     "X-01-ajuste-como-aviso-1650.dc.html": {
-      "x": 0,
-      "y": 31700,
+      "x": 1800,
+      "y": 48086,
       "w": 1720,
       "h": 1000,
       "title": "X-01 Ajuste por textos como aviso · 1650"
     },
     "X-02-ajuste-aviso-cerrado-campana-1280-claro.dc.html": {
-      "x": 1800,
-      "y": 31700,
+      "x": 3600,
+      "y": 48086,
       "w": 1280,
       "h": 820,
       "title": "X-02 Aviso cerrado y campana · 1280 claro"
     },
     "X-03-ajuste-mejoras-previsualizacion.dc.html": {
       "x": 0,
-      "y": 32900,
+      "y": 49266,
       "w": 1720,
       "h": 1160,
       "title": "X-03 Mejoras de previsualización"
     },
     "X-04-ajuste-aviso-estados.dc.html": {
       "x": 1800,
-      "y": 32900,
+      "y": 49266,
       "w": 1720,
       "h": 1060,
       "title": "X-04 Estados del aviso"
     },
     "M-01-previsualizacion-origen-de-cada-campo.dc.html": {
       "x": 0,
-      "y": 34600,
+      "y": 50986,
       "w": 1720,
       "h": 900,
       "title": "M-01 Previsualización · origen de cada campo"
     },
     "M-02-lote-previsualizar-con-datos-de-prueba.dc.html": {
       "x": 1800,
-      "y": 34600,
+      "y": 50986,
       "w": 1720,
       "h": 900,
       "title": "M-02 Lote · previsualizar con datos de prueba"
     },
     "M-03-avisos-previsualizacion-y-copiar-ajustar.dc.html": {
-      "x": 0,
-      "y": 35700,
+      "x": 3600,
+      "y": 50986,
       "w": 1720,
       "h": 900,
       "title": "M-03 Avisos de la previsualización y de Copiar / Ajustar"
     },
     "M-04-origen-estados-claro.dc.html": {
-      "x": 1800,
-      "y": 35700,
+      "x": 0,
+      "y": 52006,
       "w": 1720,
       "h": 900,
       "title": "M-04 Origen de cada campo · estados (claro)"
     },
     "Z-01-lote-export-y-comparacion-con-muestras.dc.html": {
-      "x": 0,
-      "y": 37200,
+      "x": 1800,
+      "y": 52006,
       "w": 1720,
       "h": 960,
       "title": "Z-01 Export con valores de muestra (el diálogo del ZIP no aplica: solo lleva JSON)"
     },
     "IA-01-ia-en-el-lote-flujo.dc.html": {
       "x": 0,
-      "y": 39100,
+      "y": 53526,
       "w": 1720,
       "h": 940,
       "title": "IA-01 La IA dentro del lote: cómo encaja y por qué un ayudante local"
     },
     "IA-02-conectar-la-ia-estados.dc.html": {
       "x": 1800,
-      "y": 39100,
+      "y": 53526,
       "w": 1720,
       "h": 1240,
       "title": "IA-02 Conectar la IA: chip, ayudante y elegir Claude o Copilot"
     },
     "IA-03-pedir-y-revisar-1650.dc.html": {
       "x": 3600,
-      "y": 39100,
+      "y": 53526,
       "w": 1720,
       "h": 1780,
       "title": "IA-03 Pedir y revisar la propuesta de la IA · 1650"
     },
     "IA-04-estados-de-la-peticion.dc.html": {
       "x": 0,
-      "y": 40400,
+      "y": 55426,
       "w": 1720,
       "h": 1160,
       "title": "IA-04 Estados de la petición: privacidad, carga, errores y límite"
     },
     "IA-05-1280-claro.dc.html": {
       "x": 1800,
-      "y": 40400,
+      "y": 55426,
       "w": 1280,
       "h": 820,
       "title": "IA-05 Pedir y revisar · 1280 y claro"
     },
     "AC-01-aviso-de-actualizacion.dc.html": {
       "x": 0,
-      "y": 42100,
+      "y": 67806,
       "w": 1720,
       "h": 1120,
       "title": "AC-01 Aviso de actualización (app de escritorio)"
     },
     "IA-06-ver-detalles-en-vivo.dc.html": {
-      "x": 0,
-      "y": 43800,
+      "x": 3160,
+      "y": 55426,
       "w": 1720,
       "h": 980,
       "title": "IA-06 Ver detalles de la IA · en vivo (Claude)"
     },
     "IA-07-ver-detalles-sin-cambios.dc.html": {
-      "x": 1800,
-      "y": 43800,
+      "x": 0,
+      "y": 56706,
       "w": 1720,
       "h": 980,
       "title": "IA-07 Ver detalles · resultado «sin cambios» y diagnóstico"
     },
     "IA-08-ver-detalles-copilot-claro.dc.html": {
-      "x": 0,
-      "y": 44900,
+      "x": 1800,
+      "y": 56706,
       "w": 1280,
       "h": 780,
       "title": "IA-08 Ver detalles con Copilot · 1280 y claro"
     },
     "IA-12-revisar-propuesta-guardada.dc.html": {
-      "x": 3600,
-      "y": 46200,
+      "x": 3160,
+      "y": 56706,
       "w": 1720,
       "h": 720,
       "title": "IA-12 Revisar una propuesta guardada"
     },
     "IA-14-proveedor-y-modelo.dc.html": {
-      "x": 3600,
-      "y": 47500,
+      "x": 0,
+      "y": 58246,
       "w": 1720,
       "h": 760,
       "title": "IA-14 Proveedor y modelo (oscuro)"
     },
     "IA-14b-proveedor-y-modelo-claro.dc.html": {
-      "x": 0,
-      "y": 48900,
+      "x": 1800,
+      "y": 58246,
       "w": 1720,
       "h": 760,
       "title": "IA-14b Proveedor y modelo (claro)"
     },
     "RC-01-canal-de-actualizaciones.dc.html": {
       "x": 1800,
-      "y": 42100,
+      "y": 67806,
       "w": 1720,
       "h": 1360,
       "title": "RC-01 Canal de actualizaciones y aviso de prueba"
     },
     "RC-02-canal-estados-y-claro.dc.html": {
       "x": 3600,
-      "y": 42100,
+      "y": 67806,
       "w": 1720,
       "h": 1000,
       "title": "RC-02 Canal de actualizaciones · claro y estados"
     },
     "IA-16-modelo-de-lista-real.dc.html": {
-      "x": 0,
-      "y": 51000,
+      "x": 3600,
+      "y": 58246,
       "w": 1720,
       "h": 1000,
       "title": "IA-16 Modelo desde una lista real (oscuro)"
     },
     "IA-16b-modelo-de-lista-real-claro.dc.html": {
-      "x": 1800,
-      "y": 51000,
+      "x": 0,
+      "y": 59366,
       "w": 1720,
       "h": 900,
       "title": "IA-16b Errores y casos límite (claro)"
     },
     "P-40-auditoria-1080p.dc.html": {
-      "x": 7400,
-      "y": 900,
+      "x": 0,
+      "y": 21086,
       "w": 1920,
       "h": 1180
     },
     "P-41-editor-lote-antes-despues.dc.html": {
-      "x": 7400,
-      "y": 2260,
+      "x": 2000,
+      "y": 21086,
       "w": 1920,
       "h": 1230
     },
     "P-42-traslado-ia-panel-unico.dc.html": {
-      "x": 0,
-      "y": 52600,
+      "x": 1800,
+      "y": 59366,
       "w": 1920,
       "h": 1180
     },
     "P-43-reglas-y-prioridades.dc.html": {
-      "x": 7400,
-      "y": 4910,
+      "x": 4000,
+      "y": 21086,
       "w": 1920,
       "h": 1130
     },
     "P-44-editor-lote-claro-y-1280.dc.html": {
-      "x": 7400,
-      "y": 6260,
+      "x": 0,
+      "y": 22436,
       "w": 1920,
       "h": 780
     },
     "P-45-paleta-de-comandos.dc.html": {
       "x": 7400,
-      "y": 7160,
+      "y": 9560,
       "w": 1920,
       "h": 1330
     },
     "P-46-panel-del-lote.dc.html": {
-      "x": 2000,
-      "y": 52600,
+      "x": 0,
+      "y": 37816,
       "w": 1920,
       "h": 1100
     },
     "P-47-pie-de-estado-y-enfoque.dc.html": {
-      "x": 7400,
-      "y": 9830,
+      "x": 2000,
+      "y": 22436,
       "w": 1920,
       "h": 1280
     },
     "P-48-primeros-pasos-y-estados-vacios.dc.html": {
-      "x": 4000,
-      "y": 52600,
+      "x": 0,
+      "y": 16926,
       "w": 1920,
       "h": 1330
     },
-    "P-49-prioridades-siguiente-tanda.dc.html": {
-      "x": 7400,
-      "y": 12680,
-      "w": 1920,
-      "h": 1000
-    },
     "P-50-seleccion-multiple-reglas.dc.html": {
-      "x": 7400,
-      "y": 14300,
+      "x": 0,
+      "y": 39476,
       "w": 1920,
       "h": 1100,
       "title": "P-50 Selección múltiple · reglas y decisiones"
     },
     "P-51-panel-con-seleccion.dc.html": {
-      "x": 9400,
-      "y": 14300,
+      "x": 2000,
+      "y": 39476,
       "w": 1920,
       "h": 1100,
       "title": "P-51 Panel con selección"
     },
     "P-53-seleccion-estados.dc.html": {
-      "x": 11400,
-      "y": 14300,
+      "x": 0,
+      "y": 41606,
       "w": 1920,
       "h": 960,
       "title": "P-53 Selección · estados"
     },
     "P-52-acciones-masivas-flujos.dc.html": {
-      "x": 7400,
-      "y": 15520,
+      "x": 4000,
+      "y": 39476,
       "w": 1920,
       "h": 2010,
       "title": "P-52 Acciones masivas · flujos"
     },
     "P-54-seleccion-cuadricula-1280-claro.dc.html": {
-      "x": 9400,
-      "y": 15520,
+      "x": 2000,
+      "y": 41606,
       "w": 1920,
       "h": 940,
       "title": "P-54 Selección · cuadrícula, 1280 y claro"
+    },
+    "P-55-deshacer-y-barra-de-seleccion.dc.html": {
+      "x": 4000,
+      "y": 41606,
+      "w": 1920,
+      "h": 1240,
+      "title": "P-55 Aviso «Deshacer» y barra de selección"
+    },
+    "P-56-resumen-embudo-y-filtros.dc.html": {
+      "x": 2000,
+      "y": 37816,
+      "w": 1920,
+      "h": 1100,
+      "title": "P-56 Resumen en embudo y filtros del lote"
+    },
+    "P-57-por-que-no-entra-estados.dc.html": {
+      "x": 4000,
+      "y": 37816,
+      "w": 1920,
+      "h": 1080,
+      "title": "P-57 Por qué no entra y estados"
+    },
+    "P-58-gestos-de-lienzo-que-falta.dc.html": {
+      "x": 0,
+      "y": 24276,
+      "w": 1920,
+      "h": 1480,
+      "title": "P-58 Gestos de lienzo del visor"
+    },
+    "P-59-zoom-mano-y-menu-oscuro.dc.html": {
+      "x": 2000,
+      "y": 24276,
+      "w": 1920,
+      "h": 1260,
+      "title": "P-59 Zoom, mano y menú (oscuro)"
+    },
+    "P-60-zoom-claro-1280.dc.html": {
+      "x": 4000,
+      "y": 24276,
+      "w": 1920,
+      "h": 1140,
+      "title": "P-60 Zoom en claro a 1280"
+    },
+    "AC-10-actualizaciones-donde-viven.dc.html": {
+      "x": 0,
+      "y": 69286,
+      "w": 1720,
+      "h": 1450,
+      "title": "AC-10 Actualizaciones · dónde viven"
+    },
+    "AC-11-panel-de-actualizaciones-estados.dc.html": {
+      "x": 1800,
+      "y": 69286,
+      "w": 1720,
+      "h": 1700,
+      "title": "AC-11 Panel de actualizaciones · estados"
+    },
+    "AC-12-panel-claro-chip-y-reglas.dc.html": {
+      "x": 3600,
+      "y": 69286,
+      "w": 1720,
+      "h": 1180,
+      "title": "AC-12 Panel claro, chip y reglas"
+    },
+    "P-61-desenlazar-zoom-a-b-oscuro.dc.html": {
+      "x": 0,
+      "y": 25876,
+      "w": 1920,
+      "h": 1500,
+      "title": "P-61 Desenlazar zoom A/B (oscuro)"
+    },
+    "P-62-desenlazar-zoom-a-b-claro-1280.dc.html": {
+      "x": 2000,
+      "y": 25876,
+      "w": 1920,
+      "h": 1340,
+      "title": "P-62 Desenlazar claro 1280 y estados"
+    },
+    "P-63-rueda-al-borde-pasa-de-pagina.dc.html": {
+      "x": 4000,
+      "y": 25876,
+      "w": 1920,
+      "h": 1480,
+      "title": "P-63 Rueda al borde de la hoja"
+    },
+    "P-64-rueda-al-borde-claro-1280-ajuste.dc.html": {
+      "x": 0,
+      "y": 27496,
+      "w": 1920,
+      "h": 880,
+      "title": "P-64 Rueda al borde claro 1280"
+    },
+    "P-65-cola-del-ayudante-oscuro.dc.html": {
+      "x": 0,
+      "y": 61106,
+      "w": 1920,
+      "h": 1420,
+      "title": "P-65 Cola del ayudante de IA (oscuro)"
+    },
+    "P-66-cola-del-ayudante-estados-claro-1280.dc.html": {
+      "x": 2000,
+      "y": 61106,
+      "w": 1280,
+      "h": 1380,
+      "title": "P-66 Cola del ayudante · estados · claro 1280"
+    },
+    "P-67-revision-ia-como-esta-hoy.dc.html": {
+      "x": 3360,
+      "y": 61106,
+      "w": 1280,
+      "h": 1150,
+      "title": "P-67 Revisión de la IA · cómo está hoy"
+    },
+    "P-68-revision-ia-opciones-y-recomendacion.dc.html": {
+      "x": 0,
+      "y": 62646,
+      "w": 1760,
+      "h": 2500,
+      "title": "P-68 Revisión de la IA · opciones y recomendación"
+    },
+    "P-69-revision-ia-propuesta-oscuro-1650.dc.html": {
+      "x": 1840,
+      "y": 62646,
+      "w": 1720,
+      "h": 1220,
+      "title": "P-69 Revisión de la IA · propuesta · oscuro 1650"
+    },
+    "P-70-revision-ia-propuesta-claro-1280.dc.html": {
+      "x": 3640,
+      "y": 62646,
+      "w": 1280,
+      "h": 1160,
+      "title": "P-70 Revisión de la IA · propuesta · claro 1280"
+    },
+    "P-71-revision-ia-estados-oscuro-y-claro.dc.html": {
+      "x": 0,
+      "y": 65266,
+      "w": 1760,
+      "h": 1980,
+      "title": "P-71 Revisión de la IA · estados · oscuro y claro"
+    },
+    "P-72-traslado-ia-lista-y-resumen-oscuro.dc.html": {
+      "x": 1840,
+      "y": 65266,
+      "w": 1760,
+      "h": 1330,
+      "title": "P-72 Traslado con IA · lista y resumen · oscuro 1650"
+    },
+    "P-73-traslado-ia-resumen-estados-claro-1280.dc.html": {
+      "x": 3680,
+      "y": 65266,
+      "w": 1280,
+      "h": 1740,
+      "title": "P-73 Traslado con IA · estados del resumen · claro 1280"
+    },
+    "AC-13-instalar-actualizacion-feedback.dc.html": {
+      "x": 0,
+      "y": 71106,
+      "w": 1720,
+      "h": 1500,
+      "title": "AC-13 Instalar la actualización · feedback (oscuro)"
+    },
+    "AC-14-instalar-actualizacion-claro-y-reglas.dc.html": {
+      "x": 1800,
+      "y": 71106,
+      "w": 1720,
+      "h": 1400,
+      "title": "AC-14 Instalar la actualización · claro, Windows y reglas"
+    },
+    "P-74-navegar-paginas-de-a-como-esta-hoy.dc.html": {
+      "x": 0,
+      "y": 28936,
+      "w": 1720,
+      "h": 960,
+      "title": "P-74 Navegar páginas de A · cómo está hoy"
+    },
+    "P-75-navegar-paginas-de-a-opciones-y-recomendacion.dc.html": {
+      "x": 1800,
+      "y": 28936,
+      "w": 1760,
+      "h": 1250,
+      "title": "P-75 Navegar páginas de A · opciones y recomendación"
+    },
+    "P-76-navegar-paginas-de-a-propuesta-oscuro-1650.dc.html": {
+      "x": 3640,
+      "y": 28936,
+      "w": 1720,
+      "h": 1040,
+      "title": "P-76 Navegar páginas de A · propuesta · oscuro 1650"
+    },
+    "P-77-navegar-paginas-de-a-estados-claro-1280.dc.html": {
+      "x": 0,
+      "y": 30306,
+      "w": 1280,
+      "h": 2070,
+      "title": "P-77 Navegar páginas de A · estados · claro 1280"
+    },
+    "P-78-emparejar-paginas-opciones-y-recomendacion.dc.html": {
+      "x": 7400,
+      "y": 1500,
+      "w": 1760,
+      "h": 1560,
+      "title": "P-78 Emparejar páginas A↔B · opciones y recomendación"
+    },
+    "P-79-emparejar-paginas-dialogo-oscuro-1650.dc.html": {
+      "x": 9240,
+      "y": 1500,
+      "w": 1720,
+      "h": 1240,
+      "title": "P-79 Emparejar páginas A↔B · diálogo · oscuro 1650"
+    },
+    "P-80-emparejar-paginas-estados-claro-1280.dc.html": {
+      "x": 11040,
+      "y": 1500,
+      "w": 1280,
+      "h": 2260,
+      "title": "P-80 Emparejar páginas A↔B · estados · claro 1280"
+    },
+    "P-81-emparejar-paginas-editor-y-lote-oscuro-1650.dc.html": {
+      "x": 7400,
+      "y": 3880,
+      "w": 1720,
+      "h": 1560,
+      "title": "P-81 Emparejar páginas A↔B · editor y lote · oscuro 1650"
+    },
+    "P-82-proyectos-flujo-y-reglas.dc.html": {
+      "x": 7400,
+      "y": 6000,
+      "w": 1720,
+      "h": 1280,
+      "title": "P-82 Proyectos · flujo y reglas"
+    },
+    "P-83-proyectos-entrada-y-pantalla-oscuro-1650.dc.html": {
+      "x": 9200,
+      "y": 6000,
+      "w": 1720,
+      "h": 1500,
+      "title": "P-83 Proyectos · entrada y pantalla · oscuro 1650"
+    },
+    "P-84-proyectos-estados-claro-1280.dc.html": {
+      "x": 11000,
+      "y": 6000,
+      "w": 1280,
+      "h": 3000,
+      "title": "P-84 Proyectos · estados · claro 1280"
+    },
+    "P-85-proyectos-exportar-importar-flujo-y-reglas.dc.html": {
+      "x": 7400,
+      "y": 9300,
+      "w": 1720,
+      "h": 1193,
+      "title": "P-85 Proyectos · exportar e importar · flujo y reglas"
+    },
+    "P-86-proyectos-exportar-importar-pantalla-oscuro-1650.dc.html": {
+      "x": 9200,
+      "y": 9300,
+      "w": 1720,
+      "h": 2172,
+      "title": "P-86 Proyectos · exportar e importar · pantalla · oscuro 1650"
+    },
+    "P-87-proyectos-exportar-importar-estados-claro-1280.dc.html": {
+      "x": 11000,
+      "y": 9300,
+      "w": 1280,
+      "h": 3895,
+      "title": "P-87 Proyectos · exportar e importar · estados · claro 1280"
+    },
+    "P-88-proyectos-sincronizar-flujo-y-reglas.dc.html": {
+      "x": 7400,
+      "y": 13600,
+      "w": 1720,
+      "h": 1401,
+      "title": "P-88 Proyectos · sincronizar · flujo y reglas"
+    },
+    "P-89-proyectos-sincronizar-pantalla-oscuro-1650.dc.html": {
+      "x": 9200,
+      "y": 13600,
+      "w": 1720,
+      "h": 2596,
+      "title": "P-89 Proyectos · sincronizar · pantalla · oscuro 1650"
+    },
+    "P-90-proyectos-sincronizar-estados-claro-1280.dc.html": {
+      "x": 11000,
+      "y": 13600,
+      "w": 1280,
+      "h": 3813,
+      "title": "P-90 Proyectos · sincronizar · estados · claro 1280"
     }
   },
   "order": [
@@ -756,12 +1037,52 @@
     "P-46-panel-del-lote.dc.html",
     "P-47-pie-de-estado-y-enfoque.dc.html",
     "P-48-primeros-pasos-y-estados-vacios.dc.html",
-    "P-49-prioridades-siguiente-tanda.dc.html",
     "P-50-seleccion-multiple-reglas.dc.html",
     "P-51-panel-con-seleccion.dc.html",
     "P-53-seleccion-estados.dc.html",
     "P-52-acciones-masivas-flujos.dc.html",
-    "P-54-seleccion-cuadricula-1280-claro.dc.html"
+    "P-54-seleccion-cuadricula-1280-claro.dc.html",
+    "P-55-deshacer-y-barra-de-seleccion.dc.html",
+    "P-56-resumen-embudo-y-filtros.dc.html",
+    "P-57-por-que-no-entra-estados.dc.html",
+    "P-58-gestos-de-lienzo-que-falta.dc.html",
+    "P-59-zoom-mano-y-menu-oscuro.dc.html",
+    "P-60-zoom-claro-1280.dc.html",
+    "AC-10-actualizaciones-donde-viven.dc.html",
+    "AC-11-panel-de-actualizaciones-estados.dc.html",
+    "AC-12-panel-claro-chip-y-reglas.dc.html",
+    "P-61-desenlazar-zoom-a-b-oscuro.dc.html",
+    "P-62-desenlazar-zoom-a-b-claro-1280.dc.html",
+    "P-63-rueda-al-borde-pasa-de-pagina.dc.html",
+    "P-64-rueda-al-borde-claro-1280-ajuste.dc.html",
+    "P-65-cola-del-ayudante-oscuro.dc.html",
+    "P-66-cola-del-ayudante-estados-claro-1280.dc.html",
+    "P-67-revision-ia-como-esta-hoy.dc.html",
+    "P-68-revision-ia-opciones-y-recomendacion.dc.html",
+    "P-69-revision-ia-propuesta-oscuro-1650.dc.html",
+    "P-70-revision-ia-propuesta-claro-1280.dc.html",
+    "P-71-revision-ia-estados-oscuro-y-claro.dc.html",
+    "P-72-traslado-ia-lista-y-resumen-oscuro.dc.html",
+    "P-73-traslado-ia-resumen-estados-claro-1280.dc.html",
+    "AC-13-instalar-actualizacion-feedback.dc.html",
+    "AC-14-instalar-actualizacion-claro-y-reglas.dc.html",
+    "P-74-navegar-paginas-de-a-como-esta-hoy.dc.html",
+    "P-75-navegar-paginas-de-a-opciones-y-recomendacion.dc.html",
+    "P-76-navegar-paginas-de-a-propuesta-oscuro-1650.dc.html",
+    "P-77-navegar-paginas-de-a-estados-claro-1280.dc.html",
+    "P-78-emparejar-paginas-opciones-y-recomendacion.dc.html",
+    "P-79-emparejar-paginas-dialogo-oscuro-1650.dc.html",
+    "P-80-emparejar-paginas-estados-claro-1280.dc.html",
+    "P-81-emparejar-paginas-editor-y-lote-oscuro-1650.dc.html",
+    "P-82-proyectos-flujo-y-reglas.dc.html",
+    "P-83-proyectos-entrada-y-pantalla-oscuro-1650.dc.html",
+    "P-84-proyectos-estados-claro-1280.dc.html",
+    "P-85-proyectos-exportar-importar-flujo-y-reglas.dc.html",
+    "P-86-proyectos-exportar-importar-pantalla-oscuro-1650.dc.html",
+    "P-87-proyectos-exportar-importar-estados-claro-1280.dc.html",
+    "P-88-proyectos-sincronizar-flujo-y-reglas.dc.html",
+    "P-89-proyectos-sincronizar-pantalla-oscuro-1650.dc.html",
+    "P-90-proyectos-sincronizar-estados-claro-1280.dc.html"
   ],
   "notes": {
     "t0": {
@@ -779,155 +1100,169 @@
     },
     "z_Definitivo": {
       "x": 0,
-      "y": 540,
+      "y": 900,
       "text": "DEFINITIVO",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_0": {
-      "x": 0,
-      "y": 840,
-      "text": "Definitivo · Landing (v1.5.0)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_1": {
-      "x": 0,
-      "y": 5466,
-      "text": "Definitivo · Workspace · pestañas y temas",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_2": {
-      "x": 0,
-      "y": 9566,
-      "text": "Definitivo · Workspace · editores y selección",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_3": {
-      "x": 0,
-      "y": 11266,
-      "text": "Definitivo · Workspace · atajos, avisos y vistas",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_4": {
-      "x": 0,
-      "y": 14166,
-      "text": "Definitivo · Avanzado y datos de prueba",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_5": {
-      "x": 0,
-      "y": 17066,
-      "text": "Definitivo · Inicio y Guía",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "z_Propuestas": {
-      "x": 7400,
-      "y": 540,
-      "text": "PROPUESTAS",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_6": {
-      "x": 0,
-      "y": 21800,
-      "text": "Definitivo · Lote de documentos (implementado y fusionado en develop, PR #157)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_7": {
-      "x": 0,
-      "y": 27000,
-      "text": "Definitivo · Copiar y ajustar por textos (implementado y fusionado en develop, PR #159)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_8": {
-      "x": 0,
-      "y": 29700,
-      "text": "Definitivo · Ajustar A a B y avisos cerrables (implementado y fusionado en develop, PR #160)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_9": {
-      "x": 0,
-      "y": 31400,
-      "text": "Definitivo · Ajuste por textos como aviso y mejoras de previsualización (implementado y fusionado en develop, PR #167)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_10": {
-      "x": 0,
-      "y": 34300,
-      "text": "Definitivo · Origen de cada campo, datos de prueba en el lote y campana de avisos (implementado y fusionado en develop, PR #168)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_11": {
-      "x": 0,
-      "y": 36900,
-      "text": "Definitivo · Export con valores de muestra y vista del lote en Mapeo (implementado y fusionado en develop, PR #169)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_12": {
-      "x": 0,
-      "y": 38800,
-      "text": "Definitivo · IA en el lote con Claude o Copilot en local (implementado y fusionado en develop, PR #170)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_13": {
-      "x": 0,
-      "y": 41800,
-      "text": "Definitivo · App de escritorio (Electron) y aviso de actualización (implementado y fusionado en develop, PR #175)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_14": {
-      "x": 0,
-      "y": 43500,
-      "text": "Definitivo · Ver detalles y consumo de la IA (implementado y fusionado en develop, PR #186)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_15": {
-      "x": 0,
-      "y": 45900,
-      "text": "Definitivo · Trasladar con IA en todo el lote: cola, estimación, detalle en vivo y proveedor/modelo (implementado y fusionado en develop, PR #189)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Definitivo_16": {
-      "x": 0,
-      "y": 50700,
-      "text": "Definitivo · Elegir el modelo de una lista real (implementado y fusionado en develop, PR #201)",
-      "kind": "title1",
-      "maxW": 5400
-    },
-    "g_Propuestas_1080": {
-      "x": 7400,
-      "y": 600,
-      "text": "Propuestas · Simplificar la interfaz para 1080p (v1.9.2, pendiente de aprobación)",
-      "kind": "title1",
-      "maxW": 1920
-    },
-    "g_Definitivo_17": {
-      "x": 0,
-      "y": 52300,
-      "text": "Definitivo · Panel único de la IA (P-42, PR #210), panel del lote compacto (P-46, PR #211) y primeros pasos con estados vacíos (P-48, PR #212), implementados y fusionados en develop",
       "kind": "title1",
       "maxW": 5920
     },
-    "g_Propuestas_seleccion": {
+    "gz_Definitivo_0": {
+      "x": 0,
+      "y": 1200,
+      "text": "Definitivo · Landing y carga de archivos",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_1": {
+      "x": 0,
+      "y": 5406,
+      "text": "Definitivo · Editor · pestañas, temas y 1280 px",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_2": {
+      "x": 0,
+      "y": 8906,
+      "text": "Definitivo · Editor · crear, editar y selección múltiple",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_3": {
+      "x": 0,
+      "y": 10366,
+      "text": "Definitivo · Editor · atajos, avisos, guías y árbol JSON",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_4": {
+      "x": 0,
+      "y": 12846,
+      "text": "Definitivo · Editor · Avanzado y datos de prueba",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_5": {
+      "x": 0,
+      "y": 15326,
+      "text": "Definitivo · Editor · Inicio, primeros pasos y Guía",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_6": {
+      "x": 0,
+      "y": 20786,
+      "text": "Definitivo · Editor · interfaz a 1080p y pie de estado (1.9.2 y 1.10)",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_7": {
+      "x": 0,
+      "y": 23976,
+      "text": "Definitivo · Visor · zoom, mano, desenlazar A/B y rueda al borde (1.12 y 1.13)",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_8": {
+      "x": 0,
+      "y": 28636,
+      "text": "Definitivo · Visor · navegar las páginas de A en el traslado (1.14)",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_9": {
+      "x": 0,
+      "y": 32636,
+      "text": "Definitivo · Lote · pasos, flujo y barra del editor",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_10": {
+      "x": 0,
+      "y": 37516,
+      "text": "Definitivo · Lote · panel compacto, resumen y filtros (1.10 y 1.12)",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_11": {
+      "x": 0,
+      "y": 39176,
+      "text": "Definitivo · Lote · selección múltiple y «Deshacer» (1.11)",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_12": {
+      "x": 0,
+      "y": 43106,
+      "text": "Definitivo · Lote · vista Dividida y comparar sin plantilla A",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_13": {
+      "x": 0,
+      "y": 45126,
+      "text": "Definitivo · Lote · ajustar A a B, ajuste por textos y avisos",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_14": {
+      "x": 0,
+      "y": 50686,
+      "text": "Definitivo · Lote · origen de cada campo, datos de prueba y export",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_15": {
+      "x": 0,
+      "y": 53226,
+      "text": "Definitivo · IA · conectar, pedir, revisar y ver detalles",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_16": {
+      "x": 0,
+      "y": 57946,
+      "text": "Definitivo · IA · proveedor, modelo y panel único «Trasladar con IA»",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_17": {
+      "x": 0,
+      "y": 60806,
+      "text": "Definitivo · IA · cola del ayudante, revisión de la propuesta y resumen (1.13)",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Definitivo_18": {
+      "x": 0,
+      "y": 67506,
+      "text": "Definitivo · App de escritorio · avisos, canal, panel e instalación de actualizaciones",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "z_Propuestas": {
       "x": 7400,
-      "y": 14000,
-      "text": "Propuestas · Selección múltiple en el panel del lote (v1.11, pendiente de aprobación)",
+      "y": 900,
+      "text": "PROPUESTAS",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Propuestas_0": {
+      "x": 7400,
+      "y": 1200,
+      "text": "Propuestas · Tabla de correspondencia de páginas A↔B (aprobada; PR #268 sin fusionar)",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Propuestas_1": {
+      "x": 7400,
+      "y": 5700,
+      "text": "Propuestas · Proyectos locales (fase 1, escritorio · sin aprobar)",
+      "kind": "title1",
+      "maxW": 5920
+    },
+    "gz_Propuestas_2": {
+      "x": 7400,
+      "y": 9260,
+      "text": "Propuestas · Aprobadas y pendientes de implementar",
       "kind": "title1",
       "maxW": 5920
     }

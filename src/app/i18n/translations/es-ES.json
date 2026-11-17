@@ -1733,7 +1733,9 @@
       "unsafe": "El archivo no es seguro.",
       "newer-format": "El archivo es de una versión más nueva de la app.",
       "in-use": "El proyecto está en uso en otro equipo.",
-      "disk-full": "No hay espacio en el disco."
+      "disk-full": "No hay espacio en el disco.",
+      "not-synced": "Este proyecto no se sincroniza.",
+      "bad-action": "Acción no válida."
     },
     "transfer": {
       "import": "Importar proyecto",
@@ -1830,6 +1832,146 @@
         "diskFullTitle": "No hay espacio en el disco",
         "diskFullText": "Se ha borrado lo que se había escrito a medias; tu carpeta de proyectos está como antes. Libera espacio y vuelve a intentarlo.",
         "diskFullExport": "No se ha dejado ningún archivo a medias. Libera espacio o elige otra unidad y vuelve a intentarlo."
+      }
+    },
+    "sync": {
+      "linkButton": "Sincronizar con otra carpeta…",
+      "folder": "Carpeta enlazada:",
+      "now": "Sincronizar ahora",
+      "manage": "Cambiar o desvincular",
+      "footOk": "Sincronizada",
+      "footOff": "No se encuentra la carpeta",
+      "footPend": "{{count}} proyectos con cambios pendientes",
+      "upload": "Subir ahora",
+      "pull": "Bajar cambios",
+      "resolve": "Resolver…",
+      "canceled": "Sincronización cancelada.",
+      "bgError": "No se pudo subir «{{name}}»: {{reason}}",
+      "chip": {
+        "sync": "✓ Sincronizado",
+        "pend": "Pendiente de subir",
+        "pull": "Hay cambios nuevos",
+        "conflict": "Conflicto",
+        "off": "Sin conexión",
+        "paused": "Pausado"
+      },
+      "meta": {
+        "pend": "Cambios sin subir a la carpeta enlazada.",
+        "pull": "{{by}} subió la revisión {{rev}}. Puedes bajarla.",
+        "synced": "Sincronizado · revisión {{rev}} · {{when}}"
+      },
+      "menu": {
+        "now": "Sincronizar ahora",
+        "start": "Sincronizar este proyecto",
+        "pause": "Pausar la sincronización",
+        "resume": "Reanudar la sincronización",
+        "stop": "Dejar de sincronizar este proyecto…"
+      },
+      "dups": {
+        "link": "Hay archivos duplicados en la carpeta",
+        "title": "Hay archivos duplicados en la carpeta",
+        "text": "El servicio que sincroniza la carpeta creó copias en conflicto. La app no las usa y no las borra:",
+        "reveal": "Mostrar en la carpeta",
+        "ok": "Entendido"
+      },
+      "avail": {
+        "title": "Disponibles en la carpeta enlazada",
+        "sub": "no están en este equipo",
+        "meta": "{{ref}} · {{pdfs}} PDFs · {{size}} · subido {{when}} por {{by}}",
+        "download": "Descargar"
+      },
+      "link": {
+        "title": "Sincronizar con una carpeta",
+        "intro": "Elige una carpeta que ya sincronices (Google Drive, OneDrive, Dropbox…) o una carpeta de red. La app guardará ahí una copia de tus proyectos para que puedas abrirlos en otro equipo.",
+        "field": "Carpeta",
+        "choose": "Elegir carpeta…",
+        "checked": "Carpeta comprobada: se puede leer y escribir · {{free}} libres",
+        "checkedNoFree": "Carpeta comprobada: se puede leer y escribir",
+        "warnTitle": "Antes de vincular",
+        "warnText": "Los PDFs saldrán de este equipo hacia esa carpeta y viajarán por el servicio que la sincroniza. La app no los cifra. Usa solo carpetas de confianza.",
+        "accept": "Entiendo que los PDFs y sus datos se copiarán a esa carpeta",
+        "button": "Vincular"
+      },
+      "plan": {
+        "title": "¿Qué subir a la carpeta enlazada?",
+        "intro": "Hay {{local}} proyectos en este equipo y {{remote}} en la carpeta que no tienes aquí.",
+        "both": "Subir mis proyectos y bajar los de la carpeta",
+        "bothHint": "Si algún nombre coincide, se pregunta antes de tocar nada. Tus proyectos suman {{size}}.",
+        "down": "Solo bajar los de la carpeta",
+        "downHint": "Tus proyectos se quedan en este equipo hasta que subas cada uno.",
+        "manual": "Elegir proyecto por proyecto",
+        "manualHint": "Se vincula y no se sube ni baja nada hasta que lo pidas desde el menú ⋯ de cada tarjeta."
+      },
+      "progress": {
+        "title": "Sincronizando «{{name}}»",
+        "titleAll": "Sincronizando proyectos",
+        "files": "Archivo {{done}} de {{total}}",
+        "projects": "Proyecto {{done}} de {{total}}: «{{name}}»",
+        "starting": "Preparando…",
+        "note": "Solo se suben o bajan los archivos que cambiaron. Puedes cancelar: la revisión anterior queda intacta."
+      },
+      "done": {
+        "up": "«{{name}}» subido (revisión {{rev}}). Puede tardar unos minutos en verse en otros equipos.",
+        "down": "«{{name}}» actualizado a la revisión {{rev}}.",
+        "none": "«{{name}}» ya estaba al día.",
+        "all": "Sincronización terminada: {{count}} proyectos.",
+        "allIssues": "Sincronización terminada con avisos: {{failed}} proyectos no se pudieron sincronizar y {{conflicts}} piden decidir.",
+        "copy": "Tu versión se guardó como «{{name}}».",
+        "linked": "Carpeta enlazada. Los proyectos que sincronices se subirán al cerrarlos y cada pocos minutos.",
+        "paused": "Sincronización en pausa para este proyecto.",
+        "resumed": "Sincronización reanudada.",
+        "stopped": "«{{name}}» ya no se sincroniza. Sigue en este equipo.",
+        "unlinked": "Carpeta desvinculada. Tus proyectos siguen aquí."
+      },
+      "conflict": {
+        "title": "«{{name}}» ha cambiado en la carpeta",
+        "text": "{{by}} subió la revisión {{rev}} y aquí tienes cambios sin subir. La app no pisa nada sin que lo decidas.",
+        "takenTitle": "Ya hay otro proyecto con esa ruta en la carpeta",
+        "takenText": "«{{name}}» y el de la carpeta tienen el mismo nombre pero son proyectos distintos.",
+        "mine": "Tus cambios",
+        "theirs": "Cambios del otro equipo",
+        "both": "En los dos",
+        "count": "{{count}} PDFs",
+        "optTheirs": "Quedarme con la versión de la carpeta y guardar la mía como copia",
+        "optTheirsHint": "Tu trabajo se conserva como un proyecto aparte y se abre la revisión {{rev}}.",
+        "optMine": "Subir la mía y reemplazar la de la carpeta",
+        "optMineHint": "La revisión {{rev}} se sustituye por la tuya. Antes se guarda en la carpeta una copia de lo que se sustituye, por si acaso.",
+        "optLater": "Decidir más tarde",
+        "optLaterHint": "El proyecto sigue como está y sin sincronizar hasta que elijas."
+      },
+      "offline": {
+        "title": "No se encuentra la carpeta enlazada",
+        "text": "«{{folder}}» no responde (¿red caída, servicio sin abrir o disco desconectado?). Puedes seguir trabajando: los cambios quedarán «Pendientes de subir» y se subirán al volver.",
+        "retry": "Reintentar",
+        "other": "Elegir otra carpeta",
+        "continue": "Seguir sin conexión"
+      },
+      "stop": {
+        "title": "¿Dejar de sincronizar «{{name}}»?",
+        "text": "El proyecto se queda en este equipo tal cual y deja de subirse y bajarse.",
+        "noteTitle": "Qué pasa con la copia de la carpeta",
+        "noteText": "Lo que ya subiste se queda allí y la app no lo borra. Si quieres quitarlo, hazlo desde tu sistema (Explorador o Finder).",
+        "button": "Dejar de sincronizar"
+      },
+      "unlink": {
+        "title": "¿Desvincular la carpeta?",
+        "text": "Se quita el enlace con «{{folder}}». Tus proyectos siguen aquí; lo que ya subiste se queda en la carpeta y la app no lo borra.",
+        "change": "Elegir otra carpeta",
+        "button": "Desvincular"
+      },
+      "err": {
+        "title": "No se pudo sincronizar",
+        "folder-missing": "No se encuentra la carpeta enlazada.",
+        "folder-readonly": "No se puede escribir en esa carpeta. Parece de solo lectura: elige otra o cambia sus permisos.",
+        "folder-overlaps": "Esa carpeta no sirve: no puede estar dentro de tu carpeta de proyectos ni contenerla.",
+        "remote-incomplete": "Faltan archivos en la carpeta («{{detail}}»). Es normal si el otro equipo aún está subiendo: reintenta en unos minutos.",
+        "cloud-pending": "«{{detail}}» todavía se está descargando de la nube. Abre la carpeta, pulsa «Mantener siempre en este dispositivo» (o espera a que termine) y reintenta.",
+        "ref-taken": "Ya hay otro proyecto con esa ruta en la carpeta.",
+        "in-use-local": "Ciérralo antes de bajar los cambios de otro equipo.",
+        "in-use": "Lo tiene abierto {{detail}}. Se podrá subir cuando lo cierre.",
+        "disk-full": "No hay espacio: faltan unos {{detail}} MB. No se ha escrito nada a medias.",
+        "not-linked": "Primero vincula una carpeta.",
+        "newer-format": "Esta carpeta la usa una versión más reciente de la app. Actualiza y vuelve a intentarlo."
       }
     }
   }

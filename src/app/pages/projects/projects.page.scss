@@ -625,3 +625,98 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+// Sincronizar con una carpeta enlazada (fase 3)
+.proj-chip--danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.proj-flag--ok {
+  color: var(--accent);
+}
+
+.proj-link {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--proj-warn);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.proj-foot__buttons {
+  display: inline-flex;
+  gap: 10px;
+}
+
+.proj-foot__ok {
+  color: var(--accent);
+}
+
+.proj-foot__warn {
+  color: var(--proj-warn);
+}
+
+.proj-foot__off {
+  color: var(--proj-warn);
+}
+
+.proj-avail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.proj-avail__title {
+  margin: 0 0 6px;
+  font-size: 16px;
+
+  small {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 14px;
+  }
+}
+
+.proj-avail__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--proj-line);
+}
+
+.proj-avail__name {
+  font-size: 15px;
+}
+
+.proj-pick {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.proj-pick__path {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 14px;
+  border: 1px solid var(--proj-line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.proj-loss--mono {
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  list-style: none;
+  padding-left: 0;
+}

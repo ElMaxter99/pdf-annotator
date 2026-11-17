@@ -1733,7 +1733,9 @@
       "unsafe": "O ficheiro não é seguro.",
       "newer-format": "O ficheiro é de uma versão mais recente da app.",
       "in-use": "O projeto está em uso noutro computador.",
-      "disk-full": "Sem espaço no disco."
+      "disk-full": "Sem espaço no disco.",
+      "not-synced": "Este projeto não é sincronizado.",
+      "bad-action": "Ação inválida."
     },
     "transfer": {
       "import": "Importar projeto",
@@ -1830,6 +1832,146 @@
         "diskFullTitle": "Sem espaço no disco",
         "diskFullText": "O que tinha sido escrito a meio foi apagado; a sua pasta de projetos está como antes. Liberte espaço e tente de novo.",
         "diskFullExport": "Não ficou nenhum ficheiro a meio. Liberte espaço ou escolha outra unidade e tente de novo."
+      }
+    },
+    "sync": {
+      "linkButton": "Sincronizar com outra pasta…",
+      "folder": "Pasta associada:",
+      "now": "Sincronizar agora",
+      "manage": "Alterar ou desassociar",
+      "footOk": "Sincronizada",
+      "footOff": "Pasta não encontrada",
+      "footPend": "{{count}} projetos com alterações pendentes",
+      "upload": "Enviar agora",
+      "pull": "Baixar alterações",
+      "resolve": "Resolver…",
+      "canceled": "Sincronização cancelada.",
+      "bgError": "Não foi possível enviar «{{name}}»: {{reason}}",
+      "chip": {
+        "sync": "✓ Sincronizado",
+        "pend": "Pendente de envio",
+        "pull": "Há alterações novas",
+        "conflict": "Conflito",
+        "off": "Sem ligação",
+        "paused": "Em pausa"
+      },
+      "meta": {
+        "pend": "Alterações ainda não enviadas para a pasta associada.",
+        "pull": "{{by}} enviou a revisão {{rev}}. Pode baixá-la.",
+        "synced": "Sincronizado · revisão {{rev}} · {{when}}"
+      },
+      "menu": {
+        "now": "Sincronizar agora",
+        "start": "Sincronizar este projeto",
+        "pause": "Pausar a sincronização",
+        "resume": "Retomar a sincronização",
+        "stop": "Deixar de sincronizar este projeto…"
+      },
+      "dups": {
+        "link": "Há ficheiros duplicados na pasta",
+        "title": "Há ficheiros duplicados na pasta",
+        "text": "O serviço que sincroniza a pasta criou cópias em conflito. A app não as usa nem as apaga:",
+        "reveal": "Mostrar na pasta",
+        "ok": "Entendido"
+      },
+      "avail": {
+        "title": "Disponíveis na pasta associada",
+        "sub": "não estão neste computador",
+        "meta": "{{ref}} · {{pdfs}} PDFs · {{size}} · enviado {{when}} por {{by}}",
+        "download": "Transferir"
+      },
+      "link": {
+        "title": "Sincronizar com uma pasta",
+        "intro": "Escolha uma pasta que já sincroniza (Google Drive, OneDrive, Dropbox…) ou uma pasta de rede. A app guardará lá uma cópia dos seus projetos para os poder abrir noutro computador.",
+        "field": "Pasta",
+        "choose": "Escolher pasta…",
+        "checked": "Pasta verificada: pode ler e escrever · {{free}} livres",
+        "checkedNoFree": "Pasta verificada: pode ler e escrever",
+        "warnTitle": "Antes de associar",
+        "warnText": "Os PDFs sairão deste computador para essa pasta e viajarão pelo serviço que a sincroniza. A app não os cifra. Use apenas pastas de confiança.",
+        "accept": "Compreendo que os PDFs e os seus dados serão copiados para essa pasta",
+        "button": "Associar"
+      },
+      "plan": {
+        "title": "O que enviar para a pasta associada?",
+        "intro": "Há {{local}} projetos neste computador e {{remote}} na pasta que não tem aqui.",
+        "both": "Enviar os meus projetos e transferir os da pasta",
+        "bothHint": "Se algum nome coincidir, pergunta-se antes de tocar em nada. Os seus projetos somam {{size}}.",
+        "down": "Transferir apenas os da pasta",
+        "downHint": "Os seus projetos ficam neste computador até enviar cada um.",
+        "manual": "Escolher projeto a projeto",
+        "manualHint": "Fica associada e nada é enviado nem transferido até pedir a partir do menu ⋯ de cada cartão."
+      },
+      "progress": {
+        "title": "A sincronizar «{{name}}»",
+        "titleAll": "A sincronizar projetos",
+        "files": "Ficheiro {{done}} de {{total}}",
+        "projects": "Projeto {{done}} de {{total}}: «{{name}}»",
+        "starting": "A preparar…",
+        "note": "Só são enviados ou transferidos os ficheiros que mudaram. Pode cancelar: a revisão anterior fica intacta."
+      },
+      "done": {
+        "up": "«{{name}}» enviado (revisão {{rev}}). Pode demorar alguns minutos a aparecer noutros computadores.",
+        "down": "«{{name}}» atualizado para a revisão {{rev}}.",
+        "none": "«{{name}}» já estava atualizado.",
+        "all": "Sincronização terminada: {{count}} projetos.",
+        "allIssues": "Sincronização terminada com avisos: {{failed}} projetos não foram sincronizados e {{conflicts}} pedem decisão.",
+        "copy": "A sua versão foi guardada como «{{name}}».",
+        "linked": "Pasta associada. Os projetos que sincronizar são enviados ao fechá-los e a cada poucos minutos.",
+        "paused": "Sincronização em pausa para este projeto.",
+        "resumed": "Sincronização retomada.",
+        "stopped": "«{{name}}» deixou de ser sincronizado. Continua neste computador.",
+        "unlinked": "Pasta desassociada. Os seus projetos continuam aqui."
+      },
+      "conflict": {
+        "title": "«{{name}}» mudou na pasta",
+        "text": "{{by}} enviou a revisão {{rev}} e aqui tem alterações por enviar. A app não substitui nada sem que decida.",
+        "takenTitle": "Já existe outro projeto com esse caminho na pasta",
+        "takenText": "«{{name}}» e o da pasta têm o mesmo nome mas são projetos diferentes.",
+        "mine": "As suas alterações",
+        "theirs": "Alterações do outro computador",
+        "both": "Em ambos",
+        "count": "{{count}} PDFs",
+        "optTheirs": "Ficar com a versão da pasta e guardar a minha como cópia",
+        "optTheirsHint": "O seu trabalho é conservado como um projeto à parte e usa-se a revisão {{rev}}.",
+        "optMine": "Enviar a minha e substituir a da pasta",
+        "optMineHint": "A revisão {{rev}} é substituída pela sua. Antes, guarda-se na pasta uma cópia do que é substituído, por precaução.",
+        "optLater": "Decidir mais tarde",
+        "optLaterHint": "O projeto fica como está, sem sincronizar, até escolher."
+      },
+      "offline": {
+        "title": "Não se encontra a pasta associada",
+        "text": "«{{folder}}» não responde (rede em baixo, serviço fechado ou disco desligado?). Pode continuar a trabalhar: as alterações ficarão «Pendentes de envio» e serão enviadas ao voltar.",
+        "retry": "Tentar novamente",
+        "other": "Escolher outra pasta",
+        "continue": "Continuar offline"
+      },
+      "stop": {
+        "title": "Deixar de sincronizar «{{name}}»?",
+        "text": "O projeto fica neste computador tal como está e deixa de ser enviado e transferido.",
+        "noteTitle": "O que acontece à cópia na pasta",
+        "noteText": "O que já enviou fica lá e a app não o apaga. Para o remover, faça-o a partir do seu sistema (Explorador ou Finder).",
+        "button": "Deixar de sincronizar"
+      },
+      "unlink": {
+        "title": "Desassociar a pasta?",
+        "text": "A ligação a «{{folder}}» é removida. Os seus projetos continuam aqui; o que já enviou fica na pasta e a app não o apaga.",
+        "change": "Escolher outra pasta",
+        "button": "Desassociar"
+      },
+      "err": {
+        "title": "Não foi possível sincronizar",
+        "folder-missing": "Não se encontra a pasta associada.",
+        "folder-readonly": "Não é possível escrever nessa pasta. Parece só de leitura: escolha outra ou altere as permissões.",
+        "folder-overlaps": "Essa pasta não serve: não pode estar dentro da pasta de projetos nem contê-la.",
+        "remote-incomplete": "Faltam ficheiros na pasta («{{detail}}»). É normal se o outro computador ainda estiver a enviar: tente novamente dentro de uns minutos.",
+        "cloud-pending": "«{{detail}}» ainda está a ser transferido da nuvem. Abra a pasta, escolha «Manter sempre neste dispositivo» (ou aguarde o fim) e tente novamente.",
+        "ref-taken": "Já existe outro projeto com esse caminho na pasta.",
+        "in-use-local": "Feche-o antes de baixar alterações de outro computador.",
+        "in-use": "{{detail}} tem-no aberto. Poderá ser enviado quando o fechar.",
+        "disk-full": "Sem espaço: faltam cerca de {{detail}} MB. Nada ficou escrito a meio.",
+        "not-linked": "Associe primeiro uma pasta.",
+        "newer-format": "Esta pasta é usada por uma versão mais recente da app. Atualize e tente novamente."
       }
     }
   }

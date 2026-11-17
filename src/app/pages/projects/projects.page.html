@@ -135,29 +135,58 @@
                 <span class="proj-chip proj-chip--accent">{{ 'projects.lock.mine' | t }}</span>
               } @else if (project.lock.state === 'other') {
                 <span class="proj-chip proj-chip--warn">{{ 'projects.lock.other' | t: { host: project.lock.host } }}</span>
+              } @else if (sync.statusOf(project.ref); as st) {
+                @switch (st.state) {
+                  @case ('sync') { <span class="proj-chip proj-chip--accent" data-testid="sync-chip">{{ 'projects.sync.chip.sync' | t }}</span> }
+                  @case ('pend') { <span class="proj-chip proj-chip--warn" data-testid="sync-chip">{{ 'projects.sync.chip.pend' | t }}</span> }
+                  @case ('pull') { <span class="proj-chip proj-chip--accent" data-testid="sync-chip">{{ 'projects.sync.chip.pull' | t }}</span> }
+                  @case ('other') { <span class="proj-chip proj-chip--warn" data-testid="sync-chip">{{ 'projects.lock.other' | t: { host: st.holder?.host } }}</span> }
+                  @case ('conflict') { <span class="proj-chip proj-chip--danger" data-testid="sync-chip">{{ 'projects.sync.chip.conflict' | t }}</span> }
+                  @case ('off') { <span class="proj-chip" data-testid="sync-chip">{{ 'projects.sync.chip.off' | t }}</span> }
+                  @case ('paused') { <span class="proj-chip" data-testid="sync-chip">{{ 'projects.sync.chip.paused' | t }}</span> }
+                }
               }
             </div>
             <p class="proj-card__meta">
               {{ 'projects.meta' | t: { pdfs: project.pdfs, done: project.done, size: size(project), when: when(project.updatedAt) } }}
             </p>
+            @if (syncMeta(project); as line) {
+              <p class="proj-card__meta" data-testid="sync-meta">{{ line }}</p>
+            }
             <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent(project)">
               <i [style.width.%]="percent(project)"></i>
             </div>
+            @if (sync.statusOf(project.ref).duplicates?.length) {
+              <button type="button" class="proj-link" (click)="sync.showDuplicates(project.ref)" data-testid="sync-dups">
+                {{ 'projects.sync.dups.link' | t }}
+              </button>
+            }
             @if (fill(project) === 'warn') {
               <p class="proj-flag proj-flag--warn">{{ 'projects.size.warn' | t }}</p>
             } @else if (fill(project) === 'full') {
               <p class="proj-flag proj-flag--danger">{{ 'projects.size.full' | t }}</p>
             }
             <div class="proj-actions">
-              @if (project.lock.state === 'other') {
-                <button type="button" class="btn" [disabled]="busy() === project.ref" (click)="open(project, { readOnly: true })">
+              @if (holderOf(project); as holder) {
+                <button type="button" class="btn" [disabled]="busy() === project.ref" (click)="open(project, { readOnly: true })" data-testid="project-open-readonly">
                   {{ 'projects.openReadOnly' | t }}
                 </button>
-                <button type="button" class="btn" (click)="askTakeover(project)">{{ 'projects.takeover' | t }}</button>
+                <button type="button" class="btn" (click)="askTakeover(project)" data-testid="project-takeover">{{ 'projects.takeover' | t }}</button>
               } @else {
                 <button type="button" class="btn btn--primary" [disabled]="busy() === project.ref" (click)="open(project)" data-testid="project-open">
                   {{ 'projects.open' | t }}
                 </button>
+              }
+              @switch (sync.statusOf(project.ref).state) {
+                @case ('pend') {
+                  <button type="button" class="btn" [disabled]="sync.working()" (click)="sync.syncProject(project.ref, project.name)" data-testid="sync-upload">{{ 'projects.sync.upload' | t }}</button>
+                }
+                @case ('pull') {
+                  <button type="button" class="btn" [disabled]="sync.working() || project.lock.state === 'mine'" (click)="sync.syncProject(project.ref, project.name)" data-testid="sync-download">{{ 'projects.sync.pull' | t }}</button>
+                }
+                @case ('conflict') {
+                  <button type="button" class="btn" [disabled]="sync.working()" (click)="sync.syncProject(project.ref, project.name)" data-testid="sync-resolve">{{ 'projects.sync.resolve' | t }}</button>
+                }
               }
               <div class="proj-menu">
                 <button
@@ -179,6 +208,22 @@
                     <button type="button" role="menuitem" [disabled]="transfer.busy()" (click)="exportProject(project)" data-testid="project-export">
                       {{ 'projects.transfer.export' | t }}
                     </button>
+                    @if (sync.linked()) {
+                      @switch (sync.statusOf(project.ref).state) {
+                        @case ('none') {
+                          <button type="button" role="menuitem" [disabled]="sync.working()" (click)="syncFromMenu(project)" data-testid="sync-menu-start">{{ 'projects.sync.menu.start' | t }}</button>
+                        }
+                        @case ('paused') {
+                          <button type="button" role="menuitem" (click)="pauseFromMenu(project, false)" data-testid="sync-menu-resume">{{ 'projects.sync.menu.resume' | t }}</button>
+                          <button type="button" role="menuitem" (click)="stopFromMenu(project)">{{ 'projects.sync.menu.stop' | t }}</button>
+                        }
+                        @default {
+                          <button type="button" role="menuitem" [disabled]="sync.working()" (click)="syncFromMenu(project)" data-testid="sync-menu-now">{{ 'projects.sync.menu.now' | t }}</button>
+                          <button type="button" role="menuitem" (click)="pauseFromMenu(project, true)" data-testid="sync-menu-pause">{{ 'projects.sync.menu.pause' | t }}</button>
+                          <button type="button" role="menuitem" (click)="stopFromMenu(project)" data-testid="sync-menu-stop">{{ 'projects.sync.menu.stop' | t }}</button>
+                        }
+                      }
+                    }
                     <button type="button" role="menuitem" class="proj-menu__danger" (click)="forgetFromMenu(project)" data-testid="project-forget">
                       {{ 'projects.forget' | t }}
                     </button>
@@ -191,10 +236,50 @@
       </div>
     }
 
+    @if (sync.available().length) {
+      <section class="proj-card proj-avail" data-testid="sync-available">
+        <h2 class="proj-avail__title">{{ 'projects.sync.avail.title' | t }} <small>· {{ 'projects.sync.avail.sub' | t }}</small></h2>
+        @for (item of sync.available(); track item.ref) {
+          <div class="proj-avail__row" data-testid="sync-available-row">
+            <div>
+              <div class="proj-avail__name">{{ item.name }}</div>
+              <code class="proj-card__path">{{ 'projects.sync.avail.meta' | t: { ref: item.ref, pdfs: item.pdfs, size: bytes(item.bytes), when: when(item.at), by: item.by } }}</code>
+            </div>
+            <button type="button" class="btn" [disabled]="sync.working()" (click)="sync.download(item)" data-testid="sync-download-available">
+              {{ 'projects.sync.avail.download' | t }}
+            </button>
+          </div>
+        }
+      </section>
+    }
+
     <footer class="proj-foot">
       <span>{{ 'projects.folder' | t }} <code>{{ store.root() }}</code></span>
-      <button type="button" class="btn" (click)="chooseRoot()">{{ 'projects.changeFolder' | t }}</button>
+      <span class="proj-foot__buttons">
+        @if (!sync.linked()) {
+          <button type="button" class="btn btn--primary" (click)="sync.startLink()" data-testid="sync-link">{{ 'projects.sync.linkButton' | t }}</button>
+        }
+        <button type="button" class="btn" (click)="chooseRoot()">{{ 'projects.changeFolder' | t }}</button>
+      </span>
     </footer>
+    @if (sync.linked()) {
+      <footer class="proj-foot" data-testid="sync-footer">
+        <span>
+          {{ 'projects.sync.folder' | t }} <code>{{ sync.folder() }}</code> ·
+          @if (!sync.reachable()) {
+            <span class="proj-foot__off">{{ 'projects.sync.footOff' | t }}</span>
+          } @else if (sync.pendingCount()) {
+            <span class="proj-foot__warn">{{ 'projects.sync.footPend' | t: { count: sync.pendingCount() } }}</span>
+          } @else {
+            <span class="proj-foot__ok">{{ 'projects.sync.footOk' | t }}</span>
+          }
+        </span>
+        <span class="proj-foot__buttons">
+          <button type="button" class="btn" [disabled]="sync.working()" (click)="syncNow()" data-testid="sync-now">{{ 'projects.sync.now' | t }}</button>
+          <button type="button" class="btn" (click)="sync.askManage()" data-testid="sync-manage">{{ 'projects.sync.manage' | t }}</button>
+        </span>
+      </footer>
+    }
   </main>
 
   @if (dialog(); as d) {
@@ -241,7 +326,7 @@
           }
           @case ('takeover') {
             <h2>{{ 'projects.takeoverTitle' | t: { name: d.project.name } }}</h2>
-            <p>{{ 'projects.takeoverText' | t: { host: d.project.lock.host, time: clock(d.project.lock.seen) } }}</p>
+            <p>{{ 'projects.takeoverText' | t: { host: holderOf(d.project)?.host, time: clock(holderOf(d.project)?.seen) } }}</p>
             <div class="proj-actions proj-actions--end">
               <button type="button" class="btn" (click)="closeDialog()">{{ 'projects.cancel' | t }}</button>
               <button type="button" class="btn btn--danger" (click)="open(d.project, { force: true })">{{ 'projects.takeover' | t }}</button>
@@ -475,6 +560,181 @@
             </div>
           }
         }
+      </div>
+    </div>
+  }
+
+  @if (sync.dialog(); as sd) {
+    <div class="proj-overlay" (click)="sync.closeDialog()" (keydown.escape)="sync.closeDialog()">
+      <div class="proj-dialog proj-dialog--wide" role="dialog" aria-modal="true" (click)="$event.stopPropagation()" data-testid="sync-dialog">
+        @switch (sd.kind) {
+          @case ('link') {
+            <h2>{{ 'projects.sync.link.title' | t }}</h2>
+            <p>{{ 'projects.sync.link.intro' | t }}</p>
+            <div class="proj-field">
+              <span>{{ 'projects.sync.link.field' | t }}</span>
+              <div class="proj-pick">
+                <code class="proj-pick__path" data-testid="sync-picked">{{ sd.picked?.folder || '—' }}</code>
+                <button type="button" class="btn" (click)="sync.pickFolder()" data-testid="sync-choose">{{ 'projects.sync.link.choose' | t }}</button>
+              </div>
+            </div>
+            @if (sd.error; as err) {
+              <p class="proj-flag proj-flag--danger" role="alert" data-testid="sync-link-error">{{ sync.errorText(err) }}</p>
+            }
+            @if (sd.picked; as pk) {
+              <p class="proj-flag proj-flag--ok" data-testid="sync-checked">
+                ✓
+                @if (pk.free !== null) {
+                  {{ 'projects.sync.link.checked' | t: { free: bytes(pk.free) } }}
+                } @else {
+                  {{ 'projects.sync.link.checkedNoFree' | t }}
+                }
+              </p>
+              <div class="proj-callout proj-callout--warn">
+                <strong>{{ 'projects.sync.link.warnTitle' | t }}</strong>
+                <p>{{ 'projects.sync.link.warnText' | t }}</p>
+              </div>
+              <label class="proj-check">
+                <input type="checkbox" [checked]="sync.accepted()" (change)="sync.accepted.set($any($event.target).checked)" data-testid="sync-accept" />
+                <span>{{ 'projects.sync.link.accept' | t }}</span>
+              </label>
+            }
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" [disabled]="!sd.picked || !sync.accepted()" (click)="sync.confirmLink()" data-testid="sync-link-confirm">
+                {{ 'projects.sync.link.button' | t }}
+              </button>
+            </div>
+          }
+          @case ('plan') {
+            <h2>{{ 'projects.sync.plan.title' | t }}</h2>
+            <p>{{ 'projects.sync.plan.intro' | t: { local: sd.picked.local, remote: sd.picked.remote } }}</p>
+            @if (sd.picked.local > 0) {
+              <label class="proj-choice" [class.proj-choice--on]="sync.plan() === 'both'">
+                <input type="radio" name="plan" [checked]="sync.plan() === 'both'" (change)="sync.plan.set('both')" data-testid="plan-both" />
+                <span>
+                  {{ 'projects.sync.plan.both' | t }} <em class="proj-chip proj-chip--accent">{{ 'projects.transfer.recommended' | t }}</em>
+                  <small>{{ 'projects.sync.plan.bothHint' | t: { size: bytes(sd.picked.bytes) } }}</small>
+                </span>
+              </label>
+            }
+            @if (sd.picked.remote > 0) {
+              <label class="proj-choice" [class.proj-choice--on]="sync.plan() === 'down'">
+                <input type="radio" name="plan" [checked]="sync.plan() === 'down'" (change)="sync.plan.set('down')" data-testid="plan-down" />
+                <span>{{ 'projects.sync.plan.down' | t }}<small>{{ 'projects.sync.plan.downHint' | t }}</small></span>
+              </label>
+            }
+            <label class="proj-choice" [class.proj-choice--on]="sync.plan() === 'manual'">
+              <input type="radio" name="plan" [checked]="sync.plan() === 'manual'" (change)="sync.plan.set('manual')" data-testid="plan-manual" />
+              <span>{{ 'projects.sync.plan.manual' | t }}<small>{{ 'projects.sync.plan.manualHint' | t }}</small></span>
+            </label>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn btn--primary" (click)="sync.runPlan()" data-testid="plan-go">{{ 'projects.transfer.continue' | t }}</button>
+            </div>
+          }
+          @case ('conflict') {
+            <h2>{{ (sd.conflict.kind === 'ref-taken' ? 'projects.sync.conflict.takenTitle' : 'projects.sync.conflict.title') | t: { name: sd.name } }}</h2>
+            <p>
+              {{ (sd.conflict.kind === 'ref-taken' ? 'projects.sync.conflict.takenText' : 'projects.sync.conflict.text') | t: { by: sd.conflict.by, rev: sd.conflict.remoteRev, name: sd.name } }}
+            </p>
+            <dl class="proj-kv">
+              <dt>{{ 'projects.sync.conflict.mine' | t }}</dt><dd>{{ 'projects.sync.conflict.count' | t: { count: sd.conflict.mine } }}</dd>
+              <dt>{{ 'projects.sync.conflict.theirs' | t }}</dt><dd>{{ 'projects.sync.conflict.count' | t: { count: sd.conflict.theirs } }}</dd>
+              <dt>{{ 'projects.sync.conflict.both' | t }}</dt><dd>{{ 'projects.sync.conflict.count' | t: { count: sd.conflict.both } }}</dd>
+            </dl>
+            <label class="proj-choice" [class.proj-choice--on]="sync.conflictChoice() === 'theirs'">
+              <input type="radio" name="sconf" [checked]="sync.conflictChoice() === 'theirs'" (change)="sync.conflictChoice.set('theirs')" data-testid="sconf-theirs" />
+              <span>
+                {{ 'projects.sync.conflict.optTheirs' | t }} <em class="proj-chip proj-chip--accent">{{ 'projects.transfer.recommended' | t }}</em>
+                <small>{{ 'projects.sync.conflict.optTheirsHint' | t: { rev: sd.conflict.remoteRev } }}</small>
+              </span>
+            </label>
+            <label class="proj-choice" [class.proj-choice--on]="sync.conflictChoice() === 'mine'">
+              <input type="radio" name="sconf" [checked]="sync.conflictChoice() === 'mine'" (change)="sync.conflictChoice.set('mine')" data-testid="sconf-mine" />
+              <span>{{ 'projects.sync.conflict.optMine' | t }}<small>{{ 'projects.sync.conflict.optMineHint' | t: { rev: sd.conflict.remoteRev } }}</small></span>
+            </label>
+            <label class="proj-choice" [class.proj-choice--on]="sync.conflictChoice() === 'later'">
+              <input type="radio" name="sconf" [checked]="sync.conflictChoice() === 'later'" (change)="sync.conflictChoice.set('later')" data-testid="sconf-later" />
+              <span>{{ 'projects.sync.conflict.optLater' | t }}<small>{{ 'projects.sync.conflict.optLaterHint' | t }}</small></span>
+            </label>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="sync.confirmConflict()" data-testid="sconf-continue">{{ 'projects.transfer.continue' | t }}</button>
+            </div>
+          }
+          @case ('offline') {
+            <h2>{{ 'projects.sync.offline.title' | t }}</h2>
+            <p>{{ 'projects.sync.offline.text' | t: { folder: sync.folder() } }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.changeFolder()">{{ 'projects.sync.offline.other' | t }}</button>
+              <button type="button" class="btn" (click)="sync.retryOffline()" data-testid="sync-retry">{{ 'projects.sync.offline.retry' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="sync.closeDialog()">{{ 'projects.sync.offline.continue' | t }}</button>
+            </div>
+          }
+          @case ('stop') {
+            <h2>{{ 'projects.sync.stop.title' | t: { name: sd.project.name } }}</h2>
+            <p>{{ 'projects.sync.stop.text' | t }}</p>
+            <div class="proj-callout proj-callout--ok">
+              <strong>{{ 'projects.sync.stop.noteTitle' | t }}</strong>
+              <p>{{ 'projects.sync.stop.noteText' | t }}</p>
+            </div>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="sync.confirmStop()" data-testid="sync-stop-confirm">{{ 'projects.sync.stop.button' | t }}</button>
+            </div>
+          }
+          @case ('unlink') {
+            <h2>{{ 'projects.sync.unlink.title' | t }}</h2>
+            <p>{{ 'projects.sync.unlink.text' | t: { folder: sync.folder() } }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn" (click)="sync.changeFolder()" data-testid="sync-change">{{ 'projects.sync.unlink.change' | t }}</button>
+              <button type="button" class="btn btn--danger" (click)="sync.unlink()" data-testid="sync-unlink">{{ 'projects.sync.unlink.button' | t }}</button>
+            </div>
+          }
+          @case ('duplicates') {
+            <h2>{{ 'projects.sync.dups.title' | t }}</h2>
+            <p>{{ 'projects.sync.dups.text' | t }}</p>
+            <ul class="proj-loss proj-loss--mono">
+              @for (file of sd.files; track file) {
+                <li>{{ file }}</li>
+              }
+            </ul>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.reveal(sd.ref)">{{ 'projects.sync.dups.reveal' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="sync.closeDialog()">{{ 'projects.sync.dups.ok' | t }}</button>
+            </div>
+          }
+          @case ('error') {
+            <h2>{{ 'projects.sync.err.title' | t }}</h2>
+            <p data-testid="sync-error">{{ sync.errorText(sd.code, sd.detail) }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn btn--primary" (click)="sync.closeDialog()">{{ 'projects.sync.dups.ok' | t }}</button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  @if (sync.progress(); as sp) {
+    <div class="proj-overlay proj-overlay--top">
+      <div class="proj-dialog" role="dialog" aria-modal="true" data-testid="sync-progress">
+        <h2>{{ 'projects.sync.progress.title' | t: { name: sync.subject() } }}</h2>
+        <p role="status">
+          @if (sp.total) {
+            {{ (sp.name ? 'projects.sync.progress.projects' : 'projects.sync.progress.files') | t: { done: sp.done, total: sp.total, name: sp.name } }}
+          } @else {
+            {{ 'projects.sync.progress.starting' | t }}
+          }
+        </p>
+        <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="sync.percent()">
+          <i [style.width.%]="sync.percent()"></i>
+        </div>
+        <p class="proj-hint">{{ 'projects.sync.progress.note' | t }}</p>
+        <div class="proj-actions proj-actions--end">
+          <button type="button" class="btn" (click)="sync.cancel()" data-testid="sync-cancel">{{ 'projects.cancel' | t }}</button>
+        </div>
       </div>
     </div>
   }

@@ -1733,7 +1733,9 @@
       "unsafe": "Le fichier n'est pas sûr.",
       "newer-format": "Le fichier provient d'une version plus récente de l'app.",
       "in-use": "Le projet est utilisé sur un autre ordinateur.",
-      "disk-full": "Plus d'espace sur le disque."
+      "disk-full": "Plus d'espace sur le disque.",
+      "not-synced": "Ce projet n’est pas synchronisé.",
+      "bad-action": "Action non valide."
     },
     "transfer": {
       "import": "Importer un projet",
@@ -1830,6 +1832,146 @@
         "diskFullTitle": "Plus d'espace sur le disque",
         "diskFullText": "Ce qui avait été écrit à moitié a été supprimé ; votre dossier de projets est comme avant. Libérez de l'espace et réessayez.",
         "diskFullExport": "Aucun fichier à moitié écrit n'a été laissé. Libérez de l'espace ou choisissez un autre lecteur et réessayez."
+      }
+    },
+    "sync": {
+      "linkButton": "Synchroniser avec un autre dossier…",
+      "folder": "Dossier lié :",
+      "now": "Synchroniser maintenant",
+      "manage": "Changer ou délier",
+      "footOk": "Synchronisé",
+      "footOff": "Dossier introuvable",
+      "footPend": "{{count}} projets avec des modifications en attente",
+      "upload": "Envoyer maintenant",
+      "pull": "Récupérer les modifications",
+      "resolve": "Résoudre…",
+      "canceled": "Synchronisation annulée.",
+      "bgError": "Impossible d’envoyer « {{name}} » : {{reason}}",
+      "chip": {
+        "sync": "✓ Synchronisé",
+        "pend": "En attente d’envoi",
+        "pull": "Nouvelles modifications",
+        "conflict": "Conflit",
+        "off": "Hors ligne",
+        "paused": "En pause"
+      },
+      "meta": {
+        "pend": "Modifications pas encore envoyées au dossier lié.",
+        "pull": "{{by}} a envoyé la révision {{rev}}. Vous pouvez la récupérer.",
+        "synced": "Synchronisé · révision {{rev}} · {{when}}"
+      },
+      "menu": {
+        "now": "Synchroniser maintenant",
+        "start": "Synchroniser ce projet",
+        "pause": "Mettre la synchronisation en pause",
+        "resume": "Reprendre la synchronisation",
+        "stop": "Ne plus synchroniser ce projet…"
+      },
+      "dups": {
+        "link": "Il y a des fichiers en double dans le dossier",
+        "title": "Il y a des fichiers en double dans le dossier",
+        "text": "Le service qui synchronise le dossier a créé des copies en conflit. L’application ne les utilise pas et ne les supprime pas :",
+        "reveal": "Afficher dans le dossier",
+        "ok": "Compris"
+      },
+      "avail": {
+        "title": "Disponibles dans le dossier lié",
+        "sub": "pas sur cet ordinateur",
+        "meta": "{{ref}} · {{pdfs}} PDF · {{size}} · envoyé {{when}} par {{by}}",
+        "download": "Télécharger"
+      },
+      "link": {
+        "title": "Synchroniser avec un dossier",
+        "intro": "Choisissez un dossier que vous synchronisez déjà (Google Drive, OneDrive, Dropbox…) ou un dossier réseau. L’application y conservera une copie de vos projets pour que vous puissiez les ouvrir sur un autre ordinateur.",
+        "field": "Dossier",
+        "choose": "Choisir le dossier…",
+        "checked": "Dossier vérifié : lecture et écriture possibles · {{free}} libres",
+        "checkedNoFree": "Dossier vérifié : lecture et écriture possibles",
+        "warnTitle": "Avant de lier",
+        "warnText": "Les PDF quitteront cet ordinateur vers ce dossier et transiteront par le service qui le synchronise. L’application ne les chiffre pas. N’utilisez que des dossiers de confiance.",
+        "accept": "Je comprends que les PDF et leurs données seront copiés dans ce dossier",
+        "button": "Lier"
+      },
+      "plan": {
+        "title": "Que envoyer vers le dossier lié ?",
+        "intro": "Il y a {{local}} projets sur cet ordinateur et {{remote}} dans le dossier que vous n’avez pas ici.",
+        "both": "Envoyer mes projets et télécharger ceux du dossier",
+        "bothHint": "Si un nom coïncide, on vous demande avant de toucher à quoi que ce soit. Vos projets pèsent {{size}}.",
+        "down": "Télécharger uniquement ceux du dossier",
+        "downHint": "Vos projets restent sur cet ordinateur jusqu’à ce que vous les envoyiez un par un.",
+        "manual": "Choisir projet par projet",
+        "manualHint": "Le lien est créé et rien n’est envoyé ni téléchargé tant que vous ne le demandez pas depuis le menu ⋯ de chaque carte."
+      },
+      "progress": {
+        "title": "Synchronisation de « {{name}} »",
+        "titleAll": "Synchronisation des projets",
+        "files": "Fichier {{done}} sur {{total}}",
+        "projects": "Projet {{done}} sur {{total}} : « {{name}} »",
+        "starting": "Préparation…",
+        "note": "Seuls les fichiers modifiés sont envoyés ou téléchargés. Vous pouvez annuler : la révision précédente reste intacte."
+      },
+      "done": {
+        "up": "« {{name}} » envoyé (révision {{rev}}). Cela peut prendre quelques minutes avant d’apparaître sur les autres ordinateurs.",
+        "down": "« {{name}} » mis à jour à la révision {{rev}}.",
+        "none": "« {{name}} » était déjà à jour.",
+        "all": "Synchronisation terminée : {{count}} projets.",
+        "allIssues": "Synchronisation terminée avec des avertissements : {{failed}} projets n’ont pas pu être synchronisés et {{conflicts}} demandent une décision.",
+        "copy": "Votre version a été enregistrée sous « {{name}} ».",
+        "linked": "Dossier lié. Les projets que vous synchronisez sont envoyés à leur fermeture et toutes les quelques minutes.",
+        "paused": "Synchronisation en pause pour ce projet.",
+        "resumed": "Synchronisation reprise.",
+        "stopped": "« {{name}} » n’est plus synchronisé. Il reste sur cet ordinateur.",
+        "unlinked": "Dossier délié. Vos projets sont toujours ici."
+      },
+      "conflict": {
+        "title": "« {{name}} » a changé dans le dossier",
+        "text": "{{by}} a envoyé la révision {{rev}} et vous avez ici des modifications non envoyées. L’application n’écrase rien sans votre accord.",
+        "takenTitle": "Un autre projet utilise déjà ce chemin dans le dossier",
+        "takenText": "« {{name}} » et celui du dossier portent le même nom mais sont des projets différents.",
+        "mine": "Vos modifications",
+        "theirs": "Modifications de l’autre ordinateur",
+        "both": "Dans les deux",
+        "count": "{{count}} PDF",
+        "optTheirs": "Garder la version du dossier et enregistrer la mienne comme copie",
+        "optTheirsHint": "Votre travail est conservé comme projet séparé et la révision {{rev}} est utilisée.",
+        "optMine": "Envoyer la mienne et remplacer celle du dossier",
+        "optMineHint": "La révision {{rev}} est remplacée par la vôtre. Une copie de ce qui est remplacé est d’abord conservée dans le dossier, par précaution.",
+        "optLater": "Décider plus tard",
+        "optLaterHint": "Le projet reste tel quel, non synchronisé, jusqu’à votre choix."
+      },
+      "offline": {
+        "title": "Le dossier lié est introuvable",
+        "text": "« {{folder}} » ne répond pas (réseau coupé, service fermé ou disque débranché ?). Vous pouvez continuer à travailler : les modifications resteront « En attente d’envoi » et partiront au retour.",
+        "retry": "Réessayer",
+        "other": "Choisir un autre dossier",
+        "continue": "Continuer hors ligne"
+      },
+      "stop": {
+        "title": "Ne plus synchroniser « {{name}} » ?",
+        "text": "Le projet reste sur cet ordinateur tel quel et n’est plus envoyé ni téléchargé.",
+        "noteTitle": "Que devient la copie du dossier",
+        "noteText": "Ce que vous avez déjà envoyé y reste et l’application ne le supprime pas. Pour le retirer, faites-le depuis votre système (Explorateur ou Finder).",
+        "button": "Ne plus synchroniser"
+      },
+      "unlink": {
+        "title": "Délier le dossier ?",
+        "text": "Le lien avec « {{folder}} » est supprimé. Vos projets restent ici ; ce que vous avez déjà envoyé reste dans le dossier et l’application ne le supprime pas.",
+        "change": "Choisir un autre dossier",
+        "button": "Délier"
+      },
+      "err": {
+        "title": "Impossible de synchroniser",
+        "folder-missing": "Le dossier lié est introuvable.",
+        "folder-readonly": "Impossible d’écrire dans ce dossier. Il semble en lecture seule : choisissez-en un autre ou modifiez ses droits.",
+        "folder-overlaps": "Ce dossier ne convient pas : il ne peut pas être dans votre dossier de projets ni le contenir.",
+        "remote-incomplete": "Des fichiers manquent dans le dossier (« {{detail}} »). C’est normal si l’autre ordinateur est encore en train d’envoyer : réessayez dans quelques minutes.",
+        "cloud-pending": "« {{detail}} » est encore en cours de téléchargement depuis le cloud. Ouvrez le dossier, choisissez « Toujours conserver sur cet appareil » (ou attendez la fin) et réessayez.",
+        "ref-taken": "Un autre projet utilise déjà ce chemin dans le dossier.",
+        "in-use-local": "Fermez-le avant de récupérer les modifications d’un autre ordinateur.",
+        "in-use": "{{detail}} l’a ouvert. Il pourra être envoyé une fois fermé.",
+        "disk-full": "Pas assez d’espace : il manque environ {{detail}} Mo. Rien n’a été laissé à moitié écrit.",
+        "not-linked": "Liez d’abord un dossier.",
+        "newer-format": "Ce dossier est utilisé par une version plus récente de l’application. Mettez à jour et réessayez."
       }
     }
   }

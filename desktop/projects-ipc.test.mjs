@@ -212,7 +212,12 @@ test('sincronizar con una carpeta enlazada entre dos equipos: vincular, subir, b
   assert.equal((await a.call('sync:link', { accepted: true })).error, 'not-linked');
   const { project } = await a.call('projects:create', { name: 'Cliente', subpath: 'Álvaro/c1' });
   await a.call('projects:open', { ref: project.ref });
-  await a.call('projects:save-item', { ref: project.ref, id: 'i1', meta: { name: 'i1.pdf' }, a: pdf(10) });
+  await a.call('projects:save-item', {
+    ref: project.ref,
+    id: 'i1',
+    meta: { name: 'i1.pdf' },
+    a: pdf(10),
+  });
   await a.call('projects:release', { ref: project.ref });
 
   const picked = await a.call('sync:choose');
@@ -226,7 +231,10 @@ test('sincronizar con una carpeta enlazada entre dos equipos: vincular, subir, b
   await b.call('sync:choose');
   await b.call('sync:link', { accepted: true });
   const seen = await b.call('sync:status');
-  assert.deepEqual(seen.available.map((r) => [r.ref, r.pdfs]), [[project.ref, 1]]);
+  assert.deepEqual(
+    seen.available.map((r) => [r.ref, r.pdfs]),
+    [[project.ref, 1]],
+  );
   assert.equal((await b.call('sync:all', { mode: 'down' })).synced, 1);
   assert.equal((await b.call('sync:status')).available.length, 0);
 
@@ -236,7 +244,12 @@ test('sincronizar con una carpeta enlazada entre dos equipos: vincular, subir, b
   assert.equal(blocked.locked.state, 'other');
   assert.equal(blocked.remote, true);
 
-  await b.call('projects:save-item', { ref: project.ref, id: 'i2', meta: { name: 'i2.pdf' }, a: pdf(20) });
+  await b.call('projects:save-item', {
+    ref: project.ref,
+    id: 'i2',
+    meta: { name: 'i2.pdf' },
+    a: pdf(20),
+  });
   await b.call('projects:release', { ref: project.ref });
   await new Promise((resolve) => {
     const t = setInterval(() => {
@@ -256,7 +269,10 @@ test('sincronizar con una carpeta enlazada entre dos equipos: vincular, subir, b
   assert.equal((await a.call('sync:status')).statuses[project.ref].state, 'paused');
   assert.equal((await a.call('sync:project', { ref: project.ref, action: 'stop' })).ok, true);
   assert.equal((await a.call('sync:status')).statuses[project.ref].state, 'none');
-  assert.equal((await a.call('sync:project', { ref: '../fuera', action: 'sync' })).error, 'bad-ref');
+  assert.equal(
+    (await a.call('sync:project', { ref: '../fuera', action: 'sync' })).error,
+    'bad-ref',
+  );
   assert.deepEqual(await a.call('sync:unlink'), { ok: true });
   assert.deepEqual(await a.call('sync:status'), { linked: false });
   a.api.releaseAll();
