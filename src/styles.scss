@@ -5477,10 +5477,16 @@ button.version-chip:focus-visible {
 }
 
 /* «Dividida»: chip enlazado / desenlazado (P-61) */
-.viewer.viewer--split .split-link {
+.viewer.viewer--split .split-chips {
   position: fixed;
   transform: translateX(-50%);
   z-index: 19;
+  display: flex;
+  gap: 10px;
+}
+
+.viewer.viewer--split .split-link {
+  position: static;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -6038,5 +6044,132 @@ button.version-chip:focus-visible {
   }
   .update-install__bar i {
     width: 60%;
+  }
+}
+
+/* Navegar las páginas de A en el traslado (P-74 a P-77) */
+.split-pager {
+  position: absolute;
+  top: -32px;
+  right: 0;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.viewer.viewer--unlinked .canvas-container--split-a .split-pager {
+  top: 6px;
+  right: 6px;
+}
+
+.split-pager__text {
+  min-width: 44px;
+  text-align: center;
+}
+
+.split-pager__btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.18));
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms ease-out;
+}
+
+.split-pager__btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 18%, var(--panel));
+}
+
+.split-pager__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.split-pager__btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.page-ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  background: var(--bg);
+  border: 2px dashed var(--line, rgba(255, 255, 255, 0.25));
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  animation: zoom-hud-in 150ms ease-out;
+}
+
+.page-ghost b {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.page-tag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 9;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--warn, #fbbf24) 22%, var(--panel));
+  color: var(--warn, #fbbf24);
+  pointer-events: none;
+}
+
+:root.theme-light .page-tag {
+  color: #92400e;
+}
+
+.toolbar__badge--free {
+  color: var(--warn, #fbbf24);
+}
+
+:root.theme-light .toolbar__badge--free {
+  color: #92400e;
+}
+
+.wheel-edge__pane {
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #041818;
+  font-size: 0.75rem;
+}
+
+:root.theme-light .wheel-edge__pane {
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-ghost,
+  .split-pager__btn {
+    animation: none;
+    transition: none;
   }
 }

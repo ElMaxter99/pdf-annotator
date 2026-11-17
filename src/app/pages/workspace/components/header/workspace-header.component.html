@@ -13,17 +13,20 @@
 
     <div class="toolbar__cluster">
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.navigationGroup' | t">
-        <button class="btn btn--icon" (click)="vm.prevPage()" [attr.aria-label]="'controls.prev' | t" [disabled]="!vm.pdfDoc() || vm.pageIndex()===1"
+        <button class="btn btn--icon" (click)="vm.prevPage()" [attr.aria-label]="'controls.prev' | t" [disabled]="!vm.pdfDoc() || vm.pageShown()===1"
           [attr.title]="('controls.prev' | t) + ' (←)'" [attr.aria-keyshortcuts]="'ArrowLeft'">
           <span class="btn__icon" aria-hidden="true">⟨</span>
           <span class="btn__label">{{ 'controls.prev' | t }}</span>
         </button>
         <span class="toolbar__badge" aria-live="polite"
-          [attr.aria-label]="'controls.pageIndicator' | t : { current: vm.pageIndex(), total: vm.pageCount() || 0 }"
-          [attr.title]="'controls.pageIndicator' | t : { current: vm.pageIndex(), total: vm.pageCount() || 0 }">
-          {{ vm.pageIndex() }} / {{ vm.pageCount() || 0 }}
+          [attr.aria-label]="'controls.pageIndicator' | t : { current: vm.pageShown(), total: vm.pageTotalShown() || 0 }"
+          [attr.title]="'controls.pageIndicator' | t : { current: vm.pageShown(), total: vm.pageTotalShown() || 0 }">
+          {{ vm.pageShown() }} / {{ vm.pageTotalShown() || 0 }}
         </span>
-        <button class="btn btn--icon" (click)="vm.nextPage()" [attr.aria-label]="'controls.next' | t" [disabled]="!vm.pdfDoc() || vm.pageIndex()===vm.pageCount()"
+        @if (vm.pageOffset(); as offset) {
+          <span class="toolbar__badge toolbar__badge--free" data-testid="page-offset" aria-live="polite">{{ offset }}</span>
+        }
+        <button class="btn btn--icon" (click)="vm.nextPage()" [attr.aria-label]="'controls.next' | t" [disabled]="!vm.pdfDoc() || vm.pageShown()===vm.pageTotalShown()"
           [attr.title]="('controls.next' | t) + ' (→)'" [attr.aria-keyshortcuts]="'ArrowRight'">
           <span class="btn__label">{{ 'controls.next' | t }}</span>
           <span class="btn__icon" aria-hidden="true">⟩</span>

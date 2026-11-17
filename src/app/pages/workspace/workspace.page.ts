@@ -93,6 +93,13 @@ import {
   sizeOfPage,
   sizesDiffer,
 } from '../../utils/page-scale.utils';
+import {
+  clampPageNumber,
+  holdPageOfB,
+  linkedPageTotal,
+  pageOfVersion,
+  pageOffsetLabel,
+} from '../../utils/page-link.utils';
 import { AnnotationTemplatesService, AnnotationTemplate } from '../../annotation-templates.service';
 import {
   DEFAULT_GUIDE_SETTINGS,
@@ -213,6 +220,8 @@ const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
 const WHEEL_PAGING_KEY = 'pdf-annotator.wheelPaging';
 
 interface WheelEdgeIndicator {
+  /** Which version the indicator is about when A and B have their own pages. */
+  pane?: 'A' | 'B';
   kind: 'next' | 'prev' | 'last' | 'first' | 'now';
   progress: number;
   page: number;
@@ -504,12 +513,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Factors applied to A on the current page (for the notice). */
   readonly fitFactors = computed(() =>
     pageScaleFactors(
-      sizeOfPage(this.pageSizesA(), this.pageIndex()),
+      sizeOfPage(this.pageSizesA(), this.aPage() ?? this.pageIndex()),
       sizeOfPage(this.pageSizesB(), this.pageIndex()),
     ),
   );
   readonly fitSizes = computed(() => ({
-    a: sizeOfPage(this.pageSizesA(), this.pageIndex()),
+    a: sizeOfPage(this.pageSizesA(), this.aPage() ?? this.pageIndex()),
     b: sizeOfPage(this.pageSizesB(), this.pageIndex()),
   }));
   /** «Copiar y ajustar por textos»: proposal under review (null = not open). Nothing touches B until applied. */
@@ -526,6 +535,56 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private adjustPreviousMode: 'overlay' | 'toggle' | 'split' | null = null;
   /** Page counts when A and B do not have the same number of pages (else null). */
   readonly pagesDiffer = signal<{ a: number; b: number } | null>(null);
+  /** Pages of A (0 while there is no A to compare). */
+  readonly pageCountA = signal(0);
+  /** A and B move together through 1…max(A, B) (P-74 a P-77); «libres» gives A its own page. */
+  readonly pagesLinked = signal(true);
+  /** Linked position: can run past the last page of the shorter version. */
+  readonly commonPage = signal(1);
+  /** Page of A while the pages are free. */
+  readonly freeAPage = signal(1);
+  /** The pane that has the pointer: ‹ › and PgUp/PgDn move its page while the pages are free. */
+  readonly paneFocus = signal<'a' | 'b'>('b');
+  /** True while B is compared with an A that is open. */
+  readonly comparing = computed(() => !!this.migration() && this.pageCountA() > 0);
+  /** Page of A to draw, or null when A has no page at the linked position. */
+  readonly aPage = computed<number | null>(() => {
+    if (!this.comparing()) return this.pageIndex();
+    return this.pagesLinked()
+      ? pageOfVersion(this.commonPage(), this.pageCountA())
+      : this.freeAPage();
+  });
+  readonly aGhost = computed(() => this.comparing() && this.aPage() === null);
+  /** B has no page at the linked position: its pane shows the empty state. */
+  readonly bGhost = computed(
+    () =>
+      this.comparing() &&
+      this.pagesLinked() &&
+      this.commonPage() > this.pageCount() &&
+      !this.showingOnlyA(),
+  );
+  /** Page shown in the header: the linked one, or B's while the pages are free. */
+  readonly pageShown = computed(() =>
+    this.comparing() && this.pagesLinked() ? this.commonPage() : this.pageIndex(),
+  );
+  readonly pageTotalShown = computed(() =>
+    this.comparing() && this.pagesLinked()
+      ? linkedPageTotal(this.pageCountA(), this.pageCount())
+      : this.pageCount(),
+  );
+  /** «A 2 · B 1» while the pages are free and differ. */
+  readonly pageOffset = computed(() =>
+    this.comparing() && !this.pagesLinked() ? pageOffsetLabel(this.aPage(), this.pageIndex()) : null,
+  );
+  /** Label over the page when A shows another page than B (or none) outside «Dividida». */
+  readonly pageTag = computed<{ kind: 'missing' | 'offset'; a: number; b: number } | null>(() => {
+    if (!this.comparing() || this.splitActive()) return null;
+    const a = this.aPage();
+    if (a === null) return { kind: 'missing', a: this.commonPage(), b: this.pageIndex() };
+    return !this.pagesLinked() && a !== this.pageIndex()
+      ? { kind: 'offset', a, b: this.pageIndex() }
+      : null;
+  });
   private splitDoc: { blob: Blob; doc: Promise<PDFDocumentProxy> } | null = null;
   private splitToken = 0;
   private referencePdfToken = 0;
@@ -760,6 +819,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.migration();
       this.referenceMode();
       this.showingOnlyA();
+      this.aPage();
       untracked(() => this.redrawReference());
     });
     effect(() => {
@@ -770,6 +830,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     effect(() => {
       this.splitActive();
       this.pageIndex();
+      this.aPage();
       this.scale();
       this.batch.activeItem();
       this.fitA();
@@ -1429,6 +1490,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.scale.set(restoredScale);
     }
     this.pageIndex.set(clampRestoredPage(restore.pageIndex, this.pdfDoc()?.numPages ?? 1));
+    this.resetPageLink(this.pageIndex());
   }
 
   private scheduleSessionSave() {
@@ -1536,6 +1598,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     this.pageIndex.set(1);
+    this.resetPageLink(1);
     this.resetHistory();
     this.clearAll({ skipHistory: true });
     if (restore) {
@@ -2015,14 +2078,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       case 'pageup':
         if (needsDocument()) {
           event.preventDefault();
-          void this.prevPage();
+          void (event.shiftKey && this.comparing() ? this.stepPageA(-1) : this.prevPage());
         }
         break;
       case 'arrowright':
       case 'pagedown':
         if (needsDocument()) {
           event.preventDefault();
-          void this.nextPage();
+          void (event.shiftKey && this.comparing() ? this.stepPageA(1) : this.nextPage());
         }
         break;
       case 'home':
@@ -2034,7 +2097,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       case 'end':
         if (needsDocument()) {
           event.preventDefault();
-          void this.setPageIndex(this.pageCount());
+          void this.setPageIndex(this.pageTotalShown());
         }
         break;
       case '+':
@@ -2794,13 +2857,24 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const page = this.pageIndex();
+    const pageA = this.aPage();
     const draw = (name: string, x: number, y: number, fontSize: number, missing: boolean) =>
       this.drawReferenceField(layer, canvas.height, name, x, y, fontSize, missing, onlyA);
 
     if (onlyA) {
       void this.drawReferencePdf(layer, canvas);
-      for (const field of this.fieldsOfA(page)) {
+      for (const field of pageA === null ? [] : this.fieldsOfA(pageA)) {
         draw(field.name, field.x, field.y, field.fontSize, field.missing);
+      }
+      return;
+    }
+    if (pageA === null || this.bGhost()) {
+      return;
+    }
+    if (pageA !== page) {
+      // Free pages: the fields of the page of A that is open, with no state against B.
+      for (const field of this.fieldsOfA(pageA)) {
+        draw(field.name, field.x, field.y, field.fontSize, false);
       }
       return;
     }
@@ -2822,7 +2896,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const token = ++this.referencePdfToken;
     try {
       const doc = await this.splitDocOf(item.aPdf);
-      const page = await doc.getPage(Math.min(this.pageIndex(), doc.numPages));
+      const wanted = this.aPage();
+      if (wanted === null || wanted > doc.numPages) {
+        return;
+      }
+      const page = await doc.getPage(wanted);
       const viewport = page.getViewport({ scale: this.scale() });
       const geometry = this.geometryForA(page);
       const canvas = document.createElement('canvas');
@@ -2851,6 +2929,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private async updatePagesDiffer(aPdf: Blob | null): Promise<void> {
     if (!aPdf) {
       this.pagesDiffer.set(null);
+      this.pageCountA.set(0);
       this.pageSizesA.set([]);
       this.pageSizesB.set([]);
       return;
@@ -2861,6 +2940,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const a = docA.numPages;
       const b = docB?.numPages ?? 0;
       this.pagesDiffer.set(b > 0 && a !== b ? { a, b } : null);
+      this.pageCountA.set(a);
+      if (!this.pagesLinked() && this.freeAPage() > a) {
+        this.freeAPage.set(a);
+      }
+      if (this.commonPage() < this.pageIndex()) {
+        this.commonPage.set(this.pageIndex());
+      }
       if (docB && (this.pageSizesKey?.a !== aPdf || this.pageSizesKey?.b !== docB)) {
         this.pageSizesKey = { a: aPdf, b: docB };
         const sizesOf = async (doc: PDFDocumentProxy) => {
@@ -2879,6 +2965,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
     } catch {
       this.pagesDiffer.set(null);
+      this.pageCountA.set(0);
     }
   }
 
@@ -2936,9 +3023,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       for (const field of aPage.fields) {
         const name = (field.mapField || field.value || '').trim();
-        const missing = m.states.some(
-          (state) => state.status === 'missing' && state.page === page && state.name === name,
-        );
+        const missing =
+          page === this.pageIndex() &&
+          m.states.some(
+            (state) => state.status === 'missing' && state.page === page && state.name === name,
+          );
         out.push({ name, x: field.x, y: field.y, fontSize: field.fontSize, missing });
       }
     }
@@ -3208,7 +3297,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     try {
       const doc = await this.splitDocOf(item.aPdf);
-      const pageNumber = Math.min(this.pageIndex(), doc.numPages);
+      const wanted = this.aPage();
+      if (wanted === null || wanted > doc.numPages) {
+        // A has no page here: an empty pane of the size of B's page (the template draws the text).
+        this.splitTask?.cancel();
+        const bCanvas = this.pdfCanvasRef?.nativeElement;
+        canvas.width = bCanvas?.width || 1;
+        canvas.height = bCanvas?.height || 1;
+        layer.textContent = '';
+        return;
+      }
+      const pageNumber = wanted;
       const page = await doc.getPage(pageNumber);
       const viewport = page.getViewport({ scale: this.scaleOfA() });
       const ctx = canvas.getContext('2d');
@@ -3236,7 +3335,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         return;
       }
       layer.textContent = '';
-      for (const field of this.fieldsOfA(this.pageIndex())) {
+      for (const field of this.fieldsOfA(pageNumber)) {
         this.drawReferenceField(
           layer,
           canvas.height,
@@ -4176,6 +4275,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!item) {
       return;
     }
+    const pageA = this.aPage();
+    if (this.pageOffset() && pageA !== null) {
+      this.confirmCopyPageOfA(mode, pageA, this.pageIndex());
+      return;
+    }
     if (mode === 'replace') {
       this.replaceCoords(this.normalizedTemplateA());
     } else {
@@ -4185,6 +4289,46 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     if (this.fitA()) {
       this.toast.show(this.translationService.translate('toast.batch.copiedAdjusted'));
+    }
+  }
+
+  /** Free pages: «Poner plantilla A» copies the page of A that is open into the page of B that is open. */
+  private confirmCopyPageOfA(mode: 'replace' | 'missing', pageA: number, pageB: number): void {
+    this.toast.show(
+      this.translationService.translate('batch.editor.pages.copyConfirm', { a: pageA, b: pageB }),
+      'info',
+      10000,
+      false,
+      {
+        label: this.translationService.translate('batch.editor.pages.copyAction'),
+        run: () => this.copyPageOfAToB(mode, pageA, pageB),
+      },
+    );
+  }
+
+  private copyPageOfAToB(mode: 'replace' | 'missing', pageA: number, pageB: number): void {
+    const source = this.normalizedTemplateA().find((page) => page.num === pageA)?.fields ?? [];
+    const nameOf = (field: PageField) => (field.mapField || field.value || '').trim();
+    const present = new Set(
+      (this.coords().find((page) => page.num === pageB)?.fields ?? []).map(nameOf),
+    );
+    const toAdd = mode === 'replace' ? source : source.filter((field) => !present.has(nameOf(field)));
+    if (!toAdd.length && mode !== 'replace') {
+      return;
+    }
+    const changed = this.applyCoordsChange(() => {
+      let pages = this.coords();
+      if (mode === 'replace') {
+        pages = pages.map((page) => (page.num === pageB ? { ...page, fields: [] } : page));
+      }
+      for (const field of toAdd) {
+        pages = addFieldToPages(pageB, { ...field }, pages);
+      }
+      this.coords.set(pages);
+    });
+    if (changed) {
+      this.syncCoordsTextModel();
+      this.redrawAllForPage();
     }
   }
 
@@ -5140,19 +5284,145 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.redrawAllForPage();
   }
 
+  /** Back to «Páginas enlazadas» on `page` (a new PDF, a restored session). */
+  private resetPageLink(page: number): void {
+    this.pagesLinked.set(true);
+    this.commonPage.set(page);
+    this.freeAPage.set(page);
+  }
+
+  /**
+   * Goes to a page of the header: with A and B linked it is the shared position (1…max(A, B)),
+   * otherwise a page of B.
+   */
   async setPageIndex(pageNumber: number) {
     if (!this.pdfDoc()) {
       return;
     }
 
-    const clamped = Math.min(this.pdfDoc()!.numPages, Math.max(1, Math.round(pageNumber)));
+    if (this.comparing() && this.pagesLinked()) {
+      const target = clampPageNumber(
+        pageNumber,
+        linkedPageTotal(this.pageCountA(), this.pdfDoc()!.numPages),
+      );
+      if (target === this.commonPage()) {
+        return;
+      }
+      this.commonPage.set(target);
+      const held = holdPageOfB(target, this.pdfDoc()!.numPages);
+      if (held === this.pageIndex()) {
+        // B keeps its page (it may show the empty state): only A changes.
+        this.selection.set(null);
+        await this.refreshAfterLinkedMove();
+        return;
+      }
+      await this.goToBPage(held);
+      return;
+    }
 
+    await this.goToBPage(clampPageNumber(pageNumber, this.pdfDoc()!.numPages));
+  }
+
+  private async refreshAfterLinkedMove(): Promise<void> {
+    if (this.unlinkedSplit()) {
+      const pane = this.splitAPane();
+      if (pane) {
+        pane.scrollLeft = 0;
+        pane.scrollTop = 0;
+      }
+    }
+    this.redrawAllForPage();
+  }
+
+  /** A page of A on its own (free pages). Moving A while linked first frees the pages. */
+  async setPageIndexA(pageNumber: number): Promise<void> {
+    if (!this.comparing()) {
+      return;
+    }
+    const total = this.pageCountA();
+    if (this.pagesLinked()) {
+      this.pagesLinked.set(false);
+      this.freeAPage.set(clampPageNumber(this.aPage() ?? total, total));
+    }
+    const target = clampPageNumber(pageNumber, total);
+    if (target === this.freeAPage()) {
+      return;
+    }
+    this.freeAPage.set(target);
+    const pane = this.splitAPane();
+    if (pane) {
+      pane.scrollTop = 0;
+    }
+  }
+
+  /** Chip «Páginas enlazadas / libres»: A and B stop (or start again) sharing the page. */
+  togglePagesLink(): void {
+    if (!this.comparing()) {
+      return;
+    }
+    if (this.pagesLinked()) {
+      this.freeAPage.set(clampPageNumber(this.aPage() ?? this.pageCountA(), this.pageCountA()));
+      this.pagesLinked.set(false);
+      return;
+    }
+    const before = this.freeAPage();
+    this.commonPage.set(this.pageIndex());
+    this.pagesLinked.set(true);
+    if (before === this.pageIndex()) {
+      return;
+    }
+    this.toast.show(
+      this.translationService.translate('batch.editor.pages.linkedToast', {
+        page: this.pageIndex(),
+      }),
+      'info',
+      10000,
+      false,
+      {
+        label: this.translationService.translate('controls.undo'),
+        run: () => {
+          if (this.pagesLinked() && this.comparing()) {
+            this.freeAPage.set(clampPageNumber(before, this.pageCountA()));
+            this.pagesLinked.set(false);
+          }
+        },
+      },
+    );
+  }
+
+  setPaneFocus(pane: 'a' | 'b'): void {
+    this.paneFocus.set(pane);
+  }
+
+  /** ‹ › and PgUp/PgDn: the shared page, or the page of the pane under the pointer when free. */
+  private async stepPage(direction: -1 | 1): Promise<void> {
+    if (this.comparing() && !this.pagesLinked() && this.splitActive() && this.paneFocus() === 'a') {
+      await this.setPageIndexA(this.freeAPage() + direction);
+      return;
+    }
+    await this.setPageIndex(this.pageShown() + direction);
+  }
+
+  /** Mayús + ← →: only A moves (the pages become free). */
+  async stepPageA(direction: -1 | 1): Promise<void> {
+    if (!this.comparing()) {
+      return;
+    }
+    const current = this.pagesLinked() ? (this.aPage() ?? this.pageCountA()) : this.freeAPage();
+    await this.setPageIndexA(current + direction);
+  }
+
+  private async goToBPage(clamped: number) {
     if (clamped === this.pageIndex()) {
       return;
     }
 
     this.selection.set(null);
     this.pageIndex.set(clamped);
+    if (!this.comparing()) {
+      // Without A the shared position is simply B's page (A's page count may arrive later).
+      this.commonPage.set(clamped);
+    }
     await this.render();
     this.redrawAllForPage();
     if (this.unlinkedSplit()) {
@@ -5169,11 +5439,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   async prevPage() {
-    await this.setPageIndex(this.pageIndex() - 1);
+    await this.stepPage(-1);
   }
 
   async nextPage() {
-    await this.setPageIndex(this.pageIndex() + 1);
+    await this.stepPage(1);
   }
 
   async zoomIn() {
@@ -5256,8 +5526,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     const pixels =
       evt.deltaMode === 1 ? evt.deltaY * 33 : evt.deltaMode === 2 ? evt.deltaY * 400 : evt.deltaY;
-    const page = this.pageIndex();
-    const total = this.pdfDoc()!.numPages;
+    const asA =
+      this.comparing() && !this.pagesLinked() && this.splitActive() && this.isOverSplitA(evt);
+    const pane: 'A' | 'B' | undefined =
+      this.comparing() && !this.pagesLinked() ? (asA ? 'A' : 'B') : undefined;
+    const page = asA ? this.freeAPage() : this.pageShown();
+    const total = asA ? this.pageCountA() : this.pageTotalShown();
     const step = wheelEdgeStep(this.wheelState, {
       deltaY: pixels,
       now: performance.now(),
@@ -5271,21 +5545,22 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const place = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
     if (step.change) {
       const target = page + step.change;
-      this.showWheelEdge({ kind: 'now', progress: 1, page: target, total, ...place }, 900);
-      void this.setPageIndex(target).then(() => {
+      this.showWheelEdge({ pane, kind: 'now', progress: 1, page: target, total, ...place }, 900);
+      void (asA ? this.setPageIndexA(target) : this.setPageIndex(target)).then(() => {
         viewer.scrollTop = step.change > 0 ? 0 : viewer.scrollHeight;
       });
       return;
     }
     if (step.limit) {
       this.showWheelEdge(
-        { kind: pixels > 0 ? 'last' : 'first', progress: 0, page, total, ...place },
+        { pane, kind: pixels > 0 ? 'last' : 'first', progress: 0, page, total, ...place },
         900,
       );
     } else if (step.progress > 0) {
       const dir = pixels > 0 ? 1 : -1;
       this.showWheelEdge(
         {
+          pane,
           kind: dir > 0 ? 'next' : 'prev',
           progress: step.progress,
           page: page + dir,

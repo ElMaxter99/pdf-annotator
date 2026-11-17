@@ -315,7 +315,8 @@
       "fitPage": "An Seite anpassen",
       "panCanvas": "Arbeitsfläche verschieben (halten)",
       "splitLink": "A und B verknüpfen oder trennen (Geteilt)",
-      "wheelPage": "Am Blattrand weiterscrollen: wechselt die Seite"
+      "wheelPage": "Am Blattrand weiterscrollen: wechselt die Seite",
+      "pageOnlyA": "Nur A bewegen (die Seiten werden frei)"
     }
   },
   "toast": {
@@ -462,7 +463,7 @@
         "hint": "A hat keine Vorlage: sein PDF wird unverändert verglichen.",
         "go": "Vorlage A hinzufügen (Dokument)"
       },
-      "pagesDiffer": "Unterschiedliche Seitenzahl: B {{page}} von {{b}} · A {{pageA}} von {{a}}",
+      "pagesDiffer": "A {{a}} S. · B {{b}} S. — mit ‹ › die Seiten von A ansehen",
       "toggle": {
         "label": "Welche Version anzeigen",
         "b": "B ansehen (bearbeitet)",
@@ -504,6 +505,25 @@
           "ai": "KI-Anpassung"
         },
         "adjust": "{{count}} Felder vorgeschlagen · B unverändert"
+      },
+      "pages": {
+        "free": "Freie Seiten: A S. {{a}} · B S. {{b}}",
+        "linked": "Seiten verknüpft",
+        "freeChip": "Seiten frei",
+        "chipTitle": "Seite von A und B verknüpfen oder lösen",
+        "linkedToast": "Seiten verknüpft: A springt zu Seite {{page}} von B",
+        "copyConfirm": "Seite {{a}} von A wird in Seite {{b}} von B kopiert",
+        "copyAction": "Kopieren",
+        "missingTitle": "{{version}} hat keine Seite {{page}}",
+        "missingSub": "Seiten dieser Version: {{count}}",
+        "tagMissing": "A ohne Seite {{page}}",
+        "tagOffset": "A S. {{a}}",
+        "paneA": "A",
+        "paneB": "B",
+        "prevA": "Vorherige Seite von A",
+        "nextA": "Nächste Seite von A",
+        "prevB": "Vorherige Seite von B",
+        "nextB": "Nächste Seite von B"
       }
     },
     "panel": {

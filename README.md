@@ -254,6 +254,7 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | Atajo | Acción |
 | --- | --- |
 | `←` / `→` · `PgUp` / `PgDn` | Página anterior / siguiente |
+| `⇧ ←` / `⇧ →` | Lote: mueve solo la página de A (las páginas pasan a «libres») |
 | `Home` / `End` | Primera / última página |
 | `+` / `−` | Acercar / alejar |
 | `0` | Ajustar el PDF al ancho disponible |
