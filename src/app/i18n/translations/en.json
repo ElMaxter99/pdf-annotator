@@ -1076,6 +1076,7 @@
       "s4": "4 · Ready to transfer",
       "s4out": "What «Transfer with AI» sends",
       "s5": "5 · Done",
+      "s4web": "4 · Done",
       "s5out": "{{count}} pending"
     },
     "kind": {

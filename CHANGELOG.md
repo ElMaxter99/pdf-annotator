@@ -1,4 +1,7 @@
 ## Unreleased
+### Changed
+- **La web ya no muestra rastro de IA en el resumen del lote:** sin ayudante de IA (web desplegada) el resumen pasa a 4 pasos (se quita «Listos para trasladar», «Listos» pasa a ser el 4), y las filas no muestran «Va a la IA» ni «Revisar propuesta». Escritorio y local no cambian.
+
 ### Accessibility
 - **Foco atrapado en todos los diálogos modales:** los de «Proyectos» (nuevo, sincronizar, progreso) y el de acciones masivas del lote ya mantienen Tab/Mayús+Tab dentro, llevan el foco al abrirse, lo devuelven al cerrarse y responden a Esc. Sin cambios visuales.
 - **Posición anunciada a lectores de pantalla:** al seleccionar una sola anotación (o moverla con flechas o arrastre), una región `aria-live="polite"` oculta del pie lee «Posición de «nombre»: X, Y». Las coordenadas del cursor siguen sin anunciarse para no saturar. Textos en los 7 idiomas, con test e2e.

@@ -1083,6 +1083,10 @@ app-ai-batch-chip {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   margin-bottom: 12px;
+
+  &.batch-funnel--four {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .batch-funnel__step {

@@ -499,7 +499,7 @@
       </div>
 
       @if (total() > 0) {
-        <section class="batch-funnel" [attr.aria-label]="'batch.funnel.label' | t" data-testid="batch-funnel">
+        <section class="batch-funnel" [class.batch-funnel--four]="!aiHelper.available" [attr.aria-label]="'batch.funnel.label' | t" data-testid="batch-funnel">
           <button type="button" class="batch-funnel__step" (click)="showStep('all')" data-testid="funnel-all">
             <small>{{ 'batch.funnel.s1' | t }}</small>
             <strong>{{ funnel().total }}</strong>
@@ -515,13 +515,15 @@
             <strong>{{ funnel().withB }}</strong>
             <span>{{ 'batch.funnel.s3out' | t: { count: funnel().onlyB } }}</span>
           </button>
+          @if (aiHelper.available) {
           <button type="button" class="batch-funnel__step batch-funnel__step--ai" (click)="showStep('ai')" data-testid="funnel-ai">
             <small>{{ 'batch.funnel.s4' | t }}</small>
             <strong>{{ funnel().ai }}</strong>
             <span>{{ 'batch.funnel.s4out' | t }}</span>
           </button>
+          }
           <button type="button" class="batch-funnel__step" (click)="showStep('ready')" data-testid="funnel-ready">
-            <small>{{ 'batch.funnel.s5' | t }}</small>
+            <small>{{ (aiHelper.available ? 'batch.funnel.s5' : 'batch.funnel.s4web') | t }}</small>
             <strong>{{ funnel().ready }}</strong>
             <span>{{ 'batch.funnel.s5out' | t: { count: funnel().pending } }}</span>
           </button>
@@ -670,13 +672,15 @@
                 @if (row.item.pageMap) {
                   <span class="batch-chip batch-chip--on" data-testid="row-page-map">⇄ {{ 'batch.pageMap.chip' | t }}</span>
                 }
+                @if (aiHelper.available) {
                 <small class="batch-why" [class.batch-why--ok]="aiReason(row.item) === 'eligible'" data-testid="row-why">{{ 'batch.why.' + aiReason(row.item) | t }}</small>
+                }
                 @if (aiHelper.available) {
                 <app-ai-batch-chip [item]="row.item" />
               }
               </span>
               <span class="batch-row__actions" role="cell">
-                @if (row.item.aiProposal) {
+                @if (aiHelper.available && row.item.aiProposal) {
                   <button
                     type="button"
                     class="btn btn--primary"
