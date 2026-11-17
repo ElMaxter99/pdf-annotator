@@ -5,14 +5,13 @@ import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, signal, 
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { NoticeId, WorkspacePageComponent } from '../../workspace.page';
 import { AdjustReviewComponent } from './adjust-review.component';
-import { AiReviewComponent } from './ai-review.component';
 
 /** Top bar of the editor while a PDF of a batch is open: B is edited, A is the reference. */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-migration-bar',
   standalone: true,
-  imports: [FocusTrapDirective, CommonModule, TranslationPipe, AdjustReviewComponent, AiReviewComponent, AiModelSelectComponent],
+  imports: [FocusTrapDirective, CommonModule, TranslationPipe, AdjustReviewComponent, AiModelSelectComponent],
   templateUrl: './migration-bar.component.html',
 })
 export class MigrationBarComponent implements OnInit {

@@ -1,19 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationService } from '../../../../i18n/translation.service';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import {
   confidenceLevel,
-  isRowSelected,
-  rowChangesPage,
-  rowNeedsReview,
-  sortAiRows,
   type AiRow,
 } from '../../../../utils/ai-proposal.utils';
 import { AiDetailsComponent } from './ai-details.component';
 import type { WorkspacePageComponent } from '../../workspace.page';
 
-/** «Copiar y adaptar con IA»: the strip under the bar with progress, errors and the proposal to review. */
+/** «Copiar y adaptar con IA»: the review bar docked under the viewer (progress, errors and the proposal to apply). */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-review',
@@ -27,37 +23,61 @@ export class AiReviewComponent {
 
   private readonly i18n = inject(TranslationService);
 
-  /** «9 de 10 campos colocados · 1 cambia de página · 1 sin encontrar.» */
-  stripText(): string {
-    const sum = this.vm.aiSummary();
-    const parts = [this.i18n.translate('ai.review.strip', { placed: sum.placed, total: sum.total })];
-    if (sum.changePage > 0) {
-      parts.push(this.i18n.translate('ai.review.changePage', { count: sum.changePage }));
+  readonly menuOpen = signal(false);
+  readonly confirming = signal(false);
+
+  /** Placed fields that are not high confidence: what is worth a look before applying. */
+  reviewCount(): number {
+    return (this.vm.ai()?.rows ?? []).filter((row: AiRow) => row.ok && confidenceLevel(row.confidence) !== 'high').length;
+  }
+
+  toggleMenu(event: Event): void {
+    event.stopPropagation();
+    this.menuOpen.update((open) => !open);
+  }
+
+  openDetails(): void {
+    this.menuOpen.set(false);
+    this.vm.setAiDetailsOpen(true);
+  }
+
+  askDiscard(): void {
+    this.menuOpen.set(false);
+    this.confirming.set(true);
+  }
+
+  /** ✕: a saved proposal stays in the batch (it can be reopened); a fresh one asks first. */
+  onClose(): void {
+    if (this.vm.ai()?.saved) {
+      this.vm.cancelAi();
+    } else {
+      this.confirming.set(true);
     }
-    if (sum.notFound > 0) {
-      parts.push(this.i18n.translate('ai.review.notFound', { count: sum.notFound }));
+  }
+
+  confirmDiscard(): void {
+    this.confirming.set(false);
+    if (this.vm.ai()?.saved) {
+      this.vm.discardAi();
+    } else {
+      this.vm.cancelAi();
     }
-    return parts.join(' · ') + '.';
   }
 
-  sorted(): AiRow[] {
-    return sortAiRows(this.vm.ai()?.rows ?? []);
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (this.menuOpen() && !(event.target as HTMLElement | null)?.closest?.('.ai-dock__more')) {
+      this.menuOpen.set(false);
+    }
   }
 
-  selected(row: AiRow): boolean {
-    return isRowSelected(row, this.vm.aiOverrides());
-  }
-
-  level(row: AiRow): string {
-    return row.ok ? confidenceLevel(row.confidence) : 'none';
-  }
-
-  needsReview(row: AiRow): boolean {
-    return rowNeedsReview(row);
-  }
-
-  changesPage(row: AiRow): boolean {
-    return rowChangesPage(row);
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.menuOpen()) {
+      this.menuOpen.set(false);
+    } else if (this.confirming()) {
+      this.confirming.set(false);
+    }
   }
 
   providerName(): string {

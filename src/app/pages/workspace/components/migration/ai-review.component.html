@@ -1,103 +1,135 @@
 @if (vm.ai(); as s) {
   @if (!vm.isNoticeClosed('ai')) {
+    <ng-template #moreMenu let-discard="discard">
+      <span class="ai-dock__more">
+        <button type="button" class="ai-dock__icon" [attr.aria-expanded]="menuOpen()" aria-haspopup="menu" (click)="toggleMenu($event)"
+          [attr.aria-label]="'ai.dock.more' | t" [attr.title]="'ai.dock.more' | t" data-testid="ai-more">⋯</button>
+        @if (menuOpen()) {
+          <div class="ai-dock__menu" role="menu" data-testid="ai-menu">
+            <button type="button" role="menuitem" (click)="openDetails()" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
+            @if (discard) {
+              <button type="button" role="menuitem" class="ai-dock__menu-danger" (click)="askDiscard()" data-testid="ai-discard">{{ 'ai.dock.discard' | t }}</button>
+            }
+          </div>
+        }
+      </span>
+    </ng-template>
     @switch (s.phase) {
       @case ('loading') {
-        <div class="migration-hint adjust-strip" role="status" data-testid="ai-loading">
-          <span class="adjust-strip__text">
-            <strong>{{ 'ai.loading.title' | t: { provider: providerName() } }}</strong>
-            {{ 'ai.loading.stage.' + s.stage | t }}
-            <em>{{ 'ai.loading.hint' | t }}</em>
-          </span>
-          <progress class="adjust-strip__progress"></progress>
-          <button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
-          <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
+        <div class="ai-dock" role="status" data-testid="ai-loading">
+          <div class="ai-dock__state">
+            <div class="ai-dock__l1">
+              <span class="ai-dock__chip ai-dock__chip--on">✦ {{ providerName() }}</span>
+              <b>{{ 'ai.dock.comparing' | t }}</b>
+            </div>
+            <div class="ai-dock__l2">
+              <span class="ai-dock__muted">{{ 'ai.loading.stage.' + s.stage | t }} · {{ 'ai.loading.hint' | t }}</span>
+              <progress class="ai-dock__progress"></progress>
+            </div>
+          </div>
+          <div class="ai-dock__actions">
+            <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
+            <ng-container *ngTemplateOutlet="moreMenu; context: { discard: false }"></ng-container>
+          </div>
         </div>
       }
       @case ('error') {
-        <div class="migration-hint migration-hint--warn adjust-strip" role="alert" [attr.data-testid]="'ai-error-' + s.error?.code">
-          <span class="adjust-strip__text">
-            <strong>{{ 'ai.error.' + (s.error?.code || 'error') + '.title' | t: { provider: providerName() } }}</strong>
-            {{ 'ai.error.' + (s.error?.code || 'error') + '.text' | t: { provider: providerName(), reset: s.error?.reset || '—' } }}
-            @if (s.error?.message && s.error?.code !== 'limit') {
-              <em class="ai-detail" data-testid="ai-detail">{{ s.error?.message }}</em>
-            }
-          </span>
-          <span class="migration-hint__actions">
-            <button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
-          @if (s.error?.code === 'limit' && otherProvider()) {
+        <div class="ai-dock" role="alert" [attr.data-testid]="'ai-error-' + s.error?.code">
+          <div class="ai-dock__state">
+            <div class="ai-dock__l1">
+              <span class="ai-dock__chip ai-dock__chip--on">✦ {{ providerName() }}</span>
+              <span class="ai-dock__chip ai-dock__chip--err">{{ 'ai.error.' + (s.error?.code || 'error') + '.title' | t: { provider: providerName() } }}</span>
+            </div>
+            <div class="ai-dock__l2">
+              <span class="ai-dock__muted">
+                {{ 'ai.error.' + (s.error?.code || 'error') + '.text' | t: { provider: providerName(), reset: s.error?.reset || '—' } }}
+                @if (s.error?.message && s.error?.code !== 'limit') {
+                  <em class="ai-detail" data-testid="ai-detail">{{ s.error?.message }}</em>
+                }
+              </span>
+            </div>
+          </div>
+          <div class="ai-dock__actions">
+            @if (s.error?.code === 'limit' && otherProvider()) {
               <button type="button" class="btn btn--primary" (click)="vm.retryAi(otherProvider()!)" data-testid="ai-switch">{{ 'ai.error.switch' | t: { provider: otherName() } }}</button>
             } @else {
               <button type="button" class="btn btn--primary" (click)="vm.retryAi()" data-testid="ai-retry">{{ 'ai.error.retry' | t }}</button>
             }
             <button type="button" class="btn btn--ghost" (click)="vm.useAdjustInstead()" data-testid="ai-use-adjust">{{ 'ai.error.useAdjust' | t }}</button>
-            <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
-          </span>
-          <button type="button" class="migration-hint__close" (click)="closeRequested.emit()" [attr.aria-label]="'batch.editor.notices.close' | t" [attr.title]="'batch.editor.notices.close' | t">✕</button>
+            <ng-container *ngTemplateOutlet="moreMenu; context: { discard: false }"></ng-container>
+            <button type="button" class="ai-dock__icon" (click)="closeRequested.emit()" [attr.aria-label]="'ai.dock.close' | t" [attr.title]="'ai.dock.close' | t" data-testid="ai-cancel">✕</button>
+          </div>
         </div>
       }
       @case ('empty') {
-        <div class="migration-hint migration-hint--warn adjust-strip" role="alert" data-testid="ai-empty">
-          <span class="adjust-strip__text"><strong>{{ 'ai.empty.title' | t }}</strong> {{ 'ai.empty.text' | t }}</span>
-          <span class="migration-hint__actions">
-            <button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
-          <button type="button" class="btn btn--primary" (click)="vm.useAdjustInstead()">{{ 'ai.error.useAdjust' | t }}</button>
-            <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
-          </span>
-          <button type="button" class="migration-hint__close" (click)="vm.cancelAi()" [attr.aria-label]="'batch.editor.notices.close' | t">✕</button>
+        <div class="ai-dock" role="alert" data-testid="ai-empty">
+          <div class="ai-dock__state">
+            <div class="ai-dock__l1">
+              <span class="ai-dock__chip ai-dock__chip--on">✦ {{ providerName() }}</span>
+              <span class="ai-dock__chip">{{ 'ai.dock.noChange' | t }}</span>
+            </div>
+            <div class="ai-dock__l2"><span class="ai-dock__muted">{{ 'ai.empty.text' | t }}</span></div>
+          </div>
+          <div class="ai-dock__actions">
+            <button type="button" class="btn btn--primary" (click)="vm.useAdjustInstead()">{{ 'ai.error.useAdjust' | t }}</button>
+            <ng-container *ngTemplateOutlet="moreMenu; context: { discard: false }"></ng-container>
+            <button type="button" class="ai-dock__icon" (click)="vm.cancelAi()" [attr.aria-label]="'ai.dock.close' | t" [attr.title]="'ai.dock.close' | t" data-testid="ai-cancel">✕</button>
+          </div>
         </div>
       }
       @case ('ready') {
         @let sum = vm.aiSummary();
-        <div class="migration-hint adjust-strip" role="status" data-testid="ai-review">
-          <span class="adjust-strip__text" data-testid="ai-summary">
-            <strong>{{ 'ai.review.title' | t: { provider: providerName() } }}</strong> ·
-            @if (s.saved) { <em data-testid="ai-saved">{{ 'ai.review.saved' | t: { provider: providerName() } }}</em> · }
-            {{ stripText() }}
-            <em>{{ 'ai.review.untouched' | t }}</em>
-          </span>
-          <span class="adjust-strip__actions">
-            <span class="migration-seg" role="group" [attr.aria-label]="'batch.adjust.view.label' | t">
-              <button type="button" [class.migration-seg__on]="s.view === 'proposal'" [attr.aria-pressed]="s.view === 'proposal'" (click)="vm.setAiView('proposal')" data-testid="ai-view-proposal">{{ 'batch.adjust.view.proposal' | t }}</button>
-              <button type="button" [class.migration-seg__on]="s.view === 'original'" [attr.aria-pressed]="s.view === 'original'" (click)="vm.setAiView('original')" data-testid="ai-view-original">{{ 'batch.adjust.view.original' | t }}</button>
-            </span>
-<button type="button" class="btn btn--ghost" (click)="vm.setAiDetailsOpen(true)" data-testid="ai-details-open">{{ 'ai.details.open' | t }}</button>
-            <button type="button" class="btn btn--primary" [disabled]="sum.selected === 0" (click)="vm.applyAi()" data-testid="ai-apply">{{ 'batch.adjust.apply' | t: { count: sum.selected } }}</button>
-            <button type="button" class="btn btn--ghost" [attr.aria-expanded]="s.open" (click)="vm.toggleAiOpen()" data-testid="ai-toggle-list">{{ 'batch.adjust.list' | t }} {{ s.open ? '▴' : '▾' }}</button>
-            @if (s.saved) {
-              <button type="button" class="btn btn--ghost" (click)="vm.discardAi()" data-testid="ai-discard">{{ 'ai.review.discard' | t }}</button>
-            }
-            <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="ai-cancel">{{ 'batch.editor.cancel' | t }}</button>
-          </span>
-          <button type="button" class="migration-hint__close" (click)="closeRequested.emit()" [attr.aria-label]="'batch.editor.notices.close' | t" [attr.title]="'batch.editor.notices.close' | t" data-testid="notice-close-ai">✕</button>
-        </div>
-        @if (s.open) {
-          <div class="adjust-drawer" data-testid="ai-drawer">
-            <ul class="adjust-list" data-testid="ai-fields">
-              @for (row of sorted(); track row.id) {
-                <li class="adjust-list__item" [attr.data-ai-id]="row.id">
-                  <label>
-                    <input type="checkbox" [checked]="selected(row)" [disabled]="!row.ok" (change)="vm.toggleAiRow(row)" />
-                    <span class="adjust-list__name">
-                      <b>{{ vm.aiFieldName(row) }}</b>
-                      <small>
-                        @if (!row.ok) {
-                          {{ 'ai.review.notPlaced' | t }}
-                        } @else {
-                          @if (row.anchorB) { {{ 'ai.review.anchor' | t: { text: row.anchorB } }} · }
-                          @if (changesPage(row)) { p. {{ row.page }} → p. {{ row.newPage }} } @else { p. {{ row.page }} }
-                        }
-                        @if (row.reason) { · {{ row.reason }} }
-                      </small>
-                    </span>
-                  </label>
-                  @if (row.ok && changesPage(row)) {
-                    <button type="button" class="btn btn--ghost" (click)="vm.goToAiRow(row)" data-testid="ai-goto">{{ 'ai.review.goto' | t }}</button>
-                  }
-                  <span class="adjust-badge" [ngClass]="{ 'adjust-badge--high': level(row) === 'high', 'adjust-badge--medium': level(row) === 'medium', 'adjust-badge--low': level(row) === 'low' || level(row) === 'none' }">{{ 'ai.confidence.' + level(row) | t }}</span>
-                </li>
-              }
-            </ul>
-            <small class="adjust-drawer__hint">{{ 'ai.review.listHint' | t }}</small>
+        @if (confirming()) {
+          <div class="ai-dock" role="alertdialog" [attr.aria-label]="'ai.dock.confirmTitle' | t: { provider: providerName() }" data-testid="ai-confirm">
+            <div class="ai-dock__state">
+              <div class="ai-dock__l1"><b>{{ 'ai.dock.confirmTitle' | t: { provider: providerName() } }}</b></div>
+              <div class="ai-dock__l2"><span class="ai-dock__muted">{{ (s.saved ? 'ai.dock.confirmSaved' : 'ai.dock.confirmFresh') | t }}</span></div>
+            </div>
+            <div class="ai-dock__actions">
+              <button type="button" class="btn btn--danger" (click)="confirmDiscard()" data-testid="ai-confirm-discard">{{ 'ai.dock.confirmYes' | t }}</button>
+              <button type="button" class="btn btn--ghost" (click)="confirming.set(false)" data-testid="ai-confirm-back">{{ 'ai.dock.confirmNo' | t }}</button>
+            </div>
+          </div>
+        } @else {
+          <div class="ai-dock" role="region" [attr.aria-label]="'ai.dock.label' | t" data-testid="ai-review">
+            <div class="ai-dock__state" data-testid="ai-summary">
+              <div class="ai-dock__l1">
+                <span class="ai-dock__chip ai-dock__chip--on">✦ {{ providerName() }}</span>
+                <span class="ai-dock__chip" [attr.data-testid]="s.saved ? 'ai-saved' : 'ai-fresh'">{{ (s.saved ? 'ai.dock.saved' : 'ai.dock.fresh') | t }}</span>
+              </div>
+              <div class="ai-dock__l2">
+                <b>{{ 'ai.dock.placed' | t: { placed: sum.placed, total: sum.total } }}</b>
+                @if (sum.notFound > 0) {
+                  <span class="ai-dock__chip ai-dock__chip--warn">{{ 'ai.dock.notFound' | t: { count: sum.notFound } }}</span>
+                }
+                @if (sum.changePage > 0) {
+                  <span class="ai-dock__chip">{{ 'ai.review.changePage' | t: { count: sum.changePage } }}</span>
+                }
+                @if (sum.selected === 0) {
+                  <span class="ai-dock__muted">{{ 'ai.dock.nothingMarked' | t }}</span>
+                } @else {
+                  <span class="ai-dock__muted ai-dock__untouched">{{ 'ai.dock.untouched' | t }}</span>
+                }
+              </div>
+            </div>
+            <div class="ai-dock__view">
+              <span class="ai-dock__label">{{ 'ai.dock.viewLabel' | t }}</span>
+              <span class="migration-seg" role="group" [attr.aria-label]="'ai.dock.viewLabel' | t">
+                <button type="button" [class.migration-seg__on]="s.view === 'proposal'" [attr.aria-pressed]="s.view === 'proposal'" (click)="vm.setAiView('proposal')" data-testid="ai-view-proposal">{{ 'batch.adjust.view.proposal' | t }}</button>
+                <button type="button" [class.migration-seg__on]="s.view === 'original'" [attr.aria-pressed]="s.view === 'original'" (click)="vm.setAiView('original')" data-testid="ai-view-original">{{ 'batch.adjust.view.original' | t }}</button>
+              </span>
+            </div>
+            <div class="ai-dock__actions">
+              <button type="button" class="btn btn--ghost" (click)="vm.reviewAiFields()" data-testid="ai-review-fields">
+                {{ 'ai.dock.review' | t }}
+                @if (reviewCount() > 0) {
+                  <span class="ai-dock__count" [attr.aria-label]="'ai.dock.reviewCount' | t: { count: reviewCount() }">{{ reviewCount() }}</span>
+                }
+              </button>
+              <button type="button" class="btn btn--primary" [disabled]="sum.selected === 0" [attr.title]="sum.selected === 0 ? ('ai.dock.nothingMarkedHint' | t) : null" (click)="vm.applyAi()" data-testid="ai-apply">{{ 'ai.dock.apply' | t: { count: sum.selected } }}</button>
+              <ng-container *ngTemplateOutlet="moreMenu; context: { discard: true }"></ng-container>
+              <button type="button" class="ai-dock__icon" (click)="onClose()" [attr.aria-label]="'ai.dock.close' | t" [attr.title]="'ai.dock.close' | t" data-testid="ai-cancel">✕</button>
+            </div>
           </div>
         }
       }

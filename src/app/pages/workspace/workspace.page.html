@@ -1,7 +1,10 @@
-<div class="app app--workspace" [class.app--sidebar-minimized]="vm.sidebarMinimized()">
+<div class="app app--workspace" [class.app--sidebar-minimized]="vm.sidebarMinimized()" [class.app--ai-dock]="vm.aiDockVisible()">
   <app-workspace-header [vm]="vm"></app-workspace-header>
   <app-workspace-sidebar [vm]="vm"></app-workspace-sidebar>
   <app-workspace-viewer [vm]="vm"></app-workspace-viewer>
+  @if (vm.aiHelper.available && vm.batchCtx()) {
+    <app-ai-review [vm]="vm" (closeRequested)="vm.closeNotice('ai')"></app-ai-review>
+  }
   <app-workspace-footer [vm]="vm"></app-workspace-footer>
 </div>
 @if (vm.shortcutsOpen()) {

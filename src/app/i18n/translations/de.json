@@ -910,6 +910,40 @@
         "keepRunning": "Du kannst den Tab schließen oder neu laden: Die Warteschlange läuft weiter, solange der Helfer geöffnet ist.",
         "lost": "Der Helfer wurde geschlossen und die Warteschlange ging verloren. {{kept}} PDFs behalten ihren Vorschlag; {{lost}} wurden nicht fertig.",
         "relaunch": "Die {{count}} fehlenden erneut starten"
+      },
+      "sheet": {
+        "label": "Zusammenfassung der Übertragung",
+        "scope": "Worauf sich die Zusammenfassung bezieht",
+        "scopeAll": "Ganzer Stapel",
+        "scopeFollow": "Läuft gerade",
+        "release": "Dieses PDF loslassen und zum ganzen Stapel zurück",
+        "allTitle": "Zusammenfassung · ganzer Stapel",
+        "allSub": "{{count}} PDFs übertragen",
+        "followTitle": "Läuft gerade · {{name}}",
+        "followSub": "wechselt von selbst zum nächsten, wenn es fertig ist",
+        "pdfTitle": "Zusammenfassung · {{name}}",
+        "tokens": "Tokens",
+        "noMeasure": "Verbrauch nicht messbar",
+        "requests": "Anfragen",
+        "attempts": "Versuche",
+        "time": "Zeit",
+        "free": "Ohne Kosten",
+        "placed": "Platziert",
+        "placedValue": "{{placed}} von {{total}}",
+        "more": "Schritte und Gesendetes ansehen",
+        "moreAll": "Stapeldetails ansehen"
+      },
+      "filter": {
+        "label": "Liste filtern",
+        "all": "Alle {{count}}",
+        "review": "Zu prüfen {{count}}",
+        "warn": "Mit Hinweis {{count}}",
+        "failed": "Fehlgeschlagen {{count}}",
+        "empty": "Kein PDF mit diesem Filter."
+      },
+      "row": {
+        "viewing": "Zusammenfassung wird gezeigt",
+        "following": "Folgt dem laufenden"
       }
     },
     "more": "Weitere Aktionen",
@@ -1084,7 +1118,6 @@
       "text": "Versteht, dass ein Feld den Platz oder die Seite wechselt. Nutzt dein {{provider}}. Einige Sekunden pro PDF."
     },
     "loading": {
-      "title": "{{provider}} vergleicht A und B…",
       "hint": "Du kannst weiterbearbeiten; B bleibt unverändert, bis du anwendest.",
       "stage": {
         "reading": "Seiten und Texte vorbereiten",
@@ -1142,18 +1175,10 @@
       "text": "Die KI hat kein Feld platziert."
     },
     "review": {
-      "title": "KI-Vorschlag ({{provider}})",
-      "strip": "{{placed}} von {{total}} Feldern platziert",
       "changePage": "{{count}} wechselt/wechseln die Seite",
-      "notFound": "{{count}} nicht gefunden",
-      "untouched": "B wurde noch nicht verändert.",
-      "notPlaced": "nicht platziert",
       "anchor": "Anker „{{text}}“",
-      "goto": "Zur Seite",
       "listHint": "Felder mit niedriger Zuverlässigkeit oder ohne Platz werden erst angewendet, wenn du sie ankreuzt.",
-      "saved": "Gespeicherter Vorschlag · {{provider}}",
       "adjustProvider": "Textanpassung",
-      "discard": "Vorschlag verwerfen",
       "pending": "Zu prüfen: {{count}}",
       "nextWithProposal": "Nächster mit Vorschlag ›"
     },
@@ -1295,6 +1320,47 @@
       "emptyClaude": "Das Standardmodell von Claude Code wird verwendet.",
       "retiredTitle": "„{{model}}“ ist für dein Konto nicht mehr verfügbar.",
       "retiredBody": "Wir sind zu {{fallback}} zurückgekehrt; du kannst in der Liste ein anderes wählen."
+    },
+    "dock": {
+      "label": "Prüfung des Vorschlags",
+      "viewLabel": "In B zeigen",
+      "fresh": "Neu",
+      "saved": "Gespeichert",
+      "untouched": "B unverändert",
+      "placed": "{{placed}} von {{total}} platziert",
+      "notFound": "{{count}} nicht gefunden",
+      "nothingMarked": "Nichts angehakt",
+      "nothingMarkedHint": "Haken Sie mindestens ein Feld zum Anwenden an.",
+      "review": "Felder prüfen",
+      "reviewCount": "{{count}} zu prüfen",
+      "apply": "{{count}} anwenden",
+      "more": "Weitere Aktionen",
+      "close": "Prüfung schließen",
+      "discard": "Vorschlag verwerfen…",
+      "confirmTitle": "Vorschlag von {{provider}} verwerfen?",
+      "confirmSaved": "Er wird aus dem Stapel gelöscht. Erneutes Anfordern kostet eine weitere Anfrage.",
+      "confirmFresh": "Dieser Vorschlag geht verloren. Erneutes Anfordern kostet eine weitere Anfrage.",
+      "confirmYes": "Verwerfen",
+      "confirmNo": "Zurück",
+      "comparing": "A und B werden verglichen…",
+      "noChange": "Keine Änderungen",
+      "viewingProposal": "Vorschlag wird gezeigt",
+      "viewingOriginal": "Original"
+    },
+    "proposal": {
+      "count": "{{count}} vorgeschlagen",
+      "unapplied": "Nicht angewendet",
+      "willApply": "{{count}} werden angewendet",
+      "selectHigh": "Hohe anhaken ({{count}})",
+      "selectNone": "Alle abwählen",
+      "group": {
+        "review": "Zu prüfen · {{count}}",
+        "notFound": "Nicht gefunden · {{count}}",
+        "ready": "Bereit · {{count}}"
+      },
+      "notInB": "nicht in B",
+      "placeByHand": "Von Hand platzieren",
+      "tabBadge": "KI-Vorschlag: {{count}} Felder"
     }
   },
   "update": {
