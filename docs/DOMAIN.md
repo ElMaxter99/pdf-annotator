@@ -8,6 +8,7 @@
 | **Puntos PDF** | Unidad del PDF (1 pt = 1/72 in). Origen **abajo-izquierda**: `y` crece hacia arriba. |
 | **Página (`num`)** | Número de página empezando en 1. |
 | **Plantilla** | Conjunto de anotaciones guardado en `localStorage` (`AnnotationTemplatesService`). No confundir con la plantilla de Mongo del autor, que es un objeto con `pages` y más atributos. |
+| **Archivo de proyecto** | (Escritorio) `.pdfannotator`: ZIP versionado para llevar un proyecto a otro equipo (ver «Formato del archivo de proyecto»). |
 | **Proyecto** | (Escritorio) Carpeta visible del disco con el lote de un cliente: `project.json`, `batch/` y `.lock`. «Espacio de trabajo» sigue siendo el editor. |
 | **Sesión** | Último PDF + anotaciones + página + zoom en IndexedDB (`SessionStoreService`). |
 | **Guías / snapping** | Rejilla, reglas e imán (`GuideSettings`). |
@@ -23,6 +24,14 @@
 - Avanzados (solo con «Incluir propiedades avanzadas»): `color`, `fontFamily`, `opacity`, `backgroundColor`, `locked`, `hidden`, `value`, `appender`, `decimals`.
 - La importación es tolerante: acepta un array directo o `{ pages }`, comillas simples, claves sin comillas, comentarios y comas finales (`utils/loose-json.ts`).
 - Ejemplo completo: `examples/anotaciones-ejemplo.json` con `examples/factura-ejemplo.pdf`.
+
+## Formato del archivo de proyecto (`.pdfannotator`, formato 1)
+ZIP (se abre con cualquier descompresor) con estas entradas y ninguna más:
+- `manifest.json`: `{ "format": "pdf-annotator-project", "formatVersion": 1, "app": { "name", "version" }, "exportedAt": <ms>, "files": [{ "path", "size", "sha256" }] }`. Lista todas las demás entradas con su huella.
+- `project.json`: `{ "v": 1, "name", "createdAt", "updatedAt", "ref" }` (`ref` = subcarpeta sugerida; sin id: al importar nace uno nuevo).
+- `batch/<id>.json`: metadatos y anotaciones de cada PDF del lote (lo que guarda el proyecto en disco).
+- `batch/<id>.a.pdf` (siempre) y `batch/<id>.b.pdf` (opcional).
+No viaja: `.lock`, rutas absolutas ni el nombre del equipo. Importar rechaza, sin escribir nada: nombres fuera de esa lista o con `..`, `\`, rutas absolutas; entradas cifradas o duplicadas; CRC o SHA-256 que no cuadren; PDFs sin cabecera `%PDF-`; más de 200 PDFs o 2 GB; un `formatVersion` mayor que el que entiende la app. Los PDFs de más de 40 MB se dejan fuera solo si la persona lo acepta. Un formato nuevo sube `formatVersion` y la app antigua pide actualizar.
 
 ## Coordenadas
 - Guardadas y exportadas en puntos PDF. El DOM usa `top = canvas.height − y·scale`; la conversión está en `domToPdfCoords`.

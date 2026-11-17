@@ -1,6 +1,6 @@
 'use strict';
 // Puente mínimo y explícito entre la web y el proceso principal. Nada de Node en la web.
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('desktop', {
   isDesktop: true,
@@ -40,6 +40,25 @@ contextBridge.exposeInMainWorld('desktop', {
     release: (input) => ipcRenderer.invoke('projects:release', input),
     rename: (input) => ipcRenderer.invoke('projects:rename', input),
     forget: (input) => ipcRenderer.invoke('projects:forget', input),
+    exportInfo: (input) => ipcRenderer.invoke('projects:export-info', input),
+    exportProject: (input) => ipcRenderer.invoke('projects:export', input),
+    reveal: () => ipcRenderer.invoke('projects:reveal'),
+    // `path` solo viene de soltar un archivo: el proceso principal lo revisa entero antes de fiarse de él.
+    importInspect: (input) => ipcRenderer.invoke('projects:import-inspect', input),
+    importRun: (input) => ipcRenderer.invoke('projects:import-run', input),
+    cancel: () => ipcRenderer.invoke('projects:cancel'),
+    pathForFile: (file) => {
+      try {
+        return webUtils.getPathForFile(file) || '';
+      } catch {
+        return '';
+      }
+    },
+    onProgress: (callback) => {
+      const listener = (_event, payload) => callback(payload);
+      ipcRenderer.on('projects:progress', listener);
+      return () => ipcRenderer.removeListener('projects:progress', listener);
+    },
   },
   openReleasePage: () => ipcRenderer.invoke('desktop:update:open-release'),
 });
