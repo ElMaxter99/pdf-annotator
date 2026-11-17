@@ -316,7 +316,8 @@
       "panCanvas": "Mou el llenç (mantén)",
       "splitLink": "Enllaçar o desenllaçar A i B (Dividida)",
       "wheelPage": "Continuar amb la roda a la vora del full: canvia de pàgina",
-      "pageOnlyA": "Moure només A (les pàgines passen a lliures)"
+      "pageOnlyA": "Moure només A (les pàgines passen a lliures)",
+      "palette": "Obrir la paleta d'ordres"
     }
   },
   "toast": {
@@ -523,7 +524,61 @@
         "prevA": "Pàgina anterior d'A",
         "nextA": "Pàgina següent d'A",
         "prevB": "Pàgina anterior de B",
-        "nextB": "Pàgina següent de B"
+        "nextB": "Pàgina següent de B",
+        "tagMapped": "B {{b}} ↔ A {{a}}",
+        "tagUnmapped": "A sense equivalent"
+      },
+      "pageMap": {
+        "chip": "Pàgines emparellades",
+        "menu": "Opcions de pàgines",
+        "menuMapped": "Emparellades (taula)",
+        "open": "Emparellar pàgines…",
+        "unmappedTitle": "B {{page}} no té equivalent a A",
+        "unmappedSub": "És una pàgina nova de la taula: no hi ha camps d'A per copiar.",
+        "applied": "Pàgines emparellades: {{count}} de {{total}}",
+        "cleared": "Pàgines una altra vegada per número",
+        "copied": "Camps copiats per la taula · pàgines amb equivalent: {{count}} · sense: {{unmapped}}",
+        "title": "Emparella les pàgines d'A i B",
+        "lead": "Pàgines: A {{a}} · B {{b}}. Tria quina pàgina d'A correspon a cadascuna de B.",
+        "suggest": "Suggerir per textos",
+        "shiftAll": "Desplaçar-les totes",
+        "shiftBack": "Desplaçar totes les correspondències una pàgina enrere",
+        "shiftForward": "Desplaçar totes les correspondències una pàgina endavant",
+        "byNumber": "Per número",
+        "reading": "Llegint textos…",
+        "readingCount": "{{done}} de {{total}} pàgines",
+        "cancelRead": "Cancel·lar la lectura",
+        "noTextTitle": "No s'han pogut llegir textos.",
+        "noTextHint": "Sembla un PDF escanejat, sense text seleccionable. Emparella a mà, usa «Desplaçar-les totes» o «Per número».",
+        "retry": "Tornar-ho a provar",
+        "noteNumber": "Mentre no emparellis, A1 es compara amb B1, A2 amb B2… i les pàgines de B que sobrin queden sense A.",
+        "noteSuggested": "He comparat els textos de cada pàgina. Revisa el suggerit i prem «Aplicar»: B no canvia, només quina pàgina d'A es compara amb cadascuna.",
+        "noteManual": "Has canviat {{count}} files. Les marcades «A mà» no es toquen si tornes a prémer «Suggerir per textos».",
+        "colB": "Pàgina de B",
+        "colA": "Equival a (a A)",
+        "colOrigin": "Origen",
+        "pageA": "A {{n}}",
+        "pageB": "B {{n}}",
+        "rowLabel": "Pàgina d'A que correspon a B {{n}}",
+        "none": "Sense pàgina d'A",
+        "repeated": "Repetida",
+        "alsoIn": "També a B {{pages}}",
+        "originNew": "Nova",
+        "pickOne": "Tria una pàgina d'A",
+        "originManual": "A mà",
+        "restoreRow": "Tornar al suggeriment",
+        "originAuto": "Suggerida",
+        "noMatch": "Sense coincidència suficient",
+        "match": "Coincidència {{pct}} %",
+        "originNone": "Sense pàgina d'A",
+        "originNumber": "Per número",
+        "noteRepeated": "Una mateixa pàgina d'A es copiarà en diverses de B. Pots continuar si és el que vols (per exemple, un formulari que es repeteix).",
+        "noteUnused": "A {{pages}} no s'usa: els seus camps no es copiaran.",
+        "preview": "Fila triada",
+        "summary": "{{matched}} de {{total}} files amb equivalent",
+        "cancel": "Cancel·lar",
+        "apply": "Aplicar",
+        "noticeMapped": "Pàgines emparellades amb la taula · A {{a}} pàgs · B {{b}} pàgs"
       }
     },
     "panel": {
@@ -682,7 +737,12 @@
         "removeYes": "Treu la versió B"
       },
       "noTemplateNote": "Sense plantilla: pots carregar la de l’original o afegir una versió nova a Document.",
-      "noTemplateGo": "Ves a Document"
+      "noTemplateGo": "Ves a Document",
+      "pages": {
+        "title": "Pàgines",
+        "mapped": "Emparellades a mà",
+        "byNumber": "Per número"
+      }
     },
     "adjust": {
       "title": "Ajust per textos",
@@ -1027,6 +1087,9 @@
       "ready": "Ja està llest",
       "noB": "Falta la versió B",
       "noFields": "La seva plantilla A no té camps"
+    },
+    "pageMap": {
+      "chip": "Pàgines emparellades"
     }
   },
   "preview": {
@@ -1540,6 +1603,57 @@
       "hint": "arrossega · deixa anar per anotar"
     },
     "hintWeb": "Zoom del PDF: Ctrl + roda. El zoom del navegador continua a la resta de la pantalla."
+  },
+  "palette": {
+    "title": "Paleta d'ordres",
+    "placeholder": "Escriu una acció o un PDF…",
+    "results": "Accions",
+    "count": "{{count}} resultats",
+    "emptyText": "No hi ha res amb «{{query}}».",
+    "emptyShortcuts": "Veure les dreceres de teclat",
+    "open": "Paleta d'ordres",
+    "openShort": "Ordres",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "moure's",
+      "choose": "triar",
+      "close": "tancar"
+    },
+    "hint": {
+      "confirms": "demana confirmació",
+      "current": "actual",
+      "batch": "Lot",
+      "position": "Lot {{index}} de {{total}}"
+    },
+    "why": {
+      "noPdf": "Abans: obre un PDF",
+      "nothingToUndo": "Res a desfer",
+      "nothingToRedo": "Res a refer",
+      "noAnnotations": "Encara no hi ha anotacions",
+      "firstPage": "Ja ets a la primera pàgina",
+      "lastPage": "Ja ets a l'última pàgina",
+      "noTemplateA": "Abans: puja la plantilla A",
+      "noVersionB": "Abans: puja la versió B",
+      "firstPdf": "Ja ets al primer PDF",
+      "lastPdf": "Ja ets a l'últim PDF"
+    },
+    "cmd": {
+      "fitPage": "Ajustar a la pàgina",
+      "zoomActual": "Mida real (100 %)",
+      "view": "Vista {{mode}}",
+      "tab": "Panell {{tab}}",
+      "putCopy": "Posar la plantilla A · copiar tal qual",
+      "putMissing": "Posar la plantilla A · només els que falten",
+      "putAdjust": "Posar la plantilla A · ajustar per textos",
+      "putAi": "Posar la plantilla A · adaptar amb IA",
+      "batchPanel": "Anar al panell del lot",
+      "batchPrev": "Anar al PDF anterior",
+      "batchNext": "Anar al PDF següent",
+      "goTo": "Anar a {{name}}",
+      "themeDark": "Canviar a tema fosc",
+      "themeLight": "Canviar a tema clar",
+      "language": "Idioma: {{language}}"
+    }
   },
   "projects": {
     "title": "Projectes",

@@ -1,7 +1,7 @@
 import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
 import { AiModelSelectComponent } from '../../../../components/ai-model-select/ai-model-select.component';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, effect, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { NoticeId, WorkspacePageComponent } from '../../workspace.page';
 import { AdjustReviewComponent } from './adjust-review.component';
@@ -24,6 +24,20 @@ export class MigrationBarComponent implements OnInit {
   readonly readyOpen = signal(false);
   readonly bellOpen = signal(false);
   @ViewChild('bell') private bellButton?: ElementRef<HTMLButtonElement>;
+
+  private seenPutCopy = -1;
+
+  constructor() {
+    // The command palette asks for «Poner plantilla A · copiar tal cual»: same flow as the menu.
+    effect(() => {
+      const request = this.vm.putACopyRequest();
+      if (this.seenPutCopy >= 0 && request !== this.seenPutCopy) {
+        this.menuOpen.set(true);
+        this.putCopy();
+      }
+      this.seenPutCopy = request;
+    });
+  }
 
   ngOnInit(): void {
     this.vm.aiHelper.checkIfLocal();

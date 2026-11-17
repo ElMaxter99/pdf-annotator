@@ -316,7 +316,8 @@
       "panCanvas": "Sposta la tela (tieni premuto)",
       "splitLink": "Collega o scollega A e B (Divisa)",
       "wheelPage": "Continuare con la rotellina al bordo del foglio: cambia pagina",
-      "pageOnlyA": "Muovi solo A (le pagine diventano libere)"
+      "pageOnlyA": "Muovi solo A (le pagine diventano libere)",
+      "palette": "Apri il riquadro dei comandi"
     }
   },
   "toast": {
@@ -523,7 +524,61 @@
         "prevA": "Pagina precedente di A",
         "nextA": "Pagina successiva di A",
         "prevB": "Pagina precedente di B",
-        "nextB": "Pagina successiva di B"
+        "nextB": "Pagina successiva di B",
+        "tagMapped": "B {{b}} ↔ A {{a}}",
+        "tagUnmapped": "A senza equivalente"
+      },
+      "pageMap": {
+        "chip": "Pagine abbinate",
+        "menu": "Opzioni delle pagine",
+        "menuMapped": "Abbinate (tabella)",
+        "open": "Abbina le pagine…",
+        "unmappedTitle": "B {{page}} non ha un equivalente in A",
+        "unmappedSub": "È una pagina nuova della tabella: non ci sono campi di A da copiare.",
+        "applied": "Pagine abbinate: {{count}} su {{total}}",
+        "cleared": "Pagine di nuovo abbinate per numero",
+        "copied": "Campi copiati dalla tabella · pagine con equivalente: {{count}} · senza: {{unmapped}}",
+        "title": "Abbina le pagine di A e B",
+        "lead": "Pagine: A {{a}} · B {{b}}. Scegli quale pagina di A corrisponde a ciascuna di B.",
+        "suggest": "Suggerisci dai testi",
+        "shiftAll": "Sposta tutte",
+        "shiftBack": "Sposta tutti gli abbinamenti di una pagina indietro",
+        "shiftForward": "Sposta tutti gli abbinamenti di una pagina avanti",
+        "byNumber": "Per numero",
+        "reading": "Lettura dei testi…",
+        "readingCount": "{{done}} di {{total}} pagine",
+        "cancelRead": "Annulla la lettura",
+        "noTextTitle": "Non è stato possibile leggere i testi.",
+        "noTextHint": "Sembra un PDF scansionato, senza testo selezionabile. Abbina a mano, usa «Sposta tutte» o «Per numero».",
+        "retry": "Riprova",
+        "noteNumber": "Finché non abbini, A1 si confronta con B1, A2 con B2… e le pagine di B in più restano senza A.",
+        "noteSuggested": "Ho confrontato i testi di ogni pagina. Controlla il suggerimento e premi «Applica»: B non cambia, cambia solo quale pagina di A si confronta con ciascuna.",
+        "noteManual": "Hai cambiato {{count}} righe. Quelle segnate «A mano» non vengono toccate se premi di nuovo «Suggerisci dai testi».",
+        "colB": "Pagina di B",
+        "colA": "Equivale a (in A)",
+        "colOrigin": "Origine",
+        "pageA": "A {{n}}",
+        "pageB": "B {{n}}",
+        "rowLabel": "Pagina di A che corrisponde a B {{n}}",
+        "none": "Nessuna pagina di A",
+        "repeated": "Ripetuta",
+        "alsoIn": "Anche in B {{pages}}",
+        "originNew": "Nuova",
+        "pickOne": "Scegli una pagina di A",
+        "originManual": "A mano",
+        "restoreRow": "Torna al suggerimento",
+        "originAuto": "Suggerita",
+        "noMatch": "Nessuna corrispondenza sufficiente",
+        "match": "Corrispondenza {{pct}} %",
+        "originNone": "Nessuna pagina di A",
+        "originNumber": "Per numero",
+        "noteRepeated": "La stessa pagina di A verrà copiata in più pagine di B. Puoi continuare se è ciò che vuoi (per esempio, un modulo che si ripete).",
+        "noteUnused": "A {{pages}} non è usata: i suoi campi non verranno copiati.",
+        "preview": "Riga scelta",
+        "summary": "{{matched}} righe su {{total}} con equivalente",
+        "cancel": "Annulla",
+        "apply": "Applica",
+        "noticeMapped": "Pagine abbinate con la tabella · A {{a}} pagine · B {{b}} pagine"
       }
     },
     "panel": {
@@ -682,7 +737,12 @@
         "removeYes": "Rimuovi la versione B"
       },
       "noTemplateNote": "Senza modello: puoi caricare quello dell’originale o aggiungere una nuova versione in Documento.",
-      "noTemplateGo": "Vai a Documento"
+      "noTemplateGo": "Vai a Documento",
+      "pages": {
+        "title": "Pagine",
+        "mapped": "Abbinate a mano",
+        "byNumber": "Per numero"
+      }
     },
     "adjust": {
       "title": "Regolazione per testi",
@@ -1027,6 +1087,9 @@
       "ready": "Già pronto",
       "noB": "Manca la versione B",
       "noFields": "Il suo modello A non ha campi"
+    },
+    "pageMap": {
+      "chip": "Pagine abbinate"
     }
   },
   "preview": {
@@ -1540,6 +1603,57 @@
       "hint": "trascina · rilascia per annotare"
     },
     "hintWeb": "Zoom del PDF: Ctrl + rotellina. Lo zoom del browser resta attivo nel resto dello schermo."
+  },
+  "palette": {
+    "title": "Riquadro dei comandi",
+    "placeholder": "Scrivi un'azione o un PDF…",
+    "results": "Azioni",
+    "count": "{{count}} risultati",
+    "emptyText": "Nessun risultato per «{{query}}».",
+    "emptyShortcuts": "Vedi le scorciatoie da tastiera",
+    "open": "Riquadro dei comandi",
+    "openShort": "Comandi",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "spostarsi",
+      "choose": "scegliere",
+      "close": "chiudere"
+    },
+    "hint": {
+      "confirms": "chiede conferma",
+      "current": "attuale",
+      "batch": "Lotto",
+      "position": "Lotto {{index}} di {{total}}"
+    },
+    "why": {
+      "noPdf": "Prima: apri un PDF",
+      "nothingToUndo": "Niente da annullare",
+      "nothingToRedo": "Niente da ripristinare",
+      "noAnnotations": "Ancora nessuna annotazione",
+      "firstPage": "Sei già alla prima pagina",
+      "lastPage": "Sei già all'ultima pagina",
+      "noTemplateA": "Prima: carica il modello A",
+      "noVersionB": "Prima: carica la versione B",
+      "firstPdf": "Sei già sul primo PDF",
+      "lastPdf": "Sei già sull'ultimo PDF"
+    },
+    "cmd": {
+      "fitPage": "Adatta alla pagina",
+      "zoomActual": "Dimensione reale (100 %)",
+      "view": "Vista {{mode}}",
+      "tab": "Pannello {{tab}}",
+      "putCopy": "Metti il modello A · copia così com'è",
+      "putMissing": "Metti il modello A · solo quelli mancanti",
+      "putAdjust": "Metti il modello A · adatta in base ai testi",
+      "putAi": "Metti il modello A · adatta con l'IA",
+      "batchPanel": "Vai al pannello del lotto",
+      "batchPrev": "Vai al PDF precedente",
+      "batchNext": "Vai al PDF successivo",
+      "goTo": "Vai a {{name}}",
+      "themeDark": "Passa al tema scuro",
+      "themeLight": "Passa al tema chiaro",
+      "language": "Lingua: {{language}}"
+    }
   },
   "projects": {
     "title": "Progetti",

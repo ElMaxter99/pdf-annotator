@@ -54,6 +54,22 @@
       }
     </div>
 
+    @if (vm.comparing()) {
+      <div class="batch-doc__card" [class.batch-doc__card--ok]="!!vm.pageMap()" data-testid="doc-pages">
+        <div class="batch-doc__head">
+          <strong>{{ 'batch.doc.pages.title' | t }}</strong>
+          <span class="migration-chip" [class.migration-chip--on]="!!vm.pageMap()">{{
+            (vm.pageMap() ? 'batch.doc.pages.mapped' : 'batch.doc.pages.byNumber') | t
+          }}</span>
+        </div>
+        <div class="batch-doc__row">
+          <button type="button" class="btn btn--ghost" (click)="vm.openPageMap()" data-testid="doc-pages-map">
+            {{ 'batch.editor.pageMap.open' | t }}
+          </button>
+        </div>
+      </div>
+    }
+
     <h5 class="batch-doc__title">{{ 'batch.doc.layers' | t }}</h5>
 
     <div

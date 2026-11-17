@@ -118,7 +118,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       }
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         onStage('asking', attempt);
-        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote, codes, attached });
+        const promptText = buildPrompt({ pagesA: A.pages.length, pagesB: B.pages.length, sizeA: sizes(A), sizeB: sizes(B), retryNote, codes, attached, pageMap: template?.pageMap });
         await writeFile(path.join(work, 'prompt.md'), promptText);
         const usageById = new Map();
         const attemptInfo = { n: attempt, promptChars: promptText.length, steps: [], usage: null, retry: !!retryNote };

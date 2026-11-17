@@ -381,9 +381,10 @@
      @if (!vm.isNoticeClosed('pagesDiffer')) {
       <div class="migration-hint" role="status" data-testid="pages-differ">
         <span>{{
-          (vm.pagesLinked() ? 'batch.editor.pagesDiffer' : 'batch.editor.pages.free')
+          (vm.tableLinked() ? 'batch.editor.pageMap.noticeMapped' : vm.pagesLinked() ? 'batch.editor.pagesDiffer' : 'batch.editor.pages.free')
             | t: { a: vm.pagesLinked() ? pages.a : vm.aPage(), b: vm.pagesLinked() ? pages.b : vm.pageIndex() }
         }}</span>
+        <button type="button" class="btn btn--ghost" (click)="vm.openPageMap()" data-testid="notice-pages-map">{{ 'batch.editor.pageMap.open' | t }}</button>
 
           <button type="button" class="migration-hint__close" (click)="closeNotice('pagesDiffer')" [attr.aria-label]="'batch.editor.notices.close' | t" [attr.title]="'batch.editor.notices.close' | t" data-testid="notice-close-pagesDiffer">✕</button>
       </div>

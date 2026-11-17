@@ -316,7 +316,8 @@
       "panCanvas": "Move the canvas (hold)",
       "splitLink": "Link or unlink A and B (Split)",
       "wheelPage": "Keep scrolling at the edge of the sheet: changes page",
-      "pageOnlyA": "Move only A (the pages become free)"
+      "pageOnlyA": "Move only A (the pages become free)",
+      "palette": "Open the command palette"
     }
   },
   "toast": {
@@ -523,7 +524,61 @@
         "prevA": "Previous page of A",
         "nextA": "Next page of A",
         "prevB": "Previous page of B",
-        "nextB": "Next page of B"
+        "nextB": "Next page of B",
+        "tagMapped": "B {{b}} ↔ A {{a}}",
+        "tagUnmapped": "A has no match"
+      },
+      "pageMap": {
+        "chip": "Pages matched",
+        "menu": "Page options",
+        "menuMapped": "Matched (table)",
+        "open": "Match pages…",
+        "unmappedTitle": "B {{page}} has no match in A",
+        "unmappedSub": "It is a new page in the table: there are no fields of A to copy.",
+        "applied": "Pages matched: {{count}} of {{total}}",
+        "cleared": "Pages matched by number again",
+        "copied": "Fields copied by the table · pages with a match: {{count}} · without: {{unmapped}}",
+        "title": "Match the pages of A and B",
+        "lead": "Pages: A {{a}} · B {{b}}. Choose which page of A goes with each page of B.",
+        "suggest": "Suggest from texts",
+        "shiftAll": "Shift all",
+        "shiftBack": "Shift every match one page back",
+        "shiftForward": "Shift every match one page forward",
+        "byNumber": "By number",
+        "reading": "Reading texts…",
+        "readingCount": "{{done}} of {{total}} pages",
+        "cancelRead": "Cancel reading",
+        "noTextTitle": "The texts could not be read.",
+        "noTextHint": "It looks like a scanned PDF with no selectable text. Match by hand, use “Shift all” or “By number”.",
+        "retry": "Try again",
+        "noteNumber": "Until you match them, A1 is compared with B1, A2 with B2… and any extra pages of B have no A.",
+        "noteSuggested": "I compared the text of every page. Review the suggestion and press “Apply”: B does not change, only which page of A is compared with each one.",
+        "noteManual": "You changed {{count}} rows. Rows marked “By hand” are kept if you press “Suggest from texts” again.",
+        "colB": "Page of B",
+        "colA": "Matches (in A)",
+        "colOrigin": "Source",
+        "pageA": "A {{n}}",
+        "pageB": "B {{n}}",
+        "rowLabel": "Page of A that goes with B {{n}}",
+        "none": "No page of A",
+        "repeated": "Repeated",
+        "alsoIn": "Also in B {{pages}}",
+        "originNew": "New",
+        "pickOne": "Choose a page of A",
+        "originManual": "By hand",
+        "restoreRow": "Back to the suggestion",
+        "originAuto": "Suggested",
+        "noMatch": "No close enough match",
+        "match": "Match {{pct}} %",
+        "originNone": "No page of A",
+        "originNumber": "By number",
+        "noteRepeated": "The same page of A will be copied into several pages of B. You can go on if that is what you want (for example, a form that repeats).",
+        "noteUnused": "A {{pages}} is not used: its fields will not be copied.",
+        "preview": "Selected row",
+        "summary": "{{matched}} of {{total}} rows have a match",
+        "cancel": "Cancel",
+        "apply": "Apply",
+        "noticeMapped": "Pages matched with the table · A {{a}} pages · B {{b}} pages"
       }
     },
     "panel": {
@@ -682,7 +737,12 @@
         "removeYes": "Remove version B"
       },
       "noTemplateNote": "No template: you can load the original’s or add a new version in Document.",
-      "noTemplateGo": "Go to Document"
+      "noTemplateGo": "Go to Document",
+      "pages": {
+        "title": "Pages",
+        "mapped": "Matched by hand",
+        "byNumber": "By number"
+      }
     },
     "adjust": {
       "title": "Adjust by texts",
@@ -1027,6 +1087,9 @@
       "ready": "Already done",
       "noB": "Version B missing",
       "noFields": "Its template A has no fields"
+    },
+    "pageMap": {
+      "chip": "Pages matched"
     }
   },
   "preview": {
@@ -1540,6 +1603,57 @@
       "hint": "drag · release to annotate"
     },
     "hintWeb": "PDF zoom: Ctrl + wheel. Browser zoom still works in the rest of the screen."
+  },
+  "palette": {
+    "title": "Command palette",
+    "placeholder": "Type an action or a PDF…",
+    "results": "Actions",
+    "count": "{{count}} results",
+    "emptyText": "Nothing matches “{{query}}”.",
+    "emptyShortcuts": "See keyboard shortcuts",
+    "open": "Command palette",
+    "openShort": "Commands",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "move",
+      "choose": "choose",
+      "close": "close"
+    },
+    "hint": {
+      "confirms": "asks to confirm",
+      "current": "current",
+      "batch": "Batch",
+      "position": "Batch {{index}} of {{total}}"
+    },
+    "why": {
+      "noPdf": "First: open a PDF",
+      "nothingToUndo": "Nothing to undo",
+      "nothingToRedo": "Nothing to redo",
+      "noAnnotations": "No annotations yet",
+      "firstPage": "You are on the first page",
+      "lastPage": "You are on the last page",
+      "noTemplateA": "First: upload template A",
+      "noVersionB": "First: upload version B",
+      "firstPdf": "You are on the first PDF",
+      "lastPdf": "You are on the last PDF"
+    },
+    "cmd": {
+      "fitPage": "Fit to page",
+      "zoomActual": "Actual size (100%)",
+      "view": "{{mode}} view",
+      "tab": "{{tab}} panel",
+      "putCopy": "Put template A · copy as is",
+      "putMissing": "Put template A · only the missing ones",
+      "putAdjust": "Put template A · adjust by texts",
+      "putAi": "Put template A · adapt with AI",
+      "batchPanel": "Go to the batch panel",
+      "batchPrev": "Go to the previous PDF",
+      "batchNext": "Go to the next PDF",
+      "goTo": "Go to {{name}}",
+      "themeDark": "Switch to dark theme",
+      "themeLight": "Switch to light theme",
+      "language": "Language: {{language}}"
+    }
   },
   "projects": {
     "title": "Projects",
