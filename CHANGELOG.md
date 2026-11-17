@@ -6,6 +6,7 @@
 - **Guion para medir créditos reales de Copilot:** `tools/ai-phase0/credits-report.mjs` resume lo medido por el CLI y lo compara con el consumo que marca GitHub (ver `docs/IA-LOCAL.md`).
 
 ### Changed
+- **Deuda técnica, parte 4 (sin cambios visibles):** el estado del desplegable de fuentes (abrir, cerrar, búsqueda y filtrado) sale de `workspace.page.ts` a `utils/font-dropdown.utils.ts`, con tests.
 - **Deuda técnica, parte 3 (sin cambios visibles):** las reglas de la sesión guardada (cuándo guardar, qué escala y página se aceptan al restaurar) salen de `workspace.page.ts` a `utils/session-restore.utils.ts`, con tests.
 - **Deuda técnica, parte 2 (sin cambios visibles):** importar JSON (al escribir, pegar o abrir un archivo) pasa por `AnnotationImportService.importFromText` en lugar de repetir el parseo en `workspace.page.ts`, y la construcción del JSON exportado sale a `utils/json-export.utils.ts`; ambos con tests.
 - **Deuda técnica (sin cambios visibles):** la generación de miniaturas sale de `workspace.page.ts` a `PageThumbnailGenerator` y la escala de miniatura pasa a `utils/thumbnail-scale.utils.ts`, con tests. `docs/ROADMAP.md` corregido (líneas del archivo, numeración, punto del Dockerfile ya hecho en la 1.11).

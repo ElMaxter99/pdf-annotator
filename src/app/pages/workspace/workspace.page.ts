@@ -165,6 +165,14 @@ import {
 } from '../../utils/alignment.utils';
 import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
 import {
+  closeFontDropdownState,
+  filterFontOptions,
+  initialFontDropdownState,
+  setFontDropdownQuery,
+  toggleFontDropdownState,
+  type FontDropdownState,
+} from '../../utils/font-dropdown.utils';
+import {
   clampRestoredPage,
   shouldScheduleSessionSave,
   validRestoredScale,
@@ -223,11 +231,6 @@ const AUTO_APPLY_JSON_DELAY_MS = 300;
 const SESSION_SAVE_DELAY_MS = 800;
 
 const MAX_JSON_IMPORT_BYTES = 5 * 1024 * 1024;
-
-interface FontDropdownUiState {
-  readonly open: boolean;
-  readonly query: string;
-}
 
 export interface AdjustSession {
   readonly phase: 'loading' | 'ready' | 'none' | 'noText';
@@ -361,10 +364,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
   includeAdvancedJsonFields = signal(false);
-  private readonly fontDropdownState = signal<Record<EditorMode, FontDropdownUiState>>({
-    preview: { open: false, query: '' },
-    edit: { open: false, query: '' },
-  });
+  private readonly fontDropdownState = signal<FontDropdownState>(initialFontDropdownState());
   private pendingFontSearchFocus: EditorMode | null = null;
   guideSettings = signal<GuideSettings>(cloneGuideSettings(DEFAULT_GUIDE_SETTINGS));
   snapPointsXText = signal('');
@@ -885,21 +885,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     let opened = false;
     this.fontDropdownState.update((state) => {
-      const nextOpen = !state[mode].open;
-      opened = nextOpen;
-      const nextState: Record<EditorMode, FontDropdownUiState> = {
-        ...state,
-        [mode]: { open: nextOpen, query: nextOpen ? '' : '' },
-      };
-
-      if (nextOpen) {
-        const other: EditorMode = mode === 'preview' ? 'edit' : 'preview';
-        if (state[other].open) {
-          nextState[other] = { open: false, query: '' };
-        }
-      }
-
-      return nextState;
+      const next = toggleFontDropdownState(state, mode);
+      opened = next[mode].open;
+      return next;
     });
 
     if (opened) {
@@ -949,16 +937,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   closeFontDropdown(mode: EditorMode) {
-    this.fontDropdownState.update((state) => {
-      if (!state[mode].open && !state[mode].query) {
-        return state;
-      }
-
-      return {
-        ...state,
-        [mode]: { open: false, query: '' },
-      };
-    });
+    this.fontDropdownState.update((state) => closeFontDropdownState(state, mode));
 
     if (this.pendingFontSearchFocus === mode) {
       this.pendingFontSearchFocus = null;
@@ -970,20 +949,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   onFontSearch(mode: EditorMode, value: string) {
-    const query = typeof value === 'string' ? value : '';
-    this.fontDropdownState.update((state) => ({
-      ...state,
-      [mode]: { ...state[mode], query },
-    }));
+    this.fontDropdownState.update((state) => setFontDropdownQuery(state, mode, value));
   }
 
   filteredFontOptions(mode: EditorMode): FontOption[] {
-    const query = this.fontDropdownState()[mode].query.trim().toLowerCase();
-    const options = this.fontOptions();
-    if (!query) {
-      return [...options];
-    }
-    return options.filter((option) => option.label.toLowerCase().includes(query));
+    return filterFontOptions(this.fontOptions(), this.fontDropdownState()[mode].query);
   }
 
   chooseFontOption(mode: EditorMode, fontId: string) {
