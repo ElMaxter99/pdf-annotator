@@ -94,7 +94,8 @@ export class PageThumbnailGenerator {
     } finally {
       this.running = false;
     }
-    if (this.queue.length && generationToken === this.token) {
+    // Lo pedido mientras terminaba (o tras abrir otro PDF) sigue en cola: se retoma aquí.
+    if (this.queue.length) {
       void this.drain();
     }
   }
