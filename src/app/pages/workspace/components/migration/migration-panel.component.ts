@@ -8,7 +8,7 @@ const ORDER: Record<FieldStatus, number> = { missing: 0, new: 1, moved: 2, renam
 
 /** Fields of B with their state against A, at the top of the «Anotaciones» tab. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-migration-panel',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

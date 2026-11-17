@@ -5,7 +5,7 @@ import { VersionChipComponent } from '../../../../components/version-chip/versio
 import type { WorkspacePageComponent } from '../../workspace.page';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-workspace-footer',
   standalone: true,
   templateUrl: './workspace-footer.component.html',

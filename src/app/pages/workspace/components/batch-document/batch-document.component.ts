@@ -11,7 +11,7 @@ type TemplateError = 'tooBig' | 'json' | 'noPages';
  * template of the original (A) and the new version (B). Replaces the «upload another PDF» zone.
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-batch-document',
   standalone: true,
   imports: [CommonModule, TranslationPipe, PdfThumbComponent],
