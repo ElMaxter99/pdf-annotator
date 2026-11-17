@@ -3,8 +3,10 @@ import {
   fitPageScale,
   fitPageScaleForOverflow,
   fitWidthScale,
+  panScrollPosition,
   stepScale,
   wheelZoomFactor,
+  zoomAnchorScrollDelta,
   zoomLimitFor,
 } from './zoom.utils';
 
@@ -65,5 +67,44 @@ describe('ajuste de zoom', () => {
   it('fitPageScaleForOverflow reduce lo que desborda', () => {
     expect(fitPageScaleForOverflow(800, 1, 80)).toBe(0.9);
     expect(fitPageScaleForOverflow(800, 0.3, 700)).toBe(0.25);
+  });
+});
+
+describe('mover y anclar el zoom', () => {
+  it('panScrollPosition mueve el visor al revés que el puntero', () => {
+    const start = { x: 100, y: 100, left: 50, top: 20 };
+    expect(panScrollPosition(start, { clientX: 130, clientY: 90 })).toEqual({
+      left: 20,
+      top: 30,
+    });
+    expect(panScrollPosition(start, { clientX: 100, clientY: 100 })).toEqual({
+      left: 50,
+      top: 20,
+    });
+  });
+
+  it('zoomAnchorScrollDelta no desplaza si el punto ya queda bajo el ancla', () => {
+    // Esquina en (0,0) antes y después, ancla en la esquina: sigue en (0,0).
+    expect(
+      zoomAnchorScrollDelta(
+        { left: 0, top: 0 },
+        { left: 0, top: 0 },
+        { clientX: 0, clientY: 0 },
+        1,
+        2,
+      ),
+    ).toEqual({ dx: 0, dy: 0 });
+  });
+
+  it('zoomAnchorScrollDelta compensa el crecimiento alrededor del ancla', () => {
+    // Lienzo en (100,100); ancla a 200 px de la esquina; al pasar de 1 a 2 ese punto cae a 400 px.
+    const delta = zoomAnchorScrollDelta(
+      { left: 100, top: 100 },
+      { left: 100, top: 100 },
+      { clientX: 300, clientY: 300 },
+      1,
+      2,
+    );
+    expect(delta).toEqual({ dx: 200, dy: 200 });
   });
 });
