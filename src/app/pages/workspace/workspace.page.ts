@@ -214,6 +214,7 @@ import {
 } from '../../utils/color.utils';
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
+import { moveFieldWithinPage } from '../../utils/field-move.utils';
 import { clampGroupDrag, exceedsDragThreshold } from '../../utils/group-drag.utils';
 import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
@@ -4920,11 +4921,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const maxX = pdfCanvas.width / scale;
     const maxY = pdfCanvas.height / scale;
     this.updateSelectedFields(
-      (field) => ({
-        ...field,
-        x: this.roundToTwo(this.clamp(field.x + dx, 0, maxX)),
-        y: this.roundToTwo(this.clamp(field.y + dy, 0, maxY)),
-      }),
+      (field) => moveFieldWithinPage(field, dx, dy, maxX, maxY),
       coalesceKey,
     );
   }
@@ -6332,13 +6329,5 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const key =
       error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
     this.toast.error(this.translationService.translate(key));
-  }
-
-  private roundToTwo(value: number): number {
-    return Math.round(value * 100) / 100;
-  }
-
-  private clamp(value: number, min: number, max: number): number {
-    return Math.min(Math.max(value, min), max);
   }
 }
