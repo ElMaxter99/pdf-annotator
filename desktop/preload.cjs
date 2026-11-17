@@ -27,5 +27,6 @@ contextBridge.exposeInMainWorld('desktop', {
     ipcRenderer.on('desktop:zoom', listener);
     return () => ipcRenderer.removeListener('desktop:zoom', listener);
   },
+  dismissUpdated: () => ipcRenderer.invoke('desktop:update:dismiss-updated'),
   openReleasePage: () => ipcRenderer.invoke('desktop:update:open-release'),
 });

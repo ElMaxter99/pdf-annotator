@@ -5606,3 +5606,127 @@ button.version-chip:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* Instalando la actualización (AC-13, AC-14) */
+.update-install__veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.5);
+}
+.update-install {
+  position: fixed;
+  z-index: 1101;
+  inset: 0;
+  margin: auto;
+  width: min(430px, calc(100vw - 32px));
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  animation: update-card-in 0.2s ease-out;
+}
+.update-install--error {
+  border-top: 4px solid var(--danger);
+  font-size: 14px;
+}
+.update-install:focus {
+  outline: none;
+}
+.update-install__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+.update-install__spin {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--text) 18%, transparent);
+  border-top-color: var(--accent);
+  animation: update-install-spin 1s linear infinite;
+}
+.update-install__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+}
+.update-install__steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.update-install__steps li > span {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  display: inline-grid;
+  place-items: center;
+  font-size: 10px;
+}
+.update-install__steps .is-done {
+  color: var(--text);
+}
+.update-install__steps .is-done > span {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+.update-install__steps .is-now {
+  color: var(--text);
+  font-weight: 700;
+}
+.update-install__bar i {
+  width: 38%;
+  animation: update-install-slide 1.4s ease-in-out infinite;
+}
+.update-install__hint {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.update-install__hint strong {
+  color: var(--text);
+}
+@keyframes update-install-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes update-install-slide {
+  from {
+    margin-left: -38%;
+  }
+  to {
+    margin-left: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .update-install,
+  .update-install__spin,
+  .update-install__bar i {
+    animation: none;
+  }
+  .update-install__bar i {
+    width: 60%;
+  }
+}

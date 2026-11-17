@@ -1368,11 +1368,38 @@
         "availableRc": "A test version is available: {{version}}",
         "downloading": "Downloading {{version}}…",
         "ready": "{{version}} is ready to install",
-        "error": "Couldn't check"
+        "error": "Couldn't check",
+        "installing": "Installing {{version}}…"
       },
       "readyText": "Restarting installs the new version.",
       "onQuitText": "It will be installed when you close the app. Your annotations are saved automatically.",
       "manualText": "PDF Annotator {{version}} · you have {{current}}. On this system it is installed by hand: the downloads page opens."
+    },
+    "installing": {
+      "title": "Installing version {{version}}",
+      "stepSaved": "Session saved",
+      "stepInstall": "Installing the update…",
+      "stepReopen": "Reopen PDF Annotator",
+      "password": "Your system will ask for your password",
+      "passwordHelp": "to install. If you don't see the box, look behind this window or in the top bar.",
+      "installer": "The installer will open.",
+      "installerHelp": "Follow its steps; the app reopens by itself when it finishes.",
+      "safe": "Don't turn off your computer. Your annotations are safe."
+    },
+    "installError": {
+      "title": "The update couldn't be installed",
+      "text": "The system didn't finish the installation. Your version {{current}} keeps working and the new one is already downloaded. You can try again or install the package by hand.",
+      "cancelledTitle": "The update wasn't installed",
+      "cancelledText": "You cancelled the system password, so it couldn't be installed. Your version {{current}} keeps working and the new one is already downloaded: no need to download it again.",
+      "reason": "Reason:",
+      "notNow": "Not now",
+      "manual": "Download the package",
+      "copy": "Copy details",
+      "copied": "Details copied"
+    },
+    "done": {
+      "title": "PDF Annotator updated to {{version}}",
+      "text": "Your session was restored. You came from {{from}}."
     }
   },
   "hint": {

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { compareVersions, isNewer, normalizeChannel, parseLatestRelease, parseReleaseForChannel, parseVersion, updateMode } from './update-logic.mjs';
+import { classifyInstallError, installDetail, installNeedsPassword, compareVersions, isNewer, normalizeChannel, parseLatestRelease, parseReleaseForChannel, parseVersion, updateMode } from './update-logic.mjs';
 
 test('parseVersion acepta v y prerelease, rechaza basura', () => {
   assert.deepEqual(parseVersion('v1.6.0')?.nums, [1, 6, 0]);
@@ -80,4 +80,22 @@ test('una RC instalada no se «actualiza» a otra anterior ni a la misma; sí a 
   assert.equal(isNewer('1.9.0-rc.2', '1.9.0-rc.3'), true);
   assert.equal(isNewer('1.9.0-rc.2', '1.9.0'), true);
   assert.equal(isNewer('1.8.4', '1.9.0-rc.1'), true);
+});
+
+test('classifyInstallError distingue contraseña cancelada de otros fallos', () => {
+  assert.equal(classifyInstallError('Command failed with exit status 126'), 'cancelled');
+  assert.equal(classifyInstallError('Error: Request dismissed'), 'cancelled');
+  assert.equal(classifyInstallError('dpkg: error processing archive (status 1)'), 'failed');
+  assert.equal(classifyInstallError(undefined), 'failed');
+});
+
+test('installDetail deja una línea corta sin la carpeta personal', () => {
+  assert.equal(installDetail('fallo\n en /home/ana/.cache/x.deb', '/home/ana'), 'fallo en ~/.cache/x.deb');
+  assert.equal(installDetail('a'.repeat(400)).length, 298);
+});
+
+test('installNeedsPassword solo para .deb/.rpm en Linux', () => {
+  assert.equal(installNeedsPassword({ platform: 'linux', packageType: 'deb' }), true);
+  assert.equal(installNeedsPassword({ platform: 'linux', appImage: true }), false);
+  assert.equal(installNeedsPassword({ platform: 'win32' }), false);
 });

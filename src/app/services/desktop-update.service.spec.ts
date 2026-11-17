@@ -126,4 +126,30 @@ describe('DesktopUpdateService', () => {
     expect(service.channel()).toBe('stable');
     expect(service.currentIsPrerelease()).toBeFalse();
   });
+
+  it('instalando muestra el diálogo y oculta la tarjeta; un fallo vuelve a «lista» con el motivo', () => {
+    const { service, push, bridge } = setup({ status: 'ready', mode: 'auto', current: '1.5.0', version: '1.6.0' });
+    expect(service.installDialog()).toBeNull();
+    push({ status: 'installing', mode: 'auto', current: '1.5.0', version: '1.6.0' });
+    expect(service.installDialog()).toBe('installing');
+    expect(service.cardVisible()).toBeFalse();
+    expect(service.chipDot()).toBe('warn');
+    push({ status: 'ready', mode: 'auto', current: '1.5.0', version: '1.6.0', installError: 'cancelled' });
+    expect(service.installDialog()).toBe('error');
+    service.dismissInstallError();
+    expect(service.installDialog()).toBeNull();
+    expect(service.cardVisible()).toBeTrue();
+    service.restartNow();
+    expect(bridge.installUpdate).toHaveBeenCalled();
+  });
+
+  it('avisa de que se actualizó una sola vez', () => {
+    const { service, bridge } = setup({ status: 'idle', mode: 'auto', current: '1.6.0', justUpdatedFrom: '1.5.0' });
+    return Promise.resolve().then(() => {
+      expect(service.justUpdated()).toEqual({ from: '1.5.0', to: '1.6.0' });
+      service.dismissUpdated();
+      expect(service.justUpdated()).toBeNull();
+      expect(bridge).toBeTruthy();
+    });
+  });
 });

@@ -1368,11 +1368,38 @@
         "availableRc": "Une version de test est disponible : {{version}}",
         "downloading": "Téléchargement de {{version}}…",
         "ready": "{{version}} prête à installer",
-        "error": "Vérification impossible"
+        "error": "Vérification impossible",
+        "installing": "Installation de {{version}}…"
       },
       "readyText": "Le redémarrage installe la nouvelle version.",
       "onQuitText": "Elle sera installée à la fermeture de l'app. Vos annotations sont enregistrées automatiquement.",
       "manualText": "PDF Annotator {{version}} · vous avez la {{current}}. Sur ce système, l'installation est manuelle : la page de téléchargement s'ouvre."
+    },
+    "installing": {
+      "title": "Installation de la version {{version}}",
+      "stepSaved": "Session enregistrée",
+      "stepInstall": "Installation de la mise à jour…",
+      "stepReopen": "Rouvrir PDF Annotator",
+      "password": "Le système va vous demander votre mot de passe",
+      "passwordHelp": "pour installer. Si la fenêtre n'apparaît pas, cherchez-la derrière celle-ci ou dans la barre supérieure.",
+      "installer": "L'installateur va s'ouvrir.",
+      "installerHelp": "Suivez ses étapes ; l'app se rouvrira toute seule à la fin.",
+      "safe": "N'éteignez pas l'ordinateur. Vos annotations sont à l'abri."
+    },
+    "installError": {
+      "title": "Impossible d'installer la mise à jour",
+      "text": "Le système n'a pas terminé l'installation. Votre version {{current}} continue de fonctionner et la nouvelle est déjà téléchargée. Vous pouvez réessayer ou installer le paquet à la main.",
+      "cancelledTitle": "La mise à jour n'a pas été installée",
+      "cancelledText": "Vous avez annulé le mot de passe du système, l'installation n'a donc pas pu se faire. Votre version {{current}} continue de fonctionner et la nouvelle est déjà téléchargée : inutile de la retélécharger.",
+      "reason": "Motif :",
+      "notNow": "Pas maintenant",
+      "manual": "Télécharger le paquet",
+      "copy": "Copier les détails",
+      "copied": "Détails copiés"
+    },
+    "done": {
+      "title": "PDF Annotator a été mis à jour en {{version}}",
+      "text": "Votre session a été restaurée. Vous veniez de la {{from}}."
     }
   },
   "hint": {

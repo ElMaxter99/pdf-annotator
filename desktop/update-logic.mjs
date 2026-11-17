@@ -89,3 +89,24 @@ export function parseReleaseForChannel(json, { prerelease = false } = {}) {
 }
 
 export const bytesToMb = (n) => Math.round((Number(n) || 0) / 1048576);
+
+/**
+ * Mensaje de un fallo al instalar → «cancelled» (el usuario cerró o canceló el cuadro de contraseña del sistema:
+ * pkexec/sudo terminan con 126 o 127) o «failed» (cualquier otro).
+ */
+export function classifyInstallError(message) {
+  const text = String(message ?? '');
+  if (/\b(status|code|exit(?:ed)?(?: with)?(?: code)?)\W{0,3}(126|127)\b/i.test(text) || /dismissed|cancel+ed|not authorized|authentication (?:was )?(?:canceled|cancelled|failed)/i.test(text)) return 'cancelled';
+  return 'failed';
+}
+
+/** Recorta y limpia el motivo técnico que se muestra y se copia (una línea, sin rutas del usuario, máx. 300). */
+export function installDetail(message, home = '') {
+  let text = String(message ?? '').replace(/\s+/g, ' ').trim();
+  if (home) text = text.split(home).join('~');
+  return text.length > 300 ? `${text.slice(0, 297)}…` : text;
+}
+
+/** ¿La instalación pedirá contraseña? Solo en Linux con .deb/.rpm (AppImage se sustituye sin pedirla). */
+export const installNeedsPassword = ({ platform, appImage = false, packageType = null }) =>
+  platform === 'linux' && !appImage && (packageType === 'deb' || packageType === 'rpm');

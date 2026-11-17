@@ -1,5 +1,8 @@
 ## Unreleased
+### Added
+- **Feedback al instalar una actualización (mesas AC-13 y AC-14):** al pulsar «Reiniciar ahora» aparece un diálogo «Instalando la versión X» con pasos y barra sin porcentaje; en Linux (.deb/.rpm) avisa de que el sistema pedirá la contraseña y en Windows de que se abrirá el instalador. Tras reabrir, un aviso confirma «PDF Annotator se actualizó a X». Textos en los 7 idiomas, con tests unitarios y e2e.
 ### Fixed
+- **Fallo al instalar la actualización:** ya no se muestra como «No se pudo comprobar» ni obliga a descargar otra vez. Un fallo (o contraseña cancelada) explica el motivo real, conserva la descarga y ofrece Reintentar, «Al cerrar la app», paquete manual o copiar detalles. El motivo se guarda en `update.log` de la carpeta de datos de la app.
 - **Barra del traslado A/B desbordada (1.13.0-rc.1):** en 1280 px, con «Pendientes de revisar» y «Siguiente con propuesta» (o la IA), la barra no se partía: medía más que la cabecera, sacaba fuera «Poner plantilla A» y «Listo · faltan N» y estiraba el aviso de «Distinto número de páginas». Ahora los controles de la derecha forman un grupo que pasa a una segunda línea cuando no caben. Además el chip «Enlazado» ya no tapa la franja de la IA. Nuevo e2e a 1280 px.
 
 ## [v1.13.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.13.0) - 2026-11-17

@@ -3,10 +3,11 @@ import { app, BrowserWindow, ipcMain, net, protocol, session, shell, Menu } from
 import electronUpdater from 'electron-updater';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
-import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, isNewer, normalizeChannel, parseReleaseForChannel, updateMode } from './update-logic.mjs';
+import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, normalizeChannel, parseReleaseForChannel, updateMode } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { goInHistory, historyDirectionForCommand, historyDirectionForKey } from './history-nav.mjs';
@@ -108,7 +109,27 @@ const loadChannel = () => {
   }
 };
 let channel = loadChannel();
-let state = { status: 'idle', mode, current: app.getVersion(), channel };
+const needsPassword = installNeedsPassword({ platform: process.platform, appImage: Boolean(process.env.APPIMAGE), packageType });
+const updateLog = path.join(app.getPath('userData'), 'update.log');
+const logUpdate = (line) => {
+  try {
+    appendFileSync(updateLog, `${new Date().toISOString()} ${line}\n`);
+  } catch {
+    /* sin log: no pasa nada */
+  }
+};
+// Marca de «se acaba de actualizar»: se escribe justo antes de instalar y se lee al arrancar con la versión nueva.
+const updatedFile = path.join(app.getPath('userData'), 'just-updated.json');
+const readJustUpdated = () => {
+  try {
+    const { from, to } = JSON.parse(readFileSync(updatedFile, 'utf8'));
+    rmSync(updatedFile, { force: true });
+    return to === app.getVersion() && typeof from === 'string' ? from : undefined;
+  } catch {
+    return undefined;
+  }
+};
+let state = { status: 'idle', mode, current: app.getVersion(), channel, needsPassword, justUpdatedFrom: readJustUpdated() };
 let cancelToken = null;
 const setState = (patch) => {
   state = { ...state, ...patch };
@@ -116,6 +137,12 @@ const setState = (patch) => {
 };
 const setError = (err) => {
   console.warn('[desktop] actualización:', err?.message || err);
+  logUpdate(`error (${state.status}): ${err?.message || err}`);
+  // Si falla la instalación, la descarga sigue en disco: se vuelve a «lista» con el motivo, no a un error genérico.
+  if (state.status === 'installing') {
+    rmSync(updatedFile, { force: true });
+    return setState({ status: 'ready', installError: classifyInstallError(err?.message), installDetail: installDetail(err?.message, os.homedir()) });
+  }
   setState({ status: 'error', error: 'update' });
 };
 
@@ -132,7 +159,7 @@ async function checkManual() {
 }
 
 async function checkForUpdates() {
-  if (['downloading', 'ready'].includes(state.status) || state.checking) return;
+  if (['downloading', 'ready', 'installing'].includes(state.status) || state.checking) return;
   if (!app.isPackaged && !process.env.PDF_ANNOTATOR_UPDATE_URL && !process.env.PDF_ANNOTATOR_RELEASE_API) return;
   setState({ checking: true });
   try {
@@ -198,16 +225,30 @@ function setupIpc() {
       console.warn('[desktop] no se pudo guardar el canal:', e?.message || e);
     }
     // Una descarga en curso o ya lista sigue su camino; si no, se vuelve a mirar con el canal nuevo.
-    if (['downloading', 'ready'].includes(state.status)) return setState({ channel });
+    if (['downloading', 'ready', 'installing'].includes(state.status)) return setState({ channel });
     setState({ channel, status: 'idle', version: undefined, prerelease: undefined, notesUrl: undefined, error: undefined });
     return checkForUpdates();
   });
   handle('desktop:update:cancel', () => cancelToken?.cancel());
-  handle('desktop:update:install', () => {
+  handle('desktop:update:install', async () => {
     if (state.status !== 'ready') return;
+    // La instalación en Linux es síncrona y bloquea el proceso principal: primero se pinta «Instalando» y se da un respiro.
+    setState({ status: 'installing', installError: undefined, installDetail: undefined, justUpdatedFrom: undefined });
+    logUpdate(`instalando ${state.version} (desde ${app.getVersion()})`);
+    try {
+      writeFileSync(updatedFile, JSON.stringify({ from: app.getVersion(), to: state.version }));
+    } catch {
+      /* sin aviso de «se actualizó» */
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
     stopHelper();
-    autoUpdater.quitAndInstall(false, true);
+    try {
+      autoUpdater.quitAndInstall(false, true);
+    } catch (e) {
+      setError(e);
+    }
   });
+  handle('desktop:update:dismiss-updated', () => setState({ justUpdatedFrom: undefined }));
   handle('desktop:update:install-on-quit', () => {
     if (state.status !== 'ready') return;
     autoUpdater.autoInstallOnAppQuit = true;
