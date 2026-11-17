@@ -124,7 +124,9 @@
       "selectLabel": "Modelos guardados",
       "loadButton": "Carregar",
       "deleteButton": "Eliminar",
-      "empty": "Ainda não guardou nenhum modelo."
+      "empty": "Ainda não guardou nenhum modelo.",
+      "exportButton": "Exportar modelos…",
+      "exportHint": "Guarde pelo menos um modelo para exportar."
     },
     "thumbnails": {
       "title": "Miniaturas",
@@ -2172,5 +2174,25 @@
         "other": "Escolher outra"
       }
     }
+  },
+  "templatesExport": {
+    "title": "Exportar modelos",
+    "intro": "Escolha os modelos que quer levar. São guardados num único ZIP, um JSON por modelo.",
+    "selectAll": "Selecionar todos",
+    "pages": "{{n}} pág.",
+    "empty": "Ainda não tem modelos guardados. Guarde um em Anotações e volte aqui.",
+    "understood": "Entendido",
+    "cancel": "Cancelar",
+    "workingTitle": "A exportar modelos…",
+    "counter": "{{done}} de {{total}}",
+    "doneTitle": "Modelos exportados",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} modelos · {{kb}} KB. Encontre-o na pasta de transferências.",
+    "ready": "Concluído",
+    "errorTitle": "Não foi possível exportar",
+    "errorText": "Não foi possível criar o ZIP. Os seus modelos continuam guardados e nada se perdeu.",
+    "close": "Fechar",
+    "retry": "Tentar de novo",
+    "exportButton": "Exportar {{n}} modelos"
   }
 }

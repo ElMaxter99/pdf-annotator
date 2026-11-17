@@ -1,0 +1,85 @@
+<div class="dialog-backdrop" (click)="cancel()" (keydown.escape)="cancel()">
+  <div appFocusTrap class="dialog dialog--ask tpl-export" role="dialog" aria-modal="true"
+    aria-labelledby="tpl-export-title" data-testid="templates-export" (click)="$event.stopPropagation()">
+    <header class="dialog__header">
+      <h2 id="tpl-export-title" class="dialog__title">
+        @switch (phase()) {
+          @case ('working') { {{ 'templatesExport.workingTitle' | t }} }
+          @case ('done') { {{ 'templatesExport.doneTitle' | t }} }
+          @case ('error') { {{ 'templatesExport.errorTitle' | t }} }
+          @default { {{ 'templatesExport.title' | t }} }
+        }
+      </h2>
+    </header>
+    <div class="dialog__body tpl-export__body">
+      @switch (phase()) {
+        @case ('pick') {
+          @if (!items().length) {
+            <p class="tpl-export__text">{{ 'templatesExport.empty' | t }}</p>
+          } @else {
+            <p class="tpl-export__text">{{ 'templatesExport.intro' | t }}</p>
+            <label class="tpl-export__all">
+              <input type="checkbox" [checked]="allSelected()" (change)="toggleAll()" />
+              <span>{{ 'templatesExport.selectAll' | t }}</span>
+              <small>{{ count() }} / {{ items().length }}</small>
+            </label>
+            <div class="tpl-export__list">
+              @for (template of items(); track template.id) {
+                <label class="tpl-export__item" [class.tpl-export__item--on]="selected().has(template.id)">
+                  <input type="checkbox" [checked]="selected().has(template.id)" (change)="toggle(template.id)" />
+                  <span class="tpl-export__name">{{ template.name }}</span>
+                  <small>{{ 'templatesExport.pages' | t: { n: template.pages.length } }}</small>
+                </label>
+              }
+            </div>
+          }
+        }
+        @case ('working') {
+          <div class="tpl-export__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+            [attr.aria-valuenow]="percent()"><i [style.width.%]="percent()"></i></div>
+          <p class="tpl-export__count" aria-live="polite" data-testid="templates-export-count">
+            <b>{{ 'templatesExport.counter' | t: { done: progress().done + 1 > progress().total ? progress().total : progress().done + 1, total: progress().total } }}</b>
+            @if (progress().current) { · {{ progress().current }} }
+          </p>
+          <ul class="tpl-export__states">
+            @for (name of doneNames(); track $index) {
+              <li class="tpl-export__ok">✓ {{ name }}</li>
+            }
+          </ul>
+        }
+        @case ('done') {
+          <p class="tpl-export__text" aria-live="polite" data-testid="templates-export-done">
+            <b>{{ 'templatesExport.zipName' | t }}</b><br />
+            {{ 'templatesExport.doneText' | t: { n: result().count, kb: result().kb } }}
+          </p>
+        }
+        @case ('error') {
+          <p class="tpl-export__text" role="alert">{{ 'templatesExport.errorText' | t }}</p>
+        }
+      }
+    </div>
+    <footer class="tpl-export__foot">
+      @switch (phase()) {
+        @case ('pick') {
+          @if (items().length) {
+            <button type="button" class="btn btn--ghost" (click)="closed.emit()">{{ 'templatesExport.cancel' | t }}</button>
+            <button type="button" class="btn btn--primary" [disabled]="!count()" (click)="export()"
+              data-testid="templates-export-go">{{ 'templatesExport.exportButton' | t: { n: count() } }}</button>
+          } @else {
+            <button type="button" class="btn btn--primary" (click)="closed.emit()">{{ 'templatesExport.understood' | t }}</button>
+          }
+        }
+        @case ('working') {
+          <button type="button" class="btn btn--ghost" (click)="cancel()">{{ 'templatesExport.cancel' | t }}</button>
+        }
+        @case ('done') {
+          <button type="button" class="btn btn--primary" (click)="closed.emit()">{{ 'templatesExport.ready' | t }}</button>
+        }
+        @case ('error') {
+          <button type="button" class="btn btn--ghost" (click)="closed.emit()">{{ 'templatesExport.close' | t }}</button>
+          <button type="button" class="btn btn--primary" (click)="export()">{{ 'templatesExport.retry' | t }}</button>
+        }
+      }
+    </footer>
+  </div>
+</div>

@@ -13,6 +13,9 @@
 @if (vm.shortcutsOpen()) {
   <app-shortcuts-dialog (closed)="vm.toggleShortcuts(false)"></app-shortcuts-dialog>
 }
+@if (vm.templatesExportOpen()) {
+  <app-templates-export-dialog [templates]="vm.exportableTemplates()" (closed)="vm.toggleTemplatesExport(false)"></app-templates-export-dialog>
+}
 @if (vm.aboutOpen()) {
   <app-about-dialog [appName]="vm.appName" [author]="vm.appAuthor" [version]="vm.version"
     [year]="vm.currentYear" (closed)="vm.toggleAbout(false)"></app-about-dialog>

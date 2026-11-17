@@ -194,6 +194,11 @@
           </button>
         </div>
       </div>
+      <button type="button" class="btn templates__export" data-testid="templates-export-open"
+        (click)="vm.toggleTemplatesExport(true)" [disabled]="!vm.exportableTemplates().length"
+        [attr.title]="vm.exportableTemplates().length ? null : ('sidebar.templates.exportHint' | t)">
+        {{ 'sidebar.templates.exportButton' | t }}
+      </button>
     </ng-container>
     <ng-template #emptyTemplates>
       <p class="templates__empty">{{ 'sidebar.templates.empty' | t }}</p>

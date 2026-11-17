@@ -115,6 +115,7 @@ import { ExportSamplesDialogComponent } from './components/export-samples-dialog
 import { AboutDialogComponent } from './components/about-dialog/about-dialog.component';
 import { CommandPaletteComponent } from './components/command-palette/command-palette.component';
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
+import { TemplatesExportDialogComponent } from './components/templates-export-dialog/templates-export-dialog.component';
 import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnailGenerator } from './page-thumbnail-generator';
@@ -214,6 +215,8 @@ import {
 } from '../../utils/color.utils';
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
+import { moveFieldWithinPage } from '../../utils/field-move.utils';
+import { clampGroupDrag, exceedsDragThreshold } from '../../utils/group-drag.utils';
 import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
 import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
@@ -340,6 +343,7 @@ export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
     WorkspaceFooterComponent,
     AiReviewComponent,
     ShortcutsDialogComponent,
+    TemplatesExportDialogComponent,
     CommandPaletteComponent,
     AboutDialogComponent,
     ExportSamplesDialogComponent,
@@ -418,6 +422,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.store.coords().reduce((total, page) => total + page.fields.length, 0),
   );
   readonly shortcutsOpen = signal(false);
+  readonly templatesExportOpen = signal(false);
   /** Command palette (Ctrl+K). */
   readonly paletteOpen = signal(false);
   /** The palette asks the header to open «Limpiar» (it keeps its confirmation) — counter. */
@@ -4919,11 +4924,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const maxX = pdfCanvas.width / scale;
     const maxY = pdfCanvas.height / scale;
     this.updateSelectedFields(
-      (field) => ({
-        ...field,
-        x: this.roundToTwo(this.clamp(field.x + dx, 0, maxX)),
-        y: this.roundToTwo(this.clamp(field.y + dy, 0, maxY)),
-      }),
+      (field) => moveFieldWithinPage(field, dx, dy, maxX, maxY),
       coalesceKey,
     );
   }
@@ -5105,18 +5106,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     evt.preventDefault();
     const rawDx = evt.clientX - drag.startX;
     const rawDy = evt.clientY - drag.startY;
-    if (!drag.moved && Math.abs(rawDx) <= 2 && Math.abs(rawDy) <= 2) {
+    if (!drag.moved && !exceedsDragThreshold(rawDx, rawDy)) {
       return;
     }
     drag.moved = true;
 
-    // Clamp the whole group so every member stays inside the page and spacing is preserved.
-    const minDx = Math.max(...drag.items.map((i) => -i.startLeft));
-    const maxDx = Math.min(...drag.items.map((i) => pdfCanvas.width - i.width - i.startLeft));
-    const minDy = Math.max(...drag.items.map((i) => -i.fontPx - i.startTop));
-    const maxDy = Math.min(...drag.items.map((i) => pdfCanvas.height - i.fontPx - i.startTop));
-    drag.dx = this.clamp(rawDx, Math.min(minDx, 0), Math.max(maxDx, 0));
-    drag.dy = this.clamp(rawDy, Math.min(minDy, 0), Math.max(maxDy, 0));
+    const { dx, dy } = clampGroupDrag(drag.items, pdfCanvas.width, pdfCanvas.height, rawDx, rawDy);
+    drag.dx = dx;
+    drag.dy = dy;
 
     for (const item of drag.items) {
       item.el.style.left = `${item.startLeft + drag.dx}px`;
@@ -5885,6 +5882,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.aboutOpen.set(open);
   }
 
+  /** Saved templates that can be exported (the default one is not). */
+  exportableTemplates(): AnnotationTemplate[] {
+    return this.templates().filter((template) => template.id !== this.defaultTemplateId);
+  }
+
+  toggleTemplatesExport(open = !this.templatesExportOpen()) {
+    if (open && !this.exportableTemplates().length) {
+      return;
+    }
+    this.templatesExportOpen.set(open);
+  }
+
   toggleShortcuts(open = !this.shortcutsOpen()) {
     this.shortcutsOpen.set(open);
   }
@@ -6335,13 +6344,5 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const key =
       error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
     this.toast.error(this.translationService.translate(key));
-  }
-
-  private roundToTwo(value: number): number {
-    return Math.round(value * 100) / 100;
-  }
-
-  private clamp(value: number, min: number, max: number): number {
-    return Math.min(Math.max(value, min), max);
   }
 }

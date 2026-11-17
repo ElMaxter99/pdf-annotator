@@ -124,7 +124,9 @@
       "selectLabel": "Plantilles desades",
       "loadButton": "Carrega",
       "deleteButton": "Elimina",
-      "empty": "Encara no tens cap plantilla desada."
+      "empty": "Encara no tens cap plantilla desada.",
+      "exportButton": "Exporta plantilles…",
+      "exportHint": "Desa almenys una plantilla per exportar."
     },
     "thumbnails": {
       "title": "Miniatures",
@@ -2172,5 +2174,25 @@
         "other": "Tria’n una altra"
       }
     }
+  },
+  "templatesExport": {
+    "title": "Exporta plantilles",
+    "intro": "Tria les plantilles que vols endur-te. Es desen en un únic ZIP, un JSON per plantilla.",
+    "selectAll": "Selecciona-les totes",
+    "pages": "{{n}} pàg.",
+    "empty": "Encara no tens plantilles desades. Desa'n una des d'Anotacions i torna aquí.",
+    "understood": "Entesos",
+    "cancel": "Cancel·la",
+    "workingTitle": "Exportant plantilles…",
+    "counter": "{{done}} de {{total}}",
+    "doneTitle": "Plantilles exportades",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} plantilles · {{kb}} KB. Cerca'l a la carpeta de baixades.",
+    "ready": "Fet",
+    "errorTitle": "No s'ha pogut exportar",
+    "errorText": "No s'ha pogut crear el ZIP. Les teves plantilles continuen desades i no s'ha perdut res.",
+    "close": "Tanca",
+    "retry": "Torna-ho a provar",
+    "exportButton": "Exporta {{n}} plantilles"
   }
 }
