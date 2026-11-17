@@ -12,7 +12,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 
 /** «Copiar y ajustar por textos»: a notice under the bar with the proposal, never over the PDF. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-adjust-review',
   standalone: true,
   imports: [CommonModule, TranslationPipe],
