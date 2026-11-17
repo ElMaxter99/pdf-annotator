@@ -468,7 +468,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly pageSizesB = signal<PageSize[]>([]);
   /** A and B have a different page size, so their coordinates do not line up. */
   readonly sizeMismatch = computed(
-    () => !!this.batch.activeItem()?.bPdf && sizesDiffer(this.pageSizesA(), this.pageSizesB()),
+    () =>
+      !!this.batch.activeItem()?.bPdf &&
+      sizesDiffer(this.pageSizesA(), this.pageSizesB(), this.pageMap()?.pairs),
   );
   /** The coordinates of A are scaled to the page size of B (the person chose «Ajustar»). */
   readonly fitA = computed(() => this.sizeMismatch() && this.batch.activeItem()?.fitA === true);
