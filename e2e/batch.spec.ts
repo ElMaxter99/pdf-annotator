@@ -662,6 +662,29 @@ test('A and B of different size: the notice lets you fit the coordinates of A to
   await expect(page.getByTestId('fit-off')).toBeVisible();
 });
 
+test('the bar and the notices stay inside the header at 1280 px', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  const twoPages = await PDFDocument.create();
+  twoPages.addPage([595, 842]);
+  twoPages.addPage([595, 842]);
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(
+      file('factura-0331-nuevo.pdf', Buffer.from(await twoPages.save()), 'application/pdf'),
+    );
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await openRow(page);
+  await expect(page.getByTestId('pages-differ')).toBeVisible();
+  const box = async (selector: string) => (await page.locator(selector).first().boundingBox())!;
+  const header = await box('header.header');
+  for (const target of ['.migration-bar', '[data-testid=pages-differ]', '[data-testid=mark-ready]']) {
+    const b = await box(target);
+    expect(b.x + b.width, target).toBeLessThanOrEqual(header.x + header.width);
+  }
+});
+
 test('informative notices can be closed and found again in the bell', async ({ page }) => {
   await openPanel(page);
   await page.getByTestId('view-list').click();

@@ -29,6 +29,7 @@
       <button type="button" class="btn btn--ghost" (click)="vm.goNextWithProposal()" data-testid="ai-next-proposal">{{ 'ai.review.nextWithProposal' | t }}</button>
     }
     <span class="migration-bar__spacer"></span>
+    <div class="migration-bar__tools">
 
     @if (vm.migration(); as m) {
 
@@ -363,6 +364,7 @@
         {{ 'batch.editor.ready' | t }}
       </button>
     }
+    </div>
   </div>
   <div class="migration-hints">
     <app-adjust-review [vm]="vm" (closeRequested)="closeNotice('adjust')"></app-adjust-review>
