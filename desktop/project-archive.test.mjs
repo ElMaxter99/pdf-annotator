@@ -12,7 +12,14 @@ import {
   inspectArchive,
   replaceImpact,
 } from './project-archive.mjs';
-import { acquireLock, createProject, readItems, resolveRef, writeItem } from './projects.mjs';
+import {
+  acquireLock,
+  createProject,
+  forgetProject,
+  readItems,
+  resolveRef,
+  writeItem,
+} from './projects.mjs';
 
 const tmp = () => mkdtempSync(path.join(os.tmpdir(), 'pa-arc-'));
 const pdf = (n, fill = 1) => Buffer.concat([Buffer.from('%PDF-1.4\n'), Buffer.alloc(n, fill)]);
@@ -417,4 +424,19 @@ test('el nombre y la subcarpeta del destino se limpian como en un proyecto nuevo
     'bad-name',
   );
   rmSync(root, { recursive: true, force: true });
+});
+
+test('importar tras «Quitar de la lista»: la carpeta con los PDFs se respeta y el proyecto va a otra libre', async () => {
+  const root = tmp();
+  const src = seed(root, 'Ejemplo 1', 'ejemplo 1');
+  const file = path.join(root, 'p.pdfannotator');
+  await exportProject(src.dir, file, { ref: src.ref });
+  forgetProject(src.dir);
+  assert.equal(existsSync(path.join(src.dir, 'project.json')), false);
+
+  const res = await importArchive(file, root, { name: 'Ejemplo 1', subpath: 'ejemplo 1' });
+  assert.equal(res.project.ref, 'ejemplo 1-2');
+  assert.equal(res.project.name, 'Ejemplo 1');
+  assert.equal(res.project.pdfs, 2);
+  assert.ok(existsSync(path.join(src.dir, 'batch')), 'la carpeta original no se toca');
 });
