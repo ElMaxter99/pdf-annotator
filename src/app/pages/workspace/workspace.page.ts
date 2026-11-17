@@ -303,7 +303,7 @@ export interface AiSession {
 export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-workspace-page',
   standalone: true,
   templateUrl: './workspace.page.html',
