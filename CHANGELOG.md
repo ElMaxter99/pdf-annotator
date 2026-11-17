@@ -2,6 +2,9 @@
 ### Added
 - **Tabla de correspondencia de páginas A↔B (mesas P-78 a P-81):** cuando A y B no tienen las mismas páginas (por ejemplo, B añade una portada), el diálogo «Emparejar páginas…» (desde el menú ▾ del chip de páginas, el aviso «Distinto número de páginas» o la ficha del PDF) deja elegir qué página de A corresponde a cada página de B, con «✦ Sugerir por textos» (sin IA), «Desplazar todas ±1» y «Por número». Con tabla, el visor recorre las páginas de B y A las sigue (o muestra «B n no tiene equivalente en A»); «Poner plantilla A» copia por la tabla (las páginas de B sin A se respetan), el ajuste por textos empareja por ella y la IA recibe la tabla como pista. Avisa de páginas repetidas o sin usar, se guarda por PDF del lote (chip «Páginas emparejadas» en el panel), se descarta al sustituir A y se revisa al cambiar B. Sin tabla todo sigue por número. Textos en los 7 idiomas, con tests unitarios y e2e.
 
+### Docs
+- Hoja de ruta: anotados los evolutivos futuros de escritorio (proyectos locales, importar/exportar proyectos y sincronización sin servidores propios), con fases, riesgos y preguntas abiertas. Sin cambios en la app.
+
 ## [v1.13.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.13.0) - 2026-11-17
 ### Added
 - **Feedback al instalar una actualización (mesas AC-13 y AC-14):** al pulsar «Reiniciar ahora» aparece un diálogo «Instalando la versión X» con pasos y barra sin porcentaje; en Linux (.deb/.rpm) avisa de que el sistema pedirá la contraseña y en Windows de que se abrirá el instalador. Tras reabrir, un aviso confirma «PDF Annotator se actualizó a X». Textos en los 7 idiomas, con tests unitarios y e2e.
