@@ -1780,7 +1780,8 @@
       "in-use": "The project is in use on another computer.",
       "disk-full": "Not enough disk space.",
       "not-synced": "This project is not synced.",
-      "bad-action": "Invalid action."
+      "bad-action": "Invalid action.",
+      "in-use-local": "Something has the folder open (File Explorer, an antivirus or the cloud client). Close it and try again. The project has not changed."
     },
     "transfer": {
       "import": "Import project",
@@ -2173,6 +2174,29 @@
         "create": "Create folder",
         "other": "Choose another"
       }
+    },
+    "rename": {
+      "menu": "Rename…",
+      "menuOther": "Rename… · in use on another computer",
+      "menuOpen": "Rename… · close it first",
+      "title": "Rename project",
+      "empty": "Enter a name for the project.",
+      "folderCheck": "Also rename the folder",
+      "folderHint": "The project folder changes with the name.",
+      "folderOff": "Unchecked because the folder “{{folder}}” is not named like the project. Only the name you see in the app changes.",
+      "folderSynced": "Not available while the project is synced: the path is the sync key. Only the name you see in the app changes.",
+      "previewLabel": "Folder on disk",
+      "keepParent": "Only the last part changes: “{{parent}}” stays as it is.",
+      "folderStays": "The folder stays the same.",
+      "warnChars": "Invalid characters are removed from the folder name: it becomes “{{folder}}”.",
+      "warnReserved": "“{{name}}” is a reserved Windows name. The folder will be called “{{folder}}”; the visible name does not change.",
+      "caseOnly": "On this system both spellings are the same folder; it is renamed anyway.",
+      "clash": "“{{parent}}” already has a folder called “{{folder}}”. Choose another name or uncheck the box to change only the visible name.",
+      "confirm": "Rename",
+      "working": "Renaming…",
+      "done": "Project renamed to “{{name}}”.",
+      "doneKept": "Name changed. The folder stays as “{{folder}}” because the project is synced.",
+      "locked": "{{host}} opened the project while you were typing. Nothing was renamed."
     }
   },
   "templatesExport": {

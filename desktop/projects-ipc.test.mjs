@@ -279,3 +279,44 @@ test('sincronizar con una carpeta enlazada entre dos equipos: vincular, subir, b
   b.api.releaseAll();
   rmSync(tmp, { recursive: true, force: true });
 });
+
+test('renombrar: carpeta y nombre, bloqueo de otro equipo y abierto aquí', async () => {
+  const docs = mkdtempSync(path.join(os.tmpdir(), 'pa-ipc-'));
+  const a = boot(docs, mkdtempSync(path.join(os.tmpdir(), 'pa-ud-a-')));
+  const b = boot(docs, mkdtempSync(path.join(os.tmpdir(), 'pa-ud-b-')));
+  const { project } = await a.call('projects:create', { name: 'Uno', subpath: 'Álvaro/uno' });
+  await a.call('projects:create', { name: 'Dos', subpath: 'Álvaro/dos' });
+  // El choque con otra carpeta no cambia nada.
+  const clash = await a.call('projects:rename', { ref: project.ref, name: 'dos', folder: true });
+  assert.equal(clash.error, 'exists');
+  assert.ok(existsSync(path.join(docs, 'PDF Annotator', 'Álvaro', 'uno', 'project.json')));
+  assert.equal(existsSync(path.join(docs, 'PDF Annotator', 'Álvaro', 'uno', '.lock')), false);
+  // Solo el nombre visible.
+  assert.deepEqual(await a.call('projects:rename', { ref: project.ref, name: 'Uno bis' }), {
+    ok: true,
+    ref: 'Álvaro/uno',
+    folderKept: false,
+  });
+  // Nombre y carpeta, sin dejar bloqueo.
+  const done = await a.call('projects:rename', { ref: project.ref, name: 'Tres', folder: true });
+  assert.equal(done.ref, 'Álvaro/Tres');
+  const list = await a.call('projects:list');
+  const moved = list.projects.find((p) => p.ref === 'Álvaro/Tres');
+  assert.equal(moved.name, 'Tres');
+  assert.equal(moved.lock.state, 'free');
+  // Otro equipo lo tiene abierto: no se renombra.
+  await b.call('projects:open', { ref: 'Álvaro/Tres' });
+  assert.equal(
+    (await a.call('projects:rename', { ref: 'Álvaro/Tres', name: 'X', folder: true })).locked.state,
+    'other',
+  );
+  // Abierto en este equipo: tampoco.
+  assert.equal(
+    (await b.call('projects:rename', { ref: 'Álvaro/Tres', name: 'X' })).error,
+    'in-use-local',
+  );
+  assert.equal(
+    (await a.call('projects:rename', { ref: 'Álvaro/dos', name: ' ' })).error,
+    'bad-name',
+  );
+});

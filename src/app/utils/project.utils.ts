@@ -39,3 +39,26 @@ export function exportEstimate(
 export function percentOf(done: number, total: number): number {
   return total > 0 ? Math.min(100, Math.max(0, Math.round((100 * done) / total))) : 0;
 }
+
+/** Nombre de carpeta sin el prefijo de los nombres reservados (solo quita lo que Windows rechaza). */
+export function cleanFolderName(name: string): string {
+  const part = name
+    .replace(/[\\/]+/g, ' ')
+    .replace(/[<>:"|?*\u0000-\u001f]/g, '')
+    .replace(/[. ]+$/g, '')
+    .trim()
+    .slice(0, 80);
+  return part === '.' || part === '..' ? '' : part;
+}
+
+/** Misma regla que `safeSegments` del proceso principal: lo que quedaría como nombre de carpeta (vista previa). */
+export function folderSlug(name: string): string {
+  const part = cleanFolderName(name);
+  return /^(con|prn|aux|nul|com\d|lpt\d)(\..*)?$/i.test(part) ? `_${part}` : part;
+}
+
+/** Ruta nueva al renombrar la carpeta: solo cambia el último tramo, la subcarpeta se conserva. */
+export function renamedRef(ref: string, name: string): string {
+  const slug = folderSlug(name);
+  return slug ? [...ref.split('/').slice(0, -1), slug].join('/') : '';
+}

@@ -287,6 +287,53 @@ export function renameProject(dir, name, now = Date.now()) {
   );
 }
 
+/**
+ * Cambia el nombre de la carpeta del proyecto (solo el último tramo de la ruta, la subcarpeta se conserva).
+ * Una sola operación del sistema: o se hace entera o no se hace. Devuelve la ref nueva.
+ */
+export function folderRefFor(ref, name) {
+  const slug = safeSegments(String(name ?? '').replace(/[\\/]+/g, ' '))[0] ?? '';
+  if (!slug) throw new ProjectError('bad-name');
+  const parent = String(ref).split('/').slice(0, -1);
+  return [...parent, slug].join('/');
+}
+
+export function moveProjectFolder(root, ref, name) {
+  const from = resolveRef(root, ref);
+  const to = resolveRef(root, folderRefFor(from.ref, name));
+  if (to.ref === from.ref) return { ref: from.ref };
+  if (existsSync(to.dir)) {
+    // «cliente2» → «Cliente2» en un sistema sin distinguir mayúsculas: es la misma carpeta, no un choque.
+    let same = false;
+    try {
+      const a = statSync(from.dir);
+      const b = statSync(to.dir);
+      same = a.ino === b.ino && a.dev === b.dev && from.ref.toLowerCase() === to.ref.toLowerCase();
+    } catch {
+      /* se trata como choque */
+    }
+    if (!same) throw new ProjectError('exists');
+    const hop = `${from.dir}.rename-${randomUUID().slice(0, 8)}`;
+    renameSync(from.dir, hop);
+    try {
+      renameSync(hop, to.dir);
+    } catch (error) {
+      renameSync(hop, from.dir);
+      throw error;
+    }
+    return { ref: to.ref };
+  }
+  try {
+    renameSync(from.dir, to.dir);
+  } catch (error) {
+    if (error?.code === 'EPERM' || error?.code === 'EBUSY' || error?.code === 'EACCES')
+      throw new ProjectError('in-use-local');
+    if (error?.code === 'ENOTEMPTY' || error?.code === 'EEXIST') throw new ProjectError('exists');
+    throw error;
+  }
+  return { ref: to.ref };
+}
+
 function touch(dir, now = Date.now()) {
   const file = path.join(dir, 'project.json');
   const manifest = readJson(file);

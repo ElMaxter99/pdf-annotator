@@ -1780,7 +1780,8 @@
       "in-use": "El proyecto está en uso en otro equipo.",
       "disk-full": "No hay espacio en el disco.",
       "not-synced": "Este proyecto no se sincroniza.",
-      "bad-action": "Acción no válida."
+      "bad-action": "Acción no válida.",
+      "in-use-local": "Algo tiene abierta la carpeta (el Explorador, un antivirus o el cliente de la nube). Ciérralo e inténtalo de nuevo. El proyecto no ha cambiado."
     },
     "transfer": {
       "import": "Importar proyecto",
@@ -2173,6 +2174,29 @@
         "create": "Crear carpeta",
         "other": "Elegir otra"
       }
+    },
+    "rename": {
+      "menu": "Renombrar…",
+      "menuOther": "Renombrar… · en uso en otro equipo",
+      "menuOpen": "Renombrar… · ciérralo primero",
+      "title": "Renombrar proyecto",
+      "empty": "Escribe un nombre para el proyecto.",
+      "folderCheck": "Renombrar también la carpeta",
+      "folderHint": "La carpeta del proyecto cambia con el nombre.",
+      "folderOff": "Desmarcada porque la carpeta «{{folder}}» no se llama como el nombre. Solo cambia el nombre que ves en la app.",
+      "folderSynced": "No disponible mientras el proyecto está sincronizado: la ruta es la clave de la sincronización. Solo cambia el nombre que ves en la app.",
+      "previewLabel": "Carpeta en el disco",
+      "keepParent": "Solo cambia el último tramo: «{{parent}}» se queda como está.",
+      "folderStays": "La carpeta se queda igual.",
+      "warnChars": "En la carpeta se quitan los caracteres no válidos: queda «{{folder}}».",
+      "warnReserved": "«{{name}}» es un nombre reservado de Windows. La carpeta se llamará «{{folder}}»; el nombre visible no cambia.",
+      "caseOnly": "En este sistema las dos grafías son la misma carpeta; se renombra igualmente.",
+      "clash": "En «{{parent}}» ya hay una carpeta «{{folder}}». Elige otro nombre o desmarca la casilla para cambiar solo el nombre visible.",
+      "confirm": "Renombrar",
+      "working": "Renombrando…",
+      "done": "Proyecto renombrado a «{{name}}».",
+      "doneKept": "Nombre cambiado. La carpeta se queda como «{{folder}}» porque el proyecto está sincronizado.",
+      "locked": "{{host}} ha abierto el proyecto mientras escribías. No se ha renombrado nada."
     }
   },
   "templatesExport": {

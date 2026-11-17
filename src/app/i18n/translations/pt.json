@@ -1780,7 +1780,8 @@
       "in-use": "O projeto está em uso noutro computador.",
       "disk-full": "Sem espaço no disco.",
       "not-synced": "Este projeto não é sincronizado.",
-      "bad-action": "Ação inválida."
+      "bad-action": "Ação inválida.",
+      "in-use-local": "Algo tem a pasta aberta (o Explorador, um antivírus ou o cliente da nuvem). Feche-o e tente de novo. O projeto não mudou."
     },
     "transfer": {
       "import": "Importar projeto",
@@ -2173,6 +2174,29 @@
         "create": "Criar pasta",
         "other": "Escolher outra"
       }
+    },
+    "rename": {
+      "menu": "Mudar o nome…",
+      "menuOther": "Mudar o nome… · em uso noutro computador",
+      "menuOpen": "Mudar o nome… · feche-o primeiro",
+      "title": "Mudar o nome do projeto",
+      "empty": "Escreva um nome para o projeto.",
+      "folderCheck": "Mudar também o nome da pasta",
+      "folderHint": "A pasta do projeto muda com o nome.",
+      "folderOff": "Desmarcada porque a pasta «{{folder}}» não tem o nome do projeto. Só muda o nome que vê na app.",
+      "folderSynced": "Indisponível enquanto o projeto está sincronizado: o caminho é a chave da sincronização. Só muda o nome que vê na app.",
+      "previewLabel": "Pasta no disco",
+      "keepParent": "Só muda o último troço: «{{parent}}» fica como está.",
+      "folderStays": "A pasta fica igual.",
+      "warnChars": "Os carateres inválidos são removidos do nome da pasta: fica «{{folder}}».",
+      "warnReserved": "«{{name}}» é um nome reservado do Windows. A pasta chamar-se-á «{{folder}}»; o nome visível não muda.",
+      "caseOnly": "Neste sistema as duas grafias são a mesma pasta; muda-se na mesma.",
+      "clash": "Em «{{parent}}» já existe uma pasta «{{folder}}». Escolha outro nome ou desmarque a caixa para mudar só o nome visível.",
+      "confirm": "Mudar o nome",
+      "working": "A mudar o nome…",
+      "done": "Projeto renomeado para «{{name}}».",
+      "doneKept": "Nome alterado. A pasta fica como «{{folder}}» porque o projeto está sincronizado.",
+      "locked": "{{host}} abriu o projeto enquanto escrevia. Nada foi renomeado."
     }
   },
   "templatesExport": {
