@@ -385,6 +385,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   requestThumbnail(pageNumber: number): void {
     this.thumbnailGenerator.request(pageNumber);
   }
+  retryThumbnail(pageNumber: number): void {
+    this.thumbnailGenerator.retry(pageNumber);
+  }
   cancelThumbnail(pageNumber: number): void {
     this.thumbnailGenerator.cancel(pageNumber);
   }

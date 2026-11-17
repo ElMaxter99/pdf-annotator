@@ -58,6 +58,7 @@ export class PageThumbnailsComponent {
 
   @Output() thumbnailVisible = new EventEmitter<number>();
   @Output() thumbnailHidden = new EventEmitter<number>();
+  @Output() thumbnailRetry = new EventEmitter<number>();
 
   trackByPage(_index: number, thumbnail: PageThumbnail): number {
     return thumbnail.pageNumber;
@@ -67,7 +68,10 @@ export class PageThumbnailsComponent {
     (visible ? this.thumbnailVisible : this.thumbnailHidden).emit(pageNumber);
   }
 
-  onSelect(pageNumber: number) {
-    this.pageSelected.emit(pageNumber);
+  onSelect(thumbnail: PageThumbnail) {
+    if (thumbnail.failed) {
+      this.thumbnailRetry.emit(thumbnail.pageNumber);
+    }
+    this.pageSelected.emit(thumbnail.pageNumber);
   }
 }

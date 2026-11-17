@@ -128,7 +128,8 @@
     },
     "thumbnails": {
       "title": "Vignettes",
-      "pageLabel": "Page {{index}}"
+      "pageLabel": "Page {{index}}",
+      "retryLabel": "Page {{index}} : impossible à dessiner, appuyez pour réessayer"
     },
     "advancedTitle": "Options avancées",
     "advancedHint": "Activez les guides et les aides d'alignement uniquement lorsque vous avez besoin de plus de précision.",

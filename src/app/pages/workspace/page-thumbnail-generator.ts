@@ -71,6 +71,15 @@ export class PageThumbnailGenerator {
     void this.drain();
   }
 
+  /** Reintenta una miniatura que falló. */
+  retry(pageNumber: number): void {
+    if (!this.thumbnails().some((t) => t.pageNumber === pageNumber && t.failed)) {
+      return;
+    }
+    this.mark(pageNumber, { failed: false });
+    this.request(pageNumber);
+  }
+
   /** Quita de la cola una miniatura que ya no se ve y aún no se ha dibujado. */
   cancel(pageNumber: number): void {
     this.queue = this.queue.filter((n) => n !== pageNumber);
@@ -89,6 +98,9 @@ export class PageThumbnailGenerator {
           await this.renderOne(pageNumber, generationToken);
         } catch (error) {
           console.error('No se pudo generar la miniatura de la página', pageNumber, error);
+          if (generationToken === this.token) {
+            this.mark(pageNumber, { failed: true });
+          }
         }
       }
     } finally {
@@ -113,6 +125,7 @@ export class PageThumbnailGenerator {
       const canvas = new OffscreenCanvas(item.width, item.height);
       const ctx = canvas.getContext('2d', { alpha: false });
       if (!ctx) {
+        this.mark(pageNumber, { failed: true });
         return;
       }
       ctx.clearRect(0, 0, item.width, item.height);
@@ -135,6 +148,12 @@ export class PageThumbnailGenerator {
         page.cleanup();
       }
     }
+  }
+
+  private mark(pageNumber: number, patch: Partial<PageThumbnail>): void {
+    this.thumbnails.update((list) =>
+      list.map((t) => (t.pageNumber === pageNumber ? { ...t, ...patch } : t)),
+    );
   }
 
   private revokeUrls(): void {

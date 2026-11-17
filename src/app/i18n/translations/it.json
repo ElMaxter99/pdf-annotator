@@ -128,7 +128,8 @@
     },
     "thumbnails": {
       "title": "Miniature",
-      "pageLabel": "Pagina {{index}}"
+      "pageLabel": "Pagina {{index}}",
+      "retryLabel": "Pagina {{index}}: impossibile da disegnare, premi per riprovare"
     },
     "advancedTitle": "Opzioni avanzate",
     "advancedHint": "Attiva guide e agganci solo quando ti serve maggiore precisione.",

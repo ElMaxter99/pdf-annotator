@@ -128,7 +128,8 @@
     },
     "thumbnails": {
       "title": "Miniaturen",
-      "pageLabel": "Seite {{index}}"
+      "pageLabel": "Seite {{index}}",
+      "retryLabel": "Seite {{index}}: konnte nicht gezeichnet werden, zum Wiederholen drücken"
     },
     "advancedTitle": "Erweiterte Optionen",
     "advancedHint": "Aktivieren Sie Hilfslinien und Einrast-Hilfen nur bei Bedarf für mehr Präzision.",

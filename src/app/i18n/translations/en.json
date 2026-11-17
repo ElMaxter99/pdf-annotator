@@ -128,7 +128,8 @@
     },
     "thumbnails": {
       "title": "Thumbnails",
-      "pageLabel": "Page {{index}}"
+      "pageLabel": "Page {{index}}",
+      "retryLabel": "Page {{index}}: could not be drawn, press to retry"
     },
     "advancedTitle": "Advanced options",
     "advancedHint": "Toggle guides and snapping helpers when you need extra precision.",

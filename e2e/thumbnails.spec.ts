@@ -35,3 +35,31 @@ test('thumbnails are drawn on demand: only the visible ones, the rest as they sc
   await expect(items.last().locator('img.thumbnails__image[src]')).toBeVisible();
   await expect(items.first()).toHaveAttribute('aria-label', /1/);
 });
+
+test('thumbnails not drawn yet show an animated skeleton, still with reduced motion', async ({
+  browser,
+}) => {
+  for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+    const context = await browser.newContext({ reducedMotion });
+    const page = await context.newPage();
+    await stubAnalytics(page);
+    await page.goto('/landing');
+    await page.locator('input[type=file]').setInputFiles({
+      name: 'muchas-paginas.pdf',
+      mimeType: 'application/pdf',
+      buffer: await manyPages(60),
+    });
+    await page.waitForURL('**/workspace');
+    await openSidebarTab(page, 'Documento');
+    const pending = page.locator('.thumbnails__image--pending').last();
+    await expect(pending).toHaveCount(1);
+    const animation = await pending.evaluate((el) => getComputedStyle(el).animationName);
+    if (reducedMotion === 'reduce') {
+      expect(animation).toBe('none');
+    } else {
+      expect(animation).toContain('thumbnails-shimmer');
+    }
+    await expect(pending).toHaveAttribute('aria-hidden', 'true');
+    await context.close();
+  }
+});
