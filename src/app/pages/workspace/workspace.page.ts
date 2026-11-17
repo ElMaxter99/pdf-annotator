@@ -214,6 +214,8 @@ import {
 } from '../../utils/color.utils';
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
+import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
+import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
 import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
 import {
   type AdjustAnchorRow,
@@ -1744,7 +1746,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const xPx = evt.clientX - rect.left;
     const yPx = evt.clientY - rect.top;
     const scale = this.scale();
-    return { x: +(xPx / scale).toFixed(2), y: +((canvas.height - yPx) / scale).toFixed(2) };
+    return pixelToPdfPoint(xPx, yPx, canvas.height, scale);
   }
 
   onViewerMouseMove(evt: MouseEvent) {
@@ -1984,243 +1986,150 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   @HostListener('document:keydown', ['$event'])
   onGlobalKeydown(event: KeyboardEvent) {
-    if (this.pageMapOpen()) {
-      return; // the dialog «Emparejar páginas» owns the keyboard (Esc and Ctrl+Enter are its own)
+    const target = event.target as HTMLElement | null;
+    const tag = target?.tagName;
+    const result = resolveShortcut(
+      {
+        key: event.key.toLowerCase(),
+        code: event.code,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        altKey: event.altKey,
+        shiftKey: event.shiftKey,
+        defaultPrevented: event.defaultPrevented,
+      },
+      {
+        pageMapOpen: this.pageMapOpen(),
+        paletteOpen: this.paletteOpen(),
+        aboutOpen: this.aboutOpen(),
+        shortcutsOpen: this.shortcutsOpen(),
+        zoomMenuOpen: this.zoomMenuOpen(),
+        hasDocument: !!this.pdfDoc(),
+        previewOpen: !!this.preview(),
+        editing: !!this.editing(),
+        hasSelection: !!this.selection(),
+        hasClipboard: this.selectionClipboard.length > 0,
+        canUndo: this.canUndo(),
+        canRedo: this.canRedo(),
+        comparing: this.comparing(),
+        splitActive: this.splitActive(),
+        targetEditable: isEditableElement(event.target),
+        targetBlocksPlain:
+          tag === 'INPUT' ||
+          tag === 'TEXTAREA' ||
+          tag === 'SELECT' ||
+          tag === 'BUTTON' ||
+          !!target?.isContentEditable,
+      },
+    );
+    if (!result) {
+      return;
     }
-    const key = event.key.toLowerCase();
-    const hasPrimaryModifier = event.ctrlKey || event.metaKey;
+    if (result.preventDefault) {
+      event.preventDefault();
+    }
+    this.runShortcut(event, result.action);
+  }
 
-    if (hasPrimaryModifier && !event.altKey && !event.shiftKey && key === 'k') {
-      if (!this.aboutOpen() && !this.shortcutsOpen()) {
-        event.preventDefault();
+  private runShortcut(event: KeyboardEvent, action: ShortcutAction) {
+    switch (action) {
+      case 'togglePalette':
         this.togglePalette();
-      }
-      return;
-    }
-
-    if (this.paletteOpen()) {
-      return; // the palette owns the keyboard while it is open
-    }
-
-    if (!hasPrimaryModifier) {
-      this.handlePlainShortcut(event, key);
-      return;
-    }
-
-    if (key === 's') {
-      event.preventDefault();
-      this.applyCoordsText();
-      return;
-    }
-
-    if (key === 'z' && !event.shiftKey) {
-      if (this.canUndo()) {
-        event.preventDefault();
+        break;
+      case 'applyJson':
+        this.applyCoordsText();
+        break;
+      case 'undo':
         this.undo();
-      }
-      return;
-    }
-
-    if (key === 'y' || (key === 'z' && event.shiftKey)) {
-      if (this.canRedo()) {
-        event.preventDefault();
+        break;
+      case 'redo':
         this.redo();
-      }
-      return;
-    }
-
-    if (this.handleZoomShortcut(event, key)) {
-      return;
-    }
-
-    this.handleSelectionShortcut(event, key);
-  }
-
-  /** Ctrl/⌘ + / − / 0 zoom the PDF (never the browser page) while the editor has the focus. */
-  private handleZoomShortcut(event: KeyboardEvent, key: string): boolean {
-    if (!this.pdfDoc() || isEditableElement(event.target) || this.aboutOpen() || this.shortcutsOpen()) {
-      return false;
-    }
-    if (key === '+' || key === '=') {
-      event.preventDefault();
-      void this.zoomIn();
-    } else if (key === '-' || key === '_') {
-      event.preventDefault();
-      void this.zoomOut();
-    } else if (key === '0') {
-      event.preventDefault();
-      void this.zoomActualSize();
-    } else {
-      return false;
-    }
-    return true;
-  }
-
-  /** Ctrl/⌘+A, C, V and D work on the annotation selection (never while typing in a field). */
-  private handleSelectionShortcut(event: KeyboardEvent, key: string) {
-    if (!this.pdfDoc() || isEditableElement(event.target) || this.preview() || this.editing()) {
-      return;
-    }
-
-    switch (key) {
-      case 'a':
-        event.preventDefault();
+        break;
+      case 'zoomIn':
+        void this.zoomIn();
+        break;
+      case 'zoomOut':
+        void this.zoomOut();
+        break;
+      case 'zoomActual':
+        void this.zoomActualSize();
+        break;
+      case 'selectAll':
         this.selectAllOnPage();
         break;
-      case 'c':
+      case 'copy':
         if (this.copySelection()) {
           event.preventDefault();
         }
         break;
-      case 'v':
-        if (this.selectionClipboard.length && this.pasteSelection()) {
+      case 'paste':
+        if (this.pasteSelection()) {
           event.preventDefault();
         }
         break;
-      case 'd':
-        if (this.selection()) {
-          event.preventDefault();
-          this.duplicateSelection();
-        }
+      case 'duplicate':
+        this.duplicateSelection();
         break;
-      default:
+      case 'closeAbout':
+        this.toggleAbout(false);
         break;
-    }
-  }
-
-  private handlePlainShortcut(event: KeyboardEvent, key: string) {
-    if (event.altKey || event.defaultPrevented) {
-      return;
-    }
-
-    if (key === 'escape' && this.aboutOpen()) {
-      event.preventDefault();
-      this.toggleAbout(false);
-      return;
-    }
-
-    if (key === 'escape' && this.zoomMenuOpen()) {
-      event.preventDefault();
-      this.zoomMenuOpen.set(false);
-      return;
-    }
-
-    if (key === 'escape' && this.shortcutsOpen()) {
-      event.preventDefault();
-      this.toggleShortcuts(false);
-      return;
-    }
-
-    const target = event.target as HTMLElement | null;
-    const tag = target?.tagName;
-    if (
-      tag === 'INPUT' ||
-      tag === 'TEXTAREA' ||
-      tag === 'SELECT' ||
-      tag === 'BUTTON' ||
-      target?.isContentEditable
-    ) {
-      return;
-    }
-
-    if (this.selection() && !this.preview() && !this.editing()) {
-      const step = event.shiftKey ? 10 : 1;
-      const nudges: Record<string, [number, number]> = {
-        arrowleft: [-step, 0],
-        arrowright: [step, 0],
-        arrowup: [0, step],
-        arrowdown: [0, -step],
-      };
-      if (key === 'escape') {
-        event.preventDefault();
+      case 'closeZoomMenu':
+        this.zoomMenuOpen.set(false);
+        break;
+      case 'closeShortcuts':
+        this.toggleShortcuts(false);
+        break;
+      case 'clearSelection':
         this.clearSelection();
-        return;
-      }
-      if (key === 'delete' || key === 'backspace') {
-        event.preventDefault();
+        break;
+      case 'deleteSelection':
         this.deleteSelection();
-        return;
+        break;
+      case 'nudgeLeft':
+      case 'nudgeRight':
+      case 'nudgeUp':
+      case 'nudgeDown': {
+        const step = event.shiftKey ? 10 : 1;
+        const dx = action === 'nudgeLeft' ? -step : action === 'nudgeRight' ? step : 0;
+        const dy = action === 'nudgeUp' ? step : action === 'nudgeDown' ? -step : 0;
+        this.moveSelection(dx, dy, 'nudge');
+        break;
       }
-      if (nudges[key]) {
-        event.preventDefault();
-        this.moveSelection(nudges[key][0], nudges[key][1], 'nudge');
-        return;
-      }
-    }
-
-    const needsDocument = () => !!this.pdfDoc();
-    if (key === ' ' && needsDocument() && !this.preview() && !this.editing()) {
-      event.preventDefault();
-      this.panReady.set(true);
-      return;
-    }
-    if (event.code === 'Digit1' && event.shiftKey && needsDocument()) {
-      event.preventDefault();
-      void this.fitPage();
-      return;
-    }
-    switch (key) {
-      case '?':
-        event.preventDefault();
+      case 'panReady':
+        this.panReady.set(true);
+        break;
+      case 'fitPage':
+        void this.fitPage();
+        break;
+      case 'fitWidth':
+        void this.fitWidth();
+        break;
+      case 'toggleShortcuts':
         this.toggleShortcuts();
         break;
-      case 'arrowleft':
-      case 'pageup':
-        if (needsDocument()) {
-          event.preventDefault();
-          void (event.shiftKey && this.comparing() ? this.stepPageA(-1) : this.prevPage());
-        }
+      case 'prevPage':
+        void this.prevPage();
         break;
-      case 'arrowright':
-      case 'pagedown':
-        if (needsDocument()) {
-          event.preventDefault();
-          void (event.shiftKey && this.comparing() ? this.stepPageA(1) : this.nextPage());
-        }
+      case 'nextPage':
+        void this.nextPage();
         break;
-      case 'home':
-        if (needsDocument()) {
-          event.preventDefault();
-          void this.setPageIndex(1);
-        }
+      case 'prevPageA':
+        void this.stepPageA(-1);
         break;
-      case 'end':
-        if (needsDocument()) {
-          event.preventDefault();
-          void this.setPageIndex(this.pageTotalShown());
-        }
+      case 'nextPageA':
+        void this.stepPageA(1);
         break;
-      case '+':
-      case '=':
-        if (needsDocument()) {
-          event.preventDefault();
-          void this.zoomIn();
-        }
+      case 'firstPage':
+        void this.setPageIndex(1);
         break;
-      case '-':
-      case '_':
-        if (needsDocument()) {
-          event.preventDefault();
-          void this.zoomOut();
-        }
+      case 'lastPage':
+        void this.setPageIndex(this.pageTotalShown());
         break;
-      case '0':
-        if (needsDocument()) {
-          event.preventDefault();
-          void this.fitWidth();
-        }
-        break;
-      case 'b':
-        event.preventDefault();
+      case 'toggleSidebar':
         this.toggleSidebarMinimized();
         break;
-      case 'l':
-        if (this.splitActive()) {
-          event.preventDefault();
-          void this.toggleSplitLink();
-        }
-        break;
-      default:
+      case 'toggleSplitLink':
+        void this.toggleSplitLink();
         break;
     }
   }
