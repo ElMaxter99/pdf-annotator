@@ -40,11 +40,17 @@ Brainstorming de Maxter (2026-11-17). **No hay diseño ni código todavía:** ca
 - Dependencias: fases 1 y 2 (la carpeta contiene proyectos exportables), formato de carpeta por proyecto (`project.json` + PDFs por separado para no reescribir todo), bloqueo y detección de cambios.
 - Riesgos: **conflictos** (dos equipos editan a la vez; los clientes de Drive/OneDrive crean «copias en conflicto»), por lo que hace falta un archivo de bloqueo con caducidad, una versión por proyecto y una regla clara de resolución; **privacidad** (los PDFs de clientes salen del equipo: el aviso debe ser explícito y las credenciales de SFTP irán en el almacén seguro del sistema, nunca en el repo ni en `localStorage`); **tamaño** (subir solo lo que cambió); la web no puede acceder a carpetas arbitrarias, por eso es solo escritorio; SFTP/LDAP añaden dependencias y superficie de seguridad (CSP/permisos de Electron).
 
-**Preguntas abiertas** (por decidir con Maxter antes de diseñar):
-1. ¿«Proyecto» sustituye al «lote» o lo contiene? ¿Un proyecto puede mezclar un lote y PDFs sueltos?
-2. ¿Nombre de «Proyecto» o «Espacio de trabajo»? (`workspace` ya es la ruta del editor y confunde.)
-3. ¿Dónde viven los proyectos locales: IndexedDB (como hoy) o una carpeta en disco que el usuario ve? La fase 3 se simplifica mucho con carpeta en disco.
-4. En conflictos: ¿bloqueo (uno edita, el otro solo lee) o fusión por campo? Se recomienda empezar por bloqueo.
-5. ¿Qué proveedores primero? Se recomienda carpeta sincronizada (Drive/OneDrive/red) antes que SFTP.
-6. ¿Cifrado del archivo exportado y de la carpeta sincronizada, con contraseña del usuario?
-7. ¿Qué tamaño máximo de proyecto se espera (nº de PDFs y MB)?
+**Decisiones de Maxter (2026-11-17):**
+1. **Un proyecto siempre contiene un lote**, aunque tenga un solo PDF (así hay un único modelo). Abrir un PDF suelto en la app **no cambia**: sin ventanas ni pasos de más; el proyecto es para quien quiere gestionar más cosas (p. ej. «cliente 1» con 5, 10 o 20 maquetas).
+2. **Nombre:** «Proyecto» para la funcionalidad nueva; «Espacio de trabajo» sigue siendo la zona de anotar (el `workspace` de siempre), para no liar.
+3. **Dónde viven:** en una **carpeta visible en el disco** (no oculta en IndexedDB), para que la sincronización de la fase 3 sea fácil.
+4. **Conflictos: bloqueo.** Solo un equipo edita cada proyecto; el otro lo ve en solo lectura. No se busca edición simultánea (se perdería trabajo al sincronizar); podría estudiarse mucho más adelante.
+5. **Proveedores:** primero carpeta sincronizada (Drive, OneDrive) o carpeta de red, como prueba de concepto; SFTP después.
+6. **Cifrado:** por ahora **no** (lo que subes a tu SFTP o Drive ya es tuyo; no hace falta protegerlo doble y pedir contraseña al crear cada proyecto es incómodo). Queda como idea futura con propuestas abajo.
+7. **Tope de tamaño:** lo propone Claude (abajo), pendiente de que Maxter lo confirme.
+
+**Propuestas de Claude, pendientes de validar:**
+- **Tope por proyecto:** hoy un PDF del lote admite hasta 40 MB (`MAX_BATCH_PDF_BYTES`). Se propone mantenerlo y añadir **200 PDFs y 2 GB por proyecto**, con aviso suave a partir de 1 GB y de 100 PDFs (Maxter ya trabaja con ≈90). Es un tope de la app, ajustable en una constante, no del disco.
+- **Cifrado futuro, sin pedir contraseña siempre:** (a) opcional por proyecto, activado desde sus ajustes («Proteger con contraseña»), nunca obligatorio; (b) la clave se guarda en el almacén seguro del sistema (Keychain, Credential Manager, libsecret) para no teclearla cada vez; (c) solo se pide al abrir el proyecto en un equipo nuevo; (d) al exportar (fase 2) se ofrece cifrar el archivo con contraseña y esa sí se pide en el momento.
+
+**Pendiente de diseño (fase 1):** pantalla de proyectos, crear/abrir/renombrar/quitar, qué ve un equipo que no tiene el bloqueo, migración de la «última sesión» y del lote actual, y cómo se llega desde la landing sin molestar a quien solo anota un PDF. Mesas en «Propuestas» del lienzo; no se programa hasta que Maxter las apruebe.
