@@ -1592,7 +1592,7 @@
     "created": "Project «{{name}}» created and saved on your disk.",
     "forgotten": "«{{name}}» removed from the list (the files are still on your disk).",
     "untitled": "Untitled",
-    "readOnly": "Read-only: changes are not saved",
+    "readOnly": "Read-only",
     "resume": {
       "title": "Continue in {{name}}",
       "text": "Your last project.",

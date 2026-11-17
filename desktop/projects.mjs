@@ -48,7 +48,9 @@ export function safeSegments(input) {
         .trim()
         .slice(0, MAX_NAME),
     )
-    .filter((part) => part && part !== '.' && part !== '..');
+    .filter((part) => part && part !== '.' && part !== '..')
+    // Nombres que Windows reserva (CON, NUL, COM1…): se les antepone «_» para que la carpeta se pueda crear.
+    .map((part) => (/^(con|prn|aux|nul|com\d|lpt\d)(\..*)?$/i.test(part) ? `_${part}` : part));
   return parts.slice(0, MAX_DEPTH);
 }
 

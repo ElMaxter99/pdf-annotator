@@ -140,6 +140,30 @@ describe('ProjectStoreService', () => {
     expect(bridge.saveItem).toHaveBeenCalledTimes(1);
   });
 
+  it('notices on its own that the lock was taken, without waiting for a save', async () => {
+    jasmine.clock().install();
+    try {
+      bridge.open.and.resolveTo({
+        project: summary('cliente1'),
+        readOnly: false,
+        items: [stored('a1')],
+      });
+      bridge.renew.and.resolveTo({ ok: false });
+
+      await store.open('cliente1');
+      jasmine.clock().tick(21_000);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(bridge.renew).toHaveBeenCalledWith({ ref: 'cliente1' });
+      expect(store.lockLost()).toBeTrue();
+      expect(store.active()?.readOnly).toBeTrue();
+    } finally {
+      jasmine.clock().uninstall();
+      await store.close();
+    }
+  });
+
   it('removes the files of a PDF taken out of the batch and releases the lock on close', async () => {
     bridge.open.and.resolveTo({
       project: summary('cliente1'),

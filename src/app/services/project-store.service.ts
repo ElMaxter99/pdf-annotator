@@ -17,6 +17,8 @@ import { ToastService } from './toast.service';
 const ACTIVE_KEY = 'pdf-annotator.active-project';
 const LAST_KEY = 'pdf-annotator.last-project';
 const SAVE_DELAY_MS = 400;
+/** How often an open project checks that this computer still holds it (the main process renews the lock every minute). */
+const LOCK_CHECK_MS = 20_000;
 
 export const DEFAULT_LIMITS: ProjectLimits = {
   maxPdfs: 200,
@@ -55,6 +57,7 @@ export class ProjectStoreService {
   readonly available = (): boolean => this.bridge() !== null;
 
   private restoring: Promise<boolean> | null = null;
+  private lockTimer: ReturnType<typeof setInterval> | null = null;
   private readonly pending = new Map<string, BatchItem>();
   private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly written = new WeakSet<Blob>();
@@ -163,6 +166,9 @@ export class ProjectStoreService {
     this.batch.attachProject(items, readOnly ? null : this.sinkFor(ref));
     this.active.set({ ref, name: result.project.name, readOnly });
     this.remember(ref, result.project.name, readOnly);
+    if (!readOnly) {
+      this.watchLock(ref);
+    }
     return { ok: true };
   }
 
@@ -196,6 +202,7 @@ export class ProjectStoreService {
     if (!project) {
       return;
     }
+    this.stopWatchingLock();
     await this.flush();
     this.batch.detachProject();
     this.active.set(null);
@@ -252,6 +259,29 @@ export class ProjectStoreService {
     const ref = this.active()?.ref;
     if (ref) {
       await Promise.all(jobs.map((item) => this.write(ref, item)));
+    }
+  }
+
+  /** Notices soon (not only on the next save) when another computer takes the project over. */
+  private watchLock(ref: string): void {
+    this.stopWatchingLock();
+    this.lockTimer = setInterval(() => {
+      void this.bridge()
+        ?.renew({ ref })
+        .then((result) => {
+          if ('error' in result || !result.ok) {
+            this.handle({ error: 'not-held' });
+            this.stopWatchingLock();
+          }
+        })
+        .catch(() => undefined);
+    }, LOCK_CHECK_MS);
+  }
+
+  private stopWatchingLock(): void {
+    if (this.lockTimer) {
+      clearInterval(this.lockTimer);
+      this.lockTimer = null;
     }
   }
 

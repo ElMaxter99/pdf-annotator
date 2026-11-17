@@ -1592,7 +1592,7 @@
     "created": "Proyecto «{{name}}» creado y guardado en tu disco.",
     "forgotten": "«{{name}}» quitado de la lista (los archivos siguen en el disco).",
     "untitled": "Sin título",
-    "readOnly": "Solo lectura: los cambios no se guardan",
+    "readOnly": "Solo lectura",
     "resume": {
       "title": "Continuar en {{name}}",
       "text": "Tu último proyecto.",

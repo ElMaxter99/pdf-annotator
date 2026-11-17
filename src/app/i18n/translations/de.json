@@ -1592,7 +1592,7 @@
     "created": "Projekt «{{name}}» erstellt und auf Ihrer Festplatte gespeichert.",
     "forgotten": "«{{name}}» aus der Liste entfernt (die Dateien bleiben auf der Festplatte).",
     "untitled": "Ohne Titel",
-    "readOnly": "Schreibgeschützt: Änderungen werden nicht gespeichert",
+    "readOnly": "Schreibgeschützt",
     "resume": {
       "title": "Weiter in {{name}}",
       "text": "Ihr letztes Projekt.",

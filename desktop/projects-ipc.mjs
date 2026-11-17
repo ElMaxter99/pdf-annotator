@@ -10,6 +10,7 @@ import {
   createProject,
   forgetProject,
   listProjects,
+  lockState,
   readItems,
   releaseLock,
   removeItem,
@@ -49,7 +50,7 @@ export function setupProjectsIpc({ handle, app, dialog, getWindow }) {
         return await fn(...args);
       } catch (error) {
         if (error instanceof ProjectError) return { error: error.code };
-        return { error: error?.code === 'EACCES' || error?.code === 'EPERM' ? 'denied' : 'io' };
+      return { error: error?.code === 'EACCES' || error?.code === 'EPERM' ? 'denied' : 'io' };
       }
     };
   const asText = (value, max = 200) => (typeof value === 'string' ? value.slice(0, max) : '');
@@ -57,6 +58,14 @@ export function setupProjectsIpc({ handle, app, dialog, getWindow }) {
     value instanceof Uint8Array || value instanceof ArrayBuffer
       ? Buffer.from(value instanceof ArrayBuffer ? new Uint8Array(value) : value)
       : undefined;
+
+  /** Escribir exige seguir teniendo el bloqueo: si otro equipo lo tomó, se suelta y se avisa (`not-held`). */
+  const assertHeld = (ref, dir) => {
+    if (!held.has(ref) || lockState(dir, token).state !== 'mine') {
+      held.delete(ref);
+      throw new ProjectError('not-held');
+    }
+  };
 
   handle('projects:info', () => ({ root, host, limits: LIMITS }));
   handle(
@@ -104,7 +113,7 @@ export function setupProjectsIpc({ handle, app, dialog, getWindow }) {
     'projects:save-item',
     guarded((input) => {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
-      if (!held.has(ref)) throw new ProjectError('not-held');
+      assertHeld(ref, dir);
       const meta = input?.meta && typeof input.meta === 'object' ? input.meta : {};
       const b = input?.b === null ? null : bytesOf(input?.b);
       writeItem(dir, asText(input?.id, 64), meta, { a: bytesOf(input?.a), b });
@@ -115,7 +124,7 @@ export function setupProjectsIpc({ handle, app, dialog, getWindow }) {
     'projects:remove-item',
     guarded((input) => {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
-      if (!held.has(ref)) throw new ProjectError('not-held');
+      assertHeld(ref, dir);
       removeItem(dir, asText(input?.id, 64));
       return { ok: true };
     }),
@@ -143,7 +152,7 @@ export function setupProjectsIpc({ handle, app, dialog, getWindow }) {
     'projects:rename',
     guarded((input) => {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
-      if (!held.has(ref)) throw new ProjectError('not-held');
+      assertHeld(ref, dir);
       renameProject(dir, asText(input?.name, 80));
       return { ok: true };
     }),

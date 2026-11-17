@@ -45,7 +45,8 @@ export class LandingPageComponent {
   readonly projectStore = inject(ProjectStoreService);
   /** Último proyecto abierto (solo escritorio): ofrece «Continuar en…». */
   readonly lastProject = signal<{ ref: string; name: string } | null>(null);
-  readonly batchCount = computed(() => this.batchStore.items().length);
+  // With a project open the batch belongs to the project (it has its own «Continuar en…» card).
+  readonly batchCount = computed(() => (this.projectStore.active() ? 0 : this.batchStore.items().length));
   readonly savedSession = signal<SavedSessionSummary | null>(null);
 
   readonly appName = APP_NAME;

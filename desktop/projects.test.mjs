@@ -27,6 +27,7 @@ test('safeSegments limpia rutas peligrosas', () => {
   assert.deepEqual(safeSegments('../../etc/passwd'), ['etc', 'passwd']);
   assert.deepEqual(safeSegments('a:b/c*?'), ['ab', 'c']);
   assert.deepEqual(safeSegments('..'), []);
+  assert.deepEqual(safeSegments('NUL/com1.txt/Cliente'), ['_NUL', '_com1.txt', 'Cliente']);
 });
 
 test('resolveRef no sale de la raíz', () => {

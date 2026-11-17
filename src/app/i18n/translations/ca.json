@@ -1592,7 +1592,7 @@
     "created": "Projecte «{{name}}» creat i desat al teu disc.",
     "forgotten": "«{{name}}» tret de la llista (els fitxers continuen al disc).",
     "untitled": "Sense títol",
-    "readOnly": "Només lectura: els canvis no es desen",
+    "readOnly": "Només lectura",
     "resume": {
       "title": "Continua a {{name}}",
       "text": "El teu últim projecte.",
