@@ -8,6 +8,8 @@ import { AiBatchButtonComponent } from './ai-batch/ai-batch-button.component';
 import { AiBatchChipComponent } from './ai-batch/ai-batch-chip.component';
 import { AiBatchPanelComponent } from './ai-batch/ai-batch-panel.component';
 import { AiBatchService } from '../../services/ai-batch.service';
+import { PageMapBatchDialogComponent } from './page-map-batch/page-map-batch-dialog.component';
+import { PageMapBatchService } from '../../services/page-map-batch.service';
 import { AiHelperService } from '../../services/ai-helper.service';
 import { InfoTipComponent } from '../../components/info-tip/info-tip.component';
 import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
@@ -90,6 +92,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     AiBatchChipComponent,
     AiBatchPanelComponent,
     FocusTrapDirective,
+    PageMapBatchDialogComponent,
   ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
@@ -97,6 +100,7 @@ async function sha256(blob: Blob): Promise<string | null> {
 export class BatchPageComponent implements OnInit {
   private readonly store = inject(BatchStoreService);
   readonly aiQueue = inject(AiBatchService);
+  readonly pageMaps = inject(PageMapBatchService);
   readonly projects = inject(ProjectStoreService);
   readonly moreOpen = signal(false);
 
@@ -214,7 +218,7 @@ export class BatchPageComponent implements OnInit {
   );
   readonly plan = computed(() => planBulk(this.selectedItems(), (item) => this.stateOf(item) === 'noTemplate'));
   readonly dialog = signal<'ready' | 'remove' | null>(null);
-  readonly undoNotice = signal<{ kind: 'removed' | 'ready'; count: number } | null>(null);
+  readonly undoNotice = signal<{ kind: 'removed' | 'ready' | 'tables'; count: number } | null>(null);
   private undoFn: (() => void) | null = null;
   private undoTimer: number | null = null;
 
@@ -315,6 +319,9 @@ export class BatchPageComponent implements OnInit {
     const typing = !!target?.closest('input[type="search"], input[type="text"], textarea, select');
     const key = event.key.toLowerCase();
     if (event.key === 'Escape' && !event.defaultPrevented) {
+      if (this.pageMaps.phase() !== 'closed') {
+        return;
+      }
       if (this.dialog()) {
         this.dialog.set(null);
       } else if (this.selectionCount() > 0) {
@@ -329,7 +336,28 @@ export class BatchPageComponent implements OnInit {
     }
   }
 
-  readonly bulkBusy = computed(() => this.aiQueue.busy());
+  readonly bulkBusy = computed(() => this.aiQueue.busy() || this.pageMaps.phase() !== 'closed');
+  /** Marked PDFs that have a B: the ones that can get a page table. */
+  readonly tablesCount = computed(() => this.selectedItems().filter((item) => !!item.bPdf).length);
+
+  /** «Sugerir tablas de páginas» for the marked PDFs (P-100 a P-102). */
+  openPageMaps(): void {
+    void this.pageMaps.open(this.selectedItems());
+  }
+
+  openById(id: string): void {
+    const item = this.store.items().find((candidate) => candidate.id === id);
+    if (item) {
+      void this.open(item);
+    }
+  }
+
+  /** The tables dialog closed: offers to undo what it applied. */
+  onPageMapsClosed(applied: number): void {
+    if (applied > 0) {
+      this.offerUndo('tables', applied, () => this.pageMaps.undoAll());
+    }
+  }
 
   askBulk(kind: 'ready' | 'remove'): void {
     if (kind === 'ready' ? this.plan().ready > 0 : this.plan().total > 0) {
@@ -362,7 +390,7 @@ export class BatchPageComponent implements OnInit {
     this.offerUndo('removed', removed.length, () => this.store.reinsert(removed));
   }
 
-  private offerUndo(kind: 'removed' | 'ready', count: number, restore: () => void): void {
+  private offerUndo(kind: 'removed' | 'ready' | 'tables', count: number, restore: () => void): void {
     this.dropUndo();
     this.undoFn = restore;
     this.undoNotice.set({ kind, count });

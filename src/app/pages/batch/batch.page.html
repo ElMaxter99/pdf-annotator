@@ -737,7 +737,7 @@
         <div class="batch-dock">
         @if (undoNotice(); as notice) {
           <div class="batch-undo" role="status" data-testid="bulk-undo">
-            <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
+            <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : notice.kind === 'tables' ? 'batch.bulk.tablesDone' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
             <button type="button" class="btn btn--ghost" (click)="undo()" data-testid="bulk-undo-btn">
               ↶ {{ 'batch.bulk.undo' | t }}
             </button>
@@ -763,6 +763,17 @@
             @if (aiHelper.available) {
               <app-ai-batch-button [ids]="selectedIds()" [up]="true" />
             }
+            <button
+              type="button"
+              class="btn btn--ghost"
+              [disabled]="tablesCount() === 0 || bulkBusy()"
+              [attr.title]="tablesCount() === 0 ? ('batch.bulk.noneTables' | t) : null"
+              (click)="openPageMaps()"
+              data-testid="bulk-tables"
+            >
+              ⇄ {{ 'batch.bulk.tables' | t }}
+              <span class="batch-sub">{{ tablesCount() }} / {{ plan().total }}</span>
+            </button>
             <button
               type="button"
               class="btn btn--ghost"
@@ -807,6 +818,8 @@
         }
         </div>
       }
+
+      <app-page-map-batch (closed)="onPageMapsClosed($event)" (review)="openById($event)" />
 
       @if (dialog(); as kind) {
         <div class="batch-backdrop">

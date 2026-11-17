@@ -1063,7 +1063,10 @@
       "readyDone": "{{count}} PDF segnati come Fatto",
       "undo": "Annulla",
       "downloaded": "Download pronto · {{count}} file JSON",
-      "downloadedSkipped": "Download pronto · {{count}} file JSON · {{skipped}} non convalidati esclusi"
+      "downloadedSkipped": "Download pronto · {{count}} file JSON · {{skipped}} non convalidati esclusi",
+      "tables": "Suggerisci tabelle",
+      "noneTables": "Nessuno dei PDF selezionati ha la versione B",
+      "tablesDone": "Tabelle di pagine applicate: {{count}}."
     },
     "funnel": {
       "label": "Riepilogo del lotto",
@@ -1093,6 +1096,43 @@
     },
     "pageMap": {
       "chip": "Pagine abbinate"
+    },
+    "tables": {
+      "title": "Suggerisci tabelle di pagine",
+      "preparing": "Conteggio delle pagine…",
+      "pending": "In attesa",
+      "intro": "Possono ricevere una tabella: {{count}} PDF su {{total}}. Si confronta il testo di ogni pagina di A con quello di B, sul tuo computer e senza IA.",
+      "willSuggest": "Verrà suggerita una tabella",
+      "pdfCount": "{{count}} PDF",
+      "skipSame": "Esclusi: stesse pagine in A e B",
+      "skipHasMap": "Esclusi: hanno già una tabella",
+      "skipNoB": "Esclusi: senza versione B",
+      "replace": "Sostituisci anche le tabelle già presenti",
+      "start": "Suggerisci tabelle ({{count}})",
+      "nothing": "Nessuno dei PDF selezionati ha bisogno di una tabella: hanno le stesse pagine in A e B, hanno già una tabella o non hanno la versione B.",
+      "understood": "Capito",
+      "running": "Suggerimento delle tabelle…",
+      "counter": "{{done}} di {{total}}",
+      "keepIfCancel": "Quelle già fatte restano se annulli",
+      "doneTitle": "Tabelle suggerite",
+      "appliedCount": "Tabelle applicate: {{count}}",
+      "doneText": "Vengono applicate quelle che corrispondono con chiarezza. Restano modificabili da «Abbina le pagine…».",
+      "cancelledTitle": "Suggerimento annullato",
+      "cancelledText": "Tabelle applicate: {{applied}}. PDF non toccati: {{untouched}}. Puoi rilanciarlo quando vuoi.",
+      "noTextHint": "I PDF senza testo (scansionati) si possono abbinare a mano con «Abbina le pagine…».",
+      "waiting": "In attesa della tua revisione: {{count}}",
+      "retry": "Riprova i falliti",
+      "close": "Chiudi",
+      "review": "Rivedi {{name}}",
+      "state": {
+        "pending": "In attesa",
+        "reading": "Lettura dei testi…",
+        "applied": "Applicata · {{matched}} di {{total}} abbinate",
+        "doubt": "Dubbia · non applicata",
+        "noText": "Nessun testo da confrontare",
+        "error": "Impossibile leggerlo",
+        "untouched": "Non toccato"
+      }
     }
   },
   "preview": {

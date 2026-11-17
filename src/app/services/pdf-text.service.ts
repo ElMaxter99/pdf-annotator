@@ -42,4 +42,27 @@ export class PdfTextService {
       void doc?.destroy();
     }
   }
+
+  /** Number of pages of a PDF (`null` when it cannot be read). */
+  async pageCount(blob: Blob): Promise<number | null> {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    ensureWorker();
+    let doc: Awaited<ReturnType<typeof pdfjsLib.getDocument>['promise']> | null = null;
+    try {
+      doc = await pdfjsLib.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;
+      return doc.numPages;
+    } catch {
+      return null;
+    } finally {
+      void doc?.destroy();
+    }
+  }
+
+  /** The text of every page of a PDF, one string per page (`null` when it cannot be read). */
+  async pageTexts(blob: Blob): Promise<string[] | null> {
+    const pdf = await this.read(blob);
+    return pdf ? pdf.texts.map((items) => items.map((item) => item.text).join(' ')) : null;
+  }
 }

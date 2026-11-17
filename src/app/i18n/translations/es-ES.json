@@ -1063,7 +1063,10 @@
       "readyDone": "{{count}} PDF marcados como Listo",
       "undo": "Deshacer",
       "downloaded": "Descarga lista · {{count}} archivos JSON",
-      "downloadedSkipped": "Descarga lista · {{count}} archivos JSON · {{skipped}} sin validar no se incluyeron"
+      "downloadedSkipped": "Descarga lista · {{count}} archivos JSON · {{skipped}} sin validar no se incluyeron",
+      "tables": "Sugerir tablas",
+      "noneTables": "Ninguno de los marcados tiene versión B",
+      "tablesDone": "Tablas de páginas aplicadas: {{count}}."
     },
     "funnel": {
       "label": "Resumen del lote",
@@ -1093,6 +1096,43 @@
     },
     "pageMap": {
       "chip": "Páginas emparejadas"
+    },
+    "tables": {
+      "title": "Sugerir tablas de páginas",
+      "preparing": "Contando las páginas…",
+      "pending": "Pendiente",
+      "intro": "Pueden recibir una tabla: {{count}} de {{total}} PDF. Se compara el texto de cada página de A con el de B, en tu equipo y sin IA.",
+      "willSuggest": "Se sugerirá una tabla",
+      "pdfCount": "{{count}} PDF",
+      "skipSame": "Se omiten: mismas páginas en A y B",
+      "skipHasMap": "Se omiten: ya tienen tabla",
+      "skipNoB": "Se omiten: sin versión B",
+      "replace": "También sustituir las tablas que ya tienen",
+      "start": "Sugerir tablas ({{count}})",
+      "nothing": "Ninguno de los PDF seleccionados necesita una tabla: tienen las mismas páginas en A y B, ya tienen tabla o no tienen versión B.",
+      "understood": "Entendido",
+      "running": "Sugiriendo tablas…",
+      "counter": "{{done}} de {{total}}",
+      "keepIfCancel": "Las ya hechas se conservan si cancelas",
+      "doneTitle": "Tablas sugeridas",
+      "appliedCount": "Tablas aplicadas: {{count}}",
+      "doneText": "Se aplican las que casan con claridad. Siguen editables desde «Emparejar páginas…».",
+      "cancelledTitle": "Sugerencia cancelada",
+      "cancelledText": "Tablas aplicadas: {{applied}}. PDF sin tocar: {{untouched}}. Puedes volver a lanzarlo cuando quieras.",
+      "noTextHint": "Los PDF sin texto (escaneados) se pueden emparejar a mano con «Emparejar páginas…».",
+      "waiting": "Esperan tu revisión: {{count}}",
+      "retry": "Reintentar los fallidos",
+      "close": "Cerrar",
+      "review": "Revisar {{name}}",
+      "state": {
+        "pending": "Pendiente",
+        "reading": "Leyendo textos…",
+        "applied": "Aplicada · {{matched}} de {{total}} emparejadas",
+        "doubt": "Con dudas · sin aplicar",
+        "noText": "Sin texto que comparar",
+        "error": "No se pudo leer",
+        "untouched": "Sin tocar"
+      }
     }
   },
   "preview": {
