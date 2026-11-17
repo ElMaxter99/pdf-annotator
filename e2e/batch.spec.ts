@@ -482,6 +482,22 @@ test('without template A the modes still compare the PDFs; JSON without fields i
   await expect(page.getByTestId('doc-layer-a')).toContainText('Sin plantilla');
 });
 
+test('«Dividida»: the A/B tags do not overlap the «Mostrar origen» legend', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await attachVersion2(page);
+  await openRow(page);
+  await page.evaluate(() => localStorage.setItem('pdf-annotator.showOrigin', '1'));
+  await page.reload();
+  await page.getByTestId('mode-split').click();
+  await expect(page.getByTestId('split-a')).toBeVisible();
+  const legend = await page.locator('.origin-legend').boundingBox();
+  for (const tag of [page.locator('.split-tag:not(.split-tag--b)'), page.locator('.split-tag--b')]) {
+    const box = await tag.boundingBox();
+    expect(box!.y).toBeGreaterThanOrEqual(legend!.y + legend!.height);
+  }
+});
+
 test('«Dividida» shows A with its fields on the left and B on the right', async ({ page }) => {
   await openPanel(page);
   await page.getByTestId('view-list').click();

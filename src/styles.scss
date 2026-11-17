@@ -3570,6 +3570,16 @@ kbd {
   flex: 0 0 auto;
 }
 
+/* Deja sitio a las etiquetas «A» y «B» (top: -28px) bajo la leyenda de origen y la barra de selección. */
+.viewer.viewer--split .origin-legend,
+.viewer.viewer--split .selection-bar {
+  margin-bottom: 36px;
+}
+
+.viewer.viewer--split .origin-legend:has(+ .selection-bar) {
+  margin-bottom: 8px;
+}
+
 .split-tag {
   position: absolute;
   top: -28px;
