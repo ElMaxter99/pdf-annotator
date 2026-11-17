@@ -63,7 +63,23 @@ export type ProjectErrorCode =
   | 'in-use-local'
   | 'not-linked'
   | 'not-synced'
-  | 'bad-action';
+  | 'bad-action'
+  | 'already-linked'
+  | 'bad-sftp-config'
+  | 'host-key-changed'
+  | 'host-key-unknown'
+  | 'host-not-found'
+  | 'connect-timeout'
+  | 'connection-refused'
+  | 'connection-lost'
+  | 'auth-failed'
+  | 'bad-passphrase'
+  | 'passphrase-needed'
+  | 'key-unusable'
+  | 'secret-needed'
+  | 'remote-missing'
+  | 'rename-unsupported'
+  | 'lock-expired';
 
 export interface ProjectStoredItem {
   readonly id: string;
@@ -120,6 +136,10 @@ export interface ProjectProgress {
   readonly total: number;
   /** Solo con `op: 'sync'` en una sincronización de varios proyectos: el que se está haciendo. */
   readonly name?: string;
+  /** Solo con `op: 'sync'`: bytes ya transferidos, bytes previstos y velocidad (bytes por segundo). */
+  readonly bytes?: number;
+  readonly bytesTotal?: number;
+  readonly speed?: number;
 }
 
 /** Estado de sincronización de un proyecto con la carpeta enlazada (fase 3). */
@@ -151,11 +171,30 @@ export interface SyncAvailable {
   readonly bytes: number;
 }
 
+/** Lo que la web sabe del servidor SFTP enlazado: nunca la contraseña ni la frase de paso. */
+export interface SyncServer {
+  readonly host: string;
+  readonly port: number;
+  readonly username: string;
+  readonly path: string;
+  readonly authMode: 'password' | 'key';
+  readonly keyFile: string;
+  readonly fingerprint: string;
+  readonly hostKeyType: string;
+  readonly credentialSaved: boolean;
+  readonly credentialInSession: boolean;
+  readonly secureStore: boolean;
+}
+
 export type SyncInfo =
   | { readonly linked: false }
   | {
       readonly linked: true;
-      readonly folder: string;
+      readonly kind: 'folder' | 'sftp';
+      readonly folder?: string;
+      readonly label: string;
+      readonly server?: SyncServer;
+      readonly offlineReason?: ProjectErrorCode;
       readonly reachable: boolean;
       readonly statuses: Record<string, SyncStatus>;
       readonly available: SyncAvailable[];
@@ -167,6 +206,35 @@ export interface SyncPicked {
   readonly local: number;
   readonly remote: number;
   readonly bytes: number;
+}
+
+/** Huella del servidor leída para el diálogo «¿Es este tu servidor?». */
+export interface SyncHostKey {
+  readonly fingerprint: string;
+  readonly type: string;
+  readonly changed: boolean;
+  readonly previous?: string;
+}
+
+export interface SyncSftpForm {
+  host: string;
+  port: number;
+  username: string;
+  path: string;
+  authMode: 'password' | 'key';
+}
+
+export interface SyncSftpTest {
+  readonly ok: boolean;
+  readonly steps: { id: 'login' | 'folder' | 'write'; ok: boolean }[];
+  readonly error?: ProjectErrorCode;
+  readonly detail?: unknown;
+  readonly free?: number | null;
+  readonly folder: string;
+  readonly local: number;
+  readonly remote: number;
+  readonly bytes: number;
+  readonly secureStore: boolean;
 }
 
 export interface SyncConflictInfo {
@@ -262,9 +330,12 @@ export interface ProjectsBridge {
   pathForFile(file: File): string;
   onProgress(callback: (progress: ProjectProgress) => void): () => void;
   // Carpeta enlazada (fase 3)
-  syncStatus(): Promise<SyncInfo | ProjectFailure>;
+  syncStatus(input?: { fresh?: boolean }): Promise<SyncInfo | ProjectFailure>;
   syncChoose(): Promise<SyncPicked | { canceled: true } | ProjectFailure>;
-  syncLink(input: { accepted: boolean }): Promise<{ folder: string } | ProjectFailure>;
+  syncLink(input: {
+    accepted: boolean;
+    remember?: boolean;
+  }): Promise<{ folder: string; credentialSaved?: boolean } | ProjectFailure>;
   syncUnlink(): Promise<{ ok: true } | ProjectFailure>;
   syncAll(input: { mode: SyncPlan }): Promise<SyncAllResult | { canceled: true } | ProjectFailure>;
   syncProject(input: {
@@ -274,6 +345,23 @@ export interface ProjectsBridge {
   }): Promise<SyncResult | { ok: true } | { canceled: true } | ProjectFailure>;
   syncReveal(input: { ref: string }): Promise<{ ok: true } | ProjectFailure>;
   onSyncEvent(callback: (event: SyncEvent) => void): () => void;
+  // Servidor SFTP (fase 3b)
+  syncSftpChooseKey(): Promise<{ keyFile: string } | { canceled: true } | ProjectFailure>;
+  syncSftpInspect(input: SyncSftpForm): Promise<SyncHostKey | ProjectFailure>;
+  syncSftpTrust(input: { accepted: boolean }): Promise<{ ok: true } | ProjectFailure>;
+  syncSftpTest(input: {
+    useSaved?: boolean;
+    create?: boolean;
+    remember?: boolean;
+    config?: SyncSftpForm;
+    secret?: { password?: string; passphrase?: string };
+  }): Promise<SyncSftpTest | ProjectFailure>;
+  syncSftpCredential(input: {
+    password?: string;
+    passphrase?: string;
+    remember?: boolean;
+  }): Promise<{ saved: boolean } | ProjectFailure>;
+  syncSftpForget(): Promise<{ ok: true } | ProjectFailure>;
 }
 
 export interface ActiveProject {

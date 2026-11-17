@@ -69,12 +69,21 @@ export function readState(dir) {
     if (FILE_RE.test(rel) && entry && typeof entry.sha256 === 'string')
       files[rel] = { size: num(entry.size), mtime: num(entry.mtime), sha256: entry.sha256 };
   }
+  // Archivos de una subida interrumpida que ya llegaron completos (se reanuda sin repetirlos).
+  const partial = {};
+  for (const [rel, entry] of Object.entries(raw.partial ?? {})) {
+    if (FILE_RE.test(rel) && entry && /^[0-9a-f]{64}$/.test(String(entry.sha256)))
+      partial[rel] = { size: num(entry.size), sha256: entry.sha256 };
+  }
   return {
     projectId: raw.projectId.slice(0, 64),
     baseRev: Math.max(0, Math.floor(num(raw.baseRev))),
     files,
     paused: raw.paused === true,
     lastSync: num(raw.lastSync),
+    ...(Object.keys(partial).length
+      ? { partial, partialRev: Math.floor(num(raw.partialRev)) }
+      : {}),
   };
 }
 
@@ -120,14 +129,17 @@ export function diffFiles(next, base) {
   return { changed, removed };
 }
 
-// ───────────── Carpeta enlazada ─────────────
+// ───────────── Punto de encuentro (carpeta o servidor) ─────────────
+// Todas las rutas remotas son relativas a la base del proveedor y llevan «/».
 
-export function remoteDirOf(folder, ref) {
-  return resolveRef(folder, ref).dir;
+export function remoteDirOf(ref) {
+  return resolveRef('/base', ref).ref;
 }
 
-export function readRev(rdir) {
-  const raw = readJson(path.join(rdir, '.sync', 'rev.json'));
+const at = (rdir, rel) => `${rdir}/${rel}`;
+
+export async function readRev(provider, rdir) {
+  const raw = await provider.readJson(at(rdir, '.sync/rev.json'));
   if (!raw || typeof raw !== 'object' || typeof raw.projectId !== 'string') return null;
   const rev = Math.floor(num(raw.rev));
   if (rev < 1) return null;
@@ -184,60 +196,41 @@ export function freeBytes(folder) {
   }
 }
 
-export function folderReachable(folder) {
-  try {
-    return statSync(folder).isDirectory();
-  } catch {
-    return false;
-  }
-}
-
-/** Archivos que no son del proyecto: copias en conflicto del servicio de sincronización, restos… */
-export function strays(rdir, rev) {
+/** Archivos que no son del proyecto: copias en conflicto del servicio de sincronización, restos… (solo en carpetas). */
+export async function strays(provider, rdir, rev) {
+  if (!provider.conflictCopies) return [];
   const known = new Set(['project.json', ...Object.keys(rev?.files ?? {})]);
   const out = [];
-  const scan = (sub, allowed) => {
-    let names;
-    try {
-      names = readdirSync(path.join(rdir, sub));
-    } catch {
-      return;
-    }
-    for (const name of names) {
+  const scan = async (sub, allowed) => {
+    const names = await provider.list(sub ? at(rdir, sub) : rdir);
+    for (const { name, isDir } of names) {
       const rel = sub ? `${sub}/${name}` : name;
-      if (known.has(rel) || allowed.includes(name) || name.endsWith('.part')) continue;
-      if (statSync(path.join(rdir, rel)).isDirectory()) continue;
+      if (known.has(rel) || allowed.includes(name) || name.endsWith('.part') || isDir) continue;
       out.push(rel);
     }
   };
-  scan('', ['.sync', 'batch']);
-  scan('batch', []);
-  scan('.sync', ['rev.json', 'lock.json', 'backups']);
+  await scan('', ['.sync', 'batch']);
+  await scan('batch', []);
+  await scan('.sync', ['rev.json', 'lock.json', 'backups']);
   return out.slice(0, 10);
 }
 
-/** Proyectos de la carpeta enlazada (hasta tres niveles), para la lista «Disponibles». */
-export function listRemote(folder) {
+/** Proyectos del punto de encuentro (hasta tres niveles), para la lista «Disponibles». */
+export async function listRemote(provider) {
   const found = [];
-  const walk = (dir, segments) => {
-    let entries;
-    try {
-      entries = readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-    if (segments.length && existsSync(path.join(dir, '.sync', 'rev.json'))) {
-      const rev = readRev(dir);
+  const walk = async (rdir, segments) => {
+    if (segments.length && (await provider.stat(at(rdir, '.sync/rev.json')))) {
+      const rev = await readRev(provider, rdir);
       if (rev) found.push({ ref: segments.join('/'), ...summaryOf(rev) });
       return;
     }
     if (segments.length >= 3) return;
-    for (const entry of entries) {
-      if (entry.isDirectory() && !entry.name.startsWith('.'))
-        walk(path.join(dir, entry.name), [...segments, entry.name]);
+    for (const entry of await provider.list(rdir)) {
+      if (entry.isDir && !entry.name.startsWith('.'))
+        await walk(rdir ? `${rdir}/${entry.name}` : entry.name, [...segments, entry.name]);
     }
   };
-  walk(folder, []);
+  await walk('', []);
   return found.sort((a, b) => b.at - a.at);
 }
 
@@ -256,71 +249,94 @@ function summaryOf(rev) {
 
 // ───────────── Bloqueo remoto ─────────────
 
-export function remoteLockState(rdir, token, now = Date.now()) {
-  const lock = readJson(path.join(rdir, '.sync', 'lock.json'));
+const lockPath = (rdir) => at(rdir, '.sync/lock.json');
+
+/** Edad del bloqueo: con la hora del servidor si el proveedor la da (SFTP); si no, con la marca que escribió su dueño. */
+export async function remoteLockState(provider, rdir, token, now = provider.now()) {
+  const lock = await provider.readJson(lockPath(rdir));
   if (!lock || typeof lock.host !== 'string' || typeof lock.token !== 'string')
     return { state: 'free' };
   const seen = num(lock.seen);
   if (lock.token === token) return { state: 'mine', host: lock.host, since: num(lock.since), seen };
-  if (now - seen > SYNC_STALE_MS) return { state: 'free', stale: { host: lock.host, seen } };
+  const age = (await provider.lockAge(lockPath(rdir))) ?? now - seen;
+  if (age > SYNC_STALE_MS) return { state: 'free', stale: { host: lock.host, seen } };
   return { state: 'other', host: lock.host.slice(0, 80), since: num(lock.since), seen };
 }
 
-function writeRemoteLock(rdir, host, token, since, now) {
-  mkdirSync(path.join(rdir, '.sync'), { recursive: true });
-  writeAtomic(
-    path.join(rdir, '.sync', 'lock.json'),
-    JSON.stringify({ host: String(host).slice(0, 80), token, since, seen: now }),
-  );
-}
+const lockBody = (host, token, since, now) =>
+  JSON.stringify({ host: String(host).slice(0, 80), token, since, seen: now });
 
-/** Toma el bloqueo: escribe, espera unos segundos y vuelve a leer; si otro equipo escribió a la vez, gana el más antiguo. */
+/**
+ * Toma el bloqueo. En un servidor se crea «solo si no existe» (el primero gana, sin esperas);
+ * en una carpeta se escribe, se espera unos segundos y se vuelve a leer (gana el más antiguo).
+ */
 export async function acquireRemoteLock(
+  provider,
   rdir,
   host,
   token,
-  { force = false, settleMs = SETTLE_MS, now = Date.now() } = {},
+  { force = false, settleMs = SETTLE_MS } = {},
 ) {
-  const current = remoteLockState(rdir, token, now);
+  const now = provider.now();
+  const current = await remoteLockState(provider, rdir, token, now);
   if (current.state === 'other' && !force) return { ok: false, holder: current };
+  if (provider.exclusiveLocks) {
+    if (current.state === 'mine') {
+      await provider.writeAtomic(lockPath(rdir), lockBody(host, token, current.since, now));
+      return { ok: true };
+    }
+    if (current.state !== 'free' || current.stale || force) await provider.remove(lockPath(rdir));
+    if (await provider.createExclusive(lockPath(rdir), lockBody(host, token, now, now)))
+      return { ok: true };
+    const after = await remoteLockState(provider, rdir, token, provider.now());
+    return after.state === 'mine' ? { ok: true } : { ok: false, holder: after };
+  }
   const since = current.state === 'mine' ? current.since : now;
-  writeRemoteLock(rdir, host, token, since, now);
+  await provider.writeAtomic(lockPath(rdir), lockBody(host, token, since, now));
   if (current.state !== 'mine' && settleMs > 0) {
     await sleep(settleMs);
-    const after = remoteLockState(rdir, token, Date.now());
+    const after = await remoteLockState(provider, rdir, token);
     if (after.state === 'other') return { ok: false, holder: after };
   }
   return { ok: true };
 }
 
-export function renewRemoteLock(rdir, host, token, now = Date.now()) {
-  const current = remoteLockState(rdir, token, now);
+export async function renewRemoteLock(provider, rdir, host, token) {
+  const now = provider.now();
+  const current = await remoteLockState(provider, rdir, token, now);
   if (current.state === 'other') return false;
   if (current.state === 'mine' && now - current.seen < SYNC_HEARTBEAT_MS) return true;
-  writeRemoteLock(rdir, host, token, current.state === 'mine' ? current.since : now, now);
+  await provider.writeAtomic(
+    lockPath(rdir),
+    lockBody(host, token, current.state === 'mine' ? current.since : now, now),
+  );
   return true;
 }
 
-export function releaseRemoteLock(rdir, token) {
-  const lock = readJson(path.join(rdir, '.sync', 'lock.json'));
-  if (lock?.token === token) rmSync(path.join(rdir, '.sync', 'lock.json'), { force: true });
+export async function releaseRemoteLock(provider, rdir, token) {
+  const lock = await provider.readJson(lockPath(rdir));
+  if (lock?.token === token) await provider.remove(lockPath(rdir));
 }
 
 // ───────────── Estado de un proyecto ─────────────
 
 /**
  * Estado para la tarjeta: none (no sincroniza), sync, pend (cambios sin subir), pull (hay una revisión nueva),
- * other (otro equipo lo tiene abierto), conflict (cambiaron los dos), off (carpeta no disponible), paused.
+ * other (otro equipo lo tiene abierto), conflict (cambiaron los dos), off (destino no disponible), paused.
  */
-export function projectStatus(folder, ref, dir, token, now = Date.now()) {
+export async function projectStatus(provider, ref, dir, token, now = provider.now()) {
   const state = readState(dir);
   if (!state) return { state: 'none' };
-  if (!folderReachable(folder))
+  if (!(await provider.reachable()))
     return { state: 'off', rev: state.baseRev, lastSync: state.lastSync };
-  const rdir = remoteDirOf(folder, ref);
-  const rev = readRev(rdir);
-  const lock = remoteLockState(rdir, token, now);
-  const base = { rev: state.baseRev, lastSync: state.lastSync, duplicates: strays(rdir, rev) };
+  const rdir = remoteDirOf(ref);
+  const rev = await readRev(provider, rdir);
+  const lock = await remoteLockState(provider, rdir, token, now);
+  const base = {
+    rev: state.baseRev,
+    lastSync: state.lastSync,
+    duplicates: await strays(provider, rdir, rev),
+  };
   if (state.paused) return { ...base, state: 'paused' };
   const dirty = localDirty(dir, state);
   const remoteNew = !!rev && rev.rev > state.baseRev;
@@ -336,46 +352,26 @@ export function projectStatus(folder, ref, dir, token, now = Date.now()) {
 
 // ───────────── Subir y bajar ─────────────
 
-async function copyInto(src, dest, hooks, { expectSha } = {}) {
-  if (hooks?.shouldCancel?.()) throw new ProjectError('canceled');
-  mkdirSync(path.dirname(dest), { recursive: true });
-  const part = `${dest}.part`;
-  try {
-    await copyFile(src, part);
-    if (expectSha && (await sha256File(part)) !== expectSha)
-      throw new ProjectError('remote-incomplete', undefined, path.basename(src));
-    await rename(part, dest);
-  } catch (error) {
-    rmSync(part, { force: true });
-    if (error instanceof ProjectError) throw error;
-    if (error?.code === 'ENOENT')
-      throw new ProjectError('remote-incomplete', undefined, path.basename(src));
-    if (['EIO', 'ETIMEDOUT', 'EBUSY', 'EAGAIN', 'UNKNOWN'].includes(error?.code))
-      throw new ProjectError('cloud-pending', undefined, path.basename(src));
-    throw error;
-  }
-  await tick();
-}
-
-function checkSpace(folder, bytes) {
-  const free = freeBytes(folder);
+async function checkSpace(provider, bytes) {
+  const free = await provider.free();
   if (free !== null && bytes > free)
     throw new ProjectError('disk-full', undefined, String(Math.ceil((bytes - free) / 1048576)));
 }
 
-/** Sube a la carpeta enlazada solo lo que cambió y escribe `rev.json` al final. */
+/** Sube solo lo que cambió y escribe `rev.json` al final: si la conexión se corta, queda la revisión anterior intacta. */
 export async function pushProject(
-  folder,
+  provider,
   ref,
   dir,
-  { host, token, backup = false, now = Date.now(), name } = {},
+  { host, token, backup = false, name } = {},
   hooks,
 ) {
-  const rdir = remoteDirOf(folder, ref);
-  if (!folderReachable(folder)) throw new ProjectError('folder-missing');
+  const rdir = remoteDirOf(ref);
+  if (!(await provider.reachable())) throw new ProjectError('folder-missing');
+  const now = provider.now();
   const state = readState(dir);
-  const remote = readRev(rdir);
-  const lock = remoteLockState(rdir, token, now);
+  const remote = await readRev(provider, rdir);
+  const lock = await remoteLockState(provider, rdir, token, now);
   if (lock.state === 'other') throw new ProjectError('in-use', undefined, lock.host);
   const manifest = manifestOf(readJson(path.join(dir, 'project.json')));
   if (!manifest) throw new ProjectError('not-a-project');
@@ -385,30 +381,59 @@ export async function pushProject(
   const base = remote && remote.projectId === projectId ? remote.files : {};
   const { changed, removed } = diffFiles(files, base);
   const rev = (remote?.rev ?? 0) + 1;
-  checkSpace(
-    folder,
+  await checkSpace(
+    provider,
     changed.reduce((sum, rel) => sum + files[rel].size, 0),
   );
   const total = changed.length + removed.length;
   let done = 0;
-  mkdirSync(path.join(rdir, '.sync'), { recursive: true });
+  hooks?.onPlan?.({
+    bytes: changed.reduce((sum, rel) => sum + files[rel].size, 0),
+    files: total,
+  });
+  await provider.mkdirp(at(rdir, '.sync'));
+  // Si una subida anterior se cortó, los archivos que llegaron completos (misma huella y tamaño) no se repiten.
+  const baseRev = remote?.rev ?? 0;
+  const partial = state?.partialRev === baseRev ? { ...state.partial } : {};
+  const remember = () =>
+    writeState(dir, {
+      projectId,
+      baseRev: state?.baseRev ?? 0,
+      files: state?.files ?? {},
+      paused: false,
+      lastSync: state?.lastSync ?? 0,
+      partial,
+      partialRev: baseRev,
+    });
+  // Desde que empieza a subir, el proyecto queda «pendiente de subir»: si se corta, «Sincronizar ahora» lo reintenta.
+  if (!state && changed.length) remember();
   for (const rel of changed) {
-    if (backup && existsSync(path.join(rdir, rel))) await moveToBackup(rdir, rev, rel);
-    await copyInto(path.join(dir, rel), path.join(rdir, rel), hooks);
-    const size = statSync(path.join(rdir, rel)).size;
-    if (size !== files[rel].size) throw new ProjectError('remote-incomplete', undefined, rel);
+    const there = await provider.stat(at(rdir, rel));
+    const kept = partial[rel];
+    if (kept && kept.sha256 === files[rel].sha256 && there && there.size === files[rel].size) {
+      hooks?.onBytes?.(files[rel].size);
+      hooks?.onProgress?.(++done, total);
+      continue;
+    }
+    if (backup && there) await moveToBackup(provider, rdir, rev, rel);
+    await provider.upload(path.join(dir, rel), at(rdir, rel), hooks);
+    const stat = await provider.stat(at(rdir, rel));
+    if (!stat || stat.size !== files[rel].size)
+      throw new ProjectError('remote-incomplete', undefined, rel);
+    partial[rel] = { size: files[rel].size, sha256: files[rel].sha256 };
+    remember();
     hooks?.onProgress?.(++done, total);
   }
   for (const rel of removed) {
-    if (backup) await moveToBackup(rdir, rev, rel);
-    else rmSync(path.join(rdir, rel), { force: true });
+    if (backup) await moveToBackup(provider, rdir, rev, rel);
+    else await provider.remove(at(rdir, rel));
     hooks?.onProgress?.(++done, total);
   }
   const index = {};
   for (const rel of Object.keys(files))
     index[rel] = { size: files[rel].size, sha256: files[rel].sha256 };
-  writeAtomic(
-    path.join(rdir, '.sync', 'rev.json'),
+  await provider.writeAtomic(
+    at(rdir, '.sync/rev.json'),
     JSON.stringify({
       v: 1,
       rev,
@@ -423,17 +448,17 @@ export async function pushProject(
   return { rev, uploaded: changed.length, removed: removed.length };
 }
 
-async function moveToBackup(rdir, rev, rel) {
-  const dest = path.join(rdir, '.sync', 'backups', `rev${rev - 1}`, rel);
-  mkdirSync(path.dirname(dest), { recursive: true });
-  await rename(path.join(rdir, rel), dest);
+async function moveToBackup(provider, rdir, rev, rel) {
+  if (!(await provider.stat(at(rdir, rel)))) return;
+  await provider.rename(at(rdir, rel), at(rdir, `.sync/backups/rev${rev - 1}/${rel}`));
 }
 
-/** Baja la revisión de la carpeta: copia a una carpeta temporal, verifica las huellas y solo entonces sustituye. */
-export async function pullProject(folder, ref, dir, { now = Date.now() } = {}, hooks) {
-  const rdir = remoteDirOf(folder, ref);
-  if (!folderReachable(folder)) throw new ProjectError('folder-missing');
-  const remote = readRev(rdir);
+/** Baja la revisión: copia a una carpeta temporal, verifica las huellas y solo entonces sustituye. */
+export async function pullProject(provider, ref, dir, hooks) {
+  const rdir = remoteDirOf(ref);
+  if (!(await provider.reachable())) throw new ProjectError('folder-missing');
+  const now = provider.now();
+  const remote = await readRev(provider, rdir);
   if (!remote) throw new ProjectError('not-a-project');
   if (remote.formatVersion > 1) throw new ProjectError('newer-format');
   if (Object.keys(remote.files).filter((r) => r.endsWith('.a.pdf')).length > LIMITS.maxPdfs)
@@ -445,18 +470,27 @@ export async function pullProject(folder, ref, dir, { now = Date.now() } = {}, h
   const bytes = wanted.reduce((sum, rel) => sum + remote.files[rel].size, 0);
   if (bytes > LIMITS.maxBytes) throw new ProjectError('too-big');
   mkdirSync(dir, { recursive: true });
-  checkSpace(dir, bytes);
+  const localFree = freeBytes(dir);
+  if (localFree !== null && bytes > localFree)
+    throw new ProjectError(
+      'disk-full',
+      undefined,
+      String(Math.ceil((bytes - localFree) / 1048576)),
+    );
   const staging = path.join(dir, '.sync-tmp');
   rmSync(staging, { recursive: true, force: true });
   const total = wanted.length;
   let done = 0;
+  hooks?.onPlan?.({ bytes, files: total });
   try {
     for (const rel of wanted) {
-      const src = path.join(rdir, rel);
-      if (!existsSync(src)) throw new ProjectError('remote-incomplete', undefined, rel);
-      if (statSync(src).size !== remote.files[rel].size)
+      const stat = await provider.stat(at(rdir, rel));
+      if (!stat) throw new ProjectError('remote-incomplete', undefined, rel);
+      if (stat.size !== remote.files[rel].size)
         throw new ProjectError('cloud-pending', undefined, rel);
-      await copyInto(src, path.join(staging, rel), hooks, { expectSha: remote.files[rel].sha256 });
+      await provider.download(at(rdir, rel), path.join(staging, rel), hooks, {
+        expectSha: remote.files[rel].sha256,
+      });
       hooks?.onProgress?.(++done, total);
     }
     for (const rel of wanted) {
@@ -482,9 +516,9 @@ export async function pullProject(folder, ref, dir, { now = Date.now() } = {}, h
 // ───────────── Conflictos ─────────────
 
 /** Qué se juega cada lado: sirve para el diálogo de conflicto. */
-export async function conflictImpact(folder, ref, dir) {
+export async function conflictImpact(provider, ref, dir) {
   const state = readState(dir);
-  const remote = readRev(remoteDirOf(folder, ref));
+  const remote = await readRev(provider, remoteDirOf(ref));
   const local = await scanLocal(dir, state?.files);
   const mine = diffFiles(local, state?.files ?? {});
   const theirs = remote
@@ -551,20 +585,20 @@ export async function keepLocalCopy(root, dir, ref, now = Date.now()) {
  * `resolution`: 'theirs' (queda la versión de la carpeta y lo local se guarda como copia) o 'mine' (sube lo local; la revisión que se sustituye se guarda en `.sync/backups`).
  */
 export async function syncProject(
-  folder,
+  provider,
   root,
   ref,
   { host, token, held = false, resolution, now = Date.now() } = {},
   hooks,
 ) {
   const { dir } = resolveRef(root, ref);
-  const rdir = remoteDirOf(folder, ref);
-  if (!folderReachable(folder)) throw new ProjectError('folder-missing');
+  const rdir = remoteDirOf(ref);
+  if (!(await provider.reachable())) throw new ProjectError('folder-missing');
   const state = readState(dir);
-  const remote = readRev(rdir);
+  const remote = await readRev(provider, rdir);
   const dirty = localDirty(dir, state);
-  const common = { host, token, now };
-  if (!remote) return { action: 'push', ...(await pushProject(folder, ref, dir, common, hooks)) };
+  const common = { host, token };
+  if (!remote) return { action: 'push', ...(await pushProject(provider, ref, dir, common, hooks)) };
   if (remote.formatVersion > 1) throw new ProjectError('newer-format');
   const localId = state?.projectId ?? manifestOf(readJson(path.join(dir, 'project.json')))?.id;
   const sameProject = !localId || localId === remote.projectId;
@@ -575,7 +609,7 @@ export async function syncProject(
       return {
         conflict: {
           kind: sameProject ? 'both' : 'ref-taken',
-          ...(await conflictImpact(folder, ref, dir)),
+          ...(await conflictImpact(provider, ref, dir)),
         },
       };
     if (resolution === 'later') return { action: 'later' };
@@ -583,18 +617,18 @@ export async function syncProject(
     if (resolution === 'mine') {
       const forced = { ...common, backup: true };
       if (!sameProject) await takeOver(dir, remote);
-      return { action: 'push', ...(await pushProject(folder, ref, dir, forced, hooks)) };
+      return { action: 'push', ...(await pushProject(provider, ref, dir, forced, hooks)) };
     }
     const copy = await keepLocalCopy(root, dir, ref, now);
     rmSync(path.join(dir, '.sync.json'), { force: true });
-    const out = await pullProject(folder, ref, dir, { now }, hooks);
+    const out = await pullProject(provider, ref, dir, hooks);
     return { action: 'pull', copy: copy.ref, ...out };
   }
   if (remoteNew) {
     if (held) throw new ProjectError('in-use-local');
-    return { action: 'pull', ...(await pullProject(folder, ref, dir, { now }, hooks)) };
+    return { action: 'pull', ...(await pullProject(provider, ref, dir, hooks)) };
   }
-  if (dirty) return { action: 'push', ...(await pushProject(folder, ref, dir, common, hooks)) };
+  if (dirty) return { action: 'push', ...(await pushProject(provider, ref, dir, common, hooks)) };
   writeState(dir, { ...state, lastSync: now });
   return { action: 'none', rev: state.baseRev };
 }

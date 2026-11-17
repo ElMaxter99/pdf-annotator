@@ -10,6 +10,7 @@
   "desktopName": "pdf-annotator-desktop.desktop",
   "main": "main.mjs",
   "dependencies": {
-    "electron-updater": "6.8.11"
+    "electron-updater": "6.8.11",
+    "ssh2": "1.17.0"
   }
 }
