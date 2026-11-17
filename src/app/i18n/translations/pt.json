@@ -1654,5 +1654,78 @@
       "themeLight": "Mudar para o tema claro",
       "language": "Idioma: {{language}}"
     }
+  },
+  "projects": {
+    "title": "Projetos",
+    "new": "Novo projeto",
+    "adopt": {
+      "title": "Tem um lote sem projeto",
+      "text": "Um lote de {{count}} PDFs está guardado apenas neste navegador. Pode guardá-lo como projeto «Sem título» numa pasta do seu disco.",
+      "button": "Guardar como projeto"
+    },
+    "rootError": {
+      "title": "Não é possível abrir a pasta de projetos",
+      "text": "«{{root}}» não existe ou não tem permissão (unidade de rede desligada?). Nada foi apagado."
+    },
+    "retry": "Tentar de novo",
+    "chooseOther": "Escolher outra pasta",
+    "loading": "A ler a pasta de projetos…",
+    "empty": {
+      "title": "Ainda não tem projetos",
+      "text": "Um projeto agrupa os PDFs de um cliente e guarda-se numa pasta do seu disco. Não precisa de um para anotar um PDF avulso.",
+      "cta": "Criar o meu primeiro projeto"
+    },
+    "search": "Procurar projeto…",
+    "noMatches": "Nenhum projeto corresponde à pesquisa.",
+    "lock": {
+      "mine": "Aberto neste computador",
+      "other": "Em uso em {{host}}"
+    },
+    "meta": "{{pdfs}} PDFs · {{done}} prontos · {{size}} · editado {{when}}",
+    "size": {
+      "warn": "Perto do limite: convém dividi-lo em dois projetos.",
+      "full": "Projeto cheio: não se podem adicionar mais PDFs."
+    },
+    "openReadOnly": "Abrir só para leitura",
+    "takeover": "Assumir o controlo",
+    "open": "Abrir",
+    "forget": "Remover da lista",
+    "folder": "Pasta de projetos:",
+    "changeFolder": "Mudar de pasta",
+    "newTitle": "Novo projeto",
+    "fieldName": "Nome",
+    "fieldSub": "Subpasta (opcional)",
+    "willCreate": "Será criado em {{path}}",
+    "cancel": "Cancelar",
+    "create": "Criar projeto",
+    "takeoverTitle": "Assumir o controlo de «{{name}}»?",
+    "takeoverText": "{{host}} tem-no aberto (último sinal às {{time}}). Se assumir, esse computador passa a só leitura e pode perder alterações por guardar.",
+    "forgetTitle": "Remover «{{name}}» da lista?",
+    "forgetText": "Os PDFs e o trabalho ficam no seu disco; só o projeto é removido da lista. Pode criá-lo de novo na mesma pasta.",
+    "forgetConfirm": "Remover da lista",
+    "created": "Projeto «{{name}}» criado e guardado no seu disco.",
+    "forgotten": "«{{name}}» removido da lista (os ficheiros continuam no disco).",
+    "untitled": "Sem título",
+    "readOnly": "Só leitura",
+    "resume": {
+      "title": "Continuar em {{name}}",
+      "text": "O seu último projeto.",
+      "continue": "Continuar"
+    },
+    "error": {
+      "root-missing": "A pasta de projetos não existe.",
+      "denied": "Sem permissão para escrever na pasta de projetos.",
+      "io": "Não foi possível ler ou guardar no disco.",
+      "exists": "Já existe um projeto com esse nome nessa pasta.",
+      "bad-name": "Escreva um nome para o projeto.",
+      "bad-ref": "Esse caminho não é válido.",
+      "bad-item": "Esse PDF não pode ser guardado no projeto.",
+      "not-a-project": "Essa pasta não é um projeto.",
+      "not-held": "Outro computador assumiu o projeto: fica só em leitura e as alterações não são guardadas.",
+      "pdf-too-big": "Esse PDF pesa mais de {{max}} MB, o máximo por PDF.",
+      "too-many-pdfs": "O projeto já tem 200 PDFs, o máximo. Divida-o em dois projetos.",
+      "too-big": "O projeto chegaria a 2 GB, o máximo. Divida-o em dois projetos.",
+      "lockLost": "Outro computador assumiu o projeto: fica só em leitura e as alterações não são guardadas."
+    }
   }
 }

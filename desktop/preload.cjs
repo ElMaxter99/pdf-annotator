@@ -28,5 +28,18 @@ contextBridge.exposeInMainWorld('desktop', {
     return () => ipcRenderer.removeListener('desktop:zoom', listener);
   },
   dismissUpdated: () => ipcRenderer.invoke('desktop:update:dismiss-updated'),
+  projects: {
+    info: () => ipcRenderer.invoke('projects:info'),
+    chooseRoot: () => ipcRenderer.invoke('projects:choose-root'),
+    list: () => ipcRenderer.invoke('projects:list'),
+    create: (input) => ipcRenderer.invoke('projects:create', input),
+    open: (input) => ipcRenderer.invoke('projects:open', input),
+    saveItem: (input) => ipcRenderer.invoke('projects:save-item', input),
+    removeItem: (input) => ipcRenderer.invoke('projects:remove-item', input),
+    renew: (input) => ipcRenderer.invoke('projects:renew', input),
+    release: (input) => ipcRenderer.invoke('projects:release', input),
+    rename: (input) => ipcRenderer.invoke('projects:rename', input),
+    forget: (input) => ipcRenderer.invoke('projects:forget', input),
+  },
   openReleasePage: () => ipcRenderer.invoke('desktop:update:open-release'),
 });

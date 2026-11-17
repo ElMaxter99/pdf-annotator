@@ -1654,5 +1654,78 @@
       "themeLight": "Canviar a tema clar",
       "language": "Idioma: {{language}}"
     }
+  },
+  "projects": {
+    "title": "Projectes",
+    "new": "Nou projecte",
+    "adopt": {
+      "title": "Tens un lot sense projecte",
+      "text": "Hi ha un lot de {{count}} PDFs desat només en aquest navegador. Pots desar-lo com a projecte «Sense títol» en una carpeta del teu disc.",
+      "button": "Desa com a projecte"
+    },
+    "rootError": {
+      "title": "No es pot obrir la carpeta de projectes",
+      "text": "«{{root}}» no existeix o no tens permís (unitat de xarxa desconnectada?). No s'ha esborrat res."
+    },
+    "retry": "Torna-ho a provar",
+    "chooseOther": "Tria una altra carpeta",
+    "loading": "Llegint la carpeta de projectes…",
+    "empty": {
+      "title": "Encara no tens projectes",
+      "text": "Un projecte agrupa els PDFs d'un client i es desa en una carpeta del teu disc. Per anotar un PDF solt no el necessites.",
+      "cta": "Crea el meu primer projecte"
+    },
+    "search": "Cerca projecte…",
+    "noMatches": "Cap projecte coincideix amb la cerca.",
+    "lock": {
+      "mine": "Obert en aquest equip",
+      "other": "En ús a {{host}}"
+    },
+    "meta": "{{pdfs}} PDFs · {{done}} llestos · {{size}} · editat {{when}}",
+    "size": {
+      "warn": "S'acosta al límit: convé dividir-lo en dos projectes.",
+      "full": "Projecte ple: no es poden afegir més PDFs."
+    },
+    "openReadOnly": "Obre en només lectura",
+    "takeover": "Prendre el control",
+    "open": "Obre",
+    "forget": "Treu de la llista",
+    "folder": "Carpeta de projectes:",
+    "changeFolder": "Canvia la carpeta",
+    "newTitle": "Nou projecte",
+    "fieldName": "Nom",
+    "fieldSub": "Subcarpeta (opcional)",
+    "willCreate": "Es crearà a {{path}}",
+    "cancel": "Cancel·la",
+    "create": "Crea el projecte",
+    "takeoverTitle": "Prendre el control de «{{name}}»?",
+    "takeoverText": "{{host}} el té obert (últim avís a les {{time}}). Si el prens, aquest equip passarà a només lectura i pot perdre canvis sense desar.",
+    "forgetTitle": "Treure «{{name}}» de la llista?",
+    "forgetText": "Els PDFs i la feina es queden al teu disc; només es treu el projecte de la llista. Pots tornar-lo a crear a la mateixa carpeta.",
+    "forgetConfirm": "Treu de la llista",
+    "created": "Projecte «{{name}}» creat i desat al teu disc.",
+    "forgotten": "«{{name}}» tret de la llista (els fitxers continuen al disc).",
+    "untitled": "Sense títol",
+    "readOnly": "Només lectura",
+    "resume": {
+      "title": "Continua a {{name}}",
+      "text": "El teu últim projecte.",
+      "continue": "Continua"
+    },
+    "error": {
+      "root-missing": "La carpeta de projectes no existeix.",
+      "denied": "No hi ha permís per escriure a la carpeta de projectes.",
+      "io": "No s'ha pogut llegir o desar al disc.",
+      "exists": "Ja existeix un projecte amb aquest nom en aquesta carpeta.",
+      "bad-name": "Escriu un nom per al projecte.",
+      "bad-ref": "Aquesta ruta no és vàlida.",
+      "bad-item": "Aquest PDF no es pot desar al projecte.",
+      "not-a-project": "Aquesta carpeta no és un projecte.",
+      "not-held": "Un altre equip ha pres el projecte: continues en només lectura i els canvis no es desen.",
+      "pdf-too-big": "Aquest PDF pesa més de {{max}} MB, el màxim per PDF.",
+      "too-many-pdfs": "El projecte ja té 200 PDFs, el màxim. Divideix-lo en dos projectes.",
+      "too-big": "El projecte arribaria a 2 GB, el màxim. Divideix-lo en dos projectes.",
+      "lockLost": "Un altre equip ha pres el projecte: continues en només lectura i els canvis no es desen."
+    }
   }
 }

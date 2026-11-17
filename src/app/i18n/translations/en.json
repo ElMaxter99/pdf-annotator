@@ -1654,5 +1654,78 @@
       "themeLight": "Switch to light theme",
       "language": "Language: {{language}}"
     }
+  },
+  "projects": {
+    "title": "Projects",
+    "new": "New project",
+    "adopt": {
+      "title": "You have a batch without a project",
+      "text": "A batch of {{count}} PDFs is saved only in this browser. You can save it as an «Untitled» project in a folder on your disk.",
+      "button": "Save as project"
+    },
+    "rootError": {
+      "title": "The projects folder cannot be opened",
+      "text": "«{{root}}» does not exist or you have no permission (network drive disconnected?). Nothing was deleted."
+    },
+    "retry": "Retry",
+    "chooseOther": "Choose another folder",
+    "loading": "Reading the projects folder…",
+    "empty": {
+      "title": "You have no projects yet",
+      "text": "A project groups the PDFs of a client and is saved in a folder on your disk. You do not need one to annotate a single PDF.",
+      "cta": "Create my first project"
+    },
+    "search": "Search projects…",
+    "noMatches": "No project matches the search.",
+    "lock": {
+      "mine": "Open on this computer",
+      "other": "In use on {{host}}"
+    },
+    "meta": "{{pdfs}} PDFs · {{done}} ready · {{size}} · edited {{when}}",
+    "size": {
+      "warn": "Close to the limit: consider splitting it into two projects.",
+      "full": "Project full: no more PDFs can be added."
+    },
+    "openReadOnly": "Open read-only",
+    "takeover": "Take over",
+    "open": "Open",
+    "forget": "Remove from list",
+    "folder": "Projects folder:",
+    "changeFolder": "Change folder",
+    "newTitle": "New project",
+    "fieldName": "Name",
+    "fieldSub": "Subfolder (optional)",
+    "willCreate": "It will be created in {{path}}",
+    "cancel": "Cancel",
+    "create": "Create project",
+    "takeoverTitle": "Take over «{{name}}»?",
+    "takeoverText": "{{host}} has it open (last seen at {{time}}). If you take over, that computer becomes read-only and may lose unsaved changes.",
+    "forgetTitle": "Remove «{{name}}» from the list?",
+    "forgetText": "The PDFs and your work stay on your disk; only the project is removed from the list. You can create it again in the same folder.",
+    "forgetConfirm": "Remove from list",
+    "created": "Project «{{name}}» created and saved on your disk.",
+    "forgotten": "«{{name}}» removed from the list (the files are still on your disk).",
+    "untitled": "Untitled",
+    "readOnly": "Read-only",
+    "resume": {
+      "title": "Continue in {{name}}",
+      "text": "Your last project.",
+      "continue": "Continue"
+    },
+    "error": {
+      "root-missing": "The projects folder does not exist.",
+      "denied": "No permission to write to the projects folder.",
+      "io": "Could not read or write to the disk.",
+      "exists": "A project with that name already exists in that folder.",
+      "bad-name": "Enter a name for the project.",
+      "bad-ref": "That path is not valid.",
+      "bad-item": "That PDF cannot be saved in the project.",
+      "not-a-project": "That folder is not a project.",
+      "not-held": "Another computer took the project: you stay read-only and changes are not saved.",
+      "pdf-too-big": "That PDF is larger than {{max}} MB, the maximum per PDF.",
+      "too-many-pdfs": "The project already has 200 PDFs, the maximum. Split it into two projects.",
+      "too-big": "The project would reach 2 GB, the maximum. Split it into two projects.",
+      "lockLost": "Another computer took the project: you stay read-only and changes are not saved."
+    }
   }
 }

@@ -1194,3 +1194,28 @@ app-ai-batch-chip {
     transition: border-color 0.2s ease-out, background 0.2s ease-out;
   }
 }
+
+.batch-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted);
+
+  a {
+    color: var(--accent);
+  }
+
+  strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+}
+
+.batch-crumb__chip {
+  white-space: nowrap;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--muted);
+  font-size: 13px;
+}

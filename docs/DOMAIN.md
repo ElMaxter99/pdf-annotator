@@ -8,6 +8,7 @@
 | **Puntos PDF** | Unidad del PDF (1 pt = 1/72 in). Origen **abajo-izquierda**: `y` crece hacia arriba. |
 | **Página (`num`)** | Número de página empezando en 1. |
 | **Plantilla** | Conjunto de anotaciones guardado en `localStorage` (`AnnotationTemplatesService`). No confundir con la plantilla de Mongo del autor, que es un objeto con `pages` y más atributos. |
+| **Proyecto** | (Escritorio) Carpeta visible del disco con el lote de un cliente: `project.json`, `batch/` y `.lock`. «Espacio de trabajo» sigue siendo el editor. |
 | **Sesión** | Último PDF + anotaciones + página + zoom en IndexedDB (`SessionStoreService`). |
 | **Guías / snapping** | Rejilla, reglas e imán (`GuideSettings`). |
 | **Maquetar / remaquetar** | Colocar o recolocar las coordenadas sobre un PDF nuevo o cambiado. |

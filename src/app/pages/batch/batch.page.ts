@@ -17,6 +17,7 @@ import type { PageAnnotations } from '../../models/annotation.model';
 import type { BatchItem } from '../../models/batch.model';
 import { AnnotationImportService } from '../../services/annotation-import.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
+import { ProjectStoreService } from '../../services/project-store.service';
 import { BatchStoreService } from '../../services/batch-store.service';
 import { MAX_TEST_DATA_BYTES, PreviewSettingsService } from '../../services/preview-settings.service';
 import { PendingFileService } from '../../services/pending-file.service';
@@ -94,6 +95,7 @@ async function sha256(blob: Blob): Promise<string | null> {
 export class BatchPageComponent implements OnInit {
   private readonly store = inject(BatchStoreService);
   readonly aiQueue = inject(AiBatchService);
+  readonly projects = inject(ProjectStoreService);
   readonly moreOpen = signal(false);
 
   @HostListener('document:mousedown', ['$event'])
@@ -418,6 +420,10 @@ export class BatchPageComponent implements OnInit {
   private decideStep(): void {
     if (this.step() === 'panel' && this.total() > 0) {
       return;
+    }
+    if (this.projects.active() && this.total() === 0 && !this.store.draft()) {
+      // A project with an empty batch starts at «Subir PDF» instead of going back to the landing.
+      this.store.startDraft([]);
     }
     if (this.store.draft()) {
       this.step.set('pdfs');

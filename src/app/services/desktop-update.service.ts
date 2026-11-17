@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import type { ProjectsBridge } from '../models/project.model';
 
 export type DesktopUpdateStatus = 'idle' | 'available' | 'downloading' | 'ready' | 'installing' | 'error';
 
@@ -45,6 +46,8 @@ export interface DesktopBridge {
   isDesktop: true;
   /** Puerto del ayudante de IA que lanza la app (4310 si estaba libre). */
   helperPort?: number;
+  /** Proyectos locales (carpeta en el disco). */
+  projects?: ProjectsBridge;
   getUpdateState(): Promise<DesktopUpdateState>;
   /** El menú nativo (Ayuda) pide abrir el panel; `check` = además buscar ahora. */
   onOpenUpdates?(callback: (event: { check: boolean }) => void): () => void;

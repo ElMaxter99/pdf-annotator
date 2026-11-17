@@ -6,6 +6,9 @@
       
     </a>
     <app-version-chip class="landing-nav__version" [version]="version"></app-version-chip>
+    @if (projectStore.available()) {
+      <a class="btn btn--primary landing-nav__projects" routerLink="/proyectos" data-testid="landing-projects">{{ 'projects.title' | t }}</a>
+    }
     <app-landing-language-bar [languages]="languages" [selectedLanguage]="languageModel"
       (languageChange)="onLanguageChange($event)"></app-landing-language-bar>
   </header>
@@ -25,6 +28,18 @@
             <div class="landing__resume-actions">
               <button type="button" class="landing__cta" (click)="resumeSession()">{{ 'session.continue' | t }}</button>
               <button type="button" class="btn btn--ghost" (click)="discardSession()">{{ 'session.discard' | t }}</button>
+            </div>
+          </section>
+        }
+
+        @if (lastProject(); as last) {
+          <section class="landing__resume" data-testid="resume-project">
+            <div class="landing__resume-text">
+              <strong>{{ 'projects.resume.title' | t: { name: last.name } }}</strong>
+              <span>{{ 'projects.resume.text' | t }}</span>
+            </div>
+            <div class="landing__resume-actions">
+              <button type="button" class="landing__cta" (click)="continueProject()">{{ 'projects.resume.continue' | t }}</button>
             </div>
           </section>
         }

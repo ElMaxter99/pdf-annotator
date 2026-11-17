@@ -1654,5 +1654,78 @@
       "themeLight": "Cambiar a tema claro",
       "language": "Idioma: {{language}}"
     }
+  },
+  "projects": {
+    "title": "Proyectos",
+    "new": "Nuevo proyecto",
+    "adopt": {
+      "title": "Tienes un lote sin proyecto",
+      "text": "Hay un lote de {{count}} PDFs guardado solo en este navegador. Puedes guardarlo como proyecto «Sin título» en una carpeta de tu disco.",
+      "button": "Guardar como proyecto"
+    },
+    "rootError": {
+      "title": "No se puede abrir la carpeta de proyectos",
+      "text": "«{{root}}» no existe o no tienes permiso (¿unidad de red desconectada?). No se ha borrado nada."
+    },
+    "retry": "Reintentar",
+    "chooseOther": "Elegir otra carpeta",
+    "loading": "Leyendo la carpeta de proyectos…",
+    "empty": {
+      "title": "Aún no tienes proyectos",
+      "text": "Un proyecto agrupa los PDFs de un cliente y se guarda en una carpeta de tu disco. Para anotar un PDF suelto no lo necesitas.",
+      "cta": "Crear mi primer proyecto"
+    },
+    "search": "Buscar proyecto…",
+    "noMatches": "Ningún proyecto coincide con la búsqueda.",
+    "lock": {
+      "mine": "Abierto en este equipo",
+      "other": "En uso en {{host}}"
+    },
+    "meta": "{{pdfs}} PDFs · {{done}} listos · {{size}} · editado {{when}}",
+    "size": {
+      "warn": "Se acerca al tope: conviene dividirlo en dos proyectos.",
+      "full": "Proyecto lleno: no se pueden añadir más PDFs."
+    },
+    "openReadOnly": "Abrir solo lectura",
+    "takeover": "Tomar el control",
+    "open": "Abrir",
+    "forget": "Quitar de la lista",
+    "folder": "Carpeta de proyectos:",
+    "changeFolder": "Cambiar carpeta",
+    "newTitle": "Nuevo proyecto",
+    "fieldName": "Nombre",
+    "fieldSub": "Subcarpeta (opcional)",
+    "willCreate": "Se creará en {{path}}",
+    "cancel": "Cancelar",
+    "create": "Crear proyecto",
+    "takeoverTitle": "¿Tomar el control de «{{name}}»?",
+    "takeoverText": "{{host}} lo tiene abierto (último aviso a las {{time}}). Si lo tomas, ese equipo pasará a solo lectura y puede perder cambios sin guardar.",
+    "forgetTitle": "¿Quitar «{{name}}» de la lista?",
+    "forgetText": "Los PDFs y el trabajo se quedan en tu disco; solo se quita el proyecto de la lista. Puedes volver a crearlo en la misma carpeta.",
+    "forgetConfirm": "Quitar de la lista",
+    "created": "Proyecto «{{name}}» creado y guardado en tu disco.",
+    "forgotten": "«{{name}}» quitado de la lista (los archivos siguen en el disco).",
+    "untitled": "Sin título",
+    "readOnly": "Solo lectura",
+    "resume": {
+      "title": "Continuar en {{name}}",
+      "text": "Tu último proyecto.",
+      "continue": "Continuar"
+    },
+    "error": {
+      "root-missing": "La carpeta de proyectos no existe.",
+      "denied": "No hay permiso para escribir en la carpeta de proyectos.",
+      "io": "No se pudo leer o guardar en el disco.",
+      "exists": "Ya existe un proyecto con ese nombre en esa carpeta.",
+      "bad-name": "Escribe un nombre para el proyecto.",
+      "bad-ref": "Esa ruta no es válida.",
+      "bad-item": "Ese PDF no se puede guardar en el proyecto.",
+      "not-a-project": "Esa carpeta no es un proyecto.",
+      "not-held": "Otro equipo ha tomado el proyecto: sigues en solo lectura y los cambios no se guardan.",
+      "pdf-too-big": "Ese PDF pesa más de {{max}} MB, el máximo por PDF.",
+      "too-many-pdfs": "El proyecto ya tiene 200 PDFs, el máximo. Divídelo en dos proyectos.",
+      "too-big": "El proyecto llegaría a 2 GB, el máximo. Divídelo en dos proyectos.",
+      "lockLost": "Otro equipo ha tomado el proyecto: sigues en solo lectura y los cambios no se guardan."
+    }
   }
 }
