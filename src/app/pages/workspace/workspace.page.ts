@@ -1346,6 +1346,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  readonly canvasHeight = signal(0);
   readonly pageCount = computed(() => this.pdfDoc()?.numPages ?? 0);
 
   async onFileSelected(event: Event) {
@@ -1591,6 +1592,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
+    this.canvasHeight.set(canvas.height);
 
     await page.render({ canvasContext: ctx, canvas, viewport }).promise;
     this.refreshOverlay();

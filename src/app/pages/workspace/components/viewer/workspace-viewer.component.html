@@ -114,12 +114,12 @@
 
     @if (vm.preview(); as p) {
       <app-annotation-editor #previewEditor [vm]="vm" mode="preview" [field]="p.field"
-        [leftPx]="p.field.x * vm.scale()" [topPx]="(pdfCanvas?.height ?? 0) - p.field.y * vm.scale()"></app-annotation-editor>
+        [leftPx]="p.field.x * vm.scale()" [topPx]="vm.canvasHeight() - p.field.y * vm.scale()"></app-annotation-editor>
     }
 
     @if (vm.editing(); as e) {
       <app-annotation-editor #editEditor [vm]="vm" mode="edit" [field]="e.field"
-        [leftPx]="e.field.x * vm.scale()" [topPx]="(pdfCanvas?.height ?? 0) - e.field.y * vm.scale()"></app-annotation-editor>
+        [leftPx]="e.field.x * vm.scale()" [topPx]="vm.canvasHeight() - e.field.y * vm.scale()"></app-annotation-editor>
     }
   </div>
 </main>

@@ -7,7 +7,7 @@ import { FirstStepsComponent } from '../first-steps/first-steps.component';
 import { AnnotationEditorComponent } from '../annotation-editor/annotation-editor.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-workspace-viewer',
   standalone: true,
   templateUrl: './workspace-viewer.component.html',
