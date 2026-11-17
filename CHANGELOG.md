@@ -2,6 +2,9 @@
 ### Added
 - **Paleta de comandos (mesa P-45):** `Ctrl/⌘ + K` (o el botón ⌕ del menú ⋯) abre un cuadro de búsqueda con las acciones del editor y del lote: deshacer/rehacer, descargar, limpiar (con su confirmación), zoom y páginas, vistas Muestra/Mapeo/Datos, pestañas del panel, «Poner plantilla A» con sus cuatro modos, siguiente/anterior, ir al panel e ir a un PDF por nombre, tema e idioma. Sin escribir muestra lo reciente y lo habitual; las acciones no disponibles se ven apagadas con el motivo; sin resultados ofrece los atajos. Teclado completo (`role="combobox"`, ↑↓ Intro Esc, foco atrapado), respeta `prefers-reduced-motion`. Textos en los 7 idiomas, con tests unitarios y e2e.
 
+### Docs
+- Hoja de ruta: anotados los evolutivos futuros de escritorio (proyectos locales, importar/exportar proyectos y sincronización sin servidores propios), con fases, riesgos y preguntas abiertas. Sin cambios en la app.
+
 ## [v1.13.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.13.0) - 2026-11-17
 ### Added
 - **Feedback al instalar una actualización (mesas AC-13 y AC-14):** al pulsar «Reiniciar ahora» aparece un diálogo «Instalando la versión X» con pasos y barra sin porcentaje; en Linux (.deb/.rpm) avisa de que el sistema pedirá la contraseña y en Windows de que se abrirá el instalador. Tras reabrir, un aviso confirma «PDF Annotator se actualizó a X». Textos en los 7 idiomas, con tests unitarios y e2e.
