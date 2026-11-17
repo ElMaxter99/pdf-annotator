@@ -214,6 +214,7 @@ import {
 } from '../../utils/color.utils';
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
+import { clampGroupDrag, exceedsDragThreshold } from '../../utils/group-drag.utils';
 import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
 import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
@@ -5105,18 +5106,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     evt.preventDefault();
     const rawDx = evt.clientX - drag.startX;
     const rawDy = evt.clientY - drag.startY;
-    if (!drag.moved && Math.abs(rawDx) <= 2 && Math.abs(rawDy) <= 2) {
+    if (!drag.moved && !exceedsDragThreshold(rawDx, rawDy)) {
       return;
     }
     drag.moved = true;
 
-    // Clamp the whole group so every member stays inside the page and spacing is preserved.
-    const minDx = Math.max(...drag.items.map((i) => -i.startLeft));
-    const maxDx = Math.min(...drag.items.map((i) => pdfCanvas.width - i.width - i.startLeft));
-    const minDy = Math.max(...drag.items.map((i) => -i.fontPx - i.startTop));
-    const maxDy = Math.min(...drag.items.map((i) => pdfCanvas.height - i.fontPx - i.startTop));
-    drag.dx = this.clamp(rawDx, Math.min(minDx, 0), Math.max(maxDx, 0));
-    drag.dy = this.clamp(rawDy, Math.min(minDy, 0), Math.max(maxDy, 0));
+    const { dx, dy } = clampGroupDrag(drag.items, pdfCanvas.width, pdfCanvas.height, rawDx, rawDy);
+    drag.dx = dx;
+    drag.dy = dy;
 
     for (const item of drag.items) {
       item.el.style.left = `${item.startLeft + drag.dx}px`;
