@@ -1540,5 +1540,78 @@
       "hint": "glissez · relâchez pour annoter"
     },
     "hintWeb": "Zoom du PDF : Ctrl + molette. Le zoom du navigateur reste actif sur le reste de l’écran."
+  },
+  "projects": {
+    "title": "Projets",
+    "new": "Nouveau projet",
+    "adopt": {
+      "title": "Vous avez un lot sans projet",
+      "text": "Un lot de {{count}} PDF est enregistré uniquement dans ce navigateur. Vous pouvez l'enregistrer comme projet «Sans titre» dans un dossier de votre disque.",
+      "button": "Enregistrer comme projet"
+    },
+    "rootError": {
+      "title": "Impossible d'ouvrir le dossier des projets",
+      "text": "«{{root}}» n'existe pas ou vous n'avez pas l'autorisation (lecteur réseau déconnecté ?). Rien n'a été supprimé."
+    },
+    "retry": "Réessayer",
+    "chooseOther": "Choisir un autre dossier",
+    "loading": "Lecture du dossier des projets…",
+    "empty": {
+      "title": "Vous n'avez pas encore de projets",
+      "text": "Un projet regroupe les PDF d'un client et est enregistré dans un dossier de votre disque. Pas besoin d'un projet pour annoter un PDF isolé.",
+      "cta": "Créer mon premier projet"
+    },
+    "search": "Rechercher un projet…",
+    "noMatches": "Aucun projet ne correspond à la recherche.",
+    "lock": {
+      "mine": "Ouvert sur cet ordinateur",
+      "other": "Utilisé sur {{host}}"
+    },
+    "meta": "{{pdfs}} PDF · {{done}} prêts · {{size}} · modifié {{when}}",
+    "size": {
+      "warn": "Proche de la limite : mieux vaut le diviser en deux projets.",
+      "full": "Projet plein : impossible d'ajouter d'autres PDF."
+    },
+    "openReadOnly": "Ouvrir en lecture seule",
+    "takeover": "Prendre le contrôle",
+    "open": "Ouvrir",
+    "forget": "Retirer de la liste",
+    "folder": "Dossier des projets :",
+    "changeFolder": "Changer de dossier",
+    "newTitle": "Nouveau projet",
+    "fieldName": "Nom",
+    "fieldSub": "Sous-dossier (facultatif)",
+    "willCreate": "Il sera créé dans {{path}}",
+    "cancel": "Annuler",
+    "create": "Créer le projet",
+    "takeoverTitle": "Prendre le contrôle de «{{name}}» ?",
+    "takeoverText": "{{host}} l'a ouvert (dernier signe à {{time}}). Si vous le prenez, cet ordinateur passera en lecture seule et pourra perdre des modifications non enregistrées.",
+    "forgetTitle": "Retirer «{{name}}» de la liste ?",
+    "forgetText": "Les PDF et votre travail restent sur votre disque ; seul le projet est retiré de la liste. Vous pouvez le recréer dans le même dossier.",
+    "forgetConfirm": "Retirer de la liste",
+    "created": "Projet «{{name}}» créé et enregistré sur votre disque.",
+    "forgotten": "«{{name}}» retiré de la liste (les fichiers restent sur le disque).",
+    "untitled": "Sans titre",
+    "readOnly": "Lecture seule : les modifications ne sont pas enregistrées",
+    "resume": {
+      "title": "Continuer dans {{name}}",
+      "text": "Votre dernier projet.",
+      "continue": "Continuer"
+    },
+    "error": {
+      "root-missing": "Le dossier des projets n'existe pas.",
+      "denied": "Pas d'autorisation d'écriture dans le dossier des projets.",
+      "io": "Lecture ou écriture impossible sur le disque.",
+      "exists": "Un projet portant ce nom existe déjà dans ce dossier.",
+      "bad-name": "Saisissez un nom pour le projet.",
+      "bad-ref": "Ce chemin n'est pas valide.",
+      "bad-item": "Ce PDF ne peut pas être enregistré dans le projet.",
+      "not-a-project": "Ce dossier n'est pas un projet.",
+      "not-held": "Un autre ordinateur a pris le projet : vous restez en lecture seule et les modifications ne sont pas enregistrées.",
+      "pdf-too-big": "Ce PDF dépasse {{max}} Mo, le maximum par PDF.",
+      "too-many-pdfs": "Le projet contient déjà 200 PDF, le maximum. Divisez-le en deux projets.",
+      "too-big": "Le projet atteindrait 2 Go, le maximum. Divisez-le en deux projets.",
+      "lockLost": "Un autre ordinateur a pris le projet : vous restez en lecture seule et les modifications ne sont pas enregistrées."
+    }
   }
 }

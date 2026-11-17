@@ -1540,5 +1540,78 @@
       "hint": "trascina · rilascia per annotare"
     },
     "hintWeb": "Zoom del PDF: Ctrl + rotellina. Lo zoom del browser resta attivo nel resto dello schermo."
+  },
+  "projects": {
+    "title": "Progetti",
+    "new": "Nuovo progetto",
+    "adopt": {
+      "title": "Hai un lotto senza progetto",
+      "text": "Un lotto di {{count}} PDF è salvato solo in questo browser. Puoi salvarlo come progetto «Senza titolo» in una cartella del tuo disco.",
+      "button": "Salva come progetto"
+    },
+    "rootError": {
+      "title": "Impossibile aprire la cartella dei progetti",
+      "text": "«{{root}}» non esiste o non hai il permesso (unità di rete scollegata?). Non è stato eliminato nulla."
+    },
+    "retry": "Riprova",
+    "chooseOther": "Scegli un'altra cartella",
+    "loading": "Lettura della cartella dei progetti…",
+    "empty": {
+      "title": "Non hai ancora progetti",
+      "text": "Un progetto raggruppa i PDF di un cliente e viene salvato in una cartella del tuo disco. Non serve per annotare un PDF singolo.",
+      "cta": "Crea il mio primo progetto"
+    },
+    "search": "Cerca progetto…",
+    "noMatches": "Nessun progetto corrisponde alla ricerca.",
+    "lock": {
+      "mine": "Aperto su questo computer",
+      "other": "In uso su {{host}}"
+    },
+    "meta": "{{pdfs}} PDF · {{done}} pronti · {{size}} · modificato {{when}}",
+    "size": {
+      "warn": "Vicino al limite: conviene dividerlo in due progetti.",
+      "full": "Progetto pieno: non si possono aggiungere altri PDF."
+    },
+    "openReadOnly": "Apri in sola lettura",
+    "takeover": "Prendi il controllo",
+    "open": "Apri",
+    "forget": "Rimuovi dall'elenco",
+    "folder": "Cartella dei progetti:",
+    "changeFolder": "Cambia cartella",
+    "newTitle": "Nuovo progetto",
+    "fieldName": "Nome",
+    "fieldSub": "Sottocartella (facoltativa)",
+    "willCreate": "Verrà creato in {{path}}",
+    "cancel": "Annulla",
+    "create": "Crea progetto",
+    "takeoverTitle": "Prendere il controllo di «{{name}}»?",
+    "takeoverText": "{{host}} lo ha aperto (ultimo segnale alle {{time}}). Se lo prendi, quel computer passerà in sola lettura e potrebbe perdere modifiche non salvate.",
+    "forgetTitle": "Rimuovere «{{name}}» dall'elenco?",
+    "forgetText": "I PDF e il lavoro restano sul tuo disco; viene rimosso solo il progetto dall'elenco. Puoi ricrearlo nella stessa cartella.",
+    "forgetConfirm": "Rimuovi dall'elenco",
+    "created": "Progetto «{{name}}» creato e salvato sul tuo disco.",
+    "forgotten": "«{{name}}» rimosso dall'elenco (i file restano sul disco).",
+    "untitled": "Senza titolo",
+    "readOnly": "Sola lettura: le modifiche non vengono salvate",
+    "resume": {
+      "title": "Continua in {{name}}",
+      "text": "Il tuo ultimo progetto.",
+      "continue": "Continua"
+    },
+    "error": {
+      "root-missing": "La cartella dei progetti non esiste.",
+      "denied": "Nessun permesso di scrittura nella cartella dei progetti.",
+      "io": "Impossibile leggere o scrivere sul disco.",
+      "exists": "Esiste già un progetto con questo nome in questa cartella.",
+      "bad-name": "Scrivi un nome per il progetto.",
+      "bad-ref": "Questo percorso non è valido.",
+      "bad-item": "Questo PDF non può essere salvato nel progetto.",
+      "not-a-project": "Questa cartella non è un progetto.",
+      "not-held": "Un altro computer ha preso il progetto: resti in sola lettura e le modifiche non vengono salvate.",
+      "pdf-too-big": "Questo PDF supera {{max}} MB, il massimo per PDF.",
+      "too-many-pdfs": "Il progetto ha già 200 PDF, il massimo. Dividilo in due progetti.",
+      "too-big": "Il progetto raggiungerebbe 2 GB, il massimo. Dividilo in due progetti.",
+      "lockLost": "Un altro computer ha preso il progetto: resti in sola lettura e le modifiche non vengono salvate."
+    }
   }
 }

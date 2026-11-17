@@ -1,0 +1,178 @@
+<div class="app app--projects">
+  <header class="proj-bar">
+    <a class="proj-bar__brand" routerLink="/landing" [attr.aria-label]="appName">
+      <img src="/logo.svg" alt="" width="32" height="32" />
+      <span class="proj-bar__name">{{ appName }}</span>
+    </a>
+    <span class="proj-bar__crumb" aria-hidden="true">›</span>
+    <h1 class="proj-bar__title">{{ 'projects.title' | t }}</h1>
+    <app-version-chip class="proj-bar__version"></app-version-chip>
+    <span class="proj-bar__spacer"></span>
+    <button type="button" class="btn btn--primary" (click)="openNew()" data-testid="project-new">
+      {{ 'projects.new' | t }}
+    </button>
+  </header>
+
+  <main class="proj">
+    @if (orphanCount() > 0) {
+      <section class="proj-note" data-testid="project-adopt">
+        <div>
+          <strong>{{ 'projects.adopt.title' | t }}</strong>
+          <p>{{ 'projects.adopt.text' | t: { count: orphanCount() } }}</p>
+        </div>
+        <button type="button" class="btn btn--primary" [disabled]="busy() === 'adopt'" (click)="adopt()">
+          {{ 'projects.adopt.button' | t }}
+        </button>
+      </section>
+    }
+
+    @if (store.error(); as error) {
+      <section class="proj-card proj-card--error" role="alert" data-testid="project-root-error">
+        <strong>{{ 'projects.rootError.title' | t }}</strong>
+        <p>{{ 'projects.rootError.text' | t: { root: store.root() } }}</p>
+        <div class="proj-actions">
+          <button type="button" class="btn btn--primary" (click)="store.refresh()">{{ 'projects.retry' | t }}</button>
+          <button type="button" class="btn" (click)="chooseRoot()">{{ 'projects.chooseOther' | t }}</button>
+        </div>
+      </section>
+    } @else if (store.loading() && !store.projects().length) {
+      <div class="proj-grid" aria-busy="true" [attr.aria-label]="'projects.loading' | t">
+        @for (n of skeletons; track n) {
+          <div class="proj-card proj-card--skeleton" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </div>
+        }
+      </div>
+      <p class="proj-hint" role="status">{{ 'projects.loading' | t }}</p>
+    } @else if (!store.projects().length) {
+      <section class="proj-empty" data-testid="project-empty">
+        <h2>{{ 'projects.empty.title' | t }}</h2>
+        <p>{{ 'projects.empty.text' | t }}</p>
+        <button type="button" class="btn btn--primary" (click)="openNew()">{{ 'projects.empty.cta' | t }}</button>
+      </section>
+    } @else {
+      <div class="proj-search">
+        <input
+          type="search"
+          class="proj-input"
+          [value]="query()"
+          (input)="query.set($any($event.target).value)"
+          [placeholder]="'projects.search' | t"
+          [attr.aria-label]="'projects.search' | t"
+        />
+      </div>
+      @if (!visible().length) {
+        <p class="proj-hint">{{ 'projects.noMatches' | t }}</p>
+      }
+      <div class="proj-grid">
+        @for (project of visible(); track project.ref) {
+          <article class="proj-card" [attr.data-testid]="'project-card'">
+            <div class="proj-card__head">
+              <div>
+                <h2 class="proj-card__name">{{ project.name }}</h2>
+                <code class="proj-card__path">{{ project.ref }}</code>
+              </div>
+              @if (project.lock.state === 'mine') {
+                <span class="proj-chip proj-chip--accent">{{ 'projects.lock.mine' | t }}</span>
+              } @else if (project.lock.state === 'other') {
+                <span class="proj-chip proj-chip--warn">{{ 'projects.lock.other' | t: { host: project.lock.host } }}</span>
+              }
+            </div>
+            <p class="proj-card__meta">
+              {{ 'projects.meta' | t: { pdfs: project.pdfs, done: project.done, size: size(project), when: when(project.updatedAt) } }}
+            </p>
+            <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent(project)">
+              <i [style.width.%]="percent(project)"></i>
+            </div>
+            @if (fill(project) === 'warn') {
+              <p class="proj-flag proj-flag--warn">{{ 'projects.size.warn' | t }}</p>
+            } @else if (fill(project) === 'full') {
+              <p class="proj-flag proj-flag--danger">{{ 'projects.size.full' | t }}</p>
+            }
+            <div class="proj-actions">
+              @if (project.lock.state === 'other') {
+                <button type="button" class="btn" [disabled]="busy() === project.ref" (click)="open(project, { readOnly: true })">
+                  {{ 'projects.openReadOnly' | t }}
+                </button>
+                <button type="button" class="btn" (click)="askTakeover(project)">{{ 'projects.takeover' | t }}</button>
+              } @else {
+                <button type="button" class="btn btn--primary" [disabled]="busy() === project.ref" (click)="open(project)" data-testid="project-open">
+                  {{ 'projects.open' | t }}
+                </button>
+              }
+              <button type="button" class="btn btn--ghost" (click)="askForget(project)">{{ 'projects.forget' | t }}</button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    <footer class="proj-foot">
+      <span>{{ 'projects.folder' | t }} <code>{{ store.root() }}</code></span>
+      <button type="button" class="btn" (click)="chooseRoot()">{{ 'projects.changeFolder' | t }}</button>
+    </footer>
+  </main>
+
+  @if (dialog(); as d) {
+    <div class="proj-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
+      <div class="proj-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        @switch (d.kind) {
+          @case ('new') {
+            <h2>{{ 'projects.newTitle' | t }}</h2>
+            <label class="proj-field">
+              <span>{{ 'projects.fieldName' | t }}</span>
+              <input
+                class="proj-input"
+                type="text"
+                maxlength="80"
+                autofocus
+                [value]="newName()"
+                (input)="newName.set($any($event.target).value)"
+                (keydown.enter)="create()"
+                data-testid="project-name"
+              />
+            </label>
+            <label class="proj-field">
+              <span>{{ 'projects.fieldSub' | t }}</span>
+              <input
+                class="proj-input proj-input--mono"
+                type="text"
+                maxlength="200"
+                placeholder="Álvaro/cliente1"
+                [value]="newSub()"
+                (input)="newSub.set($any($event.target).value)"
+                (keydown.enter)="create()"
+              />
+            </label>
+            <p class="proj-hint">{{ 'projects.willCreate' | t: { path: store.root() + '/' + (newSub().trim() || newName().trim() || '…') } }}</p>
+            @if (formError(); as err) {
+              <p class="proj-flag proj-flag--danger" role="alert">{{ 'projects.error.' + err | t }}</p>
+            }
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" [disabled]="busy() === 'create'" (click)="create()" data-testid="project-create">
+                {{ 'projects.create' | t }}
+              </button>
+            </div>
+          }
+          @case ('takeover') {
+            <h2>{{ 'projects.takeoverTitle' | t: { name: d.project.name } }}</h2>
+            <p>{{ 'projects.takeoverText' | t: { host: d.project.lock.host, time: clock(d.project.lock.seen) } }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--danger" (click)="open(d.project, { force: true })">{{ 'projects.takeover' | t }}</button>
+            </div>
+          }
+          @case ('forget') {
+            <h2>{{ 'projects.forgetTitle' | t: { name: d.project.name } }}</h2>
+            <p>{{ 'projects.forgetText' | t }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--danger" (click)="forget(d.project)">{{ 'projects.forgetConfirm' | t }}</button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>

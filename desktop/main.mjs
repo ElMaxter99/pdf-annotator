@@ -1,5 +1,5 @@
 // PDF Annotator · proceso principal de Electron: ventana, web empaquetada (app://), ayudante de IA y actualizaciones.
-import { app, BrowserWindow, ipcMain, net, protocol, session, shell, Menu } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, net, protocol, session, shell, Menu } from 'electron';
 import electronUpdater from 'electron-updater';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
@@ -10,6 +10,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, normalizeChannel, parseReleaseForChannel, updateMode } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
+import { setupProjectsIpc } from './projects-ipc.mjs';
 import { goInHistory, historyDirectionForCommand, historyDirectionForKey } from './history-nav.mjs';
 
 const { autoUpdater } = electronUpdater;
@@ -193,8 +194,12 @@ function setupUpdater() {
 function trusted(event) {
   return isAppUrl(event.senderFrame?.url, ORIGIN);
 }
+let projects = null;
 function setupIpc() {
   const handle = (channel, fn) => ipcMain.handle(channel, (event, ...args) => (trusted(event) ? fn(...args) : undefined));
+  projects = setupProjectsIpc({ handle, app, dialog, getWindow: () => win });
+  // El bloqueo de cada proyecto abierto se renueva cada minuto (caduca a los 10 sin señales).
+  setInterval(() => projects?.renewAll(), 60 * 1000).unref();
   ipcMain.on('desktop:helper-port', (event) => {
     event.returnValue = HELPER_PORT;
   });
@@ -330,7 +335,10 @@ app.on('second-instance', () => {
     win.focus();
   }
 });
-app.on('before-quit', stopHelper);
+app.on('before-quit', () => {
+  projects?.releaseAll();
+  stopHelper();
+});
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => {
   if (!win) createWindow();

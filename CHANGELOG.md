@@ -1,4 +1,7 @@
 ## Unreleased
+### Added
+- **Proyectos locales (app de escritorio, fase 1; mesas P-82 a P-84):** nueva pantalla «Proyectos» (`/proyectos`, botón en la landing) para separar el trabajo por cliente. Cada proyecto es una carpeta visible del disco (por defecto `Documentos/PDF Annotator`, cambiable, con subcarpetas tipo `Álvaro/cliente1`) con `project.json` y su lote (`batch/<id>.json` + PDFs A y B). Un proyecto siempre contiene un lote; soltar un PDF suelto sigue igual. Se guarda solo mientras trabajas, y la landing ofrece «Continuar en…» con el último proyecto. Solo un equipo edita a la vez: archivo `.lock` que se renueva cada minuto y caduca a los 10; otro equipo puede abrir en solo lectura o tomar el control con confirmación. Tope: 200 PDFs y 2 GB por proyecto (40 MB por PDF), con aviso desde 100 PDFs o 1 GB. Un lote que solo estaba en el navegador se puede guardar como proyecto «Sin título» (siempre a petición). Sin cifrado, servidores ni cuentas. Textos en los 7 idiomas, con tests (`desktop/projects.test.mjs`, unitarios y e2e). En la web no cambia nada.
+
 ### Docs
 - Hoja de ruta: anotados los evolutivos futuros de escritorio (proyectos locales, importar/exportar proyectos y sincronización sin servidores propios), con fases, riesgos y preguntas abiertas. Sin cambios en la app.
 

@@ -1540,5 +1540,78 @@
       "hint": "ziehen · loslassen zum Annotieren"
     },
     "hintWeb": "PDF-Zoom: Strg + Mausrad. Der Browser-Zoom gilt weiterhin im Rest des Bildschirms."
+  },
+  "projects": {
+    "title": "Projekte",
+    "new": "Neues Projekt",
+    "adopt": {
+      "title": "Sie haben einen Stapel ohne Projekt",
+      "text": "Ein Stapel mit {{count}} PDFs ist nur in diesem Browser gespeichert. Sie können ihn als Projekt «Ohne Titel» in einem Ordner auf Ihrer Festplatte speichern.",
+      "button": "Als Projekt speichern"
+    },
+    "rootError": {
+      "title": "Der Projektordner kann nicht geöffnet werden",
+      "text": "«{{root}}» existiert nicht oder Sie haben keine Berechtigung (Netzlaufwerk getrennt?). Es wurde nichts gelöscht."
+    },
+    "retry": "Erneut versuchen",
+    "chooseOther": "Anderen Ordner wählen",
+    "loading": "Projektordner wird gelesen…",
+    "empty": {
+      "title": "Sie haben noch keine Projekte",
+      "text": "Ein Projekt fasst die PDFs eines Kunden zusammen und wird in einem Ordner auf Ihrer Festplatte gespeichert. Für ein einzelnes PDF brauchen Sie keines.",
+      "cta": "Mein erstes Projekt erstellen"
+    },
+    "search": "Projekt suchen…",
+    "noMatches": "Kein Projekt entspricht der Suche.",
+    "lock": {
+      "mine": "Auf diesem Computer geöffnet",
+      "other": "In Benutzung auf {{host}}"
+    },
+    "meta": "{{pdfs}} PDFs · {{done}} fertig · {{size}} · bearbeitet {{when}}",
+    "size": {
+      "warn": "Nahe am Limit: besser in zwei Projekte aufteilen.",
+      "full": "Projekt voll: Es können keine PDFs mehr hinzugefügt werden."
+    },
+    "openReadOnly": "Schreibgeschützt öffnen",
+    "takeover": "Übernehmen",
+    "open": "Öffnen",
+    "forget": "Aus der Liste entfernen",
+    "folder": "Projektordner:",
+    "changeFolder": "Ordner ändern",
+    "newTitle": "Neues Projekt",
+    "fieldName": "Name",
+    "fieldSub": "Unterordner (optional)",
+    "willCreate": "Wird erstellt in {{path}}",
+    "cancel": "Abbrechen",
+    "create": "Projekt erstellen",
+    "takeoverTitle": "«{{name}}» übernehmen?",
+    "takeoverText": "{{host}} hat es geöffnet (letztes Signal um {{time}}). Wenn Sie es übernehmen, wird dieser Computer schreibgeschützt und kann ungespeicherte Änderungen verlieren.",
+    "forgetTitle": "«{{name}}» aus der Liste entfernen?",
+    "forgetText": "Die PDFs und Ihre Arbeit bleiben auf Ihrer Festplatte; nur das Projekt wird aus der Liste entfernt. Sie können es im selben Ordner neu erstellen.",
+    "forgetConfirm": "Aus der Liste entfernen",
+    "created": "Projekt «{{name}}» erstellt und auf Ihrer Festplatte gespeichert.",
+    "forgotten": "«{{name}}» aus der Liste entfernt (die Dateien bleiben auf der Festplatte).",
+    "untitled": "Ohne Titel",
+    "readOnly": "Schreibgeschützt: Änderungen werden nicht gespeichert",
+    "resume": {
+      "title": "Weiter in {{name}}",
+      "text": "Ihr letztes Projekt.",
+      "continue": "Weiter"
+    },
+    "error": {
+      "root-missing": "Der Projektordner existiert nicht.",
+      "denied": "Keine Berechtigung zum Schreiben im Projektordner.",
+      "io": "Lesen oder Speichern auf der Festplatte nicht möglich.",
+      "exists": "Ein Projekt mit diesem Namen existiert in diesem Ordner bereits.",
+      "bad-name": "Geben Sie einen Namen für das Projekt ein.",
+      "bad-ref": "Dieser Pfad ist ungültig.",
+      "bad-item": "Dieses PDF kann nicht im Projekt gespeichert werden.",
+      "not-a-project": "Dieser Ordner ist kein Projekt.",
+      "not-held": "Ein anderer Computer hat das Projekt übernommen: Sie bleiben schreibgeschützt und Änderungen werden nicht gespeichert.",
+      "pdf-too-big": "Dieses PDF ist größer als {{max}} MB, dem Maximum pro PDF.",
+      "too-many-pdfs": "Das Projekt hat bereits 200 PDFs, das Maximum. Teilen Sie es in zwei Projekte auf.",
+      "too-big": "Das Projekt würde 2 GB erreichen, das Maximum. Teilen Sie es in zwei Projekte auf.",
+      "lockLost": "Ein anderer Computer hat das Projekt übernommen: Sie bleiben schreibgeschützt und Änderungen werden nicht gespeichert."
+    }
   }
 }

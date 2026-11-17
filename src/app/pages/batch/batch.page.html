@@ -6,6 +6,16 @@
       <span class="batch-bar__sub">{{ 'batch.subtitle' | t }}</span>
     </a>
     <app-version-chip class="batch-bar__version"></app-version-chip>
+    @if (projects.active(); as project) {
+      <nav class="batch-crumb" [attr.aria-label]="'projects.title' | t" data-testid="project-crumb">
+        <a routerLink="/proyectos" (click)="projects.close()">{{ 'projects.title' | t }}</a>
+        <span aria-hidden="true">›</span>
+        <strong>{{ project.name }}</strong>
+        @if (project.readOnly) {
+          <span class="batch-crumb__chip" role="status">{{ 'projects.readOnly' | t }}</span>
+        }
+      </nav>
+    }
     @if (step() === 'panel') {
       <h1 class="batch-bar__title">{{ 'batch.title' | t: { count: total() } }}</h1>
       <span class="batch-bar__spacer"></span>

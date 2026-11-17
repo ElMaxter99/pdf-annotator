@@ -13,6 +13,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/batch/batch.page').then((m) => m.BatchPageComponent),
   },
   {
+    path: 'proyectos',
+    loadComponent: () =>
+      import('./pages/projects/projects.page').then((m) => m.ProjectsPageComponent),
+  },
+  {
     path: 'workspace',
     canActivate: [workspaceGuard],
     loadComponent: () =>

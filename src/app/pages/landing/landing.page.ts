@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { VersionChipComponent } from '../../components/version-chip/version-chip.component';
@@ -10,6 +10,7 @@ import { SessionStoreService, SavedSessionSummary } from '../../services/session
 import { ToastService } from '../../services/toast.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { BatchStoreService } from '../../services/batch-store.service';
+import { ProjectStoreService } from '../../services/project-store.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { LandingDropzoneComponent } from './components/dropzone/landing-dropzone.component';
 import { LandingFooterComponent } from './components/footer/landing-footer.component';
@@ -30,6 +31,7 @@ import { LandingLanguageBarComponent } from './components/language-bar/landing-l
     LandingFooterComponent,
     TranslationPipe,
     VersionChipComponent,
+    RouterLink,
   ],
 })
 export class LandingPageComponent {
@@ -40,6 +42,9 @@ export class LandingPageComponent {
   private readonly toast = inject(ToastService);
   private readonly sessionStore = inject(SessionStoreService);
   private readonly batchStore = inject(BatchStoreService);
+  readonly projectStore = inject(ProjectStoreService);
+  /** Último proyecto abierto (solo escritorio): ofrece «Continuar en…». */
+  readonly lastProject = signal<{ ref: string; name: string } | null>(null);
   readonly batchCount = computed(() => this.batchStore.items().length);
   readonly savedSession = signal<SavedSessionSummary | null>(null);
 
@@ -59,6 +64,22 @@ export class LandingPageComponent {
     if (typeof window !== 'undefined') {
       void this.sessionStore.summary().then((summary) => this.savedSession.set(summary));
       void this.batchStore.load();
+      if (this.projectStore.available()) {
+        this.lastProject.set(this.projectStore.lastProject());
+      }
+    }
+  }
+
+  async continueProject() {
+    const last = this.lastProject();
+    if (!last) {
+      return;
+    }
+    const result = await this.projectStore.open(last.ref);
+    if (result.ok) {
+      await this.router.navigate(['/lote']);
+    } else {
+      await this.router.navigate(['/proyectos']);
     }
   }
 

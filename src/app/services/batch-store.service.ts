@@ -1,12 +1,19 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
 import type { AiSavedProposal, BatchItem, FieldLink } from '../models/batch.model';
 import { sanitizeDetails, sanitizeRow } from '../utils/ai-proposal.utils';
+import { ProjectStoreService } from './project-store.service';
 
 const DB_NAME = 'pdf-annotator-batch';
 const STORE = 'items';
 /** Larger PDFs are not persisted, to stay well within browser storage quotas. */
 export const MAX_BATCH_PDF_BYTES = 40 * 1024 * 1024;
+
+/** Where a batch that belongs to a desktop project is mirrored (the folder on disk) instead of IndexedDB. */
+export interface BatchSink {
+  save(item: BatchItem): void;
+  remove(id: string): void;
+}
 
 /**
  * The batch of PDFs being migrated (A = original, B = new version). Everything lives in the
@@ -26,9 +33,43 @@ export class BatchStoreService {
   readonly persistent = signal(true);
   /** Files chosen in the landing/steps that are not a batch yet (kept in memory only). */
   readonly draft = signal<{ pdfs: File[]; jsons: File[] } | null>(null);
+  private readonly injector = inject(Injector);
+  /** Desktop project mirror: `null` = browser storage; in read-only projects nothing is saved at all. */
+  private sink: BatchSink | null = null;
+  private projectMode: 'none' | 'rw' | 'ro' = 'none';
+
+  /** Puts the items of a desktop project in memory; from now on changes go to its folder (or nowhere if read-only). */
+  attachProject(items: BatchItem[], sink: BatchSink | null): void {
+    this.closedNotices.set({});
+    this.items.set(items);
+    this.activeId.set(null);
+    this.sink = sink;
+    this.projectMode = sink ? 'rw' : 'ro';
+    this.persistent.set(true);
+    this.loaded.set(true);
+  }
+
+  /** Leaves the project: the batch goes back to browser storage and memory is emptied (the folder keeps everything). */
+  detachProject(): void {
+    this.sink = null;
+    this.projectMode = 'none';
+    this.items.set([]);
+    this.activeId.set(null);
+    this.closedNotices.set({});
+    this.loaded.set(false);
+  }
+
+  /** The project lost its lock (another computer took it): keep working in memory without saving. */
+  dropSink(): void {
+    this.sink = null;
+    this.projectMode = 'ro';
+  }
 
   async load(): Promise<void> {
     if (this.loaded()) {
+      return;
+    }
+    if (typeof window !== 'undefined' && (await this.injector.get(ProjectStoreService).restore())) {
       return;
     }
     const stored = await this.readAll();
@@ -166,7 +207,7 @@ export class BatchStoreService {
     if (this.activeId() === id) {
       this.activeId.set(null);
     }
-    void this.run('readwrite', (store) => store.delete(id));
+    this.deleteStored(id);
   }
 
   /** Removes several items at once; `reinsert` puts them back (used by «Deshacer»). */
@@ -179,7 +220,7 @@ export class BatchStoreService {
       this.activeId.set(null);
     }
     for (const item of removed) {
-      void this.run('readwrite', (store) => store.delete(item.id));
+      this.deleteStored(item.id);
     }
     return removed;
   }
@@ -207,6 +248,9 @@ export class BatchStoreService {
     this.closedNotices.set({});
     this.items.set([]);
     this.activeId.set(null);
+    if (this.projectMode !== 'none') {
+      return;
+    }
     await this.run('readwrite', (store) => store.clear());
   }
 
@@ -238,7 +282,19 @@ export class BatchStoreService {
     }
   }
 
+  private deleteStored(id: string): void {
+    if (this.projectMode === 'none') {
+      void this.run('readwrite', (store) => store.delete(id));
+    } else {
+      this.sink?.remove(id);
+    }
+  }
+
   private persist(item: BatchItem): void {
+    if (this.projectMode !== 'none') {
+      this.sink?.save(item);
+      return;
+    }
     const size = item.aPdf.size + (item.bPdf?.size ?? 0);
     if (size > MAX_BATCH_PDF_BYTES) {
       this.persistent.set(false);
@@ -299,6 +355,11 @@ export class BatchStoreService {
       db.close();
     }
   }
+}
+
+/** Rebuilds an item read from storage (IndexedDB or a project folder) or drops it if it has the wrong shape. */
+export function reviveBatchItem(value: unknown): BatchItem | null {
+  return isBatchItem(value) ? withSafeProposal(value) : null;
 }
 
 /** Stored data is untrusted: only keep what has the expected shape. */
