@@ -18,6 +18,7 @@
 ### Changed
 - **Miniaturas bajo demanda (rendimiento):** al abrir un PDF la lista de miniaturas aparece al instante con un hueco del tamaño de cada página, y la imagen solo se dibuja cuando la miniatura entra en el panel (con un pequeño margen); las que salen de pantalla antes de dibujarse se descartan de la cola. Antes se dibujaban todas las páginas en serie al abrir. Con un PDF de 150 páginas: la primera miniatura sale a ~0,5 s en lugar de ~2,9 s, se dibujan 15 en vez de 150 y el JavaScript de la apertura baja de ~750 ms a ~225 ms. Con un PDF de una página no cambia nada. Mientras llega la imagen, cada hueco es un esqueleto animado con la proporción de su página (mesa P-94: brillo de 1,2 s, fundido de 200 ms al llegar la imagen, quieto con «reducir movimiento»); si una miniatura no se puede dibujar queda un recuadro con ↻ y pulsarla la reintenta. Texto nuevo en los 7 idiomas. Con tests e2e (`e2e/thumbnails.spec.ts`).
 - El desplazamiento de las copias al pegar y duplicar anotaciones sale de `workspace.page.ts` a `utils/paste-offset.utils.ts` (con tests). Sin cambios visibles.
+- Las reglas de los atajos de teclado (qué acción toca según la tecla y el estado del editor) salen de `workspace.page.ts` a `utils/shortcuts.utils.ts`, con 30 pruebas nuevas. Sin cambios visibles.
 
 ### Docs
 - Hoja de ruta: marcada como hecha la subida a Node 26 y Angular 22 (PR #245).
