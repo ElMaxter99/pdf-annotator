@@ -14,7 +14,6 @@ import {
 } from './project-archive.mjs';
 import {
   acquireRemoteLock,
-  folderReachable,
   listRemote,
   localDirty,
   projectStatus,
@@ -26,6 +25,9 @@ import {
   validateFolder,
   writeState,
 } from './project-sync.mjs';
+import { cleanConfig, inspectHost, openSftpProvider, testConnection } from './sftp-connection.mjs';
+import { localProvider } from './sync-provider.mjs';
+import { createSecretStore } from './sync-secrets.mjs';
 import {
   LIMITS,
   ProjectError,
@@ -45,7 +47,7 @@ import {
   writeItem,
 } from './projects.mjs';
 
-export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
+export function setupProjectsIpc({ handle, app, dialog, shell, getWindow, safeStorage }) {
   const settingsFile = path.join(app.getPath('userData'), 'projects-root.json');
   /** Identifica esta ejecución de la app: dos ventanas o equipos nunca comparten el token. */
   const token = randomUUID();
@@ -64,20 +66,70 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
     return defaultRoot();
   };
   let root = loadRoot();
-  // Carpeta enlazada (fase 3): se guarda solo la ruta; lo que contiene se trata como no confiable.
+  // Destino de la sincronización: una carpeta del equipo (fase 3) o un servidor SFTP (fase 3b); solo uno a la vez.
+  // Se guarda la configuración (sin secretos); lo que hay al otro lado se trata como no confiable.
   const linkFile = path.join(app.getPath('userData'), 'projects-sync.json');
+  const secrets = createSecretStore({
+    safeStorage,
+    file: path.join(app.getPath('userData'), 'projects-sync-secret.bin'),
+  });
   const loadLink = () => {
     try {
-      const saved = JSON.parse(readFileSync(linkFile, 'utf8')).folder;
-      if (typeof saved === 'string' && path.isAbsolute(saved)) return saved;
+      const saved = JSON.parse(readFileSync(linkFile, 'utf8'));
+      if (saved?.kind === 'sftp') {
+        const config = cleanConfig(saved);
+        if (config.host && config.username && config.fingerprint)
+          return { kind: 'sftp', ...config };
+      } else if (typeof saved?.folder === 'string' && path.isAbsolute(saved.folder)) {
+        return { kind: 'folder', folder: saved.folder };
+      }
     } catch {
-      /* sin carpeta enlazada */
+      /* sin destino enlazado */
     }
     return null;
   };
   let link = loadLink();
-  /** Última carpeta que el usuario eligió y se comprobó: «Vincular» actúa sobre ella, no sobre una ruta de la web. */
+  /** Última carpeta o servidor que el usuario eligió y se comprobó: «Vincular» actúa sobre ella, no sobre datos de la web. */
   let chosen = null;
+  /** Última huella de servidor que el usuario vio en el diálogo «¿Es este tu servidor?». */
+  let inspectedHost = null;
+  /** Conexión SFTP abierta y último fallo (para no insistir en cada consulta de estado). */
+  let connection = null;
+  let connectFail = null;
+  const closeConnection = async () => {
+    const old = connection;
+    connection = null;
+    connectFail = null;
+    await old?.close?.().catch?.(() => undefined);
+  };
+  /** Proveedor del destino enlazado; lanza si no se puede abrir (se reintenta cada 15 s como mucho). */
+  const provider = async () => {
+    if (!link) throw new ProjectError('not-linked');
+    if (link.kind === 'folder') return localProvider(link.folder);
+    if (connection && (await connection.reachable())) return connection;
+    connection = null;
+    if (connectFail && Date.now() - connectFail.at < 15000) throw connectFail.error;
+    const secret = secrets.load() ?? {};
+    if (link.authMode === 'password' && !secret.password) {
+      connectFail = { at: Date.now(), error: new ProjectError('secret-needed') };
+      throw connectFail.error;
+    }
+    try {
+      connection = await openSftpProvider(link, secret);
+      connectFail = null;
+      return connection;
+    } catch (error) {
+      connectFail = { at: Date.now(), error };
+      throw error;
+    }
+  };
+  const tryProvider = async () => {
+    try {
+      return await provider();
+    } catch {
+      return null;
+    }
+  };
   /** Subidas en segundo plano (al cerrar un proyecto o cada pocos minutos) que están en curso. */
   const pushing = new Set();
   const isSynced = (dir) => {
@@ -188,9 +240,9 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
         const lock = acquireLock(dir, host, token, { force: input?.force === true });
         if (!lock.ok) return { locked: lock.holder };
         if (isSynced(dir)) {
-          if (folderReachable(link)) {
-            const rdir = remoteDirOf(link, ref);
-            const remote = await acquireRemoteLock(rdir, host, token, {
+          const prov = await tryProvider();
+          if (prov) {
+            const remote = await acquireRemoteLock(prov, remoteDirOf(ref), host, token, {
               force: input?.force === true,
             });
             if (!remote.ok) {
@@ -199,8 +251,8 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
             }
             // Si otro equipo subió una revisión y aquí no hay cambios, se baja antes de editar.
             try {
-              if (projectStatus(link, ref, dir, token).state === 'pull')
-                await syncProject(link, root, ref, { host, token });
+              if ((await projectStatus(prov, ref, dir, token)).state === 'pull')
+                await syncProject(prov, root, ref, { host, token });
             } catch {
               /* se abre con lo que hay; la tarjeta mostrará el estado */
             }
@@ -235,15 +287,19 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
   );
   handle(
     'projects:renew',
-    guarded((input) => {
+    guarded(async (input) => {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
       if (!held.has(ref)) return { ok: false };
       let ok = renewLock(dir, host, token);
-      if (ok && isSynced(dir) && folderReachable(link)) {
+      if (ok && isSynced(dir)) {
         try {
-          ok = renewRemoteLock(remoteDirOf(link, ref), host, token);
+          const prov = await tryProvider();
+          if (prov) {
+            ok = await renewRemoteLock(prov, remoteDirOf(ref), host, token);
+            if (!ok) notify({ ref, state: 'error', error: 'lock-expired' });
+          }
         } catch {
-          /* la carpeta no responde: se sigue con el bloqueo local */
+          /* el destino no responde: se sigue con el bloqueo local */
         }
       }
       if (!ok) held.delete(ref);
@@ -381,7 +437,7 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
     }),
   );
 
-  // ───────────── Sincronizar con una carpeta enlazada (fase 3) ─────────────
+  // ───────────── Sincronizar con una carpeta o un servidor (fases 3 y 3b) ─────────────
   const notify = (payload) => {
     try {
       getWindow()?.webContents?.send('projects:sync-event', payload);
@@ -393,16 +449,52 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
     error instanceof ProjectError
       ? { error: error.code, ...(error.detail === undefined ? {} : { detail: error.detail }) }
       : { error: error?.code === 'ENOSPC' ? 'disk-full' : 'io' };
+  /** Progreso de una sincronización: archivos, bytes, velocidad y bytes totales previstos. */
+  const syncHooks = () => {
+    const started = Date.now();
+    let bytes = 0;
+    let plan = { bytes: 0 };
+    let state = { done: 0, total: 0 };
+    let lastSent = 0;
+    const emit = (force) => {
+      const now = Date.now();
+      if (!force && now - lastSent < 250) return;
+      lastSent = now;
+      const seconds = Math.max(0.5, (now - started) / 1000);
+      send({
+        op: 'sync',
+        ...state,
+        bytes,
+        bytesTotal: plan.bytes,
+        speed: Math.round(bytes / seconds),
+      });
+    };
+    return {
+      onPlan: (value) => {
+        plan = value;
+      },
+      onBytes: (n) => {
+        bytes += n;
+        emit(false);
+      },
+      onProgress: (done, total) => {
+        state = { done, total };
+        emit(true);
+      },
+      shouldCancel: () => running?.cancel === true,
+    };
+  };
   /** Sube en segundo plano; si `release` es true suelta después el bloqueo remoto. No bloquea el cierre del proyecto. */
   const backgroundPush = async (ref, dir, release) => {
     if (!link || pushing.has(ref)) return;
     pushing.add(ref);
+    let prov = null;
     try {
-      if (!folderReachable(link)) throw new ProjectError('folder-missing');
+      prov = await provider();
       if (localDirty(dir, readState(dir)) && !running) {
         running = { op: 'sync', cancel: false };
         try {
-          await syncProject(link, root, ref, { host, token, held: !release });
+          await syncProject(prov, root, ref, { host, token, held: !release });
         } finally {
           running = null;
         }
@@ -412,9 +504,9 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       notify({ ref, state: 'error', ...errorOf(error) });
     } finally {
       pushing.delete(ref);
-      if (release && link && folderReachable(link)) {
+      if (release && prov) {
         try {
-          releaseRemoteLock(remoteDirOf(link, ref), token);
+          await releaseRemoteLock(prov, remoteDirOf(ref), token);
         } catch {
           /* se queda para que caduque */
         }
@@ -429,40 +521,81 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       return [];
     }
   };
+  /** Lo que la web puede saber del servidor: nunca la contraseña ni la frase de paso, solo si hay una guardada. */
+  const serverInfo = () =>
+    link?.kind === 'sftp'
+      ? {
+          host: link.host,
+          port: link.port,
+          username: link.username,
+          path: link.path,
+          authMode: link.authMode,
+          keyFile: link.keyFile,
+          fingerprint: link.fingerprint,
+          hostKeyType: link.hostKeyType,
+          credentialSaved: secrets.saved(),
+          credentialInSession: secrets.hasSession(),
+          secureStore: secrets.available(),
+        }
+      : undefined;
+  const failureOf = () => {
+    const error = connectFail?.error;
+    return error instanceof ProjectError ? error.code : undefined;
+  };
   handle(
     'sync:status',
-    guarded(() => {
+    guarded(async (input) => {
       if (!link) return { linked: false };
-      const reachable = folderReachable(link);
+      // Una petición explícita («Sincronizar ahora», «Reintentar») no espera al enfriamiento de los reintentos.
+      if (input?.fresh === true) connectFail = null;
+      const prov = await tryProvider();
+      const reachable = !!prov;
       const projects = localProjects();
       const statuses = {};
       for (const project of projects) {
         const { dir } = resolveRef(root, project.ref);
-        statuses[project.ref] = projectStatus(link, project.ref, dir, token);
+        statuses[project.ref] = prov
+          ? await projectStatus(prov, project.ref, dir, token).catch(() => ({ state: 'off' }))
+          : readState(dir)
+            ? { state: 'off', rev: readState(dir).baseRev, lastSync: readState(dir).lastSync }
+            : { state: 'none' };
         if (pushing.has(project.ref))
           statuses[project.ref] = { ...statuses[project.ref], busy: true };
       }
       const local = new Set(projects.map((p) => p.ref));
-      const available = reachable ? listRemote(link).filter((r) => !local.has(r.ref)) : [];
-      return { linked: true, folder: link, reachable, statuses, available };
+      const available = prov
+        ? (await listRemote(prov).catch(() => [])).filter((r) => !local.has(r.ref))
+        : [];
+      return {
+        linked: true,
+        kind: link.kind,
+        folder: link.kind === 'folder' ? link.folder : undefined,
+        label: link.kind === 'folder' ? link.folder : `${link.username}@${link.host}:${link.path}`,
+        server: serverInfo(),
+        reachable,
+        offlineReason: reachable ? undefined : failureOf(),
+        statuses,
+        available,
+      };
     }),
   );
   handle(
     'sync:choose',
     guarded(async () => {
+      if (link && link.kind !== 'folder') throw new ProjectError('already-linked');
       const result = await dialog.showOpenDialog(getWindow() ?? undefined, {
         properties: ['openDirectory', 'createDirectory'],
-        defaultPath: link ?? app.getPath('home'),
+        defaultPath: link?.folder ?? app.getPath('home'),
       });
       if (result.canceled || !result.filePaths[0]) return { canceled: true };
       chosen = null;
       const checked = validateFolder(result.filePaths[0], root);
-      chosen = checked.folder;
+      chosen = { kind: 'folder', folder: checked.folder };
       const projects = localProjects();
-      const remote = listRemote(chosen);
+      const remote = await listRemote(localProvider(checked.folder));
       const local = new Set(projects.map((p) => p.ref));
       return {
-        folder: chosen,
+        folder: checked.folder,
         free: checked.free,
         local: projects.length,
         remote: remote.filter((r) => !local.has(r.ref)).length,
@@ -470,30 +603,194 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       };
     }),
   );
+  /** Elegir el archivo de la clave privada (la web no puede escribir una ruta: solo este diálogo). */
+  handle(
+    'sync:sftp-choose-key',
+    guarded(async () => {
+      const result = await dialog.showOpenDialog(getWindow() ?? undefined, {
+        properties: ['openFile', 'showHiddenFiles'],
+        defaultPath: path.join(os.homedir(), '.ssh'),
+      });
+      if (result.canceled || !result.filePaths[0]) return { canceled: true };
+      pickedKey = result.filePaths[0];
+      return { keyFile: pickedKey };
+    }),
+  );
+  let pickedKey = '';
+  /** Lee la huella del servidor (sin enviar credenciales) para el diálogo «¿Es este tu servidor?». */
+  handle(
+    'sync:sftp-inspect',
+    guarded(async (input) => {
+      if (link && link.kind !== 'sftp') throw new ProjectError('already-linked');
+      const config = cleanConfig(input);
+      if (!config.host || /[\s/\\]/.test(config.host)) throw new ProjectError('bad-sftp-config');
+      const seen = await inspectHost(config);
+      inspectedHost = { host: config.host, port: config.port, ...seen };
+      const pinned =
+        link?.kind === 'sftp' && link.host === config.host && link.port === config.port
+          ? link.fingerprint
+          : '';
+      return {
+        fingerprint: seen.fingerprint,
+        type: seen.type,
+        changed: !!pinned && pinned !== seen.fingerprint,
+        previous: pinned || undefined,
+      };
+    }),
+  );
+  /** Tras confirmar a mano una huella nueva en un servidor ya enlazado: se fija la nueva (no hay «aceptar siempre»). */
+  handle(
+    'sync:sftp-trust',
+    guarded(async (input) => {
+      if (input?.accepted !== true || link?.kind !== 'sftp' || !inspectedHost)
+        throw new ProjectError('not-linked');
+      if (inspectedHost.host !== link.host || inspectedHost.port !== link.port)
+        throw new ProjectError('not-linked');
+      link = { ...link, fingerprint: inspectedHost.fingerprint, hostKeyType: inspectedHost.type };
+      writeFileSync(linkFile, JSON.stringify(link));
+      await closeConnection();
+      return { ok: true };
+    }),
+  );
+  /** «Probar conexión»: con los datos del diálogo o con el destino ya enlazado y su credencial guardada. */
+  handle(
+    'sync:sftp-test',
+    guarded(async (input) => {
+      const saved = input?.useSaved === true && link?.kind === 'sftp';
+      let config;
+      let secret;
+      if (saved) {
+        config = link;
+        secret = secrets.load() ?? {};
+      } else {
+        if (link && link.kind !== 'sftp') throw new ProjectError('already-linked');
+        config = cleanConfig(input?.config);
+        if (
+          !inspectedHost ||
+          inspectedHost.host !== config.host ||
+          inspectedHost.port !== config.port
+        )
+          throw new ProjectError('host-key-unknown');
+        config = {
+          ...config,
+          fingerprint: inspectedHost.fingerprint,
+          hostKeyType: inspectedHost.type,
+        };
+        if (config.authMode === 'key') {
+          if (!pickedKey) throw new ProjectError('key-unusable');
+          config.keyFile = pickedKey;
+        }
+        secret = {
+          password: asText(input?.secret?.password, 1024),
+          passphrase: asText(input?.secret?.passphrase, 1024),
+        };
+      }
+      const projects = localProjects();
+      const local = new Set(projects.map((p) => p.ref));
+      const out = await testConnection(config, secret, {
+        create: input?.create === true,
+        inspect: async (prov) => (await listRemote(prov)).filter((r) => !local.has(r.ref)).length,
+      });
+      if (out.ok && !saved) {
+        chosen = {
+          kind: 'sftp',
+          config,
+          secret,
+          remember: input?.remember !== false,
+        };
+      }
+      return {
+        ...out,
+        extra: undefined,
+        folder: `${config.username}@${config.host}:${config.path}`,
+        local: projects.length,
+        remote: out.extra ?? 0,
+        bytes: projects.reduce((sum, p) => sum + p.bytes, 0),
+        secureStore: secrets.available(),
+      };
+    }),
+  );
   handle(
     'sync:link',
-    guarded((input) => {
+    guarded(async (input) => {
       if (input?.accepted !== true || !chosen) throw new ProjectError('not-linked');
-      validateFolder(chosen, root);
-      link = chosen;
-      writeFileSync(linkFile, JSON.stringify({ folder: link }));
-      return { folder: link };
+      if (chosen.kind === 'folder') {
+        if (link && link.kind !== 'folder') throw new ProjectError('already-linked');
+        validateFolder(chosen.folder, root);
+        link = { kind: 'folder', folder: chosen.folder };
+        writeFileSync(linkFile, JSON.stringify({ kind: 'folder', folder: link.folder }));
+        return { folder: link.folder };
+      }
+      if (link && link.kind !== 'sftp') throw new ProjectError('already-linked');
+      link = { kind: 'sftp', ...chosen.config };
+      writeFileSync(linkFile, JSON.stringify(link));
+      await closeConnection();
+      const secret =
+        chosen.config.authMode === 'key'
+          ? { passphrase: chosen.secret.passphrase }
+          : { password: chosen.secret.password };
+      let saved = false;
+      const remember = input?.remember === undefined ? chosen.remember : input.remember !== false;
+      if (remember) saved = secrets.save(secret);
+      else secrets.remember(secret);
+      if (!saved && secrets.available() === false) secrets.remember(secret);
+      chosen = null;
+      return { folder: `${link.username}@${link.host}:${link.path}`, credentialSaved: saved };
+    }),
+  );
+  /** «Cambiar credencial»: guarda la nueva (o solo para esta sesión si no hay almacén seguro). */
+  handle(
+    'sync:sftp-credential',
+    guarded(async (input) => {
+      if (link?.kind !== 'sftp') throw new ProjectError('not-linked');
+      const secret =
+        link.authMode === 'key'
+          ? { passphrase: asText(input?.passphrase, 1024) }
+          : { password: asText(input?.password, 1024) };
+      if (!Object.values(secret)[0] && link.authMode === 'password')
+        throw new ProjectError('auth-failed');
+      let saved = false;
+      if (input?.remember !== false) saved = secrets.save(secret);
+      else secrets.remember(secret);
+      await closeConnection();
+      return { saved };
+    }),
+  );
+  handle(
+    'sync:sftp-forget',
+    guarded(async () => {
+      secrets.clear();
+      await closeConnection();
+      return { ok: true };
     }),
   );
   handle(
     'sync:unlink',
-    guarded(() => {
+    guarded(async () => {
+      if (link?.kind === 'sftp') {
+        for (const ref of held) {
+          try {
+            const prov = await tryProvider();
+            if (prov) await releaseRemoteLock(prov, remoteDirOf(ref), token);
+          } catch {
+            /* se queda para que caduque */
+          }
+        }
+        secrets.clear();
+      }
       link = null;
       chosen = null;
+      inspectedHost = null;
+      await closeConnection();
       rmSync(linkFile, { force: true });
       return { ok: true };
     }),
   );
-  /** Primera sincronización: sube los proyectos de este equipo y/o baja los de la carpeta. */
+  /** Primera sincronización: sube los proyectos de este equipo y/o baja los del destino. */
   handle(
     'sync:all',
     guarded(async (input) => {
-      if (!link) throw new ProjectError('not-linked');
+      const prov = await provider();
       const mode = ['both', 'down', 'manual', 'sync'].includes(input?.mode) ? input.mode : 'manual';
       if (mode === 'manual') return { synced: 0, failed: [], conflicts: [] };
       const projects = localProjects();
@@ -506,7 +803,7 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
           jobs.push({ ref: project.ref, name: project.name });
       }
       if (mode !== 'sync') {
-        for (const remote of listRemote(link))
+        for (const remote of await listRemote(prov))
           if (!local.has(remote.ref)) jobs.push({ ref: remote.ref, name: remote.name });
       }
       const out = { synced: 0, failed: [], conflicts: [] };
@@ -517,11 +814,11 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
           if (running?.cancel) throw new ProjectError('canceled');
           try {
             const result = await syncProject(
-              link,
+              prov,
               root,
               job.ref,
               { host, token, held: held.has(job.ref) },
-              { shouldCancel: () => running?.cancel === true },
+              syncHooks(),
             );
             if (result.conflict) out.conflicts.push(job.ref);
             else out.synced += 1;
@@ -544,7 +841,10 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       const { dir, ref } = resolveRef(root, asText(input?.ref, 300));
       const action = asText(input?.action, 12);
       if (action === 'stop') {
-        if (held.has(ref) && isSynced(dir)) releaseRemoteLock(remoteDirOf(link, ref), token);
+        if (held.has(ref) && isSynced(dir)) {
+          const prov = await tryProvider();
+          if (prov) await releaseRemoteLock(prov, remoteDirOf(ref), token);
+        }
         rmSync(path.join(dir, '.sync.json'), { force: true });
         return { ok: true };
       }
@@ -558,14 +858,9 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
       const resolution = ['mine', 'theirs', 'later'].includes(input?.resolution)
         ? input.resolution
         : undefined;
+      const prov = await provider();
       const out = await exclusive('sync', () =>
-        syncProject(
-          link,
-          root,
-          ref,
-          { host, token, held: held.has(ref), resolution },
-          hooksFor('sync'),
-        ),
+        syncProject(prov, root, ref, { host, token, held: held.has(ref), resolution }, syncHooks()),
       );
       return out;
     }),
@@ -573,8 +868,8 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
   handle(
     'sync:reveal',
     guarded((input) => {
-      if (!link) throw new ProjectError('not-linked');
-      const rdir = remoteDirOf(link, asText(input?.ref, 300));
+      if (link?.kind !== 'folder') return { ok: true };
+      const rdir = path.join(link.folder, remoteDirOf(asText(input?.ref, 300)));
       if (existsSync(rdir)) shell?.showItemInFolder?.(rdir);
       return { ok: true };
     }),
@@ -598,18 +893,28 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow }) {
         }
       }
     },
-    releaseAll() {
+    /** Al salir: suelta los bloqueos locales y, con un poco de margen, los del destino. */
+    async releaseAll() {
+      const remotes = [];
       for (const ref of held) {
         try {
           const { dir } = resolveRef(root, ref);
-          if (link && readState(dir) && folderReachable(link))
-            releaseRemoteLock(remoteDirOf(link, ref), token);
+          if (link && readState(dir)) {
+            remotes.push(
+              (async () => {
+                const prov = await tryProvider();
+                if (prov) await releaseRemoteLock(prov, remoteDirOf(ref), token);
+              })().catch(() => undefined),
+            );
+          }
           releaseLock(dir, token);
         } catch {
           /* ya no está */
         }
       }
       held.clear();
+      await Promise.race([Promise.all(remotes), new Promise((r) => setTimeout(r, 3000))]);
+      await closeConnection();
     },
     renewAll() {
       for (const ref of held) {

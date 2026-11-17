@@ -213,6 +213,7 @@ import {
   toRgbString,
 } from '../../utils/color.utils';
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
+import { offsetFieldCopy } from '../../utils/paste-offset.utils';
 import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
 import {
   type AdjustAnchorRow,
@@ -2309,21 +2310,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const pdfCanvas = this.pdfCanvasRef?.nativeElement ?? null;
     const newField: PageField = { ...this.clipboard };
 
-    if (pdfCanvas) {
-      const scale = this.scale();
-      const offset = this.roundToTwo(8 / scale);
-      const maxX = this.roundToTwo(pdfCanvas.width / scale);
-      const maxY = this.roundToTwo(pdfCanvas.height / scale);
-      newField.x = this.roundToTwo(this.clamp(newField.x + offset, 0, maxX));
-      newField.y = this.roundToTwo(this.clamp(newField.y + offset, 0, maxY));
-    }
+    const pasted = pdfCanvas
+      ? offsetFieldCopy(newField, this.scale(), pdfCanvas.width, pdfCanvas.height, 1)
+      : newField;
 
     let insertedFieldIndex = -1;
     let insertedPageIndex = -1;
 
     const changed = this.applyCoordsChange(() => {
       this.coords.update((pages) => {
-        const updated = addFieldToPages(pageNum, newField, pages);
+        const updated = addFieldToPages(pageNum, pasted, pages);
         insertedPageIndex = updated.findIndex((page) => page.num === pageNum);
         if (insertedPageIndex >= 0) {
           insertedFieldIndex = updated[insertedPageIndex].fields.length - 1;
@@ -5072,14 +5068,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const pageNum = this.pageIndex();
-    const offset = this.roundToTwo(8 / scale);
-    const maxX = this.roundToTwo(pdfCanvas.width / scale);
-    const maxY = this.roundToTwo(pdfCanvas.height / scale);
-    const copies = fields.map((field) => ({
-      ...field,
-      x: this.roundToTwo(this.clamp(field.x + offset, 0, maxX)),
-      y: this.roundToTwo(this.clamp(field.y - offset, 0, maxY)),
-    }));
+    const copies = fields.map((field) =>
+      offsetFieldCopy(field, scale, pdfCanvas.width, pdfCanvas.height, -1),
+    );
 
     let firstIndex = 0;
     const changed = this.applyCoordsChange(() =>

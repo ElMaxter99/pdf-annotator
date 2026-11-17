@@ -1890,7 +1890,9 @@
         "warnTitle": "Prima di collegare",
         "warnText": "I PDF lasceranno questo computer verso quella cartella e viaggeranno attraverso il servizio che la sincronizza. L’app non li cifra. Usa solo cartelle di cui ti fidi.",
         "accept": "Capisco che i PDF e i loro dati verranno copiati in quella cartella",
-        "button": "Collega"
+        "button": "Collega",
+        "tabFolder": "Cartella del computer",
+        "tabSftp": "Server SFTP"
       },
       "plan": {
         "title": "Cosa caricare nella cartella collegata?",
@@ -1908,7 +1910,10 @@
         "files": "File {{done}} di {{total}}",
         "projects": "Progetto {{done}} di {{total}}: «{{name}}»",
         "starting": "Preparazione…",
-        "note": "Vengono caricati o scaricati solo i file modificati. Puoi annullare: la revisione precedente resta intatta."
+        "note": "Vengono caricati o scaricati solo i file modificati. Puoi annullare: la revisione precedente resta intatta.",
+        "bytes": "{{bytes}} di {{total}} · {{speed}}/s · mancano circa {{eta}}",
+        "minutes": "{{m}} min {{s}} s",
+        "seconds": "{{s}} s"
       },
       "done": {
         "up": "«{{name}}» caricato (revisione {{rev}}). Potrebbero servire alcuni minuti prima che compaia sugli altri computer.",
@@ -1944,7 +1949,24 @@
         "text": "«{{folder}}» non risponde (rete assente, servizio chiuso o disco scollegato?). Puoi continuare a lavorare: le modifiche resteranno «In attesa di caricamento» e verranno caricate al ritorno.",
         "retry": "Riprova",
         "other": "Scegli un’altra cartella",
-        "continue": "Continua offline"
+        "continue": "Continua offline",
+        "review": "Controlla il server",
+        "host-not-found": {
+          "title": "Server non trovato",
+          "text": "«{{host}}» non risponde (rete assente, nome errato, server spento o porta {{port}} bloccata). Puoi continuare a lavorare: le modifiche resteranno «In attesa di caricamento»."
+        },
+        "connect-timeout": {
+          "title": "Tempo scaduto",
+          "text": "Il server ha impiegato più di 15 s a rispondere. Se usi una VPN, controlla che sia connessa. Il lavoro locale continua a funzionare."
+        },
+        "connection-refused": {
+          "title": "Il server rifiuta la connessione",
+          "text": "«{{host}}» è in rete ma non accetta connessioni SSH sulla porta {{port}}. Controlla che il servizio SSH sia attivo."
+        },
+        "connection-lost": {
+          "title": "La connessione è andata persa",
+          "text": "La connessione a «{{host}}» si è interrotta. Non si è perso nulla: la revisione precedente è intatta e si riproverà al ritorno."
+        }
       },
       "stop": {
         "title": "Smettere di sincronizzare «{{name}}»?",
@@ -1971,7 +1993,140 @@
         "in-use": "{{detail}} lo ha aperto. Potrà essere caricato quando lo chiuderà.",
         "disk-full": "Spazio insufficiente: mancano circa {{detail}} MB. Nulla è stato lasciato a metà.",
         "not-linked": "Prima collega una cartella.",
-        "newer-format": "Questa cartella è usata da una versione più recente dell’app. Aggiorna e riprova."
+        "newer-format": "Questa cartella è usata da una versione più recente dell’app. Aggiorna e riprova.",
+        "host-key-changed": "L’impronta del server è cambiata: non è stato inviato nulla. Conferma con chi lo amministra.",
+        "host-key-unknown": "Prima occorre confermare l’impronta del server.",
+        "host-not-found": "Server non trovato (rete assente, nome errato o server spento).",
+        "connect-timeout": "Il server ha impiegato troppo a rispondere.",
+        "connection-refused": "Il server non accetta connessioni SSH su quella porta.",
+        "connection-lost": "La connessione al server è andata persa. La revisione precedente è intatta; si riproverà al ritorno.",
+        "auth-failed": "Utente o password errati.",
+        "bad-passphrase": "La passphrase non è corretta.",
+        "passphrase-needed": "La chiave richiede una passphrase.",
+        "key-unusable": "La chiave non è utilizzabile: il file non esiste, non è leggibile o non è una chiave privata valida (sono supportati OpenSSH e PEM).",
+        "secret-needed": "Scrivi la password del server per connetterti.",
+        "remote-missing": "La cartella non esiste sul server.",
+        "rename-unsupported": "Il server non consente di rinominare file in quella cartella. Senza questo non si può garantire che nulla resti a metà, quindi non si carica.",
+        "lock-expired": "Il tuo blocco sul server è scaduto: un altro computer potrebbe aver aperto questo progetto. Chiudilo e riaprilo.",
+        "already-linked": "C’è già una destinazione collegata. Scollegala prima di sceglierne un’altra.",
+        "bad-sftp-config": "Mancano dati del server o non sono validi."
+      },
+      "sftp": {
+        "title": "Sincronizza con un server SFTP",
+        "intro": "Usa un server che hai già (un NAS, un VPS, quello della tua azienda). L’app vi conserverà una copia dei progetti per aprirli su un altro computer.",
+        "host": "Server",
+        "port": "Porta",
+        "user": "Utente",
+        "auth": "Come accedi",
+        "authPassword": "Password",
+        "authKey": "Chiave privata",
+        "password": "Password",
+        "passphrase": "Passphrase (se la chiave ne ha una)",
+        "keyFile": "File della chiave",
+        "keyChoose": "Scegli file…",
+        "keyNone": "Nessun file scelto",
+        "path": "Cartella sul server",
+        "remember": "Ricorda la credenziale nell’archivio sicuro",
+        "rememberHint": "Altrimenti viene chiesta ogni volta che apri l’app.",
+        "credTitle": "Dove va la tua credenziale",
+        "credText": "Viene salvata con la cifratura del sistema (Portachiavi, DPAPI o libsecret). Non viene salvata altrove e non compare nei file esportati.",
+        "checked": "Connessione verificata: {{folder}}",
+        "warnTitle": "Prima di collegare",
+        "warnText": "I tuoi PDF usciranno da questo computer verso quel server via SSH e non vengono cifrati sul server. Usa solo server di cui ti fidi.",
+        "accept": "Capisco che i PDF e i loro dati verranno copiati su quel server",
+        "test": "Prova la connessione",
+        "footer": "Server SFTP:",
+        "footOk": "Connesso",
+        "footOff": "Nessuna connessione al server",
+        "manage": "Server e credenziali"
+      },
+      "test": {
+        "title": "Prova la connessione",
+        "running": "Prova della connessione in corso",
+        "connecting": "Connessione a {{host}}…",
+        "back": "Indietro",
+        "step": {
+          "login": "Accesso riuscito: impronta confermata e credenziale accettata",
+          "loginBad": "Impossibile accedere",
+          "folder": "La cartella sul server è disponibile",
+          "folderBad": "La cartella sul server non è stata trovata",
+          "write": "Lì si può leggere, scrivere e rinominare",
+          "writeBad": "Lì non si può scrivere o rinominare"
+        }
+      },
+      "hostkey": {
+        "titleNew": "È questo il tuo server?",
+        "textNew": "È la prima volta che ti connetti a «{{host}}». Controlla che questa impronta coincida con quella fornita da chi amministra il server.",
+        "warnTitle": "Attenzione",
+        "warnText": "Se non puoi verificarla, annulla. Accettare un’impronta falsa permetterebbe a un terzo di vedere i tuoi PDF.",
+        "trust": "Fidati e continua",
+        "titleChanged": "L’impronta di «{{host}}» è cambiata",
+        "textChanged": "Il server potrebbe essere stato reinstallato, oppure qualcuno si sta spacciando per lui. Per sicurezza non è stato inviato nulla né usata la credenziale.",
+        "before": "Prima",
+        "now": "Ora",
+        "blocked": "Bloccato",
+        "blockedText": "Conferma la modifica con chi amministra il server prima di accettarla.",
+        "trustNew": "Fidati della nuova impronta…",
+        "pinned": "Nuova impronta fissata. Ora puoi sincronizzare."
+      },
+      "cred": {
+        "title": {
+          "auth": "Utente o password errati",
+          "passphrase": "La passphrase non è corretta",
+          "ask": "Scrivi la password di «{{host}}»",
+          "change": "Cambia la credenziale di «{{host}}»"
+        },
+        "text": {
+          "auth": "Il server ha rifiutato la credenziale salvata. Scrivi quella nuova; la precedente viene sostituita nell’archivio sicuro.",
+          "passphrase": "Impossibile aprire la chiave «{{file}}» con questa passphrase.",
+          "ask": "Non è salvata su questo computer. Verrà usata solo finché l’app resta aperta.",
+          "change": "Scrivi quella nuova; la precedente viene sostituita. Quella attuale non si può leggere."
+        },
+        "save": "Salva e riprova",
+        "connect": "Connetti",
+        "later": "Non ora",
+        "saved": "Credenziale salvata.",
+        "forgotten": "Credenziale dimenticata. La prossima volta dovrai scriverla."
+      },
+      "nostore": {
+        "title": "Impossibile salvare la password",
+        "text": "Questo computer non ha un archivio sicuro disponibile (su Linux spesso manca il portachiavi). Per sicurezza l’app non la salva in nessun file.",
+        "ask": "Chiederla ogni volta che apro l’app",
+        "askHint": "Funziona allo stesso modo; scrivi la password una sola volta per sessione.",
+        "install": "Installa un portachiavi e riprova",
+        "installHint": "Per esempio gnome-keyring o KWallet. Si riprova alla chiusura di questo avviso."
+      },
+      "server": {
+        "title": "Server e credenziali",
+        "server": "Server",
+        "serverValue": "{{host}} · porta {{port}}",
+        "user": "Utente",
+        "folder": "Cartella",
+        "fingerprint": "Impronta",
+        "credential": "Credenziale",
+        "credSavedPass": "Salvata nell’archivio sicuro (password)",
+        "credSavedKey": "Salvata nell’archivio sicuro (passphrase)",
+        "credSession": "Solo per questa sessione (nessun archivio sicuro)",
+        "credNone": "Non salvata: verrà chiesta alla connessione",
+        "change": "Cambia credenziale…",
+        "forget": "Dimentica credenziale",
+        "test": "Prova la connessione",
+        "close": "Chiudi",
+        "other": "Scegli un altro server o cartella",
+        "unlink": "Scollega"
+      },
+      "forget": {
+        "title": "Dimenticare la credenziale di «{{host}}»?",
+        "text": "Viene eliminata dall’archivio sicuro di questo computer. I progetti e ciò che è già stato caricato non vengono toccati; la prossima volta dovrai scriverla.",
+        "button": "Dimentica credenziale"
+      },
+      "unlinkSftp": {
+        "title": "Scollegare il server?",
+        "text": "Il collegamento con «{{label}}» viene rimosso e la credenziale eliminata da questo computer. I tuoi progetti restano qui; ciò che hai già caricato resta sul server e l’app non lo elimina."
+      },
+      "remote": {
+        "create": "Crea cartella",
+        "other": "Sceglierne un’altra"
       }
     }
   }
