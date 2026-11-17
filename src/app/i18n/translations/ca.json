@@ -1065,7 +1065,10 @@
       "readyDone": "{{count}} PDF marcats com a Fet",
       "undo": "Desfés",
       "downloaded": "Descàrrega a punt · {{count}} fitxers JSON",
-      "downloadedSkipped": "Descàrrega a punt · {{count}} fitxers JSON · {{skipped}} sense validar no s’han inclòs"
+      "downloadedSkipped": "Descàrrega a punt · {{count}} fitxers JSON · {{skipped}} sense validar no s’han inclòs",
+      "tables": "Suggerir taules",
+      "noneTables": "Cap dels marcats té versió B",
+      "tablesDone": "Taules de pàgines aplicades: {{count}}."
     },
     "funnel": {
       "label": "Resum del lot",
@@ -1095,6 +1098,43 @@
     },
     "pageMap": {
       "chip": "Pàgines emparellades"
+    },
+    "tables": {
+      "title": "Suggerir taules de pàgines",
+      "preparing": "Comptant les pàgines…",
+      "pending": "Pendent",
+      "intro": "Poden rebre una taula: {{count}} de {{total}} PDF. Es compara el text de cada pàgina d'A amb el de B, al teu equip i sense IA.",
+      "willSuggest": "Se suggerirà una taula",
+      "pdfCount": "{{count}} PDF",
+      "skipSame": "S'ometen: mateixes pàgines a A i B",
+      "skipHasMap": "S'ometen: ja tenen taula",
+      "skipNoB": "S'ometen: sense versió B",
+      "replace": "Substitueix també les taules que ja tenen",
+      "start": "Suggerir taules ({{count}})",
+      "nothing": "Cap dels PDF seleccionats necessita una taula: tenen les mateixes pàgines a A i B, ja tenen taula o no tenen versió B.",
+      "understood": "Entesos",
+      "running": "Suggerint taules…",
+      "counter": "{{done}} de {{total}}",
+      "keepIfCancel": "Les que ja estan fetes es conserven si cancel·les",
+      "doneTitle": "Taules suggerides",
+      "appliedCount": "Taules aplicades: {{count}}",
+      "doneText": "S'apliquen les que encaixen amb claredat. Continuen sent editables des d'«Aparellar pàgines…».",
+      "cancelledTitle": "Suggeriment cancel·lat",
+      "cancelledText": "Taules aplicades: {{applied}}. PDF sense tocar: {{untouched}}. Pots tornar-ho a llançar quan vulguis.",
+      "noTextHint": "Els PDF sense text (escanejats) es poden aparellar a mà amb «Aparellar pàgines…».",
+      "waiting": "Esperen la teva revisió: {{count}}",
+      "retry": "Reintentar els fallits",
+      "close": "Tanca",
+      "review": "Revisa {{name}}",
+      "state": {
+        "pending": "Pendent",
+        "reading": "Llegint textos…",
+        "applied": "Aplicada · {{matched}} de {{total}} aparellades",
+        "doubt": "Amb dubtes · sense aplicar",
+        "noText": "Sense text per comparar",
+        "error": "No s'ha pogut llegir",
+        "untouched": "Sense tocar"
+      }
     }
   },
   "preview": {

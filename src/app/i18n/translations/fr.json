@@ -1065,7 +1065,10 @@
       "readyDone": "{{count}} PDF marqués Terminé",
       "undo": "Annuler",
       "downloaded": "Téléchargement prêt · {{count}} fichiers JSON",
-      "downloadedSkipped": "Téléchargement prêt · {{count}} fichiers JSON · {{skipped}} non validés exclus"
+      "downloadedSkipped": "Téléchargement prêt · {{count}} fichiers JSON · {{skipped}} non validés exclus",
+      "tables": "Suggérer des tables",
+      "noneTables": "Aucun des PDF cochés n'a de version B",
+      "tablesDone": "Tables de pages appliquées : {{count}}."
     },
     "funnel": {
       "label": "Résumé du lot",
@@ -1095,6 +1098,43 @@
     },
     "pageMap": {
       "chip": "Pages appariées"
+    },
+    "tables": {
+      "title": "Suggérer des tables de pages",
+      "preparing": "Comptage des pages…",
+      "pending": "En attente",
+      "intro": "Peuvent recevoir une table : {{count}} PDF sur {{total}}. Le texte de chaque page de A est comparé à celui de B, sur votre ordinateur et sans IA.",
+      "willSuggest": "Une table sera suggérée",
+      "pdfCount": "{{count}} PDF",
+      "skipSame": "Ignorés : mêmes pages dans A et B",
+      "skipHasMap": "Ignorés : ont déjà une table",
+      "skipNoB": "Ignorés : sans version B",
+      "replace": "Remplacer aussi les tables existantes",
+      "start": "Suggérer des tables ({{count}})",
+      "nothing": "Aucun des PDF sélectionnés n'a besoin d'une table : mêmes pages dans A et B, table déjà présente ou pas de version B.",
+      "understood": "Compris",
+      "running": "Suggestion des tables…",
+      "counter": "{{done}} sur {{total}}",
+      "keepIfCancel": "Les tables déjà faites sont conservées si vous annulez",
+      "doneTitle": "Tables suggérées",
+      "appliedCount": "Tables appliquées : {{count}}",
+      "doneText": "Celles qui concordent clairement sont appliquées. Elles restent modifiables depuis « Associer les pages… ».",
+      "cancelledTitle": "Suggestion annulée",
+      "cancelledText": "Tables appliquées : {{applied}}. PDF non modifiés : {{untouched}}. Vous pouvez la relancer quand vous voulez.",
+      "noTextHint": "Les PDF sans texte (numérisés) peuvent être associés à la main avec « Associer les pages… ».",
+      "waiting": "En attente de votre revue : {{count}}",
+      "retry": "Réessayer les échecs",
+      "close": "Fermer",
+      "review": "Revoir {{name}}",
+      "state": {
+        "pending": "En attente",
+        "reading": "Lecture des textes…",
+        "applied": "Appliquée · {{matched}} sur {{total}} associées",
+        "doubt": "Doute · non appliquée",
+        "noText": "Aucun texte à comparer",
+        "error": "Lecture impossible",
+        "untouched": "Non modifié"
+      }
     }
   },
   "preview": {

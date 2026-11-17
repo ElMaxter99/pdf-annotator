@@ -1065,7 +1065,10 @@
       "readyDone": "{{count}} PDFs marked as Done",
       "undo": "Undo",
       "downloaded": "Download ready · {{count}} JSON files",
-      "downloadedSkipped": "Download ready · {{count}} JSON files · {{skipped}} not validated were left out"
+      "downloadedSkipped": "Download ready · {{count}} JSON files · {{skipped}} not validated were left out",
+      "tables": "Suggest tables",
+      "noneTables": "None of the marked PDFs has a B version",
+      "tablesDone": "Page tables applied: {{count}}."
     },
     "funnel": {
       "label": "Batch summary",
@@ -1095,6 +1098,43 @@
     },
     "pageMap": {
       "chip": "Pages matched"
+    },
+    "tables": {
+      "title": "Suggest page tables",
+      "preparing": "Counting pages…",
+      "pending": "Pending",
+      "intro": "Can get a table: {{count}} of {{total}} PDFs. The text of each page of A is compared with B, on your computer and without AI.",
+      "willSuggest": "A table will be suggested",
+      "pdfCount": "{{count}} PDFs",
+      "skipSame": "Skipped: same pages in A and B",
+      "skipHasMap": "Skipped: already have a table",
+      "skipNoB": "Skipped: no B version",
+      "replace": "Also replace the tables they already have",
+      "start": "Suggest tables ({{count}})",
+      "nothing": "None of the selected PDFs needs a table: they have the same pages in A and B, already have a table or have no B version.",
+      "understood": "Got it",
+      "running": "Suggesting tables…",
+      "counter": "{{done}} of {{total}}",
+      "keepIfCancel": "Tables already done are kept if you cancel",
+      "doneTitle": "Tables suggested",
+      "appliedCount": "Tables applied: {{count}}",
+      "doneText": "The ones that match clearly are applied. They stay editable from «Match pages…».",
+      "cancelledTitle": "Suggestion cancelled",
+      "cancelledText": "Tables applied: {{applied}}. PDFs left untouched: {{untouched}}. You can run it again whenever you want.",
+      "noTextHint": "PDFs without text (scanned) can be matched by hand with «Match pages…».",
+      "waiting": "Waiting for your review: {{count}}",
+      "retry": "Retry the failed ones",
+      "close": "Close",
+      "review": "Review {{name}}",
+      "state": {
+        "pending": "Pending",
+        "reading": "Reading texts…",
+        "applied": "Applied · {{matched}} of {{total}} matched",
+        "doubt": "Doubtful · not applied",
+        "noText": "No text to compare",
+        "error": "Could not be read",
+        "untouched": "Untouched"
+      }
     }
   },
   "preview": {

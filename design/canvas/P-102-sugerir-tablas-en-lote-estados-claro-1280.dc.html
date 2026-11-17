@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-102 Sugerir tablas en lote · estados · claro 1280</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.root{width:1280px;box-sizing:border-box;padding:56px 64px 64px;background:#eef0f6;color:#0f172a;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:28px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.lead{margin:0;max-width:1200px;font-size:16px;line-height:1.55;color:#475569}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#475569}
+.row{display:flex;gap:24px;align-items:stretch}
+.pn{flex:1;min-width:0;box-sizing:border-box;padding:20px;border-radius:14px;display:flex;flex-direction:column;gap:12px}
+.pn.dk{--panel:#2a2a3d;--accent:#5eead4;--muted:#b0b0b0;--bd:#3f3f58;--ab:#0b3b36;--warn:#fbbf24;--bad:#fca5a5;background:#1e1e2f;color:#f5f5f5;border:1px solid #34344a}
+.pn.lt{--panel:#ffffff;--accent:#0f766e;--muted:#475569;--bd:#c5ccdb;--ab:#d9f3ee;--warn:#92400e;--bad:#b91c1c;background:#f6f7fb;color:#0f172a;border:1px solid #d7dde9}
+.pt{margin:0;font-size:15px;font-weight:600}
+.pc{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+.dg{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;max-width:620px}
+.dh{font-size:16px;font-weight:600}
+.dp{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.df{display:flex;justify-content:flex-end;gap:10px;align-items:center}
+.df .sp{margin-right:auto;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.b{font:inherit;font-size:13.5px;padding:8px 14px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:inherit;display:inline-block}
+.b.pr{background:var(--accent);border-color:var(--accent);color:#06201d;font-weight:600}
+.pn.lt .b.pr{color:#fff}
+.b.sm{padding:5px 10px;font-size:12.5px}
+.cb{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+.cb.c{background:var(--accent);border-color:var(--accent);color:#06201d}
+.pn.lt .cb.c{color:#fff}
+.bar{height:10px;border-radius:999px;background:var(--bd);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.cnt{margin:0;font-size:13.5px}
+.ls{display:flex;flex-direction:column;gap:6px}
+.rw{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;border:1px solid var(--bd);font-size:13.5px}
+.rw .nm{font-weight:500;flex:1;min-width:0}
+.rw .pg{font-size:12px;color:var(--muted);white-space:nowrap}
+.rw.on{background:var(--ab);border-color:var(--accent)}
+.rw.off{opacity:.62}
+.chip{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--bd);white-space:nowrap;color:var(--muted)}
+.chip.ok{color:var(--accent);border-color:var(--accent)}
+.chip.wr{color:var(--warn);border-color:var(--warn)}
+.chip.er{color:var(--bad);border-color:var(--bad)}
+.chip.run{color:var(--fg2,inherit);border-color:var(--accent)}
+.chip.run::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--accent)}
+.selbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 14px;font-size:13.5px}
+.selbar b.n{margin-right:6px}
+.tick{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#06201d;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex:none}
+.pn.lt .tick{color:#fff}
+.done{display:flex;gap:14px;align-items:center}.done p{margin:2px 0 0}
+.undo{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;font-size:13.5px}
+.undo small{margin-left:auto;color:var(--muted);font-size:12px}
+.opt{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.opt.rec{border-color:var(--accent);background:var(--ab)}
+.opt h4{margin:0;font-size:15px}.opt p{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.opt ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.tag{font-size:12px;font-weight:600;color:var(--accent)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.rule{background:#ffffff;border:1px solid #d7dde9;border-radius:12px;padding:20px 22px}
+.rule h4{margin:0 0 8px;font-size:15px;color:#0f766e}
+.rule p{margin:0;font-size:14px;line-height:1.55;color:#475569}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.step{background:#ffffff;border:1px solid #d7dde9;border-radius:12px;padding:16px 18px}
+.step b{display:block;margin-bottom:6px;color:#0f766e;font-size:14px}
+.step p{margin:0;font-size:13.5px;line-height:1.5;color:#475569}
+</style>
+</helmet>
+<div class="root">
+<div><div class="lbl">Propuesta · claro · 1280 px</div><h1>Sugerir tablas: todos los estados</h1></div><div class="row"><section class="pn lt"><h3 class="pt">1 · Entrada en el panel del lote</h3><p class="pc">La barra de selección ya existente gana una acción; sin selección no aparece.</p><div class="dg" style="max-width:none"><div class="selbar"><b class="n">6 seleccionados</b><span class="b sm">Cambiar estado ▾</span><span class="b sm">Trasladar con IA</span><span class="b sm pr">Sugerir tablas de páginas</span><span class="b sm">Quitar</span><small style="margin-left:auto;color:var(--muted)">Desmarcar todo</small></div><div class="ls"><div class="rw on"><span class="cb c">✓</span><span class="nm">factura-0412.pdf</span><span class="pg">A 3 · B 4</span><span class="chip wr">Distinto nº de páginas</span></div><div class="rw on"><span class="cb c">✓</span><span class="nm">factura-0413.pdf</span><span class="pg">A 3 · B 4</span><span class="chip wr">Distinto nº de páginas</span></div><div class="rw on"><span class="cb c">✓</span><span class="nm">albaran-221.pdf</span><span class="pg">A 2 · B 2</span><span class="chip ">Páginas iguales</span></div><div class="rw on"><span class="cb c">✓</span><span class="nm">contrato-marco.pdf</span><span class="pg">A 6 · B 8</span><span class="chip ok">Páginas emparejadas</span></div><div class="rw on"><span class="cb c">✓</span><span class="nm">recibo-mayo.pdf</span><span class="pg">A 1 · B —</span><span class="chip ">Sin versión B</span></div><div class="rw on"><span class="cb c">✓</span><span class="nm">pedido-9087.pdf</span><span class="pg">A 5 · B 6</span><span class="chip wr">Distinto nº de páginas</span></div><div class="rw"><span class="cb "></span><span class="nm">nota-entrega.pdf</span><span class="pg">A 2 · B 3</span><span class="chip wr">Distinto nº de páginas</span></div></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">2 · Confirmar qué se hará</h3><p class="pc">Resumen antes de empezar; lo hecho a mano no se toca salvo que se marque.</p><div class="dg"><div class="dh">Sugerir tablas de páginas</div><p class="dp">De los 6 PDF seleccionados, 3 pueden recibir una tabla. Se compara el texto de cada página de A con el de B, en tu equipo y sin IA.</p><div class="ls"><div class="rw"><span class="nm">Se sugerirá una tabla</span><span class="pg">A 3 PDF · B </span><span class="chip ok">con A y B de distinto nº de páginas</span></div><div class="rw"><span class="nm">Se omiten</span><span class="pg">A 2 PDF · B </span><span class="chip ">ya tienen tabla (1) o iguales (1)</span></div><div class="rw"><span class="nm">Se omiten</span><span class="pg">A 1 PDF · B </span><span class="chip ">sin versión B</span></div></div><label class="rw" style="border:none;padding:2px"><span class="cb"></span><span class="nm">También sustituir las tablas ya hechas a mano</span></label><div class="df"><button class="b">Cancelar</button><button class="b pr">Sugerir 3 tablas</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">3 · Progreso con contador</h3><p class="pc">«2 de 3», una fila por PDF con su estado; la cola corre en serie y se puede cancelar.</p><div class="dg"><div class="dh">Sugiriendo tablas…</div><div class="bar"><i style="width:66%"></i></div><p class="cnt"><b>2 de 3</b> · pedido-9087.pdf</p><div class="ls"><div class="rw"><span class="nm">factura-0412.pdf</span><span class="pg">A 3 · B 4</span><span class="chip ok">✓ Sugerida · 3 de 4 emparejadas</span></div><div class="rw"><span class="nm">factura-0413.pdf</span><span class="pg">A 3 · B 4</span><span class="chip ok">✓ Sugerida · 3 de 4 emparejadas</span></div><div class="rw"><span class="nm">pedido-9087.pdf</span><span class="pg">A 5 · B 6</span><span class="chip run">Leyendo textos…</span></div></div><div class="df"><span class="sp">Las ya hechas se conservan si cancelas</span><button class="b">Cancelar</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">4 · Resultado y «Deshacer»</h3><p class="pc">Lo claro se aplica y se puede deshacer 10 s; lo dudoso no se toca y se revisa en el diálogo de siempre.</p><div class="dg"><div class="dh">Tablas sugeridas</div><div class="done"><span class="tick">✓</span><div><b>2 tablas aplicadas</b><p class="dp">Aplicadas porque casan con claridad. Siguen editables desde «Emparejar páginas…».</p></div></div><div class="ls"><div class="rw"><span class="nm">factura-0412.pdf</span><span class="pg">A 3 · B 4</span><span class="chip ok">Aplicada</span></div><div class="rw"><span class="nm">factura-0413.pdf</span><span class="pg">A 3 · B 4</span><span class="chip ok">Aplicada</span></div><div class="rw"><span class="nm">pedido-9087.pdf</span><span class="pg">A 5 · B 6</span><span class="chip wr">Con dudas · sin aplicar</span></div></div><div class="df"><span class="sp">1 espera tu revisión</span><button class="b">Cerrar</button><button class="b pr">Revisar pedido-9087.pdf</button></div></div>
+<div class="undo"><span>2 tablas aplicadas.</span><span class="b sm">Deshacer</span><small>10 s</small></div></section></div><div class="lbl">Estados</div><div class="row"><section class="pn lt"><h3 class="pt">5 · Nada que sugerir</h3><p class="pc">Si la selección no tiene candidatos.</p><div class="dg"><div class="dh">Sugerir tablas de páginas</div><p class="dp">Ninguno de los PDF seleccionados necesita una tabla: tienen las mismas páginas en A y B, ya tienen tabla o no tienen versión B.</p><div class="df"><button class="b pr">Entendido</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">6 · Cancelada</h3><p class="pc">Se conserva lo ya hecho; lo pendiente queda como estaba.</p><div class="dg"><div class="dh">Sugerencia cancelada</div><p class="dp">Se aplicó 1 tabla y 2 PDF quedaron sin tocar. Puedes volver a lanzarlo cuando quieras.</p><div class="ls"><div class="rw"><span class="nm">factura-0412.pdf</span><span class="pg">A 3 · B 4</span><span class="chip ok">Aplicada</span></div><div class="rw"><span class="nm">factura-0413.pdf</span><span class="pg">A 3 · B 4</span><span class="chip ">Sin tocar</span></div><div class="rw"><span class="nm">pedido-9087.pdf</span><span class="pg">A 5 · B 6</span><span class="chip ">Sin tocar</span></div></div><div class="df"><button class="b pr">Cerrar</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">7 · Sin textos y errores por fila</h3><p class="pc">Un PDF escaneado o ilegible no detiene la cola.</p><div class="dg"><div class="dh">Tablas sugeridas</div><div class="ls"><div class="rw"><span class="nm">albaran-221.pdf</span><span class="pg">A 2 · B 3</span><span class="chip wr">Sin texto que comparar</span></div><div class="rw"><span class="nm">pedido-9087.pdf</span><span class="pg">A 5 · B 6</span><span class="chip er">No se pudo leer B</span></div><div class="rw"><span class="nm">factura-0412.pdf</span><span class="pg">A 3 · B 4</span><span class="chip ok">Aplicada</span></div></div><p class="dp">Los PDF sin texto (escaneados) se pueden emparejar a mano con «Emparejar páginas…».</p><div class="df"><button class="b">Cerrar</button><button class="b pr">Reintentar los fallidos</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">8 · Cargando y sin ayuda</h3><p class="pc">Mientras se prepara la lista, esqueleto con el alto de las filas.</p><div class="dg"><div class="dh">Sugiriendo tablas…</div><div class="bar"><i style="width:8%"></i></div><p class="cnt"><b>0 de 3</b> · preparando…</p><div class="ls"><div class="rw"><span class="nm" style="height:14px;border-radius:7px;background:var(--bd);max-width:260px"></span><span class="chip">Pendiente</span></div><div class="rw"><span class="nm" style="height:14px;border-radius:7px;background:var(--bd);max-width:260px"></span><span class="chip">Pendiente</span></div><div class="rw"><span class="nm" style="height:14px;border-radius:7px;background:var(--bd);max-width:260px"></span><span class="chip">Pendiente</span></div></div><div class="df"><button class="b">Cancelar</button></div></div></section></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":4300}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

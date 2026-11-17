@@ -1065,7 +1065,10 @@
       "readyDone": "{{count}} PDF marcados como Pronto",
       "undo": "Anular",
       "downloaded": "Transferência pronta · {{count}} ficheiros JSON",
-      "downloadedSkipped": "Transferência pronta · {{count}} ficheiros JSON · {{skipped}} não validados ficaram de fora"
+      "downloadedSkipped": "Transferência pronta · {{count}} ficheiros JSON · {{skipped}} não validados ficaram de fora",
+      "tables": "Sugerir tabelas",
+      "noneTables": "Nenhum dos PDF marcados tem versão B",
+      "tablesDone": "Tabelas de páginas aplicadas: {{count}}."
     },
     "funnel": {
       "label": "Resumo do lote",
@@ -1095,6 +1098,43 @@
     },
     "pageMap": {
       "chip": "Páginas emparelhadas"
+    },
+    "tables": {
+      "title": "Sugerir tabelas de páginas",
+      "preparing": "A contar as páginas…",
+      "pending": "Pendente",
+      "intro": "Podem receber uma tabela: {{count}} de {{total}} PDF. Compara-se o texto de cada página de A com o de B, no teu computador e sem IA.",
+      "willSuggest": "Será sugerida uma tabela",
+      "pdfCount": "{{count}} PDF",
+      "skipSame": "Omitidos: mesmas páginas em A e B",
+      "skipHasMap": "Omitidos: já têm tabela",
+      "skipNoB": "Omitidos: sem versão B",
+      "replace": "Substituir também as tabelas que já existem",
+      "start": "Sugerir tabelas ({{count}})",
+      "nothing": "Nenhum dos PDF selecionados precisa de tabela: têm as mesmas páginas em A e B, já têm tabela ou não têm versão B.",
+      "understood": "Entendido",
+      "running": "A sugerir tabelas…",
+      "counter": "{{done}} de {{total}}",
+      "keepIfCancel": "As que já estão feitas mantêm-se se cancelares",
+      "doneTitle": "Tabelas sugeridas",
+      "appliedCount": "Tabelas aplicadas: {{count}}",
+      "doneText": "Aplicam-se as que coincidem com clareza. Continuam editáveis em «Emparelhar páginas…».",
+      "cancelledTitle": "Sugestão cancelada",
+      "cancelledText": "Tabelas aplicadas: {{applied}}. PDF por tocar: {{untouched}}. Podes voltar a executá-la quando quiseres.",
+      "noTextHint": "Os PDF sem texto (digitalizados) podem emparelhar-se à mão com «Emparelhar páginas…».",
+      "waiting": "À espera da tua revisão: {{count}}",
+      "retry": "Repetir os que falharam",
+      "close": "Fechar",
+      "review": "Rever {{name}}",
+      "state": {
+        "pending": "Pendente",
+        "reading": "A ler textos…",
+        "applied": "Aplicada · {{matched}} de {{total}} emparelhadas",
+        "doubt": "Com dúvidas · por aplicar",
+        "noText": "Sem texto para comparar",
+        "error": "Não foi possível ler",
+        "untouched": "Por tocar"
+      }
     }
   },
   "preview": {

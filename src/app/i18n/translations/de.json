@@ -1065,7 +1065,10 @@
       "readyDone": "{{count}} PDFs als Fertig markiert",
       "undo": "Rückgängig",
       "downloaded": "Download bereit · {{count}} JSON-Dateien",
-      "downloadedSkipped": "Download bereit · {{count}} JSON-Dateien · {{skipped}} nicht validierte ausgelassen"
+      "downloadedSkipped": "Download bereit · {{count}} JSON-Dateien · {{skipped}} nicht validierte ausgelassen",
+      "tables": "Tabellen vorschlagen",
+      "noneTables": "Keines der markierten PDFs hat eine B-Version",
+      "tablesDone": "Seitentabellen angewendet: {{count}}."
     },
     "funnel": {
       "label": "Übersicht des Stapels",
@@ -1095,6 +1098,43 @@
     },
     "pageMap": {
       "chip": "Seiten zugeordnet"
+    },
+    "tables": {
+      "title": "Seitentabellen vorschlagen",
+      "preparing": "Seiten werden gezählt…",
+      "pending": "Ausstehend",
+      "intro": "Eine Tabelle können erhalten: {{count}} von {{total}} PDFs. Der Text jeder Seite von A wird mit B verglichen, auf deinem Rechner und ohne KI.",
+      "willSuggest": "Es wird eine Tabelle vorgeschlagen",
+      "pdfCount": "{{count}} PDFs",
+      "skipSame": "Übersprungen: gleiche Seiten in A und B",
+      "skipHasMap": "Übersprungen: haben schon eine Tabelle",
+      "skipNoB": "Übersprungen: ohne B-Version",
+      "replace": "Auch bereits vorhandene Tabellen ersetzen",
+      "start": "Tabellen vorschlagen ({{count}})",
+      "nothing": "Keines der ausgewählten PDFs braucht eine Tabelle: gleiche Seiten in A und B, schon eine Tabelle oder keine B-Version.",
+      "understood": "Verstanden",
+      "running": "Tabellen werden vorgeschlagen…",
+      "counter": "{{done}} von {{total}}",
+      "keepIfCancel": "Bereits fertige bleiben beim Abbrechen erhalten",
+      "doneTitle": "Tabellen vorgeschlagen",
+      "appliedCount": "Tabellen angewendet: {{count}}",
+      "doneText": "Eindeutige Treffer werden angewendet. Sie bleiben über «Seiten zuordnen…» bearbeitbar.",
+      "cancelledTitle": "Vorschlag abgebrochen",
+      "cancelledText": "Tabellen angewendet: {{applied}}. Unberührte PDFs: {{untouched}}. Du kannst es jederzeit erneut starten.",
+      "noTextHint": "PDFs ohne Text (gescannt) lassen sich mit «Seiten zuordnen…» von Hand zuordnen.",
+      "waiting": "Warten auf deine Prüfung: {{count}}",
+      "retry": "Fehlgeschlagene wiederholen",
+      "close": "Schließen",
+      "review": "{{name}} prüfen",
+      "state": {
+        "pending": "Ausstehend",
+        "reading": "Texte werden gelesen…",
+        "applied": "Angewendet · {{matched}} von {{total}} zugeordnet",
+        "doubt": "Unsicher · nicht angewendet",
+        "noText": "Kein Text zum Vergleichen",
+        "error": "Nicht lesbar",
+        "untouched": "Unberührt"
+      }
     }
   },
   "preview": {

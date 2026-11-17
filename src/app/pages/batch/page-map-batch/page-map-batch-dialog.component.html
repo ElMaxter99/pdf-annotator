@@ -1,0 +1,180 @@
+@if (service.phase(); as phase) {
+  @if (phase !== 'closed') {
+    <div class="pmb-backdrop">
+      <div
+        appFocusTrap
+        class="pmb"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pmb-title"
+        data-testid="pagemap-batch"
+      >
+        @switch (phase) {
+          @case ('preparing') {
+            <h2 id="pmb-title">{{ 'batch.tables.title' | t }}</h2>
+            <div class="pmb-bar"><i class="pmb-bar__pulse"></i></div>
+            <p class="pmb-text" role="status">{{ 'batch.tables.preparing' | t }}</p>
+            <div class="pmb-list" aria-hidden="true">
+              @for (n of [1, 2, 3]; track n) {
+                <div class="pmb-row"><span class="pmb-skel"></span><span class="pmb-chip">{{ 'batch.tables.pending' | t }}</span></div>
+              }
+            </div>
+            <div class="pmb-actions">
+              <button type="button" class="btn btn--ghost" (click)="close()">{{ 'batch.cancel' | t }}</button>
+            </div>
+          }
+          @case ('confirm') {
+            @if (service.plan().suggest === 0 && !(service.existing() > 0)) {
+              <h2 id="pmb-title">{{ 'batch.tables.title' | t }}</h2>
+              <p class="pmb-text">{{ 'batch.tables.nothing' | t }}</p>
+              <div class="pmb-actions">
+                <button type="button" class="btn btn--primary" (click)="close()" data-testid="pagemap-batch-ok">
+                  {{ 'batch.tables.understood' | t }}
+                </button>
+              </div>
+            } @else {
+              <h2 id="pmb-title">{{ 'batch.tables.title' | t }}</h2>
+              <p class="pmb-text">
+                {{ 'batch.tables.intro' | t: { count: service.plan().suggest, total: service.plan().total } }}
+              </p>
+              <div class="pmb-list">
+                <div class="pmb-row pmb-row--on">
+                  <span class="pmb-name">{{ 'batch.tables.willSuggest' | t }}</span>
+                  <span class="pmb-chip ok">{{ 'batch.tables.pdfCount' | t: { count: service.plan().suggest } }}</span>
+                </div>
+                @if (service.plan().same > 0) {
+                  <div class="pmb-row">
+                    <span class="pmb-name">{{ 'batch.tables.skipSame' | t }}</span>
+                    <span class="pmb-chip">{{ 'batch.tables.pdfCount' | t: { count: service.plan().same } }}</span>
+                  </div>
+                }
+                @if (service.plan().hasMap > 0) {
+                  <div class="pmb-row">
+                    <span class="pmb-name">{{ 'batch.tables.skipHasMap' | t }}</span>
+                    <span class="pmb-chip">{{ 'batch.tables.pdfCount' | t: { count: service.plan().hasMap } }}</span>
+                  </div>
+                }
+                @if (service.plan().noB > 0) {
+                  <div class="pmb-row">
+                    <span class="pmb-name">{{ 'batch.tables.skipNoB' | t }}</span>
+                    <span class="pmb-chip">{{ 'batch.tables.pdfCount' | t: { count: service.plan().noB } }}</span>
+                  </div>
+                }
+              </div>
+              @if (service.existing() > 0) {
+                <label class="pmb-check">
+                  <input
+                    type="checkbox"
+                    [checked]="service.replace()"
+                    (change)="service.replace.set($any($event.target).checked)"
+                    data-testid="pagemap-batch-replace"
+                  />
+                  {{ 'batch.tables.replace' | t }}
+                </label>
+              }
+              <div class="pmb-actions">
+                <button type="button" class="btn btn--ghost" (click)="close()">{{ 'batch.cancel' | t }}</button>
+                <button
+                  type="button"
+                  class="btn btn--primary"
+                  [disabled]="service.plan().suggest === 0"
+                  (click)="service.start()"
+                  data-testid="pagemap-batch-start"
+                >
+                  {{ 'batch.tables.start' | t: { count: service.plan().suggest } }}
+                </button>
+              </div>
+            }
+          }
+          @case ('running') {
+            <h2 id="pmb-title">{{ 'batch.tables.running' | t }}</h2>
+            <div
+              class="pmb-bar"
+              role="progressbar"
+              aria-valuemin="0"
+              [attr.aria-valuemax]="service.total()"
+              [attr.aria-valuenow]="service.done()"
+            >
+              <i [style.width.%]="service.total() ? (service.done() * 100) / service.total() : 0"></i>
+            </div>
+            <p class="pmb-text" role="status" aria-live="polite" data-testid="pagemap-batch-counter">
+              <b>{{ 'batch.tables.counter' | t: { done: service.done(), total: service.total() } }}</b>
+              @if (service.current(); as now) {
+                · {{ now.name }}
+              }
+            </p>
+            <ng-container *ngTemplateOutlet="rowsTpl" />
+            <div class="pmb-actions">
+              <span class="pmb-hint">{{ 'batch.tables.keepIfCancel' | t }}</span>
+              <button
+                type="button"
+                class="btn btn--ghost"
+                [disabled]="service.cancelled()"
+                (click)="service.cancel()"
+                data-testid="pagemap-batch-cancel"
+              >
+                {{ 'batch.cancel' | t }}
+              </button>
+            </div>
+          }
+          @case ('done') {
+            @if (service.cancelled()) {
+              <h2 id="pmb-title">{{ 'batch.tables.cancelledTitle' | t }}</h2>
+              <p class="pmb-text">
+                {{
+                  'batch.tables.cancelledText'
+                    | t: { applied: service.applied().length, untouched: untouchedCount() }
+                }}
+              </p>
+            } @else {
+              <h2 id="pmb-title">{{ 'batch.tables.doneTitle' | t }}</h2>
+              <div class="pmb-done" data-testid="pagemap-batch-done">
+                <span class="pmb-tick" aria-hidden="true">✓</span>
+                <div>
+                  <b>{{ 'batch.tables.appliedCount' | t: { count: service.applied().length } }}</b>
+                  <p class="pmb-text">{{ 'batch.tables.doneText' | t }}</p>
+                </div>
+              </div>
+            }
+            <ng-container *ngTemplateOutlet="rowsTpl" />
+            @if (service.rows().some(rowIsNoText)) {
+              <p class="pmb-text">{{ 'batch.tables.noTextHint' | t }}</p>
+            }
+            <div class="pmb-actions">
+              @if (service.doubtful().length) {
+                <span class="pmb-hint">{{ 'batch.tables.waiting' | t: { count: service.doubtful().length } }}</span>
+              }
+              @if (service.failed().length) {
+                <button type="button" class="btn btn--ghost" (click)="service.retry()" data-testid="pagemap-batch-retry">
+                  {{ 'batch.tables.retry' | t }}
+                </button>
+              }
+              <button type="button" class="btn btn--ghost" (click)="close()" data-testid="pagemap-batch-close">
+                {{ 'batch.tables.close' | t }}
+              </button>
+              @if (service.doubtful()[0]; as first) {
+                <button type="button" class="btn btn--primary" (click)="reviewFirst()" data-testid="pagemap-batch-review">
+                  {{ 'batch.tables.review' | t: { name: first.name } }}
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+}
+
+<ng-template #rowsTpl>
+  <div class="pmb-list" data-testid="pagemap-batch-rows">
+    @for (row of service.rows(); track row.id) {
+      <div class="pmb-row" [attr.data-state]="row.state">
+        <span class="pmb-name">{{ row.name }}</span>
+        <span class="pmb-pages">A {{ row.pagesA }} · B {{ row.pagesB }}</span>
+        <span class="pmb-chip" [ngClass]="chipClass(row)">
+          {{ 'batch.tables.state.' + row.state | t: { matched: row.matched ?? 0, total: row.pagesB } }}
+        </span>
+      </div>
+    }
+  </div>
+</ng-template>
