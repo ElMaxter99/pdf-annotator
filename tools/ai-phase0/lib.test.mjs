@@ -91,3 +91,11 @@ test('describeImageCodes con minMatch acepta lecturas parciales con «?»', asyn
   assert.deepEqual(describeImageCodes({ images: { 'A-p1': '?62?', 'B-p1': 'CVBH' } }, codes, { minMatch: 2 }).missing, []);
   assert.deepEqual(describeImageCodes({ images: { 'A-p1': '????', 'B-p1': 'C???' } }, codes, { minMatch: 2 }).missing, ['A-p1', 'B-p1']);
 });
+
+test('buildPrompt cuenta la correspondencia de páginas solo si el usuario la dio', async () => {
+  const { buildPrompt } = await import('./lib.mjs');
+  const base = { pagesA: 3, pagesB: 4, sizeA: '1×1', sizeB: '1×1' };
+  assert.doesNotMatch(buildPrompt(base), /Correspondencia de páginas/);
+  const prompt = buildPrompt({ ...base, pageMap: [null, 1, 2, 3] });
+  assert.match(prompt, /B1: sin página de A · B2: A1 · B3: A2 · B4: A3/);
+});

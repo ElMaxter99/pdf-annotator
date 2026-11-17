@@ -323,7 +323,8 @@ export class AiBatchService {
         this.patchRow(id, { phase: 'failed', endedAt: Date.now(), error: { code: 'not_eligible', message: '', reset: null } });
         continue;
       }
-      if (this.cascade && (await this.solveWithoutAi(id, item.aPdf, item.bPdf, item.aPages, generation))) {
+      // With a page table the cascade (it pairs pages by number) would compare the wrong pages: the AI goes first.
+    if (this.cascade && !item.pageMap && (await this.solveWithoutAi(id, item.aPdf, item.bPdf, item.aPages, generation))) {
         continue;
       }
       if (generation !== this.generation) {
@@ -342,7 +343,7 @@ export class AiBatchService {
       this.queueMap = Object.fromEntries(send.map((item, index) => [remoteItemId(index), item.id]));
       this.persistQueue();
       for (const [index, item] of send.entries()) {
-        await this.ai.addToQueue(batchId, remoteItemId(index), { a: item.aPdf, b: item.bPdf as Blob, template: { pages: item.aPages } }, index === send.length - 1);
+        await this.ai.addToQueue(batchId, remoteItemId(index), { a: item.aPdf, b: item.bPdf as Blob, template: { pages: item.aPages, pageMap: item.pageMap?.pairs } }, index === send.length - 1);
         if (generation !== this.generation) {
           return;
         }
@@ -713,7 +714,7 @@ export class AiBatchService {
     this.patchRow(id, { phase: 'reading', attempt: 1, startedAt: started, t0, provider, endedAt: null, error: null, stageLog: [{ stage: 'reading', attempt: 1, at: started - t0 }], stepLog: [], sent: null, details: null });
     try {
       const result = await this.ai.propose(
-        { a: item.aPdf, b: item.bPdf, template: { pages: item.aPages } },
+        { a: item.aPdf, b: item.bPdf, template: { pages: item.aPages, pageMap: item.pageMap?.pairs } },
         (progress) => {
           if (generation === this.generation) {
             const row = this.rows()[id];

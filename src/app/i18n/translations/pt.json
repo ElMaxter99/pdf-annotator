@@ -523,7 +523,61 @@
         "prevA": "Página anterior de A",
         "nextA": "Página seguinte de A",
         "prevB": "Página anterior de B",
-        "nextB": "Página seguinte de B"
+        "nextB": "Página seguinte de B",
+        "tagMapped": "B {{b}} ↔ A {{a}}",
+        "tagUnmapped": "A sem equivalente"
+      },
+      "pageMap": {
+        "chip": "Páginas emparelhadas",
+        "menu": "Opções das páginas",
+        "menuMapped": "Emparelhadas (tabela)",
+        "open": "Emparelhar páginas…",
+        "unmappedTitle": "B {{page}} não tem equivalente em A",
+        "unmappedSub": "É uma página nova da tabela: não há campos de A para copiar.",
+        "applied": "Páginas emparelhadas: {{count}} de {{total}}",
+        "cleared": "Páginas outra vez por número",
+        "copied": "Campos copiados pela tabela · páginas com equivalente: {{count}} · sem: {{unmapped}}",
+        "title": "Emparelhar as páginas de A e B",
+        "lead": "Páginas: A {{a}} · B {{b}}. Escolha que página de A corresponde a cada uma de B.",
+        "suggest": "Sugerir pelos textos",
+        "shiftAll": "Deslocar todas",
+        "shiftBack": "Deslocar todas as correspondências uma página para trás",
+        "shiftForward": "Deslocar todas as correspondências uma página para a frente",
+        "byNumber": "Por número",
+        "reading": "A ler os textos…",
+        "readingCount": "{{done}} de {{total}} páginas",
+        "cancelRead": "Cancelar leitura",
+        "noTextTitle": "Não foi possível ler os textos.",
+        "noTextHint": "Parece um PDF digitalizado, sem texto selecionável. Emparelhe à mão, use «Deslocar todas» ou «Por número».",
+        "retry": "Tentar de novo",
+        "noteNumber": "Enquanto não emparelhar, A1 compara-se com B1, A2 com B2… e as páginas de B a mais ficam sem A.",
+        "noteSuggested": "Comparei os textos de cada página. Reveja a sugestão e carregue em «Aplicar»: B não muda, só qual página de A se compara com cada uma.",
+        "noteManual": "Alterou {{count}} linhas. As marcadas «À mão» não são tocadas se voltar a carregar em «Sugerir pelos textos».",
+        "colB": "Página de B",
+        "colA": "Equivale a (em A)",
+        "colOrigin": "Origem",
+        "pageA": "A {{n}}",
+        "pageB": "B {{n}}",
+        "rowLabel": "Página de A que corresponde a B {{n}}",
+        "none": "Sem página de A",
+        "repeated": "Repetida",
+        "alsoIn": "Também em B {{pages}}",
+        "originNew": "Nova",
+        "pickOne": "Escolha uma página de A",
+        "originManual": "À mão",
+        "restoreRow": "Voltar à sugestão",
+        "originAuto": "Sugerida",
+        "noMatch": "Sem correspondência suficiente",
+        "match": "Correspondência {{pct}} %",
+        "originNone": "Sem página de A",
+        "originNumber": "Por número",
+        "noteRepeated": "Uma mesma página de A será copiada para várias de B. Pode continuar se for isso que quer (por exemplo, um formulário que se repete).",
+        "noteUnused": "A {{pages}} não é usada: os seus campos não serão copiados.",
+        "preview": "Linha escolhida",
+        "summary": "{{matched}} de {{total}} linhas com equivalente",
+        "cancel": "Cancelar",
+        "apply": "Aplicar",
+        "noticeMapped": "Páginas emparelhadas com a tabela · A {{a}} págs · B {{b}} págs"
       }
     },
     "panel": {
@@ -682,7 +736,12 @@
         "removeYes": "Remover a versão B"
       },
       "noTemplateNote": "Sem modelo: pode carregar o do original ou adicionar uma nova versão em Documento.",
-      "noTemplateGo": "Ir para Documento"
+      "noTemplateGo": "Ir para Documento",
+      "pages": {
+        "title": "Páginas",
+        "mapped": "Emparelhadas à mão",
+        "byNumber": "Por número"
+      }
     },
     "adjust": {
       "title": "Ajuste por textos",
@@ -1027,6 +1086,9 @@
       "ready": "Já está pronto",
       "noB": "Falta a versão B",
       "noFields": "O seu modelo A não tem campos"
+    },
+    "pageMap": {
+      "chip": "Páginas emparelhadas"
     }
   },
   "preview": {
