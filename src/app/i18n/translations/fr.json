@@ -94,6 +94,7 @@
     "downloadPdf": "Télécharger le PDF",
     "cursorLabel": "Curseur (PDF)",
     "cursorInactive": "Survolez le PDF pour voir les coordonnées",
+    "selectedPosition": "Position de « {{name}} » : X {{x}}, Y {{y}}",
     "toolbarAriaLabel": "Actions PDF",
     "navigationGroup": "Navigation des pages",
     "zoomGroup": "Contrôles du zoom",

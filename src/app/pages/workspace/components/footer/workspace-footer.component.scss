@@ -23,3 +23,13 @@
 .json-coords__divider {
   opacity: 0.6;
 }
+
+.footer__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  margin: 0;
+}

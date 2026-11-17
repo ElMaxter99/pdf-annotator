@@ -1,3 +1,4 @@
+import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -88,6 +89,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     AiBatchButtonComponent,
     AiBatchChipComponent,
     AiBatchPanelComponent,
+    FocusTrapDirective,
   ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],

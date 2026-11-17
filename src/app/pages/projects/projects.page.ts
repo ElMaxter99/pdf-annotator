@@ -24,6 +24,7 @@ import {
 } from '../../services/project-transfer.service';
 import { ToastService } from '../../services/toast.service';
 import { exportEstimate, formatBytes, projectSize } from '../../utils/project.utils';
+import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 
 type Dialog =
   | { kind: 'new' }
@@ -36,7 +37,7 @@ type Dialog =
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-projects-page',
   standalone: true,
-  imports: [RouterLink, TranslationPipe, VersionChipComponent],
+  imports: [RouterLink, TranslationPipe, VersionChipComponent, FocusTrapDirective],
   templateUrl: './projects.page.html',
   styleUrls: ['./projects.page.scss'],
 })

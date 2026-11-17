@@ -260,3 +260,15 @@ test('distribute spaces three or more annotations with equal gaps', async ({ pag
   await page.keyboard.press('Control+z');
   await expect.poll(async () => (await positions(page)).map((p: number[]) => p[0])).toEqual([50, 150, 100, 200]);
 });
+
+test('a screen-reader status announces the position of the single selected annotation', async ({ page }) => {
+  const status = page.getByTestId('selected-position');
+  await expect(status).toHaveText('');
+  await ann(page, 0).click({ modifiers: ['Shift'] });
+  await expect(status).toHaveText('Posición de «a»: X 50, Y 700');
+  await leaveTextFields(page);
+  await page.keyboard.press('ArrowRight');
+  await expect(status).toHaveText('Posición de «a»: X 51, Y 700');
+  await ann(page, 2).click({ modifiers: ['Shift'] });
+  await expect(status).toHaveText('');
+});
