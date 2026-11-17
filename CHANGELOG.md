@@ -21,6 +21,7 @@
 - El desplazamiento de las copias al pegar y duplicar anotaciones sale de `workspace.page.ts` a `utils/paste-offset.utils.ts` (con tests). Sin cambios visibles.
 - Las reglas de los atajos de teclado (qué acción toca según la tecla y el estado del editor) salen de `workspace.page.ts` a `utils/shortcuts.utils.ts`, con 30 pruebas nuevas. Sin cambios visibles.
 - La conversión de píxel a punto PDF del cursor sale a `utils/pdf-coords.utils.ts` y se amplían las pruebas de normalización de coordenadas al importar JSON (negativas, fuera de página, NaN, páginas repetidas…). Sin cambios visibles.
+- El límite del arrastre en grupo (que ninguna anotación salga de la página) sale de `workspace.page.ts` a `utils/group-drag.utils.ts`, con pruebas. Sin cambios visibles.
 
 ### Docs
 - Hoja de ruta: marcada como hecha la subida a Node 26 y Angular 22 (PR #245).
