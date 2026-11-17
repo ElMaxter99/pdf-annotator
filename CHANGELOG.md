@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.14.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.14.0) - 2026-11-17
 ### Changed
 - **«Ajustar» (tamaño distinto) usa la tabla de páginas A↔B:** con tabla, la detección compara cada página de B con la página de A con la que está emparejada (antes comparaba por número, así que una portada añadida en B daba un aviso de tamaño falso o se lo callaba). Sin tabla, igual que antes. Sin cambios visibles.
 - **La web ya no muestra rastro de IA en el resumen del lote:** sin ayudante de IA (web desplegada) el resumen pasa a 4 pasos (se quita «Listos para trasladar», «Listos» pasa a ser el 4), y las filas no muestran «Va a la IA» ni «Revisar propuesta». Escritorio y local no cambian.
