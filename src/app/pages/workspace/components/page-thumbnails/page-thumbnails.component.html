@@ -2,16 +2,25 @@
   <button
     type="button"
     class="thumbnails__item"
-    *ngFor="let thumbnail of thumbnails"
+    *ngFor="let thumbnail of thumbnails; trackBy: trackByPage"
     (click)="onSelect(thumbnail.pageNumber)"
     [class.thumbnails__item--active]="thumbnail.pageNumber === activePage"
     [attr.aria-current]="thumbnail.pageNumber === activePage ? 'page' : null"
     [attr.aria-label]="'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber }"
     [attr.title]="'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber }"
     role="listitem"
+    appInView
+    (inView)="onInView(thumbnail.pageNumber, $event)"
   >
     <span class="thumbnails__badge" aria-hidden="true">{{ thumbnail.pageNumber }}</span>
+    <span
+      *ngIf="!thumbnail.imageUrl"
+      class="thumbnails__image thumbnails__image--pending"
+      aria-hidden="true"
+      [style.aspect-ratio]="thumbnail.width + ' / ' + thumbnail.height"
+    ></span>
     <img
+      *ngIf="thumbnail.imageUrl"
       class="thumbnails__image"
       [src]="thumbnail.imageUrl"
       [attr.alt]="'sidebar.thumbnails.pageLabel' | t : { index: thumbnail.pageNumber }"

@@ -381,6 +381,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   cursorPdfCoords = signal<{ x: number; y: number } | null>(null);
   private readonly thumbnailGenerator = new PageThumbnailGenerator();
   readonly pageThumbnails = this.thumbnailGenerator.thumbnails;
+  requestThumbnail(pageNumber: number): void {
+    this.thumbnailGenerator.request(pageNumber);
+  }
+  cancelThumbnail(pageNumber: number): void {
+    this.thumbnailGenerator.cancel(pageNumber);
+  }
   preview = signal<PreviewState>(null);
   editing = signal<EditState>(null);
   previewHexInput = signal('#000000');
