@@ -124,7 +124,9 @@
       "selectLabel": "Modèles enregistrés",
       "loadButton": "Charger",
       "deleteButton": "Supprimer",
-      "empty": "Vous n'avez pas encore enregistré de modèles."
+      "empty": "Vous n'avez pas encore enregistré de modèles.",
+      "exportButton": "Exporter les modèles…",
+      "exportHint": "Enregistrez au moins un modèle pour exporter."
     },
     "thumbnails": {
       "title": "Vignettes",
@@ -1778,7 +1780,8 @@
       "in-use": "Le projet est utilisé sur un autre ordinateur.",
       "disk-full": "Plus d'espace sur le disque.",
       "not-synced": "Ce projet n’est pas synchronisé.",
-      "bad-action": "Action non valide."
+      "bad-action": "Action non valide.",
+      "in-use-local": "Quelque chose garde le dossier ouvert (l’Explorateur, un antivirus ou le client cloud). Fermez-le et réessayez. Le projet n’a pas changé."
     },
     "transfer": {
       "import": "Importer un projet",
@@ -2171,6 +2174,49 @@
         "create": "Créer le dossier",
         "other": "En choisir un autre"
       }
+    },
+    "rename": {
+      "menu": "Renommer…",
+      "menuOther": "Renommer… · utilisé sur un autre ordinateur",
+      "menuOpen": "Renommer… · fermez-le d’abord",
+      "title": "Renommer le projet",
+      "empty": "Saisissez un nom pour le projet.",
+      "folderCheck": "Renommer aussi le dossier",
+      "folderHint": "Le dossier du projet change avec le nom.",
+      "folderOff": "Décochée car le dossier « {{folder}} » ne porte pas le nom du projet. Seul le nom affiché dans l’app change.",
+      "folderSynced": "Indisponible tant que le projet est synchronisé : le chemin est la clé de la synchronisation. Seul le nom affiché dans l’app change.",
+      "previewLabel": "Dossier sur le disque",
+      "keepParent": "Seul le dernier niveau change : « {{parent}} » reste tel quel.",
+      "folderStays": "Le dossier reste identique.",
+      "warnChars": "Les caractères non valides sont retirés du nom du dossier : il devient « {{folder}} ».",
+      "warnReserved": "« {{name}} » est un nom réservé de Windows. Le dossier s’appellera « {{folder}} » ; le nom affiché ne change pas.",
+      "caseOnly": "Sur ce système, les deux graphies désignent le même dossier ; il est renommé quand même.",
+      "clash": "« {{parent}} » contient déjà un dossier « {{folder}} ». Choisissez un autre nom ou décochez la case pour ne changer que le nom affiché.",
+      "confirm": "Renommer",
+      "working": "Renommage…",
+      "done": "Projet renommé en « {{name}} ».",
+      "doneKept": "Nom modifié. Le dossier reste « {{folder}} » car le projet est synchronisé.",
+      "locked": "{{host}} a ouvert le projet pendant que vous écriviez. Rien n’a été renommé."
     }
+  },
+  "templatesExport": {
+    "title": "Exporter les modèles",
+    "intro": "Choisissez les modèles à emporter. Ils sont enregistrés dans un seul ZIP, un JSON par modèle.",
+    "selectAll": "Tout sélectionner",
+    "pages": "{{n}} p.",
+    "empty": "Vous n'avez pas encore de modèle enregistré. Enregistrez-en un depuis Annotations, puis revenez ici.",
+    "understood": "Compris",
+    "cancel": "Annuler",
+    "workingTitle": "Exportation des modèles…",
+    "counter": "{{done}} sur {{total}}",
+    "doneTitle": "Modèles exportés",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} modèles · {{kb}} Ko. Retrouvez-le dans votre dossier de téléchargements.",
+    "ready": "Terminé",
+    "errorTitle": "Exportation impossible",
+    "errorText": "Le ZIP n'a pas pu être créé. Vos modèles sont toujours enregistrés et rien n'a été perdu.",
+    "close": "Fermer",
+    "retry": "Réessayer",
+    "exportButton": "Exporter {{n}} modèles"
   }
 }

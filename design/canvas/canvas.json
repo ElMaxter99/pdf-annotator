@@ -966,6 +966,27 @@
       "w": 1280,
       "h": 4107,
       "title": "P-93 Proyectos · sincronizar por SFTP · estados · claro 1280"
+    },
+    "P-97-proyectos-renombrar-flujo-y-reglas.dc.html": {
+      "x": 7400,
+      "y": 22900,
+      "w": 1720,
+      "h": 2100,
+      "title": "P-97 Proyectos · renombrar · flujo y reglas"
+    },
+    "P-98-proyectos-renombrar-pantalla-oscuro-1650.dc.html": {
+      "x": 9200,
+      "y": 22900,
+      "w": 1720,
+      "h": 2300,
+      "title": "P-98 Proyectos · renombrar · pantalla · oscuro 1650"
+    },
+    "P-99-proyectos-renombrar-estados-claro-1280.dc.html": {
+      "x": 11000,
+      "y": 22900,
+      "w": 1280,
+      "h": 5700,
+      "title": "P-99 Proyectos · renombrar · estados · claro 1280"
     }
   },
   "order": [
@@ -1106,7 +1127,10 @@
     "P-90-proyectos-sincronizar-estados-claro-1280.dc.html",
     "P-91-proyectos-sftp-flujo-y-reglas.dc.html",
     "P-92-proyectos-sftp-pantalla-oscuro-1650.dc.html",
-    "P-93-proyectos-sftp-estados-claro-1280.dc.html"
+    "P-93-proyectos-sftp-estados-claro-1280.dc.html",
+    "P-97-proyectos-renombrar-flujo-y-reglas.dc.html",
+    "P-98-proyectos-renombrar-pantalla-oscuro-1650.dc.html",
+    "P-99-proyectos-renombrar-estados-claro-1280.dc.html"
   ],
   "notes": {
     "t0": {

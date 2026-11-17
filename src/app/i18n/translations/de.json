@@ -124,7 +124,9 @@
       "selectLabel": "Gespeicherte Vorlagen",
       "loadButton": "Laden",
       "deleteButton": "Löschen",
-      "empty": "Sie haben noch keine Vorlagen gespeichert."
+      "empty": "Sie haben noch keine Vorlagen gespeichert.",
+      "exportButton": "Vorlagen exportieren…",
+      "exportHint": "Speichere mindestens eine Vorlage zum Exportieren."
     },
     "thumbnails": {
       "title": "Miniaturen",
@@ -1778,7 +1780,8 @@
       "in-use": "Das Projekt wird auf einem anderen Computer verwendet.",
       "disk-full": "Kein Speicherplatz mehr.",
       "not-synced": "Dieses Projekt wird nicht synchronisiert.",
-      "bad-action": "Ungültige Aktion."
+      "bad-action": "Ungültige Aktion.",
+      "in-use-local": "Etwas hat den Ordner geöffnet (Explorer, ein Virenscanner oder der Cloud-Client). Schließe es und versuche es erneut. Das Projekt wurde nicht geändert."
     },
     "transfer": {
       "import": "Projekt importieren",
@@ -2171,6 +2174,49 @@
         "create": "Ordner erstellen",
         "other": "Anderen wählen"
       }
+    },
+    "rename": {
+      "menu": "Umbenennen…",
+      "menuOther": "Umbenennen… · auf einem anderen Computer in Benutzung",
+      "menuOpen": "Umbenennen… · zuerst schließen",
+      "title": "Projekt umbenennen",
+      "empty": "Gib einen Namen für das Projekt ein.",
+      "folderCheck": "Auch den Ordner umbenennen",
+      "folderHint": "Der Projektordner ändert sich mit dem Namen.",
+      "folderOff": "Nicht aktiviert, weil der Ordner „{{folder}}“ nicht wie das Projekt heißt. Nur der Name in der App ändert sich.",
+      "folderSynced": "Nicht verfügbar, solange das Projekt synchronisiert wird: Der Pfad ist der Schlüssel der Synchronisierung. Nur der Name in der App ändert sich.",
+      "previewLabel": "Ordner auf dem Datenträger",
+      "keepParent": "Nur der letzte Teil ändert sich: „{{parent}}“ bleibt unverändert.",
+      "folderStays": "Der Ordner bleibt gleich.",
+      "warnChars": "Ungültige Zeichen werden aus dem Ordnernamen entfernt: Er heißt dann „{{folder}}“.",
+      "warnReserved": "„{{name}}“ ist ein reservierter Windows-Name. Der Ordner heißt „{{folder}}“; der sichtbare Name bleibt gleich.",
+      "caseOnly": "Auf diesem System sind beide Schreibweisen derselbe Ordner; er wird trotzdem umbenannt.",
+      "clash": "In „{{parent}}“ gibt es bereits einen Ordner „{{folder}}“. Wähle einen anderen Namen oder deaktiviere das Feld, um nur den sichtbaren Namen zu ändern.",
+      "confirm": "Umbenennen",
+      "working": "Wird umbenannt…",
+      "done": "Projekt umbenannt in „{{name}}“.",
+      "doneKept": "Name geändert. Der Ordner bleibt „{{folder}}“, weil das Projekt synchronisiert wird.",
+      "locked": "{{host}} hat das Projekt geöffnet, während du getippt hast. Es wurde nichts umbenannt."
     }
+  },
+  "templatesExport": {
+    "title": "Vorlagen exportieren",
+    "intro": "Wähle die Vorlagen aus, die du mitnehmen möchtest. Sie werden in einer einzigen ZIP-Datei gespeichert, eine JSON-Datei pro Vorlage.",
+    "selectAll": "Alle auswählen",
+    "pages": "{{n}} S.",
+    "empty": "Du hast noch keine gespeicherten Vorlagen. Speichere eine unter Anmerkungen und komm zurück.",
+    "understood": "Verstanden",
+    "cancel": "Abbrechen",
+    "workingTitle": "Vorlagen werden exportiert…",
+    "counter": "{{done}} von {{total}}",
+    "doneTitle": "Vorlagen exportiert",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} Vorlagen · {{kb}} KB. Du findest sie im Download-Ordner.",
+    "ready": "Fertig",
+    "errorTitle": "Export nicht möglich",
+    "errorText": "Die ZIP-Datei konnte nicht erstellt werden. Deine Vorlagen sind weiterhin gespeichert, nichts ging verloren.",
+    "close": "Schließen",
+    "retry": "Erneut versuchen",
+    "exportButton": "{{n}} Vorlagen exportieren"
   }
 }
