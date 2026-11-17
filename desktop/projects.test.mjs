@@ -8,8 +8,10 @@ import {
   LOCK_STALE_MS,
   acquireLock,
   createProject,
+  folderRefFor,
   listProjects,
   lockState,
+  moveProjectFolder,
   readItems,
   releaseLock,
   removeItem,
@@ -107,5 +109,31 @@ test('bloqueo: otro equipo, caducidad y tomar el control', () => {
   assert.equal(existsSync(path.join(dir, '.lock')), true);
   releaseLock(dir, 'B');
   assert.equal(existsSync(path.join(dir, '.lock')), false);
+  rmSync(r, { recursive: true });
+});
+
+test('renombrar la carpeta cambia solo el último tramo y no pisa otra', () => {
+  const r = root();
+  createProject(r, 'Cliente 2', 'Álvaro/cliente2');
+  createProject(r, 'Cliente 3', 'Álvaro/Cliente 3');
+  assert.equal(
+    folderRefFor('Álvaro/cliente2', 'Cliente 2 · Facturas'),
+    'Álvaro/Cliente 2 · Facturas',
+  );
+  assert.equal(folderRefFor('Álvaro/cliente2', 'CON'), 'Álvaro/_CON');
+  assert.equal(folderRefFor('Álvaro/cliente2', 'a:b/c?'), 'Álvaro/ab c');
+  assert.throws(() => folderRefFor('x', '???'), { code: 'bad-name' });
+  assert.throws(() => moveProjectFolder(r, 'Álvaro/cliente2', 'Cliente 3'), { code: 'exists' });
+  assert.ok(existsSync(path.join(r, 'Álvaro', 'cliente2', 'project.json')));
+  const moved = moveProjectFolder(r, 'Álvaro/cliente2', 'Facturas 2027');
+  assert.equal(moved.ref, 'Álvaro/Facturas 2027');
+  assert.ok(existsSync(path.join(r, 'Álvaro', 'Facturas 2027', 'project.json')));
+  assert.ok(!existsSync(path.join(r, 'Álvaro', 'cliente2')));
+  assert.equal(
+    moveProjectFolder(r, 'Álvaro/Facturas 2027', 'Facturas 2027').ref,
+    'Álvaro/Facturas 2027',
+  );
+  const caps = moveProjectFolder(r, 'Álvaro/Facturas 2027', 'FACTURAS 2027');
+  assert.equal(caps.ref, 'Álvaro/FACTURAS 2027');
   rmSync(r, { recursive: true });
 });

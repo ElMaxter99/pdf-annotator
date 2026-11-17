@@ -23,13 +23,21 @@ import {
   type TransferDialog,
 } from '../../services/project-transfer.service';
 import { ToastService } from '../../services/toast.service';
-import { exportEstimate, formatBytes, projectSize } from '../../utils/project.utils';
+import {
+  cleanFolderName,
+  exportEstimate,
+  folderSlug,
+  formatBytes,
+  projectSize,
+  renamedRef,
+} from '../../utils/project.utils';
 import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 
 type Dialog =
   | { kind: 'new' }
   | { kind: 'takeover'; project: ProjectSummary }
   | { kind: 'forget'; project: ProjectSummary }
+  | { kind: 'rename'; project: ProjectSummary }
   | null;
 
 /** «Proyectos» (solo escritorio): un cliente o trabajo = una carpeta del disco con su lote de PDFs. */
@@ -58,6 +66,10 @@ export class ProjectsPageComponent implements OnInit, OnDestroy {
   readonly formError = signal<ProjectErrorCode | null>(null);
   readonly newName = signal('');
   readonly newSub = signal('');
+  readonly renameName = signal('');
+  readonly renameFolder = signal(false);
+  readonly renameError = signal<ProjectErrorCode | 'locked' | null>(null);
+  readonly renameHost = signal('');
   /** `ref` of the card whose ⋯ menu is open. */
   readonly menuFor = signal<string | null>(null);
   readonly orphanCount = computed(() => (this.store.active() ? 0 : this.batch.items().length));
@@ -220,6 +232,124 @@ export class ProjectsPageComponent implements OnInit, OnDestroy {
 
   askForget(project: ProjectSummary): void {
     this.dialog.set({ kind: 'forget', project });
+  }
+
+  // ---- Renombrar (nombre visible y, si se quiere, la carpeta)
+
+  /** Por qué no se puede renombrar ahora (`null` = se puede). */
+  renameBlock(project: ProjectSummary): 'other' | 'open' | null {
+    if (this.holderOf(project)) {
+      return 'other';
+    }
+    return this.store.active()?.ref === project.ref ? 'open' : null;
+  }
+
+  isSynced(project: ProjectSummary): boolean {
+    return this.sync.statusOf(project.ref).state !== 'none';
+  }
+
+  folderName(project: ProjectSummary): string {
+    return project.ref.split('/').pop() ?? project.ref;
+  }
+
+  /** ¿La carpeta se llama como el nombre (la creó la app a partir de él)? */
+  folderDerived(project: ProjectSummary): boolean {
+    return this.folderName(project) === folderSlug(project.name);
+  }
+
+  askRename(project: ProjectSummary): void {
+    this.closeMenu();
+    if (this.renameBlock(project)) {
+      return;
+    }
+    this.renameName.set(project.name);
+    // Marcada solo si la carpeta se llama como el nombre (la creó la app a partir de él) y no está sincronizado.
+    this.renameFolder.set(!this.isSynced(project) && this.folderDerived(project));
+    this.renameError.set(null);
+    this.dialog.set({ kind: 'rename', project });
+  }
+
+  /** Estado del formulario de renombrar, calculado con la misma regla que el proceso principal. */
+  renameView(project: ProjectSummary): {
+    name: string;
+    synced: boolean;
+    folder: boolean;
+    newRef: string;
+    parent: string;
+    slug: string;
+    changed: boolean;
+    empty: boolean;
+    reserved: boolean;
+    cleaned: boolean;
+    caseOnly: boolean;
+    clash: boolean;
+    valid: boolean;
+  } {
+    const name = this.renameName().trim();
+    const synced = this.isSynced(project);
+    const folder = this.renameFolder() && !synced;
+    const slug = folderSlug(name);
+    const newRef = folder ? renamedRef(project.ref, name) : project.ref;
+    const parent = project.ref.split('/').slice(0, -1).join('/');
+    const reserved = !!slug && slug === `_${cleanFolderName(name)}`;
+    const moves = folder && newRef !== project.ref;
+    const caseOnly = moves && newRef.toLowerCase() === project.ref.toLowerCase();
+    const clash =
+      moves &&
+      !caseOnly &&
+      this.store
+        .projects()
+        .some(
+          (other) => other.ref !== project.ref && other.ref.toLowerCase() === newRef.toLowerCase(),
+        );
+    const empty = !name || (folder && !slug);
+    const changed = name !== project.name || moves;
+    return {
+      name,
+      synced,
+      folder,
+      newRef,
+      parent,
+      slug,
+      changed,
+      empty,
+      reserved: folder && reserved,
+      cleaned: folder && !!slug && !reserved && slug !== name,
+      caseOnly,
+      clash,
+      valid: !empty && changed && !clash && this.busy() !== 'rename',
+    };
+  }
+
+  async rename(project: ProjectSummary): Promise<void> {
+    const view = this.renameView(project);
+    if (!view.valid) {
+      return;
+    }
+    this.busy.set('rename');
+    this.renameError.set(null);
+    const result = await this.store.rename(project.ref, view.name, view.folder);
+    this.busy.set(null);
+    if (typeof result === 'string') {
+      this.renameError.set(result);
+      return;
+    }
+    if ('locked' in result) {
+      this.renameHost.set(result.locked.host ?? '');
+      this.renameError.set('locked');
+      await this.store.refresh();
+      return;
+    }
+    this.dialog.set(null);
+    this.toast.show(
+      result.folderKept
+        ? this.t('projects.rename.doneKept', {
+            name: view.name,
+            folder: this.folderName(project),
+          })
+        : this.t('projects.rename.done', { name: view.name }),
+      'success',
+    );
   }
 
   async forget(project: ProjectSummary): Promise<void> {

@@ -1738,7 +1738,8 @@
       "in-use": "El projecte està en ús en un altre equip.",
       "disk-full": "No hi ha espai al disc.",
       "not-synced": "Aquest projecte no se sincronitza.",
-      "bad-action": "Acció no vàlida."
+      "bad-action": "Acció no vàlida.",
+      "in-use-local": "Alguna cosa té oberta la carpeta (l’Explorador, un antivirus o el client del núvol). Tanca-ho i torna-ho a provar. El projecte no ha canviat."
     },
     "transfer": {
       "import": "Importa projecte",
@@ -2131,6 +2132,29 @@
         "create": "Crea la carpeta",
         "other": "Tria’n una altra"
       }
+    },
+    "rename": {
+      "menu": "Canvia el nom…",
+      "menuOther": "Canvia el nom… · en ús en un altre equip",
+      "menuOpen": "Canvia el nom… · tanca’l primer",
+      "title": "Canvia el nom del projecte",
+      "empty": "Escriu un nom per al projecte.",
+      "folderCheck": "Canvia també el nom de la carpeta",
+      "folderHint": "La carpeta del projecte canvia amb el nom.",
+      "folderOff": "Desmarcada perquè la carpeta «{{folder}}» no es diu com el nom. Només canvia el nom que veus a l’app.",
+      "folderSynced": "No disponible mentre el projecte està sincronitzat: la ruta és la clau de la sincronització. Només canvia el nom que veus a l’app.",
+      "previewLabel": "Carpeta al disc",
+      "keepParent": "Només canvia l’últim tram: «{{parent}}» es queda com està.",
+      "folderStays": "La carpeta es queda igual.",
+      "warnChars": "Dels noms de carpeta s’eliminen els caràcters no vàlids: queda «{{folder}}».",
+      "warnReserved": "«{{name}}» és un nom reservat de Windows. La carpeta es dirà «{{folder}}»; el nom visible no canvia.",
+      "caseOnly": "En aquest sistema les dues grafies són la mateixa carpeta; es canvia igualment.",
+      "clash": "A «{{parent}}» ja hi ha una carpeta «{{folder}}». Tria un altre nom o desmarca la casella per canviar només el nom visible.",
+      "confirm": "Canvia el nom",
+      "working": "Canviant el nom…",
+      "done": "Projecte reanomenat a «{{name}}».",
+      "doneKept": "Nom canviat. La carpeta es queda com «{{folder}}» perquè el projecte està sincronitzat.",
+      "locked": "{{host}} ha obert el projecte mentre escrivies. No s’ha canviat res."
     }
   }
 }

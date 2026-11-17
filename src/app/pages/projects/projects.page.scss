@@ -326,6 +326,74 @@
   color: var(--muted);
 }
 
+// ---- Renombrar
+.proj-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 15px;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 1px 0 0;
+    accent-color: var(--accent);
+  }
+
+  small {
+    display: block;
+    margin-top: 2px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+}
+
+.proj-check--off {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.proj-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.3));
+  border-radius: 10px;
+  background: var(--bg);
+  overflow-wrap: anywhere;
+
+  code {
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 13px;
+  }
+
+  small {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+}
+
+.proj-preview__label {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.proj-preview__old {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.proj-preview .proj-flag--warn-text {
+  color: var(--proj-warn);
+}
+
 // ---- Exportar e importar (fase 2)
 .proj-dialog--wide {
   max-width: 640px;

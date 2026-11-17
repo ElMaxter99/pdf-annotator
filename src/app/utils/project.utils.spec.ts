@@ -1,5 +1,12 @@
 import { DEFAULT_LIMITS } from '../services/project-store.service';
-import { exportEstimate, formatBytes, percentOf, projectSize } from './project.utils';
+import {
+  exportEstimate,
+  folderSlug,
+  formatBytes,
+  percentOf,
+  projectSize,
+  renamedRef,
+} from './project.utils';
 
 describe('project.utils', () => {
   it('formats sizes', () => {
@@ -29,5 +36,20 @@ describe('project.utils', () => {
     expect(percentOf(26, 34)).toBe(76);
     expect(percentOf(5, 3)).toBe(100);
     expect(percentOf(-1, 10)).toBe(0);
+  });
+
+  it('computes the folder name like the main process does', () => {
+    expect(folderSlug('Cliente 2 · Facturas')).toBe('Cliente 2 · Facturas');
+    expect(folderSlug('a:b/c?')).toBe('ab c');
+    expect(folderSlug('CON')).toBe('_CON');
+    expect(folderSlug('nul.txt')).toBe('_nul.txt');
+    expect(folderSlug('  ...  ')).toBe('');
+    expect(folderSlug('x'.repeat(100)).length).toBe(80);
+  });
+
+  it('renames only the last segment of the path', () => {
+    expect(renamedRef('Álvaro/cliente2', 'Facturas 2027')).toBe('Álvaro/Facturas 2027');
+    expect(renamedRef('cliente2', 'Facturas')).toBe('Facturas');
+    expect(renamedRef('Álvaro/cliente2', '???')).toBe('');
   });
 });

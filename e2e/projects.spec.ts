@@ -208,6 +208,69 @@ test('a project open on another computer asks before it is taken over', async ({
   await expect(page.getByTestId('project-crumb')).toContainText('Cliente 3');
 });
 
+test('rename a project and its folder from the menu; the checks guard the dialog', async ({
+  page,
+}) => {
+  const { root } = await withDesktopProjects(page);
+  const make = (ref: string, name: string, lock?: object) => {
+    const dir = path.join(root, ...ref.split('/'));
+    mkdirSync(path.join(dir, 'batch'), { recursive: true });
+    writeFileSync(
+      path.join(dir, 'project.json'),
+      JSON.stringify({ v: 1, id: ref, name, createdAt: 1, updatedAt: 2 }),
+    );
+    if (lock) writeFileSync(path.join(dir, '.lock'), JSON.stringify(lock));
+  };
+  make('Álvaro/Cliente 2', 'Cliente 2');
+  make('Álvaro/Cliente 3', 'Cliente 3');
+  make('Álvaro/cliente4', 'Cliente 4 · Maquetas', {
+    host: 'PORTATIL-ALVARO',
+    token: 'otro',
+    since: Date.now(),
+    seen: Date.now(),
+  });
+
+  await page.goto('/proyectos');
+  const card = page.getByTestId('project-card').filter({ hasText: 'Cliente 2' });
+  await card.getByTestId('project-menu').click();
+  await card.getByTestId('project-rename').click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByTestId('rename-folder')).toBeChecked();
+  await expect(dialog.getByTestId('rename-confirm')).toBeDisabled();
+
+  await dialog.getByTestId('rename-name').fill('Cliente 3');
+  await expect(dialog).toContainText('ya hay una carpeta');
+  await expect(dialog.getByTestId('rename-confirm')).toBeDisabled();
+
+  await dialog.getByTestId('rename-name').fill('CON');
+  await expect(dialog.getByTestId('rename-preview')).toContainText('_CON');
+  await dialog.getByTestId('rename-name').fill('Facturas 2027');
+  await expect(dialog.getByTestId('rename-preview')).toContainText('Álvaro/Facturas 2027');
+  await dialog.getByTestId('rename-confirm').click();
+  await expect(dialog).toHaveCount(0);
+
+  expect(existsSync(path.join(root, 'Álvaro', 'Facturas 2027', 'project.json'))).toBe(true);
+  expect(existsSync(path.join(root, 'Álvaro', 'Cliente 2'))).toBe(false);
+  expect(existsSync(path.join(root, 'Álvaro', 'Facturas 2027', '.lock'))).toBe(false);
+  await expect(page.getByTestId('project-card').first()).toContainText('Facturas 2027');
+
+  // Un proyecto abierto en otro equipo no se puede renombrar.
+  const locked = page.getByTestId('project-card').filter({ hasText: 'Cliente 4' });
+  await locked.getByTestId('project-menu').click();
+  await expect(locked.getByTestId('project-rename')).toBeDisabled();
+  await page.keyboard.press('Escape');
+
+  // Solo el nombre visible: la carpeta se queda cuando la casilla está desmarcada.
+  const other = page.getByTestId('project-card').filter({ hasText: 'Cliente 3' });
+  await other.getByTestId('project-menu').click();
+  await other.getByTestId('project-rename').click();
+  await dialog.getByTestId('rename-folder').uncheck();
+  await dialog.getByTestId('rename-name').fill('Contratos');
+  await dialog.getByTestId('rename-confirm').click();
+  await expect(page.getByTestId('project-card').filter({ hasText: 'Contratos' })).toHaveCount(1);
+  expect(existsSync(path.join(root, 'Álvaro', 'Cliente 3', 'project.json'))).toBe(true);
+});
+
 test('the projects folder missing shows an error with a way out', async ({ page }) => {
   await withDesktopProjects(page);
   await page.addInitScript(() => {
@@ -413,6 +476,16 @@ test('sync with a linked folder: link, upload, download from another computer, c
   await expect(page.getByTestId('project-card')).toHaveCount(3);
   expect(readdirSync(root).some((name) => name.startsWith('c1-conflicto-'))).toBe(true);
   expect(readFileSync(path.join(mine.dir, 'batch', 'a2.json'), 'utf8')).toContain('"dos.pdf"');
+
+  // Renombrar un proyecto sincronizado: cambia el nombre visible, la carpeta (la clave de la sincronización) no.
+  const synced = page.getByTestId('project-card').filter({ hasText: 'Cliente 2' }).first();
+  await synced.getByTestId('project-menu').click();
+  await synced.getByTestId('project-rename').click();
+  await expect(page.getByTestId('rename-folder')).toBeDisabled();
+  await page.getByTestId('rename-name').fill('Cliente 2 · Maquetas');
+  await page.getByTestId('rename-confirm').click();
+  await expect(page.getByTestId('project-card').filter({ hasText: 'Maquetas' })).toHaveCount(1);
+  expect(existsSync(path.join(root, 'c2', 'project.json'))).toBe(true);
 
   // Unlink keeps every project.
   await page.getByTestId('sync-manage').click();
