@@ -6,6 +6,7 @@
 - **Guion para medir créditos reales de Copilot:** `tools/ai-phase0/credits-report.mjs` resume lo medido por el CLI y lo compara con el consumo que marca GitHub (ver `docs/IA-LOCAL.md`).
 
 ### Changed
+- **Rendimiento del editor, fase 6 (invisible):** la propia página del editor pasa a `OnPush`, con lo que todo el árbol del editor solo se revisa cuando cambia una signal o salta un evento propio. Con medición antes/después en la PR. Sin cambios visibles.
 - **Rendimiento del editor, fase 5 (invisible):** la barra superior, el visor y el panel lateral pasan a `OnPush`, igual que el resto de subcomponentes del editor. Sin cambios visibles.
 - **Rendimiento del editor, fase 4 (invisible):** la barra de migración, el ajuste por textos, la revisión de la IA y el editor de anotaciones pasan a `OnPush`. Sin cambios visibles.
 - **Rendimiento del editor, fase 3 (invisible):** el pie, la ficha del lote y el panel de estados de migración pasan a `OnPush`. Sin cambios visibles.
