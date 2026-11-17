@@ -37,7 +37,7 @@
             [title]="state.name"
           >
             <span class="mono">{{ state.name || '—' }}</span>
-            @if (vm.pdfDoc && vm.pageCount > 1) {
+            @if (vm.pdfDoc() && vm.pageCount() > 1) {
               <small>{{ 'batch.panel.page' | t: { page: state.page } }}</small>
             }
           </button>

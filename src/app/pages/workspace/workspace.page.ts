@@ -322,7 +322,7 @@ export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
-  pdfDoc: PDFDocumentProxy | null = null;
+  readonly pdfDoc = signal<PDFDocumentProxy | null>(null);
   readonly vm: WorkspacePageComponent;
   pageIndex = signal(1);
   scale = signal(1.5);
@@ -365,8 +365,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   previewRgbInput = signal('rgb(0, 0, 0)');
   editHexInput = signal('#000000');
   editRgbInput = signal('rgb(0, 0, 0)');
-  coordsTextModel = JSON.stringify({ pages: [] }, null, 2);
-  jsonTreePreview: JsonTreePreview = buildJsonTreePreview(this.coordsTextModel);
+  readonly coordsTextModel = signal(JSON.stringify({ pages: [] }, null, 2));
+  readonly jsonTreePreview = signal<JsonTreePreview>(buildJsonTreePreview(this.coordsTextModel()));
   guidesFeatureEnabled = signal(false);
   advancedOptionsOpen = signal(false);
   includeAdvancedJsonFields = signal(false);
@@ -565,14 +565,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly fontOptions = this.fontCatalog.fontOptions;
   readonly templates = signal<AnnotationTemplate[]>([]);
   readonly defaultTemplateId = this.templatesService.defaultTemplateId;
-  templateNameModel = '';
-  selectedTemplateId: string | null = null;
+  readonly templateNameModel = signal('');
+  readonly selectedTemplateId = signal<string | null>(null);
   readonly version = APP_VERSION;
   readonly appName = APP_NAME;
   readonly appAuthor = APP_AUTHOR;
   readonly currentYear = new Date().getFullYear();
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
-  languageModel: Language = this.translationService.getCurrentLanguage();
+  readonly languageModel = signal<Language>(this.translationService.getCurrentLanguage());
   readonly defaultFontId = DEFAULT_FONT_ID;
   private readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
@@ -794,7 +794,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       storedTemplates[0] ??
       null;
 
-    this.selectedTemplateId = initialTemplate?.id ?? null;
+    this.selectedTemplateId.set(initialTemplate?.id ?? null);
 
     if (initialTemplate) {
       this.applyTemplate(initialTemplate);
@@ -1092,7 +1092,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   onLanguageChange(language: Language) {
     this.translationService.setLanguage(language);
-    this.languageModel = this.translationService.getCurrentLanguage();
+    this.languageModel.set(this.translationService.getCurrentLanguage());
   }
 
   toggleGuidesFeature(enabled: boolean) {
@@ -1346,9 +1346,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  get pageCount() {
-    return this.pdfDoc?.numPages ?? 0;
-  }
+  readonly pageCount = computed(() => this.pdfDoc()?.numPages ?? 0);
 
   async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -1428,7 +1426,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (restoredScale !== null) {
       this.scale.set(restoredScale);
     }
-    this.pageIndex.set(clampRestoredPage(restore.pageIndex, this.pdfDoc?.numPages ?? 1));
+    this.pageIndex.set(clampRestoredPage(restore.pageIndex, this.pdfDoc()?.numPages ?? 1));
   }
 
   private scheduleSessionSave() {
@@ -1442,7 +1440,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       !file ||
       !shouldScheduleSessionSave({
         hasFile: true,
-        hasDocument: !!this.pdfDoc,
+        hasDocument: !!this.pdfDoc(),
         hasBrowser: typeof window !== 'undefined',
         batchActive: !!this.batch.activeItem(),
         hasAnnotations: this.store.coords().length > 0,
@@ -1477,7 +1475,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Lets «Adelante» (or the history) reopen this PDF as it was after leaving the workspace. */
   private rememberLastOpened() {
-    if (!this.sessionFile || !this.pdfDoc || this.batch.activeItem()) {
+    if (!this.sessionFile || !this.pdfDoc() || this.batch.activeItem()) {
       return;
     }
     this.pendingFileService.rememberLastOpened(this.sessionFile, {
@@ -1514,7 +1512,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     const loadingTask = pdfjsLib.getDocument({ data: typed });
     const loadedPdf = await loadingTask.promise;
-    this.pdfDoc = loadedPdf;
+    this.pdfDoc.set(loadedPdf);
     this.cursorPdfCoords.set(null);
 
     try {
@@ -1550,7 +1548,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     ) {
       await (window.innerWidth < 960 ? this.fitWidth() : this.fitPage());
     }
-    this.thumbnailGenerator.generate(this.pdfDoc).catch((error) =>
+    this.thumbnailGenerator.generate(this.pdfDoc()).catch((error) =>
       console.error('No se pudieron generar las miniaturas del documento.', error),
     );
     this.fileDropActive.set(false);
@@ -1574,11 +1572,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private async renderOnce() {
-    if (!this.pdfDoc) {
+    if (!this.pdfDoc()) {
       return;
     }
 
-    const page: PDFPageProxy = await this.pdfDoc.getPage(this.pageIndex());
+    const page: PDFPageProxy = await this.pdfDoc()!.getPage(this.pageIndex());
     const viewport = page.getViewport({ scale: this.scale() });
 
     const canvas = this.pdfCanvasRef?.nativeElement;
@@ -1609,7 +1607,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   onViewerMouseMove(evt: MouseEvent) {
-    if (!this.pdfDoc) {
+    if (!this.pdfDoc()) {
       this.cursorPdfCoords.set(null);
       return;
     }
@@ -1630,7 +1628,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.suppressHitboxClick = false;
       return;
     }
-    if (!this.pdfDoc || this.editing()) return;
+    if (!this.pdfDoc() || this.editing()) return;
     if (this.adjust()?.phase === 'ready') {
       const hit = this.adjustHit(evt);
       if (hit) {
@@ -1884,7 +1882,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Ctrl/⌘ + / − / 0 zoom the PDF (never the browser page) while the editor has the focus. */
   private handleZoomShortcut(event: KeyboardEvent, key: string): boolean {
-    if (!this.pdfDoc || isEditableElement(event.target) || this.aboutOpen() || this.shortcutsOpen()) {
+    if (!this.pdfDoc() || isEditableElement(event.target) || this.aboutOpen() || this.shortcutsOpen()) {
       return false;
     }
     if (key === '+' || key === '=') {
@@ -1904,7 +1902,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Ctrl/⌘+A, C, V and D work on the annotation selection (never while typing in a field). */
   private handleSelectionShortcut(event: KeyboardEvent, key: string) {
-    if (!this.pdfDoc || isEditableElement(event.target) || this.preview() || this.editing()) {
+    if (!this.pdfDoc() || isEditableElement(event.target) || this.preview() || this.editing()) {
       return;
     }
 
@@ -1994,7 +1992,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
     }
 
-    const needsDocument = () => !!this.pdfDoc;
+    const needsDocument = () => !!this.pdfDoc();
     if (key === ' ' && needsDocument() && !this.preview() && !this.editing()) {
       event.preventDefault();
       this.panReady.set(true);
@@ -2033,7 +2031,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       case 'end':
         if (needsDocument()) {
           event.preventDefault();
-          void this.setPageIndex(this.pageCount);
+          void this.setPageIndex(this.pageCount());
         }
         break;
       case '+':
@@ -2153,7 +2151,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   pasteAnnotation(targetPageNum?: number): boolean {
-    if (!this.clipboard || !this.pdfDoc) {
+    if (!this.clipboard || !this.pdfDoc()) {
       return false;
     }
 
@@ -2398,7 +2396,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private focusJsonTreeNode(pageIndex: number, fieldIndex: number) {
-    if (this.jsonTreePreview.status !== 'ready') {
+    if (this.jsonTreePreview().status !== 'ready') {
       return;
     }
 
@@ -2856,7 +2854,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     try {
       const docA = await this.splitDocOf(aPdf);
-      const docB = this.pdfDoc;
+      const docB = this.pdfDoc();
       const a = docA.numPages;
       const b = docB?.numPages ?? 0;
       this.pagesDiffer.set(b > 0 && a !== b ? { a, b } : null);
@@ -3114,11 +3112,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Zoom so that two pages fit side by side in the viewer. */
   private async fitSplit(): Promise<void> {
     const viewer = this.pdfViewerRef?.nativeElement.closest('.viewer') as HTMLElement | null;
-    if (!viewer || !this.pdfDoc) {
+    if (!viewer || !this.pdfDoc()) {
       return;
     }
     await new Promise((resolve) => setTimeout(resolve));
-    const page = await this.pdfDoc.getPage(this.pageIndex());
+    const page = await this.pdfDoc()!.getPage(this.pageIndex());
     const baseWidth = page.getViewport({ scale: 1 }).width;
     const style = getComputedStyle(viewer);
     const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
@@ -3291,7 +3289,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Looks for the same texts in A and B and opens the review with a proposal. */
   async startAdjust(): Promise<void> {
     const item = this.batch.activeItem();
-    if (!item || !this.migration() || !this.pdfDoc || this.templateFieldsA() === 0) {
+    if (!item || !this.migration() || !this.pdfDoc() || this.templateFieldsA() === 0) {
       return;
     }
     const token = ++this.adjustToken;
@@ -3331,12 +3329,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           return;
         }
         progress.page += 1;
-        if (num > aDoc.numPages || num > this.pdfDoc.numPages) {
+        if (num > aDoc.numPages || num > this.pdfDoc()!.numPages) {
           continue;
         }
         const [aItems, bItems] = await Promise.all([
           this.pageTexts(aDoc, num),
-          this.pageTexts(this.pdfDoc, num),
+          this.pageTexts(this.pdfDoc()!, num),
         ]);
         textsA += aItems.length;
         textsB += bItems.length;
@@ -3750,7 +3748,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   /** Goes to the page of B where a field lands. */
   goToAiRow(row: AiRow): void {
-    if (row.ok && row.newPage >= 1 && row.newPage <= (this.pdfDoc?.numPages ?? 1)) {
+    if (row.ok && row.newPage >= 1 && row.newPage <= (this.pdfDoc()?.numPages ?? 1)) {
       void this.setPageIndex(row.newPage);
     }
   }
@@ -4240,7 +4238,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       clearTimeout(this.batchSaveTimer);
       this.batchSaveTimer = null;
     }
-    if (!this.batch.activeItem() || !this.pdfDoc || typeof window === 'undefined') {
+    if (!this.batch.activeItem() || !this.pdfDoc() || typeof window === 'undefined') {
       return;
     }
     this.batchSaveTimer = setTimeout(() => {
@@ -4256,7 +4254,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.batchSaveTimer = null;
     }
     const item = this.batch.activeItem();
-    if (!item || !this.pdfDoc) {
+    if (!item || !this.pdfDoc()) {
       return;
     }
     const pages = this.store.snapshot();
@@ -4537,7 +4535,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private suppressHitboxClick = false;
 
   onHitboxPointerDown(evt: PointerEvent): void {
-    if (evt.button !== 0 || !this.pdfDoc || this.editing()) {
+    if (evt.button !== 0 || !this.pdfDoc() || this.editing()) {
       return;
     }
     const target = evt.currentTarget as HTMLElement;
@@ -4683,7 +4681,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private insertCopies(fields: readonly PageField[]): boolean {
     const pdfCanvas = this.pdfCanvasRef?.nativeElement;
     const scale = this.scale();
-    if (!fields.length || !this.pdfDoc || !pdfCanvas || !scale) {
+    if (!fields.length || !this.pdfDoc() || !pdfCanvas || !scale) {
       return false;
     }
 
@@ -5108,11 +5106,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   async setPageIndex(pageNumber: number) {
-    if (!this.pdfDoc) {
+    if (!this.pdfDoc()) {
       return;
     }
 
-    const clamped = Math.min(this.pdfDoc.numPages, Math.max(1, Math.round(pageNumber)));
+    const clamped = Math.min(this.pdfDoc()!.numPages, Math.max(1, Math.round(pageNumber)));
 
     if (clamped === this.pageIndex()) {
       return;
@@ -5167,7 +5165,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
    * cursor. A plain wheel at the edge of the sheet may change page (P-63).
    */
   onViewerWheel(evt: WheelEvent): void {
-    if (!this.pdfDoc) {
+    if (!this.pdfDoc()) {
       return;
     }
     if (!evt.ctrlKey && !evt.metaKey) {
@@ -5207,8 +5205,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (
       !this.wheelPaging() ||
       !viewer ||
-      !this.pdfDoc ||
-      this.pdfDoc.numPages < 1 ||
+      !this.pdfDoc() ||
+      this.pdfDoc()!.numPages < 1 ||
       this.preview() ||
       this.editing() ||
       this.panReady() ||
@@ -5224,7 +5222,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const pixels =
       evt.deltaMode === 1 ? evt.deltaY * 33 : evt.deltaMode === 2 ? evt.deltaY * 400 : evt.deltaY;
     const page = this.pageIndex();
-    const total = this.pdfDoc.numPages;
+    const total = this.pdfDoc()!.numPages;
     const step = wheelEdgeStep(this.wheelState, {
       deltaY: pixels,
       now: performance.now(),
@@ -5288,7 +5286,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
    * running are merged into the latest one, so a fast wheel never queues stale renders.
    */
   async zoomToScale(requested: number, anchor: { clientX: number; clientY: number } | null = null) {
-    if (!this.pdfDoc) return;
+    if (!this.pdfDoc()) return;
     this.zoomPending = { requested, anchor };
     if (this.zoomBusy) return;
     this.zoomBusy = true;
@@ -5338,7 +5336,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private onPanPointerDown(evt: PointerEvent) {
-    if (!this.pdfDoc || this.panDrag) return;
+    if (!this.pdfDoc() || this.panDrag) return;
     const target = evt.target as HTMLElement | null;
     const viewer =
       this.unlinkedSplit() && this.isOverSplitA(evt)
@@ -5386,7 +5384,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   async fitPage() {
-    if (!this.pdfDoc) {
+    if (!this.pdfDoc()) {
       return;
     }
 
@@ -5395,7 +5393,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
-    const page = await this.pdfDoc.getPage(this.pageIndex());
+    const page = await this.pdfDoc()!.getPage(this.pageIndex());
     const base = page.getViewport({ scale: 1 });
     const style = getComputedStyle(container);
     const availableW =
@@ -5418,7 +5416,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   async fitWidth() {
-    if (!this.pdfDoc) {
+    if (!this.pdfDoc()) {
       return;
     }
 
@@ -5427,7 +5425,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
-    const page = await this.pdfDoc.getPage(this.pageIndex());
+    const page = await this.pdfDoc()!.getPage(this.pageIndex());
     const baseWidth = page.getViewport({ scale: 1 }).width;
     const style = getComputedStyle(container);
     const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
@@ -5455,7 +5453,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   copyJSON() {
-    navigator.clipboard.writeText(this.coordsTextModel).catch(() => {});
+    navigator.clipboard.writeText(this.coordsTextModel()).catch(() => {});
   }
 
   toggleIncludeAdvancedJsonFields(checked: boolean) {
@@ -5468,7 +5466,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   onCoordsTextChange(value: string) {
-    this.coordsTextModel = value;
+    this.coordsTextModel.set(value);
     this.refreshJsonPreview();
     this.scheduleCoordsAutoApply();
   }
@@ -5510,7 +5508,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private tryApplyCoordsText(options: { silent: boolean; clearWhenEmpty: boolean }): boolean {
-    const text = this.coordsTextModel.trim();
+    const text = this.coordsTextModel().trim();
 
     if (!text) {
       if (options.clearWhenEmpty) {
@@ -5576,11 +5574,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   downloadJSON() {
-    downloadBlob(new Blob([this.coordsTextModel], { type: 'application/json' }), 'coords.json');
+    downloadBlob(new Blob([this.coordsTextModel()], { type: 'application/json' }), 'coords.json');
   }
 
   saveCurrentAsTemplate() {
-    const name = this.templateNameModel.trim();
+    const name = this.templateNameModel().trim();
     if (!name || !this.coords().length) {
       return;
     }
@@ -5596,16 +5594,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     this.templates.set(this.templatesService.getTemplates());
-    this.templateNameModel = '';
-    this.selectedTemplateId = savedTemplate.id;
+    this.templateNameModel.set('');
+    this.selectedTemplateId.set(savedTemplate.id);
   }
 
   loadSelectedTemplate() {
-    if (!this.selectedTemplateId) {
+    if (!this.selectedTemplateId()) {
       return;
     }
 
-    const template = this.templates().find((item) => item.id === this.selectedTemplateId);
+    const template = this.templates().find((item) => item.id === this.selectedTemplateId());
     if (!template) {
       return;
     }
@@ -5614,16 +5612,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   deleteSelectedTemplate() {
-    if (!this.selectedTemplateId || this.selectedTemplateId === this.defaultTemplateId) {
+    if (!this.selectedTemplateId() || this.selectedTemplateId() === this.defaultTemplateId) {
       return;
     }
 
-    const templateId = this.selectedTemplateId;
+    const templateId = this.selectedTemplateId()!;
     this.templatesService.deleteTemplate(templateId);
     const nextTemplates = this.templatesService.getTemplates();
     this.templates.set(nextTemplates);
     if (!nextTemplates.some((template) => template.id === templateId)) {
-      this.selectedTemplateId = nextTemplates[0]?.id ?? this.templatesService.defaultTemplateId;
+      this.selectedTemplateId.set(nextTemplates[0]?.id ?? this.templatesService.defaultTemplateId);
     }
   }
 
@@ -5679,7 +5677,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private rememberedExportChoice: 'map' | 'sample' | null = null;
 
   async downloadAnnotatedPDF() {
-    if (!this.pdfDoc) return;
+    if (!this.pdfDoc()) return;
     const sampleFields = this.countSampleFields();
     if (sampleFields > 0) {
       if (this.rememberedExportChoice) {
@@ -5705,7 +5703,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private async runExport(useSamples: boolean) {
-    if (!this.pdfDoc) return;
+    if (!this.pdfDoc()) return;
     try {
       const customFonts = new Map<string, CustomFontEntry>();
       this.customFonts().forEach((fontEntry) => customFonts.set(fontEntry.id, fontEntry));
@@ -5730,10 +5728,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private async getPdfByteCandidates(): Promise<Uint8Array[]> {
-    if (this.pdfDoc) {
-      if (typeof this.pdfDoc.saveDocument === 'function') {
+    const pdfDoc = this.pdfDoc();
+    if (pdfDoc) {
+      if (typeof pdfDoc.saveDocument === 'function') {
         try {
-          const sanitized = await this.pdfDoc.saveDocument();
+          const sanitized = await pdfDoc.saveDocument();
           this.rememberPdfBytes(sanitized, 2);
         } catch (error) {
           console.warn('No se pudo obtener una versión saneada del PDF para exportar.', error);
@@ -5741,7 +5740,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
 
       try {
-        const rawData = await this.pdfDoc.getData();
+        const rawData = await pdfDoc.getData();
         this.rememberPdfBytes(rawData, 1);
       } catch (error) {
         console.warn('No se pudo obtener los bytes originales del PDF para exportar.', error);
@@ -5770,8 +5769,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private syncCoordsTextModel() {
-    this.coordsTextModel = jsonExportText(
-      buildJsonExportPayload(this.coords(), (field) => this.serializeFieldForJson(field)),
+    this.coordsTextModel.set(
+      jsonExportText(
+        buildJsonExportPayload(this.coords(), (field) => this.serializeFieldForJson(field)),
+      ),
     );
     this.refreshJsonPreview();
   }
@@ -5821,7 +5822,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private refreshJsonPreview() {
-    this.jsonTreePreview = buildJsonTreePreview(this.coordsTextModel);
+    this.jsonTreePreview.set(buildJsonTreePreview(this.coordsTextModel()));
   }
 
   /**
@@ -5831,7 +5832,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private async reportImportIssues(report: ImportReport, pages: PageAnnotations[]) {
     let outOfPage = 0;
     let missingPages = 0;
-    const doc = this.pdfDoc;
+    const doc = this.pdfDoc();
     if (doc) {
       for (const page of pages) {
         if (page.num > doc.numPages) {

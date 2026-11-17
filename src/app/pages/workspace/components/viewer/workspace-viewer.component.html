@@ -1,4 +1,4 @@
-<main class="viewer" [class.viewer--split]="vm.splitActive()" [class.viewer--unlinked]="vm.unlinkedSplit()" [style.--split-h.px]="vm.splitHeight()" [class.viewer--pan-ready]="vm.panReady()" [class.viewer--panning]="vm.panning()" (wheel)="vm.onViewerWheel($event)" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc as _">
+<main class="viewer" [class.viewer--split]="vm.splitActive()" [class.viewer--unlinked]="vm.unlinkedSplit()" [style.--split-h.px]="vm.splitHeight()" [class.viewer--pan-ready]="vm.panReady()" [class.viewer--panning]="vm.panning()" (wheel)="vm.onViewerWheel($event)" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc() as _">
   <app-first-steps [vm]="vm"></app-first-steps>
   @if (vm.zoomHud(); as z) {
     <div class="zoom-hud" [class.zoom-hud--limit]="z.limit" [class.zoom-hud--split]="vm.splitActive() && !!vm.splitBox()"

@@ -104,29 +104,29 @@
 
     <ng-container *ngIf="!vm.jsonPanelCollapsed()">
       <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
-        <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel"
+        <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel()"
           (ngModelChange)="vm.onCoordsTextChange($event)" (paste)="vm.onCoordsTextPaste()"
           [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
       </ng-container>
       <ng-template #jsonTreeView>
-        <div *ngIf="vm.jsonTreePreview.status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
-          <app-json-tree #jsonTree [value]="vm.jsonTreePreview.value"></app-json-tree>
+        <div *ngIf="vm.jsonTreePreview().status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
+          <app-json-tree #jsonTree [value]="vm.jsonTreePreview().value"></app-json-tree>
         </div>
         <ng-template #jsonTreePlaceholder>
           <div class="json-tree-placeholder">
-            <p *ngIf="vm.jsonTreePreview.status === 'empty'">{{ 'sidebar.jsonTree.empty' | t }}</p>
-            <p *ngIf="vm.jsonTreePreview.status === 'error'">{{ 'sidebar.jsonTree.invalid' | t }}</p>
+            <p *ngIf="vm.jsonTreePreview().status === 'empty'">{{ 'sidebar.jsonTree.empty' | t }}</p>
+            <p *ngIf="vm.jsonTreePreview().status === 'error'">{{ 'sidebar.jsonTree.invalid' | t }}</p>
           </div>
         </ng-template>
       </ng-template>
       <div class="json-status" role="status" aria-live="polite">
-        <ng-container [ngSwitch]="vm.jsonTreePreview.status">
+        <ng-container [ngSwitch]="vm.jsonTreePreview().status">
           <span *ngSwitchCase="'error'" class="json-status__item json-status__item--error">
-            ✗ {{ 'sidebar.jsonStatus.error' | t : { line: vm.jsonTreePreview.errorAt?.line ?? '?', column: vm.jsonTreePreview.errorAt?.column ?? '?' } }}
+            ✗ {{ 'sidebar.jsonStatus.error' | t : { line: vm.jsonTreePreview().errorAt?.line ?? '?', column: vm.jsonTreePreview().errorAt?.column ?? '?' } }}
           </span>
           <ng-container *ngSwitchCase="'ready'">
-            <span *ngIf="vm.jsonTreePreview.hasPages; else jsonNoPages" class="json-status__item json-status__item--ok">
-              ✓ {{ 'sidebar.jsonStatus.valid' | t : { count: vm.jsonTreePreview.fieldCount ?? 0 } }}
+            <span *ngIf="vm.jsonTreePreview().hasPages; else jsonNoPages" class="json-status__item json-status__item--ok">
+              ✓ {{ 'sidebar.jsonStatus.valid' | t : { count: vm.jsonTreePreview().fieldCount ?? 0 } }}
             </span>
             <ng-template #jsonNoPages>
               <span class="json-status__item json-status__item--warn">⚠ {{ 'sidebar.jsonStatus.noPages' | t }}</span>
@@ -166,7 +166,7 @@
       <input type="text" [(ngModel)]="vm.templateNameModel" [ngModelOptions]="{ standalone: true }"
         [placeholder]="'sidebar.templates.placeholder' | t" />
       <button type="button" class="btn" (click)="vm.saveCurrentAsTemplate()"
-        [disabled]="!vm.coords().length || !vm.templateNameModel.trim()">
+        [disabled]="!vm.coords().length || !vm.templateNameModel().trim()">
         {{ 'sidebar.templates.saveButton' | t }}
       </button>
     </div>
@@ -179,11 +179,11 @@
               {{ template.name }}
             </option>
           </select>
-          <button type="button" class="btn" (click)="vm.loadSelectedTemplate()" [disabled]="!vm.selectedTemplateId">
+          <button type="button" class="btn" (click)="vm.loadSelectedTemplate()" [disabled]="!vm.selectedTemplateId()">
             {{ 'sidebar.templates.loadButton' | t }}
           </button>
           <button type="button" class="btn templates__delete" (click)="vm.deleteSelectedTemplate()" [disabled]="
-            !vm.selectedTemplateId || vm.selectedTemplateId === vm.defaultTemplateId
+            !vm.selectedTemplateId() || vm.selectedTemplateId() === vm.defaultTemplateId
           ">
             {{ 'sidebar.templates.deleteButton' | t }}
           </button>

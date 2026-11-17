@@ -6,6 +6,7 @@
 - **Guion para medir créditos reales de Copilot:** `tools/ai-phase0/credits-report.mjs` resume lo medido por el CLI y lo compara con el consumo que marca GitHub (ver `docs/IA-LOCAL.md`).
 
 ### Changed
+- **Rendimiento del editor, fase 1 (invisible):** `pdfDoc`, `pageCount`, el texto y el árbol del JSON, el nombre y la selección de plantilla y el idioma del editor pasan a signals, primer paso para poder usar OnPush en los subcomponentes del editor. Sin cambios visibles.
 - **Deuda técnica, parte 7 (sin cambios visibles):** nueve componentes hoja pasan a `ChangeDetectionStrategy.OnPush` (selector de tema, campana y avisos, miniatura de PDF, diálogo «Acerca de» y los cinco trozos de la landing). Solo usan inputs, eventos y signals, así que se actualizan igual con menos comprobaciones; nuevo e2e que cambia idioma y tema en la landing.
 - **Deuda técnica, parte 6 (sin cambios visibles):** las cuentas de «mover el lienzo» y de mantener bajo el cursor el punto del zoom salen de `workspace.page.ts` a `utils/zoom.utils.ts` (`panScrollPosition`, `zoomAnchorScrollDelta`), con tests.
 - **Deuda técnica, parte 5 (sin cambios visibles):** la serialización de `render()` (una sola pasada de pdf.js a la vez, fundiendo peticiones) pasa a `utils/coalescing-runner.ts` y las cuentas de «Ajustar a la página» y «Ajustar al ancho» a `utils/zoom.utils.ts`, con tests.

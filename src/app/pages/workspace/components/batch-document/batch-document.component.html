@@ -11,7 +11,7 @@
             'batch.doc.meta'
               | t
                 : {
-                    pages: vm.pageCount,
+                    pages: vm.pageCount(),
                     index: (vm.batchCtx()?.index ?? 0) + 1,
                     total: vm.batchCtx()?.total,
                   }

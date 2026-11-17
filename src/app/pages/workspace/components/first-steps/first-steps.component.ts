@@ -27,7 +27,7 @@ export class FirstStepsComponent {
 
   /** Empty editor, a loose PDF (a batch PDF has its own guide in the migration bar) and nobody closed it yet. */
   get stepsVisible(): boolean {
-    return !this.stepsClosed() && !!this.vm.pdfDoc && !this.vm.batchCtx() && this.vm.annotationCount() === 0;
+    return !this.stepsClosed() && !!this.vm.pdfDoc() && !this.vm.batchCtx() && this.vm.annotationCount() === 0;
   }
 
   constructor() {
