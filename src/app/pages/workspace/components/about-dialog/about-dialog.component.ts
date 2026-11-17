@@ -3,7 +3,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, View
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-about-dialog',
   standalone: true,
   templateUrl: './about-dialog.component.html',

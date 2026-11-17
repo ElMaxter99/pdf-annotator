@@ -4,7 +4,7 @@ import { ToastService } from '../../services/toast.service';
 
 /** Bell with the informative notices the user closed (or that expired), to show them again. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-toast-bell',
   standalone: true,
   imports: [TranslationPipe],

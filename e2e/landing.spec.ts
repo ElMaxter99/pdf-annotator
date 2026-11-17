@@ -40,3 +40,22 @@ test('language can be switched', async ({ page }) => {
   await page.locator('app-language-selector select').selectOption('en');
   await expect(page.getByText('Load your PDF')).toBeVisible();
 });
+
+test('OnPush leaf components still refresh: language, hero text and theme toggle', async ({
+  page,
+}) => {
+  await page.goto('/landing');
+  const hero = page.locator('app-landing-hero');
+  const before = await hero.innerText();
+  await page.locator('app-language-selector select').selectOption('en');
+  await expect(page.getByText('Load your PDF')).toBeVisible();
+  await expect.poll(async () => hero.innerText()).not.toBe(before);
+
+  const toggle = page.locator('app-theme-toggle button').first();
+  const root = page.locator('html');
+  const wasLight = (await root.getAttribute('class'))?.includes('theme-light') ?? false;
+  const labelBefore = await toggle.getAttribute('aria-label');
+  await toggle.click();
+  await expect(root).toHaveClass(wasLight ? /theme-dark/ : /theme-light/);
+  await expect.poll(async () => toggle.getAttribute('aria-label')).not.toBe(labelBefore);
+});

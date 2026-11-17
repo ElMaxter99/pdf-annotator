@@ -3,7 +3,7 @@ import { TranslationPipe } from '../../i18n/translation.pipe';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-toast-host',
   standalone: true,
   imports: [TranslationPipe],

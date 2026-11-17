@@ -6,7 +6,7 @@ import { PdfThumbnailService } from '../../services/pdf-thumbnail.service';
  * generic page icon when it cannot be drawn. Only renders once it scrolls into view.
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-pdf-thumb',
   standalone: true,
   template: `
