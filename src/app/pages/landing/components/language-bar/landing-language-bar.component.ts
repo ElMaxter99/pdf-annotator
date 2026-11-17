@@ -6,7 +6,7 @@ import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { Language } from '../../../../i18n/translation.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-landing-language-bar',
   standalone: true,
   imports: [CommonModule, LanguageSelectorComponent, ThemeToggleComponent, TranslationPipe],

@@ -3,7 +3,7 @@ import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, ChangeDe
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-landing-dropzone',
   standalone: true,
   imports: [CommonModule, TranslationPipe],
