@@ -543,7 +543,7 @@ test('A and B with a different number of pages say so in the bar', async ({ page
     );
   await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
   await openRow(page);
-  await expect(page.getByTestId('pages-differ')).toContainText('B 1 de 2 · A 1 de 1');
+  await expect(page.getByTestId('pages-differ')).toContainText('A 1 págs · B 2 págs');
 });
 
 test('a new batch starts from zero: the saved one is not added to it', async ({ page }) => {

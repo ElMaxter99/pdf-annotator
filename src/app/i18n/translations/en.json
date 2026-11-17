@@ -315,7 +315,8 @@
       "fitPage": "Fit to page",
       "panCanvas": "Move the canvas (hold)",
       "splitLink": "Link or unlink A and B (Split)",
-      "wheelPage": "Keep scrolling at the edge of the sheet: changes page"
+      "wheelPage": "Keep scrolling at the edge of the sheet: changes page",
+      "pageOnlyA": "Move only A (the pages become free)"
     }
   },
   "toast": {
@@ -462,7 +463,7 @@
         "hint": "A has no template: its PDF is compared as it is.",
         "go": "Add template A (Document)"
       },
-      "pagesDiffer": "Different page counts: B {{page}} of {{b}} · A {{pageA}} of {{a}}",
+      "pagesDiffer": "A {{a}} pages · B {{b}} pages — use ‹ › to see the pages of A",
       "toggle": {
         "label": "Which version to view",
         "b": "View B (edited)",
@@ -504,6 +505,25 @@
           "ai": "AI adaptation"
         },
         "adjust": "{{count}} fields proposed · B unchanged"
+      },
+      "pages": {
+        "free": "Free pages: A p. {{a}} · B p. {{b}}",
+        "linked": "Linked pages",
+        "freeChip": "Free pages",
+        "chipTitle": "Link or free the page of A and B",
+        "linkedToast": "Linked pages: A goes to page {{page}} of B",
+        "copyConfirm": "Page {{a}} of A will be copied into page {{b}} of B",
+        "copyAction": "Copy",
+        "missingTitle": "{{version}} has no page {{page}}",
+        "missingSub": "Pages in this version: {{count}}",
+        "tagMissing": "A has no page {{page}}",
+        "tagOffset": "A p. {{a}}",
+        "paneA": "A",
+        "paneB": "B",
+        "prevA": "Previous page of A",
+        "nextA": "Next page of A",
+        "prevB": "Previous page of B",
+        "nextB": "Next page of B"
       }
     },
     "panel": {

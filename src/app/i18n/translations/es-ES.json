@@ -315,7 +315,8 @@
       "fitPage": "Ajustar a la página",
       "panCanvas": "Mover el lienzo (mantener)",
       "splitLink": "Enlazar o desenlazar A y B (Dividida)",
-      "wheelPage": "Seguir con la rueda al borde de la hoja: cambia de página"
+      "wheelPage": "Seguir con la rueda al borde de la hoja: cambia de página",
+      "pageOnlyA": "Mover solo A (las páginas pasan a libres)"
     }
   },
   "toast": {
@@ -462,7 +463,7 @@
         "hint": "A no tiene plantilla: se compara su PDF tal cual.",
         "go": "Añadir plantilla A (Documento)"
       },
-      "pagesDiffer": "Distinto número de páginas: B {{page}} de {{b}} · A {{pageA}} de {{a}}",
+      "pagesDiffer": "A {{a}} págs · B {{b}} págs — usa ‹ › para ver las páginas de A",
       "toggle": {
         "label": "Qué versión ver",
         "b": "Ver B (se edita)",
@@ -504,6 +505,25 @@
           "ai": "Adaptación con IA"
         },
         "adjust": "{{count}} campos propuestos · B sin modificar"
+      },
+      "pages": {
+        "free": "Páginas libres: A p. {{a}} · B p. {{b}}",
+        "linked": "Páginas enlazadas",
+        "freeChip": "Páginas libres",
+        "chipTitle": "Enlazar o liberar la página de A y de B",
+        "linkedToast": "Páginas enlazadas: A va a la página {{page}} de B",
+        "copyConfirm": "Se copiará la página {{a}} de A en la página {{b}} de B",
+        "copyAction": "Copiar",
+        "missingTitle": "{{version}} no tiene la página {{page}}",
+        "missingSub": "Páginas de esta versión: {{count}}",
+        "tagMissing": "A sin página {{page}}",
+        "tagOffset": "A p. {{a}}",
+        "paneA": "A",
+        "paneB": "B",
+        "prevA": "Página anterior de A",
+        "nextA": "Página siguiente de A",
+        "prevB": "Página anterior de B",
+        "nextB": "Página siguiente de B"
       }
     },
     "panel": {

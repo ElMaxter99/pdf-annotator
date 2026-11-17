@@ -1,6 +1,6 @@
 # Navegar las páginas de A en el traslado (1.14)
 
-Mesas P-74 a P-77 en «Propuestas» del lienzo. **Pendiente de aprobación: no se programa hasta entonces.**
+Mesas P-74 a P-77 en «Propuestas» del lienzo. **Aprobado por Maxter con lo recomendado (incluida la pregunta 1).**
 
 ## Problema
 En el editor del lote solo se navega por las páginas de B. Con A de 2 páginas y B de 1, la página 2 de A no se puede ver para comparar. Hoy hay un único `pageIndex` común; A se dibuja con `min(pageIndex, páginas de A)` (si B tiene más páginas, A repite su última sin avisar); el aviso «Distinto número de páginas» solo informa; el zoom desenlazado (#246) separa zoom y scroll pero no la página; la rueda al borde pasa página solo en el rango de B; el ajuste por textos, la IA y «Poner plantilla A» solo trabajan las páginas comunes.

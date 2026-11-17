@@ -28,6 +28,7 @@ export class ShortcutsDialogComponent implements AfterViewInit {
       items: [
         { keys: ['←', 'PgUp'], sep: '/', labelKey: 'shortcuts.items.prevPage' },
         { keys: ['→', 'PgDn'], sep: '/', labelKey: 'shortcuts.items.nextPage' },
+        { keys: ['⇧ ←', '⇧ →'], sep: '/', labelKey: 'shortcuts.items.pageOnlyA' },
         { keys: ['Home', 'End'], sep: '/', labelKey: 'shortcuts.items.firstLastPage' },
         { keys: ['+', '−'], sep: '/', labelKey: 'shortcuts.items.zoom' },
         { keys: ['0'], labelKey: 'shortcuts.items.fitWidth' },
