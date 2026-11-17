@@ -36,8 +36,10 @@ import {
   fitPageScale,
   fitPageScaleForOverflow,
   fitWidthScale,
+  panScrollPosition,
   stepScale,
   wheelZoomFactor,
+  zoomAnchorScrollDelta,
   zoomLimitFor,
   type ZoomLimit,
 } from '../../utils/zoom.utils';
@@ -5306,10 +5308,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         this.redrawAllForPage();
         if (at && canvas && container && before) {
           const after = canvas.getBoundingClientRect();
-          const ux = (at.clientX - before.left) / previous;
-          const uy = (at.clientY - before.top) / previous;
-          container.scrollLeft += after.left + ux * next - at.clientX;
-          container.scrollTop += after.top + uy * next - at.clientY;
+          const { dx, dy } = zoomAnchorScrollDelta(before, after, at, previous, next);
+          container.scrollLeft += dx;
+          container.scrollTop += dy;
         }
       }
     } finally {
@@ -5363,8 +5364,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private onPanPointerMove(evt: PointerEvent) {
     const drag = this.panDrag;
     if (!drag) return;
-    drag.viewer.scrollLeft = drag.left - (evt.clientX - drag.x);
-    drag.viewer.scrollTop = drag.top - (evt.clientY - drag.y);
+    const { left, top } = panScrollPosition(drag, evt);
+    drag.viewer.scrollLeft = left;
+    drag.viewer.scrollTop = top;
   }
 
   private endPan() {

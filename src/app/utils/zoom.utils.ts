@@ -68,3 +68,42 @@ export function fitPageScaleForOverflow(
 ): number {
   return clampFit(floorPercent((baseHeight * scale - overflow) / baseHeight));
 }
+
+export interface PanStart {
+  /** Posición del puntero al empezar a arrastrar. */
+  readonly x: number;
+  readonly y: number;
+  /** Desplazamiento del visor al empezar a arrastrar. */
+  readonly left: number;
+  readonly top: number;
+}
+
+/** Desplazamiento del visor al mover la mano: el lienzo sigue al puntero. */
+export function panScrollPosition(
+  start: PanStart,
+  pointer: { clientX: number; clientY: number },
+): { left: number; top: number } {
+  return {
+    left: start.left - (pointer.clientX - start.x),
+    top: start.top - (pointer.clientY - start.y),
+  };
+}
+
+/**
+ * Cuánto hay que desplazar el visor tras un zoom para que el punto bajo `anchor` siga en su sitio.
+ * `before`/`after` son las esquinas (izquierda, arriba) del lienzo antes y después del zoom.
+ */
+export function zoomAnchorScrollDelta(
+  before: { left: number; top: number },
+  after: { left: number; top: number },
+  anchor: { clientX: number; clientY: number },
+  previousScale: number,
+  nextScale: number,
+): { dx: number; dy: number } {
+  const ux = (anchor.clientX - before.left) / previousScale;
+  const uy = (anchor.clientY - before.top) / previousScale;
+  return {
+    dx: after.left + ux * nextScale - anchor.clientX,
+    dy: after.top + uy * nextScale - anchor.clientY,
+  };
+}
