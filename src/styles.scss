@@ -4974,30 +4974,6 @@ body.has-update-card .toast-host {
 
 /* ---- v1.9.2 · Interfaz simple para 1080p (mesas P-40..P-44) ---- */
 
-/* C · La propuesta de la IA flota al pie del visor en lugar de apilar una tercera barra */
-.app--workspace app-ai-review {
-  display: contents;
-}
-
-.app--workspace app-ai-review .migration-hint {
-  position: fixed;
-  left: calc(max(360px, 33vw) + 28px);
-  right: 28px;
-  bottom: 52px;
-  z-index: 60;
-  width: fit-content;
-  max-width: min(1180px, calc(100vw - max(360px, 33vw) - 56px));
-  margin: 0 auto;
-  background: var(--panel);
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(5, 5, 17, 0.45);
-}
-
-.app--workspace.app--sidebar-minimized app-ai-review .migration-hint {
-  left: 100px;
-  max-width: min(1180px, calc(100vw - 128px));
-}
-
 .app--workspace .migration-bar {
   margin-top: 6px;
   padding-top: 6px;
@@ -5086,37 +5062,13 @@ body.has-update-card .toast-host {
   }
 }
 
-.app--workspace app-ai-review .migration-hint {
-  flex-wrap: nowrap;
-}
-
-.app--workspace app-ai-review .migration-hint > span:first-child {
-  flex: 1 1 220px;
-  min-width: 0;
-}
-
-.app--workspace app-ai-review .migration-hint__close {
-  flex: none;
-}
-
 /* El aviso va arriba a la derecha del visor y no tapa la propuesta de la IA */
 body:has(.app--workspace) .toast-host {
   top: 132px;
   bottom: auto;
 }
 
-.app--workspace app-ai-review .migration-hint__actions {
-  flex-wrap: nowrap;
-  align-items: center;
-  white-space: nowrap;
-}
-
 @media (max-width: 960px) {
-  .app--workspace app-ai-review .migration-hint {
-    position: static;
-    max-width: none;
-  }
-
   .sidebar-head {
     flex-wrap: wrap;
   }
@@ -5605,4 +5557,352 @@ button.version-chip:focus-visible {
 .toast__action:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+
+/* ---- Revisión de la propuesta de la IA: barra anclada bajo el visor (mesas P-67 a P-71) ---- */
+.app--workspace app-ai-review {
+  display: contents;
+}
+
+@media (min-width: 961px) {
+  .app--workspace.app--ai-dock {
+    grid-template-areas:
+      "header header"
+      "sidebar viewer"
+      "sidebar dock"
+      "footer footer";
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+  }
+}
+
+.ai-dock {
+  --ai-on: var(--accent-text);
+  --ai-warn: #fbbf24;
+  --ai-err: #ff8a8a;
+  --ai-count-bg: #fbbf24;
+  --ai-count-fg: #1b1300;
+  grid-area: dock;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+}
+
+:root.theme-light .ai-dock {
+  --ai-warn: #92400e;
+  --ai-err: #b91c1c;
+  --ai-count-bg: #b45309;
+  --ai-count-fg: #ffffff;
+}
+
+.ai-dock__state {
+  flex: 1 1 200px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ai-dock__l1,
+.ai-dock__l2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+.ai-dock__l2 .ai-dock__muted,
+.ai-dock__l1 b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-dock__muted,
+.ai-dock__label {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.ai-dock__chip {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--muted);
+}
+
+.ai-dock__chip--on {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--ai-on);
+}
+
+.ai-dock__chip--warn {
+  background: color-mix(in srgb, var(--ai-warn) 16%, transparent);
+  color: var(--ai-warn);
+}
+
+.ai-dock__chip--err {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--ai-err);
+}
+
+.ai-dock__view {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-dock__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-dock__count {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--ai-count-bg);
+  color: var(--ai-count-fg);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.ai-dock__progress {
+  flex: none;
+  width: 180px;
+  height: 6px;
+  accent-color: var(--accent);
+}
+
+.ai-dock__icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease-out;
+}
+
+.ai-dock__icon:hover {
+  background: color-mix(in srgb, var(--text) 16%, transparent);
+}
+
+.ai-dock__icon:focus-visible,
+.ai-dock__menu button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ai-dock__more {
+  position: relative;
+  display: inline-flex;
+}
+
+.ai-dock__menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  min-width: 210px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  box-shadow: 0 10px 30px rgba(5, 5, 17, 0.45);
+}
+
+.ai-dock__menu button {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ai-dock__menu button:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.ai-dock__menu .ai-dock__menu-danger {
+  color: var(--ai-err);
+}
+
+@media (max-width: 1400px) {
+  .ai-dock__label,
+  .ai-dock__untouched {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .ai-dock {
+    grid-area: auto;
+    flex-wrap: wrap;
+  }
+}
+
+.split-tag__view {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(4, 24, 24, 0.18);
+  color: inherit;
+  font-weight: 700;
+}
+
+:root.theme-light .split-tag__view {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* ---- Pestaña Anotaciones con una propuesta de la IA activa (mesas P-69 y P-70) ---- */
+.ai-proposal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.ai-proposal:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ai-proposal__head,
+.ai-proposal__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-proposal__grow {
+  flex: 1;
+}
+
+.ai-proposal__count {
+  color: var(--muted);
+}
+
+.ai-proposal__sec {
+  margin: 6px 2px 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ai-proposal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ai-proposal__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.ai-proposal__row--off .ai-proposal__name b {
+  opacity: 0.7;
+}
+
+.ai-proposal__label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.ai-proposal__name {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ai-proposal__name b,
+.ai-proposal__name small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-proposal__name small,
+.ai-proposal__hint {
+  color: var(--muted);
+}
+
+.ai-proposal__name--off b {
+  font-weight: 500;
+}
+
+.ai-proposal__badge {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent-text);
+}
+
+.ai-proposal__badge--medium {
+  background: color-mix(in srgb, #fbbf24 16%, transparent);
+  color: #fbbf24;
+}
+
+.ai-proposal__badge--low {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: #ff8a8a;
+}
+
+:root.theme-light .ai-proposal__badge--medium {
+  color: #92400e;
+}
+
+:root.theme-light .ai-proposal__badge--low {
+  color: #b91c1c;
 }

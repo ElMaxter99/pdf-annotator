@@ -2,7 +2,11 @@
   <section class="migration-panel" [attr.aria-label]="'batch.panel.title' | t">
     <div class="migration-panel__head">
       <h5>{{ 'batch.panel.title' | t: { count: vm.annotationCount() } }}</h5>
-      @if (m.summary.missing + m.summary.new > 0) {
+      @if (proposal(); as ai) {
+        <span class="migration-chip migration-chip--on" data-testid="ai-proposal-count">{{
+          'ai.proposal.count' | t: { count: vm.aiSummary().placed }
+        }}</span>
+      } @else if (m.summary.missing + m.summary.new > 0) {
         <span class="migration-chip migration-chip--on">{{
           'batch.panel.toResolve' | t: { count: m.summary.missing }
         }}</span>
@@ -11,7 +15,53 @@
       }
     </div>
 
-    @if (vm.annotationCount() === 0 && m.item.aPages.length) {
+    @if (proposal(); as ai) {
+      @let sum = vm.aiSummary();
+      <div class="ai-proposal" tabindex="-1" data-testid="ai-proposal">
+        <div class="ai-proposal__head">
+          <span class="ai-dock__chip ai-dock__chip--on">✦ {{ providerName() }}</span>
+          <span class="ai-dock__chip">{{ 'ai.proposal.unapplied' | t }}</span>
+          <span class="ai-proposal__grow"></span>
+          <small class="ai-proposal__count" aria-live="polite" data-testid="ai-proposal-selected">{{ 'ai.proposal.willApply' | t: { count: sum.selected } }}</small>
+        </div>
+        <div class="ai-proposal__actions">
+          <button type="button" class="btn btn--ghost" (click)="vm.setAiSelection('high')" data-testid="ai-select-high">{{ 'ai.proposal.selectHigh' | t: { count: highCount() } }}</button>
+          <button type="button" class="btn btn--ghost" (click)="vm.setAiSelection('none')" data-testid="ai-select-none">{{ 'ai.proposal.selectNone' | t }}</button>
+        </div>
+      </div>
+      @for (group of groups(); track group.key) {
+        <h6 class="ai-proposal__sec">{{ 'ai.proposal.group.' + group.key | t: { count: group.rows.length } }}</h6>
+        <ul class="ai-proposal__list" [attr.data-testid]="'ai-proposal-' + group.key">
+          @for (row of group.rows; track row.id) {
+            <li class="ai-proposal__row" [attr.data-ai-id]="row.id" [class.ai-proposal__row--off]="row.ok && !selected(row)">
+              @if (row.ok) {
+                <label class="ai-proposal__label">
+                  <input type="checkbox" [checked]="selected(row)" (change)="vm.toggleAiRow(row)" [attr.data-ai-review-first]="isFirstReview(row) ? '' : null" />
+                  <span class="ai-proposal__name">
+                    <b class="mono">{{ vm.aiFieldName(row) }}</b>
+                    <small>
+                      @if (row.anchorB) { {{ 'ai.review.anchor' | t: { text: row.anchorB } }} · }
+                      @if (changesPage(row)) { {{ 'batch.panel.page' | t: { page: row.page } }} → {{ 'batch.panel.page' | t: { page: row.newPage } }} } @else { {{ 'batch.panel.page' | t: { page: row.page } }} }
+                      @if (showReason(row)) { · {{ row.reason }} }
+                    </small>
+                  </span>
+                </label>
+                <span class="ai-proposal__badge ai-proposal__badge--{{ level(row) }}">{{ 'ai.confidence.' + level(row) | t }}</span>
+              } @else {
+                <span class="ai-proposal__name ai-proposal__name--off">
+                  <b class="mono">{{ vm.aiFieldName(row) }}</b>
+                  <small>{{ 'ai.proposal.notInB' | t }}</small>
+                </span>
+                @if (missingFor(row); as state) {
+                  <button type="button" class="btn btn--ghost" (click)="vm.placeMissing(state)" data-testid="place-missing">{{ 'ai.proposal.placeByHand' | t }}</button>
+                }
+              }
+            </li>
+          }
+        </ul>
+      }
+      <small class="ai-proposal__hint">{{ 'ai.review.listHint' | t }}</small>
+    } @else if (vm.annotationCount() === 0 && m.item.aPages.length) {
       <div class="migration-note">
         <p>{{ 'batch.panel.emptyB' | t }}</p>
         <button

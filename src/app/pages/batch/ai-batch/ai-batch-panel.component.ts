@@ -32,6 +32,10 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
   private readonly now = signal(Date.now());
   private timer: ReturnType<typeof setInterval> | null = null;
   readonly pausing = signal(false);
+  /** What the summary at the foot talks about: the whole batch, the PDF in progress or a PDF the person picked. */
+  readonly scope = signal<'all' | 'follow' | 'pick'>('all');
+  readonly filterKeys = ['all', 'review', 'warn', 'failed'] as const;
+  readonly filter = signal<(typeof this.filterKeys)[number]>('all');
 
   ngOnInit(): void {
     this.timer = setInterval(() => this.now.set(Date.now()), 1000);
@@ -45,6 +49,10 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.scope() === 'pick') {
+      this.release(); // first Esc lets go of the chosen PDF; the next one closes the panel
+      return;
+    }
     if (this.queue.panelOpen() && this.queue.run() !== 'idle') {
       this.queue.closePanel();
     }
@@ -70,6 +78,79 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
   );
   /** The PDF in progress, if any. */
   readonly current = computed(() => this.list().find((entry) => AI_BATCH_ACTIVE_PHASES.includes(entry.row.phase)) ?? null);
+  /** The PDF in progress or, when nothing runs, the last one that did something. */
+  readonly followed = computed(() => {
+    const list = this.list();
+    return this.current() ?? [...list].reverse().find((entry) => entry.row.phase !== 'queued') ?? list[0] ?? null;
+  });
+  readonly picked = computed(() => {
+    const id = this.queue.detailsId();
+    return this.scope() === 'pick' && id ? this.list().find((entry) => entry.row.id === id) ?? null : null;
+  });
+  /** The PDF the summary talks about (`null` = the whole batch). */
+  readonly subject = computed(() => (this.scope() === 'pick' ? this.picked() : this.scope() === 'follow' ? this.followed() : null));
+  readonly longList = computed(() => this.list().length > 10);
+  readonly filterCounts = computed(() => {
+    const phases = this.list().map((entry) => entry.row.phase);
+    return {
+      all: phases.length,
+      review: phases.filter((p) => p === 'ready' || p === 'partial' || p === 'free').length,
+      warn: phases.filter((p) => p === 'partial').length,
+      failed: phases.filter((p) => p === 'failed' || p === 'cancelled').length,
+    };
+  });
+  readonly visible = computed(() => {
+    const filter = this.longList() ? this.filter() : 'all';
+    return this.list().filter(({ row }) =>
+      filter === 'all'
+        ? true
+        : filter === 'review'
+          ? row.phase === 'ready' || row.phase === 'partial' || row.phase === 'free'
+          : filter === 'warn'
+            ? row.phase === 'partial'
+            : row.phase === 'failed' || row.phase === 'cancelled',
+    );
+  });
+  /** Summary for the chosen scope (P-72, P-73). */
+  readonly sheet = computed(() => {
+    this.now(); // keeps the clock ticking
+    const t = (key: string, params?: Record<string, string | number>) => this.i18n.translate(key, params);
+    const row = this.subject();
+    const lang = this.i18n.language();
+    if (!row) {
+      const tokens = this.tokens();
+      return {
+        key: 'all',
+        title: t('batch.ai.sheet.allTitle'),
+        sub: t('batch.ai.sheet.allSub', { count: this.finished() }),
+        big: tokens > 0 ? tokens.toLocaleString(lang) : null,
+        note: tokens > 0 ? '' : t('batch.ai.sheet.noMeasure'),
+        error: '',
+        stats: [
+          { label: t('batch.ai.sheet.requests'), value: String(this.queue.requests()) },
+          { label: t('batch.ai.sheet.time'), value: this.elapsed() },
+          { label: t('batch.ai.sheet.free'), value: String(this.freeCount()) },
+        ],
+      };
+    }
+    const r = row.row;
+    const tokens = usageTotal(r.usage);
+    const started = r.startedAt ?? r.t0;
+    const failed = r.phase === 'failed' && r.error ? t(`ai.error.${r.error.code}.title`, { provider: providerName(r.provider || 'claude') }) : '';
+    return {
+      key: `${this.scope()}:${r.id}`,
+      title: t(this.scope() === 'follow' ? 'batch.ai.sheet.followTitle' : 'batch.ai.sheet.pdfTitle', { name: row.name }),
+      sub: this.scope() === 'follow' ? t('batch.ai.sheet.followSub') : t(this.stateOf(r).key, this.stateParams(r)),
+      big: r.phase === 'free' ? '0' : tokens > 0 ? tokens.toLocaleString(lang) : null,
+      note: r.phase === 'free' ? t('batch.ai.details.noSpend') : tokens > 0 || failed ? '' : t('batch.ai.sheet.noMeasure'),
+      error: failed,
+      stats: [
+        { label: t('batch.ai.sheet.attempts'), value: String(r.attempt) },
+        { label: t('batch.ai.sheet.time'), value: started === null ? '—' : clock(Math.max(0, (r.endedAt ?? this.now()) - started)) },
+        { label: t('batch.ai.sheet.placed'), value: t('batch.ai.sheet.placedValue', { placed: r.placed, total: r.total }) },
+      ],
+    };
+  });
   readonly retryCount = computed(() => this.counts().failed + this.counts().cancelled);
   readonly lost = computed(() => this.queue.pause()?.kind === 'lost');
   readonly provider = computed(() => providerName(this.helper.provider()));
@@ -138,6 +219,46 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
 
   retryFailed(): void {
     this.queue.retryFailed();
+  }
+
+  chooseAll(): void {
+    this.scope.set('all');
+  }
+
+  chooseFollow(): void {
+    this.scope.set('follow');
+    this.queue.detailsId.set(null);
+    this.queue.detailsFollow.set(true);
+  }
+
+  /** Clicking the chosen row again lets it go. */
+  pickRow(id: string): void {
+    if (this.scope() === 'pick' && this.queue.detailsId() === id) {
+      this.release();
+      return;
+    }
+    this.scope.set('pick');
+    this.queue.pickDetails(id);
+  }
+
+  release(): void {
+    this.scope.set('all');
+    this.queue.detailsId.set(null);
+    this.queue.detailsFollow.set(true);
+  }
+
+  /** ↑ ↓ move between the rows of the list. */
+  onListKey(event: KeyboardEvent): void {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
+      return;
+    }
+    const row = (event.target as HTMLElement | null)?.closest('li');
+    const next = event.key === 'ArrowDown' ? row?.nextElementSibling : row?.previousElementSibling;
+    const button = next?.querySelector<HTMLElement>('button');
+    if (button) {
+      event.preventDefault();
+      button.focus();
+    }
   }
 
   toggleDetails(): void {

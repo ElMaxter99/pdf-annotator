@@ -141,42 +141,103 @@
           </div>
         }
 
-        <ul class="ai-panel__list" [attr.aria-label]="'batch.ai.details.list' | t">
-          @for (entry of list(); track entry.row.id) {
+        @if (longList()) {
+          <span class="migration-seg ai-panel__filters" role="group" [attr.aria-label]="'batch.ai.filter.label' | t" data-testid="ai-filters">
+            @for (key of filterKeys; track key) {
+              <button type="button" [class.migration-seg__on]="filter() === key" [attr.aria-pressed]="filter() === key" (click)="filter.set(key)" [attr.data-testid]="'ai-filter-' + key">
+                {{ 'batch.ai.filter.' + key | t: { count: filterCounts()[key] } }}
+              </button>
+            }
+          </span>
+        }
+
+        <ul class="ai-panel__list" role="list" [attr.aria-label]="'batch.ai.details.list' | t" (keydown)="onListKey($event)">
+          @for (entry of visible(); track entry.row.id) {
             <li>
               <button
                 type="button"
                 class="ai-panel__row"
                 [class.ai-panel__row--on]="entry.row.id === selectedId()"
                 [attr.aria-pressed]="entry.row.id === selectedId()"
-                (click)="queue.pickDetails(entry.row.id); queue.detailsOpen() || queue.openDetails(entry.row.id)"
+                (click)="pickRow(entry.row.id)"
                 [attr.data-testid]="'ai-bdetails-item-' + entry.row.id"
               >
-                <span class="ai-panel__top">
-                  <b>{{ entry.name }}</b>
-                  <span class="ai-chip ai-chip--{{ stateOf(entry.row).tone || 'idle' }}">{{ stateOf(entry.row).key | t: stateParams(entry.row) }}</span>
+                <i class="ai-panel__mark" aria-hidden="true"></i>
+                <span class="ai-panel__rowbody">
+                  <span class="ai-panel__top">
+                    <b>{{ entry.name }}</b>
+                    <span class="ai-chip ai-chip--{{ stateOf(entry.row).tone || 'idle' }}">{{ stateOf(entry.row).key | t: stateParams(entry.row) }}</span>
+                  </span>
+                  <span class="ai-panel__top ai-panel__sub">
+                    @if (rowNote(entry.row); as note) {
+                      <small>{{ note }}</small>
+                    } @else {
+                      <small></small>
+                    }
+                    @if (entry.row.id === selectedId()) {
+                      <span class="ai-chip ai-chip--on" data-testid="ai-row-viewing">{{ 'batch.ai.row.viewing' | t }}</span>
+                    } @else if (scope() === 'follow' && entry.row.id === followed()?.row?.id) {
+                      <span class="ai-chip" data-testid="ai-row-following">{{ 'batch.ai.row.following' | t }}</span>
+                    }
+                  </span>
                 </span>
-                @if (rowNote(entry.row); as note) {
-                  <small>{{ note }}</small>
-                }
               </button>
             </li>
+          } @empty {
+            <li class="ai-panel__empty"><small>{{ 'batch.ai.filter.empty' | t }}</small></li>
           }
         </ul>
-
-        <button
-          type="button"
-          class="ai-panel__toggle"
-          [attr.aria-expanded]="queue.detailsOpen()"
-          (click)="toggleDetails()"
-          data-testid="ai-batch-details"
-        >
-          {{ 'batch.ai.panel.details' | t }} {{ queue.detailsOpen() ? '▴' : '▾' }}
-        </button>
-        @if (queue.detailsOpen()) {
-          <app-ai-batch-details />
-        }
       </div>
+
+      <section class="ai-sheet" role="region" aria-live="polite" [attr.aria-label]="'batch.ai.sheet.label' | t" [class.ai-sheet--pinned]="scope() === 'pick'" data-testid="ai-batch-sheet">
+        <div class="ai-sheet__scope">
+          <span class="migration-seg" role="group" [attr.aria-label]="'batch.ai.sheet.scope' | t">
+            <button type="button" [class.migration-seg__on]="scope() === 'all'" [attr.aria-pressed]="scope() === 'all'" (click)="chooseAll()" data-testid="ai-scope-all">{{ 'batch.ai.sheet.scopeAll' | t }}</button>
+            <button type="button" [class.migration-seg__on]="scope() === 'follow'" [attr.aria-pressed]="scope() === 'follow'" (click)="chooseFollow()" data-testid="ai-scope-follow">{{ 'batch.ai.sheet.scopeFollow' | t }}</button>
+            @if (picked(); as p) {
+              <button type="button" class="migration-seg__on ai-sheet__picked" aria-pressed="true" [title]="p.name" data-testid="ai-scope-pick">{{ p.name }}</button>
+            }
+          </span>
+          <span class="ai-panel__grow"></span>
+          @if (scope() === 'pick') {
+            <button type="button" class="ai-panel__x" (click)="release()" [attr.aria-label]="'batch.ai.sheet.release' | t" [attr.title]="'batch.ai.sheet.release' | t" data-testid="ai-scope-release">✕</button>
+          }
+        </div>
+        @let sh = sheet();
+        @for (k of [sh.key]; track k) {
+          <div class="ai-sheet__title" data-testid="ai-sheet-title">
+            <b>{{ sh.title }}</b>
+            <small>{{ sh.sub }}</small>
+          </div>
+        }
+        @if (sh.error) {
+          <p class="ai-sheet__error" role="alert">{{ sh.error }}</p>
+        }
+        <div class="ai-sheet__big">
+          @if (sh.big !== null) {
+            <strong data-testid="ai-sheet-tokens">{{ sh.big }}</strong> <small>{{ 'batch.ai.sheet.tokens' | t }}</small>
+          }
+          @if (sh.note) {
+            <small>{{ sh.note }}</small>
+          }
+        </div>
+        <div class="ai-sheet__stats">
+          @for (stat of sh.stats; track stat.label) {
+            <div><small>{{ stat.label }}</small><b>{{ stat.value }}</b></div>
+          }
+        </div>
+        <div class="ai-sheet__links">
+          @if (scope() === 'pick' && picked()?.row?.phase === 'failed') {
+            <button type="button" class="btn btn--ghost" (click)="retryFailed()" data-testid="ai-sheet-retry">{{ 'batch.ai.panel.retry' | t: { count: retryCount() } }}</button>
+          }
+          <button type="button" class="ai-panel__toggle" [attr.aria-expanded]="queue.detailsOpen()" (click)="toggleDetails()" data-testid="ai-batch-details">
+            {{ (scope() === 'all' ? 'batch.ai.sheet.moreAll' : 'batch.ai.sheet.more') | t }} {{ queue.detailsOpen() ? '▴' : '→' }}
+          </button>
+        </div>
+        @if (queue.detailsOpen()) {
+          <div class="ai-sheet__details"><app-ai-batch-details /></div>
+        }
+      </section>
 
       <footer class="ai-panel__foot">
         <small>{{ 'batch.ai.panel.note' | t }}</small>

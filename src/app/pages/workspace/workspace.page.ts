@@ -106,6 +106,7 @@ import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.c
 import { ExportSamplesDialogComponent } from './components/export-samples-dialog/export-samples-dialog.component';
 import { AboutDialogComponent } from './components/about-dialog/about-dialog.component';
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
+import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnailGenerator } from './page-thumbnail-generator';
 import {
@@ -285,7 +286,6 @@ export interface AiSession {
   /** Fields the person ticked or unticked on top of the default selection. */
   overrides: Record<string, boolean>;
   view: 'proposal' | 'original';
-  open: boolean;
   seconds: number;
   error: { code: string; message: string; reset: string | null } | null;
   /** Live log for «Ver detalles» (no PDF content, only names and counts). */
@@ -316,6 +316,7 @@ export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
     WorkspaceSidebarComponent,
     WorkspaceViewerComponent,
     WorkspaceFooterComponent,
+    AiReviewComponent,
     ShortcutsDialogComponent,
     AboutDialogComponent,
     ExportSamplesDialogComponent,
@@ -3512,7 +3513,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       rows: [],
       overrides: {},
       view: 'proposal',
-      open: false,
       seconds: 0,
       error: null,
       sent: null,
@@ -3583,7 +3583,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         seconds: result.seconds,
         details: result.details,
         endedAt: Date.now(),
-        open: result.rows.some((row) => !row.ok),
       });
     } catch (error) {
       if (abort !== this.aiAbort || (error as AiRequestError)?.code === 'aborted') {
@@ -3650,7 +3649,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       rows: [...rows],
       overrides: {},
       view: 'proposal',
-      open: rows.some((row) => !row.ok),
       seconds: saved.seconds,
       error: null,
       sent: saved.details?.sent ?? null,
@@ -3721,8 +3719,43 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.patchAi({ view });
   }
 
-  toggleAiOpen(): void {
-    this.patchAi({ open: !this.ai()?.open });
+  /** The proposal strip is docked under the viewer while it is showing (it reserves its own row). */
+  aiDockVisible(): boolean {
+    return this.ai() !== null && !this.isNoticeClosed('ai');
+  }
+
+  /** Fields the AI proposal places (for the badge of the «Anotaciones» tab); 0 when no proposal is waiting. */
+  aiProposedCount(): number {
+    const session = this.ai();
+    return session && session.phase === 'ready' ? session.rows.filter((row) => row.ok).length : 0;
+  }
+
+  /** «Revisar campos»: the list of the proposal lives in «Anotaciones»; opens the tab and focuses what needs a look. */
+  reviewAiFields(): void {
+    this.setSidebarMinimized(false);
+    this.setSidebarTab('annotations');
+    this.runAfterRender(() => {
+      const target =
+        this.document?.querySelector<HTMLElement>('[data-ai-review-first]') ??
+        this.document?.querySelector<HTMLElement>('[data-testid="ai-proposal"]');
+      target?.scrollIntoView?.({ block: 'nearest' });
+      target?.focus?.();
+    });
+  }
+
+  /** «Marcar las altas» / «Quitar todas»: replaces the ticks of the proposal in one go. */
+  setAiSelection(mode: 'high' | 'none'): void {
+    const session = this.ai();
+    if (!session) {
+      return;
+    }
+    const overrides: Record<string, boolean> = {};
+    for (const row of session.rows) {
+      if (row.ok) {
+        overrides[row.id] = mode === 'high' && confidenceLevel(row.confidence) === 'high';
+      }
+    }
+    this.patchAi({ overrides });
   }
 
   toggleAiRow(row: AiRow): void {

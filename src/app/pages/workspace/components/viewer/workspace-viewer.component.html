@@ -98,7 +98,7 @@
   }
   <div class="canvas-container" [class.canvas-container--split-b]="vm.splitActive()" [class.canvas-container--reference-only]="vm.showingOnlyA() && !!vm.migration()" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()">
     @if (vm.splitActive()) {
-      <span class="split-tag split-tag--b">{{ 'batch.editor.split.tagB' | t }}</span>
+      <span class="split-tag split-tag--b">{{ 'batch.editor.split.tagB' | t }}@if (vm.ai(); as ai) { @if (ai.phase === 'ready') { <span class="split-tag__view" data-testid="split-tag-view">{{ (ai.view === 'proposal' ? 'ai.dock.viewingProposal' : 'ai.dock.viewingOriginal') | t }}</span> } }</span>
     }
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
     <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
