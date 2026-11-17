@@ -110,6 +110,7 @@ import {
 import { WorkspaceHeaderComponent } from './components/header/workspace-header.component';
 import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sidebar.component';
 import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
+import { PageMapDialogComponent } from './components/migration/page-map-dialog.component';
 import { ExportSamplesDialogComponent } from './components/export-samples-dialog/export-samples-dialog.component';
 import { AboutDialogComponent } from './components/about-dialog/about-dialog.component';
 import { CommandPaletteComponent } from './components/command-palette/command-palette.component';
@@ -155,7 +156,15 @@ import { PendingFileService, PendingRestore } from '../../services/pending-file.
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
 import { BATCH_ITEM_PARAM, BATCH_OPEN_VIEW, batchItemOpening } from '../../utils/batch-open.utils';
-import type { BatchItem } from '../../models/batch.model';
+import type { BatchItem, PageMapData } from '../../models/batch.model';
+import {
+  type PageSuggestion,
+  mapPageOfA,
+  reconcileMap,
+  remapPagesToB,
+  sizesOfAByB,
+  suggestPageMap,
+} from '../../utils/page-map.utils';
 import { matchTemplate, parsePastedTemplates } from '../../utils/template-paste.utils';
 import {
   extractPagesCollection,
@@ -331,6 +340,7 @@ export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
     CommandPaletteComponent,
     AboutDialogComponent,
     ExportSamplesDialogComponent,
+    PageMapDialogComponent,
   ],
 })
 export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestroy {
@@ -518,6 +528,32 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const pages = this.batch.activeItem()?.aPages ?? [];
     return this.fitA() ? scalePagesToSize(pages, this.pageSizesA(), this.pageSizesB()) : pages;
   });
+  /**
+   * Table of pages A↔B of the open pair (P-78 a P-81), already valid for the current pages. It only
+   * needs both PDFs open (not `comparing`, which depends on the states that use it).
+   */
+  readonly pageMap = computed<PageMapData | null>(() => {
+    const item = this.batch.activeItem();
+    const a = this.pageCountA();
+    const b = this.pageCount();
+    if (!item?.pageMap || !item.bPdf || a < 1 || b < 1) {
+      return null;
+    }
+    return reconcileMap(item.pageMap, a, b);
+  });
+  /** A and B move together and the table decides which page of A goes with each page of B. */
+  readonly tableLinked = computed(() => !!this.pageMap() && this.pagesLinked());
+  /** The template of A with its pages renumbered to the page of B they go with (the table). */
+  private readonly aPagesForB = computed<PageAnnotations[]>(() => {
+    const map = this.pageMap();
+    if (!map) {
+      return this.aPagesView();
+    }
+    const remapped = remapPagesToB(this.batch.activeItem()?.aPages ?? [], map.pairs);
+    return this.fitA()
+      ? scalePagesToSize(remapped, sizesOfAByB(this.pageSizesA(), map.pairs), this.pageSizesB())
+      : remapped;
+  });
   /** Factors applied to A on the current page (for the notice). */
   readonly fitFactors = computed(() =>
     pageScaleFactors(
@@ -558,9 +594,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Page of A to draw, or null when A has no page at the linked position. */
   readonly aPage = computed<number | null>(() => {
     if (!this.comparing()) return this.pageIndex();
-    return this.pagesLinked()
-      ? pageOfVersion(this.commonPage(), this.pageCountA())
-      : this.freeAPage();
+    if (!this.pagesLinked()) return this.freeAPage();
+    const map = this.pageMap();
+    return map
+      ? mapPageOfA(map, this.pageIndex())
+      : pageOfVersion(this.commonPage(), this.pageCountA());
   });
   readonly aGhost = computed(() => this.comparing() && this.aPage() === null);
   /** B has no page at the linked position: its pane shows the empty state. */
@@ -568,15 +606,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     () =>
       this.comparing() &&
       this.pagesLinked() &&
+      !this.pageMap() &&
       this.commonPage() > this.pageCount() &&
       !this.showingOnlyA(),
   );
   /** Page shown in the header: the linked one, or B's while the pages are free. */
   readonly pageShown = computed(() =>
-    this.comparing() && this.pagesLinked() ? this.commonPage() : this.pageIndex(),
+    this.comparing() && this.pagesLinked() && !this.pageMap()
+      ? this.commonPage()
+      : this.pageIndex(),
   );
   readonly pageTotalShown = computed(() =>
-    this.comparing() && this.pagesLinked()
+    this.comparing() && this.pagesLinked() && !this.pageMap()
       ? linkedPageTotal(this.pageCountA(), this.pageCount())
       : this.pageCount(),
   );
@@ -585,14 +626,28 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.comparing() && !this.pagesLinked() ? pageOffsetLabel(this.aPage(), this.pageIndex()) : null,
   );
   /** Label over the page when A shows another page than B (or none) outside «Dividida». */
-  readonly pageTag = computed<{ kind: 'missing' | 'offset'; a: number; b: number } | null>(() => {
+  readonly pageTag = computed<{
+    kind: 'missing' | 'offset' | 'mapped' | 'unmapped';
+    a: number;
+    b: number;
+  } | null>(() => {
     if (!this.comparing() || this.splitActive()) return null;
     const a = this.aPage();
+    if (this.tableLinked()) {
+      return a === null
+        ? { kind: 'unmapped', a: 0, b: this.pageIndex() }
+        : a !== this.pageIndex()
+          ? { kind: 'mapped', a, b: this.pageIndex() }
+          : null;
+    }
     if (a === null) return { kind: 'missing', a: this.commonPage(), b: this.pageIndex() };
     return !this.pagesLinked() && a !== this.pageIndex()
       ? { kind: 'offset', a, b: this.pageIndex() }
       : null;
   });
+  /** Dialog «Emparejar páginas» (P-79): open or not. */
+  readonly pageMapOpen = signal(false);
+  private pageMapToken = 0;
   private splitDoc: { blob: Blob; doc: Promise<PDFDocumentProxy> } | null = null;
   private splitToken = 0;
   private referencePdfToken = 0;
@@ -611,7 +666,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return null; // without a new version there is nothing to compare: plain editing
     }
     const states = computeFieldStates(
-      this.aPagesView(),
+      this.aPagesForB(),
       this.store.coords(),
       item.links,
       item.dismissed,
@@ -1917,6 +1972,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   @HostListener('document:keydown', ['$event'])
   onGlobalKeydown(event: KeyboardEvent) {
+    if (this.pageMapOpen()) {
+      return; // the dialog «Emparejar páginas» owns the keyboard (Esc and Ctrl+Enter are its own)
+    }
     const key = event.key.toLowerCase();
     const hasPrimaryModifier = event.ctrlKey || event.metaKey;
 
@@ -2891,7 +2949,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (pageA === null || this.bGhost()) {
       return;
     }
-    if (pageA !== page) {
+    if (pageA !== page && !this.tableLinked()) {
       // Free pages: the fields of the page of A that is open, with no state against B.
       for (const field of this.fieldsOfA(pageA)) {
         draw(field.name, field.x, field.y, field.fontSize, false);
@@ -3043,10 +3101,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }
       for (const field of aPage.fields) {
         const name = (field.mapField || field.value || '').trim();
+        const sameAsB = this.tableLinked() ? page === this.aPage() : page === this.pageIndex();
         const missing =
-          page === this.pageIndex() &&
+          sameAsB &&
           m.states.some(
-            (state) => state.status === 'missing' && state.page === page && state.name === name,
+            (state) =>
+              state.status === 'missing' && state.page === this.pageIndex() && state.name === name,
           );
         out.push({ name, x: field.x, y: field.y, fontSize: field.fontSize, missing });
       }
@@ -3376,13 +3436,22 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
+  /** The template of A by the page of B it goes with (the table decides; without one, by number). */
   private normalizedTemplateA(): PageAnnotations[] {
-    const item = this.batch.activeItem();
-    if (!item) {
+    return this.normalizeTemplate(this.aPagesForB());
+  }
+
+  /** The template of A by its own page numbers (what the AI helper and free pages work with). */
+  private normalizedTemplateOfA(): PageAnnotations[] {
+    return this.normalizeTemplate(this.aPagesView());
+  }
+
+  private normalizeTemplate(pages: PageAnnotations[]): PageAnnotations[] {
+    if (!this.batch.activeItem()) {
       return [];
     }
     return (
-      this.annotationImport.normalizeImportedCoordinates({ pages: this.aPagesView() }, (field) =>
+      this.annotationImport.normalizeImportedCoordinates({ pages }, (field) =>
         this.prepareFieldForStorage(field),
       ) ?? []
     );
@@ -3451,16 +3520,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           return;
         }
         progress.page += 1;
-        if (num > aDoc.numPages || num > this.pdfDoc()!.numPages) {
+        const numA = mapPageOfA(this.pageMap(), num);
+        if (numA === null || numA > aDoc.numPages || num > this.pdfDoc()!.numPages) {
           continue;
         }
         const [aItems, bItems] = await Promise.all([
-          this.pageTexts(aDoc, num),
+          this.pageTexts(aDoc, numA),
           this.pageTexts(this.pdfDoc()!, num),
         ]);
         textsA += aItems.length;
         textsB += bItems.length;
-        const report = findAnchors(this.fitTextsOfA(aItems, num), bItems);
+        const report = findAnchors(this.fitTextsOfA(aItems, numA, num), bItems);
         for (const anchor of report.anchors) {
           anchors.push({
             key: `${num}:${anchor.id}`,
@@ -3524,13 +3594,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   /** With «Ajustar» on, the texts of A are scaled to B first (x and y apart), then compared. */
-  private fitTextsOfA(items: readonly PageTextItem[], page: number): readonly PageTextItem[] {
+  private fitTextsOfA(
+    items: readonly PageTextItem[],
+    pageA: number,
+    pageB: number,
+  ): readonly PageTextItem[] {
     if (!this.fitA()) {
       return items;
     }
     const { sx, sy } = pageScaleFactors(
-      sizeOfPage(this.pageSizesA(), page),
-      sizeOfPage(this.pageSizesB(), page),
+      sizeOfPage(this.pageSizesA(), pageA),
+      sizeOfPage(this.pageSizesB(), pageB),
     );
     return items.map((item) => ({ ...item, x: item.x * sx, y: item.y * sy }));
   }
@@ -3618,7 +3692,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.aiAbort?.abort();
     const abort = new AbortController();
     this.aiAbort = abort;
-    const template = this.normalizedTemplateA();
+    const template = this.normalizedTemplateOfA();
     this.aiTemplate = new Map();
     for (const page of template) {
       page.fields.forEach((field, i) => this.aiTemplate.set(`p${page.num}-f${i + 1}`, field));
@@ -3650,7 +3724,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     try {
       const result = await this.aiHelper.propose(
-        { a: aPdf, b: bPdf, template: { pages: template } },
+        { a: aPdf, b: bPdf, template: { pages: template, pageMap: this.pageMap()?.pairs } },
         (progress) =>
           this.ai.update((cur) =>
             cur
@@ -3746,7 +3820,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.cancelAi();
-    const template = this.normalizedTemplateA();
+    const template = this.normalizedTemplateOfA();
     this.aiTemplate = new Map();
     for (const page of template) {
       page.fields.forEach((field, i) => this.aiTemplate.set(`p${page.num}-f${i + 1}`, field));
@@ -4300,15 +4374,122 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.confirmCopyPageOfA(mode, pageA, this.pageIndex());
       return;
     }
+    const map = this.pageMap();
     if (mode === 'replace') {
-      this.replaceCoords(this.normalizedTemplateA());
+      if (map) {
+        // Only the pages of B that have a page of A are replaced; the others are left alone.
+        const kept = this.coords().filter((page) => map.pairs[page.num - 1] === null);
+        this.replaceCoords(
+          [...kept, ...this.normalizedTemplateA()].sort((x, y) => x.num - y.num),
+        );
+      } else {
+        this.replaceCoords(this.normalizedTemplateA());
+      }
     } else {
       this.addMissingFromA(
         this.migration()?.states.filter((state) => state.status === 'missing') ?? [],
       );
     }
+    if (map) {
+      this.toast.show(
+        this.translationService.translate('batch.editor.pageMap.copied', {
+          count: map.pairs.filter((a) => a !== null).length,
+          unmapped: map.pairs.filter((a) => a === null).length,
+        }),
+      );
+      return;
+    }
     if (this.fitA()) {
       this.toast.show(this.translationService.translate('toast.batch.copiedAdjusted'));
+    }
+  }
+
+  // ---- «Emparejar páginas» (tabla A↔B, P-78 a P-81) -------------------------------------------
+
+  openPageMap(): void {
+    if (this.comparing()) {
+      this.pageMapOpen.set(true);
+    }
+  }
+
+  closePageMap(): void {
+    this.pageMapToken += 1;
+    this.pageMapOpen.set(false);
+  }
+
+  /** Stops a text reading that is still running (the dialog's «Cancelar lectura»). */
+  cancelPageMapReading(): void {
+    this.pageMapToken += 1;
+  }
+
+  pageTagKey(kind: 'missing' | 'offset' | 'mapped' | 'unmapped'): string {
+    return `batch.editor.pages.tag${kind[0].toUpperCase()}${kind.slice(1)}`;
+  }
+
+  /** Saves the table of the open pair (`undefined` = by number again). «Deshacer» for 10 s. */
+  applyPageMap(map: PageMapData | undefined): void {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    const before = item.pageMap;
+    const change = (next: PageMapData | undefined) => {
+      this.batch.setPageMap(item.id, next);
+      this.commonPage.set(this.pageIndex());
+      this.selection.set(null);
+    };
+    change(map);
+    this.closePageMap();
+    this.toast.show(
+      this.translationService.translate(
+        map ? 'batch.editor.pageMap.applied' : 'batch.editor.pageMap.cleared',
+        { count: map?.pairs.filter((a) => a !== null).length ?? 0, total: map?.pairs.length ?? 0 },
+      ),
+      'info',
+      10000,
+      false,
+      {
+        label: this.translationService.translate('controls.undo'),
+        run: () => change(before),
+      },
+    );
+  }
+
+  /** Reads the text of every page of A and B and suggests the table; rows set by hand are kept. */
+  async suggestPageMapFromTexts(
+    keep: PageMapData | null,
+    onProgress: (done: number, total: number) => void,
+  ): Promise<PageSuggestion | 'noText' | null> {
+    const item = this.batch.activeItem();
+    const docB = this.pdfDoc();
+    if (!item || !docB) {
+      return 'noText';
+    }
+    const token = ++this.pageMapToken;
+    try {
+      const docA = await this.splitDocOf(item.aPdf);
+      const total = docA.numPages + docB.numPages;
+      let done = 0;
+      const read = async (doc: PDFDocumentProxy): Promise<string[]> => {
+        const out: string[] = [];
+        for (let num = 1; num <= doc.numPages; num++) {
+          if (token !== this.pageMapToken) {
+            throw new Error('cancelled');
+          }
+          out.push((await this.pageTexts(doc, num)).map((text) => text.text).join(' '));
+          done += 1;
+          onProgress(done, total);
+        }
+        return out;
+      };
+      const textsA = await read(docA);
+      const textsB = await read(docB);
+      if (!textsA.some((text) => text.trim()) || !textsB.some((text) => text.trim())) {
+        return 'noText';
+      }
+      return suggestPageMap(textsA, textsB, keep);
+    } catch {
+      return token !== this.pageMapToken ? null : 'noText';
     }
   }
 
@@ -4327,7 +4508,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private copyPageOfAToB(mode: 'replace' | 'missing', pageA: number, pageB: number): void {
-    const source = this.normalizedTemplateA().find((page) => page.num === pageA)?.fields ?? [];
+    const source = this.normalizedTemplateOfA().find((page) => page.num === pageA)?.fields ?? [];
     const nameOf = (field: PageField) => (field.mapField || field.value || '').trim();
     const present = new Set(
       (this.coords().find((page) => page.num === pageB)?.fields ?? []).map(nameOf),
@@ -5323,9 +5504,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (this.comparing() && this.pagesLinked()) {
       const target = clampPageNumber(
         pageNumber,
-        linkedPageTotal(this.pageCountA(), this.pdfDoc()!.numPages),
+        this.pageMap()
+          ? this.pdfDoc()!.numPages
+          : linkedPageTotal(this.pageCountA(), this.pdfDoc()!.numPages),
       );
-      if (target === this.commonPage()) {
+      if (target === this.commonPage() && !(this.pageMap() && target !== this.pageIndex())) {
         return;
       }
       this.commonPage.set(target);
@@ -5410,6 +5593,23 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     );
   }
 
+  /** Menu of the chip of pages (▾): «Emparejadas/Enlazadas», «Libres» and «Emparejar páginas…». */
+  readonly pagesMenuOpen = signal(false);
+
+  setPagesLinked(linked: boolean): void {
+    this.pagesMenuOpen.set(false);
+    if (linked !== this.pagesLinked()) {
+      this.togglePagesLink();
+    }
+  }
+
+  onPagesMenuFocusOut(event: FocusEvent): void {
+    const holder = event.currentTarget as HTMLElement | null;
+    if (!holder?.contains(event.relatedTarget as Node | null)) {
+      this.pagesMenuOpen.set(false);
+    }
+  }
+
   setPaneFocus(pane: 'a' | 'b'): void {
     this.paneFocus.set(pane);
   }
@@ -5439,8 +5639,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     this.selection.set(null);
     this.pageIndex.set(clamped);
-    if (!this.comparing()) {
-      // Without A the shared position is simply B's page (A's page count may arrive later).
+    if (!this.comparing() || this.pageMap()) {
+      // Without A, or with the table, the shared position is simply B's page.
       this.commonPage.set(clamped);
     }
     await this.render();

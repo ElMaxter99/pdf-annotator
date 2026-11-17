@@ -524,7 +524,61 @@
         "prevA": "Previous page of A",
         "nextA": "Next page of A",
         "prevB": "Previous page of B",
-        "nextB": "Next page of B"
+        "nextB": "Next page of B",
+        "tagMapped": "B {{b}} ↔ A {{a}}",
+        "tagUnmapped": "A has no match"
+      },
+      "pageMap": {
+        "chip": "Pages matched",
+        "menu": "Page options",
+        "menuMapped": "Matched (table)",
+        "open": "Match pages…",
+        "unmappedTitle": "B {{page}} has no match in A",
+        "unmappedSub": "It is a new page in the table: there are no fields of A to copy.",
+        "applied": "Pages matched: {{count}} of {{total}}",
+        "cleared": "Pages matched by number again",
+        "copied": "Fields copied by the table · pages with a match: {{count}} · without: {{unmapped}}",
+        "title": "Match the pages of A and B",
+        "lead": "Pages: A {{a}} · B {{b}}. Choose which page of A goes with each page of B.",
+        "suggest": "Suggest from texts",
+        "shiftAll": "Shift all",
+        "shiftBack": "Shift every match one page back",
+        "shiftForward": "Shift every match one page forward",
+        "byNumber": "By number",
+        "reading": "Reading texts…",
+        "readingCount": "{{done}} of {{total}} pages",
+        "cancelRead": "Cancel reading",
+        "noTextTitle": "The texts could not be read.",
+        "noTextHint": "It looks like a scanned PDF with no selectable text. Match by hand, use “Shift all” or “By number”.",
+        "retry": "Try again",
+        "noteNumber": "Until you match them, A1 is compared with B1, A2 with B2… and any extra pages of B have no A.",
+        "noteSuggested": "I compared the text of every page. Review the suggestion and press “Apply”: B does not change, only which page of A is compared with each one.",
+        "noteManual": "You changed {{count}} rows. Rows marked “By hand” are kept if you press “Suggest from texts” again.",
+        "colB": "Page of B",
+        "colA": "Matches (in A)",
+        "colOrigin": "Source",
+        "pageA": "A {{n}}",
+        "pageB": "B {{n}}",
+        "rowLabel": "Page of A that goes with B {{n}}",
+        "none": "No page of A",
+        "repeated": "Repeated",
+        "alsoIn": "Also in B {{pages}}",
+        "originNew": "New",
+        "pickOne": "Choose a page of A",
+        "originManual": "By hand",
+        "restoreRow": "Back to the suggestion",
+        "originAuto": "Suggested",
+        "noMatch": "No close enough match",
+        "match": "Match {{pct}} %",
+        "originNone": "No page of A",
+        "originNumber": "By number",
+        "noteRepeated": "The same page of A will be copied into several pages of B. You can go on if that is what you want (for example, a form that repeats).",
+        "noteUnused": "A {{pages}} is not used: its fields will not be copied.",
+        "preview": "Selected row",
+        "summary": "{{matched}} of {{total}} rows have a match",
+        "cancel": "Cancel",
+        "apply": "Apply",
+        "noticeMapped": "Pages matched with the table · A {{a}} pages · B {{b}} pages"
       }
     },
     "panel": {
@@ -683,7 +737,12 @@
         "removeYes": "Remove version B"
       },
       "noTemplateNote": "No template: you can load the original’s or add a new version in Document.",
-      "noTemplateGo": "Go to Document"
+      "noTemplateGo": "Go to Document",
+      "pages": {
+        "title": "Pages",
+        "mapped": "Matched by hand",
+        "byNumber": "By number"
+      }
     },
     "adjust": {
       "title": "Adjust by texts",
@@ -1028,6 +1087,9 @@
       "ready": "Already done",
       "noB": "Version B missing",
       "noFields": "Its template A has no fields"
+    },
+    "pageMap": {
+      "chip": "Pages matched"
     }
   },
   "preview": {

@@ -524,7 +524,61 @@
         "prevA": "Page précédente de A",
         "nextA": "Page suivante de A",
         "prevB": "Page précédente de B",
-        "nextB": "Page suivante de B"
+        "nextB": "Page suivante de B",
+        "tagMapped": "B {{b}} ↔ A {{a}}",
+        "tagUnmapped": "A sans équivalent"
+      },
+      "pageMap": {
+        "chip": "Pages appariées",
+        "menu": "Options des pages",
+        "menuMapped": "Appariées (tableau)",
+        "open": "Apparier les pages…",
+        "unmappedTitle": "B {{page}} n'a pas d'équivalent dans A",
+        "unmappedSub": "C'est une nouvelle page du tableau : il n'y a pas de champs de A à copier.",
+        "applied": "Pages appariées : {{count}} sur {{total}}",
+        "cleared": "Pages de nouveau appariées par numéro",
+        "copied": "Champs copiés d'après le tableau · pages avec équivalent : {{count}} · sans : {{unmapped}}",
+        "title": "Apparier les pages de A et de B",
+        "lead": "Pages : A {{a}} · B {{b}}. Choisissez quelle page de A correspond à chaque page de B.",
+        "suggest": "Suggérer d'après les textes",
+        "shiftAll": "Décaler toutes",
+        "shiftBack": "Décaler toutes les correspondances d'une page en arrière",
+        "shiftForward": "Décaler toutes les correspondances d'une page en avant",
+        "byNumber": "Par numéro",
+        "reading": "Lecture des textes…",
+        "readingCount": "{{done}} pages sur {{total}}",
+        "cancelRead": "Annuler la lecture",
+        "noTextTitle": "Les textes n'ont pas pu être lus.",
+        "noTextHint": "Il semble s'agir d'un PDF numérisé, sans texte sélectionnable. Appariez à la main, utilisez « Décaler toutes » ou « Par numéro ».",
+        "retry": "Réessayer",
+        "noteNumber": "Tant que vous n'appariez pas, A1 est comparée à B1, A2 à B2… et les pages de B en trop n'ont pas de A.",
+        "noteSuggested": "J'ai comparé les textes de chaque page. Vérifiez la suggestion et appuyez sur « Appliquer » : B ne change pas, seule change la page de A comparée à chacune.",
+        "noteManual": "Vous avez modifié {{count}} lignes. Celles marquées « À la main » ne sont pas touchées si vous relancez « Suggérer d'après les textes ».",
+        "colB": "Page de B",
+        "colA": "Équivaut à (dans A)",
+        "colOrigin": "Origine",
+        "pageA": "A {{n}}",
+        "pageB": "B {{n}}",
+        "rowLabel": "Page de A qui correspond à B {{n}}",
+        "none": "Aucune page de A",
+        "repeated": "Répétée",
+        "alsoIn": "Aussi en B {{pages}}",
+        "originNew": "Nouvelle",
+        "pickOne": "Choisissez une page de A",
+        "originManual": "À la main",
+        "restoreRow": "Revenir à la suggestion",
+        "originAuto": "Suggérée",
+        "noMatch": "Pas de correspondance suffisante",
+        "match": "Correspondance {{pct}} %",
+        "originNone": "Aucune page de A",
+        "originNumber": "Par numéro",
+        "noteRepeated": "Une même page de A sera copiée dans plusieurs pages de B. Vous pouvez continuer si c'est voulu (par exemple, un formulaire qui se répète).",
+        "noteUnused": "A {{pages}} n'est pas utilisée : ses champs ne seront pas copiés.",
+        "preview": "Ligne choisie",
+        "summary": "{{matched}} lignes sur {{total}} ont un équivalent",
+        "cancel": "Annuler",
+        "apply": "Appliquer",
+        "noticeMapped": "Pages appariées avec le tableau · A {{a}} pages · B {{b}} pages"
       }
     },
     "panel": {
@@ -683,7 +737,12 @@
         "removeYes": "Retirer la version B"
       },
       "noTemplateNote": "Sans modèle : vous pouvez charger celui de l’original ou ajouter une nouvelle version dans Document.",
-      "noTemplateGo": "Aller à Document"
+      "noTemplateGo": "Aller à Document",
+      "pages": {
+        "title": "Pages",
+        "mapped": "Appariées à la main",
+        "byNumber": "Par numéro"
+      }
     },
     "adjust": {
       "title": "Ajustement par textes",
@@ -1028,6 +1087,9 @@
       "ready": "Déjà prêt",
       "noB": "Version B manquante",
       "noFields": "Son modèle A n'a pas de champs"
+    },
+    "pageMap": {
+      "chip": "Pages appariées"
     }
   },
   "preview": {

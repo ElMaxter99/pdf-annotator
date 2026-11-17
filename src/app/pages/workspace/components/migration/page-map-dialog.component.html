@@ -1,0 +1,118 @@
+<div class="dialog-backdrop" (click)="close()">
+  <div appFocusTrap class="dialog pm" role="dialog" aria-modal="true" aria-labelledby="pm-title"
+    data-testid="page-map-dialog" (click)="$event.stopPropagation()" (keydown)="onKeydown($event)">
+    <header class="pm__head">
+      <h2 id="pm-title" class="dialog__title">{{ 'batch.editor.pageMap.title' | t }}</h2>
+      <p class="pm__muted">{{ 'batch.editor.pageMap.lead' | t: { a: pagesA(), b: vm.pageCount() } }}</p>
+    </header>
+    <div class="pm__body">
+      <div class="pm__main">
+        <div class="pm__tools">
+          <button type="button" class="btn btn--ghost" (click)="suggest()" [disabled]="phase() === 'loading'" data-testid="pm-suggest">✦ {{ 'batch.editor.pageMap.suggest' | t }}</button>
+          <span class="pm__shift" role="group" [attr.aria-label]="'batch.editor.pageMap.shiftAll' | t">
+            <span class="pm__muted">{{ 'batch.editor.pageMap.shiftAll' | t }}</span>
+            <button type="button" class="btn btn--ghost pm__sq" (click)="shift(-1)" [disabled]="phase() === 'loading'" [attr.aria-label]="'batch.editor.pageMap.shiftBack' | t" [attr.title]="'batch.editor.pageMap.shiftBack' | t" data-testid="pm-shift-back">−1</button>
+            <button type="button" class="btn btn--ghost pm__sq" (click)="shift(1)" [disabled]="phase() === 'loading'" [attr.aria-label]="'batch.editor.pageMap.shiftForward' | t" [attr.title]="'batch.editor.pageMap.shiftForward' | t" data-testid="pm-shift-forward">+1</button>
+          </span>
+          <button type="button" class="btn btn--ghost" (click)="resetByNumber()" [disabled]="phase() === 'loading'" data-testid="pm-reset">↺ {{ 'batch.editor.pageMap.byNumber' | t }}</button>
+        </div>
+
+        @if (phase() === 'loading') {
+          <div class="pm__note pm__note--info" role="status" data-testid="pm-loading">
+            <b>{{ 'batch.editor.pageMap.reading' | t }}</b>
+            <span>{{ 'batch.editor.pageMap.readingCount' | t: { done: progress().done, total: progress().total } }}</span>
+            <div class="pm__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent()" [attr.aria-label]="'batch.editor.pageMap.reading' | t"><i [style.width.%]="percent()"></i></div>
+          </div>
+        } @else if (phase() === 'noText') {
+          <div class="pm__note pm__note--error" role="alert" data-testid="pm-error">
+            <span><b>{{ 'batch.editor.pageMap.noTextTitle' | t }}</b> {{ 'batch.editor.pageMap.noTextHint' | t }}</span>
+            <button type="button" class="btn btn--ghost" (click)="suggest()">{{ 'batch.editor.pageMap.retry' | t }}</button>
+          </div>
+        } @else if (byNumber()) {
+          <div class="pm__note pm__note--warn" data-testid="pm-note-number">{{ 'batch.editor.pageMap.noteNumber' | t }}</div>
+        } @else if (suggestion()) {
+          <div class="pm__note pm__note--info" data-testid="pm-note-suggested">{{ 'batch.editor.pageMap.noteSuggested' | t }}</div>
+        } @else if (report().manual > 0) {
+          <div class="pm__note pm__note--info">{{ 'batch.editor.pageMap.noteManual' | t: { count: report().manual } }}</div>
+        }
+
+        <div class="pm__table" role="group" [attr.aria-label]="'batch.editor.pageMap.title' | t">
+          <div class="pm__row pm__row--head" aria-hidden="true">
+            <span>{{ 'batch.editor.pageMap.colB' | t }}</span><span></span><span>{{ 'batch.editor.pageMap.colA' | t }}</span><span>{{ 'batch.editor.pageMap.colOrigin' | t }}</span>
+          </div>
+          @for (row of rows(); track row.b) {
+            <div class="pm__row" [class.pm__row--warn]="row.repeated || (row.origin === 'new' && row.a === null)"
+              [class.pm__row--focus]="row.b === focusRow()" (focusin)="focusRow.set(row.b)" [attr.data-testid]="'pm-row-' + row.b">
+              <span class="pm__b"><span class="pm__thumb" aria-hidden="true"></span><b>{{ 'batch.editor.pageMap.pageB' | t: { n: row.b } }}</b></span>
+              <span class="pm__arrow" aria-hidden="true">↔</span>
+              <select class="pm__select" [value]="row.a === null ? '' : '' + row.a" (change)="setRow(row.b, $any($event.target).value)"
+                [attr.aria-label]="('batch.editor.pageMap.rowLabel' | t: { n: row.b })">
+                <option value="" [selected]="row.a === null">{{ 'batch.editor.pageMap.none' | t }}</option>
+                @for (n of optionsA(); track n) {
+                  <option [value]="'' + n" [selected]="row.a === n">{{ 'batch.editor.pageMap.pageA' | t: { n: n } }}</option>
+                }
+              </select>
+              <span class="pm__origin">
+                @if (row.repeated) {
+                  <span class="pm__chip pm__chip--warn">⚠ {{ 'batch.editor.pageMap.repeated' | t }}</span>
+                  <small>{{ 'batch.editor.pageMap.alsoIn' | t: { pages: row.alsoIn.join(', ') } }}</small>
+                } @else if (row.origin === 'new' && row.a === null) {
+                  <span class="pm__chip pm__chip--warn">{{ 'batch.editor.pageMap.originNew' | t }}</span>
+                  <small>{{ 'batch.editor.pageMap.pickOne' | t }}</small>
+                } @else if (row.origin === 'manual') {
+                  <span class="pm__chip pm__chip--on">✎ {{ 'batch.editor.pageMap.originManual' | t }}</span>
+                  @if (row.canRestore) {
+                    <button type="button" class="pm__link" (click)="restoreRow(row.b)">↺ {{ 'batch.editor.pageMap.restoreRow' | t }}</button>
+                  }
+                } @else if (row.origin === 'auto') {
+                  <span class="pm__chip pm__chip--on">✦ {{ 'batch.editor.pageMap.originAuto' | t }}</span>
+                  <small>{{ (row.a === null ? 'batch.editor.pageMap.noMatch' : 'batch.editor.pageMap.match') | t: { pct: (row.score * 100).toFixed(0) } }}</small>
+                } @else if (row.a === null) {
+                  <span class="pm__chip">{{ 'batch.editor.pageMap.originNone' | t }}</span>
+                } @else {
+                  <span class="pm__chip">{{ 'batch.editor.pageMap.originNumber' | t }}</span>
+                }
+              </span>
+            </div>
+          }
+        </div>
+
+        @if (report().repeated.size > 0) {
+          <div class="pm__note pm__note--warn" data-testid="pm-note-repeated">{{ 'batch.editor.pageMap.noteRepeated' | t }}</div>
+        }
+        @if (!byNumber() && report().unusedA.length > 0) {
+          <div class="pm__note pm__note--info" data-testid="pm-note-unused">{{ 'batch.editor.pageMap.noteUnused' | t: { pages: unusedText() } }}</div>
+        }
+      </div>
+
+      @if (focused(); as row) {
+        <aside class="pm__aside" [attr.aria-label]="'batch.editor.pageMap.preview' | t">
+          <span class="pm__label">{{ 'batch.editor.pageMap.preview' | t }}</span>
+          <div class="pm__pair">
+            <div>
+              @if (row.a === null) {
+                <span class="pm__page pm__page--empty">{{ 'batch.editor.pageMap.none' | t }}</span>
+              } @else {
+                <span class="pm__page" aria-hidden="true"></span>
+              }
+              <small>{{ row.a === null ? '—' : ('batch.editor.pageMap.pageA' | t: { n: row.a }) }}</small>
+            </div>
+            <div>
+              <span class="pm__page" aria-hidden="true"></span>
+              <small>{{ 'batch.editor.pageMap.pageB' | t: { n: row.b } }}</small>
+            </div>
+          </div>
+        </aside>
+      }
+    </div>
+    <footer class="pm__foot">
+      <span class="pm__muted" data-testid="pm-summary">{{ 'batch.editor.pageMap.summary' | t: { matched: report().matched, total: vm.pageCount() } }}</span>
+      <span class="pm__grow"></span>
+      @if (phase() === 'loading') {
+        <button type="button" class="btn btn--ghost" (click)="cancelReading()" data-testid="pm-cancel-read">{{ 'batch.editor.pageMap.cancelRead' | t }}</button>
+      }
+      <button type="button" class="btn btn--ghost" (click)="close()" data-testid="pm-cancel">{{ 'batch.editor.pageMap.cancel' | t }}</button>
+      <button type="button" class="btn btn--primary" (click)="apply()" [disabled]="!dirty() || phase() === 'loading'" data-testid="pm-apply">{{ 'batch.editor.pageMap.apply' | t }}</button>
+    </footer>
+  </div>
+</div>

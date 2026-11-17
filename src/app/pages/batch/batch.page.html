@@ -587,6 +587,9 @@
                 @if (row.item.bPdf) {
                   <span class="batch-chip batch-chip--on">B</span>
                 }
+                @if (row.item.pageMap) {
+                  <span class="batch-chip batch-chip--on" data-testid="row-page-map">⇄ {{ 'batch.pageMap.chip' | t }}</span>
+                }
               </span>
               @if (aiHelper.available) {
                 <app-ai-batch-chip [item]="row.item" />
@@ -654,6 +657,9 @@
                   [class.batch-state--warn]="row.state !== 'ready'"
                   >{{ 'batch.state.' + row.state | t }}</span
                 >
+                @if (row.item.pageMap) {
+                  <span class="batch-chip batch-chip--on" data-testid="row-page-map">⇄ {{ 'batch.pageMap.chip' | t }}</span>
+                }
                 <small class="batch-why" [class.batch-why--ok]="aiReason(row.item) === 'eligible'" data-testid="row-why">{{ 'batch.why.' + aiReason(row.item) | t }}</small>
                 @if (aiHelper.available) {
                 <app-ai-batch-chip [item]="row.item" />
