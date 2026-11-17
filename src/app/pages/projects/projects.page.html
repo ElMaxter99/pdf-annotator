@@ -288,7 +288,7 @@
 
   @if (dialog(); as d) {
     <div class="proj-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-      <div class="proj-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div appFocusTrap class="proj-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
         @switch (d.kind) {
           @case ('new') {
             <h2>{{ 'projects.newTitle' | t }}</h2>
@@ -350,7 +350,7 @@
   }
   @if (transfer.dialog(); as d) {
     <div class="proj-overlay" (click)="transfer.closeDialog()" (keydown.escape)="transfer.closeDialog()">
-      <div class="proj-dialog proj-dialog--wide" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div appFocusTrap class="proj-dialog proj-dialog--wide" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
         @switch (d.kind) {
           @case ('export') {
             <h2>{{ 'projects.transfer.exportTitle' | t: { name: d.info.name } }}</h2>
@@ -570,7 +570,7 @@
 
   @if (sync.dialog(); as sd) {
     <div class="proj-overlay" (click)="sync.closeDialog()" (keydown.escape)="sync.closeDialog()">
-      <div class="proj-dialog proj-dialog--wide" role="dialog" aria-modal="true" (click)="$event.stopPropagation()" data-testid="sync-dialog">
+      <div appFocusTrap class="proj-dialog proj-dialog--wide" role="dialog" aria-modal="true" (click)="$event.stopPropagation()" data-testid="sync-dialog">
         @switch (sd.kind) {
           @case ('link') {
             <h2>{{ (sync.linkTab() === 'sftp' ? 'projects.sync.sftp.title' : 'projects.sync.link.title') | t }}</h2>
@@ -955,7 +955,7 @@
 
   @if (sync.progress(); as sp) {
     <div class="proj-overlay proj-overlay--top">
-      <div class="proj-dialog" role="dialog" aria-modal="true" data-testid="sync-progress">
+      <div appFocusTrap class="proj-dialog" role="dialog" aria-modal="true" data-testid="sync-progress">
         <h2>{{ 'projects.sync.progress.title' | t: { name: sync.subject() } }}</h2>
         <p role="status">
           @if (sp.total) {
@@ -980,7 +980,7 @@
 
   @if (transfer.progress(); as pr) {
     <div class="proj-overlay proj-overlay--top">
-      <div class="proj-dialog" role="dialog" aria-modal="true" data-testid="transfer-progress">
+      <div appFocusTrap class="proj-dialog" role="dialog" aria-modal="true" data-testid="transfer-progress">
         <h2>
           @if (pr.op === 'export') {
             {{ 'projects.transfer.exporting' | t: { name: transfer.subject() } }}

@@ -12,6 +12,9 @@
       <span class="json-coords__idle">{{ 'controls.cursorInactive' | t }}</span>
     </ng-template>
     </span>
+    <span class="footer__sr" role="status" aria-live="polite" aria-atomic="true" data-testid="selected-position">
+      @if (selectedSpot(); as spot) {{{ 'controls.selectedPosition' | t : { name: spot.name, x: spot.x, y: spot.y } }}}
+    </span>
     @if (vm.savedAgo(); as saved) {
       <span class="json-coords__divider" aria-hidden="true">·</span>
       <span class="footer__saved" role="status" aria-live="polite" aria-atomic="true" data-testid="saved-ago">{{ saved.key | t : { n: saved.n } }}</span>
