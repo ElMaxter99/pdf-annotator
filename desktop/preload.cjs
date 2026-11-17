@@ -47,13 +47,19 @@ contextBridge.exposeInMainWorld('desktop', {
     importInspect: (input) => ipcRenderer.invoke('projects:import-inspect', input),
     importRun: (input) => ipcRenderer.invoke('projects:import-run', input),
     cancel: () => ipcRenderer.invoke('projects:cancel'),
-    syncStatus: () => ipcRenderer.invoke('sync:status'),
+    syncStatus: (input) => ipcRenderer.invoke('sync:status', input),
     syncChoose: () => ipcRenderer.invoke('sync:choose'),
     syncLink: (input) => ipcRenderer.invoke('sync:link', input),
     syncUnlink: () => ipcRenderer.invoke('sync:unlink'),
     syncAll: (input) => ipcRenderer.invoke('sync:all', input),
     syncProject: (input) => ipcRenderer.invoke('sync:project', input),
     syncReveal: (input) => ipcRenderer.invoke('sync:reveal', input),
+    syncSftpChooseKey: () => ipcRenderer.invoke('sync:sftp-choose-key'),
+    syncSftpInspect: (input) => ipcRenderer.invoke('sync:sftp-inspect', input),
+    syncSftpTrust: (input) => ipcRenderer.invoke('sync:sftp-trust', input),
+    syncSftpTest: (input) => ipcRenderer.invoke('sync:sftp-test', input),
+    syncSftpCredential: (input) => ipcRenderer.invoke('sync:sftp-credential', input),
+    syncSftpForget: () => ipcRenderer.invoke('sync:sftp-forget'),
     onSyncEvent: (callback) => {
       const listener = (_event, payload) => callback(payload);
       ipcRenderer.on('projects:sync-event', listener);

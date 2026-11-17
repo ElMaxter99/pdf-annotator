@@ -1891,7 +1891,9 @@
         "warnTitle": "Before linking",
         "warnText": "The PDFs will leave this computer for that folder and travel through the service that syncs it. The app does not encrypt them. Only use folders you trust.",
         "accept": "I understand the PDFs and their data will be copied to that folder",
-        "button": "Link"
+        "button": "Link",
+        "tabFolder": "Folder on this computer",
+        "tabSftp": "SFTP server"
       },
       "plan": {
         "title": "What should go to the linked folder?",
@@ -1909,7 +1911,10 @@
         "files": "File {{done}} of {{total}}",
         "projects": "Project {{done}} of {{total}}: “{{name}}”",
         "starting": "Getting ready…",
-        "note": "Only files that changed are uploaded or downloaded. You can cancel: the previous revision stays intact."
+        "note": "Only files that changed are uploaded or downloaded. You can cancel: the previous revision stays intact.",
+        "bytes": "{{bytes}} of {{total}} · {{speed}}/s · about {{eta}} left",
+        "minutes": "{{m}} min {{s}} s",
+        "seconds": "{{s}} s"
       },
       "done": {
         "up": "“{{name}}” uploaded (revision {{rev}}). It may take a few minutes to show up on other computers.",
@@ -1945,7 +1950,24 @@
         "text": "“{{folder}}” is not responding (network down, sync service closed or disk unplugged?). You can keep working: changes will wait as “Waiting to upload” and go up when it is back.",
         "retry": "Retry",
         "other": "Choose another folder",
-        "continue": "Keep working offline"
+        "continue": "Keep working offline",
+        "review": "Review the server",
+        "host-not-found": {
+          "title": "The server cannot be found",
+          "text": "“{{host}}” does not respond (no network, wrong name, server off or port {{port}} blocked). You can keep working: changes will stay “Waiting to upload”."
+        },
+        "connect-timeout": {
+          "title": "Timed out",
+          "text": "The server took more than 15 s to respond. If you use a VPN, check that it is connected. Local work keeps working."
+        },
+        "connection-refused": {
+          "title": "The server refuses the connection",
+          "text": "“{{host}}” is on the network but does not accept SSH connections on port {{port}}. Check that the SSH service is running."
+        },
+        "connection-lost": {
+          "title": "The connection was lost",
+          "text": "The connection to “{{host}}” dropped. Nothing was lost: the previous revision is intact and it will be retried when it is back."
+        }
       },
       "stop": {
         "title": "Stop syncing “{{name}}”?",
@@ -1972,7 +1994,140 @@
         "in-use": "{{detail}} has it open. It can be uploaded once they close it.",
         "disk-full": "Not enough space: about {{detail}} MB missing. Nothing was left half-written.",
         "not-linked": "Link a folder first.",
-        "newer-format": "This folder is used by a newer version of the app. Update and try again."
+        "newer-format": "This folder is used by a newer version of the app. Update and try again.",
+        "host-key-changed": "The server fingerprint changed: nothing was sent. Confirm it with whoever runs the server.",
+        "host-key-unknown": "The server fingerprint has to be confirmed first.",
+        "host-not-found": "The server cannot be found (no network, wrong name or server off).",
+        "connect-timeout": "The server took too long to respond.",
+        "connection-refused": "The server does not accept SSH connections on that port.",
+        "connection-lost": "The connection to the server was lost. The previous revision is intact; it will be retried when it is back.",
+        "auth-failed": "Wrong user or password.",
+        "bad-passphrase": "The passphrase is not correct.",
+        "passphrase-needed": "The key needs a passphrase.",
+        "key-unusable": "The key cannot be used: the file does not exist, cannot be read or is not a valid private key (OpenSSH and PEM are supported).",
+        "secret-needed": "Enter the server password to connect.",
+        "remote-missing": "The folder does not exist on the server.",
+        "rename-unsupported": "The server does not allow renaming files in that folder. Without that, nothing can be guaranteed not to be left half-written, so nothing is uploaded.",
+        "lock-expired": "Your lock on the server expired: another computer may have opened this project. Close it and open it again.",
+        "already-linked": "A destination is already linked. Unlink it before choosing another.",
+        "bad-sftp-config": "Server details are missing or invalid."
+      },
+      "sftp": {
+        "title": "Sync with an SFTP server",
+        "intro": "Use a server you already have (a NAS, a VPS, your company’s). The app will keep a copy of your projects there so you can open them on another computer.",
+        "host": "Server",
+        "port": "Port",
+        "user": "User",
+        "auth": "How you sign in",
+        "authPassword": "Password",
+        "authKey": "Private key",
+        "password": "Password",
+        "passphrase": "Passphrase (if the key has one)",
+        "keyFile": "Key file",
+        "keyChoose": "Choose file…",
+        "keyNone": "No file chosen",
+        "path": "Folder on the server",
+        "remember": "Remember the credential in the secure store",
+        "rememberHint": "If not, it is asked each time you open the app.",
+        "credTitle": "Where your credential goes",
+        "credText": "It is stored with your system’s encryption (Keychain, DPAPI or libsecret). It is not stored anywhere else and never appears in exported files.",
+        "checked": "Connection checked: {{folder}}",
+        "warnTitle": "Before linking",
+        "warnText": "Your PDFs will leave this computer for that server over SSH and are not encrypted on the server. Only use servers you trust.",
+        "accept": "I understand the PDFs and their data will be copied to that server",
+        "test": "Test connection",
+        "footer": "SFTP server:",
+        "footOk": "Connected",
+        "footOff": "No connection to the server",
+        "manage": "Server and credentials"
+      },
+      "test": {
+        "title": "Test the connection",
+        "running": "Testing the connection",
+        "connecting": "Connecting to {{host}}…",
+        "back": "Back",
+        "step": {
+          "login": "Sign-in works: fingerprint confirmed and credential accepted",
+          "loginBad": "Could not sign in",
+          "folder": "The folder on the server is available",
+          "folderBad": "The folder on the server was not found",
+          "write": "Reading, writing and renaming work there",
+          "writeBad": "Writing or renaming is not possible there"
+        }
+      },
+      "hostkey": {
+        "titleNew": "Is this your server?",
+        "textNew": "This is the first time you connect to “{{host}}”. Check that this fingerprint matches the one given by whoever runs the server.",
+        "warnTitle": "Careful",
+        "warnText": "If you cannot check it, cancel. Accepting a fake fingerprint would let a third party see your PDFs.",
+        "trust": "Trust and continue",
+        "titleChanged": "The fingerprint of “{{host}}” has changed",
+        "textChanged": "The server may have been reinstalled, or someone may be impersonating it. For safety nothing was sent and the credential was not used.",
+        "before": "Before",
+        "now": "Now",
+        "blocked": "Blocked",
+        "blockedText": "Confirm the change with whoever runs the server before accepting it.",
+        "trustNew": "Trust the new fingerprint…",
+        "pinned": "New fingerprint pinned. You can sync now."
+      },
+      "cred": {
+        "title": {
+          "auth": "Wrong user or password",
+          "passphrase": "The passphrase is not correct",
+          "ask": "Enter the password for “{{host}}”",
+          "change": "Change the credential for “{{host}}”"
+        },
+        "text": {
+          "auth": "The server rejected the saved credential. Enter the new one; the old one is replaced in the secure store.",
+          "passphrase": "The key “{{file}}” could not be opened with that passphrase.",
+          "ask": "It is not saved on this computer. It will only be used while the app is open.",
+          "change": "Enter the new one; the old one is replaced. The current one cannot be read back."
+        },
+        "save": "Save and retry",
+        "connect": "Connect",
+        "later": "Not now",
+        "saved": "Credential saved.",
+        "forgotten": "Credential forgotten. Next time you will have to enter it."
+      },
+      "nostore": {
+        "title": "The password cannot be saved",
+        "text": "This computer has no secure store available (on Linux the keyring is often missing). For safety the app does not save it in any file.",
+        "ask": "Ask for it each time I open the app",
+        "askHint": "It works the same; you only type the password once per session.",
+        "install": "Install a keyring and retry",
+        "installHint": "For example gnome-keyring or KWallet. It is tried again when you close this notice."
+      },
+      "server": {
+        "title": "Server and credentials",
+        "server": "Server",
+        "serverValue": "{{host}} · port {{port}}",
+        "user": "User",
+        "folder": "Folder",
+        "fingerprint": "Fingerprint",
+        "credential": "Credential",
+        "credSavedPass": "Saved in the secure store (password)",
+        "credSavedKey": "Saved in the secure store (passphrase)",
+        "credSession": "Only for this session (no secure store)",
+        "credNone": "Not saved: it will be asked when connecting",
+        "change": "Change credential…",
+        "forget": "Forget credential",
+        "test": "Test connection",
+        "close": "Close",
+        "other": "Choose another server or folder",
+        "unlink": "Unlink"
+      },
+      "forget": {
+        "title": "Forget the credential for “{{host}}”?",
+        "text": "It is deleted from this computer’s secure store. Projects and what was already uploaded are untouched; next time you will have to enter it.",
+        "button": "Forget credential"
+      },
+      "unlinkSftp": {
+        "title": "Unlink the server?",
+        "text": "The link with “{{label}}” is removed and the credential is deleted from this computer. Your projects stay here; what you already uploaded stays on the server and the app does not delete it."
+      },
+      "remote": {
+        "create": "Create folder",
+        "other": "Choose another"
       }
     }
   }

@@ -1891,7 +1891,9 @@
         "warnTitle": "Vor dem Verknüpfen",
         "warnText": "Die PDFs verlassen diesen Computer in Richtung dieses Ordners und laufen über den Dienst, der ihn synchronisiert. Die App verschlüsselt sie nicht. Verwenden Sie nur vertrauenswürdige Ordner.",
         "accept": "Ich verstehe, dass die PDFs und ihre Daten in diesen Ordner kopiert werden",
-        "button": "Verknüpfen"
+        "button": "Verknüpfen",
+        "tabFolder": "Ordner auf dem Computer",
+        "tabSftp": "SFTP-Server"
       },
       "plan": {
         "title": "Was soll in den verknüpften Ordner?",
@@ -1909,7 +1911,10 @@
         "files": "Datei {{done}} von {{total}}",
         "projects": "Projekt {{done}} von {{total}}: „{{name}}“",
         "starting": "Wird vorbereitet…",
-        "note": "Es werden nur geänderte Dateien hoch- oder heruntergeladen. Sie können abbrechen: Die vorherige Revision bleibt unverändert."
+        "note": "Es werden nur geänderte Dateien hoch- oder heruntergeladen. Sie können abbrechen: Die vorherige Revision bleibt unverändert.",
+        "bytes": "{{bytes}} von {{total}} · {{speed}}/s · noch etwa {{eta}}",
+        "minutes": "{{m}} Min. {{s}} s",
+        "seconds": "{{s}} s"
       },
       "done": {
         "up": "„{{name}}“ hochgeladen (Revision {{rev}}). Es kann einige Minuten dauern, bis es auf anderen Computern erscheint.",
@@ -1945,7 +1950,24 @@
         "text": "„{{folder}}“ antwortet nicht (Netzwerk getrennt, Dienst geschlossen oder Laufwerk abgesteckt?). Sie können weiterarbeiten: Änderungen bleiben „Hochladen ausstehend“ und werden nach der Rückkehr hochgeladen.",
         "retry": "Erneut versuchen",
         "other": "Anderen Ordner wählen",
-        "continue": "Offline weiterarbeiten"
+        "continue": "Offline weiterarbeiten",
+        "review": "Server prüfen",
+        "host-not-found": {
+          "title": "Server nicht gefunden",
+          "text": "„{{host}}“ antwortet nicht (kein Netz, falscher Name, Server aus oder Port {{port}} blockiert). Sie können weiterarbeiten: Änderungen bleiben „Hochladen ausstehend“."
+        },
+        "connect-timeout": {
+          "title": "Zeitüberschreitung",
+          "text": "Der Server hat länger als 15 s nicht geantwortet. Prüfen Sie bei VPN, ob sie verbunden ist. Lokal geht alles weiter."
+        },
+        "connection-refused": {
+          "title": "Der Server lehnt die Verbindung ab",
+          "text": "„{{host}}“ ist im Netz, nimmt aber auf Port {{port}} keine SSH-Verbindungen an. Prüfen Sie, ob der SSH-Dienst läuft."
+        },
+        "connection-lost": {
+          "title": "Die Verbindung wurde unterbrochen",
+          "text": "Die Verbindung zu „{{host}}“ wurde getrennt. Nichts ging verloren: Die vorherige Revision ist intakt und wird beim nächsten Mal erneut versucht."
+        }
       },
       "stop": {
         "title": "„{{name}}“ nicht mehr synchronisieren?",
@@ -1972,7 +1994,140 @@
         "in-use": "{{detail}} hat es geöffnet. Es kann hochgeladen werden, sobald es geschlossen wird.",
         "disk-full": "Nicht genug Speicherplatz: etwa {{detail}} MB fehlen. Es wurde nichts halb geschrieben.",
         "not-linked": "Verknüpfen Sie zuerst einen Ordner.",
-        "newer-format": "Dieser Ordner wird von einer neueren App-Version verwendet. Aktualisieren Sie und versuchen Sie es erneut."
+        "newer-format": "Dieser Ordner wird von einer neueren App-Version verwendet. Aktualisieren Sie und versuchen Sie es erneut.",
+        "host-key-changed": "Der Fingerabdruck des Servers hat sich geändert: Es wurde nichts gesendet. Bestätigen Sie das bei der Serveradministration.",
+        "host-key-unknown": "Der Fingerabdruck des Servers muss zuerst bestätigt werden.",
+        "host-not-found": "Server nicht gefunden (kein Netz, falscher Name oder Server aus).",
+        "connect-timeout": "Der Server hat zu lange nicht geantwortet.",
+        "connection-refused": "Der Server nimmt auf diesem Port keine SSH-Verbindungen an.",
+        "connection-lost": "Die Verbindung zum Server ging verloren. Die vorherige Revision ist intakt; es wird beim nächsten Mal erneut versucht.",
+        "auth-failed": "Benutzer oder Passwort falsch.",
+        "bad-passphrase": "Die Passphrase ist nicht korrekt.",
+        "passphrase-needed": "Der Schlüssel benötigt eine Passphrase.",
+        "key-unusable": "Der Schlüssel ist unbrauchbar: Die Datei fehlt, ist nicht lesbar oder kein gültiger privater Schlüssel (OpenSSH und PEM werden unterstützt).",
+        "secret-needed": "Geben Sie das Serverpasswort ein, um sich zu verbinden.",
+        "remote-missing": "Der Ordner existiert auf dem Server nicht.",
+        "rename-unsupported": "Der Server erlaubt in diesem Ordner kein Umbenennen. Ohne das lässt sich nicht ausschließen, dass etwas halb geschrieben bleibt; daher wird nichts hochgeladen.",
+        "lock-expired": "Ihre Sperre auf dem Server ist abgelaufen: Ein anderer Computer könnte dieses Projekt geöffnet haben. Schließen Sie es und öffnen Sie es erneut.",
+        "already-linked": "Es ist bereits ein Ziel verknüpft. Trennen Sie es, bevor Sie ein anderes wählen.",
+        "bad-sftp-config": "Serverangaben fehlen oder sind ungültig."
+      },
+      "sftp": {
+        "title": "Mit einem SFTP-Server synchronisieren",
+        "intro": "Verwenden Sie einen vorhandenen Server (ein NAS, einen VPS, den Ihres Unternehmens). Die App legt dort eine Kopie Ihrer Projekte ab, damit Sie sie auf einem anderen Computer öffnen können.",
+        "host": "Server",
+        "port": "Port",
+        "user": "Benutzer",
+        "auth": "Anmeldung",
+        "authPassword": "Passwort",
+        "authKey": "Privater Schlüssel",
+        "password": "Passwort",
+        "passphrase": "Passphrase (falls der Schlüssel eine hat)",
+        "keyFile": "Schlüsseldatei",
+        "keyChoose": "Datei wählen…",
+        "keyNone": "Keine Datei gewählt",
+        "path": "Ordner auf dem Server",
+        "remember": "Zugangsdaten im sicheren Speicher merken",
+        "rememberHint": "Sonst wird sie bei jedem Start der App abgefragt.",
+        "credTitle": "Wohin Ihre Zugangsdaten gehen",
+        "credText": "Sie werden mit der Verschlüsselung Ihres Systems gespeichert (Schlüsselbund, DPAPI oder libsecret). Nirgendwo sonst gespeichert und nie in exportierten Dateien.",
+        "checked": "Verbindung geprüft: {{folder}}",
+        "warnTitle": "Vor dem Verknüpfen",
+        "warnText": "Ihre PDFs verlassen diesen Computer per SSH zu diesem Server und werden dort nicht verschlüsselt. Nutzen Sie nur vertrauenswürdige Server.",
+        "accept": "Mir ist klar, dass die PDFs und ihre Daten auf diesen Server kopiert werden",
+        "test": "Verbindung testen",
+        "footer": "SFTP-Server:",
+        "footOk": "Verbunden",
+        "footOff": "Keine Verbindung zum Server",
+        "manage": "Server und Zugangsdaten"
+      },
+      "test": {
+        "title": "Verbindung testen",
+        "running": "Verbindung wird getestet",
+        "connecting": "Verbindung zu {{host}}…",
+        "back": "Zurück",
+        "step": {
+          "login": "Anmeldung erfolgreich: Fingerabdruck bestätigt, Zugangsdaten akzeptiert",
+          "loginBad": "Anmeldung nicht möglich",
+          "folder": "Der Ordner auf dem Server ist verfügbar",
+          "folderBad": "Der Ordner auf dem Server wurde nicht gefunden",
+          "write": "Dort kann gelesen, geschrieben und umbenannt werden",
+          "writeBad": "Dort kann nicht geschrieben oder umbenannt werden"
+        }
+      },
+      "hostkey": {
+        "titleNew": "Ist das Ihr Server?",
+        "textNew": "Sie verbinden sich zum ersten Mal mit „{{host}}“. Prüfen Sie, ob dieser Fingerabdruck mit dem übereinstimmt, den Ihnen die Serveradministration nennt.",
+        "warnTitle": "Vorsicht",
+        "warnText": "Wenn Sie ihn nicht prüfen können, brechen Sie ab. Ein falscher Fingerabdruck würde Dritten Einblick in Ihre PDFs geben.",
+        "trust": "Vertrauen und fortfahren",
+        "titleChanged": "Der Fingerabdruck von „{{host}}“ hat sich geändert",
+        "textChanged": "Der Server wurde womöglich neu installiert, oder jemand gibt sich als er aus. Aus Sicherheitsgründen wurde nichts gesendet und die Zugangsdaten wurden nicht verwendet.",
+        "before": "Vorher",
+        "now": "Jetzt",
+        "blocked": "Gesperrt",
+        "blockedText": "Bestätigen Sie die Änderung bei der Serveradministration, bevor Sie sie akzeptieren.",
+        "trustNew": "Dem neuen Fingerabdruck vertrauen…",
+        "pinned": "Neuer Fingerabdruck festgelegt. Sie können jetzt synchronisieren."
+      },
+      "cred": {
+        "title": {
+          "auth": "Benutzer oder Passwort falsch",
+          "passphrase": "Die Passphrase ist nicht korrekt",
+          "ask": "Passwort für „{{host}}“ eingeben",
+          "change": "Zugangsdaten für „{{host}}“ ändern"
+        },
+        "text": {
+          "auth": "Der Server hat die gespeicherten Zugangsdaten abgelehnt. Geben Sie neue ein; die alten werden im sicheren Speicher ersetzt.",
+          "passphrase": "Der Schlüssel „{{file}}“ ließ sich mit dieser Passphrase nicht öffnen.",
+          "ask": "Sie ist auf diesem Computer nicht gespeichert. Sie wird nur verwendet, solange die App geöffnet ist.",
+          "change": "Geben Sie neue ein; die alten werden ersetzt. Die aktuellen lassen sich nicht auslesen."
+        },
+        "save": "Speichern und erneut versuchen",
+        "connect": "Verbinden",
+        "later": "Jetzt nicht",
+        "saved": "Zugangsdaten gespeichert.",
+        "forgotten": "Zugangsdaten gelöscht. Beim nächsten Mal müssen Sie sie neu eingeben."
+      },
+      "nostore": {
+        "title": "Das Passwort kann nicht gespeichert werden",
+        "text": "Dieser Computer hat keinen sicheren Speicher (unter Linux fehlt oft der Schlüsselbund). Aus Sicherheitsgründen speichert die App es in keiner Datei.",
+        "ask": "Bei jedem Start der App abfragen",
+        "askHint": "Funktioniert genauso; Sie geben das Passwort nur einmal pro Sitzung ein.",
+        "install": "Schlüsselbund installieren und erneut versuchen",
+        "installHint": "Zum Beispiel gnome-keyring oder KWallet. Beim Schließen dieses Hinweises wird es erneut versucht."
+      },
+      "server": {
+        "title": "Server und Zugangsdaten",
+        "server": "Server",
+        "serverValue": "{{host}} · Port {{port}}",
+        "user": "Benutzer",
+        "folder": "Ordner",
+        "fingerprint": "Fingerabdruck",
+        "credential": "Zugangsdaten",
+        "credSavedPass": "Im sicheren Speicher gespeichert (Passwort)",
+        "credSavedKey": "Im sicheren Speicher gespeichert (Passphrase)",
+        "credSession": "Nur für diese Sitzung (kein sicherer Speicher)",
+        "credNone": "Nicht gespeichert: wird beim Verbinden abgefragt",
+        "change": "Zugangsdaten ändern…",
+        "forget": "Zugangsdaten löschen",
+        "test": "Verbindung testen",
+        "close": "Schließen",
+        "other": "Anderen Server oder Ordner wählen",
+        "unlink": "Trennen"
+      },
+      "forget": {
+        "title": "Zugangsdaten für „{{host}}“ löschen?",
+        "text": "Sie werden aus dem sicheren Speicher dieses Computers gelöscht. Projekte und bereits Hochgeladenes bleiben unberührt; beim nächsten Mal müssen Sie sie neu eingeben.",
+        "button": "Zugangsdaten löschen"
+      },
+      "unlinkSftp": {
+        "title": "Server trennen?",
+        "text": "Die Verknüpfung mit „{{label}}“ wird entfernt und die Zugangsdaten werden von diesem Computer gelöscht. Ihre Projekte bleiben hier; bereits Hochgeladenes bleibt auf dem Server und wird von der App nicht gelöscht."
+      },
+      "remote": {
+        "create": "Ordner erstellen",
+        "other": "Anderen wählen"
       }
     }
   }

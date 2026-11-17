@@ -1891,7 +1891,9 @@
         "warnTitle": "Avant de lier",
         "warnText": "Les PDF quitteront cet ordinateur vers ce dossier et transiteront par le service qui le synchronise. L’application ne les chiffre pas. N’utilisez que des dossiers de confiance.",
         "accept": "Je comprends que les PDF et leurs données seront copiés dans ce dossier",
-        "button": "Lier"
+        "button": "Lier",
+        "tabFolder": "Dossier de l’ordinateur",
+        "tabSftp": "Serveur SFTP"
       },
       "plan": {
         "title": "Que envoyer vers le dossier lié ?",
@@ -1909,7 +1911,10 @@
         "files": "Fichier {{done}} sur {{total}}",
         "projects": "Projet {{done}} sur {{total}} : « {{name}} »",
         "starting": "Préparation…",
-        "note": "Seuls les fichiers modifiés sont envoyés ou téléchargés. Vous pouvez annuler : la révision précédente reste intacte."
+        "note": "Seuls les fichiers modifiés sont envoyés ou téléchargés. Vous pouvez annuler : la révision précédente reste intacte.",
+        "bytes": "{{bytes}} sur {{total}} · {{speed}}/s · environ {{eta}} restantes",
+        "minutes": "{{m}} min {{s}} s",
+        "seconds": "{{s}} s"
       },
       "done": {
         "up": "« {{name}} » envoyé (révision {{rev}}). Cela peut prendre quelques minutes avant d’apparaître sur les autres ordinateurs.",
@@ -1945,7 +1950,24 @@
         "text": "« {{folder}} » ne répond pas (réseau coupé, service fermé ou disque débranché ?). Vous pouvez continuer à travailler : les modifications resteront « En attente d’envoi » et partiront au retour.",
         "retry": "Réessayer",
         "other": "Choisir un autre dossier",
-        "continue": "Continuer hors ligne"
+        "continue": "Continuer hors ligne",
+        "review": "Vérifier le serveur",
+        "host-not-found": {
+          "title": "Serveur introuvable",
+          "text": "« {{host}} » ne répond pas (pas de réseau, nom incorrect, serveur éteint ou port {{port}} bloqué). Vous pouvez continuer à travailler : les modifications resteront « En attente d’envoi »."
+        },
+        "connect-timeout": {
+          "title": "Délai dépassé",
+          "text": "Le serveur a mis plus de 15 s à répondre. Si vous utilisez un VPN, vérifiez qu’il est connecté. Le travail local continue."
+        },
+        "connection-refused": {
+          "title": "Le serveur refuse la connexion",
+          "text": "« {{host}} » est sur le réseau mais n’accepte pas les connexions SSH sur le port {{port}}. Vérifiez que le service SSH est actif."
+        },
+        "connection-lost": {
+          "title": "La connexion a été perdue",
+          "text": "La connexion à « {{host}} » a été coupée. Rien n’a été perdu : la révision précédente est intacte et un nouvel essai aura lieu au retour."
+        }
       },
       "stop": {
         "title": "Ne plus synchroniser « {{name}} » ?",
@@ -1972,7 +1994,140 @@
         "in-use": "{{detail}} l’a ouvert. Il pourra être envoyé une fois fermé.",
         "disk-full": "Pas assez d’espace : il manque environ {{detail}} Mo. Rien n’a été laissé à moitié écrit.",
         "not-linked": "Liez d’abord un dossier.",
-        "newer-format": "Ce dossier est utilisé par une version plus récente de l’application. Mettez à jour et réessayez."
+        "newer-format": "Ce dossier est utilisé par une version plus récente de l’application. Mettez à jour et réessayez.",
+        "host-key-changed": "L’empreinte du serveur a changé : rien n’a été envoyé. Confirmez-le auprès de son administrateur.",
+        "host-key-unknown": "Il faut d’abord confirmer l’empreinte du serveur.",
+        "host-not-found": "Serveur introuvable (pas de réseau, nom incorrect ou serveur éteint).",
+        "connect-timeout": "Le serveur a mis trop de temps à répondre.",
+        "connection-refused": "Le serveur n’accepte pas les connexions SSH sur ce port.",
+        "connection-lost": "La connexion au serveur a été perdue. La révision précédente est intacte ; un nouvel essai aura lieu au retour.",
+        "auth-failed": "Utilisateur ou mot de passe incorrect.",
+        "bad-passphrase": "La phrase secrète est incorrecte.",
+        "passphrase-needed": "La clé nécessite une phrase secrète.",
+        "key-unusable": "La clé est inutilisable : le fichier n’existe pas, est illisible ou n’est pas une clé privée valide (OpenSSH et PEM sont pris en charge).",
+        "secret-needed": "Saisissez le mot de passe du serveur pour vous connecter.",
+        "remote-missing": "Le dossier n’existe pas sur le serveur.",
+        "rename-unsupported": "Le serveur n’autorise pas le renommage de fichiers dans ce dossier. Sans cela, on ne peut garantir que rien ne reste à moitié écrit : rien n’est envoyé.",
+        "lock-expired": "Votre verrou sur le serveur a expiré : un autre ordinateur a pu ouvrir ce projet. Fermez-le et rouvrez-le.",
+        "already-linked": "Une destination est déjà liée. Déliez-la avant d’en choisir une autre.",
+        "bad-sftp-config": "Des informations du serveur manquent ou sont invalides."
+      },
+      "sftp": {
+        "title": "Synchroniser avec un serveur SFTP",
+        "intro": "Utilisez un serveur que vous avez déjà (un NAS, un VPS, celui de votre entreprise). L’application y gardera une copie de vos projets pour les ouvrir sur un autre ordinateur.",
+        "host": "Serveur",
+        "port": "Port",
+        "user": "Utilisateur",
+        "auth": "Comment vous vous connectez",
+        "authPassword": "Mot de passe",
+        "authKey": "Clé privée",
+        "password": "Mot de passe",
+        "passphrase": "Phrase secrète (si la clé en a une)",
+        "keyFile": "Fichier de clé",
+        "keyChoose": "Choisir un fichier…",
+        "keyNone": "Aucun fichier choisi",
+        "path": "Dossier sur le serveur",
+        "remember": "Mémoriser l’identifiant dans le coffre sécurisé",
+        "rememberHint": "Sinon, elle est demandée à chaque ouverture de l’application.",
+        "credTitle": "Où va votre identifiant",
+        "credText": "Il est stocké avec le chiffrement de votre système (Trousseau, DPAPI ou libsecret). Il n’est stocké nulle part ailleurs et n’apparaît pas dans les fichiers exportés.",
+        "checked": "Connexion vérifiée : {{folder}}",
+        "warnTitle": "Avant de lier",
+        "warnText": "Vos PDF quitteront cet ordinateur vers ce serveur par SSH et ne sont pas chiffrés sur le serveur. N’utilisez que des serveurs de confiance.",
+        "accept": "Je comprends que les PDF et leurs données seront copiés sur ce serveur",
+        "test": "Tester la connexion",
+        "footer": "Serveur SFTP :",
+        "footOk": "Connecté",
+        "footOff": "Pas de connexion au serveur",
+        "manage": "Serveur et identifiants"
+      },
+      "test": {
+        "title": "Tester la connexion",
+        "running": "Test de la connexion",
+        "connecting": "Connexion à {{host}}…",
+        "back": "Retour",
+        "step": {
+          "login": "Connexion réussie : empreinte confirmée et identifiant accepté",
+          "loginBad": "Impossible de se connecter",
+          "folder": "Le dossier du serveur est disponible",
+          "folderBad": "Le dossier du serveur est introuvable",
+          "write": "On peut y lire, écrire et renommer",
+          "writeBad": "Impossible d’y écrire ou de renommer"
+        }
+      },
+      "hostkey": {
+        "titleNew": "Est-ce bien votre serveur ?",
+        "textNew": "C’est la première fois que vous vous connectez à « {{host}} ». Vérifiez que cette empreinte correspond à celle que vous donne l’administrateur du serveur.",
+        "warnTitle": "Attention",
+        "warnText": "Si vous ne pouvez pas la vérifier, annulez. Accepter une fausse empreinte permettrait à un tiers de voir vos PDF.",
+        "trust": "Faire confiance et continuer",
+        "titleChanged": "L’empreinte de « {{host}} » a changé",
+        "textChanged": "Le serveur a peut-être été réinstallé, ou quelqu’un se fait passer pour lui. Par sécurité, rien n’a été envoyé et l’identifiant n’a pas été utilisé.",
+        "before": "Avant",
+        "now": "Maintenant",
+        "blocked": "Bloqué",
+        "blockedText": "Confirmez le changement auprès de l’administrateur du serveur avant de l’accepter.",
+        "trustNew": "Faire confiance à la nouvelle empreinte…",
+        "pinned": "Nouvelle empreinte enregistrée. Vous pouvez synchroniser."
+      },
+      "cred": {
+        "title": {
+          "auth": "Utilisateur ou mot de passe incorrect",
+          "passphrase": "La phrase secrète est incorrecte",
+          "ask": "Saisissez le mot de passe de « {{host}} »",
+          "change": "Changer l’identifiant de « {{host}} »"
+        },
+        "text": {
+          "auth": "Le serveur a refusé l’identifiant enregistré. Saisissez le nouveau ; l’ancien est remplacé dans le coffre sécurisé.",
+          "passphrase": "Impossible d’ouvrir la clé « {{file}} » avec cette phrase.",
+          "ask": "Elle n’est pas enregistrée sur cet ordinateur. Elle ne sera utilisée que tant que l’application est ouverte.",
+          "change": "Saisissez le nouveau ; l’ancien est remplacé. L’actuel ne peut pas être relu."
+        },
+        "save": "Enregistrer et réessayer",
+        "connect": "Se connecter",
+        "later": "Pas maintenant",
+        "saved": "Identifiant enregistré.",
+        "forgotten": "Identifiant oublié. La prochaine fois, vous devrez le saisir."
+      },
+      "nostore": {
+        "title": "Impossible d’enregistrer le mot de passe",
+        "text": "Cet ordinateur n’a pas de coffre sécurisé disponible (sous Linux, le trousseau manque souvent). Par sécurité, l’application ne l’enregistre dans aucun fichier.",
+        "ask": "La demander à chaque ouverture de l’application",
+        "askHint": "Cela fonctionne pareil ; vous ne saisissez le mot de passe qu’une fois par session.",
+        "install": "Installer un trousseau et réessayer",
+        "installHint": "Par exemple gnome-keyring ou KWallet. Un nouvel essai a lieu à la fermeture de cet avis."
+      },
+      "server": {
+        "title": "Serveur et identifiants",
+        "server": "Serveur",
+        "serverValue": "{{host}} · port {{port}}",
+        "user": "Utilisateur",
+        "folder": "Dossier",
+        "fingerprint": "Empreinte",
+        "credential": "Identifiant",
+        "credSavedPass": "Enregistré dans le coffre sécurisé (mot de passe)",
+        "credSavedKey": "Enregistrée dans le coffre sécurisé (phrase secrète)",
+        "credSession": "Uniquement pour cette session (pas de coffre sécurisé)",
+        "credNone": "Non enregistré : il sera demandé à la connexion",
+        "change": "Changer l’identifiant…",
+        "forget": "Oublier l’identifiant",
+        "test": "Tester la connexion",
+        "close": "Fermer",
+        "other": "Choisir un autre serveur ou dossier",
+        "unlink": "Délier"
+      },
+      "forget": {
+        "title": "Oublier l’identifiant de « {{host}} » ?",
+        "text": "Elle est supprimée du coffre sécurisé de cet ordinateur. Les projets et ce qui est déjà envoyé ne sont pas touchés ; la prochaine fois, vous devrez la saisir.",
+        "button": "Oublier l’identifiant"
+      },
+      "unlinkSftp": {
+        "title": "Délier le serveur ?",
+        "text": "Le lien avec « {{label}} » est supprimé et l’identifiant est effacé de cet ordinateur. Vos projets restent ici ; ce que vous avez déjà envoyé reste sur le serveur et l’application ne le supprime pas."
+      },
+      "remote": {
+        "create": "Créer le dossier",
+        "other": "En choisir un autre"
       }
     }
   }

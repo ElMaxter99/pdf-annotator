@@ -265,18 +265,22 @@
     @if (sync.linked()) {
       <footer class="proj-foot" data-testid="sync-footer">
         <span>
-          {{ 'projects.sync.folder' | t }} <code>{{ sync.folder() }}</code> ·
+          @if (sync.kind() === 'sftp') {
+            {{ 'projects.sync.sftp.footer' | t }} <code data-testid="sync-label">{{ sync.label() }}</code> ·
+          } @else {
+            {{ 'projects.sync.folder' | t }} <code>{{ sync.folder() }}</code> ·
+          }
           @if (!sync.reachable()) {
-            <span class="proj-foot__off">{{ 'projects.sync.footOff' | t }}</span>
+            <span class="proj-foot__off">{{ (sync.kind() === 'sftp' ? 'projects.sync.sftp.footOff' : 'projects.sync.footOff') | t }}</span>
           } @else if (sync.pendingCount()) {
             <span class="proj-foot__warn">{{ 'projects.sync.footPend' | t: { count: sync.pendingCount() } }}</span>
           } @else {
-            <span class="proj-foot__ok">{{ 'projects.sync.footOk' | t }}</span>
+            <span class="proj-foot__ok">{{ (sync.kind() === 'sftp' ? 'projects.sync.sftp.footOk' : 'projects.sync.footOk') | t }}</span>
           }
         </span>
         <span class="proj-foot__buttons">
           <button type="button" class="btn" [disabled]="sync.working()" (click)="syncNow()" data-testid="sync-now">{{ 'projects.sync.now' | t }}</button>
-          <button type="button" class="btn" (click)="sync.askManage()" data-testid="sync-manage">{{ 'projects.sync.manage' | t }}</button>
+          <button type="button" class="btn" (click)="sync.askManage()" data-testid="sync-manage">{{ (sync.kind() === 'sftp' ? 'projects.sync.sftp.manage' : 'projects.sync.manage') | t }}</button>
         </span>
       </footer>
     }
@@ -569,42 +573,120 @@
       <div appFocusTrap class="proj-dialog proj-dialog--wide" role="dialog" aria-modal="true" (click)="$event.stopPropagation()" data-testid="sync-dialog">
         @switch (sd.kind) {
           @case ('link') {
-            <h2>{{ 'projects.sync.link.title' | t }}</h2>
-            <p>{{ 'projects.sync.link.intro' | t }}</p>
-            <div class="proj-field">
-              <span>{{ 'projects.sync.link.field' | t }}</span>
-              <div class="proj-pick">
-                <code class="proj-pick__path" data-testid="sync-picked">{{ sd.picked?.folder || '—' }}</code>
-                <button type="button" class="btn" (click)="sync.pickFolder()" data-testid="sync-choose">{{ 'projects.sync.link.choose' | t }}</button>
-              </div>
+            <h2>{{ (sync.linkTab() === 'sftp' ? 'projects.sync.sftp.title' : 'projects.sync.link.title') | t }}</h2>
+            <div class="proj-tabs" role="tablist">
+              <button type="button" role="tab" class="proj-tab" [class.proj-tab--on]="sync.linkTab() === 'folder'" [attr.aria-selected]="sync.linkTab() === 'folder'" [disabled]="sync.kind() === 'sftp'" (click)="sync.setTab('folder')" data-testid="sync-tab-folder">{{ 'projects.sync.link.tabFolder' | t }}</button>
+              <button type="button" role="tab" class="proj-tab" [class.proj-tab--on]="sync.linkTab() === 'sftp'" [attr.aria-selected]="sync.linkTab() === 'sftp'" [disabled]="sync.kind() === 'folder'" (click)="sync.setTab('sftp')" data-testid="sync-tab-sftp">{{ 'projects.sync.link.tabSftp' | t }}</button>
             </div>
-            @if (sd.error; as err) {
-              <p class="proj-flag proj-flag--danger" role="alert" data-testid="sync-link-error">{{ sync.errorText(err) }}</p>
-            }
-            @if (sd.picked; as pk) {
-              <p class="proj-flag proj-flag--ok" data-testid="sync-checked">
-                ✓
-                @if (pk.free !== null) {
-                  {{ 'projects.sync.link.checked' | t: { free: bytes(pk.free) } }}
-                } @else {
-                  {{ 'projects.sync.link.checkedNoFree' | t }}
-                }
-              </p>
-              <div class="proj-callout proj-callout--warn">
-                <strong>{{ 'projects.sync.link.warnTitle' | t }}</strong>
-                <p>{{ 'projects.sync.link.warnText' | t }}</p>
+            @if (sync.linkTab() === 'sftp') {
+              <p>{{ 'projects.sync.sftp.intro' | t }}</p>
+              <div class="proj-row">
+                <label class="proj-field">
+                  <span>{{ 'projects.sync.sftp.host' | t }}</span>
+                  <input class="proj-input" type="text" autocomplete="off" spellcheck="false" [value]="sync.form().host" (input)="sync.patchForm({ host: $any($event.target).value })" data-testid="sftp-host" />
+                </label>
+                <label class="proj-field">
+                  <span>{{ 'projects.sync.sftp.port' | t }}</span>
+                  <input class="proj-input" type="number" min="1" max="65535" [value]="sync.form().port" (input)="sync.patchForm({ port: +$any($event.target).value || 22 })" data-testid="sftp-port" />
+                </label>
               </div>
-              <label class="proj-check">
-                <input type="checkbox" [checked]="sync.accepted()" (change)="sync.accepted.set($any($event.target).checked)" data-testid="sync-accept" />
-                <span>{{ 'projects.sync.link.accept' | t }}</span>
+              <label class="proj-field">
+                <span>{{ 'projects.sync.sftp.user' | t }}</span>
+                <input class="proj-input" type="text" autocomplete="off" spellcheck="false" [value]="sync.form().username" (input)="sync.patchForm({ username: $any($event.target).value })" data-testid="sftp-user" />
               </label>
+              <div class="proj-field">
+                <span>{{ 'projects.sync.sftp.auth' | t }}</span>
+                <div class="proj-seg" role="radiogroup">
+                  <button type="button" role="radio" class="proj-seg__btn" [class.proj-seg__btn--on]="sync.form().authMode === 'password'" [attr.aria-checked]="sync.form().authMode === 'password'" (click)="sync.patchForm({ authMode: 'password' })" data-testid="sftp-auth-password">{{ 'projects.sync.sftp.authPassword' | t }}</button>
+                  <button type="button" role="radio" class="proj-seg__btn" [class.proj-seg__btn--on]="sync.form().authMode === 'key'" [attr.aria-checked]="sync.form().authMode === 'key'" (click)="sync.patchForm({ authMode: 'key' })" data-testid="sftp-auth-key">{{ 'projects.sync.sftp.authKey' | t }}</button>
+                </div>
+              </div>
+              @if (sync.form().authMode === 'password') {
+                <label class="proj-field">
+                  <span>{{ 'projects.sync.sftp.password' | t }}</span>
+                  <input class="proj-input" type="password" autocomplete="new-password" [value]="sync.password()" (input)="sync.password.set($any($event.target).value); sync.sftpOk.set(null)" data-testid="sftp-password" />
+                </label>
+              } @else {
+                <div class="proj-field">
+                  <span>{{ 'projects.sync.sftp.keyFile' | t }}</span>
+                  <div class="proj-pick">
+                    <code class="proj-pick__path" data-testid="sftp-keyfile">{{ sync.keyFile() || ('projects.sync.sftp.keyNone' | t) }}</code>
+                    <button type="button" class="btn" (click)="sync.pickKey()" data-testid="sftp-choose-key">{{ 'projects.sync.sftp.keyChoose' | t }}</button>
+                  </div>
+                </div>
+                <label class="proj-field">
+                  <span>{{ 'projects.sync.sftp.passphrase' | t }}</span>
+                  <input class="proj-input" type="password" autocomplete="new-password" [value]="sync.passphrase()" (input)="sync.passphrase.set($any($event.target).value); sync.sftpOk.set(null)" data-testid="sftp-passphrase" />
+                </label>
+              }
+              <label class="proj-field">
+                <span>{{ 'projects.sync.sftp.path' | t }}</span>
+                <input class="proj-input proj-input--mono" type="text" autocomplete="off" spellcheck="false" [value]="sync.form().path" (input)="sync.patchForm({ path: $any($event.target).value })" data-testid="sftp-path" />
+              </label>
+              <label class="proj-check">
+                <input type="checkbox" [checked]="sync.remember()" (change)="sync.remember.set($any($event.target).checked)" data-testid="sftp-remember" />
+                <span>{{ 'projects.sync.sftp.remember' | t }}<small class="proj-hint">{{ 'projects.sync.sftp.rememberHint' | t }}</small></span>
+              </label>
+              <div class="proj-callout proj-callout--ok">
+                <strong>{{ 'projects.sync.sftp.credTitle' | t }}</strong>
+                <p>{{ 'projects.sync.sftp.credText' | t }}</p>
+              </div>
+              @if (sd.error; as err) {
+                <p class="proj-flag proj-flag--danger" role="alert" data-testid="sync-link-error">{{ sync.errorText(err) }}</p>
+              }
+              @if (sync.sftpOk(); as ok) {
+                <p class="proj-flag proj-flag--ok" data-testid="sync-checked">✓ {{ 'projects.sync.sftp.checked' | t: { folder: ok.folder } }}</p>
+                <div class="proj-callout proj-callout--warn">
+                  <strong>{{ 'projects.sync.sftp.warnTitle' | t }}</strong>
+                  <p>{{ 'projects.sync.sftp.warnText' | t }}</p>
+                </div>
+                <label class="proj-check">
+                  <input type="checkbox" [checked]="sync.accepted()" (change)="sync.accepted.set($any($event.target).checked)" data-testid="sync-accept" />
+                  <span>{{ 'projects.sync.sftp.accept' | t }}</span>
+                </label>
+              }
+              <div class="proj-actions proj-actions--end">
+                <button type="button" class="btn" (click)="sync.cancelLink()">{{ 'projects.cancel' | t }}</button>
+                <button type="button" class="btn" [disabled]="!sync.formReady()" (click)="sync.testSftp()" data-testid="sftp-test">{{ 'projects.sync.sftp.test' | t }}</button>
+                <button type="button" class="btn btn--primary" [disabled]="!sync.sftpOk() || !sync.accepted()" (click)="sync.confirmLinkSftp()" data-testid="sync-link-confirm">{{ 'projects.sync.link.button' | t }}</button>
+              </div>
+            } @else {
+              <p>{{ 'projects.sync.link.intro' | t }}</p>
+              <div class="proj-field">
+                <span>{{ 'projects.sync.link.field' | t }}</span>
+                <div class="proj-pick">
+                  <code class="proj-pick__path" data-testid="sync-picked">{{ sd.picked?.folder || '—' }}</code>
+                  <button type="button" class="btn" (click)="sync.pickFolder()" data-testid="sync-choose">{{ 'projects.sync.link.choose' | t }}</button>
+                </div>
+              </div>
+              @if (sd.error; as err) {
+                <p class="proj-flag proj-flag--danger" role="alert" data-testid="sync-link-error">{{ sync.errorText(err) }}</p>
+              }
+              @if (sd.picked; as pk) {
+                <p class="proj-flag proj-flag--ok" data-testid="sync-checked">
+                  ✓
+                  @if (pk.free !== null) {
+                    {{ 'projects.sync.link.checked' | t: { free: bytes(pk.free) } }}
+                  } @else {
+                    {{ 'projects.sync.link.checkedNoFree' | t }}
+                  }
+                </p>
+                <div class="proj-callout proj-callout--warn">
+                  <strong>{{ 'projects.sync.link.warnTitle' | t }}</strong>
+                  <p>{{ 'projects.sync.link.warnText' | t }}</p>
+                </div>
+                <label class="proj-check">
+                  <input type="checkbox" [checked]="sync.accepted()" (change)="sync.accepted.set($any($event.target).checked)" data-testid="sync-accept" />
+                  <span>{{ 'projects.sync.link.accept' | t }}</span>
+                </label>
+              }
+              <div class="proj-actions proj-actions--end">
+                <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.cancel' | t }}</button>
+                <button type="button" class="btn btn--primary" [disabled]="!sd.picked || !sync.accepted()" (click)="sync.confirmLink()" data-testid="sync-link-confirm">
+                  {{ 'projects.sync.link.button' | t }}
+                </button>
+              </div>
             }
-            <div class="proj-actions proj-actions--end">
-              <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.cancel' | t }}</button>
-              <button type="button" class="btn btn--primary" [disabled]="!sd.picked || !sync.accepted()" (click)="sync.confirmLink()" data-testid="sync-link-confirm">
-                {{ 'projects.sync.link.button' | t }}
-              </button>
-            </div>
           }
           @case ('plan') {
             <h2>{{ 'projects.sync.plan.title' | t }}</h2>
@@ -663,10 +745,19 @@
             </div>
           }
           @case ('offline') {
-            <h2>{{ 'projects.sync.offline.title' | t }}</h2>
-            <p>{{ 'projects.sync.offline.text' | t: { folder: sync.folder() } }}</p>
+            @if (sync.kind() === 'sftp') {
+              <h2>{{ ('projects.sync.offline.' + (sd.reason ?? 'host-not-found') + '.title') | t }}</h2>
+              <p data-testid="sync-offline-text">{{ ('projects.sync.offline.' + (sd.reason ?? 'host-not-found') + '.text') | t: { host: sync.server()?.host, port: sync.server()?.port } }}</p>
+            } @else {
+              <h2>{{ 'projects.sync.offline.title' | t }}</h2>
+              <p>{{ 'projects.sync.offline.text' | t: { folder: sync.folder() } }}</p>
+            }
             <div class="proj-actions proj-actions--end">
-              <button type="button" class="btn" (click)="sync.changeFolder()">{{ 'projects.sync.offline.other' | t }}</button>
+              @if (sync.kind() === 'sftp') {
+                <button type="button" class="btn" (click)="sync.askManage()" data-testid="sync-review-server">{{ 'projects.sync.offline.review' | t }}</button>
+              } @else {
+                <button type="button" class="btn" (click)="sync.changeFolder()">{{ 'projects.sync.offline.other' | t }}</button>
+              }
               <button type="button" class="btn" (click)="sync.retryOffline()" data-testid="sync-retry">{{ 'projects.sync.offline.retry' | t }}</button>
               <button type="button" class="btn btn--primary" (click)="sync.closeDialog()">{{ 'projects.sync.offline.continue' | t }}</button>
             </div>
@@ -690,6 +781,151 @@
               <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.cancel' | t }}</button>
               <button type="button" class="btn" (click)="sync.changeFolder()" data-testid="sync-change">{{ 'projects.sync.unlink.change' | t }}</button>
               <button type="button" class="btn btn--danger" (click)="sync.unlink()" data-testid="sync-unlink">{{ 'projects.sync.unlink.button' | t }}</button>
+            </div>
+          }
+          @case ('server') {
+            @if (sync.server(); as sv) {
+              <h2>{{ 'projects.sync.server.title' | t }}</h2>
+              <dl class="proj-kv" data-testid="sync-server-info">
+                <dt>{{ 'projects.sync.server.server' | t }}</dt><dd>{{ 'projects.sync.server.serverValue' | t: { host: sv.host, port: sv.port } }}</dd>
+                <dt>{{ 'projects.sync.server.user' | t }}</dt><dd>{{ sv.username }}</dd>
+                <dt>{{ 'projects.sync.server.folder' | t }}</dt><dd><code>{{ sv.path }}</code></dd>
+                <dt>{{ 'projects.sync.server.fingerprint' | t }}</dt><dd><code class="proj-fp" data-testid="sync-fingerprint">{{ shortFp(sv.fingerprint) }}</code></dd>
+                <dt>{{ 'projects.sync.server.credential' | t }}</dt>
+                <dd data-testid="sync-cred-state">
+                  @if (sv.credentialSaved) {
+                    {{ (sv.authMode === 'key' ? 'projects.sync.server.credSavedKey' : 'projects.sync.server.credSavedPass') | t }}
+                  } @else if (sv.credentialInSession) {
+                    {{ 'projects.sync.server.credSession' | t }}
+                  } @else {
+                    {{ 'projects.sync.server.credNone' | t }}
+                  }
+                </dd>
+              </dl>
+              <div class="proj-actions">
+                <button type="button" class="btn" (click)="sync.askCredential()" data-testid="sync-cred-change">{{ 'projects.sync.server.change' | t }}</button>
+                <button type="button" class="btn" [disabled]="!sv.credentialSaved && !sv.credentialInSession" (click)="sync.askForget()" data-testid="sync-cred-forget">{{ 'projects.sync.server.forget' | t }}</button>
+                <button type="button" class="btn" (click)="sync.testSaved()" data-testid="sync-server-test">{{ 'projects.sync.server.test' | t }}</button>
+              </div>
+              <div class="proj-actions proj-actions--end">
+                <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.sync.server.close' | t }}</button>
+                <button type="button" class="btn" (click)="sync.changeFolder()" data-testid="sync-change">{{ 'projects.sync.server.other' | t }}</button>
+                <button type="button" class="btn btn--danger" (click)="sync.dialog.set({ kind: 'unlink-sftp', relink: false })" data-testid="sync-unlink">{{ 'projects.sync.server.unlink' | t }}</button>
+              </div>
+            }
+          }
+          @case ('sftp-test') {
+            <h2>{{ (sd.state === 'running' ? 'projects.sync.test.running' : 'projects.sync.test.title') | t }}</h2>
+            <ul class="proj-steps" data-testid="sftp-steps">
+              @if (sd.state !== 'running') {
+                @for (step of sd.steps; track step.id) {
+                  <li [class.proj-steps__bad]="!step.ok">{{ step.ok ? '✓' : '✗' }} {{ ('projects.sync.test.step.' + step.id + (step.ok ? '' : 'Bad')) | t }}</li>
+                }
+              } @else {
+                <li>… {{ 'projects.sync.test.connecting' | t: { host: sd.host } }}</li>
+              }
+            </ul>
+            @if (sd.state === 'error' && sd.error; as code) {
+              <p class="proj-flag proj-flag--danger" role="alert" data-testid="sftp-test-error">{{ sync.errorText(code, sd.detail) }}</p>
+            }
+            <div class="proj-actions proj-actions--end">
+              @if (sd.state === 'ok') {
+                <button type="button" class="btn btn--primary" (click)="sync.kind() === 'sftp' ? sync.closeDialog() : sync.backToLink()" data-testid="sftp-test-continue">{{ 'projects.transfer.continue' | t }}</button>
+              } @else if (sd.state === 'error') {
+                @if (sd.error === 'remote-missing') {
+                  <button type="button" class="btn" (click)="sync.backToLink()">{{ 'projects.sync.remote.other' | t }}</button>
+                  <button type="button" class="btn btn--primary" (click)="sync.retryTest(true)" data-testid="sftp-create-folder">{{ 'projects.sync.remote.create' | t }}</button>
+                } @else {
+                  <button type="button" class="btn" (click)="sync.kind() === 'sftp' ? sync.closeDialog() : sync.backToLink()" data-testid="sftp-test-back">{{ 'projects.sync.test.back' | t }}</button>
+                  <button type="button" class="btn btn--primary" (click)="sync.retryTest()" data-testid="sftp-test-retry">{{ 'projects.sync.offline.retry' | t }}</button>
+                }
+              } @else {
+                <button type="button" class="btn" (click)="sync.cancelLink()">{{ 'projects.cancel' | t }}</button>
+              }
+            </div>
+          }
+          @case ('hostkey') {
+            @if (sd.key.changed) {
+              <h2>{{ 'projects.sync.hostkey.titleChanged' | t: { host: sd.host } }}</h2>
+              <p>{{ 'projects.sync.hostkey.textChanged' | t }}</p>
+              <dl class="proj-kv">
+                <dt>{{ 'projects.sync.hostkey.before' | t }}</dt><dd><code class="proj-fp">{{ sd.key.previous }}</code></dd>
+                <dt>{{ 'projects.sync.hostkey.now' | t }}</dt><dd><code class="proj-fp" data-testid="hostkey-fp">{{ sd.key.fingerprint }}</code></dd>
+              </dl>
+              <div class="proj-callout proj-callout--danger">
+                <strong>{{ 'projects.sync.hostkey.blocked' | t }}</strong>
+                <p>{{ 'projects.sync.hostkey.blockedText' | t }}</p>
+              </div>
+              <div class="proj-actions proj-actions--end">
+                <button type="button" class="btn" (click)="sync.closeDialog()">{{ 'projects.cancel' | t }}</button>
+                <button type="button" class="btn btn--danger" (click)="sync.trustHostKey()" data-testid="hostkey-trust">{{ 'projects.sync.hostkey.trustNew' | t }}</button>
+              </div>
+            } @else {
+              <h2>{{ 'projects.sync.hostkey.titleNew' | t }}</h2>
+              <p>{{ 'projects.sync.hostkey.textNew' | t: { host: sd.host } }}</p>
+              <p class="proj-fp-box"><small>{{ sd.key.type }}</small><code class="proj-fp" data-testid="hostkey-fp">{{ sd.key.fingerprint }}</code></p>
+              <div class="proj-callout proj-callout--warn">
+                <strong>{{ 'projects.sync.hostkey.warnTitle' | t }}</strong>
+                <p>{{ 'projects.sync.hostkey.warnText' | t }}</p>
+              </div>
+              <div class="proj-actions proj-actions--end">
+                <button type="button" class="btn" (click)="sync.backToLink()">{{ 'projects.cancel' | t }}</button>
+                <button type="button" class="btn btn--primary" (click)="sync.trustHostKey()" data-testid="hostkey-trust">{{ 'projects.sync.hostkey.trust' | t }}</button>
+              </div>
+            }
+          }
+          @case ('credential') {
+            <h2>{{ ('projects.sync.cred.title.' + sd.reason) | t: { host: sync.server()?.host } }}</h2>
+            <p>{{ ('projects.sync.cred.text.' + sd.reason) | t: { file: sync.server()?.keyFile } }}</p>
+            @if (sync.server()?.authMode === 'key') {
+              <label class="proj-field">
+                <span>{{ 'projects.sync.sftp.passphrase' | t }}</span>
+                <input class="proj-input" type="password" autocomplete="new-password" [value]="sync.passphrase()" (input)="sync.passphrase.set($any($event.target).value)" (keydown.enter)="sync.saveCredential()" data-testid="cred-input" />
+              </label>
+            } @else {
+              <label class="proj-field">
+                <span>{{ 'projects.sync.sftp.password' | t }}</span>
+                <input class="proj-input" type="password" autocomplete="new-password" [value]="sync.password()" (input)="sync.password.set($any($event.target).value)" (keydown.enter)="sync.saveCredential()" data-testid="cred-input" />
+              </label>
+            }
+            @if (sd.reason !== 'ask') {
+              <label class="proj-check">
+                <input type="checkbox" [checked]="sync.remember()" (change)="sync.remember.set($any($event.target).checked)" />
+                <span>{{ 'projects.sync.sftp.remember' | t }}</span>
+              </label>
+            }
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.closeDialog()">{{ (sd.reason === 'ask' ? 'projects.sync.cred.later' : 'projects.cancel') | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="sync.saveCredential()" data-testid="cred-save">{{ (sd.reason === 'ask' ? 'projects.sync.cred.connect' : 'projects.sync.cred.save') | t }}</button>
+            </div>
+          }
+          @case ('nostore') {
+            <h2>{{ 'projects.sync.nostore.title' | t }}</h2>
+            <p>{{ 'projects.sync.nostore.text' | t }}</p>
+            <button type="button" class="proj-choice proj-choice--on" (click)="sync.chooseNoStore(true)" data-testid="nostore-ask">
+              <span>{{ 'projects.sync.nostore.ask' | t }} <em class="proj-chip proj-chip--accent">{{ 'projects.transfer.recommended' | t }}</em><small>{{ 'projects.sync.nostore.askHint' | t }}</small></span>
+            </button>
+            <button type="button" class="proj-choice" (click)="sync.chooseNoStore(false)" data-testid="nostore-install">
+              <span>{{ 'projects.sync.nostore.install' | t }}<small>{{ 'projects.sync.nostore.installHint' | t }}</small></span>
+            </button>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.backToLink()">{{ 'projects.cancel' | t }}</button>
+            </div>
+          }
+          @case ('forget') {
+            <h2>{{ 'projects.sync.forget.title' | t: { host: sync.server()?.host } }}</h2>
+            <p>{{ 'projects.sync.forget.text' | t }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.askManage()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--danger" (click)="sync.forgetCredential()" data-testid="forget-confirm">{{ 'projects.sync.forget.button' | t }}</button>
+            </div>
+          }
+          @case ('unlink-sftp') {
+            <h2>{{ 'projects.sync.unlinkSftp.title' | t }}</h2>
+            <p>{{ 'projects.sync.unlinkSftp.text' | t: { label: sync.label() } }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="sync.askManage()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--danger" (click)="sync.unlink(sd.relink)" data-testid="sync-unlink-confirm">{{ 'projects.sync.unlink.button' | t }}</button>
             </div>
           }
           @case ('duplicates') {
@@ -728,6 +964,9 @@
             {{ 'projects.sync.progress.starting' | t }}
           }
         </p>
+        @if (sync.transferInfo(); as ti) {
+          <p class="proj-hint" data-testid="sync-speed">{{ 'projects.sync.progress.bytes' | t: { bytes: ti.done, total: ti.total, speed: ti.speed, eta: ti.eta } }}</p>
+        }
         <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="sync.percent()">
           <i [style.width.%]="sync.percent()"></i>
         </div>

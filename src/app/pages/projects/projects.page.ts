@@ -320,6 +320,11 @@ export class ProjectsPageComponent implements OnInit, OnDestroy {
     return formatBytes(exportEstimate(d.info, this.transfer.includeB()));
   }
 
+  /** Huella abreviada para listas: `SHA256:uNq3…6Gk`. */
+  shortFp(fp: string): string {
+    return fp.length > 20 ? `${fp.slice(0, 11)}…${fp.slice(-3)}` : fp;
+  }
+
   bytes(value: number): string {
     return formatBytes(value);
   }

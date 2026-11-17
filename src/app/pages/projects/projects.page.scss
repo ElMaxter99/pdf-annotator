@@ -720,3 +720,107 @@
   list-style: none;
   padding-left: 0;
 }
+
+// Servidor SFTP (fase 3b)
+.proj-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--proj-line);
+}
+
+.proj-tab {
+  padding: 10px 16px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.proj-tab--on {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.proj-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 16px;
+}
+
+.proj-seg {
+  display: inline-flex;
+  align-self: flex-start;
+  border: 1px solid var(--proj-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.proj-seg__btn {
+  padding: 9px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.proj-seg__btn--on {
+  background: var(--accent);
+  color: #fff;
+}
+
+.proj-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+}
+
+.proj-steps__bad {
+  color: var(--danger);
+}
+
+.proj-fp {
+  font-family: Consolas, monospace;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.proj-fp-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--proj-line);
+  background: var(--bg);
+}
+
+.proj-callout--danger {
+  border-color: var(--danger);
+
+  strong {
+    color: var(--danger);
+  }
+}
+
+button.proj-choice {
+  width: 100%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
