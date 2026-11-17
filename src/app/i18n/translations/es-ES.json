@@ -124,7 +124,9 @@
       "selectLabel": "Plantillas guardadas",
       "loadButton": "Cargar",
       "deleteButton": "Eliminar",
-      "empty": "Aún no tienes plantillas guardadas."
+      "empty": "Aún no tienes plantillas guardadas.",
+      "exportButton": "Exportar plantillas…",
+      "exportHint": "Guarda al menos una plantilla para exportar."
     },
     "thumbnails": {
       "title": "Miniaturas",
@@ -2132,5 +2134,25 @@
         "other": "Elegir otra"
       }
     }
+  },
+  "templatesExport": {
+    "title": "Exportar plantillas",
+    "intro": "Elige las plantillas que quieres llevarte. Se guardan en un único ZIP, un JSON por plantilla.",
+    "selectAll": "Seleccionar todas",
+    "pages": "{{n}} pág.",
+    "empty": "Aún no tienes plantillas guardadas. Guarda una desde Anotaciones y vuelve aquí.",
+    "understood": "Entendido",
+    "cancel": "Cancelar",
+    "workingTitle": "Exportando plantillas…",
+    "counter": "{{done}} de {{total}}",
+    "doneTitle": "Plantillas exportadas",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} plantillas · {{kb}} KB. Búscalo en tu carpeta de descargas.",
+    "ready": "Listo",
+    "errorTitle": "No se pudo exportar",
+    "errorText": "No se pudo crear el ZIP. Tus plantillas siguen guardadas y no se ha perdido nada.",
+    "close": "Cerrar",
+    "retry": "Reintentar",
+    "exportButton": "Exportar {{n}} plantillas"
   }
 }

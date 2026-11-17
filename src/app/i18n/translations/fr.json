@@ -124,7 +124,9 @@
       "selectLabel": "Modèles enregistrés",
       "loadButton": "Charger",
       "deleteButton": "Supprimer",
-      "empty": "Vous n'avez pas encore enregistré de modèles."
+      "empty": "Vous n'avez pas encore enregistré de modèles.",
+      "exportButton": "Exporter les modèles…",
+      "exportHint": "Enregistrez au moins un modèle pour exporter."
     },
     "thumbnails": {
       "title": "Vignettes",
@@ -2132,5 +2134,25 @@
         "other": "En choisir un autre"
       }
     }
+  },
+  "templatesExport": {
+    "title": "Exporter les modèles",
+    "intro": "Choisissez les modèles à emporter. Ils sont enregistrés dans un seul ZIP, un JSON par modèle.",
+    "selectAll": "Tout sélectionner",
+    "pages": "{{n}} p.",
+    "empty": "Vous n'avez pas encore de modèle enregistré. Enregistrez-en un depuis Annotations, puis revenez ici.",
+    "understood": "Compris",
+    "cancel": "Annuler",
+    "workingTitle": "Exportation des modèles…",
+    "counter": "{{done}} sur {{total}}",
+    "doneTitle": "Modèles exportés",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} modèles · {{kb}} Ko. Retrouvez-le dans votre dossier de téléchargements.",
+    "ready": "Terminé",
+    "errorTitle": "Exportation impossible",
+    "errorText": "Le ZIP n'a pas pu être créé. Vos modèles sont toujours enregistrés et rien n'a été perdu.",
+    "close": "Fermer",
+    "retry": "Réessayer",
+    "exportButton": "Exporter {{n}} modèles"
   }
 }

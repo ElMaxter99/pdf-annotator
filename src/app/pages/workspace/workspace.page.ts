@@ -115,6 +115,7 @@ import { ExportSamplesDialogComponent } from './components/export-samples-dialog
 import { AboutDialogComponent } from './components/about-dialog/about-dialog.component';
 import { CommandPaletteComponent } from './components/command-palette/command-palette.component';
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
+import { TemplatesExportDialogComponent } from './components/templates-export-dialog/templates-export-dialog.component';
 import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { PageThumbnailGenerator } from './page-thumbnail-generator';
@@ -338,6 +339,7 @@ export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
     WorkspaceFooterComponent,
     AiReviewComponent,
     ShortcutsDialogComponent,
+    TemplatesExportDialogComponent,
     CommandPaletteComponent,
     AboutDialogComponent,
     ExportSamplesDialogComponent,
@@ -416,6 +418,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.store.coords().reduce((total, page) => total + page.fields.length, 0),
   );
   readonly shortcutsOpen = signal(false);
+  readonly templatesExportOpen = signal(false);
   /** Command palette (Ctrl+K). */
   readonly paletteOpen = signal(false);
   /** The palette asks the header to open «Limpiar» (it keeps its confirmation) — counter. */
@@ -5972,6 +5975,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   toggleAbout(open = !this.aboutOpen()) {
     this.aboutOpen.set(open);
+  }
+
+  /** Saved templates that can be exported (the default one is not). */
+  exportableTemplates(): AnnotationTemplate[] {
+    return this.templates().filter((template) => template.id !== this.defaultTemplateId);
+  }
+
+  toggleTemplatesExport(open = !this.templatesExportOpen()) {
+    if (open && !this.exportableTemplates().length) {
+      return;
+    }
+    this.templatesExportOpen.set(open);
   }
 
   toggleShortcuts(open = !this.shortcutsOpen()) {

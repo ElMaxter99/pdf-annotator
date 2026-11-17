@@ -6525,3 +6525,90 @@ button.version-chip:focus-visible {
     display: none;
   }
 }
+
+/* Exportar plantillas en ZIP (P-96) */
+.templates__export {
+  margin-top: 10px;
+  align-self: flex-start;
+}
+.tpl-export__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+}
+.tpl-export__text {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.tpl-export__all,
+.tpl-export__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(128, 128, 150, 0.35);
+  cursor: pointer;
+}
+.tpl-export__all {
+  border: none;
+  padding: 0 2px;
+  font-weight: 600;
+}
+.tpl-export__item--on {
+  border-color: var(--accent);
+}
+.tpl-export__all small,
+.tpl-export__item small {
+  margin-left: auto;
+  color: var(--muted);
+}
+.tpl-export__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow: auto;
+}
+.tpl-export__bar {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(128, 128, 150, 0.35);
+}
+.tpl-export__bar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 200ms ease-out;
+}
+.tpl-export__count {
+  margin: 0;
+}
+.tpl-export__states {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  max-height: 180px;
+  overflow: auto;
+}
+.tpl-export__ok {
+  color: var(--accent);
+}
+.tpl-export__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 18px 16px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tpl-export__bar i {
+    transition: none;
+  }
+}
+:root.theme-light .tpl-export__ok {
+  color: #0f766e;
+}
