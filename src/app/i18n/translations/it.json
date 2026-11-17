@@ -1434,11 +1434,38 @@
         "availableRc": "Versione di prova disponibile: {{version}}",
         "downloading": "Download di {{version}}…",
         "ready": "{{version}} pronta da installare",
-        "error": "Controllo non riuscito"
+        "error": "Controllo non riuscito",
+        "installing": "Installazione di {{version}}…"
       },
       "readyText": "Riavviando si installa la nuova versione.",
       "onQuitText": "Verrà installata alla chiusura dell'app. Le tue annotazioni si salvano da sole.",
       "manualText": "PDF Annotator {{version}} · hai la {{current}}. Su questo sistema si installa a mano: si apre la pagina dei download."
+    },
+    "installing": {
+      "title": "Installazione della versione {{version}}",
+      "stepSaved": "Sessione salvata",
+      "stepInstall": "Installazione dell'aggiornamento…",
+      "stepReopen": "Riapri PDF Annotator",
+      "password": "Il sistema ti chiederà la password",
+      "passwordHelp": "per installare. Se non vedi la finestra, cercala dietro questa o nella barra superiore.",
+      "installer": "Si aprirà il programma di installazione.",
+      "installerHelp": "Segui i suoi passaggi; l'app si riaprirà da sola alla fine.",
+      "safe": "Non spegnere il computer. Le tue annotazioni sono al sicuro."
+    },
+    "installError": {
+      "title": "Impossibile installare l'aggiornamento",
+      "text": "Il sistema non ha completato l'installazione. La tua versione {{current}} continua a funzionare e la nuova è già scaricata. Puoi riprovare o installare il pacchetto a mano.",
+      "cancelledTitle": "L'aggiornamento non è stato installato",
+      "cancelledText": "Hai annullato la password del sistema, quindi non è stato possibile installare. La tua versione {{current}} continua a funzionare e la nuova è già scaricata: non serve scaricarla di nuovo.",
+      "reason": "Motivo:",
+      "notNow": "Non ora",
+      "manual": "Scarica il pacchetto",
+      "copy": "Copia i dettagli",
+      "copied": "Dettagli copiati"
+    },
+    "done": {
+      "title": "PDF Annotator si è aggiornato alla {{version}}",
+      "text": "La tua sessione è stata recuperata. Arrivavi dalla {{from}}."
     }
   },
   "hint": {

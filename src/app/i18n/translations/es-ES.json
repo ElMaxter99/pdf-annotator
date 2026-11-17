@@ -1434,11 +1434,38 @@
         "availableRc": "Hay una versión de prueba: {{version}}",
         "downloading": "Descargando {{version}}…",
         "ready": "{{version}} lista para instalar",
-        "error": "No se pudo comprobar"
+        "error": "No se pudo comprobar",
+        "installing": "Instalando {{version}}…"
       },
       "readyText": "Reiniciar instala la nueva versión.",
       "onQuitText": "Se instalará al cerrar la app. Tus anotaciones se guardan solas.",
       "manualText": "PDF Annotator {{version}} · tienes la {{current}}. En este sistema se instala a mano: se abre la página de descargas."
+    },
+    "installing": {
+      "title": "Instalando la versión {{version}}",
+      "stepSaved": "Sesión guardada",
+      "stepInstall": "Instalando la actualización…",
+      "stepReopen": "Reabrir PDF Annotator",
+      "password": "El sistema te pedirá tu contraseña",
+      "passwordHelp": "para instalar. Si no ves el cuadro, búscalo detrás de esta ventana o en la barra superior.",
+      "installer": "Se abrirá el instalador.",
+      "installerHelp": "Sigue sus pasos; la app se reabrirá sola al terminar.",
+      "safe": "No apagues el equipo. Tus anotaciones están a salvo."
+    },
+    "installError": {
+      "title": "No se pudo instalar la actualización",
+      "text": "El sistema no terminó la instalación. Tu versión {{current}} sigue funcionando y la nueva ya está descargada. Puedes reintentarlo o instalar el paquete a mano.",
+      "cancelledTitle": "No se instaló la actualización",
+      "cancelledText": "Cancelaste la contraseña del sistema, así que no se pudo instalar. Tu versión {{current}} sigue funcionando y la nueva ya está descargada: no hace falta bajarla otra vez.",
+      "reason": "Motivo:",
+      "notNow": "Ahora no",
+      "manual": "Descargar el paquete",
+      "copy": "Copiar detalles",
+      "copied": "Detalles copiados"
+    },
+    "done": {
+      "title": "PDF Annotator se actualizó a {{version}}",
+      "text": "Tu sesión se ha recuperado. Venías de la {{from}}."
     }
   },
   "hint": {

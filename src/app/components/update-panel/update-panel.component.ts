@@ -111,7 +111,7 @@ export class UpdatePanelComponent {
     if (s.checking) return 'busy';
     if (s.status === 'error') return 'danger';
     if (s.status === 'available' || s.status === 'ready') return 'warn';
-    if (s.status === 'downloading') return 'busy';
+    if (s.status === 'downloading' || s.status === 'installing') return 'busy';
     return s.lastChecked ? 'ok' : 'idle';
   });
 
@@ -149,6 +149,8 @@ export class UpdatePanelComponent {
         );
       case 'downloading':
         return this.i18n.translate('update.panel.status.downloading', v);
+      case 'installing':
+        return this.i18n.translate('update.panel.status.installing', v);
       case 'ready':
         return this.i18n.translate('update.panel.status.ready', v);
       case 'error':

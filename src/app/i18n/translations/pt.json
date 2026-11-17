@@ -1434,11 +1434,38 @@
         "availableRc": "Há uma versão de teste: {{version}}",
         "downloading": "A transferir {{version}}…",
         "ready": "{{version}} pronta a instalar",
-        "error": "Não foi possível verificar"
+        "error": "Não foi possível verificar",
+        "installing": "A instalar {{version}}…"
       },
       "readyText": "Reiniciar instala a nova versão.",
       "onQuitText": "Será instalada ao fechar a app. As suas anotações são guardadas automaticamente.",
       "manualText": "PDF Annotator {{version}} · tem a {{current}}. Neste sistema a instalação é manual: abre-se a página de transferências."
+    },
+    "installing": {
+      "title": "A instalar a versão {{version}}",
+      "stepSaved": "Sessão guardada",
+      "stepInstall": "A instalar a atualização…",
+      "stepReopen": "Reabrir o PDF Annotator",
+      "password": "O sistema vai pedir a sua palavra-passe",
+      "passwordHelp": "para instalar. Se não vir a caixa, procure-a atrás desta janela ou na barra superior.",
+      "installer": "O instalador vai abrir.",
+      "installerHelp": "Siga os passos; a app reabre sozinha no fim.",
+      "safe": "Não desligue o computador. As suas anotações estão seguras."
+    },
+    "installError": {
+      "title": "Não foi possível instalar a atualização",
+      "text": "O sistema não concluiu a instalação. A sua versão {{current}} continua a funcionar e a nova já está descarregada. Pode tentar de novo ou instalar o pacote à mão.",
+      "cancelledTitle": "A atualização não foi instalada",
+      "cancelledText": "Cancelou a palavra-passe do sistema, por isso não foi possível instalar. A sua versão {{current}} continua a funcionar e a nova já está descarregada: não é preciso descarregá-la outra vez.",
+      "reason": "Motivo:",
+      "notNow": "Agora não",
+      "manual": "Descarregar o pacote",
+      "copy": "Copiar detalhes",
+      "copied": "Detalhes copiados"
+    },
+    "done": {
+      "title": "O PDF Annotator foi atualizado para a {{version}}",
+      "text": "A sua sessão foi recuperada. Vinha da {{from}}."
     }
   },
   "hint": {

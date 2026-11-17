@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-export type DesktopUpdateStatus = 'idle' | 'available' | 'downloading' | 'ready' | 'error';
+export type DesktopUpdateStatus = 'idle' | 'available' | 'downloading' | 'ready' | 'installing' | 'error';
 
 export interface DesktopUpdateState {
   status: DesktopUpdateStatus;
@@ -22,6 +22,14 @@ export interface DesktopUpdateState {
   lastChecked?: number;
   /** Ya se eligió instalar la versión descargada al cerrar la app. */
   installOnQuit?: boolean;
+  /** La instalación pedirá la contraseña del sistema (Linux .deb/.rpm). */
+  needsPassword?: boolean;
+  /** Falló la instalación: «cancelled» (contraseña cancelada) u otro motivo; la descarga se conserva. */
+  installError?: 'cancelled' | 'failed';
+  /** Motivo técnico del fallo (una línea) para mostrar y copiar. */
+  installDetail?: string;
+  /** Primera ejecución tras actualizar: versión de la que se venía. */
+  justUpdatedFrom?: string;
 }
 
 /** Color del punto del chip de versión: nueva versión (accent), en curso o pendiente (warn) o fallo (danger). */
@@ -48,6 +56,7 @@ export interface DesktopBridge {
   installUpdate(): Promise<void>;
   installOnQuit(): Promise<void>;
   openReleasePage(): Promise<void>;
+  dismissUpdated?(): Promise<void>;
 }
 
 export function getDesktopBridge(): DesktopBridge | null {
@@ -65,6 +74,8 @@ export class DesktopUpdateService {
   private readonly deferredVersion = signal<string | null>(null);
   private readonly errorHidden = signal(false);
   private readonly installOnQuitLocal = signal(false);
+  private readonly installErrorHidden = signal(false);
+  private readonly updatedHidden = signal(false);
   /** Panel «Versión y actualizaciones» abierto (lo abre el chip de versión o el menú Ayuda). */
   readonly panelOpen = signal(false);
 
@@ -73,8 +84,19 @@ export class DesktopUpdateService {
   /** La app instalada es una versión de prueba (X.Y.Z-rc.N). */
   readonly currentIsPrerelease = computed(() => isPrereleaseVersion(this.state().current));
   readonly installOnQuitChosen = computed(() => this.installOnQuitLocal() || this.state().installOnQuit === true);
+  /** Diálogo «Instalando…» (AC-13): cubre la ventana mientras se instala o si la instalación falló. */
+  readonly installDialog = computed<'installing' | 'error' | null>(() => {
+    const s = this.state();
+    if (s.status === 'installing') return 'installing';
+    return s.status === 'ready' && s.installError && !this.installErrorHidden() ? 'error' : null;
+  });
+  /** Aviso de «se actualizó a X» tras reabrir con la versión nueva. */
+  readonly justUpdated = computed(() => {
+    const s = this.state();
+    return s.justUpdatedFrom && s.status !== 'installing' && !this.updatedHidden() ? { from: s.justUpdatedFrom, to: s.current } : null;
+  });
   readonly cardVisible = computed(() => {
-    if (this.panelOpen()) return false;
+    if (this.panelOpen() || this.installDialog()) return false;
     const s = this.state();
     if (s.status === 'available') return this.deferredVersion() !== s.version;
     if (s.status === 'error') return !this.errorHidden();
@@ -84,7 +106,7 @@ export class DesktopUpdateService {
   readonly chipDot = computed<ChipDot>(() => {
     const s = this.state();
     if (s.status === 'available') return 'accent';
-    if (s.status === 'downloading' || s.status === 'ready') return 'warn';
+    if (s.status === 'downloading' || s.status === 'ready' || s.status === 'installing') return 'warn';
     return s.status === 'error' ? 'danger' : '';
   });
 
@@ -114,6 +136,7 @@ export class DesktopUpdateService {
 
   private apply(next: DesktopUpdateState): void {
     if (next.status !== 'error') this.errorHidden.set(false);
+    if (next.status === 'installing') this.installErrorHidden.set(false);
     this.state.set(next);
   }
 
@@ -143,11 +166,20 @@ export class DesktopUpdateService {
     void this.bridge?.checkForUpdates();
   }
   restartNow(): void {
+    this.installErrorHidden.set(false);
     void this.bridge?.installUpdate();
   }
   restartOnQuit(): void {
     this.installOnQuitLocal.set(true);
     void this.bridge?.installOnQuit();
+  }
+  /** «Ahora no» tras un fallo: vuelve la tarjeta «lista para instalar». */
+  dismissInstallError(): void {
+    this.installErrorHidden.set(true);
+  }
+  dismissUpdated(): void {
+    this.updatedHidden.set(true);
+    void this.bridge?.dismissUpdated?.();
   }
   openNotes(): void {
     void this.bridge?.openReleasePage();

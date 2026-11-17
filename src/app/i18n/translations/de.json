@@ -1434,11 +1434,38 @@
         "availableRc": "Testversion verfügbar: {{version}}",
         "downloading": "{{version}} wird geladen…",
         "ready": "{{version}} bereit zur Installation",
-        "error": "Prüfung nicht möglich"
+        "error": "Prüfung nicht möglich",
+        "installing": "{{version}} wird installiert…"
       },
       "readyText": "Ein Neustart installiert die neue Version.",
       "onQuitText": "Sie wird beim Schließen der App installiert. Deine Anmerkungen werden automatisch gespeichert.",
       "manualText": "PDF Annotator {{version}} · du hast {{current}}. Auf diesem System wird manuell installiert: Die Download-Seite öffnet sich."
+    },
+    "installing": {
+      "title": "Version {{version}} wird installiert",
+      "stepSaved": "Sitzung gespeichert",
+      "stepInstall": "Update wird installiert…",
+      "stepReopen": "PDF Annotator wieder öffnen",
+      "password": "Das System fragt nach deinem Passwort",
+      "passwordHelp": "zum Installieren. Siehst du das Fenster nicht, such es hinter diesem Fenster oder in der oberen Leiste.",
+      "installer": "Das Installationsprogramm öffnet sich.",
+      "installerHelp": "Folge den Schritten; die App öffnet sich am Ende von selbst wieder.",
+      "safe": "Schalte den Rechner nicht aus. Deine Anmerkungen sind sicher."
+    },
+    "installError": {
+      "title": "Das Update konnte nicht installiert werden",
+      "text": "Das System hat die Installation nicht abgeschlossen. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen. Du kannst es erneut versuchen oder das Paket von Hand installieren.",
+      "cancelledTitle": "Das Update wurde nicht installiert",
+      "cancelledText": "Du hast das Systempasswort abgebrochen, daher ließ sich nicht installieren. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen: Sie muss nicht erneut geladen werden.",
+      "reason": "Grund:",
+      "notNow": "Jetzt nicht",
+      "manual": "Paket herunterladen",
+      "copy": "Details kopieren",
+      "copied": "Details kopiert"
+    },
+    "done": {
+      "title": "PDF Annotator wurde auf {{version}} aktualisiert",
+      "text": "Deine Sitzung wurde wiederhergestellt. Du kamst von {{from}}."
     }
   },
   "hint": {

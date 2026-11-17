@@ -1434,11 +1434,38 @@
         "availableRc": "Hi ha una versió de prova: {{version}}",
         "downloading": "Baixant {{version}}…",
         "ready": "{{version}} a punt per instal·lar",
-        "error": "No s'ha pogut comprovar"
+        "error": "No s'ha pogut comprovar",
+        "installing": "Instal·lant {{version}}…"
       },
       "readyText": "Reiniciar instal·la la nova versió.",
       "onQuitText": "S'instal·larà en tancar l'app. Les teves anotacions es desen soles.",
       "manualText": "PDF Annotator {{version}} · tens la {{current}}. En aquest sistema s'instal·la a mà: s'obre la pàgina de descàrregues."
+    },
+    "installing": {
+      "title": "Instal·lant la versió {{version}}",
+      "stepSaved": "Sessió desada",
+      "stepInstall": "Instal·lant l'actualització…",
+      "stepReopen": "Reobrir PDF Annotator",
+      "password": "El sistema et demanarà la contrasenya",
+      "passwordHelp": "per instal·lar. Si no veus el quadre, busca'l darrere d'aquesta finestra o a la barra superior.",
+      "installer": "S'obrirà l'instal·lador.",
+      "installerHelp": "Segueix-ne els passos; l'app es reobrirà sola en acabar.",
+      "safe": "No apaguis l'equip. Les teves anotacions estan a salvo."
+    },
+    "installError": {
+      "title": "No s'ha pogut instal·lar l'actualització",
+      "text": "El sistema no ha acabat la instal·lació. La teva versió {{current}} continua funcionant i la nova ja està baixada. Pots tornar-ho a provar o instal·lar el paquet a mà.",
+      "cancelledTitle": "No s'ha instal·lat l'actualització",
+      "cancelledText": "Has cancel·lat la contrasenya del sistema, així que no s'ha pogut instal·lar. La teva versió {{current}} continua funcionant i la nova ja està baixada: no cal baixar-la un altre cop.",
+      "reason": "Motiu:",
+      "notNow": "Ara no",
+      "manual": "Baixa el paquet",
+      "copy": "Copia els detalls",
+      "copied": "Detalls copiats"
+    },
+    "done": {
+      "title": "PDF Annotator s'ha actualitzat a la {{version}}",
+      "text": "S'ha recuperat la teva sessió. Veníes de la {{from}}."
     }
   },
   "hint": {
