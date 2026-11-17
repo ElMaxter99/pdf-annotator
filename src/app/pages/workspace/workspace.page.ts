@@ -33,6 +33,9 @@ import {
 import {
   ZOOM_PRESETS,
   clampScale,
+  fitPageScale,
+  fitPageScaleForOverflow,
+  fitWidthScale,
   stepScale,
   wheelZoomFactor,
   zoomLimitFor,
@@ -163,6 +166,7 @@ import {
   DistributeAxis,
   distributeBoxes,
 } from '../../utils/alignment.utils';
+import { CoalescingRunner } from '../../utils/coalescing-runner';
 import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
 import {
   closeFontDropdownState,
@@ -1553,35 +1557,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  private rendering = false;
-  private renderRequestedWhileBusy = false;
+  private readonly renderRunner = new CoalescingRunner(
+    () => this.renderOnce(),
+    () => this.redrawAllForPage(),
+  );
 
   /**
    * Draws the current page. pdf.js cannot render twice on the same canvas at once, so calls that
    * arrive mid-render (e.g. a held zoom key) are coalesced into one more pass with the latest
    * scale/page, and the annotations are repainted afterwards.
    */
-  async render() {
-    if (this.rendering) {
-      this.renderRequestedWhileBusy = true;
-      return;
-    }
-
-    this.rendering = true;
-    let coalesced = false;
-    try {
-      do {
-        this.renderRequestedWhileBusy = false;
-        await this.renderOnce();
-        coalesced = coalesced || this.renderRequestedWhileBusy;
-      } while (this.renderRequestedWhileBusy);
-    } finally {
-      this.rendering = false;
-    }
-
-    if (coalesced) {
-      this.redrawAllForPage();
-    }
+  render(): Promise<void> {
+    return this.renderRunner.request();
   }
 
   private async renderOnce() {
@@ -5413,18 +5400,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     const availableH =
       container.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
-    if (!(base.width > 0) || !(availableW > 0) || !(availableH > 0)) {
+    const fit = fitPageScale(base.width, base.height, availableW, availableH);
+    if (fit === null) {
       return;
     }
 
-    const fit = Math.min(availableW / base.width, availableH / base.height);
-    this.scale.set(Math.min(4, Math.max(0.25, Math.floor(fit * 100) / 100)));
+    this.scale.set(fit);
     await this.render();
     const overflow = container.scrollHeight - container.clientHeight;
     if (overflow > 0) {
-      const adjusted =
-        Math.floor(((base.height * this.scale() - overflow) / base.height) * 100) / 100;
-      this.scale.set(Math.min(4, Math.max(0.25, adjusted)));
+      this.scale.set(fitPageScaleForOverflow(base.height, this.scale(), overflow));
       await this.render();
     }
     this.redrawAllForPage();
@@ -5445,11 +5430,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const style = getComputedStyle(container);
     const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
     const available = container.clientWidth - padding;
-    if (!(baseWidth > 0) || !(available > 0)) {
+    const fit = fitWidthScale(baseWidth, available);
+    if (fit === null) {
       return;
     }
 
-    this.scale.set(Math.min(4, Math.max(0.25, Math.floor((available / baseWidth) * 100) / 100)));
+    this.scale.set(fit);
     await this.render();
     this.redrawAllForPage();
   }

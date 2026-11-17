@@ -1,4 +1,12 @@
-import { clampScale, stepScale, wheelZoomFactor, zoomLimitFor } from './zoom.utils';
+import {
+  clampScale,
+  fitPageScale,
+  fitPageScaleForOverflow,
+  fitWidthScale,
+  stepScale,
+  wheelZoomFactor,
+  zoomLimitFor,
+} from './zoom.utils';
 
 describe('zoom.utils', () => {
   it('clamps to 25 %–400 % and rounds to percents', () => {
@@ -26,5 +34,36 @@ describe('zoom.utils', () => {
     expect(stepScale(1, 1)).toBe(1.25);
     expect(stepScale(0.25, -1)).toBe(0.25);
     expect(stepScale(3.9, 1)).toBe(4);
+  });
+});
+
+describe('ajuste de zoom', () => {
+  it('fitWidthScale redondea hacia abajo al porcentaje y respeta los límites', () => {
+    expect(fitWidthScale(600, 900)).toBe(1.5);
+    expect(fitWidthScale(600, 1000)).toBe(1.66);
+    expect(fitWidthScale(600, 100)).toBe(0.25);
+    expect(fitWidthScale(100, 5000)).toBe(4);
+  });
+
+  it('fitWidthScale devuelve null con medidas inválidas', () => {
+    expect(fitWidthScale(0, 900)).toBeNull();
+    expect(fitWidthScale(600, 0)).toBeNull();
+    expect(fitWidthScale(NaN, 900)).toBeNull();
+  });
+
+  it('fitPageScale usa el eje más ajustado', () => {
+    expect(fitPageScale(600, 800, 1200, 800)).toBe(1);
+    expect(fitPageScale(600, 800, 600, 1600)).toBe(1);
+    expect(fitPageScale(600, 800, 3000, 400)).toBe(0.5);
+  });
+
+  it('fitPageScale devuelve null con medidas inválidas', () => {
+    expect(fitPageScale(600, 0, 1000, 1000)).toBeNull();
+    expect(fitPageScale(600, 800, 1000, -1)).toBeNull();
+  });
+
+  it('fitPageScaleForOverflow reduce lo que desborda', () => {
+    expect(fitPageScaleForOverflow(800, 1, 80)).toBe(0.9);
+    expect(fitPageScaleForOverflow(800, 0.3, 700)).toBe(0.25);
   });
 });
