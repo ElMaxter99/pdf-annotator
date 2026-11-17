@@ -128,7 +128,8 @@
     },
     "thumbnails": {
       "title": "Miniaturas",
-      "pageLabel": "Página {{index}}"
+      "pageLabel": "Página {{index}}",
+      "retryLabel": "Página {{index}}: não foi possível desenhar, prima para tentar de novo"
     },
     "advancedTitle": "Opções avançadas",
     "advancedHint": "Ative as guias e os auxiliares de alinhamento apenas quando precisar de mais precisão.",

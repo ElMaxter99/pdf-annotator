@@ -4,28 +4,33 @@ import { PageThumbnail } from '../../models/page-thumbnail.model';
 import { thumbnailScale } from '../../utils/thumbnail-scale.utils';
 
 /**
- * Genera las miniaturas del PDF abierto (una a una, con OffscreenCanvas) y gestiona sus URLs de
- * objeto. Una generación nueva cancela la anterior.
+ * Gestiona las miniaturas del PDF abierto. Al abrir un PDF solo calcula el tamaño de cada una
+ * (la lista aparece al instante, con `imageUrl: null`); la imagen se dibuja bajo demanda, cuando
+ * la miniatura entra en pantalla (`request`) y se descarta de la cola si sale antes de tocarle
+ * (`cancel`). Se dibuja de una en una con OffscreenCanvas y se gestionan sus URLs de objeto.
+ * Un PDF nuevo cancela lo anterior.
  */
 export class PageThumbnailGenerator {
   readonly thumbnails = signal<readonly PageThumbnail[]>([]);
-  private objectUrls: string[] = [];
+  private objectUrls = new Map<number, string>();
+  private queue: number[] = [];
+  private doc: PDFDocumentProxy | null = null;
+  private running = false;
   private token = 0;
 
-  /** Libera las URLs y vacía la lista (también cancela una generación en curso). */
+  /** Libera las URLs y vacía la lista (también cancela el trabajo en curso). */
   dispose(): void {
     this.token += 1;
+    this.doc = null;
+    this.queue = [];
     this.thumbnails.set([]);
     this.revokeUrls();
   }
 
+  /** Prepara la lista de miniaturas vacías (solo tamaños, sin dibujar nada). */
   async generate(doc: PDFDocumentProxy | null): Promise<void> {
-    this.token += 1;
+    this.dispose();
     const generationToken = this.token;
-
-    this.thumbnails.set([]);
-    this.revokeUrls();
-
     if (!doc) {
       return;
     }
@@ -35,69 +40,126 @@ export class PageThumbnailGenerator {
       return;
     }
 
-    const thumbnails: PageThumbnail[] = [];
-    const urls: string[] = [];
-    const discard = () => urls.forEach((url) => URL.revokeObjectURL(url));
-
-    try {
-      for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber += 1) {
-        if (generationToken !== this.token) {
-          discard();
-          return;
-        }
-
-        const page = await doc.getPage(pageNumber);
-        const baseViewport = page.getViewport({ scale: 1 });
-        const viewport = page.getViewport({ scale: thumbnailScale(baseViewport.width) });
-        const width = Math.max(1, Math.round(viewport.width));
-        const height = Math.max(1, Math.round(viewport.height));
-
-        const canvas = new OffscreenCanvas(width, height);
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        if (!ctx) {
-          if (typeof page.cleanup === 'function') {
-            page.cleanup();
-          }
-          continue;
-        }
-
-        ctx.clearRect(0, 0, width, height);
-
-        await page.render({
-          canvasContext: ctx as unknown as CanvasRenderingContext2D,
-          canvas: null,
-          viewport,
-        }).promise;
-
-        const blob = await canvas.convertToBlob({ type: 'image/png' });
-        const url = URL.createObjectURL(blob);
-
-        urls.push(url);
-        thumbnails.push({ pageNumber, imageUrl: url, width, height });
-
-        if (typeof page.cleanup === 'function') {
-          page.cleanup();
-        }
+    const items: PageThumbnail[] = [];
+    for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber += 1) {
+      const page = await doc.getPage(pageNumber);
+      if (generationToken !== this.token) {
+        return;
       }
-    } catch (error) {
-      discard();
-      throw error;
+      const base = page.getViewport({ scale: 1 });
+      const viewport = page.getViewport({ scale: thumbnailScale(base.width) });
+      items.push({
+        pageNumber,
+        imageUrl: null,
+        width: Math.max(1, Math.round(viewport.width)),
+        height: Math.max(1, Math.round(viewport.height)),
+      });
+      if (typeof page.cleanup === 'function') {
+        page.cleanup();
+      }
     }
+    this.doc = doc;
+    this.thumbnails.set(items);
+  }
 
-    if (generationToken !== this.token) {
-      discard();
+  /** Pide dibujar la miniatura de una página (la última pedida se dibuja primero). */
+  request(pageNumber: number): void {
+    if (!this.doc || this.objectUrls.has(pageNumber) || this.queue.includes(pageNumber)) {
       return;
     }
+    this.queue.push(pageNumber);
+    void this.drain();
+  }
 
-    this.objectUrls = urls;
-    this.thumbnails.set(thumbnails);
+  /** Reintenta una miniatura que falló. */
+  retry(pageNumber: number): void {
+    if (!this.thumbnails().some((t) => t.pageNumber === pageNumber && t.failed)) {
+      return;
+    }
+    this.mark(pageNumber, { failed: false });
+    this.request(pageNumber);
+  }
+
+  /** Quita de la cola una miniatura que ya no se ve y aún no se ha dibujado. */
+  cancel(pageNumber: number): void {
+    this.queue = this.queue.filter((n) => n !== pageNumber);
+  }
+
+  private async drain(): Promise<void> {
+    if (this.running) {
+      return;
+    }
+    this.running = true;
+    const generationToken = this.token;
+    try {
+      while (this.queue.length && generationToken === this.token) {
+        const pageNumber = this.queue.pop() as number;
+        try {
+          await this.renderOne(pageNumber, generationToken);
+        } catch (error) {
+          console.error('No se pudo generar la miniatura de la página', pageNumber, error);
+          if (generationToken === this.token) {
+            this.mark(pageNumber, { failed: true });
+          }
+        }
+      }
+    } finally {
+      this.running = false;
+    }
+    // Lo pedido mientras terminaba (o tras abrir otro PDF) sigue en cola: se retoma aquí.
+    if (this.queue.length) {
+      void this.drain();
+    }
+  }
+
+  private async renderOne(pageNumber: number, generationToken: number): Promise<void> {
+    const doc = this.doc;
+    const item = this.thumbnails().find((t) => t.pageNumber === pageNumber);
+    if (!doc || !item) {
+      return;
+    }
+    const page = await doc.getPage(pageNumber);
+    try {
+      const base = page.getViewport({ scale: 1 });
+      const viewport = page.getViewport({ scale: thumbnailScale(base.width) });
+      const canvas = new OffscreenCanvas(item.width, item.height);
+      const ctx = canvas.getContext('2d', { alpha: false });
+      if (!ctx) {
+        this.mark(pageNumber, { failed: true });
+        return;
+      }
+      ctx.clearRect(0, 0, item.width, item.height);
+      await page.render({
+        canvasContext: ctx as unknown as CanvasRenderingContext2D,
+        canvas: null,
+        viewport,
+      }).promise;
+      const blob = await canvas.convertToBlob({ type: 'image/png' });
+      if (generationToken !== this.token) {
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      this.objectUrls.set(pageNumber, url);
+      this.thumbnails.update((list) =>
+        list.map((t) => (t.pageNumber === pageNumber ? { ...t, imageUrl: url } : t)),
+      );
+    } finally {
+      if (typeof page.cleanup === 'function') {
+        page.cleanup();
+      }
+    }
+  }
+
+  private mark(pageNumber: number, patch: Partial<PageThumbnail>): void {
+    this.thumbnails.update((list) =>
+      list.map((t) => (t.pageNumber === pageNumber ? { ...t, ...patch } : t)),
+    );
   }
 
   private revokeUrls(): void {
-    for (const url of this.objectUrls) {
+    for (const url of this.objectUrls.values()) {
       URL.revokeObjectURL(url);
     }
-    this.objectUrls = [];
+    this.objectUrls.clear();
   }
 }
