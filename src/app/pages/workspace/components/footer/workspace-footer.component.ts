@@ -16,6 +16,20 @@ export class WorkspaceFooterComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
+  /** Position of the only selected annotation, announced to screen readers (nudges, drags). */
+  selectedSpot(): { name: string; x: number; y: number } | null {
+    const selected = this.vm.selection();
+    if (selected?.fields.length !== 1) {
+      return null;
+    }
+    const field = this.vm.coords()[selected.pageIndex]?.fields[selected.fields[0]];
+    if (!field) {
+      return null;
+    }
+    const round = (n: number) => Math.round(n * 100) / 100;
+    return { name: field.mapField, x: round(field.x), y: round(field.y) };
+  }
+
   toggleZoomMenu(): void {
     const open = !this.vm.zoomMenuOpen();
     this.vm.zoomMenuOpen.set(open);

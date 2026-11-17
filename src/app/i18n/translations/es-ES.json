@@ -94,6 +94,7 @@
     "downloadPdf": "Descargar PDF",
     "cursorLabel": "Cursor (PDF)",
     "cursorInactive": "Mueve el cursor sobre el PDF",
+    "selectedPosition": "Posición de «{{name}}»: X {{x}}, Y {{y}}",
     "toolbarAriaLabel": "Acciones del PDF",
     "navigationGroup": "Navegación de páginas",
     "zoomGroup": "Controles de zoom",
