@@ -1,4 +1,6 @@
 ## Unreleased
+### Docs
+- Hoja de ruta: anotados los evolutivos futuros de escritorio (proyectos locales, importar/exportar proyectos y sincronización sin servidores propios), con fases, riesgos y preguntas abiertas. Sin cambios en la app.
 
 ## [v1.13.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.13.0) - 2026-11-17
 ### Added
