@@ -910,6 +910,40 @@
         "keepRunning": "You can close the tab or reload: the queue keeps going while the helper is open.",
         "lost": "The helper was closed and the queue was lost. {{kept}} PDFs keep their proposal; {{lost}} did not finish.",
         "relaunch": "Launch the {{count}} missing again"
+      },
+      "sheet": {
+        "label": "Transfer summary",
+        "scope": "What the summary is about",
+        "scopeAll": "Whole batch",
+        "scopeFollow": "In progress",
+        "release": "Let go of this PDF and go back to the whole batch",
+        "allTitle": "Summary · whole batch",
+        "allSub": "{{count}} PDFs transferred",
+        "followTitle": "In progress · {{name}}",
+        "followSub": "moves to the next one when it finishes",
+        "pdfTitle": "Summary · {{name}}",
+        "tokens": "tokens",
+        "noMeasure": "Usage not measurable",
+        "requests": "Requests",
+        "attempts": "Attempts",
+        "time": "Time",
+        "free": "No cost",
+        "placed": "Placed",
+        "placedValue": "{{placed}} of {{total}}",
+        "more": "See steps and what was sent",
+        "moreAll": "See batch details"
+      },
+      "filter": {
+        "label": "Filter the list",
+        "all": "All {{count}}",
+        "review": "To review {{count}}",
+        "warn": "With warning {{count}}",
+        "failed": "Failed {{count}}",
+        "empty": "No PDF matches this filter."
+      },
+      "row": {
+        "viewing": "Showing the summary",
+        "following": "Following the one in progress"
       }
     },
     "more": "More actions",
@@ -1084,7 +1118,6 @@
       "text": "Understands that a field moves or changes page. Uses your {{provider}}. A few seconds per PDF."
     },
     "loading": {
-      "title": "{{provider}} is comparing A and B…",
       "hint": "You can keep editing; B is not touched until you apply.",
       "stage": {
         "reading": "Preparing pages and texts",
@@ -1142,18 +1175,10 @@
       "text": "The AI did not place any field."
     },
     "review": {
-      "title": "AI proposal ({{provider}})",
-      "strip": "{{placed}} of {{total}} fields placed",
       "changePage": "{{count}} change(s) page",
-      "notFound": "{{count}} not found",
-      "untouched": "B has not been modified yet.",
-      "notPlaced": "not placed",
       "anchor": "anchor “{{text}}”",
-      "goto": "Go to page",
       "listHint": "Low-confidence or unplaced fields are not applied until you tick them.",
-      "saved": "Saved proposal · {{provider}}",
       "adjustProvider": "Text adjustment",
-      "discard": "Discard the proposal",
       "pending": "Waiting for review: {{count}}",
       "nextWithProposal": "Next with a proposal ›"
     },
@@ -1295,6 +1320,47 @@
       "emptyClaude": "Claude Code's default model will be used.",
       "retiredTitle": "“{{model}}” is no longer available for your account.",
       "retiredBody": "We went back to {{fallback}}; you can pick another one from the list."
+    },
+    "dock": {
+      "label": "Proposal review",
+      "viewLabel": "Show in B",
+      "fresh": "New",
+      "saved": "Saved",
+      "untouched": "B unchanged",
+      "placed": "{{placed}} of {{total}} placed",
+      "notFound": "{{count}} not found",
+      "nothingMarked": "Nothing ticked",
+      "nothingMarkedHint": "Tick at least one field to apply.",
+      "review": "Review fields",
+      "reviewCount": "{{count}} to review",
+      "apply": "Apply {{count}}",
+      "more": "More actions",
+      "close": "Close the review",
+      "discard": "Discard the proposal…",
+      "confirmTitle": "Discard the {{provider}} proposal?",
+      "confirmSaved": "It is removed from the batch. Asking again uses another request.",
+      "confirmFresh": "This proposal is lost. Asking again uses another request.",
+      "confirmYes": "Discard",
+      "confirmNo": "Back",
+      "comparing": "Comparing A and B…",
+      "noChange": "No changes",
+      "viewingProposal": "Showing the proposal",
+      "viewingOriginal": "Original"
+    },
+    "proposal": {
+      "count": "{{count}} proposed",
+      "unapplied": "Not applied",
+      "willApply": "{{count}} will be applied",
+      "selectHigh": "Tick the high ones ({{count}})",
+      "selectNone": "Untick all",
+      "group": {
+        "review": "To review · {{count}}",
+        "notFound": "Not found · {{count}}",
+        "ready": "Ready · {{count}}"
+      },
+      "notInB": "not in B",
+      "placeByHand": "Place by hand",
+      "tabBadge": "AI proposal: {{count}} fields"
     }
   },
   "update": {

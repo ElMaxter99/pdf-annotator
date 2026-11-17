@@ -18,6 +18,8 @@
       (click)="vm.setSidebarTab('annotations')">
       {{ 'sidebar.tabs.annotations' | t }}
       <span class="sidebar-tab__badge" *ngIf="vm.annotationCount() as count">{{ count }}</span>
+      <span class="sidebar-tab__badge sidebar-tab__badge--ai" *ngIf="vm.aiProposedCount() as proposed" data-testid="ai-tab-badge"
+        [attr.title]="'ai.proposal.tabBadge' | t: { count: proposed }">{{ proposed }}</span>
     </button>
     <button type="button" role="tab" id="sidebar-tab-templates" class="sidebar-tab"
       [class.sidebar-tab--active]="vm.sidebarTab() === 'templates'" [attr.aria-selected]="vm.sidebarTab() === 'templates'"

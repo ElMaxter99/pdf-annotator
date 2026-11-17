@@ -910,6 +910,40 @@
         "keepRunning": "Pots tancar la pestanya o recarregar: la cua continua mentre l'ajudant estigui obert.",
         "lost": "L'ajudant s'ha tancat i la cua s'ha perdut. {{kept}} PDF conserven la proposta; {{lost}} no han acabat.",
         "relaunch": "Tornar a llançar els {{count}} que falten"
+      },
+      "sheet": {
+        "label": "Resum del trasllat",
+        "scope": "De què és el resum",
+        "scopeAll": "Tot el lot",
+        "scopeFollow": "En marxa",
+        "release": "Deixar aquest PDF i tornar a tot el lot",
+        "allTitle": "Resum · tot el lot",
+        "allSub": "{{count}} PDFs traslladats",
+        "followTitle": "En marxa · {{name}}",
+        "followSub": "canvia sol al següent quan acabi",
+        "pdfTitle": "Resum · {{name}}",
+        "tokens": "tokens",
+        "noMeasure": "Consum no mesurable",
+        "requests": "Peticions",
+        "attempts": "Intents",
+        "time": "Temps",
+        "free": "Sense cost",
+        "placed": "Col·locats",
+        "placedValue": "{{placed}} de {{total}}",
+        "more": "Veure passos i el que s'ha enviat",
+        "moreAll": "Veure el detall del lot"
+      },
+      "filter": {
+        "label": "Filtrar la llista",
+        "all": "Tots {{count}}",
+        "review": "Revisar {{count}}",
+        "warn": "Amb avís {{count}}",
+        "failed": "Fallits {{count}}",
+        "empty": "Cap PDF amb aquest filtre."
+      },
+      "row": {
+        "viewing": "Veient el resum",
+        "following": "Seguint el que va ara"
       }
     },
     "more": "Més accions",
@@ -1084,7 +1118,6 @@
       "text": "Entén que un camp canviï de lloc o de pàgina. Usa el teu {{provider}}. Triga uns segons per PDF."
     },
     "loading": {
-      "title": "{{provider}} està comparant A i B…",
       "hint": "Pots seguir editant; B no es toca fins aplicar.",
       "stage": {
         "reading": "Preparant pàgines i textos",
@@ -1142,18 +1175,10 @@
       "text": "La IA no ha col·locat cap camp."
     },
     "review": {
-      "title": "Proposta de la IA ({{provider}})",
-      "strip": "{{placed}} de {{total}} camps col·locats",
       "changePage": "{{count}} canvia(en) de pàgina",
-      "notFound": "{{count}} sense trobar",
-      "untouched": "B encara no s'ha modificat.",
-      "notPlaced": "sense col·locar",
       "anchor": "ancoratge «{{text}}»",
-      "goto": "Anar a la pàgina",
       "listHint": "Els de confiança baixa o sense col·locar no s'apliquen fins que els marquis.",
-      "saved": "Proposta desada · {{provider}}",
       "adjustProvider": "Ajust per textos",
-      "discard": "Descartar la proposta",
       "pending": "Pendents de revisar: {{count}}",
       "nextWithProposal": "Següent amb proposta ›"
     },
@@ -1295,6 +1320,47 @@
       "emptyClaude": "S'usarà el model per defecte de Claude Code.",
       "retiredTitle": "«{{model}}» ja no està disponible per al teu compte.",
       "retiredBody": "Hem tornat a {{fallback}}; pots triar-ne un altre de la llista."
+    },
+    "dock": {
+      "label": "Revisió de la proposta",
+      "viewLabel": "Veure a B",
+      "fresh": "Nova",
+      "saved": "Desada",
+      "untouched": "B sense modificar",
+      "placed": "{{placed}} de {{total}} col·locats",
+      "notFound": "{{count}} sense trobar",
+      "nothingMarked": "Res marcat",
+      "nothingMarkedHint": "Marca almenys un camp per aplicar.",
+      "review": "Revisar camps",
+      "reviewCount": "{{count}} per revisar",
+      "apply": "Aplicar {{count}}",
+      "more": "Més accions",
+      "close": "Tancar la revisió",
+      "discard": "Descartar la proposta…",
+      "confirmTitle": "Descartar la proposta de {{provider}}?",
+      "confirmSaved": "S'esborra del lot. Tornar-la a demanar gasta una altra petició.",
+      "confirmFresh": "Es perd aquesta proposta. Tornar-la a demanar gasta una altra petició.",
+      "confirmYes": "Descartar",
+      "confirmNo": "Tornar",
+      "comparing": "Comparant A i B…",
+      "noChange": "Sense canvis",
+      "viewingProposal": "Veient la proposta",
+      "viewingOriginal": "Original"
+    },
+    "proposal": {
+      "count": "{{count}} proposats",
+      "unapplied": "Sense aplicar",
+      "willApply": "{{count}} s'aplicaran",
+      "selectHigh": "Marcar els alts ({{count}})",
+      "selectNone": "Treure'ls tots",
+      "group": {
+        "review": "Per revisar · {{count}}",
+        "notFound": "Sense trobar · {{count}}",
+        "ready": "Llestos · {{count}}"
+      },
+      "notInB": "no és a B",
+      "placeByHand": "Col·locar a mà",
+      "tabBadge": "Proposta de la IA: {{count}} camps"
     }
   },
   "update": {

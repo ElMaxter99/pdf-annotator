@@ -910,6 +910,40 @@
         "keepRunning": "Puoi chiudere la scheda o ricaricare: la coda continua finché l'assistente è aperto.",
         "lost": "L'assistente è stato chiuso e la coda è andata persa. {{kept}} PDF conservano la proposta; {{lost}} non sono stati completati.",
         "relaunch": "Rilancia i {{count}} mancanti"
+      },
+      "sheet": {
+        "label": "Riepilogo del trasferimento",
+        "scope": "Di cosa è il riepilogo",
+        "scopeAll": "Tutto il lotto",
+        "scopeFollow": "In corso",
+        "release": "Lascia questo PDF e torna a tutto il lotto",
+        "allTitle": "Riepilogo · tutto il lotto",
+        "allSub": "{{count}} PDF trasferiti",
+        "followTitle": "In corso · {{name}}",
+        "followSub": "passa da solo al successivo quando finisce",
+        "pdfTitle": "Riepilogo · {{name}}",
+        "tokens": "token",
+        "noMeasure": "Consumo non misurabile",
+        "requests": "Richieste",
+        "attempts": "Tentativi",
+        "time": "Tempo",
+        "free": "Senza costo",
+        "placed": "Posizionati",
+        "placedValue": "{{placed}} di {{total}}",
+        "more": "Vedi i passaggi e cosa è stato inviato",
+        "moreAll": "Vedi il dettaglio del lotto"
+      },
+      "filter": {
+        "label": "Filtra l'elenco",
+        "all": "Tutti {{count}}",
+        "review": "Da rivedere {{count}}",
+        "warn": "Con avviso {{count}}",
+        "failed": "Falliti {{count}}",
+        "empty": "Nessun PDF con questo filtro."
+      },
+      "row": {
+        "viewing": "Riepilogo mostrato",
+        "following": "Segue quello in corso"
       }
     },
     "more": "Altre azioni",
@@ -1084,7 +1118,6 @@
       "text": "Capisce che un campo cambi posto o pagina. Usa il tuo {{provider}}. Pochi secondi per PDF."
     },
     "loading": {
-      "title": "{{provider}} sta confrontando A e B…",
       "hint": "Puoi continuare a modificare; B non cambia finché non applichi.",
       "stage": {
         "reading": "Preparazione di pagine e testi",
@@ -1142,18 +1175,10 @@
       "text": "L'IA non ha posizionato nessun campo."
     },
     "review": {
-      "title": "Proposta dell'IA ({{provider}})",
-      "strip": "{{placed}} campi su {{total}} posizionati",
       "changePage": "{{count}} cambia(no) pagina",
-      "notFound": "{{count}} non trovato/i",
-      "untouched": "B non è ancora stato modificato.",
-      "notPlaced": "non posizionato",
       "anchor": "àncora «{{text}}»",
-      "goto": "Vai alla pagina",
       "listHint": "I campi con bassa affidabilità o non posizionati non vengono applicati finché non li spunti.",
-      "saved": "Proposta salvata · {{provider}}",
       "adjustProvider": "Adattamento per testi",
-      "discard": "Scarta la proposta",
       "pending": "Da rivedere: {{count}}",
       "nextWithProposal": "Successivo con proposta ›"
     },
@@ -1295,6 +1320,47 @@
       "emptyClaude": "Verrà usato il modello predefinito di Claude Code.",
       "retiredTitle": "«{{model}}» non è più disponibile per il tuo account.",
       "retiredBody": "Siamo tornati a {{fallback}}; puoi sceglierne un altro dall'elenco."
+    },
+    "dock": {
+      "label": "Revisione della proposta",
+      "viewLabel": "Vedi in B",
+      "fresh": "Nuova",
+      "saved": "Salvata",
+      "untouched": "B non modificato",
+      "placed": "{{placed}} di {{total}} posizionati",
+      "notFound": "{{count}} non trovati",
+      "nothingMarked": "Niente selezionato",
+      "nothingMarkedHint": "Seleziona almeno un campo da applicare.",
+      "review": "Rivedi i campi",
+      "reviewCount": "{{count}} da rivedere",
+      "apply": "Applica {{count}}",
+      "more": "Altre azioni",
+      "close": "Chiudi la revisione",
+      "discard": "Scarta la proposta…",
+      "confirmTitle": "Scartare la proposta di {{provider}}?",
+      "confirmSaved": "Viene eliminata dal lotto. Richiederla di nuovo usa un'altra richiesta.",
+      "confirmFresh": "Questa proposta andrà persa. Richiederla di nuovo usa un'altra richiesta.",
+      "confirmYes": "Scarta",
+      "confirmNo": "Indietro",
+      "comparing": "Confronto di A e B…",
+      "noChange": "Nessuna modifica",
+      "viewingProposal": "Si vede la proposta",
+      "viewingOriginal": "Originale"
+    },
+    "proposal": {
+      "count": "{{count}} proposti",
+      "unapplied": "Non applicata",
+      "willApply": "{{count}} verranno applicati",
+      "selectHigh": "Seleziona i alti ({{count}})",
+      "selectNone": "Deseleziona tutto",
+      "group": {
+        "review": "Da rivedere · {{count}}",
+        "notFound": "Non trovati · {{count}}",
+        "ready": "Pronti · {{count}}"
+      },
+      "notInB": "non è in B",
+      "placeByHand": "Posiziona a mano",
+      "tabBadge": "Proposta dell'IA: {{count}} campi"
     }
   },
   "update": {

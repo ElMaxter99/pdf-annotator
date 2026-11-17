@@ -910,6 +910,40 @@
         "keepRunning": "Puedes cerrar la pestaña o recargar: la cola sigue mientras el ayudante esté abierto.",
         "lost": "El ayudante se cerró y la cola se perdió. {{kept}} PDFs conservan su propuesta; {{lost}} no llegaron a terminar.",
         "relaunch": "Volver a lanzar los {{count}} que faltan"
+      },
+      "sheet": {
+        "label": "Resumen del traslado",
+        "scope": "De qué es el resumen",
+        "scopeAll": "Todo el lote",
+        "scopeFollow": "En marcha",
+        "release": "Soltar este PDF y volver a todo el lote",
+        "allTitle": "Resumen · todo el lote",
+        "allSub": "{{count}} PDFs trasladados",
+        "followTitle": "En marcha · {{name}}",
+        "followSub": "cambia solo al siguiente cuando acabe",
+        "pdfTitle": "Resumen · {{name}}",
+        "tokens": "tokens",
+        "noMeasure": "Consumo no medible",
+        "requests": "Peticiones",
+        "attempts": "Intentos",
+        "time": "Tiempo",
+        "free": "Sin gasto",
+        "placed": "Colocados",
+        "placedValue": "{{placed}} de {{total}}",
+        "more": "Ver pasos y lo enviado",
+        "moreAll": "Ver detalle del lote"
+      },
+      "filter": {
+        "label": "Filtrar la lista",
+        "all": "Todos {{count}}",
+        "review": "Revisar {{count}}",
+        "warn": "Con aviso {{count}}",
+        "failed": "Fallidos {{count}}",
+        "empty": "Ningún PDF con este filtro."
+      },
+      "row": {
+        "viewing": "Viendo el resumen",
+        "following": "Siguiendo al que va ahora"
       }
     },
     "more": "Más acciones",
@@ -1084,7 +1118,6 @@
       "text": "Entiende que un campo cambie de sitio o de página. Usa tu {{provider}}. Tarda unos segundos por PDF."
     },
     "loading": {
-      "title": "{{provider}} está comparando A y B…",
       "hint": "Puedes seguir editando; B no se toca hasta aplicar.",
       "stage": {
         "reading": "Preparando páginas y textos",
@@ -1142,18 +1175,10 @@
       "text": "La IA no ha colocado ningún campo."
     },
     "review": {
-      "title": "Propuesta de la IA ({{provider}})",
-      "strip": "{{placed}} de {{total}} campos colocados",
       "changePage": "{{count}} cambia(n) de página",
-      "notFound": "{{count}} sin encontrar",
-      "untouched": "B no se ha modificado todavía.",
-      "notPlaced": "sin colocar",
       "anchor": "ancla «{{text}}»",
-      "goto": "Ir a la página",
       "listHint": "Los de confianza baja o sin colocar no se aplican hasta que los marques.",
-      "saved": "Propuesta guardada · {{provider}}",
       "adjustProvider": "Ajuste por textos",
-      "discard": "Descartar la propuesta",
       "pending": "Pendientes de revisar: {{count}}",
       "nextWithProposal": "Siguiente con propuesta ›"
     },
@@ -1295,6 +1320,47 @@
       "emptyClaude": "Se usará el modelo por defecto de Claude Code.",
       "retiredTitle": "«{{model}}» ya no está disponible para tu cuenta.",
       "retiredBody": "Hemos vuelto a {{fallback}}; puedes elegir otro en la lista."
+    },
+    "dock": {
+      "label": "Revisión de la propuesta",
+      "viewLabel": "Ver en B",
+      "fresh": "Nueva",
+      "saved": "Guardada",
+      "untouched": "B sin modificar",
+      "placed": "{{placed}} de {{total}} colocados",
+      "notFound": "{{count}} sin encontrar",
+      "nothingMarked": "Nada marcado",
+      "nothingMarkedHint": "Marca al menos un campo para aplicar.",
+      "review": "Revisar campos",
+      "reviewCount": "{{count}} por revisar",
+      "apply": "Aplicar {{count}}",
+      "more": "Más acciones",
+      "close": "Cerrar la revisión",
+      "discard": "Descartar la propuesta…",
+      "confirmTitle": "¿Descartar la propuesta de {{provider}}?",
+      "confirmSaved": "Se borra del lote. Volver a pedirla gasta otra petición.",
+      "confirmFresh": "Se pierde esta propuesta. Volver a pedirla gasta otra petición.",
+      "confirmYes": "Descartar",
+      "confirmNo": "Volver",
+      "comparing": "Comparando A y B…",
+      "noChange": "Sin cambios",
+      "viewingProposal": "Viendo la propuesta",
+      "viewingOriginal": "Original"
+    },
+    "proposal": {
+      "count": "{{count}} propuestos",
+      "unapplied": "Sin aplicar",
+      "willApply": "{{count}} se aplicarán",
+      "selectHigh": "Marcar las altas ({{count}})",
+      "selectNone": "Quitar todas",
+      "group": {
+        "review": "Por revisar · {{count}}",
+        "notFound": "Sin encontrar · {{count}}",
+        "ready": "Listos · {{count}}"
+      },
+      "notInB": "no está en B",
+      "placeByHand": "Colocar a mano",
+      "tabBadge": "Propuesta de la IA: {{count}} campos"
     }
   },
   "update": {

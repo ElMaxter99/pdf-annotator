@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, computed, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { TranslationService } from '../../../../i18n/translation.service';
+import { confidenceLevel, isRowSelected, type AiRow } from '../../../../utils/ai-proposal.utils';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { FieldState, FieldStatus } from '../../../../utils/migration.utils';
 import type { WorkspacePageComponent } from '../../workspace.page';
@@ -19,14 +21,88 @@ export class MigrationPanelComponent {
 
   readonly showSame = signal(false);
 
+  private readonly i18n = inject(TranslationService);
+
+  /** The AI proposal being reviewed (its fields are listed here instead of as «Falta en B»). */
+  readonly proposal = computed(() => {
+    const session = this.vm.ai();
+    return session && session.phase === 'ready' ? session : null;
+  });
+
   readonly rows = computed<FieldState[]>(() => {
     const m = this.vm.migration();
     if (!m) {
       return [];
     }
-    const all = [...m.states].sort((a, b) => ORDER[a.status] - ORDER[b.status]);
+    const hideMissing = this.proposal() !== null;
+    const all = [...m.states]
+      .filter((state) => !(hideMissing && state.status === 'missing'))
+      .sort((a, b) => ORDER[a.status] - ORDER[b.status]);
     return this.showSame() ? all : all.filter((state) => state.status !== 'same');
   });
+
+  /** Proposal rows in three groups: worth a look, not found and ready (high confidence). */
+  readonly groups = computed(() => {
+    const session = this.proposal();
+    if (!session) {
+      return [];
+    }
+    const byPlace = (a: AiRow, b: AiRow) => a.page - b.page || a.index - b.index;
+    const rows = [...session.rows].sort(byPlace);
+    const review = rows.filter((row) => row.ok && confidenceLevel(row.confidence) !== 'high');
+    const notFound = rows.filter((row) => !row.ok);
+    const ready = rows.filter((row) => row.ok && confidenceLevel(row.confidence) === 'high');
+    return [
+      { key: 'review', rows: review },
+      { key: 'notFound', rows: notFound },
+      { key: 'ready', rows: ready },
+    ].filter((group) => group.rows.length > 0);
+  });
+
+  readonly highCount = computed(
+    () => (this.proposal()?.rows ?? []).filter((row) => row.ok && confidenceLevel(row.confidence) === 'high').length,
+  );
+
+  providerName(): string {
+    const provider = this.proposal()?.provider;
+    return provider === 'adjust'
+      ? this.i18n.translate('ai.review.adjustProvider')
+      : provider === 'copilot'
+        ? 'Copilot'
+        : provider === 'fake'
+          ? 'Simulado'
+          : 'Claude';
+  }
+
+  selected(row: AiRow): boolean {
+    return isRowSelected(row, this.vm.aiOverrides());
+  }
+
+  level(row: AiRow): string {
+    return confidenceLevel(row.confidence);
+  }
+
+  /** The reason is shown only when it adds something to the anchor already printed. */
+  showReason(row: AiRow): boolean {
+    return !!row.reason && !(row.anchorB && row.reason.includes(row.anchorB));
+  }
+
+  changesPage(row: AiRow): boolean {
+    return row.ok && row.newPage !== row.page;
+  }
+
+  /** The «Falta en B» state that matches a field the AI could not place (to offer «Colocar a mano»). */
+  missingFor(row: AiRow): FieldState | null {
+    const name = this.vm.aiFieldName(row);
+    return (
+      this.vm.migration()?.states.find((state) => state.status === 'missing' && state.name === name && state.page === row.page) ??
+      null
+    );
+  }
+
+  isFirstReview(row: AiRow): boolean {
+    return this.groups().find((group) => group.key === 'review')?.rows[0]?.id === row.id;
+  }
 
   rowKey(state: FieldState): string {
     return `${state.status}|${state.page}|${state.name}|${state.b?.fieldIndex ?? 'a'}`;

@@ -60,12 +60,33 @@ test('«Copiar y adaptar con IA» asks once, proposes, is reviewed and applied i
   await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
   await expect(page.getByTestId('split-a')).toBeVisible();
   await expect(page.locator('.annotation')).toHaveCount(0); // B untouched until apply
-  await page.getByTestId('ai-toggle-list').click();
-  await expect(page.getByTestId('ai-fields').locator('li')).toHaveCount(FIELDS);
+  // the dock sits under the pages: «Enlazado» can no longer cover its buttons (P-67 · P-69)
+  const dock = await page.getByTestId('ai-review').boundingBox();
+  const link = await page.getByTestId('split-link').boundingBox();
+  expect(dock && link && link.y + link.height <= dock.y).toBe(true);
+  await expect(page.getByTestId('split-tag-view')).toContainText('Viendo la propuesta');
+  // the list lives in «Anotaciones»: «Revisar campos» opens it
+  await page.getByTestId('ai-review-fields').click();
+  await expect(page.getByTestId('ai-proposal')).toBeVisible();
+  await expect(page.locator('.ai-proposal__row')).toHaveCount(FIELDS);
+  await expect(page.getByTestId('ai-tab-badge')).toBeVisible();
+  await expect(page.getByTestId('migration-list').locator('[data-status="missing"]')).toHaveCount(0);
+  // «Quitar todas» leaves nothing to apply; «Marcar las altas» brings the sure ones back
+  await page.getByTestId('ai-select-none').click();
+  await expect(page.getByTestId('ai-apply')).toBeDisabled();
+  await page.getByTestId('ai-select-high').click();
+  await expect(page.getByTestId('ai-apply')).toBeEnabled();
 
-  // cancel leaves B as it was
+  // closing a fresh proposal asks first; leaving it keeps the review, discarding leaves B as it was
   await page.getByTestId('ai-cancel').click();
+  await expect(page.getByTestId('ai-confirm')).toBeVisible();
+  await page.getByTestId('ai-confirm-back').click();
+  await expect(page.getByTestId('ai-review')).toBeVisible();
+  await page.getByTestId('ai-more').click();
+  await page.getByTestId('ai-discard').click();
+  await page.getByTestId('ai-confirm-discard').click();
   await expect(page.getByTestId('ai-review')).toHaveCount(0);
+  await expect(page.getByTestId('ai-proposal')).toHaveCount(0);
   await expect(page.locator('.annotation')).toHaveCount(0);
 
   // second time: no notice (remembered), apply
@@ -136,6 +157,7 @@ test('«Ver detalles» shows what was sent, the steps and says the simulated pro
   await page.getByTestId('ai-consent-ok').click();
   await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
 
+  await page.getByTestId('ai-more').click();
   await page.getByTestId('ai-details-open').click();
   const dialog = page.getByTestId('ai-details');
   await expect(dialog).toBeVisible();
@@ -204,6 +226,44 @@ test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revi
   await page.goBack();
   await page.waitForURL('**/lote');
   await expect(page.getByTestId('ai-review-proposal')).toHaveCount(0);
+});
+
+test('«Trasladar con IA» en lote: elegir un PDF se ve y su resumen está siempre a la vista (P-72)', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('ai-batch-button').click();
+  await page.getByTestId('ai-batch-cascade').uncheck();
+  await page.getByTestId('ai-batch-start').click();
+  await expect(page.getByTestId('ai-batch-summary')).toBeVisible({ timeout: 30000 });
+
+  // by default the summary is about the whole batch and sits at the foot of the panel, on screen
+  const sheet = page.getByTestId('ai-batch-sheet');
+  await expect(sheet).toBeVisible();
+  await expect(page.getByTestId('ai-sheet-title')).toContainText('todo el lote');
+  await expect(page.getByTestId('ai-scope-pick')).toHaveCount(0);
+
+  // picking a row marks it, says what it does and the summary names it
+  const row = page.locator('[data-testid^="ai-bdetails-item-"]').first();
+  await row.click();
+  await expect(row).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('ai-row-viewing')).toBeVisible();
+  await expect(page.getByTestId('ai-scope-pick')).toContainText('.pdf');
+  await expect(page.getByTestId('ai-sheet-title')).not.toContainText('todo el lote');
+  const box = await sheet.boundingBox();
+  const viewport = page.viewportSize();
+  expect(box && viewport && box.y + box.height <= viewport.height).toBe(true);
+
+  // Esc lets go first (the panel stays), the ✕ of the scope does the same
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('ai-batch-status')).toBeVisible();
+  await expect(page.getByTestId('ai-scope-pick')).toHaveCount(0);
+  await expect(page.getByTestId('ai-sheet-title')).toContainText('todo el lote');
+  await row.click();
+  await page.getByTestId('ai-scope-release').click();
+  await expect(page.getByTestId('ai-scope-pick')).toHaveCount(0);
+  // clicking the chosen row again also lets it go
+  await row.click();
+  await row.click();
+  await expect(page.getByTestId('ai-scope-pick')).toHaveCount(0);
 });
 
 test('«Trasladar con IA» en lote: el ajuste por textos resuelve sin gastar una petición', async ({ page }) => {

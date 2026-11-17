@@ -1,4 +1,6 @@
 ## Unreleased
+### Changed
+- **Revisión de la IA más clara (mesas P-67 a P-73):** la «Propuesta de la IA» deja de ser una tira flotante y pasa a una barra acoplada bajo el visor que reserva su sitio (el chip «Enlazado» ya no tapa «Ver…»), con tres bloques: estado, «Ver en B» (Propuesta | Original) y acciones (Revisar campos, Aplicar N, menú ⋯ con «Ver detalles» y «Descartar…», ✕). La lista de campos con su confianza vive ahora en la pestaña Anotaciones (agrupada en «Revisar», «Sin encontrar» y «Listos»), con insignia en la pestaña, y mientras haya propuesta se ocultan los «Falta en B». El botón «Revisar campos» lleva allí. En «Trasladar con IA» del lote, la fila elegida se marca, el resumen queda fijo al pie con un selector de ámbito (todo el lote, en marcha o un PDF) y la lista se desplaza sola, con filtro si es larga. Textos en los 7 idiomas, e2e actualizados.
 ### Fixed
 - **Barra del traslado A/B desbordada (1.13.0-rc.1):** en 1280 px, con «Pendientes de revisar» y «Siguiente con propuesta» (o la IA), la barra no se partía: medía más que la cabecera, sacaba fuera «Poner plantilla A» y «Listo · faltan N» y estiraba el aviso de «Distinto número de páginas». Ahora los controles de la derecha forman un grupo que pasa a una segunda línea cuando no caben. Además el chip «Enlazado» ya no tapa la franja de la IA. Nuevo e2e a 1280 px.
 

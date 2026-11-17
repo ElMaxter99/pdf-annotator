@@ -188,10 +188,6 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     return tokens ? this.t('batch.ai.tokens', { count: this.num(tokens) }) : '—';
   }
 
-  setFollow(on: boolean): void {
-    this.queue.detailsFollow.set(on);
-  }
-
   cancelThis(): void {
     this.queue.skipCurrent();
   }

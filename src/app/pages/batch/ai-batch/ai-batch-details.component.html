@@ -2,10 +2,6 @@
   <header class="ai-bdetails__bar">
     <span class="ai-details__chip">{{ providerLabel() }} · {{ modelName() }}</span>
     <span class="ai-details__grow"></span>
-    <label class="ai-bdetails__follow">
-      <input type="checkbox" [checked]="follow()" (change)="setFollow($any($event.target).checked)" data-testid="ai-bdetails-follow" />
-      {{ 'batch.ai.details.follow' | t }}
-    </label>
     <button type="button" class="btn btn--ghost" (click)="copy(true)" data-testid="ai-bdetails-copy-all">{{ 'batch.ai.details.copyAll' | t }}</button>
   </header>
 
