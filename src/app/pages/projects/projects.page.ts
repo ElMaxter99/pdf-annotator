@@ -14,9 +14,14 @@ import { TranslationService } from '../../i18n/translation.service';
 import type { ProjectErrorCode, ProjectLockInfo, ProjectSummary } from '../../models/project.model';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { BatchStoreService } from '../../services/batch-store.service';
+import { getDesktopBridge } from '../../services/desktop-update.service';
 import { ProjectStoreService } from '../../services/project-store.service';
+import {
+  ProjectTransferService,
+  type TransferDialog,
+} from '../../services/project-transfer.service';
 import { ToastService } from '../../services/toast.service';
-import { formatBytes, projectSize } from '../../utils/project.utils';
+import { exportEstimate, formatBytes, projectSize } from '../../utils/project.utils';
 
 type Dialog =
   | { kind: 'new' }
@@ -35,6 +40,7 @@ type Dialog =
 })
 export class ProjectsPageComponent implements OnInit {
   readonly store = inject(ProjectStoreService);
+  readonly transfer = inject(ProjectTransferService);
   private readonly batch = inject(BatchStoreService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -48,6 +54,8 @@ export class ProjectsPageComponent implements OnInit {
   readonly formError = signal<ProjectErrorCode | null>(null);
   readonly newName = signal('');
   readonly newSub = signal('');
+  /** `ref` of the card whose ⋯ menu is open. */
+  readonly menuFor = signal<string | null>(null);
   readonly orphanCount = computed(() => (this.store.active() ? 0 : this.batch.items().length));
 
   readonly visible = computed(() => {
@@ -186,5 +194,147 @@ export class ProjectsPageComponent implements OnInit {
 
   async chooseRoot(): Promise<void> {
     await this.store.chooseRoot();
+  }
+
+  // ---- ⋯ menu, export and import (phase 2)
+
+  toggleMenu(ref: string, event: Event): void {
+    event.stopPropagation();
+    this.menuFor.update((current) => (current === ref ? null : ref));
+  }
+
+  closeMenu(): void {
+    this.menuFor.set(null);
+  }
+
+  exportProject(project: ProjectSummary): void {
+    this.closeMenu();
+    void this.transfer.startExport(project);
+  }
+
+  forgetFromMenu(project: ProjectSummary): void {
+    this.closeMenu();
+    this.askForget(project);
+  }
+
+  openFromMenu(project: ProjectSummary): void {
+    this.closeMenu();
+    void this.open(project);
+  }
+
+  openImported(): void {
+    const notice = this.transfer.notice();
+    if (notice?.kind === 'imported') {
+      this.transfer.dismissNotice();
+      void this.open(notice.project);
+    }
+  }
+
+  onDragOver(event: DragEvent): void {
+    if (!event.dataTransfer?.types.includes('Files')) {
+      return;
+    }
+    // Without this the window would navigate to the dropped file.
+    event.preventDefault();
+    if (!this.transfer.busy()) {
+      this.transfer.dragging.set(true);
+    }
+  }
+
+  onDragLeave(event: DragEvent): void {
+    if (event.relatedTarget === null) {
+      this.transfer.dragging.set(false);
+    }
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.transfer.dragging.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (file && this.store.available() && !this.transfer.dialog()) {
+      void this.transfer.dropFile(file);
+    }
+  }
+
+  exportSize(d: Extract<TransferDialog, { kind: 'export' }>): string {
+    return formatBytes(exportEstimate(d.info, this.transfer.includeB()));
+  }
+
+  bytes(value: number): string {
+    return formatBytes(value);
+  }
+
+  get maxPdfMb(): number {
+    return Math.round(this.store.limits().maxPdfBytes / (1024 * 1024));
+  }
+
+  importErrorTitleKey(code: string): string {
+    switch (code) {
+      case 'corrupt':
+        return 'projects.transfer.err.corruptTitle';
+      case 'unsafe':
+        return 'projects.transfer.err.unsafeTitle';
+      case 'newer-format':
+        return 'projects.transfer.err.newerTitle';
+      case 'too-big':
+      case 'too-many-pdfs':
+        return 'projects.transfer.err.tooBigTitle';
+      case 'disk-full':
+        return 'projects.transfer.err.diskFullTitle';
+      default:
+        return 'projects.transfer.err.notArchiveTitle';
+    }
+  }
+
+  importErrorText(d: Extract<TransferDialog, { kind: 'import-error' }>): string {
+    const detail = d.detail;
+    const text = typeof detail === 'string' ? detail : '';
+    switch (d.code) {
+      case 'not-an-archive':
+        return this.t('projects.transfer.err.notArchiveText', { name: text || d.fileName || '' });
+      case 'corrupt':
+        return text
+          ? this.t('projects.transfer.err.corruptText', { file: text })
+          : this.t('projects.transfer.err.corruptGeneric');
+      case 'unsafe':
+        return this.t('projects.transfer.err.unsafeText', { file: text });
+      case 'newer-format':
+        return this.t('projects.transfer.err.newerText', { format: text, supported: 1 });
+      case 'too-big':
+      case 'too-many-pdfs': {
+        const info = (detail ?? {}) as { pdfs?: number; bytes?: number };
+        const limits = this.store.limits();
+        return this.t('projects.transfer.err.tooBigText', {
+          pdfs: info.pdfs ?? 0,
+          size: formatBytes(info.bytes ?? 0),
+          maxPdfs: limits.maxPdfs,
+          maxSize: formatBytes(limits.maxBytes),
+        });
+      }
+      case 'disk-full':
+        return this.t('projects.transfer.err.diskFullText');
+      default:
+        return this.t(`projects.error.${d.code}`);
+    }
+  }
+
+  checkUpdates(): void {
+    this.transfer.closeDialog();
+    void getDesktopBridge()?.checkForUpdates();
+  }
+
+  oversizeNames(rows: { name: string }[]): string {
+    return rows
+      .slice(0, 3)
+      .map((row) => `«${row.name}»`)
+      .join(', ');
+  }
+
+  whichLabel(which: 'a' | 'b'): string {
+    return this.t(which === 'a' ? 'projects.transfer.whichA' : 'projects.transfer.whichB');
+  }
+
+  exportedAt(ms: number): string {
+    return ms ? this.when(ms) : '—';
   }
 }

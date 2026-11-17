@@ -1,4 +1,10 @@
-<div class="app app--projects">
+<div
+  class="app app--projects"
+  (click)="closeMenu()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
   <header class="proj-bar">
     <a class="proj-bar__brand" routerLink="/landing" [attr.aria-label]="appName">
       <img src="/logo.svg" alt="" width="32" height="32" />
@@ -8,12 +14,65 @@
     <h1 class="proj-bar__title">{{ 'projects.title' | t }}</h1>
     <app-version-chip class="proj-bar__version"></app-version-chip>
     <span class="proj-bar__spacer"></span>
+    <button
+      type="button"
+      class="btn"
+      [disabled]="transfer.busy()"
+      (click)="transfer.startImport()"
+      data-testid="project-import"
+    >
+      {{ 'projects.transfer.import' | t }}
+    </button>
     <button type="button" class="btn btn--primary" (click)="openNew()" data-testid="project-new">
       {{ 'projects.new' | t }}
     </button>
   </header>
 
   <main class="proj">
+    @if (transfer.dragging()) {
+      <div class="proj-drop" data-testid="project-drop" aria-hidden="true">
+        <strong>{{ 'projects.transfer.drop.title' | t }}</strong>
+        <span>{{ 'projects.transfer.drop.text' | t }}</span>
+      </div>
+    }
+
+    @if (transfer.notice(); as n) {
+      <section
+        class="proj-banner"
+        [class.proj-banner--warn]="n.kind === 'imported' && n.skipped.length > 0"
+        role="status"
+        data-testid="transfer-notice"
+      >
+        <span class="proj-banner__dot" aria-hidden="true"></span>
+        <span class="proj-banner__text">
+          @if (n.kind === 'exported') {
+            {{ 'projects.transfer.exported' | t: { name: n.name, size: bytes(n.bytes) } }}
+          } @else if (n.kind === 'imported') {
+            @if (n.skipped.length === 1) {
+              {{ 'projects.transfer.importedSkippedOne' | t: { name: n.skipped[0].name, size: bytes(n.skipped[0].bytes) } }}
+            } @else if (n.skipped.length > 1) {
+              {{ 'projects.transfer.importedSkippedMany' | t: { count: n.skipped.length, max: maxPdfMb } }}
+            } @else {
+              {{ 'projects.transfer.imported' | t: { name: n.project.name, count: n.project.pdfs } }}
+            }
+          }
+        </span>
+        @if (n.kind === 'exported') {
+          <button type="button" class="btn" (click)="transfer.reveal()" data-testid="transfer-reveal">
+            {{ 'projects.transfer.reveal' | t }}
+          </button>
+        } @else {
+          @if (n.skipped.length) {
+            <button type="button" class="btn" (click)="transfer.showSkipped()">{{ 'projects.transfer.detail' | t }}</button>
+          }
+          <button type="button" class="btn btn--primary" (click)="openImported()" data-testid="transfer-open">
+            {{ 'projects.open' | t }}
+          </button>
+        }
+        <button type="button" class="proj-banner__x" (click)="transfer.dismissNotice()" [attr.aria-label]="'projects.transfer.close' | t">✕</button>
+      </section>
+    }
+
     @if (orphanCount() > 0) {
       <section class="proj-note" data-testid="project-adopt">
         <div>
@@ -100,7 +159,32 @@
                   {{ 'projects.open' | t }}
                 </button>
               }
-              <button type="button" class="btn btn--ghost" (click)="askForget(project)">{{ 'projects.forget' | t }}</button>
+              <div class="proj-menu">
+                <button
+                  type="button"
+                  class="btn btn--ghost proj-menu__btn"
+                  aria-haspopup="menu"
+                  [attr.aria-expanded]="menuFor() === project.ref"
+                  [attr.aria-label]="'projects.transfer.menu' | t"
+                  (click)="toggleMenu(project.ref, $event)"
+                  data-testid="project-menu"
+                >
+                  ⋯
+                </button>
+                @if (menuFor() === project.ref) {
+                  <div class="proj-menu__list" role="menu" (click)="$event.stopPropagation()">
+                    @if (project.lock.state !== 'other') {
+                      <button type="button" role="menuitem" (click)="openFromMenu(project)">{{ 'projects.open' | t }}</button>
+                    }
+                    <button type="button" role="menuitem" [disabled]="transfer.busy()" (click)="exportProject(project)" data-testid="project-export">
+                      {{ 'projects.transfer.export' | t }}
+                    </button>
+                    <button type="button" role="menuitem" class="proj-menu__danger" (click)="forgetFromMenu(project)" data-testid="project-forget">
+                      {{ 'projects.forget' | t }}
+                    </button>
+                  </div>
+                }
+              </div>
             </div>
           </article>
         }
@@ -172,6 +256,261 @@
             </div>
           }
         }
+      </div>
+    </div>
+  }
+  @if (transfer.dialog(); as d) {
+    <div class="proj-overlay" (click)="transfer.closeDialog()" (keydown.escape)="transfer.closeDialog()">
+      <div class="proj-dialog proj-dialog--wide" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        @switch (d.kind) {
+          @case ('export') {
+            <h2>{{ 'projects.transfer.exportTitle' | t: { name: d.info.name } }}</h2>
+            <p>{{ 'projects.transfer.exportIntro' | t }}</p>
+            @if (d.info.lock.state === 'other') {
+              <div class="proj-callout proj-callout--warn" data-testid="export-readonly">
+                <strong>{{ 'projects.transfer.readOnlyTitle' | t }}</strong>
+                <p>{{ 'projects.transfer.readOnlyText' | t: { host: d.info.lock.host } }}</p>
+              </div>
+            }
+            <label class="proj-check">
+              <input type="checkbox" checked disabled />
+              <span>{{ 'projects.transfer.partA' | t }}<small>{{ 'projects.transfer.partAHint' | t: { count: d.info.pdfsA, size: bytes(d.info.bytesA) } }}</small></span>
+            </label>
+            <label class="proj-check">
+              <input
+                type="checkbox"
+                [checked]="transfer.includeB()"
+                [disabled]="d.info.pdfsB === 0"
+                (change)="transfer.includeB.set($any($event.target).checked)"
+                data-testid="export-include-b"
+              />
+              <span>{{ 'projects.transfer.partB' | t }}<small>{{ 'projects.transfer.partBHint' | t: { count: d.info.pdfsB, size: bytes(d.info.bytesB) } }}</small></span>
+            </label>
+            <label class="proj-check">
+              <input type="checkbox" checked disabled />
+              <span>{{ 'projects.transfer.partData' | t }}<small>{{ 'projects.transfer.partDataHint' | t: { size: bytes(d.info.bytesMeta) } }}</small></span>
+            </label>
+            <div class="proj-total">
+              <span>{{ 'projects.transfer.estimate' | t }}</span>
+              <strong data-testid="export-estimate">{{ exportSize(d) }}</strong>
+            </div>
+            <div class="proj-callout proj-callout--warn">
+              <strong>{{ 'projects.transfer.warnTitle' | t }}</strong>
+              <p>{{ 'projects.transfer.warnText' | t }}</p>
+            </div>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="transfer.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" [disabled]="transfer.busy()" (click)="transfer.runExport()" data-testid="export-choose">
+                {{ 'projects.transfer.choose' | t }}
+              </button>
+            </div>
+          }
+          @case ('export-empty') {
+            <h2>{{ 'projects.transfer.emptyTitle' | t }}</h2>
+            <p>{{ 'projects.transfer.emptyText' | t }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn btn--primary" (click)="transfer.closeDialog()">{{ 'projects.transfer.close' | t }}</button>
+            </div>
+          }
+          @case ('export-error') {
+            <h2>{{ 'projects.transfer.err.diskFullTitle' | t }}</h2>
+            <p>{{ 'projects.transfer.err.diskFullExport' | t }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn btn--primary" (click)="transfer.closeDialog()">{{ 'projects.transfer.close' | t }}</button>
+            </div>
+          }
+          @case ('import') {
+            <h2>{{ 'projects.transfer.importTitle' | t }}</h2>
+            <code class="proj-path" data-testid="import-file">{{ d.file }}</code>
+            <dl class="proj-kv">
+              <dt>{{ 'projects.transfer.fieldProject' | t }}</dt>
+              <dd>{{ d.info.name }}</dd>
+              <dt>{{ 'projects.transfer.fieldContent' | t }}</dt>
+              <dd>{{ 'projects.transfer.contentValue' | t: { a: d.info.pdfsA, b: d.info.pdfsB } }}</dd>
+              <dt>{{ 'projects.transfer.fieldSize' | t }}</dt>
+              <dd>{{ bytes(d.info.bytes) }}</dd>
+              <dt>{{ 'projects.transfer.fieldExported' | t }}</dt>
+              <dd>{{ exportedAt(d.info.exportedAt) }}</dd>
+              <dt>{{ 'projects.transfer.fieldApp' | t }}</dt>
+              <dd>{{ 'projects.transfer.appValue' | t: { version: d.info.appVersion || '—', format: d.info.formatVersion } }}</dd>
+            </dl>
+            <p class="proj-verified" role="status">✓ {{ 'projects.transfer.verified' | t }}</p>
+            <label class="proj-field">
+              <span>{{ 'projects.fieldName' | t }}</span>
+              <input
+                class="proj-input"
+                type="text"
+                maxlength="80"
+                [value]="transfer.importName()"
+                (input)="transfer.importName.set($any($event.target).value)"
+                (keydown.enter)="transfer.confirmImport()"
+                data-testid="import-name"
+              />
+            </label>
+            <label class="proj-field">
+              <span>{{ 'projects.fieldSub' | t }}</span>
+              <input
+                class="proj-input proj-input--mono"
+                type="text"
+                maxlength="200"
+                placeholder="Álvaro/cliente1"
+                [value]="transfer.importSub()"
+                (input)="transfer.importSub.set($any($event.target).value)"
+                (keydown.enter)="transfer.confirmImport()"
+                data-testid="import-sub"
+              />
+            </label>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="transfer.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button
+                type="button"
+                class="btn btn--primary"
+                [disabled]="transfer.busy() || !transfer.importName().trim()"
+                (click)="transfer.confirmImport()"
+                data-testid="import-confirm"
+              >
+                {{ 'projects.transfer.importButton' | t }}
+              </button>
+            </div>
+          }
+          @case ('oversize') {
+            <h2>{{ 'projects.transfer.oversizeTitle' | t }}</h2>
+            @if (d.info.oversize.length === 1) {
+              <p>{{ 'projects.transfer.oversizeOne' | t: { name: d.info.oversize[0].name, size: bytes(d.info.oversize[0].bytes), max: maxPdfMb } }}</p>
+            } @else {
+              <p>{{ 'projects.transfer.oversizeMany' | t: { count: d.info.oversize.length, max: maxPdfMb, names: oversizeNames(d.info.oversize) } }}</p>
+            }
+            <label class="proj-choice" [class.proj-choice--on]="transfer.skipChoice() === 'skip'">
+              <input type="radio" name="skip" [checked]="transfer.skipChoice() === 'skip'" (change)="transfer.skipChoice.set('skip')" data-testid="oversize-skip" />
+              <span>{{ 'projects.transfer.optSkip' | t }}<small>{{ 'projects.transfer.optSkipHint' | t }}</small></span>
+            </label>
+            <label class="proj-choice" [class.proj-choice--on]="transfer.skipChoice() === 'cancel'">
+              <input type="radio" name="skip" [checked]="transfer.skipChoice() === 'cancel'" (change)="transfer.skipChoice.set('cancel')" />
+              <span>{{ 'projects.transfer.optCancel' | t }}</span>
+            </label>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="transfer.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="transfer.acceptOversize()" data-testid="oversize-continue">{{ 'projects.transfer.continue' | t }}</button>
+            </div>
+          }
+          @case ('conflict') {
+            <h2>{{ 'projects.transfer.conflictTitle' | t }}</h2>
+            <p>
+              {{ 'projects.transfer.conflictText' | t: { name: d.conflict.name, ref: d.conflict.ref, pdfs: d.conflict.pdfs, done: d.conflict.done, when: when(d.conflict.updatedAt) } }}
+            </p>
+            <label class="proj-choice" [class.proj-choice--on]="transfer.conflictChoice() === 'copy'">
+              <input type="radio" name="conflict" [checked]="transfer.conflictChoice() === 'copy'" (change)="transfer.conflictChoice.set('copy')" data-testid="conflict-copy" />
+              <span>
+                {{ 'projects.transfer.copyTitle' | t }} <em class="proj-chip proj-chip--accent">{{ 'projects.transfer.recommended' | t }}</em>
+                <small>{{ 'projects.transfer.copyText' | t }}</small>
+              </span>
+            </label>
+            <label class="proj-choice" [class.proj-choice--on]="transfer.conflictChoice() === 'replace'">
+              <input type="radio" name="conflict" [checked]="transfer.conflictChoice() === 'replace'" (change)="transfer.conflictChoice.set('replace')" data-testid="conflict-replace" />
+              <span>{{ 'projects.transfer.replaceTitle' | t }}<small>{{ 'projects.transfer.replaceText' | t }}</small></span>
+            </label>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="transfer.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="transfer.acceptConflict()" data-testid="conflict-continue">{{ 'projects.transfer.continue' | t }}</button>
+            </div>
+          }
+          @case ('replace') {
+            <h2>{{ 'projects.transfer.replaceConfirmTitle' | t: { name: d.conflict.name } }}</h2>
+            <p>{{ 'projects.transfer.replaceConfirmText' | t }}</p>
+            <ul class="proj-loss">
+              @if (d.conflict.onlyHere) {
+                <li>{{ 'projects.transfer.lossOnlyHere' | t: { count: d.conflict.onlyHere } }}</li>
+              }
+              @if (d.conflict.changedAfter) {
+                <li>{{ 'projects.transfer.lossChanged' | t: { count: d.conflict.changedAfter } }}</li>
+              }
+              @if (!d.conflict.onlyHere && !d.conflict.changedAfter) {
+                <li>{{ 'projects.transfer.lossNone' | t }}</li>
+              }
+            </ul>
+            <div class="proj-callout proj-callout--ok">
+              <strong>{{ 'projects.transfer.safetyTitle' | t }}</strong>
+              <p>{{ 'projects.transfer.safetyText' | t: { name: d.conflict.name } }}</p>
+            </div>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="transfer.closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn btn--danger" (click)="transfer.confirmReplace()" data-testid="replace-confirm">{{ 'projects.transfer.replaceButton' | t }}</button>
+            </div>
+          }
+          @case ('in-use') {
+            <h2>{{ 'projects.transfer.inUseTitle' | t }}</h2>
+            <p>{{ 'projects.transfer.inUseText' | t: { name: d.name, host: d.host } }}</p>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn" (click)="transfer.makeCopyInstead()">{{ 'projects.transfer.makeCopy' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="transfer.closeDialog()">{{ 'projects.transfer.close' | t }}</button>
+            </div>
+          }
+          @case ('skipped') {
+            <h2>{{ 'projects.transfer.detailTitle' | t }}</h2>
+            <ul class="proj-loss">
+              @for (row of d.rows; track row.id + row.which) {
+                <li>{{ row.name }} · {{ bytes(row.bytes) }} ({{ whichLabel(row.which) }})</li>
+              }
+            </ul>
+            <div class="proj-actions proj-actions--end">
+              <button type="button" class="btn btn--primary" (click)="transfer.closeDialog()">{{ 'projects.transfer.close' | t }}</button>
+            </div>
+          }
+          @case ('import-error') {
+            <h2 class="proj-dialog__bad">{{ importErrorTitleKey(d.code) | t }}</h2>
+            <p role="alert" data-testid="import-error">{{ importErrorText(d) }}</p>
+            <div class="proj-actions proj-actions--end">
+              @if (d.code === 'not-an-archive') {
+                <button type="button" class="btn" (click)="transfer.startImport()">{{ 'projects.transfer.chooseOther' | t }}</button>
+              } @else if (d.code === 'newer-format') {
+                <button type="button" class="btn" (click)="transfer.closeDialog()">{{ 'projects.transfer.close' | t }}</button>
+                <button type="button" class="btn btn--primary" (click)="checkUpdates()">{{ 'projects.transfer.checkUpdates' | t }}</button>
+              } @else if (d.code === 'disk-full') {
+                <button type="button" class="btn" (click)="transfer.closeDialog()">{{ 'projects.transfer.close' | t }}</button>
+                <button type="button" class="btn btn--primary" (click)="transfer.retryImport()">{{ 'projects.retry' | t }}</button>
+              }
+              @if (d.code !== 'newer-format' && d.code !== 'disk-full') {
+                <button type="button" class="btn btn--primary" (click)="transfer.closeDialog()">{{ 'projects.transfer.close' | t }}</button>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  @if (transfer.progress(); as pr) {
+    <div class="proj-overlay proj-overlay--top">
+      <div class="proj-dialog" role="dialog" aria-modal="true" data-testid="transfer-progress">
+        <h2>
+          @if (pr.op === 'export') {
+            {{ 'projects.transfer.exporting' | t: { name: transfer.subject() } }}
+          } @else if (pr.op === 'import') {
+            {{ 'projects.transfer.importing' | t: { name: transfer.subject() } }}
+          } @else {
+            {{ 'projects.transfer.importTitle' | t }}
+          }
+        </h2>
+        <p role="status">
+          @if (pr.op === 'export') {
+            {{ 'projects.transfer.packing' | t: { done: pr.done, total: pr.total } }}
+          } @else if (pr.op === 'import') {
+            {{ 'projects.transfer.writing' | t: { percent: transfer.percent() } }}
+          } @else {
+            {{ 'projects.transfer.inspecting' | t: { percent: transfer.percent() } }}
+          }
+        </p>
+        <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="transfer.percent()">
+          <i [style.width.%]="transfer.percent()"></i>
+        </div>
+        @if (pr.op === 'export') {
+          <p class="proj-hint">{{ 'projects.transfer.keepBrowsing' | t }}</p>
+        }
+        <div class="proj-actions proj-actions--end">
+          <button type="button" class="btn" [disabled]="transfer.canceling()" (click)="transfer.cancel()" data-testid="transfer-cancel">
+            {{ 'projects.cancel' | t }}
+          </button>
+        </div>
       </div>
     </div>
   }

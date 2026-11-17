@@ -326,6 +326,275 @@
   color: var(--muted);
 }
 
+// ---- Exportar e importar (fase 2)
+.proj-dialog--wide {
+  max-width: 640px;
+}
+
+.proj-dialog__bad {
+  color: var(--danger);
+}
+
+.proj-overlay--top {
+  z-index: 60;
+}
+
+.proj-drop {
+  position: fixed;
+  inset: 16px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 18px;
+  border: 2px dashed var(--accent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  pointer-events: none;
+
+  span {
+    font-size: 14px;
+    color: var(--muted);
+  }
+}
+
+.proj-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--accent);
+}
+
+.proj-banner--warn {
+  border-color: var(--proj-warn);
+
+  .proj-banner__dot {
+    background: var(--proj-warn);
+  }
+}
+
+.proj-banner__dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.proj-banner__text {
+  flex: 1;
+  min-width: 220px;
+  font-size: 15px;
+}
+
+.proj-banner__x {
+  flex: none;
+  min-width: 32px;
+  min-height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.proj-menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.proj-menu__btn {
+  min-width: 44px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.proj-menu__list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--panel);
+  border: 1px solid var(--proj-line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  button {
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      background: var(--proj-line);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+}
+
+.proj-menu__danger {
+  color: var(--danger) !important;
+}
+
+.proj-check {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 15px;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--accent);
+  }
+
+  small {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+}
+
+.proj-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--proj-line);
+  font-size: 15px;
+
+  span {
+    color: var(--muted);
+  }
+}
+
+.proj-callout {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--proj-line);
+
+  p {
+    font-size: 14px;
+  }
+}
+
+.proj-callout--warn {
+  border-color: var(--proj-warn);
+
+  strong {
+    color: var(--proj-warn);
+  }
+}
+
+.proj-callout--ok {
+  border-color: var(--accent);
+}
+
+.proj-path {
+  font-family: Consolas, monospace;
+  font-size: 14px;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.proj-kv {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 6px 14px;
+  margin: 0;
+  font-size: 14px;
+
+  dt {
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.proj-verified {
+  color: var(--accent) !important;
+  font-size: 14px;
+}
+
+.proj-choice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--proj-line);
+  font-size: 15px;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--accent);
+  }
+
+  small {
+    display: block;
+    margin-top: 3px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  em {
+    font-style: normal;
+  }
+}
+
+.proj-choice--on {
+  border-color: var(--accent);
+}
+
+.proj-loss {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 @keyframes proj-in {
   from {
     opacity: 0;

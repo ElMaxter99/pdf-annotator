@@ -45,7 +45,15 @@ export type ProjectErrorCode =
   | 'not-held'
   | 'pdf-too-big'
   | 'too-many-pdfs'
-  | 'too-big';
+  | 'too-big'
+  | 'empty'
+  | 'busy'
+  | 'not-an-archive'
+  | 'corrupt'
+  | 'unsafe'
+  | 'newer-format'
+  | 'in-use'
+  | 'disk-full';
 
 export interface ProjectStoredItem {
   readonly id: string;
@@ -54,7 +62,55 @@ export interface ProjectStoredItem {
   readonly b: Uint8Array | null;
 }
 
-export type ProjectFailure = { readonly error: ProjectErrorCode };
+export type ProjectFailure = { readonly error: ProjectErrorCode; readonly detail?: unknown };
+
+/** Lo que se llevaría un archivo exportado (para el diálogo de exportar). */
+export interface ProjectExportInfo {
+  readonly name: string;
+  readonly lock: ProjectLockInfo;
+  readonly pdfsA: number;
+  readonly pdfsB: number;
+  readonly bytesA: number;
+  readonly bytesB: number;
+  readonly bytesMeta: number;
+}
+
+/** PDF de un archivo importado que pesa más que el máximo por PDF. */
+export interface ArchiveOversize {
+  readonly id: string;
+  readonly name: string;
+  readonly which: 'a' | 'b';
+  readonly bytes: number;
+}
+
+/** Resumen de un archivo `.pdfannotator` ya revisado entero por el proceso principal. */
+export interface ArchiveInfo {
+  readonly formatVersion: number;
+  readonly appVersion: string;
+  readonly exportedAt: number;
+  readonly name: string;
+  /** Subcarpeta sugerida (relativa a la carpeta de proyectos). */
+  readonly ref: string;
+  readonly createdAt: number;
+  readonly pdfsA: number;
+  readonly pdfsB: number;
+  readonly bytes: number;
+  readonly oversize: ArchiveOversize[];
+}
+
+/** Proyecto que ya existe con el mismo nombre/carpeta, y lo que se perdería al reemplazarlo. */
+export interface ProjectConflict extends ProjectSummary {
+  readonly onlyHere: number;
+  readonly changedAfter: number;
+}
+
+export interface ProjectProgress {
+  readonly op: 'export' | 'inspect' | 'import';
+  readonly done: number;
+  readonly total: number;
+}
+
+export type ImportMode = 'copy' | 'replace';
 
 /** Puente de `desktop/preload.cjs` → `desktop/projects-ipc.mjs`. Todo devuelve `{ error }` en vez de lanzar. */
 export interface ProjectsBridge {
@@ -86,6 +142,36 @@ export interface ProjectsBridge {
   release(input: { ref: string }): Promise<{ ok: true } | ProjectFailure>;
   rename(input: { ref: string; name: string }): Promise<{ ok: true } | ProjectFailure>;
   forget(input: { ref: string }): Promise<{ ok: true } | ProjectFailure>;
+  exportInfo(input: { ref: string }): Promise<ProjectExportInfo | ProjectFailure>;
+  exportProject(input: {
+    ref: string;
+    includeB: boolean;
+  }): Promise<
+    | { name: string; path: string; bytes: number; pdfs: number }
+    | { canceled: true }
+    | ProjectFailure
+  >;
+  reveal(): Promise<{ ok: true } | ProjectFailure>;
+  importInspect(input: {
+    path?: string;
+  }): Promise<
+    { file: string; fileName: string; info: ArchiveInfo } | { canceled: true } | ProjectFailure
+  >;
+  importRun(input: {
+    name: string;
+    subpath: string;
+    mode?: ImportMode;
+    skipOversize?: boolean;
+  }): Promise<
+    | { project: ProjectSummary; skipped: ArchiveOversize[]; backup: string | null }
+    | { conflict: ProjectConflict }
+    | { canceled: true }
+    | ProjectFailure
+  >;
+  cancel(): Promise<{ ok: true }>;
+  /** Ruta de un archivo soltado en la ventana (solo escritorio). */
+  pathForFile(file: File): string;
+  onProgress(callback: (progress: ProjectProgress) => void): () => void;
 }
 
 export interface ActiveProject {

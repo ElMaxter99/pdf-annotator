@@ -27,13 +27,15 @@ export const LIMITS = Object.freeze({
 /** El bloqueo se renueva cada minuto y caduca a los 10 sin señales. */
 export const LOCK_STALE_MS = 10 * 60 * 1000;
 const MAX_DEPTH = 3;
-const MAX_NAME = 80;
-const ITEM_ID = /^[A-Za-z0-9_-]{1,64}$/;
+export const MAX_NAME = 80;
+export const ITEM_ID = /^[A-Za-z0-9_-]{1,64}$/;
 
 export class ProjectError extends Error {
-  constructor(code, message) {
+  constructor(code, message, detail) {
     super(message ?? code);
     this.code = code;
+    /** Dato útil para el aviso (un nombre de archivo, un recuento…). Nunca contiene rutas del disco. */
+    this.detail = detail;
   }
 }
 
@@ -72,7 +74,7 @@ export function resolveRef(root, ref) {
   return { dir, ref: segments.join('/') };
 }
 
-function readJson(file) {
+export function readJson(file) {
   try {
     return JSON.parse(readFileSync(file, 'utf8'));
   } catch {
@@ -80,13 +82,13 @@ function readJson(file) {
   }
 }
 
-function writeAtomic(file, data) {
+export function writeAtomic(file, data) {
   const tmp = `${file}.${process.pid}.tmp`;
   writeFileSync(tmp, data);
   renameSync(tmp, file);
 }
 
-function manifestOf(value) {
+export function manifestOf(value) {
   if (
     !value ||
     typeof value !== 'object' ||

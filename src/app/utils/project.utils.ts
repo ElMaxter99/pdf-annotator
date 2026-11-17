@@ -1,4 +1,4 @@
-import type { ProjectLimits, ProjectSummary } from '../models/project.model';
+import type { ProjectExportInfo, ProjectLimits, ProjectSummary } from '../models/project.model';
 
 /** «1,3 GB», «840 MB», «12 KB». */
 export function formatBytes(bytes: number): string {
@@ -25,4 +25,17 @@ export function projectSize(
     return 'full';
   }
   return project.pdfs >= limits.warnPdfs || project.bytes >= limits.warnBytes ? 'warn' : 'ok';
+}
+
+/** Peso estimado del archivo `.pdfannotator`: PDFs de A, PDFs de B (si se llevan) y los datos del lote. */
+export function exportEstimate(
+  info: Pick<ProjectExportInfo, 'bytesA' | 'bytesB' | 'bytesMeta'>,
+  includeB: boolean,
+): number {
+  return info.bytesA + info.bytesMeta + (includeB ? info.bytesB : 0);
+}
+
+/** Porcentaje entero 0–100 de un avance `done` de `total` (0 si aún no hay total). */
+export function percentOf(done: number, total: number): number {
+  return total > 0 ? Math.min(100, Math.max(0, Math.round((100 * done) / total))) : 0;
 }

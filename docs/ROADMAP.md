@@ -33,7 +33,7 @@ Brainstorming de Maxter (2026-11-17). **No hay diseño ni código todavía:** ca
 - Dependencias: modelo de datos con `id`/nombre/fechas y versión de esquema; migrar la sesión y el lote actuales a «proyecto por defecto»; selector de proyectos (pantalla nueva: diseño primero).
 - Riesgos: cuota de IndexedDB con muchos PDFs; migración sin perder la sesión actual; tratar los datos restaurados como no confiables (`AnnotationImportService`).
 
-**Fase 2 · Importar y exportar un proyecto.** Archivo portable (por ejemplo `.pdfannotator`, un ZIP con `project.json` + PDFs + coordenadas + estado a medias) para llevarlo a otro equipo o pasárselo a un compañero. Reutiliza `zip.utils`.
+**Fase 2 · Importar y exportar un proyecto (implementada, mesas P-85 a P-87).** Archivo portable (por ejemplo `.pdfannotator`, un ZIP con `project.json` + PDFs + coordenadas + estado a medias) para llevarlo a otro equipo o pasárselo a un compañero. Reutiliza `zip.utils`.
 - Dependencias: fase 1; formato versionado y documentado en `docs/DOMAIN.md`; validación estricta al importar (tamaños, tipos, rutas del ZIP, sin evaluar nada).
 - Riesgos: PDFs pesados (límite y barra de progreso); PDFs con datos personales en un archivo que viaja por correo (aviso, y cifrado opcional más adelante); qué pasa al importar un proyecto que ya existe (duplicar, reemplazar o fusionar).
 

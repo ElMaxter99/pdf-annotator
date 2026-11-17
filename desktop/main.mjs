@@ -197,7 +197,7 @@ function trusted(event) {
 let projects = null;
 function setupIpc() {
   const handle = (channel, fn) => ipcMain.handle(channel, (event, ...args) => (trusted(event) ? fn(...args) : undefined));
-  projects = setupProjectsIpc({ handle, app, dialog, getWindow: () => win });
+  projects = setupProjectsIpc({ handle, app, dialog, shell, getWindow: () => win });
   // El bloqueo de cada proyecto abierto se renueva cada minuto (caduca a los 10 sin señales).
   setInterval(() => projects?.renewAll(), 60 * 1000).unref();
   ipcMain.on('desktop:helper-port', (event) => {
