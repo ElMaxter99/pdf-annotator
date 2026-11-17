@@ -24,7 +24,7 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 9. **Tabla de correspondencia de páginas A↔B (diseño aprobado P-78 a P-81, implementado en su PR):** diálogo «Emparejar páginas…» con sugerencia por textos; la IA y el ajuste por textos la usan. Pendiente para más adelante: «Sugerir tablas» para varios PDFs desde el panel del lote. Detalle en `design/propuestas/emparejar-paginas-a-b.md`.
 
 ## Ideas sin priorizar
-Exportación en ZIP de varias plantillas.
+**Hecho (mesa P-96, en su PR):** exportación en ZIP de varias plantillas. Detalle en `CHANGELOG.md`.
 
 ## Futuro (solo escritorio): proyectos locales y sincronización
 Brainstorming de Maxter (2026-11-17). **No hay diseño ni código todavía:** cada fase necesita mesas aprobadas antes de programarse (ver `docs/WORKFLOW.md`). Todo va en la app de escritorio (Electron); la web no cambia. Principio: **sin servidores propios, sin cuentas de usuario de la app y sin APIs**; todo en local o en un almacenamiento que el usuario ya tenga.

@@ -124,7 +124,9 @@
       "selectLabel": "Saved templates",
       "loadButton": "Load",
       "deleteButton": "Delete",
-      "empty": "You haven't saved any templates yet."
+      "empty": "You haven't saved any templates yet.",
+      "exportButton": "Export templates…",
+      "exportHint": "Save at least one template to export."
     },
     "thumbnails": {
       "title": "Thumbnails",
@@ -2132,5 +2134,25 @@
         "other": "Choose another"
       }
     }
+  },
+  "templatesExport": {
+    "title": "Export templates",
+    "intro": "Choose the templates you want to take with you. They are saved in a single ZIP, one JSON per template.",
+    "selectAll": "Select all",
+    "pages": "{{n}} pg.",
+    "empty": "You have no saved templates yet. Save one from Annotations and come back.",
+    "understood": "Got it",
+    "cancel": "Cancel",
+    "workingTitle": "Exporting templates…",
+    "counter": "{{done}} of {{total}}",
+    "doneTitle": "Templates exported",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} templates · {{kb}} KB. Find it in your downloads folder.",
+    "ready": "Done",
+    "errorTitle": "Could not export",
+    "errorText": "The ZIP could not be created. Your templates are still saved and nothing was lost.",
+    "close": "Close",
+    "retry": "Retry",
+    "exportButton": "Export {{n}} templates"
   }
 }
