@@ -194,7 +194,14 @@ export function summarize(rows) {
   };
 }
 
-export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes, attached }) {
+/** Page table given by the user («B1: sin A · B2: A1…»), or an empty string when there is none. */
+export function describePageMap(pageMap) {
+  if (!Array.isArray(pageMap) || pageMap.length === 0 || pageMap.length > 500) return '';
+  const rows = pageMap.map((a, i) => `B${i + 1}: ${Number.isInteger(a) && a >= 1 ? `A${a}` : 'sin página de A'}`);
+  return `- Correspondencia de páginas indicada por el usuario (página de B: página de A equivalente): ${rows.join(' · ')}. Úsala para saber en qué página de B buscar cada campo, salvo que las imágenes muestren claramente otra cosa.\n`;
+}
+
+export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes, attached, pageMap }) {
   const imgs = (prefix, n) => Array.from({ length: n }, (_, i) => `${prefix}-p${i + 1}.png`).join(', ');
   return `# Tarea: trasladar campos de un PDF A a un PDF B
 
@@ -204,7 +211,7 @@ Tienes en esta carpeta:
 - Tamaño de página en puntos PDF (ancho × alto): A ${sizeA}, B ${sizeB}.
 - textsA.json y textsB.json: los textos de cada PDF con su página y posición (x, y en puntos PDF, origen abajo-izquierda; x, y es el inicio del texto en su línea base).
 - fields.json: los campos del PDF A que hay que colocar en B. Cada campo trae "nearby": los textos más cercanos de A con su desplazamiento (dx, dy) hasta el campo.
-
+${describePageMap(pageMap)}
 Para cada campo de fields.json:
 1. Elige en "nearby" el texto de A que mejor sirve de ancla (normalmente la etiqueta junto a la que se escribe el valor). Cópialo EXACTO en "anchorA".
 2. Busca ese mismo texto, o el equivalente si cambió de redacción, en B y cópialo EXACTO de textsB.json en "anchorB", junto con su página en "page". El texto puede haberse movido a otra página.

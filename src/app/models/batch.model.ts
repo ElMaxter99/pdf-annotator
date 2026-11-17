@@ -22,6 +22,15 @@ export interface FieldLink {
   readonly a: string;
 }
 
+/** Where a row of the page table comes from (P-78 a P-81). */
+export type PageMapOrigin = 'auto' | 'manual' | 'number' | 'new';
+
+/** Table of pages of one pair: for every page of B (index 0 = page 1) the page of A it equals, or `null`. */
+export interface PageMapData {
+  readonly pairs: readonly (number | null)[];
+  readonly origins: readonly PageMapOrigin[];
+}
+
 /** One PDF of the batch: the original (A, reference) and its new version (B, edited). */
 export interface BatchItem {
   readonly id: string;
@@ -40,6 +49,8 @@ export interface BatchItem {
   readonly dismissed: readonly string[];
   /** A and B differ in page size: `true` scales A's coordinates to B, `false` keeps them, unset = not chosen yet. */
   readonly fitA?: boolean;
+  /** Which page of A each page of B is compared with; unset = by page number (as always). */
+  readonly pageMap?: PageMapData;
   /** Last AI proposal for this pair, waiting for review. */
   readonly aiProposal?: AiSavedProposal;
   readonly status: BatchItemStatus;

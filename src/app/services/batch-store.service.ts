@@ -1,7 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
-import type { AiSavedProposal, BatchItem, FieldLink } from '../models/batch.model';
+import type { AiSavedProposal, BatchItem, FieldLink, PageMapData } from '../models/batch.model';
 import { sanitizeDetails, sanitizeRow } from '../utils/ai-proposal.utils';
+import { sanitizePageMap } from '../utils/page-map.utils';
 
 const DB_NAME = 'pdf-annotator-batch';
 const STORE = 'items';
@@ -77,6 +78,11 @@ export class BatchStoreService {
     this.patch(id, { fitA: fit });
   }
 
+  /** Remembers which page of A each page of B is compared with (`undefined` = by number). */
+  setPageMap(id: string, map: PageMapData | undefined): void {
+    this.patch(id, { pageMap: map, aiProposal: undefined });
+  }
+
   /** Attaches (or replaces) B. A new B starts empty and needs review again. */
   setB(id: string, file: File): void {
     this.patch(id, {
@@ -102,7 +108,7 @@ export class BatchStoreService {
       id,
       item.bPdf
         ? { bPdf: file, bName: file.name, fitA: undefined, aiProposal: undefined }
-        : { aPdf: file, name: file.name, aiProposal: undefined },
+        : { aPdf: file, name: file.name, aiProposal: undefined, pageMap: undefined },
     );
   }
 
@@ -115,6 +121,7 @@ export class BatchStoreService {
       links: [],
       dismissed: [],
       aiProposal: undefined,
+      pageMap: undefined,
       status: 'review',
     });
   }
@@ -253,7 +260,7 @@ export class BatchStoreService {
 
   private async readAll(): Promise<BatchItem[]> {
     const values = await this.run<unknown[]>('readonly', (store) => store.getAll());
-    return Array.isArray(values) ? values.filter(isBatchItem).map(withSafeProposal) : [];
+    return Array.isArray(values) ? values.filter(isBatchItem).map(withSafeProposal).map(withSafePageMap) : [];
   }
 
   private open(): Promise<IDBDatabase | null> {
@@ -341,6 +348,11 @@ function withSafeProposal(item: BatchItem): BatchItem {
       at: typeof raw['at'] === 'number' && Number.isFinite(raw['at']) ? raw['at'] : 0,
     },
   };
+}
+
+/** A stored page table is untrusted too. */
+function withSafePageMap(item: BatchItem): BatchItem {
+  return { ...item, pageMap: sanitizePageMap((item as { pageMap?: unknown }).pageMap) };
 }
 
 function newId(): string {

@@ -14,6 +14,9 @@
   <app-about-dialog [appName]="vm.appName" [author]="vm.appAuthor" [version]="vm.version"
     [year]="vm.currentYear" (closed)="vm.toggleAbout(false)"></app-about-dialog>
 }
+@if (vm.pageMapOpen()) {
+  <app-page-map-dialog [vm]="vm"></app-page-map-dialog>
+}
 @if (vm.exportSamplesPrompt() !== null) {
   <app-export-samples-dialog [count]="vm.exportSamplesPrompt()!" (cancelled)="vm.cancelExportSamples()"
     (confirmed)="vm.confirmExportSamples($event)"></app-export-samples-dialog>

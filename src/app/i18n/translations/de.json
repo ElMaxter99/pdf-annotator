@@ -523,7 +523,60 @@
         "prevA": "Vorherige Seite von A",
         "nextA": "Nächste Seite von A",
         "prevB": "Vorherige Seite von B",
-        "nextB": "Nächste Seite von B"
+        "nextB": "Nächste Seite von B",
+        "tagMapped": "B {{b}} ↔ A {{a}}",
+        "tagUnmapped": "A ohne Entsprechung"
+      },
+      "pageMap": {
+        "chip": "Seiten zugeordnet",
+        "menu": "Seitenoptionen",
+        "menuMapped": "Zugeordnet (Tabelle)",
+        "open": "Seiten zuordnen…",
+        "unmappedTitle": "B {{page}} hat keine Entsprechung in A",
+        "unmappedSub": "Es ist eine neue Seite der Tabelle: Es gibt keine Felder aus A zu kopieren.",
+        "applied": "Seiten zugeordnet: {{count}} von {{total}}",
+        "cleared": "Seiten wieder nach Nummer zugeordnet",
+        "copied": "Felder laut Tabelle kopiert · Seiten mit Entsprechung: {{count}} · ohne: {{unmapped}}",
+        "title": "Seiten von A und B zuordnen",
+        "lead": "Seiten: A {{a}} · B {{b}}. Wählen Sie, welche Seite von A zu jeder Seite von B gehört.",
+        "suggest": "Aus Texten vorschlagen",
+        "shiftAll": "Alle verschieben",
+        "shiftBack": "Alle Zuordnungen um eine Seite zurück verschieben",
+        "shiftForward": "Alle Zuordnungen um eine Seite vor verschieben",
+        "byNumber": "Nach Nummer",
+        "reading": "Texte werden gelesen …",
+        "readingCount": "{{done}} von {{total}} Seiten",
+        "cancelRead": "Lesen abbrechen",
+        "noTextTitle": "Die Texte konnten nicht gelesen werden.",
+        "noTextHint": "Das sieht nach einem gescannten PDF ohne auswählbaren Text aus. Ordnen Sie von Hand zu oder nutzen Sie „Alle verschieben“ oder „Nach Nummer“.",
+        "retry": "Erneut versuchen",
+        "noteNumber": "Solange Sie nichts zuordnen, wird A1 mit B1, A2 mit B2 … verglichen; überzählige Seiten von B haben kein A.",
+        "noteSuggested": "Ich habe die Texte jeder Seite verglichen. Prüfen Sie den Vorschlag und klicken Sie auf „Anwenden“: B ändert sich nicht, nur welche Seite von A womit verglichen wird.",
+        "noteManual": "Sie haben {{count}} Zeilen geändert. Mit „Von Hand“ markierte bleiben unberührt, wenn Sie erneut „Aus Texten vorschlagen“ wählen.",
+        "colB": "Seite von B",
+        "colA": "Entspricht (in A)",
+        "colOrigin": "Herkunft",
+        "pageA": "A {{n}}",
+        "pageB": "B {{n}}",
+        "rowLabel": "Seite von A, die zu B {{n}} gehört",
+        "none": "Keine Seite von A",
+        "repeated": "Wiederholt",
+        "alsoIn": "Auch in B {{pages}}",
+        "originNew": "Neu",
+        "pickOne": "Wählen Sie eine Seite von A",
+        "originManual": "Von Hand",
+        "restoreRow": "Zurück zum Vorschlag",
+        "originAuto": "Vorgeschlagen",
+        "noMatch": "Keine ausreichende Übereinstimmung",
+        "match": "Übereinstimmung {{pct}} %",
+        "originNone": "Keine Seite von A",
+        "originNumber": "Nach Nummer",
+        "noteRepeated": "Dieselbe Seite von A wird in mehrere Seiten von B kopiert. Sie können fortfahren, wenn das gewollt ist (z. B. ein sich wiederholendes Formular).",
+        "noteUnused": "A {{pages}} wird nicht verwendet: Die Felder werden nicht kopiert.",
+        "preview": "Gewählte Zeile",
+        "summary": "{{matched}} von {{total}} Zeilen mit Entsprechung",
+        "cancel": "Abbrechen",
+        "apply": "Anwenden"
       }
     },
     "panel": {
@@ -682,7 +735,12 @@
         "removeYes": "Version B entfernen"
       },
       "noTemplateNote": "Keine Vorlage: Sie können die des Originals laden oder unter Dokument eine neue Version hinzufügen.",
-      "noTemplateGo": "Zu Dokument"
+      "noTemplateGo": "Zu Dokument",
+      "pages": {
+        "title": "Seiten",
+        "mapped": "Von Hand zugeordnet",
+        "byNumber": "Nach Nummer"
+      }
     },
     "adjust": {
       "title": "Anpassung nach Texten",
@@ -1027,6 +1085,9 @@
       "ready": "Bereits fertig",
       "noB": "Version B fehlt",
       "noFields": "Seine Vorlage A hat keine Felder"
+    },
+    "pageMap": {
+      "chip": "Seiten zugeordnet"
     }
   },
   "preview": {

@@ -342,7 +342,7 @@ export class AiBatchService {
       this.queueMap = Object.fromEntries(send.map((item, index) => [remoteItemId(index), item.id]));
       this.persistQueue();
       for (const [index, item] of send.entries()) {
-        await this.ai.addToQueue(batchId, remoteItemId(index), { a: item.aPdf, b: item.bPdf as Blob, template: { pages: item.aPages } }, index === send.length - 1);
+        await this.ai.addToQueue(batchId, remoteItemId(index), { a: item.aPdf, b: item.bPdf as Blob, template: { pages: item.aPages, pageMap: item.pageMap?.pairs } }, index === send.length - 1);
         if (generation !== this.generation) {
           return;
         }
@@ -713,7 +713,7 @@ export class AiBatchService {
     this.patchRow(id, { phase: 'reading', attempt: 1, startedAt: started, t0, provider, endedAt: null, error: null, stageLog: [{ stage: 'reading', attempt: 1, at: started - t0 }], stepLog: [], sent: null, details: null });
     try {
       const result = await this.ai.propose(
-        { a: item.aPdf, b: item.bPdf, template: { pages: item.aPages } },
+        { a: item.aPdf, b: item.bPdf, template: { pages: item.aPages, pageMap: item.pageMap?.pairs } },
         (progress) => {
           if (generation === this.generation) {
             const row = this.rows()[id];

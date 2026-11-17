@@ -93,8 +93,14 @@
       <div #splitLayer class="reference-layer" aria-hidden="true"></div>
       @if (vm.aGhost()) {
         <div class="page-ghost" data-testid="ghost-a" role="status">
-          <b>{{ 'batch.editor.pages.missingTitle' | t: { version: 'A', page: vm.commonPage() } }}</b>
-          <span>{{ 'batch.editor.pages.missingSub' | t: { count: vm.pageCountA() } }}</span>
+          @if (vm.pageMap()) {
+            <b>{{ 'batch.editor.pageMap.unmappedTitle' | t: { page: vm.pageIndex() } }}</b>
+            <span>{{ 'batch.editor.pageMap.unmappedSub' | t }}</span>
+            <button type="button" class="btn btn--ghost" (click)="vm.openPageMap()" data-testid="ghost-a-map">{{ 'batch.editor.pageMap.open' | t }}</button>
+          } @else {
+            <b>{{ 'batch.editor.pages.missingTitle' | t: { version: 'A', page: vm.commonPage() } }}</b>
+            <span>{{ 'batch.editor.pages.missingSub' | t: { count: vm.pageCountA() } }}</span>
+          }
         </div>
       }
     </div>
@@ -117,8 +123,27 @@
         [attr.aria-pressed]="!vm.pagesLinked()" data-testid="pages-link"
         [attr.title]="'batch.editor.pages.chipTitle' | t" (click)="vm.togglePagesLink()">
         <span aria-hidden="true">{{ vm.pagesLinked() ? '⇄' : '⇆' }}</span>
-        {{ (vm.pagesLinked() ? 'batch.editor.pages.linked' : 'batch.editor.pages.freeChip') | t }}
+        {{ (vm.pagesLinked() ? (vm.pageMap() ? 'batch.editor.pageMap.chip' : 'batch.editor.pages.linked') : 'batch.editor.pages.freeChip') | t }}
       </button>
+      <span class="split-link-menu" (focusout)="vm.onPagesMenuFocusOut($event)" (keydown.escape)="vm.pagesMenuOpen.set(false)">
+        <button type="button" class="split-link split-link--pages split-link--caret" data-testid="pages-menu"
+          aria-haspopup="menu" [attr.aria-expanded]="vm.pagesMenuOpen()" [attr.aria-label]="'batch.editor.pageMap.menu' | t"
+          [attr.title]="'batch.editor.pageMap.menu' | t" (click)="vm.pagesMenuOpen.set(!vm.pagesMenuOpen())">▾</button>
+        @if (vm.pagesMenuOpen()) {
+          <div class="split-menu" role="menu" data-testid="pages-menu-list">
+            <button type="button" role="menuitemradio" [attr.aria-checked]="vm.pagesLinked()" (click)="vm.setPagesLinked(true)">
+              {{ (vm.pagesLinked() ? '✓ ' : '') }}{{ (vm.pageMap() ? 'batch.editor.pageMap.menuMapped' : 'batch.editor.pages.linked') | t }}
+            </button>
+            <button type="button" role="menuitemradio" [attr.aria-checked]="!vm.pagesLinked()" (click)="vm.setPagesLinked(false)">
+              {{ (!vm.pagesLinked() ? '✓ ' : '') }}{{ 'batch.editor.pages.freeChip' | t }}
+            </button>
+            <hr />
+            <button type="button" role="menuitem" data-testid="pages-menu-map" (click)="vm.pagesMenuOpen.set(false); vm.openPageMap()">
+              {{ 'batch.editor.pageMap.open' | t }}
+            </button>
+          </div>
+        }
+      </span>
     }
    </div>
   }
@@ -137,7 +162,7 @@
     }
     @if (vm.pageTag(); as tag) {
       <span class="page-tag" [class.page-tag--missing]="tag.kind === 'missing'" data-testid="page-tag" role="status">
-        {{ (tag.kind === 'missing' ? 'batch.editor.pages.tagMissing' : 'batch.editor.pages.tagOffset') | t: { page: tag.a, a: tag.a } }}
+        {{ vm.pageTagKey(tag.kind) | t: { page: tag.a, a: tag.a, b: tag.b } }}
       </span>
     }
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
