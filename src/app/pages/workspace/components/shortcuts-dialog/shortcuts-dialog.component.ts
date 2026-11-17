@@ -68,7 +68,10 @@ export class ShortcutsDialogComponent implements AfterViewInit {
     },
     {
       titleKey: 'shortcuts.groups.general',
-      items: [{ keys: ['?'], labelKey: 'shortcuts.items.help' }],
+      items: [
+        { keys: ['Ctrl/⌘', 'K'], labelKey: 'shortcuts.items.palette' },
+        { keys: ['?'], labelKey: 'shortcuts.items.help' },
+      ],
     },
   ];
 

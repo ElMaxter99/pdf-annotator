@@ -116,6 +116,12 @@
         <span class="btn__icon" aria-hidden="true">⋯</span>
       </button>
     <div class="toolbar__group toolbar__group--preferences" role="group" [attr.aria-label]="'controls.preferencesGroup' | t">
+        <button class="btn btn--icon btn--ghost" type="button" (click)="vm.togglePalette(true)"
+          [attr.title]="('palette.open' | t) + ' (Ctrl+K)'" [attr.aria-label]="'palette.open' | t"
+          aria-keyshortcuts="Control+K Meta+K" data-testid="palette-open">
+          <span class="btn__icon" aria-hidden="true">⌕</span>
+          <span class="btn__label">{{ 'palette.openShort' | t }}</span>
+        </button>
         <button class="btn btn--icon btn--ghost" type="button" (click)="vm.toggleShortcuts()"
           [attr.title]="('shortcuts.open' | t) + ' (?)'" [attr.aria-label]="'shortcuts.open' | t"
           [attr.aria-keyshortcuts]="'?'">

@@ -316,7 +316,8 @@
       "panCanvas": "Mover a tela (manter premido)",
       "splitLink": "Ligar ou desligar A e B (Dividida)",
       "wheelPage": "Continuar com a roda na borda da folha: muda de página",
-      "pageOnlyA": "Mover só A (as páginas passam a livres)"
+      "pageOnlyA": "Mover só A (as páginas passam a livres)",
+      "palette": "Abrir a paleta de comandos"
     }
   },
   "toast": {
@@ -1602,5 +1603,56 @@
       "hint": "arraste · solte para anotar"
     },
     "hintWeb": "Zoom do PDF: Ctrl + roda. O zoom do navegador continua no resto do ecrã."
+  },
+  "palette": {
+    "title": "Paleta de comandos",
+    "placeholder": "Escreva uma ação ou um PDF…",
+    "results": "Ações",
+    "count": "{{count}} resultados",
+    "emptyText": "Nada corresponde a «{{query}}».",
+    "emptyShortcuts": "Ver atalhos de teclado",
+    "open": "Paleta de comandos",
+    "openShort": "Comandos",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "mover",
+      "choose": "escolher",
+      "close": "fechar"
+    },
+    "hint": {
+      "confirms": "pede confirmação",
+      "current": "atual",
+      "batch": "Lote",
+      "position": "Lote {{index}} de {{total}}"
+    },
+    "why": {
+      "noPdf": "Antes: abra um PDF",
+      "nothingToUndo": "Nada para desfazer",
+      "nothingToRedo": "Nada para refazer",
+      "noAnnotations": "Ainda sem anotações",
+      "firstPage": "Já está na primeira página",
+      "lastPage": "Já está na última página",
+      "noTemplateA": "Antes: carregue o modelo A",
+      "noVersionB": "Antes: carregue a versão B",
+      "firstPdf": "Já está no primeiro PDF",
+      "lastPdf": "Já está no último PDF"
+    },
+    "cmd": {
+      "fitPage": "Ajustar à página",
+      "zoomActual": "Tamanho real (100 %)",
+      "view": "Vista {{mode}}",
+      "tab": "Painel {{tab}}",
+      "putCopy": "Pôr o modelo A · copiar tal e qual",
+      "putMissing": "Pôr o modelo A · só os que faltam",
+      "putAdjust": "Pôr o modelo A · ajustar pelos textos",
+      "putAi": "Pôr o modelo A · adaptar com IA",
+      "batchPanel": "Ir para o painel do lote",
+      "batchPrev": "Ir para o PDF anterior",
+      "batchNext": "Ir para o PDF seguinte",
+      "goTo": "Ir para {{name}}",
+      "themeDark": "Mudar para o tema escuro",
+      "themeLight": "Mudar para o tema claro",
+      "language": "Idioma: {{language}}"
+    }
   }
 }

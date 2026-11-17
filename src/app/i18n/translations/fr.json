@@ -316,7 +316,8 @@
       "panCanvas": "Déplacer le canevas (maintenir)",
       "splitLink": "Lier ou dissocier A et B (Divisée)",
       "wheelPage": "Continuer avec la molette au bord de la feuille : change de page",
-      "pageOnlyA": "Déplacer seulement A (les pages deviennent libres)"
+      "pageOnlyA": "Déplacer seulement A (les pages deviennent libres)",
+      "palette": "Ouvrir la palette de commandes"
     }
   },
   "toast": {
@@ -1602,5 +1603,56 @@
       "hint": "glissez · relâchez pour annoter"
     },
     "hintWeb": "Zoom du PDF : Ctrl + molette. Le zoom du navigateur reste actif sur le reste de l’écran."
+  },
+  "palette": {
+    "title": "Palette de commandes",
+    "placeholder": "Saisissez une action ou un PDF…",
+    "results": "Actions",
+    "count": "{{count}} résultats",
+    "emptyText": "Rien ne correspond à « {{query}} ».",
+    "emptyShortcuts": "Voir les raccourcis clavier",
+    "open": "Palette de commandes",
+    "openShort": "Commandes",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "naviguer",
+      "choose": "choisir",
+      "close": "fermer"
+    },
+    "hint": {
+      "confirms": "demande confirmation",
+      "current": "actuel",
+      "batch": "Lot",
+      "position": "Lot {{index}} sur {{total}}"
+    },
+    "why": {
+      "noPdf": "D'abord : ouvrez un PDF",
+      "nothingToUndo": "Rien à annuler",
+      "nothingToRedo": "Rien à rétablir",
+      "noAnnotations": "Pas encore d'annotations",
+      "firstPage": "Vous êtes sur la première page",
+      "lastPage": "Vous êtes sur la dernière page",
+      "noTemplateA": "D'abord : importez le modèle A",
+      "noVersionB": "D'abord : importez la version B",
+      "firstPdf": "Vous êtes sur le premier PDF",
+      "lastPdf": "Vous êtes sur le dernier PDF"
+    },
+    "cmd": {
+      "fitPage": "Ajuster à la page",
+      "zoomActual": "Taille réelle (100 %)",
+      "view": "Vue {{mode}}",
+      "tab": "Panneau {{tab}}",
+      "putCopy": "Placer le modèle A · copier tel quel",
+      "putMissing": "Placer le modèle A · seulement les manquants",
+      "putAdjust": "Placer le modèle A · ajuster d'après les textes",
+      "putAi": "Placer le modèle A · adapter avec l'IA",
+      "batchPanel": "Aller au panneau du lot",
+      "batchPrev": "Aller au PDF précédent",
+      "batchNext": "Aller au PDF suivant",
+      "goTo": "Aller à {{name}}",
+      "themeDark": "Passer au thème sombre",
+      "themeLight": "Passer au thème clair",
+      "language": "Langue : {{language}}"
+    }
   }
 }

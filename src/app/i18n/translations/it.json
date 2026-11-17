@@ -316,7 +316,8 @@
       "panCanvas": "Sposta la tela (tieni premuto)",
       "splitLink": "Collega o scollega A e B (Divisa)",
       "wheelPage": "Continuare con la rotellina al bordo del foglio: cambia pagina",
-      "pageOnlyA": "Muovi solo A (le pagine diventano libere)"
+      "pageOnlyA": "Muovi solo A (le pagine diventano libere)",
+      "palette": "Apri il riquadro dei comandi"
     }
   },
   "toast": {
@@ -1602,5 +1603,56 @@
       "hint": "trascina · rilascia per annotare"
     },
     "hintWeb": "Zoom del PDF: Ctrl + rotellina. Lo zoom del browser resta attivo nel resto dello schermo."
+  },
+  "palette": {
+    "title": "Riquadro dei comandi",
+    "placeholder": "Scrivi un'azione o un PDF…",
+    "results": "Azioni",
+    "count": "{{count}} risultati",
+    "emptyText": "Nessun risultato per «{{query}}».",
+    "emptyShortcuts": "Vedi le scorciatoie da tastiera",
+    "open": "Riquadro dei comandi",
+    "openShort": "Comandi",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "spostarsi",
+      "choose": "scegliere",
+      "close": "chiudere"
+    },
+    "hint": {
+      "confirms": "chiede conferma",
+      "current": "attuale",
+      "batch": "Lotto",
+      "position": "Lotto {{index}} di {{total}}"
+    },
+    "why": {
+      "noPdf": "Prima: apri un PDF",
+      "nothingToUndo": "Niente da annullare",
+      "nothingToRedo": "Niente da ripristinare",
+      "noAnnotations": "Ancora nessuna annotazione",
+      "firstPage": "Sei già alla prima pagina",
+      "lastPage": "Sei già all'ultima pagina",
+      "noTemplateA": "Prima: carica il modello A",
+      "noVersionB": "Prima: carica la versione B",
+      "firstPdf": "Sei già sul primo PDF",
+      "lastPdf": "Sei già sull'ultimo PDF"
+    },
+    "cmd": {
+      "fitPage": "Adatta alla pagina",
+      "zoomActual": "Dimensione reale (100 %)",
+      "view": "Vista {{mode}}",
+      "tab": "Pannello {{tab}}",
+      "putCopy": "Metti il modello A · copia così com'è",
+      "putMissing": "Metti il modello A · solo quelli mancanti",
+      "putAdjust": "Metti il modello A · adatta in base ai testi",
+      "putAi": "Metti il modello A · adatta con l'IA",
+      "batchPanel": "Vai al pannello del lotto",
+      "batchPrev": "Vai al PDF precedente",
+      "batchNext": "Vai al PDF successivo",
+      "goTo": "Vai a {{name}}",
+      "themeDark": "Passa al tema scuro",
+      "themeLight": "Passa al tema chiaro",
+      "language": "Lingua: {{language}}"
+    }
   }
 }
