@@ -9,7 +9,7 @@ import { AiReviewComponent } from './ai-review.component';
 
 /** Top bar of the editor while a PDF of a batch is open: B is edited, A is the reference. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-migration-bar',
   standalone: true,
   imports: [FocusTrapDirective, CommonModule, TranslationPipe, AdjustReviewComponent, AiReviewComponent, AiModelSelectComponent],

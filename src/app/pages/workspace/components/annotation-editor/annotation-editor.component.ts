@@ -8,7 +8,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 export type AnnotationEditorMode = 'preview' | 'edit';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-annotation-editor',
   standalone: true,
   templateUrl: './annotation-editor.component.html',

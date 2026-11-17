@@ -15,7 +15,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 
 /** «Copiar y adaptar con IA»: the strip under the bar with progress, errors and the proposal to review. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-review',
   standalone: true,
   imports: [CommonModule, TranslationPipe, AiDetailsComponent],

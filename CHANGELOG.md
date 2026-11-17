@@ -6,6 +6,7 @@
 - **Guion para medir créditos reales de Copilot:** `tools/ai-phase0/credits-report.mjs` resume lo medido por el CLI y lo compara con el consumo que marca GitHub (ver `docs/IA-LOCAL.md`).
 
 ### Changed
+- **Rendimiento del editor, fase 4 (invisible):** la barra de migración, el ajuste por textos, la revisión de la IA y el editor de anotaciones pasan a `OnPush`. Sin cambios visibles.
 - **Rendimiento del editor, fase 3 (invisible):** el pie, la ficha del lote y el panel de estados de migración pasan a `OnPush`. Sin cambios visibles.
 - **Rendimiento del editor, fase 1 (invisible):** `pdfDoc`, `pageCount`, el texto y el árbol del JSON, el nombre y la selección de plantilla y el idioma del editor pasan a signals, primer paso para poder usar OnPush en los subcomponentes del editor. Sin cambios visibles.
 - **Deuda técnica, parte 7 (sin cambios visibles):** nueve componentes hoja pasan a `ChangeDetectionStrategy.OnPush` (selector de tema, campana y avisos, miniatura de PDF, diálogo «Acerca de» y los cinco trozos de la landing). Solo usan inputs, eventos y signals, así que se actualizan igual con menos comprobaciones; nuevo e2e que cambia idioma y tema en la landing.
