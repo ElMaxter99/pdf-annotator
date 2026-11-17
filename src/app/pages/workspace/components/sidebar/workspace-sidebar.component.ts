@@ -10,7 +10,7 @@ import { MigrationPanelComponent } from '../migration/migration-panel.component'
 import { PageThumbnailsComponent } from '../page-thumbnails/page-thumbnails.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-workspace-sidebar',
   standalone: true,
   templateUrl: './workspace-sidebar.component.html',

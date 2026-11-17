@@ -11,7 +11,7 @@ import { MigrationBarComponent } from '../migration/migration-bar.component';
 import { ThemeToggleComponent } from '../../../../components/theme-toggle/theme-toggle.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-workspace-header',
   standalone: true,
   templateUrl: './workspace-header.component.html',
