@@ -179,6 +179,8 @@ export class ProjectsPageComponent implements OnInit {
     }
     this.toast.show(this.t('projects.created', { name: result.name }), 'success');
     await this.store.close();
+    // The batch now lives in the project folder: drop the browser copy so it is not offered again.
+    await this.batch.clear();
     await this.store.refresh();
   }
 
