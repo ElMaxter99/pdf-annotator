@@ -16,11 +16,23 @@ export function sizeOfPage(sizes: readonly PageSize[], num: number): PageSize | 
   return sizes[Math.min(Math.max(1, Math.floor(num)), sizes.length) - 1];
 }
 
-/** `true` when some page of A is not the same size as its page in B (more than 2 points). */
-export function sizesDiffer(a: readonly PageSize[], b: readonly PageSize[]): boolean {
-  const count = Math.max(a.length, b.length);
+/**
+ * `true` when some page of A is not the same size as its page in B (more than 2 points). With the
+ * table of pages (`pairs`: page of A for each page of B, `null` = none) each page of B is compared
+ * with the page of A it goes with; without it, by page number.
+ */
+export function sizesDiffer(
+  a: readonly PageSize[],
+  b: readonly PageSize[],
+  pairs?: readonly (number | null)[] | null,
+): boolean {
+  const count = pairs ? pairs.length : Math.max(a.length, b.length);
   for (let num = 1; num <= count; num++) {
-    const sa = sizeOfPage(a, num);
+    const pageA = pairs ? pairs[num - 1] : num;
+    if (pageA === null) {
+      continue;
+    }
+    const sa = sizeOfPage(a, pageA);
     const sb = sizeOfPage(b, num);
     if (sa && sb && (Math.abs(sa.w - sb.w) > TOLERANCE || Math.abs(sa.h - sb.h) > TOLERANCE)) {
       return true;

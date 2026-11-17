@@ -11,6 +11,16 @@ describe('page-scale.utils', () => {
     expect(sizesDiffer([], [A4])).toBeFalse();
   });
 
+  it('compares each page of B with the page of A in the table', () => {
+    // A: A4, landscape. B: landscape, A4. By number they differ; by the table they match.
+    const a = [A4, A4_LANDSCAPE];
+    const b = [A4_LANDSCAPE, A4];
+    expect(sizesDiffer(a, b)).toBeTrue();
+    expect(sizesDiffer(a, b, [2, 1])).toBeFalse();
+    expect(sizesDiffer(a, b, [1, null])).toBeTrue();
+    expect(sizesDiffer(a, [A4_LANDSCAPE, A4], [null, 1])).toBeFalse();
+  });
+
   it('uses the last page when a page is missing', () => {
     expect(sizeOfPage([A4, A4_LANDSCAPE], 5)).toEqual(A4_LANDSCAPE);
     expect(sizeOfPage([], 1)).toBeNull();
