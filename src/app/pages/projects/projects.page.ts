@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnDestroy,
   OnInit,
   computed,
   inject,
@@ -16,6 +17,7 @@ import { AppMetadataService } from '../../services/app-metadata.service';
 import { BatchStoreService } from '../../services/batch-store.service';
 import { getDesktopBridge } from '../../services/desktop-update.service';
 import { ProjectStoreService } from '../../services/project-store.service';
+import { ProjectSyncService } from '../../services/project-sync.service';
 import {
   ProjectTransferService,
   type TransferDialog,
@@ -38,9 +40,10 @@ type Dialog =
   templateUrl: './projects.page.html',
   styleUrls: ['./projects.page.scss'],
 })
-export class ProjectsPageComponent implements OnInit {
+export class ProjectsPageComponent implements OnInit, OnDestroy {
   readonly store = inject(ProjectStoreService);
   readonly transfer = inject(ProjectTransferService);
+  readonly sync = inject(ProjectSyncService);
   private readonly batch = inject(BatchStoreService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -74,6 +77,11 @@ export class ProjectsPageComponent implements OnInit {
     }
     void this.store.refresh();
     void this.batch.load();
+    this.sync.start();
+  }
+
+  ngOnDestroy(): void {
+    this.sync.stop();
   }
 
   t(key: string, params?: Record<string, unknown>): string {
@@ -151,7 +159,58 @@ export class ProjectsPageComponent implements OnInit {
       this.toast.error(this.t(`projects.error.${result.error}`));
     } else {
       await this.store.refresh();
+      await this.sync.refresh();
     }
+  }
+
+  /** Quién lo tiene abierto: este equipo no, otro equipo (bloqueo local) o a través de la carpeta enlazada. */
+  holderOf(project: ProjectSummary): ProjectLockInfo | null {
+    if (project.lock.state === 'other') {
+      return project.lock;
+    }
+    const status = this.sync.statusOf(project.ref);
+    return status.state === 'other' && status.holder ? status.holder : null;
+  }
+
+  syncMeta(project: ProjectSummary): string {
+    const status = this.sync.statusOf(project.ref);
+    switch (status.state) {
+      case 'pend':
+        return this.t('projects.sync.meta.pend');
+      case 'pull':
+        return this.t('projects.sync.meta.pull', {
+          rev: status.remoteRev ?? 0,
+          by: status.by ?? '',
+        });
+      case 'sync':
+        return status.lastSync
+          ? this.t('projects.sync.meta.synced', {
+              rev: status.rev ?? 0,
+              when: this.when(status.lastSync),
+            })
+          : '';
+      default:
+        return '';
+    }
+  }
+
+  syncFromMenu(project: ProjectSummary): void {
+    this.closeMenu();
+    void this.sync.syncProject(project.ref, project.name);
+  }
+
+  pauseFromMenu(project: ProjectSummary, paused: boolean): void {
+    this.closeMenu();
+    void this.sync.setPaused(project.ref, paused);
+  }
+
+  stopFromMenu(project: ProjectSummary): void {
+    this.closeMenu();
+    this.sync.askStop(project);
+  }
+
+  syncNow(): void {
+    void this.sync.syncAll('sync');
   }
 
   askTakeover(project: ProjectSummary): void {

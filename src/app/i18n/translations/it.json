@@ -1733,7 +1733,9 @@
       "unsafe": "Il file non è sicuro.",
       "newer-format": "Il file proviene da una versione più recente dell'app.",
       "in-use": "Il progetto è in uso su un altro computer.",
-      "disk-full": "Spazio su disco esaurito."
+      "disk-full": "Spazio su disco esaurito.",
+      "not-synced": "Questo progetto non viene sincronizzato.",
+      "bad-action": "Azione non valida."
     },
     "transfer": {
       "import": "Importa progetto",
@@ -1830,6 +1832,146 @@
         "diskFullTitle": "Spazio su disco esaurito",
         "diskFullText": "Ciò che era stato scritto a metà è stato eliminato; la tua cartella dei progetti è com'era prima. Libera spazio e riprova.",
         "diskFullExport": "Non è rimasto nessun file a metà. Libera spazio o scegli un'altra unità e riprova."
+      }
+    },
+    "sync": {
+      "linkButton": "Sincronizza con un’altra cartella…",
+      "folder": "Cartella collegata:",
+      "now": "Sincronizza ora",
+      "manage": "Cambia o scollega",
+      "footOk": "Sincronizzata",
+      "footOff": "Cartella non trovata",
+      "footPend": "{{count}} progetti con modifiche in sospeso",
+      "upload": "Carica ora",
+      "pull": "Scarica le modifiche",
+      "resolve": "Risolvi…",
+      "canceled": "Sincronizzazione annullata.",
+      "bgError": "Impossibile caricare «{{name}}»: {{reason}}",
+      "chip": {
+        "sync": "✓ Sincronizzato",
+        "pend": "In attesa di caricamento",
+        "pull": "Ci sono modifiche nuove",
+        "conflict": "Conflitto",
+        "off": "Non in linea",
+        "paused": "In pausa"
+      },
+      "meta": {
+        "pend": "Modifiche non ancora caricate nella cartella collegata.",
+        "pull": "{{by}} ha caricato la revisione {{rev}}. Puoi scaricarla.",
+        "synced": "Sincronizzato · revisione {{rev}} · {{when}}"
+      },
+      "menu": {
+        "now": "Sincronizza ora",
+        "start": "Sincronizza questo progetto",
+        "pause": "Metti in pausa la sincronizzazione",
+        "resume": "Riprendi la sincronizzazione",
+        "stop": "Smetti di sincronizzare questo progetto…"
+      },
+      "dups": {
+        "link": "Ci sono file duplicati nella cartella",
+        "title": "Ci sono file duplicati nella cartella",
+        "text": "Il servizio che sincronizza la cartella ha creato copie in conflitto. L’app non le usa né le elimina:",
+        "reveal": "Mostra nella cartella",
+        "ok": "Capito"
+      },
+      "avail": {
+        "title": "Disponibili nella cartella collegata",
+        "sub": "non presenti su questo computer",
+        "meta": "{{ref}} · {{pdfs}} PDF · {{size}} · caricato {{when}} da {{by}}",
+        "download": "Scarica"
+      },
+      "link": {
+        "title": "Sincronizza con una cartella",
+        "intro": "Scegli una cartella che già sincronizzi (Google Drive, OneDrive, Dropbox…) o una cartella di rete. L’app vi conserverà una copia dei tuoi progetti così potrai aprirli su un altro computer.",
+        "field": "Cartella",
+        "choose": "Scegli la cartella…",
+        "checked": "Cartella verificata: lettura e scrittura possibili · {{free}} liberi",
+        "checkedNoFree": "Cartella verificata: lettura e scrittura possibili",
+        "warnTitle": "Prima di collegare",
+        "warnText": "I PDF lasceranno questo computer verso quella cartella e viaggeranno attraverso il servizio che la sincronizza. L’app non li cifra. Usa solo cartelle di cui ti fidi.",
+        "accept": "Capisco che i PDF e i loro dati verranno copiati in quella cartella",
+        "button": "Collega"
+      },
+      "plan": {
+        "title": "Cosa caricare nella cartella collegata?",
+        "intro": "Ci sono {{local}} progetti su questo computer e {{remote}} nella cartella che non hai qui.",
+        "both": "Carica i miei progetti e scarica quelli della cartella",
+        "bothHint": "Se un nome coincide, ti viene chiesto prima di toccare qualcosa. I tuoi progetti pesano {{size}}.",
+        "down": "Scarica solo quelli della cartella",
+        "downHint": "I tuoi progetti restano su questo computer finché non carichi ciascuno.",
+        "manual": "Scegli progetto per progetto",
+        "manualHint": "Viene collegata e non si carica né scarica nulla finché non lo chiedi dal menu ⋯ di ogni scheda."
+      },
+      "progress": {
+        "title": "Sincronizzazione di «{{name}}»",
+        "titleAll": "Sincronizzazione dei progetti",
+        "files": "File {{done}} di {{total}}",
+        "projects": "Progetto {{done}} di {{total}}: «{{name}}»",
+        "starting": "Preparazione…",
+        "note": "Vengono caricati o scaricati solo i file modificati. Puoi annullare: la revisione precedente resta intatta."
+      },
+      "done": {
+        "up": "«{{name}}» caricato (revisione {{rev}}). Potrebbero servire alcuni minuti prima che compaia sugli altri computer.",
+        "down": "«{{name}}» aggiornato alla revisione {{rev}}.",
+        "none": "«{{name}}» era già aggiornato.",
+        "all": "Sincronizzazione terminata: {{count}} progetti.",
+        "allIssues": "Sincronizzazione terminata con avvisi: {{failed}} progetti non sono stati sincronizzati e {{conflicts}} richiedono una decisione.",
+        "copy": "La tua versione è stata salvata come «{{name}}».",
+        "linked": "Cartella collegata. I progetti che sincronizzi vengono caricati alla chiusura e ogni pochi minuti.",
+        "paused": "Sincronizzazione in pausa per questo progetto.",
+        "resumed": "Sincronizzazione ripresa.",
+        "stopped": "«{{name}}» non viene più sincronizzato. Resta su questo computer.",
+        "unlinked": "Cartella scollegata. I tuoi progetti sono ancora qui."
+      },
+      "conflict": {
+        "title": "«{{name}}» è cambiato nella cartella",
+        "text": "{{by}} ha caricato la revisione {{rev}} e qui hai modifiche non caricate. L’app non sovrascrive nulla senza che tu decida.",
+        "takenTitle": "C’è già un altro progetto con quel percorso nella cartella",
+        "takenText": "«{{name}}» e quello nella cartella hanno lo stesso nome ma sono progetti diversi.",
+        "mine": "Le tue modifiche",
+        "theirs": "Modifiche dell’altro computer",
+        "both": "In entrambi",
+        "count": "{{count}} PDF",
+        "optTheirs": "Tenere la versione della cartella e salvare la mia come copia",
+        "optTheirsHint": "Il tuo lavoro viene conservato come progetto a parte e si usa la revisione {{rev}}.",
+        "optMine": "Carica la mia e sostituisci quella della cartella",
+        "optMineHint": "La revisione {{rev}} viene sostituita dalla tua. Prima si conserva nella cartella una copia di ciò che viene sostituito, per sicurezza.",
+        "optLater": "Decidere più tardi",
+        "optLaterHint": "Il progetto resta com’è, non sincronizzato, finché non scegli."
+      },
+      "offline": {
+        "title": "La cartella collegata non si trova",
+        "text": "«{{folder}}» non risponde (rete assente, servizio chiuso o disco scollegato?). Puoi continuare a lavorare: le modifiche resteranno «In attesa di caricamento» e verranno caricate al ritorno.",
+        "retry": "Riprova",
+        "other": "Scegli un’altra cartella",
+        "continue": "Continua offline"
+      },
+      "stop": {
+        "title": "Smettere di sincronizzare «{{name}}»?",
+        "text": "Il progetto resta su questo computer così com’è e non viene più caricato né scaricato.",
+        "noteTitle": "Cosa succede alla copia nella cartella",
+        "noteText": "Ciò che hai già caricato resta lì e l’app non lo elimina. Per rimuoverlo, fallo dal tuo sistema (Esplora risorse o Finder).",
+        "button": "Smetti di sincronizzare"
+      },
+      "unlink": {
+        "title": "Scollegare la cartella?",
+        "text": "Il collegamento con «{{folder}}» viene rimosso. I tuoi progetti restano qui; ciò che hai già caricato resta nella cartella e l’app non lo elimina.",
+        "change": "Scegli un’altra cartella",
+        "button": "Scollega"
+      },
+      "err": {
+        "title": "Impossibile sincronizzare",
+        "folder-missing": "La cartella collegata non si trova.",
+        "folder-readonly": "Non si può scrivere in quella cartella. Sembra di sola lettura: scegline un’altra o cambia i permessi.",
+        "folder-overlaps": "Quella cartella non va bene: non può trovarsi dentro la cartella dei progetti né contenerla.",
+        "remote-incomplete": "Mancano file nella cartella («{{detail}}»). È normale se l’altro computer sta ancora caricando: riprova tra qualche minuto.",
+        "cloud-pending": "«{{detail}}» si sta ancora scaricando dal cloud. Apri la cartella, scegli «Mantieni sempre su questo dispositivo» (o attendi la fine) e riprova.",
+        "ref-taken": "C’è già un altro progetto con quel percorso nella cartella.",
+        "in-use-local": "Chiudilo prima di scaricare le modifiche di un altro computer.",
+        "in-use": "{{detail}} lo ha aperto. Potrà essere caricato quando lo chiuderà.",
+        "disk-full": "Spazio insufficiente: mancano circa {{detail}} MB. Nulla è stato lasciato a metà.",
+        "not-linked": "Prima collega una cartella.",
+        "newer-format": "Questa cartella è usata da una versione più recente dell’app. Aggiorna e riprova."
       }
     }
   }

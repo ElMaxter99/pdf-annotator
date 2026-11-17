@@ -1733,7 +1733,9 @@
       "unsafe": "The file is not safe.",
       "newer-format": "The file comes from a newer version of the app.",
       "in-use": "The project is in use on another computer.",
-      "disk-full": "Not enough disk space."
+      "disk-full": "Not enough disk space.",
+      "not-synced": "This project is not synced.",
+      "bad-action": "Invalid action."
     },
     "transfer": {
       "import": "Import project",
@@ -1830,6 +1832,146 @@
         "diskFullTitle": "Not enough disk space",
         "diskFullText": "Whatever was half written was deleted; your projects folder is as it was. Free some space and try again.",
         "diskFullExport": "No half-written file was left behind. Free some space or pick another drive and try again."
+      }
+    },
+    "sync": {
+      "linkButton": "Sync with another folder…",
+      "folder": "Linked folder:",
+      "now": "Sync now",
+      "manage": "Change or unlink",
+      "footOk": "In sync",
+      "footOff": "Folder not found",
+      "footPend": "{{count}} projects with pending changes",
+      "upload": "Upload now",
+      "pull": "Get changes",
+      "resolve": "Resolve…",
+      "canceled": "Sync canceled.",
+      "bgError": "Could not upload “{{name}}”: {{reason}}",
+      "chip": {
+        "sync": "✓ In sync",
+        "pend": "Waiting to upload",
+        "pull": "New changes available",
+        "conflict": "Conflict",
+        "off": "Offline",
+        "paused": "Paused"
+      },
+      "meta": {
+        "pend": "Changes not yet uploaded to the linked folder.",
+        "pull": "{{by}} uploaded revision {{rev}}. You can get it.",
+        "synced": "In sync · revision {{rev}} · {{when}}"
+      },
+      "menu": {
+        "now": "Sync now",
+        "start": "Sync this project",
+        "pause": "Pause syncing",
+        "resume": "Resume syncing",
+        "stop": "Stop syncing this project…"
+      },
+      "dups": {
+        "link": "There are duplicate files in the folder",
+        "title": "There are duplicate files in the folder",
+        "text": "The service that syncs the folder created conflict copies. The app does not use or delete them:",
+        "reveal": "Show in folder",
+        "ok": "Got it"
+      },
+      "avail": {
+        "title": "Available in the linked folder",
+        "sub": "not on this computer",
+        "meta": "{{ref}} · {{pdfs}} PDFs · {{size}} · uploaded {{when}} by {{by}}",
+        "download": "Download"
+      },
+      "link": {
+        "title": "Sync with a folder",
+        "intro": "Pick a folder you already sync (Google Drive, OneDrive, Dropbox…) or a network folder. The app will keep a copy of your projects there so you can open them on another computer.",
+        "field": "Folder",
+        "choose": "Choose folder…",
+        "checked": "Folder checked: readable and writable · {{free}} free",
+        "checkedNoFree": "Folder checked: readable and writable",
+        "warnTitle": "Before linking",
+        "warnText": "The PDFs will leave this computer for that folder and travel through the service that syncs it. The app does not encrypt them. Only use folders you trust.",
+        "accept": "I understand the PDFs and their data will be copied to that folder",
+        "button": "Link"
+      },
+      "plan": {
+        "title": "What should go to the linked folder?",
+        "intro": "There are {{local}} projects on this computer and {{remote}} in the folder that you do not have here.",
+        "both": "Upload my projects and download the ones in the folder",
+        "bothHint": "If a name matches, you are asked before anything is touched. Your projects add up to {{size}}.",
+        "down": "Only download the ones in the folder",
+        "downHint": "Your projects stay on this computer until you upload each one.",
+        "manual": "Choose project by project",
+        "manualHint": "It is linked and nothing is uploaded or downloaded until you ask from each card’s ⋯ menu."
+      },
+      "progress": {
+        "title": "Syncing “{{name}}”",
+        "titleAll": "Syncing projects",
+        "files": "File {{done}} of {{total}}",
+        "projects": "Project {{done}} of {{total}}: “{{name}}”",
+        "starting": "Getting ready…",
+        "note": "Only files that changed are uploaded or downloaded. You can cancel: the previous revision stays intact."
+      },
+      "done": {
+        "up": "“{{name}}” uploaded (revision {{rev}}). It may take a few minutes to show up on other computers.",
+        "down": "“{{name}}” updated to revision {{rev}}.",
+        "none": "“{{name}}” was already up to date.",
+        "all": "Sync finished: {{count}} projects.",
+        "allIssues": "Sync finished with warnings: {{failed}} projects could not be synced and {{conflicts}} need a decision.",
+        "copy": "Your version was saved as “{{name}}”.",
+        "linked": "Folder linked. Projects you sync are uploaded when you close them and every few minutes.",
+        "paused": "Syncing paused for this project.",
+        "resumed": "Syncing resumed.",
+        "stopped": "“{{name}}” is no longer synced. It stays on this computer.",
+        "unlinked": "Folder unlinked. Your projects are still here."
+      },
+      "conflict": {
+        "title": "“{{name}}” has changed in the folder",
+        "text": "{{by}} uploaded revision {{rev}} and you have changes that are not uploaded. The app overwrites nothing unless you decide.",
+        "takenTitle": "Another project already uses that path in the folder",
+        "takenText": "“{{name}}” and the one in the folder share a name but are different projects.",
+        "mine": "Your changes",
+        "theirs": "Changes from the other computer",
+        "both": "In both",
+        "count": "{{count}} PDFs",
+        "optTheirs": "Keep the folder’s version and save mine as a copy",
+        "optTheirsHint": "Your work is kept as a separate project and revision {{rev}} is used.",
+        "optMine": "Upload mine and replace the folder’s version",
+        "optMineHint": "Revision {{rev}} is replaced by yours. A copy of what is replaced is kept in the folder first, just in case.",
+        "optLater": "Decide later",
+        "optLaterHint": "The project stays as it is, unsynced, until you choose."
+      },
+      "offline": {
+        "title": "The linked folder cannot be found",
+        "text": "“{{folder}}” is not responding (network down, sync service closed or disk unplugged?). You can keep working: changes will wait as “Waiting to upload” and go up when it is back.",
+        "retry": "Retry",
+        "other": "Choose another folder",
+        "continue": "Keep working offline"
+      },
+      "stop": {
+        "title": "Stop syncing “{{name}}”?",
+        "text": "The project stays on this computer as it is and stops being uploaded or downloaded.",
+        "noteTitle": "What happens to the copy in the folder",
+        "noteText": "What you already uploaded stays there and the app does not delete it. To remove it, do it from your system (Explorer or Finder).",
+        "button": "Stop syncing"
+      },
+      "unlink": {
+        "title": "Unlink the folder?",
+        "text": "The link to “{{folder}}” is removed. Your projects stay here; what you already uploaded stays in the folder and the app does not delete it.",
+        "change": "Choose another folder",
+        "button": "Unlink"
+      },
+      "err": {
+        "title": "Could not sync",
+        "folder-missing": "The linked folder cannot be found.",
+        "folder-readonly": "That folder cannot be written to. It looks read-only: pick another or change its permissions.",
+        "folder-overlaps": "That folder will not work: it cannot be inside your projects folder or contain it.",
+        "remote-incomplete": "Files are missing in the folder (“{{detail}}”). That is normal if the other computer is still uploading: try again in a few minutes.",
+        "cloud-pending": "“{{detail}}” is still downloading from the cloud. Open the folder, choose “Always keep on this device” (or wait for it to finish) and try again.",
+        "ref-taken": "Another project already uses that path in the folder.",
+        "in-use-local": "Close it before getting changes from another computer.",
+        "in-use": "{{detail}} has it open. It can be uploaded once they close it.",
+        "disk-full": "Not enough space: about {{detail}} MB missing. Nothing was left half-written.",
+        "not-linked": "Link a folder first.",
+        "newer-format": "This folder is used by a newer version of the app. Update and try again."
       }
     }
   }

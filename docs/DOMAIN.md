@@ -9,6 +9,7 @@
 | **Página (`num`)** | Número de página empezando en 1. |
 | **Plantilla** | Conjunto de anotaciones guardado en `localStorage` (`AnnotationTemplatesService`). No confundir con la plantilla de Mongo del autor, que es un objeto con `pages` y más atributos. |
 | **Archivo de proyecto** | (Escritorio) `.pdfannotator`: ZIP versionado para llevar un proyecto a otro equipo (ver «Formato del archivo de proyecto»). |
+| **Carpeta enlazada** | (Escritorio) Carpeta que ya sincroniza el usuario (Drive, OneDrive, red…) donde la app deja una copia de cada proyecto para abrirlo en otro equipo: `<ruta>/project.json`, `batch/…` y `.sync/` (`rev.json` = revisión con huellas, `lock.json` = bloqueo con caducidad de 15 min, `backups/`). Cada equipo trabaja en su copia local; el estado de cada proyecto vive en `.sync.json`. Ver `docs/ARCHITECTURE.md` («Sincronizar con una carpeta enlazada»). |
 | **Proyecto** | (Escritorio) Carpeta visible del disco con el lote de un cliente: `project.json`, `batch/` y `.lock`. «Espacio de trabajo» sigue siendo el editor. |
 | **Sesión** | Último PDF + anotaciones + página + zoom en IndexedDB (`SessionStoreService`). |
 | **Guías / snapping** | Rejilla, reglas e imán (`GuideSettings`). |

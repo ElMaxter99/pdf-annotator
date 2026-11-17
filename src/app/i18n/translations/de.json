@@ -1733,7 +1733,9 @@
       "unsafe": "Die Datei ist nicht sicher.",
       "newer-format": "Die Datei stammt von einer neueren App-Version.",
       "in-use": "Das Projekt wird auf einem anderen Computer verwendet.",
-      "disk-full": "Kein Speicherplatz mehr."
+      "disk-full": "Kein Speicherplatz mehr.",
+      "not-synced": "Dieses Projekt wird nicht synchronisiert.",
+      "bad-action": "Ungültige Aktion."
     },
     "transfer": {
       "import": "Projekt importieren",
@@ -1830,6 +1832,146 @@
         "diskFullTitle": "Kein Speicherplatz mehr",
         "diskFullText": "Was halb geschrieben war, wurde gelöscht; Ihr Projektordner ist wie zuvor. Schaffen Sie Platz und versuchen Sie es erneut.",
         "diskFullExport": "Es blieb keine halbe Datei zurück. Schaffen Sie Platz oder wählen Sie ein anderes Laufwerk und versuchen Sie es erneut."
+      }
+    },
+    "sync": {
+      "linkButton": "Mit anderem Ordner synchronisieren…",
+      "folder": "Verknüpfter Ordner:",
+      "now": "Jetzt synchronisieren",
+      "manage": "Ändern oder trennen",
+      "footOk": "Synchronisiert",
+      "footOff": "Ordner nicht gefunden",
+      "footPend": "{{count}} Projekte mit ausstehenden Änderungen",
+      "upload": "Jetzt hochladen",
+      "pull": "Änderungen laden",
+      "resolve": "Lösen…",
+      "canceled": "Synchronisierung abgebrochen.",
+      "bgError": "„{{name}}“ konnte nicht hochgeladen werden: {{reason}}",
+      "chip": {
+        "sync": "✓ Synchronisiert",
+        "pend": "Hochladen ausstehend",
+        "pull": "Neue Änderungen verfügbar",
+        "conflict": "Konflikt",
+        "off": "Offline",
+        "paused": "Pausiert"
+      },
+      "meta": {
+        "pend": "Änderungen noch nicht in den verknüpften Ordner hochgeladen.",
+        "pull": "{{by}} hat Revision {{rev}} hochgeladen. Sie können sie laden.",
+        "synced": "Synchronisiert · Revision {{rev}} · {{when}}"
+      },
+      "menu": {
+        "now": "Jetzt synchronisieren",
+        "start": "Dieses Projekt synchronisieren",
+        "pause": "Synchronisierung pausieren",
+        "resume": "Synchronisierung fortsetzen",
+        "stop": "Dieses Projekt nicht mehr synchronisieren…"
+      },
+      "dups": {
+        "link": "Im Ordner gibt es doppelte Dateien",
+        "title": "Im Ordner gibt es doppelte Dateien",
+        "text": "Der Dienst, der den Ordner synchronisiert, hat Konfliktkopien erstellt. Die App verwendet und löscht sie nicht:",
+        "reveal": "Im Ordner anzeigen",
+        "ok": "Verstanden"
+      },
+      "avail": {
+        "title": "Im verknüpften Ordner verfügbar",
+        "sub": "nicht auf diesem Computer",
+        "meta": "{{ref}} · {{pdfs}} PDFs · {{size}} · hochgeladen {{when}} von {{by}}",
+        "download": "Herunterladen"
+      },
+      "link": {
+        "title": "Mit einem Ordner synchronisieren",
+        "intro": "Wählen Sie einen Ordner, den Sie bereits synchronisieren (Google Drive, OneDrive, Dropbox…), oder einen Netzwerkordner. Die App legt dort eine Kopie Ihrer Projekte ab, damit Sie sie auf einem anderen Computer öffnen können.",
+        "field": "Ordner",
+        "choose": "Ordner wählen…",
+        "checked": "Ordner geprüft: lesbar und beschreibbar · {{free}} frei",
+        "checkedNoFree": "Ordner geprüft: lesbar und beschreibbar",
+        "warnTitle": "Vor dem Verknüpfen",
+        "warnText": "Die PDFs verlassen diesen Computer in Richtung dieses Ordners und laufen über den Dienst, der ihn synchronisiert. Die App verschlüsselt sie nicht. Verwenden Sie nur vertrauenswürdige Ordner.",
+        "accept": "Ich verstehe, dass die PDFs und ihre Daten in diesen Ordner kopiert werden",
+        "button": "Verknüpfen"
+      },
+      "plan": {
+        "title": "Was soll in den verknüpften Ordner?",
+        "intro": "Es gibt {{local}} Projekte auf diesem Computer und {{remote}} im Ordner, die Sie hier nicht haben.",
+        "both": "Meine Projekte hochladen und die aus dem Ordner herunterladen",
+        "bothHint": "Stimmt ein Name überein, werden Sie gefragt, bevor etwas angetastet wird. Ihre Projekte umfassen {{size}}.",
+        "down": "Nur die aus dem Ordner herunterladen",
+        "downHint": "Ihre Projekte bleiben auf diesem Computer, bis Sie jedes einzeln hochladen.",
+        "manual": "Projekt für Projekt wählen",
+        "manualHint": "Es wird verknüpft, und es wird nichts hoch- oder heruntergeladen, bis Sie es im ⋯-Menü der jeweiligen Karte anfordern."
+      },
+      "progress": {
+        "title": "„{{name}}“ wird synchronisiert",
+        "titleAll": "Projekte werden synchronisiert",
+        "files": "Datei {{done}} von {{total}}",
+        "projects": "Projekt {{done}} von {{total}}: „{{name}}“",
+        "starting": "Wird vorbereitet…",
+        "note": "Es werden nur geänderte Dateien hoch- oder heruntergeladen. Sie können abbrechen: Die vorherige Revision bleibt unverändert."
+      },
+      "done": {
+        "up": "„{{name}}“ hochgeladen (Revision {{rev}}). Es kann einige Minuten dauern, bis es auf anderen Computern erscheint.",
+        "down": "„{{name}}“ auf Revision {{rev}} aktualisiert.",
+        "none": "„{{name}}“ war bereits aktuell.",
+        "all": "Synchronisierung abgeschlossen: {{count}} Projekte.",
+        "allIssues": "Synchronisierung mit Hinweisen abgeschlossen: {{failed}} Projekte konnten nicht synchronisiert werden, {{conflicts}} erfordern eine Entscheidung.",
+        "copy": "Ihre Version wurde als „{{name}}“ gespeichert.",
+        "linked": "Ordner verknüpft. Synchronisierte Projekte werden beim Schließen und alle paar Minuten hochgeladen.",
+        "paused": "Synchronisierung für dieses Projekt pausiert.",
+        "resumed": "Synchronisierung fortgesetzt.",
+        "stopped": "„{{name}}“ wird nicht mehr synchronisiert. Es bleibt auf diesem Computer.",
+        "unlinked": "Ordner getrennt. Ihre Projekte sind weiterhin hier."
+      },
+      "conflict": {
+        "title": "„{{name}}“ wurde im Ordner geändert",
+        "text": "{{by}} hat Revision {{rev}} hochgeladen, und Sie haben hier nicht hochgeladene Änderungen. Die App überschreibt nichts ohne Ihre Entscheidung.",
+        "takenTitle": "Im Ordner gibt es bereits ein anderes Projekt mit diesem Pfad",
+        "takenText": "„{{name}}“ und das Projekt im Ordner heißen gleich, sind aber verschiedene Projekte.",
+        "mine": "Ihre Änderungen",
+        "theirs": "Änderungen des anderen Computers",
+        "both": "In beiden",
+        "count": "{{count}} PDFs",
+        "optTheirs": "Die Version aus dem Ordner behalten und meine als Kopie speichern",
+        "optTheirsHint": "Ihre Arbeit bleibt als eigenes Projekt erhalten, und Revision {{rev}} wird verwendet.",
+        "optMine": "Meine hochladen und die im Ordner ersetzen",
+        "optMineHint": "Revision {{rev}} wird durch Ihre ersetzt. Vorher wird im Ordner eine Kopie des Ersetzten aufbewahrt, sicherheitshalber.",
+        "optLater": "Später entscheiden",
+        "optLaterHint": "Das Projekt bleibt unverändert und unsynchronisiert, bis Sie wählen."
+      },
+      "offline": {
+        "title": "Der verknüpfte Ordner wurde nicht gefunden",
+        "text": "„{{folder}}“ antwortet nicht (Netzwerk getrennt, Dienst geschlossen oder Laufwerk abgesteckt?). Sie können weiterarbeiten: Änderungen bleiben „Hochladen ausstehend“ und werden nach der Rückkehr hochgeladen.",
+        "retry": "Erneut versuchen",
+        "other": "Anderen Ordner wählen",
+        "continue": "Offline weiterarbeiten"
+      },
+      "stop": {
+        "title": "„{{name}}“ nicht mehr synchronisieren?",
+        "text": "Das Projekt bleibt unverändert auf diesem Computer und wird nicht mehr hoch- oder heruntergeladen.",
+        "noteTitle": "Was mit der Kopie im Ordner passiert",
+        "noteText": "Was Sie bereits hochgeladen haben, bleibt dort, und die App löscht es nicht. Zum Entfernen nutzen Sie Ihr System (Explorer oder Finder).",
+        "button": "Nicht mehr synchronisieren"
+      },
+      "unlink": {
+        "title": "Ordner trennen?",
+        "text": "Die Verknüpfung mit „{{folder}}“ wird entfernt. Ihre Projekte bleiben hier; was Sie bereits hochgeladen haben, bleibt im Ordner, und die App löscht es nicht.",
+        "change": "Anderen Ordner wählen",
+        "button": "Trennen"
+      },
+      "err": {
+        "title": "Synchronisierung fehlgeschlagen",
+        "folder-missing": "Der verknüpfte Ordner wurde nicht gefunden.",
+        "folder-readonly": "In diesen Ordner kann nicht geschrieben werden. Er scheint schreibgeschützt: Wählen Sie einen anderen oder ändern Sie die Berechtigungen.",
+        "folder-overlaps": "Dieser Ordner eignet sich nicht: Er darf weder in Ihrem Projektordner liegen noch ihn enthalten.",
+        "remote-incomplete": "Im Ordner fehlen Dateien („{{detail}}“). Das ist normal, wenn der andere Computer noch hochlädt: Versuchen Sie es in ein paar Minuten erneut.",
+        "cloud-pending": "„{{detail}}“ wird noch aus der Cloud geladen. Öffnen Sie den Ordner, wählen Sie „Immer auf diesem Gerät behalten“ (oder warten Sie) und versuchen Sie es erneut.",
+        "ref-taken": "Im Ordner gibt es bereits ein anderes Projekt mit diesem Pfad.",
+        "in-use-local": "Schließen Sie es, bevor Sie Änderungen eines anderen Computers laden.",
+        "in-use": "{{detail}} hat es geöffnet. Es kann hochgeladen werden, sobald es geschlossen wird.",
+        "disk-full": "Nicht genug Speicherplatz: etwa {{detail}} MB fehlen. Es wurde nichts halb geschrieben.",
+        "not-linked": "Verknüpfen Sie zuerst einen Ordner.",
+        "newer-format": "Dieser Ordner wird von einer neueren App-Version verwendet. Aktualisieren Sie und versuchen Sie es erneut."
       }
     }
   }
