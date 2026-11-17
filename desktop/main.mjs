@@ -1,5 +1,5 @@
 // PDF Annotator · proceso principal de Electron: ventana, web empaquetada (app://), ayudante de IA y actualizaciones.
-import { app, BrowserWindow, dialog, ipcMain, net, protocol, session, shell, Menu } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, net, protocol, safeStorage, session, shell, Menu } from 'electron';
 import electronUpdater from 'electron-updater';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
@@ -197,7 +197,7 @@ function trusted(event) {
 let projects = null;
 function setupIpc() {
   const handle = (channel, fn) => ipcMain.handle(channel, (event, ...args) => (trusted(event) ? fn(...args) : undefined));
-  projects = setupProjectsIpc({ handle, app, dialog, shell, getWindow: () => win });
+  projects = setupProjectsIpc({ handle, app, dialog, shell, safeStorage, getWindow: () => win });
   // El bloqueo de cada proyecto abierto se renueva cada minuto (caduca a los 10 sin señales).
   setInterval(() => projects?.renewAll(), 60 * 1000).unref();
   setInterval(() => projects?.syncHeld(), 3 * 60 * 1000).unref();
@@ -336,9 +336,16 @@ app.on('second-instance', () => {
     win.focus();
   }
 });
-app.on('before-quit', () => {
-  projects?.releaseAll();
+let quitting = false;
+app.on('before-quit', (event) => {
   stopHelper();
+  if (quitting) return;
+  quitting = true;
+  // Los bloqueos del servidor se sueltan antes de salir (con un margen corto si no responde).
+  event.preventDefault();
+  Promise.resolve(projects?.releaseAll())
+    .catch(() => undefined)
+    .finally(() => app.quit());
 });
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => {

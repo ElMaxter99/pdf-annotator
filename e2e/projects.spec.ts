@@ -15,7 +15,7 @@ import { EXAMPLE_PDF, stubAnalytics } from './helpers';
  * The desktop bridge is faked in the page, but every call runs the REAL main-process code
  * (`desktop/projects-ipc.mjs` → `desktop/projects.mjs`) against a temporary folder.
  */
-async function withDesktopProjects(page: Page) {
+async function withDesktopProjects(page: Page, { secureStore = true } = {}) {
   const userData = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-ud-'));
   const documents = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-docs-'));
   const root = path.join(documents, 'PDF Annotator');
@@ -38,6 +38,13 @@ async function withDesktopProjects(page: Page) {
         picks.save ? { canceled: false, filePath: picks.save } : { canceled: true },
     },
     shell: { showItemInFolder: (file: string) => revealed.push(file) },
+    safeStorage: {
+      isEncryptionAvailable: () => secureStore,
+      getSelectedStorageBackend: () => (secureStore ? 'gnome_libsecret' : 'basic_text'),
+      encryptString: (text: string) => Buffer.from(`ENC:${Buffer.from(text).toString('base64')}`),
+      decryptString: (buf: Buffer) =>
+        Buffer.from(buf.toString().slice(4), 'base64').toString('utf8'),
+    },
     getWindow: () => ({
       webContents: {
         send: (channel: string, payload: unknown) => {
@@ -98,13 +105,19 @@ async function withDesktopProjects(page: Page) {
         importInspect: (i: unknown) => call('projects:import-inspect', i),
         importRun: (i: unknown) => call('projects:import-run', i),
         cancel: () => call('projects:cancel'),
-        syncStatus: () => call('sync:status'),
+        syncStatus: (i: unknown) => call('sync:status', i),
         syncChoose: () => call('sync:choose'),
         syncLink: (i: unknown) => call('sync:link', i),
         syncUnlink: () => call('sync:unlink'),
         syncAll: (i: unknown) => call('sync:all', i),
         syncProject: (i: unknown) => call('sync:project', i),
         syncReveal: (i: unknown) => call('sync:reveal', i),
+        syncSftpChooseKey: () => call('sync:sftp-choose-key'),
+        syncSftpInspect: (i: unknown) => call('sync:sftp-inspect', i),
+        syncSftpTrust: (i: unknown) => call('sync:sftp-trust', i),
+        syncSftpTest: (i: unknown) => call('sync:sftp-test', i),
+        syncSftpCredential: (i: unknown) => call('sync:sftp-credential', i),
+        syncSftpForget: () => call('sync:sftp-forget'),
         onSyncEvent: (cb: (p: unknown) => void) => {
           w['__emitSync'] = cb;
           return () => {
@@ -124,7 +137,7 @@ async function withDesktopProjects(page: Page) {
     };
   });
   const projects = await import('../desktop/projects.mjs');
-  return { root, picks, revealed, projects };
+  return { root, picks, revealed, projects, userData };
 }
 
 test.beforeEach(async ({ page }) => stubAnalytics(page));
@@ -326,6 +339,7 @@ test('sync with a linked folder: link, upload, download from another computer, c
 }) => {
   const { root, picks, projects } = await withDesktopProjects(page);
   const sync = await import('../desktop/project-sync.mjs');
+  const { localProvider } = await import('../desktop/sync-provider.mjs');
   const cloud = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-cloud-'));
   const otherRoot = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-other-'));
   const other = { host: 'PORTATIL-ALVARO', token: 'otro' };
@@ -351,7 +365,7 @@ test('sync with a linked folder: link, upload, download from another computer, c
 
   // Another computer uploads a new project: it shows up as available and can be downloaded.
   const theirs = seedProject(projects, otherRoot, 'Cliente 2', 'c2', false);
-  await sync.syncProject(cloud, otherRoot, theirs.ref, other);
+  await sync.syncProject(localProvider(cloud), otherRoot, theirs.ref, other);
   await page.getByTestId('sync-now').click();
   await expect(page.getByTestId('sync-available-row')).toHaveCount(1);
   await page.getByTestId('sync-download-available').click();
@@ -376,7 +390,7 @@ test('sync with a linked folder: link, upload, download from another computer, c
 
   // Both computers change the same project: nothing is overwritten until the person decides.
   const base = path.join(otherRoot, 'c1');
-  await sync.syncProject(cloud, otherRoot, 'c1', other);
+  await sync.syncProject(localProvider(cloud), otherRoot, 'c1', other);
   await new Promise((resolve) => setTimeout(resolve, 20));
   projects.writeItem(
     base,
@@ -384,7 +398,7 @@ test('sync with a linked folder: link, upload, download from another computer, c
     { name: 'uno.pdf', status: 'ready' },
     { a: readFileSync(EXAMPLE_PDF) },
   );
-  await sync.syncProject(cloud, otherRoot, 'c1', other);
+  await sync.syncProject(localProvider(cloud), otherRoot, 'c1', other);
   projects.writeItem(
     mine.dir,
     'a2',
@@ -405,4 +419,96 @@ test('sync with a linked folder: link, upload, download from another computer, c
   await page.getByTestId('sync-unlink').click();
   await expect(page.getByTestId('sync-footer')).toHaveCount(0);
   await expect(page.getByTestId('project-card')).toHaveCount(3);
+});
+
+test('sync with an SFTP server: fingerprint, test, link, upload, forget the credential', async ({
+  page,
+}) => {
+  const { root, projects } = await withDesktopProjects(page);
+  const served = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-sftp-'));
+  const { startSftpServer } = await import('../desktop/test-sftp-server.mjs');
+  const server = await startSftpServer({ root: served, users: { ana: 'secreto' } });
+  try {
+    seedProject(projects, root, 'Cliente 1', 'c1', false);
+    await page.goto('/proyectos');
+    await page.getByTestId('sync-link').click();
+    await page.getByTestId('sync-tab-sftp').click();
+    await page.getByTestId('sftp-host').fill('127.0.0.1');
+    await page.getByTestId('sftp-port').fill(String(server.port));
+    await page.getByTestId('sftp-user').fill('ana');
+    await page.getByTestId('sftp-password').fill('secreto');
+    await page.getByTestId('sftp-test').click();
+
+    // First connection: the fingerprint is shown and must be confirmed.
+    await expect(page.getByTestId('hostkey-fp')).toHaveText(server.fingerprint);
+    await page.getByTestId('hostkey-trust').click();
+
+    // The remote folder does not exist yet: it is offered to be created.
+    await expect(page.getByTestId('sftp-test-error')).toContainText('no existe');
+    await page.getByTestId('sftp-create-folder').click();
+    await expect(page.getByTestId('sftp-steps')).toContainText('Acceso correcto');
+    await page.getByTestId('sftp-test-continue').click();
+    await expect(page.getByTestId('sync-checked')).toBeVisible();
+    await expect(page.getByTestId('sync-link-confirm')).toBeDisabled();
+    await page.getByTestId('sync-accept').check();
+    await page.getByTestId('sync-link-confirm').click();
+    await page.getByTestId('plan-go').click();
+    await expect(page.getByTestId('sync-chip')).toContainText('Sincronizado');
+    expect(existsSync(path.join(served, 'pdf-annotator', 'c1', '.sync', 'rev.json'))).toBe(true);
+    await expect(page.getByTestId('sync-label')).toContainText(`ana@127.0.0.1:/pdf-annotator`);
+
+    // The web never sees the secret: the screen only knows that one is saved.
+    await page.getByTestId('sync-manage').click();
+    await expect(page.getByTestId('sync-cred-state')).toContainText('almacén seguro');
+    await expect(page.getByTestId('sync-fingerprint')).toContainText('SHA256:');
+    expect(await page.content()).not.toContain('secreto');
+
+    // Forgetting the credential keeps projects and uploaded files.
+    await page.getByTestId('sync-cred-forget').click();
+    await page.getByTestId('forget-confirm').click();
+    await expect(page.getByTestId('project-card')).toHaveCount(1);
+    expect(existsSync(path.join(served, 'pdf-annotator', 'c1', '.sync', 'rev.json'))).toBe(true);
+    // Without a credential the app asks for the password again; "Ahora no" leaves it as is.
+    await page.getByRole('button', { name: 'Ahora no' }).click();
+
+    // Unlinking removes the link, not the uploaded files.
+    await page.getByTestId('sync-manage').click();
+    await page.getByTestId('sync-unlink').click();
+    await page.getByTestId('sync-unlink-confirm').click();
+    await expect(page.getByTestId('sync-footer')).toHaveCount(0);
+    expect(existsSync(path.join(served, 'pdf-annotator', 'c1', 'project.json'))).toBe(true);
+  } finally {
+    await server.close();
+  }
+});
+
+test('SFTP without a secure store asks for the password each session', async ({ page }) => {
+  const { userData } = await withDesktopProjects(page, { secureStore: false });
+  const served = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-sftp-'));
+  const { startSftpServer } = await import('../desktop/test-sftp-server.mjs');
+  const server = await startSftpServer({ root: served, users: { ana: 'secreto' } });
+  try {
+    mkdirSync(path.join(served, 'pdf-annotator'));
+    await page.goto('/proyectos');
+    await page.getByTestId('sync-link').click();
+    await page.getByTestId('sync-tab-sftp').click();
+    await page.getByTestId('sftp-host').fill('127.0.0.1');
+    await page.getByTestId('sftp-port').fill(String(server.port));
+    await page.getByTestId('sftp-user').fill('ana');
+    await page.getByTestId('sftp-password').fill('secreto');
+    await page.getByTestId('sftp-test').click();
+    await page.getByTestId('hostkey-trust').click();
+    await page.getByTestId('sftp-test-continue').click();
+    await page.getByTestId('sync-accept').check();
+    await page.getByTestId('sync-link-confirm').click();
+    await expect(page.getByTestId('nostore-ask')).toBeVisible();
+    await page.getByTestId('nostore-ask').click();
+    await expect(page.getByTestId('sync-footer')).toContainText('127.0.0.1');
+    // Nothing secret is written to disk, in any file.
+    expect(existsSync(path.join(userData, 'projects-sync-secret.bin'))).toBe(false);
+    for (const name of readdirSync(userData))
+      expect(readFileSync(path.join(userData, name), 'utf8')).not.toContain('secreto');
+  } finally {
+    await server.close();
+  }
 });

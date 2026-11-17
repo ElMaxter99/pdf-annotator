@@ -1890,7 +1890,9 @@
         "warnTitle": "Abans de vincular",
         "warnText": "Els PDFs sortiran d’aquest equip cap a aquesta carpeta i viatjaran pel servei que la sincronitza. L’app no els xifra. Utilitza només carpetes de confiança.",
         "accept": "Entenc que els PDFs i les seves dades es copiaran a aquesta carpeta",
-        "button": "Vincula"
+        "button": "Vincula",
+        "tabFolder": "Carpeta de l’equip",
+        "tabSftp": "Servidor SFTP"
       },
       "plan": {
         "title": "Què cal pujar a la carpeta enllaçada?",
@@ -1908,7 +1910,10 @@
         "files": "Fitxer {{done}} de {{total}}",
         "projects": "Projecte {{done}} de {{total}}: «{{name}}»",
         "starting": "Preparant…",
-        "note": "Només es pugen o baixen els fitxers que han canviat. Pots cancel·lar: la revisió anterior queda intacta."
+        "note": "Només es pugen o baixen els fitxers que han canviat. Pots cancel·lar: la revisió anterior queda intacta.",
+        "bytes": "{{bytes}} de {{total}} · {{speed}}/s · queden uns {{eta}}",
+        "minutes": "{{m}} min {{s}} s",
+        "seconds": "{{s}} s"
       },
       "done": {
         "up": "«{{name}}» pujat (revisió {{rev}}). Pot tardar uns minuts a veure’s en altres equips.",
@@ -1944,7 +1949,24 @@
         "text": "«{{folder}}» no respon (xarxa caiguda, servei sense obrir o disc desconnectat?). Pots continuar treballant: els canvis quedaran com a «Pendents de pujar» i es pujaran en tornar.",
         "retry": "Reintenta",
         "other": "Tria una altra carpeta",
-        "continue": "Continua sense connexió"
+        "continue": "Continua sense connexió",
+        "review": "Revisa el servidor",
+        "host-not-found": {
+          "title": "No es troba el servidor",
+          "text": "«{{host}}» no respon (sense xarxa, nom incorrecte, servidor apagat o port {{port}} bloquejat). Pots seguir treballant: els canvis quedaran «Pendents de pujar»."
+        },
+        "connect-timeout": {
+          "title": "Temps d’espera esgotat",
+          "text": "El servidor ha trigat més de 15 s a respondre. Si fas servir VPN, comprova que està connectada. El que és local continua funcionant."
+        },
+        "connection-refused": {
+          "title": "El servidor rebutja la connexió",
+          "text": "«{{host}}» és a la xarxa però no accepta connexions SSH al port {{port}}. Comprova que el servei SSH està actiu."
+        },
+        "connection-lost": {
+          "title": "S’ha perdut la connexió",
+          "text": "La connexió amb «{{host}}» s’ha tallat. No s’ha perdut res: la revisió anterior està intacta i es tornarà a provar en tornar."
+        }
       },
       "stop": {
         "title": "Vols deixar de sincronitzar «{{name}}»?",
@@ -1971,7 +1993,140 @@
         "in-use": "{{detail}} el té obert. Es podrà pujar quan el tanqui.",
         "disk-full": "No hi ha espai: falten uns {{detail}} MB. No s’ha escrit res a mitges.",
         "not-linked": "Primer vincula una carpeta.",
-        "newer-format": "Aquesta carpeta la fa servir una versió més recent de l’app. Actualitza i torna-ho a provar."
+        "newer-format": "Aquesta carpeta la fa servir una versió més recent de l’app. Actualitza i torna-ho a provar.",
+        "host-key-changed": "L’empremta del servidor ha canviat: no s’ha enviat res. Confirma-ho amb qui l’administra.",
+        "host-key-unknown": "Primer cal confirmar l’empremta del servidor.",
+        "host-not-found": "No es troba el servidor (sense xarxa, nom incorrecte o servidor apagat).",
+        "connect-timeout": "El servidor ha trigat massa a respondre.",
+        "connection-refused": "El servidor no accepta connexions SSH en aquest port.",
+        "connection-lost": "S’ha perdut la connexió amb el servidor. La revisió anterior està intacta; es tornarà a provar en tornar.",
+        "auth-failed": "Usuari o contrasenya incorrectes.",
+        "bad-passphrase": "La frase de pas no és correcta.",
+        "passphrase-needed": "La clau necessita una frase de pas.",
+        "key-unusable": "La clau no es pot fer servir: el fitxer no existeix, no es pot llegir o no és una clau privada vàlida (s’admeten OpenSSH i PEM).",
+        "secret-needed": "Escriu la contrasenya del servidor per connectar.",
+        "remote-missing": "La carpeta no existeix al servidor.",
+        "rename-unsupported": "El servidor no permet reanomenar fitxers en aquesta carpeta. Sense això no es pot garantir que res quedi a mitges, així que no es puja.",
+        "lock-expired": "El teu bloqueig al servidor ha caducat: un altre equip ha pogut obrir aquest projecte. Tanca’l i torna’l a obrir.",
+        "already-linked": "Ja hi ha una destinació vinculada. Desvincula-la abans de triar-ne una altra.",
+        "bad-sftp-config": "Falten dades del servidor o no són vàlides."
+      },
+      "sftp": {
+        "title": "Sincronitza amb un servidor SFTP",
+        "intro": "Fes servir un servidor que ja tens (un NAS, un VPS, el de la teva empresa). L’app hi guardarà una còpia dels projectes per obrir-los en un altre equip.",
+        "host": "Servidor",
+        "port": "Port",
+        "user": "Usuari",
+        "auth": "Com entres",
+        "authPassword": "Contrasenya",
+        "authKey": "Clau privada",
+        "password": "Contrasenya",
+        "passphrase": "Frase de pas (si la clau en té)",
+        "keyFile": "Fitxer de clau",
+        "keyChoose": "Tria fitxer…",
+        "keyNone": "Cap fitxer triat",
+        "path": "Carpeta al servidor",
+        "remember": "Recorda la credencial a l’emmagatzematge segur",
+        "rememberHint": "Si no, es demana cada cop que obris l’app.",
+        "credTitle": "On va la teva credencial",
+        "credText": "Es guarda amb el xifratge del teu sistema (Clauer, DPAPI o libsecret). No es guarda enlloc més ni surt als fitxers exportats.",
+        "checked": "Connexió comprovada: {{folder}}",
+        "warnTitle": "Abans de vincular",
+        "warnText": "Els teus PDFs sortiran d’aquest equip cap a aquest servidor per SSH i no es xifren al servidor. Fes servir només servidors de confiança.",
+        "accept": "Entenc que els PDFs i les seves dades es copiaran a aquest servidor",
+        "test": "Prova la connexió",
+        "footer": "Servidor SFTP:",
+        "footOk": "Connectat",
+        "footOff": "Sense connexió amb el servidor",
+        "manage": "Servidor i credencials"
+      },
+      "test": {
+        "title": "Prova la connexió",
+        "running": "Provant la connexió",
+        "connecting": "Connectant amb {{host}}…",
+        "back": "Torna",
+        "step": {
+          "login": "Accés correcte: empremta confirmada i credencial acceptada",
+          "loginBad": "No s’ha pogut iniciar la sessió",
+          "folder": "La carpeta del servidor està disponible",
+          "folderBad": "No s’ha trobat la carpeta del servidor",
+          "write": "Allà es pot llegir, escriure i reanomenar",
+          "writeBad": "Allà no es pot escriure ni reanomenar"
+        }
+      },
+      "hostkey": {
+        "titleNew": "És aquest el teu servidor?",
+        "textNew": "És la primera vegada que et connectes a «{{host}}». Comprova que aquesta empremta coincideix amb la que et dona qui administra el servidor.",
+        "warnTitle": "Compte",
+        "warnText": "Si no la pots comprovar, cancel·la. Acceptar una empremta falsa permetria a un tercer veure els teus PDFs.",
+        "trust": "Confia i continua",
+        "titleChanged": "L’empremta de «{{host}}» ha canviat",
+        "textChanged": "Pot ser que hagin reinstal·lat el servidor, o que algú s’hi estigui fent passar. Per seguretat no s’ha enviat res ni s’ha fet servir la credencial.",
+        "before": "Abans",
+        "now": "Ara",
+        "blocked": "Bloquejat",
+        "blockedText": "Confirma el canvi amb qui administra el servidor abans d’acceptar-lo.",
+        "trustNew": "Confia en la nova empremta…",
+        "pinned": "Nova empremta fixada. Ja pots sincronitzar."
+      },
+      "cred": {
+        "title": {
+          "auth": "Usuari o contrasenya incorrectes",
+          "passphrase": "La frase de pas no és correcta",
+          "ask": "Escriu la contrasenya de «{{host}}»",
+          "change": "Canvia la credencial de «{{host}}»"
+        },
+        "text": {
+          "auth": "El servidor ha rebutjat la credencial guardada. Escriu la nova; l’anterior se substitueix a l’emmagatzematge segur.",
+          "passphrase": "No s’ha pogut obrir la clau «{{file}}» amb aquesta frase.",
+          "ask": "No està guardada en aquest equip. Només es farà servir mentre l’app estigui oberta.",
+          "change": "Escriu la nova; l’anterior se substitueix. No es pot llegir l’actual."
+        },
+        "save": "Desa i torna-ho a provar",
+        "connect": "Connecta",
+        "later": "Ara no",
+        "saved": "Credencial desada.",
+        "forgotten": "Credencial oblidada. La pròxima vegada l’hauràs d’escriure."
+      },
+      "nostore": {
+        "title": "No es pot desar la contrasenya",
+        "text": "Aquest equip no té cap emmagatzematge segur disponible (a Linux sol faltar el clauer). Per seguretat l’app no la desa en cap fitxer.",
+        "ask": "Demana-la cada cop que obri l’app",
+        "askHint": "Funciona igual; només escrius la contrasenya un cop per sessió.",
+        "install": "Instal·la un clauer i torna-ho a provar",
+        "installHint": "Per exemple gnome-keyring o KWallet. Es torna a provar en tancar aquest avís."
+      },
+      "server": {
+        "title": "Servidor i credencials",
+        "server": "Servidor",
+        "serverValue": "{{host}} · port {{port}}",
+        "user": "Usuari",
+        "folder": "Carpeta",
+        "fingerprint": "Empremta",
+        "credential": "Credencial",
+        "credSavedPass": "Desada a l’emmagatzematge segur (contrasenya)",
+        "credSavedKey": "Desada a l’emmagatzematge segur (frase de pas)",
+        "credSession": "Només en aquesta sessió (no hi ha emmagatzematge segur)",
+        "credNone": "No desada: es demanarà en connectar",
+        "change": "Canvia la credencial…",
+        "forget": "Oblida la credencial",
+        "test": "Prova la connexió",
+        "close": "Tanca",
+        "other": "Tria un altre servidor o carpeta",
+        "unlink": "Desvincula"
+      },
+      "forget": {
+        "title": "Vols oblidar la credencial de «{{host}}»?",
+        "text": "Se n’esborra de l’emmagatzematge segur d’aquest equip. Els projectes i el que ja s’ha pujat no es toquen; la pròxima vegada l’hauràs d’escriure.",
+        "button": "Oblida la credencial"
+      },
+      "unlinkSftp": {
+        "title": "Vols desvincular el servidor?",
+        "text": "Se suprimeix l’enllaç amb «{{label}}» i s’esborra la credencial d’aquest equip. Els teus projectes continuen aquí; el que ja has pujat es queda al servidor i l’app no ho esborra."
+      },
+      "remote": {
+        "create": "Crea la carpeta",
+        "other": "Tria’n una altra"
       }
     }
   }
