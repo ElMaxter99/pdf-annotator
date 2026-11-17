@@ -6,6 +6,7 @@
 - **Guion para medir créditos reales de Copilot:** `tools/ai-phase0/credits-report.mjs` resume lo medido por el CLI y lo compara con el consumo que marca GitHub (ver `docs/IA-LOCAL.md`).
 
 ### Changed
+- **Deuda técnica, parte 5 (sin cambios visibles):** la serialización de `render()` (una sola pasada de pdf.js a la vez, fundiendo peticiones) pasa a `utils/coalescing-runner.ts` y las cuentas de «Ajustar a la página» y «Ajustar al ancho» a `utils/zoom.utils.ts`, con tests.
 - **Deuda técnica, parte 4 (sin cambios visibles):** el estado del desplegable de fuentes (abrir, cerrar, búsqueda y filtrado) sale de `workspace.page.ts` a `utils/font-dropdown.utils.ts`, con tests.
 - **Deuda técnica, parte 3 (sin cambios visibles):** las reglas de la sesión guardada (cuándo guardar, qué escala y página se aceptan al restaurar) salen de `workspace.page.ts` a `utils/session-restore.utils.ts`, con tests.
 - **Deuda técnica, parte 2 (sin cambios visibles):** importar JSON (al escribir, pegar o abrir un archivo) pasa por `AnnotationImportService.importFromText` en lugar de repetir el parseo en `workspace.page.ts`, y la construcción del JSON exportado sale a `utils/json-export.utils.ts`; ambos con tests.

@@ -32,3 +32,39 @@ export function wheelZoomFactor(deltaY: number, deltaMode = 0): number {
 export function stepScale(scale: number, direction: 1 | -1): number {
   return clampScale(scale + direction * 0.25);
 }
+
+function floorPercent(value: number): number {
+  return Math.floor(value * 100) / 100;
+}
+
+function clampFit(scale: number): number {
+  return Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale));
+}
+
+/** Escala para que la página ocupe todo el ancho disponible; `null` si las medidas no valen. */
+export function fitWidthScale(baseWidth: number, availableWidth: number): number | null {
+  if (!(baseWidth > 0) || !(availableWidth > 0)) return null;
+  return clampFit(floorPercent(availableWidth / baseWidth));
+}
+
+/** Escala para que la página entera quepa en el área disponible; `null` si las medidas no valen. */
+export function fitPageScale(
+  baseWidth: number,
+  baseHeight: number,
+  availableWidth: number,
+  availableHeight: number,
+): number | null {
+  if (!(baseWidth > 0) || !(baseHeight > 0) || !(availableWidth > 0) || !(availableHeight > 0)) {
+    return null;
+  }
+  return clampFit(floorPercent(Math.min(availableWidth / baseWidth, availableHeight / baseHeight)));
+}
+
+/** Segundo ajuste de «página entera» cuando aparece scroll vertical: resta el desbordamiento. */
+export function fitPageScaleForOverflow(
+  baseHeight: number,
+  scale: number,
+  overflow: number,
+): number {
+  return clampFit(floorPercent((baseHeight * scale - overflow) / baseHeight));
+}
