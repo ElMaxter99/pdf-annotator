@@ -112,6 +112,7 @@ import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sideba
 import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
 import { ExportSamplesDialogComponent } from './components/export-samples-dialog/export-samples-dialog.component';
 import { AboutDialogComponent } from './components/about-dialog/about-dialog.component';
+import { CommandPaletteComponent } from './components/command-palette/command-palette.component';
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
 import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
@@ -327,6 +328,7 @@ export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
     WorkspaceFooterComponent,
     AiReviewComponent,
     ShortcutsDialogComponent,
+    CommandPaletteComponent,
     AboutDialogComponent,
     ExportSamplesDialogComponent,
   ],
@@ -394,6 +396,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.store.coords().reduce((total, page) => total + page.fields.length, 0),
   );
   readonly shortcutsOpen = signal(false);
+  /** Command palette (Ctrl+K). */
+  readonly paletteOpen = signal(false);
+  /** The palette asks the header to open «Limpiar» (it keeps its confirmation) — counter. */
+  readonly clearRequest = signal(0);
+  /** The palette asks the migration bar to run «Poner plantilla A · copiar tal cual» — counter. */
+  readonly putACopyRequest = signal(0);
   readonly aboutOpen = signal(false);
   /** Last time the session was written (null = nothing saved yet) and a slow clock for «hace N s». */
   private readonly lastSavedAt = signal<number | null>(null);
@@ -1911,6 +1919,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   onGlobalKeydown(event: KeyboardEvent) {
     const key = event.key.toLowerCase();
     const hasPrimaryModifier = event.ctrlKey || event.metaKey;
+
+    if (hasPrimaryModifier && !event.altKey && !event.shiftKey && key === 'k') {
+      if (!this.aboutOpen() && !this.shortcutsOpen()) {
+        event.preventDefault();
+        this.togglePalette();
+      }
+      return;
+    }
+
+    if (this.paletteOpen()) {
+      return; // the palette owns the keyboard while it is open
+    }
 
     if (!hasPrimaryModifier) {
       this.handlePlainShortcut(event, key);
@@ -5756,6 +5776,22 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   toggleShortcuts(open = !this.shortcutsOpen()) {
     this.shortcutsOpen.set(open);
+  }
+
+  togglePalette(open = !this.paletteOpen()) {
+    this.paletteOpen.set(open);
+  }
+
+  /** PDFs of the open batch (for «Ir a …» in the command palette). */
+  batchItemsForPalette(): readonly BatchItem[] {
+    return this.batchCtx() ? this.batch.items() : [];
+  }
+
+  async openBatchItem(id: string): Promise<void> {
+    const target = this.batch.items().find((item) => item.id === id);
+    if (target && target.id !== this.batch.activeId()) {
+      await this.switchBatchItem(target);
+    }
   }
 
   clearAll(options?: { skipHistory?: boolean }) {

@@ -316,7 +316,8 @@
       "panCanvas": "Move the canvas (hold)",
       "splitLink": "Link or unlink A and B (Split)",
       "wheelPage": "Keep scrolling at the edge of the sheet: changes page",
-      "pageOnlyA": "Move only A (the pages become free)"
+      "pageOnlyA": "Move only A (the pages become free)",
+      "palette": "Open the command palette"
     }
   },
   "toast": {
@@ -1540,5 +1541,56 @@
       "hint": "drag · release to annotate"
     },
     "hintWeb": "PDF zoom: Ctrl + wheel. Browser zoom still works in the rest of the screen."
+  },
+  "palette": {
+    "title": "Command palette",
+    "placeholder": "Type an action or a PDF…",
+    "results": "Actions",
+    "count": "{{count}} results",
+    "emptyText": "Nothing matches “{{query}}”.",
+    "emptyShortcuts": "See keyboard shortcuts",
+    "open": "Command palette",
+    "openShort": "Commands",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "move",
+      "choose": "choose",
+      "close": "close"
+    },
+    "hint": {
+      "confirms": "asks to confirm",
+      "current": "current",
+      "batch": "Batch",
+      "position": "Batch {{index}} of {{total}}"
+    },
+    "why": {
+      "noPdf": "First: open a PDF",
+      "nothingToUndo": "Nothing to undo",
+      "nothingToRedo": "Nothing to redo",
+      "noAnnotations": "No annotations yet",
+      "firstPage": "You are on the first page",
+      "lastPage": "You are on the last page",
+      "noTemplateA": "First: upload template A",
+      "noVersionB": "First: upload version B",
+      "firstPdf": "You are on the first PDF",
+      "lastPdf": "You are on the last PDF"
+    },
+    "cmd": {
+      "fitPage": "Fit to page",
+      "zoomActual": "Actual size (100%)",
+      "view": "{{mode}} view",
+      "tab": "{{tab}} panel",
+      "putCopy": "Put template A · copy as is",
+      "putMissing": "Put template A · only the missing ones",
+      "putAdjust": "Put template A · adjust by texts",
+      "putAi": "Put template A · adapt with AI",
+      "batchPanel": "Go to the batch panel",
+      "batchPrev": "Go to the previous PDF",
+      "batchNext": "Go to the next PDF",
+      "goTo": "Go to {{name}}",
+      "themeDark": "Switch to dark theme",
+      "themeLight": "Switch to light theme",
+      "language": "Language: {{language}}"
+    }
   }
 }

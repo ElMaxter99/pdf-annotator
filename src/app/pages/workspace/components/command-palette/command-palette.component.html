@@ -1,0 +1,46 @@
+<div class="palette-backdrop" (mousedown)="closed.emit()">
+  <div appFocusTrap class="palette" role="dialog" aria-modal="true"
+    [attr.aria-label]="'palette.title' | t" (mousedown)="$event.stopPropagation()" data-testid="command-palette">
+    <div class="palette__search">
+      <span class="palette__icon" aria-hidden="true">⌕</span>
+      <input #input class="palette__input" type="text" role="combobox" autocomplete="off" spellcheck="false"
+        aria-autocomplete="list" aria-expanded="true" aria-controls="palette-listbox"
+        [attr.aria-activedescendant]="activeId()" [attr.aria-label]="'palette.title' | t"
+        [placeholder]="'palette.placeholder' | t" [value]="query()"
+        (input)="onQuery($any($event.target).value)" (keydown)="onKeydown($event)" data-testid="palette-input" />
+      <kbd class="palette__kbd">Esc</kbd>
+    </div>
+
+    @if (results().length) {
+      <ul id="palette-listbox" class="palette__list" role="listbox" [attr.aria-label]="'palette.results' | t">
+        @for (command of results(); track command.id; let i = $index) {
+          <li class="palette__row" role="option" [id]="optionId(command)"
+            [class.palette__row--active]="i === activeIndex()"
+            [class.palette__row--off]="!!command.disabledReason"
+            [attr.aria-selected]="i === activeIndex()" [attr.aria-disabled]="!!command.disabledReason"
+            (mousemove)="!command.disabledReason && activeIndex.set(i)" (click)="run(command)"
+            [attr.data-testid]="'palette-row-' + command.id">
+            <span class="palette__ico" aria-hidden="true">{{ command.icon }}</span>
+            <span class="palette__label">{{ command.label }}</span>
+            <span class="palette__hint">{{ command.disabledReason ?? command.hint }}</span>
+            @if (command.shortcut) {
+              <kbd class="palette__kbd">{{ command.shortcut }}</kbd>
+            }
+          </li>
+        }
+      </ul>
+      <p class="palette__sr" role="status" aria-live="polite">{{ 'palette.count' | t: { count: results().length } }}</p>
+    } @else {
+      <div class="palette__empty" role="status" data-testid="palette-empty">
+        <p>{{ 'palette.emptyText' | t: { query: query().trim() } }}</p>
+        <button type="button" class="btn btn--ghost" (click)="openShortcuts()">{{ 'palette.emptyShortcuts' | t }}</button>
+      </div>
+    }
+
+    <footer class="palette__foot">
+      <span><kbd>↑↓</kbd> {{ 'palette.foot.move' | t }}</span>
+      <span><kbd>↵</kbd> {{ 'palette.foot.choose' | t }}</span>
+      <span><kbd>Esc</kbd> {{ 'palette.foot.close' | t }}</span>
+    </footer>
+  </div>
+</div>

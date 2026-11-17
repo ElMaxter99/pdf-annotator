@@ -316,7 +316,8 @@
       "panCanvas": "Mou el llenç (mantén)",
       "splitLink": "Enllaçar o desenllaçar A i B (Dividida)",
       "wheelPage": "Continuar amb la roda a la vora del full: canvia de pàgina",
-      "pageOnlyA": "Moure només A (les pàgines passen a lliures)"
+      "pageOnlyA": "Moure només A (les pàgines passen a lliures)",
+      "palette": "Obrir la paleta d'ordres"
     }
   },
   "toast": {
@@ -1540,5 +1541,56 @@
       "hint": "arrossega · deixa anar per anotar"
     },
     "hintWeb": "Zoom del PDF: Ctrl + roda. El zoom del navegador continua a la resta de la pantalla."
+  },
+  "palette": {
+    "title": "Paleta d'ordres",
+    "placeholder": "Escriu una acció o un PDF…",
+    "results": "Accions",
+    "count": "{{count}} resultats",
+    "emptyText": "No hi ha res amb «{{query}}».",
+    "emptyShortcuts": "Veure les dreceres de teclat",
+    "open": "Paleta d'ordres",
+    "openShort": "Ordres",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "moure's",
+      "choose": "triar",
+      "close": "tancar"
+    },
+    "hint": {
+      "confirms": "demana confirmació",
+      "current": "actual",
+      "batch": "Lot",
+      "position": "Lot {{index}} de {{total}}"
+    },
+    "why": {
+      "noPdf": "Abans: obre un PDF",
+      "nothingToUndo": "Res a desfer",
+      "nothingToRedo": "Res a refer",
+      "noAnnotations": "Encara no hi ha anotacions",
+      "firstPage": "Ja ets a la primera pàgina",
+      "lastPage": "Ja ets a l'última pàgina",
+      "noTemplateA": "Abans: puja la plantilla A",
+      "noVersionB": "Abans: puja la versió B",
+      "firstPdf": "Ja ets al primer PDF",
+      "lastPdf": "Ja ets a l'últim PDF"
+    },
+    "cmd": {
+      "fitPage": "Ajustar a la pàgina",
+      "zoomActual": "Mida real (100 %)",
+      "view": "Vista {{mode}}",
+      "tab": "Panell {{tab}}",
+      "putCopy": "Posar la plantilla A · copiar tal qual",
+      "putMissing": "Posar la plantilla A · només els que falten",
+      "putAdjust": "Posar la plantilla A · ajustar per textos",
+      "putAi": "Posar la plantilla A · adaptar amb IA",
+      "batchPanel": "Anar al panell del lot",
+      "batchPrev": "Anar al PDF anterior",
+      "batchNext": "Anar al PDF següent",
+      "goTo": "Anar a {{name}}",
+      "themeDark": "Canviar a tema fosc",
+      "themeLight": "Canviar a tema clar",
+      "language": "Idioma: {{language}}"
+    }
   }
 }

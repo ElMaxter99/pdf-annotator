@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, ViewChild, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild, effect, signal, ChangeDetectionStrategy } from '@angular/core';
 import { VersionChipComponent } from '../../../../components/version-chip/version-chip.component';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -36,6 +36,19 @@ export class WorkspaceHeaderComponent {
 
   readonly prefsOpen = signal(false);
   readonly clearOpen = signal(false);
+  private seenClearRequest = -1;
+
+  constructor() {
+    // The command palette asks for «Limpiar»: the same confirmation opens as with the button.
+    effect(() => {
+      const request = this.vm.clearRequest();
+      if (this.seenClearRequest >= 0 && request !== this.seenClearRequest) {
+        this.prefsOpen.set(false);
+        this.clearOpen.set(true);
+      }
+      this.seenClearRequest = request;
+    });
+  }
 
   togglePrefs(event: Event): void {
     event.stopPropagation();

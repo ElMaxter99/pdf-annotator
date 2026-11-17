@@ -7,6 +7,9 @@
   }
   <app-workspace-footer [vm]="vm"></app-workspace-footer>
 </div>
+@if (vm.paletteOpen()) {
+  <app-command-palette [vm]="vm" (closed)="vm.togglePalette(false)"></app-command-palette>
+}
 @if (vm.shortcutsOpen()) {
   <app-shortcuts-dialog (closed)="vm.toggleShortcuts(false)"></app-shortcuts-dialog>
 }

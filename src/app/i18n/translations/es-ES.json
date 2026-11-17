@@ -316,7 +316,8 @@
       "panCanvas": "Mover el lienzo (mantener)",
       "splitLink": "Enlazar o desenlazar A y B (Dividida)",
       "wheelPage": "Seguir con la rueda al borde de la hoja: cambia de página",
-      "pageOnlyA": "Mover solo A (las páginas pasan a libres)"
+      "pageOnlyA": "Mover solo A (las páginas pasan a libres)",
+      "palette": "Abrir la paleta de comandos"
     }
   },
   "toast": {
@@ -1540,5 +1541,56 @@
       "hint": "arrastra · suelta para anotar"
     },
     "hintWeb": "Zoom del PDF: Ctrl + rueda. El zoom del navegador sigue en el resto de la pantalla."
+  },
+  "palette": {
+    "title": "Paleta de comandos",
+    "placeholder": "Escribe una acción o un PDF…",
+    "results": "Acciones",
+    "count": "{{count}} resultados",
+    "emptyText": "No hay nada con «{{query}}».",
+    "emptyShortcuts": "Ver atajos de teclado",
+    "open": "Paleta de comandos",
+    "openShort": "Comandos",
+    "ctrl": "Ctrl",
+    "foot": {
+      "move": "moverse",
+      "choose": "elegir",
+      "close": "cerrar"
+    },
+    "hint": {
+      "confirms": "pide confirmar",
+      "current": "actual",
+      "batch": "Lote",
+      "position": "Lote {{index}} de {{total}}"
+    },
+    "why": {
+      "noPdf": "Antes: abre un PDF",
+      "nothingToUndo": "Nada que deshacer",
+      "nothingToRedo": "Nada que rehacer",
+      "noAnnotations": "Sin anotaciones todavía",
+      "firstPage": "Ya estás en la primera página",
+      "lastPage": "Ya estás en la última página",
+      "noTemplateA": "Antes: sube la plantilla A",
+      "noVersionB": "Antes: sube la versión B",
+      "firstPdf": "Ya estás en el primer PDF",
+      "lastPdf": "Ya estás en el último PDF"
+    },
+    "cmd": {
+      "fitPage": "Ajustar a la página",
+      "zoomActual": "Tamaño real (100 %)",
+      "view": "Vista {{mode}}",
+      "tab": "Panel {{tab}}",
+      "putCopy": "Poner plantilla A · copiar tal cual",
+      "putMissing": "Poner plantilla A · solo los que faltan",
+      "putAdjust": "Poner plantilla A · ajustar por textos",
+      "putAi": "Poner plantilla A · adaptar con IA",
+      "batchPanel": "Ir al panel del lote",
+      "batchPrev": "Ir al PDF anterior",
+      "batchNext": "Ir al PDF siguiente",
+      "goTo": "Ir a {{name}}",
+      "themeDark": "Cambiar a tema oscuro",
+      "themeLight": "Cambiar a tema claro",
+      "language": "Idioma: {{language}}"
+    }
   }
 }
