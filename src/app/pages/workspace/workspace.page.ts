@@ -214,6 +214,7 @@ import {
 } from '../../utils/color.utils';
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
+import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
 import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
 import {
@@ -1743,7 +1744,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const xPx = evt.clientX - rect.left;
     const yPx = evt.clientY - rect.top;
     const scale = this.scale();
-    return { x: +(xPx / scale).toFixed(2), y: +((canvas.height - yPx) / scale).toFixed(2) };
+    return pixelToPdfPoint(xPx, yPx, canvas.height, scale);
   }
 
   onViewerMouseMove(evt: MouseEvent) {
