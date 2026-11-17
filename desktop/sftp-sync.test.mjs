@@ -15,7 +15,7 @@ import {
   syncProject,
 } from './project-sync.mjs';
 import { inspectHost, openSftpProvider, testConnection } from './sftp-connection.mjs';
-import { startSftpServer } from './test-sftp-server.mjs';
+import { generateTestKeyPair, startSftpServer } from './test-sftp-server.mjs';
 
 const pdf = (text) => Buffer.from(`%PDF-1.4\n${text}\n%%EOF`);
 const A = { host: 'PC-A', token: 'tok-a' };
@@ -233,7 +233,7 @@ test('SFTP: la huella se fija la primera vez y un cambio bloquea la conexión', 
 });
 
 test('SFTP: clave privada con frase de paso', async () => {
-  const keys = ssh2.utils.generateKeyPairSync('ed25519', {
+  const keys = generateTestKeyPair({
     passphrase: 'frase',
     cipher: 'aes256-ctr',
     rounds: 8,

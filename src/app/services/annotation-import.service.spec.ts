@@ -235,4 +235,131 @@ describe('AnnotationImportService', () => {
     expect([b.locked, b.hidden]).toEqual([false, false]);
     expect([c.locked, c.hidden]).toEqual([false, false]);
   });
+
+  describe('coordenadas', () => {
+    const one = (field: Record<string, unknown>) =>
+      service.normalizeImportedCoordinates(
+        { pages: [{ num: 1, fields: [{ mapField: 'a', ...field }] }] },
+        identity,
+      );
+
+    it('acepta coordenadas negativas, cero y fuera de la página sin recortarlas', () => {
+      const [f] = one({ x: -12.5, y: 0 })![0].fields;
+      expect(f.x).toBe(-12.5);
+      expect(f.y).toBe(0);
+      const [big] = one({ x: 99999, y: 99999 })![0].fields;
+      expect(big.x).toBe(99999);
+    });
+
+    it('redondea a dos decimales y acepta cadenas con espacios', () => {
+      const [f] = one({ x: ' 10.005 ', y: '20.999' })![0].fields;
+      expect(f.x).toBe(10.01);
+      expect(f.y).toBe(21);
+    });
+
+    it('descarta NaN, Infinity, nulos, vacíos y valores no numéricos', () => {
+      const report = { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0 };
+      const result = service.normalizeImportedCoordinates(
+        {
+          pages: [
+            {
+              num: 1,
+              fields: [
+                { x: NaN, y: 1, mapField: 'a' },
+                { x: Infinity, y: 1, mapField: 'a' },
+                { x: null, y: 1, mapField: 'a' },
+                { x: '', y: 1, mapField: 'a' },
+                { x: true, y: 1, mapField: 'a' },
+                { x: [1], y: 1, mapField: 'a' },
+                { y: 1, mapField: 'a' },
+                { x: 1, mapField: 'a' },
+              ],
+            },
+          ],
+        },
+        identity,
+        report,
+      );
+      expect(result).toEqual([]);
+      expect(report.skippedFields).toBe(8);
+    });
+
+    it('el número de página debe ser un entero ≥ 1 (admite cadenas)', () => {
+      const result = service.normalizeImportedCoordinates(
+        {
+          pages: [
+            { num: '3', fields: [{ x: 1, y: 1, mapField: 'a' }] },
+            { num: -1, fields: [{ x: 1, y: 1, mapField: 'a' }] },
+            { num: 'x', fields: [{ x: 1, y: 1, mapField: 'a' }] },
+            { fields: [{ x: 1, y: 1, mapField: 'a' }] },
+          ],
+        },
+        identity,
+      );
+      expect(result?.map((p) => p.num)).toEqual([3]);
+    });
+
+    it('un campo sin texto solo se conserva si es check o radio', () => {
+      const result = service.normalizeImportedCoordinates(
+        {
+          pages: [
+            {
+              num: 1,
+              fields: [
+                { x: 1, y: 1 },
+                { x: 2, y: 2, type: 'radio' },
+                { x: 3, y: 3, type: 'check' },
+                { x: 4, y: 4, type: 'number' },
+              ],
+            },
+          ],
+        },
+        identity,
+      );
+      expect(result![0].fields.map((f) => f.type)).toEqual(['radio', 'check']);
+    });
+
+    it('un fontSize inválido usa el global y uno fuera de rango se avisa pero se conserva', () => {
+      const report = { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0 };
+      const result = service.normalizeImportedCoordinates(
+        {
+          fontSize: 20,
+          pages: [
+            {
+              num: 1,
+              fields: [
+                { x: 1, y: 1, mapField: 'a', fontSize: 'grande' },
+                { x: 2, y: 2, mapField: 'b', fontSize: 100 },
+                { x: 3, y: 3, mapField: 'c', fontSize: 5 },
+              ],
+            },
+          ],
+        },
+        identity,
+        report,
+      );
+      expect(result![0].fields.map((f) => f.fontSize)).toEqual([20, 100, 5]);
+      expect(report.fontSizeOutOfRange).toBe(2);
+    });
+
+    it('las páginas repetidas se conservan por separado y quedan ordenadas', () => {
+      const result = service.normalizeImportedCoordinates(
+        {
+          pages: [
+            { num: 2, fields: [{ x: 1, y: 1, mapField: 'a' }] },
+            { num: 2, fields: [{ x: 2, y: 2, mapField: 'b' }] },
+            { num: 1, fields: [{ x: 3, y: 3, mapField: 'c' }] },
+          ],
+        },
+        identity,
+      );
+      expect(result?.map((p) => p.num)).toEqual([1, 2, 2]);
+    });
+
+    it('datos que no son ni objeto ni lista devuelven null', () => {
+      for (const data of [null, undefined, 5, 'texto', true, { pages: 'x' }]) {
+        expect(service.normalizeImportedCoordinates(data, identity)).toBeNull();
+      }
+    });
+  });
 });

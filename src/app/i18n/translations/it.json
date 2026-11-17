@@ -124,7 +124,9 @@
       "selectLabel": "Modelli salvati",
       "loadButton": "Carica",
       "deleteButton": "Elimina",
-      "empty": "Non hai ancora salvato alcun modello."
+      "empty": "Non hai ancora salvato alcun modello.",
+      "exportButton": "Esporta modelli…",
+      "exportHint": "Salva almeno un modello per esportare."
     },
     "thumbnails": {
       "title": "Miniature",
@@ -2156,5 +2158,25 @@
       "doneKept": "Nome cambiato. La cartella resta «{{folder}}» perché il progetto è sincronizzato.",
       "locked": "{{host}} ha aperto il progetto mentre scrivevi. Non è stato rinominato nulla."
     }
+  },
+  "templatesExport": {
+    "title": "Esporta modelli",
+    "intro": "Scegli i modelli da portare con te. Vengono salvati in un unico ZIP, un JSON per modello.",
+    "selectAll": "Seleziona tutti",
+    "pages": "{{n}} pag.",
+    "empty": "Non hai ancora modelli salvati. Salvane uno da Annotazioni e torna qui.",
+    "understood": "Capito",
+    "cancel": "Annulla",
+    "workingTitle": "Esportazione dei modelli…",
+    "counter": "{{done}} di {{total}}",
+    "doneTitle": "Modelli esportati",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} modelli · {{kb}} KB. Lo trovi nella cartella dei download.",
+    "ready": "Fatto",
+    "errorTitle": "Impossibile esportare",
+    "errorText": "Non è stato possibile creare lo ZIP. I tuoi modelli sono ancora salvati e non è andato perso nulla.",
+    "close": "Chiudi",
+    "retry": "Riprova",
+    "exportButton": "Esporta {{n}} modelli"
   }
 }

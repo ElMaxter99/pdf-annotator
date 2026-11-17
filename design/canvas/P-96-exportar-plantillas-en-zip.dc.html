@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-96 Exportar plantillas en ZIP</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.root{width:1720px;box-sizing:border-box;padding:56px 64px 64px;background:#14141f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:28px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.lead{margin:0;max-width:1200px;font-size:16px;line-height:1.55;color:#c4c4d0}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9a9ab0}
+.row{display:flex;gap:24px;align-items:stretch}
+.pn{width:820px;box-sizing:border-box;padding:20px;border-radius:14px;display:flex;flex-direction:column;gap:12px}
+.pn.dk{--panel:#2a2a3d;--accent:#5eead4;--muted:#b0b0b0;--bd:#3f3f58;--ab:#0b3b36;background:#1e1e2f;color:#f5f5f5;border:1px solid #34344a}
+.pn.lt{--panel:#ffffff;--accent:#0f766e;--muted:#475569;--bd:#c5ccdb;--ab:#d9f3ee;background:#f6f7fb;color:#0f172a;border:1px solid #d7dde9}
+.pt{margin:0;font-size:15px;font-weight:600}
+.pc{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+.dg{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;max-width:520px}
+.dh{font-size:16px;font-weight:600}
+.dp{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.dp.err{color:inherit}
+.df{display:flex;justify-content:flex-end;gap:10px}
+.b{font:inherit;font-size:13.5px;padding:8px 14px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:inherit;display:inline-block}
+.b.pr{background:var(--accent);border-color:var(--accent);color:#06201d;font-weight:600}
+.pn.lt .b.pr{color:#fff}
+.b.w{align-self:flex-start}
+.ls{display:flex;flex-direction:column;gap:6px}
+.it,.all{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--bd);font-size:13.5px}
+.it.on{background:var(--ab);border-color:var(--accent)}
+.all{border:none;padding:0 2px;font-weight:600}
+.it small,.all small{margin-left:auto;color:var(--muted);font-size:12px;font-weight:400}
+.nm{font-weight:500}
+.cb{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+.cb.c{background:var(--accent);border-color:var(--accent);color:#06201d}
+.pn.lt .cb.c{color:#fff}
+.bar{height:10px;border-radius:999px;background:var(--bd);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.cnt{margin:0;font-size:13.5px}
+.st{font-size:13px;color:var(--muted);padding:2px 2px}.st.ok{color:var(--accent)}
+.done{display:flex;gap:14px;align-items:center}.done p{margin:2px 0 0}
+.tick{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#06201d;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.pn.lt .tick{color:#fff}
+.sb{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;max-width:380px}
+.sb h4{margin:0;font-size:14px}.sb small{font-size:12px;color:var(--muted);line-height:1.4}
+.sv{display:flex;gap:8px;align-items:center}.sv span{flex:1;font-size:13px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;color:var(--muted)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.rule{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:20px 22px}
+.rule h4{margin:0 0 8px;font-size:15px;color:#5eead4}
+.rule p{margin:0;font-size:14px;line-height:1.55;color:#c4c4d0}
+</style>
+</helmet>
+<div class="root">
+<div><div class="lbl">Propuesta · pendiente de aprobar · web, local y escritorio · sin IA</div>
+<h1>P-96 Exportar varias plantillas en un ZIP</h1></div>
+<p class="lead">Hoy las plantillas guardadas (localStorage) solo se pueden cargar o eliminar de una en una, y el JSON se descarga suelto. Propuesta: un diálogo para elegir varias plantillas y llevárselas en un único ZIP, con progreso con contador y confirmación al terminar.</p>
+<div class="lbl">Tema oscuro · 1650 px</div><div class="row"><section class="pn dk"><h3 class="pt">1 · Entrada en la pestaña Plantillas</h3><p class="pc">Un botón nuevo bajo el selector; no cambia nada de lo existente.</p><div class="sb"><h4>Plantillas reutilizables</h4><div class="sv"><span>Nombre de la plantilla</span><b class="b">Guardar plantilla</b></div><div class="sv"><span>Predeterminada ▾</span><b class="b">Cargar</b><b class="b">Eliminar</b></div><b class="b pr w">Exportar plantillas…</b><small>Con 2 o más plantillas guardadas. Sin ninguna: botón desactivado y pista «Guarda al menos una plantilla».</small></div></section><section class="pn dk"><h3 class="pt">2 · Elegir</h3><p class="pc">Todas marcadas al abrir; cuenta en el botón.</p><div class="dg"><div class="dh">Exportar plantillas</div><p class="dp">Elige las plantillas que quieres llevarte. Se guardan en un único ZIP, un JSON por plantilla.</p><label class="all"><span class="cb c">–</span>Seleccionar todas <small>3 de 5</small></label><div class="ls"><label class="it on"><span class="cb c">✓</span><span class="nm">Plantilla guía</span><small>3 pág. · 12 campos</small></label><label class="it on"><span class="cb c">✓</span><span class="nm">Factura A4</span><small>1 pág. · 7 campos</small></label><label class="it"><span class="cb"></span><span class="nm">Albarán proveedor</span><small>2 pág. · 9 campos</small></label><label class="it on"><span class="cb c">✓</span><span class="nm">Contrato marco</span><small>6 pág. · 31 campos</small></label><label class="it"><span class="cb"></span><span class="nm">Recibo mensual</span><small>1 pág. · 5 campos</small></label></div><div class="df"><button class="b">Cancelar</button><button class="b pr">Exportar 3 plantillas</button></div></div></section></div><div class="row"><section class="pn dk"><h3 class="pt">3 · Progreso con contador</h3><p class="pc">«2 de 3» y estado por plantilla; Cancelar no deja nada a medias.</p><div class="dg"><div class="dh">Exportando plantillas…</div><div class="bar"><i style="width:66%"></i></div><p class="cnt"><b>2 de 3</b> · Factura A4.json</p><div class="ls sm"><div class="st ok">✓ Plantilla guía</div><div class="st ok">✓ Factura A4</div><div class="st">Contrato marco…</div></div><div class="df"><button class="b">Cancelar</button></div></div></section><section class="pn dk"><h3 class="pt">4 · Confirmación</h3><p class="pc">Aviso claro al terminar; el ZIP ya se ha descargado.</p><div class="dg"><div class="dh">Plantillas exportadas</div><div class="done"><span class="tick">✓</span><div><b>plantillas.zip</b><p class="dp">3 plantillas · 4 KB. Búscalo en tu carpeta de descargas.</p></div></div><div class="df"><button class="b pr">Listo</button></div></div></section></div><div class="row"><section class="pn dk"><h3 class="pt">5 · Error</h3><p class="pc">Mensaje que explica y permite reintentar.</p><div class="dg"><div class="dh">No se pudo exportar</div><p class="dp err">No se pudo crear el ZIP. Tus plantillas siguen guardadas y no se ha perdido nada.</p><div class="df"><button class="b">Cerrar</button><button class="b pr">Reintentar</button></div></div></section><section class="pn dk"><h3 class="pt">6 · Vacío</h3><p class="pc">Sin plantillas guardadas.</p><div class="dg"><div class="dh">Exportar plantillas</div><p class="dp">Aún no tienes plantillas guardadas. Guarda una desde Anotaciones y vuelve aquí.</p><div class="df"><button class="b pr">Entendido</button></div></div></section></div>
+<div class="lbl">Tema claro · 1280 px</div><div class="row"><section class="pn lt"><h3 class="pt">1 · Entrada en la pestaña Plantillas</h3><p class="pc">Un botón nuevo bajo el selector; no cambia nada de lo existente.</p><div class="sb"><h4>Plantillas reutilizables</h4><div class="sv"><span>Nombre de la plantilla</span><b class="b">Guardar plantilla</b></div><div class="sv"><span>Predeterminada ▾</span><b class="b">Cargar</b><b class="b">Eliminar</b></div><b class="b pr w">Exportar plantillas…</b><small>Con 2 o más plantillas guardadas. Sin ninguna: botón desactivado y pista «Guarda al menos una plantilla».</small></div></section><section class="pn lt"><h3 class="pt">2 · Elegir</h3><p class="pc">Todas marcadas al abrir; cuenta en el botón.</p><div class="dg"><div class="dh">Exportar plantillas</div><p class="dp">Elige las plantillas que quieres llevarte. Se guardan en un único ZIP, un JSON por plantilla.</p><label class="all"><span class="cb c">–</span>Seleccionar todas <small>3 de 5</small></label><div class="ls"><label class="it on"><span class="cb c">✓</span><span class="nm">Plantilla guía</span><small>3 pág. · 12 campos</small></label><label class="it on"><span class="cb c">✓</span><span class="nm">Factura A4</span><small>1 pág. · 7 campos</small></label><label class="it"><span class="cb"></span><span class="nm">Albarán proveedor</span><small>2 pág. · 9 campos</small></label><label class="it on"><span class="cb c">✓</span><span class="nm">Contrato marco</span><small>6 pág. · 31 campos</small></label><label class="it"><span class="cb"></span><span class="nm">Recibo mensual</span><small>1 pág. · 5 campos</small></label></div><div class="df"><button class="b">Cancelar</button><button class="b pr">Exportar 3 plantillas</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">3 · Progreso con contador</h3><p class="pc">«2 de 3» y estado por plantilla; Cancelar no deja nada a medias.</p><div class="dg"><div class="dh">Exportando plantillas…</div><div class="bar"><i style="width:66%"></i></div><p class="cnt"><b>2 de 3</b> · Factura A4.json</p><div class="ls sm"><div class="st ok">✓ Plantilla guía</div><div class="st ok">✓ Factura A4</div><div class="st">Contrato marco…</div></div><div class="df"><button class="b">Cancelar</button></div></div></section><section class="pn lt"><h3 class="pt">4 · Confirmación</h3><p class="pc">Aviso claro al terminar; el ZIP ya se ha descargado.</p><div class="dg"><div class="dh">Plantillas exportadas</div><div class="done"><span class="tick">✓</span><div><b>plantillas.zip</b><p class="dp">3 plantillas · 4 KB. Búscalo en tu carpeta de descargas.</p></div></div><div class="df"><button class="b pr">Listo</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">5 · Error</h3><p class="pc">Mensaje que explica y permite reintentar.</p><div class="dg"><div class="dh">No se pudo exportar</div><p class="dp err">No se pudo crear el ZIP. Tus plantillas siguen guardadas y no se ha perdido nada.</p><div class="df"><button class="b">Cerrar</button><button class="b pr">Reintentar</button></div></div></section><section class="pn lt"><h3 class="pt">6 · Vacío</h3><p class="pc">Sin plantillas guardadas.</p><div class="dg"><div class="dh">Exportar plantillas</div><p class="dp">Aún no tienes plantillas guardadas. Guarda una desde Anotaciones y vuelve aquí.</p><div class="df"><button class="b pr">Entendido</button></div></div></section></div>
+<div class="rules"><div class="rule"><h4>Dónde vive</h4><p>Botón «Exportar plantillas…» en la pestaña Plantillas del editor, bajo el selector. Abre un diálogo; no hay pantalla nueva ni ruta nueva.</p></div><div class="rule"><h4>Qué contiene el ZIP</h4><p>Un JSON por plantilla (el mismo formato que «Descargar JSON»: <code>{ "pages": [...] }</code>), nombrado con el de la plantilla. Los nombres repetidos o con caracteres raros se normalizan (-2, -3…). Se reutiliza <code>zip.utils</code>.</p></div><div class="rule"><h4>Web y escritorio, sin IA</h4><p>Todo ocurre en el navegador con lo guardado en localStorage; funciona igual en la web, en local y en escritorio, y no muestra nada de IA. Sin red.</p></div><div class="rule"><h4>Feedback</h4><p>Contador «n de N» con estado por plantilla, Cancelar sin dejar nada a medias, confirmación con nombre y tamaño del ZIP, error con «Reintentar».</p></div><div class="rule"><h4>Accesibilidad</h4><p>Casillas reales con etiqueta, foco visible, Esc cierra, Enter exporta; el progreso se anuncia con aria-live. Animaciones de 150–300 ms que respetan prefers-reduced-motion.</p></div><div class="rule"><h4>Fuera de alcance</h4><p>El lote ya descarga las B en ZIP desde su panel y no cambia. La predeterminada no se exporta. Importar un ZIP de plantillas se propondría aparte.</p></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":2300}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

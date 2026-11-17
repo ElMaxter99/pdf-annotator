@@ -24,6 +24,22 @@ const { STATUS_CODE: CODE, flagsToString } = utils.sftp;
  * `readOnly`, `noRename` (el rename responde «no soportado»), `dropAfterBytes` (corta la conexión tras N bytes recibidos),
  * `skewMs` (adelanta o atrasa el reloj que se ve en las fechas), `writeDelayMs` (frena cada escritura), `port` y `hostKey` (clave privada del servidor).
  */
+/**
+ * `ssh2` genera de vez en cuando (≈1 de cada 300) una clave ed25519 que ni él mismo sabe leer
+ * («Malformed OpenSSH private key»). Para que las pruebas no fallen al azar, se regenera hasta
+ * que `parseKey` la acepta.
+ */
+export function generateTestKeyPair(options) {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const keys = utils.generateKeyPairSync('ed25519', options);
+    const parsed = utils.parseKey(keys.private, options?.passphrase);
+    if (!(parsed instanceof Error)) {
+      return keys;
+    }
+  }
+  throw new Error('No se pudo generar una clave ed25519 válida para las pruebas');
+}
+
 export async function startSftpServer(options) {
   const {
     root,
@@ -34,7 +50,7 @@ export async function startSftpServer(options) {
     skewMs = 0,
     writeDelayMs = 0,
   } = options;
-  const hostKey = options.hostKey ?? utils.generateKeyPairSync('ed25519').private;
+  const hostKey = options.hostKey ?? generateTestKeyPair().private;
   const hostKeyPublic = utils.parseKey(hostKey).getPublicSSH();
   const state = { dropAfterBytes: options.dropAfterBytes ?? 0, received: 0, noRename, readOnly };
   const clients = new Set();

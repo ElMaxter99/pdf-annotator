@@ -124,7 +124,9 @@
       "selectLabel": "Gespeicherte Vorlagen",
       "loadButton": "Laden",
       "deleteButton": "Löschen",
-      "empty": "Sie haben noch keine Vorlagen gespeichert."
+      "empty": "Sie haben noch keine Vorlagen gespeichert.",
+      "exportButton": "Vorlagen exportieren…",
+      "exportHint": "Speichere mindestens eine Vorlage zum Exportieren."
     },
     "thumbnails": {
       "title": "Miniaturen",
@@ -2156,5 +2158,25 @@
       "doneKept": "Name geändert. Der Ordner bleibt „{{folder}}“, weil das Projekt synchronisiert wird.",
       "locked": "{{host}} hat das Projekt geöffnet, während du getippt hast. Es wurde nichts umbenannt."
     }
+  },
+  "templatesExport": {
+    "title": "Vorlagen exportieren",
+    "intro": "Wähle die Vorlagen aus, die du mitnehmen möchtest. Sie werden in einer einzigen ZIP-Datei gespeichert, eine JSON-Datei pro Vorlage.",
+    "selectAll": "Alle auswählen",
+    "pages": "{{n}} S.",
+    "empty": "Du hast noch keine gespeicherten Vorlagen. Speichere eine unter Anmerkungen und komm zurück.",
+    "understood": "Verstanden",
+    "cancel": "Abbrechen",
+    "workingTitle": "Vorlagen werden exportiert…",
+    "counter": "{{done}} von {{total}}",
+    "doneTitle": "Vorlagen exportiert",
+    "zipName": "plantillas.zip",
+    "doneText": "{{n}} Vorlagen · {{kb}} KB. Du findest sie im Download-Ordner.",
+    "ready": "Fertig",
+    "errorTitle": "Export nicht möglich",
+    "errorText": "Die ZIP-Datei konnte nicht erstellt werden. Deine Vorlagen sind weiterhin gespeichert, nichts ging verloren.",
+    "close": "Schließen",
+    "retry": "Erneut versuchen",
+    "exportButton": "{{n}} Vorlagen exportieren"
   }
 }
