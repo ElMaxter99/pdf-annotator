@@ -24,3 +24,27 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 
 ## Ideas sin priorizar
 Exportación en ZIP de varias plantillas.
+
+## Futuro (solo escritorio): proyectos locales y sincronización
+Brainstorming de Maxter (2026-11-17). **No hay diseño ni código todavía:** cada fase necesita mesas aprobadas antes de programarse (ver `docs/WORKFLOW.md`). Todo va en la app de escritorio (Electron); la web no cambia. Principio: **sin servidores propios, sin cuentas de usuario de la app y sin APIs**; todo en local o en un almacenamiento que el usuario ya tenga.
+
+**Fase 1 · Proyectos locales.** Separar el trabajo por proyecto o cliente (un PDF suelto o un lote de, por ejemplo, 90 PDFs), guardar varios a la vez y recuperar cada uno al volver a abrir la app. Hoy solo existe la «última sesión» (#249, `SessionStoreService`) y el lote (`BatchStoreService`), ambos en IndexedDB y de un solo hueco. Contenido de un proyecto: nombre, PDFs (A/B), anotaciones, plantillas, estado del lote y de cada PDF, página y zoom.
+- Dependencias: modelo de datos con `id`/nombre/fechas y versión de esquema; migrar la sesión y el lote actuales a «proyecto por defecto»; selector de proyectos (pantalla nueva: diseño primero).
+- Riesgos: cuota de IndexedDB con muchos PDFs; migración sin perder la sesión actual; tratar los datos restaurados como no confiables (`AnnotationImportService`).
+
+**Fase 2 · Importar y exportar un proyecto.** Archivo portable (por ejemplo `.pdfannotator`, un ZIP con `project.json` + PDFs + coordenadas + estado a medias) para llevarlo a otro equipo o pasárselo a un compañero. Reutiliza `zip.utils`.
+- Dependencias: fase 1; formato versionado y documentado en `docs/DOMAIN.md`; validación estricta al importar (tamaños, tipos, rutas del ZIP, sin evaluar nada).
+- Riesgos: PDFs pesados (límite y barra de progreso); PDFs con datos personales en un archivo que viaja por correo (aviso, y cifrado opcional más adelante); qué pasa al importar un proyecto que ya existe (duplicar, reemplazar o fusionar).
+
+**Fase 3 · Sincronizar sin servidores propios.** El usuario vincula una carpeta que ya tiene y la app guarda ahí el proyecto con rutas tipo `Álvaro/cliente1`, `Álvaro/cliente2`: carpeta local sincronizada por Google Drive u OneDrive (sin API, la sincroniza su cliente de escritorio), carpeta compartida de red (SMB/NFS) y, más adelante, SFTP preconfigurado. Mismo usuario en varios equipos; la app no tiene noción de usuarios.
+- Dependencias: fases 1 y 2 (la carpeta contiene proyectos exportables), formato de carpeta por proyecto (`project.json` + PDFs por separado para no reescribir todo), bloqueo y detección de cambios.
+- Riesgos: **conflictos** (dos equipos editan a la vez; los clientes de Drive/OneDrive crean «copias en conflicto»), por lo que hace falta un archivo de bloqueo con caducidad, una versión por proyecto y una regla clara de resolución; **privacidad** (los PDFs de clientes salen del equipo: el aviso debe ser explícito y las credenciales de SFTP irán en el almacén seguro del sistema, nunca en el repo ni en `localStorage`); **tamaño** (subir solo lo que cambió); la web no puede acceder a carpetas arbitrarias, por eso es solo escritorio; SFTP/LDAP añaden dependencias y superficie de seguridad (CSP/permisos de Electron).
+
+**Preguntas abiertas** (por decidir con Maxter antes de diseñar):
+1. ¿«Proyecto» sustituye al «lote» o lo contiene? ¿Un proyecto puede mezclar un lote y PDFs sueltos?
+2. ¿Nombre de «Proyecto» o «Espacio de trabajo»? (`workspace` ya es la ruta del editor y confunde.)
+3. ¿Dónde viven los proyectos locales: IndexedDB (como hoy) o una carpeta en disco que el usuario ve? La fase 3 se simplifica mucho con carpeta en disco.
+4. En conflictos: ¿bloqueo (uno edita, el otro solo lee) o fusión por campo? Se recomienda empezar por bloqueo.
+5. ¿Qué proveedores primero? Se recomienda carpeta sincronizada (Drive/OneDrive/red) antes que SFTP.
+6. ¿Cifrado del archivo exportado y de la carpeta sincronizada, con contraseña del usuario?
+7. ¿Qué tamaño máximo de proyecto se espera (nº de PDFs y MB)?
