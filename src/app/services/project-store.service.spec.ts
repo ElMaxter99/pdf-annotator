@@ -78,6 +78,62 @@ describe('ProjectStoreService', () => {
     expect(await store.revealFolder('Uno')).toBe('folder-gone');
   });
 
+  it('keeps the newest list when an older query answers last', async () => {
+    bridge.info.and.resolveTo({ root: '/r', host: 'h' } as never);
+    let late!: (value: never) => void;
+    bridge.list.and.returnValues(
+      new Promise((resolve) => (late = resolve as never)) as never,
+      Promise.resolve({ projects: [{ ...summary('Uno'), name: 'Nuevo' }] }),
+    );
+    const old = store.refresh();
+    await store.refresh();
+    late({ projects: [{ ...summary('Uno'), name: 'Sin título' }] } as never);
+    await old;
+    expect(store.projects()[0].name).toBe('Nuevo');
+    expect(store.loading()).toBeFalse();
+  });
+
+  it('waits for a project to be left before listing projects again', async () => {
+    bridge.info.and.resolveTo({ root: '/r', host: 'h' } as never);
+    bridge.open.and.resolveTo({
+      project: summary('Uno'),
+      items: [],
+      readOnly: false,
+    } as never);
+    bridge.renew.and.resolveTo({ ok: true } as never);
+    await store.open('Uno');
+    let released!: () => void;
+    bridge.release.and.returnValue(new Promise((r) => (released = () => r({ ok: true }))) as never);
+    bridge.list.and.resolveTo({ projects: [] } as never);
+    const closing = store.close();
+    const refreshing = store.refresh();
+    await Promise.resolve();
+    expect(bridge.list).not.toHaveBeenCalled();
+    released();
+    await Promise.all([closing, refreshing]);
+    expect(bridge.list).toHaveBeenCalled();
+  });
+
+  it('reuses the close in flight so listing waits for the real release', async () => {
+    bridge.info.and.resolveTo({ root: '/r', host: 'h' } as never);
+    bridge.open.and.resolveTo({ project: summary('Uno'), items: [], readOnly: false } as never);
+    bridge.renew.and.resolveTo({ ok: true } as never);
+    await store.open('Uno');
+    let released!: () => void;
+    bridge.release.and.returnValue(new Promise((r) => (released = () => r({ ok: true }))) as never);
+    bridge.list.and.resolveTo({ projects: [] } as never);
+    const first = store.close();
+    const second = store.close();
+    const refreshing = store.refresh();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(bridge.list).not.toHaveBeenCalled();
+    expect(bridge.release).toHaveBeenCalledTimes(1);
+    released();
+    await Promise.all([first, second, refreshing]);
+    expect(bridge.list).toHaveBeenCalled();
+  });
+
   it('is available only with the desktop bridge', () => {
     expect(store.available()).toBeTrue();
     delete (window as unknown as { desktop?: unknown }).desktop;

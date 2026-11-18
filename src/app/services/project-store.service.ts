@@ -57,6 +57,8 @@ export class ProjectStoreService {
   readonly available = (): boolean => this.bridge() !== null;
 
   private restoring: Promise<boolean> | null = null;
+  private closing: Promise<void> | null = null;
+  private refreshSeq = 0;
   private lockTimer: ReturnType<typeof setInterval> | null = null;
   private readonly pending = new Map<string, BatchItem>();
   private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -86,14 +88,21 @@ export class ProjectStoreService {
     if (!bridge) {
       return;
     }
+    const seq = ++this.refreshSeq;
     this.loading.set(true);
     this.error.set(null);
     try {
+      // Si se está saliendo de un proyecto, esperar a que termine de escribirse y soltarse.
+      await this.closing;
       const info = await bridge.info();
+      const result = await bridge.list();
+      if (seq !== this.refreshSeq) {
+        // Otra consulta más reciente (p. ej. tras renombrar) manda: esta respuesta es vieja.
+        return;
+      }
       this.root.set(info.root);
       this.host.set(info.host);
       this.limits.set(info.limits ?? DEFAULT_LIMITS);
-      const result = await bridge.list();
       if ('error' in result) {
         this.projects.set([]);
         this.error.set(result.error);
@@ -101,9 +110,13 @@ export class ProjectStoreService {
         this.projects.set(result.projects);
       }
     } catch {
-      this.error.set('io');
+      if (seq === this.refreshSeq) {
+        this.error.set('io');
+      }
     } finally {
-      this.loading.set(false);
+      if (seq === this.refreshSeq) {
+        this.loading.set(false);
+      }
     }
   }
 
@@ -216,7 +229,20 @@ export class ProjectStoreService {
   }
 
   /** Leaves the project; pending changes are written first. */
-  async close(): Promise<void> {
+  close(): Promise<void> {
+    if (this.closing) {
+      return this.closing;
+    }
+    const run = this.doClose().finally(() => {
+      if (this.closing === run) {
+        this.closing = null;
+      }
+    });
+    this.closing = run;
+    return run;
+  }
+
+  private async doClose(): Promise<void> {
     const project = this.active();
     if (!project) {
       return;

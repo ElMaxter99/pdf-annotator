@@ -1,4 +1,6 @@
 ## Unreleased
+### Fixed
+- **La lista de proyectos ya no muestra un nombre viejo al volver desde el editor (app de escritorio):** la consulta de la lista espera a que termine de cerrarse el proyecto abierto y, si dos consultas se cruzan, manda siempre la más reciente. Sin cambios visibles; con tests.
 
 ## [v1.14.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.14.0) - 2026-11-17
 ### Changed
