@@ -1,11 +1,8 @@
 ## Unreleased
-### Changed
-- **Quitar un proyecto de la lista dice dónde quedan los archivos y permite abrir la carpeta (app de escritorio; mesas P-103 a P-105):** el diálogo de «Quitar de la lista» explica que no se borra ningún archivo, muestra la carpeta exacta y tiene «Abrir carpeta» (no cierra el diálogo); el foco empieza en «Cancelar». Avisa de que un proyecto sincronizado deja de sincronizarse y de que una importación posterior con el mismo nombre irá a una carpeta nueva. Tras quitarlo, un aviso de 10 s repite la ruta con «Abrir carpeta». Al importar, si la carpeta de siempre tiene archivos de un proyecto quitado, el diálogo lo dice antes de aceptar y ofrece abrirla. Si la carpeta ya no existe o no se puede abrir, un aviso lo explica. Canal nuevo `projects:reveal-folder` (solo carpetas del proyecto dentro de la raíz) y `projects:import-target`. Textos en los 7 idiomas, con tests (`desktop/`, unitario y e2e). No se borra nada del disco.
-### Fixed
-- **Importar un proyecto tras «Quitar de la lista» ya no falla con «Ya existe un proyecto con ese nombre»:** «Quitar de la lista» deja los PDFs en el disco (solo borra la marca del proyecto), y la importación se negaba a usar esa carpeta aunque la pantalla Proyectos no la listase. Ahora el proyecto importado va a una carpeta libre (`nombre-2`) y la carpeta antigua no se toca. Con test en `desktop/project-archive.test.mjs`.
 
 ## [v1.14.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.14.0) - 2026-11-17
 ### Changed
+- **Quitar un proyecto de la lista dice dónde quedan los archivos y permite abrir la carpeta (app de escritorio; mesas P-103 a P-105):** el diálogo de «Quitar de la lista» explica que no se borra ningún archivo, muestra la carpeta exacta y tiene «Abrir carpeta» (no cierra el diálogo); el foco empieza en «Cancelar». Avisa de que un proyecto sincronizado deja de sincronizarse y de que una importación posterior con el mismo nombre irá a una carpeta nueva. Tras quitarlo, un aviso de 10 s repite la ruta con «Abrir carpeta». Al importar, si la carpeta de siempre tiene archivos de un proyecto quitado, el diálogo lo dice antes de aceptar y ofrece abrirla. Si la carpeta ya no existe o no se puede abrir, un aviso lo explica. Canal nuevo `projects:reveal-folder` (solo carpetas del proyecto dentro de la raíz) y `projects:import-target`. Textos en los 7 idiomas, con tests (`desktop/`, unitario y e2e). No se borra nada del disco.
 - **«Ajustar» (tamaño distinto) usa la tabla de páginas A↔B:** con tabla, la detección compara cada página de B con la página de A con la que está emparejada (antes comparaba por número, así que una portada añadida en B daba un aviso de tamaño falso o se lo callaba). Sin tabla, igual que antes. Sin cambios visibles.
 - **La web ya no muestra rastro de IA en el resumen del lote:** sin ayudante de IA (web desplegada) el resumen pasa a 4 pasos (se quita «Listos para trasladar», «Listos» pasa a ser el 4), y las filas no muestran «Va a la IA» ni «Revisar propuesta». Escritorio y local no cambian.
 
@@ -36,6 +33,9 @@
 ### Docs
 - Hoja de ruta: marcada como hecha la subida a Node 26 y Angular 22 (PR #245).
 - Hoja de ruta: anotados los evolutivos futuros de escritorio (proyectos locales, importar/exportar proyectos y sincronización sin servidores propios), con fases, riesgos y preguntas abiertas. Sin cambios en la app.
+
+### Fixed
+- **Importar un proyecto tras «Quitar de la lista» ya no falla con «Ya existe un proyecto con ese nombre»:** «Quitar de la lista» deja los PDFs en el disco (solo borra la marca del proyecto), y la importación se negaba a usar esa carpeta aunque la pantalla Proyectos no la listase. Ahora el proyecto importado va a una carpeta libre (`nombre-2`) y la carpeta antigua no se toca. Con test en `desktop/project-archive.test.mjs`.
 
 ## [v1.13.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.13.0) - 2026-11-17
 ### Added
