@@ -22,7 +22,13 @@ function boot(documents, userData, extra = {}) {
       showSaveDialog: async () =>
         extra.save ? { canceled: false, filePath: extra.save } : { canceled: true },
     },
-    shell: { showItemInFolder: (file) => sent.push(['reveal', file]) },
+    shell: {
+      showItemInFolder: (file) => sent.push(['reveal', file]),
+      openPath: async (dir) => {
+        sent.push(['open', dir]);
+        return extra.openFails ? 'no se pudo' : '';
+      },
+    },
     getWindow: () => ({
       webContents: {
         send: (channel, payload) => {
@@ -319,4 +325,54 @@ test('renombrar: carpeta y nombre, bloqueo de otro equipo y abierto aquí', asyn
     (await a.call('projects:rename', { ref: 'Álvaro/dos', name: ' ' })).error,
     'bad-name',
   );
+});
+
+test('«Abrir carpeta»: solo dentro de la raíz, y avisa si ya no existe o no se puede abrir', async () => {
+  const docs = mkdtempSync(path.join(os.tmpdir(), 'pa-ipc-'));
+  const ok = boot(docs, mkdtempSync(path.join(os.tmpdir(), 'pa-ud-')));
+  const { project } = await ok.call('projects:create', { name: 'Uno', subpath: '' });
+  assert.deepEqual(await ok.call('projects:reveal-folder', { ref: project.ref }), { ok: true });
+  assert.deepEqual(ok.sent.at(-1), ['open', path.join(docs, 'PDF Annotator', 'Uno')]);
+  assert.equal((await ok.call('projects:reveal-folder', { ref: '../fuera' })).error, 'bad-ref');
+  assert.equal(
+    (await ok.call('projects:reveal-folder', { ref: 'No existe' })).error,
+    'folder-gone',
+  );
+  const failing = boot(docs, mkdtempSync(path.join(os.tmpdir(), 'pa-ud-')), { openFails: true });
+  assert.equal(
+    (await failing.call('projects:reveal-folder', { ref: project.ref })).error,
+    'open-failed',
+  );
+  ok.api.releaseAll();
+  failing.api.releaseAll();
+  rmSync(docs, { recursive: true, force: true });
+});
+
+test('importar: avisa antes de qué carpeta se usará si la de siempre tiene restos', async () => {
+  const docs = mkdtempSync(path.join(os.tmpdir(), 'pa-ipc-'));
+  const a = boot(docs, mkdtempSync(path.join(os.tmpdir(), 'pa-ud-')));
+  const { project } = await a.call('projects:create', { name: 'ejemplo 1', subpath: '' });
+  assert.deepEqual(
+    await a.call('projects:import-target', { name: 'ejemplo 1', subpath: 'ejemplo 1' }),
+    {
+      ref: 'ejemplo 1',
+      leftover: false,
+      next: 'ejemplo 1',
+    },
+  );
+  await a.call('projects:forget', { ref: project.ref });
+  assert.deepEqual(
+    await a.call('projects:import-target', { name: 'ejemplo 1', subpath: 'ejemplo 1' }),
+    {
+      ref: 'ejemplo 1',
+      leftover: true,
+      next: 'ejemplo 1-2',
+    },
+  );
+  assert.equal(
+    (await a.call('projects:import-target', { name: '', subpath: '' })).error,
+    'bad-name',
+  );
+  a.api.releaseAll();
+  rmSync(docs, { recursive: true, force: true });
 });

@@ -1746,7 +1746,13 @@
     "takeoverTitle": "Assumir o controlo de «{{name}}»?",
     "takeoverText": "{{host}} tem-no aberto (último sinal às {{time}}). Se assumir, esse computador passa a só leitura e pode perder alterações por guardar.",
     "forgetTitle": "Remover «{{name}}» da lista?",
-    "forgetText": "Os PDFs e o trabalho ficam no seu disco; só o projeto é removido da lista. Pode criá-lo de novo na mesma pasta.",
+    "forgetText": "Nenhum ficheiro é apagado. Os PDF e o seu trabalho ficam no disco, nesta pasta:",
+    "forgetTextEmpty": "Nenhum ficheiro é apagado. A pasta ainda não tem PDF e fica no disco:",
+    "forgetNote": "Se mais tarde importar outro projeto com este nome e a pasta ainda lá estiver, será guardado numa pasta nova (por exemplo «{{folder}}-2») para não misturar ficheiros.",
+    "forgetSync": "Também deixa de sincronizar. O que já está sincronizado fica como está.",
+    "openFolder": "Abrir pasta",
+    "openFolderExisting": "Abrir pasta existente",
+    "forgottenWhere": "«{{name}}» removido da lista. Os ficheiros continuam em {{path}}.",
     "forgetConfirm": "Remover da lista",
     "created": "Projeto «{{name}}» criado e guardado no seu disco.",
     "forgotten": "«{{name}}» removido da lista (os ficheiros continuam no disco).",
@@ -1781,7 +1787,9 @@
       "disk-full": "Sem espaço no disco.",
       "not-synced": "Este projeto não é sincronizado.",
       "bad-action": "Ação inválida.",
-      "in-use-local": "Algo tem a pasta aberta (o Explorador, um antivírus ou o cliente da nuvem). Feche-o e tente de novo. O projeto não mudou."
+      "in-use-local": "Algo tem a pasta aberta (o Explorador, um antivírus ou o cliente da nuvem). Feche-o e tente de novo. O projeto não mudou.",
+      "folder-gone": "Não foi possível abrir a pasta: já não existe no disco. Pode ter sido movida ou apagada.",
+      "open-failed": "Não foi possível abrir a pasta."
     },
     "transfer": {
       "import": "Importar projeto",
@@ -1878,7 +1886,9 @@
         "diskFullTitle": "Sem espaço no disco",
         "diskFullText": "O que tinha sido escrito a meio foi apagado; a sua pasta de projetos está como antes. Liberte espaço e tente de novo.",
         "diskFullExport": "Não ficou nenhum ficheiro a meio. Liberte espaço ou escolha outra unidade e tente de novo."
-      }
+      },
+      "targetTaken": "A pasta «{{ref}}» já tem ficheiros de um projeto removido da lista. Não são tocados: este projeto será importado para «{{next}}».",
+      "targetLabel": "Será importado para"
     },
     "sync": {
       "linkButton": "Sincronizar com outra pasta…",

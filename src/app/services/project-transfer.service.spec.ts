@@ -55,6 +55,7 @@ describe('ProjectTransferService', () => {
       'reveal',
       'importInspect',
       'importRun',
+      'importTarget',
       'cancel',
       'pathForFile',
       'onProgress',
@@ -63,6 +64,11 @@ describe('ProjectTransferService', () => {
     ]);
     bridge.onProgress.and.returnValue(() => undefined);
     bridge.cancel.and.resolveTo({ ok: true });
+    bridge.importTarget.and.resolveTo({
+      ref: 'Álvaro/cliente1',
+      leftover: false,
+      next: 'Álvaro/cliente1',
+    });
     bridge.info.and.resolveTo({
       root: '/r',
       host: 'h',
@@ -176,6 +182,30 @@ describe('ProjectTransferService', () => {
     expect(bridge.importRun.calls.mostRecent().args[0].mode).toBe('copy');
     expect(transfer.dialog()).toBeNull();
     expect(transfer.notice()?.kind).toBe('imported');
+  });
+
+  it('waits for the folder check before importing and shows a leftover folder first', async () => {
+    bridge.importInspect.and.resolveTo({
+      file: '/d/c.pdfannotator',
+      fileName: 'c.pdfannotator',
+      info: archive,
+    });
+    let answer!: (value: { ref: string; leftover: boolean; next: string }) => void;
+    bridge.importTarget.and.returnValue(
+      new Promise((resolve) => {
+        answer = resolve;
+      }),
+    );
+    await transfer.startImport();
+    bridge.importRun.and.resolveTo({ conflict });
+    const confirming = transfer.confirmImport();
+    answer({ ref: 'Álvaro/cliente1', leftover: true, next: 'Álvaro/cliente1-2' });
+    await confirming;
+    // The warning was not on screen yet: nothing is imported until the person has seen it.
+    expect(transfer.target()?.leftover).toBeTrue();
+    expect(bridge.importRun).not.toHaveBeenCalled();
+    await transfer.confirmImport();
+    expect(bridge.importRun).toHaveBeenCalled();
   });
 
   it('replacing asks for confirmation, closes the open project and keeps the safety copy', async () => {

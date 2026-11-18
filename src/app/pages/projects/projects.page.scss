@@ -596,6 +596,27 @@
   word-break: break-all;
 }
 
+.proj-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--proj-warn);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 14px;
+  line-height: 1.5;
+
+  p {
+    margin: 0;
+  }
+}
+
+.proj-notice__label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .proj-kv {
   display: grid;
   grid-template-columns: 150px 1fr;

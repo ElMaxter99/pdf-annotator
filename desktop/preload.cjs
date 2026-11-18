@@ -40,6 +40,8 @@ contextBridge.exposeInMainWorld('desktop', {
     release: (input) => ipcRenderer.invoke('projects:release', input),
     rename: (input) => ipcRenderer.invoke('projects:rename', input),
     forget: (input) => ipcRenderer.invoke('projects:forget', input),
+    revealFolder: (input) => ipcRenderer.invoke('projects:reveal-folder', input),
+    importTarget: (input) => ipcRenderer.invoke('projects:import-target', input),
     exportInfo: (input) => ipcRenderer.invoke('projects:export-info', input),
     exportProject: (input) => ipcRenderer.invoke('projects:export', input),
     reveal: () => ipcRenderer.invoke('projects:reveal'),

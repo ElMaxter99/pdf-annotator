@@ -1746,7 +1746,13 @@
     "takeoverTitle": "¿Tomar el control de «{{name}}»?",
     "takeoverText": "{{host}} lo tiene abierto (último aviso a las {{time}}). Si lo tomas, ese equipo pasará a solo lectura y puede perder cambios sin guardar.",
     "forgetTitle": "¿Quitar «{{name}}» de la lista?",
-    "forgetText": "Los PDFs y el trabajo se quedan en tu disco; solo se quita el proyecto de la lista. Puedes volver a crearlo en la misma carpeta.",
+    "forgetText": "No se borra ningún archivo. Los PDFs y su trabajo se quedan en tu disco, en esta carpeta:",
+    "forgetTextEmpty": "No se borra ningún archivo. La carpeta no tiene PDFs todavía y se queda en tu disco:",
+    "forgetNote": "Si más tarde importas otro proyecto con este nombre y la carpeta sigue ahí, se guardará en una carpeta nueva (por ejemplo «{{folder}}-2») para no mezclar archivos.",
+    "forgetSync": "También se deja de sincronizar. Lo que ya está sincronizado se queda como está.",
+    "openFolder": "Abrir carpeta",
+    "openFolderExisting": "Abrir carpeta existente",
+    "forgottenWhere": "«{{name}}» quitado de la lista. Los archivos siguen en {{path}}.",
     "forgetConfirm": "Quitar de la lista",
     "created": "Proyecto «{{name}}» creado y guardado en tu disco.",
     "forgotten": "«{{name}}» quitado de la lista (los archivos siguen en el disco).",
@@ -1781,7 +1787,9 @@
       "disk-full": "No hay espacio en el disco.",
       "not-synced": "Este proyecto no se sincroniza.",
       "bad-action": "Acción no válida.",
-      "in-use-local": "Algo tiene abierta la carpeta (el Explorador, un antivirus o el cliente de la nube). Ciérralo e inténtalo de nuevo. El proyecto no ha cambiado."
+      "in-use-local": "Algo tiene abierta la carpeta (el Explorador, un antivirus o el cliente de la nube). Ciérralo e inténtalo de nuevo. El proyecto no ha cambiado.",
+      "folder-gone": "No se pudo abrir la carpeta: ya no existe en el disco. Puede que se haya movido o borrado.",
+      "open-failed": "No se pudo abrir la carpeta."
     },
     "transfer": {
       "import": "Importar proyecto",
@@ -1878,7 +1886,9 @@
         "diskFullTitle": "No hay espacio en el disco",
         "diskFullText": "Se ha borrado lo que se había escrito a medias; tu carpeta de proyectos está como antes. Libera espacio y vuelve a intentarlo.",
         "diskFullExport": "No se ha dejado ningún archivo a medias. Libera espacio o elige otra unidad y vuelve a intentarlo."
-      }
+      },
+      "targetTaken": "La carpeta «{{ref}}» ya tiene archivos de un proyecto quitado de la lista. No se tocan: este proyecto se importará en «{{next}}».",
+      "targetLabel": "Se importará en"
     },
     "sync": {
       "linkButton": "Sincronizar con otra carpeta…",

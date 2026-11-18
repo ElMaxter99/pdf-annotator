@@ -416,9 +416,17 @@
           }
           @case ('forget') {
             <h2>{{ 'projects.forgetTitle' | t: { name: d.project.name } }}</h2>
-            <p>{{ 'projects.forgetText' | t }}</p>
+            <p>{{ (d.project.pdfs ? 'projects.forgetText' : 'projects.forgetTextEmpty') | t }}</p>
+            <code class="proj-path" data-testid="forget-path">{{ folderPath(d.project.ref) }}</code>
+            <div class="proj-actions">
+              <button type="button" class="btn" (click)="revealFolder(d.project.ref)" data-testid="forget-open-folder">{{ 'projects.openFolder' | t }}</button>
+            </div>
+            @if (isSynced(d.project)) {
+              <p class="proj-hint" data-testid="forget-sync">{{ 'projects.forgetSync' | t }}</p>
+            }
+            <p class="proj-hint">{{ 'projects.forgetNote' | t: { folder: folderName(d.project) } }}</p>
             <div class="proj-actions proj-actions--end">
-              <button type="button" class="btn" (click)="closeDialog()">{{ 'projects.cancel' | t }}</button>
+              <button type="button" class="btn" autofocus (click)="closeDialog()">{{ 'projects.cancel' | t }}</button>
               <button type="button" class="btn btn--danger" (click)="forget(d.project)">{{ 'projects.forgetConfirm' | t }}</button>
             </div>
           }
@@ -509,7 +517,7 @@
                 type="text"
                 maxlength="80"
                 [value]="transfer.importName()"
-                (input)="transfer.importName.set($any($event.target).value)"
+                (input)="transfer.importName.set($any($event.target).value); transfer.updateTarget()"
                 (keydown.enter)="transfer.confirmImport()"
                 data-testid="import-name"
               />
@@ -522,11 +530,23 @@
                 maxlength="200"
                 placeholder="Álvaro/cliente1"
                 [value]="transfer.importSub()"
-                (input)="transfer.importSub.set($any($event.target).value)"
+                (input)="transfer.importSub.set($any($event.target).value); transfer.updateTarget()"
                 (keydown.enter)="transfer.confirmImport()"
                 data-testid="import-sub"
               />
             </label>
+            @if (transfer.target(); as target) {
+              @if (target.leftover) {
+                <div class="proj-notice" role="status" data-testid="import-leftover">
+                  <p>{{ 'projects.transfer.targetTaken' | t: { ref: target.ref, next: target.next } }}</p>
+                  <div class="proj-actions">
+                    <button type="button" class="btn" (click)="transfer.revealTarget()" data-testid="import-open-existing">{{ 'projects.openFolderExisting' | t }}</button>
+                  </div>
+                  <span class="proj-notice__label">{{ 'projects.transfer.targetLabel' | t }}</span>
+                  <code class="proj-path">{{ store.root() + '/' + target.next }}</code>
+                </div>
+              }
+            }
             <div class="proj-actions proj-actions--end">
               <button type="button" class="btn" (click)="transfer.closeDialog()">{{ 'projects.cancel' | t }}</button>
               <button

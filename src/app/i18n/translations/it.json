@@ -1746,7 +1746,13 @@
     "takeoverTitle": "Prendere il controllo di «{{name}}»?",
     "takeoverText": "{{host}} lo ha aperto (ultimo segnale alle {{time}}). Se lo prendi, quel computer passerà in sola lettura e potrebbe perdere modifiche non salvate.",
     "forgetTitle": "Rimuovere «{{name}}» dall'elenco?",
-    "forgetText": "I PDF e il lavoro restano sul tuo disco; viene rimosso solo il progetto dall'elenco. Puoi ricrearlo nella stessa cartella.",
+    "forgetText": "Nessun file viene eliminato. I PDF e il tuo lavoro restano sul disco, in questa cartella:",
+    "forgetTextEmpty": "Nessun file viene eliminato. La cartella non ha ancora PDF e resta sul disco:",
+    "forgetNote": "Se in seguito importi un altro progetto con questo nome e la cartella è ancora lì, verrà salvato in una cartella nuova (ad esempio «{{folder}}-2») per non mescolare i file.",
+    "forgetSync": "Smette anche di sincronizzarsi. Ciò che è già sincronizzato resta com’è.",
+    "openFolder": "Apri cartella",
+    "openFolderExisting": "Apri la cartella esistente",
+    "forgottenWhere": "«{{name}}» rimosso dall’elenco. I file restano in {{path}}.",
     "forgetConfirm": "Rimuovi dall'elenco",
     "created": "Progetto «{{name}}» creato e salvato sul tuo disco.",
     "forgotten": "«{{name}}» rimosso dall'elenco (i file restano sul disco).",
@@ -1781,7 +1787,9 @@
       "disk-full": "Spazio su disco esaurito.",
       "not-synced": "Questo progetto non viene sincronizzato.",
       "bad-action": "Azione non valida.",
-      "in-use-local": "Qualcosa tiene aperta la cartella (Esplora risorse, un antivirus o il client cloud). Chiudilo e riprova. Il progetto non è cambiato."
+      "in-use-local": "Qualcosa tiene aperta la cartella (Esplora risorse, un antivirus o il client cloud). Chiudilo e riprova. Il progetto non è cambiato.",
+      "folder-gone": "Impossibile aprire la cartella: non esiste più sul disco. Potrebbe essere stata spostata o eliminata.",
+      "open-failed": "Impossibile aprire la cartella."
     },
     "transfer": {
       "import": "Importa progetto",
@@ -1878,7 +1886,9 @@
         "diskFullTitle": "Spazio su disco esaurito",
         "diskFullText": "Ciò che era stato scritto a metà è stato eliminato; la tua cartella dei progetti è com'era prima. Libera spazio e riprova.",
         "diskFullExport": "Non è rimasto nessun file a metà. Libera spazio o scegli un'altra unità e riprova."
-      }
+      },
+      "targetTaken": "La cartella «{{ref}}» contiene già file di un progetto rimosso dall’elenco. Non vengono toccati: questo progetto sarà importato in «{{next}}».",
+      "targetLabel": "Sarà importato in"
     },
     "sync": {
       "linkButton": "Sincronizza con un’altra cartella…",

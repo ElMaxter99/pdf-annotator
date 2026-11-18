@@ -357,10 +357,33 @@ export class ProjectsPageComponent implements OnInit, OnDestroy {
     const ok = await this.store.forget(project.ref);
     this.busy.set(null);
     this.dialog.set(null);
+    if (!ok) {
+      this.toast.show(this.t('projects.error.io', { name: project.name }), 'error');
+      return;
+    }
     this.toast.show(
-      this.t(ok ? 'projects.forgotten' : 'projects.error.io', { name: project.name }),
-      ok ? 'info' : 'error',
+      this.t('projects.forgottenWhere', { name: project.name, path: this.folderPath(project.ref) }),
+      'info',
+      10000,
+      false,
+      {
+        label: this.t('projects.openFolder'),
+        run: () => void this.revealFolder(project.ref),
+      },
     );
+  }
+
+  /** Ruta completa de la carpeta del proyecto (solo para mostrarla). */
+  folderPath(ref: string): string {
+    return `${this.store.root()}/${ref}`;
+  }
+
+  /** «Abrir carpeta»: el explorador de archivos en la carpeta del proyecto; si falla, un aviso con la causa. */
+  async revealFolder(ref: string): Promise<void> {
+    const error = await this.store.revealFolder(ref);
+    if (error) {
+      this.toast.error(this.t(`projects.error.${error}`));
+    }
   }
 
   /** The batch in browser storage has no project: save it as «Sin título» (explicit, nothing is written silently). */

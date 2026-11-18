@@ -24,7 +24,9 @@ export class FocusTrapDirective implements OnDestroy {
     if (typeof queueMicrotask === 'function') {
       queueMicrotask(() => {
         if (!this.host.contains(document.activeElement)) {
-          (focusableIn(this.host)[0] ?? this.host).focus();
+          // `autofocus` marca el control que debe recibir el foco (p. ej. «Cancelar» en una acción destructiva).
+          const wanted = this.host.querySelector<HTMLElement>('[autofocus]');
+          (wanted ?? focusableIn(this.host)[0] ?? this.host).focus();
         }
       });
     }

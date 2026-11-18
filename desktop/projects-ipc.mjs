@@ -8,6 +8,7 @@ import {
   exportInfo,
   exportProject,
   importArchive,
+  importTarget,
   inspectArchive,
   isArchiveFile,
   replaceImpact,
@@ -358,6 +359,23 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow, safeSt
       rmSync(path.join(dir, '.sync.json'), { force: true });
       return { ok: true };
     }),
+  );
+
+  /** «Abrir carpeta»: solo carpetas del propio proyecto dentro de la raíz (resolveRef lo garantiza). */
+  handle(
+    'projects:reveal-folder',
+    guarded(async (input) => {
+      const { dir } = resolveRef(root, asText(input?.ref, 300));
+      if (!existsSync(dir)) throw new ProjectError('folder-gone');
+      const failure = await shell?.openPath?.(dir);
+      if (failure) throw new ProjectError('open-failed');
+      return { ok: true };
+    }),
+  );
+  /** Dónde se importaría con ese nombre y subcarpeta (para avisar antes si la carpeta tiene restos). */
+  handle(
+    'projects:import-target',
+    guarded((input) => importTarget(root, asText(input?.name, 80), asText(input?.subpath, 300))),
   );
 
   handle(
