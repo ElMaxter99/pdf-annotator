@@ -224,8 +224,11 @@ import {
   formatShift,
   hitAdjustField,
   isFieldMoved,
+  collectAdjustFields,
+  existingFieldKeys,
   recomputeFields,
 } from '../../utils/adjust-session.utils';
+import { readPageTexts } from '../../services/pdf-text.service';
 
 const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
 const WHEEL_PAGING_KEY = 'pdf-annotator.wheelPaging';
@@ -3295,24 +3298,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   // ---- «Copiar y ajustar por textos» -------------------------------------------------------------
 
-  /** Texts of one page with their position in PDF points. */
-  private async pageTexts(doc: PDFDocumentProxy, pageNumber: number): Promise<PageTextItem[]> {
-    const page = await doc.getPage(pageNumber);
-    const content = await page.getTextContent();
-    const out: PageTextItem[] = [];
-    for (const item of content.items) {
-      if (!('str' in item) || !item.str.trim()) {
-        continue;
-      }
-      const x = Number(item.transform?.[4]);
-      const y = Number(item.transform?.[5]);
-      if (Number.isFinite(x) && Number.isFinite(y)) {
-        out.push({ text: item.str, x, y });
-      }
-    }
-    return out;
-  }
-
   /** Looks for the same texts in A and B and opens the review with a proposal. */
   async startAdjust(): Promise<void> {
     const item = this.batch.activeItem();
@@ -3321,12 +3306,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     const token = ++this.adjustToken;
     const template = this.normalizedTemplateA();
-    const existing = new Set<string>();
-    for (const page of this.coords()) {
-      for (const field of page.fields) {
-        existing.add(fieldKey(page.num, (field.mapField || field.value || '').trim()));
-      }
-    }
+    const existing = existingFieldKeys(this.coords());
     const pages = template.filter((page) => page.fields.length > 0).map((page) => page.num);
     const progress = { page: 0, total: pages.length, common: 0 };
     this.adjust.set({
@@ -3361,8 +3341,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           continue;
         }
         const [aItems, bItems] = await Promise.all([
-          this.pageTexts(aDoc, numA),
-          this.pageTexts(this.pdfDoc()!, num),
+          readPageTexts(aDoc, numA),
+          readPageTexts(this.pdfDoc()!, num),
         ]);
         textsA += aItems.length;
         textsB += bItems.length;
@@ -3384,30 +3364,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       if (token !== this.adjustToken) {
         return;
       }
-      let skipped = 0;
-      let fields: AdjustField[] = [];
-      for (const page of template) {
-        page.fields.forEach((field, fieldIndex) => {
-          const name = (field.mapField || field.value || '').trim();
-          if (existing.size > 0 && existing.has(fieldKey(page.num, name))) {
-            skipped += 1;
-            return;
-          }
-          fields.push({
-            key: `${page.num}:${fieldIndex}`,
-            page: page.num,
-            fieldIndex,
-            name: name || '—',
-            x: field.x,
-            y: field.y,
-            fontSize: field.fontSize,
-            shift: null,
-            override: null,
-            manual: null,
-          });
-        });
-      }
-      fields = recomputeFields(fields, anchors, 'near');
+      const collected = collectAdjustFields(template, existing);
+      const skipped = collected.skipped;
+      const fields = recomputeFields(collected.fields, anchors, 'near');
       const phase =
         textsA === 0 || textsB === 0 ? 'noText' : anchors.length === 0 ? 'none' : 'ready';
       this.adjust.set({
@@ -4312,7 +4271,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           if (token !== this.pageMapToken) {
             throw new Error('cancelled');
           }
-          out.push((await this.pageTexts(doc, num)).map((text) => text.text).join(' '));
+          out.push((await readPageTexts(doc, num)).map((text) => text.text).join(' '));
           done += 1;
           onProgress(done, total);
         }

@@ -1,8 +1,6 @@
-import {
-  proposeShifts,
-  type FieldShift,
-  type TextAnchor,
-} from './text-anchors.utils';
+import type { PageAnnotations } from '../models/annotation.model';
+import { fieldKey } from './migration.utils';
+import { proposeShifts, type FieldShift, type TextAnchor } from './text-anchors.utils';
 
 export type AdjustMode = 'near' | 'global';
 
@@ -132,4 +130,51 @@ export function fieldVisual(field: AdjustField): AdjustVisual {
     return field.shift?.confidence === 'estimated' ? 'estimated' : 'proposal';
   }
   return field.shift?.confidence === 'low' && field.override === null ? 'low' : 'grey';
+}
+
+/** Name of a field in the template (its map name, or its value when it has none). */
+function nameOfField(field: { mapField?: string; value?: string }): string {
+  return (field.mapField || field.value || '').trim();
+}
+
+/** Keys (page + name) of the fields B already has: the adjustment does not offer them again. */
+export function existingFieldKeys(pages: readonly PageAnnotations[]): Set<string> {
+  const keys = new Set<string>();
+  for (const page of pages) {
+    for (const field of page.fields) {
+      keys.add(fieldKey(page.num, nameOfField(field)));
+    }
+  }
+  return keys;
+}
+
+/** Fields of the template of A to offer, without the ones B already has (counted in `skipped`). */
+export function collectAdjustFields(
+  template: readonly PageAnnotations[],
+  existing: ReadonlySet<string>,
+): { fields: AdjustField[]; skipped: number } {
+  const fields: AdjustField[] = [];
+  let skipped = 0;
+  for (const page of template) {
+    page.fields.forEach((field, fieldIndex) => {
+      const name = nameOfField(field);
+      if (existing.size > 0 && existing.has(fieldKey(page.num, name))) {
+        skipped += 1;
+        return;
+      }
+      fields.push({
+        key: `${page.num}:${fieldIndex}`,
+        page: page.num,
+        fieldIndex,
+        name: name || '—',
+        x: field.x,
+        y: field.y,
+        fontSize: field.fontSize,
+        shift: null,
+        override: null,
+        manual: null,
+      });
+    });
+  }
+  return { fields, skipped };
 }

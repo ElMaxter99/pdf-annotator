@@ -1,6 +1,7 @@
 ## Unreleased
 ### Changed
 - **1.15 «Solidez» (solo mantenimiento, sin cambios visibles):** `docs/ROADMAP.md` al día (1.15 en curso, hecho de la 1.13 y 1.14, y cifras reales de `workspace.page.ts`).
+- **Deuda técnica, parte 10 (sin cambios visibles):** «Copiar y ajustar por textos» deja de duplicar código: la lectura de los textos de una página (que estaba copiada en la página del editor y en `PdfTextService`) es una sola función, `readPageTexts`, y la lista de campos que se ofrecen (sin los que B ya tiene) sale a `utils/adjust-session.utils.ts` (`existingFieldKeys`, `collectAdjustFields`) con pruebas.
 - **Deuda técnica, parte 9 (sin cambios visibles):** el arrastre de anotaciones (una o todas las seleccionadas) sale de `workspace.page.ts` a `pages/workspace/annotation-drag.controller.ts`, con pruebas. La página solo le da el DOM del visor y recibe la nueva posición.
 - **Deuda técnica, parte 8 (sin cambios visibles):** el estado derivado de las páginas A↔B (tabla, página de A que acompaña a cada página de B, etiquetas de la cabecera y del visor) sale de `workspace.page.ts` a `pages/workspace/page-link.state.ts`, con pruebas. La página sigue escribiendo `pagesLinked`, `commonPage` y `freeAPage`.
 
