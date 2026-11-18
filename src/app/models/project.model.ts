@@ -62,6 +62,8 @@ export type ProjectErrorCode =
   | 'ref-taken'
   | 'in-use-local'
   | 'not-linked'
+  | 'folder-gone'
+  | 'open-failed'
   | 'not-synced'
   | 'bad-action'
   | 'already-linked'
@@ -305,6 +307,13 @@ export interface ProjectsBridge {
     { ok: true; ref: string; folderKept: boolean } | { locked: ProjectLockInfo } | ProjectFailure
   >;
   forget(input: { ref: string }): Promise<{ ok: true } | ProjectFailure>;
+  /** «Abrir carpeta»: abre la carpeta del proyecto en el explorador de archivos. */
+  revealFolder(input: { ref: string }): Promise<{ ok: true } | ProjectFailure>;
+  /** Dónde se importaría con ese nombre y subcarpeta: `leftover` = la carpeta pedida tiene archivos ajenos. */
+  importTarget(input: {
+    name: string;
+    subpath: string;
+  }): Promise<{ ref: string; leftover: boolean; next: string } | ProjectFailure>;
   exportInfo(input: { ref: string }): Promise<ProjectExportInfo | ProjectFailure>;
   exportProject(input: {
     ref: string;

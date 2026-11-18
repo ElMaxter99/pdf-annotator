@@ -54,6 +54,7 @@ describe('ProjectStoreService', () => {
       'release',
       'rename',
       'forget',
+      'revealFolder',
     ]);
     (window as unknown as { desktop: unknown }).desktop = { isDesktop: true, projects: bridge };
     sessionStorage.clear();
@@ -65,6 +66,16 @@ describe('ProjectStoreService', () => {
   afterEach(() => {
     delete (window as unknown as { desktop?: unknown }).desktop;
     sessionStorage.clear();
+  });
+
+  it('reveals the folder of a project and reports why it could not', async () => {
+    bridge.revealFolder.and.returnValues(
+      Promise.resolve({ ok: true }),
+      Promise.resolve({ ok: false, error: 'folder-gone' }),
+    );
+    expect(await store.revealFolder('Uno')).toBeNull();
+    expect(bridge.revealFolder).toHaveBeenCalledWith({ ref: 'Uno' });
+    expect(await store.revealFolder('Uno')).toBe('folder-gone');
   });
 
   it('is available only with the desktop bridge', () => {

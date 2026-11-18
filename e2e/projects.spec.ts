@@ -19,6 +19,8 @@ async function withDesktopProjects(page: Page, { secureStore = true } = {}) {
   const userData = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-ud-'));
   const documents = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-docs-'));
   const root = path.join(documents, 'PDF Annotator');
+  const revealed: string[] = [];
+  const opened: string[] = [];
   const { setupProjectsIpc } = await import('../desktop/projects-ipc.mjs');
   const handlers = new Map<string, (...args: unknown[]) => unknown>();
   /** Files the faked native dialogs answer with (the tests set them before clicking). */
@@ -37,7 +39,13 @@ async function withDesktopProjects(page: Page, { secureStore = true } = {}) {
       showSaveDialog: async () =>
         picks.save ? { canceled: false, filePath: picks.save } : { canceled: true },
     },
-    shell: { showItemInFolder: (file: string) => revealed.push(file) },
+    shell: {
+      showItemInFolder: (file: string) => revealed.push(file),
+      openPath: async (dir: string) => {
+        opened.push(dir);
+        return '';
+      },
+    },
     safeStorage: {
       isEncryptionAvailable: () => secureStore,
       getSelectedStorageBackend: () => (secureStore ? 'gnome_libsecret' : 'basic_text'),
@@ -61,7 +69,6 @@ async function withDesktopProjects(page: Page, { secureStore = true } = {}) {
       },
     }),
   });
-  const revealed: string[] = [];
   const revive = (value: unknown): unknown => {
     if (Array.isArray(value)) return value.map(revive);
     if (value && typeof value === 'object') {
@@ -99,6 +106,8 @@ async function withDesktopProjects(page: Page, { secureStore = true } = {}) {
         release: (i: unknown) => call('projects:release', i),
         rename: (i: unknown) => call('projects:rename', i),
         forget: (i: unknown) => call('projects:forget', i),
+        revealFolder: (i: unknown) => call('projects:reveal-folder', i),
+        importTarget: (i: unknown) => call('projects:import-target', i),
         exportInfo: (i: unknown) => call('projects:export-info', i),
         exportProject: (i: unknown) => call('projects:export', i),
         reveal: () => call('projects:reveal'),
@@ -137,7 +146,7 @@ async function withDesktopProjects(page: Page, { secureStore = true } = {}) {
     };
   });
   const projects = await import('../desktop/projects.mjs');
-  return { root, picks, revealed, projects, userData };
+  return { root, picks, revealed, opened, projects, userData };
 }
 
 test.beforeEach(async ({ page }) => stubAnalytics(page));
@@ -584,4 +593,54 @@ test('SFTP without a secure store asks for the password each session', async ({ 
   } finally {
     await server.close();
   }
+});
+
+test('quitar de la lista dice dónde quedan los archivos, abre la carpeta y la importación no la pisa', async ({
+  page,
+}) => {
+  const { root, picks, opened, projects } = await withDesktopProjects(page);
+  const { dir } = seedProject(projects, root, 'ejemplo 1', 'ejemplo 1');
+  const out = mkdtempSync(path.join(os.tmpdir(), 'pa-e2e-out-'));
+  const file = path.join(out, 'ejemplo 1.pdfannotator');
+
+  await page.goto('/proyectos');
+  const card = page.getByTestId('project-card');
+  await card.getByTestId('project-menu').click();
+  await card.getByTestId('project-export').click();
+  picks.save = file;
+  await page.getByTestId('export-choose').click();
+  await expect(page.getByTestId('transfer-notice')).toContainText('ejemplo 1.pdfannotator');
+
+  // El diálogo muestra la ruta, avisa de que no se borra nada y «Abrir carpeta» no lo cierra.
+  await card.getByTestId('project-menu').click();
+  await card.getByTestId('project-forget').click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toContainText('No se borra ningún archivo');
+  await expect(dialog.getByTestId('forget-path')).toContainText(dir);
+  await expect(dialog.getByRole('button', { name: 'Cancelar' })).toBeFocused();
+  await dialog.getByTestId('forget-open-folder').click();
+  await expect.poll(() => opened).toEqual([dir]);
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button', { name: 'Quitar de la lista' }).click();
+
+  // La lista queda vacía, la carpeta sigue y el aviso ofrece abrirla otra vez.
+  await expect(page.getByTestId('project-empty')).toBeVisible();
+  expect(existsSync(path.join(dir, 'batch'))).toBe(true);
+  expect(existsSync(path.join(dir, 'project.json'))).toBe(false);
+  const toast = page.locator('.toast');
+  await expect(toast).toContainText('Los archivos siguen en');
+  await toast.getByTestId('toast-action').click();
+  await expect.poll(() => opened).toEqual([dir, dir]);
+
+  // Importar con el mismo nombre: avisa de la carpeta ocupada y usa otra, sin tocar la primera.
+  picks.open = file;
+  await page.getByTestId('project-import').click();
+  await expect(page.getByTestId('import-leftover')).toContainText('ejemplo 1-2');
+  await page.getByTestId('import-open-existing').click();
+  await expect.poll(() => opened).toEqual([dir, dir, dir]);
+  await page.getByTestId('import-confirm').click();
+  await expect(page.getByTestId('project-card')).toHaveCount(1);
+  expect(existsSync(path.join(root, 'ejemplo 1-2', 'project.json'))).toBe(true);
+  expect(existsSync(path.join(dir, 'project.json'))).toBe(false);
+  expect(existsSync(path.join(dir, 'batch'))).toBe(true);
 });

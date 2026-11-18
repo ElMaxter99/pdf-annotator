@@ -1746,7 +1746,13 @@
     "takeoverTitle": "Take over «{{name}}»?",
     "takeoverText": "{{host}} has it open (last seen at {{time}}). If you take over, that computer becomes read-only and may lose unsaved changes.",
     "forgetTitle": "Remove «{{name}}» from the list?",
-    "forgetText": "The PDFs and your work stay on your disk; only the project is removed from the list. You can create it again in the same folder.",
+    "forgetText": "No file is deleted. The PDFs and your work stay on your disk, in this folder:",
+    "forgetTextEmpty": "No file is deleted. The folder has no PDFs yet and stays on your disk:",
+    "forgetNote": "If you later import another project with this name and the folder is still there, it will be saved in a new folder (for example “{{folder}}-2”) so files are never mixed.",
+    "forgetSync": "It also stops syncing. What is already synced stays as it is.",
+    "openFolder": "Open folder",
+    "openFolderExisting": "Open existing folder",
+    "forgottenWhere": "“{{name}}” removed from the list. The files are still in {{path}}.",
     "forgetConfirm": "Remove from list",
     "created": "Project «{{name}}» created and saved on your disk.",
     "forgotten": "«{{name}}» removed from the list (the files are still on your disk).",
@@ -1781,7 +1787,9 @@
       "disk-full": "Not enough disk space.",
       "not-synced": "This project is not synced.",
       "bad-action": "Invalid action.",
-      "in-use-local": "Something has the folder open (File Explorer, an antivirus or the cloud client). Close it and try again. The project has not changed."
+      "in-use-local": "Something has the folder open (File Explorer, an antivirus or the cloud client). Close it and try again. The project has not changed.",
+      "folder-gone": "Could not open the folder: it no longer exists on the disk. It may have been moved or deleted.",
+      "open-failed": "Could not open the folder."
     },
     "transfer": {
       "import": "Import project",
@@ -1878,7 +1886,9 @@
         "diskFullTitle": "Not enough disk space",
         "diskFullText": "Whatever was half written was deleted; your projects folder is as it was. Free some space and try again.",
         "diskFullExport": "No half-written file was left behind. Free some space or pick another drive and try again."
-      }
+      },
+      "targetTaken": "The folder “{{ref}}” already has files from a project removed from the list. They are left untouched: this project will be imported into “{{next}}”.",
+      "targetLabel": "Will be imported into"
     },
     "sync": {
       "linkButton": "Sync with another folder…",

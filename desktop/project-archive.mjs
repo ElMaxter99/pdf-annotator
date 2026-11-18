@@ -563,6 +563,40 @@ function freeRef(root, segments, suffix) {
   throw new ProjectError('exists');
 }
 
+/** Carpeta (como tramos de ruta) donde iría un proyecto importado con ese nombre y subcarpeta. */
+function importSegments(base, title, subpath) {
+  const wanted = safeSegments(subpath);
+  const segments = wanted.length ? wanted : safeSegments(title.replace(/[\\/]+/g, ' ')).slice(0, 1);
+  if (!segments.length) throw new ProjectError('bad-name');
+  for (let n = 1; n < segments.length; n += 1) {
+    if (existsSync(path.join(resolveRef(base, segments.slice(0, n).join('/')).dir, 'project.json')))
+      throw new ProjectError('bad-ref');
+  }
+  return segments;
+}
+
+/**
+ * Dónde caería la importación: `ref` es la carpeta pedida y `next` la que se usará. `leftover` es una carpeta
+ * con archivos que no es un proyecto (p. ej. tras «Quitar de la lista»): no se toca y se usa la siguiente libre.
+ */
+export function importTarget(root, name, subpath) {
+  const base = path.resolve(root);
+  if (!existsSync(base)) throw new ProjectError('root-missing');
+  const title = String(name ?? '')
+    .trim()
+    .slice(0, MAX_NAME);
+  if (!title) throw new ProjectError('bad-name');
+  const segments = importSegments(base, title, subpath);
+  const target = resolveRef(base, segments.join('/'));
+  const isProject = existsSync(path.join(target.dir, 'project.json'));
+  const leftover = !isProject && existsSync(target.dir) && readdirSync(target.dir).length > 0;
+  return {
+    ref: target.ref,
+    leftover,
+    next: leftover ? freeRef(base, segments, '').ref : target.ref,
+  };
+}
+
 /**
  * Importa un archivo `.pdfannotator` como proyecto. `mode`: `'copy'` (carpeta y nombre nuevos si ya existe)
  * o `'replace'` (aparta antes el proyecto actual en «…-antes-de-importar»). Sin `mode` y con un proyecto igual,
@@ -576,13 +610,7 @@ export async function importArchive(file, root, options = {}, hooks = {}) {
   if (!title) throw new ProjectError('bad-name');
   const base = path.resolve(root);
   if (!existsSync(base)) throw new ProjectError('root-missing');
-  const wanted = safeSegments(options.subpath);
-  const segments = wanted.length ? wanted : safeSegments(title.replace(/[\\/]+/g, ' ')).slice(0, 1);
-  if (!segments.length) throw new ProjectError('bad-name');
-  for (let n = 1; n < segments.length; n += 1) {
-    if (existsSync(path.join(resolveRef(base, segments.slice(0, n).join('/')).dir, 'project.json')))
-      throw new ProjectError('bad-ref');
-  }
+  const segments = importSegments(base, title, options.subpath);
   let target = resolveRef(base, segments.join('/'));
   let projectName = title;
   const exists = existsSync(path.join(target.dir, 'project.json'));

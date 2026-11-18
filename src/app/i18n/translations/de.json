@@ -1746,7 +1746,13 @@
     "takeoverTitle": "«{{name}}» übernehmen?",
     "takeoverText": "{{host}} hat es geöffnet (letztes Signal um {{time}}). Wenn Sie es übernehmen, wird dieser Computer schreibgeschützt und kann ungespeicherte Änderungen verlieren.",
     "forgetTitle": "«{{name}}» aus der Liste entfernen?",
-    "forgetText": "Die PDFs und Ihre Arbeit bleiben auf Ihrer Festplatte; nur das Projekt wird aus der Liste entfernt. Sie können es im selben Ordner neu erstellen.",
+    "forgetText": "Es wird keine Datei gelöscht. Die PDFs und deine Arbeit bleiben auf deiner Festplatte, in diesem Ordner:",
+    "forgetTextEmpty": "Es wird keine Datei gelöscht. Der Ordner enthält noch keine PDFs und bleibt auf deiner Festplatte:",
+    "forgetNote": "Wenn du später ein anderes Projekt mit diesem Namen importierst und der Ordner noch da ist, wird es in einem neuen Ordner gespeichert (zum Beispiel „{{folder}}-2“), damit sich Dateien nie vermischen.",
+    "forgetSync": "Die Synchronisierung endet ebenfalls. Was bereits synchronisiert ist, bleibt unverändert.",
+    "openFolder": "Ordner öffnen",
+    "openFolderExisting": "Vorhandenen Ordner öffnen",
+    "forgottenWhere": "„{{name}}“ aus der Liste entfernt. Die Dateien liegen weiterhin in {{path}}.",
     "forgetConfirm": "Aus der Liste entfernen",
     "created": "Projekt «{{name}}» erstellt und auf Ihrer Festplatte gespeichert.",
     "forgotten": "«{{name}}» aus der Liste entfernt (die Dateien bleiben auf der Festplatte).",
@@ -1781,7 +1787,9 @@
       "disk-full": "Kein Speicherplatz mehr.",
       "not-synced": "Dieses Projekt wird nicht synchronisiert.",
       "bad-action": "Ungültige Aktion.",
-      "in-use-local": "Etwas hat den Ordner geöffnet (Explorer, ein Virenscanner oder der Cloud-Client). Schließe es und versuche es erneut. Das Projekt wurde nicht geändert."
+      "in-use-local": "Etwas hat den Ordner geöffnet (Explorer, ein Virenscanner oder der Cloud-Client). Schließe es und versuche es erneut. Das Projekt wurde nicht geändert.",
+      "folder-gone": "Der Ordner konnte nicht geöffnet werden: Er existiert auf der Festplatte nicht mehr. Möglicherweise wurde er verschoben oder gelöscht.",
+      "open-failed": "Der Ordner konnte nicht geöffnet werden."
     },
     "transfer": {
       "import": "Projekt importieren",
@@ -1878,7 +1886,9 @@
         "diskFullTitle": "Kein Speicherplatz mehr",
         "diskFullText": "Was halb geschrieben war, wurde gelöscht; Ihr Projektordner ist wie zuvor. Schaffen Sie Platz und versuchen Sie es erneut.",
         "diskFullExport": "Es blieb keine halbe Datei zurück. Schaffen Sie Platz oder wählen Sie ein anderes Laufwerk und versuchen Sie es erneut."
-      }
+      },
+      "targetTaken": "Der Ordner „{{ref}}“ enthält bereits Dateien eines aus der Liste entfernten Projekts. Sie bleiben unberührt: Dieses Projekt wird in „{{next}}“ importiert.",
+      "targetLabel": "Wird importiert in"
     },
     "sync": {
       "linkButton": "Mit anderem Ordner synchronisieren…",

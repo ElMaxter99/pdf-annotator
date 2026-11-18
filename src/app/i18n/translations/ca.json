@@ -1746,7 +1746,13 @@
     "takeoverTitle": "Prendre el control de «{{name}}»?",
     "takeoverText": "{{host}} el té obert (últim avís a les {{time}}). Si el prens, aquest equip passarà a només lectura i pot perdre canvis sense desar.",
     "forgetTitle": "Treure «{{name}}» de la llista?",
-    "forgetText": "Els PDFs i la feina es queden al teu disc; només es treu el projecte de la llista. Pots tornar-lo a crear a la mateixa carpeta.",
+    "forgetText": "No s’esborra cap fitxer. Els PDF i la teva feina es queden al disc, en aquesta carpeta:",
+    "forgetTextEmpty": "No s’esborra cap fitxer. La carpeta encara no té PDF i es queda al disc:",
+    "forgetNote": "Si més endavant importes un altre projecte amb aquest nom i la carpeta continua allà, es desarà en una carpeta nova (per exemple «{{folder}}-2») per no barrejar fitxers.",
+    "forgetSync": "També deixa de sincronitzar-se. El que ja està sincronitzat es queda com està.",
+    "openFolder": "Obre la carpeta",
+    "openFolderExisting": "Obre la carpeta existent",
+    "forgottenWhere": "«{{name}}» s’ha tret de la llista. Els fitxers continuen a {{path}}.",
     "forgetConfirm": "Treu de la llista",
     "created": "Projecte «{{name}}» creat i desat al teu disc.",
     "forgotten": "«{{name}}» tret de la llista (els fitxers continuen al disc).",
@@ -1781,7 +1787,9 @@
       "disk-full": "No hi ha espai al disc.",
       "not-synced": "Aquest projecte no se sincronitza.",
       "bad-action": "Acció no vàlida.",
-      "in-use-local": "Alguna cosa té oberta la carpeta (l’Explorador, un antivirus o el client del núvol). Tanca-ho i torna-ho a provar. El projecte no ha canviat."
+      "in-use-local": "Alguna cosa té oberta la carpeta (l’Explorador, un antivirus o el client del núvol). Tanca-ho i torna-ho a provar. El projecte no ha canviat.",
+      "folder-gone": "No s’ha pogut obrir la carpeta: ja no existeix al disc. Pot ser que s’hagi mogut o esborrat.",
+      "open-failed": "No s’ha pogut obrir la carpeta."
     },
     "transfer": {
       "import": "Importa projecte",
@@ -1878,7 +1886,9 @@
         "diskFullTitle": "No hi ha espai al disc",
         "diskFullText": "S'ha esborrat el que s'havia escrit a mitges; la teva carpeta de projectes està com abans. Allibera espai i torna-ho a provar.",
         "diskFullExport": "No s'ha deixat cap fitxer a mitges. Allibera espai o tria una altra unitat i torna-ho a provar."
-      }
+      },
+      "targetTaken": "La carpeta «{{ref}}» ja té fitxers d’un projecte tret de la llista. No es toquen: aquest projecte s’importarà a «{{next}}».",
+      "targetLabel": "S’importarà a"
     },
     "sync": {
       "linkButton": "Sincronitza amb una altra carpeta…",

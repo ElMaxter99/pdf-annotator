@@ -1746,7 +1746,13 @@
     "takeoverTitle": "Prendre le contrôle de «{{name}}» ?",
     "takeoverText": "{{host}} l'a ouvert (dernier signe à {{time}}). Si vous le prenez, cet ordinateur passera en lecture seule et pourra perdre des modifications non enregistrées.",
     "forgetTitle": "Retirer «{{name}}» de la liste ?",
-    "forgetText": "Les PDF et votre travail restent sur votre disque ; seul le projet est retiré de la liste. Vous pouvez le recréer dans le même dossier.",
+    "forgetText": "Aucun fichier n’est supprimé. Les PDF et votre travail restent sur votre disque, dans ce dossier :",
+    "forgetTextEmpty": "Aucun fichier n’est supprimé. Le dossier ne contient pas encore de PDF et reste sur votre disque :",
+    "forgetNote": "Si vous importez plus tard un autre projet portant ce nom et que le dossier est toujours là, il sera enregistré dans un nouveau dossier (par exemple « {{folder}}-2 ») pour ne jamais mélanger les fichiers.",
+    "forgetSync": "La synchronisation s’arrête aussi. Ce qui est déjà synchronisé reste tel quel.",
+    "openFolder": "Ouvrir le dossier",
+    "openFolderExisting": "Ouvrir le dossier existant",
+    "forgottenWhere": "« {{name}} » retiré de la liste. Les fichiers restent dans {{path}}.",
     "forgetConfirm": "Retirer de la liste",
     "created": "Projet «{{name}}» créé et enregistré sur votre disque.",
     "forgotten": "«{{name}}» retiré de la liste (les fichiers restent sur le disque).",
@@ -1781,7 +1787,9 @@
       "disk-full": "Plus d'espace sur le disque.",
       "not-synced": "Ce projet n’est pas synchronisé.",
       "bad-action": "Action non valide.",
-      "in-use-local": "Quelque chose garde le dossier ouvert (l’Explorateur, un antivirus ou le client cloud). Fermez-le et réessayez. Le projet n’a pas changé."
+      "in-use-local": "Quelque chose garde le dossier ouvert (l’Explorateur, un antivirus ou le client cloud). Fermez-le et réessayez. Le projet n’a pas changé.",
+      "folder-gone": "Impossible d’ouvrir le dossier : il n’existe plus sur le disque. Il a peut-être été déplacé ou supprimé.",
+      "open-failed": "Impossible d’ouvrir le dossier."
     },
     "transfer": {
       "import": "Importer un projet",
@@ -1878,7 +1886,9 @@
         "diskFullTitle": "Plus d'espace sur le disque",
         "diskFullText": "Ce qui avait été écrit à moitié a été supprimé ; votre dossier de projets est comme avant. Libérez de l'espace et réessayez.",
         "diskFullExport": "Aucun fichier à moitié écrit n'a été laissé. Libérez de l'espace ou choisissez un autre lecteur et réessayez."
-      }
+      },
+      "targetTaken": "Le dossier « {{ref}} » contient déjà des fichiers d’un projet retiré de la liste. Ils ne sont pas touchés : ce projet sera importé dans « {{next}} ».",
+      "targetLabel": "Sera importé dans"
     },
     "sync": {
       "linkButton": "Synchroniser avec un autre dossier…",

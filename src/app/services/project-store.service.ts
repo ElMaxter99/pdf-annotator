@@ -247,6 +247,13 @@ export class ProjectStoreService {
     return false;
   }
 
+  /** «Abrir carpeta»: `null` si se abrió, o el código del error. */
+  async revealFolder(ref: string): Promise<ProjectErrorCode | null> {
+    const result = await this.bridge()?.revealFolder({ ref });
+    if (!result) return 'io';
+    return 'error' in result ? result.error : null;
+  }
+
   /** Writes the current batch (the one in browser storage) as a project; used to adopt a batch that has no project yet. */
   async saveBatchAsProject(
     name: string,
