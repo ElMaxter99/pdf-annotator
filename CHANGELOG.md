@@ -1,4 +1,6 @@
 ## Unreleased
+### Fixed
+- **Importar un proyecto tras «Quitar de la lista» ya no falla con «Ya existe un proyecto con ese nombre»:** «Quitar de la lista» deja los PDFs en el disco (solo borra la marca del proyecto), y la importación se negaba a usar esa carpeta aunque la pantalla Proyectos no la listase. Ahora el proyecto importado va a una carpeta libre (`nombre-2`) y la carpeta antigua no se toca. Con test en `desktop/project-archive.test.mjs`.
 
 ## [v1.14.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.14.0) - 2026-11-17
 ### Changed

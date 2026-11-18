@@ -599,8 +599,10 @@ export async function importArchive(file, root, options = {}, hooks = {}) {
     target = free;
     projectName = `${title} (${free.n})`.slice(0, MAX_NAME + 6);
   } else if (!exists) {
-    // La carpeta puede existir sin ser un proyecto: se escribe dentro de ella solo si está vacía.
-    if (existsSync(target.dir) && readdirSync(target.dir).length) throw new ProjectError('exists');
+    // La carpeta puede existir sin ser un proyecto (p. ej. tras «Quitar de la lista», que deja los PDFs en el disco):
+    // se escribe dentro de ella solo si está vacía; si no, el proyecto va a una carpeta libre y no se toca lo que hay.
+    if (existsSync(target.dir) && readdirSync(target.dir).length)
+      target = freeRef(base, segments, '');
   }
   if (exists && mode === 'replace') {
     const lock = lockState(target.dir, token, now);
