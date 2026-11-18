@@ -89,7 +89,6 @@ import { FieldType, PageAnnotations, PageField } from '../../models/annotation.m
 import {
   PageSize,
   pageScaleFactors,
-  scalePagesToSize,
   sizeOfPage,
   sizesDiffer,
 } from '../../utils/page-scale.utils';
@@ -97,8 +96,6 @@ import {
   clampPageNumber,
   holdPageOfB,
   linkedPageTotal,
-  pageOfVersion,
-  pageOffsetLabel,
 } from '../../utils/page-link.utils';
 import { AnnotationTemplatesService, AnnotationTemplate } from '../../annotation-templates.service';
 import {
@@ -118,6 +115,7 @@ import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcut
 import { TemplatesExportDialogComponent } from './components/templates-export-dialog/templates-export-dialog.component';
 import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
+import { createPageLinkState } from './page-link.state';
 import { PageThumbnailGenerator } from './page-thumbnail-generator';
 import {
   CustomFontEntry,
@@ -161,9 +159,6 @@ import type { BatchItem, PageMapData } from '../../models/batch.model';
 import {
   type PageSuggestion,
   mapPageOfA,
-  reconcileMap,
-  remapPagesToB,
-  sizesOfAByB,
   suggestPageMap,
 } from '../../utils/page-map.utils';
 import { matchTemplate, parsePastedTemplates } from '../../utils/template-paste.utils';
@@ -542,48 +537,34 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return next;
     });
   }
-  /** Pages of A as shown and copied: scaled to B when «Ajustar» is on. */
-  private readonly aPagesView = computed<PageAnnotations[]>(() => {
-    const pages = this.batch.activeItem()?.aPages ?? [];
-    return this.fitA() ? scalePagesToSize(pages, this.pageSizesA(), this.pageSizesB()) : pages;
+  private readonly pageLink = createPageLinkState({
+    activeItem: () => this.batch.activeItem(),
+    fitA: () => this.fitA(),
+    pageSizesA: () => this.pageSizesA(),
+    pageSizesB: () => this.pageSizesB(),
+    pageCountA: () => this.pageCountA(),
+    pageCount: () => this.pageCount(),
+    pageIndex: () => this.pageIndex(),
+    pagesLinked: () => this.pagesLinked(),
+    commonPage: () => this.commonPage(),
+    freeAPage: () => this.freeAPage(),
+    comparing: () => this.comparing(),
+    splitActive: () => this.splitActive(),
+    showingOnlyA: () => this.showingOnlyA(),
   });
-  /**
-   * Table of pages A↔B of the open pair (P-78 a P-81), already valid for the current pages. It only
-   * needs both PDFs open (not `comparing`, which depends on the states that use it).
-   */
-  readonly pageMap = computed<PageMapData | null>(() => {
-    const item = this.batch.activeItem();
-    const a = this.pageCountA();
-    const b = this.pageCount();
-    if (!item?.pageMap || !item.bPdf || a < 1 || b < 1) {
-      return null;
-    }
-    return reconcileMap(item.pageMap, a, b);
-  });
-  /** A and B move together and the table decides which page of A goes with each page of B. */
-  readonly tableLinked = computed(() => !!this.pageMap() && this.pagesLinked());
-  /** The template of A with its pages renumbered to the page of B they go with (the table). */
-  private readonly aPagesForB = computed<PageAnnotations[]>(() => {
-    const map = this.pageMap();
-    if (!map) {
-      return this.aPagesView();
-    }
-    const remapped = remapPagesToB(this.batch.activeItem()?.aPages ?? [], map.pairs);
-    return this.fitA()
-      ? scalePagesToSize(remapped, sizesOfAByB(this.pageSizesA(), map.pairs), this.pageSizesB())
-      : remapped;
-  });
-  /** Factors applied to A on the current page (for the notice). */
-  readonly fitFactors = computed(() =>
-    pageScaleFactors(
-      sizeOfPage(this.pageSizesA(), this.aPage() ?? this.pageIndex()),
-      sizeOfPage(this.pageSizesB(), this.pageIndex()),
-    ),
-  );
-  readonly fitSizes = computed(() => ({
-    a: sizeOfPage(this.pageSizesA(), this.aPage() ?? this.pageIndex()),
-    b: sizeOfPage(this.pageSizesB(), this.pageIndex()),
-  }));
+  private readonly aPagesView = this.pageLink.aPagesView;
+  readonly pageMap = this.pageLink.pageMap;
+  readonly tableLinked = this.pageLink.tableLinked;
+  private readonly aPagesForB = this.pageLink.aPagesForB;
+  readonly fitFactors = this.pageLink.fitFactors;
+  readonly fitSizes = this.pageLink.fitSizes;
+  readonly aPage = this.pageLink.aPage;
+  readonly aGhost = this.pageLink.aGhost;
+  readonly bGhost = this.pageLink.bGhost;
+  readonly pageShown = this.pageLink.pageShown;
+  readonly pageTotalShown = this.pageLink.pageTotalShown;
+  readonly pageOffset = this.pageLink.pageOffset;
+  readonly pageTag = this.pageLink.pageTag;
   /** «Copiar y ajustar por textos»: proposal under review (null = not open). Nothing touches B until applied. */
   readonly adjust = signal<AdjustSession | null>(null);
   private adjustToken = 0;
@@ -610,60 +591,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly paneFocus = signal<'a' | 'b'>('b');
   /** True while B is compared with an A that is open. */
   readonly comparing = computed(() => !!this.migration() && this.pageCountA() > 0);
-  /** Page of A to draw, or null when A has no page at the linked position. */
-  readonly aPage = computed<number | null>(() => {
-    if (!this.comparing()) return this.pageIndex();
-    if (!this.pagesLinked()) return this.freeAPage();
-    const map = this.pageMap();
-    return map
-      ? mapPageOfA(map, this.pageIndex())
-      : pageOfVersion(this.commonPage(), this.pageCountA());
-  });
-  readonly aGhost = computed(() => this.comparing() && this.aPage() === null);
-  /** B has no page at the linked position: its pane shows the empty state. */
-  readonly bGhost = computed(
-    () =>
-      this.comparing() &&
-      this.pagesLinked() &&
-      !this.pageMap() &&
-      this.commonPage() > this.pageCount() &&
-      !this.showingOnlyA(),
-  );
-  /** Page shown in the header: the linked one, or B's while the pages are free. */
-  readonly pageShown = computed(() =>
-    this.comparing() && this.pagesLinked() && !this.pageMap()
-      ? this.commonPage()
-      : this.pageIndex(),
-  );
-  readonly pageTotalShown = computed(() =>
-    this.comparing() && this.pagesLinked() && !this.pageMap()
-      ? linkedPageTotal(this.pageCountA(), this.pageCount())
-      : this.pageCount(),
-  );
-  /** «A 2 · B 1» while the pages are free and differ. */
-  readonly pageOffset = computed(() =>
-    this.comparing() && !this.pagesLinked() ? pageOffsetLabel(this.aPage(), this.pageIndex()) : null,
-  );
-  /** Label over the page when A shows another page than B (or none) outside «Dividida». */
-  readonly pageTag = computed<{
-    kind: 'missing' | 'offset' | 'mapped' | 'unmapped';
-    a: number;
-    b: number;
-  } | null>(() => {
-    if (!this.comparing() || this.splitActive()) return null;
-    const a = this.aPage();
-    if (this.tableLinked()) {
-      return a === null
-        ? { kind: 'unmapped', a: 0, b: this.pageIndex() }
-        : a !== this.pageIndex()
-          ? { kind: 'mapped', a, b: this.pageIndex() }
-          : null;
-    }
-    if (a === null) return { kind: 'missing', a: this.commonPage(), b: this.pageIndex() };
-    return !this.pagesLinked() && a !== this.pageIndex()
-      ? { kind: 'offset', a, b: this.pageIndex() }
-      : null;
-  });
   /** Dialog «Emparejar páginas» (P-79): open or not. */
   readonly pageMapOpen = signal(false);
   private pageMapToken = 0;
