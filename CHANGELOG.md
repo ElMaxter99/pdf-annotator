@@ -1,6 +1,6 @@
 ## Unreleased
 ### Changed
-- **1.15 «Solidez» (solo mantenimiento, sin cambios visibles):** `docs/ROADMAP.md` al día (1.15 en curso, hecho de la 1.14 y cifras reales de `workspace.page.ts`).
+- **1.15 «Solidez» (solo mantenimiento, sin cambios visibles):** `docs/ROADMAP.md` al día (1.15 en curso, hecho de la 1.13 y 1.14, y cifras reales de `workspace.page.ts`).
 
 ## [v1.14.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.14.0) - 2026-11-18
 ### Changed

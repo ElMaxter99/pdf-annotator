@@ -6,13 +6,10 @@ El histórico de la iteración inicial está en `docs/archive/PROPUESTA_MEJORAS.
 Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEditor`, `PdfExportService`, `FontCatalogService`, `AnnotationStore`, `AnnotationImportService`, sidebar por pestañas, selección múltiple, sesión en IndexedDB, toasts, avisos de importación, e2e y CI.
 
 ## En curso: 1.15 «Solidez» (solo mantenimiento, sin cambios visibles)
-Aprobada por Maxter (2026-11-18). Plan en `plan/plan-desarrollos-tras-1.14.md` y `plan/plan-onpush-vm.md` (carpeta del proyecto, fuera del repo). Una PR por parte, con `build`, `test:ci` y `e2e` en verde:
-1. Docs: este ROADMAP al día.
-2. Tests de atajos (`handlePlainShortcut`) y de la normalización de coordenadas importadas.
-3. Partir `workspace.page.ts` (6.348 líneas al empezar la 1.15; objetivo: menos de 5.000): A) atajos, B) páginas A↔B, C) sincronización del JSON y guardado de sesión/lote.
-4. `OnPush` fases 1 a 3 (estado a signals, auditoría de mutaciones, hojas pequeñas).
-5. Verificaciones: `start:docker`, chip «Desenlazar» del zoom A/B (¿existe?) y gestos de lienzo.
-Fuera de la 1.15: `OnPush` fases 4 y 5, cifrado de proyectos, auditoría axe y funciones visibles nuevas.
+Aprobada por Maxter (2026-11-18). Planes en `plan/plan-desarrollos-tras-1.14.md` y `plan/plan-onpush-vm.md` (carpeta del proyecto, fuera del repo). Al revisar el código se vio que parte del plan ya estaba hecha en la 1.13: los atajos salen a `utils/shortcuts.utils.ts` (con 25 pruebas), la normalización de coordenadas importadas tiene pruebas dirigidas (`annotation-import.service.spec.ts`) y los 10 subcomponentes `[vm]` y la propia página ya son `OnPush` (CHANGELOG 1.13, «Rendimiento del editor», fases 1 a 6). Lo que queda de verdad:
+1. **Partir `workspace.page.ts`** (6.348 líneas al empezar la 1.15; objetivo: menos de 5.000), por partes pequeñas: B) estado y reglas de páginas A↔B, C) sincronización del JSON y guardado de sesión/lote.
+2. **Verificaciones:** `start:docker` con `nginx-unprivileged`, chip «Desenlazar» del zoom A/B (¿existe?) y gestos de lienzo.
+Fuera de la 1.15: cifrado de proyectos, auditoría axe y funciones visibles nuevas.
 
 ## Hecho tras v1.5.0
 - Dockerfile con `nginx-unprivileged` y `npm ci`; `npm audit` y Dependabot en CI (v1.11).
@@ -22,8 +19,8 @@ Fuera de la 1.15: `OnPush` fases 4 y 5, cifrado de proyectos, auditoría axe y f
 1. **Remaquetado por lotes:** ayudante con cola propia: **hecho** (`/batch`, concurrencia 2 con Claude y 1 con Copilot, y el panel del lote la usa con reenganche tras recargar, mesas P-65 y P-66); falta medir créditos reales con Copilot (guion en `docs/IA-LOCAL.md`, necesita la cuenta de Maxter).
 2. Dividir `workspace.page.ts` (6.348 líneas a 2026-11-18) en módulos, por partes pequeñas: ya salen la generación de miniaturas y el parseo/exportación del JSON; ya salen también las reglas de la sesión guardada; el estado del desplegable de fuentes, la cola de `render()` y las cuentas de ajuste de zoom; las cuentas de mover el lienzo y del anclaje del zoom; el desplazamiento de las copias al pegar y duplicar; el resto del render sigue en la página (acoplado al DOM).
 3. Accesibilidad: **hecho** el trap de foco en todos los diálogos modales, el `aria-live` de la posición de la anotación seleccionada y la revisión de contraste de los tokens del tema claro (cumplen AA). Pendiente, si se quiere: auditar colores sueltos fuera de los tokens con una herramienta tipo axe.
-4. Rendimiento: ya van bajo demanda las miniaturas (se dibujan al entrar en pantalla) y falta `OnPush` en el resto de componentes. Ya están en `OnPush` las hojas simples (tema, avisos, miniatura de PDF, «Acerca de», landing, miniaturas de página y árbol JSON); falta el resto, que lee estado mutable de la página (`vm`) y exige pasarlo antes a signals.
-5. Más tests: atajos y normalización de coordenadas (en la 1.15).
+4. Rendimiento: ya van bajo demanda las miniaturas (se dibujan al entrar en pantalla) y **hecho (1.13)** `OnPush` en las hojas simples y en los 10 subcomponentes que reciben `[vm]` y en la propia página, con el estado mutable pasado a signals. Quedan en `Eager` componentes menores fuera del editor (p. ej. la página del lote y sus diálogos).
+5. **Hecho (1.13):** más tests de atajos (`shortcuts.utils.spec.ts`) y de normalización de coordenadas importadas.
 6. **Hecho (PR #245):** **Subir a Node 26 en todo el proyecto**, como parte de una feature de la siguiente versión (decisión de Maxter): `Dockerfile` (`node:22.12.0-alpine` → `26.x-alpine`, PR #221 de Dependabot como referencia), `node-version` en `ci.yml`, `release.yml`, `desktop-ci.yml` y `desktop-release.yml`, y la mención de Node 22.12 en `AGENTS.md`. Comprobar build, tests, e2e y el empaquetado de escritorio antes de fusionar.
 7. **Hecho (PR #245):** **Migrar a Angular 22 de una sola vez**, también para la siguiente versión (decisión de Maxter): `ng update` de todos los paquetes `@angular/*` a la vez (referencias: PRs #227 y #228 de Dependabot, que no se pueden subir por separado), `zone.js` 0.15 → 0.16 (#240; Angular 20 exige `~0.15`) y `jasmine-core` 5 → 7 con un `karma-jasmine-html-reporter` compatible (#226). Dejar las cuatro PRs abiertas como referencia hasta hacerlo; después, `npm run build`, `npm run test:ci` y `npm run e2e` en verde.
 8. **Navegar las páginas de A en el traslado (1.14, diseño aprobado P-74 a P-77, implementado en su PR):** rango máx(A, B) con panel «sin página», chip «Páginas enlazadas / libres» junto al de zoom, `Mayús + ←/→` para mover solo A y «Poner plantilla A» con confirmación cuando las páginas difieren. Detalle en `design/propuestas/navegar-paginas-de-a.md`.
