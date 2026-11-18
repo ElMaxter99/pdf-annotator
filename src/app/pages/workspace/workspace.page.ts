@@ -115,6 +115,7 @@ import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcut
 import { TemplatesExportDialogComponent } from './components/templates-export-dialog/templates-export-dialog.component';
 import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
+import { AnnotationDragController } from './annotation-drag.controller';
 import { createPageLinkState } from './page-link.state';
 import { PageThumbnailGenerator } from './page-thumbnail-generator';
 import {
@@ -211,7 +212,6 @@ import {
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
 import { moveFieldWithinPage } from '../../utils/field-move.utils';
-import { clampGroupDrag, exceedsDragThreshold } from '../../utils/group-drag.utils';
 import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
 import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
@@ -648,19 +648,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private coordsFileInputFallback: HTMLInputElement | null = null;
   private autoApplyCoordsTimer: ReturnType<typeof setTimeout> | null = null;
 
-  private dragInfo: {
-    pageIndex: number;
-    fieldIndex: number;
-    pointerId: number;
-    startX: number;
-    startY: number;
-    startLeft: number;
-    startTop: number;
-    fontSize: number;
-    width: number;
-    moved: boolean;
-  } | null = null;
-  private draggingElement: HTMLDivElement | null = null;
   /** Original file of the open PDF, kept so the session can be saved and restored. */
   private sessionFile: File | null = null;
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -673,21 +660,32 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly selection = signal<{ pageIndex: number; fields: readonly number[] } | null>(null);
   readonly selectionCount = computed(() => this.selection()?.fields.length ?? 0);
   private selectionClipboard: PageField[] = [];
-  private groupDrag: {
-    pointerId: number;
-    startX: number;
-    startY: number;
-    moved: boolean;
-    dx: number;
-    dy: number;
-    items: {
-      el: HTMLElement;
-      startLeft: number;
-      startTop: number;
-      width: number;
-      fontPx: number;
-    }[];
-  } | null = null;
+  private readonly drag = new AnnotationDragController({
+    layer: () => this.annotationsLayerRef?.nativeElement,
+    canvas: () => this.pdfCanvasRef?.nativeElement,
+    scale: () => this.scale(),
+    guidesEnabled: () => this.guidesFeatureEnabled(),
+    refreshOverlay: (rect, guides) => this.refreshOverlay(rect, guides),
+    applySnapping: (left, top, bounds, el, canvas, fontSizePx) =>
+      this.applySnapping(left, top, bounds, el, canvas, fontSizePx),
+    coords: () => this.coords(),
+    styled: (field) => this.ensureFieldStyle(field),
+    selection: () => this.selection(),
+    clearSelection: () => this.clearSelection(),
+    toggleSelection: (pageIndex, fieldIndex) => this.toggleSelection(pageIndex, fieldIndex),
+    startEditing: (pageIndex, fieldIndex, field) => this.startEditing(pageIndex, fieldIndex, field),
+    clickOnGroupMember: (pageIndex, fieldIndex) => {
+      const field = this.coords()[pageIndex]?.fields[fieldIndex];
+      this.selection.set(null);
+      if (field) {
+        this.startEditing(pageIndex, fieldIndex, field);
+      }
+    },
+    moveSelection: (dx, dy) => this.moveSelection(dx, dy),
+    setFieldPosition: (pageIndex, fieldIndex, x, y) =>
+      this.setFieldPosition(pageIndex, fieldIndex, x, y),
+    redrawAllForPage: () => this.redrawAllForPage(),
+  });
 
   @ViewChild(WorkspaceHeaderComponent) private headerComponent?: WorkspaceHeaderComponent;
   @ViewChild(WorkspaceSidebarComponent) private sidebarComponent?: WorkspaceSidebarComponent;
@@ -2355,16 +2353,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.closeFontDropdown('edit');
   }
 
-  private computeHorizontalBounds(
-    width: number,
-    canvasWidth: number,
-  ): { minLeft: number; maxLeft: number } {
-    const elementWidth = Math.max(width, 0);
-    const min = 0;
-    const max = Math.max(canvasWidth - elementWidth, 0);
-    return { minLeft: min, maxLeft: max < min ? min : max };
-  }
-
   private runAfterRender(callback: () => void) {
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(() => callback());
@@ -2739,8 +2727,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           el.dataset['fieldIndex'] = `${fieldIndex}`;
           el.classList.toggle('annotation--selected', this.isSelected(pageIndex, fieldIndex));
           el.onpointerdown = isLocked
-            ? (evt) => this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex)
-            : (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
+            ? (evt) => this.drag.pointerDownLocked(evt, pageIndex, fieldIndex)
+            : (evt) => this.drag.pointerDown(evt, pageIndex, fieldIndex);
           layer.appendChild(el);
 
           this.runAfterRender(() => this.updateAnnotationLeft(el, styledField, scale));
@@ -4993,331 +4981,24 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     (this.document?.activeElement as HTMLElement | null)?.blur?.();
   }
 
-  private startGroupDrag(evt: PointerEvent, pressed: HTMLElement, fields: readonly number[]) {
-    const layer = this.annotationsLayerRef?.nativeElement;
-    if (!layer) {
-      return;
-    }
-    const items = fields
-      .map((index) => layer.querySelector<HTMLElement>(`[data-field-index="${index}"]`))
-      .filter((el): el is HTMLElement => !!el)
-      .map((el) => ({
-        el,
-        startLeft: parseFloat(el.style.left || '0'),
-        startTop: parseFloat(el.style.top || '0'),
-        width: el.offsetWidth,
-        fontPx: parseFloat(getComputedStyle(el).fontSize || '0'),
-      }));
-
-    this.groupDrag = {
-      pointerId: evt.pointerId,
-      startX: evt.clientX,
-      startY: evt.clientY,
-      moved: false,
-      dx: 0,
-      dy: 0,
-      items,
-    };
-    pressed.setPointerCapture(evt.pointerId);
-    pressed.onpointermove = this.handleGroupPointerMove;
-    pressed.onpointerup = this.handleGroupPointerUp;
-    pressed.onpointercancel = this.handleGroupPointerUp;
-  }
-
-  private handleGroupPointerMove = (evt: PointerEvent) => {
-    const drag = this.groupDrag;
-    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
-    if (!drag || !pdfCanvas || evt.pointerId !== drag.pointerId) {
-      return;
-    }
-    evt.preventDefault();
-    const rawDx = evt.clientX - drag.startX;
-    const rawDy = evt.clientY - drag.startY;
-    if (!drag.moved && !exceedsDragThreshold(rawDx, rawDy)) {
-      return;
-    }
-    drag.moved = true;
-
-    const { dx, dy } = clampGroupDrag(drag.items, pdfCanvas.width, pdfCanvas.height, rawDx, rawDy);
-    drag.dx = dx;
-    drag.dy = dy;
-
-    for (const item of drag.items) {
-      item.el.style.left = `${item.startLeft + drag.dx}px`;
-      item.el.style.top = `${item.startTop + drag.dy}px`;
-    }
-  };
-
-  private handleGroupPointerUp = (evt: PointerEvent) => {
-    const drag = this.groupDrag;
-    if (!drag || evt.pointerId !== drag.pointerId) {
-      return;
-    }
-    evt.preventDefault();
-    evt.stopPropagation();
-    const pressed = evt.currentTarget as HTMLElement | null;
-    pressed?.releasePointerCapture?.(evt.pointerId);
-    if (pressed) {
-      pressed.onpointermove = null;
-      pressed.onpointerup = null;
-      pressed.onpointercancel = null;
-    }
-    this.groupDrag = null;
-
-    if (drag.moved && evt.type !== 'pointercancel') {
-      const scale = this.scale();
-      this.moveSelection(drag.dx / scale, -drag.dy / scale);
-    } else {
-      // A plain click on a member: behave like a normal click on that annotation.
-      this.redrawAllForPage();
-      if (evt.type !== 'pointercancel') {
-        const index = Number(pressed?.dataset['fieldIndex']);
-        const pageIdx = Number(pressed?.dataset['pageIndex']);
-        const field = this.coords()[pageIdx]?.fields[index];
-        this.selection.set(null);
-        if (field) {
-          this.startEditing(pageIdx, index, field);
-        }
-      }
-    }
-  };
-
-  private handleLockedAnnotationPointerDown(
-    evt: PointerEvent,
-    pageIndex: number,
-    fieldIndex: number,
-  ) {
-    evt.preventDefault();
-    evt.stopPropagation();
-    const page = this.coords()[pageIndex];
-    const field = page?.fields[fieldIndex];
-    if (!field) {
-      return;
-    }
-    this.startEditing(pageIndex, fieldIndex, field);
-  }
-
-  private handleAnnotationPointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number) {
-    evt.preventDefault();
-    evt.stopPropagation();
-    const el = evt.currentTarget as HTMLDivElement | null;
-    if (!el) return;
-
-    const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');
-    const page = this.coords()[pageIndex];
-    const field = page?.fields[fieldIndex];
-    if (!field || field.locked) {
-      return;
-    }
-    const styledField = this.ensureFieldStyle(field);
-    if (styledField?.locked) {
-      this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex);
-      return;
-    }
-
-    if (evt.shiftKey || evt.ctrlKey || evt.metaKey) {
-      this.toggleSelection(pageIndex, fieldIndex);
-      return;
-    }
-
-    const selected = this.selection();
-    if (
-      selected &&
-      selected.pageIndex === pageIndex &&
-      selected.fields.length > 1 &&
-      selected.fields.includes(fieldIndex)
-    ) {
-      this.startGroupDrag(evt, el, selected.fields);
-      return;
-    }
-    if (selected) {
-      this.clearSelection();
-    }
-
-    this.dragInfo = {
-      pageIndex,
-      fieldIndex,
-      pointerId: evt.pointerId,
-      startX: evt.clientX,
-      startY: evt.clientY,
-      startLeft: parseFloat(el.style.left || '0'),
-      startTop: parseFloat(el.style.top || '0'),
-      fontSize: computedFontSize,
-      width: el.offsetWidth,
-      moved: false,
-    };
-
-    this.draggingElement = el;
-    el.setPointerCapture(evt.pointerId);
-    el.classList.add('dragging');
-    el.onpointermove = this.handleAnnotationPointerMove;
-    el.onpointerup = this.handleAnnotationPointerUp;
-    el.onpointercancel = this.handleAnnotationPointerUp;
-
-    if (this.guidesFeatureEnabled()) {
-      this.refreshOverlay(
-        {
-          left: parseFloat(el.style.left || '0'),
-          top: parseFloat(el.style.top || '0'),
-          width: el.offsetWidth,
-          height: el.offsetHeight,
-        },
-        [],
-      );
-    } else {
-      this.refreshOverlay(null, []);
-    }
-  }
-
-  private handleAnnotationPointerMove = (evt: PointerEvent) => {
-    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
-    const el = this.draggingElement;
-    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
-    if (!el || !pdfCanvas) return;
-
-    evt.preventDefault();
-    const dx = evt.clientX - this.dragInfo.startX;
-    const dy = evt.clientY - this.dragInfo.startY;
-    const shouldMove = this.dragInfo.moved || Math.abs(dx) > 2 || Math.abs(dy) > 2;
-    if (!shouldMove) return;
-
-    this.dragInfo.moved = true;
-
-    const tentativeLeft = this.dragInfo.startLeft + dx;
-    const tentativeTop = this.dragInfo.startTop + dy;
-
-    const minTop = -this.dragInfo.fontSize;
-    const maxTop = pdfCanvas.height - this.dragInfo.fontSize;
-    const elementWidth = this.dragInfo.width || el.offsetWidth;
-    const horizontalBounds = this.computeHorizontalBounds(elementWidth, pdfCanvas.width);
-    const clampedLeft = Math.min(
-      Math.max(tentativeLeft, horizontalBounds.minLeft),
-      horizontalBounds.maxLeft,
-    );
-    const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
-
-    this.dragInfo.width = el.offsetWidth;
-
-    if (!this.guidesFeatureEnabled()) {
-      el.style.left = `${clampedLeft}px`;
-      el.style.top = `${clampedTop}px`;
-      this.refreshOverlay(null, []);
-      return;
-    }
-
-    const snapResult = this.applySnapping(
-      clampedLeft,
-      clampedTop,
-      { minLeft: horizontalBounds.minLeft, maxLeft: horizontalBounds.maxLeft, minTop, maxTop },
-      el,
-      pdfCanvas,
-      this.dragInfo.fontSize,
-    );
-
-    el.style.left = `${snapResult.left}px`;
-    el.style.top = `${snapResult.top}px`;
-
-    this.refreshOverlay(
-      {
-        left: snapResult.left,
-        top: snapResult.top,
-        width: el.offsetWidth,
-        height: el.offsetHeight,
-      },
-      snapResult.guides,
-    );
-  };
-
-  private handleAnnotationPointerUp = (evt: PointerEvent) => {
-    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
-    const el = this.draggingElement;
-    if (!el) {
-      this.dragInfo = null;
-      this.refreshOverlay(null, []);
-      return;
-    }
-
-    evt.preventDefault();
-    evt.stopPropagation();
-    el.releasePointerCapture(evt.pointerId);
-    el.classList.remove('dragging');
-    el.onpointermove = null;
-    el.onpointerup = null;
-    el.onpointercancel = null;
-
-    const drag = this.dragInfo;
-    this.dragInfo = null;
-    this.draggingElement = null;
-
-    this.refreshOverlay(null, []);
-
-    if (drag.moved) {
-      const left = parseFloat(el.style.left || '0');
-      const top = parseFloat(el.style.top || '0');
-      this.updateAnnotationPosition(
-        drag.pageIndex,
-        drag.fieldIndex,
-        left,
-        top,
-        drag.fontSize,
-        drag.width || el.offsetWidth,
-      );
-    } else if (evt.type !== 'pointercancel') {
-      const page = this.coords()[drag.pageIndex];
-      const field = page?.fields[drag.fieldIndex];
-      if (field) {
-        this.startEditing(drag.pageIndex, drag.fieldIndex, field);
-      }
-    }
-  };
-
-  private updateAnnotationPosition(
-    pageIndex: number,
-    fieldIndex: number,
-    leftPx: number,
-    topPx: number,
-    fontSizePx: number,
-    widthPx: number,
-  ) {
-    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
-    if (!pdfCanvas) return;
-    const scale = this.scale();
-    const page = this.coords()[pageIndex];
-    const field = page?.fields[fieldIndex];
-    if (!field || field.locked) {
-      return;
-    }
-    const bounds = this.computeHorizontalBounds(widthPx, pdfCanvas.width);
-    const boundedLeft = Math.min(Math.max(leftPx, bounds.minLeft), bounds.maxLeft);
-    const boundedTop = Math.min(Math.max(topPx, -fontSizePx), pdfCanvas.height - fontSizePx);
-    const width = Math.max(widthPx, 0) / scale;
-    const newX = +(boundedLeft / scale).toFixed(2);
-    const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
-
+  /** Commits the new position (points PDF) of one dragged annotation, through the history. */
+  private setFieldPosition(pageIndex: number, fieldIndex: number, x: number, y: number) {
     const changed = this.applyCoordsChange(() =>
       this.coords.update((pages) =>
         pages.map((page, idx) => {
-          if (idx !== pageIndex) {
-            return page;
-          }
-          if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
+          if (idx !== pageIndex || fieldIndex < 0 || fieldIndex >= page.fields.length) {
             return page;
           }
           const updatedFields = page.fields.map((currentField, fIdx) =>
-            fIdx === fieldIndex
-              ? this.ensureFieldStyle({ ...currentField, x: newX, y: newY })
-              : currentField,
+            fIdx === fieldIndex ? this.ensureFieldStyle({ ...currentField, x, y }) : currentField,
           );
           return { ...page, fields: updatedFields };
         }),
       ),
     );
-
     if (changed) {
       this.syncCoordsTextModel();
     }
-
-    this.redrawAllForPage();
   }
 
   /** Back to «Páginas enlazadas» on `page` (a new PDF, a restored session). */

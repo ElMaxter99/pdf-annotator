@@ -1,6 +1,7 @@
 ## Unreleased
 ### Changed
 - **1.15 «Solidez» (solo mantenimiento, sin cambios visibles):** `docs/ROADMAP.md` al día (1.15 en curso, hecho de la 1.13 y 1.14, y cifras reales de `workspace.page.ts`).
+- **Deuda técnica, parte 9 (sin cambios visibles):** el arrastre de anotaciones (una o todas las seleccionadas) sale de `workspace.page.ts` a `pages/workspace/annotation-drag.controller.ts`, con pruebas. La página solo le da el DOM del visor y recibe la nueva posición.
 - **Deuda técnica, parte 8 (sin cambios visibles):** el estado derivado de las páginas A↔B (tabla, página de A que acompaña a cada página de B, etiquetas de la cabecera y del visor) sale de `workspace.page.ts` a `pages/workspace/page-link.state.ts`, con pruebas. La página sigue escribiendo `pagesLinked`, `commonPage` y `freeAPage`.
 
 ## [v1.14.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.14.0) - 2026-11-18
