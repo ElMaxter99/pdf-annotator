@@ -230,6 +230,9 @@ export class ProjectStoreService {
 
   /** Leaves the project; pending changes are written first. */
   close(): Promise<void> {
+    if (this.closing) {
+      return this.closing;
+    }
     const run = this.doClose().finally(() => {
       if (this.closing === run) {
         this.closing = null;

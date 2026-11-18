@@ -114,6 +114,26 @@ describe('ProjectStoreService', () => {
     expect(bridge.list).toHaveBeenCalled();
   });
 
+  it('reuses the close in flight so listing waits for the real release', async () => {
+    bridge.info.and.resolveTo({ root: '/r', host: 'h' } as never);
+    bridge.open.and.resolveTo({ project: summary('Uno'), items: [], readOnly: false } as never);
+    bridge.renew.and.resolveTo({ ok: true } as never);
+    await store.open('Uno');
+    let released!: () => void;
+    bridge.release.and.returnValue(new Promise((r) => (released = () => r({ ok: true }))) as never);
+    bridge.list.and.resolveTo({ projects: [] } as never);
+    const first = store.close();
+    const second = store.close();
+    const refreshing = store.refresh();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(bridge.list).not.toHaveBeenCalled();
+    expect(bridge.release).toHaveBeenCalledTimes(1);
+    released();
+    await Promise.all([first, second, refreshing]);
+    expect(bridge.list).toHaveBeenCalled();
+  });
+
   it('is available only with the desktop bridge', () => {
     expect(store.available()).toBeTrue();
     delete (window as unknown as { desktop?: unknown }).desktop;
