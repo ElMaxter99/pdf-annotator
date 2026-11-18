@@ -61,6 +61,7 @@ export class ProjectTransferService {
   /** Carpeta que se usaría con el nombre y la subcarpeta escritos (`leftover`: la de siempre tiene archivos ajenos). */
   readonly target = signal<{ ref: string; leftover: boolean; next: string } | null>(null);
   private targetCall = 0;
+  private targetPending: Promise<void> | null = null;
   readonly conflictChoice = signal<ImportMode>('copy');
   readonly skipChoice = signal<'skip' | 'cancel'>('skip');
   /** Nombre del proyecto que se está exportando o importando (para el título del avance). */
@@ -218,14 +219,37 @@ export class ProjectTransferService {
   }
 
   /** Pregunta al proceso principal dónde caería la importación; solo cuenta la última respuesta. */
-  async updateTarget(): Promise<void> {
+  updateTarget(): Promise<void> {
     const call = ++this.targetCall;
-    const result = await this.bridge()?.importTarget({
-      name: this.importName().trim(),
-      subpath: this.importSub().trim(),
+    const pending = (async () => {
+      const result = await this.bridge()?.importTarget({
+        name: this.importName().trim(),
+        subpath: this.importSub().trim(),
+      });
+      if (call !== this.targetCall) return;
+      this.target.set(result && !('error' in result) ? result : null);
+    })();
+    this.targetPending = pending;
+    void pending.finally(() => {
+      if (this.targetPending === pending) this.targetPending = null;
     });
-    if (call !== this.targetCall) return;
-    this.target.set(result && !('error' in result) ? result : null);
+    return pending;
+  }
+
+  /**
+   * Espera a la última consulta de carpeta. Devuelve `false` si con ella ha aparecido un aviso de carpeta ocupada
+   * que la persona aún no había visto: hay que enseñárselo antes de importar.
+   */
+  private async targetReady(): Promise<boolean> {
+    const shown = this.target();
+    let pending = this.targetPending;
+    if (!pending) return true;
+    while (pending) {
+      await pending;
+      pending = this.targetPending;
+    }
+    const now = this.target();
+    return !now?.leftover || (shown?.leftover === true && shown.next === now.next);
   }
 
   /** «Abrir carpeta existente»: la que tiene archivos de un proyecto quitado de la lista. */
@@ -245,6 +269,9 @@ export class ProjectTransferService {
       return;
     }
     if (!this.importName().trim()) {
+      return;
+    }
+    if (!(await this.targetReady())) {
       return;
     }
     if (d.info.oversize.length) {
