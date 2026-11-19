@@ -96,7 +96,7 @@ test('clear, JSON apply and file import are undoable steps', async ({ page }) =>
 
 test('loading another PDF resets annotations and history', async ({ page }) => {
   await addAnnotation(page, 0.3, 0.3, 'uno');
-  await page.locator('section.sidebar-upload input[type=file]').setInputFiles(EXAMPLE_JSON.replace('anotaciones-ejemplo.json', 'factura-ejemplo.pdf'));
+  await page.locator('.sidebar-upload input[type=file]').setInputFiles(EXAMPLE_JSON.replace('anotaciones-ejemplo.json', 'factura-ejemplo.pdf'));
   await expect(page.locator('.annotation')).toHaveCount(0);
   await expect(undoBtn(page)).toBeDisabled();
   await expect(jsonEditor(page)).toHaveValue(/"pages": \[\]/);

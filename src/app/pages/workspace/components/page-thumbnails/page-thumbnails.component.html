@@ -1,4 +1,4 @@
-<div class="thumbnails" role="list">
+<div class="thumbnails">
   <button
     type="button"
     class="thumbnails__item"
@@ -8,7 +8,6 @@
     [attr.aria-current]="thumbnail.pageNumber === activePage ? 'page' : null"
     [attr.aria-label]="(thumbnail.failed ? 'sidebar.thumbnails.retryLabel' : 'sidebar.thumbnails.pageLabel') | t : { index: thumbnail.pageNumber }"
     [attr.title]="(thumbnail.failed ? 'sidebar.thumbnails.retryLabel' : 'sidebar.thumbnails.pageLabel') | t : { index: thumbnail.pageNumber }"
-    role="listitem"
     appInView
     (inView)="onInView(thumbnail.pageNumber, $event)"
   >

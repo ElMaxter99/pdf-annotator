@@ -21,6 +21,7 @@
     "release:deploy": "node scripts/release.mjs",
     "start:desktop": "node scripts/start-desktop.mjs",
     "desktop:pack": "node scripts/sync-desktop-version.mjs && npm run build && cd tools/ai-phase0 && npm install --no-fund --no-audit && cd ../.. && electron-builder --projectDir desktop --publish never",
+    "a11y": "node scripts/a11y-audit.mjs --out=a11y-audit.json",
     "test:helper": "node --test tools/ai-helper/queue.test.mjs tools/ai-helper/server.test.mjs",
     "test:desktop": "node --test desktop/update-logic.test.mjs desktop/shell-path.test.mjs desktop/history-nav.test.mjs desktop/trusted-origin.test.mjs desktop/projects.test.mjs desktop/projects-ipc.test.mjs desktop/project-archive.test.mjs desktop/project-sync.test.mjs desktop/sftp-sync.test.mjs desktop/sync-secrets.test.mjs"
   },
@@ -63,6 +64,7 @@
     "@angular/build": "^22.2.6",
     "@angular/cli": "^22.2.6",
     "@angular/compiler-cli": "^22.2.6",
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "1.65.0",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~7.0.0",

@@ -1,4 +1,6 @@
 ## Unreleased
+### Accessibility
+- **Auditoría con axe (1.16 · T5):** nuevo `npm run a11y` (`scripts/a11y-audit.mjs`, `@axe-core/playwright`; fuera del CI) que recorre landing, editor, lote y Proyectos en ambos temas y a 1650/1280 px. El informe está en `docs/AUDITORIA-A11Y.md`. Se arreglan solo los hallazgos invisibles (sin cambios visibles): nombres accesibles de la barra de progreso (lote, Proyectos, exportar plantillas, IA y tablas en lote), selector de plantillas y selectores de color, nombres que ahora contienen el texto visible (zoom del pie, chip de versión, marca del lote, desplegable de fuente), roles ARIA no permitidos (miniaturas, «¿Quieres empezar de cero?») y botón dentro de botón en la zona de soltar de la landing. Claves nuevas `projects.progressLabel` y `projects.progressGeneric` en los 7 idiomas; se retira `app.workspaceUpload.ariaLabel`. Los hallazgos visibles (contraste del acento en el tema claro, colores sueltos fuera de los tokens, falta de `h1`) quedan para la mesa de diseño.
 
 ## [v1.15.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.15.0) - 2026-11-19
 ### Changed

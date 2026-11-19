@@ -55,8 +55,7 @@
     },
     "workspaceUpload": {
       "title": "Projekt zurücksetzen?",
-      "subtitle": "Legen Sie ein anderes PDF ab oder klicken Sie, um das aktuelle Dokument zu ersetzen.",
-      "ariaLabel": "Neues PDF hochladen, um den Arbeitsbereich zurückzusetzen"
+      "subtitle": "Legen Sie ein anderes PDF ab oder klicken Sie, um das aktuelle Dokument zu ersetzen."
     },
     "footer": {
       "developedBy": "Entwickelt von {{author}}",
@@ -2207,7 +2206,9 @@
       "done": "Projekt umbenannt in „{{name}}“.",
       "doneKept": "Name geändert. Der Ordner bleibt „{{folder}}“, weil das Projekt synchronisiert wird.",
       "locked": "{{host}} hat das Projekt geöffnet, während du getippt hast. Es wurde nichts umbenannt."
-    }
+    },
+    "progressLabel": "Fortschritt von „{{name}}“",
+    "progressGeneric": "Fortschritt"
   },
   "templatesExport": {
     "title": "Vorlagen exportieren",

@@ -1,6 +1,6 @@
 <div class="app app--batch" [class.app--ai-panel]="aiHelper.available && aiQueue.panelOpen() && aiQueue.run() !== 'idle'">
   <header class="batch-bar">
-    <a class="batch-bar__brand" routerLink="/landing" [attr.aria-label]="appName">
+    <a class="batch-bar__brand" routerLink="/landing">
       <img src="/logo.svg" alt="" width="32" height="32" />
       <span class="batch-bar__name">{{ appName }}</span>
       <span class="batch-bar__sub">{{ 'batch.subtitle' | t }}</span>
@@ -26,6 +26,7 @@
           aria-valuemin="0"
           aria-valuemax="100"
           [attr.aria-valuenow]="progress()"
+          [attr.aria-label]="'batch.progressLabel' | t"
         >
           <i [style.width.%]="progress()"></i>
         </div>

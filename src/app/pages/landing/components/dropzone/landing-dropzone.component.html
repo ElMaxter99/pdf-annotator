@@ -1,15 +1,12 @@
 <div class="landing__drop">
   <div
     class="landing__dropzone"
-    role="button"
-    tabindex="0"
     (click)="onOpenFilePicker()"
     (keydown)="fileUploadKeydown.emit($event)"
     (dragover)="fileDragOver.emit($event)"
     (dragleave)="fileDragLeave.emit($event)"
     (drop)="fileDrop.emit($event)"
     [class.landing__dropzone--active]="fileDropActive"
-    [attr.aria-label]="'app.upload.title' | t"
   >
     <input #pdfFileInput type="file" accept="application/pdf" multiple (change)="fileSelected.emit($event)" hidden />
     <div class="landing__icon" aria-hidden="true">📄</div>
