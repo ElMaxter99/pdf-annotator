@@ -24,7 +24,7 @@ La 1.15 «Solidez» (refactor, `workspace.page.ts` en 5.811 líneas) ya está en
 | Atajos, pruebas de coordenadas y OnPush pendientes | Hechos en la 1.13 (`utils/shortcuts.utils.ts`, `pdf-coords.utils.ts`, `annotation-import.service.spec.ts`, OnPush en los 10 subcomponentes `[vm]` y la página) |
 | Tope por proyecto pendiente | **Implementado**: `ProjectLimits` en `services/project-store.service.ts` (`maxPdfs: 200`, `warnPdfs: 100`, 2 GB, aviso a 1 GB), `projectSize()` en `utils/project.utils.ts`, avisos en `pages/projects/projects.page.html`. Falta solo el visto bueno de Maxter |
 | Chip «Desenlazar» del zoom A/B pendiente | **Existe**: `toggleSplitLink`, señal `splitLinked`, tecla `L`, `unlinkedSplit` en footer y visor |
-| Gestos de lienzo | Entraron Ctrl/⌘+rueda, pellizco, mover con Espacio o botón central, Mayús+rueda y zoom en vista «Dividida». Del punto 5 solo `Mayús+1` y `0`. **Faltan el doble clic y `Ctrl/⌘+0`/`Ctrl/⌘+1`** (cero `dblclick` en `src/`) |
+| Gestos de lienzo | Entraron Ctrl/⌘+rueda, pellizco, mover con Espacio o botón central, Mayús+rueda y zoom en vista «Dividida». Atajos de vista ya existentes: `0` = ajustar al ancho, `Ctrl/⌘+0` = 100 % (README y diálogo de atajos), `Mayús+1` = ajustar a la página. **Falta el doble clic** (cero `dblclick` en `src/`) |
 | Seguir partiendo `workspace.page.ts` | **Descartado**: no quedan bloques seguros (lo que resta está acoplado al DOM y a `render()`) |
 
 GitHub: 0 PRs y 0 issues abiertos. Tests: 62 specs unitarios y 30 e2e.
@@ -65,7 +65,7 @@ GitHub: 0 PRs y 0 issues abiertos. Tests: 62 specs unitarios y 30 e2e.
 - **Hecho:** informe de lo comprobado (o guion) y, si algo falla, PR con el arreglo en `Dockerfile`/`nginx.conf` con el CHANGELOG.
 
 ### T3 · Doble clic para alternar «ajustar» y 100 % (única función visible)
-- **Bloqueada por diseño.** Primero **mesa P-106** (escritorio 1650 y 1280, oscuro y claro): gesto, feedback y cómo se descubre. Decisión pendiente de Maxter: «botón central o `Ctrl`+doble clic en zona vacía» (propuesta de `plan/propuesta-gestos-de-lienzo.md`) frente a doble clic normal, que choca con crear anotación al hacer clic. Opcional en la misma mesa: `Ctrl/⌘+0` ajustar al ancho y `Ctrl/⌘+1` 100 %.
+- **Bloqueada por diseño.** Primero **mesa P-106** (escritorio 1650 y 1280, oscuro y claro): gesto, feedback y cómo se descubre. Decisión pendiente de Maxter: «botón central o `Ctrl`+doble clic en zona vacía» (propuesta de `plan/propuesta-gestos-de-lienzo.md`) frente a doble clic normal, que choca con crear anotación al hacer clic. **No se reasignan los atajos existentes** (`Ctrl/⌘+0` sigue siendo 100 % y `0` ajustar al ancho); si se añadiera un atajo nuevo, se documenta en README, diálogo de atajos y paleta.
 - **Tras la aprobación, archivos:** `src/app/pages/workspace/workspace.page.ts` (`onViewerWheel` ≈ L5063, `onPanPointerDown`, `zoomToScale`; todo zoom pasa por `zoomToScale(escala, ancla)`), `utils/zoom.utils.ts` (regla pura + spec), `utils/shortcuts.utils.ts` (+ spec) y `shortcuts-dialog`, claves `shortcuts.items.*` en los 7 JSON, tabla de atajos del README, `e2e/zoom-gestures.spec.ts`.
 - **Reglas:** ignorado con foco en un campo de texto o con un editor abierto; no cambia el arrastre de anotaciones ni el recuadro de selección; sin animación con `prefers-reduced-motion`.
 - **Hecho:** criterio general (§0.7) + e2e del gesto + spec de la regla pura + `npm run i18n:check`.
