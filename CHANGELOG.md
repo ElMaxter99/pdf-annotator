@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.15.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.15.0) - 2026-11-19
 ### Changed
 - **1.15 «Solidez» (solo mantenimiento, sin cambios visibles):** `docs/ROADMAP.md` al día (1.15 en curso, hecho de la 1.13 y 1.14, y cifras reales de `workspace.page.ts`).
 - **Deuda técnica, parte 11 (sin cambios visibles):** el estado de «Copiar y adaptar con IA» (`AiSession`, sesión de carga, avance por etapas, eventos en vivo, propuesta guardada por el lote y mapa de campos de la plantilla) sale de `workspace.page.ts` a `utils/ai-session.utils.ts`, con 6 pruebas. La página solo orquesta la petición.
