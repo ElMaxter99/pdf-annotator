@@ -6,7 +6,7 @@ const MB = 1048576;
 
 /** Tarjeta de actualización de la app de escritorio (diseño AC-01). Solo aparece dentro de Electron. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-update-card',
   standalone: true,
   imports: [TranslationPipe],

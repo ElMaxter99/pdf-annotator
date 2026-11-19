@@ -2,6 +2,9 @@
 ### Fixed
 - **`start:docker` verificado (sin cambios visibles):** la imagen NGINX sirve la SPA en `/landing`, `/workspace`, `/lote` y `/proyectos`, mapea `4444:8080`, sirve `.mjs` con el MIME correcto y carga el worker de pdf.js. `nginx.conf` ahora responde 404 (en vez del `index.html` con 200) a un recurso estático que no existe y a `/_vercel/*`. Guion de verificación para el build completo en `docs/TESTING.md`.
 
+### Changed
+- **OnPush en lo que quedaba en `Eager` fuera de la página del lote (1.16, T4a-T4c; sin cambios visibles):** pasan a `ChangeDetectionStrategy.OnPush` el selector de idioma, el selector de modelo de IA, las piezas de actualización de escritorio (tarjeta, panel, instalación, canal, chip de versión), «Primeros pasos», los diálogos de atajos, de exportar plantillas y de exportar con ejemplos, «Ver detalles» de la IA del editor, el diálogo de «Sugerir tablas» del lote, `ai-batch/*` (botón, chip, panel y detalles) y la landing. Todo su estado ya era de signals; solo `landing` (`languageModel`, `savedSessionDate`) y «Primeros pasos» (`stepsVisible`) pasaron a signals/computed. Medido con `src/app/onpush-idle.spec.ts`: en 20 ciclos de detección sin cambios, la plantilla de cada uno pasa de ejecutarse 40 veces a 0. `pages/batch/batch.page.ts` queda para T4d.
+
 ## [v1.15.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.15.0) - 2026-11-19
 ### Changed
 - **1.15 «Solidez» (solo mantenimiento, sin cambios visibles):** `docs/ROADMAP.md` al día (1.15 en curso, hecho de la 1.13 y 1.14, y cifras reales de `workspace.page.ts`).

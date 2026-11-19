@@ -8,7 +8,7 @@ import { DesktopUpdateService, isPrereleaseVersion } from '../../services/deskto
  * actualizaciones» desde cualquier pantalla y lleva un punto cuando hay novedad; en la web es solo texto.
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-version-chip',
   standalone: true,
   imports: [TranslationPipe],

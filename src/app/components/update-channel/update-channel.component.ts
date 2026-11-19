@@ -17,7 +17,7 @@ import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-upda
  * que no se baja de versión (se espera a la siguiente final). Solo existe dentro de Electron.
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-update-channel',
   standalone: true,
   imports: [TranslationPipe],

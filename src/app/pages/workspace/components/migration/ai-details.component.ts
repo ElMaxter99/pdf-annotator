@@ -22,7 +22,7 @@ interface TimelineItem {
 
 /** «Ver detalles» of «Copiar y adaptar con IA»: what is sent, the steps and the real usage (only what the provider reports). */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-details',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

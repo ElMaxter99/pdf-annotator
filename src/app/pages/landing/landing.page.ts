@@ -18,7 +18,7 @@ import { LandingHeroComponent } from './components/hero/landing-hero.component';
 import { LandingLanguageBarComponent } from './components/language-bar/landing-language-bar.component';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-landing-page',
   standalone: true,
   templateUrl: './landing.page.html',
@@ -54,7 +54,7 @@ export class LandingPageComponent {
   readonly currentYear = new Date().getFullYear();
   readonly appAuthor = APP_AUTHOR;
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
-  languageModel: Language = this.translationService.getCurrentLanguage();
+  readonly languageModel = signal<Language>(this.translationService.getCurrentLanguage());
   readonly fileDropActive = signal(false);
 
   @ViewChild(LandingDropzoneComponent)
@@ -84,15 +84,15 @@ export class LandingPageComponent {
     }
   }
 
-  get savedSessionDate(): string {
+  readonly savedSessionDate = computed(() => {
     const saved = this.savedSession();
     return saved
-      ? new Date(saved.savedAt).toLocaleString(this.languageModel, {
+      ? new Date(saved.savedAt).toLocaleString(this.languageModel(), {
           dateStyle: 'medium',
           timeStyle: 'short',
         })
       : '';
-  }
+  });
 
   async resumeSession() {
     const session = await this.sessionStore.load();
@@ -120,7 +120,7 @@ export class LandingPageComponent {
 
   onLanguageChange(language: Language) {
     this.translationService.setLanguage(language);
-    this.languageModel = this.translationService.getCurrentLanguage();
+    this.languageModel.set(this.translationService.getCurrentLanguage());
   }
 
   async onFileSelected(event: Event) {

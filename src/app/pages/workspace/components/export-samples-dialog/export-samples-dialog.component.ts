@@ -6,7 +6,7 @@ export type ExportSamplesChoice = 'map' | 'sample';
 
 /** Asks what to stamp when some annotations would paint a sample value. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-export-samples-dialog',
   standalone: true,
   imports: [FocusTrapDirective, TranslationPipe],
