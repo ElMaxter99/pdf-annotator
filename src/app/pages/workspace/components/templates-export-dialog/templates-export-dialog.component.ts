@@ -13,7 +13,7 @@ const nextTick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 /** Exports several saved templates in one ZIP (one JSON per template). Browser only, no network. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-templates-export-dialog',
   standalone: true,
   templateUrl: './templates-export-dialog.component.html',

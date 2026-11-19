@@ -6,7 +6,7 @@ import { PageMapBatchService, type PageMapRow } from '../../../services/page-map
 
 /** «Sugerir tablas de páginas» (P-100 a P-102): confirm, progress with counter and result per PDF. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-page-map-batch',
   standalone: true,
   imports: [CommonModule, TranslationPipe, FocusTrapDirective],
