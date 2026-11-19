@@ -1,4 +1,6 @@
 ## Unreleased
+### Fixed
+- **`start:docker` verificado (sin cambios visibles):** la imagen NGINX sirve la SPA en `/landing`, `/workspace`, `/lote` y `/proyectos`, mapea `4444:8080`, sirve `.mjs` con el MIME correcto y carga el worker de pdf.js. `nginx.conf` ahora responde 404 (en vez del `index.html` con 200) a un recurso estático que no existe y a `/_vercel/*`. Guion de verificación para el build completo en `docs/TESTING.md`.
 
 ## [v1.15.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.15.0) - 2026-11-19
 ### Changed
