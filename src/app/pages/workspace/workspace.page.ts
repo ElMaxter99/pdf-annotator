@@ -54,11 +54,7 @@ import {
   isRowSelected,
   rowChangesPage,
   summarizeAi,
-  type AiDetails,
   type AiRow,
-  type AiSent,
-  type AiStep,
-  type AiUsage,
 } from '../../utils/ai-proposal.utils';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
@@ -228,6 +224,14 @@ import {
   existingFieldKeys,
   recomputeFields,
 } from '../../utils/adjust-session.utils';
+import {
+  aiTemplateMap,
+  loadingAiSession,
+  savedAiSession,
+  withAiEvent,
+  withAiProgress,
+  type AiSession,
+} from '../../utils/ai-session.utils';
 import { readPageTexts } from '../../services/pdf-text.service';
 
 const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
@@ -298,31 +302,6 @@ const ADJUST_UI = {
 } as const;
 
 /** Informative notices of the batch bar that can be closed (and found again in the bell). */
-export interface AiSession {
-  phase: 'loading' | 'ready' | 'empty' | 'error';
-  provider: AiProvider | 'adjust';
-  /** Proposal saved by the batch queue (not asked for here): accepting or discarding it also clears the saved copy. */
-  saved?: { at: number } | null;
-  stage: 'reading' | 'asking' | 'resolving';
-  startedAt: number;
-  rows: AiRow[];
-  /** Fields the person ticked or unticked on top of the default selection. */
-  overrides: Record<string, boolean>;
-  view: 'proposal' | 'original';
-  seconds: number;
-  error: { code: string; message: string; reset: string | null } | null;
-  /** Live log for «Ver detalles» (no PDF content, only names and counts). */
-  sent: AiSent | null;
-  attempt: number;
-  /** Milliseconds since `startedAt` when each stage began. */
-  stageLog: Array<{ stage: 'reading' | 'asking' | 'resolving'; attempt: number; at: number }>;
-  stepLog: Array<{ attempt: number; step: AiStep; at: number }>;
-  usage: AiUsage | null;
-  details: AiDetails | null;
-  detailsOpen: boolean;
-  endedAt: number | null;
-}
-
 export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
 
 @Component({
@@ -3488,30 +3467,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const abort = new AbortController();
     this.aiAbort = abort;
     const template = this.normalizedTemplateOfA();
-    this.aiTemplate = new Map();
-    for (const page of template) {
-      page.fields.forEach((field, i) => this.aiTemplate.set(`p${page.num}-f${i + 1}`, field));
-    }
-    const provider = this.aiHelper.provider();
-    this.ai.set({
-      phase: 'loading',
-      provider,
-      stage: 'reading',
-      startedAt: Date.now(),
-      rows: [],
-      overrides: {},
-      view: 'proposal',
-      seconds: 0,
-      error: null,
-      sent: null,
-      attempt: 1,
-      stageLog: [{ stage: 'reading', attempt: 1, at: 0 }],
-      stepLog: [],
-      usage: null,
-      details: null,
-      detailsOpen: false,
-      endedAt: null,
-    });
+    this.aiTemplate = aiTemplateMap(template);
+    this.ai.set(loadingAiSession(this.aiHelper.provider(), Date.now()));
     this.reopenNotice('ai');
     if (this.referenceMode() !== 'split') {
       this.aiPreviousMode = this.referenceMode();
@@ -3521,45 +3478,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const result = await this.aiHelper.propose(
         { a: aPdf, b: bPdf, template: { pages: template, pageMap: this.pageMap()?.pairs } },
         (progress) =>
-          this.ai.update((cur) =>
-            cur
-              ? {
-                  ...cur,
-                  stage: progress.stage,
-                  attempt: progress.attempt ?? cur.attempt,
-                  stageLog: [
-                    ...cur.stageLog,
-                    {
-                      stage: progress.stage,
-                      attempt: progress.attempt ?? cur.attempt,
-                      at: Date.now() - cur.startedAt,
-                    },
-                  ],
-                }
-              : cur,
-          ),
+          this.ai.update((cur) => (cur ? withAiProgress(cur, progress, Date.now()) : cur)),
         abort.signal,
-        (event) =>
-          this.ai.update((cur) => {
-            if (!cur) {
-              return cur;
-            }
-            const at = Date.now() - cur.startedAt;
-            if (event.type === 'sent') {
-              return { ...cur, sent: event.sent };
-            }
-            if (event.type === 'step') {
-              return {
-                ...cur,
-                usage: event.usage ?? cur.usage,
-                stepLog: [
-                  ...cur.stepLog,
-                  ...event.steps.map((step) => ({ attempt: event.attempt, step, at })),
-                ].slice(-60),
-              };
-            }
-            return cur;
-          }),
+        (event) => this.ai.update((cur) => (cur ? withAiEvent(cur, event, Date.now()) : cur)),
       );
       if (abort !== this.aiAbort) {
         return;
@@ -3616,38 +3537,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     this.cancelAi();
     const template = this.normalizedTemplateOfA();
-    this.aiTemplate = new Map();
-    for (const page of template) {
-      page.fields.forEach((field, i) => this.aiTemplate.set(`p${page.num}-f${i + 1}`, field));
-    }
+    this.aiTemplate = aiTemplateMap(template);
     const rows = saved.rows.filter((row) => this.aiTemplate.has(row.id));
     if (!rows.length) {
       this.batch.setAiProposal(item.id, undefined);
       return;
     }
-    this.ai.set({
-      phase: 'ready',
-      provider:
-        saved.provider === 'copilot' || saved.provider === 'fake' || saved.provider === 'adjust'
-          ? saved.provider
-          : 'claude',
-      saved: { at: saved.at },
-      stage: 'resolving',
-      startedAt: saved.at,
-      rows: [...rows],
-      overrides: {},
-      view: 'proposal',
-      seconds: saved.seconds,
-      error: null,
-      sent: saved.details?.sent ?? null,
-      attempt: 1,
-      stageLog: [],
-      stepLog: [],
-      usage: null,
-      details: saved.details,
-      detailsOpen: false,
-      endedAt: saved.at,
-    });
+    this.ai.set(savedAiSession(saved, rows));
     this.reopenNotice('ai');
     if (this.referenceMode() !== 'split') {
       this.aiPreviousMode = this.referenceMode();
