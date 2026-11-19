@@ -15,7 +15,7 @@ export type BatchDetailsTab = 'summary' | 'steps' | 'sent' | 'usage';
 
 /** «Qué está haciendo la IA · lote»: the single-PDF «Ver detalles» for each PDF of the queue, plus the whole-batch usage. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-batch-details',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

@@ -14,7 +14,7 @@ import { AI_BATCH_COPILOT_CAP, estimateAiBatch, isEligibleForAiBatch } from '../
 
 /** «✦ Trasladar con IA»: the button of the panel header and its one-decision popover (estimate, provider folded under «Cambiar»). */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-batch-button',
   standalone: true,
   imports: [CommonModule, TranslationPipe, AiModelSelectComponent, InfoTipComponent],
