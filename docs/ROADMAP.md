@@ -5,11 +5,11 @@ El histórico de la iteración inicial está en `docs/archive/PROPUESTA_MEJORAS.
 ## Hecho (hasta v1.5.0)
 Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEditor`, `PdfExportService`, `FontCatalogService`, `AnnotationStore`, `AnnotationImportService`, sidebar por pestañas, selección múltiple, sesión en IndexedDB, toasts, avisos de importación, e2e y CI.
 
-## En curso: 1.15 «Solidez» (solo mantenimiento, sin cambios visibles)
-Aprobada por Maxter (2026-11-18). Planes en `plan/plan-desarrollos-tras-1.14.md` y `plan/plan-onpush-vm.md` (carpeta del proyecto, fuera del repo). Al revisar el código se vio que parte del plan ya estaba hecha en la 1.13: los atajos salen a `utils/shortcuts.utils.ts` (con 25 pruebas), la normalización de coordenadas importadas tiene pruebas dirigidas (`annotation-import.service.spec.ts`) y los 10 subcomponentes `[vm]` y la propia página ya son `OnPush` (CHANGELOG 1.13, «Rendimiento del editor», fases 1 a 6). Lo que queda de verdad:
-1. **Partir `workspace.page.ts`** (6.348 líneas al empezar la 1.15; objetivo: menos de 5.000), por partes pequeñas: B) estado y reglas de páginas A↔B, C) sincronización del JSON y guardado de sesión/lote.
-2. **Verificaciones:** `start:docker` con `nginx-unprivileged`, chip «Desenlazar» del zoom A/B (¿existe?) y gestos de lienzo.
-Fuera de la 1.15: cifrado de proyectos, auditoría axe y funciones visibles nuevas.
+## Hecho: 1.15 «Solidez» (solo mantenimiento, sin cambios visibles)
+Publicada como v1.15.0 (ver `CHANGELOG.md`). Solo refactor del editor: `workspace.page.ts` pasó de 6.348 a 5.811 líneas (estado A↔B, arrastre, ajuste por textos y estado de «Copiar y adaptar con IA» fuera de la página). No quedan bloques seguros que extraer, así que **se deja de partir el archivo**. Atajos, pruebas de coordenadas y `OnPush` ya estaban hechos en la 1.13.
+
+## En curso: 1.16 «Cierre de pendientes»
+Plan por tareas y paralelizable en `docs/PLAN-1.16.md`: verificar `start:docker`, `OnPush` en lo que queda `Eager`, auditoría axe, doble clic del visor (necesita mesa P-106), y lo que depende de Maxter (créditos de Copilot, visto bueno del tope por proyecto, cifrado opcional). Ya existen, sin pendiente: el tope por proyecto (200 PDFs / 2 GB, avisos a 100 PDFs / 1 GB; `ProjectLimits` en `project-store.service.ts`) y el chip «Desenlazar» del zoom A/B (`toggleSplitLink`, tecla `L`).
 
 ## Hecho tras v1.5.0
 - Dockerfile con `nginx-unprivileged` y `npm ci`; `npm audit` y Dependabot en CI (v1.11).
@@ -17,7 +17,7 @@ Fuera de la 1.15: cifrado de proyectos, auditoría axe y funciones visibles nuev
 
 ## Siguiente
 1. **Remaquetado por lotes:** ayudante con cola propia: **hecho** (`/batch`, concurrencia 2 con Claude y 1 con Copilot, y el panel del lote la usa con reenganche tras recargar, mesas P-65 y P-66); falta medir créditos reales con Copilot (guion en `docs/IA-LOCAL.md`, necesita la cuenta de Maxter).
-2. Dividir `workspace.page.ts` (6.348 líneas a 2026-11-18) en módulos, por partes pequeñas: ya salen la generación de miniaturas y el parseo/exportación del JSON; ya salen también las reglas de la sesión guardada; el estado del desplegable de fuentes, la cola de `render()` y las cuentas de ajuste de zoom; las cuentas de mover el lienzo y del anclaje del zoom; el desplazamiento de las copias al pegar y duplicar; el resto del render sigue en la página (acoplado al DOM).
+2. **Cerrado en la 1.15** (5.811 líneas; sin bloques seguros que extraer). Antes: dividir `workspace.page.ts` en módulos, por partes pequeñas: ya salen la generación de miniaturas y el parseo/exportación del JSON; ya salen también las reglas de la sesión guardada; el estado del desplegable de fuentes, la cola de `render()` y las cuentas de ajuste de zoom; las cuentas de mover el lienzo y del anclaje del zoom; el desplazamiento de las copias al pegar y duplicar; el resto del render sigue en la página (acoplado al DOM).
 3. Accesibilidad: **hecho** el trap de foco en todos los diálogos modales, el `aria-live` de la posición de la anotación seleccionada y la revisión de contraste de los tokens del tema claro (cumplen AA). Pendiente, si se quiere: auditar colores sueltos fuera de los tokens con una herramienta tipo axe.
 4. Rendimiento: ya van bajo demanda las miniaturas (se dibujan al entrar en pantalla) y **hecho (1.13)** `OnPush` en las hojas simples y en los 10 subcomponentes que reciben `[vm]` y en la propia página, con el estado mutable pasado a signals. Quedan en `Eager` componentes menores fuera del editor (p. ej. la página del lote y sus diálogos).
 5. **Hecho (1.13):** más tests de atajos (`shortcuts.utils.spec.ts`) y de normalización de coordenadas importadas.
@@ -27,7 +27,7 @@ Fuera de la 1.15: cifrado de proyectos, auditoría axe y funciones visibles nuev
 9. **Hecho (1.14, mesas P-78 a P-81 y P-100 a P-102):** tabla de correspondencia de páginas A↔B: diálogo «Emparejar páginas…» con sugerencia por textos (la IA y el ajuste por textos la usan) y «Sugerir tablas» para varios PDFs desde el panel del lote. Detalle en `design/propuestas/emparejar-paginas-a-b.md`.
 
 ## Ideas sin priorizar
-**Pendiente de decisión de Maxter:** tope por proyecto (propuesta abajo), cifrado opcional de proyectos y chip «Desenlazar» del zoom A/B.
+**Pendiente de decisión de Maxter:** cifrado opcional de proyectos y visto bueno definitivo del tope por proyecto (ya implementado).
 
 **Hecho (mesa P-96, 1.14):** exportación en ZIP de varias plantillas. Detalle en `CHANGELOG.md`.
 
