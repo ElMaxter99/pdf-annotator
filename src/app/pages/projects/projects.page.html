@@ -153,7 +153,7 @@
             @if (syncMeta(project); as line) {
               <p class="proj-card__meta" data-testid="sync-meta">{{ line }}</p>
             }
-            <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent(project)">
+            <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent(project)" [attr.aria-label]="'projects.progressLabel' | t: { name: project.name }">
               <i [style.width.%]="percent(project)"></i>
             </div>
             @if (sync.statusOf(project.ref).duplicates?.length) {
@@ -1065,7 +1065,7 @@
         @if (sync.transferInfo(); as ti) {
           <p class="proj-hint" data-testid="sync-speed">{{ 'projects.sync.progress.bytes' | t: { bytes: ti.done, total: ti.total, speed: ti.speed, eta: ti.eta } }}</p>
         }
-        <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="sync.percent()">
+        <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="sync.percent()" [attr.aria-label]="'projects.progressGeneric' | t">
           <i [style.width.%]="sync.percent()"></i>
         </div>
         <p class="proj-hint">{{ 'projects.sync.progress.note' | t }}</p>
@@ -1097,7 +1097,7 @@
             {{ 'projects.transfer.inspecting' | t: { percent: transfer.percent() } }}
           }
         </p>
-        <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="transfer.percent()">
+        <div class="proj-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="transfer.percent()" [attr.aria-label]="'projects.progressGeneric' | t">
           <i [style.width.%]="transfer.percent()"></i>
         </div>
         @if (pr.op === 'export') {

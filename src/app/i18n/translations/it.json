@@ -55,8 +55,7 @@
     },
     "workspaceUpload": {
       "title": "Vuoi ricominciare da capo?",
-      "subtitle": "Trascina un altro PDF oppure fai clic per sostituire il documento attuale.",
-      "ariaLabel": "Carica un nuovo PDF per reimpostare l'area di lavoro"
+      "subtitle": "Trascina un altro PDF oppure fai clic per sostituire il documento attuale."
     },
     "footer": {
       "developedBy": "Sviluppato da {{author}}",
@@ -2207,7 +2206,9 @@
       "done": "Progetto rinominato in «{{name}}».",
       "doneKept": "Nome cambiato. La cartella resta «{{folder}}» perché il progetto è sincronizzato.",
       "locked": "{{host}} ha aperto il progetto mentre scrivevi. Non è stato rinominato nulla."
-    }
+    },
+    "progressLabel": "Avanzamento di «{{name}}»",
+    "progressGeneric": "Avanzamento"
   },
   "templatesExport": {
     "title": "Esporta modelli",

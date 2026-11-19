@@ -55,8 +55,7 @@
     },
     "workspaceUpload": {
       "title": "Vols començar de zero?",
-      "subtitle": "Arrossega un altre PDF o fes clic per substituir el document actual.",
-      "ariaLabel": "Puja un nou PDF per reiniciar l'espai de treball"
+      "subtitle": "Arrossega un altre PDF o fes clic per substituir el document actual."
     },
     "footer": {
       "developedBy": "Desenvolupat per {{author}}",
@@ -2207,7 +2206,9 @@
       "done": "Projecte reanomenat a «{{name}}».",
       "doneKept": "Nom canviat. La carpeta es queda com «{{folder}}» perquè el projecte està sincronitzat.",
       "locked": "{{host}} ha obert el projecte mentre escrivies. No s’ha canviat res."
-    }
+    },
+    "progressLabel": "Progrés de «{{name}}»",
+    "progressGeneric": "Progrés"
   },
   "templatesExport": {
     "title": "Exporta plantilles",

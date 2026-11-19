@@ -71,9 +71,9 @@
   <div class="field field-small font-field">
     <span class="field-label" [id]="mode + '-font-label'">{{ 'annotation.fields.font.label' | t }}</span>
     <div class="font-dropdown" #fontDropdown [class.font-dropdown--open]="vm.fontDropdownOpen(mode)">
-      <button type="button" class="font-dropdown__trigger" (click)="vm.toggleFontDropdown(mode)"
+      <button type="button" class="font-dropdown__trigger" [id]="mode + '-font-trigger'" (click)="vm.toggleFontDropdown(mode)"
         aria-haspopup="listbox" [attr.aria-expanded]="vm.fontDropdownOpen(mode)" [disabled]="locked"
-        [attr.aria-labelledby]="mode + '-font-label'">
+        [attr.aria-labelledby]="mode + '-font-label ' + mode + '-font-trigger'">
         @if (vm.fontSummaryOption(field.fontFamily); as selectedFont) {
           <span class="font-dropdown__value">{{ selectedFont.label }}</span>
           @if (selectedFont.type === 'custom') {
@@ -113,7 +113,8 @@
     <span class="field-label">{{ 'annotation.fields.background.label' | t }}</span>
     <div class="background-row">
       <input type="color" [value]="field.backgroundColor ?? '#ffffff'"
-        (input)="vm.setFieldBackground(mode, $any($event.target).value)" [disabled]="locked" />
+        (input)="vm.setFieldBackground(mode, $any($event.target).value)" [disabled]="locked"
+        [attr.aria-label]="'annotation.fields.background.label' | t" />
       <button type="button" class="background-clear" (click)="vm.clearFieldBackground(mode)" [disabled]="locked">
         {{ 'annotation.fields.background.clear' | t }}
       </button>
@@ -122,7 +123,8 @@
   <div class="color-section">
     <span class="field-label">{{ 'annotation.fields.color.label' | t }}</span>
     <div class="color-row">
-      <input type="color" [(ngModel)]="field.color" (ngModelChange)="onColorPicker($event)" [disabled]="locked" />
+      <input type="color" [(ngModel)]="field.color" (ngModelChange)="onColorPicker($event)" [disabled]="locked"
+        [attr.aria-label]="'annotation.fields.color.label' | t" />
       <div class="color-inputs">
         <input type="text" [ngModel]="hexValue" (ngModelChange)="onHexInput($event)"
           [ngModelOptions]="{ standalone: true }" [placeholder]="'annotation.color.hexPlaceholder' | t"

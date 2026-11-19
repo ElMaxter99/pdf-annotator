@@ -37,10 +37,10 @@
   <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-document" aria-labelledby="sidebar-tab-document"
     [hidden]="vm.sidebarTab() !== 'document'">
   <app-batch-document *ngIf="vm.batchCtx()" [vm]="vm"></app-batch-document>
-  <section class="sidebar-upload" *ngIf="!vm.batchCtx()" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
+  <div class="sidebar-upload" *ngIf="!vm.batchCtx()" role="button" tabindex="0" (click)="vm.openPdfFilePicker()"
     (keydown)="vm.onFileUploadKeydown($event)" (dragover)="vm.onFileDragOver($event)"
     (dragleave)="vm.onFileDragLeave($event)" (drop)="vm.onFileDrop($event)"
-    [class.sidebar-upload--active]="vm.fileDropActive()" [attr.aria-label]="'app.workspaceUpload.ariaLabel' | t">
+    [class.sidebar-upload--active]="vm.fileDropActive()">
     <input #pdfFileInput type="file" accept="application/pdf" (change)="vm.onFileSelected($event)" hidden />
 
     <div class="sidebar-upload__body">
@@ -51,7 +51,7 @@
       </div>
     </div>
     <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
-  </section>
+  </div>
   <section class="sidebar-thumbnails" *ngIf="vm.pageThumbnails().length">
     <h5 class="sidebar-thumbnails__title">{{ 'sidebar.thumbnails.title' | t }}</h5>
     <div class="sidebar-thumbnails__list">
@@ -179,7 +179,7 @@
       <div class="templates__select">
         <label>{{ 'sidebar.templates.selectLabel' | t }}</label>
         <div class="templates__controls">
-          <select [(ngModel)]="vm.selectedTemplateId" [ngModelOptions]="{ standalone: true }">
+          <select [(ngModel)]="vm.selectedTemplateId" [ngModelOptions]="{ standalone: true }" [attr.aria-label]="'sidebar.templates.selectLabel' | t">
             <option *ngFor="let template of vm.templates()" [value]="template.id">
               {{ template.name }}
             </option>

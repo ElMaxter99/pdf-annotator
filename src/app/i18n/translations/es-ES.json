@@ -55,8 +55,7 @@
     },
     "workspaceUpload": {
       "title": "¿Quieres empezar de cero?",
-      "subtitle": "Arrastra otro PDF o haz clic para sustituir el documento actual.",
-      "ariaLabel": "Subir un nuevo PDF para reiniciar el espacio de trabajo"
+      "subtitle": "Arrastra otro PDF o haz clic para sustituir el documento actual."
     },
     "footer": {
       "developedBy": "Desarrollado por {{author}}",
@@ -2207,7 +2206,9 @@
       "done": "Proyecto renombrado a «{{name}}».",
       "doneKept": "Nombre cambiado. La carpeta se queda como «{{folder}}» porque el proyecto está sincronizado.",
       "locked": "{{host}} ha abierto el proyecto mientras escribías. No se ha renombrado nada."
-    }
+    },
+    "progressLabel": "Progreso de «{{name}}»",
+    "progressGeneric": "Progreso"
   },
   "templatesExport": {
     "title": "Exportar plantillas",

@@ -55,8 +55,7 @@
     },
     "workspaceUpload": {
       "title": "Need to reset this project?",
-      "subtitle": "Drop a different PDF or click to replace the current document.",
-      "ariaLabel": "Upload a new PDF to restart the annotation workspace"
+      "subtitle": "Drop a different PDF or click to replace the current document."
     },
     "footer": {
       "developedBy": "Developed by {{author}}",
@@ -2207,7 +2206,9 @@
       "done": "Project renamed to “{{name}}”.",
       "doneKept": "Name changed. The folder stays as “{{folder}}” because the project is synced.",
       "locked": "{{host}} opened the project while you were typing. Nothing was renamed."
-    }
+    },
+    "progressLabel": "Progress of “{{name}}”",
+    "progressGeneric": "Progress"
   },
   "templatesExport": {
     "title": "Export templates",

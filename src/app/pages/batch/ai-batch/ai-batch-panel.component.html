@@ -27,7 +27,7 @@
             <strong>{{ 'batch.ai.panel.count' | t: { done: finished(), total: counts().total } }}</strong>
             <small>{{ (queue.run() === 'done' ? 'batch.ai.done.title' : 'batch.ai.elapsed') | t: { time: elapsed() } }}</small>
           </div>
-          <div class="ai-status__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent()">
+          <div class="ai-status__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent()" [attr.aria-label]="'batch.ai.panel.count' | t: { done: finished(), total: counts().total }">
             <i [style.width.%]="percent()"></i>
           </div>
           <small class="ai-panel__usage" aria-live="polite">
