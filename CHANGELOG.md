@@ -1,4 +1,10 @@
 ## Unreleased
+### Changed
+- **1.15 «Solidez» (solo mantenimiento, sin cambios visibles):** `docs/ROADMAP.md` al día (1.15 en curso, hecho de la 1.13 y 1.14, y cifras reales de `workspace.page.ts`).
+- **Deuda técnica, parte 11 (sin cambios visibles):** el estado de «Copiar y adaptar con IA» (`AiSession`, sesión de carga, avance por etapas, eventos en vivo, propuesta guardada por el lote y mapa de campos de la plantilla) sale de `workspace.page.ts` a `utils/ai-session.utils.ts`, con 6 pruebas. La página solo orquesta la petición.
+- **Deuda técnica, parte 10 (sin cambios visibles):** «Copiar y ajustar por textos» deja de duplicar código: la lectura de los textos de una página (que estaba copiada en la página del editor y en `PdfTextService`) es una sola función, `readPageTexts`, y la lista de campos que se ofrecen (sin los que B ya tiene) sale a `utils/adjust-session.utils.ts` (`existingFieldKeys`, `collectAdjustFields`) con pruebas.
+- **Deuda técnica, parte 9 (sin cambios visibles):** el arrastre de anotaciones (una o todas las seleccionadas) sale de `workspace.page.ts` a `pages/workspace/annotation-drag.controller.ts`, con pruebas. La página solo le da el DOM del visor y recibe la nueva posición.
+- **Deuda técnica, parte 8 (sin cambios visibles):** el estado derivado de las páginas A↔B (tabla, página de A que acompaña a cada página de B, etiquetas de la cabecera y del visor) sale de `workspace.page.ts` a `pages/workspace/page-link.state.ts`, con pruebas. La página sigue escribiendo `pagesLinked`, `commonPage` y `freeAPage`.
 
 ## [v1.14.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.14.0) - 2026-11-18
 ### Changed

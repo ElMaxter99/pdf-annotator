@@ -5,31 +5,36 @@ El histórico de la iteración inicial está en `docs/archive/PROPUESTA_MEJORAS.
 ## Hecho (hasta v1.5.0)
 Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEditor`, `PdfExportService`, `FontCatalogService`, `AnnotationStore`, `AnnotationImportService`, sidebar por pestañas, selección múltiple, sesión en IndexedDB, toasts, avisos de importación, e2e y CI.
 
-## En curso
-- **Lote de documentos y remaquetado, fase 1** (diseño aprobado `L-01`..`L-11`): pasos de subida, panel en cuadrícula o lista, editor de B con A como capa de referencia, estados por campo, «Poner plantilla A», «Listo» y descarga. Sin vista dividida ni miniaturas reales en el panel todavía.
+## En curso: 1.15 «Solidez» (solo mantenimiento, sin cambios visibles)
+Aprobada por Maxter (2026-11-18). Planes en `plan/plan-desarrollos-tras-1.14.md` y `plan/plan-onpush-vm.md` (carpeta del proyecto, fuera del repo). Al revisar el código se vio que parte del plan ya estaba hecha en la 1.13: los atajos salen a `utils/shortcuts.utils.ts` (con 25 pruebas), la normalización de coordenadas importadas tiene pruebas dirigidas (`annotation-import.service.spec.ts`) y los 10 subcomponentes `[vm]` y la propia página ya son `OnPush` (CHANGELOG 1.13, «Rendimiento del editor», fases 1 a 6). Lo que queda de verdad:
+1. **Partir `workspace.page.ts`** (6.348 líneas al empezar la 1.15; objetivo: menos de 5.000), por partes pequeñas: B) estado y reglas de páginas A↔B, C) sincronización del JSON y guardado de sesión/lote.
+2. **Verificaciones:** `start:docker` con `nginx-unprivileged`, chip «Desenlazar» del zoom A/B (¿existe?) y gestos de lienzo.
+Fuera de la 1.15: cifrado de proyectos, auditoría axe y funciones visibles nuevas.
 
 ## Hecho tras v1.5.0
 - Dockerfile con `nginx-unprivileged` y `npm ci`; `npm audit` y Dependabot en CI (v1.11).
 - Remaquetado por lotes: vista dividida, aviso y escalado cuando A y B miden distinto, «Copiar y ajustar por textos», «Trasladar con IA» en cola, selección múltiple en el panel y ajuste por dos anclas (traslación + escala) en la cascada previa a la IA.
 
 ## Siguiente
-1. **Remaquetado por lotes, pendiente:** ayudante con cola propia: **hecho** (`/batch`, concurrencia 2 con Claude y 1 con Copilot, y el panel del lote la usa con reenganche tras recargar, mesas P-65 y P-66); falta medir créditos reales con Copilot (guion en `docs/IA-LOCAL.md`, necesita la cuenta de Maxter).
-2. Dividir `workspace.page.ts` (≈5.780 líneas) en módulos, por partes pequeñas: ya salen la generación de miniaturas y el parseo/exportación del JSON; ya salen también las reglas de la sesión guardada; el estado del desplegable de fuentes, la cola de `render()` y las cuentas de ajuste de zoom; las cuentas de mover el lienzo y del anclaje del zoom; el desplazamiento de las copias al pegar y duplicar; el resto del render sigue en la página (acoplado al DOM).
+1. **Remaquetado por lotes:** ayudante con cola propia: **hecho** (`/batch`, concurrencia 2 con Claude y 1 con Copilot, y el panel del lote la usa con reenganche tras recargar, mesas P-65 y P-66); falta medir créditos reales con Copilot (guion en `docs/IA-LOCAL.md`, necesita la cuenta de Maxter).
+2. Dividir `workspace.page.ts` (6.348 líneas a 2026-11-18) en módulos, por partes pequeñas: ya salen la generación de miniaturas y el parseo/exportación del JSON; ya salen también las reglas de la sesión guardada; el estado del desplegable de fuentes, la cola de `render()` y las cuentas de ajuste de zoom; las cuentas de mover el lienzo y del anclaje del zoom; el desplazamiento de las copias al pegar y duplicar; el resto del render sigue en la página (acoplado al DOM).
 3. Accesibilidad: **hecho** el trap de foco en todos los diálogos modales, el `aria-live` de la posición de la anotación seleccionada y la revisión de contraste de los tokens del tema claro (cumplen AA). Pendiente, si se quiere: auditar colores sueltos fuera de los tokens con una herramienta tipo axe.
-4. Rendimiento: ya van bajo demanda las miniaturas (se dibujan al entrar en pantalla) y falta `OnPush` en el resto de componentes. Ya están en `OnPush` las hojas simples (tema, avisos, miniatura de PDF, «Acerca de», landing, miniaturas de página y árbol JSON); falta el resto, que lee estado mutable de la página (`vm`) y exige pasarlo antes a signals.
-5. Más tests: atajos y normalización de coordenadas.
+4. Rendimiento: ya van bajo demanda las miniaturas (se dibujan al entrar en pantalla) y **hecho (1.13)** `OnPush` en las hojas simples y en los 10 subcomponentes que reciben `[vm]` y en la propia página, con el estado mutable pasado a signals. Quedan en `Eager` componentes menores fuera del editor (p. ej. la página del lote y sus diálogos).
+5. **Hecho (1.13):** más tests de atajos (`shortcuts.utils.spec.ts`) y de normalización de coordenadas importadas.
 6. **Hecho (PR #245):** **Subir a Node 26 en todo el proyecto**, como parte de una feature de la siguiente versión (decisión de Maxter): `Dockerfile` (`node:22.12.0-alpine` → `26.x-alpine`, PR #221 de Dependabot como referencia), `node-version` en `ci.yml`, `release.yml`, `desktop-ci.yml` y `desktop-release.yml`, y la mención de Node 22.12 en `AGENTS.md`. Comprobar build, tests, e2e y el empaquetado de escritorio antes de fusionar.
 7. **Hecho (PR #245):** **Migrar a Angular 22 de una sola vez**, también para la siguiente versión (decisión de Maxter): `ng update` de todos los paquetes `@angular/*` a la vez (referencias: PRs #227 y #228 de Dependabot, que no se pueden subir por separado), `zone.js` 0.15 → 0.16 (#240; Angular 20 exige `~0.15`) y `jasmine-core` 5 → 7 con un `karma-jasmine-html-reporter` compatible (#226). Dejar las cuatro PRs abiertas como referencia hasta hacerlo; después, `npm run build`, `npm run test:ci` y `npm run e2e` en verde.
 8. **Navegar las páginas de A en el traslado (1.14, diseño aprobado P-74 a P-77, implementado en su PR):** rango máx(A, B) con panel «sin página», chip «Páginas enlazadas / libres» junto al de zoom, `Mayús + ←/→` para mover solo A y «Poner plantilla A» con confirmación cuando las páginas difieren. Detalle en `design/propuestas/navegar-paginas-de-a.md`.
-9. **Tabla de correspondencia de páginas A↔B (diseño aprobado P-78 a P-81, implementado en su PR):** diálogo «Emparejar páginas…» con sugerencia por textos; la IA y el ajuste por textos la usan. Pendiente para más adelante: «Sugerir tablas» para varios PDFs desde el panel del lote. Detalle en `design/propuestas/emparejar-paginas-a-b.md`.
+9. **Hecho (1.14, mesas P-78 a P-81 y P-100 a P-102):** tabla de correspondencia de páginas A↔B: diálogo «Emparejar páginas…» con sugerencia por textos (la IA y el ajuste por textos la usan) y «Sugerir tablas» para varios PDFs desde el panel del lote. Detalle en `design/propuestas/emparejar-paginas-a-b.md`.
 
 ## Ideas sin priorizar
-**Hecho (mesa P-96, en su PR):** exportación en ZIP de varias plantillas. Detalle en `CHANGELOG.md`.
+**Pendiente de decisión de Maxter:** tope por proyecto (propuesta abajo), cifrado opcional de proyectos y chip «Desenlazar» del zoom A/B.
 
-## Futuro (solo escritorio): proyectos locales y sincronización
-Brainstorming de Maxter (2026-11-17). **No hay diseño ni código todavía:** cada fase necesita mesas aprobadas antes de programarse (ver `docs/WORKFLOW.md`). Todo va en la app de escritorio (Electron); la web no cambia. Principio: **sin servidores propios, sin cuentas de usuario de la app y sin APIs**; todo en local o en un almacenamiento que el usuario ya tenga.
+**Hecho (mesa P-96, 1.14):** exportación en ZIP de varias plantillas. Detalle en `CHANGELOG.md`.
 
-**Fase 1 · Proyectos locales (implementada en la PR de proyectos locales, mesas P-82 a P-84 aprobadas por Maxter).** Separar el trabajo por proyecto o cliente (un PDF suelto o un lote de, por ejemplo, 90 PDFs), guardar varios a la vez y recuperar cada uno al volver a abrir la app. Hoy solo existe la «última sesión» (#249, `SessionStoreService`) y el lote (`BatchStoreService`), ambos en IndexedDB y de un solo hueco. Contenido de un proyecto: nombre, PDFs (A/B), anotaciones, plantillas, estado del lote y de cada PDF, página y zoom.
+## Hecho (solo escritorio): proyectos locales y sincronización
+Brainstorming de Maxter (2026-11-17); las tres fases están implementadas y publicadas en la 1.14. Todo va en la app de escritorio (Electron); la web no cambia. Principio: **sin servidores propios, sin cuentas de usuario de la app y sin APIs**; todo en local o en un almacenamiento que el usuario ya tenga.
+
+**Fase 1 · Proyectos locales (implementada, mesas P-82 a P-84).** Separar el trabajo por proyecto o cliente (un PDF suelto o un lote de, por ejemplo, 90 PDFs), guardar varios a la vez y recuperar cada uno al volver a abrir la app. Hoy solo existe la «última sesión» (#249, `SessionStoreService`) y el lote (`BatchStoreService`), ambos en IndexedDB y de un solo hueco. Contenido de un proyecto: nombre, PDFs (A/B), anotaciones, plantillas, estado del lote y de cada PDF, página y zoom.
 - Dependencias: modelo de datos con `id`/nombre/fechas y versión de esquema; migrar la sesión y el lote actuales a «proyecto por defecto»; selector de proyectos (pantalla nueva: diseño primero).
 - Riesgos: cuota de IndexedDB con muchos PDFs; migración sin perder la sesión actual; tratar los datos restaurados como no confiables (`AnnotationImportService`).
 
@@ -56,4 +61,3 @@ Brainstorming de Maxter (2026-11-17). **No hay diseño ni código todavía:** ca
 
 **Hecho (renombrar, mesas P-97 a P-99):** «Renombrar…» en el menú ⋯ de la tarjeta (nombre visible y, opcional, carpeta; en sincronizados solo el nombre).
 
-**Pendiente de diseño (fase 1):** pantalla de proyectos, crear/abrir/renombrar/quitar, qué ve un equipo que no tiene el bloqueo, migración de la «última sesión» y del lote actual, y cómo se llega desde la landing sin molestar a quien solo anota un PDF. Mesas en «Propuestas» del lienzo; no se programa hasta que Maxter las apruebe.

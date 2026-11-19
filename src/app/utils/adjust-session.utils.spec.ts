@@ -1,5 +1,8 @@
+import type { PageAnnotations } from '../models/annotation.model';
 import {
+  collectAdjustFields,
   effectiveShift,
+  existingFieldKeys,
   fieldVisual,
   formatShift,
   hitAdjustField,
@@ -67,7 +70,11 @@ describe('adjust-session.utils', () => {
   });
 
   it('finds the field under a point at its proposed or original place', () => {
-    const f = field({ x: 100, y: 100, shift: { dx: 50, dy: 0, confidence: 'high', anchorIds: [1] } });
+    const f = field({
+      x: 100,
+      y: 100,
+      shift: { dx: 50, dy: 0, confidence: 'high', anchorIds: [1] },
+    });
     expect(hitAdjustField([f], 1, { x: 155, y: 104 }, 1)?.key).toBe(f.key);
     expect(hitAdjustField([f], 1, { x: 105, y: 104 }, 1)).toBeNull();
     expect(hitAdjustField([f], 1, { x: 105, y: 104 }, 1, true)?.key).toBe(f.key);
@@ -76,9 +83,48 @@ describe('adjust-session.utils', () => {
 
   it('classifies how a field is drawn', () => {
     expect(fieldVisual(field())).toBe('proposal');
-    expect(fieldVisual(field({ shift: { dx: 1, dy: 1, confidence: 'estimated', anchorIds: [] } }))).toBe('estimated');
+    expect(
+      fieldVisual(field({ shift: { dx: 1, dy: 1, confidence: 'estimated', anchorIds: [] } })),
+    ).toBe('estimated');
     expect(fieldVisual(field({ manual: { dx: 1, dy: 1 } }))).toBe('manual');
-    expect(fieldVisual(field({ shift: { dx: 1, dy: 1, confidence: 'low', anchorIds: [1] } }))).toBe('low');
+    expect(fieldVisual(field({ shift: { dx: 1, dy: 1, confidence: 'low', anchorIds: [1] } }))).toBe(
+      'low',
+    );
     expect(fieldVisual(field({ override: false }))).toBe('grey');
+  });
+});
+
+describe('existingFieldKeys and collectAdjustFields', () => {
+  const field = (mapField: string, x = 10) =>
+    ({
+      mapField,
+      value: '',
+      x,
+      y: 20,
+      fontSize: 12,
+    }) as unknown as PageAnnotations['fields'][number];
+  const template: PageAnnotations[] = [
+    { num: 1, fields: [field('nombre'), field('dni', 30)] },
+    { num: 2, fields: [field('')] },
+  ];
+
+  it('offers every field of the template when B has none', () => {
+    const { fields, skipped } = collectAdjustFields(template, existingFieldKeys([]));
+    expect(skipped).toBe(0);
+    expect(fields.map((f) => f.key)).toEqual(['1:0', '1:1', '2:0']);
+    expect(fields[1]).toEqual(jasmine.objectContaining({ name: 'dni', x: 30, shift: null }));
+    expect(fields[2].name).toBe('—');
+  });
+
+  it('skips the fields B already has (same page and name) and counts them', () => {
+    const existing = existingFieldKeys([{ num: 1, fields: [field(' nombre ')] }]);
+    const { fields, skipped } = collectAdjustFields(template, existing);
+    expect(skipped).toBe(1);
+    expect(fields.map((f) => f.key)).toEqual(['1:1', '2:0']);
+  });
+
+  it('the same name on another page is not a duplicate', () => {
+    const existing = existingFieldKeys([{ num: 3, fields: [field('nombre')] }]);
+    expect(collectAdjustFields(template, existing).skipped).toBe(0);
   });
 });

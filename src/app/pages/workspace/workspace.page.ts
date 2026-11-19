@@ -54,11 +54,7 @@ import {
   isRowSelected,
   rowChangesPage,
   summarizeAi,
-  type AiDetails,
   type AiRow,
-  type AiSent,
-  type AiStep,
-  type AiUsage,
 } from '../../utils/ai-proposal.utils';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
@@ -89,7 +85,6 @@ import { FieldType, PageAnnotations, PageField } from '../../models/annotation.m
 import {
   PageSize,
   pageScaleFactors,
-  scalePagesToSize,
   sizeOfPage,
   sizesDiffer,
 } from '../../utils/page-scale.utils';
@@ -97,8 +92,6 @@ import {
   clampPageNumber,
   holdPageOfB,
   linkedPageTotal,
-  pageOfVersion,
-  pageOffsetLabel,
 } from '../../utils/page-link.utils';
 import { AnnotationTemplatesService, AnnotationTemplate } from '../../annotation-templates.service';
 import {
@@ -118,6 +111,8 @@ import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcut
 import { TemplatesExportDialogComponent } from './components/templates-export-dialog/templates-export-dialog.component';
 import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
+import { AnnotationDragController } from './annotation-drag.controller';
+import { createPageLinkState } from './page-link.state';
 import { PageThumbnailGenerator } from './page-thumbnail-generator';
 import {
   CustomFontEntry,
@@ -161,9 +156,6 @@ import type { BatchItem, PageMapData } from '../../models/batch.model';
 import {
   type PageSuggestion,
   mapPageOfA,
-  reconcileMap,
-  remapPagesToB,
-  sizesOfAByB,
   suggestPageMap,
 } from '../../utils/page-map.utils';
 import { matchTemplate, parsePastedTemplates } from '../../utils/template-paste.utils';
@@ -216,7 +208,6 @@ import {
 import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
 import { moveFieldWithinPage } from '../../utils/field-move.utils';
-import { clampGroupDrag, exceedsDragThreshold } from '../../utils/group-drag.utils';
 import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
 import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
@@ -229,8 +220,19 @@ import {
   formatShift,
   hitAdjustField,
   isFieldMoved,
+  collectAdjustFields,
+  existingFieldKeys,
   recomputeFields,
 } from '../../utils/adjust-session.utils';
+import {
+  aiTemplateMap,
+  loadingAiSession,
+  savedAiSession,
+  withAiEvent,
+  withAiProgress,
+  type AiSession,
+} from '../../utils/ai-session.utils';
+import { readPageTexts } from '../../services/pdf-text.service';
 
 const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
 const WHEEL_PAGING_KEY = 'pdf-annotator.wheelPaging';
@@ -300,31 +302,6 @@ const ADJUST_UI = {
 } as const;
 
 /** Informative notices of the batch bar that can be closed (and found again in the bell). */
-export interface AiSession {
-  phase: 'loading' | 'ready' | 'empty' | 'error';
-  provider: AiProvider | 'adjust';
-  /** Proposal saved by the batch queue (not asked for here): accepting or discarding it also clears the saved copy. */
-  saved?: { at: number } | null;
-  stage: 'reading' | 'asking' | 'resolving';
-  startedAt: number;
-  rows: AiRow[];
-  /** Fields the person ticked or unticked on top of the default selection. */
-  overrides: Record<string, boolean>;
-  view: 'proposal' | 'original';
-  seconds: number;
-  error: { code: string; message: string; reset: string | null } | null;
-  /** Live log for «Ver detalles» (no PDF content, only names and counts). */
-  sent: AiSent | null;
-  attempt: number;
-  /** Milliseconds since `startedAt` when each stage began. */
-  stageLog: Array<{ stage: 'reading' | 'asking' | 'resolving'; attempt: number; at: number }>;
-  stepLog: Array<{ attempt: number; step: AiStep; at: number }>;
-  usage: AiUsage | null;
-  details: AiDetails | null;
-  detailsOpen: boolean;
-  endedAt: number | null;
-}
-
 export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
 
 @Component({
@@ -542,48 +519,34 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return next;
     });
   }
-  /** Pages of A as shown and copied: scaled to B when «Ajustar» is on. */
-  private readonly aPagesView = computed<PageAnnotations[]>(() => {
-    const pages = this.batch.activeItem()?.aPages ?? [];
-    return this.fitA() ? scalePagesToSize(pages, this.pageSizesA(), this.pageSizesB()) : pages;
+  private readonly pageLink = createPageLinkState({
+    activeItem: () => this.batch.activeItem(),
+    fitA: () => this.fitA(),
+    pageSizesA: () => this.pageSizesA(),
+    pageSizesB: () => this.pageSizesB(),
+    pageCountA: () => this.pageCountA(),
+    pageCount: () => this.pageCount(),
+    pageIndex: () => this.pageIndex(),
+    pagesLinked: () => this.pagesLinked(),
+    commonPage: () => this.commonPage(),
+    freeAPage: () => this.freeAPage(),
+    comparing: () => this.comparing(),
+    splitActive: () => this.splitActive(),
+    showingOnlyA: () => this.showingOnlyA(),
   });
-  /**
-   * Table of pages A↔B of the open pair (P-78 a P-81), already valid for the current pages. It only
-   * needs both PDFs open (not `comparing`, which depends on the states that use it).
-   */
-  readonly pageMap = computed<PageMapData | null>(() => {
-    const item = this.batch.activeItem();
-    const a = this.pageCountA();
-    const b = this.pageCount();
-    if (!item?.pageMap || !item.bPdf || a < 1 || b < 1) {
-      return null;
-    }
-    return reconcileMap(item.pageMap, a, b);
-  });
-  /** A and B move together and the table decides which page of A goes with each page of B. */
-  readonly tableLinked = computed(() => !!this.pageMap() && this.pagesLinked());
-  /** The template of A with its pages renumbered to the page of B they go with (the table). */
-  private readonly aPagesForB = computed<PageAnnotations[]>(() => {
-    const map = this.pageMap();
-    if (!map) {
-      return this.aPagesView();
-    }
-    const remapped = remapPagesToB(this.batch.activeItem()?.aPages ?? [], map.pairs);
-    return this.fitA()
-      ? scalePagesToSize(remapped, sizesOfAByB(this.pageSizesA(), map.pairs), this.pageSizesB())
-      : remapped;
-  });
-  /** Factors applied to A on the current page (for the notice). */
-  readonly fitFactors = computed(() =>
-    pageScaleFactors(
-      sizeOfPage(this.pageSizesA(), this.aPage() ?? this.pageIndex()),
-      sizeOfPage(this.pageSizesB(), this.pageIndex()),
-    ),
-  );
-  readonly fitSizes = computed(() => ({
-    a: sizeOfPage(this.pageSizesA(), this.aPage() ?? this.pageIndex()),
-    b: sizeOfPage(this.pageSizesB(), this.pageIndex()),
-  }));
+  private readonly aPagesView = this.pageLink.aPagesView;
+  readonly pageMap = this.pageLink.pageMap;
+  readonly tableLinked = this.pageLink.tableLinked;
+  private readonly aPagesForB = this.pageLink.aPagesForB;
+  readonly fitFactors = this.pageLink.fitFactors;
+  readonly fitSizes = this.pageLink.fitSizes;
+  readonly aPage = this.pageLink.aPage;
+  readonly aGhost = this.pageLink.aGhost;
+  readonly bGhost = this.pageLink.bGhost;
+  readonly pageShown = this.pageLink.pageShown;
+  readonly pageTotalShown = this.pageLink.pageTotalShown;
+  readonly pageOffset = this.pageLink.pageOffset;
+  readonly pageTag = this.pageLink.pageTag;
   /** «Copiar y ajustar por textos»: proposal under review (null = not open). Nothing touches B until applied. */
   readonly adjust = signal<AdjustSession | null>(null);
   private adjustToken = 0;
@@ -610,60 +573,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly paneFocus = signal<'a' | 'b'>('b');
   /** True while B is compared with an A that is open. */
   readonly comparing = computed(() => !!this.migration() && this.pageCountA() > 0);
-  /** Page of A to draw, or null when A has no page at the linked position. */
-  readonly aPage = computed<number | null>(() => {
-    if (!this.comparing()) return this.pageIndex();
-    if (!this.pagesLinked()) return this.freeAPage();
-    const map = this.pageMap();
-    return map
-      ? mapPageOfA(map, this.pageIndex())
-      : pageOfVersion(this.commonPage(), this.pageCountA());
-  });
-  readonly aGhost = computed(() => this.comparing() && this.aPage() === null);
-  /** B has no page at the linked position: its pane shows the empty state. */
-  readonly bGhost = computed(
-    () =>
-      this.comparing() &&
-      this.pagesLinked() &&
-      !this.pageMap() &&
-      this.commonPage() > this.pageCount() &&
-      !this.showingOnlyA(),
-  );
-  /** Page shown in the header: the linked one, or B's while the pages are free. */
-  readonly pageShown = computed(() =>
-    this.comparing() && this.pagesLinked() && !this.pageMap()
-      ? this.commonPage()
-      : this.pageIndex(),
-  );
-  readonly pageTotalShown = computed(() =>
-    this.comparing() && this.pagesLinked() && !this.pageMap()
-      ? linkedPageTotal(this.pageCountA(), this.pageCount())
-      : this.pageCount(),
-  );
-  /** «A 2 · B 1» while the pages are free and differ. */
-  readonly pageOffset = computed(() =>
-    this.comparing() && !this.pagesLinked() ? pageOffsetLabel(this.aPage(), this.pageIndex()) : null,
-  );
-  /** Label over the page when A shows another page than B (or none) outside «Dividida». */
-  readonly pageTag = computed<{
-    kind: 'missing' | 'offset' | 'mapped' | 'unmapped';
-    a: number;
-    b: number;
-  } | null>(() => {
-    if (!this.comparing() || this.splitActive()) return null;
-    const a = this.aPage();
-    if (this.tableLinked()) {
-      return a === null
-        ? { kind: 'unmapped', a: 0, b: this.pageIndex() }
-        : a !== this.pageIndex()
-          ? { kind: 'mapped', a, b: this.pageIndex() }
-          : null;
-    }
-    if (a === null) return { kind: 'missing', a: this.commonPage(), b: this.pageIndex() };
-    return !this.pagesLinked() && a !== this.pageIndex()
-      ? { kind: 'offset', a, b: this.pageIndex() }
-      : null;
-  });
   /** Dialog «Emparejar páginas» (P-79): open or not. */
   readonly pageMapOpen = signal(false);
   private pageMapToken = 0;
@@ -721,19 +630,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private coordsFileInputFallback: HTMLInputElement | null = null;
   private autoApplyCoordsTimer: ReturnType<typeof setTimeout> | null = null;
 
-  private dragInfo: {
-    pageIndex: number;
-    fieldIndex: number;
-    pointerId: number;
-    startX: number;
-    startY: number;
-    startLeft: number;
-    startTop: number;
-    fontSize: number;
-    width: number;
-    moved: boolean;
-  } | null = null;
-  private draggingElement: HTMLDivElement | null = null;
   /** Original file of the open PDF, kept so the session can be saved and restored. */
   private sessionFile: File | null = null;
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -746,21 +642,32 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly selection = signal<{ pageIndex: number; fields: readonly number[] } | null>(null);
   readonly selectionCount = computed(() => this.selection()?.fields.length ?? 0);
   private selectionClipboard: PageField[] = [];
-  private groupDrag: {
-    pointerId: number;
-    startX: number;
-    startY: number;
-    moved: boolean;
-    dx: number;
-    dy: number;
-    items: {
-      el: HTMLElement;
-      startLeft: number;
-      startTop: number;
-      width: number;
-      fontPx: number;
-    }[];
-  } | null = null;
+  private readonly drag = new AnnotationDragController({
+    layer: () => this.annotationsLayerRef?.nativeElement,
+    canvas: () => this.pdfCanvasRef?.nativeElement,
+    scale: () => this.scale(),
+    guidesEnabled: () => this.guidesFeatureEnabled(),
+    refreshOverlay: (rect, guides) => this.refreshOverlay(rect, guides),
+    applySnapping: (left, top, bounds, el, canvas, fontSizePx) =>
+      this.applySnapping(left, top, bounds, el, canvas, fontSizePx),
+    coords: () => this.coords(),
+    styled: (field) => this.ensureFieldStyle(field),
+    selection: () => this.selection(),
+    clearSelection: () => this.clearSelection(),
+    toggleSelection: (pageIndex, fieldIndex) => this.toggleSelection(pageIndex, fieldIndex),
+    startEditing: (pageIndex, fieldIndex, field) => this.startEditing(pageIndex, fieldIndex, field),
+    clickOnGroupMember: (pageIndex, fieldIndex) => {
+      const field = this.coords()[pageIndex]?.fields[fieldIndex];
+      this.selection.set(null);
+      if (field) {
+        this.startEditing(pageIndex, fieldIndex, field);
+      }
+    },
+    moveSelection: (dx, dy) => this.moveSelection(dx, dy),
+    setFieldPosition: (pageIndex, fieldIndex, x, y) =>
+      this.setFieldPosition(pageIndex, fieldIndex, x, y),
+    redrawAllForPage: () => this.redrawAllForPage(),
+  });
 
   @ViewChild(WorkspaceHeaderComponent) private headerComponent?: WorkspaceHeaderComponent;
   @ViewChild(WorkspaceSidebarComponent) private sidebarComponent?: WorkspaceSidebarComponent;
@@ -2428,16 +2335,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.closeFontDropdown('edit');
   }
 
-  private computeHorizontalBounds(
-    width: number,
-    canvasWidth: number,
-  ): { minLeft: number; maxLeft: number } {
-    const elementWidth = Math.max(width, 0);
-    const min = 0;
-    const max = Math.max(canvasWidth - elementWidth, 0);
-    return { minLeft: min, maxLeft: max < min ? min : max };
-  }
-
   private runAfterRender(callback: () => void) {
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(() => callback());
@@ -2812,8 +2709,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           el.dataset['fieldIndex'] = `${fieldIndex}`;
           el.classList.toggle('annotation--selected', this.isSelected(pageIndex, fieldIndex));
           el.onpointerdown = isLocked
-            ? (evt) => this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex)
-            : (evt) => this.handleAnnotationPointerDown(evt, pageIndex, fieldIndex);
+            ? (evt) => this.drag.pointerDownLocked(evt, pageIndex, fieldIndex)
+            : (evt) => this.drag.pointerDown(evt, pageIndex, fieldIndex);
           layer.appendChild(el);
 
           this.runAfterRender(() => this.updateAnnotationLeft(el, styledField, scale));
@@ -3380,24 +3277,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   // ---- «Copiar y ajustar por textos» -------------------------------------------------------------
 
-  /** Texts of one page with their position in PDF points. */
-  private async pageTexts(doc: PDFDocumentProxy, pageNumber: number): Promise<PageTextItem[]> {
-    const page = await doc.getPage(pageNumber);
-    const content = await page.getTextContent();
-    const out: PageTextItem[] = [];
-    for (const item of content.items) {
-      if (!('str' in item) || !item.str.trim()) {
-        continue;
-      }
-      const x = Number(item.transform?.[4]);
-      const y = Number(item.transform?.[5]);
-      if (Number.isFinite(x) && Number.isFinite(y)) {
-        out.push({ text: item.str, x, y });
-      }
-    }
-    return out;
-  }
-
   /** Looks for the same texts in A and B and opens the review with a proposal. */
   async startAdjust(): Promise<void> {
     const item = this.batch.activeItem();
@@ -3406,12 +3285,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     const token = ++this.adjustToken;
     const template = this.normalizedTemplateA();
-    const existing = new Set<string>();
-    for (const page of this.coords()) {
-      for (const field of page.fields) {
-        existing.add(fieldKey(page.num, (field.mapField || field.value || '').trim()));
-      }
-    }
+    const existing = existingFieldKeys(this.coords());
     const pages = template.filter((page) => page.fields.length > 0).map((page) => page.num);
     const progress = { page: 0, total: pages.length, common: 0 };
     this.adjust.set({
@@ -3446,8 +3320,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           continue;
         }
         const [aItems, bItems] = await Promise.all([
-          this.pageTexts(aDoc, numA),
-          this.pageTexts(this.pdfDoc()!, num),
+          readPageTexts(aDoc, numA),
+          readPageTexts(this.pdfDoc()!, num),
         ]);
         textsA += aItems.length;
         textsB += bItems.length;
@@ -3469,30 +3343,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       if (token !== this.adjustToken) {
         return;
       }
-      let skipped = 0;
-      let fields: AdjustField[] = [];
-      for (const page of template) {
-        page.fields.forEach((field, fieldIndex) => {
-          const name = (field.mapField || field.value || '').trim();
-          if (existing.size > 0 && existing.has(fieldKey(page.num, name))) {
-            skipped += 1;
-            return;
-          }
-          fields.push({
-            key: `${page.num}:${fieldIndex}`,
-            page: page.num,
-            fieldIndex,
-            name: name || '—',
-            x: field.x,
-            y: field.y,
-            fontSize: field.fontSize,
-            shift: null,
-            override: null,
-            manual: null,
-          });
-        });
-      }
-      fields = recomputeFields(fields, anchors, 'near');
+      const collected = collectAdjustFields(template, existing);
+      const skipped = collected.skipped;
+      const fields = recomputeFields(collected.fields, anchors, 'near');
       const phase =
         textsA === 0 || textsB === 0 ? 'noText' : anchors.length === 0 ? 'none' : 'ready';
       this.adjust.set({
@@ -3614,30 +3467,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const abort = new AbortController();
     this.aiAbort = abort;
     const template = this.normalizedTemplateOfA();
-    this.aiTemplate = new Map();
-    for (const page of template) {
-      page.fields.forEach((field, i) => this.aiTemplate.set(`p${page.num}-f${i + 1}`, field));
-    }
-    const provider = this.aiHelper.provider();
-    this.ai.set({
-      phase: 'loading',
-      provider,
-      stage: 'reading',
-      startedAt: Date.now(),
-      rows: [],
-      overrides: {},
-      view: 'proposal',
-      seconds: 0,
-      error: null,
-      sent: null,
-      attempt: 1,
-      stageLog: [{ stage: 'reading', attempt: 1, at: 0 }],
-      stepLog: [],
-      usage: null,
-      details: null,
-      detailsOpen: false,
-      endedAt: null,
-    });
+    this.aiTemplate = aiTemplateMap(template);
+    this.ai.set(loadingAiSession(this.aiHelper.provider(), Date.now()));
     this.reopenNotice('ai');
     if (this.referenceMode() !== 'split') {
       this.aiPreviousMode = this.referenceMode();
@@ -3647,45 +3478,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       const result = await this.aiHelper.propose(
         { a: aPdf, b: bPdf, template: { pages: template, pageMap: this.pageMap()?.pairs } },
         (progress) =>
-          this.ai.update((cur) =>
-            cur
-              ? {
-                  ...cur,
-                  stage: progress.stage,
-                  attempt: progress.attempt ?? cur.attempt,
-                  stageLog: [
-                    ...cur.stageLog,
-                    {
-                      stage: progress.stage,
-                      attempt: progress.attempt ?? cur.attempt,
-                      at: Date.now() - cur.startedAt,
-                    },
-                  ],
-                }
-              : cur,
-          ),
+          this.ai.update((cur) => (cur ? withAiProgress(cur, progress, Date.now()) : cur)),
         abort.signal,
-        (event) =>
-          this.ai.update((cur) => {
-            if (!cur) {
-              return cur;
-            }
-            const at = Date.now() - cur.startedAt;
-            if (event.type === 'sent') {
-              return { ...cur, sent: event.sent };
-            }
-            if (event.type === 'step') {
-              return {
-                ...cur,
-                usage: event.usage ?? cur.usage,
-                stepLog: [
-                  ...cur.stepLog,
-                  ...event.steps.map((step) => ({ attempt: event.attempt, step, at })),
-                ].slice(-60),
-              };
-            }
-            return cur;
-          }),
+        (event) => this.ai.update((cur) => (cur ? withAiEvent(cur, event, Date.now()) : cur)),
       );
       if (abort !== this.aiAbort) {
         return;
@@ -3742,38 +3537,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     this.cancelAi();
     const template = this.normalizedTemplateOfA();
-    this.aiTemplate = new Map();
-    for (const page of template) {
-      page.fields.forEach((field, i) => this.aiTemplate.set(`p${page.num}-f${i + 1}`, field));
-    }
+    this.aiTemplate = aiTemplateMap(template);
     const rows = saved.rows.filter((row) => this.aiTemplate.has(row.id));
     if (!rows.length) {
       this.batch.setAiProposal(item.id, undefined);
       return;
     }
-    this.ai.set({
-      phase: 'ready',
-      provider:
-        saved.provider === 'copilot' || saved.provider === 'fake' || saved.provider === 'adjust'
-          ? saved.provider
-          : 'claude',
-      saved: { at: saved.at },
-      stage: 'resolving',
-      startedAt: saved.at,
-      rows: [...rows],
-      overrides: {},
-      view: 'proposal',
-      seconds: saved.seconds,
-      error: null,
-      sent: saved.details?.sent ?? null,
-      attempt: 1,
-      stageLog: [],
-      stepLog: [],
-      usage: null,
-      details: saved.details,
-      detailsOpen: false,
-      endedAt: saved.at,
-    });
+    this.ai.set(savedAiSession(saved, rows));
     this.reopenNotice('ai');
     if (this.referenceMode() !== 'split') {
       this.aiPreviousMode = this.referenceMode();
@@ -4397,7 +4167,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           if (token !== this.pageMapToken) {
             throw new Error('cancelled');
           }
-          out.push((await this.pageTexts(doc, num)).map((text) => text.text).join(' '));
+          out.push((await readPageTexts(doc, num)).map((text) => text.text).join(' '));
           done += 1;
           onProgress(done, total);
         }
@@ -5066,331 +4836,24 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     (this.document?.activeElement as HTMLElement | null)?.blur?.();
   }
 
-  private startGroupDrag(evt: PointerEvent, pressed: HTMLElement, fields: readonly number[]) {
-    const layer = this.annotationsLayerRef?.nativeElement;
-    if (!layer) {
-      return;
-    }
-    const items = fields
-      .map((index) => layer.querySelector<HTMLElement>(`[data-field-index="${index}"]`))
-      .filter((el): el is HTMLElement => !!el)
-      .map((el) => ({
-        el,
-        startLeft: parseFloat(el.style.left || '0'),
-        startTop: parseFloat(el.style.top || '0'),
-        width: el.offsetWidth,
-        fontPx: parseFloat(getComputedStyle(el).fontSize || '0'),
-      }));
-
-    this.groupDrag = {
-      pointerId: evt.pointerId,
-      startX: evt.clientX,
-      startY: evt.clientY,
-      moved: false,
-      dx: 0,
-      dy: 0,
-      items,
-    };
-    pressed.setPointerCapture(evt.pointerId);
-    pressed.onpointermove = this.handleGroupPointerMove;
-    pressed.onpointerup = this.handleGroupPointerUp;
-    pressed.onpointercancel = this.handleGroupPointerUp;
-  }
-
-  private handleGroupPointerMove = (evt: PointerEvent) => {
-    const drag = this.groupDrag;
-    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
-    if (!drag || !pdfCanvas || evt.pointerId !== drag.pointerId) {
-      return;
-    }
-    evt.preventDefault();
-    const rawDx = evt.clientX - drag.startX;
-    const rawDy = evt.clientY - drag.startY;
-    if (!drag.moved && !exceedsDragThreshold(rawDx, rawDy)) {
-      return;
-    }
-    drag.moved = true;
-
-    const { dx, dy } = clampGroupDrag(drag.items, pdfCanvas.width, pdfCanvas.height, rawDx, rawDy);
-    drag.dx = dx;
-    drag.dy = dy;
-
-    for (const item of drag.items) {
-      item.el.style.left = `${item.startLeft + drag.dx}px`;
-      item.el.style.top = `${item.startTop + drag.dy}px`;
-    }
-  };
-
-  private handleGroupPointerUp = (evt: PointerEvent) => {
-    const drag = this.groupDrag;
-    if (!drag || evt.pointerId !== drag.pointerId) {
-      return;
-    }
-    evt.preventDefault();
-    evt.stopPropagation();
-    const pressed = evt.currentTarget as HTMLElement | null;
-    pressed?.releasePointerCapture?.(evt.pointerId);
-    if (pressed) {
-      pressed.onpointermove = null;
-      pressed.onpointerup = null;
-      pressed.onpointercancel = null;
-    }
-    this.groupDrag = null;
-
-    if (drag.moved && evt.type !== 'pointercancel') {
-      const scale = this.scale();
-      this.moveSelection(drag.dx / scale, -drag.dy / scale);
-    } else {
-      // A plain click on a member: behave like a normal click on that annotation.
-      this.redrawAllForPage();
-      if (evt.type !== 'pointercancel') {
-        const index = Number(pressed?.dataset['fieldIndex']);
-        const pageIdx = Number(pressed?.dataset['pageIndex']);
-        const field = this.coords()[pageIdx]?.fields[index];
-        this.selection.set(null);
-        if (field) {
-          this.startEditing(pageIdx, index, field);
-        }
-      }
-    }
-  };
-
-  private handleLockedAnnotationPointerDown(
-    evt: PointerEvent,
-    pageIndex: number,
-    fieldIndex: number,
-  ) {
-    evt.preventDefault();
-    evt.stopPropagation();
-    const page = this.coords()[pageIndex];
-    const field = page?.fields[fieldIndex];
-    if (!field) {
-      return;
-    }
-    this.startEditing(pageIndex, fieldIndex, field);
-  }
-
-  private handleAnnotationPointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number) {
-    evt.preventDefault();
-    evt.stopPropagation();
-    const el = evt.currentTarget as HTMLDivElement | null;
-    if (!el) return;
-
-    const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');
-    const page = this.coords()[pageIndex];
-    const field = page?.fields[fieldIndex];
-    if (!field || field.locked) {
-      return;
-    }
-    const styledField = this.ensureFieldStyle(field);
-    if (styledField?.locked) {
-      this.handleLockedAnnotationPointerDown(evt, pageIndex, fieldIndex);
-      return;
-    }
-
-    if (evt.shiftKey || evt.ctrlKey || evt.metaKey) {
-      this.toggleSelection(pageIndex, fieldIndex);
-      return;
-    }
-
-    const selected = this.selection();
-    if (
-      selected &&
-      selected.pageIndex === pageIndex &&
-      selected.fields.length > 1 &&
-      selected.fields.includes(fieldIndex)
-    ) {
-      this.startGroupDrag(evt, el, selected.fields);
-      return;
-    }
-    if (selected) {
-      this.clearSelection();
-    }
-
-    this.dragInfo = {
-      pageIndex,
-      fieldIndex,
-      pointerId: evt.pointerId,
-      startX: evt.clientX,
-      startY: evt.clientY,
-      startLeft: parseFloat(el.style.left || '0'),
-      startTop: parseFloat(el.style.top || '0'),
-      fontSize: computedFontSize,
-      width: el.offsetWidth,
-      moved: false,
-    };
-
-    this.draggingElement = el;
-    el.setPointerCapture(evt.pointerId);
-    el.classList.add('dragging');
-    el.onpointermove = this.handleAnnotationPointerMove;
-    el.onpointerup = this.handleAnnotationPointerUp;
-    el.onpointercancel = this.handleAnnotationPointerUp;
-
-    if (this.guidesFeatureEnabled()) {
-      this.refreshOverlay(
-        {
-          left: parseFloat(el.style.left || '0'),
-          top: parseFloat(el.style.top || '0'),
-          width: el.offsetWidth,
-          height: el.offsetHeight,
-        },
-        [],
-      );
-    } else {
-      this.refreshOverlay(null, []);
-    }
-  }
-
-  private handleAnnotationPointerMove = (evt: PointerEvent) => {
-    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
-    const el = this.draggingElement;
-    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
-    if (!el || !pdfCanvas) return;
-
-    evt.preventDefault();
-    const dx = evt.clientX - this.dragInfo.startX;
-    const dy = evt.clientY - this.dragInfo.startY;
-    const shouldMove = this.dragInfo.moved || Math.abs(dx) > 2 || Math.abs(dy) > 2;
-    if (!shouldMove) return;
-
-    this.dragInfo.moved = true;
-
-    const tentativeLeft = this.dragInfo.startLeft + dx;
-    const tentativeTop = this.dragInfo.startTop + dy;
-
-    const minTop = -this.dragInfo.fontSize;
-    const maxTop = pdfCanvas.height - this.dragInfo.fontSize;
-    const elementWidth = this.dragInfo.width || el.offsetWidth;
-    const horizontalBounds = this.computeHorizontalBounds(elementWidth, pdfCanvas.width);
-    const clampedLeft = Math.min(
-      Math.max(tentativeLeft, horizontalBounds.minLeft),
-      horizontalBounds.maxLeft,
-    );
-    const clampedTop = Math.min(Math.max(tentativeTop, minTop), maxTop);
-
-    this.dragInfo.width = el.offsetWidth;
-
-    if (!this.guidesFeatureEnabled()) {
-      el.style.left = `${clampedLeft}px`;
-      el.style.top = `${clampedTop}px`;
-      this.refreshOverlay(null, []);
-      return;
-    }
-
-    const snapResult = this.applySnapping(
-      clampedLeft,
-      clampedTop,
-      { minLeft: horizontalBounds.minLeft, maxLeft: horizontalBounds.maxLeft, minTop, maxTop },
-      el,
-      pdfCanvas,
-      this.dragInfo.fontSize,
-    );
-
-    el.style.left = `${snapResult.left}px`;
-    el.style.top = `${snapResult.top}px`;
-
-    this.refreshOverlay(
-      {
-        left: snapResult.left,
-        top: snapResult.top,
-        width: el.offsetWidth,
-        height: el.offsetHeight,
-      },
-      snapResult.guides,
-    );
-  };
-
-  private handleAnnotationPointerUp = (evt: PointerEvent) => {
-    if (!this.dragInfo || evt.pointerId !== this.dragInfo.pointerId) return;
-    const el = this.draggingElement;
-    if (!el) {
-      this.dragInfo = null;
-      this.refreshOverlay(null, []);
-      return;
-    }
-
-    evt.preventDefault();
-    evt.stopPropagation();
-    el.releasePointerCapture(evt.pointerId);
-    el.classList.remove('dragging');
-    el.onpointermove = null;
-    el.onpointerup = null;
-    el.onpointercancel = null;
-
-    const drag = this.dragInfo;
-    this.dragInfo = null;
-    this.draggingElement = null;
-
-    this.refreshOverlay(null, []);
-
-    if (drag.moved) {
-      const left = parseFloat(el.style.left || '0');
-      const top = parseFloat(el.style.top || '0');
-      this.updateAnnotationPosition(
-        drag.pageIndex,
-        drag.fieldIndex,
-        left,
-        top,
-        drag.fontSize,
-        drag.width || el.offsetWidth,
-      );
-    } else if (evt.type !== 'pointercancel') {
-      const page = this.coords()[drag.pageIndex];
-      const field = page?.fields[drag.fieldIndex];
-      if (field) {
-        this.startEditing(drag.pageIndex, drag.fieldIndex, field);
-      }
-    }
-  };
-
-  private updateAnnotationPosition(
-    pageIndex: number,
-    fieldIndex: number,
-    leftPx: number,
-    topPx: number,
-    fontSizePx: number,
-    widthPx: number,
-  ) {
-    const pdfCanvas = this.pdfCanvasRef?.nativeElement;
-    if (!pdfCanvas) return;
-    const scale = this.scale();
-    const page = this.coords()[pageIndex];
-    const field = page?.fields[fieldIndex];
-    if (!field || field.locked) {
-      return;
-    }
-    const bounds = this.computeHorizontalBounds(widthPx, pdfCanvas.width);
-    const boundedLeft = Math.min(Math.max(leftPx, bounds.minLeft), bounds.maxLeft);
-    const boundedTop = Math.min(Math.max(topPx, -fontSizePx), pdfCanvas.height - fontSizePx);
-    const width = Math.max(widthPx, 0) / scale;
-    const newX = +(boundedLeft / scale).toFixed(2);
-    const newY = +((pdfCanvas.height - (boundedTop + fontSizePx)) / scale).toFixed(2);
-
+  /** Commits the new position (points PDF) of one dragged annotation, through the history. */
+  private setFieldPosition(pageIndex: number, fieldIndex: number, x: number, y: number) {
     const changed = this.applyCoordsChange(() =>
       this.coords.update((pages) =>
         pages.map((page, idx) => {
-          if (idx !== pageIndex) {
-            return page;
-          }
-          if (fieldIndex < 0 || fieldIndex >= page.fields.length) {
+          if (idx !== pageIndex || fieldIndex < 0 || fieldIndex >= page.fields.length) {
             return page;
           }
           const updatedFields = page.fields.map((currentField, fIdx) =>
-            fIdx === fieldIndex
-              ? this.ensureFieldStyle({ ...currentField, x: newX, y: newY })
-              : currentField,
+            fIdx === fieldIndex ? this.ensureFieldStyle({ ...currentField, x, y }) : currentField,
           );
           return { ...page, fields: updatedFields };
         }),
       ),
     );
-
     if (changed) {
       this.syncCoordsTextModel();
     }
-
-    this.redrawAllForPage();
   }
 
   /** Back to «Páginas enlazadas» on `page` (a new PDF, a restored session). */
