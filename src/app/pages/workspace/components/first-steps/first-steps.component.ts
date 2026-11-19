@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, effect, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, computed, effect, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { guideSeen, markGuideSeen } from '../../../../utils/first-run.utils';
 import type { WorkspacePageComponent } from '../../workspace.page';
@@ -9,7 +9,7 @@ import type { WorkspacePageComponent } from '../../workspace.page';
  * campo, una pista única. Se cierra con ✕ o «No volver a mostrar» y no vuelve (localStorage, con try/catch).
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-first-steps',
   standalone: true,
   imports: [CommonModule, TranslationPipe],
@@ -26,9 +26,9 @@ export class FirstStepsComponent {
   private seenEmpty = false;
 
   /** Empty editor, a loose PDF (a batch PDF has its own guide in the migration bar) and nobody closed it yet. */
-  get stepsVisible(): boolean {
-    return !this.stepsClosed() && !!this.vm.pdfDoc() && !this.vm.batchCtx() && this.vm.annotationCount() === 0;
-  }
+  readonly stepsVisible = computed(
+    () => !this.stepsClosed() && !!this.vm.pdfDoc() && !this.vm.batchCtx() && this.vm.annotationCount() === 0,
+  );
 
   constructor() {
     effect(() => {

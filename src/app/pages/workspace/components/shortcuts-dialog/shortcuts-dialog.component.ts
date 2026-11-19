@@ -12,7 +12,7 @@ interface ShortcutGroup {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-shortcuts-dialog',
   standalone: true,
   templateUrl: './shortcuts-dialog.component.html',
