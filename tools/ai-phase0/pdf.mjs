@@ -6,6 +6,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createCanvas } from '@napi-rs/canvas';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { slotsFromOps } from './slots.mjs';
 
 const require = createRequire(import.meta.url);
 const pdfjsRoot = path.dirname(path.dirname(require.resolve('pdfjs-dist/package.json')));
@@ -16,7 +17,6 @@ async function open(file) {
   return pdfjs.getDocument({ data, standardFontDataUrl, useSystemFonts: true, verbosity: 0 }).promise;
 }
 
-/** Devuelve { pages: [{ num, width, height }], texts: [{ page, text, x, y }] } y escribe PNGs si se pide. */
 /** Glifos 5×7 del código de verificación: se dibujan con rectángulos, sin depender de ninguna fuente del sistema
  * (en algunos equipos `monospace` no tenía las letras y salían recuadros vacíos). */
 export const CODE_GLYPHS = {
@@ -73,12 +73,15 @@ export const codeWidth = (code, cell) => (code.length * 7 - 2) * cell;
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export const newCode = () => Array.from({ length: 4 }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
 
-/** Con `stamp`, cada PNG lleva un código aleatorio en la esquina: la IA debe devolverlo para demostrar que ha mirado la imagen. */
+/** Devuelve { pages: [{ num, width, height }], texts: [{ page, text, x, y }], slots, codes } y escribe PNGs si se pide.
+ * `slots` = huecos de escritura dibujados (líneas y casillas, ver slots.mjs): [{ page, kind: 'line' | 'box', x, y, w, h }].
+ * Con `stamp`, cada PNG lleva un código aleatorio en la esquina: la IA debe devolverlo para demostrar que ha mirado la imagen. */
 export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false } = {}) {
   const doc = await open(file);
   const pages = [];
   const codes = {};
   const texts = [];
+  const slots = [];
   for (let num = 1; num <= doc.numPages; num++) {
     const page = await doc.getPage(num);
     const [x0, y0, x1, y1] = page.view;
@@ -87,6 +90,12 @@ export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false
     for (const item of content.items) {
       if (!('str' in item) || !item.str.trim()) continue;
       texts.push({ page: num, text: item.str, x: Math.round(item.transform[4] * 10) / 10, y: Math.round(item.transform[5] * 10) / 10 });
+    }
+    try {
+      const opList = await page.getOperatorList();
+      slots.push(...slotsFromOps(opList.fnArray, opList.argsArray, { page: num, ops: pdfjs.OPS }));
+    } catch {
+      // un dibujo que pdf.js no sabe leer no debe impedir leer los textos
     }
     if (outDir) {
       const viewport = page.getViewport({ scale });
@@ -116,5 +125,5 @@ export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false
     }
   }
   await doc.destroy();
-  return { pages, texts, codes };
+  return { pages, texts, slots, codes };
 }
