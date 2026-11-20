@@ -19,6 +19,8 @@ const row = (id: string, ok: boolean): AiRow => ({
   reason: '',
   anchorA: '',
   anchorB: '',
+  why: '',
+  source: 'ai',
 });
 
 const result = (...oks: boolean[]): AiResult => ({

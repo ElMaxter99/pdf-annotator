@@ -6,9 +6,8 @@ import {
   AI_BATCH_COPILOT_CAP,
   AiBatchPhase,
   classifyAiError,
-  isEligibleForAiBatch,
-} from '../utils/ai-batch.utils';
-import { AiDetails, AiResult, AiSent, AiStep, AiUsage, sumUsage } from '../utils/ai-proposal.utils';
+  isEligibleForAiBatch, phaseOfResult } from '../utils/ai-batch.utils';
+import { AiDetails, AiResult, AiSent, AiStep, AiUsage, sumUsage, countPlacement } from '../utils/ai-proposal.utils';
 import { AiQueueInfo, AiQueueTaken, AiRemoteSnapshot, parseQueueInfo, phaseOfRemote, remoteItemId } from '../utils/ai-queue.utils';
 import { cascadeAdjust } from '../utils/adjust-cascade.utils';
 import { AiHelperService, AiRequestError } from './ai-helper.service';
@@ -23,6 +22,8 @@ export interface AiBatchRow {
   endedAt: number | null;
   placed: number;
   total: number;
+  /** Fields that do not exist in B: leaving them out is right, they are not failures. */
+  absent: number;
   usage: AiUsage | null;
   error: { code: string; message: string; reset: string | null } | null;
   /** Live log for «Ver detalles» (names and counts only, never PDF content). Times are ms since `t0`. */
@@ -481,11 +482,11 @@ export class AiBatchService {
     this.panelOpen.set(true);
   }
 
-  private markTaken(id: string, phase: AiQueueTaken['phase'], placed: number, total: number): void {
+  private markTaken(id: string, phase: AiQueueTaken['phase'], placed: number, total: number, absent = 0): void {
     if (!this.viaHelper()) {
       return;
     }
-    this.taken = { ...this.taken, [id]: { phase, placed, total } };
+    this.taken = { ...this.taken, [id]: { phase, placed, total, absent } };
     this.persistQueue();
   }
 
@@ -544,7 +545,7 @@ export class AiBatchService {
       for (const id of order) {
         const taken = info.taken[id];
         rows[id] = taken
-          ? { ...emptyRow(id), phase: taken.phase, placed: taken.placed, total: taken.total, provider: taken.phase === 'free' ? 'adjust' : info.provider }
+          ? { ...emptyRow(id), phase: taken.phase, placed: taken.placed, total: taken.total, absent: taken.absent ?? 0, provider: taken.phase === 'free' ? 'adjust' : info.provider }
           : emptyRow(id);
       }
       this.order.set(order);
@@ -622,16 +623,17 @@ export class AiBatchService {
 
   /** Stores one finished answer: a proposal to review (never applied) or a failure when nothing could be placed. */
   private acceptResult(id: string, result: AiResult): void {
-    const placed = result.rows.filter((row) => row.ok).length;
-    const total = result.rows.length;
+    const { placed, absent, total } = countPlacement(result.rows);
     const usage = sumUsage(result.details?.attempts.map((a) => a.usage) ?? []) ?? this.rows()[id]?.usage ?? null;
     this.streak = { kind: '', n: 0 };
-    if (placed === 0) {
+    const phase = phaseOfResult(placed, absent, total);
+    if (phase === 'failed') {
       this.patchRow(id, {
         phase: 'failed',
         endedAt: Date.now(),
         placed,
         total,
+        absent,
         usage,
         details: result.details,
         error: { code: result.details?.diagnosis ?? 'ai_found_nothing', message: '', reset: null },
@@ -646,9 +648,8 @@ export class AiBatchService {
       seconds: result.seconds,
       at: Date.now(),
     });
-    const phase = placed === total ? 'ready' : 'partial';
-    this.patchRow(id, { phase, endedAt: Date.now(), placed, total, usage, details: result.details });
-    this.markTaken(id, phase, placed, total);
+    this.patchRow(id, { phase, endedAt: Date.now(), placed, total, absent, usage, details: result.details });
+    this.markTaken(id, phase, placed, total, absent);
   }
 
   /** Runs one pair; returns what the queue must do next when it has to stop. */
@@ -785,7 +786,7 @@ export class AiBatchService {
 }
 
 function emptyRow(id: string): AiBatchRow {
-  return { id, phase: 'queued', attempt: 1, startedAt: null, endedAt: null, placed: 0, total: 0, usage: null, error: null, t0: null, provider: '', sent: null, stageLog: [], stepLog: [], details: null, cascade: null };
+  return { id, phase: 'queued', attempt: 1, startedAt: null, endedAt: null, placed: 0, total: 0, absent: 0, usage: null, error: null, t0: null, provider: '', sent: null, stageLog: [], stepLog: [], details: null, cascade: null };
 }
 
 function mapRows(rows: Record<string, AiBatchRow>, fn: (row: AiBatchRow) => AiBatchRow): Record<string, AiBatchRow> {

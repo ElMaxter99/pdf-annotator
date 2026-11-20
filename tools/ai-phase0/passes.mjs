@@ -22,13 +22,17 @@ const pick = (codes, names) => Object.fromEntries(names.filter((n) => n in codes
  *   Lanza una llamada y devuelve el texto de la respuesta; rellena `info` (uso, pasos…) y lanza errores con `code`.
  * @param {(proposal: object, entry: object) => {ok: boolean}} o.resolve
  * @param {Record<string, string> | null} [o.codes] Código de cada imagen (`A-p1`…); null = sin prueba de lectura.
+ * @param {number} [o.alreadyPlaced] Campos ya colocados sin IA (no van en el plan).
  */
-export async function runPasses({ plan, call, resolve, codes = null, minMatch, maxAttempts = 2, maxRequests = MAX_REQUESTS_PER_PDF, chunk = CANDIDATE_PAGES, onStage = () => {} }) {
+export async function runPasses({ plan, call, resolve, codes = null, minMatch, maxAttempts = 2, maxRequests = MAX_REQUESTS_PER_PDF, chunk = CANDIDATE_PAGES, onStage = () => {}, alreadyPlaced = 0 }) {
   const outcomes = new Map();
   const attempts = [];
   const sentB = new Map();
+  /** Páginas de B con las que se ha preguntado por cada campo (para saber si «no existe en B» es definitivo). */
+  const askedB = new Map();
   const state = { requests: 0, capReached: false, aborted: null };
-  const placed = () => [...outcomes.values()].filter((o) => o.resolved.ok).length;
+  // `alreadyPlaced` = campos colocados antes sin IA: cuentan para devolver parcial ante un timeout o cli_error.
+  const placed = () => alreadyPlaced + [...outcomes.values()].filter((o) => o.resolved.ok).length;
 
   async function ask(request) {
     const images = imageNames(request);
@@ -38,6 +42,7 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
     let retry = null;
     let best = null;
     let unread = null;
+    let called = false;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       if (state.requests >= maxRequests) {
         state.capReached = true;
@@ -47,6 +52,7 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
       onStage('asking', n);
       const info = { n, pass: request.pass, group: request.group, images, fields: request.entries.length, attempt, retry: !!retry, steps: [], usage: null };
       attempts.push(info);
+      called = true;
       const text = await call(request, info, retry);
       const data = parseJsonFromText(text, looksLikeProposals);
       if (!data) {
@@ -82,6 +88,13 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
       const entry = request.entries.find((e) => e.id === p.id);
       if (entry) outcomes.set(p.id, mergeOutcome(outcomes.get(p.id), { proposal: p, resolved: resolve(p, entry), pass: request.pass, group: request.group }));
     }
+    if (called) {
+      for (const e of request.entries) {
+        const asked = askedB.get(e.id) ?? new Set();
+        for (const p of request.pagesB) asked.add(p);
+        askedB.set(e.id, asked);
+      }
+    }
     const sent = sentB.get(request.group) ?? new Set();
     for (const p of request.pagesB) sent.add(p);
     sentB.set(request.group, sent);
@@ -112,5 +125,5 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
     const { pagesB, fresh } = planRetry({ candidatesB: item.candidatesB, rankB: item.rankB, sentB: sentB.get(item.group), chunk });
     await safeAsk({ pass: 2, group: item.group, pageA: item.pageA, pagesB, entries: pending, notes: pending.map((e) => failureNote(e, outcomes.get(e.id))), fresh });
   }
-  return { outcomes, attempts, requests: state.requests, capReached: state.capReached, aborted: state.aborted, sentB };
+  return { outcomes, attempts, requests: state.requests, capReached: state.capReached, aborted: state.aborted, sentB, askedB };
 }

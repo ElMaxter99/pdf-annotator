@@ -888,6 +888,7 @@
         "ready": "Pronta para rever · {{placed}} de {{total}}",
         "free": "Resolvido sem IA · {{placed}} de {{total}}",
         "partial": "Parcial · {{placed}} de {{total}}",
+        "absent": "{{n}} não existem em B",
         "failed": "Falhou",
         "cancelled": "Cancelado",
         "saved": "Proposta pronta para rever",
@@ -1490,9 +1491,12 @@
       "group": {
         "review": "Por rever · {{count}}",
         "notFound": "Por encontrar · {{count}}",
+        "absent": "Não existem em B · {{count}}",
         "ready": "Prontos · {{count}}"
       },
       "notInB": "não está em B",
+      "absentInB": "não existe em B: o correto é não o colocar",
+      "withoutAi": "colocado sem IA",
       "placeByHand": "Colocar à mão",
       "tabBadge": "Proposta da IA: {{count}} campos"
     }

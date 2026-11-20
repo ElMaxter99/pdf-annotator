@@ -888,6 +888,7 @@
         "ready": "Ready to review · {{placed}} of {{total}}",
         "free": "Solved without AI · {{placed}} of {{total}}",
         "partial": "Partial · {{placed}} of {{total}}",
+        "absent": "{{n}} not in B",
         "failed": "Failed",
         "cancelled": "Cancelled",
         "saved": "Proposal ready to review",
@@ -1490,9 +1491,12 @@
       "group": {
         "review": "To review · {{count}}",
         "notFound": "Not found · {{count}}",
+        "absent": "Not in B · {{count}}",
         "ready": "Ready · {{count}}"
       },
       "notInB": "not in B",
+      "absentInB": "does not exist in B: leaving it out is correct",
+      "withoutAi": "placed without AI",
       "placeByHand": "Place by hand",
       "tabBadge": "AI proposal: {{count}} fields"
     }

@@ -8,6 +8,8 @@ import {
   sanitizeRow,
   sortAiRows,
   summarizeAi,
+  isAbsentInB,
+  countPlacement
 } from './ai-proposal.utils';
 
 const row = (over: Partial<AiRow> = {}): AiRow => ({
@@ -22,6 +24,8 @@ const row = (over: Partial<AiRow> = {}): AiRow => ({
   reason: '',
   anchorA: 'A',
   anchorB: 'A',
+  why: '',
+  source: 'ai',
   ...over,
 });
 
@@ -120,6 +124,20 @@ describe('ai-proposal.utils', () => {
     const res = parseNdjson(line + '\n').messages[0] as { result: { details: { diagnosis: string; attempts: unknown[] } } };
     expect(res.result.details.diagnosis).toBe('cap_reached');
     expect(res.result.details.attempts.length).toBe(8);
+  });
+
+  it('reads why and source of each row and counts what does not exist in B apart', () => {
+    const base = { id: 'p1-f1', page: 1, index: 0, x: 10, y: 20, confidence: 0.8, reason: '', anchorA: '', anchorB: '' };
+    const placedByText = sanitizeRow({ ...base, ok: true, source: 'text' })!;
+    const absent = sanitizeRow({ ...base, id: 'p1-f2', index: 1, ok: false, why: 'no_existe_en_b' })!;
+    const missing = sanitizeRow({ ...base, id: 'p1-f3', index: 2, ok: false, why: 'ancla_B_no_encontrada' })!;
+    const junk = sanitizeRow({ ...base, id: 'p1-f4', index: 3, ok: false, why: '<script>', source: 'otra' })!;
+    expect(placedByText.source).toBe('text');
+    expect(junk.why).toBe('');
+    expect(junk.source).toBe('ai');
+    expect(isAbsentInB(absent)).toBeTrue();
+    expect(isAbsentInB(missing)).toBeFalse();
+    expect(countPlacement([placedByText, absent, missing, junk])).toEqual({ placed: 1, absent: 1, missing: 2, total: 4, withoutAi: 1 });
   });
 
   it('sums usage and estimates tokens only from sizes', () => {

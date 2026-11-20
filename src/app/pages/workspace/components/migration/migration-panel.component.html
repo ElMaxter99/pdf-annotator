@@ -42,6 +42,7 @@
                     <small>
                       @if (row.anchorB) { {{ 'ai.review.anchor' | t: { text: row.anchorB } }} · }
                       @if (changesPage(row)) { {{ 'batch.panel.page' | t: { page: row.page } }} → {{ 'batch.panel.page' | t: { page: row.newPage } }} } @else { {{ 'batch.panel.page' | t: { page: row.page } }} }
+                      @if (withoutAi(row)) { · <span data-testid="ai-row-without-ai">{{ 'ai.proposal.withoutAi' | t }}</span> }
                       @if (showReason(row)) { · {{ row.reason }} }
                     </small>
                   </span>
@@ -50,7 +51,7 @@
               } @else {
                 <span class="ai-proposal__name ai-proposal__name--off">
                   <b class="mono">{{ vm.aiFieldName(row) }}</b>
-                  <small>{{ 'ai.proposal.notInB' | t }}</small>
+                  <small>{{ (absent(row) ? 'ai.proposal.absentInB' : 'ai.proposal.notInB') | t }}</small>
                 </span>
                 @if (missingFor(row); as state) {
                   <button type="button" class="btn btn--ghost" (click)="vm.placeMissing(state)" data-testid="place-missing">{{ 'ai.proposal.placeByHand' | t }}</button>

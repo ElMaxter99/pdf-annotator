@@ -888,6 +888,7 @@
         "ready": "Llesta per revisar · {{placed}} de {{total}}",
         "free": "Resolt sense IA · {{placed}} de {{total}}",
         "partial": "Parcial · {{placed}} de {{total}}",
+        "absent": "{{n}} no existeixen a B",
         "failed": "Ha fallat",
         "cancelled": "Cancel·lat",
         "saved": "Proposta llesta per revisar",
@@ -1490,9 +1491,12 @@
       "group": {
         "review": "Per revisar · {{count}}",
         "notFound": "Sense trobar · {{count}}",
+        "absent": "No existeixen a B · {{count}}",
         "ready": "Llestos · {{count}}"
       },
       "notInB": "no és a B",
+      "absentInB": "no existeix a B: el correcte és no col·locar-lo",
+      "withoutAi": "col·locat sense IA",
       "placeByHand": "Col·locar a mà",
       "tabBadge": "Proposta de la IA: {{count}} camps"
     }

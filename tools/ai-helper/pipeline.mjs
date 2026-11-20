@@ -1,11 +1,13 @@
 // Propuesta de coordenadas A→B con IA para la app: recibe los PDF y la plantilla de A en memoria y devuelve una fila
 // por campo. Va por partes (docs/PLAN-IA-ROBUSTA.md): una petición por página de A con campos y sus candidatas de B,
 // una re-pregunta para lo que falte, reintentos iguales con cualquier proveedor y un tope de peticiones por PDF.
+// Antes, un pase sin IA (text-first.mjs) coloca los campos cuya etiqueta está idéntica en B y tiene hueco dibujado.
 // Nunca evalúa la salida de la IA: solo la valida y la convierte.
 import { copyFile, mkdir, mkdtemp, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { NEARBY_TEXTS, buildPlan, findText, flattenFields, nearbyTexts, resolveProposal } from '../ai-phase0/lib.mjs';
+import { NEARBY_TEXTS, buildPlan, findText, flattenFields, missingWhy, nearbyTexts, norm, resolveProposal } from '../ai-phase0/lib.mjs';
+import { placeByText, textFirstEnabled } from '../ai-phase0/text-first.mjs';
 import { MAX_REQUESTS_PER_PDF, firstPassRequest, imageNames, runPasses } from '../ai-phase0/passes.mjs';
 import { readPdf } from '../ai-phase0/pdf.mjs';
 import { PROVIDERS, describeClaudeEvent, describeCopilotEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
@@ -15,13 +17,19 @@ export { MAX_REQUESTS_PER_PDF };
 const tail = (s) => String(s ?? '').trim().replace(/\s+/g, ' ').slice(-300) || '(sin salida)';
 const countByPage = (texts, n) => Array.from({ length: n }, (_, i) => texts.filter((t) => t.page === i + 1).length);
 
-/** Proveedor simulado (solo con AI_HELPER_FAKE=1): ancla = texto más cercano de A, mismo texto en las páginas de B de la petición. */
-export function fakeAnswer(entries, textsA, textsB) {
+/**
+ * Proveedor simulado (solo con AI_HELPER_FAKE=1): ancla = texto más cercano de A, mismo texto en las páginas de B de la
+ * petición. Si ese texto no está en ninguna página de B (`allTextsB`), responde que no existe (`absent: true`).
+ */
+export function fakeAnswer(entries, textsA, textsB, allTextsB = textsB) {
   return entries.map((e) => {
     const near = nearbyTexts(textsA, e.page, e.field, 1)[0];
     if (!near) return { id: e.id, found: false, reason: 'sin texto cercano' };
     const b = textsB.filter((t) => t.text === near.text).sort((x, y) => x.page - y.page)[0];
-    if (!b) return { id: e.id, found: false, reason: 'el texto ya no existe en B' };
+    if (!b) {
+      const anywhere = allTextsB.some((t) => norm(t.text) === norm(near.text));
+      return anywhere ? { id: e.id, found: false, reason: 'no está en estas páginas de B' } : { id: e.id, found: false, absent: true, reason: 'el texto ya no existe en B' };
+    }
     return { id: e.id, found: true, page: b.page, anchorA: near.text, anchorB: near.text, dx: 0, dy: 0, confidence: 0.9, reason: `Ancla «${near.text}»` };
   });
 }
@@ -87,8 +95,10 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
     const pngBytes = new Map();
     for (const [prefix, doc] of [['A', A], ['B', B]]) for (const p of doc.pages) pngBytes.set(`${prefix}-p${p.num}`, (await stat(path.join(pagesDir, `${prefix}-p${p.num}.png`))).size);
 
+    // Pase sin IA: lo colocado así no se envía. AI_HELPER_TEXT_FIRST=0 lo desactiva (para medir la IA sola).
+    const byText = textFirstEnabled() ? placeByText(entries, { textsA: A.texts, textsB: B.texts, slotsB: B.slots ?? [] }) : { placed: new Map(), rest: entries };
     const pageMap = template?.pageMap;
-    const plan = buildPlan({ entries, pagesA: A.pages.length, textsA: A.texts, pagesB: B.pages.length, textsB: B.texts, pageMap });
+    const plan = buildPlan({ entries: byText.rest, pagesA: A.pages.length, textsA: A.texts, pagesB: B.pages.length, textsB: B.texts, pageMap });
     const planned = createSentLog({ A, B, fields: entries.length, pngBytes });
     for (const item of plan) planned.add(firstPassRequest(item), requestFiles(firstPassRequest(item), A, B));
     const sent = planned.snapshot();
@@ -132,7 +142,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       details.requests = info.n;
       if (fake) {
         info.seconds = 0;
-        return JSON.stringify({ fields: fakeAnswer(request.entries, files.textsA, files.textsB) });
+        return JSON.stringify({ fields: fakeAnswer(request.entries, files.textsA, files.textsB, B.texts) });
       }
       const usageById = new Map();
       const run = await runCliImpl(provider, dir, {
@@ -198,13 +208,14 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       result = await runPasses({
         plan,
         call,
-        resolve: (p, e) => resolveProposal(p, e, A.texts, B.texts),
+        resolve: (p, e) => resolveProposal(p, e, A.texts, B.texts, { slots: B.slots ?? [] }),
         codes,
         // Copilot reescala las imágenes y a veces pone «?»: basta con 2 de 4 caracteres (por azar, ~1 entre 200).
         minMatch: provider === 'copilot' ? 2 : undefined,
         maxAttempts,
         maxRequests,
         onStage,
+        alreadyPlaced: byText.placed.size,
       });
     } catch (e) {
       finish();
@@ -216,17 +227,22 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
     onStage('resolving');
     const counts = {};
     const rows = entries.map((e) => {
-      const o = result.outcomes.get(e.id);
+      const text = byText.placed.get(e.id);
+      const o = text ?? result.outcomes.get(e.id);
       if (!o) return (counts.sin_respuesta = (counts.sin_respuesta ?? 0) + 1), { id: e.id, page: e.page, index: e.index, ok: false, why: 'sin_respuesta', reason: '' };
       const { proposal: p, resolved: r } = o;
-      if (!r.ok) counts[r.why] = (counts[r.why] ?? 0) + 1;
-      return r.ok
-        ? { id: e.id, page: e.page, index: e.index, ok: true, newPage: r.page, x: r.x, y: r.y, confidence: p.confidence, reason: p.reason, anchorA: p.anchorA, anchorB: p.anchorB }
-        : { id: e.id, page: e.page, index: e.index, ok: false, why: r.why, reason: p.reason };
+      if (!r.ok) {
+        const why = missingWhy(o, result.askedB?.get(e.id), B.pages.length);
+        counts[why] = (counts[why] ?? 0) + 1;
+        return { id: e.id, page: e.page, index: e.index, ok: false, why, reason: p.reason };
+      }
+      const confidence = Math.min(p.confidence, r.maxConfidence ?? 1);
+      return { id: e.id, page: e.page, index: e.index, ok: true, newPage: r.page, x: r.x, y: r.y, confidence, reason: p.reason, anchorA: p.anchorA ?? '', anchorB: p.anchorB, source: text ? 'text' : 'ai', snapped: !!r.snapped };
     });
     finish();
     details.requests = result.requests;
     details.placed = rows.filter((r) => r.ok).length;
+    details.placedWithoutAi = byText.placed.size;
     details.notPlaced = counts;
     if (result.aborted) details.aborted = result.aborted;
     details.diagnosis = diagnose({ placed: details.placed, total: rows.length, sent: details.sent, counts, attempts: details.attempts, capReached: result.capReached });

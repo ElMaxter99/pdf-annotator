@@ -63,7 +63,7 @@ Que funcione con **modelos pequeños** cuando la estructura cambia, aunque cuest
 - Reintento por defecto activo con todos los proveedores.
 
 ## Fuera de esta entrega (propuestas para decidir)
-1. **Colocación por texto exacto antes de la IA**: si la etiqueta de A aparece **una sola vez y literal** en B (aunque en otra página), colocar el campo sin IA con el desplazamiento de A. Abarata mucho, pero puede colocar mal si el valor ya no va al lado de la etiqueta. Recomendado como paso marcado «revisar».
+1. ~~**Colocación por texto exacto antes de la IA**~~: hecho en la rc.4 (ver abajo), sobre el hueco dibujado y no con el desplazamiento de A.
 2. **Prompt configurable desde la app** e **instrucciones por lote o por PDF** (para el futuro; dudoso que compense a quien solo maqueta).
 3. **Medir el acierto** con casos reales anonimizados antes de pasar a modelos medianos.
 
@@ -71,3 +71,17 @@ Que funcione con **modelos pequeños** cuando la estructura cambia, aunque cuest
 - Unitarias del motor: páginas útiles, candidatas (con y sin tabla), reparto en pasadas, mezcla por confianza, tope, códigos por petición, plantillas de prompt (`npm run test:helper` y `tools/ai-phase0` `npm test`).
 - El proveedor simulado (`AI_HELPER_FAKE=1`) recorre el flujo nuevo; los e2e de `e2e/ai.spec.ts` siguen en verde.
 - `npm run build`, `npm run test:ci`, `npm run e2e`.
+
+## rc.4 · anclar en B, encajar en el hueco y colocar sin IA (motor)
+Origen: respuesta real en un formulario bancario de 17 campos. «NIF» y «domicilio» quedaron sin colocar porque en A no tenían etiqueta cerca y la regla obligaba a elegir `anchorA` entre los textos cercanos de A, aunque B sí tenía «NIF:»; hubo anclas débiles («Y DE OTRA…») con `dy` −48 estimado a ojo cuando B tenía «Nombre y apellidos:»; y 8 de 11 colocados tenían una etiqueta idéntica y única en B.
+
+1. **Anclar en B.** Respuesta por campo `{ id, found, page, anchorB, side?, anchorA?, dx?, dy?, absent?, confidence, reason }`; `anchorA` opcional (`validateProposals`). Los prompts (`traslado.md`, `repregunta.md`) piden la etiqueta de B que signifique lo mismo que el campo (`label`, `type`) y el lado del hueco; `dx`/`dy` solo como último recurso.
+2. **Encajar en el hueco** (`place.mjs`, `resolveProposal`): check/radio → casilla, resto → línea. Con `side`, el hueco de ese lado de la etiqueta de B; si no, fórmula de A ajustada al hueco a ≤ 15 pt; sin hueco ni `anchorA`, respaldo con confianza ≤ 0,5. x,y se convierte a la convención de la app (inicio de la línea base; «X» centrada en las casillas). Detalle en [`IA-LOCAL.md`](IA-LOCAL.md) («Anclar en B y encajar en el hueco»).
+3. **Colocar sin IA** (`text-first.mjs`): etiqueta de A idéntica y única en B (o repetida igual y emparejada por orden de lectura) con hueco en el mismo lado → colocado sin IA (`source: 'text'`, 0,75). Si todos se colocan, 0 peticiones. `AI_HELPER_TEXT_FIRST=0` lo desactiva.
+4. **No existe en B:** `absent: true` en la respuesta + campo ya consultado con todas las páginas de B → `why: 'no_existe_en_b'`.
+
+**Contrato con la app:** las filas colocadas añaden `source: 'text' | 'ai'` y `snapped`; las no colocadas pueden traer `why: 'no_existe_en_b'`; `details.notPlaced` lo cuenta, `details.placedWithoutAi` = n.º de colocados sin IA y `details.requests` puede ser 0. El resto (`attempts[]`, `plan`, `onStage('asking', n)`, `cap_reached`, `aborted`) no cambia.
+
+**Medido sin IA** en los 6 casos de `sample-plano/`: 31 de 45 campos colocados por el pase sin IA, todos en la página correcta y a 2 pt de la solución. En el PDF de ejemplo de los e2e coloca 8 de 10 y los otros 2 siguen yendo al proveedor simulado, así que `e2e/ai.spec.ts` no cambia.
+
+**Riesgos:** el pase sin IA confía en el dibujo: si B tiene una raya en el mismo lado que no es la del dato (tablas, separadores) puede colocar mal; por eso queda en la propuesta para revisar y con confianza 0,75. Huecos sin dibujo (solo espacio en blanco, `____` con caracteres) no se detectan: esos campos siguen yendo a la IA.

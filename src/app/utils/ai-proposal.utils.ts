@@ -17,6 +17,34 @@ export interface AiRow {
   reason: string;
   anchorA: string;
   anchorB: string;
+  /** Why it was not placed (`no_existe_en_b`: the field does not exist in B, so leaving it out is right). */
+  why: string;
+  /** `text`: placed by the helper without the AI (identical, unique label in B with its slot next to it). */
+  source: 'ai' | 'text';
+}
+
+/** The field does not exist in B: not placing it is the right answer, not a failure. */
+export function isAbsentInB(row: Pick<AiRow, 'ok' | 'why'>): boolean {
+  return !row.ok && row.why === 'no_existe_en_b';
+}
+
+/** Placed, absent from B and still missing, out of the fields of A. */
+export function countPlacement(rows: readonly Pick<AiRow, 'ok' | 'why' | 'source'>[]): {
+  placed: number;
+  absent: number;
+  missing: number;
+  total: number;
+  withoutAi: number;
+} {
+  const placed = rows.filter((row) => row.ok).length;
+  const absent = rows.filter(isAbsentInB).length;
+  return {
+    placed,
+    absent,
+    missing: rows.length - placed - absent,
+    total: rows.length,
+    withoutAi: rows.filter((row) => row.ok && row.source === 'text').length,
+  };
 }
 
 export interface AiResult {
@@ -277,6 +305,8 @@ export function sanitizeRow(raw: unknown): AiRow | null {
     reason: text(r['reason']),
     anchorA: text(r['anchorA'], 120),
     anchorB: text(r['anchorB'], 120),
+    why: typeof r['why'] === 'string' && /^[a-z_]{1,40}$/.test(r['why']) ? r['why'] : '',
+    source: r['source'] === 'text' ? 'text' : 'ai',
   };
 }
 

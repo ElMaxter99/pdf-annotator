@@ -102,6 +102,16 @@ export function classifyAiError(code: string): AiErrorKind {
   }
 }
 
+/**
+ * State of one finished answer. Fields that do not exist in B are not failures: «Lista» means every
+ * field that exists was placed. Nothing placed (and something left to place) is a failure.
+ */
+export function phaseOfResult(placed: number, absent: number, total: number): 'ready' | 'partial' | 'failed' {
+  const placeable = Math.max(0, total - absent);
+  if (placed === 0 && placeable > 0) return 'failed';
+  return placed >= placeable ? 'ready' : 'partial';
+}
+
 export function nextPendingId(order: readonly string[], phases: Readonly<Record<string, AiBatchPhase>>): string | null {
   return order.find((id) => phases[id] === 'queued') ?? null;
 }

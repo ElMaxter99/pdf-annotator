@@ -1,6 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
 
 // Needs the local helper with the simulated provider (playwright.config.ts starts it with AI_HELPER_FAKE=1).
@@ -68,6 +68,8 @@ test('«Copiar y adaptar con IA» asks once, proposes, is reviewed and applied i
   // the list lives in «Anotaciones»: «Revisar campos» opens it
   await page.getByTestId('ai-review-fields').click();
   await expect(page.getByTestId('ai-proposal')).toBeVisible();
+  // the helper placed the obvious ones by text (identical, unique label in B with its slot): marked «colocado sin IA»
+  await expect(page.getByTestId('ai-row-without-ai').first()).toBeVisible();
   await expect(page.locator('.ai-proposal__row')).toHaveCount(FIELDS);
   await expect(page.getByTestId('ai-tab-badge')).toBeVisible();
   await expect(page.getByTestId('migration-list').locator('[data-status="missing"]')).toHaveCount(0);
@@ -186,7 +188,7 @@ test('the retry option is remembered and on by default with every provider', asy
 // ---- «Trasladar con IA» sobre todo el lote -----------------------------------------------------
 
 /** Panel with one pair (0331 + shifted B) and one PDF without B. */
-async function openPanelWithPair(page: Page) {
+async function openPanelWithPair(page: Page, bPdf?: Buffer) {
   await stubAnalytics(page);
   await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.provider', 'fake'));
   await page.goto('/landing');
@@ -200,8 +202,17 @@ async function openPanelWithPair(page: Page) {
   await page.getByTestId('view-list').click();
   await page
     .getByTestId('input-b')
-    .setInputFiles(file('factura-0331-nuevo.pdf', await shiftedPdf(20, -30), 'application/pdf'));
+    .setInputFiles(file('factura-0331-nuevo.pdf', bPdf ?? (await shiftedPdf(20, -30)), 'application/pdf'));
   await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+}
+
+/** A «new version» that shares no label with A: every field of the template is absent from B. */
+async function unrelatedPdf(): Promise<Buffer> {
+  const out = await PDFDocument.create();
+  const font = await out.embedFont(StandardFonts.Helvetica);
+  const sheet = out.addPage([595, 842]);
+  sheet.drawText('Documento sin relación', { x: 60, y: 780, size: 14, font });
+  return Buffer.from(await out.save());
 }
 
 test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revisión PDF a PDF', async ({ page }) => {
@@ -325,6 +336,17 @@ test('«Trasladar con IA» en lote: en la cuadrícula, «Ver detalles» del chip
   await page.getByTestId('ai-chip-details').click();
   await expect(page.getByTestId('ai-bdetails')).toBeVisible();
   await expect(page).toHaveURL(/\/lote/);
+});
+
+test('«Trasladar con IA» en lote: los campos que no existen en B no cuentan como fallo', async ({ page }) => {
+  await openPanelWithPair(page, await unrelatedPdf());
+  await page.getByTestId('ai-batch-button').click();
+  await page.getByTestId('ai-batch-cascade').uncheck();
+  await page.getByTestId('ai-batch-start').click();
+  // Nothing exists in B: the PDF is «Lista» (all that can be placed is placed) and says how many are absent.
+  await expect(page.getByTestId('ai-chip-ready')).toBeVisible({ timeout: 30000 });
+  await expect(page.getByTestId('ai-chip-absent')).toContainText(`${FIELDS} no existen en B`);
+  await expect(page.getByTestId('ai-chip-failed')).toHaveCount(0);
 });
 
 test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada', async ({ page }) => {

@@ -1,9 +1,16 @@
 // Lógica pura de la fase 0 (sin E/S): preparar campos, leer la respuesta de la IA y convertirla en coordenadas.
+import { FALLBACK_CONFIDENCE, SIDES, defaultSide, fallbackXY, slotKind, slotOnSide, snapToSlot, toFieldXY } from './place.mjs';
 
+/**
+ * Texto comparable: sin acentos ni mayúsculas, ligaduras separadas («ﬁ», «ĳ»), sin viñeta inicial
+ * («• », «- ») y sin espacios alrededor de signos («apellidos / Razón» = «apellidos/Razón»).
+ */
 export const norm = (s) =>
   String(s ?? '')
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
+    .replace(/^[\s•·▪◦*–—-]+/u, '')
+    .replace(/\s*([/:;,.()–—-])\s*/gu, '$1')
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();
@@ -95,7 +102,12 @@ export function describeImageCodes(data, codes, { minMatch } = {}) {
   };
 }
 
-/** Valida la respuesta. Devuelve `{ proposals, errors }`; descarta entradas mal formadas. */
+/**
+ * Valida la respuesta. Devuelve `{ proposals, errors }`; descarta entradas mal formadas.
+ * Por campo: `{ id, found, page, anchorB, side?, anchorA?, dx?, dy?, absent?, confidence, reason }`. Con found, `page` y
+ * `anchorB` son obligatorios; `anchorA` es opcional (B puede tener una etiqueta que A no tenía cerca) y un `side` que no
+ * sea de `SIDES` se ignora. `absent: true` (con found:false) = el concepto no existe en B.
+ */
 export function validateProposals(data, knownIds) {
   const list = Array.isArray(data) ? data : Array.isArray(data?.fields) ? data.fields : null;
   if (!list) return { proposals: [], errors: ['La respuesta no es una lista JSON.'] };
@@ -110,25 +122,29 @@ export function validateProposals(data, knownIds) {
     if (seen.has(item.id)) continue;
     seen.add(item.id);
     if (item.found === false) {
-      proposals.push({ id: item.id, found: false, reason: String(item.reason ?? '') });
+      const p = { id: item.id, found: false, reason: String(item.reason ?? '') };
+      if (item.absent === true) p.absent = true;
+      proposals.push(p);
       continue;
     }
     const page = Number(item.page);
-    if (!Number.isInteger(page) || page < 1 || typeof item.anchorA !== 'string' || typeof item.anchorB !== 'string') {
-      errors.push(`${item.id}: faltan page, anchorA o anchorB.`);
+    if (!Number.isInteger(page) || page < 1 || typeof item.anchorB !== 'string' || !item.anchorB.trim()) {
+      errors.push(`${item.id}: faltan page o anchorB.`);
       continue;
     }
-    proposals.push({
+    const p = {
       id: item.id,
       found: true,
       page,
-      anchorA: item.anchorA,
+      anchorA: typeof item.anchorA === 'string' && item.anchorA.trim() ? item.anchorA : null,
       anchorB: item.anchorB,
       dx: finite(item.dx),
       dy: finite(item.dy),
       confidence: clamp01(Number(item.confidence)),
       reason: String(item.reason ?? ''),
-    });
+    };
+    if (SIDES.includes(item.side)) p.side = item.side;
+    proposals.push(p);
   }
   for (const id of knownIds) if (!seen.has(id)) errors.push(`${id}: sin respuesta.`);
   return { proposals, errors };
@@ -138,28 +154,82 @@ const finite = (n) => (Number.isFinite(Number(n)) ? Number(n) : 0);
 const clamp01 = (n) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0.5);
 
 /** Busca un texto exacto (normalizado) y, si hay varios, el más cercano a (nearX, nearY). */
-export function findText(texts, page, wanted, nearX, nearY) {
+/** Orden de lectura de una página: de arriba abajo (y mayor = más arriba) y, en la misma línea, de izquierda a derecha. */
+export const readingOrder = (a, b) => (Math.abs(a.y - b.y) > 2 ? b.y - a.y : a.x - b.x);
+
+/** Textos de una página que coinciden con `wanted`: primero exactos (normalizados); si no hay, los que lo contienen o están contenidos. */
+export function textHits(texts, page, wanted) {
   const w = norm(wanted);
-  if (!w) return null;
+  if (!w) return [];
   const onPage = texts.filter((t) => t.page === page);
-  let hits = onPage.filter((t) => norm(t.text) === w);
-  if (!hits.length) hits = onPage.filter((t) => norm(t.text).includes(w) || (norm(t.text).length > 2 && w.includes(norm(t.text))));
+  const exact = onPage.filter((t) => norm(t.text) === w);
+  if (exact.length) return exact;
+  return onPage.filter((t) => norm(t.text).includes(w) || (norm(t.text).length > 2 && w.includes(norm(t.text))));
+}
+
+/**
+ * Texto de la página que corresponde a `wanted`. Si se repite y `rank` dice que en A era la aparición
+ * n.º `index` de `of`, y en B aparece las mismas veces, se empareja por orden de lectura (1.ª con 1.ª…):
+ * en páginas reestructuradas la «más cercana a la posición de A» puede ser la de otro bloque.
+ */
+export function findText(texts, page, wanted, nearX, nearY, rank = null) {
+  const hits = textHits(texts, page, wanted);
   if (!hits.length) return null;
+  if (rank && hits.length > 1 && hits.length === rank.of && rank.index >= 0) {
+    return [...hits].sort(readingOrder)[rank.index];
+  }
   return hits.sort((a, b) => dist(a.x, a.y, nearX, nearY) - dist(b.x, b.y, nearX, nearY))[0];
 }
 
 /**
- * Convierte la propuesta (anclas por texto) en coordenadas de B en puntos PDF.
- * x,y = ancla B + (campo A − ancla A) + (dx,dy) que la IA haya estimado.
+ * Convierte la propuesta (anclas por texto) en coordenadas de B en puntos PDF, con la convención de la app (inicio
+ * de la línea base de lo que se pinta; ver place.mjs). Con `slots` (huecos de B, de readPdf):
+ * 1. `side`: el hueco de ese lado del ancla de B (casilla para check/radio, línea para el resto).
+ * 2. Sin hueco en ese lado (o sin side) y con `anchorA`: ancla B + (campo A − ancla A) + (dx, dy), ajustado al hueco
+ *    del mismo tipo si hay uno a ≤ 15 pt.
+ * 3. Sin hueco y sin `anchorA`: respaldo junto al ancla de B según `side`, con confianza ≤ 0,5 (`maxConfidence`).
+ * Devuelve `{ ok, page, x, y, snapped, method: 'side' | 'offset' | 'fallback', maxConfidence? }` o `{ ok: false, why }`.
  */
-export function resolveProposal(proposal, entry, textsA, textsB) {
+export function resolveProposal(proposal, entry, textsA, textsB, { slots = [] } = {}) {
   if (!proposal.found) return { ok: false, why: 'sin_resultado' };
   const f = entry.field;
-  const a = findText(textsA, entry.page, proposal.anchorA, f.x, f.y);
-  if (!a) return { ok: false, why: 'ancla_A_no_encontrada' };
-  const b = findText(textsB, proposal.page, proposal.anchorB, a.x, a.y);
+  const kind = slotKind(f);
+  let a = null;
+  let rank = null;
+  if (proposal.anchorA) {
+    a = findText(textsA, entry.page, proposal.anchorA, f.x, f.y);
+    if (!a && !proposal.side) return { ok: false, why: 'ancla_A_no_encontrada' };
+    if (a) {
+      // Si el ancla se repite en A, qué aparición es (por orden de lectura), para emparejarla con la misma en B.
+      const hitsA = textHits(textsA, entry.page, proposal.anchorA);
+      rank = hitsA.length > 1 ? { index: [...hitsA].sort(readingOrder).indexOf(a), of: hitsA.length } : null;
+    }
+  }
+  const b = findText(textsB, proposal.page, proposal.anchorB, a?.x ?? f.x, a?.y ?? f.y, rank);
   if (!b) return { ok: false, why: 'ancla_B_no_encontrada' };
-  return { ok: true, page: proposal.page, x: round(b.x + (f.x - a.x) + proposal.dx), y: round(b.y + (f.y - a.y) + proposal.dy) };
+  const pageSlots = slots.filter((s) => s.page === proposal.page);
+  const ok = (xy, extra) => ({ ok: true, page: proposal.page, x: round(xy.x), y: round(xy.y), ...extra });
+  if (proposal.side) {
+    const hit = slotOnSide(b, pageSlots, proposal.side, { texts: textsB.filter((t) => t.page === proposal.page), kind });
+    if (hit) return ok(toFieldXY(hit.point, kind, f), { snapped: true, method: 'side' });
+  }
+  if (a) {
+    const xy = { x: b.x + (f.x - a.x) + proposal.dx, y: b.y + (f.y - a.y) + proposal.dy };
+    const snap = snapToSlot(xy, kind, f, pageSlots);
+    return snap ? ok(snap, { snapped: true, method: 'offset' }) : ok(xy, { snapped: false, method: 'offset' });
+  }
+  const xy = fallbackXY(b, proposal.side ?? defaultSide(kind), kind, f);
+  return ok({ x: xy.x + proposal.dx, y: xy.y + proposal.dy }, { snapped: false, method: 'fallback', maxConfidence: FALLBACK_CONFIDENCE });
+}
+
+/**
+ * Por qué queda sin colocar un campo al final: `no_existe_en_b` si la última respuesta dijo `absent` y ya se le
+ * preguntó con todas las páginas de B (`askedPages` = páginas de B enviadas con ese campo); si no, el motivo de siempre.
+ */
+export function missingWhy(outcome, askedPages, totalPagesB) {
+  const why = outcome?.resolved?.why;
+  if (why === 'sin_resultado' && outcome.proposal?.absent === true && (askedPages?.size ?? 0) >= totalPagesB) return 'no_existe_en_b';
+  return why;
 }
 
 /** Compara con la respuesta conocida de B (mismo id). */
@@ -296,9 +366,10 @@ export function failureNote(entry, outcome) {
   const p = outcome?.proposal;
   switch (outcome?.resolved?.why) {
     case 'sin_resultado':
+      if (p?.absent) return `- ${who}: respondiste que no existe en B${p?.reason ? ` («${short(p.reason)}»)` : ''}. Búscalo en estas páginas de B (también con otra redacción); si de verdad no existe, vuelve a responder found:false y absent:true.`;
       return `- ${who}: respondiste found:false${p?.reason ? ` («${short(p.reason)}»)` : ''}. Búscalo otra vez en las páginas de esta petición; si de verdad no está, vuelve a responder found:false.`;
     case 'ancla_A_no_encontrada':
-      return `- ${who}: "anchorA" «${short(p?.anchorA)}» no existe literalmente en textsA.json. Copia un texto exacto de "nearby".`;
+      return `- ${who}: "anchorA" «${short(p?.anchorA)}» no existe literalmente en textsA.json. Copia un texto exacto de "nearby" u omite "anchorA" e indica "side".`;
     case 'ancla_B_no_encontrada':
       return `- ${who}: "anchorB" «${short(p?.anchorB)}» no existe literalmente en textsB.json en la página ${p?.page}. Elige un texto que exista en textsB.json.`;
     default:

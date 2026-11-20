@@ -25,6 +25,9 @@ const NOTHING = ['no_text_a', 'no_text_b', 'permission_denied', 'no_valid_answer
             <span class="ai-chip__spin" aria-hidden="true"></span>
           }
           {{ 'batch.ai.state.' + v.key | t: v.params }}
+          @if (v.absent) {
+            · <span data-testid="ai-chip-absent">{{ 'batch.ai.state.absent' | t: { n: v.absent } }}</span>
+          }
           @if (v.error) {
             · {{ v.error | t }}
           }
@@ -92,7 +95,8 @@ export class AiBatchChipComponent {
         sub,
         phase: row.phase,
         key: row.phase,
-        params: { n: row.attempt, placed: row.placed, total: row.total },
+        params: { n: row.attempt, placed: row.placed, total: Math.max(0, row.total - (row.absent ?? 0)) },
+        absent: row.absent ?? 0,
         tone:
           row.phase === 'ready' || row.phase === 'free'
             ? 'ok'
@@ -109,7 +113,7 @@ export class AiBatchChipComponent {
       };
     }
     if (item.aiProposal) {
-      return { id: item.id, sub: null, phase: 'saved', key: 'saved', params: {}, tone: 'ok', active: false, error: null, canSkip: false };
+      return { id: item.id, sub: null, phase: 'saved', key: 'saved', params: {}, absent: 0, tone: 'ok', active: false, error: null, canSkip: false };
     }
     return null;
   });

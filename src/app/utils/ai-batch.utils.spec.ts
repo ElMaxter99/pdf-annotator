@@ -2,6 +2,7 @@ import type { BatchItem } from '../models/batch.model';
 import {
   AI_BATCH_COPILOT_CAP,
   AI_MAX_REQUESTS_PER_PDF,
+  phaseOfResult,
   usedPagesOfA,
   classifyAiError,
   countTemplateFields,
@@ -62,6 +63,14 @@ describe('ai-batch.utils', () => {
     const est = estimateAiBatch([wide], 'claude', true);
     expect(est.minRequests).toBe(3);
     expect(est.maxRequests).toBe(AI_MAX_REQUESTS_PER_PDF);
+  });
+
+  it('does not count the fields that do not exist in B as failures', () => {
+    expect(phaseOfResult(11, 2, 13)).toBe('ready');
+    expect(phaseOfResult(11, 2, 17)).toBe('partial');
+    expect(phaseOfResult(0, 3, 3)).toBe('ready');
+    expect(phaseOfResult(0, 1, 4)).toBe('failed');
+    expect(phaseOfResult(4, 0, 4)).toBe('ready');
   });
 
   it('classifies errors by what the queue must do', () => {
