@@ -475,6 +475,81 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
   }
 }
 
+.ai-pop__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ai-pop__info {
+  all: unset;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 1rem;
+
+  &:hover,
+  &--on {
+    background: color-mix(in srgb, var(--text) 10%, transparent);
+    color: var(--text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.ai-pop__infobody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    color: var(--text);
+  }
+}
+
+.ai-pop__consent {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 0.82rem;
+
+  // La casilla va sin recuadro propio: es una línea más del texto, no otro bloque.
+  .ai-check {
+    padding: 0;
+    background: none;
+    align-items: center;
+    font-size: 0.82rem;
+  }
+}
+
+// «Ajustar por textos»: título y ⓘ en una sola línea.
+.ai-check--cascade > span {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
 .ai-pop__sum {
   margin: 0;
   display: flex;

@@ -844,7 +844,6 @@
         "cap": "tetto per passata",
         "retries": "nuovi tentativi",
         "estimateClaude": "Consumo stimato: da {{min}} a {{max}} richieste ({{max}} se serve riprovare). Con Claude il consumo reale viene misurato e mostrato in tempo reale.",
-        "noMeasure": "Crediti IA per richiesta. Il consumo mostrato è quello indicato dall’assistente (token e crediti se Copilot li restituisce). Ogni richiesta viene scalata in base al modello scelto.",
         "cascade": "Prova prima con «Adatta per testi»",
         "cascadeHint": "Gratis. L'IA si usa solo nei PDF in cui restano campi non collocati.",
         "capNote": "Se ci sono più di {{cap}} coppie, la coda si ferma a {{cap}} e attende il tuo «Continua». Nessun nuovo tentativo automatico.",
@@ -964,9 +963,13 @@
       },
       "pop": {
         "summary": "{{count}} PDF con A e B · {{fields}} campi",
-        "requests": "Da {{min}} a {{max}} richieste all'IA",
         "requestsCopilot": "Fino a {{max}} richieste (limite {{cap}})",
         "change": "Cambia",
+        "moreInfo": "Maggiori informazioni",
+        "omitted": "Esclusi: {{count}}",
+        "credits": "Ogni richiesta consuma crediti IA in base al modello scelto.",
+        "consent": "I PDF A e B vengono inviati al tuo {{provider}} locale.",
+        "consentRemember": "Non avvisare più",
         "sent": "Cosa viene inviato",
         "breakdown": {
           "title": "{{eligible}} di {{withB}} con versione B verranno inviati. Esclusi:",

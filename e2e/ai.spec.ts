@@ -275,6 +275,46 @@ test('«Trasladar con IA» en lote: el ajuste por textos resuelve sin gastar una
   await expect(page.getByTestId('ai-chip-free')).toBeVisible();
 });
 
+test('«Trasladar con IA» en lote: el modal es mínimo y la información extra sale solo si se pide', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('ai-batch-button').click();
+  const dialog = page.getByTestId('ai-batch-dialog');
+  await expect(dialog).toBeVisible();
+
+  // At rest: summary, provider, the «Ajustar por textos» option and the buttons; no long notices.
+  await expect(page.getByTestId('ai-batch-estimate')).toBeVisible();
+  await expect(page.getByTestId('ai-batch-current')).toBeVisible();
+  await expect(page.getByTestId('ai-batch-cascade')).toBeVisible();
+  await expect(page.getByTestId('ai-batch-info-body')).toHaveCount(0);
+  await expect(page.getByTestId('ai-batch-breakdown')).toHaveCount(0);
+  await expect(dialog.locator('.ai-note')).toHaveCount(0);
+  await expect(page.getByTestId('ai-batch-nomeasure')).toHaveCount(0);
+
+  // Left-out PDFs: a one-line label; the breakdown only when asked for.
+  const omit = page.getByTestId('ai-batch-omit');
+  await expect(omit).toContainText('Omitidos: 1');
+  await omit.click();
+  await expect(page.getByTestId('ai-batch-breakdown')).toBeVisible();
+  await omit.click();
+  await expect(page.getByTestId('ai-batch-breakdown')).toHaveCount(0);
+
+  // «Más información» (ⓘ): requests and what is sent.
+  const info = page.getByTestId('ai-batch-info');
+  await info.click();
+  await expect(page.getByTestId('ai-batch-info-body')).toContainText('Qué se envía');
+  await info.click();
+  await expect(page.getByTestId('ai-batch-info-body')).toHaveCount(0);
+
+  // First time: one privacy line with its checkbox.
+  const consent = page.getByTestId('ai-batch-consent');
+  await expect(consent).toContainText('Se envían los PDF A y B');
+  await expect(consent.locator('input[type=checkbox]')).toBeVisible();
+
+  // It stays compact.
+  const box = (await dialog.boundingBox())!;
+  expect(box.height).toBeLessThan(420);
+});
+
 test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada', async ({ page }) => {
   await openPanelWithPair(page);
   await page.route('http://127.0.0.1:4310/**', (route) => route.abort());

@@ -1,6 +1,6 @@
 # «Trasladar con IA» · modal mínimo con «Más información» a demanda (candidata 1.17)
 
-Mesas **P-112** (antes y después), **P-113** (estados, oscuro 1650) y **P-114** (estados, claro 1280) en «Propuestas». **Estado: propuesta pendiente de aprobación de Maxter. No se programa nada hasta entonces.** Origen: Maxter, tras probar la RC 1.16.0-rc.1: el desplegable «está súper mal planteado», con demasiados mensajes de aviso; que no ocupe nada y que la explicación se vea solo si se pide.
+Mesas **P-112** (antes y después), **P-113** (estados, oscuro 1650) y **P-114** (estados, claro 1280) en «Propuestas». **Estado: aprobada por Maxter el 2026-11-20 con lo recomendado en las 4 preguntas, sin dibujar mesas (excepción suya). Implementada: el modal baja de ~480 a ~335 px, no «a un tercio» como se estimó.** Origen: Maxter, tras probar la RC 1.16.0-rc.1: el desplegable «está súper mal planteado», con demasiados mensajes de aviso; que no ocupe nada y que la explicación se vea solo si se pide.
 
 ## Problema
 El modal de `pages/batch/ai-batch/ai-batch-button` apila hasta **ocho bloques** antes del botón (con Copilot y la primera vez):
