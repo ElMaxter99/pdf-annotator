@@ -844,7 +844,6 @@
         "cap": "plafond par passage",
         "retries": "relances",
         "estimateClaude": "Consommation estimée : de {{min}} à {{max}} requêtes ({{max}} s'il faut relancer). Avec Claude, la consommation réelle est mesurée et visible en direct.",
-        "noMeasure": "Crédits d’IA par requête. La consommation affichée est celle que signale l’assistant (tokens et crédits si Copilot les renvoie). Chaque requête est décomptée selon le modèle choisi.",
         "cascade": "Essayer d'abord « Ajuster par textes »",
         "cascadeHint": "Gratuit. L'IA n'est utilisée que pour les PDF où il reste des champs non placés.",
         "capNote": "S'il y a plus de {{cap}} paires, la file s'arrête à {{cap}} et attend votre « Continuer ». Pas de relance automatique.",
@@ -964,9 +963,13 @@
       },
       "pop": {
         "summary": "{{count}} PDF avec A et B · {{fields}} champs",
-        "requests": "De {{min}} à {{max}} requêtes à l'IA",
         "requestsCopilot": "Jusqu'à {{max}} requêtes (plafond {{cap}})",
         "change": "Modifier",
+        "moreInfo": "Plus d'informations",
+        "omitted": "Exclus : {{count}}",
+        "credits": "Chaque requête consomme des crédits d'IA selon le modèle choisi.",
+        "consent": "Les PDF A et B sont envoyés à votre {{provider}} local.",
+        "consentRemember": "Ne plus avertir",
         "sent": "Ce qui est envoyé",
         "breakdown": {
           "title": "{{eligible}} sur {{withB}} avec version B seront envoyés. Exclus :",

@@ -844,7 +844,6 @@
         "cap": "limit per run",
         "retries": "retries",
         "estimateClaude": "Estimated usage: {{min}} to {{max}} requests ({{max}} if retries are needed). With Claude the real usage is measured and shown live.",
-        "noMeasure": "AI credits per request. The usage shown is what the helper reports (tokens and credits if Copilot returns them). Each request is charged according to the chosen model.",
         "cascade": "Try «Adjust by texts» first",
         "cascadeHint": "Free. The AI is only used on PDFs where fields are left unplaced.",
         "capNote": "If there are more than {{cap}} pairs, the queue stops at {{cap}} and waits for your «Continue». No automatic retries.",
@@ -964,9 +963,13 @@
       },
       "pop": {
         "summary": "{{count}} PDF with A and B · {{fields}} fields",
-        "requests": "{{min}} to {{max}} requests to the AI",
         "requestsCopilot": "Up to {{max}} requests (cap {{cap}})",
         "change": "Change",
+        "moreInfo": "More information",
+        "omitted": "Left out: {{count}}",
+        "credits": "Each request uses AI credits depending on the chosen model.",
+        "consent": "The A and B PDFs are sent to your local {{provider}}.",
+        "consentRemember": "Don't warn me again",
         "sent": "What is sent",
         "breakdown": {
           "title": "{{eligible}} of {{withB}} with version B will be sent. Left out:",

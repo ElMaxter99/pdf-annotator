@@ -844,7 +844,6 @@
         "cap": "topall per passada",
         "retries": "reintents",
         "estimateClaude": "Consum estimat: de {{min}} a {{max}} peticions ({{max}} si cal reintentar). Amb Claude el consum real es mesura i es veu en directe.",
-        "noMeasure": "Crèdits d’IA per petició. El consum que es mostra és el que informi l’ajudant (tokens i crèdits si Copilot els retorna). Cada petició descompta segons el model triat.",
         "cascade": "Provar abans amb «Ajustar per textos»",
         "cascadeHint": "Gratuït. La IA només s'usa en els PDF on quedin camps sense col·locar.",
         "capNote": "Si hi ha més de {{cap}} parelles, la cua s'atura en arribar a {{cap}} i espera el teu «Continuar». Sense reintents automàtics.",
@@ -964,9 +963,13 @@
       },
       "pop": {
         "summary": "{{count}} PDF amb A i B · {{fields}} camps",
-        "requests": "De {{min}} a {{max}} peticions a la IA",
         "requestsCopilot": "Fins a {{max}} peticions (topall {{cap}})",
         "change": "Canvia",
+        "moreInfo": "Més informació",
+        "omitted": "Omesos: {{count}}",
+        "credits": "Cada petició descompta crèdits d'IA segons el model triat.",
+        "consent": "S'envien els PDF A i B al teu {{provider}} local.",
+        "consentRemember": "No tornar a avisar",
         "sent": "Què s'envia",
         "breakdown": {
           "title": "{{eligible}} de {{withB}} amb versió B s'enviaran. Queden fora:",

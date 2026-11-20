@@ -844,7 +844,6 @@
         "cap": "Limit pro Durchlauf",
         "retries": "Wiederholungen",
         "estimateClaude": "Geschätzter Verbrauch: {{min}} bis {{max}} Anfragen ({{max}}, falls Wiederholungen nötig sind). Bei Claude wird der echte Verbrauch gemessen und live angezeigt.",
-        "noMeasure": "KI-Credits pro Anfrage. Angezeigt wird der vom Helfer gemeldete Verbrauch (Tokens und Credits, falls Copilot sie liefert). Jede Anfrage wird je nach gewähltem Modell abgerechnet.",
         "cascade": "Zuerst «Nach Texten anpassen» versuchen",
         "cascadeHint": "Kostenlos. Die KI wird nur bei PDFs genutzt, in denen Felder nicht platziert werden konnten.",
         "capNote": "Bei mehr als {{cap}} Paaren hält die Warteschlange bei {{cap}} an und wartet auf dein «Fortfahren». Keine automatischen Wiederholungen.",
@@ -964,9 +963,13 @@
       },
       "pop": {
         "summary": "{{count}} PDF mit A und B · {{fields}} Felder",
-        "requests": "{{min}} bis {{max}} Anfragen an die KI",
         "requestsCopilot": "Bis zu {{max}} Anfragen (Limit {{cap}})",
         "change": "Ändern",
+        "moreInfo": "Weitere Informationen",
+        "omitted": "Ausgelassen: {{count}}",
+        "credits": "Jede Anfrage verbraucht KI-Guthaben je nach gewähltem Modell.",
+        "consent": "Die PDFs A und B werden an dein lokales {{provider}} gesendet.",
+        "consentRemember": "Nicht mehr warnen",
         "sent": "Was gesendet wird",
         "breakdown": {
           "title": "{{eligible}} von {{withB}} mit Version B werden gesendet. Ausgeschlossen:",

@@ -41,6 +41,10 @@ export class AiBatchButtonComponent {
   readonly cap = AI_BATCH_COPILOT_CAP;
   readonly open = signal(false);
   readonly changing = signal(false);
+  /** «Más información» (ⓘ del título): peticiones, créditos y qué se envía, cerrado por defecto. */
+  readonly info = signal(false);
+  /** Desglose de los PDF que se quedan fuera, a demanda. */
+  readonly omitOpen = signal(false);
   readonly cascade = signal(true);
   readonly remember = signal(false);
 
@@ -68,6 +72,10 @@ export class AiBatchButtonComponent {
   });
   /** Marked PDFs the run leaves out (no B, no fields or already «Listo»). */
   readonly skipped = computed(() => (this.ids() ? this.ids()!.length - this.eligible().length : 0));
+  /** PDF que se quedan fuera: de los marcados, o de todo el lote. */
+  readonly omitted = computed(() =>
+    this.ids() ? this.skipped() : Math.max(0, this.totalCount() - this.eligible().length),
+  );
   readonly withoutB = computed(() => this.store.items().filter((item) => !item.bPdf).length);
   readonly provider = this.helper.provider;
   readonly providerName = computed(() => providerName(this.provider()));
@@ -90,6 +98,8 @@ export class AiBatchButtonComponent {
     }
     this.cascade.set(true);
     this.changing.set(false);
+    this.info.set(false);
+    this.omitOpen.set(false);
     this.open.set(true);
     void this.helper.check();
   }
