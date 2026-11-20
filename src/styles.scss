@@ -6679,5 +6679,37 @@ button.version-chip:focus-visible {
 
   .app--workspace .viewer:hover {
     scrollbar-color: color-mix(in srgb, var(--muted) 65%, transparent) transparent;
+
+/* C1 de la 1.17 · «Dividida» desenlazada: el panel A, que se desplaza solo, también tiene espacio de
+   trabajo ampliado (`--a-margin`, mitad del ancho del panel, lo publica `updateWorkMargin`) alrededor
+   de su hoja (`.split-a__sheet`: canvas + capas de A, para que no se desalineen). La etiqueta y el
+   paginador compensan el desplazamiento del panel (`--ax`/`--ay`, `onSplitAScroll`). Solo escritorio. */
+.split-a__sheet {
+  position: relative;
+  width: max-content;
+}
+
+@media (min-width: 961px) {
+  .app--workspace .viewer.viewer--unlinked .canvas-container--split-a {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .app--workspace .viewer.viewer--unlinked .split-a__sheet {
+    flex: 0 0 auto;
+    margin-left: var(--a-margin, 0px);
+    margin-right: var(--a-margin, 0px);
+    transition: none;
+  }
+
+  .app--workspace .viewer.viewer--unlinked .canvas-container--split-a > .split-tag,
+  .app--workspace .viewer.viewer--unlinked .canvas-container--split-a > .split-pager {
+    translate: var(--ax, 0px) var(--ay, 0px);
+    z-index: 4;
+  }
+
+  /* Con A movida o centrada la etiqueta queda encima del PDF: mismo tono, pero opaca para que se lea. */
+  .app--workspace .viewer.viewer--unlinked .canvas-container--split-a > .split-tag {
+    background: color-mix(in srgb, var(--text) 12%, var(--panel));
   }
 }

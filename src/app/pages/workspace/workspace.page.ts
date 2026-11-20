@@ -349,6 +349,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly splitBox = signal<{ left: number; top: number; width: number; height: number } | null>(null);
   private splitResizeObserver: ResizeObserver | null = null;
   private workMarginObserver: ResizeObserver | null = null;
+  private observedAPane: HTMLElement | null = null;
+  /** `scrollLeft` del reposo del panel A desenlazado (C1), para saber si alguien lo ha movido. */
+  private aHomeLeft = 0;
   readonly zoomMenuOpen = signal(false);
   /** The wheel past the edge of the sheet changes page (P-63); on by default, switched off in ⋯. */
   readonly wheelPaging = signal(this.storedWheelPaging());
@@ -3023,7 +3026,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   private splitAPane(): HTMLElement | null {
-    return (this.splitLayerRef?.nativeElement.parentElement as HTMLElement | null) ?? null;
+    return (this.splitLayerRef?.nativeElement.closest('.canvas-container--split-a') as HTMLElement | null) ?? null;
   }
 
   private isOverSplitA(evt: { clientX: number; clientY: number }): boolean {
@@ -3073,11 +3076,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.splitLinked.set(false);
     this.updateSplitHeight();
     await this.renderSplit();
-    await new Promise((resolve) => setTimeout(resolve, 60));
+    // Espera a que el panel A termine de crecer (su margen propio, C1) para que la posición no se recorte.
+    await new Promise((resolve) => setTimeout(resolve, 250));
     const pane = this.splitAPane();
     if (pane) {
       pane.scrollLeft = before.left;
       pane.scrollTop = before.top;
+      this.aHomeLeft = Number.NaN;
     }
   }
 
@@ -4919,10 +4924,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   private async refreshAfterLinkedMove(): Promise<void> {
     if (this.unlinkedSplit()) {
       const pane = this.splitAPane();
-      if (pane) {
-        pane.scrollLeft = 0;
-        pane.scrollTop = 0;
-      }
+      if (pane) pane.scrollTop = 0;
+      this.resetSplitAScroll();
     }
     this.redrawAllForPage();
   }
@@ -5040,11 +5043,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       await this.fitSplit();
       this.scaleA.set(this.scale());
       const pane = this.splitAPane();
-      if (pane) {
-        pane.scrollLeft = 0;
-        pane.scrollTop = 0;
-      }
+      if (pane) pane.scrollTop = 0;
       await this.renderSplit();
+      this.resetSplitAScroll();
     }
   }
 
@@ -5113,7 +5114,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     const fit = fitWidthScale(baseWidth, pane.clientWidth - padding);
     if (fit === null) return;
     await this.zoomSplitA(fit, null);
-    pane.scrollLeft = 0;
+    this.resetSplitAScroll();
   }
 
   /** Zoom picked from the footer menu. */
@@ -5265,6 +5266,21 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.workMarginObserver = new ResizeObserver(() => this.updateWorkMargin());
       this.workMarginObserver.observe(viewer);
     }
+    // C1: con «Dividida» desenlazada el panel A se desplaza solo y lleva su propio margen (mitad de su
+    // ancho). El panel cambia de tamaño al desenlazar (crece desde 0) y al cambiar la ventana: se
+    // observa y, si A sigue en su reposo (nadie la ha movido), vuelve al reposo con el margen nuevo.
+    const pane = this.unlinkedSplit() ? this.splitAPane() : null;
+    if (!pane) return;
+    if (pane !== this.observedAPane && this.workMarginObserver) {
+      if (this.observedAPane) this.workMarginObserver.unobserve(this.observedAPane);
+      this.workMarginObserver.observe(pane);
+      this.observedAPane = pane;
+    }
+    const before = pane.style.getPropertyValue('--a-margin');
+    const margin = workMarginFor(pane.clientWidth);
+    pane.style.setProperty('--a-margin', `${margin}px`);
+    const untouched = before === '' || before === '0px' || Math.abs(pane.scrollLeft - this.aHomeLeft) <= 2;
+    if (margin > 0 && `${margin}px` !== before && untouched) this.resetSplitAScroll();
   }
 
   /**
@@ -5274,6 +5290,36 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   onViewerScroll(evt: Event): void {
     const viewer = evt.currentTarget as HTMLElement | null;
     viewer?.style.setProperty('--vx', `${Math.round(viewer.scrollLeft)}px`);
+  }
+
+  /**
+   * Lo mismo para el panel A desenlazado, que se desplaza solo: `--ax`/`--ay` mantienen a la vista su
+   * etiqueta y su paginador aunque A esté movida o ampliada (C1 de la 1.17).
+   */
+  onSplitAScroll(evt: Event): void {
+    const pane = evt.currentTarget as HTMLElement | null;
+    if (!pane) return;
+    pane.style.setProperty('--ax', `${Math.round(pane.scrollLeft)}px`);
+    pane.style.setProperty('--ay', `${Math.round(pane.scrollTop)}px`);
+  }
+
+  /** Hoja de A dentro de su panel (canvas y capas), en coordenadas del contenido desplazable del panel. */
+  private splitASheet(): HTMLElement | null {
+    return (this.splitLayerRef?.nativeElement.parentElement as HTMLElement | null) ?? null;
+  }
+
+  /** Reposo del panel A desenlazado: A centrada en su panel, o su borde izquierdo si no cabe (C1). */
+  private resetSplitAScroll(smooth = false): void {
+    if (!this.unlinkedSplit()) return;
+    this.updateWorkMargin();
+    const pane = this.splitAPane();
+    const sheet = this.splitASheet();
+    if (!pane || !sheet) return;
+    const box = this.contentBox(pane, sheet);
+    const padding = parseFloat(getComputedStyle(pane).paddingLeft) || 0;
+    const home = homeScrollLeft({ contentLeft: box.left, contentWidth: box.width, viewportWidth: pane.clientWidth, padding });
+    this.scrollViewerTo(pane, home, smooth);
+    this.aHomeLeft = smooth ? home : pane.scrollLeft;
   }
 
   private scrollViewerTo(viewer: HTMLElement, left: number, smooth: boolean): void {
@@ -5317,14 +5363,20 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       }),
       smooth,
     );
+    this.resetSplitAScroll(smooth);
   }
 
   /**
    * Doble clic en la etiqueta «A» o «B» de «Dividida»: lleva ese PDF al centro del visor; otro
-   * doble clic con el mismo PDF ya centrado reencuadra los dos (P-109). No aplica desenlazada.
+   * doble clic con el mismo PDF ya centrado reencuadra los dos (P-109). Desenlazada (C1), la «A»
+   * centra A dentro de su propio panel (y otro doble clic la devuelve al reposo); la «B» no aplica.
    */
   centerPane(which: 'a' | 'b'): void {
-    if (!this.splitActive() || this.unlinkedSplit()) return;
+    if (!this.splitActive()) return;
+    if (this.unlinkedSplit()) {
+      if (which === 'a') this.centerSplitA();
+      return;
+    }
     this.updateWorkMargin();
     const viewer = this.viewerScroller();
     const el = which === 'a' ? this.splitAPane() : (this.pdfViewerRef?.nativeElement ?? null);
@@ -5335,6 +5387,19 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     this.scrollViewerTo(viewer, target, true);
+  }
+
+  private centerSplitA(): void {
+    this.updateWorkMargin();
+    const pane = this.splitAPane();
+    const sheet = this.splitASheet();
+    if (!pane || !sheet) return;
+    const target = centerScrollLeft(this.contentBox(pane, sheet), pane.clientWidth);
+    if (Math.abs(target - pane.scrollLeft) < 4) {
+      this.resetSplitAScroll(true);
+      return;
+    }
+    this.scrollViewerTo(pane, target, true);
   }
 
   /**
