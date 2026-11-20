@@ -90,3 +90,9 @@ No se ha tocado `.github/workflows/`.
 - Nuevo pendiente: `heading-order` (20 nodos, solo el editor): tras el `h1`, el primer título visible del panel lateral es `h4`/`h5` («Miniaturas», «Plantillas reutilizables», «Anotaciones (JSON)», el de muestras de Avanzado). Arreglarlo es cambiar esos títulos a `h2`/`h3` **y** las reglas de `styles.scss` que los estilan por etiqueta (`.templates h5`, `.advanced-panel … h5`, `.preview-panel h4`…), sin cambio visual. Mejor después del paso a tokens (B3), que toca el mismo archivo.
 - Resultado de `npm run a11y` tras B2: 40 hallazgos (regla × estado): `color-contrast` 34 nodos (tema claro, tarea B1) y `heading-order` 20 nodos.
 
+## Actualización 1.17 · B1, `heading-order` y B4
+- **B1 (contraste):** token `--accent-fill` para el acento usado como fondo (igual que `--accent` en oscuro, `#0b7d72` en claro, ≈ 5:1 con texto blanco); todos los `background: var(--accent)` sólidos pasan a él. El chip ámbar del lote usa `--warning-text` (en claro `#92400e`).
+- **`heading-order`:** los títulos del panel lateral (`Miniaturas`, `Anotaciones (JSON)`, `Plantillas reutilizables`, fuentes, guías, muestras y datos de prueba, capas del lote y cabecera de la propuesta) pasan de `h4`/`h5` a `h2` (y el grupo de la propuesta de `h6` a `h3`), con las reglas de `styles.scss` cambiadas a la vez. Capturas del panel lateral antes/después idénticas píxel a píxel (4 pestañas × 2 anchos × 2 temas) y mismos estilos calculados.
+- **Resultado de `npm run a11y`: 0 hallazgos** en los 44 estados (landing, editor, lote, Proyectos; oscuro/claro; 1650/1280).
+- **B4:** el CI ejecuta `npm run a11y:ci` tras los e2e y falla con cualquier hallazgo serio o crítico (o un escenario sin auditar). El JSON se sube con el informe de Playwright si algo falla.
+

@@ -1,5 +1,7 @@
-// Auditoría de accesibilidad con axe (fuera del CI). Genera un JSON con los hallazgos y un resumen en consola.
+// Auditoría de accesibilidad con axe. Genera un JSON con los hallazgos y un resumen en consola.
 // Uso: npm run build && npm run a11y   (o: node scripts/a11y-audit.mjs --out=ruta.json)
+//   --fail-on=serious (lo usa el CI, `npm run a11y:ci`): sale con código 1 si hay hallazgos serios o críticos o si
+//   un escenario no se pudo auditar.
 //   PW_CHROMIUM=<ruta> usa un Chromium ya instalado; A11Y_PORT cambia el puerto (por defecto 4377).
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from '@playwright/test';
@@ -15,6 +17,8 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const PDF = join(root, 'examples', 'factura-ejemplo.pdf');
 const pdf = readFileSync(PDF);
 const out = (process.argv.find((a) => a.startsWith('--out=')) ?? '--out=a11y-audit.json').slice(6);
+const failOn = process.argv.find((a) => a.startsWith('--fail-on='))?.slice(10) ?? null;
+const FAIL_IMPACTS = { critical: ['critical'], serious: ['serious', 'critical'] };
 const WIDTHS = [1650, 1280];
 const THEMES = ['dark', 'light'];
 
@@ -267,3 +271,14 @@ const byRule = new Map();
 for (const r of results) byRule.set(r.rule, (byRule.get(r.rule) ?? 0) + r.nodes.length);
 console.log(`\n${results.length} hallazgos (regla × estado) → ${out}`);
 for (const [rule, n] of [...byRule].sort((a, b) => b[1] - a[1])) console.log(`  ${rule}: ${n} nodos`);
+
+if (failOn) {
+  const impacts = FAIL_IMPACTS[failOn] ?? FAIL_IMPACTS.serious;
+  const blocking = results.filter((r) => r.rule === 'AUDIT-ERROR' || impacts.includes(r.impact));
+  if (blocking.length) {
+    console.error(`\n${blocking.length} hallazgos bloqueantes (${impacts.join(' o ')} o escenarios sin auditar):`);
+    for (const r of blocking) console.error(`  ${r.rule} · ${r.theme} ${r.width} · ${r.state}: ${r.nodes.map((n) => n.target).join(', ') || r.help}`);
+    process.exit(1);
+  }
+  console.log(`Sin hallazgos ${impacts.join(' ni ')}.`);
+}

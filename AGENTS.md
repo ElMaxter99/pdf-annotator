@@ -21,7 +21,7 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 | `npm test` | Karma/Jasmine (necesita Chrome) |
 | `npm run test:ci` | Igual, headless y sin sandbox (como en GitHub Actions) |
 | `npm run e2e` | Playwright sobre el build de producción (`npm run build` antes; `PW_CHROMIUM=<ruta>` para usar un Chromium ya instalado) |
-| `npm run a11y` | Auditoría de accesibilidad con axe (fuera del CI; `npm run build` antes; `PW_CHROMIUM=<ruta>`); informe en `docs/AUDITORIA-A11Y.md` |
+| `npm run a11y` | Auditoría de accesibilidad con axe (`npm run build` antes; `PW_CHROMIUM=<ruta>`); informe en `docs/AUDITORIA-A11Y.md`. `npm run a11y:ci` (en el CI) falla con hallazgos serios o críticos |
 | `npm run i18n:check` | Verifica que los 7 JSON de traducción tengan **las mismas claves** que `es-ES` |
 | `node scripts/generate-example.mjs` | Regenera `examples/factura-ejemplo.pdf` |
 | `node scripts/screenshots.mjs` | Regenera las capturas del README (`screenshots/`) desde el build; `PW_CHROMIUM=<ruta>` para un Chromium ya instalado |
@@ -59,7 +59,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 ## 4. Convenciones
 - **Angular:** componentes *standalone*, signals (`signal`, `computed`), control flow `@if/@for` en código nuevo (el antiguo usa `*ngIf/*ngFor`). Los subcomponentes del workspace reciben `[vm]="vm"` (la página entera) en lugar de inputs granulares — respeta ese patrón o refactoriza de forma deliberada.
 - **Estilo:** Prettier (`printWidth` 100, comillas simples). Sigue el estilo del archivo que tocas; sin comentarios innecesarios.
-- **Estilos:** tokens `--bg --panel --accent --danger --text --muted` (+ `--accent-text --on-accent --warning --warning-text --warning-strong --danger-text --input-bg --input-border --light-surface --light-border --light-border-strong`; no metas hex nuevos si hay token). Tema claro = `:root.theme-light`. El shell del workspace vive bajo `.app--workspace` en `styles.scss`.
+- **Estilos:** tokens `--bg --panel --accent --danger --text --muted` (+ `--accent-text --accent-fill --on-accent --warning --warning-text --warning-strong --danger-text --input-bg --input-border --light-surface --light-border --light-border-strong`; no metas hex nuevos si hay token; un fondo de acento con texto encima usa `--accent-fill`, que en claro es más oscuro para el contraste). Tema claro = `:root.theme-light`. El shell del workspace vive bajo `.app--workspace` en `styles.scss`.
 - **i18n:** TODO texto visible usa la pipe `t` (`{{ 'clave' | t }}`). Añade la clave a **los 7 JSON** y ejecuta `npm run i18n:check`. No dejes cadenas fijas en español (solo quedan mensajes de `console`).
 - **Avisos al usuario:** nunca `alert()`/`confirm()`; usa `ToastService.error/warning/show` con una clave i18n (`toast.*`). Los e2e esperan `.toast--error`.
 - **Coordenadas:** `x,y` en puntos PDF. El DOM usa `top = canvas.height − y·scale`. Conversión en `domToPdfCoords`.

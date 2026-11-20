@@ -132,7 +132,7 @@
   i {
     display: block;
     height: 100%;
-    background: var(--accent);
+    background: var(--accent-fill);
     transition: width 200ms ease-out;
   }
 
@@ -163,7 +163,7 @@
   height: 36px;
   flex: none;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #06201d;
   display: inline-flex;
   align-items: center;

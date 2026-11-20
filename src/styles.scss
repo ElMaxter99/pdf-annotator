@@ -3,6 +3,7 @@
   --panel: #2a2a3d;
   --accent: #5eead4;
   --accent-text: var(--accent);
+  --accent-fill: var(--accent);
   --danger: #ff4d4d;
   --text: #f5f5f5;
   --muted: #b0b0b0;
@@ -28,6 +29,8 @@
   --panel: #ffffff;
   --accent: #0f9b8e;
   --accent-text: #0b7d72;
+  /* Acento como fondo con texto encima (B1 de la 1.17): más oscuro en claro para llegar a 4,5:1 con texto blanco. */
+  --accent-fill: #0b7d72;
   --danger: #dc2626;
   --text: #0f172a;
   --muted: #475569;
@@ -293,7 +296,7 @@ body {
   border-radius: 999px;
   border: none;
   font-weight: 700;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--on-accent);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -879,7 +882,7 @@ header .logo {
   padding: 8px 14px;
   border-radius: 999px;
   font-weight: 600;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #041818;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -933,11 +936,6 @@ header .logo {
   border-radius: 12px;
   padding: 12px;
   overflow: auto;
-
-  h4 {
-    margin-top: 0;
-    color: var(--accent-text);
-  }
 
   .sidebar-actions {
     display: flex;
@@ -1076,7 +1074,7 @@ header .logo {
     flex-direction: column;
     gap: 10px;
 
-    h5 {
+    h2 {
       margin: 0;
       font-size: 1rem;
       color: var(--text);
@@ -1307,7 +1305,7 @@ header .logo {
   padding: 12px;
 }
 
-.advanced-panel .custom-fonts-panel h5 {
+.advanced-panel .custom-fonts-panel h2 {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
@@ -1363,7 +1361,7 @@ header .logo {
   border: 1px solid rgba(94, 234, 212, 0.12);
 }
 
-.advanced-panel .guides-panel h5 {
+.advanced-panel .guides-panel h2 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
@@ -1733,7 +1731,7 @@ header .logo {
     border-radius: 6px;
     padding: 6px 10px;
     font-size: .9rem;
-    background: var(--accent);
+    background: var(--accent-fill);
     color: #0b1f1f;
     transition: transform .1s ease;
   }
@@ -2040,7 +2038,7 @@ header .logo {
   }
 
   &.editing .editor-badge {
-    background: var(--accent);
+    background: var(--accent-fill);
     color: #061111;
     box-shadow: 0 4px 12px rgba(94, 234, 212, 0.35);
   }
@@ -2186,23 +2184,23 @@ header .logo {
 }
 
 .btn--primary {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: transparent;
   color: var(--on-accent);
 }
 
 .btn--primary:hover:not(:disabled) {
-  background: var(--accent);
+  background: var(--accent-fill);
   box-shadow: 0 6px 16px rgba(94, 234, 212, 0.3);
 }
 
 :root.theme-light .btn--primary {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--on-accent);
 }
 
 :root.theme-light .btn--primary:hover:not(:disabled) {
-  background: var(--accent);
+  background: var(--accent-fill);
 }
 
 .btn:focus-visible,
@@ -2603,7 +2601,7 @@ kbd {
   min-width: 1.6em;
   padding: 0 5px;
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--on-accent);
   font-size: 0.72rem;
   line-height: 1.5;
@@ -2819,7 +2817,7 @@ kbd {
 }
 
 .migration-chip--on {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--on-accent);
 }
 
@@ -2851,7 +2849,7 @@ kbd {
   }
 
   .migration-seg__on {
-    background: var(--accent);
+    background: var(--accent-fill);
     color: var(--on-accent);
   }
 }
@@ -2991,7 +2989,7 @@ kbd {
   gap: 8px;
   justify-content: space-between;
 
-  h5 {
+  h2 {
     margin: 0;
     font-size: 0.95rem;
   }
@@ -3611,7 +3609,7 @@ kbd {
 }
 
 .split-tag--b {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--on-accent);
 }
 
@@ -4044,7 +4042,7 @@ kbd {
   height: 16px;
   padding: 0 4px;
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #04201c;
   font-size: 0.65rem;
   font-weight: 800;
@@ -4103,8 +4101,8 @@ kbd {
 }
 
 .btn.btn--active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
   color: #0b1f1c;
 }
 
@@ -4129,7 +4127,7 @@ kbd {
   border: 1px solid rgba(94, 234, 212, 0.12);
 }
 
-.preview-panel h4 {
+.preview-panel h2 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
@@ -4208,7 +4206,7 @@ kbd {
 
 :root.theme-light .btn.btn--active,
 :root.theme-light .btn.btn--active:hover:not(:disabled) {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--on-accent);
 }
 
@@ -4539,7 +4537,7 @@ kbd {
 .update-card__bar i {
   display: block;
   height: 100%;
-  background: var(--accent);
+  background: var(--accent-fill);
   border-radius: 999px;
   transition: width 0.2s ease-out;
 }
@@ -4644,7 +4642,7 @@ body.has-update-card .toast-host {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-fill);
   animation: ai-details-pulse 1.2s ease-out infinite;
 }
 @keyframes ai-details-pulse {
@@ -4675,7 +4673,7 @@ body.has-update-card .toast-host {
   transition: background 0.2s ease-out, color 0.2s ease-out;
 }
 .ai-details__tabs button.ai-details__tab--on {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--bg);
 }
 .ai-details__tabs button:focus-visible,
@@ -4772,7 +4770,7 @@ body.has-update-card .toast-host {
   color: var(--muted);
 }
 .ai-details__step--done .ai-details__n {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
   color: var(--bg);
 }
@@ -4815,7 +4813,7 @@ body.has-update-card .toast-host {
   height: 100%;
 }
 .ai-details__bar--cache {
-  background: var(--accent);
+  background: var(--accent-fill);
 }
 .ai-details__bar--write {
   background: var(--warning);
@@ -4946,7 +4944,7 @@ body.has-update-card .toast-host {
   cursor: pointer;
 }
 .update-channel__seg button[aria-pressed='true'] {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--bg);
 }
 .update-channel__seg button:focus-visible {
@@ -5034,7 +5032,7 @@ body.has-update-card .toast-host {
 
 .migration-badge--new::before,
 .migration-badge--renamed::before {
-  background: var(--accent);
+  background: var(--accent-fill);
 }
 
 :root.theme-light .migration-badge--moved::before,
@@ -5157,7 +5155,7 @@ button.version-chip:focus-visible {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-fill);
 }
 .version-chip__dot--warn {
   background: var(--update-warn);
@@ -5492,7 +5490,7 @@ button.version-chip:focus-visible {
   position: fixed;
   z-index: 25;
   height: 5px;
-  background: var(--accent);
+  background: var(--accent-fill);
   pointer-events: none;
   transition: width 120ms ease-out;
 }
@@ -6020,7 +6018,7 @@ button.version-chip:focus-visible {
   color: var(--text);
 }
 .update-install__steps .is-done > span {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
   color: var(--bg);
 }
@@ -6178,7 +6176,7 @@ button.version-chip:focus-visible {
   margin-right: 8px;
   padding: 1px 8px;
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: var(--on-accent);
   font-size: 0.75rem;
 }
@@ -6337,7 +6335,7 @@ button.version-chip:focus-visible {
 .pm__bar i {
   display: block;
   height: 100%;
-  background: var(--accent);
+  background: var(--accent-fill);
   border-radius: 999px;
   transition: width 150ms ease-out;
 }
@@ -6601,7 +6599,7 @@ button.version-chip:focus-visible {
 .tpl-export__bar i {
   display: block;
   height: 100%;
-  background: var(--accent);
+  background: var(--accent-fill);
   transition: width 200ms ease-out;
 }
 .tpl-export__count {
@@ -6669,4 +6667,17 @@ button.version-chip:focus-visible {
   clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
   border: 0 !important;
+}
+
+/* Barras del visor discretas (C2 de la 1.17): desde P-109 el visor siempre desplaza en horizontal; en reposo la
+   barra es fina y translúcida y se marca al pasar el ratón por el visor. Solo escritorio. */
+@media (min-width: 961px) {
+  .app--workspace .viewer {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--muted) 30%, transparent) transparent;
+  }
+
+  .app--workspace .viewer:hover {
+    scrollbar-color: color-mix(in srgb, var(--muted) 65%, transparent) transparent;
+  }
 }
