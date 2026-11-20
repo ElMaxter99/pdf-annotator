@@ -12,8 +12,19 @@ test('a freshly opened PDF is fitted to the viewer without scrolling', async ({ 
   await page.waitForTimeout(500);
   const fit = await canvas.evaluate((el) => {
     const viewer = el.closest('.viewer') as HTMLElement;
-    return { scrollH: viewer.scrollHeight, clientH: viewer.clientHeight, scrollW: viewer.scrollWidth, clientW: viewer.clientWidth };
+    const v = viewer.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return {
+      scrollH: viewer.scrollHeight,
+      clientH: viewer.clientHeight,
+      // The work margin (P-109) makes the viewer scroll sideways on purpose; what matters is that
+      // the PDF itself sits fully inside the visible area, centred.
+      insideLeft: r.left - v.left,
+      insideRight: v.right - r.right,
+    };
   });
   expect(fit.scrollH).toBeLessThanOrEqual(fit.clientH + 2);
-  expect(fit.scrollW).toBeLessThanOrEqual(fit.clientW + 2);
+  expect(fit.insideLeft).toBeGreaterThanOrEqual(-1);
+  expect(fit.insideRight).toBeGreaterThanOrEqual(-1);
+  expect(Math.abs(fit.insideLeft - fit.insideRight)).toBeLessThanOrEqual(4);
 });

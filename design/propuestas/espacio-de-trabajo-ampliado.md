@@ -1,6 +1,6 @@
 # Espacio de trabajo ampliado y «Centrar A / B» (candidata 1.17)
 
-Mesas **P-109** (flujo y reglas), **P-110** (estados, oscuro 1650) y **P-111** (estados, claro 1280) en «Propuestas» del lienzo. **Estado: propuesta pendiente de aprobación de Maxter. No se programa nada hasta entonces.** Origen: prueba de la RC 1.16.0-rc.1 (2026-11-20).
+Mesas **P-109** (flujo y reglas), **P-110** (estados, oscuro 1650) y **P-111** (estados, claro 1280) en «Propuestas» del lienzo. **Estado: aprobada por Maxter el 2026-11-20 con lo recomendado en las 4 preguntas, sin dibujar mesas (excepción suya; el lienzo está en otra cuenta). Implementada en la rama de la PR que la acompaña.** Origen: prueba de la RC 1.16.0-rc.1 (2026-11-20).
 
 ## Problema
 En «Dividida», al mover el lienzo (botón central, `Espacio` o la barra de desplazamiento) el recorrido acaba justo en el borde de los PDFs: **no se puede centrar el PDF de la derecha (B)**, porque no hay espacio más allá de él, ni el de la izquierda (A) en el otro extremo. Hoy `.viewer--split` es una cuadrícula `auto auto` con 12 px de relleno: el área desplazable mide lo mismo que A + B. En la vista de un solo PDF pasa igual (relleno de 12 px).

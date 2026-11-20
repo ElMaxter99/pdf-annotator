@@ -1,14 +1,17 @@
 import {
   ViewerClick,
+  centerScrollLeft,
   clampScale,
   doubleClickZoomTarget,
   fitPageScale,
   fitPageScaleForOverflow,
   fitWidthScale,
+  homeScrollLeft,
   isDoubleClick,
   panScrollPosition,
   stepScale,
   wheelZoomFactor,
+  workMarginFor,
   zoomAnchorScrollDelta,
   zoomLimitFor,
 } from './zoom.utils';
@@ -138,6 +141,39 @@ describe('mover y anclar el zoom', () => {
       expect(doubleClickZoomTarget(0.82)).toBe('actual');
       expect(doubleClickZoomTarget(0.5)).toBe('actual');
       expect(doubleClickZoomTarget(4)).toBe('actual');
+    });
+  });
+
+  describe('espacio de trabajo ampliado', () => {
+    it('workMarginFor es la mitad del visor y 0 sin medidas', () => {
+      expect(workMarginFor(1000)).toBe(500);
+      expect(workMarginFor(1001)).toBe(501);
+      expect(workMarginFor(0)).toBe(0);
+      expect(workMarginFor(-5)).toBe(0);
+    });
+
+    it('homeScrollLeft centra los PDFs si caben', () => {
+      // Margen 500 a cada lado; PDF de 400 en el visor de 1000: queda centrado.
+      expect(
+        homeScrollLeft({ contentLeft: 512, contentWidth: 400, viewportWidth: 1000, padding: 12 }),
+      ).toBe(212);
+    });
+
+    it('homeScrollLeft alinea el borde izquierdo si no caben', () => {
+      expect(
+        homeScrollLeft({ contentLeft: 512, contentWidth: 1400, viewportWidth: 1000, padding: 12 }),
+      ).toBe(500);
+    });
+
+    it('homeScrollLeft nunca es negativo', () => {
+      expect(
+        homeScrollLeft({ contentLeft: 0, contentWidth: 100, viewportWidth: 1000, padding: 0 }),
+      ).toBe(0);
+    });
+
+    it('centerScrollLeft deja el centro del elemento en el centro del visor', () => {
+      expect(centerScrollLeft({ left: 900, width: 300 }, 1000)).toBe(550);
+      expect(centerScrollLeft({ left: 0, width: 100 }, 1000)).toBe(0);
     });
   });
 });

@@ -316,6 +316,7 @@
       "zoomKeys": "Zoom avant / arrière sur le PDF",
       "zoomActual": "Taille réelle (100 %)",
       "zoomToggle": "Alterner ajuster à la largeur et 100 % (ou double-clic avec le bouton central)",
+      "centerPane": "Centrer un PDF (double-clic sur son étiquette A ou B)",
       "fitPage": "Ajuster à la page",
       "panCanvas": "Déplacer le canevas (maintenir)",
       "splitLink": "Lier ou dissocier A et B (Divisée)",
@@ -457,6 +458,7 @@
       "split": {
         "tagA": "A · original · lecture seule",
         "tagB": "B · nouvelle version · modifiée",
+        "centerHint": "Double-clic : centrer ce PDF (encore une fois, recadrer)",
         "linked": "Lié",
         "unlinked": "Dissocié",
         "linkTitle": "Lier ou dissocier le zoom et le défilement de A et B",

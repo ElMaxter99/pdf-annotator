@@ -32,15 +32,18 @@ import {
 } from '../../utils/json-text.utils';
 import {
   ZOOM_PRESETS,
+  centerScrollLeft,
   clampScale,
   doubleClickZoomTarget,
   fitPageScale,
   fitPageScaleForOverflow,
   fitWidthScale,
+  homeScrollLeft,
   isDoubleClick,
   panScrollPosition,
   stepScale,
   wheelZoomFactor,
+  workMarginFor,
   zoomAnchorScrollDelta,
   zoomLimitFor,
   type ViewerClick,
@@ -345,6 +348,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Screen box of the viewer while «Dividida» is active (the link chip is fixed over its bottom edge). */
   readonly splitBox = signal<{ left: number; top: number; width: number; height: number } | null>(null);
   private splitResizeObserver: ResizeObserver | null = null;
+  private workMarginObserver: ResizeObserver | null = null;
   readonly zoomMenuOpen = signal(false);
   /** The wheel past the edge of the sheet changes page (P-63); on by default, switched off in ⋯. */
   readonly wheelPaging = signal(this.storedWheelPaging());
@@ -894,6 +898,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (this.zoomHudTimer) clearTimeout(this.zoomHudTimer);
     if (this.wheelEdgeTimer) clearTimeout(this.wheelEdgeTimer);
     this.splitResizeObserver?.disconnect();
+    this.workMarginObserver?.disconnect();
     if (this.savedClock) {
       clearInterval(this.savedClock);
     }
@@ -1605,6 +1610,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     ) {
       await (window.innerWidth < 960 ? this.fitWidth() : this.fitPage());
     }
+    this.resetViewerScroll();
     this.thumbnailGenerator.generate(this.pdfDoc()).catch((error) =>
       console.error('No se pudieron generar las miniaturas del documento.', error),
     );
@@ -3003,6 +3009,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       await this.render();
       this.redrawAllForPage();
     }
+    this.resetViewerScroll();
   }
 
   /** True while «Dividida» is active and A has its own zoom and scroll (P-61). */
@@ -3056,6 +3063,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       );
     }
     await this.renderSplit();
+    this.resetViewerScroll();
   }
 
   /** «Deshacer» of the relink notice: A goes back to its own zoom and position. */
@@ -3130,6 +3138,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.scale.set(Math.min(4, Math.max(0.25, Math.floor((available / baseWidth) * 100) / 100)));
     await this.render();
     this.redrawAllForPage();
+    this.resetViewerScroll();
   }
 
   /** «Dividida»: the field under the pointer (in A or in B) is highlighted in both panes. */
@@ -5239,6 +5248,95 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return { clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 };
   }
 
+  private viewerScroller(): HTMLElement | null {
+    return (this.pdfViewerRef?.nativeElement.closest('.viewer') as HTMLElement | null) ?? null;
+  }
+
+  /**
+   * Espacio de trabajo ampliado (P-109): el visor deja a cada lado un margen vacío de la mitad de
+   * su ancho para poder llevar cualquier PDF al centro. Se publica como `--work-margin` y se
+   * mantiene al cambiar el tamaño del visor.
+   */
+  private updateWorkMargin(): void {
+    const viewer = this.viewerScroller();
+    if (!viewer) return;
+    viewer.style.setProperty('--work-margin', `${workMarginFor(viewer.clientWidth)}px`);
+    if (!this.workMarginObserver && typeof ResizeObserver !== 'undefined') {
+      this.workMarginObserver = new ResizeObserver(() => this.updateWorkMargin());
+      this.workMarginObserver.observe(viewer);
+    }
+  }
+
+  /**
+   * Publica el desplazamiento horizontal como `--vx` para que las capas ancladas al visor (tarjeta
+   * de primeros pasos, pista, indicador de zoom) sigan en pantalla aunque el lienzo esté movido.
+   */
+  onViewerScroll(evt: Event): void {
+    const viewer = evt.currentTarget as HTMLElement | null;
+    viewer?.style.setProperty('--vx', `${Math.round(viewer.scrollLeft)}px`);
+  }
+
+  private scrollViewerTo(viewer: HTMLElement, left: number, smooth: boolean): void {
+    const reduce =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof viewer.scrollTo === 'function') {
+      viewer.scrollTo({ left, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    } else {
+      viewer.scrollLeft = left;
+    }
+  }
+
+  /** Posición del elemento en coordenadas del contenido desplazable del visor. */
+  private contentBox(viewer: HTMLElement, el: HTMLElement): { left: number; width: number } {
+    const v = viewer.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return { left: r.left - v.left + viewer.scrollLeft, width: r.width };
+  }
+
+  /** Devuelve el visor a su posición de siempre (PDFs centrados, o su borde izquierdo si no caben). */
+  resetViewerScroll(smooth = false): void {
+    this.updateWorkMargin();
+    const viewer = this.viewerScroller();
+    const b = this.pdfViewerRef?.nativeElement;
+    if (!viewer || !b) return;
+    const boxes = [this.splitActive() ? this.splitAPane() : null, b]
+      .filter((el): el is HTMLElement => !!el)
+      .map((el) => this.contentBox(viewer, el));
+    const left = Math.min(...boxes.map((x) => x.left));
+    const right = Math.max(...boxes.map((x) => x.left + x.width));
+    const padding = parseFloat(getComputedStyle(viewer).paddingLeft) || 0;
+    this.scrollViewerTo(
+      viewer,
+      homeScrollLeft({
+        contentLeft: left,
+        contentWidth: right - left,
+        viewportWidth: viewer.clientWidth,
+        padding,
+      }),
+      smooth,
+    );
+  }
+
+  /**
+   * Doble clic en la etiqueta «A» o «B» de «Dividida»: lleva ese PDF al centro del visor; otro
+   * doble clic con el mismo PDF ya centrado reencuadra los dos (P-109). No aplica desenlazada.
+   */
+  centerPane(which: 'a' | 'b'): void {
+    if (!this.splitActive() || this.unlinkedSplit()) return;
+    this.updateWorkMargin();
+    const viewer = this.viewerScroller();
+    const el = which === 'a' ? this.splitAPane() : (this.pdfViewerRef?.nativeElement ?? null);
+    if (!viewer || !el) return;
+    const target = centerScrollLeft(this.contentBox(viewer, el), viewer.clientWidth);
+    if (Math.abs(target - viewer.scrollLeft) < 4) {
+      this.resetViewerScroll(true);
+      return;
+    }
+    this.scrollViewerTo(viewer, target, true);
+  }
+
   /**
    * Zooms keeping the point under `anchor` fixed. Requests that arrive while a render is
    * running are merged into the latest one, so a fast wheel never queues stale renders.
@@ -5356,6 +5454,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!container) {
       return;
     }
+    this.updateWorkMargin();
 
     const page = await this.pdfDoc()!.getPage(this.pageIndex());
     const base = page.getViewport({ scale: 1 });
@@ -5377,6 +5476,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       await this.render();
     }
     this.redrawAllForPage();
+    this.resetViewerScroll();
   }
 
   async fitWidth() {
@@ -5388,6 +5488,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (!container) {
       return;
     }
+    this.updateWorkMargin();
 
     const page = await this.pdfDoc()!.getPage(this.pageIndex());
     const baseWidth = page.getViewport({ scale: 1 }).width;
@@ -5402,6 +5503,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.scale.set(fit);
     await this.render();
     this.redrawAllForPage();
+    this.resetViewerScroll();
   }
 
   toggleAbout(open = !this.aboutOpen()) {

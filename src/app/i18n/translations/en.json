@@ -316,6 +316,7 @@
       "zoomKeys": "Zoom the PDF in / out",
       "zoomActual": "Actual size (100 %)",
       "zoomToggle": "Toggle fit to width and 100 % (or middle-button double-click)",
+      "centerPane": "Center a PDF (double-click its A or B tag)",
       "fitPage": "Fit to page",
       "panCanvas": "Move the canvas (hold)",
       "splitLink": "Link or unlink A and B (Split)",
@@ -457,6 +458,7 @@
       "split": {
         "tagA": "A · original · read only",
         "tagB": "B · new version · edited",
+        "centerHint": "Double-click: center this PDF (again to reset the view)",
         "linked": "Linked",
         "unlinked": "Unlinked",
         "linkTitle": "Link or unlink the zoom and scroll of A and B",

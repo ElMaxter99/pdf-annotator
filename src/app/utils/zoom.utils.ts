@@ -135,3 +135,35 @@ export function isDoubleClick(prev: ViewerClick | null, next: ViewerClick): bool
 export function doubleClickZoomTarget(current: number): 'actual' | 'fit' {
   return Math.round(current * 100) === 100 ? 'fit' : 'actual';
 }
+
+/**
+ * Posición horizontal «de partida» del visor con margen de trabajo (P-109): si los PDFs caben en
+ * el visor quedan centrados; si no, se alinea su borde izquierdo (como antes del margen).
+ * `contentLeft` y `contentWidth` están en coordenadas del contenido desplazable.
+ */
+export function homeScrollLeft(input: {
+  contentLeft: number;
+  contentWidth: number;
+  viewportWidth: number;
+  padding: number;
+}): number {
+  const { contentLeft, contentWidth, viewportWidth, padding } = input;
+  const fits = contentWidth + 2 * padding <= viewportWidth;
+  const target = fits
+    ? contentLeft + contentWidth / 2 - viewportWidth / 2
+    : contentLeft - padding;
+  return Math.max(0, Math.round(target));
+}
+
+/** Desplazamiento horizontal que deja el centro de `item` en el centro del visor. */
+export function centerScrollLeft(
+  item: { left: number; width: number },
+  viewportWidth: number,
+): number {
+  return Math.max(0, Math.round(item.left + item.width / 2 - viewportWidth / 2));
+}
+
+/** Margen de trabajo a cada lado: la mitad del ancho útil del visor. */
+export function workMarginFor(viewportWidth: number): number {
+  return viewportWidth > 0 ? Math.round(viewportWidth / 2) : 0;
+}
