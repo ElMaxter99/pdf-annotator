@@ -1,4 +1,6 @@
 ## Unreleased
+### Added
+- **Banco de medida de «Trasladar con IA» (1.17 · A1, herramienta local, sin cambios en la app):** `cd tools/ai-phase0 && npm run bench -- --provider claude|copilot|fake [--model …] [--cases <carpeta>]` ejecuta el flujo real de la app (pase sin IA, pasadas, anclar en B, huecos) sobre los casos de ejemplo o sobre una carpeta propia, con y sin el pase sin IA, y guarda en `out/` una tabla por caso: campos, colocados, colocados sin IA, «no existe en B», sin colocar por motivo, aciertos a ≤ 5 y ≤ 15 pt si hay solución conocida, peticiones, tokens o créditos si el CLI los da y segundos. El informe no lleva contenido de los PDF. Guía en `docs/IA-LOCAL.md` (también para Windows). Con pruebas.
 ### Accessibility
 - **Encabezado principal para lectores de pantalla (1.17 · B2, sin cambios visibles):** utilidad global `.sr-only` y un `h1` oculto en la cabecera del editor y en los pasos 1 y 2 del lote. La auditoría axe deja de marcar «falta un h1» (`page-has-heading-one`) y no aparece `region`. Queda `heading-order` en el panel lateral del editor (sus títulos son `h4`/`h5` y los estilan reglas por etiqueta): pendiente de una tarea aparte para no chocar con el paso a tokens de los colores.
 
