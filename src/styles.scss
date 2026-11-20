@@ -6679,6 +6679,8 @@ button.version-chip:focus-visible {
 
   .app--workspace .viewer:hover {
     scrollbar-color: color-mix(in srgb, var(--muted) 65%, transparent) transparent;
+  }
+}
 
 /* C1 de la 1.17 · «Dividida» desenlazada: el panel A, que se desplaza solo, también tiene espacio de
    trabajo ampliado (`--a-margin`, mitad del ancho del panel, lo publica `updateWorkMargin`) alrededor
