@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { findText, flattenFields, nearbyTexts, parseJsonFromText, resolveProposal, score, summarize, validateProposals } from './lib.mjs';
+import { buildPlan, candidatePagesB, failureNote, fillTemplate, findText, flattenFields, mergeOutcome, nearbyTexts, pagesFromMap, parseJsonFromText, planRetry, rankPagesB, resolveProposal, score, stripTemplateComments, summarize, usefulPagesA, validateProposals, wordsOf } from './lib.mjs';
 
 const textsA = [{ page: 1, text: 'Cliente', x: 50, y: 720 }, { page: 1, text: 'NIF', x: 50, y: 680 }];
 const textsB = [{ page: 2, text: 'Cliente', x: 60, y: 500 }, { page: 1, text: 'Cliente', x: 10, y: 10 }];
@@ -98,4 +98,97 @@ test('buildPrompt cuenta la correspondencia de páginas solo si el usuario la di
   assert.doesNotMatch(buildPrompt(base), /Correspondencia de páginas/);
   const prompt = buildPrompt({ ...base, pageMap: [null, 1, 2, 3] });
   assert.match(prompt, /B1: sin página de A · B2: A1 · B3: A2 · B4: A3/);
+});
+
+// ── Traslado por partes ───────────────────────────────────────────────────────────────────────────────────────
+
+test('usefulPagesA: solo las páginas de A con campos, sin repetir, en orden y existentes', () => {
+  const entries = [{ page: 3 }, { page: 1 }, { page: 3 }, { page: 12 }];
+  assert.deepEqual(usefulPagesA(entries, 10), [1, 3]);
+  assert.deepEqual(usefulPagesA([]), []);
+});
+
+test('wordsOf normaliza y descarta palabras cortas y con números', () => {
+  assert.deepEqual(wordsOf('Razón SOCIAL: 2024 N.º abc12 de IVA'), ['razon', 'social', 'iva']);
+});
+
+const tA = [
+  { page: 1, text: 'Datos del cliente', x: 0, y: 0 },
+  { page: 1, text: 'Dirección postal', x: 0, y: 0 },
+  { page: 2, text: 'Firma', x: 0, y: 0 },
+];
+const tB = [
+  { page: 1, text: 'Portada nueva', x: 0, y: 0 },
+  { page: 2, text: 'Condiciones 2024', x: 0, y: 0 },
+  { page: 3, text: 'Firma del cliente', x: 0, y: 0 },
+  { page: 4, text: 'Datos del cliente', x: 0, y: 0 },
+  { page: 4, text: 'Dirección postal', x: 0, y: 0 },
+  { page: 5, text: 'Anexo', x: 0, y: 0 },
+];
+
+test('rankPagesB ordena por palabras compartidas y desempata por cercanía', () => {
+  assert.deepEqual(rankPagesB({ pageA: 1, textsA: tA, textsB: tB, pagesB: 5 }), [4, 3, 1, 2, 5]);
+  assert.deepEqual(rankPagesB({ pageA: 2, textsA: tA, textsB: tB, pagesB: 5 }).slice(0, 2), [3, 2]);
+});
+
+test('candidatePagesB sin tabla: las K mejores, o todas si B tiene K o menos', () => {
+  assert.deepEqual(candidatePagesB({ pageA: 1, textsA: tA, textsB: tB, pagesB: 5 }), [1, 3, 4]);
+  assert.deepEqual(candidatePagesB({ pageA: 1, textsA: tA, textsB: tB, pagesB: 5, k: 1 }), [4]);
+  assert.deepEqual(candidatePagesB({ pageA: 1, textsA: tA, textsB: tB.filter((t) => t.page <= 3), pagesB: 3 }), [1, 2, 3]);
+});
+
+test('candidatePagesB con tabla: las páginas de B que apuntan a esa A (sin tope); si ninguna, por palabras', () => {
+  const pageMap = [null, 1, 1, 1, 2];
+  assert.deepEqual(pagesFromMap(pageMap, 1, 5), [2, 3, 4]);
+  assert.deepEqual(candidatePagesB({ pageA: 1, textsA: tA, textsB: tB, pagesB: 5, pageMap }), [2, 3, 4]);
+  assert.deepEqual(candidatePagesB({ pageA: 2, textsA: tA, textsB: tB, pagesB: 5, pageMap }), [5]);
+  assert.deepEqual(candidatePagesB({ pageA: 3, textsA: tA, textsB: tB, pagesB: 5, pageMap }), [2, 3, 4]);
+  assert.deepEqual(pagesFromMap([1, 1, 1], 1, 2), [1, 2], 'ignora páginas de la tabla que B ya no tiene');
+  assert.deepEqual(pagesFromMap('basura', 1, 2), []);
+});
+
+test('buildPlan: una petición por página útil con solo sus campos', () => {
+  const entries = flattenFields({ pages: [{ num: 1, fields: [{ x: 1, y: 1 }, { x: 2, y: 2 }] }, { num: 2, fields: [{ x: 3, y: 3 }] }] });
+  const plan = buildPlan({ entries, pagesA: 3, textsA: tA, pagesB: 5, textsB: tB });
+  assert.deepEqual(plan.map((p) => [p.group, p.candidatesB, p.fields.map((f) => f.id)]), [
+    ['A-p1', [1, 3, 4], ['p1-f1', 'p1-f2']],
+    ['A-p2', [1, 2, 3], ['p2-f1']],
+  ]);
+  assert.equal(plan[0].rankB.length, 5);
+});
+
+test('planRetry: siguientes páginas no enviadas de 3 en 3; si no quedan, las mismas', () => {
+  const rankB = [4, 3, 1, 2, 5, 6, 7];
+  assert.deepEqual(planRetry({ candidatesB: [1, 3, 4], rankB, sentB: new Set([1, 3, 4]) }), { pagesB: [2, 5, 6], fresh: true });
+  assert.deepEqual(planRetry({ candidatesB: [1, 3, 4], rankB, sentB: new Set([1, 2, 3, 4, 5, 6]) }), { pagesB: [7], fresh: true });
+  assert.deepEqual(planRetry({ candidatesB: [1, 3, 4], rankB, sentB: new Set(rankB) }), { pagesB: [1, 3, 4], fresh: false });
+});
+
+test('mergeOutcome: gana el colocado y, entre colocados, la mayor confianza', () => {
+  const ok = (c) => ({ proposal: { confidence: c }, resolved: { ok: true } });
+  const bad = { proposal: { confidence: 1 }, resolved: { ok: false, why: 'sin_resultado' } };
+  assert.equal(mergeOutcome(undefined, bad), bad);
+  const low = ok(0.4);
+  const high = ok(0.8);
+  assert.equal(mergeOutcome(low, bad), low);
+  assert.equal(mergeOutcome(bad, low), low);
+  assert.equal(mergeOutcome(low, high), high);
+  assert.equal(mergeOutcome(high, low), high);
+  assert.equal(mergeOutcome(low, ok(0.4)), low, 'empate: se queda el primero');
+});
+
+test('failureNote explica el motivo de cada fallo', () => {
+  const e = { id: 'p1-f2', field: { mapField: 'Razón social' } };
+  assert.match(failureNote(e, { proposal: { reason: 'no está' }, resolved: { ok: false, why: 'sin_resultado' } }), /p1-f2 \(«Razón social»\): respondiste found:false \(«no está»\)/);
+  assert.match(failureNote(e, { proposal: { anchorA: 'Razon' }, resolved: { ok: false, why: 'ancla_A_no_encontrada' } }), /«Razon» no existe literalmente en textsA\.json/);
+  assert.match(failureNote(e, { proposal: { anchorB: 'Razón social', page: 2 }, resolved: { ok: false, why: 'ancla_B_no_encontrada' } }), /«Razón social» no existe literalmente en textsB\.json en la página 2/);
+  assert.match(failureNote(e, undefined), /no venía en la respuesta anterior/);
+  assert.match(failureNote({ id: 'p1-f1', field: {} }, undefined), /sin nombre/);
+});
+
+test('fillTemplate rellena en una pasada y exige todos los marcadores', () => {
+  assert.equal(fillTemplate('Hola {{nombre}}, {{ n }}', { nombre: 'Ana', n: 2 }), 'Hola Ana, 2');
+  assert.equal(fillTemplate('{{a}}', { a: '{{b}} $& $1' }), '{{b}} $& $1', 'lo insertado no se vuelve a interpretar');
+  assert.throws(() => fillTemplate('{{falta}}', {}), /Falta el marcador \{\{falta\}\}/);
+  assert.equal(stripTemplateComments('<!-- nota {{x}} -->\n# T\n\n\n\nfin'), '# T\n\nfin\n');
 });
