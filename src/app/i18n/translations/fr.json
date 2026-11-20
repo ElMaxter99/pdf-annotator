@@ -888,6 +888,7 @@
         "ready": "Prête à relire · {{placed}} sur {{total}}",
         "free": "Résolu sans IA · {{placed}} sur {{total}}",
         "partial": "Partiel · {{placed}} sur {{total}}",
+        "absent": "{{n}} absents de B",
         "failed": "Échec",
         "cancelled": "Annulé",
         "saved": "Proposition prête à relire",
@@ -1490,9 +1491,12 @@
       "group": {
         "review": "À revoir · {{count}}",
         "notFound": "Introuvables · {{count}}",
+        "absent": "Absents de B · {{count}}",
         "ready": "Prêts · {{count}}"
       },
       "notInB": "absent de B",
+      "absentInB": "n'existe pas dans B : il est normal de ne pas le placer",
+      "withoutAi": "placé sans IA",
       "placeByHand": "Placer à la main",
       "tabBadge": "Proposition de l'IA : {{count}} champs"
     }

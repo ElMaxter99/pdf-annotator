@@ -18,6 +18,8 @@ export interface AiQueueTaken {
   readonly phase: 'ready' | 'partial' | 'free';
   readonly placed: number;
   readonly total: number;
+  /** Fields that do not exist in B (leaving them out is right). */
+  readonly absent?: number;
 }
 
 export interface AiRemoteItem {
@@ -71,7 +73,7 @@ export function parseQueueInfo(raw: string | null): AiQueueInfo | null {
         key.length <= 120 &&
         (phase === 'ready' || phase === 'partial' || phase === 'free')
       ) {
-        taken[key] = { phase, placed: num(value['placed']), total: num(value['total']) };
+        taken[key] = { phase, placed: num(value['placed']), total: num(value['total']), absent: num(value['absent']) };
       }
     }
     const order = Array.isArray(data['order'])

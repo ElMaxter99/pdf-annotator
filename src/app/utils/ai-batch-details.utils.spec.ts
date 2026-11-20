@@ -5,7 +5,7 @@ const t = (key: string, params?: Record<string, string | number>) => `${key}${pa
 
 function row(patch: Partial<AiBatchRow>): AiBatchRow {
   return {
-    id: 'a', phase: 'queued', attempt: 1, startedAt: null, endedAt: null, placed: 0, total: 0, usage: null, error: null,
+    id: 'a', phase: 'queued', attempt: 1, startedAt: null, endedAt: null, placed: 0, total: 0, absent: 0, usage: null, error: null,
     t0: 0, provider: 'claude', sent: null, stageLog: [], stepLog: [], details: null, cascade: null,
     ...patch,
   };

@@ -82,6 +82,8 @@ function cascadeScaled(template: readonly PageAnnotations[], a: CascadePdf, b: C
         reason: good ? 'adjust' : '',
         anchorA: '',
         anchorB: '',
+        why: '',
+        source: 'text',
       });
     });
   }
@@ -144,6 +146,8 @@ export function cascadeAdjust(template: readonly PageAnnotations[], a: CascadePd
         reason: shift ? 'adjust' : '',
         anchorA: '',
         anchorB: '',
+        why: '',
+        source: 'text',
       });
     });
   }

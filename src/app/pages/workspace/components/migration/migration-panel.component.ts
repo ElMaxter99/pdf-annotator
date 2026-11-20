@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationService } from '../../../../i18n/translation.service';
-import { confidenceLevel, isRowSelected, type AiRow } from '../../../../utils/ai-proposal.utils';
+import { confidenceLevel, isRowSelected, type AiRow, isAbsentInB } from '../../../../utils/ai-proposal.utils';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { FieldState, FieldStatus } from '../../../../utils/migration.utils';
 import type { WorkspacePageComponent } from '../../workspace.page';
@@ -50,11 +50,13 @@ export class MigrationPanelComponent {
     const byPlace = (a: AiRow, b: AiRow) => a.page - b.page || a.index - b.index;
     const rows = [...session.rows].sort(byPlace);
     const review = rows.filter((row) => row.ok && confidenceLevel(row.confidence) !== 'high');
-    const notFound = rows.filter((row) => !row.ok);
+    const notFound = rows.filter((row) => !row.ok && !isAbsentInB(row));
+    const absent = rows.filter(isAbsentInB);
     const ready = rows.filter((row) => row.ok && confidenceLevel(row.confidence) === 'high');
     return [
       { key: 'review', rows: review },
       { key: 'notFound', rows: notFound },
+      { key: 'absent', rows: absent },
       { key: 'ready', rows: ready },
     ].filter((group) => group.rows.length > 0);
   });
@@ -80,6 +82,15 @@ export class MigrationPanelComponent {
 
   level(row: AiRow): string {
     return confidenceLevel(row.confidence);
+  }
+
+  /** Placed by the helper without the AI (not shown for «Resuelto sin IA», where every row is). */
+  withoutAi(row: AiRow): boolean {
+    return row.ok && row.source === 'text' && this.proposal()?.provider !== 'adjust';
+  }
+
+  absent(row: AiRow): boolean {
+    return isAbsentInB(row);
   }
 
   /** The reason is shown only when it adds something to the anchor already printed. */

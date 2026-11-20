@@ -18,7 +18,7 @@ describe('ai-queue.utils', () => {
       startedAt: 5,
       order: ['pdf-a', 'pdf-b'],
       map: { i0: 'pdf-a' },
-      taken: { 'pdf-a': { phase: 'ready', placed: 3, total: 4 } },
+      taken: { 'pdf-a': { phase: 'ready', placed: 3, total: 4, absent: 0 } },
     });
   });
 
