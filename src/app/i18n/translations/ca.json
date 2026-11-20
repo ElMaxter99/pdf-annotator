@@ -883,7 +883,7 @@
         "queued": "A la cua",
         "adjusting": "Ajustant per textos",
         "reading": "Llegint",
-        "asking": "Preguntant · intent {{n}}",
+        "asking": "Preguntant · petició {{n}}",
         "resolving": "Col·locant",
         "ready": "Llesta per revisar · {{placed}} de {{total}}",
         "free": "Resolt sense IA · {{placed}} de {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Nou"
       },
       "retryToggle": "Reintentar una vegada si la resposta no serveix",
-      "retryHint": "Un reintent pot duplicar la despesa: amb Copilot torna a enviar-ho tot i gasta més crèdits d'IA. Amb Copilot ve desactivat."
+      "retryHint": "Un reintent pot duplicar la despesa d'aquella petició. Ve activat amb tots els proveïdors."
     },
     "menu": {
       "title": "Copiar i adaptar amb IA",
@@ -1421,7 +1421,8 @@
         "no_valid_answer": "La resposta de la IA no era una llista vàlida amb un objecte per camp, ni en el reintent.",
         "anchors_not_found": "La IA va proposar textos d'ancoratge que no existeixen als PDF. Sol passar si els textos han canviat molt de redacció.",
         "ai_found_nothing": "La IA ha respost que no pot col·locar cap dels camps.",
-        "partial": "Alguns camps no s'han pogut col·locar; la llista de la revisió indica el motiu de cadascun."
+        "partial": "Alguns camps no s'han pogut col·locar; la llista de la revisió indica el motiu de cadascun.",
+        "cap_reached": "S'ha arribat al límit de 8 peticions per a aquest PDF: es retorna el que s'ha col·locat fins aquí. Revisa a mà els camps que falten."
       },
       "copyTexts": "Textos per pàgina"
     },

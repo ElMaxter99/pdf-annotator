@@ -114,6 +114,14 @@ describe('ai-proposal.utils', () => {
     expect((res.result.details as unknown as { attempts: { aiCredits: number }[] }).attempts[0].aiCredits).toBe(6.76);
   });
 
+  it('keeps the «cap_reached» diagnosis and up to 8 calls of the split engine', () => {
+    const attempts = Array.from({ length: 10 }, (_, i) => ({ n: i + 1 }));
+    const line = JSON.stringify({ result: { rows: [], seconds: 1, warnings: [], details: { usageSource: 'measured', diagnosis: 'cap_reached', placed: 3, attempts } } });
+    const res = parseNdjson(line + '\n').messages[0] as { result: { details: { diagnosis: string; attempts: unknown[] } } };
+    expect(res.result.details.diagnosis).toBe('cap_reached');
+    expect(res.result.details.attempts.length).toBe(8);
+  });
+
   it('sums usage and estimates tokens only from sizes', () => {
     expect(sumUsage([null, null])).toBeNull();
     expect(sumUsage([{ input: 1, output: 2, cacheRead: 3, cacheWrite: 4 }, null, { input: 1, output: 1, cacheRead: 1, cacheWrite: 1 }])).toEqual({ input: 2, output: 3, cacheRead: 4, cacheWrite: 5 });

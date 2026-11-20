@@ -883,7 +883,7 @@
         "queued": "Queued",
         "adjusting": "Adjusting by texts",
         "reading": "Reading",
-        "asking": "Asking · attempt {{n}}",
+        "asking": "Asking · request {{n}}",
         "resolving": "Placing",
         "ready": "Ready to review · {{placed}} of {{total}}",
         "free": "Solved without AI · {{placed}} of {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "New"
       },
       "retryToggle": "Retry once if the answer is unusable",
-      "retryHint": "A retry can double the cost: with Copilot it sends everything again and spends more AI credits. It is off by default for Copilot."
+      "retryHint": "A retry can double the cost of that request. It is on by default with every provider."
     },
     "menu": {
       "title": "Copy and adapt with AI",
@@ -1421,7 +1421,8 @@
         "no_valid_answer": "The AI answer was not a valid list with one object per field, not even on the retry.",
         "anchors_not_found": "The AI proposed anchor texts that do not exist in the PDFs. It usually happens when the wording changed a lot.",
         "ai_found_nothing": "The AI answered that it cannot place any of the fields.",
-        "partial": "Some fields could not be placed; the review list shows the reason for each one."
+        "partial": "Some fields could not be placed; the review list shows the reason for each one.",
+        "cap_reached": "The limit of 8 requests for this PDF was reached: what was placed so far is returned. Check the missing fields by hand."
       },
       "copyTexts": "Texts per page"
     },

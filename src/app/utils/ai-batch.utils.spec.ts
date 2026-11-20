@@ -1,6 +1,8 @@
 import type { BatchItem } from '../models/batch.model';
 import {
   AI_BATCH_COPILOT_CAP,
+  AI_MAX_REQUESTS_PER_PDF,
+  usedPagesOfA,
   classifyAiError,
   countTemplateFields,
   estimateAiBatch,
@@ -39,12 +41,27 @@ describe('ai-batch.utils', () => {
     expect(claude.pairs).toBe(12);
     expect(claude.fields).toBe(24);
     expect(claude.bytes).toBe(12 * 150);
+    // One page of A with fields per pair: 1 request each; up to re-ask + a retry of each = 4.
     expect(claude.minRequests).toBe(12);
-    expect(claude.maxRequests).toBe(24);
+    expect(claude.maxRequests).toBe(48);
     expect(claude.beyondCap).toBe(0);
     const copilot = estimateAiBatch(items, 'copilot', false);
-    expect(copilot.maxRequests).toBe(12);
+    expect(copilot.maxRequests).toBe(24);
     expect(copilot.beyondCap).toBe(12 - AI_BATCH_COPILOT_CAP);
+  });
+
+  it('counts only the pages of A with fields and caps the requests per PDF', () => {
+    const wide: BatchItem = {
+      ...item('w', 0),
+      aPages: Array.from({ length: 10 }, (_, i) => ({
+        num: i + 1,
+        fields: i < 3 ? [{} as never] : [],
+      })),
+    };
+    expect(usedPagesOfA(wide)).toBe(3);
+    const est = estimateAiBatch([wide], 'claude', true);
+    expect(est.minRequests).toBe(3);
+    expect(est.maxRequests).toBe(AI_MAX_REQUESTS_PER_PDF);
   });
 
   it('classifies errors by what the queue must do', () => {

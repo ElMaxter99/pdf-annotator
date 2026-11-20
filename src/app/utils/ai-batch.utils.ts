@@ -20,6 +20,14 @@ export type AiBatchPhase =
 
 export const AI_BATCH_ACTIVE_PHASES: readonly AiBatchPhase[] = ['adjusting', 'reading', 'asking', 'resolving'];
 
+/** Most AI requests one PDF may use, retries included (same constant as the helper). */
+export const AI_MAX_REQUESTS_PER_PDF = 8;
+
+/** Pages of A that hold fields: only those are sent, one request each (plus a targeted re-ask). */
+export function usedPagesOfA(item: Pick<BatchItem, 'aPages'>): number {
+  return item.aPages.filter((page) => Array.isArray(page.fields) && page.fields.length > 0).length;
+}
+
 export function countTemplateFields(item: Pick<BatchItem, 'aPages'>): number {
   return item.aPages.reduce((n, page) => n + (Array.isArray(page.fields) ? page.fields.length : 0), 0);
 }
@@ -34,7 +42,10 @@ export interface AiBatchEstimate {
   fields: number;
   /** PDF bytes that will go to the local helper (A + B of every pair). */
   bytes: number;
-  /** Requests to the AI: one per pair, up to two per pair when retry is on. */
+  /**
+   * Requests to the AI: at least one per page of A with fields; at most a re-ask per page and a
+   * retry of each (when on), never more than `AI_MAX_REQUESTS_PER_PDF` per PDF.
+   */
   minRequests: number;
   maxRequests: number;
   /** Pairs that would wait for an explicit «Continue» because of the Copilot cap. */
@@ -52,8 +63,11 @@ export function estimateAiBatch(
     pairs: pairs.length,
     fields: pairs.reduce((n, item) => n + countTemplateFields(item), 0),
     bytes: pairs.reduce((n, item) => n + item.aPdf.size + (item.bPdf?.size ?? 0), 0),
-    minRequests: pairs.length,
-    maxRequests: pairs.length * (retry ? 2 : 1),
+    minRequests: pairs.reduce((n, item) => n + usedPagesOfA(item), 0),
+    maxRequests: pairs.reduce(
+      (n, item) => n + Math.min(AI_MAX_REQUESTS_PER_PDF, usedPagesOfA(item) * (retry ? 4 : 2)),
+      0,
+    ),
     beyondCap: Math.max(0, pairs.length - cap),
   };
 }

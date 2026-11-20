@@ -883,7 +883,7 @@
         "queued": "En file",
         "adjusting": "Ajustement par textes",
         "reading": "Lecture",
-        "asking": "Question en cours · essai {{n}}",
+        "asking": "Interrogation · requête {{n}}",
         "resolving": "Placement",
         "ready": "Prête à relire · {{placed}} sur {{total}}",
         "free": "Résolu sans IA · {{placed}} sur {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Nouveau"
       },
       "retryToggle": "Réessayer une fois si la réponse est inutilisable",
-      "retryHint": "Un nouvel essai peut doubler le coût : avec Copilot, tout est renvoyé et consomme plus de crédits IA. Désactivé par défaut pour Copilot."
+      "retryHint": "Une nouvelle tentative peut doubler le coût de cette requête. Elle est activée par défaut avec tous les fournisseurs."
     },
     "menu": {
       "title": "Copier et adapter avec l'IA",
@@ -1421,7 +1421,8 @@
         "no_valid_answer": "La réponse de l'IA n'était pas une liste valide avec un objet par champ, même après la nouvelle tentative.",
         "anchors_not_found": "L'IA a proposé des textes d'ancrage qui n'existent pas dans les PDF. Cela arrive quand la rédaction a beaucoup changé.",
         "ai_found_nothing": "L'IA a répondu qu'elle ne peut placer aucun des champs.",
-        "partial": "Certains champs n'ont pas pu être placés ; la liste de révision indique la raison de chacun."
+        "partial": "Certains champs n'ont pas pu être placés ; la liste de révision indique la raison de chacun.",
+        "cap_reached": "La limite de 8 requêtes pour ce PDF a été atteinte : ce qui a été placé jusque-là est renvoyé. Vérifiez à la main les champs manquants."
       },
       "copyTexts": "Textes par page"
     },

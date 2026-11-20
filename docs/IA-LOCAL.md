@@ -9,14 +9,14 @@
 - **Orden de pruebas:** primero todo el desarrollo con Claude; Copilot está implementado pero sin probar hasta que se vaya a usar en el trabajo.
 
 ## Qué se envía a la IA
-El script (y la futura función) prepara una carpeta temporal y ejecuta el CLI dentro de ella. El CLI lee estos archivos:
+El ayudante (y el script de la fase 0) prepara una carpeta temporal y ejecuta el CLI dentro de ella. En la app va **por partes** (ver «Cómo pregunta el ayudante»): cada petición tiene su propia carpeta con solo lo suyo:
 
 | Archivo | Contenido |
 | --- | --- |
-| `A-p<N>.png`, `B-p<N>.png` | Cada página de A y de B renderizada como imagen (escala 1,5) |
-| `textsA.json`, `textsB.json` | Textos del PDF con página y posición (extraídos con pdf.js) |
-| `fields.json` | Los campos de la plantilla A: posición, tipo, `mapField` y los textos cercanos |
-| `prompt.md` | Las instrucciones y el formato de respuesta |
+| `A-p<N>.png`, `B-p<N>.png` | La página de A de esa petición y sus páginas candidatas de B, renderizadas como imagen (escala 1,5) |
+| `textsA.json`, `textsB.json` | Textos de esas páginas con página y posición (extraídos con pdf.js) |
+| `fields.json` | Los campos de esa página de A: posición, tipo, `mapField` y los 8 textos más cercanos |
+| `prompt.md` | Las instrucciones y el formato de respuesta, generados desde las plantillas de `tools/ai-helper/prompts/` |
 
 - **No se envía el PDF original**, solo las páginas como imágenes y sus textos. Esas imágenes y textos **contienen el contenido del documento** (datos personales, importes…): usar solo PDF que el cliente permita enviar a ese proveedor.
 - La línea de comandos solo lleva una frase fija («Lee el archivo prompt.md…»); nunca contenido del PDF.
@@ -26,20 +26,34 @@ El script (y la futura función) prepara una carpeta temporal y ejecuta el CLI d
 ## Claude (`claude -p`)
 - **Qué usa:** el CLI de Claude Code con el inicio de sesión de la suscripción (Pro/Max), en modo no interactivo, con la herramienta de lectura de archivos permitida (`--allowedTools Read`) y `--output-format json`. Sin `--bare` (con `--bare` no usa el login de suscripción).
 - **Clave de API:** si existe `ANTHROPIC_API_KEY` en el entorno, el CLI cobra por API sin avisar. El script la quita del entorno del CLI; `--keep-api-key` la conserva (solo para pruebas internas).
-- **Límites:** ventana de 5 horas y límite semanal de la suscripción, compartidos con el uso normal de Claude y Claude Code. Cada llamada del script es una sesión del CLI; el script hace **una llamada por par** (un reintento si la respuesta no es JSON válido). El paso a lote usará una llamada por página de destino.
+- **Límites:** ventana de 5 horas y límite semanal de la suscripción, compartidos con el uso normal de Claude y Claude Code. Cada llamada es una sesión del CLI. El script de la fase 0 hace **una llamada por par** (un reintento si la respuesta no es JSON válido); la app hace **una por página de A con campos**, más re-preguntas y reintentos, con un tope de 8 por PDF (ver «Cómo pregunta el ayudante»).
 - **Términos (leer antes de ampliar el uso):** la documentación del [Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview) indica que Anthropic no permite a terceros ofrecer el login de claude.ai ni sus límites en sus productos. Este uso es local y personal: la app ejecuta el `claude` que cada persona instaló y con el que inició sesión, y no maneja credenciales. Es razonable pero **no es una autorización expresa**: no distribuir la función con credenciales, no usar la sesión de otra persona y cada persona usa su propia suscripción. Ver la documentación de [`claude -p`](https://code.claude.com/docs/en/headless) y la de [Claude Code con planes Pro/Max](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan).
 - **Imágenes:** el modelo las abre con la herramienta Read desde la carpeta de trabajo (funciona en la fase 0).
 
 ## Prueba de lectura de imágenes
-Cada PNG que se deja al CLI lleva un código de 4 caracteres enorme en una franja añadida debajo de la página y el prompt exige devolverlos en `images`. Si faltan tras dos intentos, el ayudante responde `images_not_read` y no se propone nada: así un modelo que no ve imágenes (posible con Copilot) no coloca campos usando solo los JSON. Cuesta una petición extra solo si el primer intento no los devuelve.
+Cada PNG que se deja al CLI lleva un código de 4 caracteres enorme en una franja añadida debajo de la página y el prompt exige devolverlos en `images`. Solo se exigen los códigos **de las imágenes de esa petición**. Sin ellos la respuesta se descarta y se reintenta (hasta 2 intentos, con cualquier proveedor). **La primera petición del PDF hace de prueba**: si tras sus intentos no devuelve los códigos, el ayudante responde `images_not_read` y no gasta más peticiones en ese PDF; así un modelo que no ve imágenes no coloca campos usando solo los JSON. Si falla una petición posterior, solo quedan sin colocar sus campos (y entran en la re-pregunta).
+
+## Cómo pregunta el ayudante (por partes)
+Plan completo: [`docs/PLAN-IA-ROBUSTA.md`](PLAN-IA-ROBUSTA.md). Código: `tools/ai-helper/pipeline.mjs` (E/S y CLI), `tools/ai-phase0/passes.mjs` (orquestación, sin E/S) y `tools/ai-phase0/lib.mjs` (reglas puras).
+1. **Preparación (sin IA).** Páginas útiles de A = las que tienen campos; solo esas se envían. B se lee entero en local para elegir candidatas.
+2. **Candidatas de B** por página útil de A: con la tabla de páginas A↔B (`template.pageMap`), las páginas de B que apuntan a esa A; sin tabla (o si la tabla no le asigna ninguna), las 3 páginas de B con más palabras compartidas (normalizadas, ≥ 3 letras, sin números; `CANDIDATE_PAGES`); si B tiene 3 páginas o menos, todas.
+3. **Pasada 1:** una petición por página útil de A con esa página, sus candidatas, sus textos y solo sus campos.
+4. **Pasada 2:** los campos sin colocar (`found:false`, ancla no encontrada o sin respuesta) se vuelven a preguntar, una petición por página de A, con las 3 siguientes páginas de B aún no enviadas (por orden de parecido) o, si ya se enviaron todas, con las mismas y el motivo de cada fallo. Si un campo sale colocado varias veces, gana el de mayor confianza.
+5. **Reintentos** (cualquier proveedor): hasta 2 intentos por petición (1 si la persona desactiva «reintentar») si el JSON no vale, menos de la mitad de los campos son válidos o faltan códigos de imágenes de esa petición.
+6. **Tope:** como mucho **8 llamadas al CLI por PDF** (`MAX_REQUESTS_PER_PDF`, reintentos incluidos). Al llegar se devuelve lo colocado con el diagnóstico `cap_reached`. Las llamadas de un PDF van en serie; la concurrencia entre PDF no cambia.
+7. **Errores:** `limit`, `aborted` y `missing` se lanzan (pausan o cortan el lote). `timeout` o `cli_error` en una petición devuelven lo ya colocado como parcial con `details.aborted = <código>`; si aún no hay nada colocado, se lanzan.
+
+**Prompts editables.** Los textos están en Markdown en `tools/ai-helper/prompts/`: `traslado.md` (pasada 1), `repregunta.md` (pasada 2), `reintento-imagenes.md` y `reintento-json.md` (avisos de reintento). El código solo rellena los `{{marcadores}}` (cada archivo lista los suyos en un comentario, que no se envía); un marcador desconocido hace fallar la petición en vez de mandar un prompt roto. El script de la fase 0 (`run.mjs`) sigue con la petición única de siempre (`buildPrompt`) para comparar con las medidas anteriores.
+
+**Contrato con la app** (`result.details`): `attempts[]` lleva una entrada por llamada al CLI con `n`, `pass` (1 | 2), `group` (`"A-p3"`), `images` (nombres enviados), `fields`, `retry`, uso, pasos y recuentos; `requests` = total de llamadas; `plan` = `[{ group, candidatesB: ["B-p1", …], fields }]`; `sent` resume lo realmente enviado (imágenes sin repetir, JSON sumados por petición, páginas y textos enviados); `placed`, `notPlaced`, `diagnosis` (además `cap_reached`) y `aborted` si se cortó por `timeout`/`cli_error`. `onStage('asking', n)` da el número de llamada dentro del PDF.
 
 ## Copilot (`copilot -p`) — pendiente de probar
 - **Qué usa:** el CLI de GitHub Copilot con la sesión de GitHub de la persona (credenciales del llavero del sistema, o `COPILOT_GITHUB_TOKEN`/`GH_TOKEN`/`GITHUB_TOKEN`). La documentación de [planes](https://docs.github.com/en/copilot/get-started/plans) dice que todos incluyen el CLI.
-- **Imágenes con `--attachment` (por defecto).** El ayudante añade `--attachment=<A-p1.png>` por cada página (verificado con un PNG en Copilot CLI 1.0.109; con varios, pendiente de confirmar). `COPILOT_ATTACH_IMAGES=0` lo desactiva y deja los PNG solo en la carpeta. La prueba de lectura sigue detectando si Copilot no las ha leído.
+- **Imágenes con `--attachment` (por defecto).** El ayudante añade `--attachment=<A-p1.png>` por cada página de la petición (verificado con un PNG en Copilot CLI 1.0.109; con varios, pendiente de confirmar). `COPILOT_ATTACH_IMAGES=0` lo desactiva y deja los PNG solo en la carpeta. La prueba de lectura sigue detectando si Copilot no las ha leído.
 - **Consumo real de Copilot.** El ayudante lanza `copilot -p … --output-format json` y lee el JSONL: tokens (entrada, salida, caché) y créditos de IA (`totalNanoAiu / 1e9`, aproximado) del último `session.usage_checkpoint`, y la respuesta del último `assistant.message`. Si tu versión no emite ese JSON, la ventana lo dice y no inventa cifras.
 - **Consumo.** Desde junio de 2026 Copilot cobra en «AI credits» según tokens de entrada, salida y caché y el modelo (no por petición premium). `copilot -p` no documenta un resumen de uso, así que la app no mide créditos con Copilot: se mira en GitHub antes y después.
-- **Prueba previa.** Con Copilot, antes de la ejecución completa se envían solo `A-p1` y `B-p1` adjuntas y se comprueba que devuelve sus códigos; si no, se corta con `images_not_read` (cuesta una fracción). `COPILOT_PROBE=0` la desactiva.
-- **Lectura parcial con Copilot.** Con Copilot la prueba (previa y completa) acepta 2 de 4 caracteres acertados por código, porque reescala las imágenes y a veces responde «?» en lo que no distingue.
+- **Sin prueba previa propia.** Ya no hay una petición de prueba solo para Copilot: como con Claude, la primera petición del PDF hace de prueba y, si no devuelve los códigos tras sus intentos, se corta con `images_not_read` (el mensaje incluye cómo repetirlo a mano con una copia local de los PNG).
+- **Lectura parcial con Copilot.** Con Copilot la prueba acepta 2 de 4 caracteres acertados por código, porque reescala las imágenes y a veces responde «?» en lo que no distingue.
 - **Sin terminal.** El ayudante añade `--deny-tool=shell` (la denegación gana a `--allow-all-tools`): Copilot hacía ~12 llamadas `bash` explorando antes de contestar. `COPILOT_ALLOW_SHELL=1` lo quita.
 - **Banderas del CLI sin verificar.** El script lanza `copilot -p "<frase fija>" --allow-all-tools` desde la carpeta de trabajo. Si tu versión usa otras, defínelas con la variable `COPILOT_ARGS` (lista JSON; `{{prompt}}` se sustituye por la frase fija), por ejemplo `COPILOT_ARGS='["-p","{{prompt}}","--allow-all-tools"]'`. `--allow-all-tools` da permiso al CLI sobre las herramientas de esa sesión: ejecútalo solo en la carpeta temporal.
 - **Imágenes:** la documentación del [SDK](https://docs.github.com/en/copilot/how-tos/copilot-sdk/use-copilot-sdk/image-input) solo admite imágenes (PNG/JPEG recomendados; no PDF ni SVG) y exige un modelo con visión. **Qué modelos tienen visión no está confirmado**: se comprueba al probarlo (`models.list` del SDK). Si el CLI no lee imágenes por ruta, la alternativa es el Copilot SDK en el ayudante local, siempre con la sesión del CLI y sin BYOK.
@@ -92,4 +106,4 @@ Reglas: un **límite de uso** pausa el lote entero y deja los pendientes «en co
 El botón «Ver detalles» (barra de la IA, en carga, error, sin cambios y revisión) abre un modal con los pasos, lo enviado y el consumo. El ayudante emite líneas `{event}` durante la petición y `result.details` al terminar (`tools/ai-helper/pipeline.mjs`; en el navegador `utils/ai-proposal.utils.ts` las trata como no confiables).
 - **Claude** corre con `--output-format stream-json --verbose`: da cada paso (qué archivos lee), tokens reales (entrada, salida, caché) y coste equivalente en API. Con suscripción no se cobra aparte.
 - **Copilot** no expone uso en `-p` según su documentación: el modal dice «No medible» y solo enseña peticiones enviadas, tamaño de lo enviado y una **estimación de tokens marcada como tal**. Nunca se muestran cifras inventadas.
-- **Diagnóstico de «sin cambios»** (`diagnose` en `pipeline.mjs`): A o B sin texto extraíble, permiso denegado a la CLI, respuesta no válida, anclas inexistentes o la IA no encuentra nada. El informe copiable no lleva contenido de los PDF.
+- **Diagnóstico de «sin cambios»** (`diagnose` en `pipeline.mjs`): A o B sin texto extraíble, permiso denegado a la CLI, tope de peticiones alcanzado (`cap_reached`), respuesta no válida, anclas inexistentes o la IA no encuentra nada. El informe copiable no lleva contenido de los PDF.

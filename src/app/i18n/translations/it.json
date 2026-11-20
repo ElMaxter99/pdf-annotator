@@ -883,7 +883,7 @@
         "queued": "In coda",
         "adjusting": "Adattamento per testi",
         "reading": "Lettura",
-        "asking": "Richiesta · tentativo {{n}}",
+        "asking": "Richiesta in corso · {{n}}",
         "resolving": "Posizionamento",
         "ready": "Pronta da rivedere · {{placed}} di {{total}}",
         "free": "Risolto senza IA · {{placed}} di {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Nuovo"
       },
       "retryToggle": "Riprova una volta se la risposta non è utilizzabile",
-      "retryHint": "Un nuovo tentativo può raddoppiare il costo: con Copilot invia di nuovo tutto e consuma più crediti IA. Per Copilot è disattivato di default."
+      "retryHint": "Un nuovo tentativo può raddoppiare il costo di quella richiesta. È attivo di default con tutti i fornitori."
     },
     "menu": {
       "title": "Copia e adatta con l'IA",
@@ -1421,7 +1421,8 @@
         "no_valid_answer": "La risposta dell'IA non era una lista valida con un oggetto per campo, nemmeno al secondo tentativo.",
         "anchors_not_found": "L'IA ha proposto testi di ancoraggio che non esistono nei PDF. Succede quando la formulazione è cambiata molto.",
         "ai_found_nothing": "L'IA ha risposto che non può posizionare nessuno dei campi.",
-        "partial": "Alcuni campi non si sono potuti posizionare; l'elenco di revisione indica il motivo di ciascuno."
+        "partial": "Alcuni campi non si sono potuti posizionare; l'elenco di revisione indica il motivo di ciascuno.",
+        "cap_reached": "È stato raggiunto il limite di 8 richieste per questo PDF: viene restituito quanto collocato finora. Controlla a mano i campi mancanti."
       },
       "copyTexts": "Testi per pagina"
     },
