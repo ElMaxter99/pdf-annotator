@@ -8,8 +8,11 @@ Parser seguro, cabecera y layout compactos, atajos, extracción de `AnnotationEd
 ## Hecho: 1.15 «Solidez» (solo mantenimiento, sin cambios visibles)
 Publicada como v1.15.0 (ver `CHANGELOG.md`). Solo refactor del editor: `workspace.page.ts` pasó de 6.348 a 5.811 líneas (estado A↔B, arrastre, ajuste por textos y estado de «Copiar y adaptar con IA» fuera de la página). No quedan bloques seguros que extraer, así que **se deja de partir el archivo**. Atajos, pruebas de coordenadas y `OnPush` ya estaban hechos en la 1.13.
 
-## En curso: 1.16 «Cierre de pendientes»
-Plan por tareas y paralelizable en `docs/PLAN-1.16.md`: verificar `start:docker` (T2: hecho salvo el build completo en la máquina de Maxter, guion en `docs/TESTING.md`), `OnPush` en lo que queda `Eager`, auditoría axe (**hecha**, informe en `docs/AUDITORIA-A11Y.md`; quedan para mesa el contraste del acento en tema claro y un `h1` en el editor), doble clic del visor (**hecho**, T3: mesa P-106 aprobada con lo recomendado e implementada; falta publicar la 1.16), y lo que depende de Maxter (créditos de Copilot, visto bueno del tope por proyecto, cifrado opcional). Ya existen, sin pendiente: el tope por proyecto (200 PDFs / 2 GB, avisos a 100 PDFs / 1 GB; `ProjectLimits` en `project-store.service.ts`) y el chip «Desenlazar» del zoom A/B (`toggleSplitLink`, tecla `L`).
+## Hecho: 1.16 «Cierre de pendientes»
+Publicada como v1.16.0 (ver `CHANGELOG.md`): doble clic del visor, espacio de trabajo ampliado y «Centrar A/B», modal mínimo de «Trasladar con IA», motor de IA por partes (páginas útiles, candidatas de B, re-pregunta, reintentos iguales, tope de 8 peticiones), anclar en B con huecos de escritura, colocación sin IA y «no existe en B», `start:docker` verificado, `OnPush` en todo menos `app.ts` y auditoría axe. Planes: `docs/PLAN-1.16.md` y `docs/PLAN-IA-ROBUSTA.md`.
+
+## En curso: 1.17 «IA medible y pulido»
+Plan por tareas y paralelizable en `docs/PLAN-1.17.md`, **pendiente de que Maxter elija el alcance**: banco de medida de la IA con el motor nuevo, ajustes con resultados reales, huecos escritos con texto, no perder lo colocado sin IA, contraste del acento en tema claro, `h1` oculto, colores a tokens, «Dividida» desenlazada con margen, y decisiones sobre la barra horizontal del visor y Vercel Insights.
 
 ## Hecho tras v1.5.0
 - Dockerfile con `nginx-unprivileged` y `npm ci`; `npm audit` y Dependabot en CI (v1.11).
