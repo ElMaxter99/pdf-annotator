@@ -19,6 +19,7 @@ Esta petición es solo una parte del trabajo: trae **una página de A** (la {{pa
 
 ## Qué hacer con cada campo de fields.json
 1. Elige en "nearby" el texto de A que mejor sirve de ancla (normalmente la etiqueta junto a la que se escribe el valor). Cópialo EXACTO en "anchorA".
+   Prefiere como ancla el texto **más concreto y que aparezca una sola vez** (por ejemplo, el texto de la opción junto a la casilla, o la etiqueta propia del bloque), no un enunciado, título o pregunta que se repite. Si aun así el texto se repite, el código empareja las apariciones por orden de lectura (la 1.ª de A con la 1.ª de B, y así).
 2. Busca ese mismo texto, o el equivalente si cambió de redacción, en B y cópialo EXACTO de textsB.json en "anchorB", junto con su página en "page". El texto puede haberse movido a otra de las páginas de B que tienes aquí.
 3. La app calculará la posición final: ancla B + desplazamiento que tenía el campo en A. Si en B el campo ya no está en la misma posición relativa respecto a su etiqueta (se ve en las imágenes), estima la corrección en puntos PDF en "dx" y "dy" (si no cambió, 0 y 0). No calcules coordenadas absolutas.
 4. Si el campo no está en estas páginas de B, o no hay forma razonable de colocarlo (por ejemplo, la etiqueta ya no existe), devuelve "found": false con el motivo. No fuerces un ancla distinta: si hace falta, se buscará en otras páginas de B.

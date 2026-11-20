@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildPlan, candidatePagesB, failureNote, fillTemplate, findText, flattenFields, mergeOutcome, nearbyTexts, pagesFromMap, parseJsonFromText, planRetry, rankPagesB, resolveProposal, score, stripTemplateComments, summarize, usefulPagesA, validateProposals, wordsOf } from './lib.mjs';
+import { buildPlan, candidatePagesB, norm, readingOrder, textHits, failureNote, fillTemplate, findText, flattenFields, mergeOutcome, nearbyTexts, pagesFromMap, parseJsonFromText, planRetry, rankPagesB, resolveProposal, score, stripTemplateComments, summarize, usefulPagesA, validateProposals, wordsOf } from './lib.mjs';
 
 const textsA = [{ page: 1, text: 'Cliente', x: 50, y: 720 }, { page: 1, text: 'NIF', x: 50, y: 680 }];
 const textsB = [{ page: 2, text: 'Cliente', x: 60, y: 500 }, { page: 1, text: 'Cliente', x: 10, y: 10 }];
@@ -192,3 +192,54 @@ test('fillTemplate rellena en una pasada y exige todos los marcadores', () => {
   assert.throws(() => fillTemplate('{{falta}}', {}), /Falta el marcador \{\{falta\}\}/);
   assert.equal(stripTemplateComments('<!-- nota {{x}} -->\n# T\n\n\n\nfin'), '# T\n\nfin\n');
 });
+
+test('norm iguala ligaduras, viñetas y espacios alrededor de signos', () => {
+  assert.equal(norm('Nombre y apellidos/Razón social:'), norm('Nombre y apellidos / Razón social :'));
+  assert.equal(norm('• Productos Especialmente Complejos:'), norm('Productos Especialmente Complejos:'));
+  assert.equal(norm('operativa con Renta Fĳa.'), norm('operativa con Renta Fija.'));
+  assert.equal(norm('  - Teléfono:'), 'telefono:');
+});
+
+test('findText encuentra la etiqueta aunque cambien los espacios alrededor de «/»', () => {
+  const texts = [{ page: 1, text: 'Nombre y apellidos / Razón social:', x: 40, y: 700 }];
+  const hit = findText(texts, 1, 'Nombre y apellidos/Razón social:', 0, 0);
+  assert.equal(hit?.x, 40);
+});
+
+test('resolveProposal empareja etiquetas repetidas por orden de lectura y no por cercanía a A', () => {
+  // A: dos bloques «Nombre y apellidos:» (arriba y abajo); el campo es del 2.º bloque.
+  const tA = [
+    { page: 1, text: 'Nombre y apellidos:', x: 50, y: 700 },
+    { page: 1, text: 'Nombre y apellidos:', x: 50, y: 400 },
+  ];
+  // B reestructurada: los dos bloques suben; el 1.º queda más cerca de donde estaba el 2.º de A.
+  const tB = [
+    { page: 1, text: 'Nombre y apellidos:', x: 60, y: 420 },
+    { page: 1, text: 'Nombre y apellidos:', x: 60, y: 200 },
+  ];
+  const e = { id: 'p1-f2', page: 1, field: { x: 150, y: 400 } };
+  const p = { found: true, page: 1, anchorA: 'Nombre y apellidos:', anchorB: 'Nombre y apellidos:', dx: 0, dy: 0 };
+  assert.deepEqual(resolveProposal(p, e, tA, tB), { ok: true, page: 1, x: 160, y: 200 });
+});
+
+test('si el número de apariciones no coincide se usa la más cercana, como antes', () => {
+  const tA = [
+    { page: 1, text: 'Firma', x: 50, y: 700 },
+    { page: 1, text: 'Firma', x: 50, y: 400 },
+  ];
+  const tB = [{ page: 1, text: 'Firma', x: 60, y: 300 }];
+  const e = { id: 'p1-f1', page: 1, field: { x: 120, y: 400 } };
+  const p = { found: true, page: 1, anchorA: 'Firma', anchorB: 'Firma', dx: 0, dy: 0 };
+  assert.deepEqual(resolveProposal(p, e, tA, tB), { ok: true, page: 1, x: 130, y: 300 });
+});
+
+test('readingOrder y textHits: de arriba abajo y exactos antes que parciales', () => {
+  const ts = [
+    { page: 1, text: 'Total', x: 300, y: 500 },
+    { page: 1, text: 'Total', x: 50, y: 500 },
+    { page: 1, text: 'Total parcial', x: 50, y: 700 },
+  ];
+  assert.deepEqual(textHits(ts, 1, 'Total').sort(readingOrder).map((t) => t.x), [50, 300]);
+  assert.equal(textHits(ts, 1, 'parcial')[0].text, 'Total parcial');
+});
+

@@ -1,9 +1,15 @@
 // Lógica pura de la fase 0 (sin E/S): preparar campos, leer la respuesta de la IA y convertirla en coordenadas.
 
+/**
+ * Texto comparable: sin acentos ni mayúsculas, ligaduras separadas («ﬁ», «ĳ»), sin viñeta inicial
+ * («• », «- ») y sin espacios alrededor de signos («apellidos / Razón» = «apellidos/Razón»).
+ */
 export const norm = (s) =>
   String(s ?? '')
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
+    .replace(/^[\s•·▪◦*–—-]+/u, '')
+    .replace(/\s*([/:;,.()–—-])\s*/gu, '$1')
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();
@@ -138,13 +144,30 @@ const finite = (n) => (Number.isFinite(Number(n)) ? Number(n) : 0);
 const clamp01 = (n) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0.5);
 
 /** Busca un texto exacto (normalizado) y, si hay varios, el más cercano a (nearX, nearY). */
-export function findText(texts, page, wanted, nearX, nearY) {
+/** Orden de lectura de una página: de arriba abajo (y mayor = más arriba) y, en la misma línea, de izquierda a derecha. */
+export const readingOrder = (a, b) => (Math.abs(a.y - b.y) > 2 ? b.y - a.y : a.x - b.x);
+
+/** Textos de una página que coinciden con `wanted`: primero exactos (normalizados); si no hay, los que lo contienen o están contenidos. */
+export function textHits(texts, page, wanted) {
   const w = norm(wanted);
-  if (!w) return null;
+  if (!w) return [];
   const onPage = texts.filter((t) => t.page === page);
-  let hits = onPage.filter((t) => norm(t.text) === w);
-  if (!hits.length) hits = onPage.filter((t) => norm(t.text).includes(w) || (norm(t.text).length > 2 && w.includes(norm(t.text))));
+  const exact = onPage.filter((t) => norm(t.text) === w);
+  if (exact.length) return exact;
+  return onPage.filter((t) => norm(t.text).includes(w) || (norm(t.text).length > 2 && w.includes(norm(t.text))));
+}
+
+/**
+ * Texto de la página que corresponde a `wanted`. Si se repite y `rank` dice que en A era la aparición
+ * n.º `index` de `of`, y en B aparece las mismas veces, se empareja por orden de lectura (1.ª con 1.ª…):
+ * en páginas reestructuradas la «más cercana a la posición de A» puede ser la de otro bloque.
+ */
+export function findText(texts, page, wanted, nearX, nearY, rank = null) {
+  const hits = textHits(texts, page, wanted);
   if (!hits.length) return null;
+  if (rank && hits.length > 1 && hits.length === rank.of && rank.index >= 0) {
+    return [...hits].sort(readingOrder)[rank.index];
+  }
   return hits.sort((a, b) => dist(a.x, a.y, nearX, nearY) - dist(b.x, b.y, nearX, nearY))[0];
 }
 
@@ -157,7 +180,10 @@ export function resolveProposal(proposal, entry, textsA, textsB) {
   const f = entry.field;
   const a = findText(textsA, entry.page, proposal.anchorA, f.x, f.y);
   if (!a) return { ok: false, why: 'ancla_A_no_encontrada' };
-  const b = findText(textsB, proposal.page, proposal.anchorB, a.x, a.y);
+  // Si el ancla se repite en A, qué aparición es (por orden de lectura), para emparejarla con la misma en B.
+  const hitsA = textHits(textsA, entry.page, proposal.anchorA);
+  const rank = hitsA.length > 1 ? { index: [...hitsA].sort(readingOrder).indexOf(a), of: hitsA.length } : null;
+  const b = findText(textsB, proposal.page, proposal.anchorB, a.x, a.y, rank);
   if (!b) return { ok: false, why: 'ancla_B_no_encontrada' };
   return { ok: true, page: proposal.page, x: round(b.x + (f.x - a.x) + proposal.dx), y: round(b.y + (f.y - a.y) + proposal.dy) };
 }

@@ -1,4 +1,6 @@
 ## Unreleased
+### Changed
+- **«Trasladar con IA»: anclas más fiables (motor, sin cambios visibles):** al comparar etiquetas se ignoran la viñeta inicial («• ») y los espacios alrededor de signos («apellidos / Razón» = «apellidos/Razón»), además de acentos, mayúsculas y ligaduras como hasta ahora. Si una etiqueta se repite (dos bloques de interviniente, la misma pregunta dos veces) y aparece las mismas veces en A y en B, se emparejan por orden de lectura en vez de elegir la más cercana a la posición de A, que en páginas reestructuradas podía ser la de otro bloque. Los prompts piden usar como ancla el texto más concreto y único (la opción junto a la casilla) en vez de un enunciado repetido. Nace del análisis estructural de 15 pares reales. Con pruebas.
 
 ## [v1.16.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.16.0) - 2026-11-20
 ### Added
