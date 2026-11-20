@@ -35,6 +35,7 @@ export class ShortcutsDialogComponent implements AfterViewInit {
         { keys: ['⇧', '1'], labelKey: 'shortcuts.items.fitPage' },
         { keys: ['Ctrl/⌘', '+ / −'], labelKey: 'shortcuts.items.zoomKeys' },
         { keys: ['Ctrl/⌘', '0'], labelKey: 'shortcuts.items.zoomActual' },
+        { keys: ['Ctrl/⌘', '🖱 ×2'], labelKey: 'shortcuts.items.zoomToggle' },
         { keys: ['Ctrl/⌘', '🖱'], labelKey: 'shortcuts.items.zoomWheel' },
         { keys: ['␣'], labelKey: 'shortcuts.items.panCanvas' },
         { keys: ['B'], labelKey: 'shortcuts.items.toggleSidebar' },

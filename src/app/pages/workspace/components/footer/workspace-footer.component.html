@@ -24,6 +24,7 @@
     <span class="footer__zoomwrap">
       <button type="button" class="footer__zoom footer__zoom--btn" data-testid="footer-zoom" [disabled]="!vm.pdfDoc()"
         aria-haspopup="menu" [attr.aria-expanded]="vm.zoomMenuOpen()"
+        [attr.title]="'zoom.menu.toggleHint' | t"
         [attr.aria-label]="(vm.unlinkedSplit() ? 'B · ' : '') + (vm.scale() * 100 | number:'1.0-0') + ' % · ' + ('zoom.menu.label' | t)"
         (click)="toggleZoomMenu()">{{ vm.unlinkedSplit() ? 'B · ' : '' }}{{ vm.scale() * 100 | number:'1.0-0' }} %</button>
       @if (vm.zoomMenuOpen()) {

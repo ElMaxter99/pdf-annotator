@@ -1,8 +1,11 @@
 import {
+  ViewerClick,
   clampScale,
+  doubleClickZoomTarget,
   fitPageScale,
   fitPageScaleForOverflow,
   fitWidthScale,
+  isDoubleClick,
   panScrollPosition,
   stepScale,
   wheelZoomFactor,
@@ -106,5 +109,35 @@ describe('mover y anclar el zoom', () => {
       2,
     );
     expect(delta).toEqual({ dx: 200, dy: 200 });
+  });
+
+  describe('doble clic del visor', () => {
+    const click = (kind: 'middle' | 'modifier', time: number, x = 100, y = 100): ViewerClick => ({
+      kind,
+      x,
+      y,
+      time,
+    });
+
+    it('isDoubleClick acepta dos clics del mismo tipo, rápidos y juntos', () => {
+      expect(isDoubleClick(click('middle', 0), click('middle', 200, 103, 98))).toBeTrue();
+      expect(isDoubleClick(click('modifier', 0), click('modifier', 350))).toBeTrue();
+    });
+
+    it('isDoubleClick rechaza distinto tipo, demasiado tiempo, lejos o sin clic previo', () => {
+      expect(isDoubleClick(null, click('middle', 0))).toBeFalse();
+      expect(isDoubleClick(click('middle', 0), click('modifier', 100))).toBeFalse();
+      expect(isDoubleClick(click('middle', 0), click('middle', 351))).toBeFalse();
+      expect(isDoubleClick(click('middle', 0), click('middle', 100, 120, 100))).toBeFalse();
+      expect(isDoubleClick(click('middle', 500), click('middle', 100))).toBeFalse();
+    });
+
+    it('doubleClickZoomTarget: 100 % ajusta; cualquier otro zoom va a 100 %', () => {
+      expect(doubleClickZoomTarget(1)).toBe('fit');
+      expect(doubleClickZoomTarget(1.004)).toBe('fit');
+      expect(doubleClickZoomTarget(0.82)).toBe('actual');
+      expect(doubleClickZoomTarget(0.5)).toBe('actual');
+      expect(doubleClickZoomTarget(4)).toBe('actual');
+    });
   });
 });

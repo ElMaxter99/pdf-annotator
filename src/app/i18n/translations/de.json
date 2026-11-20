@@ -315,6 +315,7 @@
       "zoomWheel": "Zoom mit Mausrad oder Pinch-Geste",
       "zoomKeys": "PDF vergrößern / verkleinern",
       "zoomActual": "Originalgröße (100 %)",
+      "zoomToggle": "Zwischen Breite anpassen und 100 % wechseln (oder Doppelklick mit der mittleren Taste)",
       "fitPage": "An Seite anpassen",
       "panCanvas": "Arbeitsfläche verschieben (halten)",
       "splitLink": "A und B verknüpfen oder trennen (Geteilt)",
@@ -1639,7 +1640,8 @@
     "menu": {
       "label": "PDF-Zoom",
       "fitPage": "An Seite anpassen",
-      "fitWidth": "An Breite anpassen"
+      "fitWidth": "An Breite anpassen",
+      "toggleHint": "Doppelklick im Viewer: zwischen Breite anpassen und 100 % wechseln"
     },
     "pan": {
       "title": "Verschieben",

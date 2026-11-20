@@ -878,3 +878,44 @@ test('«Dividida»: the chip unlinks the zoom of A and B and links them again', 
   await expect(chip).toContainText('Desenlazado');
   await expect.poll(widthA).toBeGreaterThan(await widthB());
 });
+
+test('«Dividida»: the double click of the viewer acts on the pane under the pointer (P-106)', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await attachVersion2(page);
+  await openRow(page);
+  await page.getByTestId('mode-split').click();
+  await expect(page.getByTestId('split-a')).toBeVisible();
+
+  const widthB = () => page.locator('.canvas--pdf').evaluate((el: HTMLCanvasElement) => el.width);
+  const widthA = () =>
+    page.getByTestId('split-a').locator('canvas').evaluate((el: HTMLCanvasElement) => el.width);
+  const middleDouble = async (x: number, y: number) => {
+    await page.mouse.move(x, y);
+    for (let i = 0; i < 2; i += 1) {
+      await page.mouse.down({ button: 'middle' });
+      await page.mouse.up({ button: 'middle' });
+    }
+  };
+
+  // Unlinked: only the pane under the pointer changes.
+  await page.getByTestId('split-link').click();
+  await expect(page.getByTestId('footer-unlinked')).toBeVisible();
+  const bBefore = await widthB();
+  const aBefore = await widthA();
+  const paneA = (await page.getByTestId('split-a').boundingBox())!;
+  await middleDouble(paneA.x + 60, paneA.y + 60);
+  await expect.poll(widthA).not.toBe(aBefore);
+  expect(await widthB()).toBe(bBefore);
+
+  // Linked: a double click over B changes both panes together.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('l');
+  await expect(page.getByTestId('split-link')).toContainText('Enlazado');
+  await expect.poll(widthA).toBe(await widthB());
+  const b0 = await widthB();
+  const canvasB = (await page.locator('.canvas--pdf').boundingBox())!;
+  await middleDouble(canvasB.x + canvasB.width / 2, canvasB.y + 40);
+  await expect.poll(widthB).not.toBe(b0);
+  await expect.poll(widthA).toBe(await widthB());
+});
