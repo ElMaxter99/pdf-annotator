@@ -69,7 +69,8 @@ export type AiDiagnosis =
   | 'no_valid_answer'
   | 'anchors_not_found'
   | 'ai_found_nothing'
-  | 'partial';
+  | 'partial'
+  | 'cap_reached';
 
 export interface AiDetails {
   model: string | null;
@@ -107,6 +108,7 @@ const DIAGNOSES: readonly AiDiagnosis[] = [
   'anchors_not_found',
   'ai_found_nothing',
   'partial',
+  'cap_reached',
 ];
 const diagnosisOf = (value: unknown): AiDiagnosis | null =>
   DIAGNOSES.includes(value as AiDiagnosis) ? (value as AiDiagnosis) : null;
@@ -166,7 +168,7 @@ export function sanitizeDetails(raw: unknown): AiDetails | null {
     return null;
   }
   const r = obj(raw);
-  const attempts = (Array.isArray(r['attempts']) ? r['attempts'] : []).slice(0, 4).map((a) => {
+  const attempts = (Array.isArray(r['attempts']) ? r['attempts'] : []).slice(0, 8).map((a) => {
     const o = obj(a);
     return {
       n: count(o['n']),

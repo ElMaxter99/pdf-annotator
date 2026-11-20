@@ -1421,7 +1421,8 @@
         "no_valid_answer": "La réponse de l'IA n'était pas une liste valide avec un objet par champ, même après la nouvelle tentative.",
         "anchors_not_found": "L'IA a proposé des textes d'ancrage qui n'existent pas dans les PDF. Cela arrive quand la rédaction a beaucoup changé.",
         "ai_found_nothing": "L'IA a répondu qu'elle ne peut placer aucun des champs.",
-        "partial": "Certains champs n'ont pas pu être placés ; la liste de révision indique la raison de chacun."
+        "partial": "Certains champs n'ont pas pu être placés ; la liste de révision indique la raison de chacun.",
+        "cap_reached": "La limite de 8 requêtes pour ce PDF a été atteinte : ce qui a été placé jusque-là est renvoyé. Vérifiez à la main les champs manquants."
       },
       "copyTexts": "Textes par page"
     },

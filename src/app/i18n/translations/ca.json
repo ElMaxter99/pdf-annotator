@@ -1421,7 +1421,8 @@
         "no_valid_answer": "La resposta de la IA no era una llista vàlida amb un objecte per camp, ni en el reintent.",
         "anchors_not_found": "La IA va proposar textos d'ancoratge que no existeixen als PDF. Sol passar si els textos han canviat molt de redacció.",
         "ai_found_nothing": "La IA ha respost que no pot col·locar cap dels camps.",
-        "partial": "Alguns camps no s'han pogut col·locar; la llista de la revisió indica el motiu de cadascun."
+        "partial": "Alguns camps no s'han pogut col·locar; la llista de la revisió indica el motiu de cadascun.",
+        "cap_reached": "S'ha arribat al límit de 8 peticions per a aquest PDF: es retorna el que s'ha col·locat fins aquí. Revisa a mà els camps que falten."
       },
       "copyTexts": "Textos per pàgina"
     },

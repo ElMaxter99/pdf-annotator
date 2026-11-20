@@ -1421,7 +1421,8 @@
         "no_valid_answer": "La respuesta de la IA no era una lista válida con un objeto por campo, ni en el reintento.",
         "anchors_not_found": "La IA propuso textos de anclaje que no existen en los PDF. Suele pasar si los textos cambiaron mucho de redacción.",
         "ai_found_nothing": "La IA ha respondido que no puede colocar ninguno de los campos.",
-        "partial": "Algunos campos no se han podido colocar; la lista de la revisión indica el motivo de cada uno."
+        "partial": "Algunos campos no se han podido colocar; la lista de la revisión indica el motivo de cada uno.",
+        "cap_reached": "Se llegó al tope de 8 peticiones para este PDF: se devuelve lo colocado hasta ahí. Revisa a mano los campos que faltan."
       },
       "copyTexts": "Textos por página"
     },

@@ -1421,7 +1421,8 @@
         "no_valid_answer": "The AI answer was not a valid list with one object per field, not even on the retry.",
         "anchors_not_found": "The AI proposed anchor texts that do not exist in the PDFs. It usually happens when the wording changed a lot.",
         "ai_found_nothing": "The AI answered that it cannot place any of the fields.",
-        "partial": "Some fields could not be placed; the review list shows the reason for each one."
+        "partial": "Some fields could not be placed; the review list shows the reason for each one.",
+        "cap_reached": "The limit of 8 requests for this PDF was reached: what was placed so far is returned. Check the missing fields by hand."
       },
       "copyTexts": "Texts per page"
     },

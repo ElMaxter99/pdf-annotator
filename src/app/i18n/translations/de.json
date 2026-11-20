@@ -1421,7 +1421,8 @@
         "no_valid_answer": "Die Antwort der KI war keine gültige Liste mit einem Objekt pro Feld, auch nicht im zweiten Versuch.",
         "anchors_not_found": "Die KI schlug Ankertexte vor, die in den PDFs nicht vorkommen. Das passiert, wenn sich die Formulierung stark geändert hat.",
         "ai_found_nothing": "Die KI antwortete, dass sie keines der Felder platzieren kann.",
-        "partial": "Einige Felder konnten nicht platziert werden; die Prüfliste nennt den Grund für jedes."
+        "partial": "Einige Felder konnten nicht platziert werden; die Prüfliste nennt den Grund für jedes.",
+        "cap_reached": "Das Limit von 8 Anfragen für dieses PDF wurde erreicht: Zurückgegeben wird, was bis dahin platziert wurde. Prüfe die fehlenden Felder von Hand."
       },
       "copyTexts": "Texte pro Seite"
     },
