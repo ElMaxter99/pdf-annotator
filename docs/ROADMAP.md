@@ -27,7 +27,7 @@ Plan por tareas y paralelizable en `docs/PLAN-1.16.md`: verificar `start:docker`
 9. **Hecho (1.14, mesas P-78 a P-81 y P-100 a P-102):** tabla de correspondencia de páginas A↔B: diálogo «Emparejar páginas…» con sugerencia por textos (la IA y el ajuste por textos la usan) y «Sugerir tablas» para varios PDFs desde el panel del lote. Detalle en `design/propuestas/emparejar-paginas-a-b.md`.
 
 ## Ideas sin priorizar
-**Pendiente de decisión de Maxter:** cifrado opcional de proyectos y visto bueno definitivo del tope por proyecto (ya implementado).
+**Pendiente de decisión de Maxter:** cifrado opcional de proyectos. El tope por proyecto (200 PDFs / 2 GB, avisos a 100 PDFs / 1 GB) está **confirmado** (`DECISIONS` 16).
 
 **Hecho (mesa P-96, 1.14):** exportación en ZIP de varias plantillas. Detalle en `CHANGELOG.md`.
 
@@ -56,7 +56,7 @@ Brainstorming de Maxter (2026-11-17); las tres fases están implementadas y publ
 7. **Tope de tamaño:** lo propone Claude (abajo), pendiente de que Maxter lo confirme.
 
 **Propuestas de Claude, pendientes de validar:**
-- **Tope por proyecto:** hoy un PDF del lote admite hasta 40 MB (`MAX_BATCH_PDF_BYTES`). Se propone mantenerlo y añadir **200 PDFs y 2 GB por proyecto**, con aviso suave a partir de 1 GB y de 100 PDFs (Maxter ya trabaja con ≈90). Es un tope de la app, ajustable en una constante, no del disco.
+- **Tope por proyecto (confirmado por Maxter el 2026-11-20, `DECISIONS` 16):** hoy un PDF del lote admite hasta 40 MB (`MAX_BATCH_PDF_BYTES`). Se propone mantenerlo y añadir **200 PDFs y 2 GB por proyecto**, con aviso suave a partir de 1 GB y de 100 PDFs (Maxter ya trabaja con ≈90). Es un tope de la app, ajustable en una constante, no del disco.
 - **Cifrado futuro, sin pedir contraseña siempre:** (a) opcional por proyecto, activado desde sus ajustes («Proteger con contraseña»), nunca obligatorio; (b) la clave se guarda en el almacén seguro del sistema (Keychain, Credential Manager, libsecret) para no teclearla cada vez; (c) solo se pide al abrir el proyecto en un equipo nuevo; (d) al exportar (fase 2) se ofrece cifrar el archivo con contraseña y esa sí se pide en el momento.
 
 **Hecho (renombrar, mesas P-97 a P-99):** «Renombrar…» en el menú ⋯ de la tarjeta (nombre visible y, opcional, carpeta; en sincronizados solo el nombre).
