@@ -201,6 +201,126 @@ export function describePageMap(pageMap) {
   return `- Correspondencia de páginas indicada por el usuario (página de B: página de A equivalente): ${rows.join(' · ')}. Úsala para saber en qué página de B buscar cada campo, salvo que las imágenes muestren claramente otra cosa.\n`;
 }
 
+// ── Traslado por partes (ayudante de la app): preparación sin IA ──────────────────────────────────────────────
+
+/** Páginas de B candidatas por cada página útil de A cuando no hay tabla (y tamaño de cada tanda de la pasada 2). */
+export const CANDIDATE_PAGES = 3;
+/** Textos cercanos que acompañan a cada campo en fields.json. */
+export const NEARBY_TEXTS = 8;
+
+/** Páginas útiles de A: las que tienen campos (y existen en A), en orden. */
+export function usefulPagesA(entries, pagesA = Infinity) {
+  return [...new Set(entries.map((e) => e.page))].filter((p) => Number.isInteger(p) && p >= 1 && p <= pagesA).sort((a, b) => a - b);
+}
+
+/** Palabras comparables de un texto: normalizadas, de 3 letras o más y sin números. */
+export const wordsOf = (s) =>
+  norm(s)
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((w) => w.length >= 3 && !/\p{N}/u.test(w));
+
+const pageWordSet = (texts, page) => new Set(texts.filter((t) => t.page === page).flatMap((t) => wordsOf(t.text)));
+
+/** Todas las páginas de B ordenadas por palabras compartidas con `pageA` (desempate: más cerca en número, luego la primera). */
+export function rankPagesB({ pageA, textsA, textsB, pagesB }) {
+  const wa = pageWordSet(textsA, pageA);
+  const scored = Array.from({ length: pagesB }, (_, i) => {
+    const wb = pageWordSet(textsB, i + 1);
+    let shared = 0;
+    for (const w of wb) if (wa.has(w)) shared++;
+    return { page: i + 1, shared };
+  });
+  return scored.sort((x, y) => y.shared - x.shared || Math.abs(x.page - pageA) - Math.abs(y.page - pageA) || x.page - y.page).map((s) => s.page);
+}
+
+/** Páginas de B que la tabla A↔B (índice = página de B − 1, valor = página de A o null) asigna a `pageA`. */
+export function pagesFromMap(pageMap, pageA, pagesB) {
+  if (!Array.isArray(pageMap) || pageMap.length === 0 || pageMap.length > 500) return [];
+  return pageMap.flatMap((a, i) => (a === pageA && i + 1 <= pagesB ? [i + 1] : []));
+}
+
+/**
+ * Candidatas de B para una página útil de A: las de la tabla si la hay (y asigna alguna); si no, todas cuando B tiene
+ * `k` páginas o menos, o las `k` con más palabras compartidas. Devueltas en orden de página.
+ */
+export function candidatePagesB({ pageA, textsA, textsB, pagesB, pageMap, k = CANDIDATE_PAGES, rank }) {
+  const fromMap = pagesFromMap(pageMap, pageA, pagesB);
+  if (fromMap.length) return fromMap;
+  if (pagesB <= k) return Array.from({ length: pagesB }, (_, i) => i + 1);
+  return (rank ?? rankPagesB({ pageA, textsA, textsB, pagesB })).slice(0, k).sort((a, b) => a - b);
+}
+
+/** Plan de la pasada 1: una petición por página útil de A con sus candidatas de B y sus campos. */
+export function buildPlan({ entries, pagesA, textsA, pagesB, textsB, pageMap, k = CANDIDATE_PAGES }) {
+  return usefulPagesA(entries, pagesA).map((pageA) => {
+    const rankB = rankPagesB({ pageA, textsA, textsB, pagesB });
+    return {
+      group: `A-p${pageA}`,
+      pageA,
+      candidatesB: candidatePagesB({ pageA, textsA, textsB, pagesB, pageMap, k, rank: rankB }),
+      rankB,
+      fields: entries.filter((e) => e.page === pageA),
+    };
+  });
+}
+
+/**
+ * Páginas de B para la re-pregunta de un grupo: las siguientes `chunk` aún no enviadas (por orden de parecido) o, si ya
+ * se enviaron todas, las mismas candidatas de la pasada 1 (`fresh: false`: la petición lleva el motivo de cada fallo).
+ */
+export function planRetry({ candidatesB, rankB, sentB, chunk = CANDIDATE_PAGES }) {
+  const unsent = rankB.filter((p) => !sentB.has(p));
+  if (unsent.length) return { pagesB: unsent.slice(0, chunk).sort((a, b) => a - b), fresh: true };
+  return { pagesB: [...candidatesB], fresh: false };
+}
+
+/** Si un campo sale en varias peticiones: gana el colocado y, entre colocados, el de mayor confianza (empate: el primero). */
+export function mergeOutcome(prev, next) {
+  if (!prev) return next;
+  if (!next) return prev;
+  if (next.resolved.ok !== prev.resolved.ok) return next.resolved.ok ? next : prev;
+  if (next.resolved.ok) return (next.proposal.confidence ?? 0) > (prev.proposal.confidence ?? 0) ? next : prev;
+  return next;
+}
+
+const short = (s, n = 80) =>
+  String(s ?? '')
+    .replace(/[\u0000-\u001f\u007f]+/g, ' ')
+    .trim()
+    .slice(0, n);
+
+/** Motivo de un fallo para la re-pregunta (una línea por campo). `outcome` puede faltar: la IA no devolvió ese campo. */
+export function failureNote(entry, outcome) {
+  const label = short(entry.field?.mapField) || 'sin nombre';
+  const who = `${entry.id} («${label}»)`;
+  const p = outcome?.proposal;
+  switch (outcome?.resolved?.why) {
+    case 'sin_resultado':
+      return `- ${who}: respondiste found:false${p?.reason ? ` («${short(p.reason)}»)` : ''}. Búscalo otra vez en las páginas de esta petición; si de verdad no está, vuelve a responder found:false.`;
+    case 'ancla_A_no_encontrada':
+      return `- ${who}: "anchorA" «${short(p?.anchorA)}» no existe literalmente en textsA.json. Copia un texto exacto de "nearby".`;
+    case 'ancla_B_no_encontrada':
+      return `- ${who}: "anchorB" «${short(p?.anchorB)}» no existe literalmente en textsB.json en la página ${p?.page}. Elige un texto que exista en textsB.json.`;
+    default:
+      return `- ${who}: no venía en la respuesta anterior.`;
+  }
+}
+
+/** Rellena los `{{marcadores}}` de una plantilla en una sola pasada (lo insertado no se vuelve a interpretar). */
+export function fillTemplate(template, vars) {
+  return String(template).replace(/\{\{\s*([\w-]+)\s*\}\}/g, (_, key) => {
+    if (!Object.prototype.hasOwnProperty.call(vars, key)) throw new Error(`Falta el marcador {{${key}}} en la plantilla.`);
+    return String(vars[key] ?? '');
+  });
+}
+
+/** Quita los comentarios HTML (notas para quien edita la plantilla) y los saltos de línea sobrantes. */
+export const stripTemplateComments = (text) =>
+  String(text)
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim() + '\n';
+
 export function buildPrompt({ pagesA, pagesB, sizeA, sizeB, retryNote, codes, attached, pageMap }) {
   const imgs = (prefix, n) => Array.from({ length: n }, (_, i) => `${prefix}-p${i + 1}.png`).join(', ');
   return `# Tarea: trasladar campos de un PDF A a un PDF B
