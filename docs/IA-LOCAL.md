@@ -97,7 +97,33 @@ Objetivo: poder decir «≈ X créditos por PDF, medido en nuestra prueba» sin 
 No mezcles otro uso de Copilot durante la medida, o el «después» no será comparable.
 
 ## Cómo medir (fase 0)
-`cd tools/ai-phase0 && npm install && npm run sample && npm test`; después `node run.mjs --provider claude` (Windows PowerShell incluido) y, cuando toque, `--provider copilot` o `both`. Resultados en `out/summary.md`. Detalles y formato de casos en el [README de la herramienta](../tools/ai-phase0/README.md).
+`cd tools/ai-phase0 && npm install && npm run sample && npm test`; después `node run.mjs --provider claude` (Windows PowerShell incluido) y, cuando toque, `--provider copilot` o `both`. Resultados en `out/summary.md`. Detalles y formato de casos en el [README de la herramienta](../tools/ai-phase0/README.md). Para medir el motor que usa la app (no la petición única de la fase 0), usa `bench.mjs` (siguiente sección).
+
+## Banco de medida con el motor de la app (`bench.mjs`)
+`run.mjs` mide la petición única de la fase 0; **`tools/ai-phase0/bench.mjs` mide el motor que usa la app** (`runProposal` de `tools/ai-helper/pipeline.mjs`: pase sin IA, pasadas por página, anclar en B y huecos). Por defecto ejecuta cada caso **dos veces, con y sin el pase sin IA** (`AI_HELPER_TEXT_FIRST=0`), para ver cuánto ahorra.
+
+**Preparación (una vez):** tener `claude` (o `copilot`) instalado y con la sesión iniciada, y `cd tools/ai-phase0 && npm install`.
+
+**Ejecutar** (igual en macOS/Linux y en Windows PowerShell; en PowerShell las rutas pueden ir con `\` y entre comillas si llevan espacios):
+```
+cd tools/ai-phase0
+npm run bench -- --provider fake                    # prueba sin IA (proveedor simulado), sobre sample-plano/
+npm run bench -- --provider claude                  # los 6 casos de sample-plano/ con Claude
+npm run bench -- --provider claude --model haiku --cases "C:\Users\yo\Documents\casos-ia"
+node bench.mjs --provider copilot --cases ..\..\mis-casos --no-retry
+```
+| Opción | Qué hace |
+| --- | --- |
+| `--cases <carpeta>` | Tus casos (por defecto `sample-plano/`). Mismo formato que `run.mjs`: subcarpetas con `A.pdf`, `A.json` (plantilla de A), `B.pdf` y, opcional, `expected.json` (solución conocida: `[{ "id": "p1-f1", "page": 1, "x": 90, "y": 700 }, { "id": "p1-f2", "gone": true }]`); o la carpeta de un solo caso; o archivos planos `A-<caso>.pdf`, `A-<caso>.json`, `B-<caso>.pdf`, `expected-<caso>.json`. El `id` es `p<página>-f<posición en esa página>` según `A.json`. |
+| `--provider claude\|copilot\|fake` | CLI con el que preguntar (por defecto `claude`). `fake` = proveedor simulado, sin gastar nada. |
+| `--model <id>` | Modelo del CLI (como el desplegable de la app). Sin él, el de la app (`sonnet` con Claude; el del CLI con Copilot). |
+| `--no-retry` | Sin re-pregunta ni reintentos (como desmarcar «reintentar» en la app). |
+| `--text-first both\|on\|off` | Con y sin pase sin IA (`both`, por defecto), solo con él o solo sin él. Con `off` o `both` se gasta más. |
+| `--timeout <s>` · `--max-requests <n>` · `--keep-api-key` · `--out <carpeta>` | Tiempo por petición (300), tope de peticiones por PDF (el de la app), no quitar `ANTHROPIC_API_KEY` y carpeta de salida (`out/`). |
+
+**Qué saca:** `out/bench-<fecha>.md` (tabla por caso y totales, una por modo, y la comparación con/sin pase sin IA) y `out/bench-<fecha>.json` (lo mismo con el detalle por campo). Por caso: campos, colocados, colocados sin IA, «no existe en B», sin colocar por motivo (`ancla_B_no_encontrada`, `sin_resultado`…), página acertada y aciertos a ≤ 5 pt y ≤ 15 pt (solo con `expected`, en la misma página), ausentes bien detectados, peticiones (con «(tope)» si se alcanzó el máximo), tokens y coste/créditos **solo si el CLI los da** («–» si no), y segundos. Si salta el límite de uso, se para y lo dice (no gasta más intentos). Un caso que falla aparece con su código (`images_not_read`, `timeout`…).
+
+**Qué sale del ordenador y qué no.** Como en la app: el CLI elegido recibe las imágenes de las páginas y los textos de las páginas de cada petición (ver «Qué se envía a la IA»); con `fake` no sale nada. Los PDF se preparan en una carpeta temporal que se borra al terminar. El informe (`.md`/`.json`) **no lleva contenido de los PDF**: solo nombres de caso (el nombre de archivo o carpeta), ids de campo, `mapField` de la plantilla, páginas, coordenadas, números y motivos en código; ni textos, ni anclas, ni las explicaciones de la IA, ni los mensajes de error del CLI (esos solo se ven en la consola). `out/` no se sube a git. Para compartir resultados basta con pegar el `.md`.
 
 ## Usarla en la app (lote)
 1. Instala y abre sesión una vez en `claude` (o `copilot`) desde una terminal.

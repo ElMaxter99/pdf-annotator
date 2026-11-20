@@ -16,7 +16,9 @@ node run.mjs --provider claude      # todos los pares de pairs/ y sample-plano/
 node run.mjs --provider copilot --pair factura-desplazada
 node run.mjs --provider both
 ```
-Opciones: `--timeout <segundos>` (por defecto 300), `--keep-api-key` (no quitar `ANTHROPIC_API_KEY`), `--keep-work` (no borrar la carpeta con las imágenes enviadas). Resultado: `out/summary.md` y, por par y proveedor, `out/<par>/<proveedor>/` con `result.json`, `B-propuesta.json` (importable en la app) y `raw-*.txt`.
+**Motor de la app:** `npm run bench -- --provider claude [--cases <carpeta>]` mide `runProposal` (el flujo real de la app, con y sin pase sin IA) y deja `out/bench-<fecha>.md` y `.json` sin contenido de los PDF; `--provider fake` lo prueba sin IA. Opciones y formato en [`docs/IA-LOCAL.md`](../../docs/IA-LOCAL.md#banco-de-medida-con-el-motor-de-la-app-benchmjs).
+
+Opciones de `run.mjs`: `--timeout <segundos>` (por defecto 300), `--keep-api-key` (no quitar `ANTHROPIC_API_KEY`), `--keep-work` (no borrar la carpeta con las imágenes enviadas). Resultado: `out/summary.md` y, por par y proveedor, `out/<par>/<proveedor>/` con `result.json`, `B-propuesta.json` (importable en la app) y `raw-*.txt`.
 
 ## Casos sintéticos (`sample-plano/`, datos inventados)
 | Caso | Qué prueba |
