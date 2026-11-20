@@ -172,8 +172,8 @@
   background: color-mix(in srgb, var(--danger) 12%, transparent);
 }
 .ms__note--warn {
-  border-color: color-mix(in srgb, #fbbf24 55%, transparent);
-  background: color-mix(in srgb, #fbbf24 14%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 55%, transparent);
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
 }
 :host-context(:root.theme-light) .ms__note--warn {
   border-color: color-mix(in srgb, #8a5a00 55%, transparent);

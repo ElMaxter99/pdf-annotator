@@ -6,7 +6,8 @@
   "scripts": {
     "sample": "node make-samples.mjs",
     "test": "node --test",
-    "run": "node run.mjs"
+    "run": "node run.mjs",
+    "bench": "node bench.mjs"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.70",

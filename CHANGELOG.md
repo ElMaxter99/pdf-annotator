@@ -1,4 +1,13 @@
 ## Unreleased
+### Added
+- **Banco de medida de «Trasladar con IA» (1.17 · A1, herramienta local, sin cambios en la app):** `cd tools/ai-phase0 && npm run bench -- --provider claude|copilot|fake [--model …] [--cases <carpeta>]` ejecuta el flujo real de la app (pase sin IA, pasadas, anclar en B, huecos) sobre los casos de ejemplo o sobre una carpeta propia, con y sin el pase sin IA, y guarda en `out/` una tabla por caso: campos, colocados, colocados sin IA, «no existe en B», sin colocar por motivo, aciertos a ≤ 5 y ≤ 15 pt si hay solución conocida, peticiones, tokens o créditos si el CLI los da y segundos. El informe no lleva contenido de los PDF. Guía en `docs/IA-LOCAL.md` (también para Windows). Con pruebas.
+
+### Changed
+- **«Trasladar con IA»: huecos escritos con texto y parcial si falla la lectura de imágenes (1.17 · A3 y A4, motor, sin cambios visibles):** además de las líneas y casillas dibujadas, cuentan como hueco los rellenos escritos con guiones bajos o puntos («Nombre: ________», «Fecha: ……»), y se usan igual en el pase sin IA y al colocar las respuestas de la IA. No se detectan los rellenos con guiones (`-----`) ni tramos de menos de 20 pt. Si la primera petición falla porque la IA no lee las imágenes, ya no se pierde el PDF entero: se devuelve un parcial con lo colocado sin IA y el motivo. Con pruebas.
+- **Colores sueltos a tokens (1.17 · B3, sin cambio visual):** `styles.scss` y las hojas de componente usan tokens nuevos en `:root` en lugar de hex repetidos: `--warning` (ámbar de avisos, antes 47 `#fbbf24` sueltos o `var(--warn, #fbbf24)` con `--warn` sin definir), `--warning-text` y `--danger-text` (cambian en tema claro), `--warning-strong`, `--on-accent` (texto sobre el acento), `--input-bg`/`--input-border` (campos oscuros) y `--light-surface`/`--light-border`/`--light-border-strong` (neutros del tema claro); los `#ffffff`/`#f6f7fb` de reglas solo claras pasan a `var(--panel)`/`var(--bg)`. Mismos valores: 64 capturas antes/después (1650 y 1280 px, ambos temas, landing, editor, lote, «Trasladar con IA» y Proyectos) idénticas píxel a píxel y con los mismos estilos calculados.
+
+### Accessibility
+- **Encabezado principal para lectores de pantalla (1.17 · B2, sin cambios visibles):** utilidad global `.sr-only` y un `h1` oculto en la cabecera del editor y en los pasos 1 y 2 del lote. La auditoría axe deja de marcar «falta un h1» (`page-has-heading-one`) y no aparece `region`. Queda `heading-order` en el panel lateral del editor (sus títulos son `h4`/`h5` y los estilan reglas por etiqueta): pendiente de una tarea aparte para no chocar con el paso a tokens de los colores.
 
 ## [v1.16.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.16.0) - 2026-11-20
 ### Added

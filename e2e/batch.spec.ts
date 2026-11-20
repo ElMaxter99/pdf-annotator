@@ -858,13 +858,17 @@ test('«Dividida»: the chip unlinks the zoom of A and B and links them again', 
   await expect(page.getByTestId('footer-unlinked')).toBeVisible();
 
   const b0 = await widthB();
-  const box = await page.getByTestId('split-a').boundingBox();
-  if (!box) throw new Error('no A pane');
-  await page.mouse.move(box.x + 60, box.y + 60);
-  await page.keyboard.down('Control');
-  await page.mouse.wheel(0, -100);
-  await page.keyboard.up('Control');
-  await expect.poll(widthA).toBeGreaterThan(b0);
+  // Under CI load the first wheel can land before the unlinked pane is ready: retry the gesture
+  // (re-measuring the pane) until A grows.
+  await expect(async () => {
+    const box = await page.getByTestId('split-a').boundingBox();
+    if (!box) throw new Error('no A pane');
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.keyboard.down('Control');
+    await page.mouse.wheel(0, -100);
+    await page.keyboard.up('Control');
+    await expect.poll(widthA, { timeout: 2000 }).toBeGreaterThan(b0);
+  }).toPass({ timeout: 15000 });
   expect(await widthB()).toBe(b0);
 
   // «L» links them again and A takes the zoom of B.

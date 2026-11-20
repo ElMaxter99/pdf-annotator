@@ -301,13 +301,13 @@
 }
 
 .batch-chip--warn {
-  color: #b45309;
-  background: color-mix(in srgb, #fbbf24 20%, transparent);
+  color: var(--warning-strong);
+  background: color-mix(in srgb, var(--warning) 20%, transparent);
 }
 
 :host-context(:root.theme-dark) .batch-chip--warn,
 :host-context(:root:not(.theme-light)) .batch-chip--warn {
-  color: #fbbf24;
+  color: var(--warning);
 }
 
 .btn--danger {
@@ -807,11 +807,11 @@ app-ai-batch-chip {
 }
 
 .batch-state--warn::before {
-  background: #fbbf24;
+  background: var(--warning);
 }
 
 :host-context(:root.theme-light) .batch-state--warn::before {
-  background: #b45309;
+  background: var(--warning-strong);
 }
 
 // Row actions show on hover or focus (and on the active row)
@@ -979,12 +979,12 @@ app-ai-batch-chip {
 }
 
 .btn--danger-ghost {
-  color: #ff8a8a;
+  color: var(--danger-text);
   border-color: rgba(255, 77, 77, 0.5);
 }
 
 :host-context(:root.theme-light) .btn--danger-ghost {
-  color: #b91c1c;
+  color: var(--danger-text);
 }
 
 .batch-selbar__close {
@@ -1040,7 +1040,7 @@ app-ai-batch-chip {
 }
 
 .batch-dialog__warn {
-  color: #fbbf24 !important;
+  color: var(--warning) !important;
 }
 
 :host-context(:root.theme-light) .batch-dialog__warn {

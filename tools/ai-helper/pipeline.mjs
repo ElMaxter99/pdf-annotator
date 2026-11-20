@@ -245,9 +245,16 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
     details.placedWithoutAi = byText.placed.size;
     details.notPlaced = counts;
     if (result.aborted) details.aborted = result.aborted;
+    // La primera petición no leyó las imágenes pero el pase sin IA ya había colocado campos: parcial con lo colocado.
+    let abortNote = null;
+    if (result.aborted === 'images_not_read') {
+      abortNote = `Lectura de imágenes fallida en la primera petición: ${result.abortError?.message ?? ''}`.trim();
+      if (provider === 'copilot' && result.abortError?.request) abortNote += await debugHint(result.abortError.request, pagesDir, codes);
+    }
     details.diagnosis = diagnose({ placed: details.placed, total: rows.length, sent: details.sent, counts, attempts: details.attempts, capReached: result.capReached });
     onEvent({ type: 'resolved', placed: details.placed, total: rows.length, diagnosis: details.diagnosis });
     const warnings = result.attempts.flatMap((a) => (a.warnings ? [`${a.group}: ${a.warnings} entradas no válidas en la llamada ${a.n}.`] : []));
+    if (abortNote) warnings.unshift(abortNote);
     return { rows, seconds, warnings, details, pagesA: A.pages.length, pagesB: B.pages.length };
   } finally {
     await rm(work, { recursive: true, force: true });
