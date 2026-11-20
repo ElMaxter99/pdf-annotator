@@ -65,6 +65,7 @@ GitHub: 0 PRs y 0 issues abiertos. Tests: 62 specs unitarios y 30 e2e.
 - **Hecho:** informe de lo comprobado (o guion) y, si algo falla, PR con el arreglo en `Dockerfile`/`nginx.conf` con el CHANGELOG.
 
 ### T3 · Doble clic para alternar «ajustar» y 100 % (única función visible)
+- **Actualización 2026-11-20:** Maxter eligió el gesto **A** (botón central o `Ctrl/⌘` + doble clic). Propuesta escrita en `design/propuestas/doble-clic-ajustar-zoom.md`; falta la mesa P-106 en el lienzo y su aprobación. Pregunta abierta: hoy `Ctrl/⌘` + clic en zona vacía crea una anotación. **La versión 1.16 espera a T3** (decisión de Maxter).
 - **Bloqueada por diseño.** Primero **mesa P-106** (escritorio 1650 y 1280, oscuro y claro): gesto, feedback y cómo se descubre. Decisión pendiente de Maxter: «botón central o `Ctrl`+doble clic en zona vacía» (propuesta de `plan/propuesta-gestos-de-lienzo.md`) frente a doble clic normal, que choca con crear anotación al hacer clic. **No se reasignan los atajos existentes** (`Ctrl/⌘+0` sigue siendo 100 % y `0` ajustar al ancho); si se añadiera un atajo nuevo, se documenta en README, diálogo de atajos y paleta.
 - **Tras la aprobación, archivos:** `src/app/pages/workspace/workspace.page.ts` (`onViewerWheel` ≈ L5063, `onPanPointerDown`, `zoomToScale`; todo zoom pasa por `zoomToScale(escala, ancla)`), `utils/zoom.utils.ts` (regla pura + spec), `utils/shortcuts.utils.ts` (+ spec) y `shortcuts-dialog`, claves `shortcuts.items.*` en los 7 JSON, tabla de atajos del README, `e2e/zoom-gestures.spec.ts`.
 - **Reglas:** ignorado con foco en un campo de texto o con un editor abierto; no cambia el arrastre de anotaciones ni el recuadro de selección; sin animación con `prefers-reduced-motion`.
@@ -86,7 +87,10 @@ GitHub: 0 PRs y 0 issues abiertos. Tests: 62 specs unitarios y 30 e2e.
 ### T6 · Créditos reales de Copilot (necesita a Maxter)
 Solo Maxter puede ejecutarlo con su cuenta: guion en `docs/IA-LOCAL.md` («Medir los créditos reales de Copilot», `tools/ai-phase0`, casos de `sample-plano/`). Con la tabla, otra PR cambia el texto del diálogo de «Trasladar con IA» (`batch.ai.*`, «medido en nuestra prueba»), con mesa si cambia algo visible. Un agente no debe inventar cifras.
 
-### T7 · Visto bueno del tope por proyecto (necesita a Maxter)
+### T7 · Visto bueno del tope por proyecto — HECHA (2026-11-20)
+Maxter confirmó 200 PDFs / 2 GB con avisos a 100 PDFs / 1 GB; recogido en `DECISIONS` 16 y en el ROADMAP.
+
+_Texto original:_
 Confirmar 200 PDFs / 2 GB con avisos a 100 PDFs / 1 GB (ya implementado). Si dice que sí, añadir la decisión a `docs/DECISIONS.md` y quitar «sin confirmar» del ROADMAP.
 
 ### T8 · Cifrado opcional de proyectos (decisión de Maxter; fuera de la 1.16 salvo aprobación)
