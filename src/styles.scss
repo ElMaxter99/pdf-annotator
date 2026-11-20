@@ -3585,6 +3585,7 @@ kbd {
   position: absolute;
   top: -28px;
   left: 0;
+  user-select: none;
   padding: 3px 10px;
   border-radius: 999px;
   font-size: 0.7rem;
@@ -4213,6 +4214,7 @@ kbd {
 .origin-legend {
   position: sticky;
   top: 0;
+  left: 12px;
   z-index: 19;
   align-self: flex-start;
   display: flex;
@@ -5308,6 +5310,11 @@ button.version-chip:focus-visible {
 
 .zoom-hud--pan {
   top: 54px;
+}
+
+/* Sigue en pantalla aunque el lienzo esté movido (`--vx` = desplazamiento horizontal del visor). */
+.zoom-hud:not(.zoom-hud--split) {
+  translate: var(--vx, 0px) 0;
 }
 
 .zoom-hud kbd,
@@ -6611,4 +6618,29 @@ button.version-chip:focus-visible {
 }
 :root.theme-light .tpl-export__ok {
   color: #0f766e;
+}
+
+/* P-109 · Espacio de trabajo ampliado: un margen vacío (la mitad del visor, `--work-margin`) a cada
+   lado de los PDFs para poder llevar cualquiera al centro. Solo escritorio; con «Dividida» desenlazada
+   cada panel conserva su desplazamiento propio y no lleva margen. */
+@media (min-width: 961px) {
+  .app--workspace .viewer:not(.viewer--split) .canvas-container {
+    margin-left: var(--work-margin, 0px);
+    margin-right: var(--work-margin, 0px);
+    transition: none;
+  }
+
+  .app--workspace .viewer.viewer--split:not(.viewer--unlinked) {
+    justify-content: safe center;
+  }
+
+  .app--workspace .viewer.viewer--split:not(.viewer--unlinked) .canvas-container--split-a {
+    margin-left: var(--work-margin, 0px);
+    transition: none;
+  }
+
+  .app--workspace .viewer.viewer--split:not(.viewer--unlinked) .canvas-container--split-b {
+    margin-right: var(--work-margin, 0px);
+    transition: none;
+  }
 }

@@ -316,6 +316,7 @@
       "zoomKeys": "Ingrandisci / riduci il PDF",
       "zoomActual": "Dimensione reale (100 %)",
       "zoomToggle": "Alterna adatta alla larghezza e 100 % (o doppio clic con il pulsante centrale)",
+      "centerPane": "Centra un PDF (doppio clic sull’etichetta A o B)",
       "fitPage": "Adatta alla pagina",
       "panCanvas": "Sposta la tela (tieni premuto)",
       "splitLink": "Collega o scollega A e B (Divisa)",
@@ -457,6 +458,7 @@
       "split": {
         "tagA": "A · originale · sola lettura",
         "tagB": "B · nuova versione · modificata",
+        "centerHint": "Doppio clic: centra questo PDF (di nuovo, reinquadra)",
         "linked": "Collegato",
         "unlinked": "Scollegato",
         "linkTitle": "Collega o scollega zoom e scorrimento di A e B",

@@ -316,6 +316,7 @@
       "zoomKeys": "Apropa / allunya el PDF",
       "zoomActual": "Mida real (100 %)",
       "zoomToggle": "Alterna ajusta a l’ample i 100 % (o doble clic amb el botó central)",
+      "centerPane": "Centra un PDF (doble clic a l’etiqueta A o B)",
       "fitPage": "Ajusta a la pàgina",
       "panCanvas": "Mou el llenç (mantén)",
       "splitLink": "Enllaçar o desenllaçar A i B (Dividida)",
@@ -457,6 +458,7 @@
       "split": {
         "tagA": "A · original · només lectura",
         "tagB": "B · versió nova · s’edita",
+        "centerHint": "Doble clic: centra aquest PDF (un altre cop, torna a enquadrar)",
         "linked": "Enllaçat",
         "unlinked": "Desenllaçat",
         "linkTitle": "Enllaçar o desenllaçar el zoom i el desplaçament d'A i B",

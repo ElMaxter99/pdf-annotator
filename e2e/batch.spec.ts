@@ -902,8 +902,15 @@ test('«Dividida»: the double click of the viewer acts on the pane under the po
   await page.getByTestId('split-link').click();
   await expect(page.getByTestId('footer-unlinked')).toBeVisible();
   const bBefore = await widthB();
-  const aBefore = await widthA();
+  const a0 = await widthA();
   const paneA = (await page.getByTestId('split-a').boundingBox())!;
+  // Start from a zoom of A that is neither 100 % nor the fit, whatever the viewport size.
+  await page.mouse.move(paneA.x + 60, paneA.y + 60);
+  await page.keyboard.down('Control');
+  await page.mouse.wheel(0, -100);
+  await page.keyboard.up('Control');
+  await expect.poll(widthA).toBeGreaterThan(a0);
+  const aBefore = await widthA();
   await middleDouble(paneA.x + 60, paneA.y + 60);
   await expect.poll(widthA).not.toBe(aBefore);
   expect(await widthB()).toBe(bBefore);
@@ -919,3 +926,40 @@ test('«Dividida»: the double click of the viewer acts on the pane under the po
   await expect.poll(widthB).not.toBe(b0);
   await expect.poll(widthA).toBe(await widthB());
 });
+
+test('«Dividida»: double click on the A or B tag centers that PDF and again resets the view (P-109)', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await attachVersion2(page);
+  await openRow(page);
+  await page.getByTestId('mode-split').click();
+  await expect(page.getByTestId('split-a')).toBeVisible();
+  await page.waitForTimeout(500);
+
+  const offset = (selector: string) =>
+    page.evaluate((sel) => {
+      const viewer = document.querySelector('.viewer') as HTMLElement;
+      const el = document.querySelector(sel) as HTMLElement;
+      const v = viewer.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      return Math.round(r.left + r.width / 2 - (v.left + v.width / 2));
+    }, selector);
+  const scrollLeft = () => page.locator('.viewer').evaluate((el) => Math.round(el.scrollLeft));
+
+  const home = await scrollLeft();
+  expect(await page.locator('.viewer').evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+
+  // B is on the right; its centre is far from the centre of the viewer until it is centred.
+  expect(await offset('.canvas-container--split-b')).toBeGreaterThan(20);
+  await page.getByTestId('split-tag-b').dblclick();
+  await expect.poll(() => offset('.canvas-container--split-b')).toBeLessThanOrEqual(4);
+  expect(await offset('.canvas-container--split-b')).toBeGreaterThanOrEqual(-4);
+
+  // A second double click on the same tag resets the view.
+  await page.getByTestId('split-tag-b').dblclick();
+  await expect.poll(scrollLeft).toBe(home);
+
+  await page.getByTestId('split-tag-a').dblclick();
+  await expect.poll(async () => Math.abs(await offset('.canvas-container--split-a'))).toBeLessThanOrEqual(4);
+});
+

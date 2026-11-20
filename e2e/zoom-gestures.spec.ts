@@ -169,3 +169,59 @@ test('two middle clicks far apart or too slow are not a double click', async ({ 
   await page.waitForTimeout(500);
   await expect(zoom).toHaveText('50 %');
 });
+
+const centerOffset = (page: import('@playwright/test').Page, selector: string) =>
+  page.evaluate((sel) => {
+    const viewer = document.querySelector('.viewer') as HTMLElement;
+    const el = document.querySelector(sel) as HTMLElement;
+    const v = viewer.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return Math.round(r.left + r.width / 2 - (v.left + v.width / 2));
+  }, selector);
+
+test('the viewer has a work margin: the PDF can be moved away from the right edge (P-109)', async ({ page }) => {
+  const viewer = page.locator('.viewer');
+  const sizes = await viewer.evaluate((el) => ({ sw: el.scrollWidth, cw: el.clientWidth }));
+  expect(sizes.sw).toBeGreaterThan(sizes.cw);
+  // At rest the PDF is where it always was: centered.
+  expect(Math.abs(await centerOffset(page, '.canvas--pdf'))).toBeLessThanOrEqual(4);
+  // Scrolling to the far right leaves empty space on the right of the PDF.
+  await viewer.evaluate((el) => (el.scrollLeft = el.scrollWidth));
+  const room = await page.evaluate(() => {
+    const v = (document.querySelector('.viewer') as HTMLElement).getBoundingClientRect();
+    const r = (document.querySelector('.canvas--pdf') as HTMLElement).getBoundingClientRect();
+    return { gap: v.right - r.right, width: v.width };
+  });
+  expect(room.gap).toBeGreaterThan(room.width * 0.4);
+  // «0» (fit to width) brings the PDF back to its place.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('0');
+  await expect.poll(() => centerOffset(page, '.canvas--pdf')).toBeLessThanOrEqual(4);
+});
+
+test('the floating cards and the zoom chip stay on screen with the work margin (P-109)', async ({ page }) => {
+  const inside = async (testId: string) =>
+    page.evaluate((id) => {
+      const v = (document.querySelector('.viewer') as HTMLElement).getBoundingClientRect();
+      const r = (document.querySelector(`[data-testid="${id}"]`) as HTMLElement).getBoundingClientRect();
+      return r.left >= v.left - 1 && r.right <= v.right + 1;
+    }, testId);
+  await expect(page.getByTestId('first-steps')).toBeVisible();
+  expect(await inside('first-steps')).toBe(true);
+  const at = await centerOfCanvas(page);
+  await page.mouse.move(at.x, at.y);
+  await page.keyboard.down('Control');
+  await page.mouse.wheel(0, -100);
+  await page.keyboard.up('Control');
+  await expect(page.getByTestId('zoom-hud')).toBeVisible();
+  expect(await inside('zoom-hud')).toBe(true);
+  // Also after moving the canvas to the far right.
+  await page.locator('.viewer').evaluate((el) => (el.scrollLeft = el.scrollWidth));
+  await page.keyboard.down('Control');
+  await page.mouse.wheel(0, 100);
+  await page.keyboard.up('Control');
+  await expect(page.getByTestId('zoom-hud')).toBeVisible();
+  expect(await inside('zoom-hud')).toBe(true);
+  expect(await inside('first-steps')).toBe(true);
+});
+

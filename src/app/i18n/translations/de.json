@@ -316,6 +316,7 @@
       "zoomKeys": "PDF vergrößern / verkleinern",
       "zoomActual": "Originalgröße (100 %)",
       "zoomToggle": "Zwischen Breite anpassen und 100 % wechseln (oder Doppelklick mit der mittleren Taste)",
+      "centerPane": "Ein PDF zentrieren (Doppelklick auf das Etikett A oder B)",
       "fitPage": "An Seite anpassen",
       "panCanvas": "Arbeitsfläche verschieben (halten)",
       "splitLink": "A und B verknüpfen oder trennen (Geteilt)",
@@ -457,6 +458,7 @@
       "split": {
         "tagA": "A · Original · nur Lesen",
         "tagB": "B · neue Version · bearbeitet",
+        "centerHint": "Doppelklick: dieses PDF zentrieren (nochmal: Ansicht zurücksetzen)",
         "linked": "Verknüpft",
         "unlinked": "Getrennt",
         "linkTitle": "Zoom und Scrollen von A und B verknüpfen oder trennen",

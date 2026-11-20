@@ -1,4 +1,4 @@
-<main class="viewer" [class.viewer--split]="vm.splitActive()" [class.viewer--unlinked]="vm.unlinkedSplit()" [style.--split-h.px]="vm.splitHeight()" [class.viewer--pan-ready]="vm.panReady()" [class.viewer--panning]="vm.panning()" (wheel)="vm.onViewerWheel($event)" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc() as _">
+<main class="viewer" [class.viewer--split]="vm.splitActive()" [class.viewer--unlinked]="vm.unlinkedSplit()" [style.--split-h.px]="vm.splitHeight()" [class.viewer--pan-ready]="vm.panReady()" [class.viewer--panning]="vm.panning()" (wheel)="vm.onViewerWheel($event)" (scroll)="vm.onViewerScroll($event)" (mousemove)="vm.onSplitHover($event)" (mouseleave)="vm.clearSplitHover()" *ngIf="vm.pdfDoc() as _">
   <app-first-steps [vm]="vm"></app-first-steps>
   @if (vm.zoomHud(); as z) {
     <div class="zoom-hud" [class.zoom-hud--limit]="z.limit" [class.zoom-hud--split]="vm.splitActive() && !!vm.splitBox()"
@@ -79,7 +79,7 @@
   }
   @if (vm.splitActive()) {
     <div class="canvas-container canvas-container--split-a" data-testid="split-a">
-      <span class="split-tag">{{ 'batch.editor.split.tagA' | t }}</span>
+      <span class="split-tag" (dblclick)="vm.centerPane('a')" [attr.title]="'batch.editor.split.centerHint' | t" data-testid="split-tag-a">{{ 'batch.editor.split.tagA' | t }}</span>
       @if (vm.comparing() && !vm.pagesLinked()) {
         <span class="split-pager" role="group" [attr.aria-label]="'batch.editor.pages.paneA' | t" data-testid="pager-a">
           <button type="button" class="split-pager__btn" (click)="vm.setPageIndexA(vm.freeAPage() - 1)" [disabled]="vm.freeAPage() <= 1"
@@ -149,7 +149,7 @@
   }
   <div class="canvas-container" [class.canvas-container--split-b]="vm.splitActive()" [class.canvas-container--reference-only]="vm.showingOnlyA() && !!vm.migration()" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()" (mouseenter)="vm.setPaneFocus('b')">
     @if (vm.splitActive()) {
-      <span class="split-tag split-tag--b">{{ 'batch.editor.split.tagB' | t }}@if (vm.ai(); as ai) { @if (ai.phase === 'ready') { <span class="split-tag__view" data-testid="split-tag-view">{{ (ai.view === 'proposal' ? 'ai.dock.viewingProposal' : 'ai.dock.viewingOriginal') | t }}</span> } }</span>
+      <span class="split-tag split-tag--b" (dblclick)="vm.centerPane('b')" [attr.title]="'batch.editor.split.centerHint' | t" data-testid="split-tag-b">{{ 'batch.editor.split.tagB' | t }}@if (vm.ai(); as ai) { @if (ai.phase === 'ready') { <span class="split-tag__view" data-testid="split-tag-view">{{ (ai.view === 'proposal' ? 'ai.dock.viewingProposal' : 'ai.dock.viewingOriginal') | t }}</span> } }</span>
     }
     @if (vm.comparing() && !vm.pagesLinked() && vm.splitActive()) {
       <span class="split-pager" role="group" [attr.aria-label]="'batch.editor.pages.paneB' | t" data-testid="pager-b">
