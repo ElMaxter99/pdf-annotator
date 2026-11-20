@@ -11,6 +11,7 @@ import { runPasses } from './passes.mjs';
 import { readPdf } from './pdf.mjs';
 import { DEFAULT_FONT_SIZE, FALLBACK_CONFIDENCE, X_CAP, X_WIDTH, boxCenterOf, sideInA, slotKind, slotOnSide, snapToSlot, toFieldXY } from './place.mjs';
 import { looksLikeLabel, matchLabelInB, placeByText, placeEntryByText, textFirstEnabled } from './text-first.mjs';
+import { slotsFromTexts } from './slots.mjs';
 
 const line = (x, y, w, page = 1) => ({ page, kind: 'line', x, y, w, h: 0.6 });
 const box = (x, y, page = 1) => ({ page, kind: 'box', x, y, w: 10, h: 10 });
@@ -319,6 +320,77 @@ test('extremo a extremo: PDF reales, pase sin IA + respuesta de la IA anclada en
     assert.equal(nombre.y, 770);
     assert.equal(nombre.x, round1(B.slots.find((x) => x.kind === 'line' && x.y === 767).x + 2));
     assert.ok(tB('Nombre y apellidos:'));
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+// ── Huecos escritos con caracteres («____», «....») en el pase sin IA y en la resolución ───────────────────────
+
+test('pase sin IA: etiqueta con su relleno («Nombre: ____») aunque B cambie el número de guiones', () => {
+  const textsA = [T('Nombre: ________', 50, 700, 1, 80.6)];
+  const textsB = [T('Otra cosa', 50, 760, 1, 40), T('Nombre: ________________', 70, 500, 2, 125)];
+  const slotsB = slotsFromTexts(textsB);
+  assert.equal(slotsB.length, 1);
+  assert.equal(looksLikeLabel('Nombre y apellidos del titular de la cuenta: ______________________________'), true);
+  const e = entry({ x: 92, y: 700 }); // sobre los guiones de A
+  assert.equal(sideInA(e.field, textsA[0], 'line'), 'right');
+  assert.equal(matchLabelInB(textsA[0], textsA, textsB).b, textsB[1]);
+  const r = placeEntryByText(e, { textsA, textsB, slotsB });
+  assert.equal(r.resolved.page, 2);
+  assert.deepEqual({ x: r.resolved.x, y: r.resolved.y }, { x: round1(slotsB[0].x + 2), y: 500 });
+  assert.equal(r.proposal.reason, 'Colocado sin IA: etiqueta «Nombre:» idéntica y única en B, hueco a la derecha');
+});
+
+test('resolveProposal: la IA ancla en «Fecha:» y el hueco es el relleno del mismo texto de B', () => {
+  const textsB = [T('Fecha: ..............', 60, 400, 1, 70)];
+  const slots = slotsFromTexts(textsB);
+  const p = validateProposals({ fields: [{ id: 'p1-f1', found: true, page: 1, anchorB: 'Fecha:', side: 'right', confidence: 0.9, reason: 'fecha' }] }, new Set(['p1-f1'])).proposals[0];
+  const r = resolveProposal(p, entry({ x: 10, y: 10 }), [], textsB, { slots });
+  assert.deepEqual(r, { ok: true, page: 1, x: round1(slots[0].x + 2), y: 400, snapped: true, method: 'side' });
+  // y el ajuste ≤ 15 pt también vale para un hueco escrito
+  assert.equal(snapToSlot({ x: slots[0].x + 5, y: 405 }, 'line', {}, slots).slot.fromText, true);
+});
+
+test('extremo a extremo: A con raya dibujada, B con el hueco escrito con guiones o puntos', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'place-text-'));
+  try {
+    const make = async (file, variant) => {
+      const doc = await PDFDocument.create();
+      const font = await doc.embedFont(StandardFonts.Helvetica);
+      const page = doc.addPage([595, 842]);
+      const text = (s, x, y) => page.drawText(s, { x, y, size: 10, font });
+      const width = (s) => font.widthOfTextAtSize(s, 10);
+      if (variant === 'A') {
+        text('Teléfono', 50, 760);
+        page.drawLine({ start: { x: 50 + width('Teléfono') + 6, y: 757 }, end: { x: 300, y: 757 }, thickness: 0.6 });
+        text('Localidad', 50, 720);
+        page.drawLine({ start: { x: 50 + width('Localidad') + 6, y: 717 }, end: { x: 300, y: 717 }, thickness: 0.6 });
+      } else {
+        text('Localidad ..................................', 80, 700);
+        text('Teléfono', 80, 660);
+        text('_______________________', 80 + width('Teléfono') + 4, 660);
+      }
+      await writeFile(file, await doc.save());
+      return width;
+    };
+    const width = await make(path.join(dir, 'A.pdf'), 'A');
+    await make(path.join(dir, 'B.pdf'), 'B');
+    const A = await readPdf(path.join(dir, 'A.pdf'));
+    const B = await readPdf(path.join(dir, 'B.pdf'));
+    assert.equal(B.slots.length, 2);
+    assert.ok(B.slots.every((s) => s.fromText));
+    const entries = [
+      entry({ x: round1(50 + width('Teléfono') + 8), y: 760, mapField: 'telefono' }, 1, 'p1-f1'),
+      entry({ x: round1(50 + width('Localidad') + 8), y: 720, mapField: 'localidad' }, 1, 'p1-f2'),
+    ];
+    const r = placeByText(entries, { textsA: A.texts, textsB: B.texts, slotsB: B.slots });
+    assert.equal(r.placed.size, 2);
+    const tel = r.placed.get('p1-f1').resolved;
+    assert.deepEqual({ x: tel.x, y: tel.y }, { x: round1(80 + width('Teléfono') + 4 + 2), y: 660 });
+    const loc = r.placed.get('p1-f2').resolved;
+    assert.equal(loc.y, 700);
+    assert.ok(Math.abs(loc.x - (80 + width('Localidad ') + 2)) < 2, `x ${loc.x}`);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

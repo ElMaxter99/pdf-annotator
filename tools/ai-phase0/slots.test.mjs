@@ -13,10 +13,15 @@ import {
   boxesFromSegments,
   compose,
   dedupeBoxes,
+  fillerRuns,
+  isFillerText,
+  labelText,
+  labelWidth,
   mergeLines,
   nearestSlot,
   parsePathBuffer,
   slotsFromOps,
+  slotsFromTexts,
 } from './slots.mjs';
 
 const { moveTo: M, lineTo: L, closePath: Z, curveTo: C } = DRAW_OPS;
@@ -265,3 +270,129 @@ for (const spacing of [16, 20]) {
     }
   });
 }
+
+// ---- Huecos escritos con caracteres («____», «....», «…») ----
+
+const tx = (text, x, y, w, page = 1) => ({ page, text, x, y, ...(w ? { w } : {}) });
+
+test('fillerRuns / isFillerText / labelText: guiones bajos, puntos y «…», con espacios sueltos', () => {
+  assert.deepEqual(fillerRuns('Nombre: ________'), [{ start: 8, end: 16 }]);
+  assert.deepEqual(fillerRuns('Fecha: ....'), [{ start: 7, end: 11 }]);
+  assert.deepEqual(fillerRuns('. . . . .'), [{ start: 0, end: 9 }]);
+  assert.deepEqual(fillerRuns('……'), [{ start: 0, end: 2 }]);
+  // no son huecos: puntos suspensivos, abreviaturas, importes, un guion bajo suelto
+  for (const s of ['Etc...', 'Sr. D.', '1.234.567,00', 'mi_campo', '__', '…']) assert.deepEqual(fillerRuns(s), [], s);
+  assert.equal(isFillerText('________'), true);
+  assert.equal(isFillerText('  . . . . . '), true);
+  assert.equal(isFillerText('Nombre: ____'), false);
+  assert.equal(isFillerText('Etc...'), false);
+  assert.equal(labelText('Nombre: ________'), 'Nombre:');
+  assert.equal(labelText('DNI ......... Fecha ____'), 'DNI Fecha');
+  assert.equal(labelText('Teléfono'), 'Teléfono');
+});
+
+test('labelWidth: la etiqueta acaba donde empieza su relleno (reparto proporcional de w)', () => {
+  assert.equal(labelWidth(tx('Teléfono', 50, 700, 40)), 40);
+  assert.equal(labelWidth(tx('________', 50, 700, 44)), 0);
+  const w = labelWidth(tx('Nombre: ________', 50, 700, 80));
+  assert.ok(w > 30 && w < 40, String(w)); // «Nombre:» ≈ 37 de 81 pt en Helvetica 10
+});
+
+test('slotsFromTexts: texto entero o trozo de texto → línea fromText en la línea base; descarta cortos y repetidos', () => {
+  const texts = [
+    tx('________________', 150, 700, 89), // solo relleno
+    tx('Nombre: ________', 50, 650, 80.6), // etiqueta + relleno: el hueco empieza en los guiones
+    tx('Fecha: ..........', 50, 600), // sin w: ancho estimado a 10 pt
+    tx('___', 50, 550, 16.7), // demasiado corto (< 20 pt)
+    tx('Firma ____________', 50, 500, 95), // ya hay una raya dibujada encima: no se repite
+    tx('Sin hueco', 50, 450, 40),
+  ];
+  const drawn = [line(80, 498.5, 70)];
+  const slots = slotsFromTexts(texts, { drawn });
+  assert.equal(slots.length, 3, JSON.stringify(slots));
+  assert.ok(slots.every((s) => s.kind === 'line' && s.fromText === true && s.page === 1));
+  const [whole, name, date] = slots;
+  assert.deepEqual(whole, { page: 1, kind: 'line', x: 150, y: 698, w: 89, h: 0.5, fromText: true });
+  assert.equal(name.y, 648);
+  assert.ok(Math.abs(name.x - (50 + 36.7 + 2.8)) < 2, `x ${name.x}`); // tras «Nombre: »
+  assert.ok(Math.abs(name.x + name.w - 130.6) < 0.2);
+  assert.equal(date.y, 598);
+  assert.ok(date.x > 80 && date.w >= 20, JSON.stringify(date));
+});
+
+test('nearestSlot: hueco escrito como texto aparte o dentro del ancla, igual que una raya dibujada', () => {
+  const nombre = tx('Nombre:', 50, 700, 36.7);
+  const relleno = tx('______________', 90, 700, 77.8);
+  const texts = [nombre, relleno, tx('Calle', 50, 670, 25)];
+  const slots = slotsFromTexts(texts);
+  const r = nearestSlot(nombre, slots, { texts });
+  assert.equal(r.side, 'right');
+  assert.deepEqual(r.point, { x: 92, y: 700 }, 'se escribe en la línea base del texto');
+  // el propio relleno no cuenta como «otro texto en medio»: tampoco bloquea un hueco debajo
+  const below = tx('________________', 50, 685, 89);
+  const r2 = nearestSlot(nombre, slotsFromTexts([below]), { texts: [nombre, below], prefer: 'below', strict: true });
+  assert.equal(r2.side, 'below');
+  assert.equal(r2.point.y, 685);
+  // relleno dentro del ancla: «Nombre: ________» → su hueco a la derecha
+  const own = tx('Nombre: ________', 50, 600, 80.6);
+  const r3 = nearestSlot(own, slotsFromTexts([own]), { texts: [own], prefer: 'right', strict: true });
+  assert.equal(r3.side, 'right');
+  assert.equal(r3.distance < 4, true);
+  assert.equal(r3.point.y, 600);
+});
+
+test('nearestSlot: el relleno de otra etiqueta en la misma línea no es el hueco de esta', () => {
+  const nombre = tx('Nombre:', 50, 700, 36.7);
+  const otro = tx('Apellidos: ____________', 100, 700, 110);
+  const slots = slotsFromTexts([nombre, otro]);
+  assert.equal(slots.length, 1);
+  assert.equal(nearestSlot(nombre, slots, { texts: [nombre, otro], prefer: 'right', strict: true }), null);
+  assert.equal(nearestSlot(otro, slots, { texts: [nombre, otro], prefer: 'right', strict: true }).side, 'right');
+  // debajo: la línea «Apellidos: ____» tiene su propia etiqueta a la izquierda → no es el hueco de «Nombre:» de arriba
+  const arriba = tx('Nombre:', 100, 720, 36.7);
+  assert.equal(nearestSlot(arriba, slots, { texts: [arriba, otro], prefer: 'below', strict: true }), null);
+});
+
+async function makeTextSlotsPdf(file) {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const page = doc.addPage([595, 842]);
+  const text = (s, x, y) => page.drawText(s, { x, y, size: 10, font });
+  const width = (s) => font.widthOfTextAtSize(s, 10);
+  text('Nombre: ____________________', 50, 760); // relleno dentro del texto
+  text('Fecha:', 50, 730);
+  text('...................................', 50 + width('Fecha:') + 6, 730); // relleno aparte
+  text('Domicilio', 50, 700);
+  text('______________________________________', 50, 684); // relleno debajo
+  text('Firma ____________________', 300, 760);
+  page.drawLine({ start: { x: 300 + width('Firma '), y: 758.5 }, end: { x: 300 + width('Firma ____________________'), y: 758.5 }, thickness: 0.6 });
+  await writeFile(file, await doc.save());
+  return { width };
+}
+
+test('readPdf: huecos escritos con caracteres (fromText) y nearestSlot los usa', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'slots-text-'));
+  try {
+    const file = path.join(dir, 't.pdf');
+    const { width } = await makeTextSlotsPdf(file);
+    const { texts, slots } = await readPdf(file);
+    const fromText = slots.filter((s) => s.fromText);
+    assert.equal(fromText.length, 3, JSON.stringify(slots));
+    assert.equal(slots.filter((s) => !s.fromText && s.kind === 'line').length, 1, 'la raya de la firma (sin repetir su relleno)');
+    const t = (s) => texts.find((x) => x.text.startsWith(s));
+    const nombre = nearestSlot(t('Nombre'), slots, { texts, prefer: 'right', strict: true });
+    assert.equal(nombre.slot.fromText, true);
+    assert.ok(Math.abs(nombre.slot.x - (50 + width('Nombre: '))) < 2, `x ${nombre.slot.x} vs ${50 + width('Nombre: ')}`);
+    assert.equal(nombre.point.y, 760);
+    const fecha = nearestSlot(t('Fecha'), slots, { texts });
+    assert.equal(fecha.side, 'right');
+    assert.ok(Math.abs(fecha.slot.x - (50 + width('Fecha:') + 6)) < 0.2);
+    const domicilio = nearestSlot(t('Domicilio'), slots, { texts });
+    assert.equal(domicilio.side, 'below');
+    assert.deepEqual(domicilio.point, { x: 52, y: 684 });
+    const firma = nearestSlot(t('Firma'), slots, { texts, prefer: 'right', strict: true });
+    assert.equal(firma.slot.fromText, undefined, 'gana la raya dibujada');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
