@@ -109,6 +109,8 @@ export function scoreCase({ name, textFirst, result, entries, truth, seconds }) 
     requests: d.requests ?? 0,
     ...usageOf(d.attempts),
     capReached: d.diagnosis === 'cap_reached',
+    // Parcial (A4): la IA cortó el PDF (p. ej. no leyó las imágenes) y se devolvió lo colocado sin IA.
+    aborted: d.aborted ?? null,
     seconds: round1(seconds),
     fields,
   };
@@ -173,7 +175,7 @@ const SEP = '| --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---:
 function row(r) {
   if (r.error) return `| ${r.case} | ${dash(r.total)} | ✖ ${r.error.code}${r.error.reset ? ` (renueva ${r.error.reset})` : ''} | | | | | | | | | | | ${r.seconds} |`;
   const k = r.known;
-  const cap = r.capReached ? ' (tope)' : '';
+  const cap = r.capReached ? ' (tope)' : r.aborted ? ` (parcial: ${r.aborted})` : '';
   return `| ${r.case} | ${r.total} | ${r.placed} | ${r.placedWithoutAi} | ${r.absent} | ${notPlacedCount(r.notPlaced)}${notPlacedCount(r.notPlaced) ? `: ${reasons(r.notPlaced)}` : ''} | ${k ? frac(k.pageOk, k.withPosition) : '–'} | ${k ? frac(k.within5, k.withPosition) : '–'} | ${k ? frac(k.within15, k.withPosition) : '–'} | ${k ? frac(k.goneOk, k.gone) : '–'} | ${r.requests}${cap} | ${tokensOf(r)} | ${money(r)} | ${r.seconds} |`;
 }
 

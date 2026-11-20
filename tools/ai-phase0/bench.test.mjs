@@ -86,6 +86,14 @@ test('renderMarkdown pinta una tabla por modo y la comparación', () => {
   assert.match(md, /Ahorro del pase sin IA: 2 \(40 %\) peticiones/);
 });
 
+test('scoreCase y renderMarkdown marcan el parcial cuando la IA cortó el PDF (A4)', () => {
+  const partial = { ...result, details: { ...result.details, aborted: 'images_not_read' } };
+  const r = scoreCase({ name: 'p', textFirst: true, result: partial, entries, truth, seconds: 1 });
+  assert.equal(r.aborted, 'images_not_read');
+  const md = renderMarkdown(buildReport({ date: 'hoy', provider: 'fake', model: null, retry: true, maxRequests: 8, cases: 1, casesDir: 'x' }, [{ textFirst: true, runs: [r] }]));
+  assert.match(md, /\| 3 \(parcial: images_not_read\) \|/);
+});
+
 test('stamp da una marca ordenable sin caracteres raros', () => {
   assert.equal(stamp(new Date(2026, 0, 2, 3, 4, 5)), '2026-01-02-030405');
 });
