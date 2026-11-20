@@ -5,7 +5,7 @@
 // para TODOS los tipos, x,y es el inicio de la línea base de lo que se pinta (`page.drawText(texto, { x, y })`; en el
 // editor `top = alto − y·escala − fontSize·escala`). Una casilla (check/radio) pinta una «X» con esa misma regla, así
 // que para centrarla en la casilla hay que restar media «X» de ancho y media de alto de mayúscula (Helvetica).
-import { nearestSlot } from './slots.mjs';
+import { labelText, labelWidth, nearestSlot } from './slots.mjs';
 
 /** Lados válidos del hueco respecto a la etiqueta de B (`side` en la respuesta de la IA). */
 export const SIDES = ['right', 'below', 'above', 'left', 'box-left', 'box-right'];
@@ -97,8 +97,9 @@ export function snapToSlot(xy, kind, field, slots, max = SNAP_DISTANCE) {
   return best ? { ...best.to, slot: best.slot, distance: round(best.d) } : null;
 }
 
-/** Ancho de un texto: el de pdf.js si lo hay; si no, una estimación (media letra por punto de cuerpo, a 10 pt). */
-const widthOf = (t) => (Number(t?.w) > 0 ? Number(t.w) : String(t?.text ?? '').length * 5);
+/** Ancho de la etiqueta de un texto: el de pdf.js si lo hay; si no, una estimación (media letra por punto de cuerpo, a
+ * 10 pt). Si el texto trae su propio relleno («Nombre: ____»), solo hasta donde empieza (el relleno es el hueco). */
+const widthOf = (t) => (Number(t?.w) > 0 ? labelWidth(t) : labelText(t?.text).length * 5);
 
 /** Lado por defecto cuando la IA no dice ninguno: línea a la derecha, casilla a la izquierda del texto. */
 export const defaultSide = (kind) => (kind === 'box' ? 'box-left' : 'right');

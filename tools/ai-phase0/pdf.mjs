@@ -6,7 +6,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createCanvas } from '@napi-rs/canvas';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { slotsFromOps } from './slots.mjs';
+import { slotsFromOps, slotsFromTexts } from './slots.mjs';
 
 const require = createRequire(import.meta.url);
 const pdfjsRoot = path.dirname(path.dirname(require.resolve('pdfjs-dist/package.json')));
@@ -74,7 +74,8 @@ const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export const newCode = () => Array.from({ length: 4 }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
 
 /** Devuelve { pages: [{ num, width, height }], texts: [{ page, text, x, y, w? }], slots, codes } y escribe PNGs si se pide.
- * `slots` = huecos de escritura dibujados (líneas y casillas, ver slots.mjs): [{ page, kind: 'line' | 'box', x, y, w, h }].
+ * `slots` = huecos de escritura (líneas y casillas, ver slots.mjs): [{ page, kind: 'line' | 'box', x, y, w, h }]; los
+ * dibujados y, detrás, las líneas escritas con «____» o «....» en los textos (`fromText: true`).
  * Con `stamp`, cada PNG lleva un código aleatorio en la esquina: la IA debe devolverlo para demostrar que ha mirado la imagen. */
 export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false } = {}) {
   const doc = await open(file);
@@ -94,12 +95,15 @@ export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false
       if (Number.isFinite(item.width) && item.width > 0) t.w = Math.round(item.width * 10) / 10;
       texts.push(t);
     }
+    const drawn = [];
     try {
       const opList = await page.getOperatorList();
-      slots.push(...slotsFromOps(opList.fnArray, opList.argsArray, { page: num, ops: pdfjs.OPS }));
+      drawn.push(...slotsFromOps(opList.fnArray, opList.argsArray, { page: num, ops: pdfjs.OPS }));
     } catch {
       // un dibujo que pdf.js no sabe leer no debe impedir leer los textos
     }
+    // Huecos escritos con caracteres («Nombre: ________», «.......»), marcados con `fromText: true`.
+    slots.push(...drawn, ...slotsFromTexts(texts.filter((t) => t.page === num), { drawn }));
     if (outDir) {
       const viewport = page.getViewport({ scale });
       let canvas = createCanvas(Math.ceil(viewport.width), Math.ceil(viewport.height));

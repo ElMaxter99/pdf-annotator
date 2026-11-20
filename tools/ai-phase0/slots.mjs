@@ -272,6 +272,110 @@ export function slotsFromOps(fnArray, argsArray, { page = 1, ops = PDFJS_OPS, ..
   return classifyGeometry(collectGeometry(fnArray, argsArray, { ops }), page, opts);
 }
 
+// ── Huecos escritos con caracteres («Nombre: ________», «Fecha: .........», «……») ─────────────────────────────────
+
+export const TEXT_SLOT_DEFAULTS = {
+  minUnderscores: 3, // guiones bajos mínimos de un hueco
+  minDots: 4, // puntos mínimos (una «…» cuenta como 3)
+  minLine: SLOT_DEFAULTS.minLine, // ancho mínimo, como las líneas dibujadas
+  fontSize: 10, // cuerpo supuesto para estimar el ancho si el texto no trae `w`
+  drop: 2, // el trazo virtual queda tanto por debajo de la línea base (punto de escritura = línea base)
+  thickness: 0.5, // grosor nominal del trazo virtual
+  dupTol: 3, // diferencia vertical máxima con una línea dibujada para darlo por repetido
+};
+
+/** Tramos de relleno: guiones bajos, puntos o «…», con como mucho un espacio entre ellos. */
+const FILLER_RUN = /[_.…](?:[  ]?[_.…])*/gu;
+const FILLER_ONLY = /^[\s ]*[_.…](?:[\s ]*[_.…])*[\s ]*$/u;
+
+/** Ancho aproximado (en em) de un carácter en una sans tipo Helvetica: solo sirve para repartir `w` entre trozos. */
+function charEm(ch) {
+  if (ch === '…') return 1;
+  if (ch === '_') return 0.556;
+  if (/[.,:;!|'iljIf\s]/u.test(ch)) return 0.278;
+  if (/[mwMW]/u.test(ch)) return 0.85;
+  if (/\p{Lu}/u.test(ch)) return 0.68;
+  if (/\p{Ll}/u.test(ch)) return 0.52;
+  return 0.556;
+}
+const em = (s) => [...s].reduce((n, ch) => n + charEm(ch), 0);
+
+/** ¿El tramo cuenta como hueco? ≥ 3 guiones bajos o ≥ 4 puntos (cada «…» vale 3). */
+const isFiller = (run, o) =>
+  (run.match(/_/g) ?? []).length >= o.minUnderscores || (run.match(/\./g) ?? []).length + 3 * (run.match(/…/g) ?? []).length >= o.minDots;
+
+/** Tramos de relleno de un texto que cuentan como hueco: [{ start, end }] en índices de carácter (code points). */
+export function fillerRuns(text, opts = {}) {
+  const o = { ...TEXT_SLOT_DEFAULTS, ...opts };
+  const s = String(text ?? '');
+  const out = [];
+  for (const m of s.matchAll(FILLER_RUN)) {
+    if (!isFiller(m[0], o)) continue;
+    const start = [...s.slice(0, m.index)].length;
+    out.push({ start, end: start + [...m[0]].length });
+  }
+  return out;
+}
+
+/** ¿El texto es solo relleno («________», «. . . . .»)? No es una etiqueta ni «otro texto» entre etiqueta y hueco. */
+export const isFillerText = (text, opts = {}) => FILLER_ONLY.test(String(text ?? '')) && fillerRuns(text, opts).length > 0;
+
+/** Texto sin sus tramos de relleno («Nombre: ________» → «Nombre:»), para comparar etiquetas. */
+export function labelText(text, opts = {}) {
+  const s = String(text ?? '');
+  const runs = fillerRuns(s, opts);
+  if (!runs.length) return s;
+  return [...s]
+    .filter((_, i) => !runs.some((r) => i >= r.start && i < r.end))
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Ancho total de un texto: el de pdf.js (`w`) o una estimación con el cuerpo supuesto. */
+const totalWidth = (t, o) => (Number(t?.w) > 0 ? Number(t.w) : em(String(t?.text ?? '')) * o.fontSize);
+
+/** Ancho de la etiqueta de un texto: hasta donde empieza su primer relleno (sin espacios); sin relleno, el ancho entero. */
+export function labelWidth(t, opts = {}) {
+  const o = { ...TEXT_SLOT_DEFAULTS, ...opts };
+  const text = String(t?.text ?? '');
+  const runs = fillerRuns(text, o);
+  if (!runs.length) return totalWidth(t, o);
+  const prefix = [...text].slice(0, runs[0].start).join('').trimEnd();
+  return prefix ? (totalWidth(t, o) * em(prefix)) / (em(text) || 1) : 0;
+}
+
+/**
+ * Huecos escritos con caracteres en los textos de readPdf: [{ page, kind: 'line', x, y, w, h, fromText: true }].
+ * Sirve el texto entero («________») o un trozo («Nombre: ________»: el hueco empieza donde empiezan los guiones).
+ * La posición del relleno dentro del texto se estima repartiendo su `w` (o un ancho estimado) según el ancho
+ * aproximado de cada carácter. `y` queda `drop` pt bajo la línea base, así el punto de escritura de nearestSlot
+ * (2 pt por encima) cae en la línea base del texto. `drawn` = huecos dibujados: un relleno sobre una línea dibujada no
+ * se repite.
+ */
+export function slotsFromTexts(texts, { drawn = [], ...opts } = {}) {
+  const o = { ...TEXT_SLOT_DEFAULTS, ...opts };
+  const found = [];
+  for (const t of texts ?? []) {
+    const text = String(t?.text ?? '');
+    const runs = fillerRuns(text, o);
+    if (!runs.length) continue;
+    const chars = [...text];
+    const total = totalWidth(t, o);
+    const full = em(text) || 1;
+    for (const r of runs) {
+      const x = t.x + (total * em(chars.slice(0, r.start).join(''))) / full;
+      const w = (total * em(chars.slice(r.start, r.end).join(''))) / full;
+      if (w >= o.minLine) found.push({ page: t.page, kind: 'line', x, y: t.y - o.drop, w, h: o.thickness, fromText: true });
+    }
+  }
+  const overlapsDrawn = (s) =>
+    drawn.some((d) => d.kind === 'line' && d.page === s.page && Math.abs(d.y - s.y) <= o.dupTol && Math.min(d.x + d.w, s.x + s.w) - Math.max(d.x, s.x) > s.w / 2);
+  return mergeLines(found.filter((s) => !overlapsDrawn(s)))
+    .map((s) => ({ page: s.page, kind: 'line', x: r1(s.x), y: r1(s.y), w: r1(s.w), h: r1(s.h), fromText: true }))
+    .sort((a, b) => b.y - a.y || a.x - b.x);
+}
+
 export const NEAREST_DEFAULTS = {
   radius: 200, // distancia máxima del ancla al hueco
   prefer: 'auto', // 'auto' (el más cercano) | 'right' | 'below' | 'above' | 'left'
@@ -289,15 +393,18 @@ export const NEAREST_DEFAULTS = {
   lift: 2, // … y tanto por encima del trazo
 };
 
-/** Texto (de `texts`) entre dos x en la línea base del ancla, sin contar el propio ancla. */
+/** Textos que pueden estorbar entre una etiqueta y su hueco: los que no son solo relleno («____» es el propio hueco). */
+const solid = (texts) => (texts ?? []).filter((t) => !isFillerText(t.text));
+
+/** Texto (de `texts`) entre dos x en la línea base del ancla, sin contar el propio ancla ni los rellenos. */
 const textBetween = (texts, anchor, x0, x1, yTol) =>
-  (texts ?? []).some(
+  solid(texts).some(
     (t) => t.page === anchor.page && !(t.x === anchor.x && t.y === anchor.y) && Math.abs(t.y - anchor.y) <= yTol && t.x > x0 + 1 && t.x < x1 - 1,
   );
 
 /** ¿La línea tiene su propia etiqueta a la izquierda en su misma altura? Entonces es el hueco «a la derecha» de otro texto. */
 const ownedLine = (texts, anchor, s, yTol) =>
-  (texts ?? []).some(
+  solid(texts).some(
     (t) => t.page === anchor.page && t !== anchor && !(t.x === anchor.x && t.y === anchor.y) && Math.abs(t.y - s.y) <= yTol && t.x < s.x - 1 && s.x - (t.x + (t.w ?? 0)) <= 60,
   );
 
@@ -307,13 +414,16 @@ const ownedLine = (texts, anchor, s, yTol) =>
  * `prefer: 'above' | 'left'`, también justo encima o a la izquierda en la misma línea base. `strict` = solo el lado pedido.
  * Casillas (`kind: 'box'`): la casilla a la izquierda (o derecha, `boxSide`) del texto de la opción, centrada en su altura.
  * `opts.texts` (los de readPdf) descarta huecos con otro texto en medio y, debajo/encima, las líneas que tienen su propia
- * etiqueta a la izquierda en su altura (son el hueco «a la derecha» de otro texto). Devuelve null o
+ * etiqueta a la izquierda en su altura (son el hueco «a la derecha» de otro texto). Los huecos escritos con caracteres
+ * (`fromText`, de slotsFromTexts) cuentan igual: los textos que son solo relleno no estorban, y si el ancla trae su propio
+ * relleno («Nombre: ____»), mide desde el final de la etiqueta, así ese relleno es su hueco a la derecha. Devuelve null o
  * { slot, side: 'right' | 'below' | 'above' | 'left', distance, point: { x, y } }; `point` es donde se escribiría:
  * inicio de la línea un poco por encima, o el centro de la casilla.
  */
 export function nearestSlot(anchor, slots, opts = {}) {
   const o = { ...NEAREST_DEFAULTS, ...opts };
-  const right = anchor.x + (anchor.w ?? 0);
+  // Con relleno propio («Nombre: ____»), la etiqueta acaba donde empiezan los guiones: ese hueco queda «a la derecha».
+  const right = anchor.x + (anchor.w ? labelWidth(anchor) : 0);
   const cands = [];
   for (const s of slots) {
     if (s.page !== anchor.page || s.kind !== o.kind) continue;
@@ -327,7 +437,7 @@ export function nearestSlot(anchor, slots, opts = {}) {
       // debajo: por debajo del subrayado propio, sin pasarse, y solapando la columna del ancla
       const below = anchor.y - s.y;
       const colEnd = right + (anchor.w ? 0 : 40);
-      const blocked = (o.texts ?? []).some((t) => t.page === anchor.page && t.y < anchor.y - 1 && t.y > s.y && t.x >= s.x - 5 && t.x <= s.x + s.w);
+      const blocked = solid(o.texts).some((t) => t.page === anchor.page && t.y < anchor.y - 1 && t.y > s.y && t.x >= s.x - 5 && t.x <= s.x + s.w);
       if (below >= o.minBelow && below <= o.maxBelow && s.x <= colEnd + 10 && s.x + s.w >= anchor.x - 10 && !blocked && !ownedLine(o.texts, anchor, s, o.yTol)) {
         const d = Math.hypot(Math.max(0, s.x - anchor.x), below);
         cands.push({ slot: s, side: 'below', distance: d, score: o.prefer === 'auto' ? d * o.belowWeight : d });
@@ -335,7 +445,7 @@ export function nearestSlot(anchor, slots, opts = {}) {
       // encima y a la izquierda solo si se piden (la etiqueta bajo la línea, «____ Firma»; el hueco antes del texto)
       const above = s.y - anchor.y;
       if (o.prefer === 'above' && above >= o.minAbove && above <= o.maxBelow && s.x <= colEnd + 10 && s.x + s.w >= anchor.x - 10) {
-        const between = (o.texts ?? []).some((t) => t.page === anchor.page && t.y > anchor.y + 1 && t.y < s.y && t.x >= s.x - 5 && t.x <= s.x + s.w);
+        const between = solid(o.texts).some((t) => t.page === anchor.page && t.y > anchor.y + 1 && t.y < s.y && t.x >= s.x - 5 && t.x <= s.x + s.w);
         if (!between && !ownedLine(o.texts, anchor, s, o.yTol)) cands.push({ slot: s, side: 'above', distance: Math.hypot(Math.max(0, s.x - anchor.x), above) });
       }
       if (o.prefer === 'left' && Math.abs(dy) <= o.yTol && s.x + s.w <= anchor.x + 2 && !textBetween(o.texts, anchor, s.x + s.w, anchor.x, o.yTol)) {

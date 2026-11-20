@@ -5,8 +5,9 @@ import { describeImageCodes, failureNote, looksLikeProposals, mergeOutcome, pars
 
 /** Tope de llamadas al CLI por PDF, reintentos incluidos. Al llegar se devuelve lo colocado (`cap_reached`). */
 export const MAX_REQUESTS_PER_PDF = 8;
-/** Errores de una petición que, con campos ya colocados, dejan el PDF en parcial en vez de fallar. */
-export const PARTIAL_CODES = new Set(['timeout', 'cli_error']);
+/** Errores de una petición que, con campos ya colocados, dejan el PDF en parcial en vez de fallar. `images_not_read`
+ * solo sale de la primera petición: lo colocado entonces es lo del pase sin IA (`alreadyPlaced`). */
+export const PARTIAL_CODES = new Set(['timeout', 'cli_error', 'images_not_read']);
 
 export const imageNames = (request) => [`A-p${request.pageA}`, ...request.pagesB.map((p) => `B-p${p}`)];
 
@@ -30,8 +31,8 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
   const sentB = new Map();
   /** Páginas de B con las que se ha preguntado por cada campo (para saber si «no existe en B» es definitivo). */
   const askedB = new Map();
-  const state = { requests: 0, capReached: false, aborted: null };
-  // `alreadyPlaced` = campos colocados antes sin IA: cuentan para devolver parcial ante un timeout o cli_error.
+  const state = { requests: 0, capReached: false, aborted: null, abortError: null };
+  // `alreadyPlaced` = campos colocados antes sin IA: cuentan para devolver parcial ante un timeout, cli_error o images_not_read.
   const placed = () => alreadyPlaced + [...outcomes.values()].filter((o) => o.resolved.ok).length;
 
   async function ask(request) {
@@ -107,6 +108,7 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
     } catch (e) {
       if (PARTIAL_CODES.has(e?.code) && placed() > 0) {
         state.aborted = e.code;
+        state.abortError = e;
         return false;
       }
       throw e;
@@ -125,5 +127,6 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
     const { pagesB, fresh } = planRetry({ candidatesB: item.candidatesB, rankB: item.rankB, sentB: sentB.get(item.group), chunk });
     await safeAsk({ pass: 2, group: item.group, pageA: item.pageA, pagesB, entries: pending, notes: pending.map((e) => failureNote(e, outcomes.get(e.id))), fresh });
   }
-  return { outcomes, attempts, requests: state.requests, capReached: state.capReached, aborted: state.aborted, sentB, askedB };
+  // `abortError` = el error que cortó el PDF en parcial (su mensaje y, con images_not_read, `request`/`unread`).
+  return { outcomes, attempts, requests: state.requests, capReached: state.capReached, aborted: state.aborted, abortError: state.abortError, sentB, askedB };
 }
