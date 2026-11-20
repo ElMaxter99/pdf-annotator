@@ -13,7 +13,7 @@ const NOTHING = ['no_text_a', 'no_text_b', 'permission_denied', 'no_valid_answer
 
 /** State of one PDF in the AI queue (or its saved proposal, once the queue is gone). */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-batch-chip',
   standalone: true,
   imports: [CommonModule, TranslationPipe],

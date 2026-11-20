@@ -20,7 +20,7 @@ type Row =
 
 /** Model picker fed with the list the CLI itself offers (its /model): nothing is typed by hand. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-model-select',
   standalone: true,
   imports: [TranslationPipe],

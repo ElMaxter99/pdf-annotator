@@ -15,7 +15,7 @@ import { providerName } from './ai-batch-button.component';
  * details accordion). It replaces the old status bar, the toasts and the full-screen «Qué está haciendo la IA».
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-batch-panel',
   standalone: true,
   imports: [CommonModule, TranslationPipe, AiBatchDetailsComponent],

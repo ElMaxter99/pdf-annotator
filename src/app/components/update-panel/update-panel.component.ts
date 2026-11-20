@@ -11,7 +11,7 @@ const MB = 1048576;
  * desde el chip de versión de cualquier pantalla y desde el menú Ayuda. Solo existe dentro de Electron.
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-update-panel',
   standalone: true,
   imports: [TranslationPipe, UpdateChannelComponent],

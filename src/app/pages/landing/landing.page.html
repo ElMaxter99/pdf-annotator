@@ -9,7 +9,7 @@
     @if (projectStore.available()) {
       <a class="btn btn--primary landing-nav__projects" routerLink="/proyectos" data-testid="landing-projects">{{ 'projects.title' | t }}</a>
     }
-    <app-landing-language-bar [languages]="languages" [selectedLanguage]="languageModel"
+    <app-landing-language-bar [languages]="languages" [selectedLanguage]="languageModel()"
       (languageChange)="onLanguageChange($event)"></app-landing-language-bar>
   </header>
 
@@ -22,7 +22,7 @@
           <section class="landing__resume" aria-labelledby="resume-title">
             <div class="landing__resume-text">
               <strong id="resume-title">{{ 'session.title' | t }}</strong>
-              <span>{{ 'session.description' | t : { name: saved.name, count: saved.annotationCount, date: savedSessionDate } }}</span>
+              <span>{{ 'session.description' | t : { name: saved.name, count: saved.annotationCount, date: savedSessionDate() } }}</span>
               <small>{{ 'session.privacy' | t }}</small>
             </div>
             <div class="landing__resume-actions">

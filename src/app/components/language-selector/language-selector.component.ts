@@ -21,7 +21,7 @@ function getLanguageFlag(language: Language): string {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-language-selector',
   standalone: true,
   imports: [CommonModule, FormsModule, TranslationPipe],

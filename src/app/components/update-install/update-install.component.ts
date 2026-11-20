@@ -9,7 +9,7 @@ import { ToastService } from '../../services/toast.service';
  * instala (en Linux el sistema pide la contraseña), explica el fallo si lo hay y confirma la actualización al reabrir.
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-update-install',
   standalone: true,
   imports: [TranslationPipe],

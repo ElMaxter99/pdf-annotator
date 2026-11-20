@@ -35,7 +35,7 @@
           }
         }
         @case ('working') {
-          <div class="tpl-export__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+          <div class="tpl-export__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-labelledby="tpl-export-title"
             [attr.aria-valuenow]="percent()"><i [style.width.%]="percent()"></i></div>
           <p class="tpl-export__count" aria-live="polite" data-testid="templates-export-count">
             <b>{{ 'templatesExport.counter' | t: { done: progress().done + 1 > progress().total ? progress().total : progress().done + 1, total: progress().total } }}</b>

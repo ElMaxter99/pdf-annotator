@@ -21,6 +21,7 @@ Rutas: `/landing` (carga inicial) → `/workspace` (editor). Idiomas: es-ES, en,
 | `npm test` | Karma/Jasmine (necesita Chrome) |
 | `npm run test:ci` | Igual, headless y sin sandbox (como en GitHub Actions) |
 | `npm run e2e` | Playwright sobre el build de producción (`npm run build` antes; `PW_CHROMIUM=<ruta>` para usar un Chromium ya instalado) |
+| `npm run a11y` | Auditoría de accesibilidad con axe (fuera del CI; `npm run build` antes; `PW_CHROMIUM=<ruta>`); informe en `docs/AUDITORIA-A11Y.md` |
 | `npm run i18n:check` | Verifica que los 7 JSON de traducción tengan **las mismas claves** que `es-ES` |
 | `node scripts/generate-example.mjs` | Regenera `examples/factura-ejemplo.pdf` |
 | `node scripts/screenshots.mjs` | Regenera las capturas del README (`screenshots/`) desde el build; `PW_CHROMIUM=<ruta>` para un Chromium ya instalado |

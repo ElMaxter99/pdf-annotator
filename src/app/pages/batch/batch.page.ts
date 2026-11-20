@@ -77,7 +77,7 @@ async function sha256(blob: Blob): Promise<string | null> {
 
 /** Batch tray: every PDF to migrate, with what is still missing for each. */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-batch-page',
   standalone: true,
   imports: [

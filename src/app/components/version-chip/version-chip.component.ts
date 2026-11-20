@@ -8,7 +8,7 @@ import { DesktopUpdateService, isPrereleaseVersion } from '../../services/deskto
  * actualizaciones» desde cualquier pantalla y lleva un punto cuando hay novedad; en la web es solo texto.
  */
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-version-chip',
   standalone: true,
   imports: [TranslationPipe],
@@ -19,7 +19,7 @@ import { DesktopUpdateService, isPrereleaseVersion } from '../../services/deskto
         class="version-chip"
         [class.version-chip--open]="update.panelOpen()"
         aria-haspopup="dialog"
-        [attr.aria-label]="'update.panel.chipLabel' | t: { version: shown() }"
+        [attr.aria-label]="'update.panel.chipLabel' | t: { version: 'v' + shown() }"
         [attr.title]="'update.panel.title' | t"
         (click)="update.openPanel()"
         data-testid="version-chip"
