@@ -883,7 +883,7 @@
         "queued": "Na fila",
         "adjusting": "A ajustar por textos",
         "reading": "A ler",
-        "asking": "A perguntar · tentativa {{n}}",
+        "asking": "A perguntar · pedido {{n}}",
         "resolving": "A colocar",
         "ready": "Pronta para rever · {{placed}} de {{total}}",
         "free": "Resolvido sem IA · {{placed}} de {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Novo"
       },
       "retryToggle": "Tentar de novo uma vez se a resposta não servir",
-      "retryHint": "Uma nova tentativa pode duplicar o custo: com o Copilot volta a enviar tudo e gasta mais créditos de IA. Com o Copilot vem desativado."
+      "retryHint": "Uma nova tentativa pode duplicar o custo desse pedido. Vem ativada com todos os fornecedores."
     },
     "menu": {
       "title": "Copiar e adaptar com IA",

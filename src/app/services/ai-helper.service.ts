@@ -76,7 +76,7 @@ const KEYS = {
 } as const;
 /** Cheap by default: the task (match labels, move fields) does not need the biggest model. */
 /** A second request doubles the cost with Copilot (premium requests), so it is off there by default. */
-export const DEFAULT_RETRY: Record<string, boolean> = { claude: true, copilot: false, fake: true };
+export const DEFAULT_RETRY: Record<string, boolean> = { claude: true, copilot: true, fake: true };
 export const DEFAULT_MODELS: Record<string, string> = { claude: 'sonnet', copilot: '', fake: '' };
 
 function read(key: string): string | null {

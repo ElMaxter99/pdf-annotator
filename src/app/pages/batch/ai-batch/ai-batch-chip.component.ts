@@ -30,7 +30,7 @@ const NOTHING = ['no_text_a', 'no_text_b', 'permission_denied', 'no_valid_answer
           }
         </span>
         @if (v.canSkip) {
-          <button type="button" class="btn btn--ghost ai-chip__skip" (click)="queue.skipCurrent()" data-testid="ai-skip-one">
+          <button type="button" class="btn btn--ghost ai-chip__skip" (click)="$event.stopPropagation(); queue.skipCurrent()" data-testid="ai-skip-one">
             {{ 'batch.ai.skipOne' | t }}
           </button>
         }
@@ -42,7 +42,7 @@ const NOTHING = ['no_text_a', 'no_text_b', 'permission_denied', 'no_valid_answer
           } @else if (sub.text) {
             {{ sub.text }} ·
           }
-          <button type="button" class="ai-chip__link" (click)="queue.openDetails(v.id)" [attr.data-testid]="'ai-chip-details'">
+          <button type="button" class="ai-chip__link" (click)="$event.stopPropagation(); queue.openDetails(v.id)" [attr.data-testid]="'ai-chip-details'">
             {{ sub.link | t }}
           </button>
         </span>

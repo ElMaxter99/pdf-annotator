@@ -883,7 +883,7 @@
         "queued": "Queued",
         "adjusting": "Adjusting by texts",
         "reading": "Reading",
-        "asking": "Asking · attempt {{n}}",
+        "asking": "Asking · request {{n}}",
         "resolving": "Placing",
         "ready": "Ready to review · {{placed}} of {{total}}",
         "free": "Solved without AI · {{placed}} of {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "New"
       },
       "retryToggle": "Retry once if the answer is unusable",
-      "retryHint": "A retry can double the cost: with Copilot it sends everything again and spends more AI credits. It is off by default for Copilot."
+      "retryHint": "A retry can double the cost of that request. It is on by default with every provider."
     },
     "menu": {
       "title": "Copy and adapt with AI",

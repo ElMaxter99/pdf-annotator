@@ -883,7 +883,7 @@
         "queued": "En file",
         "adjusting": "Ajustement par textes",
         "reading": "Lecture",
-        "asking": "Question en cours · essai {{n}}",
+        "asking": "Interrogation · requête {{n}}",
         "resolving": "Placement",
         "ready": "Prête à relire · {{placed}} sur {{total}}",
         "free": "Résolu sans IA · {{placed}} sur {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Nouveau"
       },
       "retryToggle": "Réessayer une fois si la réponse est inutilisable",
-      "retryHint": "Un nouvel essai peut doubler le coût : avec Copilot, tout est renvoyé et consomme plus de crédits IA. Désactivé par défaut pour Copilot."
+      "retryHint": "Une nouvelle tentative peut doubler le coût de cette requête. Elle est activée par défaut avec tous les fournisseurs."
     },
     "menu": {
       "title": "Copier et adapter avec l'IA",

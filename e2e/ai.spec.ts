@@ -173,14 +173,14 @@ test('«Ver detalles» shows what was sent, the steps and says the simulated pro
   await expect(page.getByTestId('ai-apply')).toBeVisible();
 });
 
-test('the retry option is remembered and off by default for Copilot', async ({ page }) => {
+test('the retry option is remembered and on by default with every provider', async ({ page }) => {
   await openBatchWithB(page);
   await page.getByTestId('ai-chip').click();
   const toggle = page.getByTestId('ai-retry-toggle');
   await expect(toggle).toBeChecked();
   await toggle.uncheck();
   const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.retry'));
-  expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: true, copilot: false, fake: false });
+  expect(JSON.parse(stored ?? '{}')).toMatchObject({ claude: true, copilot: true, fake: false });
 });
 
 // ---- «Trasladar con IA» sobre todo el lote -----------------------------------------------------
@@ -313,6 +313,18 @@ test('«Trasladar con IA» en lote: el modal es mínimo y la información extra 
   // It stays compact.
   const box = (await dialog.boundingBox())!;
   expect(box.height).toBeLessThan(420);
+});
+
+test('«Trasladar con IA» en lote: en la cuadrícula, «Ver detalles» del chip abre los detalles y no el editor', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('view-grid').click();
+  await page.getByTestId('ai-batch-button').click();
+  await page.getByTestId('ai-batch-cascade').uncheck();
+  await page.getByTestId('ai-batch-start').click();
+  await expect(page.getByTestId('ai-chip-ready')).toBeVisible({ timeout: 30000 });
+  await page.getByTestId('ai-chip-details').click();
+  await expect(page.getByTestId('ai-bdetails')).toBeVisible();
+  await expect(page).toHaveURL(/\/lote/);
 });
 
 test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada', async ({ page }) => {

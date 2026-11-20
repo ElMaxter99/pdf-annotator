@@ -883,7 +883,7 @@
         "queued": "En cola",
         "adjusting": "Ajustando por textos",
         "reading": "Leyendo",
-        "asking": "Preguntando · intento {{n}}",
+        "asking": "Preguntando · petición {{n}}",
         "resolving": "Colocando",
         "ready": "Lista para revisar · {{placed}} de {{total}}",
         "free": "Resuelto sin IA · {{placed}} de {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Nuevo"
       },
       "retryToggle": "Reintentar una vez si la respuesta no sirve",
-      "retryHint": "Un reintento puede duplicar el gasto: con Copilot vuelve a enviar todo y gasta más créditos de IA. Con Copilot viene desactivado."
+      "retryHint": "Un reintento puede duplicar el gasto de esa petición. Viene activado con todos los proveedores."
     },
     "menu": {
       "title": "Copiar y adaptar con IA",

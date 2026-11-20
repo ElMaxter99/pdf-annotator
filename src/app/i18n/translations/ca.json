@@ -883,7 +883,7 @@
         "queued": "A la cua",
         "adjusting": "Ajustant per textos",
         "reading": "Llegint",
-        "asking": "Preguntant · intent {{n}}",
+        "asking": "Preguntant · petició {{n}}",
         "resolving": "Col·locant",
         "ready": "Llesta per revisar · {{placed}} de {{total}}",
         "free": "Resolt sense IA · {{placed}} de {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Nou"
       },
       "retryToggle": "Reintentar una vegada si la resposta no serveix",
-      "retryHint": "Un reintent pot duplicar la despesa: amb Copilot torna a enviar-ho tot i gasta més crèdits d'IA. Amb Copilot ve desactivat."
+      "retryHint": "Un reintent pot duplicar la despesa d'aquella petició. Ve activat amb tots els proveïdors."
     },
     "menu": {
       "title": "Copiar i adaptar amb IA",

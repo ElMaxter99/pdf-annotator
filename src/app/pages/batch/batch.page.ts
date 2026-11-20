@@ -269,6 +269,11 @@ export class BatchPageComponent implements OnInit {
 
   /** Ctrl/⌘+click on a card or row name toggles it without opening the PDF. */
   onCardClick(item: BatchItem, event: MouseEvent): void {
+    // A button inside the card (the AI chip's «Ver detalles» or «Saltar este») does its own thing.
+    const inner = (event.target as HTMLElement | null)?.closest?.('button');
+    if (inner && inner !== event.currentTarget) {
+      return;
+    }
     if (event.ctrlKey || event.metaKey || event.shiftKey) {
       event.preventDefault();
       this.onCheck(item.id, event);

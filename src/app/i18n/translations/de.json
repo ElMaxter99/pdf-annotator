@@ -883,7 +883,7 @@
         "queued": "In Warteschlange",
         "adjusting": "Anpassung nach Texten",
         "reading": "Lesen",
-        "asking": "Anfrage · Versuch {{n}}",
+        "asking": "Frage läuft · Anfrage {{n}}",
         "resolving": "Platzieren",
         "ready": "Bereit zur Prüfung · {{placed}} von {{total}}",
         "free": "Ohne KI gelöst · {{placed}} von {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Neu"
       },
       "retryToggle": "Einmal wiederholen, wenn die Antwort unbrauchbar ist",
-      "retryHint": "Eine Wiederholung kann die Kosten verdoppeln: Bei Copilot wird alles erneut gesendet und es werden mehr KI-Credits verbraucht. Für Copilot ist sie standardmäßig aus."
+      "retryHint": "Ein neuer Versuch kann die Kosten dieser Anfrage verdoppeln. Er ist bei allen Anbietern standardmäßig aktiv."
     },
     "menu": {
       "title": "Mit KI kopieren und anpassen",

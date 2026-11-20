@@ -883,7 +883,7 @@
         "queued": "In coda",
         "adjusting": "Adattamento per testi",
         "reading": "Lettura",
-        "asking": "Richiesta · tentativo {{n}}",
+        "asking": "Richiesta in corso · {{n}}",
         "resolving": "Posizionamento",
         "ready": "Pronta da rivedere · {{placed}} di {{total}}",
         "free": "Risolto senza IA · {{placed}} di {{total}}",
@@ -1243,7 +1243,7 @@
         "new": "Nuovo"
       },
       "retryToggle": "Riprova una volta se la risposta non è utilizzabile",
-      "retryHint": "Un nuovo tentativo può raddoppiare il costo: con Copilot invia di nuovo tutto e consuma più crediti IA. Per Copilot è disattivato di default."
+      "retryHint": "Un nuovo tentativo può raddoppiare il costo di quella richiesta. È attivo di default con tutti i fornitori."
     },
     "menu": {
       "title": "Copia e adatta con l'IA",
