@@ -1,11 +1,11 @@
 :host {
   display: block;
-  --proj-warn: #fbbf24;
+  --proj-warn: var(--warning);
   --proj-line: color-mix(in srgb, var(--text) 14%, transparent);
 }
 
 :host-context(.theme-light) {
-  --proj-warn: #b45309;
+  --proj-warn: var(--warning-strong);
 }
 
 .app--projects {

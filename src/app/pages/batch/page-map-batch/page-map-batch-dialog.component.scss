@@ -10,7 +10,7 @@
 
 .pmb {
   --pmb-line: color-mix(in srgb, var(--text) 18%, transparent);
-  --pmb-warn: #fbbf24;
+  --pmb-warn: var(--warning);
   --pmb-bad: #fca5a5;
   width: min(620px, calc(100vw - 32px));
   max-height: calc(100vh - 48px);
@@ -32,8 +32,8 @@
 }
 
 :host-context(:root.theme-light) .pmb {
-  --pmb-warn: #92400e;
-  --pmb-bad: #b91c1c;
+  --pmb-warn: var(--warning-text);
+  --pmb-bad: var(--danger-text);
 }
 
 .pmb-text {
@@ -164,7 +164,7 @@
   flex: none;
   border-radius: 50%;
   background: var(--accent);
-  color: var(--on-accent, #06201d);
+  color: #06201d;
   display: inline-flex;
   align-items: center;
   justify-content: center;
