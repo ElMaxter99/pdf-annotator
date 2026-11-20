@@ -1,4 +1,6 @@
 ## Unreleased
+### Accessibility
+- **Encabezado principal para lectores de pantalla (1.17 · B2, sin cambios visibles):** utilidad global `.sr-only` y un `h1` oculto en la cabecera del editor y en los pasos 1 y 2 del lote. La auditoría axe deja de marcar «falta un h1» (`page-has-heading-one`) y no aparece `region`. Queda `heading-order` en el panel lateral del editor (sus títulos son `h4`/`h5` y los estilan reglas por etiqueta): pendiente de una tarea aparte para no chocar con el paso a tokens de los colores.
 
 ## [v1.16.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.16.0) - 2026-11-20
 ### Added

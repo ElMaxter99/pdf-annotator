@@ -105,6 +105,7 @@
       <div class="batch-loading" role="status">{{ 'batch.loading' | t }}</div>
     } @else if (step() !== 'panel') {
       <!-- ================= steps ================= -->
+      <h1 class="sr-only">{{ 'batch.title' | t: { count: total() } }}</h1>
       <ol class="batch-steps" [attr.aria-label]="'batch.steps.label' | t">
         <li
           [class.batch-steps__on]="step() === 'pdfs'"

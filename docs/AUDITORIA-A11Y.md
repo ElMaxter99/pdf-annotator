@@ -84,3 +84,9 @@ Hoy no sale limpio (quedan B1 y B2). Cuando la mesa los resuelva, propongo **no*
 2. Para ello habría que añadir al script una opción de salida con error (hoy solo informa) y, si se quiere empezar antes, ejecutarlo solo en tema oscuro hasta cerrar B1.
 
 No se ha tocado `.github/workflows/`.
+
+## Actualización 1.17 · B2 (h1 oculto)
+- Hecho: `.sr-only` global y `<h1 class="sr-only">` en la cabecera del editor y en los pasos del lote. Desaparecen `page-has-heading-one` y `region`.
+- Nuevo pendiente: `heading-order` (20 nodos, solo el editor): tras el `h1`, el primer título visible del panel lateral es `h4`/`h5` («Miniaturas», «Plantillas reutilizables», «Anotaciones (JSON)», el de muestras de Avanzado). Arreglarlo es cambiar esos títulos a `h2`/`h3` **y** las reglas de `styles.scss` que los estilan por etiqueta (`.templates h5`, `.advanced-panel … h5`, `.preview-panel h4`…), sin cambio visual. Mejor después del paso a tokens (B3), que toca el mismo archivo.
+- Resultado de `npm run a11y` tras B2: 40 hallazgos (regla × estado): `color-contrast` 34 nodos (tema claro, tarea B1) y `heading-order` 20 nodos.
+
