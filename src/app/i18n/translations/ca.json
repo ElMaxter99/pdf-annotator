@@ -315,6 +315,7 @@
       "zoomWheel": "Zoom amb la roda o el pessic",
       "zoomKeys": "Apropa / allunya el PDF",
       "zoomActual": "Mida real (100 %)",
+      "zoomToggle": "Alterna ajusta a l’ample i 100 % (o doble clic amb el botó central)",
       "fitPage": "Ajusta a la pàgina",
       "panCanvas": "Mou el llenç (mantén)",
       "splitLink": "Enllaçar o desenllaçar A i B (Dividida)",
@@ -1639,7 +1640,8 @@
     "menu": {
       "label": "Zoom del PDF",
       "fitPage": "Ajusta a la pàgina",
-      "fitWidth": "Ajusta a l’ample"
+      "fitWidth": "Ajusta a l’ample",
+      "toggleHint": "Doble clic al visor: alterna ajusta a l’ample i 100 %"
     },
     "pan": {
       "title": "Mou",

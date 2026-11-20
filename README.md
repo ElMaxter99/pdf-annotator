@@ -266,6 +266,7 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | `Ctrl/⌘ + rueda` · pellizco | Zoom del PDF hacia el cursor |
 | `Ctrl/⌘ + +` · `−` · `0` | Acercar · alejar · 100 % (`0` solo = ajustar al ancho, `⇧1` = ajustar a la página) |
 | `Espacio` (mantener) · botón central | Mover el lienzo arrastrando |
+| Doble clic con el botón central · `Ctrl/⌘` + doble clic en zona vacía | Alterna 100 % y ajustar al ancho, manteniendo bajo el cursor el punto pulsado (en «Dividida» desenlazada, solo el panel bajo el puntero). Con `Ctrl/⌘`, un clic en zona vacía ya no crea una anotación |
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
 | `Ctrl/⌘ + S` | Aplicar el JSON del editor |
 | `Ctrl/⌘ + K` | Paleta de comandos: buscar y ejecutar cualquier acción (↑↓ Intro Esc) |

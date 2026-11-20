@@ -1,4 +1,7 @@
 ## Unreleased
+### Added
+- **Doble clic del visor (1.16 · T3, mesas P-106 a P-108):** un doble clic con el botón central, o `Ctrl/⌘` + doble clic en zona vacía, alterna 100 % y «ajustar al ancho» en el panel bajo el puntero (en «Dividida» desenlazada solo ese panel; enlazada, los dos), manteniendo bajo el cursor el punto pulsado. Se ignora con un editor de anotación abierto. **Cambio de comportamiento:** con `Ctrl/⌘`, un clic en zona vacía ya no crea una anotación (solo vacía la selección). Regla pura en `utils/zoom.utils.ts` (`isDoubleClick`, `doubleClickZoomTarget`) con pruebas; fila nueva en el diálogo de atajos, tooltip del «%» del pie y tabla del README; claves `shortcuts.items.zoomToggle` y `zoom.menu.toggleHint` en los 7 idiomas; e2e en `zoom-gestures.spec.ts` y `batch.spec.ts`.
+
 ### Fixed
 - **`start:docker` verificado (sin cambios visibles):** la imagen NGINX sirve la SPA en `/landing`, `/workspace`, `/lote` y `/proyectos`, mapea `4444:8080`, sirve `.mjs` con el MIME correcto y carga el worker de pdf.js. `nginx.conf` ahora responde 404 (en vez del `index.html` con 200) a un recurso estático que no existe y a `/_vercel/*`. Guion de verificación para el build completo en `docs/TESTING.md`.
 

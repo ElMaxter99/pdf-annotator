@@ -315,6 +315,7 @@
       "zoomWheel": "Zoom avec la molette ou le pincement",
       "zoomKeys": "Zoom avant / arrière sur le PDF",
       "zoomActual": "Taille réelle (100 %)",
+      "zoomToggle": "Alterner ajuster à la largeur et 100 % (ou double-clic avec le bouton central)",
       "fitPage": "Ajuster à la page",
       "panCanvas": "Déplacer le canevas (maintenir)",
       "splitLink": "Lier ou dissocier A et B (Divisée)",
@@ -1639,7 +1640,8 @@
     "menu": {
       "label": "Zoom du PDF",
       "fitPage": "Ajuster à la page",
-      "fitWidth": "Ajuster à la largeur"
+      "fitWidth": "Ajuster à la largeur",
+      "toggleHint": "Double-clic dans la visionneuse : alterner ajuster à la largeur et 100 %"
     },
     "pan": {
       "title": "Déplacer",

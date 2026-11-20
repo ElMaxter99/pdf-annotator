@@ -107,3 +107,31 @@ export function zoomAnchorScrollDelta(
     dy: after.top + uy * nextScale - anchor.clientY,
   };
 }
+
+/** Un clic del visor (puntero y momento) para reconocer un doble clic propio. */
+export interface ViewerClick {
+  /** `middle`: botón central. `modifier`: clic con Ctrl/⌘ en zona vacía. */
+  readonly kind: 'middle' | 'modifier';
+  readonly x: number;
+  readonly y: number;
+  readonly time: number;
+}
+
+export const DOUBLE_CLICK_MS = 350;
+export const DOUBLE_CLICK_PX = 6;
+
+/** ¿`next` es el segundo clic de un doble clic? Mismo tipo, poco tiempo y casi el mismo sitio. */
+export function isDoubleClick(prev: ViewerClick | null, next: ViewerClick): boolean {
+  if (!prev || prev.kind !== next.kind) return false;
+  const elapsed = next.time - prev.time;
+  if (!(elapsed >= 0) || elapsed > DOUBLE_CLICK_MS) return false;
+  return Math.hypot(next.x - prev.x, next.y - prev.y) <= DOUBLE_CLICK_PX;
+}
+
+/**
+ * Doble clic del visor (P-106): en 100 % se ajusta al ancho; con cualquier otro zoom (incluido el
+ * ajustado) se pasa a 100 %.
+ */
+export function doubleClickZoomTarget(current: number): 'actual' | 'fit' {
+  return Math.round(current * 100) === 100 ? 'fit' : 'actual';
+}

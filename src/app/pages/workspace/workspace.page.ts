@@ -33,14 +33,17 @@ import {
 import {
   ZOOM_PRESETS,
   clampScale,
+  doubleClickZoomTarget,
   fitPageScale,
   fitPageScaleForOverflow,
   fitWidthScale,
+  isDoubleClick,
   panScrollPosition,
   stepScale,
   wheelZoomFactor,
   zoomAnchorScrollDelta,
   zoomLimitFor,
+  type ViewerClick,
   type ZoomLimit,
 } from '../../utils/zoom.utils';
 import {
@@ -1695,6 +1698,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         return;
       }
       this.closeAdjustCard();
+    }
+    if (evt.ctrlKey || evt.metaKey) {
+      // Ctrl/⌘ + clic en zona vacía no crea anotación: vacía la selección y, a la segunda vez,
+      // alterna ajustar y 100 % (P-106).
+      this.clearSelection();
+      if (this.isViewerDoubleClick('modifier', evt)) void this.toggleFitActual(evt);
+      return;
     }
     this.clearSelection();
     const pt = this.domToPdfCoords(evt);
@@ -5050,6 +5060,53 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.zoomToScale(1, this.viewerCenter());
   }
 
+  private lastViewerClick: ViewerClick | null = null;
+
+  /** Anota un clic del visor y dice si es el segundo de un doble clic (P-106). */
+  private isViewerDoubleClick(kind: ViewerClick['kind'], evt: MouseEvent): boolean {
+    const click: ViewerClick = { kind, x: evt.clientX, y: evt.clientY, time: Date.now() };
+    const double = isDoubleClick(this.lastViewerClick, click);
+    this.lastViewerClick = double ? null : click;
+    return double;
+  }
+
+  /**
+   * Doble clic del visor (P-106): alterna 100 % y «ajustar al ancho» en el panel bajo el puntero
+   * (en «Dividida» con zoom desenlazado, solo ese panel; enlazado, los dos). Ignorado con un
+   * editor de anotación abierto.
+   */
+  async toggleFitActual(at: { clientX: number; clientY: number }): Promise<void> {
+    if (!this.pdfDoc() || this.editing() || this.preview()) return;
+    if (this.unlinkedSplit() && this.isOverSplitA(at)) {
+      await this.toggleFitActualA(at);
+      return;
+    }
+    if (doubleClickZoomTarget(this.zoomBase()) === 'actual') {
+      await this.zoomToScale(1, at);
+      return;
+    }
+    await (this.splitActive() ? this.fitSplit() : this.fitWidth());
+    this.showZoomHud(this.scale(), null, this.unlinkedSplit() ? 'B' : undefined);
+  }
+
+  /** Lo mismo para A cuando «Dividida» está desenlazada y el puntero está sobre A. */
+  private async toggleFitActualA(at: { clientX: number; clientY: number }): Promise<void> {
+    const pane = this.splitAPane();
+    const canvas = this.splitCanvasRef?.nativeElement;
+    if (!pane || !canvas) return;
+    if (doubleClickZoomTarget(this.scaleA()) === 'actual') {
+      await this.zoomSplitA(1, at);
+      return;
+    }
+    const style = getComputedStyle(pane);
+    const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const baseWidth = canvas.getBoundingClientRect().width / this.scaleA();
+    const fit = fitWidthScale(baseWidth, pane.clientWidth - padding);
+    if (fit === null) return;
+    await this.zoomSplitA(fit, null);
+    pane.scrollLeft = 0;
+  }
+
   /** Zoom picked from the footer menu. */
   async setZoomPercent(percent: number) {
     this.zoomMenuOpen.set(false);
@@ -5245,6 +5302,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         : (target?.closest?.('.viewer') as HTMLElement | null);
     const wanted = evt.button === 1 || (evt.button === 0 && this.panReady());
     if (!viewer || !wanted || isEditableElement(target)) return;
+    if (evt.button === 1 && this.isViewerDoubleClick('middle', evt)) {
+      evt.preventDefault();
+      evt.stopPropagation();
+      void this.toggleFitActual(evt);
+      return;
+    }
     evt.preventDefault();
     evt.stopPropagation();
     this.panDrag = {
