@@ -36,7 +36,7 @@ test('findText elige el texto más cercano y tolera acentos y mayúsculas', () =
 
 test('resolveProposal suma el desplazamiento del campo al ancla de B', () => {
   const p = { found: true, page: 2, anchorA: 'Cliente', anchorB: 'Cliente', dx: 3, dy: -1 };
-  assert.deepEqual(resolveProposal(p, entry, textsA, textsB), { ok: true, page: 2, x: 163, y: 501 });
+  assert.deepEqual(resolveProposal(p, entry, textsA, textsB), { ok: true, page: 2, x: 163, y: 501, snapped: false, method: 'offset' });
   assert.equal(resolveProposal({ ...p, anchorB: 'Nada' }, entry, textsA, textsB).why, 'ancla_B_no_encontrada');
 });
 
@@ -46,7 +46,7 @@ test('score trata los campos ausentes', () => {
 });
 
 test('score y summarize', () => {
-  const s = score({ ok: true, page: 2, x: 163, y: 501 }, { page: 2, field: { x: 163, y: 503 } });
+  const s = score({ ok: true, page: 2, x: 163, y: 501, snapped: false, method: 'offset' }, { page: 2, field: { x: 163, y: 503 } });
   assert.deepEqual(s, { pageOk: true, err: 2 });
   assert.equal(summarize([{ resolved: { ok: true }, score: s }]).within2, 1);
 });
@@ -219,7 +219,7 @@ test('resolveProposal empareja etiquetas repetidas por orden de lectura y no por
   ];
   const e = { id: 'p1-f2', page: 1, field: { x: 150, y: 400 } };
   const p = { found: true, page: 1, anchorA: 'Nombre y apellidos:', anchorB: 'Nombre y apellidos:', dx: 0, dy: 0 };
-  assert.deepEqual(resolveProposal(p, e, tA, tB), { ok: true, page: 1, x: 160, y: 200 });
+  assert.deepEqual(resolveProposal(p, e, tA, tB), { ok: true, page: 1, x: 160, y: 200, snapped: false, method: 'offset' });
 });
 
 test('si el número de apariciones no coincide se usa la más cercana, como antes', () => {
@@ -230,7 +230,7 @@ test('si el número de apariciones no coincide se usa la más cercana, como ante
   const tB = [{ page: 1, text: 'Firma', x: 60, y: 300 }];
   const e = { id: 'p1-f1', page: 1, field: { x: 120, y: 400 } };
   const p = { found: true, page: 1, anchorA: 'Firma', anchorB: 'Firma', dx: 0, dy: 0 };
-  assert.deepEqual(resolveProposal(p, e, tA, tB), { ok: true, page: 1, x: 130, y: 300 });
+  assert.deepEqual(resolveProposal(p, e, tA, tB), { ok: true, page: 1, x: 130, y: 300, snapped: false, method: 'offset' });
 });
 
 test('readingOrder y textHits: de arriba abajo y exactos antes que parciales', () => {

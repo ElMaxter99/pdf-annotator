@@ -263,6 +263,7 @@ const load = async (c) => ({ aBytes: await readFile(sample(`A-${c}.pdf`)), bByte
 test('runProposal simulado recorre las pasadas y cumple el contrato con la app', async () => {
   const { runProposal } = await import('../ai-helper/pipeline.mjs');
   process.env.AI_HELPER_FAKE = '1';
+  process.env.AI_HELPER_TEXT_FIRST = '0'; // todo por la IA (el pase sin IA tiene sus propias pruebas)
   try {
     const stages = [];
     const events = [];
@@ -287,9 +288,54 @@ test('runProposal simulado recorre las pasadas y cumple el contrato con la app',
     const c = await runProposal({ provider: 'fake', ...(await load('contrato-etiquetas-cambian')) });
     assert.ok(c.details.attempts.some((a) => a.pass === 2));
     assert.equal(c.details.diagnosis, 'partial');
-    assert.ok(c.details.notPlaced.sin_resultado > 0);
+    // B tiene 1 página y ya se envió: el simulado dice absent y el campo queda como «no existe en B».
+    assert.ok(c.details.notPlaced.no_existe_en_b > 0);
+    assert.ok(c.rows.some((r) => !r.ok && r.why === 'no_existe_en_b'));
+    assert.ok(c.rows.filter((r) => r.ok).every((r) => r.source === 'ai' && typeof r.snapped === 'boolean'));
+    assert.equal(c.details.placedWithoutAi, 0);
   } finally {
     delete process.env.AI_HELPER_FAKE;
+    delete process.env.AI_HELPER_TEXT_FIRST;
+  }
+});
+
+test('runProposal: el pase sin IA coloca sin llamadas y lo marca en el contrato (source, snapped, placedWithoutAi)', async () => {
+  const { runProposal } = await import('../ai-helper/pipeline.mjs');
+  process.env.AI_HELPER_FAKE = '1';
+  try {
+    const stages = [];
+    // Todas las etiquetas de A están idénticas y únicas en B, con su línea a la derecha: 0 peticiones.
+    const r = await runProposal({ provider: 'fake', ...(await load('solicitud-portada-nueva')), onStage: (st, n) => stages.push(n ? `${st}${n}` : st) });
+    assert.equal(r.details.requests, 0);
+    assert.deepEqual(r.details.attempts, []);
+    assert.deepEqual(r.details.plan, []);
+    assert.deepEqual(stages, ['reading', 'resolving']);
+    assert.equal(r.details.placed, 6);
+    assert.equal(r.details.placedWithoutAi, 6);
+    assert.equal(r.details.diagnosis, null);
+    for (const row of r.rows) {
+      assert.equal(row.ok, true);
+      assert.equal(row.source, 'text');
+      assert.equal(row.snapped, true);
+      assert.equal(row.confidence, 0.75);
+      assert.match(row.reason, /^Colocado sin IA: etiqueta «.+» idéntica y única en B, hueco a la derecha$/);
+    }
+    // Mezcla: lo que no se coloca sin IA va a la IA (y solo eso se envía).
+    const f = await runProposal({ provider: 'fake', ...(await load('factura-desplazada')) });
+    assert.equal(f.details.placedWithoutAi, 7);
+    assert.ok(f.details.requests >= 1);
+    assert.equal(f.details.plan.reduce((n, p) => n + p.fields, 0), 3);
+    assert.equal(f.rows.filter((x) => x.source === 'text').length, 7);
+    assert.ok(f.rows.some((x) => x.source === 'ai'));
+
+    // AI_HELPER_TEXT_FIRST=0 lo desactiva.
+    process.env.AI_HELPER_TEXT_FIRST = '0';
+    const off = await runProposal({ provider: 'fake', ...(await load('solicitud-portada-nueva')) });
+    assert.equal(off.details.placedWithoutAi, 0);
+    assert.equal(off.details.requests, 2);
+  } finally {
+    delete process.env.AI_HELPER_FAKE;
+    delete process.env.AI_HELPER_TEXT_FIRST;
   }
 });
 

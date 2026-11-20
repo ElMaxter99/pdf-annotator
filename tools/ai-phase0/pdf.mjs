@@ -73,7 +73,7 @@ export const codeWidth = (code, cell) => (code.length * 7 - 2) * cell;
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export const newCode = () => Array.from({ length: 4 }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
 
-/** Devuelve { pages: [{ num, width, height }], texts: [{ page, text, x, y }], slots, codes } y escribe PNGs si se pide.
+/** Devuelve { pages: [{ num, width, height }], texts: [{ page, text, x, y, w? }], slots, codes } y escribe PNGs si se pide.
  * `slots` = huecos de escritura dibujados (líneas y casillas, ver slots.mjs): [{ page, kind: 'line' | 'box', x, y, w, h }].
  * Con `stamp`, cada PNG lleva un código aleatorio en la esquina: la IA debe devolverlo para demostrar que ha mirado la imagen. */
 export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false } = {}) {
@@ -89,7 +89,10 @@ export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false
     const content = await page.getTextContent();
     for (const item of content.items) {
       if (!('str' in item) || !item.str.trim()) continue;
-      texts.push({ page: num, text: item.str, x: Math.round(item.transform[4] * 10) / 10, y: Math.round(item.transform[5] * 10) / 10 });
+      const t = { page: num, text: item.str, x: Math.round(item.transform[4] * 10) / 10, y: Math.round(item.transform[5] * 10) / 10 };
+      // ancho en puntos (pdf.js ya lo da escalado): permite medir «a la derecha» desde el final del texto
+      if (Number.isFinite(item.width) && item.width > 0) t.w = Math.round(item.width * 10) / 10;
+      texts.push(t);
     }
     try {
       const opList = await page.getOperatorList();

@@ -1,6 +1,6 @@
 // Huecos de escritura dibujados en el PDF (líneas para escribir y casillas), sin E/S ni pdf.js: reglas puras.
 // Coordenadas en puntos PDF, origen abajo-izquierda (la misma convención que los textos de readPdf).
-// Aún no se usa en el pipeline ni en el prompt.
+// El pipeline las usa al resolver las propuestas y en el pase sin IA (place.mjs).
 
 /** Códigos de operador de pdf.js 5.x que se usan aquí (copia de `pdfjs.OPS`; un test comprueba que coinciden). */
 export const PDFJS_OPS = {
@@ -274,11 +274,13 @@ export function slotsFromOps(fnArray, argsArray, { page = 1, ops = PDFJS_OPS, ..
 
 export const NEAREST_DEFAULTS = {
   radius: 200, // distancia máxima del ancla al hueco
-  prefer: 'auto', // 'auto' (el más cercano) | 'right' | 'below'
+  prefer: 'auto', // 'auto' (el más cercano) | 'right' | 'below' | 'above' | 'left'
+  strict: false, // con prefer concreto: true = solo ese lado (null si no hay); false = si no hay, el más cercano
   kind: 'line', // 'line' (líneas para escribir) | 'box' (casillas)
   yTol: 6, // tolerancia vertical para «en la misma línea»
   minBelow: 4, // un trazo más cerca que esto bajo la línea base es el subrayado del propio texto
-  maxBelow: 40, // distancia vertical máxima para «justo debajo»
+  maxBelow: 40, // distancia vertical máxima para «justo debajo» (y «justo encima»)
+  minAbove: 7, // un trazo encima tiene que pasar por encima de las letras del ancla
   belowWeight: 1.5, // con prefer 'auto', la distancia de «debajo» cuenta tanto más (gana la misma línea si dudan)
   boxSide: 'left', // casillas: 'left' (casilla a la izquierda de la opción) | 'right' | 'auto'
   maxBoxGap: 30, // casillas: separación horizontal máxima entre casilla y texto
@@ -293,12 +295,20 @@ const textBetween = (texts, anchor, x0, x1, yTol) =>
     (t) => t.page === anchor.page && !(t.x === anchor.x && t.y === anchor.y) && Math.abs(t.y - anchor.y) <= yTol && t.x > x0 + 1 && t.x < x1 - 1,
   );
 
+/** ¿La línea tiene su propia etiqueta a la izquierda en su misma altura? Entonces es el hueco «a la derecha» de otro texto. */
+const ownedLine = (texts, anchor, s, yTol) =>
+  (texts ?? []).some(
+    (t) => t.page === anchor.page && t !== anchor && !(t.x === anchor.x && t.y === anchor.y) && Math.abs(t.y - s.y) <= yTol && t.x < s.x - 1 && s.x - (t.x + (t.w ?? 0)) <= 60,
+  );
+
 /**
  * Hueco más probable para un texto ancla { page, x, y, w?, h? } (x, y = inicio de la línea base, como en readPdf).
- * Líneas (`kind: 'line'`): a la derecha en la misma línea base (±yTol) o justo debajo (solapando en horizontal).
+ * Líneas (`kind: 'line'`): a la derecha en la misma línea base (±yTol) o justo debajo (solapando en horizontal); con
+ * `prefer: 'above' | 'left'`, también justo encima o a la izquierda en la misma línea base. `strict` = solo el lado pedido.
  * Casillas (`kind: 'box'`): la casilla a la izquierda (o derecha, `boxSide`) del texto de la opción, centrada en su altura.
- * `opts.texts` (los de readPdf) descarta huecos con otro texto en medio. Devuelve null o
- * { slot, side: 'right' | 'below' | 'left', distance, point: { x, y } }; `point` es donde se escribiría:
+ * `opts.texts` (los de readPdf) descarta huecos con otro texto en medio y, debajo/encima, las líneas que tienen su propia
+ * etiqueta a la izquierda en su altura (son el hueco «a la derecha» de otro texto). Devuelve null o
+ * { slot, side: 'right' | 'below' | 'above' | 'left', distance, point: { x, y } }; `point` es donde se escribiría:
  * inicio de la línea un poco por encima, o el centro de la casilla.
  */
 export function nearestSlot(anchor, slots, opts = {}) {
@@ -318,9 +328,18 @@ export function nearestSlot(anchor, slots, opts = {}) {
       const below = anchor.y - s.y;
       const colEnd = right + (anchor.w ? 0 : 40);
       const blocked = (o.texts ?? []).some((t) => t.page === anchor.page && t.y < anchor.y - 1 && t.y > s.y && t.x >= s.x - 5 && t.x <= s.x + s.w);
-      if (below >= o.minBelow && below <= o.maxBelow && s.x <= colEnd + 10 && s.x + s.w >= anchor.x - 10 && !blocked) {
+      if (below >= o.minBelow && below <= o.maxBelow && s.x <= colEnd + 10 && s.x + s.w >= anchor.x - 10 && !blocked && !ownedLine(o.texts, anchor, s, o.yTol)) {
         const d = Math.hypot(Math.max(0, s.x - anchor.x), below);
         cands.push({ slot: s, side: 'below', distance: d, score: o.prefer === 'auto' ? d * o.belowWeight : d });
+      }
+      // encima y a la izquierda solo si se piden (la etiqueta bajo la línea, «____ Firma»; el hueco antes del texto)
+      const above = s.y - anchor.y;
+      if (o.prefer === 'above' && above >= o.minAbove && above <= o.maxBelow && s.x <= colEnd + 10 && s.x + s.w >= anchor.x - 10) {
+        const between = (o.texts ?? []).some((t) => t.page === anchor.page && t.y > anchor.y + 1 && t.y < s.y && t.x >= s.x - 5 && t.x <= s.x + s.w);
+        if (!between && !ownedLine(o.texts, anchor, s, o.yTol)) cands.push({ slot: s, side: 'above', distance: Math.hypot(Math.max(0, s.x - anchor.x), above) });
+      }
+      if (o.prefer === 'left' && Math.abs(dy) <= o.yTol && s.x + s.w <= anchor.x + 2 && !textBetween(o.texts, anchor, s.x + s.w, anchor.x, o.yTol)) {
+        cands.push({ slot: s, side: 'left', distance: Math.hypot(Math.max(0, anchor.x - (s.x + s.w)), dy) });
       }
     } else {
       const mid = anchor.y + (anchor.h ?? o.fontSize) * 0.35;
@@ -337,7 +356,9 @@ export function nearestSlot(anchor, slots, opts = {}) {
   }
   const inRange = cands.filter((c) => c.distance <= o.radius);
   if (!inRange.length) return null;
-  const pool = o.kind === 'line' && o.prefer !== 'auto' && inRange.some((c) => c.side === o.prefer) ? inRange.filter((c) => c.side === o.prefer) : inRange;
+  const wanted = o.kind === 'line' && o.prefer !== 'auto' ? inRange.filter((c) => c.side === o.prefer) : inRange;
+  if (o.strict && !wanted.length) return null;
+  const pool = wanted.length ? wanted : inRange;
   const score = (c) => c.score ?? c.distance;
   const best = pool.reduce((a, b) => (score(b) < score(a) ? b : a));
   const s = best.slot;
