@@ -203,7 +203,7 @@ test(`tope: como mucho ${MAX_REQUESTS_PER_PDF} llamadas por PDF (reintentos incl
   assert.equal(exact.capReached, false);
 });
 
-test('errores: timeout/cli_error con campos colocados dejan parcial; sin colocados, o limit/aborted/missing, se lanzan', async () => {
+test('errores: timeout/cli_error/images_not_read con campos colocados dejan parcial; sin colocados, o limit/aborted/missing, se lanzan', async () => {
   const plan = [item(1, [1], [1], 1), item(2, [2], [2], 1)];
   const fail = (code) => async (req) => {
     if (req.group === 'A-p1') return reply(req, [placedAt('p1-f1')]);
@@ -216,6 +216,15 @@ test('errores: timeout/cli_error con campos colocados dejan parcial; sin colocad
     assert.equal(r.requests, 2, 'no sigue preguntando');
   }
   for (const code of ['limit', 'aborted', 'missing']) await assert.rejects(runPasses({ plan, resolve, call: fail(code) }), (e) => e.code === code);
+  // images_not_read (solo la primera petición): parcial si el pase sin IA ya colocó algo; si no, se lanza.
+  const unread = async () => JSON.stringify({ images: {}, fields: [] });
+  const partial = await runPasses({ plan, resolve, codes: allCodes, alreadyPlaced: 3, call: unread });
+  assert.equal(partial.aborted, 'images_not_read');
+  assert.equal(partial.abortError.code, 'images_not_read');
+  assert.equal(partial.abortError.request.group, 'A-p1');
+  assert.equal(partial.requests, 2, 'los dos intentos de la prueba y ninguna petición más');
+  assert.equal(partial.outcomes.size, 0);
+  await assert.rejects(runPasses({ plan, resolve, codes: allCodes, call: unread }), (e) => e.code === 'images_not_read');
   await assert.rejects(runPasses({ plan, resolve, call: async () => { throw Object.assign(new Error('t'), { code: 'timeout' }); } }), (e) => e.code === 'timeout');
 });
 
@@ -339,18 +348,43 @@ test('runProposal: el pase sin IA coloca sin llamadas y lo marca en el contrato 
   }
 });
 
-test('runProposal: tras dos intentos sin códigos falla con images_not_read y lleva los detalles', async () => {
+test('runProposal: tras dos intentos sin códigos y sin nada colocado falla con images_not_read y lleva los detalles', async () => {
   const { runProposal } = await import('../ai-helper/pipeline.mjs');
   const dirs = [];
   const runCliImpl = async (provider, cwd) => {
     dirs.push(cwd);
     return { ok: true, seconds: 1, code: 0, stderr: '', stdout: JSON.stringify({ type: 'result', result: '{"images":{},"fields":[]}', num_turns: 1 }) };
   };
-  await assert.rejects(runProposal({ provider: 'claude', ...(await load('alta-banco-otra-pagina')), runCliImpl }), (e) => {
-    assert.equal(e.code, 'images_not_read');
-    assert.equal(e.details.requests, 2);
-    assert.deepEqual(e.details.attempts.map((a) => [a.n, a.group, a.retry]), [[1, 'A-p1', false], [2, 'A-p1', true]]);
-    return true;
-  });
+  process.env.AI_HELPER_TEXT_FIRST = '0'; // sin el pase sin IA no hay nada colocado antes de la prueba
+  try {
+    await assert.rejects(runProposal({ provider: 'claude', ...(await load('alta-banco-otra-pagina')), runCliImpl }), (e) => {
+      assert.equal(e.code, 'images_not_read');
+      assert.equal(e.details.requests, 2);
+      assert.deepEqual(e.details.attempts.map((a) => [a.n, a.group, a.retry]), [[1, 'A-p1', false], [2, 'A-p1', true]]);
+      return true;
+    });
+  } finally {
+    delete process.env.AI_HELPER_TEXT_FIRST;
+  }
   assert.equal(dirs[0], dirs[1], 'los reintentos reutilizan la carpeta de la petición');
+});
+
+test('runProposal: images_not_read con campos colocados sin IA devuelve un parcial con ellos (aborted, partial)', async () => {
+  const { runProposal } = await import('../ai-helper/pipeline.mjs');
+  let calls = 0;
+  const runCliImpl = async () => (calls++, { ok: true, seconds: 1, code: 0, stderr: '', stdout: JSON.stringify({ type: 'result', result: '{"images":{},"fields":[]}', num_turns: 1 }) });
+  const r = await runProposal({ provider: 'claude', ...(await load('alta-banco-otra-pagina')), runCliImpl });
+  assert.equal(calls, 2, 'solo los dos intentos de la primera petición');
+  assert.equal(r.details.aborted, 'images_not_read');
+  assert.equal(r.details.diagnosis, 'partial');
+  assert.equal(r.details.requests, 2);
+  assert.ok(r.details.placedWithoutAi > 0);
+  assert.equal(r.details.placed, r.details.placedWithoutAi);
+  const ok = r.rows.filter((x) => x.ok);
+  assert.equal(ok.length, r.details.placedWithoutAi);
+  assert.ok(ok.every((x) => x.source === 'text' && x.snapped === true));
+  // Los no colocados siguen el contrato de siempre (sin respuesta de la IA).
+  assert.ok(r.rows.filter((x) => !x.ok).every((x) => x.why === 'sin_respuesta'));
+  assert.equal(r.details.notPlaced.sin_respuesta, r.rows.length - ok.length);
+  assert.match(r.warnings[0], /^Lectura de imágenes fallida en la primera petición: \d+ de \d+ imágenes sin leer/);
 });
