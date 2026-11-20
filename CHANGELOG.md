@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.16.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.16.0) - 2026-11-20
 ### Added
 - **Doble clic del visor (1.16 · T3, mesas P-106 a P-108):** un doble clic con el botón central, o `Ctrl/⌘` + doble clic en zona vacía, alterna 100 % y «ajustar al ancho» en el panel bajo el puntero (en «Dividida» desenlazada solo ese panel; enlazada, los dos), manteniendo bajo el cursor el punto pulsado. Se ignora con un editor de anotación abierto. **Cambio de comportamiento:** con `Ctrl/⌘`, un clic en zona vacía ya no crea una anotación (solo vacía la selección). Regla pura en `utils/zoom.utils.ts` (`isDoubleClick`, `doubleClickZoomTarget`) con pruebas; fila nueva en el diálogo de atajos, tooltip del «%» del pie y tabla del README; claves `shortcuts.items.zoomToggle` y `zoom.menu.toggleHint` en los 7 idiomas; e2e en `zoom-gestures.spec.ts` y `batch.spec.ts`.
 
