@@ -1,4 +1,5 @@
 // Lógica pura de la fase 0 (sin E/S): preparar campos, leer la respuesta de la IA y convertirla en coordenadas.
+import { nearestSlot } from './slots.mjs';
 import { FALLBACK_CONFIDENCE, SIDES, defaultSide, fallbackXY, slotKind, slotOnSide, snapToSlot, toFieldXY } from './place.mjs';
 
 /**
@@ -172,13 +173,40 @@ export function textHits(texts, page, wanted) {
  * n.º `index` de `of`, y en B aparece las mismas veces, se empareja por orden de lectura (1.ª con 1.ª…):
  * en páginas reestructuradas la «más cercana a la posición de A» puede ser la de otro bloque.
  */
-export function findText(texts, page, wanted, nearX, nearY, rank = null) {
-  const hits = textHits(texts, page, wanted);
+export function findText(texts, page, wanted, nearX, nearY, rank = null, { section = null } = {}) {
+  let hits = textHits(texts, page, wanted);
   if (!hits.length) return null;
+  // Etiqueta repetida (dos secciones con «Nombre», «NIF»…): manda el título de la sección, que en B puede estar en
+  // otro orden u otra columna; el orden de lectura solo sirve si las secciones no se han movido.
+  if (section && hits.length > 1) {
+    const same = hits.filter((h) => sectionHeading(texts, h) === section);
+    if (same.length === 1) return same[0];
+    if (same.length > 1) hits = same;
+  }
   if (rank && hits.length > 1 && hits.length === rank.of && rank.index >= 0) {
     return [...hits].sort(readingOrder)[rank.index];
   }
   return hits.sort((a, b) => dist(a.x, a.y, nearX, nearY) - dist(b.x, b.y, nearX, nearY))[0];
+}
+
+/**
+ * Título de la sección de un texto: el texto más cercano por encima, en su misma columna (±60 pt) y a ≤ 200 pt,
+ * que no se repita en la página (las etiquetas repetidas como «Nombre» no son títulos) ni sea un relleno «____».
+ * Devuelve el texto normalizado o null.
+ */
+export function sectionHeading(texts, hit) {
+  const onPage = texts.filter((t) => t.page === hit.page);
+  const count = new Map();
+  for (const t of onPage) count.set(norm(t.text), (count.get(norm(t.text)) ?? 0) + 1);
+  let best = null;
+  for (const t of onPage) {
+    const dy = t.y - hit.y;
+    if (dy <= 2 || dy > 200 || Math.abs(t.x - hit.x) > 60) continue;
+    const n = norm(t.text);
+    if (!n || count.get(n) > 1 || /^[_.\s…-]+$/.test(t.text)) continue;
+    if (!best || dy < best.dy) best = { dy, n };
+  }
+  return best?.n ?? null;
 }
 
 /**
@@ -205,13 +233,24 @@ export function resolveProposal(proposal, entry, textsA, textsB, { slots = [] } 
       rank = hitsA.length > 1 ? { index: [...hitsA].sort(readingOrder).indexOf(a), of: hitsA.length } : null;
     }
   }
-  const b = findText(textsB, proposal.page, proposal.anchorB, a?.x ?? f.x, a?.y ?? f.y, rank);
+  // Si el ancla de B se repite, el título de la sección de A (del ancla de A o, sin ella, del mismo texto junto al campo) elige.
+  let section = null;
+  if (textHits(textsB, proposal.page, proposal.anchorB).length > 1) {
+    const ref = a ?? findText(textsA, entry.page, proposal.anchorB, f.x, f.y);
+    if (ref) section = sectionHeading(textsA, ref);
+  }
+  const b = findText(textsB, proposal.page, proposal.anchorB, a?.x ?? f.x, a?.y ?? f.y, rank, { section });
   if (!b) return { ok: false, why: 'ancla_B_no_encontrada' };
   const pageSlots = slots.filter((s) => s.page === proposal.page);
   const ok = (xy, extra) => ({ ok: true, page: proposal.page, x: round(xy.x), y: round(xy.y), ...extra });
+  const textsOfPage = textsB.filter((t) => t.page === proposal.page);
   if (proposal.side) {
-    const hit = slotOnSide(b, pageSlots, proposal.side, { texts: textsB.filter((t) => t.page === proposal.page), kind });
+    const hit = slotOnSide(b, pageSlots, proposal.side, { texts: textsOfPage, kind });
     if (hit) return ok(toFieldXY(hit.point, kind, f), { snapped: true, method: 'side' });
+    // El lado pedido no tiene hueco pero la etiqueta de B sí tiene uno pegado en otro lado (la IA suele decir «right»
+    // por costumbre cuando en B el hueco está debajo, o la casilla cambió de lado): se usa ese.
+    const other = kind === 'box' ? nearestSlot(b, pageSlots, { kind: 'box', boxSide: 'auto', texts: textsOfPage }) : nearestSlot(b, pageSlots, { kind: 'line', prefer: 'auto', radius: 45, texts: textsOfPage });
+    if (other) return ok(toFieldXY(other.point, kind, f), { snapped: true, method: 'side-auto' });
   }
   if (a) {
     const xy = { x: b.x + (f.x - a.x) + proposal.dx, y: b.y + (f.y - a.y) + proposal.dy };

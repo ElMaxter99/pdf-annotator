@@ -31,7 +31,7 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
   const sentB = new Map();
   /** Páginas de B con las que se ha preguntado por cada campo (para saber si «no existe en B» es definitivo). */
   const askedB = new Map();
-  const state = { requests: 0, capReached: false, aborted: null, abortError: null };
+  const state = { requests: 0, capReached: false, aborted: null, abortError: null, splitAfterUnread: false };
   // `alreadyPlaced` = campos colocados antes sin IA: cuentan para devolver parcial ante un timeout, cli_error o images_not_read.
   const placed = () => alreadyPlaced + [...outcomes.values()].filter((o) => o.resolved.ok).length;
 
@@ -44,7 +44,9 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
     let best = null;
     let unread = null;
     let called = false;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    // Los trozos de una petición que no leyó las imágenes van con un solo intento: si tampoco, no se insiste.
+    const attemptsHere = request.split ? 1 : maxAttempts;
+    for (let attempt = 1; attempt <= attemptsHere; attempt++) {
       if (state.requests >= maxRequests) {
         state.capReached = true;
         break;
@@ -106,6 +108,18 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
       await ask(request);
       return true;
     } catch (e) {
+      // La primera petición no leyó las imágenes (modelos pequeños con 3-4 imágenes): antes de rendirse se prueba con
+      // peticiones más pequeñas, la página de A con UNA página de B cada vez (dentro del tope de peticiones).
+      if (e?.code === 'images_not_read' && request.pagesB.length > 1 && !request.split) {
+        state.splitAfterUnread = true;
+        const before = outcomes.size;
+        for (const p of request.pagesB) {
+          if (stopped()) break;
+          await safeAsk({ ...request, pagesB: [p], split: true });
+        }
+        if (outcomes.size > before || stopped()) return true;
+        // Tampoco con peticiones pequeñas: como antes, parcial con lo colocado sin IA o error.
+      }
       if (PARTIAL_CODES.has(e?.code) && placed() > 0) {
         state.aborted = e.code;
         state.abortError = e;
@@ -128,5 +142,5 @@ export async function runPasses({ plan, call, resolve, codes = null, minMatch, m
     await safeAsk({ pass: 2, group: item.group, pageA: item.pageA, pagesB, entries: pending, notes: pending.map((e) => failureNote(e, outcomes.get(e.id))), fresh });
   }
   // `abortError` = el error que cortó el PDF en parcial (su mensaje y, con images_not_read, `request`/`unread`).
-  return { outcomes, attempts, requests: state.requests, capReached: state.capReached, aborted: state.aborted, abortError: state.abortError, sentB, askedB };
+  return { outcomes, attempts, requests: state.requests, capReached: state.capReached, aborted: state.aborted, abortError: state.abortError, splitAfterUnread: state.splitAfterUnread, sentB, askedB };
 }

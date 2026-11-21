@@ -1,0 +1,58 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 89.2,
+          "y": 732,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{persona.nombre}}"
+        },
+        {
+          "x": 307.8,
+          "y": 732,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{persona.dni}}"
+        },
+        {
+          "x": 116.6,
+          "y": 707,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{persona.domicilio}}"
+        },
+        {
+          "x": 100.1,
+          "y": 672,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{autorizado.nombre}}"
+        },
+        {
+          "x": 379.9,
+          "y": 672,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{documento}}"
+        },
+        {
+          "x": 68.2,
+          "y": 202,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{firma.lugar}}"
+        },
+        {
+          "x": 198.6,
+          "y": 202,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{firma.fecha}}"
+        }
+      ]
+    }
+  ]
+}

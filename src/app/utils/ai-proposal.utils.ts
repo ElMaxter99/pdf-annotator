@@ -19,8 +19,11 @@ export interface AiRow {
   anchorB: string;
   /** Why it was not placed (`no_existe_en_b`: the field does not exist in B, so leaving it out is right). */
   why: string;
-  /** `text`: placed by the helper without the AI (identical, unique label in B with its slot next to it). */
-  source: 'ai' | 'text';
+  /**
+   * `text`: placed by the helper without the AI (identical, unique label in B with its slot next to it).
+   * `pattern`: repeated in the same spot on every page of A (page number…), filled in for every page of B by the app.
+   */
+  source: 'ai' | 'text' | 'pattern';
 }
 
 /** The field does not exist in B: not placing it is the right answer, not a failure. */
@@ -43,7 +46,7 @@ export function countPlacement(rows: readonly Pick<AiRow, 'ok' | 'why' | 'source
     absent,
     missing: rows.length - placed - absent,
     total: rows.length,
-    withoutAi: rows.filter((row) => row.ok && row.source === 'text').length,
+    withoutAi: rows.filter((row) => row.ok && (row.source === 'text' || row.source === 'pattern')).length,
   };
 }
 
@@ -110,6 +113,11 @@ export interface AiDetails {
   placed: number;
   notPlaced: Record<string, number>;
   diagnosis: AiDiagnosis | null;
+  /** Por qué el motor cortó el PDF y devolvió un parcial (p. ej. la IA no leyó las imágenes). */
+  aborted?: 'images_not_read' | 'timeout' | 'cli_error' | null;
+  /** Peticiones hechas y reparto de páginas (A → candidatas de B), para el informe copiado. */
+  requests?: number;
+  plan?: { group: string; candidatesB: string[]; fields: number }[];
 }
 
 export type AiLiveEvent =
@@ -226,6 +234,13 @@ export function sanitizeDetails(raw: unknown): AiDetails | null {
     placed: count(r['placed']),
     notPlaced,
     diagnosis: diagnosisOf(r['diagnosis']),
+    aborted: ['images_not_read', 'timeout', 'cli_error'].includes(r['aborted'] as string) ? (r['aborted'] as AiDetails['aborted']) : null,
+    requests: count(r['requests']),
+    plan: (Array.isArray(r['plan']) ? r['plan'] : []).slice(0, 40).map((p) => {
+      const o = obj(p);
+      const names = (Array.isArray(o['candidatesB']) ? o['candidatesB'] : []).slice(0, 12);
+      return { group: text(o['group'], 12), candidatesB: names.map((n) => text(n, 12)).filter((n) => /^B-p\d+$/.test(n)), fields: count(o['fields']) };
+    }).filter((p) => /^A-p\d+$/.test(p.group)),
   };
 }
 

@@ -234,6 +234,21 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     if (row.error) {
       lines.push(`error: ${row.error.code}`);
     }
+    // Para diagnosticar sin ver los PDF: por qué quedó parcial, qué faltó y qué páginas de B se miraron por cada página de A.
+    const d = row.details;
+    if (d?.aborted) {
+      lines.push(`parcial: ${d.aborted}`);
+    }
+    const missing = Object.entries(d?.notPlaced ?? {}).filter(([, n]) => n > 0);
+    if (missing.length) {
+      lines.push(`sin colocar: ${missing.map(([why, n]) => `${why} ${n}`).join(', ')}`);
+    }
+    if (d?.plan?.length) {
+      lines.push(`páginas: ${d.plan.map((p) => `${p.group}(${p.fields})→${p.candidatesB.join('+') || '—'}`).join(' · ')}`);
+    }
+    if (d?.requests) {
+      lines.push(`peticiones: ${d.requests}`);
+    }
     const tokens = usageTotal(row.usage);
     if (tokens) {
       lines.push(`tokens: ${tokens}`);

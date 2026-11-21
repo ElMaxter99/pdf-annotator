@@ -1499,7 +1499,12 @@
       "absentInB": "existiert in B nicht: es nicht zu platzieren ist richtig",
       "withoutAi": "ohne KI platziert",
       "placeByHand": "Von Hand platzieren",
-      "tabBadge": "KI-Vorschlag: {{count}} Felder"
+      "tabBadge": "KI-Vorschlag: {{count}} Felder",
+      "editHint": "{{name}} · Konfidenz {{level}} · klicken zum Bearbeiten, ziehen zum Verschieben",
+      "editingBadge": "Vorgeschlagenes Feld",
+      "edited": "bearbeitet",
+      "leaveOut": "Aus dem Vorschlag nehmen",
+      "pagePattern": "auf jeder Seite wiederholt"
     },
     "instructions": {
       "title": "Anweisungen für die KI",
@@ -2253,5 +2258,12 @@
     "close": "Schließen",
     "retry": "Erneut versuchen",
     "exportButton": "{{n}} Vorlagen exportieren"
+  },
+  "pairing": {
+    "noPartnerB": "Kein Gegenstück in B",
+    "noPartnerA": "Kein Gegenstück in A",
+    "otherPageA": "Sein Feld aus A ist auf Seite {{page}} von A (bei verknüpften Seiten folgt A der Version B).",
+    "goTitle": "In A und B zeigen",
+    "goTitleA": "In A zeigen"
   }
 }

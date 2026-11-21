@@ -1,5 +1,6 @@
 import {
   AiRow,
+  sanitizeDetails,
   confidenceLevel,
   estimateTokens,
   sumUsage,
@@ -146,5 +147,22 @@ describe('ai-proposal.utils', () => {
     const sent = { files: [{ name: 'A-p1.png', bytes: 9000 }, { name: 'fields.json', bytes: 8000 }, { name: 'A.pdf', bytes: 5 }], fields: 1, pagesA: 1, pagesB: 1, textsA: 1, textsB: 1, imageBytes: 9000 };
     expect(estimateTokens(sent)).toBe(3600);
     expect(estimateTokens(null)).toBe(0);
+  });
+});
+
+describe('sanitizeDetails · motivo del parcial y reparto de páginas', () => {
+  it('acepta solo los motivos conocidos y planes con nombres de página válidos', () => {
+    const d = sanitizeDetails({
+      aborted: 'images_not_read',
+      requests: 4,
+      plan: [
+        { group: 'A-p1', candidatesB: ['B-p3', 'B-p4', '<script>'], fields: 7 },
+        { group: 'malo', candidatesB: ['B-p1'], fields: 1 },
+      ],
+    });
+    expect(d?.aborted).toBe('images_not_read');
+    expect(d?.requests).toBe(4);
+    expect(d?.plan).toEqual([{ group: 'A-p1', candidatesB: ['B-p3', 'B-p4'], fields: 7 }]);
+    expect(sanitizeDetails({ aborted: 'rm -rf' })?.aborted).toBeNull();
   });
 });

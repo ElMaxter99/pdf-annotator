@@ -16,6 +16,8 @@ export interface AiSession {
   rows: AiRow[];
   /** Fields the person ticked or unticked on top of the default selection. */
   overrides: Record<string, boolean>;
+  /** Changes made to proposed fields before applying (editor or drag in B): the whole field, x,y included. */
+  edits: AiRowEdits;
   view: 'proposal' | 'original';
   seconds: number;
   error: { code: string; message: string; reset: string | null } | null;
@@ -29,6 +31,63 @@ export interface AiSession {
   details: AiDetails | null;
   detailsOpen: boolean;
   endedAt: number | null;
+}
+
+/** Edited proposed fields by row id (complete field, with its x,y in B). */
+export type AiRowEdits = Record<string, PageField>;
+
+/** The field a proposal row would create in B: the field of A, with the person's edits and the row's position. */
+export function aiProposalField(base: PageField, row: Pick<AiRow, 'x' | 'y'>, edit?: PageField | null): PageField {
+  if (edit) {
+    return { ...base, ...edit };
+  }
+  return { ...base, x: row.x, y: row.y };
+}
+
+/** Saves an edit of a proposed field (and ticks it: editing it means wanting it). */
+export function withAiRowEdit(session: AiSession, rowId: string, field: PageField): AiSession {
+  return {
+    ...session,
+    edits: { ...session.edits, [rowId]: { ...field } },
+    overrides: { ...session.overrides, [rowId]: true },
+  };
+}
+
+const EDIT_TEXT_MAX = 2000;
+
+/**
+ * Edits read back from storage are untrusted: only rows that exist, plain objects with finite x,y ≥ 0 and
+ * primitive values (strings cut, finite numbers, booleans). The page still normalizes them before applying.
+ */
+export function sanitizeAiEdits(raw: unknown, ids: ReadonlySet<string>): AiRowEdits {
+  const out: AiRowEdits = {};
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return out;
+  }
+  for (const [id, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!ids.has(id) || !value || typeof value !== 'object' || Array.isArray(value)) {
+      continue;
+    }
+    const v = value as Record<string, unknown>;
+    const x = Number(v['x']);
+    const y = Number(v['y']);
+    if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || y < 0) {
+      continue;
+    }
+    const field: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(v).slice(0, 40)) {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue;
+      }
+      if (typeof item === 'string') {
+        field[key] = item.slice(0, EDIT_TEXT_MAX);
+      } else if ((typeof item === 'number' && Number.isFinite(item)) || typeof item === 'boolean') {
+        field[key] = item;
+      }
+    }
+    out[id] = { ...(field as unknown as PageField), x, y };
+  }
+  return out;
 }
 
 /** Most recent steps kept in the log of «Ver detalles». */
@@ -52,6 +111,7 @@ export function loadingAiSession(provider: AiProvider, now: number): AiSession {
     startedAt: now,
     rows: [],
     overrides: {},
+    edits: {},
     view: 'proposal',
     seconds: 0,
     error: null,
@@ -109,7 +169,8 @@ export function savedAiSession(saved: AiSavedProposal, rows: readonly AiRow[]): 
     stage: 'resolving',
     startedAt: saved.at,
     rows: [...rows],
-    overrides: {},
+    overrides: Object.fromEntries(Object.keys(saved.edits ?? {}).filter((id) => rows.some((r) => r.id === id)).map((id) => [id, true])),
+    edits: sanitizeAiEdits(saved.edits, new Set(rows.map((r) => r.id))),
     view: 'proposal',
     seconds: saved.seconds,
     error: null,

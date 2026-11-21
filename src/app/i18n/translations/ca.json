@@ -1499,7 +1499,12 @@
       "absentInB": "no existeix a B: el correcte és no col·locar-lo",
       "withoutAi": "col·locat sense IA",
       "placeByHand": "Col·locar a mà",
-      "tabBadge": "Proposta de la IA: {{count}} camps"
+      "tabBadge": "Proposta de la IA: {{count}} camps",
+      "editHint": "{{name}} · confiança {{level}} · clic per editar, arrossega per moure",
+      "editingBadge": "Camp de la proposta",
+      "edited": "editat",
+      "leaveOut": "Deixa fora de la proposta",
+      "pagePattern": "repetit a cada pàgina"
     },
     "instructions": {
       "title": "Instruccions per a la IA",
@@ -2253,5 +2258,12 @@
     "close": "Tanca",
     "retry": "Torna-ho a provar",
     "exportButton": "Exporta {{n}} plantilles"
+  },
+  "pairing": {
+    "noPartnerB": "Sense parella a B",
+    "noPartnerA": "Sense parella a A",
+    "otherPageA": "El seu camp d’A és a la pàgina {{page}} d’A (amb les pàgines enllaçades A segueix B).",
+    "goTitle": "Veure-ho a A i a B",
+    "goTitleA": "Veure-ho a A"
   }
 }

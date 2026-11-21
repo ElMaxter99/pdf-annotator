@@ -1,0 +1,93 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 150.3,
+          "y": 742,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{titular.nombre}}"
+        },
+        {
+          "x": 83.3,
+          "y": 712,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{titular.nif}}"
+        },
+        {
+          "x": 103,
+          "y": 682,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{titular.domicilio}}"
+        },
+        {
+          "x": 76.3,
+          "y": 652,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{titular.cp}}"
+        },
+        {
+          "x": 254.7,
+          "y": 652,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{titular.localidad}}"
+        },
+        {
+          "x": 82.1,
+          "y": 592,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{banco.iban}}"
+        },
+        {
+          "x": 94.7,
+          "y": 562,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{banco.entidad}}"
+        },
+        {
+          "x": 371.9,
+          "y": 562,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{banco.oficina}}"
+        },
+        {
+          "x": 170.7,
+          "y": 499.2,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "acepto"
+        },
+        {
+          "x": 231.4,
+          "y": 474.2,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "publicidad"
+        },
+        {
+          "x": 86.8,
+          "y": 162,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{firma.fecha}}"
+        },
+        {
+          "x": 335.2,
+          "y": 162,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{firma.nombre}}"
+        }
+      ]
+    }
+  ]
+}

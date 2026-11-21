@@ -1499,7 +1499,12 @@
       "absentInB": "non esiste in B: è corretto non collocarlo",
       "withoutAi": "collocato senza IA",
       "placeByHand": "Posiziona a mano",
-      "tabBadge": "Proposta dell'IA: {{count}} campi"
+      "tabBadge": "Proposta dell'IA: {{count}} campi",
+      "editHint": "{{name}} · affidabilità {{level}} · clic per modificare, trascina per spostare",
+      "editingBadge": "Campo della proposta",
+      "edited": "modificato",
+      "leaveOut": "Escludi dalla proposta",
+      "pagePattern": "ripetuto su ogni pagina"
     },
     "instructions": {
       "title": "Istruzioni per l’IA",
@@ -2253,5 +2258,12 @@
     "close": "Chiudi",
     "retry": "Riprova",
     "exportButton": "Esporta {{n}} modelli"
+  },
+  "pairing": {
+    "noPartnerB": "Nessuna coppia in B",
+    "noPartnerA": "Nessuna coppia in A",
+    "otherPageA": "Il suo campo di A è a pagina {{page}} di A (con le pagine collegate A segue B).",
+    "goTitle": "Mostra in A e in B",
+    "goTitleA": "Mostra in A"
   }
 }

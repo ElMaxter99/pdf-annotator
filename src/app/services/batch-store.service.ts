@@ -2,6 +2,7 @@ import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
 import type { AiSavedProposal, BatchItem, FieldLink, PageMapData } from '../models/batch.model';
 import { sanitizeDetails, sanitizeRow } from '../utils/ai-proposal.utils';
+import { sanitizeAiEdits } from '../utils/ai-session.utils';
 import { ProjectStoreService } from './project-store.service';
 import { sanitizePageMap } from '../utils/page-map.utils';
 import { cleanAiInstructions } from '../utils/ai-instructions.utils';
@@ -465,6 +466,7 @@ function withSafeProposal(item: BatchItem): BatchItem {
       model: typeof raw['model'] === 'string' ? raw['model'].slice(0, 60) : null,
       seconds: typeof raw['seconds'] === 'number' && Number.isFinite(raw['seconds']) ? raw['seconds'] : 0,
       at: typeof raw['at'] === 'number' && Number.isFinite(raw['at']) ? raw['at'] : 0,
+      edits: sanitizeAiEdits(raw['edits'], new Set(rows.map((row) => row.id))),
     },
   };
 }

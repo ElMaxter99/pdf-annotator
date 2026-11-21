@@ -1499,7 +1499,12 @@
       "absentInB": "does not exist in B: leaving it out is correct",
       "withoutAi": "placed without AI",
       "placeByHand": "Place by hand",
-      "tabBadge": "AI proposal: {{count}} fields"
+      "tabBadge": "AI proposal: {{count}} fields",
+      "editHint": "{{name}} · {{level}} confidence · click to edit, drag to move",
+      "editingBadge": "Proposed field",
+      "edited": "edited",
+      "leaveOut": "Leave out of the proposal",
+      "pagePattern": "repeated on every page"
     },
     "instructions": {
       "title": "Instructions for the AI",
@@ -2253,5 +2258,12 @@
     "close": "Close",
     "retry": "Retry",
     "exportButton": "Export {{n}} templates"
+  },
+  "pairing": {
+    "noPartnerB": "No match in B",
+    "noPartnerA": "No match in A",
+    "otherPageA": "Its field of A is on page {{page}} of A (with linked pages A follows B).",
+    "goTitle": "Show in A and B",
+    "goTitleA": "Show in A"
   }
 }

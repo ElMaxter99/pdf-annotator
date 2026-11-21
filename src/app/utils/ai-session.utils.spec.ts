@@ -3,7 +3,10 @@ import type { AiSavedProposal } from '../models/batch.model';
 import type { AiLiveEvent, AiRow, AiSent, AiStep, AiUsage } from './ai-proposal.utils';
 import {
   AI_STEP_LOG_LIMIT,
+  aiProposalField,
   aiTemplateMap,
+  sanitizeAiEdits,
+  withAiRowEdit,
   loadingAiSession,
   savedAiSession,
   withAiEvent,
@@ -86,5 +89,58 @@ describe('ai-session.utils', () => {
     expect(s.rows).toEqual(rows);
     expect(s.rows).not.toBe(rows);
     expect(savedAiSession({ ...saved, provider: 'otro' }, rows).provider).toBe('claude');
+  });
+});
+
+describe('editar la propuesta antes de aplicarla', () => {
+  const base = { x: 10, y: 20, mapField: 'name', type: 'text', fontSize: 11 } as never;
+  const row = { id: 'p1-f1', x: 100, y: 200 } as unknown as AiRow;
+
+  it('aiProposalField usa la posición de la fila o, si se editó, el campo editado entero', () => {
+    expect(aiProposalField(base, row)).toEqual(jasmine.objectContaining({ mapField: 'name', x: 100, y: 200 }));
+    const edited = aiProposalField(base, row, { ...(base as object), mapField: 'apellido', x: 120, y: 190 } as never);
+    expect(edited).toEqual(jasmine.objectContaining({ mapField: 'apellido', x: 120, y: 190, fontSize: 11 }));
+  });
+
+  it('withAiRowEdit guarda la edición y marca la fila', () => {
+    const s = withAiRowEdit(loadingAiSession('claude', 0), 'p1-f1', { ...(base as object), x: 5, y: 6 } as never);
+    expect(s.edits['p1-f1']).toEqual(jasmine.objectContaining({ x: 5, y: 6, mapField: 'name' }));
+    expect(s.overrides['p1-f1']).toBeTrue();
+  });
+
+  it('sanitizeAiEdits trata lo guardado como no confiable', () => {
+    const ids = new Set(['p1-f1', 'p1-f2']);
+    const out = sanitizeAiEdits(
+      {
+        'p1-f1': { x: 1, y: 2, mapField: 'a'.repeat(3000), locked: true, nested: { bad: 1 }, n: Infinity },
+        'p1-f2': { x: -1, y: 2 },
+        'p9-f9': { x: 1, y: 1 },
+      },
+      ids,
+    );
+    expect(Object.keys(out)).toEqual(['p1-f1']);
+    const f = out['p1-f1'] as unknown as Record<string, unknown>;
+    expect((f['mapField'] as string).length).toBe(2000);
+    expect(f['locked']).toBeTrue();
+    expect('nested' in f).toBeFalse();
+    expect('n' in f).toBeFalse();
+    expect(sanitizeAiEdits('nada', ids)).toEqual({});
+    expect(sanitizeAiEdits([1, 2], ids)).toEqual({});
+  });
+
+  it('savedAiSession recupera las ediciones guardadas (solo de filas que existen) y las marca', () => {
+    const rows = [{ id: 'p1-f1' }] as unknown as AiRow[];
+    const saved = {
+      rows,
+      details: null,
+      provider: 'claude',
+      model: null,
+      seconds: 1,
+      at: 5,
+      edits: { 'p1-f1': { x: 3, y: 4, mapField: 'b' }, 'p2-f1': { x: 1, y: 1 } },
+    } as unknown as AiSavedProposal;
+    const s = savedAiSession(saved, rows);
+    expect(Object.keys(s.edits)).toEqual(['p1-f1']);
+    expect(s.overrides).toEqual({ 'p1-f1': true });
   });
 });

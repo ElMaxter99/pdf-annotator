@@ -35,24 +35,29 @@
           @for (row of group.rows; track row.id) {
             <li class="ai-proposal__row" [attr.data-ai-id]="row.id" [class.ai-proposal__row--off]="row.ok && !selected(row)">
               @if (row.ok) {
-                <label class="ai-proposal__label">
-                  <input type="checkbox" [checked]="selected(row)" (change)="vm.toggleAiRow(row)" [attr.data-ai-review-first]="isFirstReview(row) ? '' : null" />
-                  <span class="ai-proposal__name">
+                <span class="ai-proposal__label">
+                  <input type="checkbox" [checked]="selected(row)" (change)="vm.toggleAiRow(row)" [attr.data-ai-review-first]="isFirstReview(row) ? '' : null"
+                    [attr.aria-label]="vm.aiFieldName(row)" />
+                  <button type="button" class="ai-proposal__name ai-proposal__go" (click)="vm.focusAiRow(row)" [attr.title]="'pairing.goTitle' | t" data-testid="ai-row-go">
                     <b class="mono">{{ vm.aiFieldName(row) }}</b>
                     <small>
                       @if (row.anchorB) { {{ 'ai.review.anchor' | t: { text: row.anchorB } }} · }
                       @if (changesPage(row)) { {{ 'batch.panel.page' | t: { page: row.page } }} → {{ 'batch.panel.page' | t: { page: row.newPage } }} } @else { {{ 'batch.panel.page' | t: { page: row.page } }} }
                       @if (withoutAi(row)) { · <span data-testid="ai-row-without-ai">{{ 'ai.proposal.withoutAi' | t }}</span> }
+                      @if (row.source === 'pattern') { · <span data-testid="ai-row-pattern" [attr.title]="row.reason">{{ 'ai.proposal.pagePattern' | t }}</span> }
                       @if (showReason(row)) { · {{ row.reason }} }
                     </small>
-                  </span>
-                </label>
+                  </button>
+                </span>
+                @if (vm.aiRowEdited(row)) {
+                  <span class="ai-proposal__badge ai-proposal__edited" data-testid="ai-row-edited">{{ 'ai.proposal.edited' | t }}</span>
+                }
                 <span class="ai-proposal__badge ai-proposal__badge--{{ level(row) }}">{{ 'ai.confidence.' + level(row) | t }}</span>
               } @else {
-                <span class="ai-proposal__name ai-proposal__name--off">
+                <button type="button" class="ai-proposal__name ai-proposal__name--off ai-proposal__go" (click)="vm.focusAiRow(row)" [attr.title]="'pairing.goTitleA' | t" data-testid="ai-row-go">
                   <b class="mono">{{ vm.aiFieldName(row) }}</b>
                   <small>{{ (absent(row) ? 'ai.proposal.absentInB' : 'ai.proposal.notInB') | t }}</small>
-                </span>
+                </button>
                 @if (missingFor(row); as state) {
                   <button type="button" class="btn btn--ghost" (click)="vm.placeMissing(state)" data-testid="place-missing">{{ 'ai.proposal.placeByHand' | t }}</button>
                 }

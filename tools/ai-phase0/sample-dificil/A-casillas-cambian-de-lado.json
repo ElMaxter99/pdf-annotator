@@ -1,0 +1,44 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 200.1,
+          "y": 719.2,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "avisos.email"
+        },
+        {
+          "x": 134.7,
+          "y": 694.2,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "avisos.sms"
+        },
+        {
+          "x": 138.3,
+          "y": 669.2,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "factura.papel"
+        },
+        {
+          "x": 125.2,
+          "y": 644.2,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "envio.urgente"
+        },
+        {
+          "x": 167,
+          "y": 619.2,
+          "type": "check",
+          "fontSize": 12,
+          "mapField": "datos.ceder"
+        }
+      ]
+    }
+  ]
+}
