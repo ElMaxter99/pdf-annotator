@@ -33,7 +33,7 @@ export const SLOT_DEFAULTS = {
   minBox: 5, // lado mínimo de una casilla
   maxBox: 20, // lado máximo de una casilla
   boxRatio: 1.35, // proporción máxima lado largo / lado corto de una casilla
-  maxFrame: 30, // altura máxima de un recuadro alargado que se trata como línea (su borde inferior)
+  maxFrame: 50, // altura máxima de un recuadro alargado (celda de tabla, recuadro de dato) que se trata como línea (su borde inferior)
   mergeGap: 3, // separación máxima para unir dos trozos de la misma línea
   yTol: 0.75, // diferencia vertical máxima para considerar dos trozos en la misma línea
 };
@@ -464,7 +464,11 @@ export function nearestSlot(anchor, slots, opts = {}) {
       }
     }
   }
-  const inRange = cands.filter((c) => c.distance <= o.radius);
+  // Tabla o recuadro: la raya pegada bajo la cabecera (≤ 10 pt) es el borde de la celda; si debajo hay otra raya de la
+  // misma columna (el pie de la celda), el valor va en esa, dentro de la celda.
+  const nearBelow = (c) => c.side === 'below' && anchor.y - c.slot.y < 10;
+  const deeper = cands.some((c) => c.side === 'below' && anchor.y - c.slot.y >= 10);
+  const inRange = cands.filter((c) => c.distance <= o.radius && !(deeper && nearBelow(c)));
   if (!inRange.length) return null;
   const wanted = o.kind === 'line' && o.prefer !== 'auto' ? inRange.filter((c) => c.side === o.prefer) : inRange;
   if (o.strict && !wanted.length) return null;
@@ -472,6 +476,9 @@ export function nearestSlot(anchor, slots, opts = {}) {
   const score = (c) => c.score ?? c.distance;
   const best = pool.reduce((a, b) => (score(b) < score(a) ? b : a));
   const s = best.slot;
-  const point = s.kind === 'box' ? { x: r1(s.x + s.w / 2), y: r1(s.y + s.h / 2) } : { x: r1(s.x + o.padX), y: r1(s.y + o.lift) };
+  // Debajo o encima, una raya larga (fila de una tabla, varias celdas fundidas) empieza antes que la columna del ancla:
+  // se escribe bajo el ancla, no al principio de la raya.
+  const startX = best.side === 'below' || best.side === 'above' ? Math.max(s.x, Math.min(anchor.x - 2, s.x + s.w - 10)) : s.x;
+  const point = s.kind === 'box' ? { x: r1(s.x + s.w / 2), y: r1(s.y + s.h / 2) } : { x: r1(startX + o.padX), y: r1(s.y + o.lift) };
   return { slot: s, side: best.side, distance: r1(best.distance), point };
 }

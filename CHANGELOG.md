@@ -1,4 +1,12 @@
 ## Unreleased
+### Changed
+- **Motor de «Trasladar con IA» más robusto en formularios difíciles (A2 adelantado con casos sintéticos):** nuevos casos de prueba en `tools/ai-phase0/sample-dificil/` (`make-hard-samples.mjs`: una página que pasa a tres con etiquetas renombradas y huecos debajo, frases con huecos «____», secciones con las mismas etiquetas, tablas con columnas reordenadas y casillas que cambian de lado). Con haiku pasan de 16 a 35 de 35 campos bien colocados (cuando la IA lee las imágenes) sin empeorar los casos fáciles (44/44):
+  - **Tablas:** una celda dibujada como recuadro (hasta 50 pt de alto) cuenta como hueco y el valor va dentro de la celda y bajo su columna, no al principio de la fila ni encima de la cabecera.
+  - **Etiquetas repetidas** («Nombre» del comprador y del vendedor): se elige la de la misma sección por su título, aunque en B las secciones cambien de orden o de columna.
+  - **Lado del hueco:** si la IA dice «a la derecha» pero en B el hueco de esa etiqueta está debajo (o la casilla cambió de lado), se usa el hueco que sí tiene.
+  - **La IA no lee las imágenes:** si la primera petición (con varias páginas de B) no lee los códigos, antes de rendirse se prueba con una página de B por petición, con un solo intento cada una y dentro del tope de 8.
+  - **«Copiar informe»** dice ahora por qué un PDF quedó parcial (`parcial: images_not_read`), qué faltó por motivo (`sin colocar: …`), qué páginas de B se miraron por cada página de A y cuántas peticiones se hicieron.
+
 
 ## [v1.17.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.17.0) - 2026-11-21
 ### Added

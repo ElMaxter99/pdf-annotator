@@ -1,0 +1,44 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 44,
+          "y": 676,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{linea.concepto}}"
+        },
+        {
+          "x": 244,
+          "y": 676,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{linea.cantidad}}"
+        },
+        {
+          "x": 314,
+          "y": 676,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{linea.precio}}"
+        },
+        {
+          "x": 404,
+          "y": 676,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{linea.descuento}}"
+        },
+        {
+          "x": 474,
+          "y": 676,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{linea.importe}}"
+        }
+      ]
+    }
+  ]
+}

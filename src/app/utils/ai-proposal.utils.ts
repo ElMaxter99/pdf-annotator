@@ -110,6 +110,11 @@ export interface AiDetails {
   placed: number;
   notPlaced: Record<string, number>;
   diagnosis: AiDiagnosis | null;
+  /** Por qué el motor cortó el PDF y devolvió un parcial (p. ej. la IA no leyó las imágenes). */
+  aborted?: 'images_not_read' | 'timeout' | 'cli_error' | null;
+  /** Peticiones hechas y reparto de páginas (A → candidatas de B), para el informe copiado. */
+  requests?: number;
+  plan?: { group: string; candidatesB: string[]; fields: number }[];
 }
 
 export type AiLiveEvent =
@@ -226,6 +231,13 @@ export function sanitizeDetails(raw: unknown): AiDetails | null {
     placed: count(r['placed']),
     notPlaced,
     diagnosis: diagnosisOf(r['diagnosis']),
+    aborted: ['images_not_read', 'timeout', 'cli_error'].includes(r['aborted'] as string) ? (r['aborted'] as AiDetails['aborted']) : null,
+    requests: count(r['requests']),
+    plan: (Array.isArray(r['plan']) ? r['plan'] : []).slice(0, 40).map((p) => {
+      const o = obj(p);
+      const names = (Array.isArray(o['candidatesB']) ? o['candidatesB'] : []).slice(0, 12);
+      return { group: text(o['group'], 12), candidatesB: names.map((n) => text(n, 12)).filter((n) => /^B-p\d+$/.test(n)), fields: count(o['fields']) };
+    }).filter((p) => /^A-p\d+$/.test(p.group)),
   };
 }
 

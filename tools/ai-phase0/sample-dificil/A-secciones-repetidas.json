@@ -1,0 +1,65 @@
+{
+  "pages": [
+    {
+      "num": 1,
+      "fields": [
+        {
+          "x": 95.8,
+          "y": 712,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{comprador.nombre}}"
+        },
+        {
+          "x": 74.1,
+          "y": 684,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{comprador.nif}}"
+        },
+        {
+          "x": 103,
+          "y": 656,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{comprador.domicilio}}"
+        },
+        {
+          "x": 85.2,
+          "y": 628,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{comprador.firma}}"
+        },
+        {
+          "x": 95.8,
+          "y": 532,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{vendedor.nombre}}"
+        },
+        {
+          "x": 74.1,
+          "y": 504,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{vendedor.nif}}"
+        },
+        {
+          "x": 103,
+          "y": 476,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{vendedor.domicilio}}"
+        },
+        {
+          "x": 85.2,
+          "y": 448,
+          "type": "text",
+          "fontSize": 10,
+          "mapField": "{{vendedor.firma}}"
+        }
+      ]
+    }
+  ]
+}

@@ -359,8 +359,9 @@ test('runProposal: tras dos intentos sin códigos y sin nada colocado falla con 
   try {
     await assert.rejects(runProposal({ provider: 'claude', ...(await load('alta-banco-otra-pagina')), runCliImpl }), (e) => {
       assert.equal(e.code, 'images_not_read');
-      assert.equal(e.details.requests, 2);
-      assert.deepEqual(e.details.attempts.map((a) => [a.n, a.group, a.retry]), [[1, 'A-p1', false], [2, 'A-p1', true]]);
+      // dos intentos con las dos páginas de B y luego una petición por página de B (un intento cada una)
+      assert.equal(e.details.requests, 4);
+      assert.deepEqual(e.details.attempts.map((a) => [a.n, a.group, a.retry, a.images.length]), [[1, 'A-p1', false, 3], [2, 'A-p1', true, 3], [3, 'A-p1', false, 2], [4, 'A-p1', false, 2]]);
       return true;
     });
   } finally {
@@ -374,10 +375,10 @@ test('runProposal: images_not_read con campos colocados sin IA devuelve un parci
   let calls = 0;
   const runCliImpl = async () => (calls++, { ok: true, seconds: 1, code: 0, stderr: '', stdout: JSON.stringify({ type: 'result', result: '{"images":{},"fields":[]}', num_turns: 1 }) });
   const r = await runProposal({ provider: 'claude', ...(await load('alta-banco-otra-pagina')), runCliImpl });
-  assert.equal(calls, 2, 'solo los dos intentos de la primera petición');
+  assert.equal(calls, 4, 'los dos intentos de la primera petición y una petición por página de B');
   assert.equal(r.details.aborted, 'images_not_read');
   assert.equal(r.details.diagnosis, 'partial');
-  assert.equal(r.details.requests, 2);
+  assert.equal(r.details.requests, 4);
   assert.ok(r.details.placedWithoutAi > 0);
   assert.equal(r.details.placed, r.details.placedWithoutAi);
   const ok = r.rows.filter((x) => x.ok);
@@ -436,7 +437,7 @@ test('runProposal lleva las indicaciones al prompt de cada petición a la IA y l
       assert.equal(e.details.instructions, 'Las casillas van a la izquierda.'.length);
       return true;
     });
-    assert.equal(prompts.length, 2);
+    assert.equal(prompts.length, 4);
     for (const p of prompts) assert.match(p, /## Indicaciones de la persona[\s\S]*> Las casillas van a la izquierda\.\n/);
     prompts.length = 0;
     await assert.rejects(runProposal({ provider: 'claude', ...(await load('alta-banco-otra-pagina')), runCliImpl }), (e) => e.details.instructions === 0);
@@ -444,4 +445,29 @@ test('runProposal lleva las indicaciones al prompt de cada petición a la IA y l
   } finally {
     delete process.env.AI_HELPER_TEXT_FIRST;
   }
+});
+
+test('si la primera petición (varias páginas de B) no lee las imágenes, se prueba con una página de B por petición', async () => {
+  const seen = [];
+  const r = await runPasses({
+    plan: [item(1, [1, 2, 3], [1, 2, 3], 2)],
+    codes: allCodes,
+    resolve,
+    call: async (req) => {
+      seen.push(req.pagesB.join(','));
+      if (req.pagesB.length > 1) return JSON.stringify({ images: {}, fields: [] }); // no lee las 4 imágenes
+      return reply(req, req.pagesB[0] === 2 ? [placedAt('p1-f1', 2), placedAt('p1-f2', 2)] : [notFound('p1-f1'), notFound('p1-f2')]);
+    },
+  });
+  assert.deepEqual(seen, ['1,2,3', '1,2,3', '1', '2', '3']); // los trozos, un intento cada uno
+  assert.equal(r.splitAfterUnread, true);
+  assert.equal(r.aborted, null);
+  assert.equal(r.outcomes.get('p1-f1').resolved.ok, true);
+  assert.equal(r.outcomes.get('p1-f2').proposal.page, 2);
+
+  // Si tampoco lee las imágenes con peticiones pequeñas, se sigue como antes: error sin nada colocado, parcial con algo.
+  const unread = async () => JSON.stringify({ images: {}, fields: [] });
+  await assert.rejects(runPasses({ plan: [item(1, [1, 2], [1, 2], 1)], codes: allCodes, resolve, call: unread }), (e) => e.code === 'images_not_read');
+  const partial = await runPasses({ plan: [item(1, [1, 2], [1, 2], 1)], codes: allCodes, resolve, alreadyPlaced: 2, call: unread });
+  assert.equal(partial.aborted, 'images_not_read');
 });
