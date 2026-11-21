@@ -3002,7 +3002,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     el.style.top = `${canvasHeight - py * scale - size * scale}px`;
     el.style.height = `${size * scale * 1.2}px`;
     el.style.minWidth = `${Math.max(24, name.length * size * 0.55 * scale)}px`;
-    el.style.fontSize = `${Math.max(9, size * scale * 0.8)}px`;
+    el.style.fontSize = `${Math.max(10, size * scale * 0.8)}px`;
     layer.appendChild(el);
   }
 

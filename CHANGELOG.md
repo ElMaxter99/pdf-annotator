@@ -1,4 +1,8 @@
 ## Unreleased
+### Changed
+- **Una sola fuente de datos para la propuesta de la IA:** la cola del lote completa la propuesta (número de página repetido) antes de contarla y guardarla, así la fila del lote («N de M») y el editor muestran las mismas filas; completarla es idempotente.
+- **Nombres de la propuesta más legibles con poco zoom:** letra mínima de 10 px y seminegrita en los campos propuestos sobre B; el gris de los desmarcados, más oscuro.
+
 
 ## [v1.17.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.17.0) - 2026-11-21
 ### Added

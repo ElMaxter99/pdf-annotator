@@ -1,4 +1,5 @@
 import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
+import { extendPagePattern } from '../utils/page-pattern.utils';
 import type { BatchItem } from '../models/batch.model';
 import {
   AI_BATCH_ACTIVE_PHASES,
@@ -628,7 +629,12 @@ export class AiBatchService {
   }
 
   /** Stores one finished answer: a proposal to review (never applied) or a failure when nothing could be placed. */
-  private acceptResult(id: string, result: AiResult): void {
+  private acceptResult(id: string, raw: AiResult): void {
+    // Una sola fuente de datos: la propuesta se completa aquí (número de página repetido…) antes de contarla y
+    // guardarla, así la lista del lote y el editor ven las mismas filas.
+    const item = this.batch.items().find((entry) => entry.id === id);
+    const pagesB = raw.details?.sent?.textsByPageB?.length ?? 0;
+    const result: AiResult = item ? { ...raw, rows: extendPagePattern(raw.rows, item.aPages, pagesB).rows } : raw;
     const { placed, absent, total } = countPlacement(result.rows);
     const usage = sumUsage(result.details?.attempts.map((a) => a.usage) ?? []) ?? this.rows()[id]?.usage ?? null;
     this.streak = { kind: '', n: 0 };
@@ -693,9 +699,10 @@ export class AiBatchService {
     if (!result.solved) {
       return false;
     }
-    this.batch.setAiProposal(id, { rows: result.rows, details: null, provider: 'adjust', model: null, seconds: 0, at: Date.now() });
-    this.patchRow(id, { phase: 'free', endedAt: Date.now(), placed: result.rows.length, total: result.rows.length });
-    this.markTaken(id, 'free', result.rows.length, result.rows.length);
+    const rows = extendPagePattern(result.rows, aPages, b.texts.length).rows;
+    this.batch.setAiProposal(id, { rows, details: null, provider: 'adjust', model: null, seconds: 0, at: Date.now() });
+    this.patchRow(id, { phase: 'free', endedAt: Date.now(), placed: rows.length, total: rows.length });
+    this.markTaken(id, 'free', rows.length, rows.length);
     return true;
   }
 

@@ -110,7 +110,7 @@ export function extendPagePattern(
       const reason = `Se repite en cada página de A (${pattern.members.length} de ${pattern.members.length}): misma posición en la página ${pageB} de B.`;
       if (member) {
         const row = out.find((r) => r.id === member.id);
-        if (row && (!row.ok || row.newPage !== pageB)) {
+        if (row && (!row.ok || row.newPage !== pageB) && row.source !== 'pattern') {
           Object.assign(row, { ok: true, newPage: pageB, ...at, confidence: 0.8, reason, why: '', source: 'pattern' as const });
           placed += 1;
         }
@@ -118,6 +118,8 @@ export function extendPagePattern(
       }
       const id = `pattern-${g + 1}-p${pageB}`;
       extra.set(id, { ...last.field, mapField: name });
+      // Idempotente: una propuesta ya completada (guardada por la cola del lote) no se duplica al abrirla en el editor.
+      if (out.some((r) => r.id === id)) continue;
       out.push({
         id,
         page: last.page,

@@ -59,4 +59,13 @@ describe('page-pattern.utils', () => {
     expect(r.rows.find((x) => x.id === 'p6-f1')?.ok).toBe(false);
     expect(extendPagePattern(rows, template, 0).placed).toBe(0);
   });
+
+  it('es idempotente: aplicarlo dos veces (cola del lote y editor) no duplica ni cuenta de nuevo', () => {
+    const rows = Array.from({ length: 11 }, (_, i) => row(`p${i + 1}-f${i === 0 ? 2 : 1}`, i + 1));
+    const once = extendPagePattern(rows, template, 19);
+    const twice = extendPagePattern(once.rows, template, 19);
+    expect(twice.rows.length).toBe(once.rows.length);
+    expect(twice.placed).toBe(0);
+    expect(twice.extra.size).toBe(8);
+  });
 });
