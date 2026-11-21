@@ -1,6 +1,7 @@
 ## Unreleased
 ### Changed
 - **«La IA no ha leído las imágenes» casi desaparece:** medido con haiku, la IA sí leía los códigos de control de cada imagen pero confundía caracteres parecidos (`5`/`S`, `0`/`O`, `8`/`B`, `2`/`Z`, `6`/`G`) y se descartaban respuestas buenas. Los códigos ya no usan esos caracteres y, al comprobarlos, los pares que se confunden cuentan como iguales. En los casos difíciles, de 1 de cada 3 tandas con el fallo a ninguna en 5 repeticiones; 34-35 de 35 campos bien colocados.
+- **Código del editor repartido en 8 archivos, sin cambios de comportamiento:** `workspace.page.ts` pasa de ~6.580 a ~2.640 líneas y conserva el estado y el núcleo; los métodos por áreas viven en `workspace-ai.ts`, `workspace-adjust.ts`, `workspace-batch.ts`, `workspace-view.ts`, `workspace-pairing.ts`, `workspace-selection.ts` y `workspace-json.ts`, y los tipos en `workspace.types.ts` (ver `docs/ARCHITECTURE.md` §1).
 - **Una sola fuente de datos para la propuesta de la IA:** la cola del lote completa la propuesta (número de página repetido) antes de contarla y guardarla, así la fila del lote («N de M») y el editor muestran las mismas filas; completarla es idempotente.
 - **Nombres de la propuesta más legibles con poco zoom:** letra mínima de 10 px y seminegrita en los campos propuestos sobre B; el gris de los desmarcados, más oscuro.
 
