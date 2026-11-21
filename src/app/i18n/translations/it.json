@@ -1500,6 +1500,17 @@
       "withoutAi": "collocato senza IA",
       "placeByHand": "Posiziona a mano",
       "tabBadge": "Proposta dell'IA: {{count}} campi"
+    },
+    "instructions": {
+      "title": "Istruzioni per l’IA",
+      "optional": "(facoltativo)",
+      "on": "impostate",
+      "placeholder": "Es.: Le caselle sono a sinistra del testo. Il CIF ora si chiama NIF.",
+      "hintBatch": "Indizi per l’IA su questi documenti: come si chiama ora un dato, dove vanno le caselle… Vengono inviati con ogni PDF del lotto e ogni PDF può avere i propri dall’editor. Non cambiano le regole né sostituiscono la tua revisione.",
+      "hintPdf": "Indizi per l’IA solo per questo PDF. Finché non li cambi, si usano quelli del lotto.",
+      "fromBatch": "Quelle del lotto",
+      "ownPdf": "Solo questo PDF",
+      "useBatch": "Usa quelle del lotto"
     }
   },
   "update": {

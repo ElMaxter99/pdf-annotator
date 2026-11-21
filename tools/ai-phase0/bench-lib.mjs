@@ -214,6 +214,7 @@ export function renderMarkdown(report) {
     `- Motor: \`runProposal\` (tools/ai-helper/pipeline.mjs), el mismo que usa la app.`,
     `- Proveedor: **${meta.provider}**${meta.model ? ` · modelo \`${meta.model}\`` : ''} · reintento ${meta.retry ? 'sí' : 'no'} · tope ${meta.maxRequests} peticiones por PDF.`,
     `- Casos: ${meta.cases} (\`${meta.casesDir}\`).`,
+    ...(meta.instructions ? [`- Con indicaciones de la persona (${meta.instructions} caracteres; el texto no se copia aquí).`] : []),
     '- Aciertos (≤ 5 / ≤ 15 pt, página OK) solo con solución conocida y en la misma página; «Ausentes OK» = campos que ya no están en B y no se colocaron.',
     '- Tokens y créditos solo si el CLI los da (Claude: tokens y coste equivalente en API; Copilot: créditos aproximados del JSONL). «–» = no medido.',
   ];

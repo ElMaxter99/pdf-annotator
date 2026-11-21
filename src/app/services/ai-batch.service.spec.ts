@@ -39,8 +39,10 @@ class FakeHelper {
   calls = 0;
   steps: Step[] = [];
   release: (() => void) | null = null;
-  async propose(_args: unknown, onProgress: (p: { stage: 'asking' }) => void, signal: AbortSignal) {
+  instructions: (string | undefined)[] = [];
+  async propose(args: { instructions?: string }, onProgress: (p: { stage: 'asking' }) => void, signal: AbortSignal) {
     this.calls++;
+    this.instructions.push(args.instructions);
     onProgress({ stage: 'asking' });
     const step = this.steps.shift() ?? result(true);
     if (step === 'wait') {
@@ -116,6 +118,16 @@ describe('AiBatchService', () => {
     expect(batch.find(ids[2])?.aiProposal).toBeUndefined();
     expect(batch.find(ids[0])?.bPages).toBeNull();
     expect(batch.find(ids[0])?.status).toBe('review');
+  });
+
+  it('sends each PDF its own AI instructions, or the batch ones when it has none (A6)', async () => {
+    batch.setBatchAiInstructions('Casillas a la izquierda');
+    batch.setItemAiInstructions(ids[1], 'Solo este PDF');
+    batch.setItemAiInstructions(ids[2], '');
+    expect(service.start(ids.slice(0, 3))).toBe('started');
+    await finished();
+    expect(helper.instructions).toEqual(['Casillas a la izquierda', 'Solo este PDF', '']);
+    batch.setBatchAiInstructions(''); // the settings record lives in the browser's IndexedDB: leave it empty
   });
 
   it('pauses the whole queue on a usage limit and keeps the rest queued', async () => {
@@ -240,6 +252,7 @@ describe('AiBatchService with the helper queue', () => {
     readonly consent = signal(true);
     readonly queueSupported = signal(true);
     added: string[] = [];
+    sentInstructions: (string | undefined)[] = [];
     resumed = 0;
     cancelled = 0;
     lost = false;
@@ -247,8 +260,9 @@ describe('AiBatchService with the helper queue', () => {
     async createQueue() {
       return 'q1';
     }
-    async addToQueue(_id: string, itemId: string) {
+    async addToQueue(_id: string, itemId: string, args: { instructions?: string }) {
       this.added.push(itemId);
+      this.sentInstructions.push(args.instructions);
     }
     async readQueue() {
       return this.lost ? null : this.snapshot;
@@ -303,6 +317,7 @@ describe('AiBatchService with the helper queue', () => {
     expect(service.start()).toBe('started');
     await until(() => helper.added.length === 3);
     expect(helper.added).toEqual(['i0', 'i1', 'i2']);
+    expect(helper.sentInstructions).toEqual(['', '', '']);
     expect(service.viaHelper()).toBe(true);
     expect(service.run()).toBe('running');
     expect(localStorage.getItem('pdf-annotator.ai.queue')).toContain('q1');

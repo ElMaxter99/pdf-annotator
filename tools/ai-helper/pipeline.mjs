@@ -12,6 +12,7 @@ import { MAX_REQUESTS_PER_PDF, firstPassRequest, imageNames, runPasses } from '.
 import { readPdf } from '../ai-phase0/pdf.mjs';
 import { PROVIDERS, describeClaudeEvent, describeCopilotEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
 import { requestPrompt } from './prompts.mjs';
+import { cleanInstructions } from './instructions.mjs';
 
 export { MAX_REQUESTS_PER_PDF };
 const tail = (s) => String(s ?? '').trim().replace(/\s+/g, ' ').slice(-300) || '(sin salida)';
@@ -77,8 +78,10 @@ function createSentLog({ A, B, fields, pngBytes }) {
   };
 }
 
-export async function runProposal({ provider, model, aBytes, bBytes, template, keepApiKey = false, timeoutMs = 300_000, onStage = () => {}, onEvent = () => {}, signal, maxAttempts = 2, maxRequests = MAX_REQUESTS_PER_PDF, runCliImpl = runCli }) {
+export async function runProposal({ provider, model, aBytes, bBytes, template, instructions = '', keepApiKey = false, timeoutMs = 300_000, onStage = () => {}, onEvent = () => {}, signal, maxAttempts = 2, maxRequests = MAX_REQUESTS_PER_PDF, runCliImpl = runCli }) {
   const fake = process.env.AI_HELPER_FAKE === '1' && provider === 'fake';
+  // Indicaciones de la persona (A6): no confiables; solo van citadas en el prompt de cada petición a la IA.
+  const hints = cleanInstructions(instructions);
   if (!fake && !PROVIDERS[provider]) throw Object.assign(new Error('Proveedor desconocido.'), { code: 'bad_provider' });
   const work = await mkdtemp(path.join(os.tmpdir(), 'pdfann-ia-'));
   try {
@@ -111,11 +114,13 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, k
       requests: 0,
       plan: plan.map((p) => ({ group: p.group, candidatesB: p.candidatesB.map((n) => `B-p${n}`), fields: p.fields.length })),
       usageSource: fake ? 'none' : 'measured',
+      // Caracteres de las indicaciones de la persona (0 = sin indicaciones); el texto no se repite aquí.
+      instructions: hints.length,
     };
     onEvent({ type: 'sent', sent });
 
     const attached = provider === 'copilot' && process.env.COPILOT_ATTACH_IMAGES !== '0';
-    const ctx = { pagesA: A.pages, pagesB: B.pages, pageMap, attached };
+    const ctx = { pagesA: A.pages, pagesB: B.pages, pageMap, attached, instructions: hints };
     const folders = new Map();
     let seconds = 0;
     let folderSeq = 0;

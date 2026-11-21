@@ -3,6 +3,7 @@
 // en B y huecos). Por defecto mide cada caso con y sin el pase sin IA para ver cuánto ahorra.
 // Uso: node bench.mjs [--cases <carpeta>] [--provider claude|copilot|fake] [--model <id>] [--no-retry]
 //                     [--text-first both|on|off] [--timeout <segundos>] [--max-requests <n>] [--keep-api-key] [--out <carpeta>]
+//                     [--instructions "<texto>"]  (indicaciones de la persona para la IA, como en la app; A6)
 // Salida: out/bench-<fecha>.md y out/bench-<fecha>.json, sin contenido de los PDF (solo ids, mapField, números y motivos).
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -11,6 +12,7 @@ import { MAX_REQUESTS_PER_PDF, runProposal } from '../ai-helper/pipeline.mjs';
 import { buildReport, failedCase, listCases, renderMarkdown, scoreCase, stamp, truthMap } from './bench-lib.mjs';
 import { flattenFields } from './lib.mjs';
 import { PROVIDERS } from './providers.mjs';
+import { cleanInstructions } from '../ai-helper/instructions.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -34,6 +36,7 @@ const modes = tfArg === 'both' ? [true, false] : [tfArg === 'on'];
 const timeoutMs = Number(opt('timeout', '300')) * 1000;
 const maxRequests = Number(opt('max-requests', String(MAX_REQUESTS_PER_PDF)));
 const keepApiKey = args.includes('--keep-api-key');
+const instructions = cleanInstructions(opt('instructions', ''));
 const casesDir = path.resolve(opt('cases', path.join(here, 'sample-plano')));
 const outDir = path.resolve(opt('out', path.join(here, 'out')));
 if (provider === 'fake') process.env.AI_HELPER_FAKE = '1';
@@ -63,7 +66,7 @@ for (const c of cases) {
     process.stdout.write(`→ ${c.name} ${mode.textFirst ? 'con' : 'sin'} pase sin IA… `);
     const t0 = performance.now();
     try {
-      const result = await runProposal({ provider, model, aBytes, bBytes, template, keepApiKey, timeoutMs, maxAttempts: retry ? 2 : 1, maxRequests });
+      const result = await runProposal({ provider, model, aBytes, bBytes, template, instructions, keepApiKey, timeoutMs, maxAttempts: retry ? 2 : 1, maxRequests });
       const r = scoreCase({ name: c.name, textFirst: mode.textFirst, result, entries, truth, seconds: (performance.now() - t0) / 1000 });
       mode.runs.push(r);
       console.log(`${r.placed}/${r.total} colocados (${r.placedWithoutAi} sin IA), ${r.requests} peticiones, ${r.seconds} s`);
@@ -86,7 +89,7 @@ if (previousTextFirst === undefined) delete process.env.AI_HELPER_TEXT_FIRST;
 else process.env.AI_HELPER_TEXT_FIRST = previousTextFirst;
 
 const now = new Date();
-const meta = { date: now.toISOString(), provider, model: model ?? null, retry, maxRequests, cases: cases.length, casesDir: path.basename(casesDir), modes: modes.map((m) => (m ? 'con' : 'sin')), stopped };
+const meta = { date: now.toISOString(), provider, model: model ?? null, retry, maxRequests, instructions: instructions.length, cases: cases.length, casesDir: path.basename(casesDir), modes: modes.map((m) => (m ? 'con' : 'sin')), stopped };
 const report = buildReport(meta, runsByMode);
 await mkdir(outDir, { recursive: true });
 const base = path.join(outDir, `bench-${stamp(now)}`);

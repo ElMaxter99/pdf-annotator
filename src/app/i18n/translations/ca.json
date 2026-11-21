@@ -1500,6 +1500,17 @@
       "withoutAi": "col·locat sense IA",
       "placeByHand": "Col·locar a mà",
       "tabBadge": "Proposta de la IA: {{count}} camps"
+    },
+    "instructions": {
+      "title": "Instruccions per a la IA",
+      "optional": "(opcional)",
+      "on": "amb text",
+      "placeholder": "Ex.: Les caselles van a l’esquerra del text. El CIF ara es diu NIF.",
+      "hintBatch": "Pistes per a la IA sobre aquests documents: com es diu ara una dada, on van les caselles… S’envien amb cada PDF del lot, i cada PDF pot tenir les seves des de l’editor. No canvien les regles ni substitueixen la teva revisió.",
+      "hintPdf": "Pistes per a la IA només per a aquest PDF. Mentre no les canviïs, s’usen les del lot.",
+      "fromBatch": "Les del lot",
+      "ownPdf": "Només aquest PDF",
+      "useBatch": "Usar les del lot"
     }
   },
   "update": {

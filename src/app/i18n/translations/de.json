@@ -1500,6 +1500,17 @@
       "withoutAi": "ohne KI platziert",
       "placeByHand": "Von Hand platzieren",
       "tabBadge": "KI-Vorschlag: {{count}} Felder"
+    },
+    "instructions": {
+      "title": "Anweisungen für die KI",
+      "optional": "(optional)",
+      "on": "gesetzt",
+      "placeholder": "Z. B.: Die Kästchen stehen links vom Text. Die CIF heißt jetzt NIF.",
+      "hintBatch": "Hinweise für die KI zu diesen Dokumenten: wie ein Feld jetzt heißt, wo die Kästchen stehen … Sie werden mit jedem PDF des Stapels gesendet, und jedes PDF kann im Editor eigene haben. Sie ändern nicht die Regeln und ersetzen nicht deine Prüfung.",
+      "hintPdf": "Hinweise für die KI nur für dieses PDF. Solange du sie nicht änderst, gelten die des Stapels.",
+      "fromBatch": "Die des Stapels",
+      "ownPdf": "Nur dieses PDF",
+      "useBatch": "Die des Stapels verwenden"
     }
   },
   "update": {

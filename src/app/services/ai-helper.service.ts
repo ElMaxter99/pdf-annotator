@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { AiDetails, AiLiveEvent, AiResult, parseNdjson } from '../utils/ai-proposal.utils';
 import { AiRemoteSnapshot, parseSnapshot } from '../utils/ai-queue.utils';
+import { cleanAiInstructions } from '../utils/ai-instructions.utils';
 import { getDesktopBridge } from './desktop-update.service';
 
 export type AiProvider = 'claude' | 'copilot' | 'fake';
@@ -376,12 +377,14 @@ export class AiHelperService {
   }
 
   /** Adds one pair; `last` closes the queue so it can finish. Pairs go one by one to keep memory low. */
-  async addToQueue(batchId: string, itemId: string, args: { a: Blob; b: Blob; template: unknown }, last: boolean): Promise<void> {
+  async addToQueue(batchId: string, itemId: string, args: { a: Blob; b: Blob; template: unknown; instructions?: string }, last: boolean): Promise<void> {
+    const instructions = cleanAiInstructions(args.instructions);
     const { status } = await this.queueCall(`/batch/${encodeURIComponent(batchId)}/items`, 'POST', {
       itemId,
       a: await toBase64(args.a),
       b: await toBase64(args.b),
       template: args.template,
+      ...(instructions ? { instructions } : {}),
       last,
     });
     if (status === 404 || status === 401) {
@@ -417,12 +420,13 @@ export class AiHelperService {
   }
 
   async propose(
-    args: { a: Blob; b: Blob; template: unknown },
+    args: { a: Blob; b: Blob; template: unknown; instructions?: string },
     onProgress: (p: AiProgress) => void,
     signal: AbortSignal,
     onEvent: (event: AiLiveEvent) => void = () => undefined,
   ): Promise<AiResult> {
     const provider = this.provider();
+    const instructions = cleanAiInstructions(args.instructions);
     const body = JSON.stringify({
       provider,
       model: this.models()[provider] || undefined,
@@ -430,6 +434,7 @@ export class AiHelperService {
       a: await toBase64(args.a),
       b: await toBase64(args.b),
       template: args.template,
+      ...(instructions ? { instructions } : {}),
     });
     let response: Response;
     try {

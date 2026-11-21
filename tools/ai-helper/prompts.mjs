@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describePageMap, fillTemplate, stripTemplateComments } from '../ai-phase0/lib.mjs';
 import { imageNames } from '../ai-phase0/passes.mjs';
+import { instructionsSection } from './instructions.mjs';
 
 export const PROMPT_NAMES = ['traslado', 'repregunta', 'reintento-imagenes', 'reintento-json'];
 const DIR = new URL('./prompts/', import.meta.url);
@@ -25,7 +26,8 @@ const sizesOf = (pages, nums) => [...new Set(nums.map((n) => pages[n - 1]).filte
 /**
  * prompt.md de una petición (pasada 1 o 2) con el aviso del reintento si lo hay.
  * @param {{pass: 1|2, pageA: number, pagesB: number[], notes: string[], fresh: boolean}} request
- * @param {{pagesA: Array<{width:number,height:number}>, pagesB: Array<{width:number,height:number}>, pageMap?: unknown, attached?: boolean}} ctx
+ * @param {{pagesA: Array<{width:number,height:number}>, pagesB: Array<{width:number,height:number}>, pageMap?: unknown, attached?: boolean, instructions?: string}} ctx
+ *   `instructions`: indicaciones opcionales de la persona (A6); sin ellas el prompt no cambia.
  * @param {null | {kind: 'images'|'json', missing?: string[]}} retry
  */
 export function requestPrompt(request, ctx, retry = null, prompts = loadPrompts()) {
@@ -44,6 +46,7 @@ export function requestPrompt(request, ctx, retry = null, prompts = loadPrompts(
     listaImagenes: images.join(', '),
     ejemploImagenes: JSON.stringify(Object.fromEntries(images.map((n) => [n, 'XXXX']))),
     aviso: aviso ? `\n${aviso}` : '',
+    instrucciones: instructionsSection(ctx.instructions),
   };
   if (request.pass === 1) return renderPrompt('traslado', vars, prompts);
   return renderPrompt(

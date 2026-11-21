@@ -107,6 +107,18 @@
               <button type="button" class="btn btn--ghost" (click)="recheckAi()" data-testid="ai-recheck">{{ 'ai.panel.recheck' | t }}</button>
             }
           }
+          @if (batchItem(); as item) {
+            <app-ai-instructions
+              class="ai-panel__instr"
+              scope="pdf"
+              [value]="item.aiInstructions ?? store.aiInstructions()"
+              [inherited]="item.aiInstructions === undefined"
+              [key]="item.id"
+              [commit]="saveInstructions"
+              (reset)="store.setItemAiInstructions(item.id, undefined)"
+              testId="ai-instructions"
+            />
+          }
           <p class="ai-panel__text ai-panel__send">{{ 'ai.panel.send' | t }}</p>
         </div>
       }

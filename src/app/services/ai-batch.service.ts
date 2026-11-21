@@ -10,6 +10,7 @@ import {
 import { AiDetails, AiResult, AiSent, AiStep, AiUsage, sumUsage, countPlacement } from '../utils/ai-proposal.utils';
 import { AiQueueInfo, AiQueueTaken, AiRemoteSnapshot, parseQueueInfo, phaseOfRemote, remoteItemId } from '../utils/ai-queue.utils';
 import { cascadeAdjust } from '../utils/adjust-cascade.utils';
+import { effectiveAiInstructions } from '../utils/ai-instructions.utils';
 import { AiHelperService, AiRequestError } from './ai-helper.service';
 import { BatchStoreService } from './batch-store.service';
 import { PdfTextService } from './pdf-text.service';
@@ -85,6 +86,11 @@ export class AiBatchService {
   private readonly ai = inject(AiHelperService);
   private readonly batch = inject(BatchStoreService);
   private readonly texts = inject(PdfTextService);
+
+  /** Instructions sent with a PDF (A6): its own if it has them, otherwise the batch ones. */
+  private instructionsFor(id: string): string {
+    return effectiveAiInstructions(this.batch.find(id), this.batch.aiInstructions());
+  }
 
   readonly rows = signal<Record<string, AiBatchRow>>({});
   readonly run = signal<AiBatchRun>('idle');
@@ -344,7 +350,7 @@ export class AiBatchService {
       this.queueMap = Object.fromEntries(send.map((item, index) => [remoteItemId(index), item.id]));
       this.persistQueue();
       for (const [index, item] of send.entries()) {
-        await this.ai.addToQueue(batchId, remoteItemId(index), { a: item.aPdf, b: item.bPdf as Blob, template: { pages: item.aPages, pageMap: item.pageMap?.pairs } }, index === send.length - 1);
+        await this.ai.addToQueue(batchId, remoteItemId(index), { a: item.aPdf, b: item.bPdf as Blob, template: { pages: item.aPages, pageMap: item.pageMap?.pairs }, instructions: this.instructionsFor(item.id) }, index === send.length - 1);
         if (generation !== this.generation) {
           return;
         }
@@ -715,7 +721,7 @@ export class AiBatchService {
     this.patchRow(id, { phase: 'reading', attempt: 1, startedAt: started, t0, provider, endedAt: null, error: null, stageLog: [{ stage: 'reading', attempt: 1, at: started - t0 }], stepLog: [], sent: null, details: null });
     try {
       const result = await this.ai.propose(
-        { a: item.aPdf, b: item.bPdf, template: { pages: item.aPages, pageMap: item.pageMap?.pairs } },
+        { a: item.aPdf, b: item.bPdf, template: { pages: item.aPages, pageMap: item.pageMap?.pairs }, instructions: this.instructionsFor(id) },
         (progress) => {
           if (generation === this.generation) {
             const row = this.rows()[id];

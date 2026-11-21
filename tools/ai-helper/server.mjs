@@ -7,6 +7,7 @@ import { runProposal } from './pipeline.mjs';
 import { listModels } from './models.mjs';
 import { PROVIDERS, findExecutable } from '../ai-phase0/providers.mjs';
 import { createBatchQueue, createSlots, validItemId } from './queue.mjs';
+import { cleanInstructions } from './instructions.mjs';
 
 const PORT = Number(process.env.AI_HELPER_PORT || 4310);
 const ORIGINS = new Set((process.env.AI_HELPER_ORIGINS || 'http://localhost:4200,http://127.0.0.1:4200,http://localhost:4300,http://127.0.0.1:4300').split(','));
@@ -27,6 +28,7 @@ const queue = createBatchQueue({
       aBytes: Buffer.from(payload.a, 'base64'),
       bBytes: Buffer.from(payload.b, 'base64'),
       template: payload.template,
+      instructions: payload.instructions,
       keepApiKey: keepApiKey(),
       timeoutMs: Number(process.env.AI_HELPER_TIMEOUT || 300) * 1000,
       signal,
@@ -123,6 +125,7 @@ const server = createServer(async (req, res) => {
         aBytes: Buffer.from(a, 'base64'),
         bBytes: Buffer.from(b, 'base64'),
         template,
+        instructions: cleanInstructions(body?.instructions),
         keepApiKey: process.env.AI_HELPER_KEEP_API_KEY === '1',
         timeoutMs: Number(process.env.AI_HELPER_TIMEOUT || 300) * 1000,
         signal: ac.signal,
@@ -170,7 +173,7 @@ const server = createServer(async (req, res) => {
       }
       const { itemId, a, b, template } = body ?? {};
       if (!validItemId(itemId) || typeof a !== 'string' || typeof b !== 'string' || !template || !Array.isArray(template.pages)) return send(res, 400, { error: 'datos' }, cors);
-      const r = queue.add(id, itemId, { a, b, template }, { last: body.last === true });
+      const r = queue.add(id, itemId, { a, b, template, instructions: cleanInstructions(body.instructions) }, { last: body.last === true });
       if (r.error === 'not_found') return send(res, 404, r, cors);
       if (r.error) return send(res, 409, r, cors);
       return send(res, 202, queue.get(id), cors);

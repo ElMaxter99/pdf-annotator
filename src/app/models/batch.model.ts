@@ -53,6 +53,8 @@ export interface BatchItem {
   readonly pageMap?: PageMapData;
   /** Last AI proposal for this pair, waiting for review. */
   readonly aiProposal?: AiSavedProposal;
+  /** Instructions for the AI for this PDF only (A6); unset = the batch ones apply, `''` = none for this PDF. */
+  readonly aiInstructions?: string;
   readonly status: BatchItemStatus;
   readonly updatedAt: number;
 }

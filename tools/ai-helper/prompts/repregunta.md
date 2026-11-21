@@ -3,7 +3,8 @@ Pasada 2 de «Trasladar con IA»: se vuelve a preguntar solo por los campos de u
 Van las páginas de B que aún no se habían enviado (de 3 en 3) o, si ya se enviaron todas, las mismas con el motivo de
 cada fallo. Los comentarios como este no se envían. Marcadores disponibles:
   paginaA, imagenA, imagenesB, totalA, totalB, tamanoA, tamanoB, tablaPaginas, adjuntas,
-  novedad, motivos, listaImagenes, ejemploImagenes, aviso
+  novedad, motivos, listaImagenes, ejemploImagenes, aviso,
+  instrucciones (indicaciones opcionales de la persona, ya citadas; vacío si no hay: entonces no queda rastro)
 -->
 # Tarea: segunda vuelta para colocar campos de un PDF A en un PDF B
 
@@ -30,6 +31,8 @@ Por qué no se colocaron:
 {{adjuntas}}Trabaja solo con las imágenes y los JSON de esta carpeta: abre cada imagen una sola vez, no uses la terminal ni escribas archivos.
 
 Mira las imágenes de B para confirmar el concepto y el lado del hueco. No inventes textos: "anchorB" (y "anchorA" si lo das) deben existir literalmente en textsB.json (y textsA.json).
+
+{{instrucciones}}
 
 ## Prueba de lectura de imágenes
 Cada imagen lleva, en una franja añadida debajo de la página, un código de 4 caracteres muy grande. Abre TODAS las imágenes de esta petición ({{listaImagenes}}) y copia el código de cada una en "images" (si dudas de un carácter escribe tu mejor lectura; nunca "?"). Sin esos códigos la respuesta se descarta.

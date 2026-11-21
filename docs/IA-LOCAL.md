@@ -140,7 +140,7 @@ node bench.mjs --provider copilot --cases ..\..\mis-casos --no-retry
 | Ruta | Qué hace |
 | --- | --- |
 | `POST /batch` `{provider, model?, retry?}` | Crea el lote y devuelve su `id` |
-| `POST /batch/:id/items` `{itemId, a, b, template, last?}` | Añade un par (uno a uno, para no cargar todos los PDF en una sola petición); `last: true` cierra el lote |
+| `POST /batch/:id/items` `{itemId, a, b, template, instructions?, last?}` | Añade un par (uno a uno, para no cargar todos los PDF en una sola petición); `last: true` cierra el lote |
 | `GET /batch/:id` · `GET /batch` | Estado: recuentos y estado/etapa por par; `rev` sube con cada cambio |
 | `GET /batch/:id/items/:itemId` | Estado del par y su propuesta (`result`) |
 | `POST /batch/:id/resume` `{retryFailed?}` | Reanuda tras un límite o el cortacircuitos; opcionalmente reencola los fallidos |
@@ -153,6 +153,13 @@ Reglas: un **límite de uso** pausa el lote entero y deja los pendientes «en co
 **Variables del ayudante:** `AI_HELPER_PORT`, `AI_HELPER_ORIGINS`, `AI_HELPER_TIMEOUT` (segundos, 300), `AI_HELPER_KEEP_API_KEY=1` (por defecto se quita `ANTHROPIC_API_KEY` para usar la suscripción), `COPILOT_ARGS` (banderas de Copilot sin verificar), `AI_HELPER_FAKE=1` (proveedor simulado para los e2e), `AI_HELPER_TEXT_FIRST=0` (desactiva el pase sin IA).
 
 **Seguridad.** El ayudante no entra en Docker ni en el despliegue. La CSP de `nginx.conf` permite `connect-src http://127.0.0.1:4310` solo para que, con el ayudante abierto en tu equipo, la app pueda hablarle; sin él, la opción aparece desactivada y explica cómo arrancarlo.
+
+## Instrucciones para la IA (A6)
+Pistas opcionales sobre los documentos (máx. 500 caracteres): «Las casillas van a la izquierda del texto», «El CIF ahora se llama NIF». Se escriben en el popover de «Trasladar con IA» del lote (para todos sus PDF) o en el panel del chip «✦ IA» del editor (solo ese PDF; si no se tocan, se usan las del lote). Las del lote se guardan con el lote (registro `__batch-settings__` de su IndexedDB; en un proyecto de escritorio, en `localStorage` de este ordenador por proyecto) y las de un PDF en su `BatchItem.aiInstructions` (`undefined` = las del lote, `''` = ninguna).
+
+- **Envío:** `instructions` en `POST /propose` y en `POST /batch/:id/items` (por PDF). El ayudante las limpia otra vez (`tools/ai-helper/instructions.mjs`: texto plano, sin caracteres de control ni de dirección, saltos normalizados, ≤ 500).
+- **Prompt:** van citadas línea a línea («> ») en una sección «Indicaciones de la persona» (marcador `{{instrucciones}}` de `traslado.md` y `repregunta.md`, antes de la prueba de lectura), que avisa de que no cambian las reglas ni el formato de la respuesta. Sin indicaciones, el prompt es el de siempre byte a byte. `result.details.instructions` = n.º de caracteres enviados (el texto no se repite).
+- **Banco:** `npm run bench -- --instructions "<texto>"`; el informe solo dice cuántos caracteres llevaba.
 
 ## Ver detalles y consumo
 El botón «Ver detalles» (barra de la IA, en carga, error, sin cambios y revisión) abre un modal con los pasos, lo enviado y el consumo. El ayudante emite líneas `{event}` durante la petición y `result.details` al terminar (`tools/ai-helper/pipeline.mjs`; en el navegador `utils/ai-proposal.utils.ts` las trata como no confiables).

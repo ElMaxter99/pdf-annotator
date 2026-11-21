@@ -163,6 +163,39 @@ describe('ProjectStoreService', () => {
     expect((call.meta as { status: string }).status).toBe('ready');
   });
 
+  it('keeps the AI instructions of the batch per project and reads those of each PDF as untrusted (A6)', async () => {
+    const ref = 'Álvaro/cliente2';
+    localStorage.setItem(`pdf-annotator.project-settings:${ref}`, JSON.stringify({ aiInstructions: ' El CIF es NIF ' }));
+    const own = stored('a1');
+    const odd = stored('a2');
+    bridge.open.and.resolveTo({
+      project: summary(ref),
+      readOnly: false,
+      items: [
+        { ...own, meta: { ...(own.meta as object), aiInstructions: `Solo este${String.fromCharCode(0)}` } },
+        { ...odd, meta: { ...(odd.meta as object), aiInstructions: { no: 'texto' } } },
+      ],
+    });
+    bridge.saveItem.and.resolveTo({ ok: true });
+    try {
+      await store.open(ref);
+      expect(batch.aiInstructions()).toBe('El CIF es NIF');
+      expect(batch.find('a1')?.aiInstructions).toBe('Solo este');
+      expect(batch.find('a2')?.aiInstructions).toBeUndefined();
+
+      batch.setBatchAiInstructions('Casillas a la izquierda');
+      expect(JSON.parse(localStorage.getItem(`pdf-annotator.project-settings:${ref}`) ?? '{}')).toEqual({
+        aiInstructions: 'Casillas a la izquierda',
+      });
+      batch.setItemAiInstructions('a2', '');
+      await store.flush();
+      const saved = bridge.saveItem.calls.mostRecent().args[0];
+      expect((saved.meta as { aiInstructions?: string }).aiInstructions).toBe('');
+    } finally {
+      localStorage.removeItem(`pdf-annotator.project-settings:${ref}`);
+    }
+  });
+
   it('reports a project that another computer has open', async () => {
     bridge.open.and.resolveTo({ locked: { state: 'other', host: 'PORTATIL-ALVARO', seen: 5 } });
 
