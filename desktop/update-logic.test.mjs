@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyInstallError, installDetail, installNeedsPassword, compareVersions, isNewer, normalizeChannel, parseLatestRelease, parseReleaseForChannel, parseVersion, updateMode } from './update-logic.mjs';
+import { classifyInstallError, installDetail, installNeedsPassword, compareVersions, isNewer, normalizeChannel, parseLatestRelease, parseReleaseForChannel, parseVersion, shouldCleanPendingUpdate, updateMode, updaterCacheDirName } from './update-logic.mjs';
 
 test('parseVersion acepta v y prerelease, rechaza basura', () => {
   assert.deepEqual(parseVersion('v1.6.0')?.nums, [1, 6, 0]);
@@ -98,4 +98,20 @@ test('installNeedsPassword solo para .deb/.rpm en Linux', () => {
   assert.equal(installNeedsPassword({ platform: 'linux', packageType: 'deb' }), true);
   assert.equal(installNeedsPassword({ platform: 'linux', appImage: true }), false);
   assert.equal(installNeedsPassword({ platform: 'win32' }), false);
+});
+
+test('updaterCacheDirName lee el nombre y rechaza rutas', () => {
+  assert.equal(updaterCacheDirName('owner: x\nupdaterCacheDirName: pdf-annotator-desktop-updater\n'), 'pdf-annotator-desktop-updater');
+  assert.equal(updaterCacheDirName("updaterCacheDirName: 'a-updater'"), 'a-updater');
+  assert.equal(updaterCacheDirName('updaterCacheDirName: ../../etc'), null);
+  assert.equal(updaterCacheDirName('updaterCacheDirName: ..'), null);
+  assert.equal(updaterCacheDirName('provider: github'), null);
+  assert.equal(updaterCacheDirName(undefined), null);
+});
+
+test('shouldCleanPendingUpdate solo tras arrancar una versión distinta', () => {
+  assert.equal(shouldCleanPendingUpdate('1.16.0', '1.17.0'), true);
+  assert.equal(shouldCleanPendingUpdate('1.17.0', '1.17.0'), false);
+  assert.equal(shouldCleanPendingUpdate(null, '1.17.0'), false);
+  assert.equal(shouldCleanPendingUpdate('', '1.17.0'), false);
 });

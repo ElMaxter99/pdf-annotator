@@ -1,6 +1,6 @@
 # Plan de la 1.17 · «IA medible y pulido»
 
-Estado (2026-11-20): **ola 1 fusionada** (A1, A3, A4, B2, B3; #308 y #309) y **ola 2 hecha** (B1, C1, C2, D2, B4 y `heading-order`, sin mesas por decisión de Maxter; D3 ya estaba resuelto). Pendiente: A2 (con los PDF de Maxter), A5 (créditos de Copilot), A6 (si hace falta), D1 (Docker en el equipo de Maxter). Pensado, como el de la 1.16, para lanzar agentes en paralelo: cada tarea dice sus archivos, dependencias, si necesita diseño y su criterio de hecho.
+Estado (2026-11-20): **ola 1 fusionada** (A1, A3, A4, B2, B3; #308 y #309) y **ola 2 hecha** (B1, C1, C2, D2, B4 y `heading-order`, sin mesas por decisión de Maxter; D3 ya estaba resuelto). A6 hecho tras la RC1 (aprobado por Maxter sin mesas). Pendiente: A2 (con los PDF de Maxter), A5 (créditos de Copilot), D1 (Docker en el equipo de Maxter). Pensado, como el de la 1.16, para lanzar agentes en paralelo: cada tarea dice sus archivos, dependencias, si necesita diseño y su criterio de hecho.
 
 La 1.16.0 está publicada (doble clic del visor, espacio de trabajo ampliado, modal mínimo de «Trasladar con IA», motor por partes, anclar en B, huecos de escritura, colocación sin IA y «no existe en B»). Lo pendiente que sale de ella es sobre todo **comprobar la IA con datos reales** y cerrar lo que quedó a medias.
 
@@ -53,7 +53,8 @@ La 1.16.0 está publicada (doble clic del visor, espacio de trabajo ampliado, mo
 ### A5 · Créditos reales de Copilot (Maxter)
 - Guion en `docs/IA-LOCAL.md` («Medir los créditos reales de Copilot»); con A1 se puede repetir con el motor nuevo. Con la cifra, se cambia el texto del ⓘ «Más información» del diálogo.
 
-### A6 · Instrucciones por lote o por PDF (decisión)
+### A6 · Instrucciones por lote o por PDF (hecho)
+- **Hecho:** fila plegada «Instrucciones para la IA (opcional)» en el popover del lote y en el panel del chip «✦ IA» del editor (solo ese PDF, hereda las del lote); se envían al ayudante y van citadas en los prompts. Detalle en `docs/IA-LOCAL.md` («Instrucciones para la IA»).
 - Un texto libre opcional por lote («las casillas van a la izquierda», «el CIF se llama NIF») que se añade al prompt. Visible: necesita mesa. **Recomendación:** esperar a A1/A2; puede que no haga falta.
 
 ### B1 · Contraste del acento en tema claro (visible)

@@ -62,6 +62,7 @@ import {
   summarizeAi,
   type AiRow,
 } from '../../utils/ai-proposal.utils';
+import { effectiveAiInstructions } from '../../utils/ai-instructions.utils';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   Component,
@@ -3500,7 +3501,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     try {
       const result = await this.aiHelper.propose(
-        { a: aPdf, b: bPdf, template: { pages: template, pageMap: this.pageMap()?.pairs } },
+        {
+          a: aPdf,
+          b: bPdf,
+          template: { pages: template, pageMap: this.pageMap()?.pairs },
+          instructions: effectiveAiInstructions(this.batch.activeItem(), this.batch.aiInstructions()),
+        },
         (progress) =>
           this.ai.update((cur) => (cur ? withAiProgress(cur, progress, Date.now()) : cur)),
         abort.signal,

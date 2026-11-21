@@ -84,6 +84,9 @@ test('renderMarkdown pinta una tabla por modo y la comparación', () => {
   assert.match(md, /\| a \| 4 \| 2 \| 1 \| 1 \| 1: 1 ancla_B_no_encontrada \| 2\/3 \| 1\/3 \| 2\/3 \| 1\/1 \| 3 \| 118 \| \$0\.030 \| 1 \|/);
   assert.match(md, /\| \*\*Total\*\* \| 2 \/ 2 \| 3 \/ 5 \|/);
   assert.match(md, /Ahorro del pase sin IA: 2 \(40 %\) peticiones/);
+  assert.doesNotMatch(md, /indicaciones de la persona/);
+  const withHints = renderMarkdown(buildReport({ date: 'hoy', provider: 'fake', model: null, retry: true, maxRequests: 8, instructions: 31, cases: 1, casesDir: 'x' }, [{ textFirst: true, runs: [on] }]));
+  assert.match(withHints, /Con indicaciones de la persona \(31 caracteres; el texto no se copia aquí\)/);
 });
 
 test('scoreCase y renderMarkdown marcan el parcial cuando la IA cortó el PDF (A4)', () => {

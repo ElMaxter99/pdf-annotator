@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, ViewChild, computed, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { InfoTipComponent } from '../../../components/info-tip/info-tip.component';
+import { AiInstructionsComponent } from '../../../components/ai-instructions/ai-instructions.component';
 import { AiModelSelectComponent } from '../../../components/ai-model-select/ai-model-select.component';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { AiBatchService } from '../../../services/ai-batch.service';
@@ -17,14 +18,14 @@ import { AI_BATCH_COPILOT_CAP, estimateAiBatch, isEligibleForAiBatch } from '../
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-batch-button',
   standalone: true,
-  imports: [CommonModule, TranslationPipe, AiModelSelectComponent, InfoTipComponent],
+  imports: [CommonModule, TranslationPipe, AiModelSelectComponent, InfoTipComponent, AiInstructionsComponent],
   templateUrl: './ai-batch-button.component.html',
   styleUrl: './ai-batch.scss',
 })
 export class AiBatchButtonComponent {
   readonly queue = inject(AiBatchService);
   readonly helper = inject(AiHelperService);
-  private readonly store = inject(BatchStoreService);
+  readonly store = inject(BatchStoreService);
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(TranslationService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -59,6 +60,9 @@ export class AiBatchButtonComponent {
   readonly breakdown = computed(() => buildAiBreakdown(this.store.items()));
 
   readonly totalCount = computed(() => this.store.items().length);
+
+  /** «Instrucciones para la IA» of the whole batch (A6). */
+  readonly saveInstructions = (text: string): void => this.store.setBatchAiInstructions(text);
 
   see(reason: 'noB' | 'noFields'): void {
     this.showReason.emit(reason);
@@ -137,7 +141,7 @@ export class AiBatchButtonComponent {
       return;
     }
     const focusable = Array.from(
-      root.querySelectorAll<HTMLElement>('button:not([disabled]), select, input, [href]'),
+      root.querySelectorAll<HTMLElement>('button:not([disabled]), select, input, textarea, [href]'),
     );
     if (!focusable.length) {
       return;

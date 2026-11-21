@@ -8,6 +8,7 @@ import { BatchStoreService } from '../../../services/batch-store.service';
 import { usageTotal } from '../../../utils/ai-proposal.utils';
 import { AI_BATCH_ACTIVE_PHASES } from '../../../utils/ai-batch.utils';
 import { AiBatchDetailsComponent } from './ai-batch-details.component';
+import { InfoTipComponent } from '../../../components/info-tip/info-tip.component';
 import { providerName } from './ai-batch-button.component';
 
 /**
@@ -18,7 +19,7 @@ import { providerName } from './ai-batch-button.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ai-batch-panel',
   standalone: true,
-  imports: [CommonModule, TranslationPipe, AiBatchDetailsComponent],
+  imports: [CommonModule, TranslationPipe, AiBatchDetailsComponent, InfoTipComponent],
   templateUrl: './ai-batch-panel.component.html',
   styleUrl: './ai-batch.scss',
 })
@@ -49,6 +50,10 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.queue.detailsOpen()) {
+      this.queue.closeDetails(); // first Esc goes back from the details to the list
+      return;
+    }
     if (this.scope() === 'pick') {
       this.release(); // first Esc lets go of the chosen PDF; the next one closes the panel
       return;

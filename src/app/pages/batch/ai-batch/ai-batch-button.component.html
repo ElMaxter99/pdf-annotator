@@ -144,6 +144,14 @@
         </div>
       }
 
+      <app-ai-instructions
+        class="ai-pop__instr"
+        scope="batch"
+        [value]="store.aiInstructions()"
+        [commit]="saveInstructions"
+        testId="ai-batch-instructions"
+      />
+
       @if (helper.connection() === 'offline' || helper.connection() === 'unknown') {
         <div class="ai-note ai-note--warn" role="alert" data-testid="ai-batch-offline">
           <span aria-hidden="true">⚠</span>

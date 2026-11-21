@@ -95,3 +95,32 @@ test('un lote de 3 pares sale adelante y se puede consultar después', async () 
   assert.equal((await call(`/batch/${id}`, { method: 'DELETE' })).status, 200);
   assert.equal((await call(`/batch/${id}`)).status, 404);
 });
+
+test('las indicaciones de la persona llegan limpias al motor, por PDF del lote y en /propose (A6)', async () => {
+  const c = CASES[0];
+  const a = (await readFile(sample(`A-${c}.pdf`))).toString('base64');
+  const b = (await readFile(sample(`B-${c}.pdf`))).toString('base64');
+  const template = JSON.parse(await readFile(sample(`A-${c}.json`), 'utf8'));
+  const id = (await call('/batch', { method: 'POST', body: { provider: 'fake' } })).json.id;
+  const hints = `  El CIF ahora se llama NIF.${String.fromCharCode(0)}  `;
+  assert.equal((await call(`/batch/${id}/items`, { method: 'POST', body: { itemId: 'con', a, b, template, instructions: hints } })).status, 202);
+  assert.equal((await call(`/batch/${id}/items`, { method: 'POST', body: { itemId: 'raro', a, b, template, instructions: { no: 'texto' }, last: true } })).status, 202);
+  let snap;
+  for (let i = 0; i < 150; i++) {
+    snap = (await call(`/batch/${id}`)).json;
+    if (snap.state === 'done') break;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  assert.equal(snap.state, 'done');
+  assert.equal((await call(`/batch/${id}/items/con`)).json.result.details.instructions, 'El CIF ahora se llama NIF.'.length);
+  assert.equal((await call(`/batch/${id}/items/raro`)).json.result.details.instructions, 0);
+  await call(`/batch/${id}`, { method: 'DELETE' });
+
+  const res = await fetch(`${BASE}/propose`, {
+    method: 'POST',
+    headers: { origin: ORIGIN, 'x-ai-token': token, 'content-type': 'application/json' },
+    body: JSON.stringify({ provider: 'fake', a, b, template, instructions: 'x'.repeat(900) }),
+  });
+  const lines = (await res.text()).trim().split('\n').map((l) => JSON.parse(l));
+  assert.equal(lines.at(-1).result.details.instructions, 500);
+});

@@ -1,7 +1,9 @@
 import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
 import { AiModelSelectComponent } from '../../../../components/ai-model-select/ai-model-select.component';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, effect, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { AiInstructionsComponent } from '../../../../components/ai-instructions/ai-instructions.component';
+import { BatchStoreService } from '../../../../services/batch-store.service';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { NoticeId, WorkspacePageComponent } from '../../workspace.page';
 import { AdjustReviewComponent } from './adjust-review.component';
@@ -11,11 +13,20 @@ import { AdjustReviewComponent } from './adjust-review.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-migration-bar',
   standalone: true,
-  imports: [FocusTrapDirective, CommonModule, TranslationPipe, AdjustReviewComponent, AiModelSelectComponent],
+  imports: [FocusTrapDirective, CommonModule, TranslationPipe, AdjustReviewComponent, AiModelSelectComponent, AiInstructionsComponent],
   templateUrl: './migration-bar.component.html',
 })
 export class MigrationBarComponent implements OnInit {
   @Input({ required: true }) vm!: WorkspacePageComponent;
+  readonly store = inject(BatchStoreService);
+  /** PDF of the batch open in the editor (for its AI instructions, A6). */
+  readonly batchItem = this.store.activeItem;
+  /** Saves the instructions typed for one PDF (the id it was typed for, even if another PDF is open now). */
+  readonly saveInstructions = (text: string, id: string): void => {
+    if (id && this.store.find(id)) {
+      this.store.setItemAiInstructions(id, text);
+    }
+  };
 
   readonly modes = ['overlay', 'toggle', 'split'] as const;
   readonly menuOpen = signal(false);

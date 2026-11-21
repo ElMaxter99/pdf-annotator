@@ -7,7 +7,7 @@ import { appendFileSync, existsSync, readFileSync, rmSync, statSync, writeFileSy
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, normalizeChannel, parseReleaseForChannel, updateMode } from './update-logic.mjs';
+import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, normalizeChannel, parseReleaseForChannel, shouldCleanPendingUpdate, updateMode, updaterCacheDirName } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { setupProjectsIpc } from './projects-ipc.mjs';
@@ -373,7 +373,32 @@ function viewMenu() {
   };
 }
 
+/** Caché de descargas de electron-updater (misma regla que su `getAppCacheDir`). */
+function appCacheBase() {
+  if (process.platform === 'win32') return process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
+  if (process.platform === 'darwin') return path.join(os.homedir(), 'Library', 'Caches');
+  return process.env.XDG_CACHE_HOME || path.join(os.homedir(), '.cache');
+}
+
+/** Tras una actualización, borra el instalador ya usado de `pending` (puede pesar cientos de MB). Nunca falla el arranque. */
+function cleanUsedUpdate() {
+  if (!app.isPackaged) return;
+  const marker = path.join(app.getPath('userData'), 'last-run-version');
+  try {
+    const last = existsSync(marker) ? readFileSync(marker, 'utf8') : null;
+    if (shouldCleanPendingUpdate(last, app.getVersion())) {
+      const ymlPath = path.join(process.resourcesPath, 'app-update.yml');
+      const dir = updaterCacheDirName(existsSync(ymlPath) ? readFileSync(ymlPath, 'utf8') : '');
+      if (dir) rmSync(path.join(appCacheBase(), dir, 'pending'), { recursive: true, force: true });
+    }
+    writeFileSync(marker, app.getVersion());
+  } catch (e) {
+    console.warn('[desktop] limpieza de la actualización:', e?.message || e);
+  }
+}
+
 app.whenReady().then(async () => {
+  cleanUsedUpdate();
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
   Menu.setApplicationMenu(buildMenu());
   registerWebProtocol();

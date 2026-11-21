@@ -4,16 +4,28 @@ import type { AiSavedProposal, BatchItem, FieldLink, PageMapData } from '../mode
 import { sanitizeDetails, sanitizeRow } from '../utils/ai-proposal.utils';
 import { ProjectStoreService } from './project-store.service';
 import { sanitizePageMap } from '../utils/page-map.utils';
+import { cleanAiInstructions } from '../utils/ai-instructions.utils';
 
 const DB_NAME = 'pdf-annotator-batch';
 const STORE = 'items';
 /** Larger PDFs are not persisted, to stay well within browser storage quotas. */
 export const MAX_BATCH_PDF_BYTES = 40 * 1024 * 1024;
 
+/** Key of the batch-wide settings record in the same IndexedDB store (never an item: items have a UUID). */
+const SETTINGS_KEY = '__batch-settings__';
+
+/** Settings of the whole batch, not of one PDF. */
+export interface BatchSettings {
+  /** Instructions for the AI for every PDF of the batch (A6); a PDF can override them. */
+  readonly aiInstructions: string;
+}
+
 /** Where a batch that belongs to a desktop project is mirrored (the folder on disk) instead of IndexedDB. */
 export interface BatchSink {
   save(item: BatchItem): void;
   remove(id: string): void;
+  /** Batch-wide settings (optional: a read-only project keeps them in memory only). */
+  saveSettings?(settings: BatchSettings): void;
 }
 
 /**
@@ -34,15 +46,18 @@ export class BatchStoreService {
   readonly persistent = signal(true);
   /** Files chosen in the landing/steps that are not a batch yet (kept in memory only). */
   readonly draft = signal<{ pdfs: File[]; jsons: File[] } | null>(null);
+  /** Instructions for the AI for the whole batch (A6); each PDF can override them (`BatchItem.aiInstructions`). */
+  readonly aiInstructions = signal('');
   private readonly injector = inject(Injector);
   /** Desktop project mirror: `null` = browser storage; in read-only projects nothing is saved at all. */
   private sink: BatchSink | null = null;
   private projectMode: 'none' | 'rw' | 'ro' = 'none';
 
   /** Puts the items of a desktop project in memory; from now on changes go to its folder (or nowhere if read-only). */
-  attachProject(items: BatchItem[], sink: BatchSink | null): void {
+  attachProject(items: BatchItem[], sink: BatchSink | null, settings?: Partial<BatchSettings> | null): void {
     this.closedNotices.set({});
     this.items.set(items);
+    this.aiInstructions.set(cleanAiInstructions(settings?.aiInstructions));
     this.activeId.set(null);
     this.sink = sink;
     this.projectMode = sink ? 'rw' : 'ro';
@@ -55,6 +70,7 @@ export class BatchStoreService {
     this.sink = null;
     this.projectMode = 'none';
     this.items.set([]);
+    this.aiInstructions.set('');
     this.activeId.set(null);
     this.closedNotices.set({});
     this.loaded.set(false);
@@ -73,7 +89,10 @@ export class BatchStoreService {
     if (typeof window !== 'undefined' && (await this.injector.get(ProjectStoreService).restore())) {
       return;
     }
-    const stored = await this.readAll();
+    const [stored, settings] = await Promise.all([this.readAll(), this.readSettings()]);
+    if (settings && !this.aiInstructions()) {
+      this.aiInstructions.set(cleanAiInstructions(settings.aiInstructions));
+    }
     // Items added before the read finished win over stored ones with the same id.
     const known = new Set(this.items().map((item) => item.id));
     this.items.update((current) => [...current, ...stored.filter((item) => !known.has(item.id))]);
@@ -115,6 +134,30 @@ export class BatchStoreService {
   }
 
   /** Remembers whether the coordinates of A are scaled to the page size of B. */
+  /** Instructions for the AI for the whole batch (A6). Saved with the batch; untrusted when read back. */
+  setBatchAiInstructions(text: string): void {
+    const clean = cleanAiInstructions(text);
+    if (clean === this.aiInstructions()) {
+      return;
+    }
+    this.aiInstructions.set(clean);
+    const settings: BatchSettings = { aiInstructions: clean };
+    if (this.projectMode !== 'none') {
+      this.sink?.saveSettings?.(settings);
+      return;
+    }
+    void this.run('readwrite', (store) => store.put(settings, SETTINGS_KEY));
+  }
+
+  /** Instructions for this PDF only; `undefined` = follow the batch again. */
+  setItemAiInstructions(id: string, text: string | undefined): void {
+    const next = text === undefined ? undefined : cleanAiInstructions(text);
+    if (this.find(id)?.aiInstructions === next) {
+      return;
+    }
+    this.patch(id, { aiInstructions: next });
+  }
+
   setFitA(id: string, fit: boolean | undefined): void {
     this.patch(id, { fitA: fit });
   }
@@ -316,7 +359,16 @@ export class BatchStoreService {
 
   private async readAll(): Promise<BatchItem[]> {
     const values = await this.run<unknown[]>('readonly', (store) => store.getAll());
-    return Array.isArray(values) ? values.filter(isBatchItem).map(withSafeProposal).map(withSafePageMap) : [];
+    return Array.isArray(values)
+      ? values.filter(isBatchItem).map(withSafeProposal).map(withSafePageMap).map(withSafeInstructions)
+      : [];
+  }
+
+  private async readSettings(): Promise<BatchSettings | null> {
+    const value = await this.run<unknown>('readonly', (store) => store.get(SETTINGS_KEY));
+    return value && typeof value === 'object'
+      ? { aiInstructions: cleanAiInstructions((value as { aiInstructions?: unknown }).aiInstructions) }
+      : null;
   }
 
   private open(): Promise<IDBDatabase | null> {
@@ -366,7 +418,13 @@ export class BatchStoreService {
 
 /** Rebuilds an item read from storage (IndexedDB or a project folder) or drops it if it has the wrong shape. */
 export function reviveBatchItem(value: unknown): BatchItem | null {
-  return isBatchItem(value) ? withSafeProposal(value) : null;
+  return isBatchItem(value) ? withSafeInstructions(withSafeProposal(value)) : null;
+}
+
+/** Stored instructions are untrusted: plain text or nothing (unset = follow the batch). */
+function withSafeInstructions(item: BatchItem): BatchItem {
+  const raw = (item as { aiInstructions?: unknown }).aiInstructions;
+  return { ...item, aiInstructions: typeof raw === 'string' ? cleanAiInstructions(raw) : undefined };
 }
 
 /** Stored data is untrusted: only keep what has the expected shape. */

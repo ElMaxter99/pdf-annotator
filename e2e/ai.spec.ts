@@ -383,12 +383,31 @@ test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos
   await page.getByTestId('ai-batch-details').click();
   const dialog = page.getByTestId('ai-bdetails');
   await expect(dialog).toBeVisible();
-  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(1);
+  // the details take the place of the list and the summary: no nested scroll areas in the panel
+  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(0);
+  await expect(page.getByTestId('ai-batch-sheet')).toHaveCount(0);
   await expect(page.getByTestId('ai-bdetails-steps')).toContainText(/\S/);
   await expect(page.getByTestId('ai-bdetails-batch')).toBeVisible();
   await page.getByTestId('ai-bdetails-tab-sent').click();
   await expect(page.getByTestId('ai-bdetails-sent')).toBeVisible();
-  await page.keyboard.press('Escape'); // closes the side panel; the work goes on
+  const scrollers = await page.getByTestId('ai-batch-status').evaluate((panel) =>
+    [panel, ...panel.querySelectorAll('*')].filter((el) => {
+      const c = getComputedStyle(el);
+      return /(auto|scroll)/.test(c.overflowY) && el.scrollHeight > el.clientHeight + 1;
+    }).length
+  );
+  expect(scrollers).toBeLessThanOrEqual(1);
+  // «Volver a la lista» (or Esc) brings the list and the summary back
+  await page.getByTestId('ai-batch-details-back').click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(1);
+  await expect(page.getByTestId('ai-batch-sheet')).toBeVisible();
+  await page.getByTestId('ai-batch-details').click();
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press('Escape'); // first Esc: back to the list
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByTestId('ai-batch-status')).toBeVisible();
+  await page.keyboard.press('Escape'); // then it closes the side panel; the work goes on
   await expect(page.getByTestId('ai-batch-status')).toHaveCount(0);
   await expect(dialog).toHaveCount(0);
   // Once finished, the row keeps a link to what happened.
@@ -448,4 +467,66 @@ test('«Trasladar con IA» en lote: la cola vive en el ayudante y el panel lo di
   // a finished queue is forgotten: nothing to recover after a reload
   expect(await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.queue'))).toBeNull();
   await expect(page.getByTestId('ai-batch-pause')).toHaveCount(0);
+});
+
+test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guardadas y enviadas (A6)', async ({ page }) => {
+  await openPanelWithPair(page);
+  await page.getByTestId('ai-batch-button').click();
+  // Folded by default: one line, no text box.
+  const toggle = page.getByTestId('ai-batch-instructions-toggle');
+  await expect(toggle).toContainText('Instrucciones para la IA');
+  await expect(toggle).toContainText('(opcional)');
+  await expect(page.getByTestId('ai-batch-instructions')).toHaveCount(0);
+  await toggle.click();
+  await page.getByTestId('ai-batch-instructions').fill('Las casillas van a la izquierda del texto.');
+  // Closing the popover keeps what was typed (saved on the batch).
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('ai-batch-dialog')).toHaveCount(0);
+  const storedSettings = () =>
+    page.evaluate(
+      () =>
+        new Promise<string>((resolve) => {
+          const open = indexedDB.open('pdf-annotator-batch', 1);
+          open.onerror = () => resolve('');
+          open.onsuccess = () => {
+            const get = open.result.transaction('items').objectStore('items').get('__batch-settings__');
+            get.onsuccess = () => resolve(String((get.result as { aiInstructions?: string } | undefined)?.aiInstructions ?? ''));
+            get.onerror = () => resolve('');
+          };
+        }),
+    );
+  await expect.poll(storedSettings).toBe('Las casillas van a la izquierda del texto.');
+
+  await page.reload();
+  await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
+  await page.getByTestId('ai-batch-button').click();
+  await expect(page.getByTestId('ai-batch-instructions-on')).toBeVisible();
+  await page.getByTestId('ai-batch-instructions-toggle').click();
+  await expect(page.getByTestId('ai-batch-instructions')).toHaveValue('Las casillas van a la izquierda del texto.');
+
+  // They go to the helper with the PDF.
+  const sent: string[] = [];
+  page.on('request', (request) => {
+    if (request.method() === 'POST' && /\/batch\/[^/]+\/items$/.test(request.url())) {
+      sent.push(String((JSON.parse(request.postData() ?? '{}') as { instructions?: unknown }).instructions ?? ''));
+    }
+  });
+  await page.getByTestId('ai-batch-cascade').uncheck();
+  await page.getByTestId('ai-batch-start').click();
+  await expect(page.getByTestId('ai-batch-summary')).toBeVisible({ timeout: 30000 });
+  expect(sent).toEqual(['Las casillas van a la izquierda del texto.']);
+
+  // In the editor the PDF follows the batch until it gets its own, and «Usar las del lote» goes back.
+  await page.getByTestId('panel-item').filter({ hasText: 'factura-0331' }).getByRole('button', { name: 'Revisar' }).click();
+  await page.waitForURL('**/workspace?lote=*');
+  await page.getByTestId('ai-chip').click();
+  await page.getByTestId('ai-instructions-toggle').click();
+  const box = page.getByTestId('ai-instructions');
+  await expect(box).toHaveValue('Las casillas van a la izquierda del texto.');
+  await expect(page.getByTestId('ai-instructions-source')).toContainText('Las del lote');
+  await box.fill('El CIF ahora se llama NIF.');
+  await expect(page.getByTestId('ai-instructions-source')).toContainText('Solo este PDF', { timeout: 5000 });
+  await page.getByTestId('ai-instructions-reset').click();
+  await expect(box).toHaveValue('Las casillas van a la izquierda del texto.');
+  await expect(page.getByTestId('ai-instructions-source')).toContainText('Las del lote');
 });

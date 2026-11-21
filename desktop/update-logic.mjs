@@ -110,3 +110,18 @@ export function installDetail(message, home = '') {
 /** ¿La instalación pedirá contraseña? Solo en Linux con .deb/.rpm (AppImage se sustituye sin pedirla). */
 export const installNeedsPassword = ({ platform, appImage = false, packageType = null }) =>
   platform === 'linux' && !appImage && (packageType === 'deb' || packageType === 'rpm');
+
+/** `updaterCacheDirName` del `app-update.yml` que deja electron-builder (o null). Solo un nombre de carpeta, nunca una ruta. */
+export function updaterCacheDirName(yml) {
+  const m = /^updaterCacheDirName:\s*['"]?([^'"\r\n]+?)['"]?\s*$/m.exec(String(yml ?? ''));
+  const name = m?.[1]?.trim();
+  return name && !/[\\/]|^\.\.?$/.test(name) ? name : null;
+}
+
+/**
+ * Tras instalar una versión, el instalador descargado se queda en `<caché>/<updaterCacheDirName>/pending`
+ * (electron-updater solo vacía esa carpeta al descargar la siguiente). Se borra al arrancar una versión distinta
+ * de la última que arrancó, así no ocupa espacio hasta la próxima actualización.
+ */
+export const shouldCleanPendingUpdate = (lastVersion, currentVersion) =>
+  typeof lastVersion === 'string' && lastVersion.trim() !== '' && lastVersion.trim() !== currentVersion;

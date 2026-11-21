@@ -10,12 +10,32 @@ import type {
   ProjectSummary,
   ProjectsBridge,
 } from '../models/project.model';
-import { BatchStoreService, type BatchSink, reviveBatchItem } from './batch-store.service';
+import { BatchStoreService, type BatchSettings, type BatchSink, reviveBatchItem } from './batch-store.service';
 import { getDesktopBridge } from './desktop-update.service';
 import { ToastService } from './toast.service';
 
 const ACTIVE_KEY = 'pdf-annotator.active-project';
 const LAST_KEY = 'pdf-annotator.last-project';
+/** Batch-wide settings of a project (AI instructions, A6): kept on this computer, per project. */
+const SETTINGS_KEY = (ref: string) => `pdf-annotator.project-settings:${ref}`;
+
+function readProjectSettings(ref: string): Partial<BatchSettings> | null {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY(ref));
+    const value = raw ? (JSON.parse(raw) as unknown) : null;
+    return value && typeof value === 'object' ? (value as Partial<BatchSettings>) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeProjectSettings(ref: string, settings: BatchSettings): void {
+  try {
+    localStorage.setItem(SETTINGS_KEY(ref), JSON.stringify(settings));
+  } catch {
+    /* sin almacenamiento del navegador */
+  }
+}
 const SAVE_DELAY_MS = 400;
 /** How often an open project checks that this computer still holds it (the main process renews the lock every minute). */
 const LOCK_CHECK_MS = 20_000;
@@ -195,7 +215,7 @@ export class ProjectStoreService {
     }
     const readOnly = result.readOnly;
     this.lockLost.set(false);
-    this.batch.attachProject(items, readOnly ? null : this.sinkFor(ref));
+    this.batch.attachProject(items, readOnly ? null : this.sinkFor(ref), readProjectSettings(ref));
     this.active.set({ ref, name: result.project.name, readOnly });
     this.remember(ref, result.project.name, readOnly);
     if (!readOnly) {
@@ -293,7 +313,9 @@ export class ProjectStoreService {
     if (!opened.ok) {
       return 'locked' in opened ? 'io' : opened.error;
     }
-    this.batch.attachProject([...items], this.sinkFor(created.ref));
+    const carried: BatchSettings = { aiInstructions: this.batch.aiInstructions() };
+    this.batch.attachProject([...items], this.sinkFor(created.ref), carried);
+    writeProjectSettings(created.ref, carried);
     for (const item of items) {
       this.queueSave(created.ref, item);
     }
@@ -340,6 +362,7 @@ export class ProjectStoreService {
   private sinkFor(ref: string): BatchSink {
     return {
       save: (item) => this.queueSave(ref, item),
+      saveSettings: (settings) => writeProjectSettings(ref, settings),
       remove: (id) => {
         this.pending.delete(id);
         const timer = this.timers.get(id);

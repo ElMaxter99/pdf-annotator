@@ -989,7 +989,8 @@
         "details": "Details",
         "note": "Nothing is applied on its own: you review each proposal.",
         "keepRunning": "You can close this panel: the work goes on.",
-        "open": "Open"
+        "open": "Open",
+        "backToList": "Back to the list"
       },
       "queue": {
         "badge": "In the helper",
@@ -1499,6 +1500,17 @@
       "withoutAi": "placed without AI",
       "placeByHand": "Place by hand",
       "tabBadge": "AI proposal: {{count}} fields"
+    },
+    "instructions": {
+      "title": "Instructions for the AI",
+      "optional": "(optional)",
+      "on": "set",
+      "placeholder": "E.g.: The checkboxes are to the left of the text. The CIF is now called NIF.",
+      "hintBatch": "Hints for the AI about these documents: what a field is called now, where the checkboxes go… They are sent with every PDF of the batch, and each PDF can have its own from the editor. They do not change the rules or replace your review.",
+      "hintPdf": "Hints for the AI for this PDF only. Until you change them, the batch ones are used.",
+      "fromBatch": "From the batch",
+      "ownPdf": "This PDF only",
+      "useBatch": "Use the batch ones"
     }
   },
   "update": {

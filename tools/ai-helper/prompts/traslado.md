@@ -3,7 +3,8 @@ Pasada 1 de «Trasladar con IA»: una petición por cada página de A que tiene 
 El ayudante rellena los {{marcadores}} y guarda el resultado como prompt.md en la carpeta de la petición.
 Los comentarios como este no se envían. Marcadores disponibles:
   paginaA, imagenA, imagenesB, totalA, totalB, tamanoA, tamanoB, tablaPaginas, adjuntas,
-  listaImagenes, ejemploImagenes (objeto JSON de ejemplo con un código por imagen), aviso
+  listaImagenes, ejemploImagenes (objeto JSON de ejemplo con un código por imagen), aviso,
+  instrucciones (indicaciones opcionales de la persona, ya citadas; vacío si no hay: entonces no queda rastro)
 -->
 # Tarea: trasladar campos de un PDF A a un PDF B
 
@@ -27,6 +28,8 @@ Esta petición es solo una parte del trabajo: trae **una página de A** (la {{pa
 {{adjuntas}}Trabaja solo con las imágenes y los JSON de esta carpeta: abre cada imagen una sola vez, no uses la terminal ni escribas archivos.
 
 Mira las imágenes de B para confirmar el concepto y el lado del hueco. No inventes textos: "anchorB" (y "anchorA" si lo das) deben existir literalmente en textsB.json (y textsA.json).
+
+{{instrucciones}}
 
 ## Prueba de lectura de imágenes
 Cada imagen lleva, en una franja añadida debajo de la página, un código de 4 caracteres muy grande. Abre TODAS las imágenes de esta petición ({{listaImagenes}}) y copia el código de cada una en "images" (si dudas de un carácter escribe tu mejor lectura; nunca "?"). Sin esos códigos la respuesta se descarta.

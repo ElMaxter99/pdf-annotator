@@ -989,7 +989,8 @@
         "details": "Détails",
         "note": "Rien n'est appliqué tout seul : vous vérifiez chaque proposition.",
         "keepRunning": "Vous pouvez fermer ce panneau : le travail continue.",
-        "open": "Ouvrir"
+        "open": "Ouvrir",
+        "backToList": "Retour à la liste"
       },
       "queue": {
         "badge": "Dans l'assistant",
@@ -1499,6 +1500,17 @@
       "withoutAi": "placé sans IA",
       "placeByHand": "Placer à la main",
       "tabBadge": "Proposition de l'IA : {{count}} champs"
+    },
+    "instructions": {
+      "title": "Instructions pour l’IA",
+      "optional": "(facultatif)",
+      "on": "renseignées",
+      "placeholder": "Ex. : Les cases sont à gauche du texte. Le CIF s’appelle maintenant NIF.",
+      "hintBatch": "Indices pour l’IA sur ces documents : le nouveau nom d’une donnée, l’emplacement des cases… Ils sont envoyés avec chaque PDF du lot, et chaque PDF peut avoir les siens depuis l’éditeur. Ils ne changent pas les règles et ne remplacent pas votre relecture.",
+      "hintPdf": "Indices pour l’IA pour ce PDF uniquement. Tant que vous ne les modifiez pas, ceux du lot s’appliquent.",
+      "fromBatch": "Ceux du lot",
+      "ownPdf": "Ce PDF uniquement",
+      "useBatch": "Utiliser ceux du lot"
     }
   },
   "update": {
