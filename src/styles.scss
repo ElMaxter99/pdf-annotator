@@ -2095,7 +2095,7 @@ header .logo {
   height: 100dvh;
   min-height: 0;
   overflow: hidden;
-  grid-template-columns: clamp(320px, 28vw, 440px) minmax(0, 1fr);
+  grid-template-columns: clamp(320px, 30vw, 440px) minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 10px;
   padding: 10px;
@@ -2562,7 +2562,8 @@ kbd {
 }
 
 .sidebar-tab {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  min-width: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2580,6 +2581,14 @@ kbd {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+/* Si aun así no caben (insignias de anotaciones y de IA a la vez), el nombre se abrevia con «…» en vez de
+   quedar oculto fuera de la tira. */
+.sidebar-tab__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .sidebar-tab:hover {
   color: var(--text);
   background: rgba(94, 234, 212, 0.08);
@@ -2591,6 +2600,7 @@ kbd {
 }
 
 .sidebar-tab--active {
+  flex-shrink: 0;
   color: var(--accent-text);
   background: rgba(94, 234, 212, 0.14);
   border-color: rgba(94, 234, 212, 0.35);
@@ -2610,6 +2620,30 @@ kbd {
 
 :root.theme-light .sidebar-tab__badge {
   color: var(--on-accent);
+}
+
+/* Pestañas en paneles estrechos (~1280 px): letra y relleno algo menores para que quepan las cuatro con su
+   insignia en los 7 idiomas, sin cortar «Avanzado». */
+.sidebar-head {
+  container: sidebar-head / inline-size;
+}
+
+@container sidebar-head (max-width: 400px) {
+  .sidebar-tabs {
+    gap: 1px;
+  }
+
+  .sidebar-tab {
+    gap: 3px;
+    padding: 7px 3px;
+    font-size: 0.74rem;
+  }
+
+  .sidebar-tab__badge {
+    min-width: 1.5em;
+    padding: 0 4px;
+    font-size: 0.68rem;
+  }
 }
 
 .sidebar-panel[hidden] {

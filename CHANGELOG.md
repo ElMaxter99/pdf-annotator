@@ -1,4 +1,7 @@
 ## Unreleased
+### Fixed
+- **Pestañas del panel lateral a 1280 px:** «Avanzado» ya no queda oculta fuera de la tira. El panel lateral es algo más ancho en pantallas medianas (`clamp(320px, 30vw, 440px)`; a 1650 px no cambia), las pestañas usan letra y relleno algo menores cuando el panel es estrecho, la activa nunca se encoge y, si aun así no caben (insignias de anotaciones y de IA a la vez), los nombres se abrevian con «…». Comprobado en los 7 idiomas a 1650, 1366 y 1280 px.
+- **App de escritorio: el instalador descargado ya no se queda en el disco:** electron-updater guarda la descarga en `<caché>/<app>-updater/pending` y solo la vaciaba al bajar la siguiente versión (nunca se acumulaban varias, pero la última ocupaba cientos de MB). Ahora se borra al arrancar por primera vez la versión nueva (`cleanUsedUpdate`, reglas en `update-logic.mjs` con pruebas).
 
 ## [v1.17.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.17.0) - 2026-11-21
 ### Added
