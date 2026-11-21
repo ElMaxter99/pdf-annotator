@@ -101,3 +101,17 @@ test('con la propuesta aplicada, la fila de un campo de B lleva a la pareja en �
   await expect(page.getByTestId('split-a').locator('.reference-field.pair-focus')).toHaveCount(1);
   await expect(page.getByTestId('pair-line')).toBeVisible();
 });
+
+test('con la propuesta editable: pasar el ratón por un campo propuesto de B dibuja la línea a A y el clic sigue abriendo el editor', async ({ page }) => {
+  await openBatchWithB(page);
+  await proposeWithAi(page);
+  const proposed = page.getByTestId('ai-proposal-field').first();
+  const r = await proposed.boundingBox();
+  if (!r) throw new Error('sin campo propuesto');
+  await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
+  await page.waitForTimeout(600);
+  await expect(page.getByTestId('pair-line')).toBeVisible();
+  await expect(page.getByTestId('split-a').locator('.reference-field.pair-focus')).toHaveCount(1);
+  await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
+  await expect(page.locator('.annotation-editor, app-annotation-editor').first()).toBeVisible();
+});
