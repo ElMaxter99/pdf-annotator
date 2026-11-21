@@ -121,6 +121,7 @@ import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { AnnotationDragController } from './annotation-drag.controller';
 import { createPageLinkState } from './page-link.state';
+import { WorkspaceAi } from './workspace-ai';
 import { PageThumbnailGenerator } from './page-thumbnail-generator';
 import {
   CustomFontEntry,
@@ -245,76 +246,26 @@ import {
 import { readPageTexts } from '../../services/pdf-text.service';
 import { closestByName, closestElementIndex, lineBetween, pairName, type PairCandidate } from '../../utils/pairing.utils';
 
-const REFERENCE_MODE_KEY = 'pdf-annotator.batch.mode';
-const WHEEL_PAGING_KEY = 'pdf-annotator.wheelPaging';
-
-interface WheelEdgeIndicator {
-  /** Which version the indicator is about when A and B have their own pages. */
-  pane?: 'A' | 'B';
-  kind: 'next' | 'prev' | 'last' | 'first' | 'now';
-  progress: number;
-  page: number;
-  total: number;
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-}
-
-type PreviewState = { page: number; field: PageField } | null;
-
-/** `aiRowId`: editing a field of the AI proposal (not of B yet); the change stays in the proposal until «Aplicar». */
-type EditState = { pageIndex: number; fieldIndex: number; field: PageField; aiRowId?: string } | null;
-
-type JsonViewMode = 'text' | 'tree';
-
-type EditorMode = 'preview' | 'edit';
-
-const SIDEBAR_TABS = ['document', 'annotations', 'templates', 'advanced'] as const;
-type SidebarTab = (typeof SIDEBAR_TABS)[number];
-
-const AUTO_APPLY_JSON_DELAY_MS = 300;
-const SESSION_SAVE_DELAY_MS = 800;
-
-const MAX_JSON_IMPORT_BYTES = 5 * 1024 * 1024;
-
-export interface AdjustSession {
-  readonly phase: 'loading' | 'ready' | 'none' | 'noText';
-  readonly progress: { page: number; total: number; common: number };
-  readonly mode: AdjustMode;
-  readonly tab: 'fields' | 'texts';
-  readonly fields: AdjustField[];
-  readonly anchors: AdjustAnchorRow[];
-  /** Fields of A that B already has (kept, not copied). */
-  readonly skipped: number;
-  readonly textsA: number;
-  readonly textsB: number;
-  /** «Propuesta» shows B with the fields where the proposal puts them; «Original» where they are in A. */
-  readonly view: 'proposal' | 'original';
-  /** The list of fields and texts is open under the notice. */
-  readonly open: boolean;
-  /** Anchor pins are shown on both pages (always shown in the «Textos» tab). */
-  readonly anchorsShown: boolean;
-  /** Field or anchor under the pointer or the keyboard focus (highlighted on A and B). */
-  readonly hover: string | null;
-  readonly hoverAnchor: string | null;
-  /** Field with its card open, and where the card goes (viewport pixels). */
-  readonly selected: string | null;
-  readonly card: { x: number; y: number } | null;
-}
-
-const ADJUST_UI = {
-  view: 'proposal',
-  open: false,
-  anchorsShown: false,
-  hover: null,
-  hoverAnchor: null,
-  selected: null,
-  card: null,
-} as const;
-
-/** Informative notices of the batch bar that can be closed (and found again in the bell). */
-export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
+import {
+  REFERENCE_MODE_KEY,
+  WHEEL_PAGING_KEY,
+  WheelEdgeIndicator,
+  PreviewState,
+  EditState,
+  JsonViewMode,
+  EditorMode,
+  SIDEBAR_TABS,
+  SidebarTab,
+  AUTO_APPLY_JSON_DELAY_MS,
+  SESSION_SAVE_DELAY_MS,
+  MAX_JSON_IMPORT_BYTES,
+  AdjustSession,
+  ADJUST_UI,
+  NoticeId,
+  PairRefB,
+  PairTarget,
+} from './workspace.types';
+export type { AdjustSession, NoticeId } from './workspace.types';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -436,17 +387,17 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       ? { key: 'app.footer.savedSeconds', n: seconds }
       : { key: 'app.footer.savedMinutes', n: Math.floor(seconds / 60) };
   });
-  private readonly translationService = inject(TranslationService);
-  private readonly document = inject(DOCUMENT);
+  readonly translationService = inject(TranslationService);
+  readonly document = inject(DOCUMENT);
   private readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
   private readonly pdfExportService = inject(PdfExportService);
-  private readonly toast = inject(ToastService);
+  readonly toast = inject(ToastService);
   private readonly sessionStore = inject(SessionStoreService);
   private readonly store = inject(AnnotationStore);
   private readonly router = inject(Router);
-  private readonly batch = inject(BatchStoreService);
+  readonly batch = inject(BatchStoreService);
   private readonly annotationImport = inject(AnnotationImportService);
   readonly aiHelper = inject(AiHelperService);
   private readonly fontCatalog = inject(FontCatalogService);
@@ -571,9 +522,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly aiPanelOpen = signal(false);
   /** Privacy notice before the first send. */
   readonly aiConsentOpen = signal(false);
-  private aiAbort: AbortController | null = null;
-  private aiPreviousMode: 'overlay' | 'toggle' | 'split' | null = null;
-  private aiTemplate = new Map<string, PageField>();
+  aiAbort: AbortController | null = null;
+  aiPreviousMode: 'overlay' | 'toggle' | 'split' | null = null;
+  aiTemplate = new Map<string, PageField>();
   private adjustPreviousMode: 'overlay' | 'toggle' | 'split' | null = null;
   /** Page counts when A and B do not have the same number of pages (else null). */
   readonly pagesDiffer = signal<{ a: number; b: number } | null>(null);
@@ -1762,7 +1713,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  private updateEditingColorState(color: string) {
+  updateEditingColorState(color: string) {
     const hex = ensureHex(color);
     if (hex) {
       this.editHexInput.set(hex);
@@ -2231,11 +2182,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return !this.areFieldsEqual(original, sanitized);
   }
 
-  private prepareFieldForStorage(field: PageField): PageField {
+  prepareFieldForStorage(field: PageField): PageField {
     return prepareFieldForStorage(field, (f) => this.fontCatalog.normalizeFontFamily(f));
   }
 
-  private prepareFieldForForm(field: PageField): PageField {
+  prepareFieldForForm(field: PageField): PageField {
     return prepareFieldForForm(field, (f) => this.fontCatalog.normalizeFontFamily(f));
   }
 
@@ -2376,7 +2327,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.closeFontDropdown('edit');
   }
 
-  private runAfterRender(callback: () => void) {
+  runAfterRender(callback: () => void) {
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(() => callback());
     } else {
@@ -2974,7 +2925,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return out;
   }
 
-  private drawReferenceField(
+  drawReferenceField(
     layer: HTMLElement,
     canvasHeight: number,
     name: string,
@@ -3650,7 +3601,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   /** The template of A by its own page numbers (what the AI helper and free pages work with). */
-  private normalizedTemplateOfA(): PageAnnotations[] {
+  normalizedTemplateOfA(): PageAnnotations[] {
     return this.normalizeTemplate(this.aPagesView());
   }
 
@@ -3788,7 +3739,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   /** Adds fields to B (replacing nothing): the first ones go straight in, later ones are one undo step. */
-  private insertFields(toAdd: Array<{ page: number; field: PageField }>): void {
+  insertFields(toAdd: Array<{ page: number; field: PageField }>): void {
     if (toAdd.length === 0) {
       return;
     }
@@ -3817,468 +3768,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  // ---- «Copiar y adaptar con IA» -----------------------------------------------------------------
-
-  /** Opens the chip panel and checks the helper again. */
-  openAiPanel(): void {
-    this.aiPanelOpen.set(true);
-    void this.aiHelper.check();
-  }
-
-  /** Entry from «Poner plantilla A ▾»: asks for consent once, then sends A and B to the helper. */
-  async startAi(): Promise<void> {
-    const item = this.batch.activeItem();
-    if (!item?.bPdf || !this.migration() || this.templateFieldsA() === 0) {
-      return;
-    }
-    if (this.aiHelper.connection() !== 'ready') {
-      await this.aiHelper.check();
-      if (this.aiHelper.connection() !== 'ready') {
-        this.openAiPanel();
-        return;
-      }
-    }
-    if (!this.aiHelper.consent()) {
-      this.aiConsentOpen.set(true);
-      return;
-    }
-    await this.runAi(item.aPdf, item.bPdf);
-  }
-
-  confirmAiConsent(remember: boolean): void {
-    this.aiHelper.acceptConsent(remember);
-    this.aiConsentOpen.set(false);
-    void this.startAi();
-  }
-
-  private async runAi(aPdf: Blob, bPdf: Blob): Promise<void> {
-    this.cancelAdjust();
-    this.aiAbort?.abort();
-    const abort = new AbortController();
-    this.aiAbort = abort;
-    const template = this.normalizedTemplateOfA();
-    this.aiTemplate = aiTemplateMap(template);
-    this.ai.set(loadingAiSession(this.aiHelper.provider(), Date.now()));
-    this.reopenNotice('ai');
-    if (this.referenceMode() !== 'split') {
-      this.aiPreviousMode = this.referenceMode();
-      await this.setReferenceMode('split');
-    }
-    try {
-      const result = await this.aiHelper.propose(
-        {
-          a: aPdf,
-          b: bPdf,
-          template: { pages: template, pageMap: this.pageMap()?.pairs },
-          instructions: effectiveAiInstructions(this.batch.activeItem(), this.batch.aiInstructions()),
-        },
-        (progress) =>
-          this.ai.update((cur) => (cur ? withAiProgress(cur, progress, Date.now()) : cur)),
-        abort.signal,
-        (event) => this.ai.update((cur) => (cur ? withAiEvent(cur, event, Date.now()) : cur)),
-      );
-      if (abort !== this.aiAbort) {
-        return;
-      }
-      const rows = this.withPagePatterns(result.rows, template);
-      const placed = rows.filter((row) => row.ok).length;
-      this.patchAi({
-        phase: placed === 0 ? 'empty' : 'ready',
-        rows,
-        seconds: result.seconds,
-        details: result.details,
-        endedAt: Date.now(),
-      });
-    } catch (error) {
-      if (abort !== this.aiAbort || (error as AiRequestError)?.code === 'aborted') {
-        return;
-      }
-      const e = error as AiRequestError;
-      this.patchAi({
-        phase: 'error',
-        endedAt: Date.now(),
-        error: { code: e.code ?? 'error', message: String(e.message ?? e), reset: e.reset ?? null },
-        details: e.details ?? null,
-      });
-    }
-    this.redrawAllForPage();
-  }
-
-  /**
-   * Campos repetidos en el mismo sitio de cada página de A (número de página…): la propuesta los completa para cada
-   * página de B sin IA (`utils/page-pattern.utils.ts`); los campos nuevos de las páginas extra entran en `aiTemplate`.
-   */
-  private withPagePatterns(rows: AiRow[], template: PageAnnotations[]): AiRow[] {
-    const extended = extendPagePattern(rows, template, this.pdfDoc()?.numPages ?? 0);
-    for (const [id, field] of extended.extra) {
-      this.aiTemplate.set(id, field);
-    }
-    return extended.rows;
-  }
-
-  private patchAi(patch: Partial<AiSession>): void {
-    this.ai.update((current) => (current ? { ...current, ...patch } : current));
-    this.redrawAllForPage();
-  }
-
-  cancelAi(): void {
-    if (this.editing()?.aiRowId) {
-      this.editing.set(null);
-    }
-    this.aiAbort?.abort();
-    this.aiAbort = null;
-    this.ai.set(null);
-    this.holdingOriginal.set(false);
-    this.reopenNotice('ai');
-    const previous = this.aiPreviousMode;
-    this.aiPreviousMode = null;
-    if (previous) {
-      void this.setReferenceMode(previous);
-    } else {
-      this.redrawAllForPage();
-    }
-  }
-
-  /** Opens the proposal that the batch queue saved for this PDF, ready to review (nothing is asked again). */
-  private async loadSavedAi(): Promise<void> {
-    const item = this.batch.activeItem();
-    const saved = item?.aiProposal;
-    if (!item || !saved || !item.bPdf || !this.migration()) {
-      return;
-    }
-    this.cancelAi();
-    const template = this.normalizedTemplateOfA();
-    this.aiTemplate = aiTemplateMap(template);
-    const rows = this.withPagePatterns(
-      saved.rows.filter((row) => this.aiTemplate.has(row.id)),
-      template,
-    );
-    if (!rows.length) {
-      this.batch.setAiProposal(item.id, undefined);
-      return;
-    }
-    this.ai.set(savedAiSession(saved, rows));
-    this.reopenNotice('ai');
-    if (this.referenceMode() !== 'split') {
-      this.aiPreviousMode = this.referenceMode();
-      await this.setReferenceMode('split');
-    }
-    this.redrawAllForPage();
-  }
-
-  /** Drops the proposal saved by the queue for this PDF and closes the review. */
-  discardAi(): void {
-    const id = this.batch.activeItem()?.id;
-    this.cancelAi();
-    if (id) {
-      this.batch.setAiProposal(id, undefined);
-    }
-  }
-
   /** Other PDFs of the batch whose AI proposal is waiting for review. */
   readonly aiPendingOthers = computed(
     () =>
       this.batch.items().filter((item) => item.aiProposal && item.id !== this.batch.activeId())
         .length,
   );
-
-  /** Jumps to the next PDF (after this one, wrapping around) that has a proposal waiting. */
-  async goNextWithProposal(): Promise<void> {
-    const items = this.batch.items();
-    const at = items.findIndex((item) => item.id === this.batch.activeId());
-    const ordered = [...items.slice(at + 1), ...items.slice(0, Math.max(0, at))];
-    const target = ordered.find((item) => item.aiProposal);
-    if (target) {
-      await this.switchBatchItem(target);
-    }
-  }
-
-  /** After an error: the same request again, or the same one with the other provider. */
-  async retryAi(provider?: AiProvider): Promise<void> {
-    if (provider) {
-      this.aiHelper.setProvider(provider);
-    }
-    this.cancelAi();
-    await this.aiHelper.check();
-    await this.startAi();
-  }
-
-  /** The text-based adjustment as the way out when the AI cannot help. */
-  useAdjustInstead(): void {
-    this.cancelAi();
-    void this.startAdjust();
-  }
-
-  setAiDetailsOpen(open: boolean): void {
-    this.ai.update((cur) => (cur ? { ...cur, detailsOpen: open } : cur));
-  }
-
-  setAiView(view: 'proposal' | 'original'): void {
-    this.patchAi({ view });
-  }
-
-  /** The proposal strip is docked under the viewer while it is showing (it reserves its own row). */
-  aiDockVisible(): boolean {
-    return this.ai() !== null && !this.isNoticeClosed('ai');
-  }
-
-  /** Fields the AI proposal places (for the badge of the «Anotaciones» tab); 0 when no proposal is waiting. */
-  aiProposedCount(): number {
-    const session = this.ai();
-    return session && session.phase === 'ready' ? session.rows.filter((row) => row.ok).length : 0;
-  }
-
-  /** «Revisar campos»: the list of the proposal lives in «Anotaciones»; opens the tab and focuses what needs a look. */
-  reviewAiFields(): void {
-    this.setSidebarMinimized(false);
-    this.setSidebarTab('annotations');
-    this.runAfterRender(() => {
-      const target =
-        this.document?.querySelector<HTMLElement>('[data-ai-review-first]') ??
-        this.document?.querySelector<HTMLElement>('[data-testid="ai-proposal"]');
-      target?.scrollIntoView?.({ block: 'nearest' });
-      target?.focus?.();
-    });
-  }
-
-  /** «Marcar las altas» / «Quitar todas»: replaces the ticks of the proposal in one go. */
-  setAiSelection(mode: 'high' | 'none'): void {
-    const session = this.ai();
-    if (!session) {
-      return;
-    }
-    const overrides: Record<string, boolean> = {};
-    for (const row of session.rows) {
-      if (row.ok) {
-        overrides[row.id] = mode === 'high' && confidenceLevel(row.confidence) === 'high';
-      }
-    }
-    this.patchAi({ overrides });
-  }
-
-  toggleAiRow(row: AiRow): void {
-    const session = this.ai();
-    if (!session || !row.ok) {
-      return;
-    }
-    const overrides = new Map(Object.entries(session.overrides));
-    const next = !isRowSelected(row, overrides);
-    this.patchAi({ overrides: { ...session.overrides, [row.id]: next } });
-  }
-
-  aiOverrides(): ReadonlyMap<string, boolean> {
-    return new Map(Object.entries(this.ai()?.overrides ?? {}));
-  }
-
-  aiSummary() {
-    return summarizeAi(this.ai()?.rows ?? [], this.aiOverrides());
-  }
-
-  aiFieldName(row: AiRow): string {
-    const field = this.ai()?.edits[row.id] ?? this.aiTemplate.get(row.id);
-    return (field?.mapField || field?.value || '').toString().trim() || '—';
-  }
-
-  /** Goes to the page of B where a field lands. */
-  goToAiRow(row: AiRow): void {
-    if (row.ok && row.newPage >= 1 && row.newPage <= (this.pdfDoc()?.numPages ?? 1)) {
-      void this.setPageIndex(row.newPage);
-    }
-  }
-
-  applyAi(): void {
-    const session = this.ai();
-    if (!session || session.phase !== 'ready') {
-      return;
-    }
-    const overrides = this.aiOverrides();
-    const toAdd: Array<{ page: number; field: PageField }> = [];
-    let moved = 0;
-    for (const row of session.rows) {
-      const field = this.aiTemplate.get(row.id);
-      if (!field || !isRowSelected(row, overrides)) {
-        continue;
-      }
-      if (rowChangesPage(row)) {
-        moved += 1;
-      }
-      const edited = session.edits[row.id];
-      const target = edited ? this.prepareFieldForStorage(aiProposalField(field, row, edited)) : aiProposalField(field, row);
-      toAdd.push({
-        page: row.newPage,
-        field: {
-          ...target,
-          x: Math.max(0, Math.round(Number(target.x) * 100) / 100),
-          y: Math.max(0, Math.round(Number(target.y) * 100) / 100),
-        },
-      });
-    }
-    this.insertFields(toAdd);
-    const count = toAdd.length;
-    const savedFor = session.saved ? this.batch.activeItem()?.id : undefined;
-    this.cancelAi();
-    if (savedFor) {
-      this.batch.setAiProposal(savedFor, undefined);
-    }
-    this.toast.show(this.translationService.translate('toast.batch.aiApplied', { count, moved }));
-  }
-
-  private drawAiPreview(layer: HTMLElement, canvasHeight: number): void {
-    const session = this.ai();
-    if (!session || session.phase !== 'ready' || session.view === 'original') {
-      return;
-    }
-    const page = this.pageIndex();
-    const overrides = this.aiOverrides();
-    layer.classList.add('reference-layer--interactive');
-    for (const row of session.rows) {
-      const base = this.aiTemplate.get(row.id);
-      if (!base || !row.ok || row.newPage !== page) {
-        continue;
-      }
-      const field = aiProposalField(base, row, session.edits[row.id]);
-      const name = (field.mapField || field.value || '').toString();
-      this.drawReferenceField(layer, canvasHeight, name, Number(field.x), Number(field.y), field.fontSize, false, false);
-      const el = layer.lastElementChild as HTMLElement | null;
-      if (el) {
-        // Editable before applying: hover, click opens the editor, drag moves it (all of it stays in the proposal).
-        el.classList.add('reference-field--editable');
-        el.classList.toggle('reference-field--edited', !!session.edits[row.id]);
-        el.title = this.translationService.translate('ai.proposal.editHint', {
-          name: name || '—',
-          level: this.translationService.translate(`ai.confidence.${confidenceLevel(row.confidence)}`),
-        });
-        el.setAttribute('data-testid', 'ai-proposal-field');
-        el.addEventListener('pointerdown', (event) => this.onAiProposalPointerDown(event, row.id, el));
-        const selected = isRowSelected(row, overrides);
-        el.classList.add(
-          selected
-            ? confidenceLevel(row.confidence) === 'high'
-              ? 'reference-field--proposal'
-              : 'reference-field--estimated'
-            : 'reference-field--grey',
-        );
-        el.dataset['aiId'] = row.id;
-      }
-    }
-  }
-
-  /** The field a proposal row would create (with its edits), or null if the row has no place in B. */
-  private aiRowField(rowId: string): PageField | null {
-    const session = this.ai();
-    const row = session?.rows.find((r) => r.id === rowId);
-    const base = this.aiTemplate.get(rowId);
-    return session && row?.ok && base ? aiProposalField(base, row, session.edits[rowId]) : null;
-  }
-
-  /** The proposed field was edited before applying (editor or drag). */
-  aiRowEdited(row: AiRow): boolean {
-    return !!this.ai()?.edits[row.id];
-  }
-
-  /** Editing a field of the proposal (the editor then saves into the proposal, not into B). */
-  editingAiRow(): boolean {
-    return !!this.editing()?.aiRowId;
-  }
-
-  /** Keeps an edit of a proposed field (and the saved copy of the batch proposal, if it came from there). */
-  private saveAiRowEdit(rowId: string, field: PageField): void {
-    const session = this.ai();
-    if (!session) {
-      return;
-    }
-    this.ai.set(withAiRowEdit(session, rowId, field));
-    this.persistAiEdits();
-    this.redrawAllForPage();
-  }
-
-  private persistAiEdits(): void {
-    const session = this.ai();
-    const item = this.batch.activeItem();
-    if (!session?.saved || !item?.aiProposal) {
-      return;
-    }
-    this.batch.setAiProposal(item.id, { ...item.aiProposal, edits: { ...session.edits } });
-  }
-
-  /** Pointer down on a proposed field in B: a click opens the editor; a drag moves it (Esc cancels the drag). */
-  private onAiProposalPointerDown(event: PointerEvent, rowId: string, el: HTMLElement): void {
-    if (event.button !== 0 || this.panReady()) {
-      return;
-    }
-    const start = this.aiRowField(rowId);
-    if (!start) {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    const doc = this.document;
-    const x0 = event.clientX;
-    const y0 = event.clientY;
-    const left0 = parseFloat(el.style.left) || 0;
-    const top0 = parseFloat(el.style.top) || 0;
-    let dragging = false;
-    let cancelled = false;
-    const scale = this.scale();
-    el.classList.add('reference-field--active');
-    const move = (e: PointerEvent) => {
-      const dx = e.clientX - x0;
-      const dy = e.clientY - y0;
-      if (!dragging && Math.hypot(dx, dy) < 4) {
-        return;
-      }
-      dragging = true;
-      el.classList.add('reference-field--dragging');
-      el.style.left = `${left0 + dx}px`;
-      el.style.top = `${top0 + dy}px`;
-    };
-    const finish = (e: PointerEvent | null) => {
-      doc.removeEventListener('pointermove', move);
-      doc.removeEventListener('pointerup', up);
-      doc.removeEventListener('pointercancel', cancel);
-      doc.removeEventListener('keydown', key, true);
-      el.classList.remove('reference-field--active', 'reference-field--dragging');
-      if (cancelled || !e) {
-        this.redrawAllForPage();
-        return;
-      }
-      if (dragging) {
-        const x = Math.max(0, Math.round((Number(start.x) + (e.clientX - x0) / scale) * 100) / 100);
-        const y = Math.max(0, Math.round((Number(start.y) - (e.clientY - y0) / scale) * 100) / 100);
-        this.saveAiRowEdit(rowId, { ...start, x, y });
-        return;
-      }
-      this.openAiRowEditor(rowId);
-    };
-    const up = (e: PointerEvent) => finish(e);
-    const cancel = () => {
-      cancelled = true;
-      finish(null);
-    };
-    const key = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
-        cancel();
-      }
-    };
-    doc.addEventListener('pointermove', move);
-    doc.addEventListener('pointerup', up);
-    doc.addEventListener('pointercancel', cancel);
-    doc.addEventListener('keydown', key, true);
-  }
-
-  /** Opens the annotation editor on a proposed field; saving keeps the change in the proposal. */
-  openAiRowEditor(rowId: string): void {
-    const field = this.aiRowField(rowId);
-    if (!field) {
-      return;
-    }
-    this.preview.set(null);
-    const formField = this.prepareFieldForForm(this.prepareFieldForStorage(field));
-    this.editing.set({ pageIndex: -1, fieldIndex: -1, field: formField, aiRowId: rowId });
-    this.updateEditingColorState(formField.color);
-  }
 
   setAdjustMode(mode: AdjustMode): void {
     this.updateAdjust((current) => ({
@@ -4901,7 +4396,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     await this.switchBatchItem(target);
   }
 
-  private async switchBatchItem(target: BatchItem): Promise<void> {
+  async switchBatchItem(target: BatchItem): Promise<void> {
     this.flushBatchSave();
     this.cancelAi();
     this.batch.activate(target.id);
@@ -6566,15 +6061,20 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 }
 
-/** Campo de B de una pareja: fila de la propuesta de la IA o campo ya puesto. */
-type PairRefB = { kind: 'ai'; id: string; page: number } | { kind: 'field'; page: number; pageIndex: number; index: number };
-
-/** Pareja activa: el campo de A (página propia y posición) y el de B; `flashUntil` = fin del destello. */
-interface PairTarget {
-  aName: string;
-  aPage: number | null;
-  aX?: number;
-  aY?: number;
-  b: PairRefB | null;
-  flashUntil?: number;
+/*
+ * El código de la página está repartido en archivos hermanos por áreas (IA, ajuste por textos, vista, parejas A↔B,
+ * lote, selección, JSON y exportación). Cada uno es una clase sin estado cuyos métodos se copian al prototipo de la
+ * página: `this` sigue siendo la página y los subcomponentes siguen llamando a `vm.metodo()`. El estado (signals)
+ * vive en la página.
+ */
+const WORKSPACE_PARTS = [WorkspaceAi] as const;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
+export interface WorkspacePageComponent extends WorkspaceAi {}
+for (const part of WORKSPACE_PARTS) {
+  for (const name of Object.getOwnPropertyNames(part.prototype)) {
+    if (name !== 'constructor') {
+      const descriptor = Object.getOwnPropertyDescriptor(part.prototype, name);
+      if (descriptor) Object.defineProperty(WorkspacePageComponent.prototype, name, descriptor);
+    }
+  }
 }
