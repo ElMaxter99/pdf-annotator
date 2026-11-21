@@ -159,9 +159,10 @@ test('the AI proposal can be edited in B before applying: click opens the editor
   // «Aplicar» creates the fields with the edited name and position, in one undo step
   await page.getByTestId('ai-apply').click();
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
-  const json = await page.locator('textarea.json-editor').inputValue();
-  expect(json).toContain('apellido.editado');
-  expect(json).not.toContain(`"mapField": "${name}"`);
+  // el texto JSON se actualiza un instante después de pintar las anotaciones (más lento en el CI)
+  const jsonText = () => page.locator('textarea.json-editor').inputValue();
+  await expect.poll(jsonText, { timeout: 10000 }).toContain('apellido.editado');
+  expect(await jsonText()).not.toContain(`"mapField": "${name}"`);
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.keyboard.press('Control+z');
   await expect(page.locator('.annotation')).toHaveCount(0);
