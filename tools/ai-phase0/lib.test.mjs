@@ -243,3 +243,12 @@ test('readingOrder y textHits: de arriba abajo y exactos antes que parciales', (
   assert.equal(textHits(ts, 1, 'parcial')[0].text, 'Total parcial');
 });
 
+
+test('códigos de imagen: los caracteres que se confunden al leer cuentan como iguales y el alfabeto no los usa', async () => {
+  const { describeImageCodes } = await import('./lib.mjs');
+  const { CODE_ALPHABET } = await import('./pdf.mjs');
+  // medido con haiku: «7Q85» por «7Q8S», «FOWS» por «F0WS», «NJ2Z» por «NJZ2»
+  assert.deepEqual(describeImageCodes({ images: { 'A-p1': '7Q85', 'B-p1': 'FOWS' } }, { 'A-p1': '7Q8S', 'B-p1': 'F0WS' }).missing, []);
+  assert.deepEqual(describeImageCodes({ images: { 'A-p1': 'XXXX' } }, { 'A-p1': '7Q8S' }).missing, ['A-p1']);
+  for (const c of 'SBZGODQIL502681') assert.ok(!CODE_ALPHABET.includes(c), `el alfabeto no debe tener «${c}»`);
+});

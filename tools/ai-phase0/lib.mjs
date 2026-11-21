@@ -86,6 +86,8 @@ export function missingImageCodes(data, codes, opts) {
 }
 
 /** Como `missingImageCodes`, y además lo que devolvió la IA por cada imagen que falla (para diagnosticar; los códigos son aleatorios, no contenido del PDF). */
+const CONFUSABLE = { S: '5', B: '8', Z: '2', G: '6', O: '0', D: '0', Q: '0', I: '1', L: '1' };
+
 export function describeImageCodes(data, codes, { minMatch } = {}) {
   const raw = data && typeof data === 'object' && !Array.isArray(data) && data.images && typeof data.images === 'object' ? data.images : {};
   // Admite claves como «A-p1.png» y un carácter mal transcrito (el modelo pequeño confunde letras parecidas).
@@ -93,8 +95,10 @@ export function describeImageCodes(data, codes, { minMatch } = {}) {
   for (const [k, v] of Object.entries(raw)) got[String(k).replace(/\.png$/i, '').trim()] = String(v ?? '').trim().toUpperCase();
   // Por defecto, mismo largo y como mucho un carácter distinto. Con `minMatch` (Copilot, que reescala las imágenes y a veces
   // pone «?» en lo que no distingue) basta con acertar ese número de posiciones: por azar es ~1 entre 200.
+  // Los pares que se confunden al leer (S/5, B/8, Z/2, G/6, O/0/D/Q, I/L/1) cuentan como el mismo carácter.
+  const same = (x, y) => x === y || (CONFUSABLE[x] ?? x) === (CONFUSABLE[y] ?? y);
   const close = (a, b) =>
-    minMatch ? [...b].filter((c, i) => a[i] === c).length >= minMatch : a.length === b.length && [...a].filter((c, i) => c !== b[i]).length <= 1;
+    minMatch ? [...b].filter((c, i) => same(a[i], c)).length >= minMatch : a.length === b.length && [...a].filter((c, i) => !same(c, b[i])).length <= 1;
   const bad = Object.entries(codes).filter(([name, code]) => !close(got[name] ?? '', code));
   return {
     missing: bad.map(([name]) => name),
