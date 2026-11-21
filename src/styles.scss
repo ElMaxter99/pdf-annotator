@@ -6792,3 +6792,87 @@ button.version-chip:focus-visible {
   font-weight: 600;
 }
 
+/* Parejas A↔B en el editor del lote: tarjeta que lleva al campo, resaltado de la pareja y línea que la une. */
+.ai-proposal__go {
+  all: unset;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  cursor: pointer;
+  border-radius: 8px;
+
+  &:hover b {
+    color: var(--accent-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.reference-field.pair-focus,
+.annotation.pair-focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  z-index: 5;
+}
+
+.reference-field.pair-focus {
+  border-style: solid;
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.pair-flash {
+  animation: pair-flash 0.6s ease-in-out 3;
+}
+
+@keyframes pair-flash {
+  50% {
+    outline-color: transparent;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+}
+
+.pair-line {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 60;
+  pointer-events: none;
+  overflow: visible;
+
+  line {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+  }
+
+  circle {
+    fill: var(--accent);
+  }
+}
+
+.pair-tip {
+  position: fixed;
+  z-index: 61;
+  translate: -50% calc(-100% - 6px);
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--warning);
+  color: var(--text);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pair-flash {
+    animation: none;
+  }
+}

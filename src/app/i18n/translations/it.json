@@ -2258,5 +2258,12 @@
     "close": "Chiudi",
     "retry": "Riprova",
     "exportButton": "Esporta {{n}} modelli"
+  },
+  "pairing": {
+    "noPartnerB": "Nessuna coppia in B",
+    "noPartnerA": "Nessuna coppia in A",
+    "otherPageA": "Il suo campo di A è a pagina {{page}} di A (con le pagine collegate A segue B).",
+    "goTitle": "Mostra in A e in B",
+    "goTitleA": "Mostra in A"
   }
 }

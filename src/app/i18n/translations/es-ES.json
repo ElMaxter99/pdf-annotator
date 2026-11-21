@@ -2258,5 +2258,12 @@
     "close": "Cerrar",
     "retry": "Reintentar",
     "exportButton": "Exportar {{n}} plantillas"
+  },
+  "pairing": {
+    "noPartnerB": "Sin pareja en B",
+    "noPartnerA": "Sin pareja en A",
+    "otherPageA": "Su campo de A está en la página {{page}} de A (con las páginas enlazadas A sigue a B).",
+    "goTitle": "Ver en A y en B",
+    "goTitleA": "Ver en A"
   }
 }

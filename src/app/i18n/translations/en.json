@@ -2258,5 +2258,12 @@
     "close": "Close",
     "retry": "Retry",
     "exportButton": "Export {{n}} templates"
+  },
+  "pairing": {
+    "noPartnerB": "No match in B",
+    "noPartnerA": "No match in A",
+    "otherPageA": "Its field of A is on page {{page}} of A (with linked pages A follows B).",
+    "goTitle": "Show in A and B",
+    "goTitleA": "Show in A"
   }
 }

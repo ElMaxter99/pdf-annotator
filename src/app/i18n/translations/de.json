@@ -2258,5 +2258,12 @@
     "close": "Schließen",
     "retry": "Erneut versuchen",
     "exportButton": "{{n}} Vorlagen exportieren"
+  },
+  "pairing": {
+    "noPartnerB": "Kein Gegenstück in B",
+    "noPartnerA": "Kein Gegenstück in A",
+    "otherPageA": "Sein Feld aus A ist auf Seite {{page}} von A (bei verknüpften Seiten folgt A der Version B).",
+    "goTitle": "In A und B zeigen",
+    "goTitleA": "In A zeigen"
   }
 }

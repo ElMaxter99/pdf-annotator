@@ -78,7 +78,7 @@
     </div>
   }
   @if (vm.splitActive()) {
-    <div class="canvas-container canvas-container--split-a" data-testid="split-a" (scroll)="vm.onSplitAScroll($event)">
+    <div class="canvas-container canvas-container--split-a" data-testid="split-a" (scroll)="vm.onSplitAScroll($event)" (click)="vm.onSplitAClick($event)">
       <span class="split-tag" (dblclick)="vm.centerPane('a')" [attr.title]="'batch.editor.split.centerHint' | t" data-testid="split-tag-a">{{ 'batch.editor.split.tagA' | t }}</span>
       @if (vm.comparing() && !vm.pagesLinked()) {
         <span class="split-pager" role="group" [attr.aria-label]="'batch.editor.pages.paneA' | t" data-testid="pager-a">
@@ -148,6 +148,16 @@
       </span>
     }
    </div>
+  }
+  @if (vm.pairLine(); as l) {
+    <svg class="pair-line" aria-hidden="true" data-testid="pair-line">
+      <line [attr.x1]="l.x1" [attr.y1]="l.y1" [attr.x2]="l.x2" [attr.y2]="l.y2" />
+      <circle [attr.cx]="l.x1" [attr.cy]="l.y1" r="4" />
+      <circle [attr.cx]="l.x2" [attr.cy]="l.y2" r="4" />
+    </svg>
+  }
+  @if (vm.pairTip(); as tip) {
+    <span class="pair-tip" role="status" data-testid="pair-tip" [style.left.px]="tip.x" [style.top.px]="tip.y">{{ tip.key | t }}</span>
   }
   <div class="canvas-container" [class.canvas-container--split-b]="vm.splitActive()" [class.canvas-container--reference-only]="vm.showingOnlyA() && !!vm.migration()" #pdfViewer (mousemove)="vm.onViewerMouseMove($event)" (mouseleave)="vm.onViewerMouseLeave()" (mouseenter)="vm.setPaneFocus('b')">
     @if (vm.splitActive()) {

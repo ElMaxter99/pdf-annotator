@@ -2258,5 +2258,12 @@
     "close": "Fermer",
     "retry": "Réessayer",
     "exportButton": "Exporter {{n}} modèles"
+  },
+  "pairing": {
+    "noPartnerB": "Sans équivalent dans B",
+    "noPartnerA": "Sans équivalent dans A",
+    "otherPageA": "Son champ de A est à la page {{page}} de A (pages liées : A suit B).",
+    "goTitle": "Voir dans A et B",
+    "goTitleA": "Voir dans A"
   }
 }

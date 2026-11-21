@@ -2258,5 +2258,12 @@
     "close": "Tanca",
     "retry": "Torna-ho a provar",
     "exportButton": "Exporta {{n}} plantilles"
+  },
+  "pairing": {
+    "noPartnerB": "Sense parella a B",
+    "noPartnerA": "Sense parella a A",
+    "otherPageA": "El seu camp d’A és a la pàgina {{page}} d’A (amb les pàgines enllaçades A segueix B).",
+    "goTitle": "Veure-ho a A i a B",
+    "goTitleA": "Veure-ho a A"
   }
 }
