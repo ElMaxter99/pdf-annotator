@@ -1499,7 +1499,11 @@
       "absentInB": "existiert in B nicht: es nicht zu platzieren ist richtig",
       "withoutAi": "ohne KI platziert",
       "placeByHand": "Von Hand platzieren",
-      "tabBadge": "KI-Vorschlag: {{count}} Felder"
+      "tabBadge": "KI-Vorschlag: {{count}} Felder",
+      "editHint": "{{name}} · Konfidenz {{level}} · klicken zum Bearbeiten, ziehen zum Verschieben",
+      "editingBadge": "Vorgeschlagenes Feld",
+      "edited": "bearbeitet",
+      "leaveOut": "Aus dem Vorschlag nehmen"
     },
     "instructions": {
       "title": "Anweisungen für die KI",

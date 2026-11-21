@@ -2043,6 +2043,13 @@ header .logo {
     box-shadow: 0 4px 12px rgba(94, 234, 212, 0.35);
   }
 
+  /* Campo de la propuesta de la IA (aún no está en B): mismo ámbar que la propuesta en el visor. */
+  &.editing .editor-badge--ai {
+    background: color-mix(in srgb, var(--warning) 28%, var(--panel));
+    color: var(--warning-text);
+    box-shadow: none;
+  }
+
   .color-hint code {
     background: rgba(94, 234, 212, 0.1);
     padding: 0 4px;
@@ -6749,3 +6756,39 @@ button.version-chip:focus-visible {
     background: color-mix(in srgb, var(--text) 12%, var(--panel));
   }
 }
+
+/* Propuesta de la IA editable en B antes de aplicarla: la capa de referencia sube sobre la zona de clic (hitbox)
+   para que sus campos reciban el ratón; los huecos vacíos siguen dejando pasar el clic. */
+.reference-layer.reference-layer--interactive {
+  z-index: 6;
+}
+
+.reference-layer--interactive .reference-field--editable {
+  pointer-events: auto;
+  cursor: grab;
+  transition: box-shadow 0.15s ease, outline-color 0.15s ease;
+}
+
+.reference-layer--interactive .reference-field--editable:hover,
+.reference-layer--interactive .reference-field--active {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+  z-index: 3;
+}
+
+.reference-layer--interactive .reference-field--dragging {
+  cursor: grabbing;
+  opacity: 0.85;
+}
+
+.reference-field--edited {
+  border-style: solid;
+}
+
+.ai-proposal__badge.ai-proposal__edited {
+  color: var(--warning-text);
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  font-weight: 600;
+}
+

@@ -1499,7 +1499,11 @@
       "absentInB": "no existeix a B: el correcte és no col·locar-lo",
       "withoutAi": "col·locat sense IA",
       "placeByHand": "Col·locar a mà",
-      "tabBadge": "Proposta de la IA: {{count}} camps"
+      "tabBadge": "Proposta de la IA: {{count}} camps",
+      "editHint": "{{name}} · confiança {{level}} · clic per editar, arrossega per moure",
+      "editingBadge": "Camp de la proposta",
+      "edited": "editat",
+      "leaveOut": "Deixa fora de la proposta"
     },
     "instructions": {
       "title": "Instruccions per a la IA",

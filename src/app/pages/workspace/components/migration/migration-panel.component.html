@@ -47,6 +47,9 @@
                     </small>
                   </span>
                 </label>
+                @if (vm.aiRowEdited(row)) {
+                  <span class="ai-proposal__badge ai-proposal__edited" data-testid="ai-row-edited">{{ 'ai.proposal.edited' | t }}</span>
+                }
                 <span class="ai-proposal__badge ai-proposal__badge--{{ level(row) }}">{{ 'ai.confidence.' + level(row) | t }}</span>
               } @else {
                 <span class="ai-proposal__name ai-proposal__name--off">

@@ -1499,7 +1499,11 @@
       "absentInB": "n'existe pas dans B : il est normal de ne pas le placer",
       "withoutAi": "placé sans IA",
       "placeByHand": "Placer à la main",
-      "tabBadge": "Proposition de l'IA : {{count}} champs"
+      "tabBadge": "Proposition de l'IA : {{count}} champs",
+      "editHint": "{{name}} · confiance {{level}} · cliquez pour modifier, glissez pour déplacer",
+      "editingBadge": "Champ proposé",
+      "edited": "modifié",
+      "leaveOut": "Exclure de la proposition"
     },
     "instructions": {
       "title": "Instructions pour l’IA",

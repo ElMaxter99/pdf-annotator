@@ -1,4 +1,4 @@
-import type { PageAnnotations } from './annotation.model';
+import type { PageAnnotations, PageField } from './annotation.model';
 import type { AiDetails, AiRow } from '../utils/ai-proposal.utils';
 
 /** The AI answer for one pair, kept until the person reviews it in the editor (never applied by itself). */
@@ -10,6 +10,8 @@ export interface AiSavedProposal {
   readonly model: string | null;
   readonly seconds: number;
   readonly at: number;
+  /** Fields edited in the review before applying (row id → field with its x,y in B); untrusted when read back. */
+  readonly edits?: Readonly<Record<string, PageField>>;
 }
 
 export type BatchItemStatus = 'review' | 'ready';

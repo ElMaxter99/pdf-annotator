@@ -1,4 +1,7 @@
 ## Unreleased
+### Added
+- **La propuesta de la IA se puede editar en B antes de aplicarla** (feedback de Maxter con la rc.2, sin mesas): los campos propuestos del visor de B reaccionan al pasar el ratón (realce y aviso con el nombre y la confianza), un clic abre el mismo editor de anotaciones con la marca «Campo de la propuesta» y lo que se guarde (nombre, tipo, tamaño, bloqueo…) se queda en la propuesta, no en B; arrastrar un campo lo mueve (Esc durante el arrastre lo deja como estaba). Lo editado se marca «editado» en la lista de Anotaciones y se aplica con «Aplicar» en un solo paso de historial; la papelera del editor lo deja fuera de la propuesta. En el lote, las ediciones se guardan con la propuesta del PDF (`AiSavedProposal.edits`, limpiadas al leerlas como no confiables). Con pruebas unitarias y e2e.
+
 ### Changed
 - **Motor de «Trasladar con IA» más robusto en formularios difíciles (A2 adelantado con casos sintéticos):** nuevos casos de prueba en `tools/ai-phase0/sample-dificil/` (`make-hard-samples.mjs`: una página que pasa a tres con etiquetas renombradas y huecos debajo, frases con huecos «____», secciones con las mismas etiquetas, tablas con columnas reordenadas y casillas que cambian de lado). Con haiku pasan de 16 a 35 de 35 campos bien colocados (cuando la IA lee las imágenes) sin empeorar los casos fáciles (44/44):
   - **Tablas:** una celda dibujada como recuadro (hasta 50 pt de alto) cuenta como hueco y el valor va dentro de la celda y bajo su columna, no al principio de la fila ni encima de la cabecera.

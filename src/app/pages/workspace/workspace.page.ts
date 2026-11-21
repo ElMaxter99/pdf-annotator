@@ -232,9 +232,11 @@ import {
   recomputeFields,
 } from '../../utils/adjust-session.utils';
 import {
+  aiProposalField,
   aiTemplateMap,
   loadingAiSession,
   savedAiSession,
+  withAiRowEdit,
   withAiEvent,
   withAiProgress,
   type AiSession,
@@ -259,7 +261,8 @@ interface WheelEdgeIndicator {
 
 type PreviewState = { page: number; field: PageField } | null;
 
-type EditState = { pageIndex: number; fieldIndex: number; field: PageField } | null;
+/** `aiRowId`: editing a field of the AI proposal (not of B yet); the change stays in the proposal until «Aplicar». */
+type EditState = { pageIndex: number; fieldIndex: number; field: PageField; aiRowId?: string } | null;
 
 type JsonViewMode = 'text' | 'tree';
 
@@ -1891,6 +1894,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
+    if (e.aiRowId) {
+      this.saveAiRowEdit(e.aiRowId, this.prepareFieldForStorage(e.field));
+      this.editing.set(null);
+      this.closeFontDropdown('edit');
+      return;
+    }
     if (!fieldHasRenderableContent(e.field)) {
       this.editing.set(null);
       this.closeFontDropdown('edit');
@@ -2125,6 +2134,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   deleteAnnotation() {
     const e = this.editing();
     if (!e) return;
+    if (e.aiRowId) {
+      // In the proposal, «eliminar» leaves the field out of what «Aplicar» creates.
+      const session = this.ai();
+      if (session) {
+        this.patchAi({ overrides: { ...session.overrides, [e.aiRowId]: false } });
+      }
+      this.editing.set(null);
+      return;
+    }
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages)),
@@ -2754,6 +2772,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
     layer.textContent = '';
+    layer.classList.remove('reference-layer--interactive');
     const m = this.migration();
     const canvas = this.pdfCanvasRef?.nativeElement;
     if (this.adjust()?.phase === 'ready' && canvas) {
@@ -3544,6 +3563,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   cancelAi(): void {
+    if (this.editing()?.aiRowId) {
+      this.editing.set(null);
+    }
     this.aiAbort?.abort();
     this.aiAbort = null;
     this.ai.set(null);
@@ -3691,7 +3713,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   aiFieldName(row: AiRow): string {
-    const field = this.aiTemplate.get(row.id);
+    const field = this.ai()?.edits[row.id] ?? this.aiTemplate.get(row.id);
     return (field?.mapField || field?.value || '').toString().trim() || '—';
   }
 
@@ -3718,12 +3740,14 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       if (rowChangesPage(row)) {
         moved += 1;
       }
+      const edited = session.edits[row.id];
+      const target = edited ? this.prepareFieldForStorage(aiProposalField(field, row, edited)) : aiProposalField(field, row);
       toAdd.push({
         page: row.newPage,
         field: {
-          ...field,
-          x: Math.max(0, Math.round(row.x * 100) / 100),
-          y: Math.max(0, Math.round(row.y * 100) / 100),
+          ...target,
+          x: Math.max(0, Math.round(Number(target.x) * 100) / 100),
+          y: Math.max(0, Math.round(Number(target.y) * 100) / 100),
         },
       });
     }
@@ -3744,23 +3768,26 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
     const page = this.pageIndex();
     const overrides = this.aiOverrides();
+    layer.classList.add('reference-layer--interactive');
     for (const row of session.rows) {
-      const field = this.aiTemplate.get(row.id);
-      if (!field || !row.ok || row.newPage !== page) {
+      const base = this.aiTemplate.get(row.id);
+      if (!base || !row.ok || row.newPage !== page) {
         continue;
       }
-      this.drawReferenceField(
-        layer,
-        canvasHeight,
-        (field.mapField || field.value || '').toString(),
-        row.x,
-        row.y,
-        field.fontSize,
-        false,
-        false,
-      );
+      const field = aiProposalField(base, row, session.edits[row.id]);
+      const name = (field.mapField || field.value || '').toString();
+      this.drawReferenceField(layer, canvasHeight, name, Number(field.x), Number(field.y), field.fontSize, false, false);
       const el = layer.lastElementChild as HTMLElement | null;
       if (el) {
+        // Editable before applying: hover, click opens the editor, drag moves it (all of it stays in the proposal).
+        el.classList.add('reference-field--editable');
+        el.classList.toggle('reference-field--edited', !!session.edits[row.id]);
+        el.title = this.translationService.translate('ai.proposal.editHint', {
+          name: name || '—',
+          level: this.translationService.translate(`ai.confidence.${confidenceLevel(row.confidence)}`),
+        });
+        el.setAttribute('data-testid', 'ai-proposal-field');
+        el.addEventListener('pointerdown', (event) => this.onAiProposalPointerDown(event, row.id, el));
         const selected = isRowSelected(row, overrides);
         el.classList.add(
           selected
@@ -3772,6 +3799,123 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         el.dataset['aiId'] = row.id;
       }
     }
+  }
+
+  /** The field a proposal row would create (with its edits), or null if the row has no place in B. */
+  private aiRowField(rowId: string): PageField | null {
+    const session = this.ai();
+    const row = session?.rows.find((r) => r.id === rowId);
+    const base = this.aiTemplate.get(rowId);
+    return session && row?.ok && base ? aiProposalField(base, row, session.edits[rowId]) : null;
+  }
+
+  /** The proposed field was edited before applying (editor or drag). */
+  aiRowEdited(row: AiRow): boolean {
+    return !!this.ai()?.edits[row.id];
+  }
+
+  /** Editing a field of the proposal (the editor then saves into the proposal, not into B). */
+  editingAiRow(): boolean {
+    return !!this.editing()?.aiRowId;
+  }
+
+  /** Keeps an edit of a proposed field (and the saved copy of the batch proposal, if it came from there). */
+  private saveAiRowEdit(rowId: string, field: PageField): void {
+    const session = this.ai();
+    if (!session) {
+      return;
+    }
+    this.ai.set(withAiRowEdit(session, rowId, field));
+    this.persistAiEdits();
+    this.redrawAllForPage();
+  }
+
+  private persistAiEdits(): void {
+    const session = this.ai();
+    const item = this.batch.activeItem();
+    if (!session?.saved || !item?.aiProposal) {
+      return;
+    }
+    this.batch.setAiProposal(item.id, { ...item.aiProposal, edits: { ...session.edits } });
+  }
+
+  /** Pointer down on a proposed field in B: a click opens the editor; a drag moves it (Esc cancels the drag). */
+  private onAiProposalPointerDown(event: PointerEvent, rowId: string, el: HTMLElement): void {
+    if (event.button !== 0 || this.panReady()) {
+      return;
+    }
+    const start = this.aiRowField(rowId);
+    if (!start) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    const doc = this.document;
+    const x0 = event.clientX;
+    const y0 = event.clientY;
+    const left0 = parseFloat(el.style.left) || 0;
+    const top0 = parseFloat(el.style.top) || 0;
+    let dragging = false;
+    let cancelled = false;
+    const scale = this.scale();
+    el.classList.add('reference-field--active');
+    const move = (e: PointerEvent) => {
+      const dx = e.clientX - x0;
+      const dy = e.clientY - y0;
+      if (!dragging && Math.hypot(dx, dy) < 4) {
+        return;
+      }
+      dragging = true;
+      el.classList.add('reference-field--dragging');
+      el.style.left = `${left0 + dx}px`;
+      el.style.top = `${top0 + dy}px`;
+    };
+    const finish = (e: PointerEvent | null) => {
+      doc.removeEventListener('pointermove', move);
+      doc.removeEventListener('pointerup', up);
+      doc.removeEventListener('pointercancel', cancel);
+      doc.removeEventListener('keydown', key, true);
+      el.classList.remove('reference-field--active', 'reference-field--dragging');
+      if (cancelled || !e) {
+        this.redrawAllForPage();
+        return;
+      }
+      if (dragging) {
+        const x = Math.max(0, Math.round((Number(start.x) + (e.clientX - x0) / scale) * 100) / 100);
+        const y = Math.max(0, Math.round((Number(start.y) - (e.clientY - y0) / scale) * 100) / 100);
+        this.saveAiRowEdit(rowId, { ...start, x, y });
+        return;
+      }
+      this.openAiRowEditor(rowId);
+    };
+    const up = (e: PointerEvent) => finish(e);
+    const cancel = () => {
+      cancelled = true;
+      finish(null);
+    };
+    const key = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        cancel();
+      }
+    };
+    doc.addEventListener('pointermove', move);
+    doc.addEventListener('pointerup', up);
+    doc.addEventListener('pointercancel', cancel);
+    doc.addEventListener('keydown', key, true);
+  }
+
+  /** Opens the annotation editor on a proposed field; saving keeps the change in the proposal. */
+  openAiRowEditor(rowId: string): void {
+    const field = this.aiRowField(rowId);
+    if (!field) {
+      return;
+    }
+    this.preview.set(null);
+    const formField = this.prepareFieldForForm(this.prepareFieldForStorage(field));
+    this.editing.set({ pageIndex: -1, fieldIndex: -1, field: formField, aiRowId: rowId });
+    this.updateEditingColorState(formField.color);
   }
 
   setAdjustMode(mode: AdjustMode): void {

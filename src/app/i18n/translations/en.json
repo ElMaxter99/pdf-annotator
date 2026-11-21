@@ -1499,7 +1499,11 @@
       "absentInB": "does not exist in B: leaving it out is correct",
       "withoutAi": "placed without AI",
       "placeByHand": "Place by hand",
-      "tabBadge": "AI proposal: {{count}} fields"
+      "tabBadge": "AI proposal: {{count}} fields",
+      "editHint": "{{name}} · {{level}} confidence · click to edit, drag to move",
+      "editingBadge": "Proposed field",
+      "edited": "edited",
+      "leaveOut": "Leave out of the proposal"
     },
     "instructions": {
       "title": "Instructions for the AI",
