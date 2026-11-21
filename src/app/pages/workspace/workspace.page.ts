@@ -89,6 +89,7 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
 import '../../array-buffer-transfer.polyfill';
 import { FieldType, PageAnnotations, PageField } from '../../models/annotation.model';
+import { extendPagePattern } from '../../utils/page-pattern.utils';
 import {
   PageSize,
   pageScaleFactors,
@@ -3534,10 +3535,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       if (abort !== this.aiAbort) {
         return;
       }
-      const placed = result.rows.filter((row) => row.ok).length;
+      const rows = this.withPagePatterns(result.rows, template);
+      const placed = rows.filter((row) => row.ok).length;
       this.patchAi({
         phase: placed === 0 ? 'empty' : 'ready',
-        rows: result.rows,
+        rows,
         seconds: result.seconds,
         details: result.details,
         endedAt: Date.now(),
@@ -3555,6 +3557,18 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       });
     }
     this.redrawAllForPage();
+  }
+
+  /**
+   * Campos repetidos en el mismo sitio de cada página de A (número de página…): la propuesta los completa para cada
+   * página de B sin IA (`utils/page-pattern.utils.ts`); los campos nuevos de las páginas extra entran en `aiTemplate`.
+   */
+  private withPagePatterns(rows: AiRow[], template: PageAnnotations[]): AiRow[] {
+    const extended = extendPagePattern(rows, template, this.pdfDoc()?.numPages ?? 0);
+    for (const [id, field] of extended.extra) {
+      this.aiTemplate.set(id, field);
+    }
+    return extended.rows;
   }
 
   private patchAi(patch: Partial<AiSession>): void {
@@ -3590,7 +3604,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.cancelAi();
     const template = this.normalizedTemplateOfA();
     this.aiTemplate = aiTemplateMap(template);
-    const rows = saved.rows.filter((row) => this.aiTemplate.has(row.id));
+    const rows = this.withPagePatterns(
+      saved.rows.filter((row) => this.aiTemplate.has(row.id)),
+      template,
+    );
     if (!rows.length) {
       this.batch.setAiProposal(item.id, undefined);
       return;

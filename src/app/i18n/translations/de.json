@@ -1503,7 +1503,8 @@
       "editHint": "{{name}} · Konfidenz {{level}} · klicken zum Bearbeiten, ziehen zum Verschieben",
       "editingBadge": "Vorgeschlagenes Feld",
       "edited": "bearbeitet",
-      "leaveOut": "Aus dem Vorschlag nehmen"
+      "leaveOut": "Aus dem Vorschlag nehmen",
+      "pagePattern": "auf jeder Seite wiederholt"
     },
     "instructions": {
       "title": "Anweisungen für die KI",

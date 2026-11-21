@@ -1503,7 +1503,8 @@
       "editHint": "{{name}} · confiance {{level}} · cliquez pour modifier, glissez pour déplacer",
       "editingBadge": "Champ proposé",
       "edited": "modifié",
-      "leaveOut": "Exclure de la proposition"
+      "leaveOut": "Exclure de la proposition",
+      "pagePattern": "répété sur chaque page"
     },
     "instructions": {
       "title": "Instructions pour l’IA",

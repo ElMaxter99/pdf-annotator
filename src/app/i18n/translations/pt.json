@@ -1503,7 +1503,8 @@
       "editHint": "{{name}} · confiança {{level}} · clique para editar, arraste para mover",
       "editingBadge": "Campo da proposta",
       "edited": "editado",
-      "leaveOut": "Deixar fora da proposta"
+      "leaveOut": "Deixar fora da proposta",
+      "pagePattern": "repetido em cada página"
     },
     "instructions": {
       "title": "Instruções para a IA",

@@ -593,3 +593,37 @@ test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guard
   await expect(box).toHaveValue('Las casillas van a la izquierda del texto.');
   await expect(page.getByTestId('ai-instructions-source')).toContainText('Las del lote');
 });
+
+test('«Copiar y adaptar con IA»: el número de página repetido en A se propone en cada página de B (3 → 4)', async ({ page }) => {
+  const pages = async (n: number) => {
+    const doc = await PDFDocument.create();
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    for (let i = 1; i <= n; i += 1) doc.addPage([595, 842]).drawText(`Página ${i}`, { x: 60, y: 780, size: 14, font });
+    return Buffer.from(await doc.save());
+  };
+  const template = { pages: [1, 2, 3].map((num) => ({ num, fields: [{ x: 540, y: 30, mapField: `numpages${num - 1}`, fontSize: 9, type: 'text' }] })) };
+  await stubAnalytics(page);
+  await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.provider', 'fake'));
+  await page.goto('/landing');
+  const a = await pages(3);
+  await page.locator('input[type=file]').setInputFiles([file('parte.pdf', a, 'application/pdf'), file('otro.pdf', a, 'application/pdf')]);
+  await page.waitForURL('**/lote');
+  await page.getByTestId('next-templates').click();
+  await page.getByTestId('input-templates').setInputFiles(file('parte.json', Buffer.from(JSON.stringify(template)), 'application/json'));
+  await page.getByTestId('open-panel').click();
+  await page.getByTestId('view-list').click();
+  await page.getByTestId('input-b').setInputFiles(file('parte-nuevo.pdf', await pages(4), 'application/pdf'));
+  await expect(page.getByTestId('panel-list')).toContainText('parte-nuevo.pdf');
+  await page.getByTestId('panel-item').filter({ hasText: 'parte.pdf' }).getByRole('button', { name: 'Revisar' }).click();
+  await page.waitForURL('**/workspace?lote=*');
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-ai').click();
+  await page.getByTestId('ai-consent-ok').click();
+  await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
+  await page.getByTestId('ai-review-fields').click();
+  // los 3 de A y uno nuevo para la página 4 de B (numpages3), marcado «repetido en cada página»
+  await expect(page.locator('.ai-proposal__row')).toHaveCount(4);
+  await expect(page.locator('.ai-proposal__row', { hasText: 'numpages3' }).getByTestId('ai-row-pattern')).toBeVisible();
+  await page.getByTestId('ai-apply').click();
+  await expect(page.locator('.annotation')).toHaveCount(1); // la de la página 1 de B
+});

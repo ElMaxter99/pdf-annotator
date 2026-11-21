@@ -1,5 +1,6 @@
 ## Unreleased
 ### Added
+- **Número de página repetido (petición de Maxter al probar la RC2):** si un campo está en el mismo sitio de cada página de A (al menos 3) con un nombre que sigue a la página («numpages0» en la 1, «numpages1» en la 2…) o con el mismo nombre en todas, la propuesta de la IA lo completa sin IA para cada página de B: recoloca los de A y añade los de las páginas nuevas («numpages11…18» si B pasa de 11 a 19 páginas), marcados «repetido en cada página» en la lista. Reglas en `utils/page-pattern.utils.ts`, con pruebas unitarias y e2e.
 - **La propuesta de la IA se puede editar en B antes de aplicarla** (feedback de Maxter con la rc.2, sin mesas): los campos propuestos del visor de B reaccionan al pasar el ratón (realce y aviso con el nombre y la confianza), un clic abre el mismo editor de anotaciones con la marca «Campo de la propuesta» y lo que se guarde (nombre, tipo, tamaño, bloqueo…) se queda en la propuesta, no en B; arrastrar un campo lo mueve (Esc durante el arrastre lo deja como estaba). Lo editado se marca «editado» en la lista de Anotaciones y se aplica con «Aplicar» en un solo paso de historial; la papelera del editor lo deja fuera de la propuesta. En el lote, las ediciones se guardan con la propuesta del PDF (`AiSavedProposal.edits`, limpiadas al leerlas como no confiables). Con pruebas unitarias y e2e.
 
 ### Changed

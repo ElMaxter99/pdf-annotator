@@ -1503,7 +1503,8 @@
       "editHint": "{{name}} · {{level}} confidence · click to edit, drag to move",
       "editingBadge": "Proposed field",
       "edited": "edited",
-      "leaveOut": "Leave out of the proposal"
+      "leaveOut": "Leave out of the proposal",
+      "pagePattern": "repeated on every page"
     },
     "instructions": {
       "title": "Instructions for the AI",

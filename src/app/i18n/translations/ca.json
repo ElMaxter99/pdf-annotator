@@ -1503,7 +1503,8 @@
       "editHint": "{{name}} · confiança {{level}} · clic per editar, arrossega per moure",
       "editingBadge": "Camp de la proposta",
       "edited": "editat",
-      "leaveOut": "Deixa fora de la proposta"
+      "leaveOut": "Deixa fora de la proposta",
+      "pagePattern": "repetit a cada pàgina"
     },
     "instructions": {
       "title": "Instruccions per a la IA",
