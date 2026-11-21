@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.17.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.17.0) - 2026-11-21
 ### Added
 - **Banco de medida de «Trasladar con IA» (1.17 · A1, herramienta local, sin cambios en la app):** `cd tools/ai-phase0 && npm run bench -- --provider claude|copilot|fake [--model …] [--cases <carpeta>]` ejecuta el flujo real de la app (pase sin IA, pasadas, anclar en B, huecos) sobre los casos de ejemplo o sobre una carpeta propia, con y sin el pase sin IA, y guarda en `out/` una tabla por caso: campos, colocados, colocados sin IA, «no existe en B», sin colocar por motivo, aciertos a ≤ 5 y ≤ 15 pt si hay solución conocida, peticiones, tokens o créditos si el CLI los da y segundos. El informe no lleva contenido de los PDF. Guía en `docs/IA-LOCAL.md` (también para Windows). Si la IA corta un PDF y se devuelve un parcial (p. ej. no leyó las imágenes), la columna de peticiones lo marca «(parcial: images_not_read)». Con pruebas.
 
