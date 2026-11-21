@@ -1,4 +1,7 @@
 ## Unreleased
+### Changed
+- **Panel «Traslado con IA» del lote sin scroll anidado:** antes había tres zonas con desplazamiento dentro del panel (cuerpo, lista de PDF y resumen con sus detalles). Ahora solo se desplaza la lista; cabecera, progreso con sus acciones y el resumen del pie quedan fijos y compactos. «Ver detalle» ya no se abre dentro del resumen: el panel pasa a una vista de detalles a toda la altura con «‹ Volver a la lista» (y `Esc`), con una sola zona desplazable. Las notas del pie («Nada se aplica solo…») pasan al ⓘ de la cabecera y los nombres de los PDF ya no se parten en dos líneas.
+
 ### Fixed
 - **Pestañas del panel lateral a 1280 px:** «Avanzado» ya no queda oculta fuera de la tira. El panel lateral es algo más ancho en pantallas medianas (`clamp(320px, 30vw, 440px)`; a 1650 px no cambia), las pestañas usan letra y relleno algo menores cuando el panel es estrecho, la activa nunca se encoge y, si aun así no caben (insignias de anotaciones y de IA a la vez), los nombres se abrevian con «…». Comprobado en los 7 idiomas a 1650, 1366 y 1280 px.
 - **App de escritorio: el instalador descargado ya no se queda en el disco:** electron-updater guarda la descarga en `<caché>/<app>-updater/pending` y solo la vaciaba al bajar la siguiente versión (nunca se acumulaban varias, pero la última ocupaba cientos de MB). Ahora se borra al arrancar por primera vez la versión nueva (`cleanUsedUpdate`, reglas en `update-logic.mjs` con pruebas).

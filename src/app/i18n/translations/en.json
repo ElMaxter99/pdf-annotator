@@ -989,7 +989,8 @@
         "details": "Details",
         "note": "Nothing is applied on its own: you review each proposal.",
         "keepRunning": "You can close this panel: the work goes on.",
-        "open": "Open"
+        "open": "Open",
+        "backToList": "Back to the list"
       },
       "queue": {
         "badge": "In the helper",

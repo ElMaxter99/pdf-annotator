@@ -989,7 +989,8 @@
         "details": "Detalles",
         "note": "Nada se aplica solo: tú revisas cada propuesta.",
         "keepRunning": "Puedes cerrar este panel: el trabajo sigue.",
-        "open": "Abrir"
+        "open": "Abrir",
+        "backToList": "Volver a la lista"
       },
       "queue": {
         "badge": "En el ayudante",

@@ -383,12 +383,31 @@ test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos
   await page.getByTestId('ai-batch-details').click();
   const dialog = page.getByTestId('ai-bdetails');
   await expect(dialog).toBeVisible();
-  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(1);
+  // the details take the place of the list and the summary: no nested scroll areas in the panel
+  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(0);
+  await expect(page.getByTestId('ai-batch-sheet')).toHaveCount(0);
   await expect(page.getByTestId('ai-bdetails-steps')).toContainText(/\S/);
   await expect(page.getByTestId('ai-bdetails-batch')).toBeVisible();
   await page.getByTestId('ai-bdetails-tab-sent').click();
   await expect(page.getByTestId('ai-bdetails-sent')).toBeVisible();
-  await page.keyboard.press('Escape'); // closes the side panel; the work goes on
+  const scrollers = await page.getByTestId('ai-batch-status').evaluate((panel) =>
+    [panel, ...panel.querySelectorAll('*')].filter((el) => {
+      const c = getComputedStyle(el);
+      return /(auto|scroll)/.test(c.overflowY) && el.scrollHeight > el.clientHeight + 1;
+    }).length
+  );
+  expect(scrollers).toBeLessThanOrEqual(1);
+  // «Volver a la lista» (or Esc) brings the list and the summary back
+  await page.getByTestId('ai-batch-details-back').click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(1);
+  await expect(page.getByTestId('ai-batch-sheet')).toBeVisible();
+  await page.getByTestId('ai-batch-details').click();
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press('Escape'); // first Esc: back to the list
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByTestId('ai-batch-status')).toBeVisible();
+  await page.keyboard.press('Escape'); // then it closes the side panel; the work goes on
   await expect(page.getByTestId('ai-batch-status')).toHaveCount(0);
   await expect(dialog).toHaveCount(0);
   // Once finished, the row keeps a link to what happened.

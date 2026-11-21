@@ -4,11 +4,12 @@
       <header class="ai-panel__head">
         <h2>{{ 'batch.ai.panel.title' | t }}</h2>
         <span class="ai-panel__provider">{{ provider() }}</span>
+        <app-info-tip [text]="('batch.ai.panel.note' | t) + ' ' + ((queue.viaHelper() ? 'batch.ai.queue.keepRunning' : 'batch.ai.panel.keepRunning') | t)" />
         <span class="ai-panel__grow"></span>
         <button type="button" class="ai-panel__x" (click)="close()" [attr.aria-label]="'batch.ai.panel.close' | t" data-testid="ai-batch-panel-close">✕</button>
       </header>
 
-      <div class="ai-panel__body">
+      <div class="ai-panel__status">
         @if (queue.viaHelper()) {
           <div class="ai-panel__chips">
             <span class="ai-chip ai-chip--ok" data-testid="ai-batch-via-helper"><i class="ai-dot" aria-hidden="true"></i>{{ 'batch.ai.queue.badge' | t }}</span>
@@ -141,6 +142,9 @@
           </div>
         }
 
+      </div>
+
+      @if (!queue.detailsOpen()) {
         @if (longList()) {
           <span class="migration-seg ai-panel__filters" role="group" [attr.aria-label]="'batch.ai.filter.label' | t" data-testid="ai-filters">
             @for (key of filterKeys; track key) {
@@ -187,7 +191,6 @@
             <li class="ai-panel__empty"><small>{{ 'batch.ai.filter.empty' | t }}</small></li>
           }
         </ul>
-      </div>
 
       <section class="ai-sheet" role="region" aria-live="polite" [attr.aria-label]="'batch.ai.sheet.label' | t" [class.ai-sheet--pinned]="scope() === 'pick'" data-testid="ai-batch-sheet">
         <div class="ai-sheet__scope">
@@ -231,18 +234,16 @@
             <button type="button" class="btn btn--ghost" (click)="retryFailed()" data-testid="ai-sheet-retry">{{ 'batch.ai.panel.retry' | t: { count: retryCount() } }}</button>
           }
           <button type="button" class="ai-panel__toggle" [attr.aria-expanded]="queue.detailsOpen()" (click)="toggleDetails()" data-testid="ai-batch-details">
-            {{ (scope() === 'all' ? 'batch.ai.sheet.moreAll' : 'batch.ai.sheet.more') | t }} {{ queue.detailsOpen() ? '▴' : '→' }}
+            {{ (scope() === 'all' ? 'batch.ai.sheet.moreAll' : 'batch.ai.sheet.more') | t }} →
           </button>
         </div>
-        @if (queue.detailsOpen()) {
-          <div class="ai-sheet__details"><app-ai-batch-details /></div>
-        }
       </section>
-
-      <footer class="ai-panel__foot">
-        <small>{{ 'batch.ai.panel.note' | t }}</small>
-        <small>{{ (queue.viaHelper() ? 'batch.ai.queue.keepRunning' : 'batch.ai.panel.keepRunning') | t }}</small>
-      </footer>
+      } @else {
+        <div class="ai-panel__detailview" data-testid="ai-batch-detailview">
+          <button type="button" class="ai-panel__back" (click)="toggleDetails()" data-testid="ai-batch-details-back">‹ {{ 'batch.ai.panel.backToList' | t }}</button>
+          <app-ai-batch-details />
+        </div>
+      }
     </aside>
   } @else {
     <button type="button" class="ai-panel-pill" (click)="queue.openPanel()" data-testid="ai-batch-panel-open">

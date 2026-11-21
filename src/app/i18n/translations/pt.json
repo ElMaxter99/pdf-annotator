@@ -989,7 +989,8 @@
         "details": "Detalhes",
         "note": "Nada é aplicado sozinho: você revisa cada proposta.",
         "keepRunning": "Pode fechar este painel: o trabalho continua.",
-        "open": "Abrir"
+        "open": "Abrir",
+        "backToList": "Voltar à lista"
       },
       "queue": {
         "badge": "No assistente",

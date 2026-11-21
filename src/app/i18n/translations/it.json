@@ -989,7 +989,8 @@
         "details": "Dettagli",
         "note": "Nulla viene applicato da solo: controlli tu ogni proposta.",
         "keepRunning": "Puoi chiudere questo pannello: il lavoro continua.",
-        "open": "Apri"
+        "open": "Apri",
+        "backToList": "Torna all’elenco"
       },
       "queue": {
         "badge": "Nell'assistente",

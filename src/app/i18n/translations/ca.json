@@ -989,7 +989,8 @@
         "details": "Detalls",
         "note": "No s'aplica res soles: tu revises cada proposta.",
         "keepRunning": "Pots tancar aquest panell: la feina continua.",
-        "open": "Obre"
+        "open": "Obre",
+        "backToList": "Torna a la llista"
       },
       "queue": {
         "badge": "A l'ajudant",

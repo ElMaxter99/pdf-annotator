@@ -989,7 +989,8 @@
         "details": "Details",
         "note": "Nichts wird von selbst angewendet: Sie prüfen jeden Vorschlag.",
         "keepRunning": "Sie können dieses Panel schließen: die Arbeit läuft weiter.",
-        "open": "Öffnen"
+        "open": "Öffnen",
+        "backToList": "Zurück zur Liste"
       },
       "queue": {
         "badge": "Im Helfer",
