@@ -121,6 +121,7 @@ import { AiReviewComponent } from './components/migration/ai-review.component';
 import { WorkspaceFooterComponent } from './components/footer/workspace-footer.component';
 import { AnnotationDragController } from './annotation-drag.controller';
 import { createPageLinkState } from './page-link.state';
+import { WorkspaceJson } from './workspace-json';
 import { WorkspaceView } from './workspace-view';
 import { WorkspaceBatch } from './workspace-batch';
 import { WorkspaceSelection } from './workspace-selection';
@@ -394,10 +395,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   });
   readonly translationService = inject(TranslationService);
   readonly document = inject(DOCUMENT);
-  private readonly templatesService = inject(AnnotationTemplatesService);
+  readonly templatesService = inject(AnnotationTemplatesService);
   private readonly metadataService = inject(AppMetadataService);
   private readonly pendingFileService = inject(PendingFileService);
-  private readonly pdfExportService = inject(PdfExportService);
+  readonly pdfExportService = inject(PdfExportService);
   readonly toast = inject(ToastService);
   private readonly sessionStore = inject(SessionStoreService);
   readonly store = inject(AnnotationStore);
@@ -405,7 +406,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly batch = inject(BatchStoreService);
   readonly annotationImport = inject(AnnotationImportService);
   readonly aiHelper = inject(AiHelperService);
-  private readonly fontCatalog = inject(FontCatalogService);
+  readonly fontCatalog = inject(FontCatalogService);
   readonly previewSettings = inject(PreviewSettingsService);
   readonly sampleKinds: readonly SampleKind[] = ['text', 'check', 'radio', 'number'];
   readonly previewModes: readonly PreviewMode[] = ['sample', 'map', 'data'];
@@ -597,15 +598,15 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly languages: readonly Language[] = this.translationService.supportedLanguages;
   readonly languageModel = signal<Language>(this.translationService.getCurrentLanguage());
   readonly defaultFontId = DEFAULT_FONT_ID;
-  private readonly coordsFileInputChangeHandler = (event: Event) =>
+  readonly coordsFileInputChangeHandler = (event: Event) =>
     this.onCoordsFileSelected(event);
-  private coordsFileInputFallback: HTMLInputElement | null = null;
-  private autoApplyCoordsTimer: ReturnType<typeof setTimeout> | null = null;
+  coordsFileInputFallback: HTMLInputElement | null = null;
+  autoApplyCoordsTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Original file of the open PDF, kept so the session can be saved and restored. */
   private sessionFile: File | null = null;
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
-  private pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
+  pdfByteSources = new Map<string, { bytes: Uint8Array; weight: number }>();
   private overlayDragRect: OverlayRect | null = null;
   private overlayGuides: OverlayGuide[] = [];
   private clipboard: PageField | null = null;
@@ -1237,7 +1238,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.metadataService.applyDefaultMetadata();
   }
 
-  private refreshOverlay(
+  refreshOverlay(
     activeRect?: { left: number; top: number; width: number; height: number } | null,
     guides?: OverlayGuide[],
   ) {
@@ -2340,181 +2341,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  private focusJsonOnSelection(pageIndex: number, fieldIndex: number) {
-    if (pageIndex < 0 || fieldIndex < 0) {
-      return;
-    }
-
-    this.runAfterRender(() => {
-      if (this.jsonViewMode() === 'tree') {
-        this.focusJsonTreeNode(pageIndex, fieldIndex);
-      } else {
-        this.focusJsonTextRange(pageIndex, fieldIndex);
-      }
-    });
-  }
-
-  private focusJsonTreeNode(pageIndex: number, fieldIndex: number) {
-    if (this.jsonTreePreview().status !== 'ready') {
-      return;
-    }
-
-    const component = this.jsonTreeComponent;
-    if (!component) {
-      return;
-    }
-
-    const pages = this.coords();
-    if (pageIndex < 0 || pageIndex >= pages.length) {
-      return;
-    }
-
-    const fields = pages[pageIndex]?.fields ?? [];
-    if (fieldIndex < 0 || fieldIndex >= fields.length) {
-      return;
-    }
-
-    component.focusPath(buildJsonTreePath(pageIndex, fieldIndex), { smooth: true });
-  }
-
-  private focusJsonTextRange(pageIndex: number, fieldIndex: number) {
-    const textarea = this.jsonEditorRef?.nativeElement;
-    if (!textarea) {
-      return;
-    }
-
-    const pages = this.coords();
-    if (pageIndex < 0 || pageIndex >= pages.length) {
-      return;
-    }
-
-    const fields = pages[pageIndex]?.fields ?? [];
-    if (fieldIndex < 0 || fieldIndex >= fields.length) {
-      return;
-    }
-
-    const range = this.locateJsonFieldRange(pageIndex, fieldIndex, textarea.value);
-    if (!range) {
-      return;
-    }
-
-    this.highlightTextareaRange(textarea, range);
-  }
-
-  private locateJsonFieldRange(
-    pageIndex: number,
-    fieldIndex: number,
-    text: string,
-  ): { start: number; end: number } | null {
-    if (!text) {
-      return null;
-    }
-
-    const pages = this.coords();
-    if (pageIndex < 0 || pageIndex >= pages.length) {
-      return null;
-    }
-
-    const targetPage = pages[pageIndex];
-    if (!targetPage.fields.length || fieldIndex < 0 || fieldIndex >= targetPage.fields.length) {
-      return null;
-    }
-
-    let searchFrom = 0;
-
-    for (let i = 0; i < pages.length; i += 1) {
-      const pageBlock = this.buildPageJsonBlock(pages[i]);
-      const pagePos = text.indexOf(pageBlock, searchFrom);
-      if (pagePos === -1) {
-        return null;
-      }
-
-      if (i === pageIndex) {
-        let fieldSearchFrom = pagePos;
-        for (let j = 0; j < targetPage.fields.length; j += 1) {
-          const fieldBlock = this.buildFieldJsonBlock(targetPage.fields[j]);
-          const fieldPos = text.indexOf(fieldBlock, fieldSearchFrom);
-          if (fieldPos === -1) {
-            return null;
-          }
-
-          if (j === fieldIndex) {
-            return { start: fieldPos, end: fieldPos + fieldBlock.length };
-          }
-
-          fieldSearchFrom = fieldPos + fieldBlock.length;
-        }
-
-        return null;
-      }
-
-      searchFrom = pagePos + pageBlock.length;
-    }
-
-    return null;
-  }
-
-  private buildPageJsonBlock(page: PageAnnotations): string {
-    return indentJsonBlock(
-      buildJsonExportPayload([page], (field) => this.serializeFieldForJson(field)).pages[0],
-      '    ',
-    );
-  }
-
-  private buildFieldJsonBlock(field: PageField): string {
-    return indentJsonBlock(this.serializeFieldForJson(field), '        ');
-  }
-
-  private highlightTextareaRange(
-    textarea: HTMLTextAreaElement,
-    range: { start: number; end: number },
-  ) {
-    const { start, end } = range;
-    if (start < 0 || end <= start) {
-      return;
-    }
-
-    const activeElement = (this.document?.activeElement ?? null) as HTMLElement | null;
-    const hadFocus = activeElement === textarea;
-
-    if (!hadFocus) {
-      try {
-        textarea.focus({ preventScroll: true } as FocusOptions);
-      } catch {
-        textarea.focus();
-      }
-    }
-
-    try {
-      textarea.setSelectionRange(start, end);
-    } catch {
-      // Ignore selection errors in unsupported environments.
-    }
-
-    const lineHeight = getTextareaLineHeight(textarea, this.document);
-    const precedingText = textarea.value.slice(0, start);
-    const lineIndex = countLineBreaks(precedingText);
-    const desiredTop = Math.max(lineIndex - 2, 0) * lineHeight;
-    const maxScrollTop = Math.max(textarea.scrollHeight - textarea.clientHeight, 0);
-    const top = Math.min(desiredTop, maxScrollTop);
-
-    if (typeof textarea.scrollTo === 'function') {
-      textarea.scrollTo({ top, behavior: 'smooth' });
-    } else {
-      textarea.scrollTop = top;
-    }
-
-    if (!hadFocus && activeElement && activeElement !== textarea) {
-      this.runAfterRender(() => {
-        try {
-          activeElement.focus({ preventScroll: true } as FocusOptions);
-        } catch {
-          activeElement.focus();
-        }
-      });
-    }
-  }
-
   private updateAnnotationLeft(el: HTMLDivElement, field: PageField, scale: number) {
     const width = el.offsetWidth;
     const left = field.x * scale;
@@ -2548,7 +2374,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   /** Counts annotations that would paint a sample value, for the export notice. */
-  private countSampleFields(): number {
+  countSampleFields(): number {
     const ctx = this.previewSettings.context();
     let count = 0;
     for (const page of this.coords()) {
@@ -2860,325 +2686,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
   }
 
-  clearAll(options?: { skipHistory?: boolean }) {
-    this.replaceCoords([], options);
-  }
-
-  copyJSON() {
-    navigator.clipboard.writeText(this.coordsTextModel()).catch(() => {});
-  }
-
-  toggleIncludeAdvancedJsonFields(checked: boolean) {
-    if (this.includeAdvancedJsonFields() === checked) {
-      return;
-    }
-
-    this.includeAdvancedJsonFields.set(checked);
-    this.syncCoordsTextModel();
-  }
-
-  onCoordsTextChange(value: string) {
-    this.coordsTextModel.set(value);
-    this.refreshJsonPreview();
-    this.scheduleCoordsAutoApply();
-  }
-
-  onCoordsTextPaste() {
-    this.scheduleCoordsAutoApply(0);
-  }
-
-  setJsonViewMode(mode: JsonViewMode) {
-    if (this.jsonViewMode() === mode) {
-      return;
-    }
-
-    if (mode === 'tree') {
-      this.refreshJsonPreview();
-    }
-
-    this.jsonViewMode.set(mode);
-
-    const editState = this.editing();
-    if (editState) {
-      this.focusJsonOnSelection(editState.pageIndex, editState.fieldIndex);
-    }
-  }
-
-  applyCoordsText() {
-    this.tryApplyCoordsText({ silent: false, clearWhenEmpty: true });
-  }
-
-  private scheduleCoordsAutoApply(delayMs = AUTO_APPLY_JSON_DELAY_MS) {
-    if (this.autoApplyCoordsTimer) {
-      clearTimeout(this.autoApplyCoordsTimer);
-    }
-
-    this.autoApplyCoordsTimer = setTimeout(() => {
-      this.autoApplyCoordsTimer = null;
-      this.tryApplyCoordsText({ silent: true, clearWhenEmpty: false });
-    }, delayMs);
-  }
-
-  private tryApplyCoordsText(options: { silent: boolean; clearWhenEmpty: boolean }): boolean {
-    const text = this.coordsTextModel().trim();
-
-    if (!text) {
-      if (options.clearWhenEmpty) {
-        this.clearAll();
-      }
-      return false;
-    }
-
-    try {
-      const { pages, report } = this.annotationImport.importFromText(text, (field) =>
-        this.prepareFieldForStorage(field),
-      );
-
-      this.replaceCoords(pages, { preserveTextModel: true });
-      if (!options.silent) {
-        void this.reportImportIssues(report, pages);
-      }
-      return true;
-    } catch (error) {
-      if (!options.silent) {
-        console.error('No se pudo importar el JSON de anotaciones.', error);
-        this.reportJsonImportError(error);
-      }
-      return false;
-    }
-  }
-
-  triggerImportCoords() {
-    const input = this.coordsFileInputRef?.nativeElement ?? this.ensureCoordsFileInput();
-    if (!input) {
-      console.warn('No se pudo abrir el selector de archivos para importar anotaciones.');
-      return;
-    }
-
-    input.value = '';
-    input.click();
-  }
-
-  async onCoordsFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    try {
-      if (file.size > MAX_JSON_IMPORT_BYTES) {
-        throw new Error('El archivo JSON supera el tamaño máximo permitido');
-      }
-      const text = await file.text();
-      const { pages, report } = this.annotationImport.importFromText(text, (field) =>
-        this.prepareFieldForStorage(field),
-      );
-
-      this.replaceCoords(pages, { preserveTextModel: false });
-      void this.reportImportIssues(report, pages);
-    } catch (error) {
-      console.error('No se pudo importar el JSON de anotaciones.', error);
-      this.reportJsonImportError(error);
-    } finally {
-      input.value = '';
-    }
-  }
-
-  downloadJSON() {
-    downloadBlob(new Blob([this.coordsTextModel()], { type: 'application/json' }), 'coords.json');
-  }
-
-  saveCurrentAsTemplate() {
-    const name = this.templateNameModel().trim();
-    if (!name || !this.coords().length) {
-      return;
-    }
-
-    const savedTemplate = this.templatesService.saveTemplate(name, {
-      pages: this.coords(),
-      guideSettings: this.guideSettings(),
-      guidesEnabled: this.guidesFeatureEnabled(),
-    });
-    if (!savedTemplate) {
-      console.warn('El navegador no soporta almacenamiento local para plantillas.');
-      return;
-    }
-
-    this.templates.set(this.templatesService.getTemplates());
-    this.templateNameModel.set('');
-    this.selectedTemplateId.set(savedTemplate.id);
-  }
-
-  loadSelectedTemplate() {
-    if (!this.selectedTemplateId()) {
-      return;
-    }
-
-    const template = this.templates().find((item) => item.id === this.selectedTemplateId());
-    if (!template) {
-      return;
-    }
-
-    this.applyTemplate(template);
-  }
-
-  deleteSelectedTemplate() {
-    if (!this.selectedTemplateId() || this.selectedTemplateId() === this.defaultTemplateId) {
-      return;
-    }
-
-    const templateId = this.selectedTemplateId()!;
-    this.templatesService.deleteTemplate(templateId);
-    const nextTemplates = this.templatesService.getTemplates();
-    this.templates.set(nextTemplates);
-    if (!nextTemplates.some((template) => template.id === templateId)) {
-      this.selectedTemplateId.set(nextTemplates[0]?.id ?? this.templatesService.defaultTemplateId);
-    }
-  }
-
-  private applyTemplate(template: AnnotationTemplate) {
-    const clonedPages = cloneAnnotationPages(template.pages);
-    const nextGuideSettings = cloneGuideSettings(template.guideSettings);
-
-    this.coords.set(clonedPages);
-    this.guideSettings.set(nextGuideSettings);
-    this.snapPointsXText.set(nextGuideSettings.snapPointsX.join(', '));
-    this.snapPointsYText.set(nextGuideSettings.snapPointsY.join(', '));
-    this.guidesFeatureEnabled.set(template.guidesEnabled);
-    if (template.guidesEnabled || differsFromDefaultGuideSettings(nextGuideSettings)) {
-      this.advancedOptionsOpen.set(true);
-    }
-    this.syncCoordsTextModel();
-    this.preview.set(null);
-    this.editing.set(null);
-    this.refreshOverlay();
-    this.redrawAllForPage();
-  }
-
-  private ensureCoordsFileInput(): HTMLInputElement | null {
-    if (this.coordsFileInputFallback) {
-      return this.coordsFileInputFallback;
-    }
-
-    if (!this.document?.body) {
-      return null;
-    }
-
-    const input = this.document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/json';
-    input.style.display = 'none';
-    input.addEventListener('change', this.coordsFileInputChangeHandler);
-    this.document.body.appendChild(input);
-    this.coordsFileInputFallback = input;
-    return input;
-  }
-
-  /** Sample-sourced fields are stamped as the mapField unless the person chose the samples. */
-  private exportText(field: PageField, useSamples: boolean): string {
-    const ctx = this.previewSettings.context();
-    const preview = resolveFieldPreview(field, ctx);
-    if (useSamples || preview.source !== 'sample') {
-      return preview.text;
-    }
-    return resolveFieldPreview(field, { ...ctx, mode: 'map' }).text;
-  }
-
   readonly exportSamplesPrompt = signal<number | null>(null);
-  private rememberedExportChoice: 'map' | 'sample' | null = null;
-
-  async downloadAnnotatedPDF() {
-    if (!this.pdfDoc()) return;
-    const sampleFields = this.countSampleFields();
-    if (sampleFields > 0) {
-      if (this.rememberedExportChoice) {
-        await this.runExport(this.rememberedExportChoice === 'sample');
-      } else {
-        this.exportSamplesPrompt.set(sampleFields);
-      }
-      return;
-    }
-    await this.runExport(false);
-  }
-
-  async confirmExportSamples(result: { choice: 'map' | 'sample'; remember: boolean }) {
-    this.exportSamplesPrompt.set(null);
-    if (result.remember) {
-      this.rememberedExportChoice = result.choice;
-    }
-    await this.runExport(result.choice === 'sample');
-  }
-
-  cancelExportSamples() {
-    this.exportSamplesPrompt.set(null);
-  }
-
-  private async runExport(useSamples: boolean) {
-    if (!this.pdfDoc()) return;
-    try {
-      const customFonts = new Map<string, CustomFontEntry>();
-      this.customFonts().forEach((fontEntry) => customFonts.set(fontEntry.id, fontEntry));
-
-      const { bytes, sourceBytes } = await this.pdfExportService.exportAnnotatedPdf({
-        pdfByteCandidates: await this.getPdfByteCandidates(),
-        pages: this.coords(),
-        customFonts,
-        defaultFontId: DEFAULT_FONT_ID,
-        defaultOpacity: DEFAULT_OPACITY,
-        styleField: (field) => this.ensureFieldStyle(field),
-        renderText: (field) => this.exportText(field, useSamples),
-        resolveFont: (fontId) => this.fontCatalog.getFontOptionById(fontId),
-      });
-
-      this.rememberPdfBytes(sourceBytes, 3);
-      downloadBlob(new Blob([toArrayBuffer(bytes)], { type: 'application/pdf' }), 'annotated.pdf');
-    } catch (error) {
-      console.error('No se pudo generar el PDF anotado.', error);
-      this.toast.error(this.translationService.translate('toast.exportPdfFailed'));
-    }
-  }
-
-  private async getPdfByteCandidates(): Promise<Uint8Array[]> {
-    const pdfDoc = this.pdfDoc();
-    if (pdfDoc) {
-      if (typeof pdfDoc.saveDocument === 'function') {
-        try {
-          const sanitized = await pdfDoc.saveDocument();
-          this.rememberPdfBytes(sanitized, 2);
-        } catch (error) {
-          console.warn('No se pudo obtener una versión saneada del PDF para exportar.', error);
-        }
-      }
-
-      try {
-        const rawData = await pdfDoc.getData();
-        this.rememberPdfBytes(rawData, 1);
-      } catch (error) {
-        console.warn('No se pudo obtener los bytes originales del PDF para exportar.', error);
-      }
-    }
-
-    if (this.pdfByteSources.size === 0) {
-      return [];
-    }
-
-    return Array.from(this.pdfByteSources.values())
-      .sort((a, b) => b.weight - a.weight)
-      .map((entry) => entry.bytes.slice());
-  }
-
-  private rememberPdfBytes(data?: Uint8Array | ArrayBuffer | null, weight = 0) {
-    if (!data) return;
-    const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
-    if (!typed.length) return;
-    const head = Array.from(typed.slice(0, 16)).join(',');
-    const key = `${typed.length}:${head}`;
-    const existing = this.pdfByteSources.get(key);
-    if (!existing || weight >= existing.weight) {
-      this.pdfByteSources.set(key, { bytes: typed.slice(), weight });
-    }
-  }
+  rememberedExportChoice: 'map' | 'sample' | null = null;
 
   syncCoordsTextModel() {
     this.coordsTextModel.set(
@@ -3233,63 +2742,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return areFieldsEqual(a, b, (f) => this.fontCatalog.normalizeFontFamily(f));
   }
 
-  private refreshJsonPreview() {
+  refreshJsonPreview() {
     this.jsonTreePreview.set(buildJsonTreePreview(this.coordsTextModel()));
-  }
-
-  /**
-   * After an explicit import/apply, warns about what was skipped or looks wrong. The import itself
-   * is never altered: these are hints so the user can fix the JSON.
-   */
-  private async reportImportIssues(report: ImportReport, pages: PageAnnotations[]) {
-    let outOfPage = 0;
-    let missingPages = 0;
-    const doc = this.pdfDoc();
-    if (doc) {
-      for (const page of pages) {
-        if (page.num > doc.numPages) {
-          missingPages += 1;
-          continue;
-        }
-        const { width, height } = (await doc.getPage(page.num)).getViewport({ scale: 1 });
-        outOfPage += page.fields.filter(
-          (field) => field.x < 0 || field.y < 0 || field.x > width || field.y > height,
-        ).length;
-      }
-    }
-
-    const t = (key: string, count: number) =>
-      this.translationService.translate(`toast.importIssues.${key}`, { count });
-    const parts: string[] = [];
-    if (report.skippedFields) parts.push(t('skippedFields', report.skippedFields));
-    if (report.skippedPages) parts.push(t('skippedPages', report.skippedPages));
-    if (missingPages) parts.push(t('missingPages', missingPages));
-    if (outOfPage) parts.push(t('outOfPage', outOfPage));
-    if (report.fontSizeOutOfRange) parts.push(t('fontSize', report.fontSizeOutOfRange));
-    if (report.opacityOutOfRange) parts.push(t('opacity', report.opacityOutOfRange));
-    if (!parts.length) {
-      return;
-    }
-
-    const title = this.translationService.translate('toast.importIssues.title');
-    this.toast.warning(`${title} ${parts.join('; ')}.`);
-  }
-
-  /** Shows why a JSON import failed, with the line/column when the syntax is at fault. */
-  private reportJsonImportError(error: unknown) {
-    if (error instanceof LooseJsonError) {
-      this.toast.error(
-        this.translationService.translate('toast.importJsonFailedAt', {
-          line: error.line,
-          column: error.column,
-        }),
-      );
-      return;
-    }
-
-    const key =
-      error instanceof JsonShapeError ? 'toast.importJsonNoPages' : 'toast.importJsonFailed';
-    this.toast.error(this.translationService.translate(key));
   }
 }
 
@@ -3299,9 +2753,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
  * página: `this` sigue siendo la página y los subcomponentes siguen llamando a `vm.metodo()`. El estado (signals)
  * vive en la página.
  */
-const WORKSPACE_PARTS = [WorkspaceAi, WorkspaceAdjust, WorkspacePairing, WorkspaceSelection, WorkspaceBatch, WorkspaceView] as const;
+const WORKSPACE_PARTS = [WorkspaceAi, WorkspaceAdjust, WorkspacePairing, WorkspaceSelection, WorkspaceBatch, WorkspaceView, WorkspaceJson] as const;
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
-export interface WorkspacePageComponent extends WorkspaceAi, WorkspaceAdjust, WorkspacePairing, WorkspaceSelection, WorkspaceBatch, WorkspaceView {}
+export interface WorkspacePageComponent extends WorkspaceAi, WorkspaceAdjust, WorkspacePairing, WorkspaceSelection, WorkspaceBatch, WorkspaceView, WorkspaceJson {}
 for (const part of WORKSPACE_PARTS) {
   for (const name of Object.getOwnPropertyNames(part.prototype)) {
     if (name !== 'constructor') {
