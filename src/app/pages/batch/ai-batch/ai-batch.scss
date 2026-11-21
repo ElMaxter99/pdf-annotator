@@ -146,7 +146,7 @@
 }
 
 .ai-tile--acc {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
   color: var(--bg);
 }
@@ -254,7 +254,7 @@
   i {
     display: block;
     height: 100%;
-    background: var(--accent);
+    background: var(--accent-fill);
     border-radius: 999px;
     transition: width 0.25s ease-out;
   }
@@ -357,7 +357,7 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--accent-fill);
   }
 }
 
@@ -813,7 +813,7 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
   bottom: 0;
   left: 0;
   width: 4px;
-  background: var(--accent);
+  background: var(--accent-fill);
 }
 
 .ai-sheet__scope {

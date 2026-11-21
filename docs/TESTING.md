@@ -5,7 +5,7 @@
 | `npm run test:ci` | Karma/Jasmine headless sin sandbox (unitarias, ~80). |
 | `npm run build` | `i18n:check` + `ng build`. Los e2e usan este build. |
 | `npm run e2e` | Playwright contra `dist/pdf-annotator/browser` servido por `e2e/static-server.mjs` (127.0.0.1:4300). |
-| `npm run a11y` | Auditoría axe (`scripts/a11y-audit.mjs`, fuera del CI): landing, editor, lote y Proyectos en oscuro/claro y 1650/1280 px; escribe `a11y-audit.json`. Informe en `docs/AUDITORIA-A11Y.md`. Necesita `npm run build` antes. |
+| `npm run a11y` | Auditoría axe (`scripts/a11y-audit.mjs`; en el CI como `npm run a11y:ci`, que falla con hallazgos serios o críticos): landing, editor, lote y Proyectos en oscuro/claro y 1650/1280 px; escribe `a11y-audit.json`. Informe en `docs/AUDITORIA-A11Y.md`. Necesita `npm run build` antes. |
 
 ## En un entorno sin Chrome instalado (cloud)
 - Chromium está en `/opt/pw-browsers/chromium`. No ejecutes `playwright install`.

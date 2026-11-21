@@ -58,12 +58,17 @@ jobs:
       - name: End-to-end tests
         run: npm run e2e
 
+      - name: Accessibility audit (axe, fails on serious or critical)
+        run: npm run a11y:ci
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-results
-          path: test-results/
+          path: |
+            test-results/
+            a11y-audit.json
           retention-days: 7
 
       - name: Desktop app smoke test (Electron)

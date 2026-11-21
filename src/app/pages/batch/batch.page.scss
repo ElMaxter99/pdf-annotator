@@ -81,7 +81,7 @@
   i {
     display: block;
     height: 100%;
-    background: var(--accent);
+    background: var(--accent-fill);
     border-radius: 999px;
     transition: width 0.25s ease-out;
   }
@@ -301,7 +301,7 @@
 }
 
 .batch-chip--warn {
-  color: var(--warning-strong);
+  color: var(--warning-text);
   background: color-mix(in srgb, var(--warning) 20%, transparent);
 }
 
@@ -361,7 +361,7 @@
   color: var(--text) !important;
 
   .batch-steps__n {
-    background: var(--accent);
+    background: var(--accent-fill);
     border-color: var(--accent);
     color: var(--bg);
   }
@@ -548,7 +548,7 @@
 }
 
 .batch-seg__on {
-  background: var(--accent) !important;
+  background: var(--accent-fill) !important;
   color: var(--bg) !important;
 }
 
@@ -627,7 +627,7 @@
 }
 
 .batch-tabs__on {
-  background: var(--accent) !important;
+  background: var(--accent-fill) !important;
   color: var(--bg) !important;
 }
 
@@ -803,7 +803,7 @@ app-ai-batch-chip {
 }
 
 .batch-state--ok::before {
-  background: var(--accent);
+  background: var(--accent-fill);
 }
 
 .batch-state--warn::before {
@@ -1167,7 +1167,7 @@ app-ai-batch-chip {
 }
 
 .batch-kind--on {
-  background: var(--accent);
+  background: var(--accent-fill);
   border-color: var(--accent);
   color: var(--bg);
 }

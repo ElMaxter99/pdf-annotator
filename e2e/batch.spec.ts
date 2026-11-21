@@ -967,3 +967,69 @@ test('«Dividida»: double click on the A or B tag centers that PDF and again re
   await expect.poll(async () => Math.abs(await offset('.canvas-container--split-a'))).toBeLessThanOrEqual(4);
 });
 
+/** «Dividida» desenlazada: helpers for the A pane, which scrolls on its own (C1). */
+async function openUnlinkedSplit(page: Page) {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await attachVersion2(page);
+  await openRow(page);
+  await page.getByTestId('mode-split').click();
+  await expect(page.getByTestId('split-a')).toBeVisible();
+  await page.getByTestId('split-link').click();
+  await expect(page.getByTestId('split-link')).toContainText('Desenlazado');
+}
+
+/** Distance between the centre of A's page and the centre of its pane (0 = centred). */
+const offsetInPaneA = (page: Page) =>
+  page.getByTestId('split-a').evaluate((pane) => {
+    const p = pane.getBoundingClientRect();
+    const c = pane.querySelector('canvas')!.getBoundingClientRect();
+    return Math.round(c.left + c.width / 2 - (p.left + p.width / 2));
+  });
+
+test('«Dividida» desenlazada: A has its own work margin and rests centred in its pane (C1)', async ({ page }) => {
+  await openUnlinkedSplit(page);
+  const pane = page.getByTestId('split-a');
+
+  // A can be moved sideways: there is empty room on both sides of its page.
+  await expect.poll(() => pane.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeGreaterThan(200);
+  await expect.poll(async () => Math.abs(await offsetInPaneA(page))).toBeLessThanOrEqual(4);
+
+  await pane.evaluate((el) => (el.scrollLeft = 0));
+  await expect.poll(() => offsetInPaneA(page)).toBeGreaterThan(100);
+
+  // The A tag stays on screen inside the pane although A has moved.
+  const tag = await page.getByTestId('split-tag-a').boundingBox();
+  const box = await pane.boundingBox();
+  expect(tag!.x).toBeGreaterThanOrEqual(box!.x);
+  expect(tag!.x + tag!.width).toBeLessThanOrEqual(box!.x + box!.width);
+  expect(tag!.y).toBeGreaterThanOrEqual(box!.y);
+});
+
+test('«Dividida» desenlazada: double click on the A tag centres A in its pane (C1)', async ({ page }) => {
+  await openUnlinkedSplit(page);
+  const pane = page.getByTestId('split-a');
+  const widthA = () => pane.locator('canvas').evaluate((el: HTMLCanvasElement) => el.width);
+  const w0 = await widthA();
+
+  // Zoom A so it is wider than its pane (retry the gesture under load, as in the zoom test above).
+  await expect(async () => {
+    const b = await pane.boundingBox();
+    if (!b) throw new Error('no A pane');
+    await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+    await page.keyboard.down('Control');
+    await page.mouse.wheel(0, -300);
+    await page.keyboard.up('Control');
+    await expect.poll(widthA, { timeout: 2000 }).toBeGreaterThan(w0 * 1.15);
+  }).toPass({ timeout: 15000 });
+
+  await pane.evaluate((el) => (el.scrollLeft = 0));
+  await expect.poll(async () => Math.abs(await offsetInPaneA(page))).toBeGreaterThan(40);
+  await page.getByTestId('split-tag-a').dblclick();
+  await expect.poll(async () => Math.abs(await offsetInPaneA(page))).toBeLessThanOrEqual(4);
+
+  // A second double click with A already centred goes back to the resting position.
+  await page.getByTestId('split-tag-a').dblclick();
+  await expect.poll(async () => Math.abs(await offsetInPaneA(page))).toBeGreaterThan(20);
+});
+

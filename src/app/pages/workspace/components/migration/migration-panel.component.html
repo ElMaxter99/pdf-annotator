@@ -1,7 +1,7 @@
 @if (vm.migration(); as m) {
   <section class="migration-panel" [attr.aria-label]="'batch.panel.title' | t">
     <div class="migration-panel__head">
-      <h5>{{ 'batch.panel.title' | t: { count: vm.annotationCount() } }}</h5>
+      <h2>{{ 'batch.panel.title' | t: { count: vm.annotationCount() } }}</h2>
       @if (proposal(); as ai) {
         <span class="migration-chip migration-chip--on" data-testid="ai-proposal-count">{{
           'ai.proposal.count' | t: { count: vm.aiSummary().placed }
@@ -30,7 +30,7 @@
         </div>
       </div>
       @for (group of groups(); track group.key) {
-        <h6 class="ai-proposal__sec">{{ 'ai.proposal.group.' + group.key | t: { count: group.rows.length } }}</h6>
+        <h3 class="ai-proposal__sec">{{ 'ai.proposal.group.' + group.key | t: { count: group.rows.length } }}</h3>
         <ul class="ai-proposal__list" [attr.data-testid]="'ai-proposal-' + group.key">
           @for (row of group.rows; track row.id) {
             <li class="ai-proposal__row" [attr.data-ai-id]="row.id" [class.ai-proposal__row--off]="row.ok && !selected(row)">

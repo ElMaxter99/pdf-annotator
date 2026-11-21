@@ -53,7 +53,7 @@
     <span class="sidebar-upload__hint">{{ 'app.upload.hint' | t }}</span>
   </div>
   <section class="sidebar-thumbnails" *ngIf="vm.pageThumbnails().length">
-    <h5 class="sidebar-thumbnails__title">{{ 'sidebar.thumbnails.title' | t }}</h5>
+    <h2 class="sidebar-thumbnails__title">{{ 'sidebar.thumbnails.title' | t }}</h2>
     <div class="sidebar-thumbnails__list">
       <app-page-thumbnails
         [thumbnails]="vm.pageThumbnails()"
@@ -99,7 +99,7 @@
   }
   <section class="json-panel" [class.json-panel--collapsed]="vm.jsonPanelCollapsed()">
     <div class="json-panel__header">
-      <h5 class="json-panel__title">{{ 'sidebar.title' | t }}</h5>
+      <h2 class="json-panel__title">{{ 'sidebar.title' | t }}</h2>
       <button type="button" class="json-panel__toggle" (click)="vm.toggleJsonPanelCollapsed()"
         [attr.aria-expanded]="!vm.jsonPanelCollapsed()">
         <span>{{ (vm.jsonPanelCollapsed() ? 'sidebar.jsonPanelShow' : 'sidebar.jsonPanelHide') | t }}</span>
@@ -166,7 +166,7 @@
   <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-templates" aria-labelledby="sidebar-tab-templates"
     [hidden]="vm.sidebarTab() !== 'templates'">
   <section class="templates">
-    <h5>{{ 'sidebar.templates.title' | t }}</h5>
+    <h2>{{ 'sidebar.templates.title' | t }}</h2>
     <div class="templates__save">
       <input type="text" [(ngModel)]="vm.templateNameModel" [ngModelOptions]="{ standalone: true }"
         [placeholder]="'sidebar.templates.placeholder' | t" />
@@ -227,7 +227,7 @@
         </label>
 
         <section class="custom-fonts-panel" *ngIf="vm.customFontsFeatureEnabled()">
-          <h5>{{ 'fonts.custom.title' | t }} <app-info-tip [text]="'fonts.custom.description' | t"></app-info-tip></h5>
+          <h2>{{ 'fonts.custom.title' | t }} <app-info-tip [text]="'fonts.custom.description' | t"></app-info-tip></h2>
           <div class="custom-fonts-panel__actions">
             <button type="button" class="btn" (click)="vm.triggerCustomFontPicker()">
               {{ 'fonts.custom.add' | t }}
@@ -266,7 +266,7 @@
         </label>
 
         <section class="guides-panel" *ngIf="vm.guidesFeatureEnabled() && vm.guideSettings() as guides">
-          <h5>{{ 'guides.title' | t }} <app-info-tip [text]="(guides.usePdfCoordinates ? 'guides.customHint.pdf' : 'guides.customHint.canvas') | t"></app-info-tip></h5>
+          <h2>{{ 'guides.title' | t }} <app-info-tip [text]="(guides.usePdfCoordinates ? 'guides.customHint.pdf' : 'guides.customHint.canvas') | t"></app-info-tip></h2>
           <div class="guides-toggles">
             <label>
               <input type="checkbox" [checked]="guides.showGrid"
@@ -359,7 +359,7 @@
   </section>
 
   <section class="preview-panel" aria-labelledby="preview-samples-title">
-    <h4 id="preview-samples-title">{{ 'preview.samples.title' | t }} <app-info-tip [text]="('preview.samples.description' | t) + ' ' + ('preview.samples.hint' | t) + ' ' + ('preview.samples.note' | t)"></app-info-tip></h4>
+    <h2 id="preview-samples-title">{{ 'preview.samples.title' | t }} <app-info-tip [text]="('preview.samples.description' | t) + ' ' + ('preview.samples.hint' | t) + ' ' + ('preview.samples.note' | t)"></app-info-tip></h2>
     <div class="preview-samples">
       <div class="preview-samples__row" *ngFor="let kind of vm.sampleKinds">
         <label [for]="'sample-' + kind">{{ 'preview.samples.' + kind | t }}</label>
@@ -374,7 +374,7 @@
       </section>
 
   <section class="preview-panel" aria-labelledby="preview-data-title">
-    <h4 id="preview-data-title">{{ 'preview.testData.title' | t }} <app-info-tip [text]="'preview.testData.description' | t"></app-info-tip></h4>
+    <h2 id="preview-data-title">{{ 'preview.testData.title' | t }} <app-info-tip [text]="'preview.testData.description' | t"></app-info-tip></h2>
     <textarea class="preview-data__input" rows="8" spellcheck="false"
       [attr.aria-label]="'preview.testData.title' | t" [placeholder]="'preview.testData.placeholder' | t"
       [attr.aria-invalid]="vm.previewSettings.testDataError() ? 'true' : null"

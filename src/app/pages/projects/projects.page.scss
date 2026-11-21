@@ -147,7 +147,7 @@
     display: block;
     height: 6px;
     border-radius: 3px;
-    background: var(--accent);
+    background: var(--accent-fill);
     transition: width 200ms ease-out;
   }
 }
@@ -453,7 +453,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-fill);
 }
 
 .proj-banner__text {
@@ -863,7 +863,7 @@
 }
 
 .proj-seg__btn--on {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #fff;
 }
 

@@ -78,7 +78,7 @@
     </div>
   }
   @if (vm.splitActive()) {
-    <div class="canvas-container canvas-container--split-a" data-testid="split-a">
+    <div class="canvas-container canvas-container--split-a" data-testid="split-a" (scroll)="vm.onSplitAScroll($event)">
       <span class="split-tag" (dblclick)="vm.centerPane('a')" [attr.title]="'batch.editor.split.centerHint' | t" data-testid="split-tag-a">{{ 'batch.editor.split.tagA' | t }}</span>
       @if (vm.comparing() && !vm.pagesLinked()) {
         <span class="split-pager" role="group" [attr.aria-label]="'batch.editor.pages.paneA' | t" data-testid="pager-a">
@@ -89,20 +89,22 @@
             [attr.aria-label]="'batch.editor.pages.nextA' | t" [attr.title]="'batch.editor.pages.nextA' | t">›</button>
         </span>
       }
-      <canvas #splitCanvas class="canvas"></canvas>
-      <div #splitLayer class="reference-layer" aria-hidden="true"></div>
-      @if (vm.aGhost()) {
-        <div class="page-ghost" data-testid="ghost-a" role="status">
-          @if (vm.pageMap()) {
-            <b>{{ 'batch.editor.pageMap.unmappedTitle' | t: { page: vm.pageIndex() } }}</b>
-            <span>{{ 'batch.editor.pageMap.unmappedSub' | t }}</span>
-            <button type="button" class="btn btn--ghost" (click)="vm.openPageMap()" data-testid="ghost-a-map">{{ 'batch.editor.pageMap.open' | t }}</button>
-          } @else {
-            <b>{{ 'batch.editor.pages.missingTitle' | t: { version: 'A', page: vm.commonPage() } }}</b>
-            <span>{{ 'batch.editor.pages.missingSub' | t: { count: vm.pageCountA() } }}</span>
-          }
-        </div>
-      }
+      <div class="split-a__sheet">
+        <canvas #splitCanvas class="canvas"></canvas>
+        <div #splitLayer class="reference-layer" aria-hidden="true"></div>
+        @if (vm.aGhost()) {
+          <div class="page-ghost" data-testid="ghost-a" role="status">
+            @if (vm.pageMap()) {
+              <b>{{ 'batch.editor.pageMap.unmappedTitle' | t: { page: vm.pageIndex() } }}</b>
+              <span>{{ 'batch.editor.pageMap.unmappedSub' | t }}</span>
+              <button type="button" class="btn btn--ghost" (click)="vm.openPageMap()" data-testid="ghost-a-map">{{ 'batch.editor.pageMap.open' | t }}</button>
+            } @else {
+              <b>{{ 'batch.editor.pages.missingTitle' | t: { version: 'A', page: vm.commonPage() } }}</b>
+              <span>{{ 'batch.editor.pages.missingSub' | t: { count: vm.pageCountA() } }}</span>
+            }
+          </div>
+        }
+      </div>
     </div>
   }
   @if (vm.splitActive() && vm.splitBox(); as box) {
