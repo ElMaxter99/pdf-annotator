@@ -1,18 +1,30 @@
 import { type AiRow } from '../../utils/ai-proposal.utils';
-import { closestByName, closestElementIndex, lineBetween, pairName, type PairCandidate } from '../../utils/pairing.utils';
+import {
+  closestByName,
+  closestElementIndex,
+  lineBetween,
+  pairName,
+  type PairCandidate,
+} from '../../utils/pairing.utils';
 import { PairRefB, PairTarget } from './workspace.types';
 import type { WorkspacePageComponent } from './workspace.page';
 
 /**
  * Parejas A↔B: llevar a la pareja desde una tarjeta o un clic, resaltar ambos campos y unirlos con la línea.
- * Métodos de `WorkspacePageComponent` (se le añaden con `applyMixins` en workspace.page.ts; `this` es la página).
+ * Métodos de `WorkspacePageComponent` (se copian a su prototipo con `WORKSPACE_PARTS`, al final de workspace.page.ts;
+ * `this` es la página).
  */
 export class WorkspacePairing {
-
   /** Campos de A con su página propia (lo que dibuja «Dividida»). */
   pairCandidatesA(this: WorkspacePageComponent): PairCandidate<null>[] {
     return this.aPagesView().flatMap((page) =>
-      page.fields.map((field) => ({ name: pairName(field), page: page.num, x: field.x, y: field.y, ref: null })),
+      page.fields.map((field) => ({
+        name: pairName(field),
+        page: page.num,
+        x: field.x,
+        y: field.y,
+        ref: null,
+      })),
     );
   }
 
@@ -30,7 +42,13 @@ export class WorkspacePairing {
   }
 
   /** Pareja en B de un campo de A: su fila de la propuesta de la IA (si hay) o el campo de B con el mismo nombre. */
-  partnerInB(this: WorkspacePageComponent, name: string, aPage: number | null, x: number, y: number): PairCandidate<PairRefB> | null {
+  partnerInB(
+    this: WorkspacePageComponent,
+    name: string,
+    aPage: number | null,
+    x: number,
+    y: number,
+  ): PairCandidate<PairRefB> | null {
     const session = this.ai();
     if (session?.phase === 'ready' && aPage !== null) {
       let best: { row: AiRow; d: number } | null = null;
@@ -46,14 +64,26 @@ export class WorkspacePairing {
       }
       if (best) {
         const r = best.row;
-        return { name, page: r.newPage, x: r.x, y: r.y, ref: { kind: 'ai', id: r.id, page: r.newPage } };
+        return {
+          name,
+          page: r.newPage,
+          x: r.x,
+          y: r.y,
+          ref: { kind: 'ai', id: r.id, page: r.newPage },
+        };
       }
     }
     return closestByName(name, this.pairCandidatesB(), { page: this.pageIndex(), x, y });
   }
 
   /** Pareja en A de un campo de B (por nombre; la página de A que va con la de B, si la hay). */
-  partnerInA(this: WorkspacePageComponent, name: string, bPage: number, x: number, y: number): PairCandidate<null> | null {
+  partnerInA(
+    this: WorkspacePageComponent,
+    name: string,
+    bPage: number,
+    x: number,
+    y: number,
+  ): PairCandidate<null> | null {
     const shown = this.aPage();
     const near = bPage === this.pageIndex() && shown !== null ? shown : bPage;
     return closestByName(name, this.pairCandidatesA(), { page: near, x, y });
@@ -79,7 +109,9 @@ export class WorkspacePairing {
         await this.setPageIndexA(target.aPage);
       } else {
         // Enlazadas, A sigue a B: no se desenlaza por sorpresa; se avisa de en qué página de A está.
-        this.toast.show(this.translationService.translate('pairing.otherPageA', { page: target.aPage }));
+        this.toast.show(
+          this.translationService.translate('pairing.otherPageA', { page: target.aPage }),
+        );
       }
     }
     this.pairTarget = { ...target, flashUntil: Date.now() + 2000 };
@@ -122,7 +154,10 @@ export class WorkspacePairing {
       const next = lineBetween(aEl.getBoundingClientRect(), bEl.getBoundingClientRect());
       const cur = this.pairLine();
       const moved = cur
-        ? Math.abs(cur.x1 - next.x1) + Math.abs(cur.y1 - next.y1) + Math.abs(cur.x2 - next.x2) + Math.abs(cur.y2 - next.y2)
+        ? Math.abs(cur.x1 - next.x1) +
+          Math.abs(cur.y1 - next.y1) +
+          Math.abs(cur.x2 - next.x2) +
+          Math.abs(cur.y2 - next.y2)
         : Infinity;
       if (moved > 0.5) {
         this.pairLine.set(next);
@@ -162,7 +197,9 @@ export class WorkspacePairing {
     }
     if (t.b.kind === 'ai') {
       return (
-        this.referenceLayerRef?.nativeElement.querySelector<HTMLElement>(`[data-ai-id="${CSS.escape(t.b.id)}"]`) ?? null
+        this.referenceLayerRef?.nativeElement.querySelector<HTMLElement>(
+          `[data-ai-id="${CSS.escape(t.b.id)}"]`,
+        ) ?? null
       );
     }
     return (
@@ -200,7 +237,10 @@ export class WorkspacePairing {
   }
 
   /** Campo de A bajo el puntero en «Dividida» (con su posición en A). */
-  hitFieldOfA(this: WorkspacePageComponent, event: MouseEvent): { el: HTMLElement; name: string; x: number; y: number } | null {
+  hitFieldOfA(
+    this: WorkspacePageComponent,
+    event: MouseEvent,
+  ): { el: HTMLElement; name: string; x: number; y: number } | null {
     const layer = this.splitLayerRef?.nativeElement;
     const page = this.aPage();
     if (!layer || page === null) {
@@ -208,7 +248,12 @@ export class WorkspacePairing {
     }
     const el = Array.from(layer.querySelectorAll<HTMLElement>('.reference-field')).find((node) => {
       const r = node.getBoundingClientRect();
-      return event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom;
+      return (
+        event.clientX >= r.left &&
+        event.clientX <= r.right &&
+        event.clientY >= r.top &&
+        event.clientY <= r.bottom
+      );
     });
     if (!el) {
       return null;
@@ -256,7 +301,9 @@ export class WorkspacePairing {
     };
     await this.revealPair(target);
     if (!row.ok) {
-      this.runAfterRender(() => this.showPairTip(this.findPairElementA(target), 'pairing.noPartnerB'));
+      this.runAfterRender(() =>
+        this.showPairTip(this.findPairElementA(target), 'pairing.noPartnerB'),
+      );
     }
   }
 
@@ -266,7 +313,12 @@ export class WorkspacePairing {
     const refLayer = this.referenceLayerRef?.nativeElement;
     const inside = (el: Element) => {
       const r = el.getBoundingClientRect();
-      return event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom;
+      return (
+        event.clientX >= r.left &&
+        event.clientX <= r.right &&
+        event.clientY >= r.top &&
+        event.clientY <= r.bottom
+      );
     };
     type Found = { key: string; name: string; page: number; x: number; y: number; b: PairRefB };
     let found: Found | null = null;
@@ -281,10 +333,19 @@ export class WorkspacePairing {
       const row = session.rows.find((r) => r.id === id);
       const t = this.aiTemplate.get(id);
       if (row && t) {
-        found = { key: `ai:${id}`, name: pairName(t), page: row.page, x: t.x, y: t.y, b: { kind: 'ai', id, page: row.newPage } };
+        found = {
+          key: `ai:${id}`,
+          name: pairName(t),
+          page: row.page,
+          x: t.x,
+          y: t.y,
+          b: { kind: 'ai', id, page: row.newPage },
+        };
       }
     } else {
-      const el = Array.from(bLayer?.querySelectorAll<HTMLElement>('.annotation') ?? []).find(inside);
+      const el = Array.from(bLayer?.querySelectorAll<HTMLElement>('.annotation') ?? []).find(
+        inside,
+      );
       const pageIndex = Number(el?.dataset['pageIndex']);
       const index = Number(el?.dataset['fieldIndex']);
       const field = el ? this.coords()[pageIndex]?.fields[index] : undefined;
@@ -340,9 +401,11 @@ export class WorkspacePairing {
     });
     // La propuesta de la IA (capa encima de B) también responde al campo de A bajo el puntero.
     if (this.ai()?.phase === 'ready') {
-      this.referenceLayerRef?.nativeElement.querySelectorAll<HTMLElement>('[data-ai-id]').forEach((el) => {
-        el.classList.toggle('reference-field--pair', !!name && el.dataset['name'] === name);
-      });
+      this.referenceLayerRef?.nativeElement
+        .querySelectorAll<HTMLElement>('[data-ai-id]')
+        .forEach((el) => {
+          el.classList.toggle('reference-field--pair', !!name && el.dataset['name'] === name);
+        });
     }
   }
 }

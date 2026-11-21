@@ -1,19 +1,34 @@
 import { prepareFieldForForm, prepareFieldForStorage } from '../../utils/field-style.utils';
 import { AiRequestError, type AiProvider } from '../../services/ai-helper.service';
-import { confidenceLevel, isRowSelected, rowChangesPage, summarizeAi, type AiRow } from '../../utils/ai-proposal.utils';
+import {
+  confidenceLevel,
+  isRowSelected,
+  rowChangesPage,
+  summarizeAi,
+  type AiRow,
+} from '../../utils/ai-proposal.utils';
 import { effectiveAiInstructions } from '../../utils/ai-instructions.utils';
 import { signal } from '@angular/core';
 import { PageAnnotations, PageField } from '../../models/annotation.model';
 import { extendPagePattern } from '../../utils/page-pattern.utils';
-import { aiProposalField, aiTemplateMap, loadingAiSession, savedAiSession, withAiRowEdit, withAiEvent, withAiProgress, type AiSession } from '../../utils/ai-session.utils';
+import {
+  aiProposalField,
+  aiTemplateMap,
+  loadingAiSession,
+  savedAiSession,
+  withAiRowEdit,
+  withAiEvent,
+  withAiProgress,
+  type AiSession,
+} from '../../utils/ai-session.utils';
 import type { WorkspacePageComponent } from './workspace.page';
 
 /**
  * «Copiar y adaptar con IA» en el editor: pedir la propuesta, revisarla (también editable en B), aplicarla o descartarla.
- * Métodos de `WorkspacePageComponent` (se le añaden con `applyMixins` en workspace.page.ts; `this` es la página).
+ * Métodos de `WorkspacePageComponent` (se copian a su prototipo con `WORKSPACE_PARTS`, al final de workspace.page.ts;
+ * `this` es la página).
  */
 export class WorkspaceAi {
-
   // ---- «Copiar y adaptar con IA» -----------------------------------------------------------------
 
   /** Opens the chip panel and checks the helper again. */
@@ -67,7 +82,10 @@ export class WorkspaceAi {
           a: aPdf,
           b: bPdf,
           template: { pages: template, pageMap: this.pageMap()?.pairs },
-          instructions: effectiveAiInstructions(this.batch.activeItem(), this.batch.aiInstructions()),
+          instructions: effectiveAiInstructions(
+            this.batch.activeItem(),
+            this.batch.aiInstructions(),
+          ),
         },
         (progress) =>
           this.ai.update((cur) => (cur ? withAiProgress(cur, progress, Date.now()) : cur)),
@@ -105,7 +123,11 @@ export class WorkspaceAi {
    * Campos repetidos en el mismo sitio de cada página de A (número de página…): la propuesta los completa para cada
    * página de B sin IA (`utils/page-pattern.utils.ts`); los campos nuevos de las páginas extra entran en `aiTemplate`.
    */
-  withPagePatterns(this: WorkspacePageComponent, rows: AiRow[], template: PageAnnotations[]): AiRow[] {
+  withPagePatterns(
+    this: WorkspacePageComponent,
+    rows: AiRow[],
+    template: PageAnnotations[],
+  ): AiRow[] {
     const extended = extendPagePattern(rows, template, this.pdfDoc()?.numPages ?? 0);
     for (const [id, field] of extended.extra) {
       this.aiTemplate.set(id, field);
@@ -293,7 +315,9 @@ export class WorkspaceAi {
         moved += 1;
       }
       const edited = session.edits[row.id];
-      const target = edited ? this.prepareFieldForStorage(aiProposalField(field, row, edited)) : aiProposalField(field, row);
+      const target = edited
+        ? this.prepareFieldForStorage(aiProposalField(field, row, edited))
+        : aiProposalField(field, row);
       toAdd.push({
         page: row.newPage,
         field: {
@@ -328,7 +352,16 @@ export class WorkspaceAi {
       }
       const field = aiProposalField(base, row, session.edits[row.id]);
       const name = (field.mapField || field.value || '').toString();
-      this.drawReferenceField(layer, canvasHeight, name, Number(field.x), Number(field.y), field.fontSize, false, false);
+      this.drawReferenceField(
+        layer,
+        canvasHeight,
+        name,
+        Number(field.x),
+        Number(field.y),
+        field.fontSize,
+        false,
+        false,
+      );
       const el = layer.lastElementChild as HTMLElement | null;
       if (el) {
         // Editable before applying: hover, click opens the editor, drag moves it (all of it stays in the proposal).
@@ -336,10 +369,14 @@ export class WorkspaceAi {
         el.classList.toggle('reference-field--edited', !!session.edits[row.id]);
         el.title = this.translationService.translate('ai.proposal.editHint', {
           name: name || '—',
-          level: this.translationService.translate(`ai.confidence.${confidenceLevel(row.confidence)}`),
+          level: this.translationService.translate(
+            `ai.confidence.${confidenceLevel(row.confidence)}`,
+          ),
         });
         el.setAttribute('data-testid', 'ai-proposal-field');
-        el.addEventListener('pointerdown', (event) => this.onAiProposalPointerDown(event, row.id, el));
+        el.addEventListener('pointerdown', (event) =>
+          this.onAiProposalPointerDown(event, row.id, el),
+        );
         const selected = isRowSelected(row, overrides);
         el.classList.add(
           selected
@@ -392,7 +429,12 @@ export class WorkspaceAi {
   }
 
   /** Pointer down on a proposed field in B: a click opens the editor; a drag moves it (Esc cancels the drag). */
-  onAiProposalPointerDown(this: WorkspacePageComponent, event: PointerEvent, rowId: string, el: HTMLElement): void {
+  onAiProposalPointerDown(
+    this: WorkspacePageComponent,
+    event: PointerEvent,
+    rowId: string,
+    el: HTMLElement,
+  ): void {
     if (event.button !== 0 || this.panReady()) {
       return;
     }

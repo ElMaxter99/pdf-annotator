@@ -19,10 +19,10 @@ import type { WorkspacePageComponent } from './workspace.page';
 
 /**
  * Lote y traslado A→B: capa de referencia de A, tamaños y páginas de A y B, plantilla A, tabla de páginas, estados de los campos, guardado de B y acciones del PDF del lote.
- * Métodos de `WorkspacePageComponent` (se le añaden con `applyMixins` en workspace.page.ts; `this` es la página).
+ * Métodos de `WorkspacePageComponent` (se copian a su prototipo con `WORKSPACE_PARTS`, al final de workspace.page.ts;
+ * `this` es la página).
  */
 export class WorkspaceBatch {
-
   /** Paints the fields of A (read only) behind those of B. */
   redrawReference(this: WorkspacePageComponent) {
     const layer = this.referenceLayerRef?.nativeElement;
@@ -81,7 +81,11 @@ export class WorkspaceBatch {
   }
 
   /** Holding «A» swaps the page for the PDF of A, even when A has no template. */
-  async drawReferencePdf(this: WorkspacePageComponent, layer: HTMLElement, bCanvas: HTMLCanvasElement): Promise<void> {
+  async drawReferencePdf(
+    this: WorkspacePageComponent,
+    layer: HTMLElement,
+    bCanvas: HTMLCanvasElement,
+  ): Promise<void> {
     const item = this.batch.activeItem();
     if (!item) {
       return;
@@ -172,7 +176,10 @@ export class WorkspaceBatch {
    * Size and transform to draw the page of A: its own size, or the size of B with the page
    * stretched to it when the coordinates of A are scaled.
    */
-  geometryForA(this: WorkspacePageComponent, page: PDFPageProxy): {
+  geometryForA(
+    this: WorkspacePageComponent,
+    page: PDFPageProxy,
+  ): {
     width: number;
     height: number;
     transform: number[] | undefined;
@@ -227,7 +234,8 @@ export class WorkspaceBatch {
     return out;
   }
 
-  drawReferenceField(this: WorkspacePageComponent, 
+  drawReferenceField(
+    this: WorkspacePageComponent,
     layer: HTMLElement,
     canvasHeight: number,
     name: string,
@@ -296,9 +304,7 @@ export class WorkspaceBatch {
       if (map) {
         // Only the pages of B that have a page of A are replaced; the others are left alone.
         const kept = this.coords().filter((page) => map.pairs[page.num - 1] === null);
-        this.replaceCoords(
-          [...kept, ...this.normalizedTemplateA()].sort((x, y) => x.num - y.num),
-        );
+        this.replaceCoords([...kept, ...this.normalizedTemplateA()].sort((x, y) => x.num - y.num));
       } else {
         this.replaceCoords(this.normalizedTemplateA());
       }
@@ -339,7 +345,10 @@ export class WorkspaceBatch {
     this.pageMapToken += 1;
   }
 
-  pageTagKey(this: WorkspacePageComponent, kind: 'missing' | 'offset' | 'mapped' | 'unmapped'): string {
+  pageTagKey(
+    this: WorkspacePageComponent,
+    kind: 'missing' | 'offset' | 'mapped' | 'unmapped',
+  ): string {
     return `batch.editor.pages.tag${kind[0].toUpperCase()}${kind.slice(1)}`;
   }
 
@@ -373,7 +382,8 @@ export class WorkspaceBatch {
   }
 
   /** Reads the text of every page of A and B and suggests the table; rows set by hand are kept. */
-  async suggestPageMapFromTexts(this: WorkspacePageComponent, 
+  async suggestPageMapFromTexts(
+    this: WorkspacePageComponent,
     keep: PageMapData | null,
     onProgress: (done: number, total: number) => void,
   ): Promise<PageSuggestion | 'noText' | null> {
@@ -411,7 +421,12 @@ export class WorkspaceBatch {
   }
 
   /** Free pages: «Poner plantilla A» copies the page of A that is open into the page of B that is open. */
-  confirmCopyPageOfA(this: WorkspacePageComponent, mode: 'replace' | 'missing', pageA: number, pageB: number): void {
+  confirmCopyPageOfA(
+    this: WorkspacePageComponent,
+    mode: 'replace' | 'missing',
+    pageA: number,
+    pageB: number,
+  ): void {
     this.toast.show(
       this.translationService.translate('batch.editor.pages.copyConfirm', { a: pageA, b: pageB }),
       'info',
@@ -424,13 +439,19 @@ export class WorkspaceBatch {
     );
   }
 
-  copyPageOfAToB(this: WorkspacePageComponent, mode: 'replace' | 'missing', pageA: number, pageB: number): void {
+  copyPageOfAToB(
+    this: WorkspacePageComponent,
+    mode: 'replace' | 'missing',
+    pageA: number,
+    pageB: number,
+  ): void {
     const source = this.normalizedTemplateOfA().find((page) => page.num === pageA)?.fields ?? [];
     const nameOf = (field: PageField) => (field.mapField || field.value || '').trim();
     const present = new Set(
       (this.coords().find((page) => page.num === pageB)?.fields ?? []).map(nameOf),
     );
-    const toAdd = mode === 'replace' ? source : source.filter((field) => !present.has(nameOf(field)));
+    const toAdd =
+      mode === 'replace' ? source : source.filter((field) => !present.has(nameOf(field)));
     if (!toAdd.length && mode !== 'replace') {
       return;
     }
@@ -534,13 +555,24 @@ export class WorkspaceBatch {
       aPage: state.a ? this.aPage() : null,
       aX: state.a?.x,
       aY: state.a?.y,
-      b: state.b ? { kind: 'field', page: state.page, pageIndex: state.b.pageIndex, index: state.b.fieldIndex } : null,
+      b: state.b
+        ? {
+            kind: 'field',
+            page: state.page,
+            pageIndex: state.b.pageIndex,
+            index: state.b.fieldIndex,
+          }
+        : null,
     };
     await this.revealPair(target);
     if (!state.b) {
-      this.runAfterRender(() => this.showPairTip(this.findPairElementA(target), 'pairing.noPartnerB'));
+      this.runAfterRender(() =>
+        this.showPairTip(this.findPairElementA(target), 'pairing.noPartnerB'),
+      );
     } else if (!state.a) {
-      this.runAfterRender(() => this.showPairTip(this.findPairElementB(target), 'pairing.noPartnerA'));
+      this.runAfterRender(() =>
+        this.showPairTip(this.findPairElementB(target), 'pairing.noPartnerA'),
+      );
     }
   }
 
@@ -604,7 +636,8 @@ export class WorkspaceBatch {
   }
 
   /** Loads the PDF to edit for a batch item: B when it has one, otherwise A with its template. */
-  async openBatchPdf(this: WorkspacePageComponent, 
+  async openBatchPdf(
+    this: WorkspacePageComponent,
     item: BatchItem,
     coordsOverride: PageAnnotations[] | null = null,
   ): Promise<void> {
@@ -677,7 +710,8 @@ export class WorkspaceBatch {
    * Sets the template A from a JSON file or pasted text. Returns an error key, or `null` when it
    * worked. Without B the template is also loaded into the editor (one undo step).
    */
-  async batchSetTemplate(this: WorkspacePageComponent, 
+  async batchSetTemplate(
+    this: WorkspacePageComponent,
     source: { file: File } | { text: string },
   ): Promise<'tooBig' | 'json' | 'noPages' | null> {
     const item = this.batch.activeItem();

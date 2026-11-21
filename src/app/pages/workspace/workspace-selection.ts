@@ -1,17 +1,22 @@
 import { ensureFieldStyle, prepareFieldForStorage } from '../../utils/field-style.utils';
 import { PageField } from '../../models/annotation.model';
 import { addFieldToPages } from '../../utils/annotation-pages.utils';
-import { AlignMode, alignBoxes, DistributeAxis, distributeBoxes } from '../../utils/alignment.utils';
+import {
+  AlignMode,
+  alignBoxes,
+  DistributeAxis,
+  distributeBoxes,
+} from '../../utils/alignment.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
 import { moveFieldWithinPage } from '../../utils/field-move.utils';
 import type { WorkspacePageComponent } from './workspace.page';
 
 /**
  * Selección múltiple: seleccionar, recuadro (lasso), mover, alinear, distribuir, copiar, pegar y borrar en grupo (un paso de historial).
- * Métodos de `WorkspacePageComponent` (se le añaden con `applyMixins` en workspace.page.ts; `this` es la página).
+ * Métodos de `WorkspacePageComponent` (se copian a su prototipo con `WORKSPACE_PARTS`, al final de workspace.page.ts;
+ * `this` es la página).
  */
 export class WorkspaceSelection {
-
   isSelected(this: WorkspacePageComponent, pageIndex: number, fieldIndex: number): boolean {
     const selected = this.selection();
     return !!selected && selected.pageIndex === pageIndex && selected.fields.includes(fieldIndex);
@@ -279,7 +284,8 @@ export class WorkspaceSelection {
   }
 
   /** Applies `update` to every selected field in a single history step. */
-  updateSelectedFields(this: WorkspacePageComponent, 
+  updateSelectedFields(
+    this: WorkspacePageComponent,
     update: (field: PageField, order: number) => PageField,
     coalesceKey?: string,
   ): void {
@@ -311,7 +317,12 @@ export class WorkspaceSelection {
   }
 
   /** Rendered width of an annotation in px (falls back to a rough estimate before first paint). */
-  annotationWidthPx(this: WorkspacePageComponent, pageIndex: number, fieldIndex: number, field: PageField): number {
+  annotationWidthPx(
+    this: WorkspacePageComponent,
+    pageIndex: number,
+    fieldIndex: number,
+    field: PageField,
+  ): number {
     const el = this.annotationsLayerRef?.nativeElement.querySelector<HTMLElement>(
       `[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`,
     );
@@ -326,7 +337,13 @@ export class WorkspaceSelection {
   }
 
   /** Commits the new position (points PDF) of one dragged annotation, through the history. */
-  setFieldPosition(this: WorkspacePageComponent, pageIndex: number, fieldIndex: number, x: number, y: number) {
+  setFieldPosition(
+    this: WorkspacePageComponent,
+    pageIndex: number,
+    fieldIndex: number,
+    x: number,
+    y: number,
+  ) {
     const changed = this.applyCoordsChange(() =>
       this.coords.update((pages) =>
         pages.map((page, idx) => {

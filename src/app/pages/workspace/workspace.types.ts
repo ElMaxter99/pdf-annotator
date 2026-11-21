@@ -22,7 +22,12 @@ export interface WheelEdgeIndicator {
 export type PreviewState = { page: number; field: PageField } | null;
 
 /** `aiRowId`: editing a field of the AI proposal (not of B yet); the change stays in the proposal until «Aplicar». */
-export type EditState = { pageIndex: number; fieldIndex: number; field: PageField; aiRowId?: string } | null;
+export type EditState = {
+  pageIndex: number;
+  fieldIndex: number;
+  field: PageField;
+  aiRowId?: string;
+} | null;
 
 export type JsonViewMode = 'text' | 'tree';
 
@@ -75,7 +80,9 @@ export const ADJUST_UI = {
 export type NoticeId = 'noTemplate' | 'pagesDiffer' | 'fit' | 'adjust' | 'ai';
 
 /** Campo de B de una pareja: fila de la propuesta de la IA o campo ya puesto. */
-export type PairRefB = { kind: 'ai'; id: string; page: number } | { kind: 'field'; page: number; pageIndex: number; index: number };
+export type PairRefB =
+  | { kind: 'ai'; id: string; page: number }
+  | { kind: 'field'; page: number; pageIndex: number; index: number };
 
 /** Pareja activa: el campo de A (página propia y posición) y el de B; `flashUntil` = fin del destello. */
 export interface PairTarget {

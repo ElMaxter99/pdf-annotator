@@ -19,50 +19,15 @@ import {
   prepareFieldForStorage,
 } from '../../utils/field-style.utils';
 import {
-  JsonShapeError,
   JsonTreePreview,
-  buildJsonTreePath,
   buildJsonTreePreview,
-  countLineBreaks,
-  getTextareaLineHeight,
-  indentJsonBlock,
   isEditableElement,
   parseNumericList,
   serializeFieldForJson,
 } from '../../utils/json-text.utils';
-import {
-  ZOOM_PRESETS,
-  centerScrollLeft,
-  clampScale,
-  doubleClickZoomTarget,
-  fitPageScale,
-  fitPageScaleForOverflow,
-  fitWidthScale,
-  homeScrollLeft,
-  isDoubleClick,
-  panScrollPosition,
-  stepScale,
-  wheelZoomFactor,
-  workMarginFor,
-  zoomAnchorScrollDelta,
-  zoomLimitFor,
-  type ViewerClick,
-  type ZoomLimit,
-} from '../../utils/zoom.utils';
-import {
-  initialWheelPageState,
-  wheelEdgeStep,
-  type WheelPageState,
-} from '../../utils/wheel-page.utils';
-import { AiHelperService, AiRequestError, type AiProvider } from '../../services/ai-helper.service';
-import {
-  confidenceLevel,
-  isRowSelected,
-  rowChangesPage,
-  summarizeAi,
-  type AiRow,
-} from '../../utils/ai-proposal.utils';
-import { effectiveAiInstructions } from '../../utils/ai-instructions.utils';
+import { ZOOM_PRESETS, type ViewerClick, type ZoomLimit } from '../../utils/zoom.utils';
+import { initialWheelPageState, type WheelPageState } from '../../utils/wheel-page.utils';
+import { AiHelperService } from '../../services/ai-helper.service';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   Component,
@@ -88,26 +53,10 @@ import { Language, TranslationService } from '../../i18n/translation.service';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import '../../promise-with-resolvers.polyfill';
 import '../../array-buffer-transfer.polyfill';
-import { FieldType, PageAnnotations, PageField } from '../../models/annotation.model';
-import { extendPagePattern } from '../../utils/page-pattern.utils';
-import {
-  PageSize,
-  pageScaleFactors,
-  sizeOfPage,
-  sizesDiffer,
-} from '../../utils/page-scale.utils';
-import {
-  clampPageNumber,
-  holdPageOfB,
-  linkedPageTotal,
-} from '../../utils/page-link.utils';
+import { PageAnnotations, PageField } from '../../models/annotation.model';
+import { PageSize, sizesDiffer } from '../../utils/page-scale.utils';
 import { AnnotationTemplatesService, AnnotationTemplate } from '../../annotation-templates.service';
-import {
-  DEFAULT_GUIDE_SETTINGS,
-  GuideSettings,
-  cloneGuideSettings,
-  differsFromDefaultGuideSettings,
-} from '../../models/guide-settings.model';
+import { DEFAULT_GUIDE_SETTINGS, GuideSettings, cloneGuideSettings } from '../../models/guide-settings.model';
 import { WorkspaceHeaderComponent } from './components/header/workspace-header.component';
 import { WorkspaceSidebarComponent } from './components/sidebar/workspace-sidebar.component';
 import { WorkspaceViewerComponent } from './components/viewer/workspace-viewer.component';
@@ -129,17 +78,8 @@ import { WorkspacePairing } from './workspace-pairing';
 import { WorkspaceAdjust } from './workspace-adjust';
 import { WorkspaceAi } from './workspace-ai';
 import { PageThumbnailGenerator } from './page-thumbnail-generator';
-import {
-  CustomFontEntry,
-  DEFAULT_FONT_ID,
-  FontCatalogService,
-  FontOption,
-} from '../../fonts/font-catalog.service';
-import { FontVariantDescriptor } from '../../fonts/font-variant';
-import {
-  AnnotationImportService,
-  ImportReport,
-} from '../../services/annotation-import.service';
+import { DEFAULT_FONT_ID, FontCatalogService, FontOption } from '../../fonts/font-catalog.service';
+import { AnnotationImportService } from '../../services/annotation-import.service';
 import { ToastService } from '../../services/toast.service';
 import { AnnotationStore } from '../../services/annotation-store';
 import { PdfExportService } from '../../services/pdf-export.service';
@@ -157,45 +97,14 @@ import {
 } from '../../utils/preview-values.utils';
 import { SessionStoreService } from '../../services/session-store.service';
 import { BatchStoreService } from '../../services/batch-store.service';
-import {
-  FieldState,
-  computeFieldStates,
-  fieldKey,
-  summarizeStates,
-} from '../../utils/migration.utils';
+import { computeFieldStates, summarizeStates } from '../../utils/migration.utils';
 import { PendingFileService, PendingRestore } from '../../services/pending-file.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { isPdfFile } from '../../utils/pdf-file.utils';
-import { BATCH_ITEM_PARAM, BATCH_OPEN_VIEW, batchItemOpening } from '../../utils/batch-open.utils';
-import type { BatchItem, PageMapData } from '../../models/batch.model';
-import {
-  type PageSuggestion,
-  mapPageOfA,
-  suggestPageMap,
-} from '../../utils/page-map.utils';
-import { matchTemplate, parsePastedTemplates } from '../../utils/template-paste.utils';
-import {
-  extractPagesCollection,
-  normalizeFieldDecimals,
-  normalizeFieldType,
-  sanitizeOptionalAppender,
-  sanitizeTextPreservingSpacing,
-} from '../../utils/annotation-fields.utils';
-import {
-  addFieldToPages,
-  cloneAnnotationPages,
-  removeFieldFromPages,
-  updateFieldInPages,
-} from '../../utils/annotation-pages.utils';
-import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
-import {
-  AlignMode,
-  alignBoxes,
-  DistributeAxis,
-  distributeBoxes,
-} from '../../utils/alignment.utils';
+import type { BatchItem } from '../../models/batch.model';
+import { normalizeFieldType } from '../../utils/annotation-fields.utils';
+import { addFieldToPages, removeFieldFromPages, updateFieldInPages } from '../../utils/annotation-pages.utils';
 import { CoalescingRunner } from '../../utils/coalescing-runner';
-import { LooseJsonError, parseLooseJson } from '../../utils/loose-json';
 import {
   closeFontDropdownState,
   filterFontOptions,
@@ -212,49 +121,18 @@ import {
 import { buildJsonExportPayload, jsonExportText } from '../../utils/json-export.utils';
 import {
   ensureHex,
-  hexToRgbComponents,
-  normalizeColor,
   normalizeHexInput,
-  parseColorComponents,
   parseRgbText,
   rgbToHex,
   toRgbString,
 } from '../../utils/color.utils';
-import { formatNumberWithTruncation, toFiniteNumber } from '../../utils/number.utils';
+import { toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
-import { moveFieldWithinPage } from '../../utils/field-move.utils';
 import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
-import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
-import {
-  type AdjustAnchorRow,
-  type AdjustField,
-  type AdjustMode,
-  effectiveShift,
-  fieldVisual,
-  formatShift,
-  hitAdjustField,
-  isFieldMoved,
-  collectAdjustFields,
-  existingFieldKeys,
-  recomputeFields,
-} from '../../utils/adjust-session.utils';
-import {
-  aiProposalField,
-  aiTemplateMap,
-  loadingAiSession,
-  savedAiSession,
-  withAiRowEdit,
-  withAiEvent,
-  withAiProgress,
-  type AiSession,
-} from '../../utils/ai-session.utils';
-import { readPageTexts } from '../../services/pdf-text.service';
-import { closestByName, closestElementIndex, lineBetween, pairName, type PairCandidate } from '../../utils/pairing.utils';
+import { type AiSession } from '../../utils/ai-session.utils';
 
 import {
-  REFERENCE_MODE_KEY,
-  WHEEL_PAGING_KEY,
   WheelEdgeIndicator,
   PreviewState,
   EditState,
@@ -262,13 +140,9 @@ import {
   EditorMode,
   SIDEBAR_TABS,
   SidebarTab,
-  AUTO_APPLY_JSON_DELAY_MS,
   SESSION_SAVE_DELAY_MS,
-  MAX_JSON_IMPORT_BYTES,
   AdjustSession,
-  ADJUST_UI,
   NoticeId,
-  PairRefB,
   PairTarget,
 } from './workspace.types';
 export type { AdjustSession, NoticeId } from './workspace.types';
@@ -2753,14 +2627,30 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
  * página: `this` sigue siendo la página y los subcomponentes siguen llamando a `vm.metodo()`. El estado (signals)
  * vive en la página.
  */
-const WORKSPACE_PARTS = [WorkspaceAi, WorkspaceAdjust, WorkspacePairing, WorkspaceSelection, WorkspaceBatch, WorkspaceView, WorkspaceJson] as const;
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
-export interface WorkspacePageComponent extends WorkspaceAi, WorkspaceAdjust, WorkspacePairing, WorkspaceSelection, WorkspaceBatch, WorkspaceView, WorkspaceJson {}
+const WORKSPACE_PARTS = [
+  WorkspaceAi,
+  WorkspaceAdjust,
+  WorkspacePairing,
+  WorkspaceSelection,
+  WorkspaceBatch,
+  WorkspaceView,
+  WorkspaceJson,
+] as const;
+export interface WorkspacePageComponent
+  extends WorkspaceAi,
+    WorkspaceAdjust,
+    WorkspacePairing,
+    WorkspaceSelection,
+    WorkspaceBatch,
+    WorkspaceView,
+    WorkspaceJson {}
 for (const part of WORKSPACE_PARTS) {
   for (const name of Object.getOwnPropertyNames(part.prototype)) {
     if (name !== 'constructor') {
       const descriptor = Object.getOwnPropertyDescriptor(part.prototype, name);
-      if (descriptor) Object.defineProperty(WorkspacePageComponent.prototype, name, descriptor);
+      if (descriptor) {
+        Object.defineProperty(WorkspacePageComponent.prototype, name, descriptor);
+      }
     }
   }
 }

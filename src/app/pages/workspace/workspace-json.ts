@@ -1,8 +1,22 @@
-import { DEFAULT_OPACITY, ensureFieldStyle, prepareFieldForStorage } from '../../utils/field-style.utils';
-import { JsonShapeError, buildJsonTreePath, countLineBreaks, getTextareaLineHeight, indentJsonBlock, serializeFieldForJson } from '../../utils/json-text.utils';
+import {
+  DEFAULT_OPACITY,
+  ensureFieldStyle,
+  prepareFieldForStorage,
+} from '../../utils/field-style.utils';
+import {
+  JsonShapeError,
+  buildJsonTreePath,
+  countLineBreaks,
+  getTextareaLineHeight,
+  indentJsonBlock,
+  serializeFieldForJson,
+} from '../../utils/json-text.utils';
 import { PageAnnotations, PageField } from '../../models/annotation.model';
 import { AnnotationTemplate } from '../../annotation-templates.service';
-import { cloneGuideSettings, differsFromDefaultGuideSettings } from '../../models/guide-settings.model';
+import {
+  cloneGuideSettings,
+  differsFromDefaultGuideSettings,
+} from '../../models/guide-settings.model';
 import { CustomFontEntry, DEFAULT_FONT_ID } from '../../fonts/font-catalog.service';
 import { ImportReport } from '../../services/annotation-import.service';
 import { resolveFieldPreview } from '../../utils/preview-values.utils';
@@ -15,10 +29,10 @@ import type { WorkspacePageComponent } from './workspace.page';
 
 /**
  * JSON, plantillas y exportación: foco del JSON al seleccionar, aplicar e importar JSON, plantillas guardadas y descarga del PDF anotado.
- * Métodos de `WorkspacePageComponent` (se le añaden con `applyMixins` en workspace.page.ts; `this` es la página).
+ * Métodos de `WorkspacePageComponent` (se copian a su prototipo con `WORKSPACE_PARTS`, al final de workspace.page.ts;
+ * `this` es la página).
  */
 export class WorkspaceJson {
-
   focusJsonOnSelection(this: WorkspacePageComponent, pageIndex: number, fieldIndex: number) {
     if (pageIndex < 0 || fieldIndex < 0) {
       return;
@@ -80,7 +94,8 @@ export class WorkspaceJson {
     this.highlightTextareaRange(textarea, range);
   }
 
-  locateJsonFieldRange(this: WorkspacePageComponent, 
+  locateJsonFieldRange(
+    this: WorkspacePageComponent,
     pageIndex: number,
     fieldIndex: number,
     text: string,
@@ -144,7 +159,8 @@ export class WorkspaceJson {
     return indentJsonBlock(this.serializeFieldForJson(field), '        ');
   }
 
-  highlightTextareaRange(this: WorkspacePageComponent, 
+  highlightTextareaRange(
+    this: WorkspacePageComponent,
     textarea: HTMLTextAreaElement,
     range: { start: number; end: number },
   ) {
@@ -253,7 +269,10 @@ export class WorkspaceJson {
     }, delayMs);
   }
 
-  tryApplyCoordsText(this: WorkspacePageComponent, options: { silent: boolean; clearWhenEmpty: boolean }): boolean {
+  tryApplyCoordsText(
+    this: WorkspacePageComponent,
+    options: { silent: boolean; clearWhenEmpty: boolean },
+  ): boolean {
     const text = this.coordsTextModel().trim();
 
     if (!text) {
@@ -433,7 +452,10 @@ export class WorkspaceJson {
     await this.runExport(false);
   }
 
-  async confirmExportSamples(this: WorkspacePageComponent, result: { choice: 'map' | 'sample'; remember: boolean }) {
+  async confirmExportSamples(
+    this: WorkspacePageComponent,
+    result: { choice: 'map' | 'sample'; remember: boolean },
+  ) {
     this.exportSamplesPrompt.set(null);
     if (result.remember) {
       this.rememberedExportChoice = result.choice;
@@ -499,7 +521,11 @@ export class WorkspaceJson {
       .map((entry) => entry.bytes.slice());
   }
 
-  rememberPdfBytes(this: WorkspacePageComponent, data?: Uint8Array | ArrayBuffer | null, weight = 0) {
+  rememberPdfBytes(
+    this: WorkspacePageComponent,
+    data?: Uint8Array | ArrayBuffer | null,
+    weight = 0,
+  ) {
     if (!data) return;
     const typed = data instanceof Uint8Array ? data : new Uint8Array(data);
     if (!typed.length) return;
@@ -515,7 +541,11 @@ export class WorkspaceJson {
    * After an explicit import/apply, warns about what was skipped or looks wrong. The import itself
    * is never altered: these are hints so the user can fix the JSON.
    */
-  async reportImportIssues(this: WorkspacePageComponent, report: ImportReport, pages: PageAnnotations[]) {
+  async reportImportIssues(
+    this: WorkspacePageComponent,
+    report: ImportReport,
+    pages: PageAnnotations[],
+  ) {
     let outOfPage = 0;
     let missingPages = 0;
     const doc = this.pdfDoc();

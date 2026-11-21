@@ -2,17 +2,29 @@ import { PageField } from '../../models/annotation.model';
 import { pageScaleFactors, sizeOfPage } from '../../utils/page-scale.utils';
 import { mapPageOfA } from '../../utils/page-map.utils';
 import { findAnchors, type PageTextItem } from '../../utils/text-anchors.utils';
-import { type AdjustAnchorRow, type AdjustField, type AdjustMode, effectiveShift, fieldVisual, formatShift, hitAdjustField, isFieldMoved, collectAdjustFields, existingFieldKeys, recomputeFields } from '../../utils/adjust-session.utils';
+import {
+  type AdjustAnchorRow,
+  type AdjustField,
+  type AdjustMode,
+  effectiveShift,
+  fieldVisual,
+  formatShift,
+  hitAdjustField,
+  isFieldMoved,
+  collectAdjustFields,
+  existingFieldKeys,
+  recomputeFields,
+} from '../../utils/adjust-session.utils';
 import { readPageTexts } from '../../services/pdf-text.service';
 import { AdjustSession, ADJUST_UI } from './workspace.types';
 import type { WorkspacePageComponent } from './workspace.page';
 
 /**
  * «Copiar y ajustar por textos»: proponer, revisar en la capa de referencia y aplicar (un paso de historial).
- * Métodos de `WorkspacePageComponent` (se le añaden con `applyMixins` en workspace.page.ts; `this` es la página).
+ * Métodos de `WorkspacePageComponent` (se copian a su prototipo con `WORKSPACE_PARTS`, al final de workspace.page.ts;
+ * `this` es la página).
  */
 export class WorkspaceAdjust {
-
   // ---- «Copiar y ajustar por textos» -------------------------------------------------------------
 
   /** Looks for the same texts in A and B and opens the review with a proposal. */
@@ -106,7 +118,8 @@ export class WorkspaceAdjust {
   }
 
   /** With «Ajustar» on, the texts of A are scaled to B first (x and y apart), then compared. */
-  fitTextsOfA(this: WorkspacePageComponent, 
+  fitTextsOfA(
+    this: WorkspacePageComponent,
     items: readonly PageTextItem[],
     pageA: number,
     pageB: number,
@@ -210,7 +223,10 @@ export class WorkspaceAdjust {
     );
   }
 
-  updateAdjust(this: WorkspacePageComponent, update: (current: AdjustSession) => AdjustSession): void {
+  updateAdjust(
+    this: WorkspacePageComponent,
+    update: (current: AdjustSession) => AdjustSession,
+  ): void {
     const current = this.adjust();
     if (!current) {
       return;
@@ -394,7 +410,12 @@ export class WorkspaceAdjust {
     }
   }
 
-  drawAdjustPins(this: WorkspacePageComponent, layer: HTMLElement, canvasHeight: number, side: 'a' | 'b'): void {
+  drawAdjustPins(
+    this: WorkspacePageComponent,
+    layer: HTMLElement,
+    canvasHeight: number,
+    side: 'a' | 'b',
+  ): void {
     const session = this.adjust();
     if (
       !session ||

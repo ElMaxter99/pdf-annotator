@@ -1,5 +1,22 @@
 import { isEditableElement } from '../../utils/json-text.utils';
-import { centerScrollLeft, clampScale, doubleClickZoomTarget, fitPageScale, fitPageScaleForOverflow, fitWidthScale, homeScrollLeft, isDoubleClick, panScrollPosition, stepScale, wheelZoomFactor, workMarginFor, zoomAnchorScrollDelta, zoomLimitFor, type ViewerClick, type ZoomLimit } from '../../utils/zoom.utils';
+import {
+  centerScrollLeft,
+  clampScale,
+  doubleClickZoomTarget,
+  fitPageScale,
+  fitPageScaleForOverflow,
+  fitWidthScale,
+  homeScrollLeft,
+  isDoubleClick,
+  panScrollPosition,
+  stepScale,
+  wheelZoomFactor,
+  workMarginFor,
+  zoomAnchorScrollDelta,
+  zoomLimitFor,
+  type ViewerClick,
+  type ZoomLimit,
+} from '../../utils/zoom.utils';
 import { initialWheelPageState, wheelEdgeStep } from '../../utils/wheel-page.utils';
 import { clampPageNumber, holdPageOfB, linkedPageTotal } from '../../utils/page-link.utils';
 import { REFERENCE_MODE_KEY, WHEEL_PAGING_KEY, WheelEdgeIndicator } from './workspace.types';
@@ -7,10 +24,10 @@ import type { WorkspacePageComponent } from './workspace.page';
 
 /**
  * Vista del visor: modos de referencia y «Dividida», páginas de A y B, zoom, rueda, mover el lienzo, espacio de trabajo ampliado y ajustar a página o ancho.
- * Métodos de `WorkspacePageComponent` (se le añaden con `applyMixins` en workspace.page.ts; `this` es la página).
+ * Métodos de `WorkspacePageComponent` (se copian a su prototipo con `WORKSPACE_PARTS`, al final de workspace.page.ts;
+ * `this` es la página).
  */
 export class WorkspaceView {
-
   storedReferenceMode(this: WorkspacePageComponent): 'overlay' | 'toggle' | 'split' {
     try {
       const value =
@@ -22,7 +39,10 @@ export class WorkspaceView {
   }
 
   /** Changes how A is shown. «Dividida» also fits both pages in the viewer. */
-  async setReferenceMode(this: WorkspacePageComponent, mode: 'overlay' | 'toggle' | 'split'): Promise<void> {
+  async setReferenceMode(
+    this: WorkspacePageComponent,
+    mode: 'overlay' | 'toggle' | 'split',
+  ): Promise<void> {
     this.referenceMode.set(mode);
     if (mode !== 'split') {
       this.splitLinked.set(true);
@@ -54,14 +74,23 @@ export class WorkspaceView {
   }
 
   splitAPane(this: WorkspacePageComponent): HTMLElement | null {
-    return (this.splitLayerRef?.nativeElement.closest('.canvas-container--split-a') as HTMLElement | null) ?? null;
+    return (
+      (this.splitLayerRef?.nativeElement.closest(
+        '.canvas-container--split-a',
+      ) as HTMLElement | null) ?? null
+    );
   }
 
   isOverSplitA(this: WorkspacePageComponent, evt: { clientX: number; clientY: number }): boolean {
     const pane = this.splitAPane();
     if (!pane) return false;
     const r = pane.getBoundingClientRect();
-    return evt.clientX >= r.left && evt.clientX <= r.right && evt.clientY >= r.top && evt.clientY <= r.bottom;
+    return (
+      evt.clientX >= r.left &&
+      evt.clientX <= r.right &&
+      evt.clientY >= r.top &&
+      evt.clientY <= r.bottom
+    );
   }
 
   /** Chip «Enlazado / Desenlazado»: A and B stop (or start again) sharing zoom and scroll. */
@@ -71,10 +100,18 @@ export class WorkspaceView {
       this.scaleA.set(this.scale());
       this.splitLinked.set(false);
       this.updateSplitHeight();
-      this.toast.show(this.translationService.translate('batch.editor.split.unlinkedToast'), 'info', 4000);
+      this.toast.show(
+        this.translationService.translate('batch.editor.split.unlinkedToast'),
+        'info',
+        4000,
+      );
     } else {
       const pane = this.splitAPane();
-      const before = { scale: this.scaleA(), left: pane?.scrollLeft ?? 0, top: pane?.scrollTop ?? 0 };
+      const before = {
+        scale: this.scaleA(),
+        left: pane?.scrollLeft ?? 0,
+        top: pane?.scrollTop ?? 0,
+      };
       this.splitLinked.set(true);
       if (pane) {
         pane.scrollLeft = 0;
@@ -98,7 +135,10 @@ export class WorkspaceView {
   }
 
   /** «Deshacer» of the relink notice: A goes back to its own zoom and position. */
-  async undoSplitLink(this: WorkspacePageComponent, before: { scale: number; left: number; top: number }): Promise<void> {
+  async undoSplitLink(
+    this: WorkspacePageComponent,
+    before: { scale: number; left: number; top: number },
+  ): Promise<void> {
     if (!this.splitActive() || !this.splitLinked()) return;
     this.scaleA.set(before.scale);
     this.splitLinked.set(false);
@@ -115,7 +155,11 @@ export class WorkspaceView {
   }
 
   /** Zoom of A alone (unlinked «Dividida»), keeping the point under the cursor. */
-  async zoomSplitA(this: WorkspacePageComponent, requested: number, anchor: { clientX: number; clientY: number } | null) {
+  async zoomSplitA(
+    this: WorkspacePageComponent,
+    requested: number,
+    anchor: { clientX: number; clientY: number } | null,
+  ) {
     const pane = this.splitAPane();
     const canvas = this.splitCanvasRef?.nativeElement;
     const next = clampScale(requested);
@@ -466,7 +510,11 @@ export class WorkspaceView {
   }
 
   /** Anota un clic del visor y dice si es el segundo de un doble clic (P-106). */
-  isViewerDoubleClick(this: WorkspacePageComponent, kind: ViewerClick['kind'], evt: MouseEvent): boolean {
+  isViewerDoubleClick(
+    this: WorkspacePageComponent,
+    kind: ViewerClick['kind'],
+    evt: MouseEvent,
+  ): boolean {
     const click: ViewerClick = { kind, x: evt.clientX, y: evt.clientY, time: Date.now() };
     const double = isDoubleClick(this.lastViewerClick, click);
     this.lastViewerClick = double ? null : click;
@@ -478,7 +526,10 @@ export class WorkspaceView {
    * (en «Dividida» con zoom desenlazado, solo ese panel; enlazado, los dos). Ignorado con un
    * editor de anotación abierto.
    */
-  async toggleFitActual(this: WorkspacePageComponent, at: { clientX: number; clientY: number }): Promise<void> {
+  async toggleFitActual(
+    this: WorkspacePageComponent,
+    at: { clientX: number; clientY: number },
+  ): Promise<void> {
     if (!this.pdfDoc() || this.editing() || this.preview()) return;
     if (this.unlinkedSplit() && this.isOverSplitA(at)) {
       await this.toggleFitActualA(at);
@@ -493,7 +544,10 @@ export class WorkspaceView {
   }
 
   /** Lo mismo para A cuando «Dividida» está desenlazada y el puntero está sobre A. */
-  async toggleFitActualA(this: WorkspacePageComponent, at: { clientX: number; clientY: number }): Promise<void> {
+  async toggleFitActualA(
+    this: WorkspacePageComponent,
+    at: { clientX: number; clientY: number },
+  ): Promise<void> {
     const pane = this.splitAPane();
     const canvas = this.splitCanvasRef?.nativeElement;
     if (!pane || !canvas) return;
@@ -672,7 +726,8 @@ export class WorkspaceView {
     const before = pane.style.getPropertyValue('--a-margin');
     const margin = workMarginFor(pane.clientWidth);
     pane.style.setProperty('--a-margin', `${margin}px`);
-    const untouched = before === '' || before === '0px' || Math.abs(pane.scrollLeft - this.aHomeLeft) <= 2;
+    const untouched =
+      before === '' || before === '0px' || Math.abs(pane.scrollLeft - this.aHomeLeft) <= 2;
     if (margin > 0 && `${margin}px` !== before && untouched) this.resetSplitAScroll();
   }
 
@@ -710,12 +765,22 @@ export class WorkspaceView {
     if (!pane || !sheet) return;
     const box = this.contentBox(pane, sheet);
     const padding = parseFloat(getComputedStyle(pane).paddingLeft) || 0;
-    const home = homeScrollLeft({ contentLeft: box.left, contentWidth: box.width, viewportWidth: pane.clientWidth, padding });
+    const home = homeScrollLeft({
+      contentLeft: box.left,
+      contentWidth: box.width,
+      viewportWidth: pane.clientWidth,
+      padding,
+    });
     this.scrollViewerTo(pane, home, smooth);
     this.aHomeLeft = smooth ? home : pane.scrollLeft;
   }
 
-  scrollViewerTo(this: WorkspacePageComponent, viewer: HTMLElement, left: number, smooth: boolean): void {
+  scrollViewerTo(
+    this: WorkspacePageComponent,
+    viewer: HTMLElement,
+    left: number,
+    smooth: boolean,
+  ): void {
     const reduce =
       typeof window !== 'undefined' &&
       typeof window.matchMedia === 'function' &&
@@ -728,7 +793,11 @@ export class WorkspaceView {
   }
 
   /** Posición del elemento en coordenadas del contenido desplazable del visor. */
-  contentBox(this: WorkspacePageComponent, viewer: HTMLElement, el: HTMLElement): { left: number; width: number } {
+  contentBox(
+    this: WorkspacePageComponent,
+    viewer: HTMLElement,
+    el: HTMLElement,
+  ): { left: number; width: number } {
     const v = viewer.getBoundingClientRect();
     const r = el.getBoundingClientRect();
     return { left: r.left - v.left + viewer.scrollLeft, width: r.width };
@@ -799,7 +868,11 @@ export class WorkspaceView {
    * Zooms keeping the point under `anchor` fixed. Requests that arrive while a render is
    * running are merged into the latest one, so a fast wheel never queues stale renders.
    */
-  async zoomToScale(this: WorkspacePageComponent, requested: number, anchor: { clientX: number; clientY: number } | null = null) {
+  async zoomToScale(
+    this: WorkspacePageComponent,
+    requested: number,
+    anchor: { clientX: number; clientY: number } | null = null,
+  ) {
     if (!this.pdfDoc()) return;
     this.zoomPending = { requested, anchor };
     if (this.zoomBusy) return;
@@ -839,7 +912,8 @@ export class WorkspaceView {
 
   /** On the web, the browser zoom keeps working outside the viewer: say so once. */
   maybeShowWebZoomHint(this: WorkspacePageComponent) {
-    if (typeof window === 'undefined' || (window as unknown as { desktop?: unknown }).desktop) return;
+    if (typeof window === 'undefined' || (window as unknown as { desktop?: unknown }).desktop)
+      return;
     try {
       if (localStorage.getItem('pdf-annotator.zoomHint') === '1') return;
       localStorage.setItem('pdf-annotator.zoomHint', '1');
