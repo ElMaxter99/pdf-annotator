@@ -1487,13 +1487,14 @@
       "count": "{{count}} proposats",
       "unapplied": "Sense aplicar",
       "willApply": "{{count}} s'aplicaran",
-      "selectHigh": "Marcar els alts ({{count}})",
-      "selectNone": "Treure'ls tots",
+      "selectHigh": "Marca només els segurs ({{count}})",
+      "selectNone": "Desmarca-ho tot",
       "group": {
-        "review": "Per revisar · {{count}}",
-        "notFound": "Sense trobar · {{count}}",
-        "absent": "No existeixen a B · {{count}}",
-        "ready": "Llestos · {{count}}"
+        "review": "D’A · per revisar · {{count}}",
+        "notFound": "D’A · sense col·locar · {{count}}",
+        "absent": "D’A · ja no existeixen a B · {{count}}",
+        "ready": "D’A · segurs · {{count}}",
+        "newInB": "Nous a B (no eren a A) · {{count}}"
       },
       "notInB": "no és a B",
       "absentInB": "no existeix a B: el correcte és no col·locar-lo",
@@ -1504,7 +1505,14 @@
       "editingBadge": "Camp de la proposta",
       "edited": "editat",
       "leaveOut": "Deixa fora de la proposta",
-      "pagePattern": "repetit a cada pàgina"
+      "pagePattern": "repetit a cada pàgina",
+      "groupHint": {
+        "ready": "Camps de la plantilla d’A que la IA ha col·locat a B amb confiança alta. Van marcats per aplicar.",
+        "review": "Camps d’A col·locats a B amb dubtes (una altra pàgina, una etiqueta semblant o confiança mitjana o baixa). No van marcats: mira’ls abans d’aplicar.",
+        "newInB": "No existien a A: B té més pàgines i el camp es repeteix a cada pàgina d’A (p. ex. el número de pàgina), així que es proposen per a les pàgines noves.",
+        "notFound": "Camps d’A que la IA no ha sabut col·locar a B. Crea’ls a mà si cal.",
+        "absent": "Camps d’A el text dels quals ja no existeix a B: no col·locar-los és el correcte."
+      }
     },
     "instructions": {
       "title": "Instruccions per a la IA",

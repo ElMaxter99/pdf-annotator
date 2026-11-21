@@ -30,7 +30,7 @@
         </div>
       </div>
       @for (group of groups(); track group.key) {
-        <h3 class="ai-proposal__sec">{{ 'ai.proposal.group.' + group.key | t: { count: group.rows.length } }}</h3>
+        <h3 class="ai-proposal__sec" [attr.data-testid]="'ai-group-' + group.key">{{ 'ai.proposal.group.' + group.key | t: { count: group.rows.length } }} <app-info-tip [text]="'ai.proposal.groupHint.' + group.key | t" /></h3>
         <ul class="ai-proposal__list" [attr.data-testid]="'ai-proposal-' + group.key">
           @for (row of group.rows; track row.id) {
             <li class="ai-proposal__row" [attr.data-ai-id]="row.id" [class.ai-proposal__row--off]="row.ok && !selected(row)">

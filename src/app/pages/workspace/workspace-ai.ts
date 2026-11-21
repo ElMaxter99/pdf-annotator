@@ -2,6 +2,7 @@ import { prepareFieldForForm, prepareFieldForStorage } from '../../utils/field-s
 import { AiRequestError, type AiProvider } from '../../services/ai-helper.service';
 import {
   confidenceLevel,
+  proposalGroup,
   isRowSelected,
   rowChangesPage,
   summarizeAi,
@@ -262,7 +263,8 @@ export class WorkspaceAi {
     const overrides: Record<string, boolean> = {};
     for (const row of session.rows) {
       if (row.ok) {
-        overrides[row.id] = mode === 'high' && confidenceLevel(row.confidence) === 'high';
+        // «Marcar solo los seguros»: los de A colocados con confianza alta (no los nuevos en B ni los dudosos).
+        overrides[row.id] = mode === 'high' && proposalGroup(row) === 'ready';
       }
     }
     this.patchAi({ overrides });

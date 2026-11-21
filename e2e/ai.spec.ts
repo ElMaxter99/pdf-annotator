@@ -625,6 +625,10 @@ test('«Copiar y adaptar con IA»: el número de página repetido en A se propon
   // los 3 de A y uno nuevo para la página 4 de B (numpages3), marcado «repetido en cada página»
   await expect(page.locator('.ai-proposal__row')).toHaveCount(4);
   await expect(page.locator('.ai-proposal__row', { hasText: 'numpages3' }).getByTestId('ai-row-pattern')).toBeVisible();
+  // grupos claros: el de la página nueva va en «Nuevos en B (no estaban en A)», separado de los que vienen de A
+  await expect(page.getByTestId('ai-group-newInB')).toContainText('Nuevos en B');
+  await expect(page.getByTestId('ai-proposal-newInB')).toContainText('numpages3');
+  await expect(page.getByTestId('ai-proposal-newInB').locator('.ai-proposal__row')).toHaveCount(1);
   await page.getByTestId('ai-apply').click();
   await expect(page.locator('.annotation')).toHaveCount(1); // la de la página 1 de B
 });

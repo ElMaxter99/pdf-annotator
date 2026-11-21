@@ -1487,13 +1487,14 @@
       "count": "{{count}} proposed",
       "unapplied": "Not applied",
       "willApply": "{{count}} will be applied",
-      "selectHigh": "Tick the high ones ({{count}})",
+      "selectHigh": "Tick only the sure ones ({{count}})",
       "selectNone": "Untick all",
       "group": {
-        "review": "To review · {{count}}",
-        "notFound": "Not found · {{count}}",
-        "absent": "Not in B · {{count}}",
-        "ready": "Ready · {{count}}"
+        "review": "From A · to check · {{count}}",
+        "notFound": "From A · not placed · {{count}}",
+        "absent": "From A · not in B any more · {{count}}",
+        "ready": "From A · sure · {{count}}",
+        "newInB": "New in B (not in A) · {{count}}"
       },
       "notInB": "not in B",
       "absentInB": "does not exist in B: leaving it out is correct",
@@ -1504,7 +1505,14 @@
       "editingBadge": "Proposed field",
       "edited": "edited",
       "leaveOut": "Leave out of the proposal",
-      "pagePattern": "repeated on every page"
+      "pagePattern": "repeated on every page",
+      "groupHint": {
+        "ready": "Fields of the A template placed in B with high confidence. They are ticked to apply.",
+        "review": "Fields of A placed in B with doubts (another page, a similar label or medium or low confidence). Not ticked: look at them before applying.",
+        "newInB": "They were not in A: B has more pages and the field repeats on every page of A (e.g. the page number), so they are proposed for the new pages.",
+        "notFound": "Fields of A the AI could not place in B. Create them by hand if needed.",
+        "absent": "Fields of A whose text no longer exists in B: leaving them out is right."
+      }
     },
     "instructions": {
       "title": "Instructions for the AI",
