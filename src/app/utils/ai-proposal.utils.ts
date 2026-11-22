@@ -34,21 +34,30 @@ export function isAbsentInB(row: Pick<AiRow, 'ok' | 'why'>): boolean {
 }
 
 /** Placed, absent from B and still missing, out of the fields of A. */
-export function countPlacement(rows: readonly Pick<AiRow, 'ok' | 'why' | 'source'>[]): {
+/**
+ * Recuento de una propuesta para el lote. `placed`/`total`/`missing` son solo los campos de A; `added` son los que no
+ * estaban en A (página nueva de un campo repetido por página) y `toCheck` los de A colocados con dudas (no «seguros»).
+ */
+export function countPlacement(rows: readonly Pick<AiRow, 'id' | 'ok' | 'why' | 'source' | 'confidence'>[]): {
   placed: number;
   absent: number;
   missing: number;
   total: number;
   withoutAi: number;
+  added: number;
+  toCheck: number;
 } {
-  const placed = rows.filter((row) => row.ok).length;
-  const absent = rows.filter(isAbsentInB).length;
+  const fromA = rows.filter((row) => !row.id.startsWith('pattern-'));
+  const placed = fromA.filter((row) => row.ok).length;
+  const absent = fromA.filter(isAbsentInB).length;
   return {
     placed,
     absent,
-    missing: rows.length - placed - absent,
-    total: rows.length,
+    missing: fromA.length - placed - absent,
+    total: fromA.length,
     withoutAi: rows.filter((row) => row.ok && (row.source === 'text' || row.source === 'pattern')).length,
+    added: rows.length - fromA.length,
+    toCheck: fromA.filter((row) => row.ok && confidenceLevel(row.confidence) !== 'high').length,
   };
 }
 
@@ -273,6 +282,12 @@ export function sanitizeEvent(raw: unknown): AiLiveEvent | null {
 
 export const usageTotal = (u: AiUsage | null): number =>
   u ? u.input + u.output + u.cacheRead + u.cacheWrite : 0;
+
+/**
+ * Tokens que cuentan de verdad para el gasto: entrada, salida y escritura en caché. Los leídos de caché (cada paso de
+ * una petición vuelve a leer las imágenes y el contexto) se cuentan aparte: cuestan mucho menos e inflaban la cifra.
+ */
+export const usageBilled = (u: AiUsage | null): number => (u ? u.input + u.output + u.cacheWrite : 0);
 
 export function sumUsage(list: Array<AiUsage | null>): AiUsage | null {
   const found = list.filter((u): u is AiUsage => !!u);

@@ -1136,3 +1136,9 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
 .ai-bdetails--inline .ai-details__body {
   overflow: visible;
 }
+
+// «N a revisar» dentro del chip: lo que el usuario tiene que mirar, en el tono de aviso.
+.ai-chip__check {
+  font-weight: 700;
+  color: var(--warning-text);
+}

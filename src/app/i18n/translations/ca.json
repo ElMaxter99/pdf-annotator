@@ -885,14 +885,16 @@
         "reading": "Llegint",
         "asking": "Preguntant · petició {{n}}",
         "resolving": "Col·locant",
-        "ready": "Llesta per revisar · {{placed}} de {{total}}",
-        "free": "Resolt sense IA · {{placed}} de {{total}}",
-        "partial": "Parcial · {{placed}} de {{total}}",
+        "ready": "Llista per revisar · {{placed}} de {{total}} d’A",
+        "free": "Resolt sense IA · {{placed}} de {{total}} d’A",
+        "partial": "Parcial · {{placed}} de {{total}} d’A",
         "absent": "{{n}} no existeixen a B",
         "failed": "Ha fallat",
         "cancelled": "Cancel·lat",
         "saved": "Proposta llesta per revisar",
-        "noB": "Sense B · s'omet"
+        "noB": "Sense B · s'omet",
+        "toCheck": "{{n}} per revisar",
+        "added": "+{{n}} nous a B"
       },
       "err": {
         "images_not_read": "La IA no ha llegit les imatges",
@@ -1022,7 +1024,9 @@
         "placed": "Col·locats",
         "placedValue": "{{placed}} de {{total}}",
         "more": "Veure passos i el que s'ha enviat",
-        "moreAll": "Veure el detall del lot"
+        "moreAll": "Veure el detall del lot",
+        "credits": "crèdits d’IA (segons Copilot)",
+        "cacheNote": "+{{count}} tokens llegits de la memòria cau, que costen molt menys"
       },
       "filter": {
         "label": "Filtrar la llista",

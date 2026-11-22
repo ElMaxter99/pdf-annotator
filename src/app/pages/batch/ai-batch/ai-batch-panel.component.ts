@@ -5,7 +5,7 @@ import { TranslationService } from '../../../i18n/translation.service';
 import { AiBatchService, type AiBatchRow } from '../../../services/ai-batch.service';
 import { AiHelperService } from '../../../services/ai-helper.service';
 import { BatchStoreService } from '../../../services/batch-store.service';
-import { usageTotal } from '../../../utils/ai-proposal.utils';
+import { usageBilled } from '../../../utils/ai-proposal.utils';
 import { AI_BATCH_ACTIVE_PHASES } from '../../../utils/ai-batch.utils';
 import { AiBatchDetailsComponent } from './ai-batch-details.component';
 import { InfoTipComponent } from '../../../components/info-tip/info-tip.component';
@@ -69,11 +69,16 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
     this.counts().total ? Math.round((this.finished() / this.counts().total) * 100) : 0,
   );
   readonly waiting = computed(() => this.counts().queued + this.counts().active);
+  /** Tiempo de la tanda: corre mientras trabaja y se para al terminar el último PDF (no sigue contando). */
   readonly elapsed = computed(() => {
     const start = this.queue.startedAt();
-    return start ? clock(Math.max(0, this.now() - start)) : '0:00';
+    if (!start) return '0:00';
+    const ends = Object.values(this.queue.rows()).map((row) => row.endedAt ?? 0);
+    const end = this.queue.run() === 'done' && ends.length ? Math.max(start, ...ends) : this.now();
+    return clock(Math.max(0, end - start));
   });
-  readonly tokens = computed(() => usageTotal(this.queue.usage()));
+  readonly tokens = computed(() => usageBilled(this.queue.usage()));
+  readonly cacheRead = computed(() => this.queue.usage()?.cacheRead ?? 0);
   readonly measured = computed(() => this.tokens() > 0);
   /** Créditos de IA que el propio Copilot anota en cada petición (≈); 0 si el CLI no los da (Claude da tokens). */
   readonly credits = computed(() =>
@@ -137,19 +142,25 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
         key: 'all',
         title: t('batch.ai.sheet.allTitle'),
         sub: t('batch.ai.sheet.allSub', { count: this.finished() }),
-        big: tokens > 0 ? tokens.toLocaleString(lang) : null,
-        note: tokens > 0 || this.credits() > 0 ? '' : t('batch.ai.sheet.noMeasure'),
+        // Con Copilot, la cifra que importa son sus créditos; con Claude, los tokens que cuentan (sin los leídos de caché).
+        big: this.credits() > 0 ? `≈ ${this.credits().toLocaleString(lang)}` : tokens > 0 ? tokens.toLocaleString(lang) : null,
+        bigLabel: t(this.credits() > 0 ? 'batch.ai.sheet.credits' : 'batch.ai.sheet.tokens'),
+        note:
+          tokens > 0 || this.credits() > 0
+            ? this.cacheRead() > 0 && this.credits() === 0
+              ? t('batch.ai.sheet.cacheNote', { count: this.cacheRead().toLocaleString(lang) })
+              : ''
+            : t('batch.ai.sheet.noMeasure'),
         error: '',
         stats: [
           { label: t('batch.ai.sheet.requests'), value: String(this.queue.requests()) },
           { label: t('batch.ai.sheet.time'), value: this.elapsed() },
           { label: t('batch.ai.sheet.free'), value: String(this.freeCount()) },
-          ...(this.credits() > 0 ? [{ label: t('ai.details.usage.credits'), value: `≈ ${this.credits().toLocaleString(lang)}` }] : []),
         ],
       };
     }
     const r = row.row;
-    const tokens = usageTotal(r.usage);
+    const tokens = usageBilled(r.usage);
     const started = r.startedAt ?? r.t0;
     const failed = r.phase === 'failed' && r.error ? t(`ai.error.${r.error.code}.title`, { provider: providerName(r.provider || 'claude') }) : '';
     return {
@@ -157,6 +168,7 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
       title: t(this.scope() === 'follow' ? 'batch.ai.sheet.followTitle' : 'batch.ai.sheet.pdfTitle', { name: row.name }),
       sub: this.scope() === 'follow' ? t('batch.ai.sheet.followSub') : t(this.stateOf(r).key, this.stateParams(r)),
       big: r.phase === 'free' ? '0' : tokens > 0 ? tokens.toLocaleString(lang) : null,
+      bigLabel: t('batch.ai.sheet.tokens'),
       note: r.phase === 'free' ? t('batch.ai.details.noSpend') : tokens > 0 || failed ? '' : t('batch.ai.sheet.noMeasure'),
       error: failed,
       stats: [
@@ -203,7 +215,7 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
     if (row.phase === 'failed' && row.error) {
       return this.i18n.translate(`ai.error.${row.error.code}.title`, { provider: providerName(row.provider || 'claude') });
     }
-    const tokens = usageTotal(row.usage);
+    const tokens = usageBilled(row.usage);
     return tokens ? this.i18n.translate('batch.ai.tokens', { count: tokens.toLocaleString(this.i18n.language()) }) : '';
   }
 

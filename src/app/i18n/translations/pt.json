@@ -885,14 +885,16 @@
         "reading": "A ler",
         "asking": "A perguntar · pedido {{n}}",
         "resolving": "A colocar",
-        "ready": "Pronta para rever · {{placed}} de {{total}}",
-        "free": "Resolvido sem IA · {{placed}} de {{total}}",
-        "partial": "Parcial · {{placed}} de {{total}}",
+        "ready": "Pronta para rever · {{placed}} de {{total}} de A",
+        "free": "Resolvido sem IA · {{placed}} de {{total}} de A",
+        "partial": "Parcial · {{placed}} de {{total}} de A",
         "absent": "{{n}} não existem em B",
         "failed": "Falhou",
         "cancelled": "Cancelado",
         "saved": "Proposta pronta para rever",
-        "noB": "Sem B · ignorado"
+        "noB": "Sem B · ignorado",
+        "toCheck": "{{n}} a rever",
+        "added": "+{{n}} novos em B"
       },
       "err": {
         "images_not_read": "A IA não leu as imagens",
@@ -1022,7 +1024,9 @@
         "placed": "Colocados",
         "placedValue": "{{placed}} de {{total}}",
         "more": "Ver passos e o que foi enviado",
-        "moreAll": "Ver detalhe do lote"
+        "moreAll": "Ver detalhe do lote",
+        "credits": "créditos de IA (segundo o Copilot)",
+        "cacheNote": "+{{count}} tokens lidos da cache, que custam muito menos"
       },
       "filter": {
         "label": "Filtrar a lista",

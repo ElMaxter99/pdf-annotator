@@ -885,14 +885,16 @@
         "reading": "Lesen",
         "asking": "Frage läuft · Anfrage {{n}}",
         "resolving": "Platzieren",
-        "ready": "Bereit zur Prüfung · {{placed}} von {{total}}",
-        "free": "Ohne KI gelöst · {{placed}} von {{total}}",
-        "partial": "Teilweise · {{placed}} von {{total}}",
+        "ready": "Bereit zur Prüfung · {{placed}} von {{total}} aus A",
+        "free": "Ohne KI gelöst · {{placed}} von {{total}} aus A",
+        "partial": "Teilweise · {{placed}} von {{total}} aus A",
         "absent": "{{n}} nicht in B",
         "failed": "Fehlgeschlagen",
         "cancelled": "Abgebrochen",
         "saved": "Vorschlag zur Prüfung bereit",
-        "noB": "Ohne B · übersprungen"
+        "noB": "Ohne B · übersprungen",
+        "toCheck": "{{n}} zu prüfen",
+        "added": "+{{n}} neu in B"
       },
       "err": {
         "images_not_read": "Die KI hat die Bilder nicht gelesen",
@@ -1022,7 +1024,9 @@
         "placed": "Platziert",
         "placedValue": "{{placed}} von {{total}}",
         "more": "Schritte und Gesendetes ansehen",
-        "moreAll": "Stapeldetails ansehen"
+        "moreAll": "Stapeldetails ansehen",
+        "credits": "KI-Credits (laut Copilot)",
+        "cacheNote": "+{{count}} aus dem Cache gelesene Tokens, die viel weniger kosten"
       },
       "filter": {
         "label": "Liste filtern",

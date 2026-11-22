@@ -885,14 +885,16 @@
         "reading": "Lettura",
         "asking": "Richiesta in corso · {{n}}",
         "resolving": "Posizionamento",
-        "ready": "Pronta da rivedere · {{placed}} di {{total}}",
-        "free": "Risolto senza IA · {{placed}} di {{total}}",
-        "partial": "Parziale · {{placed}} di {{total}}",
+        "ready": "Pronta da rivedere · {{placed}} di {{total}} da A",
+        "free": "Risolto senza IA · {{placed}} di {{total}} da A",
+        "partial": "Parziale · {{placed}} di {{total}} da A",
         "absent": "{{n}} non presenti in B",
         "failed": "Fallito",
         "cancelled": "Annullato",
         "saved": "Proposta pronta da rivedere",
-        "noB": "Senza B · saltato"
+        "noB": "Senza B · saltato",
+        "toCheck": "{{n}} da rivedere",
+        "added": "+{{n}} nuovi in B"
       },
       "err": {
         "images_not_read": "L'IA non ha letto le immagini",
@@ -1022,7 +1024,9 @@
         "placed": "Posizionati",
         "placedValue": "{{placed}} di {{total}}",
         "more": "Vedi i passaggi e cosa è stato inviato",
-        "moreAll": "Vedi il dettaglio del lotto"
+        "moreAll": "Vedi il dettaglio del lotto",
+        "credits": "crediti IA (secondo Copilot)",
+        "cacheNote": "+{{count}} token letti dalla cache, che costano molto meno"
       },
       "filter": {
         "label": "Filtra l'elenco",

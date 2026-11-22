@@ -8,7 +8,7 @@ import { BatchStoreService } from '../../../services/batch-store.service';
 import { ToastService } from '../../../services/toast.service';
 import { AI_BATCH_ACTIVE_PHASES } from '../../../utils/ai-batch.utils';
 import { buildBatchTimeline, isFinished } from '../../../utils/ai-batch-details.utils';
-import { estimateTokens, sumUsage, usageTotal } from '../../../utils/ai-proposal.utils';
+import { estimateTokens, sumUsage, usageBilled, usageTotal } from '../../../utils/ai-proposal.utils';
 import { providerName } from './ai-batch-button.component';
 
 export type BatchDetailsTab = 'summary' | 'steps' | 'sent' | 'usage';
@@ -73,7 +73,7 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
   readonly total = computed(() => usageTotal(this.usage()));
   readonly measured = computed(() => this.total() > 0);
   readonly freeCount = computed(() => this.list().filter((entry) => entry.row.phase === 'free').length);
-  readonly batchTokens = computed(() => usageTotal(this.queue.usage()));
+  readonly batchTokens = computed(() => usageBilled(this.queue.usage()));
   readonly credits = computed(() => {
     const v = (this.row()?.details?.attempts ?? []).map((a) => a.aiCredits).filter((c): c is number => c !== null);
     return v.length ? v.reduce((a, b) => a + b, 0) : null;
@@ -253,9 +253,9 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     if (credits > 0) {
       lines.push(`créditos (≈, según Copilot): ${Math.round(credits * 100) / 100}`);
     }
-    const tokens = usageTotal(row.usage);
+    const tokens = usageBilled(row.usage);
     if (tokens) {
-      lines.push(`tokens: ${tokens}`);
+      lines.push(`tokens: ${tokens}${row.usage?.cacheRead ? ` (+${row.usage.cacheRead} leídos de caché)` : ''}`);
     }
     return lines;
   }

@@ -885,14 +885,16 @@
         "reading": "Reading",
         "asking": "Asking · request {{n}}",
         "resolving": "Placing",
-        "ready": "Ready to review · {{placed}} of {{total}}",
-        "free": "Solved without AI · {{placed}} of {{total}}",
-        "partial": "Partial · {{placed}} of {{total}}",
+        "ready": "Ready to review · {{placed}} of {{total}} from A",
+        "free": "Solved without AI · {{placed}} of {{total}} from A",
+        "partial": "Partial · {{placed}} of {{total}} from A",
         "absent": "{{n}} not in B",
         "failed": "Failed",
         "cancelled": "Cancelled",
         "saved": "Proposal ready to review",
-        "noB": "No B · skipped"
+        "noB": "No B · skipped",
+        "toCheck": "{{n}} to check",
+        "added": "+{{n}} new in B"
       },
       "err": {
         "images_not_read": "The AI did not read the images",
@@ -1022,7 +1024,9 @@
         "placed": "Placed",
         "placedValue": "{{placed}} of {{total}}",
         "more": "See steps and what was sent",
-        "moreAll": "See batch details"
+        "moreAll": "See batch details",
+        "credits": "AI credits (per Copilot)",
+        "cacheNote": "+{{count}} tokens read from cache, which cost much less"
       },
       "filter": {
         "label": "Filter the list",
