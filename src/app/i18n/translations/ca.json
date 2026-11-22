@@ -901,7 +901,8 @@
         "timeout": "Temps esgotat",
         "cli_error": "Error del CLI",
         "generic": "No s'ha pogut traslladar",
-        "nothing": "La IA no ha col·locat cap camp"
+        "nothing": "La IA no ha col·locat cap camp",
+        "model_no_vision": "El model no llegeix imatges"
       },
       "paused": {
         "limit": "Has arribat al límit del teu pla de Claude. La cua està en pausa i {{count}} PDF continuen esperant (no compten com a fallits).",
@@ -1320,6 +1321,10 @@
       "images_not_read": {
         "title": "La IA no ha llegit les imatges.",
         "text": "{{provider}} no ha retornat els codis de les imatges després de dos intents, així que s'ha descartat la resposta: sense veure les pàgines no es poden traslladar els camps. Prova amb un altre proveïdor."
+      },
+      "model_no_vision": {
+        "title": "El model triat no llegeix imatges.",
+        "text": "{{provider}} amb aquest model no ha pogut llegir una imatge de prova (un codi i una marca), així que no s’ha enviat cap PDF ni s’ha gastat res més. Tria un model amb visió a «Canvia»."
       }
     },
     "empty": {

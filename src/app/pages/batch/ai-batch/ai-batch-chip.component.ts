@@ -8,7 +8,7 @@ import { AI_BATCH_ACTIVE_PHASES } from '../../../utils/ai-batch.utils';
 import { buildBatchTimeline, currentStep, isFinished } from '../../../utils/ai-batch-details.utils';
 import { providerName } from './ai-batch-button.component';
 
-const KNOWN_ERRORS = ['images_not_read', 'timeout', 'cli_error'];
+const KNOWN_ERRORS = ['images_not_read', 'timeout', 'cli_error', 'model_no_vision'];
 const NOTHING = ['no_text_a', 'no_text_b', 'permission_denied', 'no_valid_answer', 'anchors_not_found', 'ai_found_nothing'];
 
 /** State of one PDF in the AI queue (or its saved proposal, once the queue is gone). */

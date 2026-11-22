@@ -901,7 +901,8 @@
         "timeout": "Délai dépassé",
         "cli_error": "Erreur du CLI",
         "generic": "Transfert impossible",
-        "nothing": "L'IA n'a placé aucun champ"
+        "nothing": "L'IA n'a placé aucun champ",
+        "model_no_vision": "Le modèle ne lit pas les images"
       },
       "paused": {
         "limit": "Vous avez atteint la limite de votre forfait Claude. La file est en pause et {{count}} PDF attendent encore (ils ne comptent pas comme échoués).",
@@ -1320,6 +1321,10 @@
       "images_not_read": {
         "title": "L'IA n'a pas lu les images.",
         "text": "{{provider}} n'a pas renvoyé les codes des images après deux essais, la réponse a donc été écartée : sans voir les pages, les champs ne peuvent pas être déplacés. Essayez un autre fournisseur."
+      },
+      "model_no_vision": {
+        "title": "Le modèle choisi ne lit pas les images.",
+        "text": "{{provider}} avec ce modèle n’a pas pu lire une image de test (un code et une marque) : aucun PDF n’a été envoyé et rien d’autre n’a été dépensé. Choisissez un modèle avec vision dans « Changer »."
       }
     },
     "empty": {

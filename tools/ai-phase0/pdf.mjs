@@ -5,6 +5,9 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createCanvas } from '@napi-rs/canvas';
+
+/** Para el ayudante (prueba de vista): el lienzo se resuelve aquí, donde están sus dependencias también al empaquetar. */
+export { createCanvas };
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { slotsFromOps, slotsFromTexts } from './slots.mjs';
 

@@ -901,7 +901,8 @@
         "timeout": "Timed out",
         "cli_error": "CLI error",
         "generic": "Could not transfer",
-        "nothing": "The AI placed no field"
+        "nothing": "The AI placed no field",
+        "model_no_vision": "The model cannot read images"
       },
       "paused": {
         "limit": "You have reached your Claude plan limit. The queue is paused and {{count}} PDFs are still waiting (they do not count as failed).",
@@ -1320,6 +1321,10 @@
       "images_not_read": {
         "title": "The AI did not read the images.",
         "text": "{{provider}} did not return the image codes after two attempts, so the answer was discarded: without seeing the pages the fields cannot be moved. Try another provider."
+      },
+      "model_no_vision": {
+        "title": "The chosen model cannot read images.",
+        "text": "{{provider}} with this model could not read a test image (a code and a mark), so no PDF was sent and nothing else was spent. Pick a model with vision in «Change»."
       }
     },
     "empty": {

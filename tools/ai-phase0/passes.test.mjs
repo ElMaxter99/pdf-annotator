@@ -1,5 +1,6 @@
 // Motor del traslado por partes (runPasses), plantillas de prompt del ayudante y contrato de runProposal.
 import assert from 'node:assert/strict';
+process.env.AI_HELPER_VISION_PROBE = '0'; // la prueba de vista se prueba aparte (vision-probe.test.mjs)
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
