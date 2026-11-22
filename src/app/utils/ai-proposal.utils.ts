@@ -24,6 +24,8 @@ export interface AiRow {
    * `pattern`: repeated in the same spot on every page of A (page number…), filled in for every page of B by the app.
    */
   source: 'ai' | 'text' | 'pattern';
+  /** The AI said the slot is visibly in the same place as in A (no label in B): A's position, kept for review. */
+  sameAsA?: boolean;
 }
 
 /** The field does not exist in B: not placing it is the right answer, not a failure. */
@@ -322,6 +324,7 @@ export function sanitizeRow(raw: unknown): AiRow | null {
     anchorB: text(r['anchorB'], 120),
     why: typeof r['why'] === 'string' && /^[a-z_]{1,40}$/.test(r['why']) ? r['why'] : '',
     source: r['source'] === 'text' ? 'text' : 'ai',
+    ...(r['sameAsA'] === true ? { sameAsA: true } : {}),
   };
 }
 

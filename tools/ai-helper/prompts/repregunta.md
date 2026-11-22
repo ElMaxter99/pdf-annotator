@@ -27,6 +27,7 @@ Por qué no se colocaron:
 3. **Ancla en A (opcional).** Si en "nearby" hay un texto de A que es la misma etiqueta, cópialo EXACTO en "anchorA"; si no lo hay, omítelo. Sirve de respaldo cuando en B no hay una línea o casilla dibujada.
 4. **"dx" y "dy" solo como último recurso:** una corrección en puntos PDF cuando no hay hueco dibujado y el desplazamiento de A no vale. Normalmente no los pongas. No calcules coordenadas absolutas.
 5. **Si el campo no está en estas páginas de B**, devuelve "found": false con el motivo. **Si el dato no existe en B** (ni esa etiqueta ni otra que signifique lo mismo: B ya no lo pide), devuelve "found": false y "absent": true. No fuerces un ancla que no corresponde.
+6. **Igual que en A (solo si lo ves claro).** Si un campo no tiene en B ninguna etiqueta que lo identifique, pero en la imagen de B su hueco está **visiblemente en el mismo sitio** que en la imagen de A (esa zona de la página no ha cambiado), devuelve "found": true, su "page" de B y "sameAsA": true, sin "anchorB". El código lo pondrá en la misma posición que en A, ajustado al hueco si lo hay, y quedará para revisar. No lo uses por defecto ni para rellenar lo que no encuentras: si no estás seguro, "found": false.
 
 {{adjuntas}}Trabaja solo con las imágenes y los JSON de esta carpeta: abre cada imagen una sola vez, no uses la terminal ni escribas archivos.
 

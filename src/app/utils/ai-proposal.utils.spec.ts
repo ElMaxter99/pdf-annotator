@@ -178,3 +178,12 @@ describe('proposalGroup · grupos claros de la propuesta', () => {
     expect(proposalGroup({ ...base, ok: false, why: 'no_existe_en_b' })).toBe('absent');
   });
 });
+
+describe('sanitizeRow · «igual que en A»', () => {
+  it('conserva la marca solo si es exactamente true', () => {
+    const raw = { id: 'p1-f1', page: 1, index: 0, ok: true, newPage: 2, x: 10, y: 20, confidence: 0.6, reason: 'misma zona', anchorA: '', anchorB: '' };
+    expect(sanitizeRow({ ...raw, sameAsA: true })?.sameAsA).toBeTrue();
+    expect(sanitizeRow({ ...raw, sameAsA: 'yes' })?.sameAsA).toBeUndefined();
+    expect(proposalGroup(sanitizeRow({ ...raw, sameAsA: true })!)).toBe('review'); // nunca «seguro»
+  });
+});

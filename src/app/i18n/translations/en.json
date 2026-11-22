@@ -1512,7 +1512,8 @@
         "newInB": "They were not in A: B has more pages and the field repeats on every page of A (e.g. the page number), so they are proposed for the new pages.",
         "notFound": "Fields of A the AI could not place in B. Create them by hand if needed.",
         "absent": "Fields of A whose text no longer exists in B: leaving them out is right."
-      }
+      },
+      "sameAsA": "same as in A"
     },
     "instructions": {
       "title": "Instructions for the AI",

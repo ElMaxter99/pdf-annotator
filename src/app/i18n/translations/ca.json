@@ -1512,7 +1512,8 @@
         "newInB": "No existien a A: B té més pàgines i el camp es repeteix a cada pàgina d’A (p. ex. el número de pàgina), així que es proposen per a les pàgines noves.",
         "notFound": "Camps d’A que la IA no ha sabut col·locar a B. Crea’ls a mà si cal.",
         "absent": "Camps d’A el text dels quals ja no existeix a B: no col·locar-los és el correcte."
-      }
+      },
+      "sameAsA": "igual que a A"
     },
     "instructions": {
       "title": "Instruccions per a la IA",

@@ -44,6 +44,7 @@
                       @if (row.anchorB) { {{ 'ai.review.anchor' | t: { text: row.anchorB } }} · }
                       @if (changesPage(row)) { {{ 'batch.panel.page' | t: { page: row.page } }} → {{ 'batch.panel.page' | t: { page: row.newPage } }} } @else { {{ 'batch.panel.page' | t: { page: row.page } }} }
                       @if (withoutAi(row)) { · <span data-testid="ai-row-without-ai">{{ 'ai.proposal.withoutAi' | t }}</span> }
+                      @if (row.sameAsA) { · <span data-testid="ai-row-same-as-a">{{ 'ai.proposal.sameAsA' | t }}</span> }
                       @if (row.source === 'pattern') { · <span data-testid="ai-row-pattern" [attr.title]="row.reason">{{ 'ai.proposal.pagePattern' | t }}</span> }
                       @if (showReason(row)) { · {{ row.reason }} }
                     </small>

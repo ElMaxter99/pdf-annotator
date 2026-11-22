@@ -25,7 +25,8 @@ const countByPage = (texts, n) => Array.from({ length: n }, (_, i) => texts.filt
 export function fakeAnswer(entries, textsA, textsB, allTextsB = textsB) {
   return entries.map((e) => {
     const near = nearbyTexts(textsA, e.page, e.field, 1)[0];
-    if (!near) return { id: e.id, found: false, reason: 'sin texto cercano' };
+    // Sin etiqueta cercana, el simulado dice «igual que en A» en la página de A (si B la tiene).
+    if (!near) return textsB.some((t) => t.page === e.page) ? { id: e.id, found: true, page: e.page, sameAsA: true, confidence: 0.6, reason: 'misma zona que en A' } : { id: e.id, found: false, reason: 'sin texto cercano' };
     const b = textsB.filter((t) => t.text === near.text).sort((x, y) => x.page - y.page)[0];
     if (!b) {
       const anywhere = allTextsB.some((t) => norm(t.text) === norm(near.text));
@@ -242,7 +243,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, i
         return { id: e.id, page: e.page, index: e.index, ok: false, why, reason: p.reason };
       }
       const confidence = Math.min(p.confidence, r.maxConfidence ?? 1);
-      return { id: e.id, page: e.page, index: e.index, ok: true, newPage: r.page, x: r.x, y: r.y, confidence, reason: p.reason, anchorA: p.anchorA ?? '', anchorB: p.anchorB, source: text ? 'text' : 'ai', snapped: !!r.snapped };
+      return { id: e.id, page: e.page, index: e.index, ok: true, newPage: r.page, x: r.x, y: r.y, confidence, reason: p.reason, anchorA: p.anchorA ?? '', anchorB: p.anchorB, source: text ? 'text' : 'ai', snapped: !!r.snapped, ...(p.sameAsA ? { sameAsA: true } : {}) };
     });
     finish();
     details.requests = result.requests;

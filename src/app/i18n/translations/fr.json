@@ -1512,7 +1512,8 @@
         "newInB": "Ils n’existaient pas dans A : B a plus de pages et le champ se répète sur chaque page de A (p. ex. le numéro de page), ils sont donc proposés pour les nouvelles pages.",
         "notFound": "Champs de A que l’IA n’a pas su placer dans B. Créez-les à la main si besoin.",
         "absent": "Champs de A dont le texte n’existe plus dans B : ne pas les placer est correct."
-      }
+      },
+      "sameAsA": "comme dans A"
     },
     "instructions": {
       "title": "Instructions pour l’IA",

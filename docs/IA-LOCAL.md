@@ -166,3 +166,6 @@ El botón «Ver detalles» (barra de la IA, en carga, error, sin cambios y revis
 - **Claude** corre con `--output-format stream-json --verbose`: da cada paso (qué archivos lee), tokens reales (entrada, salida, caché) y coste equivalente en API. Con suscripción no se cobra aparte.
 - **Copilot** no expone uso en `-p` según su documentación: el modal dice «No medible» y solo enseña peticiones enviadas, tamaño de lo enviado y una **estimación de tokens marcada como tal**. Nunca se muestran cifras inventadas.
 - **Diagnóstico de «sin cambios»** (`diagnose` en `pipeline.mjs`): A o B sin texto extraíble, permiso denegado a la CLI, tope de peticiones alcanzado (`cap_reached`), respuesta no válida, anclas inexistentes o la IA no encuentra nada. El informe copiable no lleva contenido de los PDF.
+
+## «Igual que en A» (1.17)
+Si un campo no tiene en B ninguna etiqueta que lo identifique pero la IA ve su hueco en el mismo sitio que en A, responde `"sameAsA": true` con su página de B (sin `anchorB`). `resolveProposal` lo pone en la posición de A ajustado al hueco (≤ 15 pt) con confianza ≤ 0,6 (`SAME_AS_A_CONFIDENCE`), así que nunca va marcado: la persona lo revisa. El motor no coloca nada en la posición de A por su cuenta. El proveedor simulado lo usa cuando la página de A no tiene ningún texto.

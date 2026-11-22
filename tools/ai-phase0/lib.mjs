@@ -113,6 +113,9 @@ export function describeImageCodes(data, codes, { minMatch } = {}) {
  * `anchorB` son obligatorios; `anchorA` es opcional (B puede tener una etiqueta que A no tenía cerca) y un `side` que no
  * sea de `SIDES` se ignora. `absent: true` (con found:false) = el concepto no existe en B.
  */
+/** Tope de confianza de «igual que en A»: siempre queda en «a revisar», nunca marcado por defecto. */
+export const SAME_AS_A_CONFIDENCE = 0.6;
+
 export function validateProposals(data, knownIds) {
   const list = Array.isArray(data) ? data : Array.isArray(data?.fields) ? data.fields : null;
   if (!list) return { proposals: [], errors: ['La respuesta no es una lista JSON.'] };
@@ -133,6 +136,11 @@ export function validateProposals(data, knownIds) {
       continue;
     }
     const page = Number(item.page);
+    // «Igual que en A»: la IA afirma que el hueco está en el mismo sitio que en A (sin etiqueta en B). Confianza ≤ 0,6.
+    if (item.sameAsA === true && Number.isInteger(page) && page >= 1) {
+      proposals.push({ id: item.id, found: true, page, sameAsA: true, anchorA: null, anchorB: '', dx: 0, dy: 0, confidence: Math.min(SAME_AS_A_CONFIDENCE, clamp01(Number(item.confidence))), reason: String(item.reason ?? '') });
+      continue;
+    }
     if (!Number.isInteger(page) || page < 1 || typeof item.anchorB !== 'string' || !item.anchorB.trim()) {
       errors.push(`${item.id}: faltan page o anchorB.`);
       continue;
@@ -226,6 +234,13 @@ export function resolveProposal(proposal, entry, textsA, textsB, { slots = [] } 
   if (!proposal.found) return { ok: false, why: 'sin_resultado' };
   const f = entry.field;
   const kind = slotKind(f);
+  if (proposal.sameAsA) {
+    // Misma posición que en A en la página que dice la IA, ajustada al hueco del mismo tipo si hay uno a ≤ 15 pt.
+    const at = { x: f.x, y: f.y };
+    const snap = snapToSlot(at, kind, f, slots.filter((s) => s.page === proposal.page));
+    const xy = snap ?? at;
+    return { ok: true, page: proposal.page, x: round(xy.x), y: round(xy.y), snapped: !!snap, method: 'sameAsA', maxConfidence: SAME_AS_A_CONFIDENCE };
+  }
   let a = null;
   let rank = null;
   if (proposal.anchorA) {

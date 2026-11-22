@@ -1512,7 +1512,8 @@
         "newInB": "Sie gab es in A nicht: B hat mehr Seiten und das Feld wiederholt sich auf jeder Seite von A (z. B. die Seitenzahl), daher werden sie für die neuen Seiten vorgeschlagen.",
         "notFound": "Felder aus A, die die KI nicht in B platzieren konnte. Lege sie bei Bedarf von Hand an.",
         "absent": "Felder aus A, deren Text es in B nicht mehr gibt: sie wegzulassen ist richtig."
-      }
+      },
+      "sameAsA": "wie in A"
     },
     "instructions": {
       "title": "Anweisungen für die KI",
