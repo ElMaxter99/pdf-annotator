@@ -62,3 +62,6 @@ Lo que sale de la 1.17: hay mucho hecho **sin mesas** que el lienzo no tiene, la
 No se planifica ni se propone de nuevo salvo que Maxter lo pida.
 - **Firmar la app de macOS** (actualización automática en Mac): sin prioridad, nadie usa la app en Mac. Exigiría una cuenta de Apple Developer de pago y secretos en el CI. Si algún día se hace, `latest-mac.yml` ya lista arm64 e Intel.
 - **Cifrado opcional de proyectos:** Maxter considera que traería más problemas que ventajas (claves olvidadas, sincronización, soporte).
+
+## 6. Para la 1.19
+- **Pintar en el lienzo todo lo que falte** (decisión de Maxter, 2026-11-22): los puntos de `design/PENDIENTE-MESAS.md` que M1 no haya cerrado y lo que se programe sin mesa durante la 1.18. Lo hace la sesión de Claude que tenga el lienzo (esta no lo tiene; Maxter sigue con la otra sesión). Al pintar cada punto se marca con su `P-NN` y se quita de la lista.

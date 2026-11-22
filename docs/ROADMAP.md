@@ -17,6 +17,9 @@ Publicada como v1.17.0 el 2026-11-22 tras 8 RC (ver `CHANGELOG.md`): banco de me
 ## Siguiente: 1.18 (alcance por elegir)
 Plan por tareas en `docs/PLAN-1.18.md`, **pendiente de que Maxter elija el alcance**: apartado «Almacenamiento» (con mesa), pintar en el lienzo lo hecho sin mesas, comprobar la IA con PDF reales y Copilot, e2e sin intermitencias y mantenimiento de dependencias. Cifrado de proyectos y firma de macOS, aparcados muy a futuro.
 
+## Después: 1.19
+- **Lienzo al día (Maxter, 2026-11-22):** todo lo que falte en el lienzo (lo de `design/PENDIENTE-MESAS.md` y lo que se programe sin mesa en la 1.18) se pinta en la sesión de Claude que tenga el lienzo. Si M1 de la 1.18 no lo termina, se completa en la 1.19 antes de diseñar nada nuevo. Detalle en `docs/PLAN-1.18.md` §6.
+
 ## Hecho tras v1.5.0
 - Dockerfile con `nginx-unprivileged` y `npm ci`; `npm audit` y Dependabot en CI (v1.11).
 - Remaquetado por lotes: vista dividida, aviso y escalado cuando A y B miden distinto, «Copiar y ajustar por textos», «Trasladar con IA» en cola, selección múltiple en el panel y ajuste por dos anclas (traslación + escala) en la cascada previa a la IA.
