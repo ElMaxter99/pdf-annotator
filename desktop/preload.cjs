@@ -80,5 +80,11 @@ contextBridge.exposeInMainWorld('desktop', {
       return () => ipcRenderer.removeListener('projects:progress', listener);
     },
   },
+  storage: {
+    list: () => ipcRenderer.invoke('storage:list'),
+    size: (id) => ipcRenderer.invoke('storage:size', id),
+    clear: (id) => ipcRenderer.invoke('storage:clear', id),
+    reveal: (id) => ipcRenderer.invoke('storage:reveal', id),
+  },
   openReleasePage: () => ipcRenderer.invoke('desktop:update:open-release'),
 });

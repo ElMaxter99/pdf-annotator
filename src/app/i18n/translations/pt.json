@@ -2299,5 +2299,55 @@
     "otherPageA": "O seu campo de A está na página {{page}} de A (com as páginas ligadas, A segue B).",
     "goTitle": "Ver em A e em B",
     "goTitleA": "Ver em A"
+  },
+  "storage": {
+    "open": "Armazenamento",
+    "projectsLink": "Onde fica guardado →",
+    "title": "Armazenamento",
+    "close": "Fechar",
+    "summary": "No total ocupa {{total}}. O seu trabalho: {{work}}.",
+    "calculating": "A calcular…",
+    "calculatingRow": "A calcular…",
+    "missing": "Ainda não existe",
+    "partial": "Pelo menos {{size}}",
+    "error": "Não foi possível medir",
+    "loadError": "Não foi possível ler o armazenamento.",
+    "retry": "Tentar de novo",
+    "groups": {
+      "work": "O seu trabalho",
+      "app": "A app",
+      "clearable": "Pode ser esvaziado"
+    },
+    "rows": {
+      "projects": "Projetos",
+      "editor-data": "Dados do editor (sessão, modelos, lotes)",
+      "program": "Programa",
+      "settings": "Definições da app",
+      "browser-cache": "Cache do navegador",
+      "update-downloads": "Transferências de atualizações",
+      "ai-temp": "Temporários da IA",
+      "update-log": "Registo de atualizações"
+    },
+    "openFolder": "Abrir pasta",
+    "copyPath": "Copiar caminho",
+    "clear": "Esvaziar",
+    "clearAll": "Esvaziar tudo isto ({{size}})",
+    "confirm": {
+      "title": "Esvaziar «{{name}}»?",
+      "titleAll": "Esvaziar tudo o que se pode esvaziar?",
+      "text": "Libertam-se {{size}}. Os seus projetos e definições não são tocados e a app volta a criar isto se for preciso.",
+      "textAll": "Libertam-se {{size}}. Os seus projetos e definições não são tocados e a app volta a criar isto se for preciso.",
+      "cancel": "Cancelar",
+      "ok": "Esvaziar ({{size}})"
+    },
+    "freed": "Libertados {{size}}.",
+    "clearFailed": "Não foi possível esvaziar «{{name}}».",
+    "note": "Só se esvaziam caches e temporários. Os seus projetos e definições nunca são apagados daqui.",
+    "toast": {
+      "missing": "Essa pasta ainda não existe.",
+      "openFailed": "Não foi possível abrir a pasta.",
+      "copied": "Caminho copiado.",
+      "copyFailed": "Não foi possível copiar o caminho."
+    }
   }
 }

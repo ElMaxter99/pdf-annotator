@@ -921,6 +921,8 @@ export function setupProjectsIpc({ handle, app, dialog, shell, getWindow, safeSt
   });
 
   return {
+    /** Carpeta de proyectos de ahora (la usa «Almacenamiento»). */
+    getRoot: () => root,
     /** Cada pocos minutos: sube los cambios de los proyectos abiertos que se sincronizan. */
     syncHeld() {
       for (const ref of held) {

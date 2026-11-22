@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, ViewChild, effect, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ElementRef, HostListener, Input, ViewChild, effect, signal, ChangeDetectionStrategy } from '@angular/core';
 import { VersionChipComponent } from '../../../../components/version-chip/version-chip.component';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import type { WorkspacePageComponent } from '../../workspace.page';
+import { StorageService } from '../../../../services/storage.service';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { LanguageSelectorComponent } from '../../../../components/language-selector/language-selector.component';
 import { ToastBellComponent } from '../../../../components/toast-bell/toast-bell.component';
@@ -34,6 +35,7 @@ export class WorkspaceHeaderComponent {
   @ViewChild('coordsFileInput', { static: false })
   coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
+  readonly storage = inject(StorageService);
   readonly prefsOpen = signal(false);
   readonly clearOpen = signal(false);
   private seenClearRequest = -1;

@@ -2299,5 +2299,55 @@
     "otherPageA": "Su campo de A está en la página {{page}} de A (con las páginas enlazadas A sigue a B).",
     "goTitle": "Ver en A y en B",
     "goTitleA": "Ver en A"
+  },
+  "storage": {
+    "open": "Almacenamiento",
+    "projectsLink": "Dónde se guarda →",
+    "title": "Almacenamiento",
+    "close": "Cerrar",
+    "summary": "En total ocupa {{total}}. Tu trabajo: {{work}}.",
+    "calculating": "Calculando…",
+    "calculatingRow": "Calculando…",
+    "missing": "No existe todavía",
+    "partial": "Al menos {{size}}",
+    "error": "No se pudo medir",
+    "loadError": "No se pudo leer el almacenamiento.",
+    "retry": "Reintentar",
+    "groups": {
+      "work": "Tu trabajo",
+      "app": "La app",
+      "clearable": "Se puede vaciar"
+    },
+    "rows": {
+      "projects": "Proyectos",
+      "editor-data": "Datos del editor (sesión, plantillas, lotes)",
+      "program": "Programa",
+      "settings": "Ajustes de la app",
+      "browser-cache": "Caché del navegador",
+      "update-downloads": "Descargas de actualizaciones",
+      "ai-temp": "Temporales de la IA",
+      "update-log": "Registro de actualizaciones"
+    },
+    "openFolder": "Abrir carpeta",
+    "copyPath": "Copiar ruta",
+    "clear": "Vaciar",
+    "clearAll": "Vaciar todo esto ({{size}})",
+    "confirm": {
+      "title": "¿Vaciar «{{name}}»?",
+      "titleAll": "¿Vaciar todo lo que se puede vaciar?",
+      "text": "Se liberan {{size}}. Tus proyectos y ajustes no se tocan y la app lo vuelve a crear si hace falta.",
+      "textAll": "Se liberan {{size}}. Tus proyectos y ajustes no se tocan y la app lo vuelve a crear si hace falta.",
+      "cancel": "Cancelar",
+      "ok": "Vaciar ({{size}})"
+    },
+    "freed": "Se han liberado {{size}}.",
+    "clearFailed": "No se pudo vaciar «{{name}}».",
+    "note": "Solo se vacían cachés y temporales. Tus proyectos y tus ajustes nunca se borran desde aquí.",
+    "toast": {
+      "missing": "Esa carpeta todavía no existe.",
+      "openFailed": "No se pudo abrir la carpeta.",
+      "copied": "Ruta copiada.",
+      "copyFailed": "No se pudo copiar la ruta."
+    }
   }
 }

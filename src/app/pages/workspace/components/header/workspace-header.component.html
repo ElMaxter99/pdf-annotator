@@ -129,6 +129,12 @@
           <span class="btn__icon" aria-hidden="true">⌨</span>
           <span class="btn__label">{{ 'shortcuts.openShort' | t }}</span>
         </button>
+        @if (storage.available) {
+          <button class="btn btn--ghost" type="button" (click)="storage.open()" data-testid="storage-open">
+            <span class="btn__icon" aria-hidden="true">▤</span>
+            <span class="btn__label">{{ 'storage.open' | t }}</span>
+          </button>
+        }
         <button class="btn btn--ghost" type="button" (click)="vm.toggleAbout(true)" data-testid="about-open">
           <span class="btn__icon" aria-hidden="true">ⓘ</span>
           <span class="btn__label">{{ 'about.open' | t }}</span>

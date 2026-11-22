@@ -245,6 +245,7 @@ Con la app instalada la IA local funciona sin abrir ninguna terminal: arranca so
 
 - **Sin firmar:** Windows muestra SmartScreen («Más información → Ejecutar de todas formas») y macOS pide abrirla con clic derecho → Abrir (si dice «dañada», `xattr -cr "/Applications/PDF Annotator.app"`).
 - **Actualizaciones:** al abrir y cada 6 h comprueba si hay una versión nueva y muestra un aviso con «Actualizar ahora» / «Más tarde». Windows y AppImage se actualizan solos; en macOS y con `.deb`/`.rpm` el botón abre la página de descargas.
+- **Almacenamiento:** menú ⋯ del editor (o «Dónde se guarda →» en Proyectos) → qué guarda la app, dónde y cuánto ocupa, en tres grupos (tu trabajo, la app, lo que se puede vaciar). «Abrir carpeta» y «Copiar ruta» en cada fila; solo se vacían cachés y temporales (con confirmación): tus proyectos y ajustes nunca se borran desde ahí.
 - **Atrás / Adelante:** `Alt+←` / `Alt+→` (`⌘[` / `⌘]` en macOS), los botones laterales del ratón o deslizar con el trackpad. El logo del editor vuelve al inicio.
 - **Desarrollo:** `npm run start:desktop` (instala lo que falte, compila y abre la app) y `npm run desktop:pack` (instalador de tu sistema en `release/`). Versiones: se publican al empujar una etiqueta `vX.Y.Z` (`desktop-release.yml`, release en borrador).
 

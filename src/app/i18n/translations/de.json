@@ -2299,5 +2299,55 @@
     "otherPageA": "Sein Feld aus A ist auf Seite {{page}} von A (bei verknüpften Seiten folgt A der Version B).",
     "goTitle": "In A und B zeigen",
     "goTitleA": "In A zeigen"
+  },
+  "storage": {
+    "open": "Speicher",
+    "projectsLink": "Wo es gespeichert wird →",
+    "title": "Speicher",
+    "close": "Schließen",
+    "summary": "Insgesamt belegt die App {{total}}. Deine Arbeit: {{work}}.",
+    "calculating": "Wird berechnet…",
+    "calculatingRow": "Wird berechnet…",
+    "missing": "Existiert noch nicht",
+    "partial": "Mindestens {{size}}",
+    "error": "Messung nicht möglich",
+    "loadError": "Der Speicher konnte nicht gelesen werden.",
+    "retry": "Erneut versuchen",
+    "groups": {
+      "work": "Deine Arbeit",
+      "app": "Die App",
+      "clearable": "Kann geleert werden"
+    },
+    "rows": {
+      "projects": "Projekte",
+      "editor-data": "Editordaten (Sitzung, Vorlagen, Stapel)",
+      "program": "Programm",
+      "settings": "App-Einstellungen",
+      "browser-cache": "Browser-Cache",
+      "update-downloads": "Update-Downloads",
+      "ai-temp": "Temporäre KI-Dateien",
+      "update-log": "Update-Protokoll"
+    },
+    "openFolder": "Ordner öffnen",
+    "copyPath": "Pfad kopieren",
+    "clear": "Leeren",
+    "clearAll": "Alles leeren ({{size}})",
+    "confirm": {
+      "title": "„{{name}}“ leeren?",
+      "titleAll": "Alles leeren, was sich leeren lässt?",
+      "text": "Das gibt {{size}} frei. Deine Projekte und Einstellungen bleiben unberührt; die App legt es bei Bedarf neu an.",
+      "textAll": "Das gibt {{size}} frei. Deine Projekte und Einstellungen bleiben unberührt; die App legt es bei Bedarf neu an.",
+      "cancel": "Abbrechen",
+      "ok": "Leeren ({{size}})"
+    },
+    "freed": "{{size}} freigegeben.",
+    "clearFailed": "„{{name}}“ konnte nicht geleert werden.",
+    "note": "Es werden nur Caches und temporäre Dateien geleert. Deine Projekte und Einstellungen werden von hier aus nie gelöscht.",
+    "toast": {
+      "missing": "Dieser Ordner existiert noch nicht.",
+      "openFailed": "Der Ordner konnte nicht geöffnet werden.",
+      "copied": "Pfad kopiert.",
+      "copyFailed": "Der Pfad konnte nicht kopiert werden."
+    }
   }
 }

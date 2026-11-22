@@ -2299,5 +2299,55 @@
     "otherPageA": "Its field of A is on page {{page}} of A (with linked pages A follows B).",
     "goTitle": "Show in A and B",
     "goTitleA": "Show in A"
+  },
+  "storage": {
+    "open": "Storage",
+    "projectsLink": "Where it's stored →",
+    "title": "Storage",
+    "close": "Close",
+    "summary": "In total it takes {{total}}. Your work: {{work}}.",
+    "calculating": "Calculating…",
+    "calculatingRow": "Calculating…",
+    "missing": "Doesn't exist yet",
+    "partial": "At least {{size}}",
+    "error": "Couldn't measure",
+    "loadError": "Couldn't read the storage.",
+    "retry": "Retry",
+    "groups": {
+      "work": "Your work",
+      "app": "The app",
+      "clearable": "Can be cleared"
+    },
+    "rows": {
+      "projects": "Projects",
+      "editor-data": "Editor data (session, templates, batches)",
+      "program": "Program",
+      "settings": "App settings",
+      "browser-cache": "Browser cache",
+      "update-downloads": "Update downloads",
+      "ai-temp": "AI temporary files",
+      "update-log": "Update log"
+    },
+    "openFolder": "Open folder",
+    "copyPath": "Copy path",
+    "clear": "Clear",
+    "clearAll": "Clear all of this ({{size}})",
+    "confirm": {
+      "title": "Clear \"{{name}}\"?",
+      "titleAll": "Clear everything that can be cleared?",
+      "text": "This frees {{size}}. Your projects and settings are not touched and the app recreates this if needed.",
+      "textAll": "This frees {{size}}. Your projects and settings are not touched and the app recreates this if needed.",
+      "cancel": "Cancel",
+      "ok": "Clear ({{size}})"
+    },
+    "freed": "{{size}} freed.",
+    "clearFailed": "Couldn't clear \"{{name}}\".",
+    "note": "Only caches and temporary files are cleared. Your projects and settings are never deleted from here.",
+    "toast": {
+      "missing": "That folder doesn't exist yet.",
+      "openFailed": "Couldn't open the folder.",
+      "copied": "Path copied.",
+      "copyFailed": "Couldn't copy the path."
+    }
   }
 }
