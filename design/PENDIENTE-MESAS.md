@@ -2,6 +2,8 @@
 
 Maxter aprobó estos cambios visibles **sin mesas** («ya lo veo yo cuando programas») mientras el lienzo vivía en otra cuenta de Claude. Cuando se retome esa cuenta, **la mesa debe pintar todo lo que ya está en la app** para que el lienzo vuelva a ser la fuente de verdad (`docs/WORKFLOW.md`, «Diseño primero»). Cada fila dice dónde verlo en la app y en qué versión entró. Al pintar una, márcala con su mesa (`P-NN`) y quítala de aquí.
 
+**Regla para cualquier sesión con acceso al lienzo (Maxter, 2026-11-22):** si la sesión de Claude tiene el lienzo, antes de diseñar nada nuevo pinta lo que falte de esta lista (y de `design/PENDIENTE-MESAS.md` en general), marca cada punto con su `P-NN` y quítalo de aquí. Las sesiones sin lienzo (como la que cerró la 1.17) solo lo anotan.
+
 ## Ya programado, falta la mesa
 
 | # | Qué | Dónde se ve | Versión | Detalle |

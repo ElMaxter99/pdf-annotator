@@ -11,8 +11,14 @@ Publicada como v1.15.0 (ver `CHANGELOG.md`). Solo refactor del editor: `workspac
 ## Hecho: 1.16 «Cierre de pendientes»
 Publicada como v1.16.0 (ver `CHANGELOG.md`): doble clic del visor, espacio de trabajo ampliado y «Centrar A/B», modal mínimo de «Trasladar con IA», motor de IA por partes (páginas útiles, candidatas de B, re-pregunta, reintentos iguales, tope de 8 peticiones), anclar en B con huecos de escritura, colocación sin IA y «no existe en B», `start:docker` verificado, `OnPush` en todo menos `app.ts` y auditoría axe. Planes: `docs/PLAN-1.16.md` y `docs/PLAN-IA-ROBUSTA.md`.
 
-## En curso: 1.17 «IA medible y pulido»
-Plan por tareas y paralelizable en `docs/PLAN-1.17.md`, **pendiente de que Maxter elija el alcance**: banco de medida de la IA con el motor nuevo, ajustes con resultados reales, huecos escritos con texto, no perder lo colocado sin IA, contraste del acento en tema claro, `h1` oculto, colores a tokens, «Dividida» desenlazada con margen, y decisiones sobre la barra horizontal del visor y Vercel Insights.
+## Hecho: 1.17 «IA medible y pulido»
+Publicada como v1.17.0 el 2026-11-22 tras 8 RC (ver `CHANGELOG.md`): banco de medida de la IA, motor más robusto (tablas, etiquetas repetidas, lado del hueco, huecos escritos, parcial si no lee imágenes, códigos sin caracteres confusos), prueba de vista del modelo, instrucciones para la IA, propuesta editable en B, parejas A↔B, número de página repetido, lista y chips de la propuesta más claros, créditos de Copilot, actualizar tras cancelar la contraseña o el permiso, limpieza de la descarga del actualizador, accesibilidad (contraste del acento, `h1`, títulos, axe en el CI), colores a tokens y editor repartido en 8 archivos. Plan: `docs/PLAN-1.17.md`. Lo hecho sin mesas queda en `design/PENDIENTE-MESAS.md`.
+
+## Siguiente: 1.18 (alcance por elegir)
+Plan por tareas en `docs/PLAN-1.18.md`, **pendiente de que Maxter elija el alcance**: apartado «Almacenamiento» (con mesa), pintar en el lienzo lo hecho sin mesas, comprobar la IA con PDF reales y Copilot, e2e sin intermitencias y mantenimiento de dependencias. Cifrado de proyectos y firma de macOS, aparcados muy a futuro.
+
+## Después: 1.19
+- **Lienzo al día (Maxter, 2026-11-22):** todo lo que falte en el lienzo (lo de `design/PENDIENTE-MESAS.md` y lo que se programe sin mesa en la 1.18) se pinta en la sesión de Claude que tenga el lienzo. Si M1 de la 1.18 no lo termina, se completa en la 1.19 antes de diseñar nada nuevo. Detalle en `docs/PLAN-1.18.md` §6.
 
 ## Hecho tras v1.5.0
 - Dockerfile con `nginx-unprivileged` y `npm ci`; `npm audit` y Dependabot en CI (v1.11).
@@ -30,7 +36,7 @@ Plan por tareas y paralelizable en `docs/PLAN-1.17.md`, **pendiente de que Maxte
 9. **Hecho (1.14, mesas P-78 a P-81 y P-100 a P-102):** tabla de correspondencia de páginas A↔B: diálogo «Emparejar páginas…» con sugerencia por textos (la IA y el ajuste por textos la usan) y «Sugerir tablas» para varios PDFs desde el panel del lote. Detalle en `design/propuestas/emparejar-paginas-a-b.md`.
 
 ## Ideas sin priorizar
-**Pendiente de decisión de Maxter:** cifrado opcional de proyectos. El tope por proyecto (200 PDFs / 2 GB, avisos a 100 PDFs / 1 GB) está **confirmado** (`DECISIONS` 16).
+**Aparcado muy a futuro (Maxter, 2026-11-22):** cifrado opcional de proyectos («más problemas que ventajas») y firmar la app de macOS (nadie la usa en Mac). No se proponen de nuevo salvo que Maxter lo pida. El tope por proyecto (200 PDFs / 2 GB, avisos a 100 PDFs / 1 GB) está **confirmado** (`DECISIONS` 16).
 
 **Hecho (mesa P-96, 1.14):** exportación en ZIP de varias plantillas. Detalle en `CHANGELOG.md`.
 

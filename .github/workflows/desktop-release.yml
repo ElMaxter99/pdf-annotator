@@ -108,6 +108,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      # Los dos jobs de macOS suben su latest-mac.yml y el último pisa al otro: se guarda cada uno y `notes` los une.
+      - name: Guardar latest-mac.yml de este procesador
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: latest-mac-${{ matrix.os }}
+          path: release/latest-mac.yml
+          if-no-files-found: error
+          retention-days: 1
+          overwrite: true
 
   # Pone las notas (sección del CHANGELOG) en el borrador. Solo publica si se pidió explícitamente.
   notes:
@@ -122,6 +132,13 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 26
+      - name: latest-mac.yml de los dos procesadores
+        uses: actions/download-artifact@v7
+        with:
+          pattern: latest-mac-*
+          path: mac-feeds
+      - name: Unir latest-mac.yml (arm64 + Intel)
+        run: node scripts/merge-mac-feed.mjs mac-feeds/latest-mac-macos-latest/latest-mac.yml mac-feeds/latest-mac-macos-15-intel/latest-mac.yml --out latest-mac.yml
       - name: Notas desde el CHANGELOG
         run: node scripts/release-notes.mjs "$TAG" --out notes.md
       - name: Actualizar el borrador
@@ -137,6 +154,12 @@ jobs:
           # Una RC siempre es pre-release (nunca «latest»): el aviso de actualización de las apps estables la ignora.
           gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F body=@notes.md -f name="${TAG#v}" -F prerelease=$pre --silent
           echo "Notas puestas en el borrador de $TAG."
+          # Sustituir el latest-mac.yml que dejó el último job de macOS por el unido (así el actualizador ve los dos procesadores).
+          old=$(gh api "repos/$GITHUB_REPOSITORY/releases/$id/assets" --paginate --jq '.[] | select(.name=="latest-mac.yml") | .id')
+          for a in $old; do gh api -X DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$a" --silent; done
+          gh api -X POST "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$id/assets?name=latest-mac.yml" \
+            -H 'Content-Type: text/yaml' --input latest-mac.yml --silent
+          echo "latest-mac.yml con arm64 e Intel."
           if [ "$PUBLISH" = true ]; then
             # Fijar tag_name al publicar: sin esto GitHub puede dejar la release como «untagged-…» y el actualizador no la encuentra.
             gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F draft=false -f tag_name="$TAG" --silent

@@ -24,7 +24,7 @@
     "a11y": "node scripts/a11y-audit.mjs --out=a11y-audit.json",
     "a11y:ci": "node scripts/a11y-audit.mjs --out=a11y-audit.json --fail-on=serious",
     "test:helper": "node --test tools/ai-helper/queue.test.mjs tools/ai-helper/server.test.mjs tools/ai-helper/vision-probe.test.mjs",
-    "test:desktop": "node --test desktop/update-logic.test.mjs desktop/shell-path.test.mjs desktop/history-nav.test.mjs desktop/trusted-origin.test.mjs desktop/projects.test.mjs desktop/projects-ipc.test.mjs desktop/project-archive.test.mjs desktop/project-sync.test.mjs desktop/sftp-sync.test.mjs desktop/sync-secrets.test.mjs"
+    "test:desktop": "node --test scripts/merge-mac-feed.test.mjs desktop/update-logic.test.mjs desktop/shell-path.test.mjs desktop/history-nav.test.mjs desktop/trusted-origin.test.mjs desktop/projects.test.mjs desktop/projects-ipc.test.mjs desktop/project-archive.test.mjs desktop/project-sync.test.mjs desktop/sftp-sync.test.mjs desktop/sync-secrets.test.mjs"
   },
   "prettier": {
     "printWidth": 100,

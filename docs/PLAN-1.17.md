@@ -1,6 +1,6 @@
 # Plan de la 1.17 · «IA medible y pulido»
 
-Estado (2026-11-20): **ola 1 fusionada** (A1, A3, A4, B2, B3; #308 y #309) y **ola 2 hecha** (B1, C1, C2, D2, B4 y `heading-order`, sin mesas por decisión de Maxter; D3 ya estaba resuelto). A6 hecho tras la RC1 (aprobado por Maxter sin mesas). Pendiente: A2 (con los PDF de Maxter), A5 (créditos de Copilot), D1 (Docker en el equipo de Maxter). Pensado, como el de la 1.16, para lanzar agentes en paralelo: cada tarea dice sus archivos, dependencias, si necesita diseño y su criterio de hecho.
+**Estado (2026-11-22): cerrado.** Publicada como v1.17.0 tras 8 RC. Hecho: A1, A3, A4, A6, B1-B4, C1, C2, D2 (D3 ya resuelto) y, con casos sintéticos, A2; D1 (Docker) verificado en la nube y aceptado por Maxter. A5 pasa a la 1.18 (la app ya muestra los créditos que estima Copilot; falta compararlos con la factura). Lo que entró fuera de plan está en el CHANGELOG 1.17.0. Lo que sigue: `docs/PLAN-1.18.md`.
 
 La 1.16.0 está publicada (doble clic del visor, espacio de trabajo ampliado, modal mínimo de «Trasladar con IA», motor por partes, anclar en B, huecos de escritura, colocación sin IA y «no existe en B»). Lo pendiente que sale de ella es sobre todo **comprobar la IA con datos reales** y cerrar lo que quedó a medias.
 
