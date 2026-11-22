@@ -1039,6 +1039,19 @@
       "row": {
         "viewing": "Veient el resum",
         "following": "Seguint el que va ara"
+      },
+      "chip": {
+        "ready": "Per revisar · {{placed}}/{{total}}",
+        "free": "Sense IA · {{placed}}/{{total}}",
+        "partial": "Parcial · {{placed}}/{{total}}",
+        "added": "+{{n}} a B",
+        "absent": "{{n}} ja no a B",
+        "tip": {
+          "placed": "{{placed}} de {{total}} camps d’A col·locats a B",
+          "toCheck": "{{n}} camps d’A col·locats amb dubtes: revisa’ls abans d’aplicar",
+          "added": "{{n}} camps nous que no eren a A (p. ex. el número de pàgina de les pàgines noves de B)",
+          "absent": "{{n}} camps d’A el text dels quals ja no existeix a B: no col·locar-los és el correcte"
+        }
       }
     },
     "more": "Més accions",

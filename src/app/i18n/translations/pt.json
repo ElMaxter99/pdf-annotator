@@ -1039,6 +1039,19 @@
       "row": {
         "viewing": "A ver o resumo",
         "following": "A seguir o que está em curso"
+      },
+      "chip": {
+        "ready": "A rever · {{placed}}/{{total}}",
+        "free": "Sem IA · {{placed}}/{{total}}",
+        "partial": "Parcial · {{placed}}/{{total}}",
+        "added": "+{{n}} em B",
+        "absent": "{{n}} já não em B",
+        "tip": {
+          "placed": "{{placed}} de {{total}} campos de A colocados em B",
+          "toCheck": "{{n}} campos de A colocados com dúvidas: reveja-os antes de aplicar",
+          "added": "{{n}} campos novos que não estavam em A (p. ex. o número de página das páginas novas de B)",
+          "absent": "{{n}} campos de A cujo texto já não existe em B: não os colocar é o correto"
+        }
       }
     },
     "more": "Mais ações",

@@ -1137,8 +1137,27 @@ app-ai-batch-chip .ai-chip { white-space: normal; max-width: 100%; }
   overflow: visible;
 }
 
-// «N a revisar» dentro del chip: lo que el usuario tiene que mirar, en el tono de aviso.
-.ai-chip__check {
-  font-weight: 700;
+// Piezas que acompañan al estado (a revisar, nuevos en B, ya no en B): pequeñas, con su explicación en el title, y que
+// bajan de línea si no caben (en la cuadrícula la tarjeta es estrecha).
+.ai-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--muted);
+  cursor: help;
+}
+
+.ai-pill--warn {
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
   color: var(--warning-text);
+}
+
+app-ai-batch-chip .ai-chip-wrap {
+  gap: 6px;
+  max-width: 100%;
 }

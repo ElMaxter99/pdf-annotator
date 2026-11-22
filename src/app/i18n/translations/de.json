@@ -1039,6 +1039,19 @@
       "row": {
         "viewing": "Zusammenfassung wird gezeigt",
         "following": "Folgt dem laufenden"
+      },
+      "chip": {
+        "ready": "Zu prüfen · {{placed}}/{{total}}",
+        "free": "Ohne KI · {{placed}}/{{total}}",
+        "partial": "Teilweise · {{placed}}/{{total}}",
+        "added": "+{{n}} in B",
+        "absent": "{{n}} nicht mehr in B",
+        "tip": {
+          "placed": "{{placed}} von {{total}} Feldern aus A in B platziert",
+          "toCheck": "{{n}} Felder aus A mit Zweifeln platziert: vor dem Anwenden prüfen",
+          "added": "{{n}} neue Felder, die nicht in A waren (z. B. die Seitenzahl der neuen Seiten von B)",
+          "absent": "{{n}} Felder aus A, deren Text es in B nicht mehr gibt: sie wegzulassen ist richtig"
+        }
       }
     },
     "more": "Weitere Aktionen",
