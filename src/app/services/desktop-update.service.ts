@@ -43,6 +43,30 @@ export type UpdateChannel = 'stable' | 'beta';
 /** «1.9.0-rc.2» → true. */
 export const isPrereleaseVersion = (version: string | undefined): boolean => /-rc\.\d+$/.test(version ?? '');
 
+export type StorageGroup = 'work' | 'app' | 'clearable';
+export interface StorageEntryInfo {
+  id: string;
+  group: StorageGroup;
+  /** Ruta ya abreviada («~/…») para enseñarla. */
+  path: string;
+  clearable: boolean;
+  canOpen: boolean;
+}
+export interface StorageSize {
+  bytes: number;
+  /** Se agotó el tiempo de medida: el tamaño real es mayor. */
+  partial: boolean;
+  /** La carpeta o el archivo existe. */
+  exists: boolean;
+}
+export interface StorageBridge {
+  list(): Promise<{ entries: StorageEntryInfo[] }>;
+  size(id: string): Promise<StorageSize | null>;
+  clear(id: string): Promise<{ ok: boolean; freed?: number }>;
+  /** '' = abierta; 'missing' = ya no existe; otro texto = motivo del fallo. */
+  reveal(id: string): Promise<string>;
+}
+
 /** Puente que expone `desktop/preload.cjs` en la app de escritorio (Electron). En la web no existe. */
 export interface DesktopBridge {
   isDesktop: true;
@@ -50,6 +74,8 @@ export interface DesktopBridge {
   helperPort?: number;
   /** Proyectos locales (carpeta en el disco). */
   projects?: ProjectsBridge;
+  /** «Almacenamiento» (1.18 · S1): lista cerrada de filas; la web solo manda su identificador, nunca una ruta. */
+  storage?: StorageBridge;
   getUpdateState(): Promise<DesktopUpdateState>;
   /** El menú nativo (Ayuda) pide abrir el panel; `check` = además buscar ahora. */
   onOpenUpdates?(callback: (event: { check: boolean }) => void): () => void;

@@ -1,4 +1,6 @@
 ## Unreleased
+### Added
+- **Almacenamiento (1.18 · S1, mesas P-125 y P-126 aprobadas; solo app de escritorio):** nueva entrada «Almacenamiento» en el menú ⋯ del editor y enlace «Dónde se guarda →» en Proyectos. Un panel muestra qué guarda la app, dónde y cuánto ocupa, en tres grupos (Tu trabajo, La app, Se puede vaciar), con «Abrir carpeta» y «Copiar ruta» por fila y «Vaciar» solo para cachés y temporales (caché del navegador, descargas de actualizaciones, temporales de la IA de más de 10 min y registro de actualizaciones), siempre con confirmación. Los tamaños se miden en segundo plano con tope de tiempo; el proceso principal decide la lista cerrada de rutas y la web solo envía el id de la fila. Con pruebas (`desktop/storage.test.mjs`, `e2e/storage.spec.ts`) y textos en los 7 idiomas.
 ### Fixed
 - **Actualizaciones de macOS para los dos procesadores:** el archivo que lee el actualizador (`latest-mac.yml`) solo listaba los instaladores del último empaquetado de macOS (Intel), porque los dos jobs lo suben y el último pisaba al otro. Ahora el workflow guarda el de cada procesador y los une antes de publicar (`scripts/merge-mac-feed.mjs`, con pruebas). Hoy no cambia nada para quien usa la app (en Mac la actualización lleva a la descarga), pero deja listo el día que se firme.
 

@@ -266,6 +266,9 @@
         @if (!sync.linked()) {
           <button type="button" class="btn btn--primary" (click)="sync.startLink()" data-testid="sync-link">{{ 'projects.sync.linkButton' | t }}</button>
         }
+        @if (storage.available) {
+          <button type="button" class="btn" (click)="storage.open()" data-testid="storage-link">{{ 'storage.projectsLink' | t }}</button>
+        }
         <button type="button" class="btn" (click)="chooseRoot()">{{ 'projects.changeFolder' | t }}</button>
       </span>
     </footer>

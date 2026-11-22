@@ -2299,5 +2299,55 @@
     "otherPageA": "Son champ de A est à la page {{page}} de A (pages liées : A suit B).",
     "goTitle": "Voir dans A et B",
     "goTitleA": "Voir dans A"
+  },
+  "storage": {
+    "open": "Stockage",
+    "projectsLink": "Où c'est enregistré →",
+    "title": "Stockage",
+    "close": "Fermer",
+    "summary": "Au total, cela occupe {{total}}. Votre travail : {{work}}.",
+    "calculating": "Calcul…",
+    "calculatingRow": "Calcul…",
+    "missing": "N'existe pas encore",
+    "partial": "Au moins {{size}}",
+    "error": "Mesure impossible",
+    "loadError": "Impossible de lire le stockage.",
+    "retry": "Réessayer",
+    "groups": {
+      "work": "Votre travail",
+      "app": "L'application",
+      "clearable": "Peut être vidé"
+    },
+    "rows": {
+      "projects": "Projets",
+      "editor-data": "Données de l'éditeur (session, modèles, lots)",
+      "program": "Programme",
+      "settings": "Réglages de l'application",
+      "browser-cache": "Cache du navigateur",
+      "update-downloads": "Téléchargements de mises à jour",
+      "ai-temp": "Fichiers temporaires de l'IA",
+      "update-log": "Journal des mises à jour"
+    },
+    "openFolder": "Ouvrir le dossier",
+    "copyPath": "Copier le chemin",
+    "clear": "Vider",
+    "clearAll": "Tout vider ({{size}})",
+    "confirm": {
+      "title": "Vider « {{name}} » ?",
+      "titleAll": "Vider tout ce qui peut l'être ?",
+      "text": "Cela libère {{size}}. Vos projets et réglages ne sont pas touchés et l'application recrée ces données si besoin.",
+      "textAll": "Cela libère {{size}}. Vos projets et réglages ne sont pas touchés et l'application recrée ces données si besoin.",
+      "cancel": "Annuler",
+      "ok": "Vider ({{size}})"
+    },
+    "freed": "{{size}} libérés.",
+    "clearFailed": "Impossible de vider « {{name}} ».",
+    "note": "Seuls les caches et les fichiers temporaires sont vidés. Vos projets et réglages ne sont jamais supprimés d'ici.",
+    "toast": {
+      "missing": "Ce dossier n'existe pas encore.",
+      "openFailed": "Impossible d'ouvrir le dossier.",
+      "copied": "Chemin copié.",
+      "copyFailed": "Impossible de copier le chemin."
+    }
   }
 }

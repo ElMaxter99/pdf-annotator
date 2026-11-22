@@ -2299,5 +2299,55 @@
     "otherPageA": "El seu camp d’A és a la pàgina {{page}} d’A (amb les pàgines enllaçades A segueix B).",
     "goTitle": "Veure-ho a A i a B",
     "goTitleA": "Veure-ho a A"
+  },
+  "storage": {
+    "open": "Emmagatzematge",
+    "projectsLink": "On es desa →",
+    "title": "Emmagatzematge",
+    "close": "Tanca",
+    "summary": "En total ocupa {{total}}. El teu treball: {{work}}.",
+    "calculating": "Calculant…",
+    "calculatingRow": "Calculant…",
+    "missing": "Encara no existeix",
+    "partial": "Almenys {{size}}",
+    "error": "No s'ha pogut mesurar",
+    "loadError": "No s'ha pogut llegir l'emmagatzematge.",
+    "retry": "Reintenta",
+    "groups": {
+      "work": "El teu treball",
+      "app": "L'app",
+      "clearable": "Es pot buidar"
+    },
+    "rows": {
+      "projects": "Projectes",
+      "editor-data": "Dades de l'editor (sessió, plantilles, lots)",
+      "program": "Programa",
+      "settings": "Ajustos de l'app",
+      "browser-cache": "Memòria cau del navegador",
+      "update-downloads": "Descàrregues d'actualitzacions",
+      "ai-temp": "Temporals de la IA",
+      "update-log": "Registre d'actualitzacions"
+    },
+    "openFolder": "Obre la carpeta",
+    "copyPath": "Copia la ruta",
+    "clear": "Buida",
+    "clearAll": "Buida tot això ({{size}})",
+    "confirm": {
+      "title": "Voleu buidar «{{name}}»?",
+      "titleAll": "Voleu buidar tot el que es pot buidar?",
+      "text": "S'alliberen {{size}}. Els teus projectes i ajustos no es toquen i l'app ho torna a crear si cal.",
+      "textAll": "S'alliberen {{size}}. Els teus projectes i ajustos no es toquen i l'app ho torna a crear si cal.",
+      "cancel": "Cancel·la",
+      "ok": "Buida ({{size}})"
+    },
+    "freed": "S'han alliberat {{size}}.",
+    "clearFailed": "No s'ha pogut buidar «{{name}}».",
+    "note": "Només es buiden memòries cau i temporals. Els teus projectes i ajustos mai s'esborren des d'aquí.",
+    "toast": {
+      "missing": "Aquesta carpeta encara no existeix.",
+      "openFailed": "No s'ha pogut obrir la carpeta.",
+      "copied": "Ruta copiada.",
+      "copyFailed": "No s'ha pogut copiar la ruta."
+    }
   }
 }

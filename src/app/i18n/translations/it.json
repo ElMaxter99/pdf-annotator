@@ -2299,5 +2299,55 @@
     "otherPageA": "Il suo campo di A è a pagina {{page}} di A (con le pagine collegate A segue B).",
     "goTitle": "Mostra in A e in B",
     "goTitleA": "Mostra in A"
+  },
+  "storage": {
+    "open": "Archiviazione",
+    "projectsLink": "Dove viene salvato →",
+    "title": "Archiviazione",
+    "close": "Chiudi",
+    "summary": "In totale occupa {{total}}. Il tuo lavoro: {{work}}.",
+    "calculating": "Calcolo…",
+    "calculatingRow": "Calcolo…",
+    "missing": "Non esiste ancora",
+    "partial": "Almeno {{size}}",
+    "error": "Impossibile misurare",
+    "loadError": "Impossibile leggere l'archiviazione.",
+    "retry": "Riprova",
+    "groups": {
+      "work": "Il tuo lavoro",
+      "app": "L'app",
+      "clearable": "Si può svuotare"
+    },
+    "rows": {
+      "projects": "Progetti",
+      "editor-data": "Dati dell'editor (sessione, modelli, lotti)",
+      "program": "Programma",
+      "settings": "Impostazioni dell'app",
+      "browser-cache": "Cache del browser",
+      "update-downloads": "Download degli aggiornamenti",
+      "ai-temp": "Temporanei dell'IA",
+      "update-log": "Registro degli aggiornamenti"
+    },
+    "openFolder": "Apri cartella",
+    "copyPath": "Copia percorso",
+    "clear": "Svuota",
+    "clearAll": "Svuota tutto ({{size}})",
+    "confirm": {
+      "title": "Svuotare «{{name}}»?",
+      "titleAll": "Svuotare tutto ciò che si può svuotare?",
+      "text": "Si liberano {{size}}. I tuoi progetti e le impostazioni non vengono toccati e l'app lo ricrea se serve.",
+      "textAll": "Si liberano {{size}}. I tuoi progetti e le impostazioni non vengono toccati e l'app lo ricrea se serve.",
+      "cancel": "Annulla",
+      "ok": "Svuota ({{size}})"
+    },
+    "freed": "Liberati {{size}}.",
+    "clearFailed": "Impossibile svuotare «{{name}}».",
+    "note": "Si svuotano solo cache e temporanei. I tuoi progetti e le impostazioni non vengono mai eliminati da qui.",
+    "toast": {
+      "missing": "Questa cartella non esiste ancora.",
+      "openFailed": "Impossibile aprire la cartella.",
+      "copied": "Percorso copiato.",
+      "copyFailed": "Impossibile copiare il percorso."
+    }
   }
 }

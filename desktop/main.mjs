@@ -11,6 +11,7 @@ import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPa
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { setupProjectsIpc } from './projects-ipc.mjs';
+import { createStorage, updatesDir } from './storage.mjs';
 import { goInHistory, historyDirectionForCommand, historyDirectionForKey } from './history-nav.mjs';
 
 const { autoUpdater } = electronUpdater;
@@ -215,6 +216,34 @@ let projects = null;
 function setupIpc() {
   const handle = (channel, fn) => ipcMain.handle(channel, (event, ...args) => (trusted(event) ? fn(...args) : undefined));
   projects = setupProjectsIpc({ handle, app, dialog, shell, safeStorage, getWindow: () => win });
+  // «Almacenamiento» (1.18 · S1): lista cerrada de rutas; la web solo manda el identificador de una fila.
+  const storage = createStorage({
+    getContext: () => ({
+      userData: app.getPath('userData'),
+      projectsRoot: projects?.getRoot?.() ?? null,
+      installDir: app.isPackaged ? path.dirname(process.execPath) : null,
+      updatesDir: updatesDir(appCacheBase(), app.isPackaged ? updaterCacheDirName(existsSync(path.join(process.resourcesPath, 'app-update.yml')) ? readFileSync(path.join(process.resourcesPath, 'app-update.yml'), 'utf8') : '') : null),
+      tmpdir: os.tmpdir(),
+    }),
+    exists: async (p) => existsSync(p),
+    openPath: (p) => shell.openPath(p),
+    clearElectronCache: async () => {
+      await session.defaultSession.clearCache();
+      await session.defaultSession.clearCodeCaches({});
+      await session.defaultSession.clearStorageData({ storages: ['shadercache', 'cachestorage'] });
+    },
+  });
+  const wanted = (id) => (typeof id === 'string' && id.length <= 40 ? id : '');
+  handle('storage:list', () => storage.list());
+  handle('storage:size', (id) => storage.size(wanted(id)));
+  handle('storage:clear', async (id) => {
+    try {
+      return { ok: true, ...(await storage.clear(wanted(id))) };
+    } catch {
+      return { ok: false };
+    }
+  });
+  handle('storage:reveal', (id) => storage.reveal(wanted(id)));
   // El bloqueo de cada proyecto abierto se renueva cada minuto (caduca a los 10 sin señales).
   setInterval(() => projects?.renewAll(), 60 * 1000).unref();
   setInterval(() => projects?.syncHeld(), 3 * 60 * 1000).unref();

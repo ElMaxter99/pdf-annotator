@@ -32,6 +32,7 @@ import {
   renamedRef,
 } from '../../utils/project.utils';
 import { FocusTrapDirective } from '../../directives/focus-trap.directive';
+import { StorageService } from '../../services/storage.service';
 
 type Dialog =
   | { kind: 'new' }
@@ -53,6 +54,7 @@ export class ProjectsPageComponent implements OnInit, OnDestroy {
   readonly store = inject(ProjectStoreService);
   readonly transfer = inject(ProjectTransferService);
   readonly sync = inject(ProjectSyncService);
+  readonly storage = inject(StorageService);
   private readonly batch = inject(BatchStoreService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
