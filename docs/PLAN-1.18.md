@@ -1,6 +1,6 @@
 # Plan de la 1.18 · propuesta
 
-Estado (2026-11-22): **propuesta de Claude, pendiente de que Maxter elija el alcance.** La 1.17.0 está publicada (ver `docs/PLAN-1.17.md` y el CHANGELOG). Como los anteriores, pensado para trabajar por tareas en paralelo: cada una dice qué toca, si es visible, de qué depende y cuándo está hecha.
+Estado (2026-11-22): **propuesta de Claude; entran Q1, R1, S1, M1, I1 e I2 (pendiente de orden y de la mesa de S1).** D1 y D2 quedan aparcados muy a futuro por decisión de Maxter (§5). La 1.17.0 está publicada (ver `docs/PLAN-1.17.md` y el CHANGELOG). Como los anteriores, pensado para trabajar por tareas en paralelo: cada una dice qué toca, si es visible, de qué depende y cuándo está hecha.
 
 Lo que sale de la 1.17: hay mucho hecho **sin mesas** que el lienzo no tiene, la IA está medida con casos sintéticos pero no con los PDF reales de Maxter, y hubo dos e2e intermitentes que retrasaron RC. Ninguna funcionalidad grande está pedida aún, salvo «Almacenamiento».
 
@@ -19,8 +19,6 @@ Lo que sale de la 1.17: hay mucho hecho **sin mesas** que el lienzo no tiene, la
 | **I1** | IA con los PDF reales de Maxter (A2 real) | No | **PDF y pruebas de Maxter** | Entra si Maxter pasa casos |
 | **I2** | Créditos reales de Copilot frente a la factura (A5) | Un texto | **cuenta de Maxter** | Opcional |
 | **R1** | Mantenimiento: dependencias y `app.ts` en `OnPush` | No | — | Entra |
-| **D1** | Cifrado opcional de proyectos | **Sí** | **decisión de Maxter** | Solo si Maxter lo quiere |
-| **D2** | Firmar la app de macOS (actualización automática) | Poco | **decisión y cuenta de Apple** | Solo si Maxter lo quiere |
 
 ## 2. Tareas
 
@@ -49,12 +47,6 @@ Lo que sale de la 1.17: hay mucho hecho **sin mesas** que el lienzo no tiene, la
 - Actualizar dependencias menores (Angular, Playwright, electron, electron-updater, pdf.js, pdf-lib) en una PR con la suite completa y el empaquetado de escritorio en verde.
 - `app.ts` sigue en `ChangeDetectionStrategy.Eager`: pasarlo a `OnPush` con su guardia, como el resto (`onpush-idle.spec.ts`).
 
-### D1 · Cifrado opcional de proyectos (decisión)
-- Pendiente de decisión desde la 1.14 (`docs/ROADMAP.md`, «Ideas sin priorizar»). Si Maxter lo quiere, primero una propuesta en `design/propuestas/` (qué se cifra, dónde vive la clave, qué pasa si se olvida) y una mesa.
-
-### D2 · Firmar la app de macOS (decisión)
-- Hoy la app de Mac no se firma (decisión 13): Gatekeeper avisa al instalar y no hay actualización automática. Firmar y notarizar exige una cuenta de Apple Developer (de pago) y secretos en el CI. Si se hace, el actualizador de Mac pasa a automático; `latest-mac.yml` ya lista arm64 e Intel desde esta versión.
-
 ## 3. Orden sugerido
 1. **Ya (invisible):** Q1 y R1, en paralelo.
 2. **En paralelo:** M1 (cuenta del lienzo) y la mesa de S1.
@@ -63,6 +55,10 @@ Lo que sale de la 1.17: hay mucho hecho **sin mesas** que el lienzo no tiene, la
 5. **Cierre:** subida a 1.18.0 y RC solo con petición de Maxter.
 
 ## 4. Preguntas para Maxter
-1. ¿Entran Q1, R1, S1, M1 e I1? ¿Algo más que te haya salido usando la 1.17?
-2. ¿D1 (cifrado) y D2 (firma de macOS): sí, no o más adelante?
-3. ¿Una PR por tarea o una que las reúna, como en la 1.17?
+1. ¿Algo más que te haya salido usando la 1.17?
+2. ¿Una PR por tarea o una que las reúna, como en la 1.17?
+
+## 5. Aparcado muy a futuro (decisión de Maxter, 2026-11-22)
+No se planifica ni se propone de nuevo salvo que Maxter lo pida.
+- **Firmar la app de macOS** (actualización automática en Mac): sin prioridad, nadie usa la app en Mac. Exigiría una cuenta de Apple Developer de pago y secretos en el CI. Si algún día se hace, `latest-mac.yml` ya lista arm64 e Intel.
+- **Cifrado opcional de proyectos:** Maxter considera que traería más problemas que ventajas (claves olvidadas, sincronización, soporte).
