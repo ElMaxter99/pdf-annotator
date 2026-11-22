@@ -29,3 +29,4 @@ Maxter aprobó estos cambios visibles **sin mesas** («ya lo veo yo cuando progr
 | # | Qué | Propuesta |
 | --- | --- | --- |
 | A | Apartado «Almacenamiento» de la app de escritorio | [`propuestas/almacenamiento-en-disco.md`](propuestas/almacenamiento-en-disco.md) |
+| B | Aviso «Pedir la contraseña / el permiso otra vez» tras cancelar la instalación de una actualización | [`propuestas/actualizar-tras-cancelar-contrasena.md`](propuestas/actualizar-tras-cancelar-contrasena.md) |
