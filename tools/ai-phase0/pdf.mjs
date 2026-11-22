@@ -70,7 +70,9 @@ export function drawCode(ctx, code, x, y, cell) {
 /** Ancho total de `code` en píxeles para un `cell` dado. */
 export const codeWidth = (code, cell) => (code.length * 7 - 2) * cell;
 
-const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+// Sin caracteres que un modelo pequeño confunde al leerlos en la imagen (5/S, 8/B, 2/Z, 6/G, 0/O/D/Q, 1/I/L): con ellos se
+// descartaban respuestas buenas por «no leyó las imágenes» (medido con haiku: «7Q85» por «7Q8S»).
+export const CODE_ALPHABET = 'ACEFHJKMNPRTUVWXY3479';
 export const newCode = () => Array.from({ length: 4 }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
 
 /** Devuelve { pages: [{ num, width, height }], texts: [{ page, text, x, y, w? }], slots, codes } y escribe PNGs si se pide.

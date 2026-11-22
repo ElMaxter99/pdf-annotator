@@ -398,6 +398,21 @@ export function isRowSelected(row: AiRow, overrides: ReadonlyMap<string, boolean
   return overrides.get(row.id) ?? !rowNeedsReview(row);
 }
 
+/**
+ * Grupo de una fila en la lista de la propuesta, de lo más seguro a lo que falta:
+ * `ready` = de A, colocado con confianza alta · `review` = de A, colocado con dudas (revisar) · `newInB` = no estaba en A
+ * (página nueva de un campo repetido por página) · `notFound` = de A, sin colocar · `absent` = de A, ya no existe en B.
+ */
+export type ProposalGroup = 'ready' | 'review' | 'newInB' | 'notFound' | 'absent';
+export const PROPOSAL_GROUPS: readonly ProposalGroup[] = ['ready', 'review', 'newInB', 'notFound', 'absent'];
+
+export function proposalGroup(row: AiRow): ProposalGroup {
+  if (row.id.startsWith('pattern-')) return 'newInB';
+  if (isAbsentInB(row)) return 'absent';
+  if (!row.ok) return 'notFound';
+  return confidenceLevel(row.confidence) === 'high' ? 'ready' : 'review';
+}
+
 export function summarizeAi(rows: AiRow[], overrides: ReadonlyMap<string, boolean>) {
   return {
     total: rows.length,

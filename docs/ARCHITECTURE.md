@@ -13,6 +13,22 @@ flowchart LR
 ```
 Todo ocurre en el cliente. El servidor (NGINX) solo entrega estáticos con cabeceras de seguridad.
 
+### Código del editor (`pages/workspace/`)
+`WorkspacePageComponent` (`workspace.page.ts`) guarda **todo el estado** del editor (signals, `computed`, referencias a la vista) y el núcleo: carga y render del PDF, editores de anotaciones, atajos, sesión, historial (`applyCoordsChange`, `replaceCoords`, `insertFields`) y sincronización del JSON. Sus métodos por áreas viven en archivos hermanos, cada uno una clase **sin estado** cuyos métodos llevan `this: WorkspacePageComponent` y se copian al prototipo de la página al final de `workspace.page.ts` (`WORKSPACE_PARTS`, más una interfaz con el mismo nombre para que TypeScript y las plantillas los vean):
+
+| Archivo | Área |
+| --- | --- |
+| `workspace-ai.ts` | «Copiar y adaptar con IA»: pedir, revisar (también editable en B), aplicar o descartar la propuesta |
+| `workspace-adjust.ts` | «Copiar y ajustar por textos» |
+| `workspace-batch.ts` | Lote y traslado A→B: capa de referencia de A, tamaños y páginas, plantilla A, tabla de páginas, estados, guardado de B y acciones del PDF del lote |
+| `workspace-view.ts` | Vista: modos de referencia y «Dividida», páginas de A y B, zoom, rueda, mover el lienzo, espacio de trabajo ampliado, ajustar |
+| `workspace-pairing.ts` | Parejas A↔B y su línea |
+| `workspace-selection.ts` | Selección múltiple y recuadro |
+| `workspace-json.ts` | Foco del JSON, aplicar/importar JSON, plantillas y exportación |
+| `workspace.types.ts` | Tipos y constantes compartidos |
+
+No hay cambio de comportamiento: `this` sigue siendo la página y los subcomponentes siguen llamando a `vm.metodo()`. Un método nuevo va en el archivo de su área; un estado nuevo, en la página. Los métodos de estos archivos son públicos (TypeScript no permite `private` en ese patrón) y los miembros de la página que usan dejaron de ser `private`.
+
 ## 2. Flujo de datos
 `coords: signal<PageAnnotations[]>` es la **única fuente de verdad**. Todo lo demás se deriva:
 
@@ -115,4 +131,4 @@ Shell `.app--workspace`: grid `header / sidebar+viewer / footer`, `100dvh`, scro
 `desktop/` (paquete propio con `electron-updater`; la versión se copia de `package.json` con `scripts/sync-desktop-version.mjs`). `main.mjs` sirve `dist/pdf-annotator/browser` con el protocolo `app://pdf-annotator` (fallback SPA a `index.csr.html`, misma CSP que `nginx.conf` más `connect-src` al ayudante), lanza `tools/ai-helper/server.mjs` con `ELECTRON_RUN_AS_NODE=1` (puerto 4310, origen `app://pdf-annotator`, PATH del shell de login para encontrar `claude`/`copilot`) y gestiona las actualizaciones. `preload.cjs` expone solo `window.desktop` (ventana con `contextIsolation` y `sandbox`). En la web, `services/desktop-update.service.ts` + `components/update-card` (diseño AC-01) pintan el aviso; `update-logic.mjs` (puro, con tests) decide versión y modo (`auto`: Windows NSIS, AppImage y deb/rpm —leídos de `resources/package-type`—, que se instalan con `pkexec`; `manual`: macOS sin firma y Linux sin formato reconocido). `after-pack.cjs` copia las `node_modules` del ayudante porque `extraResources` no las incluye. `history-nav.mjs` (puro, con tests) da Atrás/Adelante a la ventana: `Alt+←/→` (`⌘[`/`⌘]` en macOS) en `before-input-event`, botones laterales del ratón (`app-command`) y deslizar (`swipe`). Pruebas: `npm run test:desktop` y `node desktop/smoke.mjs` (Electron real con xvfb en Linux). Canal de actualizaciones: `stable` (por defecto) o `beta` (también RC `X.Y.Z-rc.N`), guardado en `update-channel.json` de `userData`; `parseReleaseForChannel` (puro) elige la release en modo manual y `autoUpdater.allowPrerelease` en el automático; la web lo cambia con `window.desktop.setUpdateChannel` desde `components/update-channel`, que vive dentro del panel «Versión y actualizaciones» (`components/update-panel`, mesas AC-10 a AC-12). Ese panel se abre desde el chip de versión (`components/version-chip`, en landing, lote y editor; con punto cuando hay novedad) o desde el menú nativo Ayuda → «Buscar actualizaciones…» (`desktop:update:open-panel`, `onOpenUpdates`); el estado lleva `checking`, `lastChecked` e `installOnQuit`, y «Buscar ahora» es `checkNow()`. Releases: `.github/workflows/desktop-release.yml` (finales) y `release-candidate.yml` (RC como pre-release). Variables de prueba: `PDF_ANNOTATOR_RELEASE_API` y `PDF_ANNOTATOR_UPDATE_URL` (feed alternativo).
 
 ## 11. Deuda técnica y hoja de ruta
-Ver [`ROADMAP.md`](ROADMAP.md). Pendiente principal: dividir `workspace.page.ts` (render del PDF, miniaturas y sincronización del JSON).
+Ver [`ROADMAP.md`](ROADMAP.md). `workspace.page.ts` ya está repartido por áreas (§1, «Código del editor»); lo que queda en la página es el núcleo (render, editores, atajos, sesión, historial y JSON).

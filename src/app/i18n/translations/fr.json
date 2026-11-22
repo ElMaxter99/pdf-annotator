@@ -1487,13 +1487,14 @@
       "count": "{{count}} proposés",
       "unapplied": "Non appliquée",
       "willApply": "{{count}} seront appliqués",
-      "selectHigh": "Cocher les élevées ({{count}})",
+      "selectHigh": "Cocher seulement les sûrs ({{count}})",
       "selectNone": "Tout décocher",
       "group": {
-        "review": "À revoir · {{count}}",
-        "notFound": "Introuvables · {{count}}",
-        "absent": "Absents de B · {{count}}",
-        "ready": "Prêts · {{count}}"
+        "review": "De A · à vérifier · {{count}}",
+        "notFound": "De A · non placés · {{count}}",
+        "absent": "De A · n’existent plus dans B · {{count}}",
+        "ready": "De A · sûrs · {{count}}",
+        "newInB": "Nouveaux dans B (absents de A) · {{count}}"
       },
       "notInB": "absent de B",
       "absentInB": "n'existe pas dans B : il est normal de ne pas le placer",
@@ -1504,7 +1505,14 @@
       "editingBadge": "Champ proposé",
       "edited": "modifié",
       "leaveOut": "Exclure de la proposition",
-      "pagePattern": "répété sur chaque page"
+      "pagePattern": "répété sur chaque page",
+      "groupHint": {
+        "ready": "Champs du modèle de A placés dans B avec une confiance élevée. Ils sont cochés pour être appliqués.",
+        "review": "Champs de A placés dans B avec des doutes (autre page, libellé proche ou confiance moyenne ou faible). Non cochés : regardez-les avant d’appliquer.",
+        "newInB": "Ils n’existaient pas dans A : B a plus de pages et le champ se répète sur chaque page de A (p. ex. le numéro de page), ils sont donc proposés pour les nouvelles pages.",
+        "notFound": "Champs de A que l’IA n’a pas su placer dans B. Créez-les à la main si besoin.",
+        "absent": "Champs de A dont le texte n’existe plus dans B : ne pas les placer est correct."
+      }
     },
     "instructions": {
       "title": "Instructions pour l’IA",

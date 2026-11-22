@@ -1487,13 +1487,14 @@
       "count": "{{count}} propostos",
       "unapplied": "Por aplicar",
       "willApply": "{{count}} serão aplicados",
-      "selectHigh": "Marcar os altos ({{count}})",
-      "selectNone": "Desmarcar todos",
+      "selectHigh": "Marcar só os seguros ({{count}})",
+      "selectNone": "Desmarcar tudo",
       "group": {
-        "review": "Por rever · {{count}}",
-        "notFound": "Por encontrar · {{count}}",
-        "absent": "Não existem em B · {{count}}",
-        "ready": "Prontos · {{count}}"
+        "review": "De A · a rever · {{count}}",
+        "notFound": "De A · sem colocar · {{count}}",
+        "absent": "De A · já não existem em B · {{count}}",
+        "ready": "De A · seguros · {{count}}",
+        "newInB": "Novos em B (não estavam em A) · {{count}}"
       },
       "notInB": "não está em B",
       "absentInB": "não existe em B: o correto é não o colocar",
@@ -1504,7 +1505,14 @@
       "editingBadge": "Campo da proposta",
       "edited": "editado",
       "leaveOut": "Deixar fora da proposta",
-      "pagePattern": "repetido em cada página"
+      "pagePattern": "repetido em cada página",
+      "groupHint": {
+        "ready": "Campos do modelo de A colocados em B com confiança alta. Vão marcados para aplicar.",
+        "review": "Campos de A colocados em B com dúvidas (outra página, rótulo parecido ou confiança média ou baixa). Não vão marcados: veja-os antes de aplicar.",
+        "newInB": "Não existiam em A: B tem mais páginas e o campo repete-se em cada página de A (p. ex. o número de página), por isso são propostos para as páginas novas.",
+        "notFound": "Campos de A que a IA não conseguiu colocar em B. Crie-os à mão se fizerem falta.",
+        "absent": "Campos de A cujo texto já não existe em B: não os colocar é o correto."
+      }
     },
     "instructions": {
       "title": "Instruções para a IA",

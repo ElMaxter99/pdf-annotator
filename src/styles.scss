@@ -4010,7 +4010,15 @@ kbd {
 .reference-field--grey {
   border: 2px solid #94a3b8;
   background: rgba(148, 163, 184, 0.2);
-  color: #556;
+  color: #334155;
+}
+
+/* Nombres de la propuesta legibles con poco zoom (las capas van sobre el PDF, blanco en ambos temas). */
+.reference-field--proposal,
+.reference-field--estimated,
+.reference-field--grey,
+.reference-field--manual {
+  font-weight: 600;
 }
 
 .reference-field--hover {

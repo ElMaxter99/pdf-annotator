@@ -1487,13 +1487,14 @@
       "count": "{{count}} vorgeschlagen",
       "unapplied": "Nicht angewendet",
       "willApply": "{{count}} werden angewendet",
-      "selectHigh": "Hohe anhaken ({{count}})",
+      "selectHigh": "Nur die sicheren markieren ({{count}})",
       "selectNone": "Alle abwählen",
       "group": {
-        "review": "Zu prüfen · {{count}}",
-        "notFound": "Nicht gefunden · {{count}}",
-        "absent": "Nicht in B · {{count}}",
-        "ready": "Bereit · {{count}}"
+        "review": "Aus A · prüfen · {{count}}",
+        "notFound": "Aus A · nicht platziert · {{count}}",
+        "absent": "Aus A · nicht mehr in B · {{count}}",
+        "ready": "Aus A · sicher · {{count}}",
+        "newInB": "Neu in B (nicht in A) · {{count}}"
       },
       "notInB": "nicht in B",
       "absentInB": "existiert in B nicht: es nicht zu platzieren ist richtig",
@@ -1504,7 +1505,14 @@
       "editingBadge": "Vorgeschlagenes Feld",
       "edited": "bearbeitet",
       "leaveOut": "Aus dem Vorschlag nehmen",
-      "pagePattern": "auf jeder Seite wiederholt"
+      "pagePattern": "auf jeder Seite wiederholt",
+      "groupHint": {
+        "ready": "Felder der A-Vorlage, die die KI mit hoher Sicherheit in B platziert hat. Sie sind zum Anwenden markiert.",
+        "review": "Felder aus A, die mit Zweifeln in B platziert wurden (andere Seite, ähnliche Beschriftung oder mittlere bzw. niedrige Sicherheit). Nicht markiert: vor dem Anwenden prüfen.",
+        "newInB": "Sie gab es in A nicht: B hat mehr Seiten und das Feld wiederholt sich auf jeder Seite von A (z. B. die Seitenzahl), daher werden sie für die neuen Seiten vorgeschlagen.",
+        "notFound": "Felder aus A, die die KI nicht in B platzieren konnte. Lege sie bei Bedarf von Hand an.",
+        "absent": "Felder aus A, deren Text es in B nicht mehr gibt: sie wegzulassen ist richtig."
+      }
     },
     "instructions": {
       "title": "Anweisungen für die KI",

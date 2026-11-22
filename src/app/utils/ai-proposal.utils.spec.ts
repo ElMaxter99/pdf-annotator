@@ -1,6 +1,7 @@
 import {
   AiRow,
   sanitizeDetails,
+  proposalGroup,
   confidenceLevel,
   estimateTokens,
   sumUsage,
@@ -164,5 +165,16 @@ describe('sanitizeDetails · motivo del parcial y reparto de páginas', () => {
     expect(d?.requests).toBe(4);
     expect(d?.plan).toEqual([{ group: 'A-p1', candidatesB: ['B-p3', 'B-p4'], fields: 7 }]);
     expect(sanitizeDetails({ aborted: 'rm -rf' })?.aborted).toBeNull();
+  });
+});
+
+describe('proposalGroup · grupos claros de la propuesta', () => {
+  const base = { id: 'p1-f1', page: 1, index: 0, ok: true, newPage: 1, x: 1, y: 1, confidence: 0.9, reason: '', anchorA: '', anchorB: '', why: '', source: 'ai' } as AiRow;
+  it('separa seguros, a revisar, nuevos en B, sin colocar y que ya no existen', () => {
+    expect(proposalGroup(base)).toBe('ready');
+    expect(proposalGroup({ ...base, confidence: 0.6 })).toBe('review');
+    expect(proposalGroup({ ...base, id: 'pattern-1-p12', source: 'pattern' })).toBe('newInB');
+    expect(proposalGroup({ ...base, ok: false, why: 'sin_respuesta' })).toBe('notFound');
+    expect(proposalGroup({ ...base, ok: false, why: 'no_existe_en_b' })).toBe('absent');
   });
 });

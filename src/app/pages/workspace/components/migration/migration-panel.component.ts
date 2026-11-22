@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationService } from '../../../../i18n/translation.service';
-import { confidenceLevel, isRowSelected, type AiRow, isAbsentInB } from '../../../../utils/ai-proposal.utils';
+import { confidenceLevel, isRowSelected, type AiRow, isAbsentInB, PROPOSAL_GROUPS, proposalGroup } from '../../../../utils/ai-proposal.utils';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
+import { InfoTipComponent } from '../../../../components/info-tip/info-tip.component';
 import type { FieldState, FieldStatus } from '../../../../utils/migration.utils';
 import type { WorkspacePageComponent } from '../../workspace.page';
 
@@ -13,7 +14,7 @@ const ORDER: Record<FieldStatus, number> = { missing: 0, new: 1, moved: 2, renam
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-migration-panel',
   standalone: true,
-  imports: [CommonModule, TranslationPipe],
+  imports: [CommonModule, TranslationPipe, InfoTipComponent],
   templateUrl: './migration-panel.component.html',
 })
 export class MigrationPanelComponent {
@@ -41,29 +42,20 @@ export class MigrationPanelComponent {
     return this.showSame() ? all : all.filter((state) => state.status !== 'same');
   });
 
-  /** Proposal rows in three groups: worth a look, not found and ready (high confidence). */
+  /** Proposal rows by where they come from and how sure they are (`proposalGroup`): sure, to check, new in B, not placed, gone. */
   readonly groups = computed(() => {
     const session = this.proposal();
     if (!session) {
       return [];
     }
-    const byPlace = (a: AiRow, b: AiRow) => a.page - b.page || a.index - b.index;
+    const byPlace = (a: AiRow, b: AiRow) => a.page - b.page || a.index - b.index || a.newPage - b.newPage;
     const rows = [...session.rows].sort(byPlace);
-    const review = rows.filter((row) => row.ok && confidenceLevel(row.confidence) !== 'high');
-    const notFound = rows.filter((row) => !row.ok && !isAbsentInB(row));
-    const absent = rows.filter(isAbsentInB);
-    const ready = rows.filter((row) => row.ok && confidenceLevel(row.confidence) === 'high');
-    return [
-      { key: 'review', rows: review },
-      { key: 'notFound', rows: notFound },
-      { key: 'absent', rows: absent },
-      { key: 'ready', rows: ready },
-    ].filter((group) => group.rows.length > 0);
+    return PROPOSAL_GROUPS.map((key) => ({ key, rows: rows.filter((row) => proposalGroup(row) === key) })).filter(
+      (group) => group.rows.length > 0,
+    );
   });
 
-  readonly highCount = computed(
-    () => (this.proposal()?.rows ?? []).filter((row) => row.ok && confidenceLevel(row.confidence) === 'high').length,
-  );
+  readonly highCount = computed(() => (this.proposal()?.rows ?? []).filter((row) => proposalGroup(row) === 'ready').length);
 
   providerName(): string {
     const provider = this.proposal()?.provider;

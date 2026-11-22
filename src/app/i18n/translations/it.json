@@ -1487,13 +1487,14 @@
       "count": "{{count}} proposti",
       "unapplied": "Non applicata",
       "willApply": "{{count}} verranno applicati",
-      "selectHigh": "Seleziona i alti ({{count}})",
+      "selectHigh": "Seleziona solo i sicuri ({{count}})",
       "selectNone": "Deseleziona tutto",
       "group": {
-        "review": "Da rivedere · {{count}}",
-        "notFound": "Non trovati · {{count}}",
-        "absent": "Non presenti in B · {{count}}",
-        "ready": "Pronti · {{count}}"
+        "review": "Da A · da rivedere · {{count}}",
+        "notFound": "Da A · non collocati · {{count}}",
+        "absent": "Da A · non esistono più in B · {{count}}",
+        "ready": "Da A · sicuri · {{count}}",
+        "newInB": "Nuovi in B (non erano in A) · {{count}}"
       },
       "notInB": "non è in B",
       "absentInB": "non esiste in B: è corretto non collocarlo",
@@ -1504,7 +1505,14 @@
       "editingBadge": "Campo della proposta",
       "edited": "modificato",
       "leaveOut": "Escludi dalla proposta",
-      "pagePattern": "ripetuto su ogni pagina"
+      "pagePattern": "ripetuto su ogni pagina",
+      "groupHint": {
+        "ready": "Campi del modello di A collocati in B con alta fiducia. Sono selezionati per l’applicazione.",
+        "review": "Campi di A collocati in B con dubbi (altra pagina, etichetta simile o fiducia media o bassa). Non selezionati: controllali prima di applicare.",
+        "newInB": "Non esistevano in A: B ha più pagine e il campo si ripete su ogni pagina di A (es. il numero di pagina), quindi vengono proposti per le pagine nuove.",
+        "notFound": "Campi di A che l’IA non è riuscita a collocare in B. Creali a mano se servono.",
+        "absent": "Campi di A il cui testo non esiste più in B: non collocarli è corretto."
+      }
     },
     "instructions": {
       "title": "Istruzioni per l’IA",
