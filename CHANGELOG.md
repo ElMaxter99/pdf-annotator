@@ -1,4 +1,9 @@
 ## Unreleased
+### Fixed
+- **Actualizaciones de macOS para los dos procesadores:** el archivo que lee el actualizador (`latest-mac.yml`) solo listaba los instaladores del último empaquetado de macOS (Intel), porque los dos jobs lo suben y el último pisaba al otro. Ahora el workflow guarda el de cada procesador y los une antes de publicar (`scripts/merge-mac-feed.mjs`, con pruebas). Hoy no cambia nada para quien usa la app (en Mac la actualización lleva a la descarga), pero deja listo el día que se firme.
+
+### Changed
+- **Hoja de ruta:** 1.17 cerrada en `docs/ROADMAP.md` y `docs/PLAN-1.17.md`; propuesta de la 1.18 en `docs/PLAN-1.18.md`, pendiente de elegir alcance.
 
 ## [v1.17.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.17.0) - 2026-11-21
 ### Added
