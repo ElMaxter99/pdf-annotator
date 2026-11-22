@@ -75,6 +75,15 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
   });
   readonly tokens = computed(() => usageTotal(this.queue.usage()));
   readonly measured = computed(() => this.tokens() > 0);
+  /** Créditos de IA que el propio Copilot anota en cada petición (≈); 0 si el CLI no los da (Claude da tokens). */
+  readonly credits = computed(() =>
+    Math.round(
+      Object.values(this.queue.rows()).reduce(
+        (n, row) => n + (row.details?.attempts ?? []).reduce((m, a) => m + (a.aiCredits ?? 0), 0),
+        0,
+      ) * 100,
+    ) / 100,
+  );
   readonly list = computed(() =>
     this.queue
       .order()
@@ -129,12 +138,13 @@ export class AiBatchPanelComponent implements OnInit, OnDestroy {
         title: t('batch.ai.sheet.allTitle'),
         sub: t('batch.ai.sheet.allSub', { count: this.finished() }),
         big: tokens > 0 ? tokens.toLocaleString(lang) : null,
-        note: tokens > 0 ? '' : t('batch.ai.sheet.noMeasure'),
+        note: tokens > 0 || this.credits() > 0 ? '' : t('batch.ai.sheet.noMeasure'),
         error: '',
         stats: [
           { label: t('batch.ai.sheet.requests'), value: String(this.queue.requests()) },
           { label: t('batch.ai.sheet.time'), value: this.elapsed() },
           { label: t('batch.ai.sheet.free'), value: String(this.freeCount()) },
+          ...(this.credits() > 0 ? [{ label: t('ai.details.usage.credits'), value: `≈ ${this.credits().toLocaleString(lang)}` }] : []),
         ],
       };
     }

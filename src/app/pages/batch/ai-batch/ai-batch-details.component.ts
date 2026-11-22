@@ -249,6 +249,10 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     if (d?.requests) {
       lines.push(`peticiones: ${d.requests}`);
     }
+    const credits = (d?.attempts ?? []).reduce((n, at) => n + (at.aiCredits ?? 0), 0);
+    if (credits > 0) {
+      lines.push(`créditos (≈, según Copilot): ${Math.round(credits * 100) / 100}`);
+    }
     const tokens = usageTotal(row.usage);
     if (tokens) {
       lines.push(`tokens: ${tokens}`);
