@@ -62,9 +62,20 @@ test('si se cancela la contraseña se explica y «Reintentar» reutiliza la desc
   await page.evaluate(() => (window as unknown as { __push: (s: object) => void }).__push({ status: 'ready', installError: 'cancelled' }));
   const dialog = page.getByTestId('update-install-error');
   await expect(dialog).toContainText('Cancelaste la contraseña');
+  await expect(page.getByTestId('update-install-retry')).toContainText('Pedir la contraseña otra vez');
   await page.getByTestId('update-install-retry').click();
   await expect(page.getByTestId('update-installing')).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { __installCalls: number }).__installCalls)).toBe(2);
+});
+
+test('en Windows, tras cancelar el permiso, se ofrece pedirlo otra vez con su propio texto', async ({ page }) => {
+  await fakeDesktop(page, { ...ready, needsAdmin: true, installError: 'cancelled' });
+  await page.goto('/landing');
+  const dialog = page.getByTestId('update-install-error');
+  await expect(dialog).toContainText('Cancelaste el permiso de Windows');
+  await expect(page.getByTestId('update-install-retry')).toContainText('Pedir permiso otra vez');
+  await page.getByTestId('update-install-retry').click();
+  await expect(page.getByTestId('update-installing')).toBeVisible();
 });
 
 test('un fallo muestra el motivo real y «Ahora no» devuelve la tarjeta', async ({ page }) => {

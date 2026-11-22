@@ -115,3 +115,57 @@ test('shouldCleanPendingUpdate solo tras arrancar una versión distinta', () => 
   assert.equal(shouldCleanPendingUpdate(null, '1.17.0'), false);
   assert.equal(shouldCleanPendingUpdate('', '1.17.0'), false);
 });
+
+test('linuxInstallCommand: una sola contraseña con pkexec y el gestor que haya', async () => {
+  const { linuxInstallCommand } = await import('./update-logic.mjs');
+  const has = (list) => (cmd) => list.includes(cmd);
+  assert.deepEqual(linuxInstallCommand({ packageType: 'deb', file: '/c/p.deb', has: has(['pkexec', 'dpkg']) }), { cmd: 'pkexec', args: ['dpkg', '-i', '/c/p.deb'] });
+  assert.deepEqual(linuxInstallCommand({ packageType: 'rpm', file: '/c/p.rpm', has: has(['pkexec', 'dnf', 'rpm']) }).args.slice(0, 3), ['dnf', 'install', '-y']);
+  assert.deepEqual(linuxInstallCommand({ packageType: 'rpm', file: '/c/p.rpm', has: has(['pkexec', 'rpm']) }).args, ['rpm', '-U', '--replacepkgs', '/c/p.rpm']);
+  assert.equal(linuxInstallCommand({ packageType: 'deb', file: '/c/p.deb', has: has(['dpkg']) }), null, 'sin pkexec: el instalador de siempre');
+  assert.equal(linuxInstallCommand({ packageType: 'deb', file: null, has: has(['pkexec', 'dpkg']) }), null);
+  assert.equal(linuxInstallCommand({ packageType: 'pacman', file: '/c/p', has: has(['pkexec']) }), null);
+});
+
+test('classifyPkexecResult: cancelar (126/127), dependencias, error y bien', async () => {
+  const { classifyPkexecResult } = await import('./update-logic.mjs');
+  assert.equal(classifyPkexecResult({ code: 0 }), 'ok');
+  assert.equal(classifyPkexecResult({ code: 126 }), 'cancelled');
+  assert.equal(classifyPkexecResult({ code: 127 }), 'cancelled');
+  assert.equal(classifyPkexecResult({ code: 1, stderr: 'dpkg: dependency problems prevent configuration of pdf-annotator' }), 'deps');
+  assert.equal(classifyPkexecResult({ code: 1, stderr: 'algo raro' }), 'failed');
+});
+
+test('windowsElevatedLaunch: pide permiso, espera y reabre la app si se cancela; las comillas no rompen el script', async () => {
+  const { windowsElevatedLaunch, psQuote } = await import('./update-logic.mjs');
+  assert.equal(psQuote("C:\\Users\\O'Neil\\x.exe"), "'C:\\Users\\O''Neil\\x.exe'");
+  const r = windowsElevatedLaunch({ installer: 'C:\\Temp\\setup.exe', exe: "C:\\Program Files\\PDF Annotator\\PDF Annotator.exe" });
+  assert.equal(r.cmd, 'powershell.exe');
+  const script = r.args.at(-1);
+  assert.match(script, /-Verb RunAs -Wait -PassThru/);
+  assert.match(script, /'--updated','--force-run'/);
+  assert.match(script, /catch \{ Start-Process -FilePath 'C:\\Program Files\\PDF Annotator\\PDF Annotator\.exe' -ArgumentList '--update-cancelled' \}/);
+  assert.match(script, /if \(\$p\.ExitCode -ne 0\)/);
+});
+
+test('runLinuxInstall: cancelar no abre otra ventana; pedirla otra vez instala; dependencias se arreglan tras la contraseña', async () => {
+  const { runLinuxInstall } = await import('./update-logic.mjs');
+  const plan = { cmd: 'pkexec', args: ['dpkg', '-i', '/c/p.deb'] };
+  const calls = [];
+  const answers = [{ code: 126, stderr: '' }, { code: 0, stderr: '' }];
+  const run = async (p) => (calls.push(p.args[0]), answers.shift());
+  const first = await runLinuxInstall({ plan, packageType: 'deb', run });
+  assert.equal(first.kind, 'cancelled');
+  assert.deepEqual(calls, ['dpkg'], 'una sola ventana al cancelar (sin apt-get -f)');
+  const again = await runLinuxInstall({ plan, packageType: 'deb', run }); // «Pedir la contraseña otra vez»
+  assert.equal(again.kind, 'ok');
+  assert.deepEqual(calls, ['dpkg', 'dpkg']);
+
+  const seq = [{ code: 1, stderr: 'dpkg: dependency problems prevent configuration' }, { code: 0, stderr: '' }];
+  const deps = [];
+  const r = await runLinuxInstall({ plan, packageType: 'deb', run: async (p) => (deps.push(p.args[0]), seq.shift()) });
+  assert.equal(r.kind, 'ok');
+  assert.deepEqual(deps, ['dpkg', 'apt-get']);
+  const rpm = await runLinuxInstall({ plan: { cmd: 'pkexec', args: ['rpm', '-U', 'x'] }, packageType: 'rpm', run: async () => ({ code: 1, stderr: 'dependency problems' }) });
+  assert.equal(rpm.kind, 'failed', 'en rpm no hay apt-get -f');
+});

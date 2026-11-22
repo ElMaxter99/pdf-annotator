@@ -1629,7 +1629,10 @@
       "notNow": "Jetzt nicht",
       "manual": "Paket herunterladen",
       "copy": "Details kopieren",
-      "copied": "Details kopiert"
+      "copied": "Details kopiert",
+      "askPasswordAgain": "Erneut nach dem Passwort fragen",
+      "askPermissionAgain": "Erneut um Erlaubnis bitten",
+      "cancelledTextWindows": "Du hast die Windows-Berechtigung abgebrochen, daher konnte nicht installiert werden. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen: Du musst sie nicht erneut laden."
     },
     "done": {
       "title": "PDF Annotator wurde auf {{version}} aktualisiert",

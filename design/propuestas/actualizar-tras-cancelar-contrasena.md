@@ -1,6 +1,6 @@
 # Actualizar después de cancelar la contraseña o el permiso del sistema (candidata 1.17/1.18)
 
-**Estado: análisis y plan de Claude, pendiente de aprobación de Maxter (2026-11-22).** Origen: Maxter, probando la rc.5 en Ubuntu: «a veces me pone *No se instaló la actualización, cancelaste la contraseña*; quiero que en ese caso me la vuelva a pedir sin tener que cerrar y abrir la app; y que en Mac y Windows funcione igual».
+**Estado: aprobado por Maxter («hazlo como recomiendes») e implementado para la siguiente rc de la 1.17, sin mesas (2026-11-22).** Falta probar en un Ubuntu real y, si se puede, en un Windows con la app en «Archivos de programa». Origen: Maxter, probando la rc.5 en Ubuntu: «a veces me pone *No se instaló la actualización, cancelaste la contraseña*; quiero que en ese caso me la vuelva a pedir sin tener que cerrar y abrir la app; y que en Mac y Windows funcione igual».
 
 ## 1. Cómo funciona hoy (verificado en el código y en electron-updater 6.8.11)
 

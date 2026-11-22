@@ -25,6 +25,8 @@ export interface DesktopUpdateState {
   installOnQuit?: boolean;
   /** La instalación pedirá la contraseña del sistema (Linux .deb/.rpm). */
   needsPassword?: boolean;
+  /** La instalación pedirá el permiso de Windows (app en una carpeta del sistema, p. ej. «Archivos de programa»). */
+  needsAdmin?: boolean;
   /** Falló la instalación: «cancelled» (contraseña cancelada) u otro motivo; la descarga se conserva. */
   installError?: 'cancelled' | 'failed';
   /** Motivo técnico del fallo (una línea) para mostrar y copiar. */
