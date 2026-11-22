@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-125 Almacenamiento · flujo y pantalla · oscuro 1650</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.root{box-sizing:border-box;padding:56px 64px 64px;background:#14141f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:28px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chip{font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid #3f3f58;color:#b9b9cc}
+.chip.ok{background:#0b3b36;border-color:#5eead4;color:#5eead4}
+.lead{margin:0;max-width:1300px;font-size:16px;line-height:1.55;color:#c4c4d0}
+.shot{display:flex;flex-direction:column;gap:10px}
+.shot img{display:block;border-radius:12px;border:1px solid #34344a}
+.cap{margin:0;font-size:14px;line-height:1.5;color:#c4c4d0;max-width:1300px}
+.cap b{color:#f5f5f5}
+.rules{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.rule{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:14px 18px}
+.rule h4{margin:0 0 6px;font-size:14px;color:#5eead4}
+.rule p{margin:0;font-size:13.5px;line-height:1.5;color:#c4c4d0}
+.pt{display:flex;gap:10px;font-size:14px;line-height:1.5;color:#c4c4d0}
+.pt i{font-style:normal;flex:none;min-width:26px;height:22px;border-radius:999px;background:#0b3b36;color:#5eead4;font-size:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.pts{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9a9ab0}
+.root{width:1688px}
+
+.win{box-sizing:border-box;padding:22px;border-radius:14px;display:flex;flex-direction:column;gap:14px}
+.win.dk{--panel:#2a2a3d;--accent:#5eead4;--fill:#5eead4;--onfill:#041818;--muted:#b0b0b0;--bd:#3f3f58;--ab:#0b3b36;--warn:#fbbf24;--dng:#ff8a8a;background:#1e1e2f;color:#f5f5f5;border:1px solid #34344a}
+.win.lt{--panel:#ffffff;--accent:#0b7d72;--fill:#0b7d72;--onfill:#ffffff;--muted:#475569;--bd:#c5ccdb;--ab:#d9f3ee;--warn:#92400e;--dng:#b91c1c;background:#f6f7fb;color:#0f172a;border:1px solid #d7dde9}
+.sh{display:flex;align-items:center;gap:12px}.sh h2{margin:0;font-size:20px;font-weight:600}.sh .x{margin-left:auto;font-size:13px;color:var(--muted)}
+.sum{margin:0;font-size:14.5px;line-height:1.5}.sum b{color:var(--accent)}
+.gr{display:flex;flex-direction:column;gap:8px}
+.gt{margin:6px 0 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rw{display:grid;grid-template-columns:1fr auto;gap:2px 16px;align-items:center;background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:11px 14px}
+.rn{font-size:14px;font-weight:600}.rp{font-size:12px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+.rs{font-size:14px;font-weight:600;text-align:right;white-space:nowrap}.rs.sk{color:var(--muted);font-weight:400}
+.ra{grid-column:1 / span 2;display:flex;gap:8px;margin-top:6px}
+.bt{font:inherit;font-size:13px;padding:6px 12px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:inherit;display:inline-block}
+.bt.pr{background:var(--fill);border-color:var(--fill);color:var(--onfill);font-weight:600}
+.bt.dg{border-color:var(--dng);color:var(--dng)}
+.note{font-size:13px;line-height:1.45;color:var(--muted);margin:0}
+.bn{display:flex;gap:10px;align-items:center;font-size:13.5px;border-radius:10px;padding:9px 12px;border:1px solid var(--bd);background:var(--panel)}
+.bn.ok{border-color:var(--accent)}.bn.er{border-color:var(--dng)}
+.skl{height:12px;width:70px;border-radius:6px;background:var(--bd);display:inline-block}
+.dlg{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.dlg h3{margin:0;font-size:16px}.dlg p{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}.df{display:flex;justify-content:flex-end;gap:10px}
+.menu{width:300px;background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:6px;display:flex;flex-direction:column}
+.mi{padding:9px 12px;border-radius:8px;font-size:13.5px}.mi.on{background:var(--ab);color:var(--accent);font-weight:600}.mi.sp{border-top:1px solid var(--bd);margin-top:4px;padding-top:12px}
+.two{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+.state{display:flex;flex-direction:column;gap:10px;width:560px}
+.sl{font-size:13px;font-weight:600;color:#9a9ab0;letter-spacing:.06em;text-transform:uppercase}
+</style>
+</helmet>
+<div class="root">
+<div class="top"><h1>P-125 · Almacenamiento · flujo y pantalla · oscuro 1650</h1><span class="chip ok">Propuesta · pendiente de aprobar</span><span class="chip">Candidata 1.18</span></div>
+<p class="lead">Solo en la app de escritorio. Un panel que dice <b>qué guarda la app, dónde y cuánto ocupa</b>, en tres grupos, de lo que es de la persona a lo que es desechable. Solo se vacían las cachés, con confirmación. Análisis y decisiones de Maxter (2026-11-22): <code>design/propuestas/almacenamiento-en-disco.md</code>.</p>
+
+<div class="lbl">Panel · oscuro 1650</div><div class="win dk" style="width:820px"><div class="sh"><h2>Almacenamiento</h2><span class="x">Cerrar ✕</span></div><p class="sum">PDF Annotator ocupa <b>1,1 GB</b> en tu disco (<b>450 MB</b> son tu trabajo).</p><div class="gr"><p class="gt">Tu trabajo · no se vacía desde aquí</p><div class="rw"><span class="rn">Proyectos</span><span class="rs">412 MB</span><span class="rp">~/Documentos/PDF Annotator</span><span></span><div class=ra><span class="bt">Abrir carpeta</span><span class="bt">Copiar ruta</span></div></div><div class="rw"><span class="rn">Datos del editor (lote, última sesión, plantillas, fuentes)</span><span class="rs">38 MB</span><span class="rp">~/.config/PDF Annotator/IndexedDB · Local Storage</span><span></span><div class=ra><span class="bt">Abrir carpeta</span><span class="bt">Copiar ruta</span></div></div><p class="gt">La app · no se vacía</p><div class="rw"><span class="rn">Programa instalado</span><span class="rs">312 MB</span><span class="rp">/opt/PDF Annotator</span><span></span><div class=ra><span class="bt">Abrir carpeta</span></div></div><div class="rw"><span class="rn">Ajustes (canal, carpeta de proyectos, sincronización)</span><span class="rs">24 KB</span><span class="rp">~/.config/PDF Annotator</span><span></span><div class=ra><span class="bt">Abrir carpeta</span></div></div><p class="gt">Se puede vaciar</p><div class="rw"><span class="rn">Caché del navegador interno</span><span class="rs">96 MB</span><span class="rp">~/.config/PDF Annotator/Cache · Code Cache · GPUCache</span><span></span><div class=ra><span class="bt dg">Vaciar</span></div></div><div class="rw"><span class="rn">Descargas de actualizaciones</span><span class="rs">148 MB</span><span class="rp">~/.cache/pdf-annotator-desktop-updater</span><span></span><div class=ra><span class="bt dg">Vaciar</span></div></div><div class="rw"><span class="rn">Temporales de la IA</span><span class="rs">2 MB</span><span class="rp">/tmp/pdfann-ia-*</span><span></span><div class=ra><span class="bt dg">Vaciar</span></div></div><div class="rw"><span class="rn">Registro de actualizaciones</span><span class="rs">14 KB</span><span class="rp">~/.config/PDF Annotator/update.log</span><span></span><div class=ra><span class="bt dg">Vaciar</span></div></div><div><span class="bt pr">Vaciar todo esto (246 MB)</span></div></div><p class="note">Tamaños y rutas de ejemplo (Linux). En Windows y macOS las rutas son las de <code>app.getPath</code>.</p></div><div class="two"><div><div class="lbl" style="margin-bottom:8px">Entrada en el menú ⋯ del editor</div><div class="win dk" style="width:360px;padding:14px"><div class="menu"><div class="mi">Atajos de teclado</div><div class="mi">Versión y actualizaciones</div><div class="mi on">Almacenamiento</div><div class="mi sp">Idioma · Tema</div></div></div></div><div><div class="lbl" style="margin-bottom:8px">Enlace en «Proyectos»</div><div class="win dk" style="width:560px;padding:14px"><div class="rw" style="grid-template-columns:1fr auto"><span class="rn">Carpeta de proyectos</span><span class="bt">Cambiar…</span><span class="rp">~/Documentos/PDF Annotator</span><span class="bt" style="border:none;color:var(--accent);padding:0">Dónde se guarda →</span></div></div></div></div>
+
+<div class="rules"><div class="rule"><h4>Dónde está</h4><p>Menú ⋯ de la cabecera del editor, junto a «Versión y actualizaciones», y un enlace «Dónde se guarda» en «Proyectos». Solo existe con el puente de escritorio: en la web la entrada no existe.</p></div><div class="rule"><h4>Tres grupos</h4><p><b>Tu trabajo</b> (proyectos y datos del editor): ruta, tamaño, «Abrir carpeta» y «Copiar ruta», sin vaciar. <b>La app</b> (programa y ajustes): ruta y tamaño. <b>Se puede vaciar</b>: caché del navegador interno, descargas de actualizaciones, temporales de la IA y registro de actualizaciones.</p></div><div class="rule"><h4>Seguridad</h4><p>Lista cerrada de rutas decidida por el proceso principal: la parte web pide «listar» y «vaciar(id)», nunca manda una ruta. «Abrir carpeta» solo para rutas de la lista. Los tamaños se calculan en segundo plano, con «Calculando…» por fila.</p></div><div class="rule"><h4>Accesibilidad</h4><p>Filas con nombre y tamaño legibles por lector de pantalla; foco visible; Esc cierra; el vaciado se confirma con un diálogo y se anuncia con aria-live.</p></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1688,"height":2128}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
