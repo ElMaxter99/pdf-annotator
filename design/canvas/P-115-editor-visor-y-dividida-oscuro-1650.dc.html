@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-115 Editor · visor y «Dividida» · oscuro 1650</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.root{box-sizing:border-box;padding:56px 64px 64px;background:#14141f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:28px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chip{font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid #3f3f58;color:#b9b9cc}
+.chip.ok{background:#0b3b36;border-color:#5eead4;color:#5eead4}
+.lead{margin:0;max-width:1300px;font-size:16px;line-height:1.55;color:#c4c4d0}
+.shot{display:flex;flex-direction:column;gap:10px}
+.shot img{display:block;border-radius:12px;border:1px solid #34344a}
+.cap{margin:0;font-size:14px;line-height:1.5;color:#c4c4d0;max-width:1300px}
+.cap b{color:#f5f5f5}
+.rules{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.rule{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:14px 18px}
+.rule h4{margin:0 0 6px;font-size:14px;color:#5eead4}
+.rule p{margin:0;font-size:13.5px;line-height:1.5;color:#c4c4d0}
+.pt{display:flex;gap:10px;font-size:14px;line-height:1.5;color:#c4c4d0}
+.pt i{font-style:normal;flex:none;min-width:26px;height:22px;border-radius:999px;background:#0b3b36;color:#5eead4;font-size:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.pts{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9a9ab0}
+.root{width:1778px}
+</style>
+</helmet>
+<div class="root">
+<div class="top"><h1>P-115 · Editor · visor y «Dividida» · oscuro 1650</h1><span class="chip ok">Definitivo · en producción</span><span class="chip">1.16 y 1.17</span></div>
+<p class="lead">Capturas 1:1 de la 1.17.0 (editor del lote con la versión B abierta). Primera: «Dividida» con A y B enlazados. Segunda: «Dividida» desenlazada, con el aviso «A y B desenlazados» y el chip «Desenlazado».</p>
+<div class="shot"><img src="/_blob/00e1f079f7a09c03b6a3089005dfa7ce" width="1650" height="900" alt="&lt;b&gt;«Dividida» enlazada.&lt;/b&gt; A (solo lectura) a la izquierda y B a la derecha, con el espac"><p class="cap"><b>«Dividida» enlazada.</b> A (solo lectura) a la izquierda y B a la derecha, con el espacio de trabajo ampliado: a cada lado de las hojas queda un margen vacío de la mitad del ancho del visor.</p></div><div class="shot"><img src="/_blob/4237be7df663b5da1a0397e34d336fac" width="1650" height="900" alt="&lt;b&gt;«Dividida» desenlazada (1.17 · C1).&lt;/b&gt; Cada panel con su zoom y su desplazamiento; el "><p class="cap"><b>«Dividida» desenlazada (1.17 · C1).</b> Cada panel con su zoom y su desplazamiento; el panel A también lleva margen propio y se centra con doble clic en su etiqueta «A».</p></div>
+
+<div class="lbl">Qué recoge esta mesa (de «Pendiente de pintar»)</div><div class="pts"><div class="pt"><i>1</i><span><b>Doble clic del visor</b> (1.16 · P-106 a P-108): botón central, o <code>Ctrl/⌘</code> + doble clic en zona vacía, alterna 100 % ↔ ajustar al ancho; en «Dividida» desenlazada solo actúa el panel bajo el puntero. Es un gesto: no tiene captura propia; su contenido está en <code>design/propuestas/P-106-doble-clic-contenido-de-la-mesa.md</code>.</span></div><div class="pt"><i>2</i><span><b>Espacio de trabajo ampliado y «Centrar A/B»</b> (1.16 · P-109 a P-111): el margen vacío de las capturas y el doble clic en la etiqueta «A» o «B» para centrarlos.</span></div><div class="pt"><i>3</i><span><b>«Dividida» desenlazada con margen y «Centrar» en A</b> (1.17 · C1): la segunda captura.</span></div><div class="pt"><i>4</i><span><b>Barras del visor finas en reposo</b> (1.17 · C2): translúcidas y finas; se marcan al pasar el ratón. La captura estática no puede enseñar el estado con el puntero encima.</span></div></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1778,"height":2570}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

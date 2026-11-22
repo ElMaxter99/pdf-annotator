@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-117 Propuesta de la IA en el editor · oscuro 1650</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.root{box-sizing:border-box;padding:56px 64px 64px;background:#14141f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:28px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chip{font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid #3f3f58;color:#b9b9cc}
+.chip.ok{background:#0b3b36;border-color:#5eead4;color:#5eead4}
+.lead{margin:0;max-width:1300px;font-size:16px;line-height:1.55;color:#c4c4d0}
+.shot{display:flex;flex-direction:column;gap:10px}
+.shot img{display:block;border-radius:12px;border:1px solid #34344a}
+.cap{margin:0;font-size:14px;line-height:1.5;color:#c4c4d0;max-width:1300px}
+.cap b{color:#f5f5f5}
+.rules{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.rule{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:14px 18px}
+.rule h4{margin:0 0 6px;font-size:14px;color:#5eead4}
+.rule p{margin:0;font-size:13.5px;line-height:1.5;color:#c4c4d0}
+.pt{display:flex;gap:10px;font-size:14px;line-height:1.5;color:#c4c4d0}
+.pt i{font-style:normal;flex:none;min-width:26px;height:22px;border-radius:999px;background:#0b3b36;color:#5eead4;font-size:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.pts{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9a9ab0}
+.root{width:1778px}
+</style>
+</helmet>
+<div class="root">
+<div class="top"><h1>P-117 · Propuesta de la IA en el editor · oscuro 1650</h1><span class="chip ok">Definitivo · en producción</span><span class="chip">1.16 y 1.17</span></div>
+<p class="lead">Lo que se ve al revisar una propuesta de «Trasladar con IA» en el editor del lote (proveedor simulado, A con 10 campos y B con la página desplazada).</p>
+<div class="shot"><img src="/_blob/8215370cf82ab33a474a638f0265427c" width="1650" height="900" alt="&lt;b&gt;Lista por grupos.&lt;/b&gt; «De A · seguros» (marcados), «De A · a revisar» (sin marcar), con"><p class="cap"><b>Lista por grupos.</b> «De A · seguros» (marcados), «De A · a revisar» (sin marcar), con ⓘ en cada grupo, «Marcar solo los seguros (N)» y «Desmarcar todo». En B, los campos propuestos con el nombre en 10 px y seminegrita.</p></div><div class="shot"><img src="/_blob/a57ce209b40bbed52937c2b8946bf1cd" width="1650" height="900" alt="&lt;b&gt;Parejas A↔B.&lt;/b&gt; Pulsar un campo de A (o el nombre de una tarjeta) resalta los dos y lo"><p class="cap"><b>Parejas A↔B.</b> Pulsar un campo de A (o el nombre de una tarjeta) resalta los dos y los une con una línea discontinua; Esc la quita.</p></div><div class="shot"><img src="/_blob/12954a3ad1e7fc33866b926d45b63fd2" width="1650" height="900" alt="&lt;b&gt;Propuesta editable en B.&lt;/b&gt; Un clic en un campo propuesto abre el editor de anotacione"><p class="cap"><b>Propuesta editable en B.</b> Un clic en un campo propuesto abre el editor de anotaciones con la marca «Campo de la propuesta»; arrastrar lo mueve; lo editado se queda en la propuesta, no en B.</p></div><div class="shot"><img src="/_blob/2707c1009df5c9ba7d01b00a11edde57" width="1650" height="900" alt="&lt;b&gt;«No existen en B».&lt;/b&gt; Cuando B es otro documento, los campos sin sitio salen en su gru"><p class="cap"><b>«No existen en B».</b> Cuando B es otro documento, los campos sin sitio salen en su grupo, con «Colocar a mano», y no cuentan como fallo.</p></div>
+
+<div class="lbl">Qué recoge esta mesa (de «Pendiente de pintar»)</div><div class="pts"><div class="pt"><i>5</i><span><b>Propuesta editable en B</b>: hover con aviso del nombre y la confianza, clic, arrastrar y marca «editado» (tercera captura).</span></div><div class="pt"><i>6</i><span><b>Parejas A↔B</b> con línea, tarjetas que navegan y «Sin pareja» (segunda captura).</span></div><div class="pt"><i>9</i><span><b>Lista de la propuesta por grupos</b> y «Marcar solo los seguros» (primera captura).</span></div><div class="pt"><i>10</i><span><b>«Igual que en A»</b>: etiqueta en la fila cuando la IA dice que el hueco está en el mismo sitio. El proveedor simulado no devuelve ese caso, así que no hay captura; el texto está en la fila de la lista.</span></div><div class="pt"><i>11</i><span><b>Número de página repetido</b> («repetido en cada página»): necesita un A de varias páginas; tampoco sale con el simulado.</span></div><div class="pt"><i>12</i><span><b>«No existen en B»</b> (1.16) (cuarta captura).</span></div><div class="pt"><i>13</i><span><b>Nombres de la propuesta más legibles</b> (10 px, seminegrita, gris de los desmarcados más oscuro).</span></div></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1778,"height":4488}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

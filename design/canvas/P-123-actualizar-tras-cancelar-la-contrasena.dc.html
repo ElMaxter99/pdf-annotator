@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-123 Actualizar tras cancelar la contraseña o el permiso</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.root{box-sizing:border-box;padding:56px 64px 64px;background:#14141f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:28px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chip{font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid #3f3f58;color:#b9b9cc}
+.chip.ok{background:#0b3b36;border-color:#5eead4;color:#5eead4}
+.lead{margin:0;max-width:1300px;font-size:16px;line-height:1.55;color:#c4c4d0}
+.shot{display:flex;flex-direction:column;gap:10px}
+.shot img{display:block;border-radius:12px;border:1px solid #34344a}
+.cap{margin:0;font-size:14px;line-height:1.5;color:#c4c4d0;max-width:1300px}
+.cap b{color:#f5f5f5}
+.rules{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.rule{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:14px 18px}
+.rule h4{margin:0 0 6px;font-size:14px;color:#5eead4}
+.rule p{margin:0;font-size:13.5px;line-height:1.5;color:#c4c4d0}
+.pt{display:flex;gap:10px;font-size:14px;line-height:1.5;color:#c4c4d0}
+.pt i{font-style:normal;flex:none;min-width:26px;height:22px;border-radius:999px;background:#0b3b36;color:#5eead4;font-size:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.pts{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9a9ab0}
+.root{width:1778px}
+</style>
+</helmet>
+<div class="root">
+<div class="top"><h1>P-123 · Actualizar tras cancelar la contraseña o el permiso</h1><span class="chip ok">Definitivo · en producción</span><span class="chip">1.17</span></div>
+<p class="lead">App de escritorio, aviso de actualización tras cancelar la contraseña del sistema (Linux) o el permiso de Windows. Antes se quedaba en «No se instaló la actualización». Ahora lo explica y ofrece volver a pedirlo con un botón. Pantalla capturada con un puente de escritorio simulado (estado «ready» + <code>installError: cancelled</code>). Propuesta: <code>design/propuestas/actualizar-tras-cancelar-contrasena.md</code>.</p>
+<div class="shot"><img src="/_blob/a4b4ed8529ab02726088a05577149ba1" width="1650" height="900" alt="&lt;b&gt;Oscuro 1650.&lt;/b&gt; «Cancelaste la contraseña…» con «Pedir la contraseña otra vez»; «Ahora"><p class="cap"><b>Oscuro 1650.</b> «Cancelaste la contraseña…» con «Pedir la contraseña otra vez»; «Ahora no» devuelve la tarjeta de actualización.</p></div><div class="shot"><img src="/_blob/c9d1795b4c4c289c6b2bd5488fcf433c" width="1280" height="800" alt="&lt;b&gt;Claro 1280.&lt;/b&gt; Igual, en claro. En Windows el texto dice «Cancelaste el permiso de Win"><p class="cap"><b>Claro 1280.</b> Igual, en claro. En Windows el texto dice «Cancelaste el permiso de Windows» y el botón, «Pedir permiso otra vez».</p></div>
+
+<div class="lbl">Qué recoge esta mesa (de «Pendiente de pintar»)</div><div class="pts"><div class="pt"><i>19</i><span><b>Aviso «Pedir la contraseña / el permiso otra vez»</b> tras cancelar una actualización (1.17).</span></div></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1778,"height":2274}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

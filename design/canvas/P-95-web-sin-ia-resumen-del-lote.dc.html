@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-95 Web sin IA</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.root{width:1720px;box-sizing:border-box;padding:56px 64px 64px;background:#14141f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:32px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.lead{margin:0;max-width:1200px;font-size:16px;line-height:1.55;color:#c4c4d0}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9a9ab0}
+.row{display:flex;gap:24px;align-items:flex-start}
+.pn{width:820px;box-sizing:border-box;padding:20px;border-radius:14px;display:flex;flex-direction:column;gap:12px}
+.pn.dk{--panel:#2a2a3d;--accent:#5eead4;--muted:#b0b0b0;background:#1e1e2f;color:#f5f5f5;border:1px solid #34344a}
+.pn.lt{--panel:#ffffff;--accent:#0f766e;--muted:#475569;background:#f6f7fb;color:#0f172a;border:1px solid #d7dde9}
+.pt{margin:0;font-size:15px;font-weight:600}
+.pc{margin:0;font-size:13px;line-height:1.45;color:var(--muted);min-height:38px}
+.fn{display:grid}
+.fs{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--panel);border:1px solid rgba(128,128,150,.35)}
+.fs:first-child{border-radius:16px 0 0 16px}.fs:last-child{border-radius:0 16px 16px 0}
+.fs small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fs strong{font-size:30px;line-height:1}
+.fs span{font-size:12.5px;color:var(--muted)}
+.rw{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:10px;background:var(--panel);font-size:14px}
+.bs{font-size:12px;padding:2px 10px;border-radius:999px;border:1px solid rgba(128,128,150,.5)}
+.why{color:var(--accent);font-size:12.5px}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.rule{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:20px 22px}
+.rule h4{margin:0 0 8px;font-size:15px;color:#5eead4}
+.rule p{margin:0;font-size:14px;line-height:1.55;color:#c4c4d0}
+</style>
+</helmet>
+<div class="root">
+<div><div class="lbl">Propuesta · pendiente de aprobar · versión web (Vercel y dominio propio)</div>
+<h1>P-95 Web sin rastro de IA · resumen del lote</h1></div>
+<p class="lead">En la web desplegada la IA no existe (solo en escritorio y en local), pero el resumen del lote aún cuenta el paso «4 · Listos para trasladar» y cada fila dice «Va a la IA». Propuesta: en la web se quitan ese paso y esa pista, y el último paso pasa a ser «4 · Listos». Es lo único que cambia de numeración. Escritorio y local se quedan exactamente igual.</p>
+<div class="lbl">Tema oscuro · 1650 px</div>
+<div class="row"><section class="pn dk"><h3 class="pt">Antes (web)</h3><p class="pc">Cinco pasos; el 4 habla de IA y la fila lo repite.</p><div class="fn" style="grid-template-columns:repeat(5,1fr)"><div class="fs"><small>1 · Subidos</small><strong>6</strong><span>2 sin plantilla ni B</span></div><div class="fs"><small>2 · Con plantilla A</small><strong>4</strong><span>1 aún sin versión B</span></div><div class="fs"><small>3 · Con versión B</small><strong>3</strong><span>0 con B pero sin campos en A</span></div><div class="fs"><small>4 · Listos para trasladar</small><strong>2</strong><span>Lo que envía «Trasladar con IA»</span></div><div class="fs"><small>5 · Listos</small><strong>1</strong><span>5 pendientes</span></div></div><div class="rw"><b>factura-03.pdf</b><span class="bs">Pendiente</span><small class="why">Va a la IA</small></div></section><section class="pn dk"><h3 class="pt">Después (web)</h3><p class="pc">Cuatro pasos, numeración 1-4; la fila no menciona la IA.</p><div class="fn" style="grid-template-columns:repeat(4,1fr)"><div class="fs"><small>1 · Subidos</small><strong>6</strong><span>2 sin plantilla ni B</span></div><div class="fs"><small>2 · Con plantilla A</small><strong>4</strong><span>1 aún sin versión B</span></div><div class="fs"><small>3 · Con versión B</small><strong>3</strong><span>0 con B pero sin campos en A</span></div><div class="fs"><small>4 · Listos</small><strong>1</strong><span>5 pendientes</span></div></div><div class="rw"><b>factura-03.pdf</b><span class="bs">Pendiente</span></div></section></div>
+<div class="lbl">Tema claro · 1280 px</div>
+<div class="row"><section class="pn lt"><h3 class="pt">Antes (web)</h3><p class="pc">Igual que arriba.</p><div class="fn" style="grid-template-columns:repeat(5,1fr)"><div class="fs"><small>1 · Subidos</small><strong>6</strong><span>2 sin plantilla ni B</span></div><div class="fs"><small>2 · Con plantilla A</small><strong>4</strong><span>1 aún sin versión B</span></div><div class="fs"><small>3 · Con versión B</small><strong>3</strong><span>0 con B pero sin campos en A</span></div><div class="fs"><small>4 · Listos para trasladar</small><strong>2</strong><span>Lo que envía «Trasladar con IA»</span></div><div class="fs"><small>5 · Listos</small><strong>1</strong><span>5 pendientes</span></div></div><div class="rw"><b>factura-03.pdf</b><span class="bs">Pendiente</span><small class="why">Va a la IA</small></div></section><section class="pn lt"><h3 class="pt">Después (web)</h3><p class="pc">Igual que arriba.</p><div class="fn" style="grid-template-columns:repeat(4,1fr)"><div class="fs"><small>1 · Subidos</small><strong>6</strong><span>2 sin plantilla ni B</span></div><div class="fs"><small>2 · Con plantilla A</small><strong>4</strong><span>1 aún sin versión B</span></div><div class="fs"><small>3 · Con versión B</small><strong>3</strong><span>0 con B pero sin campos en A</span></div><div class="fs"><small>4 · Listos</small><strong>1</strong><span>5 pendientes</span></div></div><div class="rw"><b>factura-03.pdf</b><span class="bs">Pendiente</span></div></section></div>
+<div class="rules">
+<div class="rule"><h4>Misma detección</h4><p>Se usa la que ya existe (<code>AiHelperService.available</code>: escritorio o localhost). Si es verdadera, todo queda como hoy.</p></div>
+<div class="rule"><h4>Qué más se oculta</h4><p>Botón «Revisar propuesta» de las filas, filtro «ai» del resumen, avisos y menús de IA que aún no tuvieran la comprobación. Paleta Ctrl+K, barra del editor, ajustes y panel de lote ya estaban ocultos.</p></div>
+<div class="rule"><h4>Sin cambios de fondo</h4><p>Mismos colores, tipografía y espaciado. Cuatro columnas en lugar de cinco, con las esquinas redondeadas en el primero y el último.</p></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

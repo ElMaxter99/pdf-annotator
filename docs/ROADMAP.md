@@ -15,10 +15,10 @@ Publicada como v1.16.0 (ver `CHANGELOG.md`): doble clic del visor, espacio de tr
 Publicada como v1.17.0 el 2026-11-22 tras 8 RC (ver `CHANGELOG.md`): banco de medida de la IA, motor más robusto (tablas, etiquetas repetidas, lado del hueco, huecos escritos, parcial si no lee imágenes, códigos sin caracteres confusos), prueba de vista del modelo, instrucciones para la IA, propuesta editable en B, parejas A↔B, número de página repetido, lista y chips de la propuesta más claros, créditos de Copilot, actualizar tras cancelar la contraseña o el permiso, limpieza de la descarga del actualizador, accesibilidad (contraste del acento, `h1`, títulos, axe en el CI), colores a tokens y editor repartido en 8 archivos. Plan: `docs/PLAN-1.17.md`. Lo hecho sin mesas queda en `design/PENDIENTE-MESAS.md`.
 
 ## Siguiente: 1.18 (alcance por elegir)
-Plan por tareas en `docs/PLAN-1.18.md`, **pendiente de que Maxter elija el alcance**: apartado «Almacenamiento» (con mesa), pintar en el lienzo lo hecho sin mesas, comprobar la IA con PDF reales y Copilot, e2e sin intermitencias y mantenimiento de dependencias. Cifrado de proyectos y firma de macOS, aparcados muy a futuro.
+Plan por tareas en `docs/PLAN-1.18.md`: apartado «Almacenamiento» (diseño aprobado, P-125 y P-126), e2e sin intermitencias, mantenimiento (`pdfjs-dist` 6 y `app.ts` en `OnPush`) y, si Maxter pasa casos, comprobar la IA con PDF reales y Copilot. El lienzo se puso al día el 2026-11-22 (P-115 a P-124). Cifrado de proyectos y firma de macOS, aparcados muy a futuro.
 
 ## Después: 1.19
-- **Lienzo al día (Maxter, 2026-11-22):** todo lo que falte en el lienzo (lo de `design/PENDIENTE-MESAS.md` y lo que se programe sin mesa en la 1.18) se pinta en la sesión de Claude que tenga el lienzo. Si M1 de la 1.18 no lo termina, se completa en la 1.19 antes de diseñar nada nuevo. Detalle en `docs/PLAN-1.18.md` §6.
+- **Lienzo al día (Maxter, 2026-11-22):** todo lo que falte en el lienzo (lo de `design/PENDIENTE-MESAS.md` y lo que se programe sin mesa en la 1.18) se pinta en la sesión de Claude que tenga el lienzo. M1 de la 1.18 ya lo cerró; en la 1.19 solo queda pintar lo que se programe sin mesa durante la 1.18. Detalle en `docs/PLAN-1.18.md` §6.
 
 ## Hecho tras v1.5.0
 - Dockerfile con `nginx-unprivileged` y `npm ci`; `npm audit` y Dependabot en CI (v1.11).
