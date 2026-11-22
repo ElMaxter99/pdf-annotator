@@ -409,7 +409,7 @@ test('«Trasladar con IA» en lote: los campos que no existen en B no cuentan co
   await page.getByTestId('ai-batch-start').click();
   // Nothing exists in B: the PDF is «Lista» (all that can be placed is placed) and says how many are absent.
   await expect(page.getByTestId('ai-chip-ready')).toBeVisible({ timeout: 30000 });
-  await expect(page.getByTestId('ai-chip-absent')).toContainText(`${FIELDS} no existen en B`);
+  await expect(page.getByTestId('ai-chip-absent')).toContainText(`${FIELDS} ya no en B`);
   await expect(page.getByTestId('ai-chip-failed')).toHaveCount(0);
 });
 

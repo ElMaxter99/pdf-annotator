@@ -43,13 +43,15 @@ import { ToastService } from '../../services/toast.service';
         <div #dialog class="update-install update-install--error" role="alertdialog" aria-modal="true" aria-labelledby="update-install-title" aria-describedby="update-install-desc" data-testid="update-install-error" tabindex="-1" (keydown.escape)="update.dismissInstallError()">
           <strong id="update-install-title">{{ (state().installError === 'cancelled' ? 'update.installError.cancelledTitle' : 'update.installError.title') | t }}</strong>
           <p id="update-install-desc" class="update-card__text">
-            {{ (state().installError === 'cancelled' ? 'update.installError.cancelledText' : 'update.installError.text') | t: { current: state().current } }}
+            {{ (state().installError === 'cancelled' ? (state().needsAdmin ? 'update.installError.cancelledTextWindows' : 'update.installError.cancelledText') : 'update.installError.text') | t: { current: state().current } }}
           </p>
           @if (state().installError !== 'cancelled' && state().installDetail) {
             <p class="update-install__hint" data-testid="update-install-detail">{{ 'update.installError.reason' | t }} <strong>{{ state().installDetail }}</strong></p>
           }
           <div class="update-card__actions">
-            <button type="button" class="btn btn--primary" (click)="update.restartNow()" data-testid="update-install-retry">{{ 'update.retry' | t }}</button>
+            <button type="button" class="btn btn--primary" (click)="update.restartNow()" data-testid="update-install-retry">
+              {{ (state().installError === 'cancelled' ? (state().needsAdmin ? 'update.installError.askPermissionAgain' : 'update.installError.askPasswordAgain') : 'update.retry') | t }}
+            </button>
             <button type="button" class="btn btn--ghost" (click)="onQuit()">{{ 'update.onQuit' | t }}</button>
             @if (state().installError === 'cancelled') {
               <button type="button" class="btn btn--ghost" (click)="update.dismissInstallError()">{{ 'update.installError.notNow' | t }}</button>

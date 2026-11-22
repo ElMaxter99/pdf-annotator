@@ -1,13 +1,13 @@
 // PDF Annotator · proceso principal de Electron: ventana, web empaquetada (app://), ayudante de IA y actualizaciones.
 import { app, BrowserWindow, dialog, ipcMain, net, protocol, safeStorage, session, shell, Menu } from 'electron';
 import electronUpdater from 'electron-updater';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'node:net';
-import { appendFileSync, existsSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { accessSync, appendFileSync, constants as fsConstants, existsSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, normalizeChannel, parseReleaseForChannel, shouldCleanPendingUpdate, updateMode, updaterCacheDirName } from './update-logic.mjs';
+import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, normalizeChannel, parseReleaseForChannel, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { setupProjectsIpc } from './projects-ipc.mjs';
@@ -111,6 +111,18 @@ const loadChannel = () => {
 };
 let channel = loadChannel();
 const needsPassword = installNeedsPassword({ platform: process.platform, appImage: Boolean(process.env.APPIMAGE), packageType });
+// Windows con la app en una carpeta del sistema (p. ej. «Archivos de programa»): instalar pide el permiso de Windows (UAC).
+const needsAdmin = (() => {
+  if (process.platform !== 'win32' || !app.isPackaged) return false;
+  try {
+    accessSync(path.dirname(process.execPath), fsConstants.W_OK);
+    return false;
+  } catch {
+    return true;
+  }
+})();
+// La app se reabrió porque se canceló el permiso de Windows al instalar: en cuanto la descarga esté lista, se ofrece otra vez.
+let reopenedAfterCancel = process.argv.includes('--update-cancelled');
 const updateLog = path.join(app.getPath('userData'), 'update.log');
 const logUpdate = (line) => {
   try {
@@ -130,7 +142,7 @@ const readJustUpdated = () => {
     return undefined;
   }
 };
-let state = { status: 'idle', mode, current: app.getVersion(), channel, needsPassword, justUpdatedFrom: readJustUpdated() };
+let state = { status: 'idle', mode, current: app.getVersion(), channel, needsPassword, needsAdmin, justUpdatedFrom: readJustUpdated() };
 let cancelToken = null;
 const setState = (patch) => {
   state = { ...state, ...patch };
@@ -183,11 +195,16 @@ function setupUpdater() {
     autoUpdater.forceDevUpdateConfig = true;
     autoUpdater.setFeedURL({ provider: 'generic', url: process.env.PDF_ANNOTATOR_UPDATE_URL });
   }
-  autoUpdater.on('update-available', (info) =>
-    setState({ status: 'available', version: info.version, prerelease: /-rc\.\d+$/.test(info.version), notesUrl: `${RELEASES_URL}/tag/v${info.version}`, error: undefined }),
-  );
+  autoUpdater.on('update-available', (info) => {
+    setState({ status: 'available', version: info.version, prerelease: /-rc\.\d+$/.test(info.version), notesUrl: `${RELEASES_URL}/tag/v${info.version}`, error: undefined });
+    // Tras cancelar el permiso de Windows la descarga sigue en la caché: se valida (sin bajarla otra vez) para ofrecerla.
+    if (reopenedAfterCancel) autoUpdater.downloadUpdate().catch(setError);
+  });
   autoUpdater.on('download-progress', (p) => setState({ status: 'downloading', percent: Math.round(p.percent), transferred: p.transferred, total: p.total }));
-  autoUpdater.on('update-downloaded', () => setState({ status: 'ready' }));
+  autoUpdater.on('update-downloaded', () => {
+    setState(reopenedAfterCancel ? { status: 'ready', installError: 'cancelled' } : { status: 'ready' });
+    reopenedAfterCancel = false;
+  });
   autoUpdater.on('error', setError);
 }
 
@@ -247,6 +264,14 @@ function setupIpc() {
       /* sin aviso de «se actualizó» */
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
+    // Linux .deb/.rpm: instalación propia, en segundo plano y con una sola ventana de contraseña; si se cancela, se puede
+    // pedir otra vez sin cerrar la app. Sin pkexec (raro) se usa el instalador de electron-updater.
+    if (process.platform === 'linux' && needsPassword) {
+      const plan = linuxInstallCommand({ packageType, file: autoUpdater.installerPath, has: hasCommand });
+      if (plan) return installLinux(plan);
+    }
+    // Windows en una carpeta del sistema: el aviso de Windows (UAC) se pide a través de un lanzador que reabre la app si se cancela.
+    if (process.platform === 'win32' && needsAdmin && autoUpdater.installerPath) return installWindowsElevated(autoUpdater.installerPath);
     stopHelper();
     try {
       autoUpdater.quitAndInstall(false, true);
@@ -261,6 +286,56 @@ function setupIpc() {
     setState({ installOnQuit: true });
   });
   handle('desktop:update:open-release', () => shell.openExternal(state.notesUrl?.startsWith(RELEASES_URL) ? state.notesUrl : RELEASES_URL));
+}
+
+/** ¿Existe el programa? Solo nombres fijos de esta app (pkexec, dpkg, dnf…), nunca texto que venga de fuera. */
+function hasCommand(cmd) {
+  try {
+    return spawnSync('sh', ['-c', `command -v ${cmd}`], { stdio: 'ignore' }).status === 0;
+  } catch {
+    return false;
+  }
+}
+
+/** Ejecuta `pkexec …` sin bloquear la app y devuelve `{ code, stderr }`. */
+function runPrivileged({ cmd, args }) {
+  return new Promise((resolve) => {
+    let stderr = '';
+    const child = spawn(cmd, args, { stdio: ['ignore', 'ignore', 'pipe'] });
+    child.stderr.on('data', (chunk) => {
+      stderr = (stderr + chunk).slice(-8000);
+    });
+    child.on('error', (e) => resolve({ code: -1, stderr: String(e?.message ?? e) }));
+    child.on('close', (code) => resolve({ code, stderr }));
+  });
+}
+
+async function installLinux(plan) {
+  logUpdate(`instalando con ${plan.args[0]} (pkexec)`);
+  const { kind, result } = await runLinuxInstall({ plan, packageType, run: runPrivileged });
+  if (kind === 'ok') {
+    logUpdate(`instalada ${state.version}: reiniciando`);
+    stopHelper();
+    app.relaunch();
+    app.exit(0);
+    return;
+  }
+  rmSync(updatedFile, { force: true });
+  logUpdate(`instalación ${kind === 'cancelled' ? 'cancelada (contraseña)' : 'fallida'}: código ${result.code} ${installDetail(result.stderr, os.homedir())}`);
+  setState({ status: 'ready', installError: kind === 'cancelled' ? 'cancelled' : 'failed', installDetail: kind === 'cancelled' ? undefined : installDetail(result.stderr || `código ${result.code}`, os.homedir()) });
+}
+
+function installWindowsElevated(installer) {
+  logUpdate('instalando con permiso de administrador (UAC); si se cancela, la app se vuelve a abrir');
+  const { cmd, args } = windowsElevatedLaunch({ installer, exe: process.execPath });
+  try {
+    spawn(cmd, args, { detached: true, stdio: 'ignore', windowsHide: true }).unref();
+  } catch (e) {
+    setError(e);
+    return;
+  }
+  stopHelper();
+  app.quit();
 }
 
 // ───────── Menú ─────────

@@ -1039,6 +1039,19 @@
       "row": {
         "viewing": "Riepilogo mostrato",
         "following": "Segue quello in corso"
+      },
+      "chip": {
+        "ready": "Da rivedere · {{placed}}/{{total}}",
+        "free": "Senza IA · {{placed}}/{{total}}",
+        "partial": "Parziale · {{placed}}/{{total}}",
+        "added": "+{{n}} in B",
+        "absent": "{{n}} non più in B",
+        "tip": {
+          "placed": "{{placed}} di {{total}} campi di A collocati in B",
+          "toCheck": "{{n}} campi di A collocati con dubbi: controllali prima di applicare",
+          "added": "{{n}} campi nuovi che non erano in A (es. il numero di pagina delle nuove pagine di B)",
+          "absent": "{{n}} campi di A il cui testo non esiste più in B: non collocarli è corretto"
+        }
       }
     },
     "more": "Altre azioni",
@@ -1629,7 +1642,10 @@
       "notNow": "Non ora",
       "manual": "Scarica il pacchetto",
       "copy": "Copia i dettagli",
-      "copied": "Dettagli copiati"
+      "copied": "Dettagli copiati",
+      "askPasswordAgain": "Chiedi di nuovo la password",
+      "askPermissionAgain": "Chiedi di nuovo l’autorizzazione",
+      "cancelledTextWindows": "Hai annullato l’autorizzazione di Windows, quindi non è stato possibile installare. La tua versione {{current}} funziona ancora e la nuova è già scaricata: non serve scaricarla di nuovo."
     },
     "done": {
       "title": "PDF Annotator si è aggiornato alla {{version}}",

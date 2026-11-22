@@ -23,6 +23,7 @@ Maxter aprobó estos cambios visibles **sin mesas** («ya lo veo yo cuando progr
 | 15 | Chip del lote «N de M de A · K a revisar · +X nuevos en B» | Lote, columna de estado | 1.17 | CHANGELOG 1.17.0 |
 | 16 | Consumo de la IA: créditos de Copilot y tokens sin caché | Panel «Traslado con IA», resumen | 1.17 | CHANGELOG 1.17.0 |
 | 17 | Nombres de la propuesta más legibles (10 px, seminegrita) | Editor del lote, capa de la propuesta | 1.17 | CHANGELOG 1.17.0 |
+| 18 | Aviso «Pedir la contraseña / el permiso otra vez» tras cancelar una actualización | App de escritorio, aviso de actualización | 1.17 | [`propuestas/actualizar-tras-cancelar-contrasena.md`](propuestas/actualizar-tras-cancelar-contrasena.md) |
 
 ## Propuesto, falta la mesa antes de programar
 

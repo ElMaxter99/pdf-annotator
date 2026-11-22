@@ -1039,6 +1039,19 @@
       "row": {
         "viewing": "A ver o resumo",
         "following": "A seguir o que está em curso"
+      },
+      "chip": {
+        "ready": "A rever · {{placed}}/{{total}}",
+        "free": "Sem IA · {{placed}}/{{total}}",
+        "partial": "Parcial · {{placed}}/{{total}}",
+        "added": "+{{n}} em B",
+        "absent": "{{n}} já não em B",
+        "tip": {
+          "placed": "{{placed}} de {{total}} campos de A colocados em B",
+          "toCheck": "{{n}} campos de A colocados com dúvidas: reveja-os antes de aplicar",
+          "added": "{{n}} campos novos que não estavam em A (p. ex. o número de página das páginas novas de B)",
+          "absent": "{{n}} campos de A cujo texto já não existe em B: não os colocar é o correto"
+        }
       }
     },
     "more": "Mais ações",
@@ -1629,7 +1642,10 @@
       "notNow": "Agora não",
       "manual": "Descarregar o pacote",
       "copy": "Copiar detalhes",
-      "copied": "Detalhes copiados"
+      "copied": "Detalhes copiados",
+      "askPasswordAgain": "Pedir a palavra-passe outra vez",
+      "askPermissionAgain": "Pedir permissão outra vez",
+      "cancelledTextWindows": "Cancelou a permissão do Windows, por isso não foi possível instalar. A sua versão {{current}} continua a funcionar e a nova já está descarregada: não é preciso descarregá-la outra vez."
     },
     "done": {
       "title": "O PDF Annotator foi atualizado para a {{version}}",

@@ -125,3 +125,65 @@ export function updaterCacheDirName(yml) {
  */
 export const shouldCleanPendingUpdate = (lastVersion, currentVersion) =>
   typeof lastVersion === 'string' && lastVersion.trim() !== '' && lastVersion.trim() !== currentVersion;
+
+// ───────── Instalar tras cancelar la contraseña o el permiso (1.17) ─────────
+
+/**
+ * Comando para instalar el paquete descargado en Linux .deb/.rpm con UNA sola ventana de contraseña (`pkexec`).
+ * electron-updater encadena un `apt-get -f` (otra contraseña) cuando `dpkg` falla, también si se cancela: aquí no.
+ * `has(cmd)` dice si un programa existe. Devuelve `{ cmd, args }` o null si no hay forma (se usa el instalador de siempre).
+ */
+export function linuxInstallCommand({ packageType, file, has }) {
+  if (!file || !has('pkexec')) return null;
+  if (packageType === 'deb' && has('dpkg')) return { cmd: 'pkexec', args: ['dpkg', '-i', file] };
+  if (packageType === 'rpm') {
+    if (has('dnf')) return { cmd: 'pkexec', args: ['dnf', 'install', '-y', file] };
+    if (has('zypper')) return { cmd: 'pkexec', args: ['zypper', '--non-interactive', 'install', '--allow-unsigned-rpm', file] };
+    if (has('rpm')) return { cmd: 'pkexec', args: ['rpm', '-U', '--replacepkgs', file] };
+  }
+  return null;
+}
+
+/** Arreglo de dependencias tras un `dpkg -i` que falló por ellas (solo si la persona ya dio la contraseña). */
+export const linuxFixDepsCommand = () => ({ cmd: 'pkexec', args: ['apt-get', 'install', '-f', '-y'] });
+
+/**
+ * Resultado de `pkexec …`: `ok`, `cancelled` (126 = ventana cerrada o cancelada, 127 = no autorizado), `deps`
+ * (dpkg instaló a medias por dependencias que faltan) o `failed`.
+ */
+export function classifyPkexecResult({ code, stderr = '' }) {
+  if (code === 0) return 'ok';
+  if (code === 126 || code === 127) return 'cancelled';
+  if (/dependency problems|dependencias|depends on .* however/i.test(String(stderr))) return 'deps';
+  return 'failed';
+}
+
+/**
+ * Un intento de instalación en Linux: `pkexec` con el paquete y, solo si `dpkg` falló por dependencias tras dar la
+ * contraseña, el arreglo con `apt-get -f`. `run({ cmd, args })` → `{ code, stderr }`. Devuelve `{ kind, result }`
+ * con kind `ok` | `cancelled` | `failed`. Cancelar NO lanza una segunda ventana.
+ */
+export async function runLinuxInstall({ plan, packageType, run }) {
+  let result = await run(plan);
+  let kind = classifyPkexecResult(result);
+  if (kind === 'deps' && packageType === 'deb') {
+    result = await run(linuxFixDepsCommand());
+    kind = classifyPkexecResult(result) === 'ok' ? 'ok' : 'failed';
+  }
+  return { kind: kind === 'deps' ? 'failed' : kind, result };
+}
+
+/** Comillas simples de PowerShell: se doblan las que haya dentro. */
+export const psQuote = (text) => `'${String(text).replace(/'/g, "''")}'`;
+
+/**
+ * Windows con la app en una carpeta que pide permiso de administrador: lanza el instalador con el aviso de Windows (UAC)
+ * y espera; si el permiso se cancela o el instalador falla, vuelve a abrir la app con `--update-cancelled` para ofrecer
+ * «Pedir permiso otra vez» en lugar de dejar a la persona sin app.
+ */
+export function windowsElevatedLaunch({ installer, exe, args = ['--updated', '--force-run'] }) {
+  const list = args.map(psQuote).join(',');
+  const reopen = `Start-Process -FilePath ${psQuote(exe)} -ArgumentList '--update-cancelled'`;
+  const script = `try { $p = Start-Process -FilePath ${psQuote(installer)} -ArgumentList ${list} -Verb RunAs -Wait -PassThru -ErrorAction Stop; if ($p.ExitCode -ne 0) { ${reopen} } } catch { ${reopen} }`;
+  return { cmd: 'powershell.exe', args: ['-NoProfile', '-NonInteractive', '-WindowStyle', 'Hidden', '-Command', script] };
+}

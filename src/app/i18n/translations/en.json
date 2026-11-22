@@ -1039,6 +1039,19 @@
       "row": {
         "viewing": "Showing the summary",
         "following": "Following the one in progress"
+      },
+      "chip": {
+        "ready": "To review · {{placed}}/{{total}}",
+        "free": "No AI · {{placed}}/{{total}}",
+        "partial": "Partial · {{placed}}/{{total}}",
+        "added": "+{{n}} in B",
+        "absent": "{{n}} gone in B",
+        "tip": {
+          "placed": "{{placed}} of {{total}} fields of A placed in B",
+          "toCheck": "{{n}} fields of A placed with doubts: check them before applying",
+          "added": "{{n}} new fields that were not in A (e.g. the page number of the new pages of B)",
+          "absent": "{{n}} fields of A whose text no longer exists in B: leaving them out is right"
+        }
       }
     },
     "more": "More actions",
@@ -1629,7 +1642,10 @@
       "notNow": "Not now",
       "manual": "Download the package",
       "copy": "Copy details",
-      "copied": "Details copied"
+      "copied": "Details copied",
+      "askPasswordAgain": "Ask for the password again",
+      "askPermissionAgain": "Ask for permission again",
+      "cancelledTextWindows": "You cancelled the Windows permission, so it could not be installed. Your version {{current}} still works and the new one is already downloaded: no need to download it again."
     },
     "done": {
       "title": "PDF Annotator updated to {{version}}",
