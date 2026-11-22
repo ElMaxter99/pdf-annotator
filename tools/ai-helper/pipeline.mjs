@@ -12,6 +12,7 @@ import { MAX_REQUESTS_PER_PDF, firstPassRequest, imageNames, runPasses } from '.
 import { readPdf } from '../ai-phase0/pdf.mjs';
 import { PROVIDERS, describeClaudeEvent, describeCopilotEvent, detectLimit, finalResultLine, runCli } from '../ai-phase0/providers.mjs';
 import { requestPrompt } from './prompts.mjs';
+import { ensureVision } from './vision-probe.mjs';
 import { cleanInstructions } from './instructions.mjs';
 
 export { MAX_REQUESTS_PER_PDF };
@@ -79,7 +80,7 @@ function createSentLog({ A, B, fields, pngBytes }) {
   };
 }
 
-export async function runProposal({ provider, model, aBytes, bBytes, template, instructions = '', keepApiKey = false, timeoutMs = 300_000, onStage = () => {}, onEvent = () => {}, signal, maxAttempts = 2, maxRequests = MAX_REQUESTS_PER_PDF, runCliImpl = runCli }) {
+export async function runProposal({ provider, model, aBytes, bBytes, template, instructions = '', keepApiKey = false, timeoutMs = 300_000, onStage = () => {}, onEvent = () => {}, signal, maxAttempts = 2, maxRequests = MAX_REQUESTS_PER_PDF, runCliImpl = runCli, visionProbe = process.env.AI_HELPER_VISION_PROBE !== '0' }) {
   const fake = process.env.AI_HELPER_FAKE === '1' && provider === 'fake';
   // Indicaciones de la persona (A6): no confiables; solo van citadas en el prompt de cada petición a la IA.
   const hints = cleanInstructions(instructions);
@@ -209,6 +210,16 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, i
       details.seconds = seconds;
       details.sent = actual.snapshot();
     };
+    // Prueba de vista (una por proveedor y modelo): sin ella, un modelo solo de texto gastaría las peticiones a ciegas.
+    if (!fake && visionProbe && plan.length > 0) {
+      onStage('checking');
+      const vision = await ensureVision({ provider, model, keepApiKey, timeoutMs, signal, runCliImpl });
+      details.vision = vision.ok === true ? (vision.cached ? 'cached' : 'ok') : vision.ok === false ? 'failed' : 'unknown';
+      if (vision.ok === false) {
+        finish();
+        throw Object.assign(new Error(`El modelo ${model || 'del CLI'} de ${provider} no lee imágenes: no ha podido leer el código ni situar la marca de una imagen de prueba (${vision.attempts} intentos). Elige un modelo con visión.`), { code: 'model_no_vision', details });
+      }
+    }
     let result;
     try {
       result = await runPasses({

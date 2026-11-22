@@ -901,7 +901,8 @@
         "timeout": "Tempo esgotado",
         "cli_error": "Erro do CLI",
         "generic": "Não foi possível transferir",
-        "nothing": "A IA não colocou nenhum campo"
+        "nothing": "A IA não colocou nenhum campo",
+        "model_no_vision": "O modelo não lê imagens"
       },
       "paused": {
         "limit": "Atingiste o limite do teu plano do Claude. A fila está em pausa e {{count}} PDFs continuam à espera (não contam como falhados).",
@@ -1320,6 +1321,10 @@
       "images_not_read": {
         "title": "A IA não leu as imagens.",
         "text": "{{provider}} não devolveu os códigos das imagens após duas tentativas, por isso a resposta foi descartada: sem ver as páginas não é possível transferir os campos. Experimenta outro fornecedor."
+      },
+      "model_no_vision": {
+        "title": "O modelo escolhido não lê imagens.",
+        "text": "{{provider}} com este modelo não conseguiu ler uma imagem de teste (um código e uma marca), por isso não foi enviado nenhum PDF nem gasto mais nada. Escolha um modelo com visão em «Alterar»."
       }
     },
     "empty": {

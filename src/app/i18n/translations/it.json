@@ -901,7 +901,8 @@
         "timeout": "Tempo scaduto",
         "cli_error": "Errore della CLI",
         "generic": "Impossibile trasferire",
-        "nothing": "L'IA non ha collocato nessun campo"
+        "nothing": "L'IA non ha collocato nessun campo",
+        "model_no_vision": "Il modello non legge le immagini"
       },
       "paused": {
         "limit": "Hai raggiunto il limite del tuo piano Claude. La coda è in pausa e {{count}} PDF sono ancora in attesa (non contano come falliti).",
@@ -1320,6 +1321,10 @@
       "images_not_read": {
         "title": "L'IA non ha letto le immagini.",
         "text": "{{provider}} non ha restituito i codici delle immagini dopo due tentativi, quindi la risposta è stata scartata: senza vedere le pagine non si possono spostare i campi. Prova con un altro provider."
+      },
+      "model_no_vision": {
+        "title": "Il modello scelto non legge le immagini.",
+        "text": "{{provider}} con questo modello non è riuscito a leggere un’immagine di prova (un codice e un segno), quindi non è stato inviato nessun PDF né speso altro. Scegli un modello con visione in «Cambia»."
       }
     },
     "empty": {

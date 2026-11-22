@@ -901,7 +901,8 @@
         "timeout": "Zeitüberschreitung",
         "cli_error": "CLI-Fehler",
         "generic": "Übertragung nicht möglich",
-        "nothing": "Die KI hat kein Feld platziert"
+        "nothing": "Die KI hat kein Feld platziert",
+        "model_no_vision": "Das Modell kann keine Bilder lesen"
       },
       "paused": {
         "limit": "Du hast das Limit deines Claude-Tarifs erreicht. Die Warteschlange pausiert und {{count}} PDFs warten noch (sie zählen nicht als fehlgeschlagen).",
@@ -1320,6 +1321,10 @@
       "images_not_read": {
         "title": "Die KI hat die Bilder nicht gelesen.",
         "text": "{{provider}} hat nach zwei Versuchen die Bildcodes nicht zurückgegeben, daher wurde die Antwort verworfen: Ohne die Seiten zu sehen, lassen sich die Felder nicht übertragen. Versuche einen anderen Anbieter."
+      },
+      "model_no_vision": {
+        "title": "Das gewählte Modell kann keine Bilder lesen.",
+        "text": "{{provider}} konnte mit diesem Modell ein Testbild (ein Code und eine Markierung) nicht lesen, daher wurde kein PDF gesendet und nichts weiter verbraucht. Wähle unter «Ändern» ein Modell mit Bildverständnis."
       }
     },
     "empty": {

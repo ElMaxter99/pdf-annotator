@@ -76,7 +76,7 @@ describe('ai-batch.utils', () => {
   it('classifies errors by what the queue must do', () => {
     expect(classifyAiError('limit')).toBe('limit');
     expect(classifyAiError('aborted')).toBe('aborted');
-    for (const code of ['offline', 'missing', 'busy']) {
+    for (const code of ['offline', 'missing', 'busy', 'model_no_vision']) {
       expect(classifyAiError(code)).toBe('fatal');
     }
     for (const code of ['cli_error', 'timeout', 'bad_response']) {

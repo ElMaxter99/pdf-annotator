@@ -92,6 +92,7 @@ export function classifyAiError(code: string): AiErrorKind {
     case 'missing':
     case 'busy':
     case 'bad_provider':
+    case 'model_no_vision': // el modelo no ve imágenes: fallarían todos los PDF, se para la tanda
       return 'fatal';
     case 'cli_error':
     case 'timeout':
