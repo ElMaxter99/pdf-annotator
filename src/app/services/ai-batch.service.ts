@@ -26,6 +26,10 @@ export interface AiBatchRow {
   total: number;
   /** Fields that do not exist in B: leaving them out is right, they are not failures. */
   absent: number;
+  /** Campos que no estaban en A (páginas nuevas de un campo repetido por página). */
+  added?: number;
+  /** Campos de A colocados con dudas (a revisar). */
+  toCheck?: number;
   usage: AiUsage | null;
   error: { code: string; message: string; reset: string | null } | null;
   /** Live log for «Ver detalles» (names and counts only, never PDF content). Times are ms since `t0`. */
@@ -489,11 +493,11 @@ export class AiBatchService {
     this.panelOpen.set(true);
   }
 
-  private markTaken(id: string, phase: AiQueueTaken['phase'], placed: number, total: number, absent = 0): void {
+  private markTaken(id: string, phase: AiQueueTaken['phase'], placed: number, total: number, absent = 0, added = 0, toCheck = 0): void {
     if (!this.viaHelper()) {
       return;
     }
-    this.taken = { ...this.taken, [id]: { phase, placed, total, absent } };
+    this.taken = { ...this.taken, [id]: { phase, placed, total, absent, added, toCheck } };
     this.persistQueue();
   }
 
@@ -552,7 +556,7 @@ export class AiBatchService {
       for (const id of order) {
         const taken = info.taken[id];
         rows[id] = taken
-          ? { ...emptyRow(id), phase: taken.phase, placed: taken.placed, total: taken.total, absent: taken.absent ?? 0, provider: taken.phase === 'free' ? 'adjust' : info.provider }
+          ? { ...emptyRow(id), phase: taken.phase, placed: taken.placed, total: taken.total, absent: taken.absent ?? 0, added: taken.added ?? 0, toCheck: taken.toCheck ?? 0, provider: taken.phase === 'free' ? 'adjust' : info.provider }
           : emptyRow(id);
       }
       this.order.set(order);
@@ -635,7 +639,7 @@ export class AiBatchService {
     const item = this.batch.items().find((entry) => entry.id === id);
     const pagesB = raw.details?.sent?.textsByPageB?.length ?? 0;
     const result: AiResult = item ? { ...raw, rows: extendPagePattern(raw.rows, item.aPages, pagesB).rows } : raw;
-    const { placed, absent, total } = countPlacement(result.rows);
+    const { placed, absent, total, added, toCheck } = countPlacement(result.rows);
     const usage = sumUsage(result.details?.attempts.map((a) => a.usage) ?? []) ?? this.rows()[id]?.usage ?? null;
     this.streak = { kind: '', n: 0 };
     const phase = phaseOfResult(placed, absent, total);
@@ -660,8 +664,8 @@ export class AiBatchService {
       seconds: result.seconds,
       at: Date.now(),
     });
-    this.patchRow(id, { phase, endedAt: Date.now(), placed, total, absent, usage, details: result.details });
-    this.markTaken(id, phase, placed, total, absent);
+    this.patchRow(id, { phase, endedAt: Date.now(), placed, total, absent, added, toCheck, usage, details: result.details });
+    this.markTaken(id, phase, placed, total, absent, added, toCheck);
   }
 
   /** Runs one pair; returns what the queue must do next when it has to stop. */

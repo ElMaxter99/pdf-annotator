@@ -32,7 +32,9 @@
             <i [style.width.%]="percent()"></i>
           </div>
           <small class="ai-panel__usage" aria-live="polite">
-            @if (measured()) {
+            @if (credits() > 0) {
+              ≈ {{ credits() }} {{ 'batch.ai.sheet.credits' | t }}
+            } @else if (measured()) {
               {{ 'batch.ai.tokens' | t: { count: tokens() } }}
             } @else {
               {{ 'batch.ai.requests' | t: { sent: queue.requests() } }}
@@ -218,7 +220,7 @@
         }
         <div class="ai-sheet__big">
           @if (sh.big !== null) {
-            <strong data-testid="ai-sheet-tokens">{{ sh.big }}</strong> <small>{{ 'batch.ai.sheet.tokens' | t }}</small>
+            <strong data-testid="ai-sheet-tokens">{{ sh.big }}</strong> <small>{{ sh.bigLabel }}</small>
           }
           @if (sh.note) {
             <small>{{ sh.note }}</small>

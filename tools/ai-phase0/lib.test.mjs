@@ -252,3 +252,23 @@ test('códigos de imagen: los caracteres que se confunden al leer cuentan como i
   assert.deepEqual(describeImageCodes({ images: { 'A-p1': 'XXXX' } }, { 'A-p1': '7Q8S' }).missing, ['A-p1']);
   for (const c of 'SBZGODQIL502681') assert.ok(!CODE_ALPHABET.includes(c), `el alfabeto no debe tener «${c}»`);
 });
+
+test('«igual que en A»: se acepta sin anchorB, la confianza no pasa de 0,6 y se coloca en la posición de A ajustada al hueco', async () => {
+  const { validateProposals, resolveProposal, SAME_AS_A_CONFIDENCE } = await import('./lib.mjs');
+  const known = new Set(['p1-f1', 'p1-f2']);
+  const { proposals, errors } = validateProposals({ fields: [
+    { id: 'p1-f1', found: true, page: 2, sameAsA: true, confidence: 0.95, reason: 'misma zona' },
+    { id: 'p1-f2', found: true, sameAsA: true, confidence: 0.9 }, // sin página: no vale
+  ] }, known);
+  assert.equal(proposals.length, 1);
+  assert.deepEqual([proposals[0].sameAsA, proposals[0].page, proposals[0].confidence], [true, 2, SAME_AS_A_CONFIDENCE]);
+  assert.ok(errors.some((e) => e.startsWith('p1-f2')));
+  const entry = { id: 'p1-f1', page: 1, field: { x: 100, y: 500, type: 'text', fontSize: 10 } };
+  // sin hueco cerca: misma x,y que en A
+  const r = resolveProposal(proposals[0], entry, [], [], { slots: [] });
+  assert.deepEqual([r.ok, r.page, r.x, r.y, r.method, r.snapped, r.maxConfidence], [true, 2, 100, 500, 'sameAsA', false, SAME_AS_A_CONFIDENCE]);
+  // con una línea a 6 pt: se ajusta a ella
+  const snapped = resolveProposal(proposals[0], entry, [], [], { slots: [{ page: 2, kind: 'line', x: 95, y: 494, w: 120, h: 0.6 }] });
+  assert.equal(snapped.snapped, true);
+  assert.equal(snapped.page, 2);
+});

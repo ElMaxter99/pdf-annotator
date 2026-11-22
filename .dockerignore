@@ -1,4 +1,5 @@
 node_modules
+**/node_modules
 npm-debug.log
 .git
 .gitignore
@@ -18,3 +19,11 @@ coverage
 *.local
 *.env
 design
+
+# Copias de trabajo de agentes, informes de pruebas y salidas de herramientas (no hacen falta para construir)
+.claude
+test-results
+playwright-report
+a11y-audit.json
+release
+tools/ai-phase0/out

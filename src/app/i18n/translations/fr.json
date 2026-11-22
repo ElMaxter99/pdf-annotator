@@ -885,14 +885,16 @@
         "reading": "Lecture",
         "asking": "Interrogation · requête {{n}}",
         "resolving": "Placement",
-        "ready": "Prête à relire · {{placed}} sur {{total}}",
-        "free": "Résolu sans IA · {{placed}} sur {{total}}",
-        "partial": "Partiel · {{placed}} sur {{total}}",
+        "ready": "Prête à vérifier · {{placed}} sur {{total}} de A",
+        "free": "Résolu sans IA · {{placed}} sur {{total}} de A",
+        "partial": "Partiel · {{placed}} sur {{total}} de A",
         "absent": "{{n}} absents de B",
         "failed": "Échec",
         "cancelled": "Annulé",
         "saved": "Proposition prête à relire",
-        "noB": "Sans B · ignoré"
+        "noB": "Sans B · ignoré",
+        "toCheck": "{{n}} à vérifier",
+        "added": "+{{n}} nouveaux dans B"
       },
       "err": {
         "images_not_read": "L'IA n'a pas lu les images",
@@ -1022,7 +1024,9 @@
         "placed": "Placés",
         "placedValue": "{{placed}} sur {{total}}",
         "more": "Voir les étapes et ce qui a été envoyé",
-        "moreAll": "Voir le détail du lot"
+        "moreAll": "Voir le détail du lot",
+        "credits": "crédits d’IA (selon Copilot)",
+        "cacheNote": "+{{count}} tokens lus depuis le cache, beaucoup moins chers"
       },
       "filter": {
         "label": "Filtrer la liste",
@@ -1512,7 +1516,8 @@
         "newInB": "Ils n’existaient pas dans A : B a plus de pages et le champ se répète sur chaque page de A (p. ex. le numéro de page), ils sont donc proposés pour les nouvelles pages.",
         "notFound": "Champs de A que l’IA n’a pas su placer dans B. Créez-les à la main si besoin.",
         "absent": "Champs de A dont le texte n’existe plus dans B : ne pas les placer est correct."
-      }
+      },
+      "sameAsA": "comme dans A"
     },
     "instructions": {
       "title": "Instructions pour l’IA",

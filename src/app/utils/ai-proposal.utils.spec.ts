@@ -1,6 +1,7 @@
 import {
   AiRow,
   sanitizeDetails,
+  usageBilled,
   proposalGroup,
   confidenceLevel,
   estimateTokens,
@@ -139,7 +140,7 @@ describe('ai-proposal.utils', () => {
     expect(junk.source).toBe('ai');
     expect(isAbsentInB(absent)).toBeTrue();
     expect(isAbsentInB(missing)).toBeFalse();
-    expect(countPlacement([placedByText, absent, missing, junk])).toEqual({ placed: 1, absent: 1, missing: 2, total: 4, withoutAi: 1 });
+    expect(countPlacement([placedByText, absent, missing, junk])).toEqual({ placed: 1, absent: 1, missing: 2, total: 4, withoutAi: 1, added: 0, toCheck: 0 });
   });
 
   it('sums usage and estimates tokens only from sizes', () => {
@@ -176,5 +177,35 @@ describe('proposalGroup · grupos claros de la propuesta', () => {
     expect(proposalGroup({ ...base, id: 'pattern-1-p12', source: 'pattern' })).toBe('newInB');
     expect(proposalGroup({ ...base, ok: false, why: 'sin_respuesta' })).toBe('notFound');
     expect(proposalGroup({ ...base, ok: false, why: 'no_existe_en_b' })).toBe('absent');
+  });
+});
+
+describe('sanitizeRow · «igual que en A»', () => {
+  it('conserva la marca solo si es exactamente true', () => {
+    const raw = { id: 'p1-f1', page: 1, index: 0, ok: true, newPage: 2, x: 10, y: 20, confidence: 0.6, reason: 'misma zona', anchorA: '', anchorB: '' };
+    expect(sanitizeRow({ ...raw, sameAsA: true })?.sameAsA).toBeTrue();
+    expect(sanitizeRow({ ...raw, sameAsA: 'yes' })?.sameAsA).toBeUndefined();
+    expect(proposalGroup(sanitizeRow({ ...raw, sameAsA: true })!)).toBe('review'); // nunca «seguro»
+  });
+});
+
+describe('countPlacement · lo de A y lo nuevo en B por separado', () => {
+  const row = (id: string, ok: boolean, confidence = 0.9, why = ''): AiRow =>
+    ({ id, page: 1, index: 0, ok, newPage: ok ? 1 : 0, x: 0, y: 0, confidence, reason: '', anchorA: '', anchorB: '', why, source: 'ai' }) as AiRow;
+  it('11 de A (3 con dudas) y 9 nuevos en B no se cuentan como «20 de 20»', () => {
+    const rows = [
+      ...Array.from({ length: 8 }, (_, i) => row(`p${i + 1}-f1`, true)),
+      ...Array.from({ length: 3 }, (_, i) => row(`p${i + 9}-f1`, true, 0.6)),
+      ...Array.from({ length: 9 }, (_, i) => row(`pattern-1-p${i + 12}`, true, 0.8)),
+    ];
+    const c = countPlacement(rows);
+    expect([c.placed, c.total, c.toCheck, c.added]).toEqual([11, 11, 3, 9]);
+  });
+});
+
+describe('usageBilled · sin los tokens leídos de caché', () => {
+  it('cuenta entrada, salida y escritura en caché, no la lectura', () => {
+    expect(usageBilled({ input: 100, output: 50, cacheRead: 600000, cacheWrite: 2000 })).toBe(2150);
+    expect(usageBilled(null)).toBe(0);
   });
 });

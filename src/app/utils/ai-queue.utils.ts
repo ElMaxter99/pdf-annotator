@@ -20,6 +20,10 @@ export interface AiQueueTaken {
   readonly total: number;
   /** Fields that do not exist in B (leaving them out is right). */
   readonly absent?: number;
+  /** Fields that were not in A (new page of a field repeated on every page). */
+  readonly added?: number;
+  /** Fields of A placed with doubts (not «sure»). */
+  readonly toCheck?: number;
 }
 
 export interface AiRemoteItem {
