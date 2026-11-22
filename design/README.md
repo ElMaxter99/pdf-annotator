@@ -9,6 +9,7 @@ Esta carpeta está fuera del build: no la compila Angular ni entra en la imagen 
 ## Estructura
 - `canvas/`: copia exacta de lo publicado (`canvas.json` y `*.dc.html`), solo de diseños aprobados.
 - `propuestas/`: un `.md` por propuesta, con el problema, las decisiones y la recomendación.
+- [`PENDIENTE-MESAS.md`](PENDIENTE-MESAS.md): cambios visibles ya programados sin mesa (aprobados por Maxter) y propuestas que la mesa debe pintar cuando se retome el lienzo.
 
 ## Mesas
 La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECISIONS.md`).
