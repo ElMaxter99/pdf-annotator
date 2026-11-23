@@ -637,7 +637,7 @@ export class WorkspaceView {
     const page = asA ? this.freeAPage() : this.pageShown();
     const total = asA ? this.pageCountA() : this.pageTotalShown();
     // El margen vertical (P-120) es zona vacía: el borde de la hoja es donde la rueda pasa de página.
-    const marginY = workMarginFor(viewer.clientHeight);
+    const marginY = this.workMarginY(viewer);
     const atTop = viewer.scrollTop <= marginY;
     const atBottom = viewer.scrollTop + viewer.clientHeight >= viewer.scrollHeight - marginY - 1;
     if (evt.cancelable && (pixels > 0 ? atBottom : atTop)) evt.preventDefault();
@@ -703,6 +703,15 @@ export class WorkspaceView {
     return { clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 };
   }
 
+  /** Margen vertical (P-133): solo escritorio, igual que el CSS (≥ 961 px); en móvil no hay margen. */
+  workMarginY(this: WorkspacePageComponent, el: HTMLElement): number {
+    const desktop =
+      typeof window === 'undefined' ||
+      typeof window.matchMedia !== 'function' ||
+      window.matchMedia('(min-width: 961px)').matches;
+    return desktop ? workMarginFor(el.clientHeight) : 0;
+  }
+
   viewerScroller(this: WorkspacePageComponent): HTMLElement | null {
     return (this.pdfViewerRef?.nativeElement.closest('.viewer') as HTMLElement | null) ?? null;
   }
@@ -717,7 +726,7 @@ export class WorkspaceView {
     if (!viewer) return;
     viewer.style.setProperty('--work-margin', `${workMarginFor(viewer.clientWidth)}px`);
     const beforeY = viewer.style.getPropertyValue('--work-margin-y');
-    const marginY = `${workMarginFor(viewer.clientHeight)}px`;
+    const marginY = `${this.workMarginY(viewer)}px`;
     viewer.style.setProperty('--work-margin-y', marginY);
     // El margen vertical (P-120) cambia con la altura del visor: si nadie ha movido el lienzo, el reposo
     // sigue con la hoja arriba.
@@ -750,7 +759,7 @@ export class WorkspaceView {
     const before = pane.style.getPropertyValue('--a-margin');
     const margin = workMarginFor(pane.clientWidth);
     pane.style.setProperty('--a-margin', `${margin}px`);
-    pane.style.setProperty('--a-margin-y', `${workMarginFor(pane.clientHeight)}px`);
+    pane.style.setProperty('--a-margin-y', `${this.workMarginY(pane)}px`);
     const untouched =
       before === '' ||
       before === '0px' ||
@@ -800,7 +809,7 @@ export class WorkspaceView {
       viewportWidth: pane.clientWidth,
       padding,
     });
-    const homeTop = workMarginFor(pane.clientHeight);
+    const homeTop = this.workMarginY(pane);
     this.scrollViewerTo(pane, home, smooth, homeTop);
     this.aHomeLeft = smooth ? home : pane.scrollLeft;
     this.aHomeTop = smooth ? homeTop : pane.scrollTop;
@@ -858,7 +867,7 @@ export class WorkspaceView {
     const right = Math.max(...boxes.map((x) => x.left + x.width));
     const style = getComputedStyle(viewer);
     const padding = parseFloat(style.paddingLeft) || 0;
-    const homeTop = workMarginFor(viewer.clientHeight);
+    const homeTop = this.workMarginY(viewer);
     this.scrollViewerTo(
       viewer,
       homeScrollLeft({
@@ -895,7 +904,7 @@ export class WorkspaceView {
     const targetTop =
       box.height <= viewer.clientHeight
         ? centerScrollLeft({ left: box.top, width: box.height }, viewer.clientHeight)
-        : workMarginFor(viewer.clientHeight);
+        : this.workMarginY(viewer);
     if (
       Math.abs(target - viewer.scrollLeft) < 4 &&
       Math.abs(targetTop - viewer.scrollTop) < 4
@@ -916,7 +925,7 @@ export class WorkspaceView {
     const targetTop =
       box.height <= pane.clientHeight
         ? centerScrollLeft({ left: box.top, width: box.height }, pane.clientHeight)
-        : workMarginFor(pane.clientHeight);
+        : this.workMarginY(pane);
     if (Math.abs(target - pane.scrollLeft) < 4 && Math.abs(targetTop - pane.scrollTop) < 4) {
       this.resetSplitAScroll(true);
       return;
@@ -1066,7 +1075,7 @@ export class WorkspaceView {
     this.scale.set(fit);
     await this.render();
     const overflow =
-      container.scrollHeight - container.clientHeight - 2 * workMarginFor(container.clientHeight);
+      container.scrollHeight - container.clientHeight - 2 * this.workMarginY(container);
     if (overflow > 0) {
       this.scale.set(fitPageScaleForOverflow(base.height, this.scale(), overflow));
       await this.render();

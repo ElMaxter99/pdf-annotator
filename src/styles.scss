@@ -5374,7 +5374,7 @@ button.version-chip:focus-visible {
 
 /* Sigue en pantalla aunque el lienzo esté movido (`--vx` = desplazamiento horizontal del visor). */
 .zoom-hud:not(.zoom-hud--split) {
-  translate: var(--vx, 0px) var(--vy, 0px);
+  translate: var(--vx, 0px) 0;
 }
 
 .zoom-hud kbd,
