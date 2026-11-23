@@ -10,7 +10,7 @@ import {
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
 import { moveFieldWithinPage } from '../../utils/field-move.utils';
 import { snapToAnnotations, type SnapTarget } from '../../utils/annotation-snap.utils';
-import type { OverlayGuide } from '../../utils/guides.utils';
+import type { OverlayGuide, SnapBounds } from '../../utils/guides.utils';
 import type { WorkspacePageComponent } from './workspace.page';
 
 /**
@@ -32,6 +32,7 @@ export class WorkspaceSelection {
       top: number;
       fontSize: number;
       bypass: boolean;
+      bounds: SnapBounds;
     },
   ): { left: number | null; top: number | null; guides: OverlayGuide[] } | null {
     const canvas = this.pdfCanvasRef?.nativeElement;
@@ -42,10 +43,15 @@ export class WorkspaceSelection {
     }
     const fields = this.coords()[input.pageIndex]?.fields ?? [];
     const targets: SnapTarget[] = [];
+    const { bounds } = input;
     fields.forEach((f, i) => {
-      if (i !== input.fieldIndex) {
-        targets.push({ x: f.x, y: f.y, name: f.mapField || '' });
-      }
+      if (i === input.fieldIndex) return;
+      // A target the dragged annotation cannot reach exactly (it would be clamped) is not offered.
+      const left = f.x * scale;
+      const top = canvas.height - f.y * scale - input.fontSize;
+      const reachX = left >= bounds.minLeft - 0.01 && left <= bounds.maxLeft + 0.01;
+      const reachY = top >= bounds.minTop - 0.01 && top <= bounds.maxTop + 0.01;
+      targets.push({ x: reachX ? f.x : NaN, y: reachY ? f.y : NaN, name: f.mapField || '' });
     });
     const x = input.left / scale;
     const y = (canvas.height - (input.top + input.fontSize)) / scale;

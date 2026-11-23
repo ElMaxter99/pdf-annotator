@@ -43,7 +43,7 @@ export function snapToAnnotations(
     return { x: null, y: null };
   }
   for (const t of targets) {
-    if (!Number.isFinite(t.x) || !Number.isFinite(t.y)) continue;
+    // An axis with a non-finite value (e.g. unreachable) is simply not offered; the other still counts.
     const ax = Math.abs(t.x - x);
     if (ax <= tolerance && ax < dx) {
       dx = ax;

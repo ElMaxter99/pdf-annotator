@@ -32,6 +32,12 @@ describe('snapToAnnotations', () => {
     expect(r.x?.name).toBe('b');
   });
 
+  it('skips a non-finite axis of a target but keeps the other', () => {
+    const r = snapToAnnotations(101, 301, [{ x: NaN, y: 300, name: 'a' }], 3);
+    expect(r.x).toBeNull();
+    expect(r.y?.value).toBe(300);
+  });
+
   it('does nothing without targets, tolerance or finite numbers', () => {
     expect(snapToAnnotations(1, 1, [], 3)).toEqual({ x: null, y: null });
     expect(snapToAnnotations(100, 500, targets, 0)).toEqual({ x: null, y: null });

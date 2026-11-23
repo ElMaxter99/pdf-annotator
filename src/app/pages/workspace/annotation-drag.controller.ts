@@ -30,6 +30,8 @@ export interface AnnotationDragHost {
     top: number;
     fontSize: number;
     bypass: boolean;
+    /** Reachable range of `left` and `top`: targets outside it cannot be matched exactly. */
+    bounds: SnapBounds;
   }): { left: number | null; top: number | null; guides: OverlayGuide[] } | null;
   coords(): PageAnnotations[];
   /** Field with its style normalized (so a `locked` flag from the style is honoured). */
@@ -313,6 +315,7 @@ export class AnnotationDragController {
       top: clampedTop,
       fontSize: this.dragInfo.fontSize,
       bypass: evt.altKey,
+      bounds: { minLeft: bounds.minLeft, maxLeft: bounds.maxLeft, minTop, maxTop },
     });
     if (aligned) {
       if (aligned.left !== null) {
