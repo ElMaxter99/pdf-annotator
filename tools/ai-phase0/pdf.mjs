@@ -136,6 +136,6 @@ export async function readPdf(file, { prefix, outDir, scale = 1.5, stamp = false
       await writeFile(path.join(outDir, `${prefix}-p${num}.png`), canvas.toBuffer('image/png'));
     }
   }
-  await doc.destroy();
+  await doc.loadingTask.destroy();
   return { pages, texts, slots, codes };
 }

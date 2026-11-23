@@ -1161,3 +1161,100 @@ app-ai-batch-chip .ai-chip-wrap {
   gap: 6px;
   max-width: 100%;
 }
+
+/* Aviso de recuperación del traslado con IA (P-127 a P-129) */
+.ai-draft {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  margin: 0 0 12px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+  font-size: 0.9rem;
+}
+
+.ai-draft--wait {
+  align-items: center;
+  color: var(--muted);
+}
+
+.ai-draft__sk {
+  width: 120px;
+  height: 14px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--input-bg), color-mix(in srgb, var(--text) 14%, transparent), var(--input-bg));
+  background-size: 200% 100%;
+  animation: ai-draft-sk 1.2s ease-out infinite;
+}
+
+.ai-draft__dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: var(--warning);
+  flex: none;
+}
+
+.ai-draft__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ai-draft__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ai-draft__text {
+  margin: 2px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.ai-draft__bar {
+  height: 6px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+  overflow: hidden;
+
+  i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 200ms ease-out;
+  }
+}
+
+.ai-draft__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.ai-draft__sp {
+  flex-grow: 1;
+}
+
+@keyframes ai-draft-sk {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-draft__sk {
+    animation: none;
+  }
+
+  .ai-draft__bar i {
+    transition: none;
+  }
+}

@@ -632,3 +632,44 @@ test('«Copiar y adaptar con IA»: el número de página repetido en A se propon
   await page.getByTestId('ai-apply').click();
   await expect(page.locator('.annotation')).toHaveCount(1); // la de la página 1 de B
 });
+
+test('traslado cortado: al volver aparece el aviso con lo que falta y se puede descartar conservando lo guardado', async ({ page }) => {
+  await openPanelWithPair(page);
+  await expect(page.getByTestId('ai-draft')).toHaveCount(0); // sin pasada previa no hay aviso
+
+  // La pasada se «cortó»: el borrador dice que se lanzaron los dos PDF y ninguno llegó a tener propuesta.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const open = indexedDB.open('pdf-annotator-batch', 1);
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const tx = open.result.transaction('items', 'readwrite');
+          const store = tx.objectStore('items');
+          const keys = store.getAllKeys();
+          keys.onsuccess = () => {
+            const ids = (keys.result as string[]).filter((key) => !key.startsWith('__'));
+            store.put({ ids, provider: 'fake', startedAt: Date.now(), started: [], failed: [] }, '__tmp__');
+            const all = store.get('__batch-settings__');
+            all.onsuccess = () =>
+              store.put({ ...(all.result ?? { aiInstructions: '' }), aiRun: { ids, provider: 'fake', startedAt: Date.now(), started: [], failed: [], rerun: [] } }, '__batch-settings__');
+            store.delete('__tmp__');
+          };
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        };
+      }),
+  );
+  await page.reload();
+  await expect(page.getByTestId('ai-draft')).toBeVisible();
+  await expect(page.getByTestId('ai-chip-notStarted').first()).toBeVisible();
+  await expect(page.getByTestId('ai-draft')).toContainText('0');
+
+  await page.getByTestId('ai-draft-choose').click();
+  await expect(page.locator('.batch-selbar')).toBeVisible();
+
+  await page.getByTestId('ai-draft-discard').click();
+  await expect(page.getByTestId('ai-draft')).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByTestId('ai-draft')).toHaveCount(0);
+});

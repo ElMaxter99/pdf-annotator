@@ -1,0 +1,32 @@
+@if (queue.checking()) {
+  <div class="ai-draft ai-draft--wait" role="status" data-testid="ai-draft-checking">
+    <span class="ai-draft__sk" aria-hidden="true"></span>
+    <span>{{ 'batch.ai.draft.checking' | t }}</span>
+  </div>
+} @else if (summary(); as s) {
+  <section class="ai-draft" role="region" aria-labelledby="ai-draft-title" data-testid="ai-draft">
+    <span class="ai-draft__dot" aria-hidden="true"></span>
+    <div class="ai-draft__body">
+      <h2 id="ai-draft-title" class="ai-draft__title">{{ 'batch.ai.draft.title' | t }}</h2>
+      <p class="ai-draft__text">
+        {{ 'batch.ai.draft.summary' | t: params() }}
+        {{ 'batch.ai.draft.rest' | t: params() }}
+        @if (s.missing > 0) {
+          {{ 'batch.ai.draft.missing' | t: params() }}
+        }
+      </p>
+      <div class="ai-draft__bar" aria-hidden="true"><i [style.width.%]="(100 * s.saved.length) / Math.max(1, s.all.length)"></i></div>
+      <div class="ai-draft__actions">
+        <app-ai-batch-button [ids]="s.pending" label="batch.ai.draft.resume" />
+        <button type="button" class="btn btn--ghost" (click)="choose.emit(s.pending)" data-testid="ai-draft-choose">
+          {{ 'batch.ai.draft.choose' | t }}
+        </button>
+        <app-ai-batch-button [ids]="s.all" label="batch.ai.draft.all" [ghost]="true" />
+        <span class="ai-draft__sp"></span>
+        <button type="button" class="btn btn--ghost" (click)="queue.discardInterrupted()" data-testid="ai-draft-discard">
+          {{ 'batch.ai.draft.discard' | t }}
+        </button>
+      </div>
+    </div>
+  </section>
+}
