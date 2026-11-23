@@ -76,6 +76,9 @@ export class WorkspaceBatch {
       if (state.page !== page || !state.a || state.status === 'same') {
         continue;
       }
+      if (state.a.page !== undefined && state.a.page !== page) {
+        continue; // the field of A lives on another page of A: nothing to draw on this one
+      }
       draw(state.a.name, state.a.x, state.a.y, state.a.fontSize, state.status === 'missing');
     }
   }
@@ -552,7 +555,10 @@ export class WorkspaceBatch {
     // La pareja de A (misma página de B por la tabla o el número) resaltada y unida con una línea.
     const target: PairTarget = {
       aName: state.a?.name ?? '',
-      aPage: state.a ? this.aPage() : null,
+      aPage:
+        state.a && (state.a.page === undefined || state.a.page === state.page)
+          ? this.aPage()
+          : null,
       aX: state.a?.x,
       aY: state.a?.y,
       b: state.b
