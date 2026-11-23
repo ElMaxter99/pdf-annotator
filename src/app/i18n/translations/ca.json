@@ -150,7 +150,8 @@
       "document": "Document",
       "annotations": "Anotacions",
       "templates": "Plantilles",
-      "advanced": "Avançat"
+      "advanced": "Avançat",
+      "settings": "Ajustaments"
     },
     "empty": {
       "title": "Encara no hi ha anotacions",

@@ -1,6 +1,6 @@
 # Simplificar el editor y la caja de la anotación (P-139 a P-142)
 
-**Estado: aprobada por Maxter el 2026-11-23 («diseño ok»; en las cuatro preguntas, lo recomendado: propuesta B, pie fuera, «Limpiar» a ⋯, botones con texto). Fase 1 (caja de la anotación, P-142) y fase 2 (píldora flotante en lugar del pie; zoom, vista y Limpiar fuera de la barra) implementadas; faltan fundir la barra del lote y el carril lateral. La «Vista» se queda como tres botones en la píldora (no como desplegable) para no romper los flujos actuales.**
+**Estado: aprobada por Maxter el 2026-11-23 («diseño ok»; en las cuatro preguntas, lo recomendado: propuesta B, pie fuera, «Limpiar» a ⋯, botones con texto). Fase 1 (caja de la anotación, P-142) y fase 2 (píldora flotante en lugar del pie; zoom, vista y Limpiar fuera de la barra) implementadas; fase 3 hecha en su versión simple: pestañas Plantillas y Avanzado reunidas en «Ajustes» (3 pestañas). Faltan el carril de iconos y fundir la barra del lote. La «Vista» se queda como tres botones en la píldora (no como desplegable) para no romper los flujos actuales.**
 **Diseño:** lienzo, zona «Propuestas», mesas P-139 (hoy y opciones), P-140 (B oscuro 1650), P-141 (B claro 1280 con la caja), P-142 (estados de la caja). https://claude.ai/artifact/AUL7g11U4ZDtLFf3katowh
 
 ## 1. Problema

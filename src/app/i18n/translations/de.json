@@ -150,7 +150,8 @@
       "document": "Dokument",
       "annotations": "Anmerkungen",
       "templates": "Vorlagen",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "settings": "Einstellungen"
     },
     "empty": {
       "title": "Noch keine Anmerkungen",

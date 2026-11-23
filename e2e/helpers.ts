@@ -16,10 +16,12 @@ export async function stubAnalytics(page: Page, options: { fit?: boolean } = {})
 }
 
 /** Opens the workspace with the example invoice loaded and zoomed out to see the whole page. */
-export type SidebarTab = 'Documento' | 'Anotaciones' | 'Plantillas' | 'Avanzado';
+export type SidebarTab = 'Documento' | 'Anotaciones' | 'Ajustes' | 'Plantillas' | 'Avanzado';
 
 export async function openSidebarTab(page: Page, name: SidebarTab) {
-  await page.getByRole('tab', { name: new RegExp(`^\\s*${name}`) }).click();
+  // Plantillas y Avanzado viven ahora en la pestaña «Ajustes».
+  const tab = name === 'Plantillas' || name === 'Avanzado' ? 'Ajustes' : name;
+  await page.getByRole('tab', { name: new RegExp(`^\\s*${tab}`) }).click();
 }
 
 export async function openWorkspace(

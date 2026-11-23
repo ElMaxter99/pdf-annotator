@@ -150,7 +150,8 @@
       "document": "Document",
       "annotations": "Annotations",
       "templates": "Templates",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "settings": "Settings"
     },
     "empty": {
       "title": "No annotations yet",
