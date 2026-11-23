@@ -118,3 +118,40 @@ test('con la propuesta editable: pasar el ratón por un campo propuesto de B dib
   await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
   await expect(page.locator('.annotation-editor, app-annotation-editor').first()).toBeVisible();
 });
+
+test('con una pareja activa, arrastrar sobre cajas solapadas de la propuesta mueve la emparejada y no la de encima', async ({ page }) => {
+  await openBatchWithB(page);
+  await proposeWithAi(page);
+  const fieldA = page.getByTestId('split-a').locator('.reference-field').first();
+  await expect(fieldA).toBeVisible();
+  const a = await fieldA.boundingBox();
+  if (!a) throw new Error('sin campo de A');
+  await page.mouse.click(a.x + a.width / 2, a.y + a.height / 2);
+  const paired = page.locator('.canvas-container--split-b .reference-field.pair-focus');
+  await expect(paired).toHaveCount(1);
+  const pairedId = await paired.getAttribute('data-ai-id');
+  // Otra caja de la propuesta (la última, que queda encima) se pone justo sobre la emparejada.
+  const { topId, topOriginalLeft } = await page.evaluate((id) => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>('[data-testid="ai-proposal-field"]'));
+    const base = els.find((el) => el.dataset['aiId'] === id)!;
+    const top = els.filter((el) => el.dataset['aiId'] !== id).pop()!;
+    const original = top.style.left;
+    top.style.left = base.style.left;
+    top.style.top = base.style.top;
+    top.style.zIndex = '10';
+    return { topId: top.dataset['aiId'], topOriginalLeft: original };
+  }, pairedId);
+  const box = (id: string) => page.locator(`[data-testid="ai-proposal-field"][data-ai-id="${id}"]`);
+  const pairedBefore = await box(pairedId!).evaluate((el) => (el as HTMLElement).style.left);
+  const r = await box(pairedId!).boundingBox();
+  if (!r) throw new Error('sin caja emparejada');
+  const x = r.x + 3;
+  const y = r.y + r.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 60, y + 10, { steps: 6 });
+  await page.mouse.up();
+  await expect.poll(() => box(pairedId!).evaluate((el) => (el as HTMLElement).style.left)).not.toBe(pairedBefore);
+  // Tras el redibujado, la de encima sigue donde estaba en la propuesta: no se arrastró.
+  expect(await box(topId!).evaluate((el) => (el as HTMLElement).style.left)).toBe(topOriginalLeft);
+});

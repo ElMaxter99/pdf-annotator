@@ -376,9 +376,10 @@ export class WorkspaceAi {
           ),
         });
         el.setAttribute('data-testid', 'ai-proposal-field');
-        el.addEventListener('pointerdown', (event) =>
-          this.onAiProposalPointerDown(event, row.id, el),
-        );
+        el.addEventListener('pointerdown', (event) => {
+          const paired = this.pairedProposalUnder(event, row.id, el);
+          this.onAiProposalPointerDown(event, paired.id, paired.el);
+        });
         const selected = isRowSelected(row, overrides);
         el.classList.add(
           selected
@@ -390,6 +391,33 @@ export class WorkspaceAi {
         el.dataset['aiId'] = row.id;
       }
     }
+  }
+
+  /**
+   * Con cajas de la propuesta solapadas en B, un clic coge la que está emparejada con el campo de A seleccionado
+   * (la que une la línea) y no la que esté encima; sin pareja bajo el puntero, la de siempre.
+   */
+  pairedProposalUnder(
+    this: WorkspacePageComponent,
+    event: PointerEvent,
+    rowId: string,
+    el: HTMLElement,
+  ): { id: string; el: HTMLElement } {
+    const target = this.pairTarget;
+    if (target?.b?.kind !== 'ai' || target.b.id === rowId) {
+      return { id: rowId, el };
+    }
+    const paired = this.findPairElementB(target);
+    if (!paired) {
+      return { id: rowId, el };
+    }
+    const r = paired.getBoundingClientRect();
+    const inside =
+      event.clientX >= r.left &&
+      event.clientX <= r.right &&
+      event.clientY >= r.top &&
+      event.clientY <= r.bottom;
+    return inside ? { id: target.b.id, el: paired } : { id: rowId, el };
   }
 
   /** The field a proposal row would create (with its edits), or null if the row has no place in B. */
