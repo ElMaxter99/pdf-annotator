@@ -1,7 +1,4 @@
 ## Unreleased
-### Changed
-- **App de escritorio: canales de actualización «Solo estables» y «Últimas» (mesas RC-03 y RC-04, aprobadas por Maxter):** sustituyen a «Estable» y «Pruebas». «Últimas» ofrece siempre la versión más reciente publicada: si es una RC, la RC; si es estable, la estable (la final gana a sus RC). Quien tenía «Pruebas» pasa a «Últimas» y quien tenía «Estable» a «Solo estables», sin avisos (el valor guardado `beta` se lee como `latest`). Textos en los 7 idiomas, con tests (`update-logic`, servicio y e2e).
-
 ### Added
 - **Comprobación de tipos con TypeScript 7 (1.19, invisible):** `npm run typecheck:ts7` ejecuta `tsc --noEmit` con TypeScript 7 sobre `tsconfig.app.json` y `tsconfig.spec.json` (hoy 0 errores, unas 4 veces más rápido que con la 6.0) y un job de CI aparte, no bloqueante, lo repite. El build sigue con TypeScript 6.0.x porque Angular 22 solo admite `>=6.0 <6.1` y `ngc` no arranca con la 7. `docs/MIGRACION-TS7.md` explica el bloqueo, las mediciones y cuándo migrar; `DECISIONS` 17 lo recoge.
 
