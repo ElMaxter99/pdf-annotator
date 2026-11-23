@@ -40,12 +40,24 @@ try {
         .filter(Boolean)
         .map((line) => line.split('\t'));
       const names = changed.map((parts) => parts[parts.length - 1]);
-      const added = changed.filter(
-        (parts) => parts[0] !== 'D' && parts[parts.length - 1].startsWith(`${DIR}/`),
-      );
-      if (touchesProduct(names) && added.length === 0) {
+      const fragments = new Set(files());
+      // Solo cuentan los ficheros nuevos (A) que `load()` ya validó: no los editados ni README.md.
+      const added = changed.filter((parts) => {
+        const path = parts[parts.length - 1];
+        return (
+          parts[0].startsWith('A') &&
+          path.startsWith(`${DIR}/`) &&
+          fragments.has(path.slice(DIR.length + 1))
+        );
+      });
+      // Una PR de subida de versión consume las entradas (`changelog:release`) y toca `CHANGELOG.md`.
+      const consumed =
+        changed.some(
+          (parts) => parts[0] === 'D' && parts[parts.length - 1].startsWith(`${DIR}/`),
+        ) && names.includes('CHANGELOG.md');
+      if (touchesProduct(names) && added.length === 0 && !consumed) {
         console.error(
-          `✖ Esta PR cambia código de la app pero no añade ningún fichero en ${DIR}/. Crea uno (o con «type: none» si no necesita entrada). Ver changelog/README.md.`,
+          `✖ Esta PR cambia código de la app pero no añade ningún fichero nuevo en ${DIR}/. Crea uno (o con «type: none» si no necesita entrada). Ver changelog/README.md.`,
         );
         process.exit(1);
       }
