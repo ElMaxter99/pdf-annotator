@@ -156,6 +156,29 @@
       "title": "Encara no hi ha anotacions",
       "text": "Fes clic al PDF per col·locar la primera, o porta les d'una altra feina.",
       "paste": "Enganxa JSON"
+    },
+    "copyFormat": {
+      "title": "Format en copiar",
+      "preset": "Dreçera",
+      "keys": "Claus",
+      "keysQuoted": "\"amb cometes\"",
+      "keysBare": "sense cometes",
+      "quote": "Cometes dels textos",
+      "quoteDouble": "Dobles \"…\"",
+      "quoteSingle": "Simples '…'",
+      "indent": "Sagnat",
+      "indentTab": "Tab",
+      "indentCompact": "Compacta",
+      "trailingComma": "Coma final en llistes i objectes",
+      "preview": "Vista prèvia del que es copia",
+      "copyWith": "Copia amb aquest format",
+      "valid": "JSON vàlid",
+      "notJson": "No és JSON vàlid · serveix per a JS/TS",
+      "name": {
+        "json": "JSON",
+        "js": "Objecte JS/TS",
+        "custom": "Personalitzat"
+      }
     }
   },
   "guides": {
@@ -363,7 +386,9 @@
       "emptyTitle": "Res a recuperar",
       "emptyHint": "Aquí apareixen els avisos informatius que tanquis."
     },
-    "noData": "{{count}} anotacions sense dada a les dades de prova: es pinten amb la mostra."
+    "noData": "{{count}} anotacions sense dada a les dades de prova: es pinten amb la mostra.",
+    "jsonCopied": "JSON copiat · {{format}}",
+    "jsonCopyFailed": "No s'ha pogut copiar. Selecciona el text de l'editor i prem Ctrl+C."
   },
   "session": {
     "title": "Continua on ho vas deixar",

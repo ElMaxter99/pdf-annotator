@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { WorkspacePageComponent } from '../../workspace.page';
 import { InfoTipComponent } from '../../../../components/info-tip/info-tip.component';
@@ -35,6 +35,14 @@ export class WorkspaceSidebarComponent {
 
   get jsonEditorElement(): HTMLTextAreaElement | null {
     return this.jsonEditorRef?.nativeElement ?? null;
+  }
+
+  /** Cierra la ventana «Formato al copiar» al pulsar fuera de ella. */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.vm?.jsonCopyOpen()) return;
+    const target = event.target as Element | null;
+    if (!target?.closest?.('.json-copy')) this.vm.closeJsonCopyPanel();
   }
 
   /** «Pegar JSON» of the empty state: opens the text editor and puts the cursor in it. */

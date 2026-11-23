@@ -156,6 +156,29 @@
       "title": "Pas encore d'annotations",
       "text": "Cliquez sur le PDF pour placer la première, ou importez celles d'un autre travail.",
       "paste": "Coller un JSON"
+    },
+    "copyFormat": {
+      "title": "Format de copie",
+      "preset": "Préréglage",
+      "keys": "Clés",
+      "keysQuoted": "\"avec guillemets\"",
+      "keysBare": "sans guillemets",
+      "quote": "Guillemets des textes",
+      "quoteDouble": "Doubles \"…\"",
+      "quoteSingle": "Simples '…'",
+      "indent": "Indentation",
+      "indentTab": "Tab",
+      "indentCompact": "Compacte",
+      "trailingComma": "Virgule finale dans les listes et objets",
+      "preview": "Aperçu de ce qui est copié",
+      "copyWith": "Copier avec ce format",
+      "valid": "JSON valide",
+      "notJson": "JSON non valide · utilisable en JS/TS",
+      "name": {
+        "json": "JSON",
+        "js": "Objet JS/TS",
+        "custom": "Personnalisé"
+      }
     }
   },
   "guides": {
@@ -363,7 +386,9 @@
       "emptyTitle": "Rien à récupérer",
       "emptyHint": "Les avis informatifs que vous fermez apparaissent ici."
     },
-    "noData": "{{count}} annotations sans donnée dans les données de test : elles affichent leur exemple."
+    "noData": "{{count}} annotations sans donnée dans les données de test : elles affichent leur exemple.",
+    "jsonCopied": "JSON copié · {{format}}",
+    "jsonCopyFailed": "Copie impossible. Sélectionnez le texte de l'éditeur et appuyez sur Ctrl+C."
   },
   "session": {
     "title": "Reprendre là où vous en étiez",

@@ -156,6 +156,29 @@
       "title": "No annotations yet",
       "text": "Click on the PDF to place the first one, or bring them from another job.",
       "paste": "Paste JSON"
+    },
+    "copyFormat": {
+      "title": "Copy format",
+      "preset": "Preset",
+      "keys": "Keys",
+      "keysQuoted": "\"quoted\"",
+      "keysBare": "unquoted",
+      "quote": "String quotes",
+      "quoteDouble": "Double \"…\"",
+      "quoteSingle": "Single '…'",
+      "indent": "Indentation",
+      "indentTab": "Tab",
+      "indentCompact": "Compact",
+      "trailingComma": "Trailing comma in lists and objects",
+      "preview": "Preview of what is copied",
+      "copyWith": "Copy with this format",
+      "valid": "Valid JSON",
+      "notJson": "Not valid JSON · works in JS/TS",
+      "name": {
+        "json": "JSON",
+        "js": "JS/TS object",
+        "custom": "Custom"
+      }
     }
   },
   "guides": {
@@ -363,7 +386,9 @@
       "emptyTitle": "Nothing to recover",
       "emptyHint": "Informative notices you close show up here."
     },
-    "noData": "{{count}} annotations have no data in the test data: they paint their sample."
+    "noData": "{{count}} annotations have no data in the test data: they paint their sample.",
+    "jsonCopied": "JSON copied · {{format}}",
+    "jsonCopyFailed": "Could not copy. Select the editor text and press Ctrl+C."
   },
   "session": {
     "title": "Pick up where you left off",
