@@ -75,3 +75,10 @@ test('a filter from the palette changes the panel', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page.getByTestId('panel-item')).toHaveCount(0);
 });
+
+test('Ctrl+K does nothing while the template-update dialog is open', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('update-templates').click();
+  await page.keyboard.press('Control+k');
+  await expect(page.getByTestId('command-palette')).toHaveCount(0);
+});

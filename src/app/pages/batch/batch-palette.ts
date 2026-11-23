@@ -194,7 +194,13 @@ export function buildBatchCommands(
     label: t('palette.batch.downloadSelected'),
     keywords: 'download selected descargar seleccionados',
     hint: selected ? selHint(false) : group('selection'),
-    disabledReason: noSelection ?? (readyInSel ? undefined : t('palette.why.noReadyInSelection')),
+    disabledReason:
+      noSelection ??
+      (page.bulkBusy()
+        ? t('palette.why.busy')
+        : readyInSel
+          ? undefined
+          : t('palette.why.noReadyInSelection')),
     run: () => page.downloadSelected(),
   });
   add({
@@ -239,7 +245,7 @@ export function buildBatchCommands(
     label: t('palette.batch.removeSelected'),
     keywords: 'remove delete quitar eliminar borrar',
     hint: selected ? selHint(true) : group('selection'),
-    disabledReason: noSelection,
+    disabledReason: noSelection ?? (page.bulkBusy() ? t('palette.why.busy') : undefined),
     run: () => page.askBulk('remove'),
   });
 

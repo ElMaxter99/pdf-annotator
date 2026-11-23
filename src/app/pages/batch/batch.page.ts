@@ -341,7 +341,12 @@ export class BatchPageComponent implements OnInit {
     const typing = !!target?.closest('input[type="search"], input[type="text"], textarea, select');
     const key = event.key.toLowerCase();
     if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && key === 'k') {
-      if (this.pageMaps.phase() === 'closed' && !this.dialog() && !this.shortcutsOpen()) {
+      if (
+        this.pageMaps.phase() === 'closed' &&
+        !this.updateOpen() &&
+        !this.dialog() &&
+        !this.shortcutsOpen()
+      ) {
         event.preventDefault();
         this.togglePalette();
       }
@@ -448,6 +453,12 @@ export class BatchPageComponent implements OnInit {
   }
 
   @ViewChild(TemplateUpdateDialogComponent) private updateDialog?: TemplateUpdateDialogComponent;
+
+  /** The template-update dialog is open in any phase but «closed». */
+  private updateOpen(): boolean {
+    const phase = this.updateDialog?.phase();
+    return !!phase && phase !== 'closed';
+  }
 
   openTemplateUpdate(): void {
     this.updateDialog?.open();
