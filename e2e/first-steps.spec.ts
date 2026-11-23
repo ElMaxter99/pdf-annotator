@@ -26,3 +26,18 @@ test('«Pegar JSON» del estado vacío abre el editor de texto', async ({ page }
   await page.getByTestId('empty-paste').click();
   await expect(page.locator('textarea.json-editor')).toBeFocused();
 });
+
+test('los botones de los tres pasos reciben el clic (no lo recoge la zona de clic del PDF)', async ({ page }) => {
+  for (const id of ['first-steps-import', 'first-steps-never', 'first-steps-close']) {
+    const hit = await page.getByTestId(id).evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return !!top && (top === el || el.contains(top));
+    });
+    expect(hit, id).toBe(true);
+  }
+  // «No volver a mostrar» cierra el aviso y no se pone ningún campo detrás.
+  await page.getByTestId('first-steps-never').click();
+  await expect(page.getByTestId('first-steps')).toHaveCount(0);
+  await expect(page.getByTestId('annotation-editor')).toHaveCount(0);
+});
