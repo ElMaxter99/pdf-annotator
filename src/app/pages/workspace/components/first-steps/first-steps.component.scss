@@ -9,7 +9,8 @@
   transform: translate(-50%, -50%);
   // Sigue en pantalla aunque el lienzo esté movido (`--vx`/`--vy` = desplazamiento del visor).
   translate: var(--vx, 0px) var(--vy, 0px);
-  z-index: 5;
+  // Por encima de la zona de clic (5) y de la capa de anotaciones (15) del PDF.
+  z-index: 20;
   width: min(440px, calc(100% - 32px));
   display: flex;
   flex-direction: column;
@@ -111,7 +112,8 @@
   right: 24px;
   top: 24px;
   translate: var(--vx, 0px) var(--vy, 0px);
-  z-index: 5;
+  // Por encima de la zona de clic (5) y de la capa de anotaciones (15) del PDF.
+  z-index: 20;
   width: min(300px, calc(100% - 48px));
   display: flex;
   flex-direction: column;
