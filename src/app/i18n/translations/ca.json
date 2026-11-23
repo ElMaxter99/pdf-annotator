@@ -460,6 +460,7 @@
       "back": "Tauler",
       "versionA": "A: {{name}}",
       "editingB": "Editant la versió B",
+      "lote": "Lot",
       "viewLabel": "Com veure A",
       "view": {
         "overlay": "Al damunt",

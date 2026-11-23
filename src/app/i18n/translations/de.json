@@ -460,6 +460,7 @@
       "back": "Panel",
       "versionA": "A: {{name}}",
       "editingB": "Version B wird bearbeitet",
+      "lote": "Stapel",
       "viewLabel": "A anzeigen",
       "view": {
         "overlay": "Darüber",

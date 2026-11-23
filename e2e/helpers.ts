@@ -93,3 +93,10 @@ export async function renderedAnnotations(page: Page) {
     }))
   );
 }
+
+/** Opens the «Lote» menu of the single batch bar (P-143) unless it is already open. */
+export async function openLote(page: Page) {
+  const menu = page.getByTestId('lote-menu');
+  if (!(await menu.isVisible())) await page.getByTestId('lote-open').click();
+  await expect(menu).toBeVisible();
+}

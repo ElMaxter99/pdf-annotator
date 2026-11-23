@@ -460,6 +460,7 @@
       "back": "Panel",
       "versionA": "A: {{name}}",
       "editingB": "Editing version B",
+      "lote": "Batch",
       "viewLabel": "How to see A",
       "view": {
         "overlay": "Overlay",

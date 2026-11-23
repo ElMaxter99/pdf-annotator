@@ -1,7 +1,7 @@
 import { expect, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
-import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
+import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics, openLote } from './helpers';
 
 // Needs the local helper with the simulated provider (playwright.config.ts starts it with AI_HELPER_FAKE=1).
 const pdf = readFileSync(EXAMPLE_PDF);
@@ -51,6 +51,8 @@ test('«Copiar y adaptar con IA» asks once, writes the proposal in B in one und
   await openBatchWithB(page);
   await expect(page.getByTestId('ai-chip')).toContainText('Simulado');
 
+  await openLote(page);
+
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   // first time: privacy notice, nothing is sent before accepting
@@ -92,6 +94,7 @@ test('«Copiar y adaptar con IA» asks once, writes the proposal in B in one und
   await expect(page.locator('.annotation')).toHaveCount(0);
 
   // second time: no notice (remembered); one Ctrl+Z takes the whole proposal out, Ctrl+Y brings it back
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await expect(page.getByTestId('ai-consent')).toHaveCount(0);
@@ -112,6 +115,7 @@ test('«Copiar y adaptar con IA» asks once, writes the proposal in B in one und
 
 test('moving a field written by the AI is undoable and redoable, step by step', async ({ page }) => {
   await openBatchWithB(page);
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await page.getByTestId('ai-consent-ok').click();
@@ -151,6 +155,7 @@ test('moving a field written by the AI is undoable and redoable, step by step', 
 
 test('copies of fields written by the AI are the user\'s own: discarding the proposal keeps them', async ({ page }) => {
   await openBatchWithB(page);
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await page.getByTestId('ai-consent-ok').click();
@@ -170,6 +175,7 @@ test('without the helper the chip says so and the AI option explains how to star
   await page.route('**/127.0.0.1:4310/**', (route) => route.abort());
   await openBatchWithB(page, null);
   await expect(page.getByTestId('ai-chip')).toContainText('sin conectar');
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await expect(page.getByTestId('ai-panel')).toContainText('npm run start:ia');
@@ -178,6 +184,7 @@ test('without the helper the chip says so and the AI option explains how to star
 
 test('the model is picked from the list the helper reads, never typed, and remembered', async ({ page }) => {
   await openBatchWithB(page);
+  await openLote(page);
   await page.getByTestId('ai-chip').click();
   const toggle = page.getByTestId('ai-model-toggle');
   await expect(page.getByTestId('ai-model-refresh')).toBeVisible();
@@ -195,6 +202,7 @@ test('the model is picked from the list the helper reads, never typed, and remem
 test('a saved model the CLI no longer offers goes back to a valid one with a notice', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.models', JSON.stringify({ fake: 'modelo-retirado' })));
   await openBatchWithB(page);
+  await openLote(page);
   await page.getByTestId('ai-chip').click();
   await expect(page.getByTestId('ai-model-retired')).toContainText('modelo-retirado');
   const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.models'));
@@ -206,6 +214,7 @@ test('if the helper cannot list the models the error is clear and «Reintentar»
     route.fulfill({ status: 502, contentType: 'application/json', body: JSON.stringify({ error: { code: 'auth', message: 'x' } }) }),
   );
   await openBatchWithB(page);
+  await openLote(page);
   await page.getByTestId('ai-chip').click();
   await expect(page.getByTestId('ai-model-error')).toContainText('No se pudo leer la lista de modelos');
   await expect(page.getByTestId('ai-model-retry')).toBeVisible();
@@ -216,6 +225,7 @@ test('if the helper cannot list the models the error is clear and «Reintentar»
 
 test('«Ver detalles» shows what was sent, the steps and says the simulated provider reports no usage', async ({ page }) => {
   await openBatchWithB(page);
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await page.getByTestId('ai-consent-ok').click();
@@ -239,6 +249,7 @@ test('«Ver detalles» shows what was sent, the steps and says the simulated pro
 
 test('the retry option is remembered and on by default with every provider', async ({ page }) => {
   await openBatchWithB(page);
+  await openLote(page);
   await page.getByTestId('ai-chip').click();
   const toggle = page.getByTestId('ai-retry-toggle');
   await expect(toggle).toBeChecked();
@@ -581,6 +592,7 @@ test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guard
   // In the editor the PDF follows the batch until it gets its own, and «Usar las del lote» goes back.
   await page.getByTestId('panel-item').filter({ hasText: 'factura-0331' }).getByRole('button', { name: 'Revisar' }).click();
   await page.waitForURL('**/workspace?lote=*');
+  await openLote(page);
   await page.getByTestId('ai-chip').click();
   await page.getByTestId('ai-instructions-toggle').click();
   const box = page.getByTestId('ai-instructions');
@@ -615,6 +627,7 @@ test('«Copiar y adaptar con IA»: el número de página repetido en A se propon
   await expect(page.getByTestId('panel-list')).toContainText('parte-nuevo.pdf');
   await page.getByTestId('panel-item').filter({ hasText: 'parte.pdf' }).getByRole('button', { name: 'Revisar' }).click();
   await page.waitForURL('**/workspace?lote=*');
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await page.getByTestId('ai-consent-ok').click();

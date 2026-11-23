@@ -34,6 +34,9 @@ export class MigrationBarComponent implements OnInit {
   readonly confirmMode = signal<'replace' | null>(null);
   readonly readyOpen = signal(false);
   readonly bellOpen = signal(false);
+  readonly loteOpen = signal(false);
+  /** The «Lote» menu stays open while one of its nested panels (put A, AI) is open. */
+  readonly loteVisible = () => this.loteOpen() || this.menuOpen() || this.vm.aiPanelOpen();
   @ViewChild('bell') private bellButton?: ElementRef<HTMLButtonElement>;
 
   private seenPutCopy = -1;
@@ -137,6 +140,16 @@ export class MigrationBarComponent implements OnInit {
     this.vm.applyTemplateA('replace');
   }
 
+  toggleLote(): void {
+    if (this.loteVisible()) {
+      this.loteOpen.set(false);
+      this.closeMenu();
+      this.vm.aiPanelOpen.set(false);
+    } else {
+      this.loteOpen.set(true);
+    }
+  }
+
   closeMenu(): void {
     this.menuOpen.set(false);
     this.confirmMode.set(null);
@@ -157,6 +170,9 @@ export class MigrationBarComponent implements OnInit {
     const path = event.composedPath();
     const inside = (selector: string) =>
       path.some((node) => node instanceof Element && node.matches(selector));
+    if (!inside('.lote')) {
+      this.loteOpen.set(false);
+    }
     if (this.menuOpen() && !inside('.migration-menu--put')) {
       this.closeMenu();
     }
@@ -173,6 +189,10 @@ export class MigrationBarComponent implements OnInit {
   onEscape(): void {
     if (this.vm.aiConsentOpen()) {
       this.vm.aiConsentOpen.set(false);
+      return;
+    }
+    if (this.loteOpen() && !this.menuOpen() && !this.vm.aiPanelOpen()) {
+      this.loteOpen.set(false);
       return;
     }
     if (this.vm.aiPanelOpen()) {
@@ -202,6 +222,8 @@ export class MigrationBarComponent implements OnInit {
       this.bellButton?.nativeElement.focus();
     } else if (this.menuOpen()) {
       this.closeMenu();
+    } else if (this.loteOpen()) {
+      this.loteOpen.set(false);
     }
   }
 

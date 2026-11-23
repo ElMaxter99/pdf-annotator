@@ -7392,3 +7392,123 @@ button.version-chip:focus-visible {
   opacity: 0.5;
   cursor: default;
 }
+
+/* P-143 · Barra del lote fundida: en un PDF del lote, la barra del editor y la del lote son una sola fila.
+   Los hijos de ambas barras se reparten en la misma fila del header (display: contents) y los avisos
+   informativos bajan a su propia franja. */
+@media (min-width: 961px) {
+  .app--workspace header.header.header--batch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+  }
+
+  .header--batch .toolbar,
+  .header--batch app-migration-bar,
+  .header--batch .migration-bar {
+    display: contents;
+  }
+
+  .header--batch .toolbar__brand-text,
+  .header--batch .toolbar__version {
+    display: none;
+  }
+
+  .header--batch .toolbar__identity {
+    order: 0;
+  }
+
+  .header--batch .migration-bar > .btn,
+  .header--batch .migration-bar__file,
+  .header--batch .migration-chip,
+  .header--batch .migration-nav,
+  .header--batch .migration-bar > .migration-bar__count {
+    order: 1;
+  }
+
+  .header--batch .toolbar__cluster {
+    order: 2;
+    flex: 0 0 auto;
+  }
+
+  .header--batch .migration-bar__tools {
+    order: 3;
+    margin-left: auto;
+  }
+
+  .header--batch .toolbar__prefs {
+    order: 4;
+  }
+
+  .header--batch .migration-hints {
+    order: 5;
+    flex: 1 0 100%;
+  }
+
+  .header--batch .migration-bar__file {
+    max-width: 220px;
+  }
+}
+
+.lote {
+  position: relative;
+}
+
+.lote__btn {
+  position: relative;
+}
+
+.lote__dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--accent-fill);
+  vertical-align: middle;
+}
+
+.lote__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.lote__panel[hidden] {
+  display: none;
+}
+
+.lote__panel .migration-menu__panel,
+.lote__panel .ai-panel {
+  position: static;
+  width: auto;
+  box-shadow: none;
+}
+
+.lote__panel .migration-menu,
+.lote__panel .migration-menu > .btn,
+.lote__panel .ai-chip-wrap > .btn {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.lote__panel .migration-put__long,
+.lote__panel .ai-chip__text {
+  display: inline;
+}
+
+.lote__panel .migration-put__short {
+  display: none;
+}
