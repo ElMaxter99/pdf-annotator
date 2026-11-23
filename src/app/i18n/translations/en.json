@@ -1852,7 +1852,8 @@
       "confirms": "asks to confirm",
       "current": "current",
       "batch": "Batch",
-      "position": "Batch {{index}} of {{total}}"
+      "position": "Batch {{index}} of {{total}}",
+      "active": "active"
     },
     "why": {
       "noPdf": "First: open a PDF",
@@ -1864,7 +1865,18 @@
       "noTemplateA": "First: upload template A",
       "noVersionB": "First: upload version B",
       "firstPdf": "You are on the first PDF",
-      "lastPdf": "You are on the last PDF"
+      "lastPdf": "You are on the last PDF",
+      "noSelection": "Select a PDF first",
+      "noReady": "No PDFs are ready yet",
+      "nothingToReview": "No PDFs left to review",
+      "noFilters": "No filters are active",
+      "alreadyActive": "Already applied",
+      "alreadySelected": "Everything is already selected",
+      "noVisible": "No PDFs are visible",
+      "noReadyInSelection": "None of the selected PDFs is ready",
+      "noVersionBInSelection": "None of the selected PDFs has a version B",
+      "busy": "A task is running",
+      "nothingToMark": "Nothing to mark as ready"
     },
     "cmd": {
       "fitPage": "Fit to page",
@@ -1882,6 +1894,41 @@
       "themeDark": "Switch to dark theme",
       "themeLight": "Switch to light theme",
       "language": "Language: {{language}}"
+    },
+    "group": {
+      "batch": "Batch",
+      "view": "View",
+      "filter": "Filter",
+      "selection": "Selection"
+    },
+    "batch": {
+      "downloadReady": "Download the ready ones (ZIP)",
+      "readyCount": "{{count}} ready",
+      "reviewNext": "Review the next one",
+      "reviewCount": "{{count}} to review",
+      "updateTemplates": "Update templates…",
+      "testData": "Upload test data…",
+      "testDataReplace": "Replace test data…",
+      "testDataRemove": "Remove test data",
+      "viewGrid": "Switch to grid",
+      "viewList": "Switch to list",
+      "showAll": "Show: all",
+      "showReview": "Show: to review",
+      "showReady": "Show: ready",
+      "showWithA": "Show: with template A",
+      "showWithB": "Show: with version B",
+      "showAi": "Show: with AI",
+      "clearFilters": "Clear filters",
+      "selectVisible": "Select the visible ones",
+      "clearSelection": "Clear the selection",
+      "downloadSelected": "Download the selected ones",
+      "suggestTables": "Suggest page tables…",
+      "translateAi": "Move with AI…",
+      "markReady": "Mark the selected ones as ready",
+      "removeSelected": "Remove the selected ones from the batch",
+      "pdfCount": "{{count}} PDFs",
+      "openMenu": "Search actions",
+      "keyhint": "Actions"
     }
   },
   "projects": {

@@ -1,10 +1,13 @@
 import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy, ElementRef, ViewChild, ViewChildren, type QueryList } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
 import { AiBatchButtonComponent } from './ai-batch/ai-batch-button.component';
+import { CommandPaletteComponent } from '../workspace/components/command-palette/command-palette.component';
+import { ShortcutsDialogComponent } from '../workspace/components/shortcuts-dialog/shortcuts-dialog.component';
+import { BATCH_DEFAULT_IDS, buildBatchCommands } from './batch-palette';
 import { AiBatchChipComponent } from './ai-batch/ai-batch-chip.component';
 import { AiDraftBannerComponent } from './ai-batch/ai-draft-banner.component';
 import { AiBatchPanelComponent } from './ai-batch/ai-batch-panel.component';
@@ -99,6 +102,8 @@ async function sha256(blob: Blob): Promise<string | null> {
     FocusTrapDirective,
     PageMapBatchDialogComponent,
     TemplateUpdateDialogComponent,
+    CommandPaletteComponent,
+    ShortcutsDialogComponent,
   ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
@@ -335,6 +340,16 @@ export class BatchPageComponent implements OnInit {
     const target = event.target as HTMLElement | null;
     const typing = !!target?.closest('input[type="search"], input[type="text"], textarea, select');
     const key = event.key.toLowerCase();
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && key === 'k') {
+      if (this.pageMaps.phase() === 'closed' && !this.dialog() && !this.shortcutsOpen()) {
+        event.preventDefault();
+        this.togglePalette();
+      }
+      return;
+    }
+    if (this.paletteOpen()) {
+      return;
+    }
     if (event.key === 'Escape' && !event.defaultPrevented) {
       if (this.pageMaps.phase() !== 'closed') {
         return;
@@ -350,6 +365,31 @@ export class BatchPageComponent implements OnInit {
     } else if ((event.ctrlKey || event.metaKey) && key === 'z' && !typing && this.undoFn) {
       event.preventDefault();
       this.undo();
+    }
+  }
+
+  // ---- command palette (Ctrl+K, P-144 a P-146) ------------------------------------------------------
+  readonly paletteOpen = signal(false);
+  readonly shortcutsOpen = signal(false);
+  readonly batchDefaultIds = BATCH_DEFAULT_IDS;
+  readonly paletteSource = (t: (key: string, params?: Record<string, string | number>) => string) =>
+    buildBatchCommands(this, t);
+  @ViewChild('testDataInput') private testDataInput?: ElementRef<HTMLInputElement>;
+  @ViewChildren(AiBatchButtonComponent) private aiButtons?: QueryList<AiBatchButtonComponent>;
+
+  togglePalette(open = !this.paletteOpen()): void {
+    this.paletteOpen.set(open);
+  }
+
+  pickTestData(): void {
+    this.testDataInput?.nativeElement.click();
+  }
+
+  /** «Trasladar con IA» for the marked PDFs: opens the popover of the selection bar. */
+  openAiForSelection(): void {
+    const button = this.aiButtons?.find((candidate) => candidate.up());
+    if (button && !button.open()) {
+      button.toggle();
     }
   }
 

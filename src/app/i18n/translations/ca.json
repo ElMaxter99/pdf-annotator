@@ -1852,7 +1852,8 @@
       "confirms": "demana confirmació",
       "current": "actual",
       "batch": "Lot",
-      "position": "Lot {{index}} de {{total}}"
+      "position": "Lot {{index}} de {{total}}",
+      "active": "actiu"
     },
     "why": {
       "noPdf": "Abans: obre un PDF",
@@ -1864,7 +1865,18 @@
       "noTemplateA": "Abans: puja la plantilla A",
       "noVersionB": "Abans: puja la versió B",
       "firstPdf": "Ja ets al primer PDF",
-      "lastPdf": "Ja ets a l'últim PDF"
+      "lastPdf": "Ja ets a l'últim PDF",
+      "noSelection": "Selecciona abans algun PDF",
+      "noReady": "Encara no hi ha PDFs llestos",
+      "nothingToReview": "No hi ha PDFs per revisar",
+      "noFilters": "No hi ha filtres actius",
+      "alreadyActive": "Ja està aplicat",
+      "alreadySelected": "Ja hi ha tot seleccionat",
+      "noVisible": "No hi ha PDFs visibles",
+      "noReadyInSelection": "Cap dels seleccionats està llest",
+      "noVersionBInSelection": "Cap dels seleccionats té versió B",
+      "busy": "Hi ha una tasca en curs",
+      "nothingToMark": "Res per marcar com a llest"
     },
     "cmd": {
       "fitPage": "Ajustar a la pàgina",
@@ -1882,6 +1894,41 @@
       "themeDark": "Canviar a tema fosc",
       "themeLight": "Canviar a tema clar",
       "language": "Idioma: {{language}}"
+    },
+    "group": {
+      "batch": "Lot",
+      "view": "Vista",
+      "filter": "Filtre",
+      "selection": "Selecció"
+    },
+    "batch": {
+      "downloadReady": "Descarrega els llestos (ZIP)",
+      "readyCount": "{{count}} llestos",
+      "reviewNext": "Revisa el següent",
+      "reviewCount": "{{count}} per revisar",
+      "updateTemplates": "Actualitza les plantilles…",
+      "testData": "Puja dades de prova…",
+      "testDataReplace": "Substitueix les dades de prova…",
+      "testDataRemove": "Treu les dades de prova",
+      "viewGrid": "Canvia a quadrícula",
+      "viewList": "Canvia a llista",
+      "showAll": "Mostra: tots",
+      "showReview": "Mostra: per revisar",
+      "showReady": "Mostra: llestos",
+      "showWithA": "Mostra: amb plantilla A",
+      "showWithB": "Mostra: amb versió B",
+      "showAi": "Mostra: amb IA",
+      "clearFilters": "Treu els filtres",
+      "selectVisible": "Selecciona els visibles",
+      "clearSelection": "Treu la selecció",
+      "downloadSelected": "Descarrega els seleccionats",
+      "suggestTables": "Suggereix taules de pàgines…",
+      "translateAi": "Trasllada amb IA…",
+      "markReady": "Marca els seleccionats com a llestos",
+      "removeSelected": "Treu els seleccionats del lot",
+      "pdfCount": "{{count}} PDFs",
+      "openMenu": "Cerca accions",
+      "keyhint": "Accions"
     }
   },
   "projects": {
