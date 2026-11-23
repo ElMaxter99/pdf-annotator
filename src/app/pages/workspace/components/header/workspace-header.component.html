@@ -34,34 +34,6 @@
         </button>
       </div>
 
-      <div class="toolbar__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
-        <button class="btn btn--icon" (click)="vm.zoomOut()" [attr.aria-label]="'controls.zoomOut' | t" [disabled]="!vm.pdfDoc()"
-          [attr.title]="('controls.zoomOut' | t) + ' (−)'" [attr.aria-keyshortcuts]="'-'">
-          <span class="btn__icon" aria-hidden="true">−</span>
-          <span class="btn__label">{{ 'controls.zoomOut' | t }}</span>
-        </button>
-        <span class="toolbar__badge">{{ vm.scale() * 100 | number:'1.0-0' }} %</span>
-        <button class="btn btn--icon" (click)="vm.zoomIn()" [attr.aria-label]="'controls.zoomIn' | t" [disabled]="!vm.pdfDoc()"
-          [attr.title]="('controls.zoomIn' | t) + ' (+)'" [attr.aria-keyshortcuts]="'+'">
-          <span class="btn__label">{{ 'controls.zoomIn' | t }}</span>
-          <span class="btn__icon" aria-hidden="true">＋</span>
-        </button>
-        <button class="btn btn--icon" (click)="vm.fitWidth()" [attr.aria-label]="'controls.fitWidth' | t" [disabled]="!vm.pdfDoc()"
-          [attr.title]="('controls.fitWidth' | t) + ' (0)'" [attr.aria-keyshortcuts]="'0'">
-          <span class="btn__icon" aria-hidden="true">⤢</span>
-          <span class="btn__label">{{ 'controls.fitWidth' | t }}</span>
-        </button>
-      </div>
-
-      <div class="toolbar__group preview-mode" role="group" [attr.aria-label]="'preview.mode.group' | t">
-        <span class="preview-mode__label">{{ 'preview.mode.label' | t }}</span>
-        <button type="button" class="btn btn--small" *ngFor="let mode of vm.previewModes"
-          [class.btn--active]="vm.previewSettings.mode() === mode" [attr.aria-pressed]="vm.previewSettings.mode() === mode"
-          [disabled]="!vm.pdfDoc() || (mode === 'data' && !vm.previewSettings.hasTestData())"
-          [attr.title]="mode === 'data' && !vm.previewSettings.hasTestData() ? ('preview.mode.dataDisabled' | t) : null"
-          (click)="vm.setPreviewMode(mode)">{{ 'preview.mode.' + mode | t }}</button>
-      </div>
-
       @if (!vm.inBatchMode()) {
         <app-toast-bell></app-toast-bell>
       }
@@ -78,12 +50,7 @@
           <span class="btn__label">{{ 'controls.redo' | t }}</span>
         </button>
         <div class="toolbar__pop">
-          <button class="btn btn--icon btn--danger" type="button" (click)="toggleClear($event)"
-            [disabled]="!vm.coords().length" [attr.aria-label]="'controls.clear' | t"
-            [attr.title]="'controls.clear' | t" [attr.aria-expanded]="clearOpen()" aria-haspopup="true">
-            <span class="btn__icon" aria-hidden="true">🧹</span>
-            <span class="btn__label">{{ 'controls.clear' | t }}</span>
-          </button>
+          
           @if (clearOpen()) {
             <div class="toolbar__menu toolbar__menu--confirm" role="alertdialog" [attr.aria-label]="'controls.clear' | t">
               <p>{{ 'controls.clearConfirm' | t }}</p>
@@ -117,7 +84,12 @@
         <span class="btn__icon" aria-hidden="true">⋯</span>
       </button>
     <div class="toolbar__group toolbar__group--preferences" role="group" [attr.aria-label]="'controls.preferencesGroup' | t">
-        <button class="btn btn--icon btn--ghost" type="button" (click)="vm.togglePalette(true)"
+        <button class="btn btn--ghost" type="button" (click)="toggleClear($event)" [disabled]="!vm.coords().length"
+[attr.aria-label]="'controls.clear' | t" data-testid="clear-open">
+<span class="btn__icon" aria-hidden="true">🧹</span>
+<span class="btn__label">{{ 'controls.clear' | t }}</span>
+</button>
+<button class="btn btn--icon btn--ghost" type="button" (click)="vm.togglePalette(true)"
           [attr.title]="('palette.open' | t) + ' (Ctrl+K)'" [attr.aria-label]="'palette.open' | t"
           aria-keyshortcuts="Control+K Meta+K" data-testid="palette-open">
           <span class="btn__icon" aria-hidden="true">⌕</span>

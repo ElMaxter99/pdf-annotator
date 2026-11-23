@@ -150,7 +150,8 @@
       "document": "Document",
       "annotations": "Anotacions",
       "templates": "Plantilles",
-      "advanced": "Avançat"
+      "advanced": "Avançat",
+      "settings": "Ajustaments"
     },
     "empty": {
       "title": "Encara no hi ha anotacions",
@@ -270,13 +271,30 @@
       "hintPreview": "Selecciona un color, escriu un HEX o un RGB. El JSON sempre exportarà el color en HEX.",
       "hintEdit": "Pots enganxar un HEX o un RGB existent per reutilitzar colors exactes.",
       "hexPlaceholder": "#5eead4",
-      "rgbPlaceholder": "rgb(94, 234, 212)"
+      "rgbPlaceholder": "rgb(94, 234, 212)",
+      "rgbLabel": "Color (RGB)"
     },
     "actions": {
-      "duplicate": "Duplicar anotació"
+      "duplicate": "Duplicar anotació",
+      "accept": "Accepta",
+      "cancel": "Cancel·la",
+      "delete": "Elimina",
+      "close": "Tanca"
     },
     "editingBadge": "Editant",
-    "coordinatesLabel": "Coordenades (PDF)"
+    "coordinatesLabel": "Coordenades (PDF)",
+    "title": {
+      "create": "Nova anotació",
+      "edit": "Edita l'anotació"
+    },
+    "more": {
+      "show": "Més opcions",
+      "hide": "Menys opcions"
+    },
+    "error": {
+      "field": "Escriu el nom del camp."
+    },
+    "lockedNote": "Anotació bloquejada. Desbloqueja-la per editar-la."
   },
   "fonts": {
     "custom": {

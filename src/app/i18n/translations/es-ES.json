@@ -150,7 +150,8 @@
       "document": "Documento",
       "annotations": "Anotaciones",
       "templates": "Plantillas",
-      "advanced": "Avanzado"
+      "advanced": "Avanzado",
+      "settings": "Ajustes"
     },
     "empty": {
       "title": "Aún no hay anotaciones",
@@ -270,13 +271,30 @@
       "hintPreview": "Selecciona un color, escribe un HEX o un RGB. El JSON siempre exportará el color en HEX.",
       "hintEdit": "Puedes pegar un HEX o un RGB existente para reutilizar colores exactos.",
       "hexPlaceholder": "#5eead4",
-      "rgbPlaceholder": "rgb(94, 234, 212)"
+      "rgbPlaceholder": "rgb(94, 234, 212)",
+      "rgbLabel": "Color (RGB)"
     },
     "actions": {
-      "duplicate": "Duplicar anotación"
+      "duplicate": "Duplicar anotación",
+      "accept": "Aceptar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "close": "Cerrar"
     },
     "editingBadge": "Editando",
-    "coordinatesLabel": "Coordenadas (PDF)"
+    "coordinatesLabel": "Coordenadas (PDF)",
+    "title": {
+      "create": "Nueva anotación",
+      "edit": "Editar anotación"
+    },
+    "more": {
+      "show": "Más opciones",
+      "hide": "Menos opciones"
+    },
+    "error": {
+      "field": "Escribe el nombre del campo."
+    },
+    "lockedNote": "Anotación bloqueada. Desbloquéala para editarla."
   },
   "fonts": {
     "custom": {

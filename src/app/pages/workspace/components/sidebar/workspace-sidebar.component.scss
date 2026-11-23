@@ -184,3 +184,50 @@
 .empty-state__icon {
   font-size: 1.9rem;
 }
+
+.sidebar-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.sidebar-rail__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.sidebar-rail__btn:hover {
+  color: var(--text);
+  background: rgba(94, 234, 212, 0.1);
+}
+
+.sidebar-rail__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.sidebar-rail__badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 1.4em;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent-fill);
+  color: var(--on-accent);
+  font-size: 0.65rem;
+  line-height: 1.5;
+  text-align: center;
+}

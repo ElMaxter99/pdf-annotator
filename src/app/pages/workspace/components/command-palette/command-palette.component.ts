@@ -210,7 +210,7 @@ export class CommandPaletteComponent implements OnInit {
       });
     }
 
-    const tabs = ['document', 'annotations', 'templates', 'advanced'] as const;
+    const tabs = ['document', 'annotations', 'settings'] as const;
     for (const tab of tabs) {
       add({
         id: `tab-${tab}`,

@@ -150,7 +150,8 @@
       "document": "Documento",
       "annotations": "Annotazioni",
       "templates": "Modelli",
-      "advanced": "Avanzate"
+      "advanced": "Avanzate",
+      "settings": "Impostazioni"
     },
     "empty": {
       "title": "Ancora nessuna annotazione",
@@ -270,13 +271,30 @@
       "hintPreview": "Scegli un colore, inserisci un HEX o un RGB. Il JSON esporterà sempre il colore in HEX.",
       "hintEdit": "Incolla un HEX o un RGB esistente per riutilizzare colori identici.",
       "hexPlaceholder": "#5eead4",
-      "rgbPlaceholder": "rgb(94, 234, 212)"
+      "rgbPlaceholder": "rgb(94, 234, 212)",
+      "rgbLabel": "Colore (RGB)"
     },
     "actions": {
-      "duplicate": "Duplica annotazione"
+      "duplicate": "Duplica annotazione",
+      "accept": "Accetta",
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "close": "Chiudi"
     },
     "editingBadge": "Modifica in corso",
-    "coordinatesLabel": "Coordinate (PDF)"
+    "coordinatesLabel": "Coordinate (PDF)",
+    "title": {
+      "create": "Nuova annotazione",
+      "edit": "Modifica annotazione"
+    },
+    "more": {
+      "show": "Più opzioni",
+      "hide": "Meno opzioni"
+    },
+    "error": {
+      "field": "Scrivi il nome del campo."
+    },
+    "lockedNote": "Annotazione bloccata. Sbloccala per modificarla."
   },
   "fonts": {
     "custom": {
