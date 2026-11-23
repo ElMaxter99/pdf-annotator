@@ -21,16 +21,22 @@
       <span class="sidebar-tab__badge sidebar-tab__badge--ai" *ngIf="vm.aiProposedCount() as proposed" data-testid="ai-tab-badge"
         [attr.title]="'ai.proposal.tabBadge' | t: { count: proposed }">{{ proposed }}</span>
     </button>
-    <button type="button" role="tab" id="sidebar-tab-templates" class="sidebar-tab"
-      [class.sidebar-tab--active]="vm.sidebarTab() === 'templates'" [attr.aria-selected]="vm.sidebarTab() === 'templates'"
-      aria-controls="sidebar-panel-templates" [attr.tabindex]="vm.sidebarTab() === 'templates' ? 0 : -1"
-      (click)="vm.setSidebarTab('templates')"><span class="sidebar-tab__label">{{ 'sidebar.tabs.templates' | t }}</span></button>
-    <button type="button" role="tab" id="sidebar-tab-advanced" class="sidebar-tab"
-      [class.sidebar-tab--active]="vm.sidebarTab() === 'advanced'" [attr.aria-selected]="vm.sidebarTab() === 'advanced'"
-      aria-controls="sidebar-panel-advanced" [attr.tabindex]="vm.sidebarTab() === 'advanced' ? 0 : -1"
-      (click)="vm.setSidebarTab('advanced')"><span class="sidebar-tab__label">{{ 'sidebar.tabs.advanced' | t }}</span></button>
+    <button type="button" role="tab" id="sidebar-tab-settings" class="sidebar-tab"
+      [class.sidebar-tab--active]="vm.sidebarTab() === 'settings'" [attr.aria-selected]="vm.sidebarTab() === 'settings'"
+      aria-controls="sidebar-panel-templates sidebar-panel-advanced" [attr.tabindex]="vm.sidebarTab() === 'settings' ? 0 : -1"
+      (click)="vm.setSidebarTab('settings')"><span class="sidebar-tab__label">{{ 'sidebar.tabs.settings' | t }}</span></button>
   </div>
   </div>
+
+  <nav class="sidebar-rail" *ngIf="vm.sidebarMinimized()" [attr.aria-label]="'sidebar.tabs.label' | t" data-testid="sidebar-rail">
+    <button type="button" class="sidebar-rail__btn" data-testid="rail-document" (click)="openFromRail('document')"
+      [attr.aria-label]="'sidebar.tabs.document' | t" [attr.title]="'sidebar.tabs.document' | t"><span aria-hidden="true">🗂️</span></button>
+    <button type="button" class="sidebar-rail__btn" data-testid="rail-annotations" (click)="openFromRail('annotations')"
+      [attr.aria-label]="'sidebar.tabs.annotations' | t" [attr.title]="'sidebar.tabs.annotations' | t"><span aria-hidden="true">✎</span>
+      <span class="sidebar-rail__badge" *ngIf="vm.annotationCount() as count">{{ count }}</span></button>
+    <button type="button" class="sidebar-rail__btn" data-testid="rail-settings" (click)="openFromRail('settings')"
+      [attr.aria-label]="'sidebar.tabs.settings' | t" [attr.title]="'sidebar.tabs.settings' | t"><span aria-hidden="true">⚙</span></button>
+  </nav>
 
   <div class="sidebar-content" *ngIf="!vm.sidebarMinimized()">
   <div class="sidebar-scroll">
@@ -232,8 +238,8 @@
     </ng-container>
   </section>
   </div>
-  <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-templates" aria-labelledby="sidebar-tab-templates"
-    [hidden]="vm.sidebarTab() !== 'templates'">
+  <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-templates" aria-labelledby="sidebar-tab-settings"
+    [hidden]="vm.sidebarTab() !== 'settings'">
   <section class="templates">
     <h2>{{ 'sidebar.templates.title' | t }}</h2>
     <div class="templates__save">
@@ -274,8 +280,8 @@
     </ng-template>
   </section>
   </div>
-  <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-advanced" aria-labelledby="sidebar-tab-advanced"
-    [hidden]="vm.sidebarTab() !== 'advanced'">
+  <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-advanced" aria-labelledby="sidebar-tab-settings"
+    [hidden]="vm.sidebarTab() !== 'settings'">
   <section class="advanced-panel" [class.open]="vm.advancedOptionsOpen()"
     [class.active]="vm.guidesFeatureEnabled() || vm.customFontsFeatureEnabled()">
     <button type="button" class="advanced-toggle" (click)="vm.toggleAdvancedOptions(!vm.advancedOptionsOpen())"

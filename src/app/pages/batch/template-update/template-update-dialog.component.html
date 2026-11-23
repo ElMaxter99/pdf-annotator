@@ -119,6 +119,11 @@
                     <small>{{
                       row.doc ? ('batch.upd.docOf' | t: { label: row.doc.label }) : ('batch.upd.noDoc' | t)
                     }}</small>
+                    @if (row.why; as why) {
+                      <small class="upd-why" data-testid="tpl-why">{{
+                        'batch.upd.noPagesWhy' | t: { pages: why.pages, skippedPages: why.skippedPages, skippedFields: why.skippedFields }
+                      }}</small>
+                    }
                   </button>
                   @if (row.diff) {
                     <span class="upd-diff">

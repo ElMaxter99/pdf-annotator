@@ -150,7 +150,8 @@
       "document": "Document",
       "annotations": "Annotations",
       "templates": "Modèles",
-      "advanced": "Avancé"
+      "advanced": "Avancé",
+      "settings": "Réglages"
     },
     "empty": {
       "title": "Pas encore d'annotations",
@@ -270,13 +271,30 @@
       "hintPreview": "Choisissez une couleur, saisissez un HEX ou un RGB. Le JSON exportera toujours la couleur en HEX.",
       "hintEdit": "Collez un HEX ou un RGB existant pour réutiliser des couleurs exactes.",
       "hexPlaceholder": "#5eead4",
-      "rgbPlaceholder": "rgb(94, 234, 212)"
+      "rgbPlaceholder": "rgb(94, 234, 212)",
+      "rgbLabel": "Couleur (RVB)"
     },
     "actions": {
-      "duplicate": "Dupliquer l'annotation"
+      "duplicate": "Dupliquer l'annotation",
+      "accept": "Valider",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "close": "Fermer"
     },
     "editingBadge": "Édition",
-    "coordinatesLabel": "Coordonnées (PDF)"
+    "coordinatesLabel": "Coordonnées (PDF)",
+    "title": {
+      "create": "Nouvelle annotation",
+      "edit": "Modifier l'annotation"
+    },
+    "more": {
+      "show": "Plus d'options",
+      "hide": "Moins d'options"
+    },
+    "error": {
+      "field": "Saisissez le nom du champ."
+    },
+    "lockedNote": "Annotation verrouillée. Déverrouillez-la pour la modifier."
   },
   "fonts": {
     "custom": {
@@ -442,6 +460,7 @@
       "back": "Panneau",
       "versionA": "A : {{name}}",
       "editingB": "Édition de la version B",
+      "lote": "Lot",
       "viewLabel": "Comment voir A",
       "view": {
         "overlay": "Superposé",
@@ -1260,7 +1279,8 @@
       "backToPanel": "Retour au tableau",
       "undoNotice": "{{count}} modèles mis à jour.",
       "undoAll": "Tout annuler",
-      "backupDone": "Copie téléchargée : {{count}} modèles."
+      "backupDone": "Copie téléchargée : {{count}} modèles.",
+      "noPagesWhy": "Le document a {{pages}} pages, mais aucune avec des champs valides ({{skippedPages}} pages et {{skippedFields}} champs écartés). Chaque champ nécessite x et y numériques et un mapField."
     }
   },
   "preview": {

@@ -150,7 +150,8 @@
       "document": "Documento",
       "annotations": "Anotações",
       "templates": "Modelos",
-      "advanced": "Avançado"
+      "advanced": "Avançado",
+      "settings": "Definições"
     },
     "empty": {
       "title": "Ainda não há anotações",
@@ -270,13 +271,30 @@
       "hintPreview": "Escolha uma cor, introduza um HEX ou um RGB. O JSON exportará sempre a cor em HEX.",
       "hintEdit": "Cole um HEX ou um RGB existente para reutilizar cores exatas.",
       "hexPlaceholder": "#5eead4",
-      "rgbPlaceholder": "rgb(94, 234, 212)"
+      "rgbPlaceholder": "rgb(94, 234, 212)",
+      "rgbLabel": "Cor (RGB)"
     },
     "actions": {
-      "duplicate": "Duplicar anotação"
+      "duplicate": "Duplicar anotação",
+      "accept": "Aceitar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "close": "Fechar"
     },
     "editingBadge": "A editar",
-    "coordinatesLabel": "Coordenadas (PDF)"
+    "coordinatesLabel": "Coordenadas (PDF)",
+    "title": {
+      "create": "Nova anotação",
+      "edit": "Editar anotação"
+    },
+    "more": {
+      "show": "Mais opções",
+      "hide": "Menos opções"
+    },
+    "error": {
+      "field": "Escreve o nome do campo."
+    },
+    "lockedNote": "Anotação bloqueada. Desbloqueia-a para a editar."
   },
   "fonts": {
     "custom": {
@@ -442,6 +460,7 @@
       "back": "Painel",
       "versionA": "A: {{name}}",
       "editingB": "A editar a versão B",
+      "lote": "Lote",
       "viewLabel": "Como ver A",
       "view": {
         "overlay": "Por cima",
@@ -1260,7 +1279,8 @@
       "backToPanel": "Voltar ao painel",
       "undoNotice": "{{count}} modelos atualizados.",
       "undoAll": "Desfazer tudo",
-      "backupDone": "Cópia descarregada: {{count}} modelos."
+      "backupDone": "Cópia descarregada: {{count}} modelos.",
+      "noPagesWhy": "O documento tem {{pages}} páginas, mas nenhuma com campos válidos ({{skippedPages}} páginas e {{skippedFields}} campos descartados). Cada campo precisa de x e y numéricos e de um mapField."
     }
   },
   "preview": {

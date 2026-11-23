@@ -3,7 +3,11 @@ import { addAnnotation, applyJsonText, EXAMPLE_JSON, fieldCount, jsonEditor, ope
 
 const undoBtn = (page: Page) => page.getByRole('button', { name: /Deshacer/ });
 const redoBtn = (page: Page) => page.getByRole('button', { name: /Rehacer/ });
-const clearBtn = (page: Page) => page.getByRole('button', { name: /Limpiar/ });
+const clearBtn = (page: Page) => page.getByTestId('clear-open');
+const openClear = async (page: Page) => {
+  await page.getByTestId('more-options').click();
+  await clearBtn(page).click();
+};
 
 test.beforeEach(async ({ page }) => openWorkspace(page));
 
@@ -49,7 +53,7 @@ test('edits can be undone and redone', async ({ page }) => {
   // Justo después de crearla, el clic puede caer en la capa de debajo mientras se redibuja y abrir el editor de CREAR, y
   // el campo del editor puede repoblarse tras escribir: se repite todo el gesto (abrir EDITAR, escribir, guardar) hasta
   // que la anotación muestra el texto nuevo.
-  const valueInput = page.locator('.annotation-editor input[type=text]').nth(1);
+  const valueInput = page.locator('.annotation-editor input[data-autofocus]');
   await expect(async () => {
     if (await page.locator('.annotation-editor').count()) await page.keyboard.press('Escape');
     await page.locator('.annotation').first().click();
@@ -92,7 +96,7 @@ test('clear, JSON apply and file import are undoable steps', async ({ page }) =>
   await page.locator('input[type=file][accept="application/json"]').setInputFiles(EXAMPLE_JSON);
   await expect(page.locator('.annotation')).toHaveCount(10);
 
-  await clearBtn(page).click();
+  await openClear(page);
   await page.getByTestId('clear-confirm').click();
   await expect(page.locator('.annotation')).toHaveCount(0);
   await page.keyboard.press('Control+z');

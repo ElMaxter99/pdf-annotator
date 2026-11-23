@@ -1,5 +1,4 @@
 <footer class="footer">
-  <span class="footer__hint"><kbd>?</kbd> {{ 'shortcuts.footerHint' | t }}</span>
   <div class="json-coords">
     <span class="json-coords__cursor" role="group" aria-live="off" [attr.aria-label]="'controls.cursorLabel' | t">
     <ng-container *ngIf="vm.cursorPdfCoords() as cursor; else coordsIdle">
@@ -8,9 +7,7 @@
       <span class="json-coords__divider" aria-hidden="true">·</span>
       <span class="json-coords__value">Y: {{ cursor.y | number:'1.0-2' }}</span>
     </ng-container>
-    <ng-template #coordsIdle>
-      <span class="json-coords__idle">{{ 'controls.cursorInactive' | t }}</span>
-    </ng-template>
+    <ng-template #coordsIdle></ng-template>
     </span>
     <span class="footer__sr" role="status" aria-live="polite" aria-atomic="true" data-testid="selected-position">
       @if (selectedSpot(); as spot) {{{ 'controls.selectedPosition' | t : { name: spot.name, x: spot.x, y: spot.y } }}}
@@ -21,7 +18,10 @@
     }
   </div>
   <span class="footer__status">
-    <span class="footer__zoomwrap">
+    <span class="footer__group" role="group" [attr.aria-label]="'controls.zoomGroup' | t">
+      <button type="button" class="footer__btn" (click)="vm.zoomOut()" [attr.aria-label]="'controls.zoomOut' | t" [disabled]="!vm.pdfDoc()"
+        [attr.title]="('controls.zoomOut' | t) + ' (−)'" [attr.aria-keyshortcuts]="'-'">−</button>
+      <span class="footer__zoomwrap">
       <button type="button" class="footer__zoom footer__zoom--btn" data-testid="footer-zoom" [disabled]="!vm.pdfDoc()"
         aria-haspopup="menu" [attr.aria-expanded]="vm.zoomMenuOpen()"
         [attr.title]="'zoom.menu.toggleHint' | t"
@@ -46,11 +46,34 @@
         </div>
       }
     </span>
+      <button type="button" class="footer__btn" (click)="vm.zoomIn()" [attr.aria-label]="'controls.zoomIn' | t" [disabled]="!vm.pdfDoc()"
+        [attr.title]="('controls.zoomIn' | t) + ' (+)'" [attr.aria-keyshortcuts]="'+'">+</button>
+    </span>
     @if (vm.unlinkedSplit()) {
       <span class="footer__fit footer__unlinked" data-testid="footer-unlinked">{{ 'batch.editor.split.footer' | t }}</span>
     }
     <button type="button" class="footer__fit" (click)="vm.fitPage()" [disabled]="!vm.pdfDoc()"
       [attr.title]="'app.footer.fitPage' | t">{{ 'controls.fitWidth' | t }}</button>
+    <span class="footer__sep" aria-hidden="true"></span>
+    <span class="footer__viewwrap">
+      <button type="button" class="footer__vista" data-testid="view-menu" [disabled]="!vm.pdfDoc()"
+        aria-haspopup="menu" [attr.aria-expanded]="viewMenuOpen()" (click)="toggleViewMenu($event)">
+        {{ 'preview.mode.label' | t }}: {{ 'preview.mode.' + vm.previewSettings.mode() | t }}
+      </button>
+      @if (viewMenuOpen()) {
+        <div class="zoom-menu footer__view-menu" role="menu" [attr.aria-label]="'preview.mode.group' | t"
+          (keydown)="onViewMenuKey($event)" data-testid="view-menu-list">
+          @for (mode of vm.previewModes; track mode) {
+            <button type="button" role="menuitemradio" class="zoom-menu__item" data-view-item
+              [class.zoom-menu__item--on]="vm.previewSettings.mode() === mode"
+              [attr.aria-checked]="vm.previewSettings.mode() === mode"
+              [disabled]="mode === 'data' && !vm.previewSettings.hasTestData()"
+              [attr.title]="mode === 'data' && !vm.previewSettings.hasTestData() ? ('preview.mode.dataDisabled' | t) : null"
+              (click)="chooseView(mode)">{{ 'preview.mode.' + mode | t }}</button>
+          }
+        </div>
+      }
+    </span>
     <app-version-chip class="footer__version" [version]="vm.version"></app-version-chip>
   </span>
 </footer>

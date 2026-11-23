@@ -7,7 +7,7 @@ const tab = (page: import('@playwright/test').Page, name: string) =>
   page.getByRole('tab', { name: new RegExp(`^\\s*${name}`) });
 
 test('the sidebar is organised in tabs and shows one section at a time', async ({ page }) => {
-  await expect(page.getByRole('tab')).toHaveCount(4);
+  await expect(page.getByRole('tab')).toHaveCount(3);
   await expect(tab(page, 'Documento')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('.sidebar-upload')).toBeVisible();
   await expect(page.locator('.sidebar-thumbnails')).toBeVisible();
@@ -25,10 +25,12 @@ test('the sidebar is organised in tabs and shows one section at a time', async (
   await expect(page.locator('.advanced-panel')).toBeVisible();
 });
 
-test('the cursor coordinates stay visible in every tab', async ({ page }) => {
+test('the cursor coordinates show in the floating bar over the PDF in every tab', async ({ page }) => {
   for (const name of ['Documento', 'Anotaciones', 'Plantillas', 'Avanzado'] as const) {
     await openSidebarTab(page, name);
-    await expect(page.locator('.json-coords')).toBeVisible();
+    const box = await page.locator('.hitbox').boundingBox();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await expect(page.locator('.footer .json-coords__value').first()).toBeVisible();
   }
 });
 
@@ -47,20 +49,28 @@ test('tabs can be changed with the arrow keys, Home and End', async ({ page }) =
   await expect(tab(page, 'Anotaciones')).toHaveAttribute('aria-selected', 'true');
   await expect(tab(page, 'Anotaciones')).toBeFocused();
   await page.keyboard.press('End');
-  await expect(tab(page, 'Avanzado')).toHaveAttribute('aria-selected', 'true');
+  await expect(tab(page, 'Ajustes')).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press('ArrowRight');
   await expect(tab(page, 'Documento')).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press('ArrowLeft');
-  await expect(tab(page, 'Avanzado')).toHaveAttribute('aria-selected', 'true');
+  await expect(tab(page, 'Ajustes')).toHaveAttribute('aria-selected', 'true');
 });
 
 test('the tab choice is kept when the sidebar is minimized and expanded again', async ({ page }) => {
-  await openSidebarTab(page, 'Plantillas');
+  await openSidebarTab(page, 'Ajustes');
   await page.locator('.sidebar-minimize-toggle').click();
   await expect(page.getByRole('tab')).toHaveCount(0);
   await page.locator('.sidebar-minimize-toggle').click();
-  await expect(tab(page, 'Plantillas')).toHaveAttribute('aria-selected', 'true');
+  await expect(tab(page, 'Ajustes')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('.templates')).toBeVisible();
+});
+
+test('the icon rail stays when minimized and opens the chosen panel', async ({ page }) => {
+  await page.locator('.sidebar-minimize-toggle').click();
+  await expect(page.getByTestId('sidebar-rail')).toBeVisible();
+  await page.getByTestId('rail-settings').click();
+  await expect(page.getByTestId('sidebar-rail')).toHaveCount(0);
+  await expect(tab(page, 'Ajustes')).toHaveAttribute('aria-selected', 'true');
 });
 
 test.describe('narrow screens', () => {
@@ -84,12 +94,12 @@ test.describe('narrow screens', () => {
 
 test('the sidebar keeps its tabs and the collapse button while the panel scrolls', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 700 });
-  await openWorkspace(page, { tab: 'Avanzado' });
+  await openWorkspace(page, { tab: 'Ajustes' });
   const toggle = page.locator('.sidebar-minimize-toggle');
   await expect(toggle).toBeVisible();
   await page.locator('.sidebar-scroll').evaluate((el) => (el.scrollTop = el.scrollHeight));
   await expect(toggle).toBeInViewport();
-  await expect(page.getByRole('tab', { name: /^\s*Avanzado/ })).toBeInViewport();
+  await expect(page.getByRole('tab', { name: /^\s*Ajustes/ })).toBeInViewport();
   const scrollers = await page.evaluate(
     () =>
       [...document.querySelectorAll('.sidebar')].filter((e) => e.scrollHeight > e.clientHeight + 2).length,

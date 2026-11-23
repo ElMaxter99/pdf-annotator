@@ -1,7 +1,7 @@
 import { expect, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { PDFDocument } from 'pdf-lib';
-import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
+import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics, openLote } from './helpers';
 
 const pdf = readFileSync(EXAMPLE_PDF);
 const json = readFileSync(EXAMPLE_JSON);
@@ -43,6 +43,7 @@ async function openWithPages(page: Page, pagesA: number, pagesB = 1) {
     .click();
   await page.waitForURL('**/workspace?lote=*');
   await expect(page.locator('.migration-bar')).toContainText('Editando versión B');
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
   // The page count of A is read asynchronously: wait for the header to know the linked range.
@@ -125,6 +126,7 @@ test('«Poner plantilla A» with free pages asks before copying A page 1 into B'
   await openWithPages(page, 2);
   await page.getByTestId('pages-link').click();
   await page.getByTestId('pager-a').getByRole('button', { name: 'Página siguiente de A' }).click();
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-missing').click();
   await expect(page.getByText('Se copiará la página 2 de A en la página 1 de B')).toBeVisible();
@@ -133,6 +135,7 @@ test('«Poner plantilla A» with free pages asks before copying A page 1 into B'
 test('in «A» and «Superpuesta» a free page of A gets its own label', async ({ page }) => {
   await openWithPages(page, 2);
   await page.keyboard.press('Shift+ArrowRight');
+  await openLote(page);
   await page.getByTestId('mode-overlay').click();
   await expect(page.getByTestId('page-tag')).toContainText('A p. 2');
 });

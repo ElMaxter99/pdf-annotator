@@ -8,7 +8,7 @@ test('a freshly opened PDF is fitted to the viewer without scrolling', async ({ 
   await page.waitForURL('**/workspace');
   const canvas = page.locator('.canvas--pdf');
   await expect(canvas).toBeVisible();
-  await expect(page.locator('.toolbar__badge').nth(1)).not.toHaveText('150 %');
+  await expect(page.getByTestId('footer-zoom')).not.toHaveText('150 %');
   await page.waitForTimeout(500);
   const fit = await canvas.evaluate((el) => {
     const viewer = el.closest('.viewer') as HTMLElement;

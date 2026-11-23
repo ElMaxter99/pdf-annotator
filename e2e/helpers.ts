@@ -16,10 +16,18 @@ export async function stubAnalytics(page: Page, options: { fit?: boolean } = {})
 }
 
 /** Opens the workspace with the example invoice loaded and zoomed out to see the whole page. */
-export type SidebarTab = 'Documento' | 'Anotaciones' | 'Plantillas' | 'Avanzado';
+export type SidebarTab = 'Documento' | 'Anotaciones' | 'Ajustes' | 'Plantillas' | 'Avanzado';
 
 export async function openSidebarTab(page: Page, name: SidebarTab) {
-  await page.getByRole('tab', { name: new RegExp(`^\\s*${name}`) }).click();
+  // Plantillas y Avanzado viven ahora en la pestaña «Ajustes».
+  const tab = name === 'Plantillas' || name === 'Avanzado' ? 'Ajustes' : name;
+  await page.getByRole('tab', { name: new RegExp(`^\\s*${tab}`) }).click();
+}
+
+/** La vista (Muestra / Mapeo / Datos) se elige en el desplegable de la píldora. */
+export async function chooseView(page: Page, name: 'Muestra' | 'Mapeo' | 'Datos') {
+  await page.getByTestId('view-menu').click();
+  await page.getByRole('menu', { name: 'Qué se pinta en las anotaciones' }).getByRole('menuitemradio', { name }).click();
 }
 
 export async function openWorkspace(
@@ -37,7 +45,7 @@ export async function openWorkspace(
     await page.waitForTimeout(120);
   }
   // Most tests assert the mapField text, so they open the "Mapeo" view (the app default is "Muestra").
-  await page.getByRole('group', { name: 'Qué se pinta en las anotaciones' }).getByRole('button', { name: options.view ?? 'Mapeo' }).click();
+  await chooseView(page, options.view ?? 'Mapeo');
   // Most flows work with the JSON editor, which lives in the "Anotaciones" tab.
   await openSidebarTab(page, options.tab ?? 'Anotaciones');
   // Single-key shortcuts are ignored while a button has focus, so leave the tab button.
@@ -84,4 +92,11 @@ export async function renderedAnnotations(page: Page) {
       fontSize: el.style.fontSize,
     }))
   );
+}
+
+/** Opens the «Lote» menu of the single batch bar (P-143) unless it is already open. */
+export async function openLote(page: Page) {
+  const menu = page.getByTestId('lote-menu');
+  if (!(await menu.isVisible())) await page.getByTestId('lote-open').click();
+  await expect(menu).toBeVisible();
 }

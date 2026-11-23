@@ -189,7 +189,7 @@ const scenarios = [
       await page.waitForURL('**/workspace');
       await page.locator('.canvas--pdf').waitFor();
       await settle(page, 1200);
-      for (const tab of ['Documento', 'Anotaciones', 'Plantillas', 'Avanzado']) {
+      for (const tab of ['Documento', 'Anotaciones', 'Ajustes']) {
         await clickTab(page, tab);
         await settle(page, 300);
         await audit(`editor · pestaña ${tab}`);

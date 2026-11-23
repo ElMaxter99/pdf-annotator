@@ -12,7 +12,7 @@ test('annotations, page and zoom survive a reload and can be resumed from the la
   await addAnnotation(page, 0.3, 0.3, 'recuperame');
   await expect.poll(() => fieldCount(page)).toBe(1);
   await page.keyboard.press('+'); // 0.5 → 0.75
-  const zoom = page.locator('.toolbar__badge').nth(1);
+  const zoom = page.getByTestId('footer-zoom');
   await expect(zoom).toHaveText('75 %');
   await page.waitForTimeout(1200); // autosave debounce
 
@@ -63,7 +63,8 @@ test('clearing every annotation removes the saved session', async ({ page }) => 
   await openWorkspace(page);
   await addAnnotation(page, 0.3, 0.3, 'temporal');
   await page.waitForTimeout(1200);
-  await page.getByRole('button', { name: /Limpiar/ }).click();
+  await page.getByTestId('more-options').click();
+  await page.getByTestId('clear-open').click();
   await page.getByTestId('clear-confirm').click();
   await page.waitForTimeout(1200);
 

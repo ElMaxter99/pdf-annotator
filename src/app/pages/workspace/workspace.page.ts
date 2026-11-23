@@ -1221,7 +1221,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
-    const focusTarget = editorEl.querySelector<HTMLElement>('input, select, textarea, button');
+    const focusTarget =
+      editorEl.querySelector<HTMLElement>('[data-autofocus]') ??
+      editorEl.querySelector<HTMLElement>('input, select, textarea, button');
     focusTarget?.focus();
   }
 
@@ -1233,7 +1235,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     switch (event.key) {
       case 'Enter':
-        triggerAction('confirm');
+        if ((event.target as HTMLElement | null)?.closest('button')) break;
+        // Pasa por el botón «Aceptar» para que el teclado use la misma validación que el clic.
+        event.preventDefault();
+        (event.currentTarget as HTMLElement | null)
+          ?.querySelector<HTMLButtonElement>('.action-primary')
+          ?.click();
+        break;
         break;
       case 'Escape':
         triggerAction('cancel');

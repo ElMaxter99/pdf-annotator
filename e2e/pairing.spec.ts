@@ -1,7 +1,7 @@
 import { expect, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { PDFDocument } from 'pdf-lib';
-import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
+import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics, openLote } from './helpers';
 
 // Parejas A↔B del editor del lote: navegar desde las tarjetas, resaltar la pareja y unirla con una línea.
 // Usa el ayudante con el proveedor simulado (playwright.config.ts lo arranca con AI_HELPER_FAKE=1).
@@ -38,6 +38,7 @@ async function openBatchWithB(page: Page) {
 }
 
 async function proposeWithAi(page: Page) {
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await page.getByTestId('ai-consent-ok').click();
@@ -96,6 +97,7 @@ test('con la propuesta aplicada, la fila de un campo de B lleva a la pareja en �
   await proposeWithAi(page);
   await page.getByTestId('ai-apply').click();
   await expect(page.getByTestId('ai-review')).toHaveCount(0);
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
   await page.getByTestId('migration-list').locator('.migration-row__name').first().click();

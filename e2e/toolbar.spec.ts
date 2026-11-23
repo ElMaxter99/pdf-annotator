@@ -43,14 +43,16 @@ for (const width of [1920, 1280, 1100]) {
   });
 }
 
-test('«Limpiar» asks before removing the annotations', async ({ page }) => {
+test('«Limpiar» (in the ⋯ menu) asks before removing the annotations', async ({ page }) => {
   await open(page, 1280);
   await page.locator('input[type=file][accept="application/json"]').setInputFiles('examples/anotaciones-ejemplo.json');
   await expect(page.locator('.annotation')).toHaveCount(10);
-  await page.getByRole('button', { name: 'Limpiar' }).click();
+  await page.getByTestId('more-options').click();
+  await page.getByTestId('clear-open').click();
   await page.getByRole('button', { name: 'Cancelar' }).click();
   await expect(page.locator('.annotation')).toHaveCount(10);
-  await page.getByRole('button', { name: 'Limpiar' }).click();
+  await page.getByTestId('more-options').click();
+  await page.getByTestId('clear-open').click();
   await page.getByTestId('clear-confirm').click();
   await expect(page.locator('.annotation')).toHaveCount(0);
 });

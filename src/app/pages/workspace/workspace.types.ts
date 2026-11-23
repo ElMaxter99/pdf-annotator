@@ -31,7 +31,7 @@ export type JsonViewMode = 'text' | 'tree';
 
 export type EditorMode = 'preview' | 'edit';
 
-export const SIDEBAR_TABS = ['document', 'annotations', 'templates', 'advanced'] as const;
+export const SIDEBAR_TABS = ['document', 'annotations', 'settings'] as const;
 export type SidebarTab = (typeof SIDEBAR_TABS)[number];
 
 export const AUTO_APPLY_JSON_DELAY_MS = 300;

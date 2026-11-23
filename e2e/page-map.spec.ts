@@ -1,7 +1,7 @@
 import { expect, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { PDFDocument } from 'pdf-lib';
-import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
+import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics, openLote } from './helpers';
 
 const pdf = readFileSync(EXAMPLE_PDF);
 const json = readFileSync(EXAMPLE_JSON);
@@ -35,6 +35,7 @@ async function openWithCover(page: Page) {
     .getByRole('button', { name: 'Revisar' })
     .click();
   await page.waitForURL('**/workspace?lote=*');
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('pages-differ')).toContainText('A 1 págs · B 2 págs');
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
@@ -78,6 +79,8 @@ test('page table: «Sugerir por textos» finds the shift and «Poner plantilla A
   await expect(page.getByTestId('pm-row-1').locator('select')).toHaveValue('');
   await page.getByTestId('pm-apply').click();
 
+  await openLote(page);
+
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-copy').click();
   await expect(page.getByText('páginas con equivalente: 1 · sin equivalente: 1')).toBeVisible();
@@ -109,6 +112,7 @@ test('page table: it survives a reload and the notice says the pages are matched
   await expect(page.getByTestId('pages-differ')).toContainText('emparejadas con la tabla');
 
   await page.reload();
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('pages-link')).toContainText('Páginas emparejadas');
   await page.getByTestId('pages-menu').click();

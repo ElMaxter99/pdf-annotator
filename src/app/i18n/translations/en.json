@@ -150,7 +150,8 @@
       "document": "Document",
       "annotations": "Annotations",
       "templates": "Templates",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "settings": "Settings"
     },
     "empty": {
       "title": "No annotations yet",
@@ -270,13 +271,30 @@
       "hintPreview": "Pick a color, type a HEX or an RGB value. The JSON will always export the color in HEX.",
       "hintEdit": "Paste an existing HEX or RGB value to reuse exact colors.",
       "hexPlaceholder": "#5eead4",
-      "rgbPlaceholder": "rgb(94, 234, 212)"
+      "rgbPlaceholder": "rgb(94, 234, 212)",
+      "rgbLabel": "Colour (RGB)"
     },
     "actions": {
-      "duplicate": "Duplicate annotation"
+      "duplicate": "Duplicate annotation",
+      "accept": "Accept",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "close": "Close"
     },
     "editingBadge": "Editing",
-    "coordinatesLabel": "Coordinates (PDF)"
+    "coordinatesLabel": "Coordinates (PDF)",
+    "title": {
+      "create": "New annotation",
+      "edit": "Edit annotation"
+    },
+    "more": {
+      "show": "More options",
+      "hide": "Fewer options"
+    },
+    "error": {
+      "field": "Enter the field name."
+    },
+    "lockedNote": "Annotation locked. Unlock it to edit."
   },
   "fonts": {
     "custom": {
@@ -442,6 +460,7 @@
       "back": "Panel",
       "versionA": "A: {{name}}",
       "editingB": "Editing version B",
+      "lote": "Batch",
       "viewLabel": "How to see A",
       "view": {
         "overlay": "Overlay",
@@ -1260,7 +1279,8 @@
       "backToPanel": "Back to the panel",
       "undoNotice": "{{count}} templates updated.",
       "undoAll": "Undo all",
-      "backupDone": "Backup downloaded: {{count}} templates."
+      "backupDone": "Backup downloaded: {{count}} templates.",
+      "noPagesWhy": "The document has {{pages}} pages, but none with valid fields ({{skippedPages}} pages and {{skippedFields}} fields discarded). Each field needs numeric x and y and a mapField."
     }
   },
   "preview": {
