@@ -1,4 +1,4 @@
-# Espacio de trabajo libre (P-127, 1.18)
+# Espacio de trabajo libre (P-133, 1.18)
 
 **Estado: aprobada por Maxter el 2026-11-23 («diseño ok», «ambos diseños»: un PDF y «Dividida»); en las cuatro preguntas, lo recomendado. Implementada.** Origen: petición de Maxter al probar el traslado (poder subir los PDF y dejar A en una esquina). Continúa P-109 (margen horizontal).
 
