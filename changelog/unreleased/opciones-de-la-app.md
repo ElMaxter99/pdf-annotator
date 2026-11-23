@@ -1,4 +1,0 @@
----
-type: Added
----
-**Zona de «Opciones» de la app (mesas P-150 a P-152, aprobadas por Maxter):** ventana modal desde ⋯ › «Opciones…» (también en la landing y el lote), con `Ctrl/⌘ + ,` y desde la paleta Ctrl+K. Dos secciones, solo donde existen: **Actualizaciones** (canal, «Buscar ahora» y notas; solo escritorio) e **Inteligencia artificial** (proveedor y modelo por defecto, los mismos del popover de «Trasladar con IA», y el nuevo **límite de peticiones por traslado**: 10 · 25 · 50 · 100 · «Sin límite» · «Otro…» de 1 a 500; solo escritorio o local). El límite es por proveedor (Copilot 10 por defecto, Claude Code sin límite), antes fijo en 10 y solo con Copilot, y cuenta peticiones a la IA, no PDFs. Al llegar al límite, el aviso del lote enlaza a «Cambiar el límite en Opciones». En la web no hay Opciones. Textos en los 7 idiomas.
