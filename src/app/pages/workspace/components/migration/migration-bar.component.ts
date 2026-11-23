@@ -191,6 +191,10 @@ export class MigrationBarComponent implements OnInit {
       this.vm.aiConsentOpen.set(false);
       return;
     }
+    if (this.loteOpen() && !this.menuOpen() && !this.vm.aiPanelOpen()) {
+      this.loteOpen.set(false);
+      return;
+    }
     if (this.vm.aiPanelOpen()) {
       this.vm.aiPanelOpen.set(false);
       return;
