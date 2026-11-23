@@ -1,4 +1,6 @@
 ## Unreleased
+### Fixed
+- **Los filtros del panel del lote se conservan al volver (petición de Maxter):** la búsqueda por nombre, el filtro de estado y el de «lo que tienen» se perdían al entrar en un PDF y volver al panel. Ahora viven en `BatchStoreService` (en memoria, por lote) y solo se reinician al cambiar de lote o vaciarlo. Sin cambios visibles de interfaz. `e2e/batch.spec.ts` lo cubre.
 
 ## [v1.18.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.18.0) - 2026-11-23
 ### Added

@@ -45,7 +45,6 @@ const MAX_JSON_BYTES = 5 * 1024 * 1024;
 type RowState = 'ready' | 'review' | 'noTemplate';
 type Step = 'pdfs' | 'templates' | 'panel';
 type ViewMode = 'grid' | 'list';
-type Filter = 'all' | 'review' | 'ready';
 
 interface TemplateInfo {
   readonly name: string;
@@ -125,16 +124,16 @@ export class BatchPageComponent implements OnInit {
   readonly loaded = this.store.loaded;
   readonly persistent = this.store.persistent;
   readonly activeId = this.store.activeId;
-  readonly query = signal('');
+  readonly query = this.store.panelQuery;
   readonly dragActive = signal(false);
   readonly confirmRemove = signal<string | null>(null);
   private manualTarget: string | null = null;
 
   readonly step = signal<Step>('pdfs');
   readonly view = signal<ViewMode>(readView());
-  readonly filter = signal<Filter>('all');
+  readonly filter = this.store.panelFilter;
   /** «What they have» filter (and the funnel steps); combines with the state filter. */
-  readonly kind = signal<KindFilter>('any');
+  readonly kind = this.store.panelKind;
   readonly templates = signal<Map<string, TemplateInfo>>(new Map());
   readonly templateTab = signal<'files' | 'paste'>('files');
   readonly pasteText = signal('');

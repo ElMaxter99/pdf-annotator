@@ -1051,3 +1051,20 @@ test('«Dividida» desenlazada: double click on the A tag centres A in its pane 
   await expect.poll(async () => Math.abs(await offsetInPaneA(page))).toBeGreaterThan(20);
 });
 
+
+test('the panel filters survive going into a PDF and coming back', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await page.locator('.batch-search').fill('0331');
+  await expect(page.getByTestId('panel-item')).toHaveCount(1);
+  await page
+    .getByTestId('panel-item')
+    .getByRole('button', { name: 'Revisar' })
+    .click();
+  await page.waitForURL('**/workspace?lote=*');
+  await expect(page.locator('.canvas--pdf')).toBeVisible();
+  await page.goBack();
+  await page.waitForURL('**/lote');
+  await expect(page.locator('.batch-search')).toHaveValue('0331');
+  await expect(page.getByTestId('panel-item')).toHaveCount(1);
+});

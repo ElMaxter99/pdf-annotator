@@ -1,4 +1,5 @@
 import { sanitizeAiRun, type AiRunRecord } from '../utils/ai-run.utils';
+import type { KindFilter } from '../utils/batch-summary.utils';
 import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
 import type { AiSavedProposal, BatchItem, FieldLink, PageMapData } from '../models/batch.model';
@@ -62,6 +63,7 @@ export class BatchStoreService {
   /** Puts the items of a desktop project in memory; from now on changes go to its folder (or nowhere if read-only). */
   attachProject(items: BatchItem[], sink: BatchSink | null, settings?: Partial<BatchSettings> | null): void {
     this.closedNotices.set({});
+    this.resetPanelFilters();
     this.items.set(items);
     this.aiInstructions.set(cleanAiInstructions(settings?.aiInstructions));
     this.aiRun.set(sanitizeAiRun(settings?.aiRun));
@@ -81,6 +83,7 @@ export class BatchStoreService {
     this.aiRun.set(null);
     this.activeId.set(null);
     this.closedNotices.set({});
+    this.resetPanelFilters();
     this.loaded.set(false);
   }
 
@@ -318,8 +321,20 @@ export class BatchStoreService {
   /** Notices of the editor that were closed (`itemId:notice` → what they were about). In memory only. */
   readonly closedNotices = signal<Record<string, string>>({});
 
+  /** Filters of the batch panel (search, state, «what they have»). They live here, not in the page, so they survive going into a PDF and back. In memory only; they reset when the batch changes. */
+  readonly panelQuery = signal('');
+  readonly panelFilter = signal<'all' | 'review' | 'ready'>('all');
+  readonly panelKind = signal<KindFilter>('any');
+
+  private resetPanelFilters(): void {
+    this.panelQuery.set('');
+    this.panelFilter.set('all');
+    this.panelKind.set('any');
+  }
+
   async clear(): Promise<void> {
     this.closedNotices.set({});
+    this.resetPanelFilters();
     this.items.set([]);
     this.activeId.set(null);
     if (this.projectMode !== 'none') {
