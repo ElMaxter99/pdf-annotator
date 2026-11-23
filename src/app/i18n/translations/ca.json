@@ -492,7 +492,7 @@
         "reopen": "Podràs reobrir-lo i canviar-lo quan vulguis.",
         "confirm": "Marca com a llest",
         "keep": "Continua editant",
-        "missing": "Queden {{count}} camps d'A sense col·locar a B."
+        "missing": "Queden {{count}} camps d’A sense col·locar a B: passaran a «Eliminats de B»."
       },
       "plain": "Editant amb la seva plantilla",
       "navLabel": "Moure's pel lot",
@@ -634,7 +634,17 @@
     "panel": {
       "title": "Camps de B · {{count}}",
       "toResolve": "Per resoldre {{count}}",
-      "allSet": "Tot resolt",
+      "allSet": "Revisat",
+      "toReview": "Per revisar · {{count}}",
+      "reviewed": "Tot revisat.",
+      "reviewedText": "{{count}} camps col·locats a B; res no espera una decisió teva.",
+      "markedReady": "PDF marcat com a Llest.",
+      "summary": "Resum del trasllat",
+      "sumNew": "Nous: {{count}}",
+      "sumMoved": "Moguts: {{count}}",
+      "sumRenamed": "Reanomenats: {{count}}",
+      "sumRemoved": "Eliminats: {{count}}",
+      "removedBadge": "Eliminat de B",
       "emptyB": "B és buida. Posa la plantilla d’A i ajusta el que hagi canviat.",
       "noTemplate": "Aquest PDF no té JSON d’A: B comença buida.",
       "page": "pàg. {{page}}",

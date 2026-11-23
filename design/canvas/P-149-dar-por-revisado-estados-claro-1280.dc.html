@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-149 Dar por revisado · estados claro 1280</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.p{width:1280px;height:1480px;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.45}
+.hdr{background:var(--panel);border-radius:16px;padding:12px 20px;display:flex;align-items:center;gap:14px;border:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--accent);margin-right:8px}
+.brand small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.s{min-height:32px;padding:4px 12px;font-size:13px}
+.btn[disabled]{opacity:.45}
+.st{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.st.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.st.done{color:var(--text)}
+.st.err{color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,transparent)}
+.st.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 16px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:var(--inset)}
+.drop.act{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--inset))}
+.ic{width:44px;height:44px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.row.sel{outline:2px solid var(--accent)}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar i.w{background:var(--warn)}.bar i.e{background:var(--danger)}
+.mono{font-family:Consolas,monospace;font-size:13px}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.pane{background:var(--inset);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:9%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.bad{border-color:#dc2626;background:rgba(220,38,38,.14)}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.tag{font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--text)}
+.tbl{display:flex;flex-direction:column;gap:6px}
+.tr{display:grid;gap:14px;align-items:center;padding:7px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sp{flex-grow:1}
+.sk{background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));border-radius:6px;display:inline-block}
+.note{border-radius:12px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.note.w{background:color-mix(in srgb,var(--warn) 14%,transparent);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+.note.e{background:color-mix(in srgb,var(--danger) 12%,transparent);border:1px solid color-mix(in srgb,var(--danger) 60%,transparent)}
+.note.i{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.radio{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1px solid var(--line)}
+.radio.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;margin-top:2px}
+.radio.on .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+.chk.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.ta{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre;overflow:hidden}
+.g2{display:grid;gap:16px}
+.toast{position:absolute;right:24px;bottom:24px;background:var(--panel);border-left:4px solid var(--accent);border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;gap:12px;font-size:14px}
+.toast.e{border-color:var(--danger)}
+
+.sm{font-size:12px;color:var(--muted)}
+.tag.n{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600}
+.sum{border:1px solid var(--line);border-radius:14px;background:var(--soft);overflow:hidden}
+.sum>.sh{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--muted);font-size:13px;width:100%;border:0;background:transparent;font-family:inherit;text-align:left}
+.sum .cnt{display:flex;gap:6px;flex-wrap:wrap}
+.sum .cnt span{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line)}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.tabs{display:flex;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
+.tabs span{padding:6px 12px;border-radius:999px}.tabs span.on{background:var(--soft);color:var(--text)}
+.grp{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.hd2{font-size:13px;color:var(--muted)}
+</style>
+</helmet>
+<div class="p" style="--bg:#f6f7fb;--panel:#ffffff;--accent:#0f9b8e;--danger:#dc2626;--text:#0f172a;--muted:#475569;--ink:#ffffff;--line:rgba(15,23,42,.18);--soft:rgba(15,23,42,.05);--warn:#b45309;--ok:#0f766e;--inset:#eef0f6">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">P-149 · Propuesta · claro 1280</span><h1 style="font-size:26px;font-weight:600">Estados del panel</h1><p class="cap" style="max-width:1300px">Un mismo panel, cuatro momentos. Solo el pendiente pide acción; lo informativo vive en el resumen.</p></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div style="display:flex;flex-direction:column;gap:10px"><div><span class="lab">1 · Revisando, con pendientes</span><p class="cap">Chip «Por resolver 2». Los 12 nuevos y 3 movidos ya cuentan como revisados.</p></div><div class="side" style="gap:10px"><div class="hd2" style="display:flex;gap:8px;align-items:center"><b style="color:var(--text);font-size:15px">Campos de B · 31</b><span class="sp"></span><span class="st on">Por resolver 2</span></div><div class="grp">Por revisar · 2</div><div class="row"><span class="mono">firma_2</span><span class="sm">pág. 7 · falta en B</span><span class="sp"></span><button class="btn s">Colocar en B</button><button class="btn g s">Descartar</button></div><div class="row"><span class="mono">sello</span><span class="sm">pág. 8 · falta en B</span><span class="sp"></span><button class="btn s">Colocar en B</button><button class="btn g s">Descartar</button></div><div class="sum"><button class="sh"><span>▸</span><b style="color:var(--text);font-weight:600">Resumen del traslado</b><span class="sp"></span><span class="cnt"><span>12 nuevos</span><span>3 movidos</span><span>1 renombrado</span><span>2 quitados</span></span></button></div></div></div><div style="display:flex;flex-direction:column;gap:10px"><div><span class="lab">2 · Revisando, sin pendientes</span><p class="cap">Nada que decidir: aparece la tarjeta y el botón «Marcar Listo» se vuelve el principal.</p></div><div class="side" style="gap:10px"><div class="hd2" style="display:flex;gap:8px;align-items:center"><b style="color:var(--text);font-size:15px">Campos de B · 31</b><span class="sp"></span><span class="st done">✓ Revisado</span></div><div class="note i"><span>✓</span><div><b>Todo revisado.</b> 15 campos colocados en B.</div></div><div class="sum"><button class="sh"><span>▸</span><b style="color:var(--text);font-weight:600">Resumen del traslado</b><span class="sp"></span><span class="cnt"><span>12 nuevos</span><span>3 movidos</span><span>1 renombrado</span><span>0 quitados</span></span></button></div></div></div><div style="display:flex;flex-direction:column;gap:10px"><div><span class="lab">3 · «Listo» con quitados</span><p class="cap">Los 2 «Falta en B» pasaron a «Quitados de B». El PDF se siente terminado.</p></div><div class="side" style="gap:10px"><div class="hd2" style="display:flex;gap:8px;align-items:center"><b style="color:var(--text);font-size:15px">Campos de B · 31</b><span class="sp"></span><span class="st done">✓ Revisado</span></div><div class="note i"><span>✓</span><div><b>Todo revisado.</b> 15 campos colocados en B; nada espera una decisión tuya.<div class="sm" style="margin-top:2px">Marcado Listo · 23 nov, 21:40</div></div></div><div class="sum"><button class="sh"><span>▾</span><b style="color:var(--text);font-weight:600">Resumen del traslado</b><span class="sp"></span><span class="cnt"><span>12 nuevos</span><span>3 movidos</span><span>1 renombrado</span><span>2 quitados</span></span></button><div style="padding:4px 14px 14px;display:flex;flex-direction:column;gap:6px">
+<div class="grp">Nuevos · 12</div><div class="row"><span class="mono">B13</span><span class="sm">pág. 11</span><span class="sp"></span><span class="tag n">Nuevo</span></div><div class="row"><span class="mono">B14</span><span class="sm">pág. 12</span><span class="sp"></span><span class="tag n">Nuevo</span></div><div class="row"><span class="mono">nif_cliente</span><span class="sm">pág. 9</span><span class="sp"></span><span class="tag n">Nuevo</span></div><div class="sm">… 9 más</div>
+<div class="grp">Movidos · 3</div><div class="row"><span class="mono">importe_total</span><span class="sm">pág. 3</span><span class="sp"></span><span class="tag n">Movido</span></div><div class="row"><span class="mono">fecha_emision</span><span class="sm">pág. 1</span><span class="sp"></span><span class="tag n">Movido</span></div><div class="row"><span class="mono">iban</span><span class="sm">pág. 12</span><span class="sp"></span><span class="tag n">Movido</span></div>
+<div class="grp">Renombrados · 1</div><div class="row"><span class="mono">total_iva</span><span class="sm">pág. 4</span><span class="sp"></span><span class="tag n">antes: iva_total</span></div>
+<div class="grp">Quitados de B · 2</div><div class="row"><span class="mono">firma_2</span><span class="sm">pág. 7</span><span class="sp"></span><span class="tag n">No está en B</span></div><div class="row"><span class="mono">sello</span><span class="sm">pág. 8</span><span class="sp"></span><span class="tag n">No está en B</span></div>
+</div></div></div></div><div style="display:flex;flex-direction:column;gap:10px"><div><span class="lab">4 · Diálogo de «Listo»</span><p class="cap">Mismo diálogo de hoy, con el desglose en una línea.</p></div><div class="card" style="gap:10px"><h3>¿Marcar factura-2026-0417.pdf como Listo?</h3><ul class="cap" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px"><li>31 campos en B, todos revisados.</li><li>12 nuevos · 3 movidos · 1 renombrado · 15 iguales.</li><li style="color:var(--warn)">2 siguen sin colocar: pasarán a «Quitados de B».</li><li>Puedes reabrirlo cuando quieras.</li></ul><div style="display:flex;gap:10px"><button class="btn">Marcar Listo</button><button class="btn g">Seguir revisando</button></div></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1480}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

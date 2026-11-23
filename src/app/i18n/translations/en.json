@@ -492,7 +492,7 @@
         "reopen": "You can reopen and change it at any time.",
         "confirm": "Mark as done",
         "keep": "Keep editing",
-        "missing": "{{count}} fields of A are still not placed in B."
+        "missing": "{{count}} fields of A are still not placed in B: they will move to “Removed from B”."
       },
       "plain": "Editing with its template",
       "navLabel": "Move through the batch",
@@ -634,7 +634,17 @@
     "panel": {
       "title": "Fields of B · {{count}}",
       "toResolve": "To resolve {{count}}",
-      "allSet": "All resolved",
+      "allSet": "Reviewed",
+      "toReview": "To review · {{count}}",
+      "reviewed": "All reviewed.",
+      "reviewedText": "{{count}} fields placed in B; nothing is waiting for your decision.",
+      "markedReady": "PDF marked as Ready.",
+      "summary": "Transfer summary",
+      "sumNew": "New: {{count}}",
+      "sumMoved": "Moved: {{count}}",
+      "sumRenamed": "Renamed: {{count}}",
+      "sumRemoved": "Removed: {{count}}",
+      "removedBadge": "Removed from B",
       "emptyB": "B is empty. Put A’s template and adjust what changed.",
       "noTemplate": "This PDF has no JSON for A: B starts empty.",
       "page": "p. {{page}}",

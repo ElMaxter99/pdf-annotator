@@ -492,7 +492,7 @@
         "reopen": "Poderá reabri-lo e alterá-lo quando quiser.",
         "confirm": "Marcar como concluído",
         "keep": "Continuar a editar",
-        "missing": "Faltam colocar {{count}} campos de A em B."
+        "missing": "{{count}} campos de A ainda não estão colocados em B: passarão para «Removidos de B»."
       },
       "plain": "A editar com o seu modelo",
       "navLabel": "Mover-se pelo lote",
@@ -634,7 +634,17 @@
     "panel": {
       "title": "Campos de B · {{count}}",
       "toResolve": "Por resolver {{count}}",
-      "allSet": "Tudo resolvido",
+      "allSet": "Revisto",
+      "toReview": "Para rever · {{count}}",
+      "reviewed": "Tudo revisto.",
+      "reviewedText": "{{count}} campos colocados em B; nada aguarda uma decisão sua.",
+      "markedReady": "PDF marcado como Pronto.",
+      "summary": "Resumo da transferência",
+      "sumNew": "Novos: {{count}}",
+      "sumMoved": "Movidos: {{count}}",
+      "sumRenamed": "Renomeados: {{count}}",
+      "sumRemoved": "Removidos: {{count}}",
+      "removedBadge": "Removido de B",
       "emptyB": "B está vazia. Coloque o modelo de A e ajuste o que mudou.",
       "noTemplate": "Este PDF não tem JSON de A: B começa vazia.",
       "page": "pág. {{page}}",
