@@ -50,7 +50,7 @@ Es un ensayo general. «Candidata a versión final». Tiene instaladores reales 
 Repositorio: `ElMaxter99/pdf-annotator`. Ramas: `develop` (trabajo) y `master` (estable; la alinea el workflow «Release»). Variable: `X.Y.Z` = versión (solo dígitos).
 
 ## 0. Antes de empezar
-- [ ] Hay trabajo fusionado en `develop` que justifique versión (`CHANGELOG.md` → *Unreleased* no vacío).
+- [ ] Hay trabajo fusionado en `develop` que justifique versión (hay ficheros en `changelog/unreleased/` o algo en `CHANGELOG.md` → *Unreleased*).
 - [ ] Decide `X.Y.Z` (patch = solo arreglos, minor = funcionalidad) y díselo a Maxter si hay duda.
 - [ ] **¿RC o directo?** Haz RC (pasos 2–4) si hay funcionalidad nueva, cambios en `desktop/` (Electron, instaladores, actualizador), en los workflows de release o en algo que solo se prueba instalando; también si es la primera versión tras un cambio de proceso. Puedes ir directo al paso 5 (con el visto bueno de Maxter) solo para arreglos pequeños y de bajo riesgo, con la versión anterior sana. Si dudas, haz RC y explícaselo a Maxter. Una RC es un ensayo de la **misma** versión: no se sube el número por cada RC.
 - [ ] La rama asignada ya fusionada se reinicia desde `develop` sin forzar: `git fetch origin develop && git switch -C <rama> origin/develop` (un `push --force` puede estar denegado; un push normal avanza si `develop` ya contiene lo viejo).
@@ -58,7 +58,7 @@ Repositorio: `ElMaxter99/pdf-annotator`. Ramas: `develop` (trabajo) y `master` (
 ## 1. Subir la versión (PR a `develop`)
 - [ ] `npm run release:deploy -- bump X.Y.Z` (cambia `package.json` y el badge del README).
 - [ ] `package-lock.json`: líneas 3 y 9 → `X.Y.Z`. `node scripts/sync-desktop-version.mjs` (copia a `desktop/package.json`).
-- [ ] `CHANGELOG.md`: dejar `## Unreleased` vacío y debajo `## [vX.Y.Z](https://github.com/ElMaxter99/pdf-annotator/tree/v.X.Y.Z) - AAAA-MM-DD` con el contenido que había en *Unreleased*.
+- [ ] `CHANGELOG.md`: `npm run changelog:release -- X.Y.Z` (opcional `--date AAAA-MM-DD`) junta los ficheros de `changelog/unreleased/` y lo que hubiera en *Unreleased* en `## [vX.Y.Z](…) - AAAA-MM-DD`, deja `## Unreleased` vacío y borra los ficheros. Revisa antes con `npm run changelog:preview`.
 - [ ] `node scripts/release-notes.mjs X.Y.Z-rc.1 | head` debe mostrar las notas (no «Aún no hay sección»).
 - [ ] Commit, push a la rama asignada, PR a `develop` (cuerpo con las 2 líneas de atribución del proyecto).
 - [ ] Esperar `build-and-test` **verde**. Snyk, Codex y CodeRabbit fallan por límites de cuenta: se ignoran. Fusionar (merge) con `expectedHeadSha`.
