@@ -187,6 +187,16 @@ describe('AiBatchService', () => {
     expect(helper.calls).toBe(3);
   });
 
+  it('counts every request a PDF makes against the limit, not one per PDF', async () => {
+    helper.limits.set({ claude: 5, copilot: 10 });
+    const many = { ...result(true), details: { requests: 4 } as never };
+    helper.steps = [many, many, many];
+    service.start();
+    await finished();
+    expect(service.pause()?.kind).toBe('cap');
+    expect(helper.calls).toBe(2);
+  });
+
   it('pauses after the pair in progress and cancels by aborting it', async () => {
     helper.steps = ['wait'];
     service.start();

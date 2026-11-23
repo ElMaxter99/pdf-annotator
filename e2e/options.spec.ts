@@ -54,7 +54,10 @@ test('el límite de peticiones tiene valores por defecto, se guarda y valida «O
   await page.getByTestId('options-limit-other').click();
   await page.getByTestId('options-limit-input').fill('0');
   await expect(page.getByTestId('options-limit-error')).toBeVisible();
-  await page.getByTestId('options-limit-input').fill('75');
+  await page.getByTestId('options-limit-input').fill('');
+  await page.getByTestId('options-limit-input').pressSequentially('75');
+  await expect(page.getByTestId('options-limit-input')).toBeFocused();
+  await expect(page.getByTestId('options-limit-input')).toHaveValue('75');
   await expect(page.getByTestId('options-limit-error')).toHaveCount(0);
   expect(await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.limits'))).toContain('"copilot":75');
   // Claude Code arranca sin límite y lo explica.

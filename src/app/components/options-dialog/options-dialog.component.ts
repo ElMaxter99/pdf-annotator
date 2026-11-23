@@ -9,6 +9,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
@@ -69,10 +70,13 @@ export class OptionsDialogComponent {
       const open = this.options.isOpen();
       if (typeof document === 'undefined') return;
       if (open) {
-        this.opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-        this.confirmReset.set(false);
-        this.syncOther();
-        setTimeout(() => this.closeBtn?.nativeElement.focus());
+        // Only the opening matters here: typing a limit changes `limit()` and must not reset the dialog.
+        untracked(() => {
+          this.opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+          this.confirmReset.set(false);
+          this.syncOther();
+          setTimeout(() => this.closeBtn?.nativeElement.focus());
+        });
       } else if (this.opener) {
         this.opener.focus?.();
         this.opener = null;
