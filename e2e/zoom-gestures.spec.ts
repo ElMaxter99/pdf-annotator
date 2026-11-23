@@ -41,8 +41,11 @@ test('holding Space and dragging moves the canvas without creating an annotation
   await page.keyboard.press('Control+=');
   await expect(page.getByTestId('footer-zoom')).toHaveText('150 %');
   const viewer = page.locator('.viewer');
+  await page.waitForTimeout(500);
   const before = await viewer.evaluate((el) => el.scrollTop);
-  const at = await centerOfCanvas(page);
+  // Con el margen vertical (P-120) la hoja puede quedar fuera de la vista tras ampliar: se arrastra desde el centro del visor.
+  const vbox = (await viewer.boundingBox())!;
+  const at = { x: vbox.x + vbox.width / 2, y: vbox.y + vbox.height / 2 };
   await page.mouse.move(at.x, at.y);
   await page.keyboard.down(' ');
   await expect(page.getByTestId('pan-hud')).toBeVisible();
@@ -225,3 +228,24 @@ test('the floating cards and the zoom chip stay on screen with the work margin (
   expect(await inside('first-steps')).toBe(true);
 });
 
+
+test('the viewer has a vertical work margin: the PDF can be moved up and rests at the top', async ({ page }) => {
+  const viewer = page.locator('.viewer');
+  await page.waitForTimeout(400);
+  const home = await viewer.evaluate((el) => ({
+    top: el.scrollTop,
+    margin: Math.round(el.clientHeight / 2),
+    sheetTop: (document.querySelector('.canvas--pdf') as HTMLElement).getBoundingClientRect().top - el.getBoundingClientRect().top,
+    max: el.scrollHeight - el.clientHeight,
+  }));
+  // Reposo: la hoja arriba, como antes del margen (el margen queda por encima, fuera de la vista).
+  expect(Math.abs(home.top - home.margin)).toBeLessThanOrEqual(2);
+  expect(home.sheetTop).toBeLessThan(40);
+  // Se puede llevar la hoja más arriba (scroll hasta el final) y más abajo (hasta el principio).
+  await viewer.evaluate((el) => (el.scrollTop = el.scrollHeight));
+  const up = await page.locator('.canvas--pdf').evaluate((el) => el.getBoundingClientRect().bottom - (el.closest('.viewer') as HTMLElement).getBoundingClientRect().top);
+  expect(up).toBeLessThan(home.margin - 10);
+  await viewer.evaluate((el) => (el.scrollTop = 0));
+  const down = await page.locator('.canvas--pdf').evaluate((el) => el.getBoundingClientRect().top - (el.closest('.viewer') as HTMLElement).getBoundingClientRect().top);
+  expect(down).toBeGreaterThan(home.margin - 20);
+});

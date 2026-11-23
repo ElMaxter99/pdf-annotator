@@ -71,6 +71,8 @@ test('clic en un campo de A dibuja la línea hasta su pareja en B; clic en vací
   await openBatchWithB(page);
   await proposeWithAi(page);
   const fieldA = page.getByTestId('split-a').locator('.reference-field').first();
+  // `boundingBox()` no espera: el campo de A se dibuja tras el render del panel.
+  await expect(fieldA).toBeVisible();
   const r = await fieldA.boundingBox();
   if (!r) throw new Error('sin campo de A');
   await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);

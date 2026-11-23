@@ -189,6 +189,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   observedAPane: HTMLElement | null = null;
   /** `scrollLeft` del reposo del panel A desenlazado (C1), para saber si alguien lo ha movido. */
   aHomeLeft = 0;
+  aHomeTop = 0;
+  viewerHomeTop = 0;
+  reHoming = false;
   readonly zoomMenuOpen = signal(false);
   /** Formato con el que se copia el JSON (solo al copiar; P-130 a P-132) y si su ventana está abierta. */
   readonly jsonCopyFormat = signal(this.storedJsonCopyFormat());
