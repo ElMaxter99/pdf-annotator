@@ -118,7 +118,7 @@ async function workspace(browser) {
   await shot(page, 'json-tree');
 
   // Guides, rulers and grid.
-  await page.getByRole('tab', { name: /^\s*Avanzado/ }).click();
+  await page.getByRole('tab', { name: /^\s*Ajustes/ }).click();
   const advanced = page.locator('.advanced-toggle');
   if ((await advanced.getAttribute('aria-expanded')) !== 'true') await advanced.click();
   await page.getByLabel('Activar guías y snapping').check();
