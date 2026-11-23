@@ -56,9 +56,11 @@ export function estimateAiBatch(
   items: readonly BatchItem[],
   provider: string,
   retry: boolean,
+  limit?: number | null,
 ): AiBatchEstimate {
   const pairs = items.filter(isEligibleForAiBatch);
-  const cap = provider === 'copilot' ? AI_BATCH_COPILOT_CAP : Infinity;
+  const chosen = limit === undefined ? (provider === 'copilot' ? AI_BATCH_COPILOT_CAP : null) : limit;
+  const cap = chosen ?? Infinity;
   return {
     pairs: pairs.length,
     fields: pairs.reduce((n, item) => n + countTemplateFields(item), 0),

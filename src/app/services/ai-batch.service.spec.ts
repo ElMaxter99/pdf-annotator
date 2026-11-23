@@ -36,6 +36,10 @@ class FakeHelper {
   readonly connection = signal('ready');
   readonly provider = signal('claude');
   readonly consent = signal(true);
+  readonly limits = signal<Record<string, number | null>>({ claude: null, copilot: 10 });
+  limitFor(provider: string): number | null {
+    return this.limits()[provider] ?? null;
+  }
   calls = 0;
   steps: Step[] = [];
   release: (() => void) | null = null;
@@ -175,6 +179,14 @@ describe('AiBatchService', () => {
     expect(service.run()).toBe('done');
   });
 
+  it('stops at the limit chosen in Opciones, also with Claude Code', async () => {
+    helper.limits.set({ claude: 3, copilot: 10 });
+    service.start();
+    await finished();
+    expect(service.pause()?.kind).toBe('cap');
+    expect(helper.calls).toBe(3);
+  });
+
   it('pauses after the pair in progress and cancels by aborting it', async () => {
     helper.steps = ['wait'];
     service.start();
@@ -251,6 +263,9 @@ describe('AiBatchService with the helper queue', () => {
     readonly provider = signal('claude');
     readonly consent = signal(true);
     readonly queueSupported = signal(true);
+    limitFor(provider: string): number | null {
+      return provider === 'copilot' ? 10 : null;
+    }
     added: string[] = [];
     sentInstructions: (string | undefined)[] = [];
     resumed = 0;

@@ -363,7 +363,8 @@
       "splitLink": "Link or unlink A and B (Split)",
       "wheelPage": "Keep scrolling at the edge of the sheet: changes page",
       "pageOnlyA": "Move only A (the pages become free)",
-      "palette": "Open the command palette"
+      "palette": "Open the command palette",
+      "options": "Open Options"
     }
   },
   "toast": {
@@ -954,9 +955,10 @@
         "limit": "You have reached your Claude plan limit. The queue is paused and {{count}} PDFs are still waiting (they do not count as failed).",
         "reset": "It renews at {{reset}}.",
         "breaker": "Stopped after two failures in a row ({{code}}). Paused to avoid spending more; check that the CLI responds and continue.",
-        "cap": "{{sent}} requests sent. The queue stops here to protect your Copilot credits; {{count}} are waiting.",
+        "cap": "{{sent}} requests sent. The queue stops here because you reached the limit you chose; {{count}} are waiting.",
         "fatal": "The helper or CLI cannot be found. The queue is paused; the {{count}} pending PDFs stay queued.",
-        "user": "Paused. {{count}} PDFs left in the queue."
+        "user": "Paused. {{count}} PDFs left in the queue.",
+        "capOptions": "Change the limit in Options"
       },
       "done": {
         "title": "Finished in {{time}}",
@@ -1747,7 +1749,8 @@
       },
       "readyText": "Restarting installs the new version.",
       "onQuitText": "It will be installed when you close the app. Your annotations are saved automatically.",
-      "manualText": "PDF Annotator {{version}} · you have {{current}}. On this system it is installed by hand: the downloads page opens."
+      "manualText": "PDF Annotator {{version}} · you have {{current}}. On this system it is installed by hand: the downloads page opens.",
+      "moreOptions": "More settings in Options"
     },
     "installing": {
       "title": "Installing version {{version}}",
@@ -2470,6 +2473,42 @@
       "openFailed": "Couldn't open the folder.",
       "copied": "Path copied.",
       "copyFailed": "Couldn't copy the path."
+    }
+  },
+  "options": {
+    "title": "Options",
+    "open": "Options…",
+    "openShort": "Options",
+    "close": "Close options",
+    "badge": "Desktop",
+    "savedNote": "Saved instantly. Esc closes.",
+    "updates": {
+      "title": "Updates",
+      "footer": "This is the same channel you already had: nothing changes with the new Options."
+    },
+    "ai": {
+      "title": "Artificial intelligence",
+      "intro": "This is what you choose in the batch «Move with AI» button: here it becomes the default.",
+      "provider": "Default provider",
+      "model": "Default model · {{provider}}",
+      "helper": "Local helper · 127.0.0.1:{{port}}",
+      "reset": "Restore defaults",
+      "resetConfirm": "Go back to Claude Code, its model and the factory limits?",
+      "resetOk": "Restore",
+      "resetCancel": "Cancel",
+      "limit": {
+        "title": "Request limit per run · {{provider}}",
+        "help": "The run stops and asks when it reaches this number of AI requests. A PDF uses between 1 and 8.",
+        "default": "default",
+        "inf": "No limit",
+        "other": "Other…",
+        "requests": "Requests",
+        "range": "between 1 and 500",
+        "error": "Type a whole number between 1 and 500. The previous limit ({{previous}}) is kept.",
+        "noteInfTitle": "No limit on Copilot.",
+        "noteInf": "Every request spends credits and the run will not stop to ask. You can cancel it from the panel at any time.",
+        "noteClaude": "Claude Code has no limit by default. You can set one if you want to review before continuing."
+      }
     }
   }
 }

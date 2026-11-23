@@ -272,6 +272,7 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
 | `Ctrl/⌘ + S` | Aplicar el JSON del editor |
 | `Ctrl/⌘ + K` | Paleta de comandos: buscar y ejecutar cualquier acción (↑↓ Intro Esc) |
+| `Ctrl/⌘ + ,` | Abrir las Opciones de la app (solo escritorio o local) |
 | `Shift + clic` | Añadir o quitar una anotación de la selección |
 | Arrastrar en una zona vacía | Seleccionar con un recuadro (con `Shift`, suma a la selección) |
 | `Ctrl/⌘ + A` | Seleccionar todas las anotaciones de la página (las bloqueadas no) |

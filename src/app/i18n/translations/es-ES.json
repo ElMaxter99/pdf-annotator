@@ -363,7 +363,8 @@
       "splitLink": "Enlazar o desenlazar A y B (Dividida)",
       "wheelPage": "Seguir con la rueda al borde de la hoja: cambia de página",
       "pageOnlyA": "Mover solo A (las páginas pasan a libres)",
-      "palette": "Abrir la paleta de comandos"
+      "palette": "Abrir la paleta de comandos",
+      "options": "Abrir las Opciones"
     }
   },
   "toast": {
@@ -954,9 +955,10 @@
         "limit": "Has llegado al límite de tu plan de Claude. La cola está en pausa y {{count}} PDFs siguen esperando (no cuentan como fallidos).",
         "reset": "Se renueva a las {{reset}}.",
         "breaker": "Se detuvo tras dos fallos seguidos ({{code}}). He parado para no seguir gastando; comprueba que el CLI responde y continúa.",
-        "cap": "{{sent}} peticiones enviadas. La cola se para aquí para proteger tus créditos de Copilot; quedan {{count}} en espera.",
+        "cap": "{{sent}} peticiones enviadas. La cola se para aquí porque has llegado al límite que elegiste; quedan {{count}} en espera.",
         "fatal": "No encuentro el ayudante o el CLI. La cola está en pausa; los {{count}} PDFs pendientes siguen en cola.",
-        "user": "En pausa. Quedan {{count}} PDFs en cola."
+        "user": "En pausa. Quedan {{count}} PDFs en cola.",
+        "capOptions": "Cambiar el límite en Opciones"
       },
       "done": {
         "title": "Terminado en {{time}}",
@@ -1747,7 +1749,8 @@
       },
       "readyText": "Reiniciar instala la nueva versión.",
       "onQuitText": "Se instalará al cerrar la app. Tus anotaciones se guardan solas.",
-      "manualText": "PDF Annotator {{version}} · tienes la {{current}}. En este sistema se instala a mano: se abre la página de descargas."
+      "manualText": "PDF Annotator {{version}} · tienes la {{current}}. En este sistema se instala a mano: se abre la página de descargas.",
+      "moreOptions": "Más ajustes en Opciones"
     },
     "installing": {
       "title": "Instalando la versión {{version}}",
@@ -2470,6 +2473,42 @@
       "openFailed": "No se pudo abrir la carpeta.",
       "copied": "Ruta copiada.",
       "copyFailed": "No se pudo copiar la ruta."
+    }
+  },
+  "options": {
+    "title": "Opciones",
+    "open": "Opciones…",
+    "openShort": "Opciones",
+    "close": "Cerrar las opciones",
+    "badge": "Escritorio",
+    "savedNote": "Se guardan al momento. Esc cierra.",
+    "updates": {
+      "title": "Actualizaciones",
+      "footer": "Es el mismo canal que ya tenías: no cambia nada al estrenar las Opciones."
+    },
+    "ai": {
+      "title": "Inteligencia artificial",
+      "intro": "Es lo mismo que eliges en «Trasladar con IA» del lote: aquí queda como valor por defecto.",
+      "provider": "Proveedor por defecto",
+      "model": "Modelo por defecto · {{provider}}",
+      "helper": "Ayudante local · 127.0.0.1:{{port}}",
+      "reset": "Restablecer valores",
+      "resetConfirm": "¿Volver a Claude Code, su modelo y los límites de fábrica?",
+      "resetOk": "Restablecer",
+      "resetCancel": "Cancelar",
+      "limit": {
+        "title": "Límite de peticiones por traslado · {{provider}}",
+        "help": "El traslado se para y te pregunta al llegar a este número de peticiones a la IA. Un PDF usa entre 1 y 8.",
+        "default": "por defecto",
+        "inf": "Sin límite",
+        "other": "Otro…",
+        "requests": "Peticiones",
+        "range": "entre 1 y 500",
+        "error": "Escribe un número entero entre 1 y 500. Se mantiene el límite anterior ({{previous}}).",
+        "noteInfTitle": "Sin límite en Copilot.",
+        "noteInf": "Cada petición gasta créditos y el traslado no se parará a preguntar. Puedes cancelarlo desde el panel en cualquier momento.",
+        "noteClaude": "Claude Code no tiene tope por defecto. Puedes ponerle uno si quieres revisar antes de seguir."
+      }
     }
   }
 }

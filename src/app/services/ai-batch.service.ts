@@ -4,7 +4,6 @@ import type { BatchItem } from '../models/batch.model';
 import {
   AI_BATCH_ACTIVE_PHASES,
   AI_BATCH_BREAKER,
-  AI_BATCH_COPILOT_CAP,
   AiBatchPhase,
   classifyAiError,
   isEligibleForAiBatch, phaseOfResult } from '../utils/ai-batch.utils';
@@ -224,10 +223,11 @@ export class AiBatchService {
     return 'started';
   }
 
-  /** The helper's own queue when it has one (Copilot keeps the browser loop beyond its cap of 10 requests). */
+  /** The helper's own queue when it has one (the browser loop keeps it beyond the request limit chosen in Opciones). */
   private useHelperQueue(count: number): boolean {
-    const copilotCap = this.ai.provider() === 'copilot' && count > AI_BATCH_COPILOT_CAP;
-    return this.ai.queueSupported?.() === true && !copilotCap;
+    const limit = this.ai.limitFor(this.ai.provider());
+    const beyondLimit = limit !== null && count > limit;
+    return this.ai.queueSupported?.() === true && !beyondLimit;
   }
 
   private launch(ids: readonly string[]): void {
@@ -639,7 +639,7 @@ export class AiBatchService {
     this.run.set('running');
     this.pause.set(null);
     this.pauseRequested = false;
-    const cap = this.ai.provider() === 'copilot' ? AI_BATCH_COPILOT_CAP : Infinity;
+    const cap = this.ai.limitFor(this.ai.provider()) ?? Infinity;
     for (;;) {
       if (generation !== this.generation) {
         return;

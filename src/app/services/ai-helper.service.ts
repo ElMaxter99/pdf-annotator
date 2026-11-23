@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { AiDetails, AiLiveEvent, AiResult, parseNdjson } from '../utils/ai-proposal.utils';
 import { AiRemoteSnapshot, parseSnapshot } from '../utils/ai-queue.utils';
+import { AiLimit, DEFAULT_AI_LIMITS, normalizeStoredLimit } from '../utils/ai-limit.utils';
 import { cleanAiInstructions } from '../utils/ai-instructions.utils';
 import { getDesktopBridge } from './desktop-update.service';
 
@@ -74,6 +75,7 @@ const KEYS = {
   consent: 'pdf-annotator.ai.consent',
   retry: 'pdf-annotator.ai.retry',
   modelLists: 'pdf-annotator.ai.modelLists',
+  limits: 'pdf-annotator.ai.limits',
 } as const;
 /** Cheap by default: the task (match labels, move fields) does not need the biggest model. */
 /** A second request doubles the cost with Copilot (premium requests), so it is off there by default. */
@@ -120,6 +122,8 @@ export class AiHelperService {
   readonly provider = signal<AiProvider>(this.initialProvider());
   readonly models = signal<Record<string, string>>(this.initialModels());
   readonly retry = signal<Record<string, boolean>>(this.initialRetry());
+  /** Requests per run before the batch queue stops and asks to continue; `null` = no limit. Chosen in Opciones. */
+  readonly limits = signal<Record<string, AiLimit>>(this.initialLimits());
   readonly consent = signal(read(KEYS.consent) === '1');
   /** The helper keeps the queue itself (version 2): it survives reloads and Claude runs two at a time. */
   readonly queueSupported = signal(false);
@@ -254,6 +258,39 @@ export class AiHelperService {
       /* corrupt value: defaults */
     }
     return retry;
+  }
+
+  limitFor(provider: AiProvider): AiLimit {
+    return this.limits()[provider] ?? null;
+  }
+
+  private initialLimits(): Record<string, AiLimit> {
+    const limits = { ...DEFAULT_AI_LIMITS };
+    try {
+      const stored = JSON.parse(read(KEYS.limits) ?? '{}') as Record<string, unknown>;
+      for (const key of Object.keys(limits)) {
+        if (key in stored) {
+          limits[key] = normalizeStoredLimit(stored[key], limits[key]);
+        }
+      }
+    } catch {
+      /* corrupt value: defaults */
+    }
+    return limits;
+  }
+
+  setLimit(provider: AiProvider, limit: AiLimit): void {
+    this.limits.update((all) => ({ ...all, [provider]: normalizeStoredLimit(limit, DEFAULT_AI_LIMITS[provider] ?? null) }));
+    write(KEYS.limits, JSON.stringify(this.limits()));
+  }
+
+  /** Back to the factory provider, model and limits (button «Restablecer valores» of Opciones). */
+  resetDefaults(): void {
+    this.setProvider('claude');
+    this.models.set({ ...DEFAULT_MODELS });
+    write(KEYS.models, JSON.stringify(this.models()));
+    this.limits.set({ ...DEFAULT_AI_LIMITS });
+    write(KEYS.limits, JSON.stringify(this.limits()));
   }
 
   setRetry(provider: AiProvider, value: boolean): void {

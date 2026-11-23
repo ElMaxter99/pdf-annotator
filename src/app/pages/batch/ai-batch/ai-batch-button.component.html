@@ -43,8 +43,9 @@
       @if (info()) {
         <div class="ai-pop__infobody" id="ai-batch-info" data-testid="ai-batch-info-body">
           <p>
-            @if (isCopilot()) {
-              {{ 'batch.ai.pop.requestsCopilot' | t: { max: estimate().maxRequests, cap: cap } }} {{ 'batch.ai.pop.credits' | t }}
+            @if (cap() !== null) {
+              {{ 'batch.ai.pop.requestsCopilot' | t: { max: estimate().maxRequests, cap: cap() } }}
+              @if (isCopilot()) { {{ 'batch.ai.pop.credits' | t }} }
             } @else {
               {{ 'batch.ai.confirm.estimateClaude' | t: { min: estimate().minRequests, max: estimate().maxRequests } }}
             }

@@ -14,6 +14,7 @@ import {
 import { FocusTrapDirective } from '../../../../directives/focus-trap.directive';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { TranslationService } from '../../../../i18n/translation.service';
+import { OptionsService } from '../../../../services/options.service';
 import { ThemeService } from '../../../../services/theme.service';
 import {
   filterCommands,
@@ -47,6 +48,7 @@ export class CommandPaletteComponent implements OnInit {
 
   private readonly i18n = inject(TranslationService);
   private readonly theme = inject(ThemeService);
+  private readonly options = inject(OptionsService);
 
   readonly query = signal('');
   readonly activeIndex = signal(0);
@@ -272,6 +274,9 @@ export class CommandPaletteComponent implements OnInit {
       });
     }
     add({ id: 'shortcuts', icon: '⌨', label: t('shortcuts.open'), keywords: 'shortcuts keyboard help atajos', shortcut: '?', run: () => vm.toggleShortcuts(true) });
+    if (this.options.available()) {
+      add({ id: 'options', icon: '⚙', label: t('options.open'), keywords: 'options opciones settings ajustes ia updates actualizaciones', shortcut: 'Ctrl+,', run: () => this.options.open() });
+    }
     add({ id: 'about', icon: 'ⓘ', label: t('about.open'), keywords: 'about version', run: () => vm.toggleAbout(true) });
 
     return list;

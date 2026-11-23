@@ -76,6 +76,11 @@
         </button>
         @if (moreOpen()) {
           <div class="batch-more__menu" role="menu" data-testid="batch-more-menu">
+            @if (options.available()) {
+              <button type="button" role="menuitem" class="batch-more__item" (click)="moreOpen.set(false); options.open()" data-testid="batch-options">
+                ⚙ {{ 'options.open' | t }}
+              </button>
+            }
             @if (readyCount() === 0) {
               <button type="button" role="menuitem" class="batch-more__item" disabled data-testid="download-ready">
                 {{ 'batch.downloadReady' | t: { count: readyCount() } }}

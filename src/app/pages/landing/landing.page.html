@@ -9,6 +9,10 @@
     @if (projectStore.available()) {
       <a class="btn btn--primary landing-nav__projects" routerLink="/proyectos" data-testid="landing-projects">{{ 'projects.title' | t }}</a>
     }
+    @if (options.available()) {
+      <button type="button" class="btn btn--ghost landing-nav__options" (click)="options.open()"
+        [attr.title]="('options.open' | t) + ' (Ctrl+,)'" data-testid="options-open">⚙ {{ 'options.openShort' | t }}</button>
+    }
     <app-landing-language-bar [languages]="languages" [selectedLanguage]="languageModel()"
       (languageChange)="onLanguageChange($event)"></app-landing-language-bar>
   </header>

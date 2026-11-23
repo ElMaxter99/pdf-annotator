@@ -51,6 +51,13 @@ describe('ai-batch.utils', () => {
     expect(copilot.beyondCap).toBe(12 - AI_BATCH_COPILOT_CAP);
   });
 
+  it('uses the limit chosen in Opciones instead of the provider default', () => {
+    const items = Array.from({ length: 12 }, (_, i) => item(`p${i}`, 2));
+    expect(estimateAiBatch(items, 'copilot', false, null).beyondCap).toBe(0);
+    expect(estimateAiBatch(items, 'copilot', false, 50).beyondCap).toBe(0);
+    expect(estimateAiBatch(items, 'claude', false, 5).beyondCap).toBe(7);
+  });
+
   it('counts only the pages of A with fields and caps the requests per PDF', () => {
     const wide: BatchItem = {
       ...item('w', 0),

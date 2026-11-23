@@ -363,7 +363,8 @@
       "splitLink": "Collega o scollega A e B (Divisa)",
       "wheelPage": "Continuare con la rotellina al bordo del foglio: cambia pagina",
       "pageOnlyA": "Muovi solo A (le pagine diventano libere)",
-      "palette": "Apri il riquadro dei comandi"
+      "palette": "Apri il riquadro dei comandi",
+      "options": "Apri le Opzioni"
     }
   },
   "toast": {
@@ -954,9 +955,10 @@
         "limit": "Hai raggiunto il limite del tuo piano Claude. La coda è in pausa e {{count}} PDF sono ancora in attesa (non contano come falliti).",
         "reset": "Si rinnova alle {{reset}}.",
         "breaker": "Fermata dopo due errori di fila ({{code}}). In pausa per non spendere altro; controlla che la CLI risponda e continua.",
-        "cap": "{{sent}} richieste inviate. La coda si ferma qui per proteggere i tuoi crediti Copilot; ne restano {{count}} in attesa.",
+        "cap": "{{sent}} richieste inviate. La coda si ferma qui perché hai raggiunto il limite scelto; ne restano {{count}} in attesa.",
         "fatal": "Non trovo l'assistente o la CLI. La coda è in pausa; i {{count}} PDF in sospeso restano in coda.",
-        "user": "In pausa. Restano {{count}} PDF in coda."
+        "user": "In pausa. Restano {{count}} PDF in coda.",
+        "capOptions": "Cambia il limite in Opzioni"
       },
       "done": {
         "title": "Terminato in {{time}}",
@@ -1747,7 +1749,8 @@
       },
       "readyText": "Riavviando si installa la nuova versione.",
       "onQuitText": "Verrà installata alla chiusura dell'app. Le tue annotazioni si salvano da sole.",
-      "manualText": "PDF Annotator {{version}} · hai la {{current}}. Su questo sistema si installa a mano: si apre la pagina dei download."
+      "manualText": "PDF Annotator {{version}} · hai la {{current}}. Su questo sistema si installa a mano: si apre la pagina dei download.",
+      "moreOptions": "Altre impostazioni in Opzioni"
     },
     "installing": {
       "title": "Installazione della versione {{version}}",
@@ -2470,6 +2473,42 @@
       "openFailed": "Impossibile aprire la cartella.",
       "copied": "Percorso copiato.",
       "copyFailed": "Impossibile copiare il percorso."
+    }
+  },
+  "options": {
+    "title": "Opzioni",
+    "open": "Opzioni…",
+    "openShort": "Opzioni",
+    "close": "Chiudi le opzioni",
+    "badge": "Desktop",
+    "savedNote": "Salvate subito. Esc chiude.",
+    "updates": {
+      "title": "Aggiornamenti",
+      "footer": "È lo stesso canale di prima: non cambia nulla con le nuove Opzioni."
+    },
+    "ai": {
+      "title": "Intelligenza artificiale",
+      "intro": "È ciò che scegli in «Trasferisci con l’IA» del lotto: qui diventa il valore predefinito.",
+      "provider": "Fornitore predefinito",
+      "model": "Modello predefinito · {{provider}}",
+      "helper": "Assistente locale · 127.0.0.1:{{port}}",
+      "reset": "Ripristina i valori",
+      "resetConfirm": "Tornare a Claude Code, al suo modello e ai limiti di fabbrica?",
+      "resetOk": "Ripristina",
+      "resetCancel": "Annulla",
+      "limit": {
+        "title": "Limite di richieste per trasferimento · {{provider}}",
+        "help": "Il trasferimento si ferma e chiede conferma a questo numero di richieste all’IA. Un PDF ne usa da 1 a 8.",
+        "default": "predefinito",
+        "inf": "Senza limite",
+        "other": "Altro…",
+        "requests": "Richieste",
+        "range": "tra 1 e 500",
+        "error": "Scrivi un numero intero tra 1 e 500. Resta il limite precedente ({{previous}}).",
+        "noteInfTitle": "Senza limite con Copilot.",
+        "noteInf": "Ogni richiesta consuma crediti e il trasferimento non si fermerà a chiedere. Puoi annullarlo dal pannello in qualsiasi momento.",
+        "noteClaude": "Claude Code non ha un tetto predefinito. Puoi impostarne uno se vuoi controllare prima di continuare."
+      }
     }
   }
 }

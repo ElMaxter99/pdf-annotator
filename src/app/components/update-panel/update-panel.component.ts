@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild, computed, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
+import { OptionsService } from '../../services/options.service';
 import { DesktopUpdateService } from '../../services/desktop-update.service';
 import { UpdateChannelComponent } from '../update-channel/update-channel.component';
 
@@ -86,6 +87,7 @@ const MB = 1048576;
 
         <hr class="update-panel__hr" />
         <app-update-channel class="update-panel__channel"></app-update-channel>
+        <button type="button" class="update-card__link" (click)="update.closePanel(); options.open('updates')" data-testid="panel-options">{{ 'update.panel.moreOptions' | t }}</button>
         <hr class="update-panel__hr" />
 
         <div class="update-panel__row">
@@ -101,6 +103,7 @@ const MB = 1048576;
 export class UpdatePanelComponent {
   readonly update = inject(DesktopUpdateService);
   readonly state = this.update.state;
+  readonly options = inject(OptionsService);
   private readonly i18n = inject(TranslationService);
   @ViewChild('closeBtn') private closeBtn?: ElementRef<HTMLButtonElement>;
   @ViewChild('dialog') private dialog?: ElementRef<HTMLElement>;
