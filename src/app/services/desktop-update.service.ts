@@ -13,7 +13,7 @@ export interface DesktopUpdateState {
   total?: number;
   notesUrl?: string;
   error?: string;
-  /** Canal elegido: «stable» (solo finales) o «beta» (también versiones de prueba RC). */
+  /** Canal elegido: «stable» (solo estables) o «latest» (siempre la última, sea RC o estable). */
   channel?: UpdateChannel;
   /** La versión ofrecida es una prueba (X.Y.Z-rc.N). */
   prerelease?: boolean;
@@ -38,7 +38,7 @@ export interface DesktopUpdateState {
 /** Color del punto del chip de versión: nueva versión (accent), en curso o pendiente (warn) o fallo (danger). */
 export type ChipDot = '' | 'accent' | 'warn' | 'danger';
 
-export type UpdateChannel = 'stable' | 'beta';
+export type UpdateChannel = 'stable' | 'latest';
 
 /** «1.9.0-rc.2» → true. */
 export const isPrereleaseVersion = (version: string | undefined): boolean => /-rc\.\d+$/.test(version ?? '');
@@ -111,7 +111,7 @@ export class DesktopUpdateService {
   readonly panelOpen = signal(false);
 
   readonly isDesktop = this.bridge !== null;
-  readonly channel = computed<UpdateChannel>(() => (this.state().channel === 'beta' ? 'beta' : 'stable'));
+  readonly channel = computed<UpdateChannel>(() => (this.state().channel === 'latest' || this.state().channel === ('beta' as string) ? 'latest' : 'stable'));
   /** La app instalada es una versión de prueba (X.Y.Z-rc.N). */
   readonly currentIsPrerelease = computed(() => isPrereleaseVersion(this.state().current));
   readonly installOnQuitChosen = computed(() => this.installOnQuitLocal() || this.state().installOnQuit === true);

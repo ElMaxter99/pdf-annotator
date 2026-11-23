@@ -29,6 +29,8 @@ import type { WorkspacePageComponent } from '../../workspace.page';
 
 const DEFAULT_IDS = ['undo', 'download', 'tab-annotations', 'shortcuts'];
 
+export type PaletteTranslate = (key: string, params?: Record<string, string | number>) => string;
+
 /**
  * Command palette (P-45): Ctrl+K opens a search box over the actions of the editor and the
  * batch. It adds a second way to reach them; buttons and one-key shortcuts stay where they are.
@@ -42,8 +44,12 @@ const DEFAULT_IDS = ['undo', 'download', 'tab-annotations', 'shortcuts'];
   imports: [FocusTrapDirective, TranslationPipe],
 })
 export class CommandPaletteComponent implements OnInit {
-  @Input({ required: true }) vm!: WorkspacePageComponent;
+  @Input() vm!: WorkspacePageComponent;
+  /** Actions of another screen (the batch panel); without it the palette lists the editor's. */
+  @Input() source?: (t: PaletteTranslate) => PaletteCommand[];
+  @Input() defaultIds: readonly string[] = DEFAULT_IDS;
   @Output() closed = new EventEmitter<void>();
+  @Output() shortcutsRequested = new EventEmitter<void>();
   @ViewChild('input', { static: true }) input!: ElementRef<HTMLInputElement>;
 
   private readonly i18n = inject(TranslationService);
@@ -54,12 +60,14 @@ export class CommandPaletteComponent implements OnInit {
   readonly activeIndex = signal(0);
   private readonly recent = signal<string[]>(loadRecent());
 
-  private readonly all = computed(() => this.buildCommands());
+  private readonly all = computed(() =>
+    this.source ? this.source((key, params) => this.t(key, params)) : this.buildCommands(),
+  );
   readonly results = computed(() => {
     const query = this.query();
     return query.trim()
       ? filterCommands(this.all(), query)
-      : suggestedCommands(this.all(), this.recent(), DEFAULT_IDS);
+      : suggestedCommands(this.all(), this.recent(), this.defaultIds);
   });
   readonly searching = computed(() => this.query().trim().length > 0);
   readonly activeId = computed(() => {
@@ -124,6 +132,10 @@ export class CommandPaletteComponent implements OnInit {
 
   openShortcuts(): void {
     this.closed.emit();
+    if (this.source) {
+      this.shortcutsRequested.emit();
+      return;
+    }
     setTimeout(() => this.vm.toggleShortcuts(true));
   }
 

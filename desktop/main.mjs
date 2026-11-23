@@ -101,7 +101,7 @@ const packageType = (() => {
   }
 })();
 const mode = updateMode({ platform: process.platform, appImage: Boolean(process.env.APPIMAGE), packageType, macSigned: false });
-// Canal de actualizaciones («stable» por defecto, «beta» = también versiones de prueba RC). Se guarda en la carpeta de datos de la app.
+// Canal de actualizaciones («stable» por defecto, «latest» = siempre la última, RC o estable). Se guarda en la carpeta de datos de la app.
 const settingsFile = path.join(app.getPath('userData'), 'update-channel.json');
 const loadChannel = () => {
   try {
@@ -161,12 +161,12 @@ const setError = (err) => {
 };
 
 const releasesApi = `https://api.github.com/repos/${REPO.owner}/${REPO.repo}/releases`;
-const releaseApi = () => process.env.PDF_ANNOTATOR_RELEASE_API || (channel === 'beta' ? `${releasesApi}?per_page=30` : `${releasesApi}/latest`);
+const releaseApi = () => process.env.PDF_ANNOTATOR_RELEASE_API || (channel === 'latest' ? `${releasesApi}?per_page=30` : `${releasesApi}/latest`);
 
 async function checkManual() {
   const res = await net.fetch(releaseApi(), { headers: { accept: 'application/vnd.github+json' } });
   if (!res.ok) throw new Error(`GitHub ${res.status}`);
-  const latest = parseReleaseForChannel(await res.json(), { prerelease: channel === 'beta' });
+  const latest = parseReleaseForChannel(await res.json(), { prerelease: channel === 'latest' });
   if (latest && isNewer(app.getVersion(), latest.version)) {
     setState({ status: 'available', version: latest.version, prerelease: latest.prerelease, notesUrl: latest.url, error: undefined });
   }
@@ -190,7 +190,7 @@ async function checkForUpdates() {
 function setupUpdater() {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
-  autoUpdater.allowPrerelease = channel === 'beta';
+  autoUpdater.allowPrerelease = channel === 'latest';
   autoUpdater.allowDowngrade = false;
   if (process.env.PDF_ANNOTATOR_UPDATE_URL) {
     autoUpdater.forceDevUpdateConfig = true;
@@ -270,7 +270,7 @@ function setupIpc() {
     const value = normalizeChannel(next);
     if (value === channel) return;
     channel = value;
-    autoUpdater.allowPrerelease = channel === 'beta';
+    autoUpdater.allowPrerelease = channel === 'latest';
     try {
       writeFileSync(settingsFile, JSON.stringify({ channel }));
     } catch (e) {

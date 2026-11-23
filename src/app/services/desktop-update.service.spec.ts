@@ -119,9 +119,9 @@ describe('DesktopUpdateService', () => {
     push({ status: 'idle', mode: 'auto', current: '1.9.0-rc.1' });
     expect(service.channel()).toBe('stable');
     expect(service.currentIsPrerelease()).toBeTrue();
-    service.setChannel('beta');
-    expect(service.channel()).toBe('beta');
-    expect(bridge.setUpdateChannel).toHaveBeenCalledWith('beta');
+    service.setChannel('latest');
+    expect(service.channel()).toBe('latest');
+    expect(bridge.setUpdateChannel).toHaveBeenCalledWith('latest');
     push({ status: 'idle', mode: 'auto', current: '1.8.4', channel: 'stable' });
     expect(service.channel()).toBe('stable');
     expect(service.currentIsPrerelease()).toBeFalse();

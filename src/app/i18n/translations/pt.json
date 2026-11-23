@@ -493,7 +493,7 @@
         "reopen": "Poderá reabri-lo e alterá-lo quando quiser.",
         "confirm": "Marcar como concluído",
         "keep": "Continuar a editar",
-        "missing": "Faltam colocar {{count}} campos de A em B."
+        "missing": "{{count}} campos de A ainda não estão colocados em B: passarão para «Removidos de B»."
       },
       "plain": "A editar com o seu modelo",
       "navLabel": "Mover-se pelo lote",
@@ -635,7 +635,17 @@
     "panel": {
       "title": "Campos de B · {{count}}",
       "toResolve": "Por resolver {{count}}",
-      "allSet": "Tudo resolvido",
+      "allSet": "Revisto",
+      "toReview": "Para rever · {{count}}",
+      "reviewed": "Tudo revisto.",
+      "reviewedText": "{{count}} campos colocados em B; nada aguarda uma decisão sua.",
+      "markedReady": "PDF marcado como Pronto.",
+      "summary": "Resumo da transferência",
+      "sumNew": "Novos: {{count}}",
+      "sumMoved": "Movidos: {{count}}",
+      "sumRenamed": "Renomeados: {{count}}",
+      "sumRemoved": "Removidos: {{count}}",
+      "removedBadge": "Removido de B",
       "emptyB": "B está vazia. Coloque o modelo de A e ajuste o que mudou.",
       "noTemplate": "Este PDF não tem JSON de A: B começa vazia.",
       "page": "pág. {{page}}",
@@ -1706,20 +1716,20 @@
     "notesRc": "Notas da versão de teste",
     "channel": {
       "label": "Canal de atualizações",
-      "stable": "Estável",
-      "beta": "Testes",
-      "hintStable": "Apenas versões finais. É o recomendado.",
-      "hintBeta": "Recebes também versões de teste (RC) antes da final. Podem ter falhas.",
+      "stable": "Só estáveis",
+      "latest": "Últimas",
+      "hintStable": "Só versões estáveis. É o recomendado.",
+      "hintLatest": "Sempre a versão mais recente: se for de teste (RC), essa; se for estável, a estável.",
       "confirm": {
-        "title": "Receber versões de teste?",
-        "text": "As versões de teste (RC) chegam antes da final para poderem ser experimentadas a sério. Podem ter falhas. Os teus PDF e anotações não são tocados, mas convém exportar o que for importante.",
-        "text2": "Para voltar ao canal estável, muda-o aqui: receberás a próxima versão final.",
-        "yes": "Receber testes",
+        "title": "Receber sempre a última versão?",
+        "text": "Se a última publicada for uma versão de teste (RC), será essa que lhe oferecemos. Pode ter falhas. Os seus PDF e anotações não são tocados, mas convém exportar o que for importante.",
+        "text2": "Quando sair a estável seguinte, será essa que lhe oferecemos. Para receber só estáveis, volte a mudar aqui.",
+        "yes": "Receber as últimas",
         "cancel": "Cancelar"
       },
       "back": {
-        "title": "Voltar ao canal estável",
-        "text": "Continuas com a {{current}} até sair a versão final; então será oferecida. Se quiseres já a estável, instala-a à mão a partir do GitHub.",
+        "title": "Voltar a só estáveis",
+        "text": "Continua com a {{current}} até sair a versão estável; então será oferecida. Se quiser a estável já, instale-a manualmente a partir do GitHub.",
         "github": "Abrir GitHub",
         "ok": "Percebido"
       }
@@ -1855,7 +1865,8 @@
       "confirms": "pede confirmação",
       "current": "atual",
       "batch": "Lote",
-      "position": "Lote {{index}} de {{total}}"
+      "position": "Lote {{index}} de {{total}}",
+      "active": "ativo"
     },
     "why": {
       "noPdf": "Antes: abra um PDF",
@@ -1867,7 +1878,18 @@
       "noTemplateA": "Antes: carregue o modelo A",
       "noVersionB": "Antes: carregue a versão B",
       "firstPdf": "Já está no primeiro PDF",
-      "lastPdf": "Já está no último PDF"
+      "lastPdf": "Já está no último PDF",
+      "noSelection": "Selecione primeiro algum PDF",
+      "noReady": "Ainda não há PDFs prontos",
+      "nothingToReview": "Não há PDFs por rever",
+      "noFilters": "Não há filtros ativos",
+      "alreadyActive": "Já aplicado",
+      "alreadySelected": "Já está tudo selecionado",
+      "noVisible": "Não há PDFs visíveis",
+      "noReadyInSelection": "Nenhum PDF selecionado está pronto",
+      "noVersionBInSelection": "Nenhum PDF selecionado tem versão B",
+      "busy": "Há uma tarefa em curso",
+      "nothingToMark": "Nada para marcar como pronto"
     },
     "cmd": {
       "fitPage": "Ajustar à página",
@@ -1885,6 +1907,41 @@
       "themeDark": "Mudar para o tema escuro",
       "themeLight": "Mudar para o tema claro",
       "language": "Idioma: {{language}}"
+    },
+    "group": {
+      "batch": "Lote",
+      "view": "Vista",
+      "filter": "Filtro",
+      "selection": "Seleção"
+    },
+    "batch": {
+      "downloadReady": "Descarregar os prontos (ZIP)",
+      "readyCount": "{{count}} prontos",
+      "reviewNext": "Rever o seguinte",
+      "reviewCount": "{{count}} por rever",
+      "updateTemplates": "Atualizar modelos…",
+      "testData": "Carregar dados de teste…",
+      "testDataReplace": "Substituir dados de teste…",
+      "testDataRemove": "Remover dados de teste",
+      "viewGrid": "Mudar para grelha",
+      "viewList": "Mudar para lista",
+      "showAll": "Mostrar: todos",
+      "showReview": "Mostrar: por rever",
+      "showReady": "Mostrar: prontos",
+      "showWithA": "Mostrar: com modelo A",
+      "showWithB": "Mostrar: com versão B",
+      "showAi": "Mostrar: com IA",
+      "clearFilters": "Remover filtros",
+      "selectVisible": "Selecionar os visíveis",
+      "clearSelection": "Limpar a seleção",
+      "downloadSelected": "Descarregar os selecionados",
+      "suggestTables": "Sugerir tabelas de páginas…",
+      "translateAi": "Transferir com IA…",
+      "markReady": "Marcar os selecionados como prontos",
+      "removeSelected": "Remover os selecionados do lote",
+      "pdfCount": "{{count}} PDFs",
+      "openMenu": "Procurar ações",
+      "keyhint": "Ações"
     }
   },
   "projects": {

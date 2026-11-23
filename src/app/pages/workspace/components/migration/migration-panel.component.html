@@ -6,9 +6,9 @@
         <span class="migration-chip migration-chip--on" data-testid="ai-proposal-count">{{
           'ai.proposal.count' | t: { count: vm.aiSummary().placed }
         }}</span>
-      } @else if (m.summary.missing + m.summary.new > 0) {
+      } @else if (pendingStates().length > 0) {
         <span class="migration-chip migration-chip--on">{{
-          'batch.panel.toResolve' | t: { count: m.summary.missing }
+          'batch.panel.toResolve' | t: { count: pendingStates().length }
         }}</span>
       } @else {
         <span class="migration-chip">✓ {{ 'batch.panel.allSet' | t }}</span>
@@ -84,79 +84,107 @@
       <p class="migration-note">{{ 'batch.panel.noTemplate' | t }}</p>
     }
 
-    <ul class="migration-list" data-testid="migration-list">
-      @for (state of rows(); track rowKey(state)) {
-        <li class="migration-row" [attr.data-status]="state.status">
-          <button
-            type="button"
-            class="migration-row__name"
-            (click)="vm.focusField(state)"
-            [title]="state.name"
-          >
-            <span class="mono">{{ state.name || '—' }}</span>
-            @if (vm.pdfDoc() && vm.pageCount() > 1) {
-              <small>{{ 'batch.panel.page' | t: { page: state.page } }}</small>
-            }
-          </button>
-          <span class="migration-badge migration-badge--{{ state.status }}">{{
-            'batch.status.' + state.status | t
-          }}</span>
-          @if (state.status === 'missing') {
-            <span class="migration-row__actions">
-              <button
-                type="button"
-                class="btn"
-                (click)="vm.placeMissing(state)"
-                data-testid="place-missing"
-              >
-                {{ 'batch.panel.place' | t }}
-              </button>
-              <button
-                type="button"
-                class="btn btn--ghost"
-                (click)="vm.dismissMissing(state)"
-                data-testid="dismiss-missing"
-              >
-                {{ 'batch.panel.dismiss' | t }}
-              </button>
-            </span>
-          } @else if (state.status === 'new' && missingNames(m).length) {
-            <select
-              class="migration-row__link"
-              (change)="onLink(state, $event)"
-              [attr.aria-label]="'batch.panel.renameOf' | t"
-            >
-              <option value="">{{ 'batch.panel.renameOf' | t }}</option>
-              @for (name of missingNames(m); track name) {
-                <option [value]="name">{{ name }}</option>
-              }
-            </select>
-          } @else if (state.status === 'renamed') {
-            <span class="migration-row__actions">
-              <small class="migration-row__from">{{
-                'batch.panel.renamedFrom' | t: { name: state.a?.name }
-              }}</small>
-              <button type="button" class="btn btn--ghost" (click)="vm.unlinkField(state)">
-                {{ 'batch.panel.unlink' | t }}
-              </button>
-            </span>
+    <ng-template #rowTpl let-state>
+      <li class="migration-row" [attr.data-status]="state.status">
+        <button
+          type="button"
+          class="migration-row__name"
+          (click)="vm.focusField(state)"
+          [title]="state.name"
+        >
+          <span class="mono">{{ state.name || '—' }}</span>
+          @if (vm.pdfDoc() && vm.pageCount() > 1) {
+            <small>{{ 'batch.panel.page' | t: { page: state.page } }}</small>
           }
-        </li>
-      }
-    </ul>
+        </button>
+        <span class="migration-badge migration-badge--{{ state.status }}">{{
+          (state.status === 'missing' && !pendingStates().length ? 'batch.panel.removedBadge' : 'batch.status.' + state.status) | t
+        }}</span>
+        @if (state.status === 'missing' && pendingStates().length) {
+          <span class="migration-row__actions">
+            <button
+              type="button"
+              class="btn"
+              (click)="vm.placeMissing(state)"
+              data-testid="place-missing"
+            >
+              {{ 'batch.panel.place' | t }}
+            </button>
+            <button
+              type="button"
+              class="btn btn--ghost"
+              (click)="vm.dismissMissing(state)"
+              data-testid="dismiss-missing"
+            >
+              {{ 'batch.panel.dismiss' | t }}
+            </button>
+          </span>
+        } @else if (state.status === 'new' && missingNames(m).length && pendingStates().length) {
+          <select
+            class="migration-row__link"
+            (change)="onLink(state, $event)"
+            [attr.aria-label]="'batch.panel.renameOf' | t"
+          >
+            <option value="">{{ 'batch.panel.renameOf' | t }}</option>
+            @for (name of missingNames(m); track name) {
+              <option [value]="name">{{ name }}</option>
+            }
+          </select>
+        } @else if (state.status === 'renamed') {
+          <span class="migration-row__actions">
+            <small class="migration-row__from">{{
+              'batch.panel.renamedFrom' | t: { name: state.a?.name }
+            }}</small>
+            <button type="button" class="btn btn--ghost" (click)="vm.unlinkField(state)">
+              {{ 'batch.panel.unlink' | t }}
+            </button>
+          </span>
+        }
+      </li>
+    </ng-template>
 
-    @if (m.summary.same > 0) {
-      <button
-        type="button"
-        class="btn btn--ghost migration-panel__toggle"
-        (click)="showSame.set(!showSame())"
-        [attr.aria-pressed]="showSame()"
-      >
-        {{
-          (showSame() ? 'batch.panel.hideSame' : 'batch.panel.showSame')
-            | t: { count: m.summary.same }
-        }}
-      </button>
+    @if (pendingStates().length) {
+      <h3 class="migration-sec">{{ 'batch.panel.toReview' | t: { count: pendingStates().length } }}</h3>
+      <ul class="migration-list" data-testid="migration-pending">
+        @for (state of pendingStates(); track rowKey(state)) {
+          <ng-container [ngTemplateOutlet]="rowTpl" [ngTemplateOutletContext]="{ $implicit: state }" />
+        }
+      </ul>
+    } @else if (!proposal() && m.item.aPages.length && vm.annotationCount() > 0) {
+      <div class="migration-done" data-testid="migration-reviewed">
+        <span aria-hidden="true">✓</span>
+        <div>
+          <b>{{ 'batch.panel.reviewed' | t }}</b> {{ 'batch.panel.reviewedText' | t: { count: vm.annotationCount() } }}
+          @if (m.item.status === 'ready') {
+            <small>{{ 'batch.panel.markedReady' | t }}</small>
+          }
+        </div>
+      </div>
+    }
+
+    @if (m.summary.new + m.summary.moved + m.summary.renamed + m.summary.same + m.summary.missing > 0 && (summaryRows().length || m.summary.same)) {
+      <div class="migration-sum" data-testid="migration-summary">
+        <button type="button" class="migration-sum__head" (click)="summaryOpen.set(!summaryOpen())" [attr.aria-expanded]="summaryOpen()" data-testid="migration-summary-toggle">
+          <span aria-hidden="true">{{ summaryOpen() ? '▾' : '▸' }}</span>
+          <b>{{ 'batch.panel.summary' | t }}</b>
+          <span class="migration-sum__counts">
+            @if (m.summary.new) { <span>{{ 'batch.panel.sumNew' | t: { count: m.summary.new } }}</span> }
+            @if (m.summary.moved) { <span>{{ 'batch.panel.sumMoved' | t: { count: m.summary.moved } }}</span> }
+            @if (m.summary.renamed) { <span>{{ 'batch.panel.sumRenamed' | t: { count: m.summary.renamed } }}</span> }
+            @if (removedCount() > 0) { <span>{{ 'batch.panel.sumRemoved' | t: { count: removedCount() } }}</span> }
+          </span>
+        </button>
+        <ul class="migration-list" data-testid="migration-list" [hidden]="!summaryOpen()">
+          @for (state of summaryRows(); track rowKey(state)) {
+            <ng-container [ngTemplateOutlet]="rowTpl" [ngTemplateOutletContext]="{ $implicit: state }" />
+          }
+        </ul>
+        @if (summaryOpen() && m.summary.same > 0) {
+          <button type="button" class="btn btn--ghost migration-panel__toggle" (click)="showSame.set(!showSame())" [attr.aria-pressed]="showSame()">
+            {{ (showSame() ? 'batch.panel.hideSame' : 'batch.panel.showSame') | t: { count: m.summary.same } }}
+          </button>
+        }
+      </div>
     }
 
     @if (m.dismissed.length) {

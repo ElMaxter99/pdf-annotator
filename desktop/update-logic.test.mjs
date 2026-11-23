@@ -47,8 +47,9 @@ test('parseLatestRelease ignora borradores y prereleases y fija la URL al reposi
 
 const rel = (tag, extra = {}) => ({ tag_name: tag, draft: false, prerelease: /-/.test(tag), html_url: `https://github.com/ElMaxter99/pdf-annotator/releases/tag/${tag}`, ...extra });
 
-test('normalizeChannel: solo «beta» activa las pruebas', () => {
-  assert.equal(normalizeChannel('beta'), 'beta');
+test('normalizeChannel: «latest» y el antiguo «beta» son Últimas; lo demás, Solo estables', () => {
+  assert.equal(normalizeChannel('latest'), 'latest');
+  assert.equal(normalizeChannel('beta'), 'latest');
   assert.equal(normalizeChannel('stable'), 'stable');
   assert.equal(normalizeChannel('rc'), 'stable');
   assert.equal(normalizeChannel(undefined), 'stable');

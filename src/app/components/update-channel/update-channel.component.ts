@@ -12,8 +12,7 @@ import { TranslationPipe } from '../../i18n/translation.pipe';
 import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-update.service';
 
 /**
- * Canal de actualizaciones de la app de escritorio (diseño RC-01 y RC-02): «Estable» o «Pruebas» (también
- * versiones de prueba RC). Pasar a Pruebas pide confirmación; volver a Estable estando en una prueba explica
+ * Canal de actualizaciones de la app de escritorio (diseño RC-01 y RC-02): «Solo estables» o «Últimas» (siempre la más reciente, RC o estable). Pasar a Pruebas pide confirmación; volver a Estable estando en una prueba explica
  * que no se baja de versión (se espera a la siguiente final). Solo existe dentro de Electron.
  */
 @Component({
@@ -33,8 +32,8 @@ import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-upda
             role="group"
             aria-labelledby="update-channel-label"
             [attr.title]="
-              (update.channel() === 'beta'
-                ? 'update.channel.hintBeta'
+              (update.channel() === 'latest'
+                ? 'update.channel.hintLatest'
                 : 'update.channel.hintStable'
               ) | t
             "
@@ -49,11 +48,11 @@ import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-upda
             </button>
             <button
               type="button"
-              [attr.aria-pressed]="update.channel() === 'beta'"
-              (click)="choose('beta')"
-              data-testid="channel-beta"
+              [attr.aria-pressed]="update.channel() === 'latest'"
+              (click)="choose('latest')"
+              data-testid="channel-latest"
             >
-              {{ 'update.channel.beta' | t }}
+              {{ 'update.channel.latest' | t }}
             </button>
           </span>
           @if (update.currentIsPrerelease()) {
@@ -64,7 +63,7 @@ import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-upda
         </div>
         <p class="update-channel__hint">
           {{
-            (update.channel() === 'beta' ? 'update.channel.hintBeta' : 'update.channel.hintStable')
+            (update.channel() === 'latest' ? 'update.channel.hintLatest' : 'update.channel.hintStable')
               | t
           }}
         </p>
@@ -78,7 +77,7 @@ import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-upda
           [attr.aria-labelledby]="'update-channel-title'"
           data-testid="channel-dialog"
         >
-          @if (ask === 'beta') {
+          @if (ask === 'latest') {
             <strong id="update-channel-title">{{ 'update.channel.confirm.title' | t }}</strong>
             <p>{{ 'update.channel.confirm.text' | t }}</p>
             <p>{{ 'update.channel.confirm.text2' | t }}</p>
@@ -90,7 +89,7 @@ import { DesktopUpdateService, UpdateChannel } from '../../services/desktop-upda
                 type="button"
                 #primary
                 class="btn btn--primary"
-                (click)="apply('beta')"
+                (click)="apply('latest')"
                 data-testid="channel-confirm"
               >
                 {{ 'update.channel.confirm.yes' | t }}
@@ -126,13 +125,13 @@ export class UpdateChannelComponent {
   readonly update = inject(DesktopUpdateService);
   /** Canal que se está confirmando (null = sin diálogo). */
   readonly asking = signal<UpdateChannel | null>(null);
-  readonly isBeta = computed(() => this.update.channel() === 'beta');
+  readonly isLatest = computed(() => this.update.channel() === 'latest');
   @ViewChild('primary') private primary?: ElementRef<HTMLButtonElement>;
 
   choose(target: UpdateChannel): void {
     if (target === this.update.channel()) return;
     // A Pruebas siempre confirma; a Estable solo hace falta explicar si ya se está en una prueba.
-    if (target === 'beta' || this.update.currentIsPrerelease()) {
+    if (target === 'latest' || this.update.currentIsPrerelease()) {
       this.asking.set(target);
       setTimeout(() => this.primary?.nativeElement.focus());
       return;

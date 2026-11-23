@@ -493,7 +493,7 @@
         "reopen": "Du kannst es jederzeit wieder öffnen und ändern.",
         "confirm": "Als fertig markieren",
         "keep": "Weiter bearbeiten",
-        "missing": "{{count}} Felder aus A sind noch nicht in B platziert."
+        "missing": "{{count}} Felder aus A sind noch nicht in B platziert: Sie wandern zu „Aus B entfernt“."
       },
       "plain": "Bearbeitung mit eigener Vorlage",
       "navLabel": "Durch den Stapel navigieren",
@@ -635,7 +635,17 @@
     "panel": {
       "title": "Felder von B · {{count}}",
       "toResolve": "Zu klären {{count}}",
-      "allSet": "Alles geklärt",
+      "allSet": "Geprüft",
+      "toReview": "Zu prüfen · {{count}}",
+      "reviewed": "Alles geprüft.",
+      "reviewedText": "{{count}} Felder in B platziert; nichts wartet auf deine Entscheidung.",
+      "markedReady": "PDF als Fertig markiert.",
+      "summary": "Übertragungsübersicht",
+      "sumNew": "Neu: {{count}}",
+      "sumMoved": "Verschoben: {{count}}",
+      "sumRenamed": "Umbenannt: {{count}}",
+      "sumRemoved": "Entfernt: {{count}}",
+      "removedBadge": "Aus B entfernt",
       "emptyB": "B ist leer. Setze die Vorlage von A ein und passe Änderungen an.",
       "noTemplate": "Für dieses PDF gibt es kein JSON von A: B beginnt leer.",
       "page": "S. {{page}}",
@@ -1706,20 +1716,20 @@
     "notesRc": "Hinweise zur Testversion",
     "channel": {
       "label": "Update-Kanal",
-      "stable": "Stabil",
-      "beta": "Tests",
-      "hintStable": "Nur endgültige Versionen. Empfohlen.",
-      "hintBeta": "Du erhältst auch Testversionen (RC) vor der endgültigen. Sie können Fehler haben.",
+      "stable": "Nur stabile",
+      "latest": "Neueste",
+      "hintStable": "Nur stabile Versionen. Empfohlen.",
+      "hintLatest": "Immer die neueste Version: eine Testversion (RC), wenn sie die neueste ist, sonst die stabile.",
       "confirm": {
-        "title": "Testversionen erhalten?",
-        "text": "Testversionen (RC) kommen vor der endgültigen, damit man sie echt ausprobieren kann. Sie können Fehler haben. Deine PDFs und Anmerkungen bleiben unberührt, exportiere aber vorher Wichtiges.",
-        "text2": "Um zum stabilen Kanal zurückzukehren, ändere ihn hier: du erhältst die nächste endgültige Version.",
-        "yes": "Tests erhalten",
+        "title": "Immer die neueste Version erhalten?",
+        "text": "Ist die zuletzt veröffentlichte Version eine Testversion (RC), wird diese angeboten. Sie kann Fehler enthalten. Ihre PDFs und Anmerkungen bleiben unberührt, wichtige Dinge sollten Sie aber exportieren.",
+        "text2": "Sobald die nächste stabile Version erscheint, wird diese angeboten. Um nur stabile zu erhalten, ändern Sie es hier wieder.",
+        "yes": "Neueste erhalten",
         "cancel": "Abbrechen"
       },
       "back": {
-        "title": "Zurück zum stabilen Kanal",
-        "text": "Du bleibst bei {{current}}, bis die endgültige Version erscheint; dann wird sie angeboten. Willst du die stabile sofort, installiere sie von Hand über GitHub.",
+        "title": "Zurück zu nur stabilen",
+        "text": "Sie bleiben bei {{current}}, bis die stabile Version erscheint; dann wird sie angeboten. Wenn Sie die stabile sofort möchten, installieren Sie sie von Hand über GitHub.",
         "github": "GitHub öffnen",
         "ok": "Verstanden"
       }
@@ -1855,7 +1865,8 @@
       "confirms": "fragt nach",
       "current": "aktuell",
       "batch": "Stapel",
-      "position": "Stapel {{index}} von {{total}}"
+      "position": "Stapel {{index}} von {{total}}",
+      "active": "aktiv"
     },
     "why": {
       "noPdf": "Zuerst: ein PDF öffnen",
@@ -1867,7 +1878,18 @@
       "noTemplateA": "Zuerst: Vorlage A hochladen",
       "noVersionB": "Zuerst: Version B hochladen",
       "firstPdf": "Sie sind beim ersten PDF",
-      "lastPdf": "Sie sind beim letzten PDF"
+      "lastPdf": "Sie sind beim letzten PDF",
+      "noSelection": "Wähle zuerst ein PDF aus",
+      "noReady": "Noch keine PDFs fertig",
+      "nothingToReview": "Keine PDFs zu prüfen",
+      "noFilters": "Keine Filter aktiv",
+      "alreadyActive": "Bereits angewendet",
+      "alreadySelected": "Alles ist schon ausgewählt",
+      "noVisible": "Keine PDFs sichtbar",
+      "noReadyInSelection": "Kein ausgewähltes PDF ist fertig",
+      "noVersionBInSelection": "Kein ausgewähltes PDF hat eine Version B",
+      "busy": "Eine Aufgabe läuft",
+      "nothingToMark": "Nichts als fertig zu markieren"
     },
     "cmd": {
       "fitPage": "An Seite anpassen",
@@ -1885,6 +1907,41 @@
       "themeDark": "Zum dunklen Design wechseln",
       "themeLight": "Zum hellen Design wechseln",
       "language": "Sprache: {{language}}"
+    },
+    "group": {
+      "batch": "Stapel",
+      "view": "Ansicht",
+      "filter": "Filter",
+      "selection": "Auswahl"
+    },
+    "batch": {
+      "downloadReady": "Fertige herunterladen (ZIP)",
+      "readyCount": "{{count}} fertig",
+      "reviewNext": "Nächstes prüfen",
+      "reviewCount": "{{count}} zu prüfen",
+      "updateTemplates": "Vorlagen aktualisieren…",
+      "testData": "Testdaten hochladen…",
+      "testDataReplace": "Testdaten ersetzen…",
+      "testDataRemove": "Testdaten entfernen",
+      "viewGrid": "Zur Kachelansicht wechseln",
+      "viewList": "Zur Liste wechseln",
+      "showAll": "Anzeigen: alle",
+      "showReview": "Anzeigen: zu prüfen",
+      "showReady": "Anzeigen: fertig",
+      "showWithA": "Anzeigen: mit Vorlage A",
+      "showWithB": "Anzeigen: mit Version B",
+      "showAi": "Anzeigen: mit KI",
+      "clearFilters": "Filter entfernen",
+      "selectVisible": "Sichtbare auswählen",
+      "clearSelection": "Auswahl aufheben",
+      "downloadSelected": "Ausgewählte herunterladen",
+      "suggestTables": "Seitentabellen vorschlagen…",
+      "translateAi": "Mit KI übertragen…",
+      "markReady": "Ausgewählte als fertig markieren",
+      "removeSelected": "Ausgewählte aus dem Stapel entfernen",
+      "pdfCount": "{{count}} PDFs",
+      "openMenu": "Aktionen suchen",
+      "keyhint": "Aktionen"
     }
   },
   "projects": {

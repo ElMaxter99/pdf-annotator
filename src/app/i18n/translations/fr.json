@@ -493,7 +493,7 @@
         "reopen": "Vous pourrez le rouvrir et le modifier à tout moment.",
         "confirm": "Marquer comme terminé",
         "keep": "Continuer à modifier",
-        "missing": "Il reste {{count}} champs de A non placés dans B."
+        "missing": "{{count}} champs de A ne sont pas encore placés dans B : ils passeront dans « Retirés de B »."
       },
       "plain": "Modification avec son modèle",
       "navLabel": "Parcourir le lot",
@@ -635,7 +635,17 @@
     "panel": {
       "title": "Champs de B · {{count}}",
       "toResolve": "À résoudre {{count}}",
-      "allSet": "Tout est réglé",
+      "allSet": "Révisé",
+      "toReview": "À réviser · {{count}}",
+      "reviewed": "Tout est révisé.",
+      "reviewedText": "{{count}} champs placés dans B ; rien n’attend une décision de votre part.",
+      "markedReady": "PDF marqué comme Prêt.",
+      "summary": "Résumé du transfert",
+      "sumNew": "Nouveaux: {{count}}",
+      "sumMoved": "Déplacés: {{count}}",
+      "sumRenamed": "Renommés: {{count}}",
+      "sumRemoved": "Retirés: {{count}}",
+      "removedBadge": "Retiré de B",
       "emptyB": "B est vide. Appliquez le modèle de A et ajustez ce qui a changé.",
       "noTemplate": "Ce PDF n’a pas de JSON pour A : B démarre vide.",
       "page": "p. {{page}}",
@@ -1706,20 +1716,20 @@
     "notesRc": "Notes de la version de test",
     "channel": {
       "label": "Canal de mises à jour",
-      "stable": "Stable",
-      "beta": "Tests",
-      "hintStable": "Versions finales uniquement. Recommandé.",
-      "hintBeta": "Vous recevez aussi des versions de test (RC) avant la finale. Elles peuvent avoir des bugs.",
+      "stable": "Stables uniquement",
+      "latest": "Dernières",
+      "hintStable": "Uniquement les versions stables. C’est recommandé.",
+      "hintLatest": "Toujours la version la plus récente : une version de test (RC) si c’est la dernière, une stable si c’est elle.",
       "confirm": {
-        "title": "Recevoir les versions de test ?",
-        "text": "Les versions de test (RC) arrivent avant la finale pour pouvoir être essayées pour de vrai. Elles peuvent avoir des bugs. Vos PDF et annotations ne sont pas touchés, mais exportez d'abord l'important.",
-        "text2": "Pour revenir au canal stable, changez-le ici : vous recevrez la prochaine version finale.",
-        "yes": "Recevoir les tests",
+        "title": "Recevoir toujours la dernière version ?",
+        "text": "Si la dernière publication est une version de test (RC), c’est celle qui vous sera proposée. Elle peut contenir des bogues. Vos PDF et annotations ne sont pas touchés, mais mieux vaut exporter l’essentiel.",
+        "text2": "Quand la version stable suivante sortira, elle vous sera proposée. Pour ne recevoir que des stables, modifiez-le ici.",
+        "yes": "Recevoir les dernières",
         "cancel": "Annuler"
       },
       "back": {
-        "title": "Revenir au canal stable",
-        "text": "Vous restez sur la {{current}} jusqu'à la sortie de la version finale ; elle vous sera alors proposée. Pour la stable tout de suite, installez-la à la main depuis GitHub.",
+        "title": "Revenir à stables uniquement",
+        "text": "Vous restez sur la {{current}} jusqu’à la sortie de la version stable ; elle vous sera alors proposée. Pour l’avoir tout de suite, installez-la à la main depuis GitHub.",
         "github": "Ouvrir GitHub",
         "ok": "Compris"
       }
@@ -1855,7 +1865,8 @@
       "confirms": "demande confirmation",
       "current": "actuel",
       "batch": "Lot",
-      "position": "Lot {{index}} sur {{total}}"
+      "position": "Lot {{index}} sur {{total}}",
+      "active": "actif"
     },
     "why": {
       "noPdf": "D'abord : ouvrez un PDF",
@@ -1867,7 +1878,18 @@
       "noTemplateA": "D'abord : importez le modèle A",
       "noVersionB": "D'abord : importez la version B",
       "firstPdf": "Vous êtes sur le premier PDF",
-      "lastPdf": "Vous êtes sur le dernier PDF"
+      "lastPdf": "Vous êtes sur le dernier PDF",
+      "noSelection": "Sélectionnez d’abord un PDF",
+      "noReady": "Aucun PDF n’est encore prêt",
+      "nothingToReview": "Aucun PDF à vérifier",
+      "noFilters": "Aucun filtre actif",
+      "alreadyActive": "Déjà appliqué",
+      "alreadySelected": "Tout est déjà sélectionné",
+      "noVisible": "Aucun PDF visible",
+      "noReadyInSelection": "Aucun PDF sélectionné n’est prêt",
+      "noVersionBInSelection": "Aucun PDF sélectionné n’a de version B",
+      "busy": "Une tâche est en cours",
+      "nothingToMark": "Rien à marquer comme prêt"
     },
     "cmd": {
       "fitPage": "Ajuster à la page",
@@ -1885,6 +1907,41 @@
       "themeDark": "Passer au thème sombre",
       "themeLight": "Passer au thème clair",
       "language": "Langue : {{language}}"
+    },
+    "group": {
+      "batch": "Lot",
+      "view": "Vue",
+      "filter": "Filtre",
+      "selection": "Sélection"
+    },
+    "batch": {
+      "downloadReady": "Télécharger les PDF prêts (ZIP)",
+      "readyCount": "{{count}} prêts",
+      "reviewNext": "Vérifier le suivant",
+      "reviewCount": "{{count}} à vérifier",
+      "updateTemplates": "Mettre à jour les modèles…",
+      "testData": "Importer des données de test…",
+      "testDataReplace": "Remplacer les données de test…",
+      "testDataRemove": "Retirer les données de test",
+      "viewGrid": "Passer en grille",
+      "viewList": "Passer en liste",
+      "showAll": "Afficher : tous",
+      "showReview": "Afficher : à vérifier",
+      "showReady": "Afficher : prêts",
+      "showWithA": "Afficher : avec modèle A",
+      "showWithB": "Afficher : avec version B",
+      "showAi": "Afficher : avec IA",
+      "clearFilters": "Retirer les filtres",
+      "selectVisible": "Sélectionner les PDF visibles",
+      "clearSelection": "Retirer la sélection",
+      "downloadSelected": "Télécharger les PDF sélectionnés",
+      "suggestTables": "Suggérer des tables de pages…",
+      "translateAi": "Transférer avec l’IA…",
+      "markReady": "Marquer les PDF sélectionnés comme prêts",
+      "removeSelected": "Retirer les PDF sélectionnés du lot",
+      "pdfCount": "{{count}} PDF",
+      "openMenu": "Rechercher des actions",
+      "keyhint": "Actions"
     }
   },
   "projects": {

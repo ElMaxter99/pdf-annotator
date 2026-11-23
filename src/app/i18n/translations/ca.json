@@ -493,7 +493,7 @@
         "reopen": "Podràs reobrir-lo i canviar-lo quan vulguis.",
         "confirm": "Marca com a llest",
         "keep": "Continua editant",
-        "missing": "Queden {{count}} camps d'A sense col·locar a B."
+        "missing": "Queden {{count}} camps d’A sense col·locar a B: passaran a «Eliminats de B»."
       },
       "plain": "Editant amb la seva plantilla",
       "navLabel": "Moure's pel lot",
@@ -635,7 +635,17 @@
     "panel": {
       "title": "Camps de B · {{count}}",
       "toResolve": "Per resoldre {{count}}",
-      "allSet": "Tot resolt",
+      "allSet": "Revisat",
+      "toReview": "Per revisar · {{count}}",
+      "reviewed": "Tot revisat.",
+      "reviewedText": "{{count}} camps col·locats a B; res no espera una decisió teva.",
+      "markedReady": "PDF marcat com a Llest.",
+      "summary": "Resum del trasllat",
+      "sumNew": "Nous: {{count}}",
+      "sumMoved": "Moguts: {{count}}",
+      "sumRenamed": "Reanomenats: {{count}}",
+      "sumRemoved": "Eliminats: {{count}}",
+      "removedBadge": "Eliminat de B",
       "emptyB": "B és buida. Posa la plantilla d’A i ajusta el que hagi canviat.",
       "noTemplate": "Aquest PDF no té JSON d’A: B comença buida.",
       "page": "pàg. {{page}}",
@@ -1706,20 +1716,20 @@
     "notesRc": "Notes de la prova",
     "channel": {
       "label": "Canal d'actualitzacions",
-      "stable": "Estable",
-      "beta": "Proves",
-      "hintStable": "Només versions finals. És el recomanat.",
-      "hintBeta": "Reps també versions de prova (RC) abans de la final. Poden fallar.",
+      "stable": "Només estables",
+      "latest": "Últimes",
+      "hintStable": "Només versions estables. És el recomanat.",
+      "hintLatest": "Sempre la versió més recent: si és de prova (RC), aquesta; si és estable, l’estable.",
       "confirm": {
-        "title": "Rebre versions de prova?",
-        "text": "Les versions de prova (RC) arriben abans que la final perquè es puguin provar de debò. Poden tenir errors. Els teus PDF i anotacions no es toquen, però convé exportar el que sigui important.",
-        "text2": "Per tornar al canal estable, canvia-ho aquí: rebràs la propera versió final.",
-        "yes": "Rebre proves",
+        "title": "Vols rebre sempre l’última versió?",
+        "text": "Si l’última publicada és una versió de prova (RC), t’oferirem aquesta. Pot tenir errors. Els teus PDF i anotacions no es toquen, però convé exportar el que sigui important.",
+        "text2": "Quan surti l’estable posterior, t’oferirem aquesta. Per rebre només estables, torna-ho a canviar aquí.",
+        "yes": "Rebre les últimes",
         "cancel": "Cancel·lar"
       },
       "back": {
-        "title": "Tornar al canal estable",
-        "text": "Continues amb la {{current}} fins que surti la versió final; llavors se't oferirà. Si vols l'estable ja, instal·la-la a mà des de GitHub.",
+        "title": "Tornar a només estables",
+        "text": "Continues amb la {{current}} fins que surti la versió estable; llavors te l’oferirem. Si vols l’estable ja, instal·la-la a mà des de GitHub.",
         "github": "Obrir GitHub",
         "ok": "Entesos"
       }
@@ -1855,7 +1865,8 @@
       "confirms": "demana confirmació",
       "current": "actual",
       "batch": "Lot",
-      "position": "Lot {{index}} de {{total}}"
+      "position": "Lot {{index}} de {{total}}",
+      "active": "actiu"
     },
     "why": {
       "noPdf": "Abans: obre un PDF",
@@ -1867,7 +1878,18 @@
       "noTemplateA": "Abans: puja la plantilla A",
       "noVersionB": "Abans: puja la versió B",
       "firstPdf": "Ja ets al primer PDF",
-      "lastPdf": "Ja ets a l'últim PDF"
+      "lastPdf": "Ja ets a l'últim PDF",
+      "noSelection": "Selecciona abans algun PDF",
+      "noReady": "Encara no hi ha PDFs llestos",
+      "nothingToReview": "No hi ha PDFs per revisar",
+      "noFilters": "No hi ha filtres actius",
+      "alreadyActive": "Ja està aplicat",
+      "alreadySelected": "Ja hi ha tot seleccionat",
+      "noVisible": "No hi ha PDFs visibles",
+      "noReadyInSelection": "Cap dels seleccionats està llest",
+      "noVersionBInSelection": "Cap dels seleccionats té versió B",
+      "busy": "Hi ha una tasca en curs",
+      "nothingToMark": "Res per marcar com a llest"
     },
     "cmd": {
       "fitPage": "Ajustar a la pàgina",
@@ -1885,6 +1907,41 @@
       "themeDark": "Canviar a tema fosc",
       "themeLight": "Canviar a tema clar",
       "language": "Idioma: {{language}}"
+    },
+    "group": {
+      "batch": "Lot",
+      "view": "Vista",
+      "filter": "Filtre",
+      "selection": "Selecció"
+    },
+    "batch": {
+      "downloadReady": "Descarrega els llestos (ZIP)",
+      "readyCount": "{{count}} llestos",
+      "reviewNext": "Revisa el següent",
+      "reviewCount": "{{count}} per revisar",
+      "updateTemplates": "Actualitza les plantilles…",
+      "testData": "Puja dades de prova…",
+      "testDataReplace": "Substitueix les dades de prova…",
+      "testDataRemove": "Treu les dades de prova",
+      "viewGrid": "Canvia a quadrícula",
+      "viewList": "Canvia a llista",
+      "showAll": "Mostra: tots",
+      "showReview": "Mostra: per revisar",
+      "showReady": "Mostra: llestos",
+      "showWithA": "Mostra: amb plantilla A",
+      "showWithB": "Mostra: amb versió B",
+      "showAi": "Mostra: amb IA",
+      "clearFilters": "Treu els filtres",
+      "selectVisible": "Selecciona els visibles",
+      "clearSelection": "Treu la selecció",
+      "downloadSelected": "Descarrega els seleccionats",
+      "suggestTables": "Suggereix taules de pàgines…",
+      "translateAi": "Trasllada amb IA…",
+      "markReady": "Marca els seleccionats com a llestos",
+      "removeSelected": "Treu els seleccionats del lot",
+      "pdfCount": "{{count}} PDFs",
+      "openMenu": "Cerca accions",
+      "keyhint": "Accions"
     }
   },
   "projects": {

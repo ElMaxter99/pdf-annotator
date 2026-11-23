@@ -30,14 +30,32 @@ export class MigrationPanelComponent {
     return session && session.phase === 'ready' ? session : null;
   });
 
-  readonly rows = computed<FieldState[]>(() => {
+  readonly summaryOpen = signal(false);
+
+  /** What still asks for a decision: «Falta en B» without placing or dismissing. «Listo» (or a proposal under review) takes them out. */
+  readonly pendingStates = computed<FieldState[]>(() => {
+    const m = this.vm.migration();
+    if (!m || m.item.status === 'ready' || this.proposal() !== null) {
+      return [];
+    }
+    return m.states.filter((state) => state.status === 'missing');
+  });
+
+  /** «Quitados de B»: missing fields that no longer ask for anything (the PDF is «Listo» or a proposal is open). */
+  readonly removedCount = computed(() =>
+    this.pendingStates().length || this.proposal() ? 0 : (this.vm.migration()?.summary.missing ?? 0),
+  );
+
+  /** Informative states (new, moved, renamed, same and removed), shown in the collapsed summary. */
+  readonly summaryRows = computed<FieldState[]>(() => {
     const m = this.vm.migration();
     if (!m) {
       return [];
     }
+    const pending = this.pendingStates().length > 0;
     const hideMissing = this.proposal() !== null;
     const all = [...m.states]
-      .filter((state) => !(hideMissing && state.status === 'missing'))
+      .filter((state) => state.status !== 'missing' || (!pending && !hideMissing))
       .sort((a, b) => ORDER[a.status] - ORDER[b.status]);
     return this.showSame() ? all : all.filter((state) => state.status !== 'same');
   });
