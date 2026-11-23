@@ -5,7 +5,7 @@ Maxter aprobó estos cambios visibles **sin mesas** («ya lo veo yo cuando progr
 **Regla para cualquier sesión con acceso al lienzo (Maxter, 2026-11-22):** si la sesión de Claude tiene el lienzo, antes de diseñar nada nuevo pinta lo que falte de esta lista (y de `design/PENDIENTE-MESAS.md` en general), marca cada punto con su `P-NN` y quítalo de aquí. Las sesiones sin lienzo (como la que cerró la 1.17) solo lo anotan.
 
 ## Ya programado, falta la mesa
-Nada. El 2026-11-22 se pintaron en el lienzo los 20 puntos que había (P-115 a P-124, capturas reales de la 1.17.0).
+Nada. El 2026-11-23 se pintaron en «Definitivo» el editor de la 1.18 (D-18 a D-23: capturas reales, caja de la anotación, lote con barra única, copiar JSON con formato y espacio de trabajo libre) y se movieron ahí las propuestas ya implementadas (P-125 a P-129, P-134, P-135 y P-139 a P-143). El 2026-11-22 se pintaron en el lienzo los 20 puntos que había (P-115 a P-124, capturas reales de la 1.17.0).
 
 | Antes (#) | Qué | Mesa |
 | --- | --- | --- |
