@@ -1,4 +1,6 @@
 ## Unreleased
+### Added
+- **Actualizar las plantillas del lote desde JSON (petición de Maxter, mesas P-136 a P-138 aprobadas):** nuevo botón «Actualizar plantillas» en la barra del panel del lote, con el mismo patrón que «Subir las plantillas» del alta: pestañas «Archivos» (un JSON por PDF con el mismo nombre, o archivos con varios documentos) y «Pegar JSON» (el fichero largo, con varios documentos seguidos y tolerando `ObjectId(..)`/`ISODate(..)`), emparejado por `pdfName`, `name`, `fileName` y `type`, «Asignar…» para los documentos sin PDF y ✕ para omitir uno. Cada fila enseña «antes → después» (nuevos, quitados, movidos o editados) y se despliega por página. Tras confirmar (con una copia ZIP opcional de las plantillas actuales) se reemplaza solo la plantilla A de esos PDF, nunca el PDF ni la versión B, con contador «n de N», estado por fila y «Deshacer todo» mientras el panel esté abierto. Límite de 20 MB para el texto o archivo largo. Textos en los 7 idiomas, tests unitarios y e2e.
 
 ## [v1.18.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.18.0) - 2026-11-23
 ### Added

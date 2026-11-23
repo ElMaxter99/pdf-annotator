@@ -1,6 +1,6 @@
 import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
@@ -10,6 +10,10 @@ import { AiDraftBannerComponent } from './ai-batch/ai-draft-banner.component';
 import { AiBatchPanelComponent } from './ai-batch/ai-batch-panel.component';
 import { AiBatchService } from '../../services/ai-batch.service';
 import { PageMapBatchDialogComponent } from './page-map-batch/page-map-batch-dialog.component';
+import {
+  TemplateUpdateDialogComponent,
+  type TemplateUpdateResult,
+} from './template-update/template-update-dialog.component';
 import { PageMapBatchService } from '../../services/page-map-batch.service';
 import { AiHelperService } from '../../services/ai-helper.service';
 import { InfoTipComponent } from '../../components/info-tip/info-tip.component';
@@ -94,6 +98,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     AiDraftBannerComponent,
     FocusTrapDirective,
     PageMapBatchDialogComponent,
+    TemplateUpdateDialogComponent,
   ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
@@ -402,7 +407,46 @@ export class BatchPageComponent implements OnInit {
     this.offerUndo('removed', removed.length, () => this.store.reinsert(removed));
   }
 
-  private offerUndo(kind: 'removed' | 'ready' | 'tables', count: number, restore: () => void): void {
+  @ViewChild(TemplateUpdateDialogComponent) private updateDialog?: TemplateUpdateDialogComponent;
+
+  openTemplateUpdate(): void {
+    this.updateDialog?.open();
+  }
+
+  /**
+   * Replaced templates (P-136). Their «Deshacer todo» is kept apart from the transient bulk undo and
+   * stays while the panel is open; a later update keeps the templates as they were before the first.
+   */
+  readonly templatesUndo = signal<number>(0);
+  private readonly templatesOriginal = new Map<string, PageAnnotations[]>();
+
+  onTemplatesUpdated(result: TemplateUpdateResult | null): void {
+    if (!result) {
+      return;
+    }
+    for (const entry of result.previous) {
+      if (!this.templatesOriginal.has(entry.id)) {
+        this.templatesOriginal.set(entry.id, entry.pages);
+      }
+    }
+    this.templatesUndo.set(this.templatesOriginal.size);
+  }
+
+  undoTemplates(): void {
+    this.templatesOriginal.forEach((pages, id) => {
+      if (this.store.find(id)) {
+        this.store.setTemplate(id, pages);
+      }
+    });
+    this.templatesOriginal.clear();
+    this.templatesUndo.set(0);
+  }
+
+  private offerUndo(
+    kind: 'removed' | 'ready' | 'tables',
+    count: number,
+    restore: () => void,
+  ): void {
     this.dropUndo();
     this.undoFn = restore;
     this.undoNotice.set({ kind, count });

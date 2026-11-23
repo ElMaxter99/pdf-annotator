@@ -37,6 +37,15 @@
       @if (aiHelper.available) {
         <app-ai-batch-button (showReason)="showAiReason($event)" />
       }
+      <button
+        type="button"
+        class="btn btn--ghost"
+        (click)="openTemplateUpdate()"
+        [disabled]="total() === 0"
+        data-testid="update-templates"
+      >
+        {{ 'batch.upd.open' | t }}
+      </button>
       @if (readyCount() > 0) {
         <button type="button" class="btn" (click)="downloadReady()" data-testid="download-ready">
           {{ 'batch.downloadReady' | t: { count: readyCount() } }}
@@ -736,8 +745,16 @@
       }
       <p class="batch-note">{{ 'batch.panelHint' | t }}</p>
 
-      @if (selectionCount() > 0 || undoNotice()) {
+      @if (selectionCount() > 0 || undoNotice() || templatesUndo() > 0) {
         <div class="batch-dock">
+        @if (templatesUndo() > 0) {
+          <div class="batch-undo" role="status" data-testid="templates-undo">
+            <span>{{ 'batch.upd.undoNotice' | t: { count: templatesUndo() } }}</span>
+            <button type="button" class="btn btn--ghost" (click)="undoTemplates()" data-testid="templates-undo-btn">
+              ↶ {{ 'batch.upd.undoAll' | t }}
+            </button>
+          </div>
+        }
         @if (undoNotice(); as notice) {
           <div class="batch-undo" role="status" data-testid="bulk-undo">
             <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : notice.kind === 'tables' ? 'batch.bulk.tablesDone' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
@@ -822,6 +839,7 @@
         </div>
       }
 
+      <app-template-update (closed)="onTemplatesUpdated($event)" />
       <app-page-map-batch (closed)="onPageMapsClosed($event)" (review)="openById($event)" />
 
       @if (dialog(); as kind) {
