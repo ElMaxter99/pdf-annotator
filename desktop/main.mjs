@@ -364,7 +364,7 @@ async function installLinux(plan) {
     return;
   }
   rmSync(updatedFile, { force: true });
-  if (kind === 'failed' && !result.stderr) result.stderr = `pkexec terminó con código ${result.code} sin pedir la contraseña`;
+  if (kind === 'failed' && !result.stderr) result.stderr = `pkexec exit ${result.code}`;
   logUpdate(`instalación ${kind === 'cancelled' ? 'cancelada (contraseña)' : 'fallida'}: código ${result.code} ${installDetail(result.stderr, os.homedir())}`);
   setState({ status: 'ready', installError: kind === 'cancelled' ? 'cancelled' : 'failed', installDetail: kind === 'cancelled' ? undefined : installDetail(result.stderr || `código ${result.code}`, os.homedir()) });
 }
