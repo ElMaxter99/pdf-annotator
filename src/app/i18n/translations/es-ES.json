@@ -919,7 +919,9 @@
         "saved": "Propuesta lista para revisar",
         "noB": "Sin B · se omite",
         "toCheck": "{{n}} a revisar",
-        "added": "+{{n}} nuevos en B"
+        "added": "+{{n}} nuevos en B",
+        "interrupted": "Interrumpido",
+        "notStarted": "No llegó a empezar"
       },
       "err": {
         "images_not_read": "La IA no leyó las imágenes",
@@ -1078,6 +1080,19 @@
           "added": "{{n}} campos nuevos que no estaban en A (p. ej. el número de página de las páginas nuevas de B)",
           "absent": "{{n}} campos de A cuyo texto ya no existe en B: no colocarlos es lo correcto"
         }
+      },
+      "draft": {
+        "title": "Quedó un traslado con IA a medias",
+        "summary": "Lo lanzaste con {{provider}} el {{when}} sobre {{total}} PDFs. {{saved}} tienen su propuesta guardada y no se ha perdido.",
+        "rest": "Falta: {{failed}} fallaron, {{interrupted}} iban en vuelo y {{notStarted}} no llegaron a empezar.",
+        "missing": "{{count}} PDFs de esa pasada ya no están en el lote.",
+        "resume": "Retomar lo que falta ({{count}})",
+        "all": "Volver a lanzar todo ({{count}})",
+        "choose": "Elegir cuáles…",
+        "discard": "Descartar aviso",
+        "checking": "Buscando el borrador del traslado anterior…",
+        "replaces": "Se sustituirán {{count}} propuestas guardadas ({{edited}} con cambios tuyos). Se gasta de nuevo.",
+        "chosen": "Marcados los {{count}} que faltan. Pulsa «Trasladar con IA» en la barra para lanzarlos."
       }
     },
     "more": "Más acciones",

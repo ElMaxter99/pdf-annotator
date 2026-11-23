@@ -1,3 +1,4 @@
+import { sanitizeAiRun, type AiRunRecord } from '../utils/ai-run.utils';
 import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
 import type { AiSavedProposal, BatchItem, FieldLink, PageMapData } from '../models/batch.model';
@@ -19,6 +20,8 @@ const SETTINGS_KEY = '__batch-settings__';
 export interface BatchSettings {
   /** Instructions for the AI for every PDF of the batch (A6); a PDF can override them. */
   readonly aiInstructions: string;
+  /** Borrador de la última pasada de «Trasladar con IA» (P-127); `null` = nada que recuperar. */
+  readonly aiRun?: AiRunRecord | null;
 }
 
 /** Where a batch that belongs to a desktop project is mirrored (the folder on disk) instead of IndexedDB. */
@@ -49,6 +52,8 @@ export class BatchStoreService {
   readonly draft = signal<{ pdfs: File[]; jsons: File[] } | null>(null);
   /** Instructions for the AI for the whole batch (A6); each PDF can override them (`BatchItem.aiInstructions`). */
   readonly aiInstructions = signal('');
+  /** Draft of the last AI run, so a closed app can offer to pick it up again (P-127). */
+  readonly aiRun = signal<AiRunRecord | null>(null);
   private readonly injector = inject(Injector);
   /** Desktop project mirror: `null` = browser storage; in read-only projects nothing is saved at all. */
   private sink: BatchSink | null = null;
@@ -59,6 +64,7 @@ export class BatchStoreService {
     this.closedNotices.set({});
     this.items.set(items);
     this.aiInstructions.set(cleanAiInstructions(settings?.aiInstructions));
+    this.aiRun.set(sanitizeAiRun(settings?.aiRun));
     this.activeId.set(null);
     this.sink = sink;
     this.projectMode = sink ? 'rw' : 'ro';
@@ -72,6 +78,7 @@ export class BatchStoreService {
     this.projectMode = 'none';
     this.items.set([]);
     this.aiInstructions.set('');
+    this.aiRun.set(null);
     this.activeId.set(null);
     this.closedNotices.set({});
     this.loaded.set(false);
@@ -93,6 +100,9 @@ export class BatchStoreService {
     const [stored, settings] = await Promise.all([this.readAll(), this.readSettings()]);
     if (settings && !this.aiInstructions()) {
       this.aiInstructions.set(cleanAiInstructions(settings.aiInstructions));
+    }
+    if (settings && !this.aiRun()) {
+      this.aiRun.set(settings.aiRun ?? null);
     }
     // Items added before the read finished win over stored ones with the same id.
     const known = new Set(this.items().map((item) => item.id));
@@ -142,7 +152,20 @@ export class BatchStoreService {
       return;
     }
     this.aiInstructions.set(clean);
-    const settings: BatchSettings = { aiInstructions: clean };
+    this.saveSettings();
+  }
+
+  /** Saves (or clears with `null`) the draft of the AI run; it lives next to the batch, in the same place. */
+  setAiRun(record: AiRunRecord | null): void {
+    this.aiRun.set(record);
+    this.saveSettings();
+  }
+
+  private saveSettings(): void {
+    const run = this.aiRun();
+    const settings: BatchSettings = run
+      ? { aiInstructions: this.aiInstructions(), aiRun: run }
+      : { aiInstructions: this.aiInstructions() };
     if (this.projectMode !== 'none') {
       this.sink?.saveSettings?.(settings);
       return;
@@ -368,7 +391,10 @@ export class BatchStoreService {
   private async readSettings(): Promise<BatchSettings | null> {
     const value = await this.run<unknown>('readonly', (store) => store.get(SETTINGS_KEY));
     return value && typeof value === 'object'
-      ? { aiInstructions: cleanAiInstructions((value as { aiInstructions?: unknown }).aiInstructions) }
+      ? {
+          aiInstructions: cleanAiInstructions((value as { aiInstructions?: unknown }).aiInstructions),
+          aiRun: sanitizeAiRun((value as { aiRun?: unknown }).aiRun),
+        }
       : null;
   }
 

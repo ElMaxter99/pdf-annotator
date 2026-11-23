@@ -313,7 +313,7 @@ export class ProjectStoreService {
     if (!opened.ok) {
       return 'locked' in opened ? 'io' : opened.error;
     }
-    const carried: BatchSettings = { aiInstructions: this.batch.aiInstructions() };
+    const carried: BatchSettings = { aiInstructions: this.batch.aiInstructions(), aiRun: this.batch.aiRun() };
     this.batch.attachProject([...items], this.sinkFor(created.ref), carried);
     writeProjectSettings(created.ref, carried);
     for (const item of items) {

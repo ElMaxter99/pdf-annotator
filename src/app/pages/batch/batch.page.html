@@ -386,6 +386,7 @@
       />
       @if (aiHelper.available) {
         <app-ai-batch-panel (reviewFirst)="reviewProposal()" />
+        <app-ai-draft-banner (choose)="chooseDraft($event)" />
       }
       @if (counts().all > 0) {
         <div
