@@ -38,11 +38,15 @@ const queue = createBatchQueue({
 });
 const busyNow = (provider) => slots.used(provider) >= slots.max(provider);
 
-const providersInfo = () => ({
-  claude: { label: PROVIDERS.claude.label, found: !!findExecutable('claude') },
-  copilot: { label: PROVIDERS.copilot.label, found: !!findExecutable('copilot') },
-  ...(process.env.AI_HELPER_FAKE === '1' ? { fake: { label: 'Simulado', found: true } } : {}),
-});
+// Con AI_HELPER_FAKE=1 (e2e) no hace falta ningún CLI: todos los proveedores salen como encontrados.
+const providersInfo = () => {
+  const fake = process.env.AI_HELPER_FAKE === '1';
+  return {
+    claude: { label: PROVIDERS.claude.label, found: fake || !!findExecutable('claude') },
+    copilot: { label: PROVIDERS.copilot.label, found: fake || !!findExecutable('copilot') },
+    ...(fake ? { fake: { label: 'Simulado', found: true } } : {}),
+  };
+};
 
 function send(res, status, body, cors) {
   res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...cors });

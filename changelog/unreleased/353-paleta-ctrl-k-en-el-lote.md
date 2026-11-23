@@ -1,4 +1,0 @@
----
-type: Added
----
-**Ctrl+K también en el panel del lote (1.19 · F7, mesas P-144 a P-146 aprobadas por Maxter):** la paleta de comandos se abre ahora también en `/lote` (Ctrl/⌘+K, o «Buscar acciones» en ⋯) con las acciones del panel: cambiar entre cuadrícula y lista, filtros (todos, por revisar, listos, con plantilla A, con versión B, con IA) y «Quitar filtros», seleccionar los visibles, descargar los listos o los seleccionados, «Revisar el siguiente», «Actualizar plantillas», datos de prueba, «Sugerir tablas», «Trasladar con IA», e «Ir a» un PDF por nombre de A o de B. Es una segunda vía: cada acción llama al método de su botón, así que «Marcar como listos» y «Quitar» abren el mismo diálogo de confirmación y dejan el «Deshacer» de 10 s. Las acciones que no se pueden usar se ven apagadas con el motivo. Pie discreto «Ctrl+K Acciones» en el panel. Textos en los 7 idiomas y `e2e/batch-palette.spec.ts`.
