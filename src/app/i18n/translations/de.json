@@ -270,13 +270,30 @@
       "hintPreview": "Wählen Sie eine Farbe, geben Sie HEX oder RGB ein. Der JSON-Export verwendet immer HEX.",
       "hintEdit": "Fügen Sie einen vorhandenen HEX- oder RGB-Wert ein, um identische Farben zu verwenden.",
       "hexPlaceholder": "#5eead4",
-      "rgbPlaceholder": "rgb(94, 234, 212)"
+      "rgbPlaceholder": "rgb(94, 234, 212)",
+      "rgbLabel": "Farbe (RGB)"
     },
     "actions": {
-      "duplicate": "Anmerkung duplizieren"
+      "duplicate": "Anmerkung duplizieren",
+      "accept": "Übernehmen",
+      "cancel": "Abbrechen",
+      "delete": "Löschen",
+      "close": "Schließen"
     },
     "editingBadge": "Bearbeitung",
-    "coordinatesLabel": "Koordinaten (PDF)"
+    "coordinatesLabel": "Koordinaten (PDF)",
+    "title": {
+      "create": "Neue Anmerkung",
+      "edit": "Anmerkung bearbeiten"
+    },
+    "more": {
+      "show": "Mehr Optionen",
+      "hide": "Weniger Optionen"
+    },
+    "error": {
+      "field": "Gib den Feldnamen ein."
+    },
+    "lockedNote": "Anmerkung gesperrt. Entsperre sie zum Bearbeiten."
   },
   "fonts": {
     "custom": {

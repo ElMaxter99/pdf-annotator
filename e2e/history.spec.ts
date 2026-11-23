@@ -49,7 +49,7 @@ test('edits can be undone and redone', async ({ page }) => {
   // Justo después de crearla, el clic puede caer en la capa de debajo mientras se redibuja y abrir el editor de CREAR, y
   // el campo del editor puede repoblarse tras escribir: se repite todo el gesto (abrir EDITAR, escribir, guardar) hasta
   // que la anotación muestra el texto nuevo.
-  const valueInput = page.locator('.annotation-editor input[type=text]').nth(1);
+  const valueInput = page.locator('.annotation-editor input[data-autofocus]');
   await expect(async () => {
     if (await page.locator('.annotation-editor').count()) await page.keyboard.press('Escape');
     await page.locator('.annotation').first().click();

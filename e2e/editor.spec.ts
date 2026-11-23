@@ -7,7 +7,7 @@ test('creating an annotation opens a focused editor and stores the field', async
   await clickPage(page, 0.5, 0.5);
   const editor = page.locator('.annotation-editor');
   await expect(editor).toBeVisible();
-  await expect(page.locator('.editor-badge')).toHaveCount(0);
+  await expect(editor.locator('.editor-title')).toBeVisible();
   await expect(editor.locator('.editor-actions button')).toHaveCount(2);
   expect(await page.evaluate(() => !!document.activeElement?.closest('.annotation-editor'))).toBe(true);
 
@@ -24,7 +24,8 @@ test('colour inputs stay in sync and the font dropdown is searchable', async ({ 
   await clickPage(page, 0.5, 0.5);
   const inputs = page.locator('.annotation-editor .color-inputs input');
   await inputs.first().fill('#ff0000');
-  await expect(inputs.nth(1)).toHaveValue('rgb(255, 0, 0)');
+  await page.getByTestId('editor-more').click();
+  await expect(page.locator('.annotation-editor .editor-extra input[placeholder^="rgb"]')).toHaveValue('rgb(255, 0, 0)');
 
   await page.locator('.font-dropdown__trigger').click();
   await expect(page.locator('.font-dropdown__panel')).toBeVisible();
@@ -37,7 +38,7 @@ test('number type exposes decimals and appender', async ({ page }) => {
   await clickPage(page, 0.5, 0.5);
   const editor = page.locator('.annotation-editor');
   await expect(editor.locator('.field-small')).toHaveCount(2);
-  await editor.locator('select').first().selectOption('number');
+  await editor.locator('.type-seg__opt', { hasText: 'Número' }).click();
   await expect(editor.locator('.field-small')).toHaveCount(4);
 });
 
@@ -46,14 +47,15 @@ test('editing shows coordinates, duplicate and delete; locking disables fields',
   await page.locator('.annotation').first().click();
   const editor = page.locator('.annotation-editor.editing');
   await expect(editor).toBeVisible();
-  await expect(page.locator('.editor-badge')).toHaveCount(1);
+  await expect(editor.locator('.editor-title')).toBeVisible();
+  await page.getByTestId('editor-more').click();
   await expect(editor.locator('input[readonly]')).toHaveValue(/^X: /);
   await expect(editor.locator('.editor-actions button')).toHaveCount(4);
 
-  const lock = editor.locator('.toggle-control input').first();
+  const lock = editor.locator('.editor-extra .toggle-control input').first();
   await lock.check();
   await expect(editor.locator('input[type=text][disabled]')).toHaveCount(4);
-  await expect(editor.locator('.toggle-control input').nth(1)).toBeDisabled();
+  await expect(editor.locator('.editor-extra .toggle-control input').nth(1)).toBeDisabled();
   await lock.uncheck();
 
   await editor.locator('.editor-actions button').first().click(); // duplicate
@@ -62,6 +64,46 @@ test('editing shows coordinates, duplicate and delete; locking disables fields',
   await page.locator('.annotation').first().click();
   await page.locator('.btn-delete').click();
   await expect.poll(() => fieldCount(page)).toBe(1);
+});
+
+async function expectEditorInsideViewer(page: import('@playwright/test').Page) {
+  const editor = page.locator('.annotation-editor');
+  await expect(editor).toBeVisible();
+  const box = await editor.boundingBox();
+  const viewer = await page.locator('.viewer').boundingBox();
+  expect(box && viewer).toBeTruthy();
+  expect(box!.x).toBeGreaterThanOrEqual(viewer!.x - 1);
+  expect(box!.y).toBeGreaterThanOrEqual(viewer!.y - 1);
+  expect(box!.x + box!.width).toBeLessThanOrEqual(viewer!.x + viewer!.width + 1);
+  expect(box!.y + box!.height).toBeLessThanOrEqual(viewer!.y + viewer!.height + 1);
+}
+
+test('the editor box never leaves the viewer, even clicking at the bottom or right edge', async ({ page }) => {
+  await clickPage(page, 0.5, 0.97);
+  await expectEditorInsideViewer(page);
+  await page.keyboard.press('Escape');
+  await clickPage(page, 0.97, 0.5);
+  await expectEditorInsideViewer(page);
+  await page.keyboard.press('Escape');
+  await clickPage(page, 0.97, 0.97);
+  await expectEditorInsideViewer(page);
+});
+
+test('a short window turns the editor into a bottom sheet and "more options" stays inside', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 640 });
+  await clickPage(page, 0.4, 0.3);
+  const editor = page.locator('.annotation-editor');
+  await expect(editor).toHaveAttribute('data-placement', 'sheet');
+  await page.getByTestId('editor-more').click();
+  await expectEditorInsideViewer(page);
+  await expect(editor.locator('.editor-actions .action-primary')).toBeInViewport();
+});
+
+test('accepting an empty new annotation shows an error instead of closing', async ({ page }) => {
+  await clickPage(page, 0.4, 0.4);
+  await page.locator('.annotation-editor .action-primary').click();
+  await expect(page.locator('.annotation-editor .field-error')).toBeVisible();
+  await expect.poll(() => fieldCount(page)).toBe(0);
 });
 
 test('Escape and outside clicks cancel the editor', async ({ page }) => {

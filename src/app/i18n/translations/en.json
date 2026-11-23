@@ -270,13 +270,30 @@
       "hintPreview": "Pick a color, type a HEX or an RGB value. The JSON will always export the color in HEX.",
       "hintEdit": "Paste an existing HEX or RGB value to reuse exact colors.",
       "hexPlaceholder": "#5eead4",
-      "rgbPlaceholder": "rgb(94, 234, 212)"
+      "rgbPlaceholder": "rgb(94, 234, 212)",
+      "rgbLabel": "Colour (RGB)"
     },
     "actions": {
-      "duplicate": "Duplicate annotation"
+      "duplicate": "Duplicate annotation",
+      "accept": "Accept",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "close": "Close"
     },
     "editingBadge": "Editing",
-    "coordinatesLabel": "Coordinates (PDF)"
+    "coordinatesLabel": "Coordinates (PDF)",
+    "title": {
+      "create": "New annotation",
+      "edit": "Edit annotation"
+    },
+    "more": {
+      "show": "More options",
+      "hide": "Fewer options"
+    },
+    "error": {
+      "field": "Enter the field name."
+    },
+    "lockedNote": "Annotation locked. Unlock it to edit."
   },
   "fonts": {
     "custom": {

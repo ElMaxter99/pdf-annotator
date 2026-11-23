@@ -1221,7 +1221,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       return;
     }
 
-    const focusTarget = editorEl.querySelector<HTMLElement>('input, select, textarea, button');
+    const focusTarget =
+      editorEl.querySelector<HTMLElement>('[data-autofocus]') ??
+      editorEl.querySelector<HTMLElement>('input, select, textarea, button');
     focusTarget?.focus();
   }
 
@@ -1233,6 +1235,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     switch (event.key) {
       case 'Enter':
+        if ((event.target as HTMLElement | null)?.closest('button')) break;
         triggerAction('confirm');
         break;
       case 'Escape':
