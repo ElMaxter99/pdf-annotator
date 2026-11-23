@@ -8,7 +8,7 @@ import { ToastHostComponent } from './components/toast-host/toast-host.component
 import { ThemeService } from './services/theme.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, ToastHostComponent, UpdateCardComponent, UpdatePanelComponent, UpdateInstallComponent, StoragePanelComponent],
