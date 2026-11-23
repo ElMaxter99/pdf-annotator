@@ -156,6 +156,29 @@
       "title": "Noch keine Anmerkungen",
       "text": "Klicken Sie auf das PDF, um die erste zu setzen, oder holen Sie sie aus einer anderen Arbeit.",
       "paste": "JSON einfügen"
+    },
+    "copyFormat": {
+      "title": "Kopierformat",
+      "preset": "Voreinstellung",
+      "keys": "Schlüssel",
+      "keysQuoted": "\"in Anführungszeichen\"",
+      "keysBare": "ohne Anführungszeichen",
+      "quote": "Anführungszeichen der Texte",
+      "quoteDouble": "Doppelt \"…\"",
+      "quoteSingle": "Einfach '…'",
+      "indent": "Einrückung",
+      "indentTab": "Tab",
+      "indentCompact": "Kompakt",
+      "trailingComma": "Abschließendes Komma in Listen und Objekten",
+      "preview": "Vorschau des Kopierten",
+      "copyWith": "Mit diesem Format kopieren",
+      "valid": "Gültiges JSON",
+      "notJson": "Kein gültiges JSON · nutzbar in JS/TS",
+      "name": {
+        "json": "JSON",
+        "js": "JS/TS-Objekt",
+        "custom": "Benutzerdefiniert"
+      }
     }
   },
   "guides": {
@@ -363,7 +386,9 @@
       "emptyTitle": "Nichts wiederherzustellen",
       "emptyHint": "Hier erscheinen die Hinweise, die du schließt."
     },
-    "noData": "{{count}} Anmerkungen ohne Daten in den Testdaten: sie zeigen ihr Muster."
+    "noData": "{{count}} Anmerkungen ohne Daten in den Testdaten: sie zeigen ihr Muster.",
+    "jsonCopied": "JSON kopiert · {{format}}",
+    "jsonCopyFailed": "Kopieren nicht möglich. Text im Editor markieren und Strg+C drücken."
   },
   "session": {
     "title": "Dort weitermachen, wo Sie aufgehört haben",

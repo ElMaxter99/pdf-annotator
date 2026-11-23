@@ -23,6 +23,17 @@ import { resolveFieldPreview } from '../../utils/preview-values.utils';
 import { cloneAnnotationPages } from '../../utils/annotation-pages.utils';
 import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
 import { LooseJsonError } from '../../utils/loose-json';
+import {
+  JSON_COPY_JS,
+  JSON_COPY_KEY,
+  JSON_COPY_STRICT,
+  JsonCopyFormat,
+  JsonCopyPreset,
+  formatJsonForCopy,
+  isStrictJsonFormat,
+  jsonCopyPreset,
+  normalizeJsonCopyFormat,
+} from '../../utils/json-copy-format.utils';
 import { buildJsonExportPayload } from '../../utils/json-export.utils';
 import { JsonViewMode, AUTO_APPLY_JSON_DELAY_MS, MAX_JSON_IMPORT_BYTES } from './workspace.types';
 import type { WorkspacePageComponent } from './workspace.page';
@@ -215,7 +226,67 @@ export class WorkspaceJson {
   }
 
   copyJSON(this: WorkspacePageComponent) {
-    navigator.clipboard.writeText(this.coordsTextModel()).catch(() => {});
+    const text = this.coordsTextModel();
+    const format = this.jsonCopyFormat();
+    const preset = jsonCopyPreset(format);
+    const output = preset === 'json' ? text : (formatJsonForCopy(text, format) ?? text);
+    const label = this.translationService.translate(`sidebar.copyFormat.name.${preset}`);
+    navigator.clipboard.writeText(output).then(
+      () =>
+        this.toast.show(
+          this.translationService.translate('toast.jsonCopied', { format: label }),
+          'success',
+          2000,
+        ),
+      () => this.toast.error(this.translationService.translate('toast.jsonCopyFailed')),
+    );
+  }
+
+  storedJsonCopyFormat(this: WorkspacePageComponent): JsonCopyFormat {
+    try {
+      const raw = typeof localStorage === 'undefined' ? null : localStorage.getItem(JSON_COPY_KEY);
+      return normalizeJsonCopyFormat(raw ? JSON.parse(raw) : null);
+    } catch {
+      return { ...JSON_COPY_STRICT };
+    }
+  }
+
+  setJsonCopyFormat(this: WorkspacePageComponent, patch: Partial<JsonCopyFormat>) {
+    const next = normalizeJsonCopyFormat({ ...this.jsonCopyFormat(), ...patch });
+    this.jsonCopyFormat.set(next);
+    try {
+      localStorage.setItem(JSON_COPY_KEY, JSON.stringify(next));
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  setJsonCopyPreset(this: WorkspacePageComponent, preset: Exclude<JsonCopyPreset, 'custom'>) {
+    this.setJsonCopyFormat(preset === 'js' ? JSON_COPY_JS : JSON_COPY_STRICT);
+  }
+
+  toggleJsonCopyPanel(this: WorkspacePageComponent) {
+    this.jsonCopyOpen.update((open) => !open);
+  }
+
+  closeJsonCopyPanel(this: WorkspacePageComponent) {
+    this.jsonCopyOpen.set(false);
+  }
+
+  jsonCopyPresetName(this: WorkspacePageComponent): JsonCopyPreset {
+    return jsonCopyPreset(this.jsonCopyFormat());
+  }
+
+  jsonCopyIsStrict(this: WorkspacePageComponent): boolean {
+    return isStrictJsonFormat(this.jsonCopyFormat());
+  }
+
+  /** Vista previa de la ventana: el primer campo del JSON actual (o uno de ejemplo) con el formato elegido. */
+  jsonCopyPreview(this: WorkspacePageComponent): string {
+    const sample = JSON.stringify({
+      pages: [{ num: 1, fields: [{ x: 72, y: 710, mapField: "nombre", fontSize: 12, type: 'text' }] }],
+    });
+    return formatJsonForCopy(sample, this.jsonCopyFormat()) ?? '';
   }
 
   toggleIncludeAdvancedJsonFields(this: WorkspacePageComponent, checked: boolean) {
