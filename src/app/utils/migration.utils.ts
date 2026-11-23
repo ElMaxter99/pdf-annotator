@@ -13,6 +13,8 @@ export interface FieldState {
   /** Matching field of A (not for `new`). */
   readonly a?: {
     readonly name: string;
+    /** Page of A (renumbered to B's), which can differ from `page` when the field changed page. */
+    readonly page?: number;
     readonly x: number;
     readonly y: number;
     readonly fontSize: number;
@@ -68,38 +70,67 @@ export function computeFieldStates(
     })),
   );
   const states: FieldState[] = [];
+  const bFields = bPages.flatMap((page, pageIndex) =>
+    page.fields.map((field, fieldIndex) => ({
+      page: page.num,
+      field,
+      name: fieldName(field),
+      ref: { pageIndex, fieldIndex },
+    })),
+  );
+  const matched = new Map<(typeof bFields)[number], AEntry>();
 
-  bPages.forEach((page, pageIndex) => {
-    page.fields.forEach((field, fieldIndex) => {
-      const name = fieldName(field);
-      const ref = { pageIndex, fieldIndex };
-      const sameName = entries.find((e) => !e.used && e.page === page.num && e.name === name);
-      if (sameName) {
-        sameName.used = true;
-        const unchanged =
-          Math.abs(sameName.x - field.x) <= SAME_POSITION_TOLERANCE &&
-          Math.abs(sameName.y - field.y) <= SAME_POSITION_TOLERANCE;
-        states.push({
-          status: unchanged ? 'same' : 'moved',
-          page: page.num,
-          name,
-          b: ref,
-          a: sameName,
-        });
-        return;
+  // 1) Same name on the same page.
+  for (const b of bFields) {
+    const hit = entries.find((e) => !e.used && e.page === b.page && e.name === b.name);
+    if (hit) {
+      hit.used = true;
+      matched.set(b, hit);
+    }
+  }
+  // 2) Same name on another page (the field changed page in B): the nearest page wins.
+  for (const b of bFields) {
+    if (matched.has(b) || !b.name) {
+      continue;
+    }
+    let hit: AEntry | undefined;
+    for (const e of entries) {
+      if (
+        !e.used &&
+        e.name === b.name &&
+        (!hit || Math.abs(e.page - b.page) < Math.abs(hit.page - b.page))
+      ) {
+        hit = e;
       }
-      const link = links.find((l) => l.page === page.num && l.b === name);
-      const linked = link
-        ? entries.find((e) => !e.used && e.page === page.num && e.name === link.a)
-        : undefined;
-      if (linked) {
-        linked.used = true;
-        states.push({ status: 'renamed', page: page.num, name, b: ref, a: linked });
-        return;
-      }
-      states.push({ status: 'new', page: page.num, name, b: ref });
-    });
-  });
+    }
+    if (hit) {
+      hit.used = true;
+      matched.set(b, hit);
+    }
+  }
+
+  for (const b of bFields) {
+    const { page, field, name, ref } = b;
+    const sameName = matched.get(b);
+    if (sameName) {
+      const unchanged =
+        sameName.page === page &&
+        Math.abs(sameName.x - field.x) <= SAME_POSITION_TOLERANCE &&
+        Math.abs(sameName.y - field.y) <= SAME_POSITION_TOLERANCE;
+      states.push({ status: unchanged ? 'same' : 'moved', page, name, b: ref, a: sameName });
+      continue;
+    }
+    const link = links.find((l) => l.page === page && l.b === name);
+    const linked = link
+      ? entries.find((e) => !e.used && e.page === page && e.name === link.a)
+      : undefined;
+    if (linked) {
+      linked.used = true;
+      states.push({ status: 'renamed', page, name, b: ref, a: linked });
+      continue;
+    }
+    states.push({ status: 'new', page, name, b: ref });
+  }
 
   for (const entry of entries) {
     if (!entry.used && !dismissed.includes(fieldKey(entry.page, entry.name))) {
