@@ -83,7 +83,7 @@
           <div class="ai-dock" role="alertdialog" [attr.aria-label]="'ai.dock.confirmTitle' | t: { provider: providerName() }" data-testid="ai-confirm">
             <div class="ai-dock__state">
               <div class="ai-dock__l1"><b>{{ 'ai.dock.confirmTitle' | t: { provider: providerName() } }}</b></div>
-              <div class="ai-dock__l2"><span class="ai-dock__muted">{{ (s.saved ? 'ai.dock.confirmSaved' : 'ai.dock.confirmFresh') | t }}</span></div>
+              <div class="ai-dock__l2"><span class="ai-dock__muted">{{ 'ai.dock.confirmFresh' | t }}</span></div>
             </div>
             <div class="ai-dock__actions">
               <button type="button" class="btn btn--danger" (click)="confirmDiscard()" data-testid="ai-confirm-discard">{{ 'ai.dock.confirmYes' | t }}</button>
@@ -112,13 +112,6 @@
                 }
               </div>
             </div>
-            <div class="ai-dock__view">
-              <span class="ai-dock__label">{{ 'ai.dock.viewLabel' | t }}</span>
-              <span class="migration-seg" role="group" [attr.aria-label]="'ai.dock.viewLabel' | t">
-                <button type="button" [class.migration-seg__on]="s.view === 'proposal'" [attr.aria-pressed]="s.view === 'proposal'" (click)="vm.setAiView('proposal')" data-testid="ai-view-proposal">{{ 'batch.adjust.view.proposal' | t }}</button>
-                <button type="button" [class.migration-seg__on]="s.view === 'original'" [attr.aria-pressed]="s.view === 'original'" (click)="vm.setAiView('original')" data-testid="ai-view-original">{{ 'batch.adjust.view.original' | t }}</button>
-              </span>
-            </div>
             <div class="ai-dock__actions">
               <button type="button" class="btn btn--ghost" (click)="vm.reviewAiFields()" data-testid="ai-review-fields">
                 {{ 'ai.dock.review' | t }}
@@ -126,7 +119,7 @@
                   <span class="ai-dock__count" [attr.aria-label]="'ai.dock.reviewCount' | t: { count: reviewCount() }">{{ reviewCount() }}</span>
                 }
               </button>
-              <button type="button" class="btn btn--primary" [disabled]="sum.selected === 0" [attr.title]="sum.selected === 0 ? ('ai.dock.nothingMarkedHint' | t) : null" (click)="vm.applyAi()" data-testid="ai-apply">{{ 'ai.dock.apply' | t: { count: sum.selected } }}</button>
+              <button type="button" class="btn btn--primary" (click)="vm.applyAi()" data-testid="ai-apply">{{ 'ai.dock.apply' | t: { count: sum.selected } }}</button>
               <ng-container *ngTemplateOutlet="moreMenu; context: { discard: true }"></ng-container>
               <button type="button" class="ai-dock__icon" (click)="onClose()" [attr.aria-label]="'ai.dock.close' | t" [attr.title]="'ai.dock.close' | t" data-testid="ai-cancel">✕</button>
             </div>

@@ -46,22 +46,15 @@ export class AiReviewComponent {
     this.confirming.set(true);
   }
 
-  /** ✕: a saved proposal stays in the batch (it can be reopened); a fresh one asks first. */
+  /** ✕: cierra la revisión y deja en B lo que escribió la IA. */
   onClose(): void {
-    if (this.vm.ai()?.saved) {
-      this.vm.cancelAi();
-    } else {
-      this.confirming.set(true);
-    }
+    this.vm.cancelAi();
   }
 
+  /** «Descartar»: quita de B lo que escribió la IA (Ctrl+Z lo devuelve). */
   confirmDiscard(): void {
     this.confirming.set(false);
-    if (this.vm.ai()?.saved) {
-      this.vm.discardAi();
-    } else {
-      this.vm.cancelAi();
-    }
+    this.vm.discardAi();
   }
 
   @HostListener('document:click', ['$event'])

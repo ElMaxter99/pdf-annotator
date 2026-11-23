@@ -223,7 +223,10 @@ export class WorkspaceSelection {
     if (!fields.length) {
       return false;
     }
-    this.selectionClipboard = fields.map((field) => ({ ...this.prepareFieldForStorage(field) }));
+    this.selectionClipboard = fields.map((field) => {
+      const { aiId: _aiId, ...copy } = this.prepareFieldForStorage(field);
+      return copy;
+    });
     return true;
   }
 

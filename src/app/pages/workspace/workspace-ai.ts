@@ -1,4 +1,5 @@
-import { prepareFieldForForm, prepareFieldForStorage } from '../../utils/field-style.utils';
+import { areFieldsEqual } from '../../utils/field-style.utils';
+import { addFieldToPages } from '../../utils/annotation-pages.utils';
 import { AiRequestError, type AiProvider } from '../../services/ai-helper.service';
 import {
   confidenceLevel,
@@ -17,7 +18,6 @@ import {
   aiTemplateMap,
   loadingAiSession,
   savedAiSession,
-  withAiRowEdit,
   withAiEvent,
   withAiProgress,
   type AiSession,
@@ -105,6 +105,9 @@ export class WorkspaceAi {
         details: result.details,
         endedAt: Date.now(),
       });
+      if (placed > 0) {
+        this.aiWriteDefault();
+      }
     } catch (error) {
       if (abort !== this.aiAbort || (error as AiRequestError)?.code === 'aborted') {
         return;
@@ -142,9 +145,6 @@ export class WorkspaceAi {
   }
 
   cancelAi(this: WorkspacePageComponent): void {
-    if (this.editing()?.aiRowId) {
-      this.editing.set(null);
-    }
     this.aiAbort?.abort();
     this.aiAbort = null;
     this.ai.set(null);
@@ -178,6 +178,9 @@ export class WorkspaceAi {
       return;
     }
     this.ai.set(savedAiSession(saved, rows));
+    // La propuesta guardada se escribe en B al abrirla (un paso de historial) y deja de estar guardada en el lote.
+    this.aiWriteDefault();
+    this.batch.setAiProposal(item.id, undefined);
     this.reopenNotice('ai');
     if (this.referenceMode() !== 'split') {
       this.aiPreviousMode = this.referenceMode();
@@ -186,9 +189,10 @@ export class WorkspaceAi {
     this.redrawAllForPage();
   }
 
-  /** Drops the proposal saved by the queue for this PDF and closes the review. */
+  /** «Descartar»: quita de B lo que escribió la IA (un paso de historial, Ctrl+Z lo devuelve) y cierra la revisión. */
   discardAi(this: WorkspacePageComponent): void {
     const id = this.batch.activeItem()?.id;
+    this.aiSetWritten(new Set());
     this.cancelAi();
     if (id) {
       this.batch.setAiProposal(id, undefined);
@@ -254,34 +258,188 @@ export class WorkspaceAi {
     });
   }
 
-  /** «Marcar las altas» / «Quitar todas»: replaces the ticks of the proposal in one go. */
+  /** «Marcar las altas» / «Quitar todas»: escribe o quita de B las filas en un solo paso de historial. */
   setAiSelection(this: WorkspacePageComponent, mode: 'high' | 'none'): void {
     const session = this.ai();
     if (!session) {
       return;
     }
-    const overrides: Record<string, boolean> = {};
-    for (const row of session.rows) {
-      if (row.ok) {
+    const desired = new Set<string>();
+    if (mode === 'high') {
+      for (const row of session.rows) {
         // «Marcar solo los seguros»: los de A colocados con confianza alta (no los nuevos en B ni los dudosos).
-        overrides[row.id] = mode === 'high' && proposalGroup(row) === 'ready';
+        if (row.ok && proposalGroup(row) === 'ready') {
+          desired.add(row.id);
+        }
       }
     }
-    this.patchAi({ overrides });
+    this.aiSetWritten(desired);
   }
 
+  /** Marcar una fila la escribe en B; desmarcarla la quita de B (un paso de historial cada vez). */
   toggleAiRow(this: WorkspacePageComponent, row: AiRow): void {
     const session = this.ai();
     if (!session || !row.ok) {
       return;
     }
-    const overrides = new Map(Object.entries(session.overrides));
-    const next = !isRowSelected(row, overrides);
-    this.patchAi({ overrides: { ...session.overrides, [row.id]: next } });
+    const desired = this.aiWrittenRowIds();
+    if (desired.has(row.id)) {
+      desired.delete(row.id);
+    } else {
+      desired.add(row.id);
+    }
+    this.aiSetWritten(desired);
   }
 
+  /** Marca interna del campo de una fila en B para esta revisión (otra revisión nunca la reconoce). */
+  aiTag(this: WorkspacePageComponent, rowId: string): string {
+    return `${this.ai()?.startedAt ?? 0}:${rowId}`;
+  }
+
+  /** Dónde está ahora en B el campo de una fila (null si no está escrito: desmarcado, quitado o deshecho). */
+  aiWrittenRef(
+    this: WorkspacePageComponent,
+    rowId: string,
+  ): { pageIndex: number; index: number; page: number; field: PageField } | null {
+    const tag = this.aiTag(rowId);
+    const pages = this.coords();
+    for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
+      const index = pages[pageIndex].fields.findIndex((field) => field.aiId === tag);
+      if (index >= 0) {
+        return { pageIndex, index, page: pages[pageIndex].num, field: pages[pageIndex].fields[index] };
+      }
+    }
+    return null;
+  }
+
+  /** Filas de la propuesta cuyo campo está escrito en B ahora mismo. */
+  aiWrittenRowIds(this: WorkspacePageComponent): Set<string> {
+    const session = this.ai();
+    const out = new Set<string>();
+    if (!session) {
+      return out;
+    }
+    const tags = this.aiWrittenTags();
+    for (const row of session.rows) {
+      if (row.ok && tags.has(this.aiTag(row.id))) {
+        out.add(row.id);
+      }
+    }
+    return out;
+  }
+
+  /** El campo que una fila escribe en B: el de A con su posición (y los cambios guardados del lote), con su marca. */
+  aiBuildField(this: WorkspacePageComponent, row: AiRow): PageField | null {
+    const base = this.aiTemplate.get(row.id);
+    if (!base) {
+      return null;
+    }
+    const edited = this.ai()?.edits[row.id];
+    const target = edited
+      ? this.prepareFieldForStorage(aiProposalField(base, row, edited))
+      : aiProposalField(base, row);
+    return {
+      ...target,
+      x: Math.max(0, Math.round(Number(target.x) * 100) / 100),
+      y: Math.max(0, Math.round(Number(target.y) * 100) / 100),
+      aiId: this.aiTag(row.id),
+    };
+  }
+
+  /** Escribe en B la selección de partida (las filas colocadas y marcadas) en un solo paso de historial. */
+  aiWriteDefault(this: WorkspacePageComponent): void {
+    const session = this.ai();
+    if (!session) {
+      return;
+    }
+    const overrides = new Map(Object.entries(session.overrides));
+    const desired = new Set<string>();
+    for (const row of session.rows) {
+      if (row.ok && isRowSelected(row, overrides)) {
+        desired.add(row.id);
+      }
+    }
+    this.aiSetWritten(desired);
+  }
+
+  /** Deja escritas en B exactamente las filas pedidas: añade las que faltan y quita las que sobran (un paso de historial). */
+  aiSetWritten(this: WorkspacePageComponent, desired: ReadonlySet<string>): void {
+    const session = this.ai();
+    if (!session) {
+      return;
+    }
+    const tags = this.aiWrittenTags();
+    const remove = new Set<string>();
+    const add: AiRow[] = [];
+    for (const row of session.rows) {
+      if (!row.ok || !this.aiTemplate.has(row.id)) {
+        continue;
+      }
+      const tag = this.aiTag(row.id);
+      const written = tags.has(tag);
+      const wanted = desired.has(row.id);
+      if (written && !wanted) {
+        remove.add(tag);
+      } else if (!written && wanted) {
+        add.push(row);
+      }
+    }
+    if (!remove.size && !add.length) {
+      return;
+    }
+    this.dismissEditors();
+    const changed = this.applyCoordsChange(() => {
+      let pages = this.coords();
+      if (remove.size) {
+        pages = pages
+          .map((page) => ({
+            ...page,
+            fields: page.fields.filter((field) => !(field.aiId && remove.has(field.aiId))),
+          }))
+          .filter((page) => page.fields.length > 0);
+      }
+      for (const row of add) {
+        const field = this.aiBuildField(row);
+        if (field) {
+          pages = addFieldToPages(row.newPage, field, pages);
+        }
+      }
+      this.coords.set(pages);
+    });
+    if (changed) {
+      this.selection.set(null);
+      this.syncCoordsTextModel();
+    }
+    this.redrawAllForPage();
+  }
+
+  /** Marcas de los campos de B que escribió una propuesta. */
+  aiWrittenTags(this: WorkspacePageComponent): Set<string> {
+    const tags = new Set<string>();
+    for (const page of this.coords()) {
+      for (const field of page.fields) {
+        if (field.aiId) {
+          tags.add(field.aiId);
+        }
+      }
+    }
+    return tags;
+  }
+
+  /** Para cada fila colocada: ¿está escrita en B? (lo que marca la casilla). */
   aiOverrides(this: WorkspacePageComponent): ReadonlyMap<string, boolean> {
-    return new Map(Object.entries(this.ai()?.overrides ?? {}));
+    const session = this.ai();
+    const out = new Map<string, boolean>();
+    if (!session) {
+      return out;
+    }
+    const tags = this.aiWrittenTags();
+    for (const row of session.rows) {
+      if (row.ok) {
+        out.set(row.id, tags.has(this.aiTag(row.id)));
+      }
+    }
+    return out;
   }
 
   aiSummary(this: WorkspacePageComponent) {
@@ -289,7 +447,8 @@ export class WorkspaceAi {
   }
 
   aiFieldName(this: WorkspacePageComponent, row: AiRow): string {
-    const field = this.ai()?.edits[row.id] ?? this.aiTemplate.get(row.id);
+    const field =
+      this.aiWrittenRef(row.id)?.field ?? this.ai()?.edits[row.id] ?? this.aiTemplate.get(row.id);
     return (field?.mapField || field?.value || '').toString().trim() || '—';
   }
 
@@ -300,56 +459,40 @@ export class WorkspaceAi {
     }
   }
 
+  /** «Dar por buena»: la propuesta ya está en B; solo se cierra la revisión (y se borra la copia guardada del lote). */
   applyAi(this: WorkspacePageComponent): void {
     const session = this.ai();
     if (!session || session.phase !== 'ready') {
       return;
     }
-    const overrides = this.aiOverrides();
-    const toAdd: Array<{ page: number; field: PageField }> = [];
+    const written = this.aiWrittenRowIds();
     let moved = 0;
     for (const row of session.rows) {
-      const field = this.aiTemplate.get(row.id);
-      if (!field || !isRowSelected(row, overrides)) {
-        continue;
-      }
-      if (rowChangesPage(row)) {
+      if (written.has(row.id) && rowChangesPage(row)) {
         moved += 1;
       }
-      const edited = session.edits[row.id];
-      const target = edited
-        ? this.prepareFieldForStorage(aiProposalField(field, row, edited))
-        : aiProposalField(field, row);
-      toAdd.push({
-        page: row.newPage,
-        field: {
-          ...target,
-          x: Math.max(0, Math.round(Number(target.x) * 100) / 100),
-          y: Math.max(0, Math.round(Number(target.y) * 100) / 100),
-        },
-      });
     }
-    this.insertFields(toAdd);
-    const count = toAdd.length;
     const savedFor = session.saved ? this.batch.activeItem()?.id : undefined;
     this.cancelAi();
     if (savedFor) {
       this.batch.setAiProposal(savedFor, undefined);
     }
-    this.toast.show(this.translationService.translate('toast.batch.aiApplied', { count, moved }));
+    this.toast.show(
+      this.translationService.translate('toast.batch.aiApplied', { count: written.size, moved }),
+    );
   }
 
+  /** Las filas que no están en B (desmarcadas, quitadas o deshechas) se ven en gris; un clic las vuelve a poner. */
   drawAiPreview(this: WorkspacePageComponent, layer: HTMLElement, canvasHeight: number): void {
     const session = this.ai();
     if (!session || session.phase !== 'ready' || session.view === 'original') {
       return;
     }
     const page = this.pageIndex();
-    const overrides = this.aiOverrides();
-    layer.classList.add('reference-layer--interactive');
+    const tags = this.aiWrittenTags();
     for (const row of session.rows) {
       const base = this.aiTemplate.get(row.id);
-      if (!base || !row.ok || row.newPage !== page) {
+      if (!base || !row.ok || row.newPage !== page || tags.has(this.aiTag(row.id))) {
         continue;
       }
       const field = aiProposalField(base, row, session.edits[row.id]);
@@ -366,179 +509,31 @@ export class WorkspaceAi {
       );
       const el = layer.lastElementChild as HTMLElement | null;
       if (el) {
-        // Editable before applying: hover, click opens the editor, drag moves it (all of it stays in the proposal).
-        el.classList.add('reference-field--editable');
-        el.classList.toggle('reference-field--edited', !!session.edits[row.id]);
-        el.title = this.translationService.translate('ai.proposal.editHint', {
-          name: name || '—',
-          level: this.translationService.translate(
-            `ai.confidence.${confidenceLevel(row.confidence)}`,
-          ),
-        });
+        layer.classList.add('reference-layer--interactive');
+        el.classList.add('reference-field--editable', 'reference-field--grey');
+        el.title = this.translationService.translate('ai.proposal.ghostHint', { name: name || '—' });
         el.setAttribute('data-testid', 'ai-proposal-field');
         el.addEventListener('pointerdown', (event) => {
-          const paired = this.pairedProposalUnder(event, row.id, el);
-          this.onAiProposalPointerDown(event, paired.id, paired.el);
+          if (event.button !== 0 || this.panReady()) {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+          this.toggleAiRow(row);
         });
-        const selected = isRowSelected(row, overrides);
-        el.classList.add(
-          selected
-            ? confidenceLevel(row.confidence) === 'high'
-              ? 'reference-field--proposal'
-              : 'reference-field--estimated'
-            : 'reference-field--grey',
-        );
         el.dataset['aiId'] = row.id;
       }
     }
   }
 
-  /**
-   * Con cajas de la propuesta solapadas en B, un clic coge la que está emparejada con el campo de A seleccionado
-   * (la que une la línea) y no la que esté encima; sin pareja bajo el puntero, la de siempre.
-   */
-  pairedProposalUnder(
-    this: WorkspacePageComponent,
-    event: PointerEvent,
-    rowId: string,
-    el: HTMLElement,
-  ): { id: string; el: HTMLElement } {
-    const target = this.pairTarget;
-    if (target?.b?.kind !== 'ai' || target.b.id === rowId) {
-      return { id: rowId, el };
-    }
-    const paired = this.findPairElementB(target);
-    if (!paired) {
-      return { id: rowId, el };
-    }
-    const r = paired.getBoundingClientRect();
-    const inside =
-      event.clientX >= r.left &&
-      event.clientX <= r.right &&
-      event.clientY >= r.top &&
-      event.clientY <= r.bottom;
-    return inside ? { id: target.b.id, el: paired } : { id: rowId, el };
-  }
-
-  /** The field a proposal row would create (with its edits), or null if the row has no place in B. */
-  aiRowField(this: WorkspacePageComponent, rowId: string): PageField | null {
-    const session = this.ai();
-    const row = session?.rows.find((r) => r.id === rowId);
-    const base = this.aiTemplate.get(rowId);
-    return session && row?.ok && base ? aiProposalField(base, row, session.edits[rowId]) : null;
-  }
-
-  /** The proposed field was edited before applying (editor or drag). */
+  /** El campo escrito de la fila cambió respecto a lo que escribió la propuesta (movido o editado). */
   aiRowEdited(this: WorkspacePageComponent, row: AiRow): boolean {
-    return !!this.ai()?.edits[row.id];
-  }
-
-  /** Editing a field of the proposal (the editor then saves into the proposal, not into B). */
-  editingAiRow(this: WorkspacePageComponent): boolean {
-    return !!this.editing()?.aiRowId;
-  }
-
-  /** Keeps an edit of a proposed field (and the saved copy of the batch proposal, if it came from there). */
-  saveAiRowEdit(this: WorkspacePageComponent, rowId: string, field: PageField): void {
-    const session = this.ai();
-    if (!session) {
-      return;
-    }
-    this.ai.set(withAiRowEdit(session, rowId, field));
-    this.persistAiEdits();
-    this.redrawAllForPage();
-  }
-
-  persistAiEdits(this: WorkspacePageComponent): void {
-    const session = this.ai();
-    const item = this.batch.activeItem();
-    if (!session?.saved || !item?.aiProposal) {
-      return;
-    }
-    this.batch.setAiProposal(item.id, { ...item.aiProposal, edits: { ...session.edits } });
-  }
-
-  /** Pointer down on a proposed field in B: a click opens the editor; a drag moves it (Esc cancels the drag). */
-  onAiProposalPointerDown(
-    this: WorkspacePageComponent,
-    event: PointerEvent,
-    rowId: string,
-    el: HTMLElement,
-  ): void {
-    if (event.button !== 0 || this.panReady()) {
-      return;
-    }
-    const start = this.aiRowField(rowId);
-    if (!start) {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    const doc = this.document;
-    const x0 = event.clientX;
-    const y0 = event.clientY;
-    const left0 = parseFloat(el.style.left) || 0;
-    const top0 = parseFloat(el.style.top) || 0;
-    let dragging = false;
-    let cancelled = false;
-    const scale = this.scale();
-    el.classList.add('reference-field--active');
-    const move = (e: PointerEvent) => {
-      const dx = e.clientX - x0;
-      const dy = e.clientY - y0;
-      if (!dragging && Math.hypot(dx, dy) < 4) {
-        return;
-      }
-      dragging = true;
-      el.classList.add('reference-field--dragging');
-      el.style.left = `${left0 + dx}px`;
-      el.style.top = `${top0 + dy}px`;
-    };
-    const finish = (e: PointerEvent | null) => {
-      doc.removeEventListener('pointermove', move);
-      doc.removeEventListener('pointerup', up);
-      doc.removeEventListener('pointercancel', cancel);
-      doc.removeEventListener('keydown', key, true);
-      el.classList.remove('reference-field--active', 'reference-field--dragging');
-      if (cancelled || !e) {
-        this.redrawAllForPage();
-        return;
-      }
-      if (dragging) {
-        const x = Math.max(0, Math.round((Number(start.x) + (e.clientX - x0) / scale) * 100) / 100);
-        const y = Math.max(0, Math.round((Number(start.y) - (e.clientY - y0) / scale) * 100) / 100);
-        this.saveAiRowEdit(rowId, { ...start, x, y });
-        return;
-      }
-      this.openAiRowEditor(rowId);
-    };
-    const up = (e: PointerEvent) => finish(e);
-    const cancel = () => {
-      cancelled = true;
-      finish(null);
-    };
-    const key = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
-        cancel();
-      }
-    };
-    doc.addEventListener('pointermove', move);
-    doc.addEventListener('pointerup', up);
-    doc.addEventListener('pointercancel', cancel);
-    doc.addEventListener('keydown', key, true);
-  }
-
-  /** Opens the annotation editor on a proposed field; saving keeps the change in the proposal. */
-  openAiRowEditor(this: WorkspacePageComponent, rowId: string): void {
-    const field = this.aiRowField(rowId);
-    if (!field) {
-      return;
-    }
-    this.preview.set(null);
-    const formField = this.prepareFieldForForm(this.prepareFieldForStorage(field));
-    this.editing.set({ pageIndex: -1, fieldIndex: -1, field: formField, aiRowId: rowId });
-    this.updateEditingColorState(formField.color);
+    const written = this.aiWrittenRef(row.id)?.field;
+    const built = this.aiBuildField(row);
+    return (
+      !!written &&
+      !!built &&
+      !areFieldsEqual(written, built, (f) => this.fontCatalog.normalizeFontFamily(f))
+    );
   }
 }

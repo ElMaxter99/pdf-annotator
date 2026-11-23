@@ -1,6 +1,6 @@
 # La propuesta de la IA se escribe en el JSON de B (candidata 1.18)
 
-Mesas **P-134** (flujo y reglas) y **P-135** (estados, oscuro 1650 y claro 1280) en «Propuestas». **Estado: pendiente de aprobar. Las mesas no están pintadas (esta sesión no tiene acceso al lienzo); este texto es la propuesta.** Origen: Maxter, 2026-11-23, con páginas libres en «Dividida».
+Mesas **P-134** (flujo y reglas) y **P-135** (estados, oscuro 1650 y claro 1280) en «Propuestas». **Estado: aprobada por Maxter el 2026-11-23 con lo recomendado en las 4 preguntas. Mesas pintadas en el lienzo (zona «Propuestas»). Implementada en la PR #337.** Origen: Maxter, 2026-11-23, con páginas libres en «Dividida».
 
 ## Problema
 Hoy la propuesta de la IA vive aparte (`ai.edits` en `workspace-ai.ts`) y solo entra en B al pulsar «Aplicar» (`insertFields`, un paso de historial). Mover o editar una caja de la propuesta no pasa por `applyCoordsChange`, así que **Ctrl+Z / Ctrl+Y no la deshacen**.

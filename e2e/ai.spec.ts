@@ -47,7 +47,7 @@ async function openBatchWithB(page: Page, provider: string | null = 'fake') {
   await expect(page.locator('.migration-bar')).toContainText('Editando versión B');
 }
 
-test('«Copiar y adaptar con IA» asks once, proposes, is reviewed and applied in one undo step', async ({ page }) => {
+test('«Copiar y adaptar con IA» asks once, writes the proposal in B in one undo step and is kept or discarded', async ({ page }) => {
   await openBatchWithB(page);
   await expect(page.getByTestId('ai-chip')).toContainText('Simulado');
 
@@ -59,12 +59,11 @@ test('«Copiar y adaptar con IA» asks once, proposes, is reviewed and applied i
 
   await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
   await expect(page.getByTestId('split-a')).toBeVisible();
-  await expect(page.locator('.annotation')).toHaveCount(0); // B untouched until apply
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS); // written in B as soon as it arrives
   // the dock sits under the pages: «Enlazado» can no longer cover its buttons (P-67 · P-69)
   const dock = await page.getByTestId('ai-review').boundingBox();
   const link = await page.getByTestId('split-link').boundingBox();
   expect(dock && link && link.y + link.height <= dock.y).toBe(true);
-  await expect(page.getByTestId('split-tag-view')).toContainText('Viendo la propuesta');
   // the list lives in «Anotaciones»: «Revisar campos» opens it
   await page.getByTestId('ai-review-fields').click();
   await expect(page.getByTestId('ai-proposal')).toBeVisible();
@@ -73,14 +72,15 @@ test('«Copiar y adaptar con IA» asks once, proposes, is reviewed and applied i
   await expect(page.locator('.ai-proposal__row')).toHaveCount(FIELDS);
   await expect(page.getByTestId('ai-tab-badge')).toBeVisible();
   await expect(page.getByTestId('migration-list').locator('[data-status="missing"]')).toHaveCount(0);
-  // «Quitar todas» leaves nothing to apply; «Marcar las altas» brings the sure ones back
+  // «Quitar todas» takes them out of B; «Marcar las altas» writes the sure ones back
   await page.getByTestId('ai-select-none').click();
-  await expect(page.getByTestId('ai-apply')).toBeDisabled();
+  await expect(page.locator('.annotation')).toHaveCount(0);
   await page.getByTestId('ai-select-high').click();
-  await expect(page.getByTestId('ai-apply')).toBeEnabled();
+  await expect(page.locator('.annotation').first()).toBeVisible();
 
-  // closing a fresh proposal asks first; leaving it keeps the review, discarding leaves B as it was
-  await page.getByTestId('ai-cancel').click();
+  // «Descartar» asks first and takes what the AI wrote out of B
+  await page.getByTestId('ai-more').click();
+  await page.getByTestId('ai-discard').click();
   await expect(page.getByTestId('ai-confirm')).toBeVisible();
   await page.getByTestId('ai-confirm-back').click();
   await expect(page.getByTestId('ai-review')).toBeVisible();
@@ -91,81 +91,79 @@ test('«Copiar y adaptar con IA» asks once, proposes, is reviewed and applied i
   await expect(page.getByTestId('ai-proposal')).toHaveCount(0);
   await expect(page.locator('.annotation')).toHaveCount(0);
 
-  // second time: no notice (remembered), apply
+  // second time: no notice (remembered); one Ctrl+Z takes the whole proposal out, Ctrl+Y brings it back
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await expect(page.getByTestId('ai-consent')).toHaveCount(0);
-  await page.getByTestId('ai-apply').click({ timeout: 30000 });
-  await expect(page.getByTestId('ai-review')).toHaveCount(0);
+  await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
-
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.keyboard.press('Control+z');
   await expect(page.locator('.annotation')).toHaveCount(0);
+  await expect(page.getByTestId('ai-review')).toBeVisible(); // the review stays; the rows are just out of B
+  await page.keyboard.press('Control+y');
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+
+  // «Dar por buena» only closes the review: B keeps the fields
+  await page.getByTestId('ai-apply').click();
+  await expect(page.getByTestId('ai-review')).toHaveCount(0);
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 });
 
-test('the AI proposal can be edited in B before applying: click opens the editor, drag moves, «Aplicar» uses both', async ({ page }) => {
+test('moving a field written by the AI is undoable and redoable, step by step', async ({ page }) => {
   await openBatchWithB(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-ai').click();
   await page.getByTestId('ai-consent-ok').click();
   await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 
-  const proposed = page.getByTestId('ai-proposal-field');
-  await expect(proposed.first()).toBeVisible();
-  const first = proposed.first();
-  const name = (await first.textContent())?.trim() ?? '';
-  await expect(first).toHaveAttribute('title', /clic para editar/);
-
-  // click → the same annotation editor, marked as a field of the proposal; saving keeps it in the proposal
-  await first.click();
-  await expect(page.getByTestId('editor-ai-badge')).toBeVisible();
-  const text = page.locator('.annotation-editor input[type="text"]').nth(1);
-  await text.fill('apellido.editado');
-  await page.locator('.annotation-editor .action-primary').click();
-  await expect(page.getByTestId('editor-ai-badge')).toHaveCount(0);
-  await expect(page.locator('.annotation')).toHaveCount(0); // B untouched until «Aplicar»
-  await expect(proposed.filter({ hasText: 'apellido.editado' })).toHaveCount(1);
+  const first = page.locator('.annotation').first();
+  await first.scrollIntoViewIfNeeded();
+  const before = await first.boundingBox();
+  if (!before) throw new Error('no field written in B');
+  await page.mouse.move(before.x + 4, before.y + 4);
+  await page.mouse.down();
+  await page.mouse.move(before.x + 44, before.y + 34, { steps: 5 });
+  await page.mouse.up();
+  const moved = await first.boundingBox();
+  expect(moved && Math.abs(moved.x - (before.x + 40)) < 3 && Math.abs(moved.y - (before.y + 30)) < 3).toBe(true);
+  // moving it keeps it as a field of the proposal (the row is marked as changed)
   await page.getByTestId('ai-review-fields').click();
   await expect(page.getByTestId('ai-row-edited')).toHaveCount(1);
 
-  // drag another proposed field: it moves and is marked as edited too
-  const second = proposed.filter({ hasNotText: 'apellido.editado' }).first();
-  const secondName = (await second.textContent())?.trim() ?? '';
-  await second.scrollIntoViewIfNeeded();
-  const box = await second.boundingBox();
-  if (!box) throw new Error('no proposed field');
-  await page.mouse.move(box.x + 5, box.y + 5);
-  await page.mouse.down();
-  await page.mouse.move(box.x + 45, box.y + 35, { steps: 5 });
-  await page.mouse.up();
-  await expect(page.getByTestId('ai-row-edited')).toHaveCount(2);
-  const moved = await proposed.filter({ hasText: secondName }).first().boundingBox();
-  expect(moved && Math.abs(moved.x - (box.x + 40)) < 3 && Math.abs(moved.y - (box.y + 30)) < 3).toBe(true);
-  await expect(page.getByTestId('editor-ai-badge')).toHaveCount(0); // a drag does not open the editor
-
-  // Esc during a drag puts it back
-  const third = proposed.filter({ hasNotText: 'apellido.editado' }).filter({ hasNotText: secondName }).first();
-  await third.scrollIntoViewIfNeeded();
-  const tBox = await third.boundingBox();
-  if (!tBox) throw new Error('no third field');
-  await page.mouse.move(tBox.x + 5, tBox.y + 5);
-  await page.mouse.down();
-  await page.mouse.move(tBox.x + 60, tBox.y + 5, { steps: 4 });
-  await page.keyboard.press('Escape');
-  await page.mouse.up();
-  await expect(page.getByTestId('ai-row-edited')).toHaveCount(2);
-
-  // «Aplicar» creates the fields with the edited name and position, in one undo step
-  await page.getByTestId('ai-apply').click();
-  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
-  // el texto JSON se actualiza un instante después de pintar las anotaciones (más lento en el CI)
-  const jsonText = () => page.locator('textarea.json-editor').inputValue();
-  await expect.poll(jsonText, { timeout: 10000 }).toContain('apellido.editado');
-  expect(await jsonText()).not.toContain(`"mapField": "${name}"`);
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.keyboard.press('Control+z');
+  await expect(page.getByTestId('ai-row-edited')).toHaveCount(0);
+  const back = await first.boundingBox();
+  expect(back && Math.abs(back.x - before.x) < 3 && Math.abs(back.y - before.y) < 3).toBe(true);
+  await page.keyboard.press('Control+y');
+  await expect(page.getByTestId('ai-row-edited')).toHaveCount(1);
+
+  // one more undo and the move is gone; another one takes the whole proposal out of B
+  await page.keyboard.press('Control+z');
+  await page.keyboard.press('Control+z');
   await expect(page.locator('.annotation')).toHaveCount(0);
+  await expect(page.getByTestId('ai-proposal-field').first()).toBeVisible(); // rows out of B are grey, one click puts them back
+  await page.getByTestId('ai-proposal-field').first().click();
+  await expect(page.locator('.annotation')).toHaveCount(1);
+});
+
+test('copies of fields written by the AI are the user\'s own: discarding the proposal keeps them', async ({ page }) => {
+  await openBatchWithB(page);
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-ai').click();
+  await page.getByTestId('ai-consent-ok').click();
+  await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('Control+a');
+  await page.keyboard.press('Control+d');
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS * 2);
+  await page.getByTestId('ai-more').click();
+  await page.getByTestId('ai-discard').click();
+  await page.getByTestId('ai-confirm-discard').click();
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 });
 
 test('without the helper the chip says so and the AI option explains how to start it', async ({ page }) => {
@@ -289,12 +287,12 @@ test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revi
 
   await expect(page.getByTestId('ai-batch-summary')).toBeVisible({ timeout: 30000 });
   await expect(page.getByTestId('ai-chip-ready')).toBeVisible();
-  // nothing is applied by itself
+  // nothing is written in B by itself: only when the PDF is opened for review
   await page.getByTestId('ai-batch-review-first').click();
   await page.waitForURL('**/workspace?lote=*');
   await expect(page.getByTestId('ai-review')).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId('ai-saved')).toBeVisible();
-  await expect(page.locator('.annotation')).toHaveCount(0);
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
   await page.getByTestId('ai-apply').click();
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
   // accepted: the saved copy is gone, going back to the panel shows no proposal to review

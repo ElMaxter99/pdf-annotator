@@ -169,7 +169,8 @@ export function serializeFieldForJson(
   includeAdvanced: boolean,
 ): Record<string, unknown> {
   if (includeAdvanced) {
-    return { ...sanitized };
+    const { aiId: _aiId, ...rest } = sanitized;
+    return rest;
   }
 
   return {

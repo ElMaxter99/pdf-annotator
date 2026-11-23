@@ -64,6 +64,16 @@ export class WorkspacePairing {
       }
       if (best) {
         const r = best.row;
+        const written = this.aiWrittenRef(r.id);
+        if (written) {
+          return {
+            name,
+            page: written.page,
+            x: written.field.x,
+            y: written.field.y,
+            ref: { kind: 'field', page: written.page, pageIndex: written.pageIndex, index: written.index },
+          };
+        }
         return {
           name,
           page: r.newPage,
@@ -209,6 +219,38 @@ export class WorkspacePairing {
     );
   }
 
+  /**
+   * Con cajas de B solapadas y una pareja activa, un clic o arrastre coge la caja emparejada con el campo de A
+   * seleccionado (la que une la línea) y no la que esté encima; sin pareja bajo el puntero, la de siempre.
+   */
+  pairedFieldUnder(
+    this: WorkspacePageComponent,
+    event: PointerEvent,
+    pageIndex: number,
+    fieldIndex: number,
+    el: HTMLElement,
+  ): { pageIndex: number; fieldIndex: number; el: HTMLElement } {
+    const own = { pageIndex, fieldIndex, el };
+    const target = this.pairTarget;
+    if (
+      target?.b?.kind !== 'field' ||
+      (target.b.pageIndex === pageIndex && target.b.index === fieldIndex)
+    ) {
+      return own;
+    }
+    const paired = this.findPairElementB(target);
+    if (!paired) {
+      return own;
+    }
+    const r = paired.getBoundingClientRect();
+    const inside =
+      event.clientX >= r.left &&
+      event.clientX <= r.right &&
+      event.clientY >= r.top &&
+      event.clientY <= r.bottom;
+    return inside ? { pageIndex: target.b.pageIndex, fieldIndex: target.b.index, el: paired } : own;
+  }
+
   /** Quita la línea y los resaltados. */
   clearPair(this: WorkspacePageComponent): void {
     this.pairTarget = null;
@@ -292,12 +334,17 @@ export class WorkspacePairing {
   /** Tarjeta de la propuesta de la IA: B a la página donde cae, A a la de origen, y la pareja unida. */
   async focusAiRow(this: WorkspacePageComponent, row: AiRow): Promise<void> {
     const t = this.aiTemplate.get(row.id);
+    const written = row.ok ? this.aiWrittenRef(row.id) : null;
     const target: PairTarget = {
       aName: pairName(t),
       aPage: row.page,
       aX: t?.x,
       aY: t?.y,
-      b: row.ok ? { kind: 'ai', id: row.id, page: row.newPage } : null,
+      b: written
+        ? { kind: 'field', page: written.page, pageIndex: written.pageIndex, index: written.index }
+        : row.ok
+          ? { kind: 'ai', id: row.id, page: row.newPage }
+          : null,
     };
     await this.revealPair(target);
     if (!row.ok) {
