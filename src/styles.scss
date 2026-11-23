@@ -7162,3 +7162,23 @@ button.version-chip:focus-visible {
   border-color: var(--accent-text);
   color: var(--accent-text);
 }
+
+:root.theme-light .sidebar .json-copy__pop {
+  border-color: var(--light-border-strong);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+}
+:root.theme-light .sidebar .json-copy__seg,
+:root.theme-light .sidebar .json-copy__preview {
+  border-color: var(--light-border-strong);
+}
+:root.theme-light .sidebar .json-copy__seg button {
+  background: var(--light-surface);
+  border-right-color: var(--light-border-strong);
+}
+:root.theme-light .sidebar .json-copy__seg button[aria-pressed='true'] {
+  background: var(--accent-fill);
+}
+:root.theme-light .sidebar .json-copy__preview {
+  background: var(--light-surface);
+  color: var(--text);
+}
