@@ -55,14 +55,25 @@
     <button type="button" class="footer__fit" (click)="vm.fitPage()" [disabled]="!vm.pdfDoc()"
       [attr.title]="'app.footer.fitPage' | t">{{ 'controls.fitWidth' | t }}</button>
     <span class="footer__sep" aria-hidden="true"></span>
-    <div class="footer__group preview-mode" role="group" [attr.aria-label]="'preview.mode.group' | t">
-      <span class="preview-mode__label">{{ 'preview.mode.label' | t }}</span>
-      <button type="button" class="btn btn--small" *ngFor="let mode of vm.previewModes"
-        [class.btn--active]="vm.previewSettings.mode() === mode" [attr.aria-pressed]="vm.previewSettings.mode() === mode"
-        [disabled]="!vm.pdfDoc() || (mode === 'data' && !vm.previewSettings.hasTestData())"
-        [attr.title]="mode === 'data' && !vm.previewSettings.hasTestData() ? ('preview.mode.dataDisabled' | t) : null"
-        (click)="vm.setPreviewMode(mode)">{{ 'preview.mode.' + mode | t }}</button>
-    </div>
+    <span class="footer__viewwrap">
+      <button type="button" class="footer__vista" data-testid="view-menu" [disabled]="!vm.pdfDoc()"
+        aria-haspopup="menu" [attr.aria-expanded]="viewMenuOpen()" (click)="toggleViewMenu($event)">
+        {{ 'preview.mode.label' | t }}: {{ 'preview.mode.' + vm.previewSettings.mode() | t }}
+      </button>
+      @if (viewMenuOpen()) {
+        <div class="zoom-menu footer__view-menu" role="menu" [attr.aria-label]="'preview.mode.group' | t"
+          (keydown)="onViewMenuKey($event)" data-testid="view-menu-list">
+          @for (mode of vm.previewModes; track mode) {
+            <button type="button" role="menuitemradio" class="zoom-menu__item" data-view-item
+              [class.zoom-menu__item--on]="vm.previewSettings.mode() === mode"
+              [attr.aria-checked]="vm.previewSettings.mode() === mode"
+              [disabled]="mode === 'data' && !vm.previewSettings.hasTestData()"
+              [attr.title]="mode === 'data' && !vm.previewSettings.hasTestData() ? ('preview.mode.dataDisabled' | t) : null"
+              (click)="chooseView(mode)">{{ 'preview.mode.' + mode | t }}</button>
+          }
+        </div>
+      }
+    </span>
     <app-version-chip class="footer__version" [version]="vm.version"></app-version-chip>
   </span>
 </footer>

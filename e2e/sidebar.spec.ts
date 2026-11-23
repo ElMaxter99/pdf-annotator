@@ -65,6 +65,14 @@ test('the tab choice is kept when the sidebar is minimized and expanded again', 
   await expect(page.locator('.templates')).toBeVisible();
 });
 
+test('the icon rail stays when minimized and opens the chosen panel', async ({ page }) => {
+  await page.locator('.sidebar-minimize-toggle').click();
+  await expect(page.getByTestId('sidebar-rail')).toBeVisible();
+  await page.getByTestId('rail-settings').click();
+  await expect(page.getByTestId('sidebar-rail')).toHaveCount(0);
+  await expect(tab(page, 'Ajustes')).toHaveAttribute('aria-selected', 'true');
+});
+
 test.describe('narrow screens', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 

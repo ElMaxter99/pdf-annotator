@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { applyJsonText, openSidebarTab, openWorkspace, renderedAnnotations } from './helpers';
+import { applyJsonText, chooseView, openSidebarTab, openWorkspace, renderedAnnotations } from './helpers';
 
 const FIELDS = {
   pages: [
@@ -17,10 +17,9 @@ const FIELDS = {
 };
 const DATA = { holder: [{ fullname: 'Lucía Fernández' }], amounts: { total: 1284.5 } };
 
-const mode = (page: import('@playwright/test').Page, name: 'Muestra' | 'Mapeo' | 'Datos') =>
-  page
-    .getByRole('group', { name: 'Qué se pinta en las anotaciones' })
-    .getByRole('button', { name });
+const mode = (page: import('@playwright/test').Page, name: 'Muestra' | 'Mapeo' | 'Datos') => ({
+  click: () => chooseView(page, name),
+});
 const texts = async (page: import('@playwright/test').Page) =>
   (await renderedAnnotations(page)).map((a) => a.text);
 
@@ -50,7 +49,9 @@ test('sample values are editable and kept after a reload', async ({ page }) => {
 });
 
 test('test data resolves each mapField and falls back to the sample', async ({ page }) => {
-  await expect(mode(page, 'Datos')).toBeDisabled();
+  await page.getByTestId('view-menu').click();
+  await expect(page.getByRole('menuitemradio', { name: 'Datos' })).toBeDisabled();
+  await page.keyboard.press('Escape');
   await openSidebarTab(page, 'Avanzado');
   const input = page.getByRole('textbox', { name: 'Datos de prueba' });
   await input.fill('{ "holder": [ { "fullname": ');

@@ -25,6 +25,11 @@ export class WorkspaceSidebarComponent {
   @ViewChild('jsonEditor', { static: false }) jsonEditorRef?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('jsonTree', { static: false }) jsonTreeComponent?: JsonTreeComponent;
 
+  openFromRail(tab: 'document' | 'annotations' | 'settings'): void {
+    this.vm.setSidebarTab(tab);
+    this.vm.sidebarMinimized.set(false);
+  }
+
   get pdfFileInputElement(): HTMLInputElement | null {
     return this.pdfFileInputRef?.nativeElement ?? null;
   }

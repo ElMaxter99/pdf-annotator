@@ -28,6 +28,16 @@
   </div>
   </div>
 
+  <nav class="sidebar-rail" *ngIf="vm.sidebarMinimized()" [attr.aria-label]="'sidebar.tabs.label' | t" data-testid="sidebar-rail">
+    <button type="button" class="sidebar-rail__btn" data-testid="rail-document" (click)="openFromRail('document')"
+      [attr.aria-label]="'sidebar.tabs.document' | t" [attr.title]="'sidebar.tabs.document' | t"><span aria-hidden="true">🗂️</span></button>
+    <button type="button" class="sidebar-rail__btn" data-testid="rail-annotations" (click)="openFromRail('annotations')"
+      [attr.aria-label]="'sidebar.tabs.annotations' | t" [attr.title]="'sidebar.tabs.annotations' | t"><span aria-hidden="true">✎</span>
+      <span class="sidebar-rail__badge" *ngIf="vm.annotationCount() as count">{{ count }}</span></button>
+    <button type="button" class="sidebar-rail__btn" data-testid="rail-settings" (click)="openFromRail('settings')"
+      [attr.aria-label]="'sidebar.tabs.settings' | t" [attr.title]="'sidebar.tabs.settings' | t"><span aria-hidden="true">⚙</span></button>
+  </nav>
+
   <div class="sidebar-content" *ngIf="!vm.sidebarMinimized()">
   <div class="sidebar-scroll">
   <div class="sidebar-panel" role="tabpanel" id="sidebar-panel-document" aria-labelledby="sidebar-tab-document"

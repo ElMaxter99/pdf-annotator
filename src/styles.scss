@@ -7355,3 +7355,40 @@ button.version-chip:focus-visible {
 .footer .preview-mode {
   gap: 4px;
 }
+
+.footer__viewwrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.footer__vista {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 1px 8px;
+}
+
+.footer__vista::after {
+  content: ' ▾';
+  color: var(--muted);
+}
+
+.footer__vista:hover:not(:disabled),
+.footer__vista:focus-visible,
+.footer__vista[aria-expanded='true'] {
+  border-color: var(--accent);
+  color: var(--accent-text, var(--accent));
+}
+
+.footer__vista:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.footer__view-menu .zoom-menu__item:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

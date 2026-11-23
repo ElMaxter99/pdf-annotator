@@ -24,6 +24,12 @@ export async function openSidebarTab(page: Page, name: SidebarTab) {
   await page.getByRole('tab', { name: new RegExp(`^\\s*${tab}`) }).click();
 }
 
+/** La vista (Muestra / Mapeo / Datos) se elige en el desplegable de la píldora. */
+export async function chooseView(page: Page, name: 'Muestra' | 'Mapeo' | 'Datos') {
+  await page.getByTestId('view-menu').click();
+  await page.getByRole('menu', { name: 'Qué se pinta en las anotaciones' }).getByRole('menuitemradio', { name }).click();
+}
+
 export async function openWorkspace(
   page: Page,
   options: { zoomOut?: number; tab?: SidebarTab; view?: 'Muestra' | 'Mapeo' | 'Datos' } = {}
@@ -39,7 +45,7 @@ export async function openWorkspace(
     await page.waitForTimeout(120);
   }
   // Most tests assert the mapField text, so they open the "Mapeo" view (the app default is "Muestra").
-  await page.getByRole('group', { name: 'Qué se pinta en las anotaciones' }).getByRole('button', { name: options.view ?? 'Mapeo' }).click();
+  await chooseView(page, options.view ?? 'Mapeo');
   // Most flows work with the JSON editor, which lives in the "Anotaciones" tab.
   await openSidebarTab(page, options.tab ?? 'Anotaciones');
   // Single-key shortcuts are ignored while a button has focus, so leave the tab button.
