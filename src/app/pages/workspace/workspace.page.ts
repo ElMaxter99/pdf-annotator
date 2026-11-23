@@ -189,6 +189,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   observedAPane: HTMLElement | null = null;
   /** `scrollLeft` del reposo del panel A desenlazado (C1), para saber si alguien lo ha movido. */
   aHomeLeft = 0;
+  aHomeTop = 0;
+  viewerHomeTop = 0;
+  reHoming = false;
   readonly zoomMenuOpen = signal(false);
   /** The wheel past the edge of the sheet changes page (P-63); on by default, switched off in ⋯. */
   readonly wheelPaging = signal(this.storedWheelPaging());

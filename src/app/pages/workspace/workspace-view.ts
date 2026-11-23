@@ -167,6 +167,7 @@ export class WorkspaceView {
     const previous = this.scaleA();
     if (next === previous || !pane || !canvas) return;
     const before = canvas.getBoundingClientRect();
+    const atHome = Math.abs(pane.scrollTop - this.aHomeTop) <= 2;
     this.scaleA.set(next);
     await this.renderSplit();
     await new Promise((resolve) => setTimeout(resolve, 60));
@@ -176,6 +177,7 @@ export class WorkspaceView {
       const uy = (anchor.clientY - before.top) / previous;
       pane.scrollLeft += after.left + ux * next - anchor.clientX;
       pane.scrollTop += after.top + uy * next - anchor.clientY;
+      if (atHome) pane.scrollTop = Math.max(pane.scrollTop, this.aHomeTop);
     }
   }
 
@@ -387,10 +389,7 @@ export class WorkspaceView {
       return;
     }
     this.freeAPage.set(target);
-    const pane = this.splitAPane();
-    if (pane) {
-      pane.scrollTop = 0;
-    }
+    this.resetSplitAScroll();
   }
 
   /** Chip «Páginas enlazadas / libres»: A and B stop (or start again) sharing the page. */
@@ -637,11 +636,16 @@ export class WorkspaceView {
       this.comparing() && !this.pagesLinked() ? (asA ? 'A' : 'B') : undefined;
     const page = asA ? this.freeAPage() : this.pageShown();
     const total = asA ? this.pageCountA() : this.pageTotalShown();
+    // El margen vertical (P-120) es zona vacía: el borde de la hoja es donde la rueda pasa de página.
+    const marginY = workMarginFor(viewer.clientHeight);
+    const atTop = viewer.scrollTop <= marginY;
+    const atBottom = viewer.scrollTop + viewer.clientHeight >= viewer.scrollHeight - marginY - 1;
+    if (evt.cancelable && (pixels > 0 ? atBottom : atTop)) evt.preventDefault();
     const step = wheelEdgeStep(this.wheelState, {
       deltaY: pixels,
       now: performance.now(),
-      atTop: viewer.scrollTop <= 0,
-      atBottom: viewer.scrollTop + viewer.clientHeight >= viewer.scrollHeight - 1,
+      atTop,
+      atBottom,
       hasPrev: page > 1,
       hasNext: page < total,
     });
@@ -652,7 +656,10 @@ export class WorkspaceView {
       const target = page + step.change;
       this.showWheelEdge({ pane, kind: 'now', progress: 1, page: target, total, ...place }, 900);
       void (asA ? this.setPageIndexA(target) : this.setPageIndex(target)).then(() => {
-        viewer.scrollTop = step.change > 0 ? 0 : viewer.scrollHeight;
+        viewer.scrollTop =
+          step.change > 0
+            ? marginY
+            : Math.max(0, viewer.scrollHeight - marginY - viewer.clientHeight);
       });
       return;
     }
@@ -709,6 +716,23 @@ export class WorkspaceView {
     const viewer = this.viewerScroller();
     if (!viewer) return;
     viewer.style.setProperty('--work-margin', `${workMarginFor(viewer.clientWidth)}px`);
+    const beforeY = viewer.style.getPropertyValue('--work-margin-y');
+    const marginY = `${workMarginFor(viewer.clientHeight)}px`;
+    viewer.style.setProperty('--work-margin-y', marginY);
+    // El margen vertical (P-120) cambia con la altura del visor: si nadie ha movido el lienzo, el reposo
+    // sigue con la hoja arriba.
+    if (
+      beforeY !== marginY &&
+      !this.reHoming &&
+      (beforeY === '' || Math.abs(viewer.scrollTop - this.viewerHomeTop) <= 2)
+    ) {
+      this.reHoming = true;
+      try {
+        this.resetViewerScroll();
+      } finally {
+        this.reHoming = false;
+      }
+    }
     if (!this.workMarginObserver && typeof ResizeObserver !== 'undefined') {
       this.workMarginObserver = new ResizeObserver(() => this.updateWorkMargin());
       this.workMarginObserver.observe(viewer);
@@ -726,8 +750,12 @@ export class WorkspaceView {
     const before = pane.style.getPropertyValue('--a-margin');
     const margin = workMarginFor(pane.clientWidth);
     pane.style.setProperty('--a-margin', `${margin}px`);
+    pane.style.setProperty('--a-margin-y', `${workMarginFor(pane.clientHeight)}px`);
     const untouched =
-      before === '' || before === '0px' || Math.abs(pane.scrollLeft - this.aHomeLeft) <= 2;
+      before === '' ||
+      before === '0px' ||
+      (Math.abs(pane.scrollLeft - this.aHomeLeft) <= 2 &&
+        Math.abs(pane.scrollTop - this.aHomeTop) <= 2);
     if (margin > 0 && `${margin}px` !== before && untouched) this.resetSplitAScroll();
   }
 
@@ -738,6 +766,7 @@ export class WorkspaceView {
   onViewerScroll(this: WorkspacePageComponent, evt: Event): void {
     const viewer = evt.currentTarget as HTMLElement | null;
     viewer?.style.setProperty('--vx', `${Math.round(viewer.scrollLeft)}px`);
+    viewer?.style.setProperty('--vy', `${Math.round(viewer.scrollTop)}px`);
   }
 
   /**
@@ -771,8 +800,10 @@ export class WorkspaceView {
       viewportWidth: pane.clientWidth,
       padding,
     });
-    this.scrollViewerTo(pane, home, smooth);
+    const homeTop = workMarginFor(pane.clientHeight);
+    this.scrollViewerTo(pane, home, smooth, homeTop);
     this.aHomeLeft = smooth ? home : pane.scrollLeft;
+    this.aHomeTop = smooth ? homeTop : pane.scrollTop;
   }
 
   scrollViewerTo(
@@ -780,15 +811,21 @@ export class WorkspaceView {
     viewer: HTMLElement,
     left: number,
     smooth: boolean,
+    top?: number,
   ): void {
     const reduce =
       typeof window !== 'undefined' &&
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (typeof viewer.scrollTo === 'function') {
-      viewer.scrollTo({ left, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+      viewer.scrollTo({
+        left,
+        ...(top === undefined ? {} : { top }),
+        behavior: smooth && !reduce ? 'smooth' : 'auto',
+      });
     } else {
       viewer.scrollLeft = left;
+      if (top !== undefined) viewer.scrollTop = top;
     }
   }
 
@@ -797,10 +834,15 @@ export class WorkspaceView {
     this: WorkspacePageComponent,
     viewer: HTMLElement,
     el: HTMLElement,
-  ): { left: number; width: number } {
+  ): { left: number; width: number; top: number; height: number } {
     const v = viewer.getBoundingClientRect();
     const r = el.getBoundingClientRect();
-    return { left: r.left - v.left + viewer.scrollLeft, width: r.width };
+    return {
+      left: r.left - v.left + viewer.scrollLeft,
+      width: r.width,
+      top: r.top - v.top + viewer.scrollTop,
+      height: r.height,
+    };
   }
 
   /** Devuelve el visor a su posición de siempre (PDFs centrados, o su borde izquierdo si no caben). */
@@ -814,7 +856,9 @@ export class WorkspaceView {
       .map((el) => this.contentBox(viewer, el));
     const left = Math.min(...boxes.map((x) => x.left));
     const right = Math.max(...boxes.map((x) => x.left + x.width));
-    const padding = parseFloat(getComputedStyle(viewer).paddingLeft) || 0;
+    const style = getComputedStyle(viewer);
+    const padding = parseFloat(style.paddingLeft) || 0;
+    const homeTop = workMarginFor(viewer.clientHeight);
     this.scrollViewerTo(
       viewer,
       homeScrollLeft({
@@ -824,7 +868,9 @@ export class WorkspaceView {
         padding,
       }),
       smooth,
+      homeTop,
     );
+    this.viewerHomeTop = smooth ? homeTop : viewer.scrollTop;
     this.resetSplitAScroll(smooth);
   }
 
@@ -843,12 +889,21 @@ export class WorkspaceView {
     const viewer = this.viewerScroller();
     const el = which === 'a' ? this.splitAPane() : (this.pdfViewerRef?.nativeElement ?? null);
     if (!viewer || !el) return;
-    const target = centerScrollLeft(this.contentBox(viewer, el), viewer.clientWidth);
-    if (Math.abs(target - viewer.scrollLeft) < 4) {
+    const box = this.contentBox(viewer, el);
+    const target = centerScrollLeft(box, viewer.clientWidth);
+    // Si la hoja es más alta que el visor no se centra en vertical (se perdería su etiqueta): queda arriba.
+    const targetTop =
+      box.height <= viewer.clientHeight
+        ? centerScrollLeft({ left: box.top, width: box.height }, viewer.clientHeight)
+        : workMarginFor(viewer.clientHeight);
+    if (
+      Math.abs(target - viewer.scrollLeft) < 4 &&
+      Math.abs(targetTop - viewer.scrollTop) < 4
+    ) {
       this.resetViewerScroll(true);
       return;
     }
-    this.scrollViewerTo(viewer, target, true);
+    this.scrollViewerTo(viewer, target, true, targetTop);
   }
 
   centerSplitA(this: WorkspacePageComponent): void {
@@ -856,12 +911,17 @@ export class WorkspaceView {
     const pane = this.splitAPane();
     const sheet = this.splitASheet();
     if (!pane || !sheet) return;
-    const target = centerScrollLeft(this.contentBox(pane, sheet), pane.clientWidth);
-    if (Math.abs(target - pane.scrollLeft) < 4) {
+    const box = this.contentBox(pane, sheet);
+    const target = centerScrollLeft(box, pane.clientWidth);
+    const targetTop =
+      box.height <= pane.clientHeight
+        ? centerScrollLeft({ left: box.top, width: box.height }, pane.clientHeight)
+        : workMarginFor(pane.clientHeight);
+    if (Math.abs(target - pane.scrollLeft) < 4 && Math.abs(targetTop - pane.scrollTop) < 4) {
       this.resetSplitAScroll(true);
       return;
     }
-    this.scrollViewerTo(pane, target, true);
+    this.scrollViewerTo(pane, target, true, targetTop);
   }
 
   /**
@@ -888,6 +948,8 @@ export class WorkspaceView {
         const canvas = this.pdfCanvasRef?.nativeElement;
         const container = this.pdfViewerRef?.nativeElement.parentElement;
         const before = canvas?.getBoundingClientRect();
+        // En reposo (hoja arriba) el zoom no la despega del borde, como antes del margen vertical (P-120).
+        const atHome = !!container && Math.abs(container.scrollTop - this.viewerHomeTop) <= 2;
         this.scale.set(next);
         await this.render();
         this.redrawAllForPage();
@@ -896,6 +958,7 @@ export class WorkspaceView {
           const { dx, dy } = zoomAnchorScrollDelta(before, after, at, previous, next);
           container.scrollLeft += dx;
           container.scrollTop += dy;
+          if (atHome) container.scrollTop = Math.max(container.scrollTop, this.viewerHomeTop);
         }
       }
     } finally {
@@ -1002,7 +1065,8 @@ export class WorkspaceView {
 
     this.scale.set(fit);
     await this.render();
-    const overflow = container.scrollHeight - container.clientHeight;
+    const overflow =
+      container.scrollHeight - container.clientHeight - 2 * workMarginFor(container.clientHeight);
     if (overflow > 0) {
       this.scale.set(fitPageScaleForOverflow(base.height, this.scale(), overflow));
       await this.render();
