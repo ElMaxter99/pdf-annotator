@@ -460,6 +460,7 @@
       "back": "Pannello",
       "versionA": "A: {{name}}",
       "editingB": "Modifica della versione B",
+      "lote": "Lotto",
       "viewLabel": "Come vedere A",
       "view": {
         "overlay": "Sopra",

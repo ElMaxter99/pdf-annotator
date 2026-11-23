@@ -1,4 +1,4 @@
-<header class="header">
+<header class="header" [class.header--batch]="vm.inBatchMode()">
   <h1 class="sr-only">{{ 'app.title' | t }}</h1>
   <div class="toolbar" role="toolbar" [attr.aria-label]="'controls.toolbarAriaLabel' | t">
     <a class="toolbar__identity toolbar__home" routerLink="/landing"
@@ -67,6 +67,7 @@
         </div>
       </div>
 
+      @if (!vm.inBatchMode()) {
       <div class="toolbar__group" role="group" [attr.aria-label]="'controls.exportGroup' | t">
         <button class="btn btn--icon btn--primary" (click)="vm.downloadAnnotatedPDF()"
           [attr.aria-label]="'controls.downloadPdf' | t" [attr.title]="'controls.downloadPdf' | t"
@@ -75,6 +76,7 @@
           <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
         </button>
       </div>
+      }
     </div>
 
     <div class="toolbar__pop toolbar__prefs" [class.toolbar__prefs--open]="prefsOpen()">
@@ -84,6 +86,13 @@
         <span class="btn__icon" aria-hidden="true">⋯</span>
       </button>
     <div class="toolbar__group toolbar__group--preferences" role="group" [attr.aria-label]="'controls.preferencesGroup' | t">
+        @if (vm.inBatchMode()) {
+          <button class="btn btn--ghost" type="button" (click)="vm.downloadAnnotatedPDF()"
+            [disabled]="!vm.coords().length || !vm.pdfDoc()" data-testid="download-open">
+            <span class="btn__icon" aria-hidden="true">⬇</span>
+            <span class="btn__label">{{ 'controls.downloadPdf' | t }}</span>
+          </button>
+        }
         <button class="btn btn--ghost" type="button" (click)="toggleClear($event)" [disabled]="!vm.coords().length"
 [attr.aria-label]="'controls.clear' | t" data-testid="clear-open">
 <span class="btn__icon" aria-hidden="true">🧹</span>

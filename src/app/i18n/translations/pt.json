@@ -460,6 +460,7 @@
       "back": "Painel",
       "versionA": "A: {{name}}",
       "editingB": "A editar a versão B",
+      "lote": "Lote",
       "viewLabel": "Como ver A",
       "view": {
         "overlay": "Por cima",

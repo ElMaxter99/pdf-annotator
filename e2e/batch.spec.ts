@@ -1,7 +1,7 @@
 import { expect, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { PDFDocument } from 'pdf-lib';
-import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics } from './helpers';
+import { EXAMPLE_JSON, EXAMPLE_PDF, stubAnalytics, openLote } from './helpers';
 
 const pdf = readFileSync(EXAMPLE_PDF);
 const json = readFileSync(EXAMPLE_JSON);
@@ -178,6 +178,8 @@ test('B starts empty, A can be put in and the PDF is marked ready and downloaded
   await expect(page.getByTestId('mark-ready')).toContainText(`faltan ${FIELDS}`);
   await expect(page.locator('.migration-row[data-status="missing"]')).toHaveCount(FIELDS);
 
+  await openLote(page);
+
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-copy').click();
   await expect(page.locator('.migration-row[data-status="missing"]')).toHaveCount(0);
@@ -214,10 +216,14 @@ test('the «Poner plantilla A» menu closes on an outside click and on Escape', 
   await attachVersion2(page);
   await openRow(page);
 
+  await openLote(page);
+
   await page.getByTestId('put-template-a').click();
   await expect(page.getByTestId('put-a-copy')).toBeVisible();
   await page.locator('.pdf-viewer, .viewer, body').first().click({ position: { x: 5, y: 300 } });
   await expect(page.getByTestId('put-a-copy')).toBeHidden();
+
+  await openLote(page);
 
   await page.getByTestId('put-template-a').click();
   await expect(page.getByTestId('put-a-copy')).toBeVisible();
@@ -232,6 +238,8 @@ test('missing fields are counted on «Listo» until each one is placed or dismis
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
+
+  await openLote(page);
 
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-copy').click();
@@ -264,6 +272,7 @@ test('a moved field is reported and A can be seen alone by holding the A key', a
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-copy').click();
 
@@ -288,6 +297,7 @@ test('the batch and B survive a reload of the tray', async ({ page }) => {
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-copy').click();
   await page.waitForTimeout(600); // autosave debounce
@@ -452,6 +462,7 @@ test('without template A the modes still compare the PDFs; JSON without fields i
   await expect(page.getByTestId('mode-split')).toBeEnabled();
   await expect(page.getByTestId('put-template-a')).toBeDisabled();
   // A has no fields, but its PDF is still shown on the left of «Dividida».
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
   await expect(page.getByTestId('split-a').locator('.reference-field')).toHaveCount(0);
@@ -459,14 +470,19 @@ test('without template A the modes still compare the PDFs; JSON without fields i
     'width',
     await page.locator('.canvas--pdf').evaluate((el: HTMLCanvasElement) => el.width),
   );
+  await openLote(page);
   await page.getByTestId('mode-overlay').click();
   // «Alternar» switches the page between the PDF of B and the PDF of A.
+  await openLote(page);
   await page.getByTestId('mode-toggle').click();
   await expect(page.locator('.reference-pdf')).toHaveCount(0);
+  await openLote(page);
   await page.getByTestId('toggle-a').click();
   await expect(page.locator('.reference-pdf')).toHaveCount(1);
+  await openLote(page);
   await page.getByTestId('toggle-b').click();
   await expect(page.locator('.reference-pdf')).toHaveCount(0);
+  await openLote(page);
   await page.getByTestId('mode-overlay').click();
   // Holding «A» swaps the page for A's PDF.
   await page.keyboard.down('a');
@@ -488,6 +504,7 @@ test('«Dividida»: the A/B tags do not overlap the «Mostrar origen» legend', 
   await openRow(page);
   await page.evaluate(() => localStorage.setItem('pdf-annotator.showOrigin', '1'));
   await page.reload();
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
   const legend = await page.locator('.origin-legend').boundingBox();
@@ -503,6 +520,8 @@ test('«Dividida» shows A with its fields on the left and B on the right', asyn
   await attachVersion2(page);
   await openRow(page);
 
+  await openLote(page);
+
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
   await expect(page.locator('.canvas--pdf')).toBeVisible();
@@ -513,6 +532,7 @@ test('«Dividida» shows A with its fields on the left and B on the right', asyn
   );
 
   // B is edited on the right: put A in and B gets the fields
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-copy').click();
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
@@ -524,6 +544,8 @@ test('«Dividida» shows A with its fields on the left and B on the right', asyn
   const box = await page.getByTestId('split-a').locator('.reference-field').nth(2).boundingBox();
   await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
   await expect(page.locator('.annotation--pair')).toHaveCount(1);
+
+  await openLote(page);
 
   await page.getByTestId('mode-overlay').click();
   await expect(page.getByTestId('split-a')).toHaveCount(0);
@@ -589,6 +611,8 @@ test('«Copiar y ajustar por textos» proposes the shift, is reviewed and applie
   await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
   await openRow(page);
 
+  await openLote(page);
+
   await page.getByTestId('put-template-a').click();
   await expect(page.getByTestId('put-a-adjust')).toBeEnabled();
   await page.getByTestId('put-a-adjust').click();
@@ -606,6 +630,8 @@ test('«Copiar y ajustar por textos» proposes the shift, is reviewed and applie
   await page.getByTestId('adjust-cancel').click();
   await expect(page.getByTestId('adjust-review')).toHaveCount(0);
   await expect(page.locator('.annotation')).toHaveCount(0);
+
+  await openLote(page);
 
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-adjust').click();
@@ -644,6 +670,7 @@ test('A and B of different size: the notice lets you fit the coordinates of A to
   // Leave them: A is shown as it is, and it can be fitted later
   await page.getByTestId('fit-no').click();
   await expect(page.getByTestId('fit-off')).toBeVisible();
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await expect(page.getByTestId('put-a-fit').locator('input')).not.toBeChecked();
   await page.getByTestId('put-a-copy').click();
@@ -656,6 +683,7 @@ test('A and B of different size: the notice lets you fit the coordinates of A to
   // Fit: the copy lands scaled in one history step, and the choice is remembered
   await page.getByTestId('fit-apply').click();
   await expect(page.getByTestId('fit-on')).toContainText('×1.42');
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await expect(page.getByTestId('put-a-fit').locator('input')).toBeChecked();
   await page.getByTestId('put-a-copy').click();
@@ -694,7 +722,7 @@ test('the bar and the notices stay inside the header at 1280 px', async ({ page 
   await expect(page.getByTestId('pages-differ')).toBeVisible();
   const box = async (selector: string) => (await page.locator(selector).first().boundingBox())!;
   const header = await box('header.header');
-  for (const target of ['.migration-bar', '[data-testid=pages-differ]', '[data-testid=mark-ready]']) {
+  for (const target of ['[data-testid=batch-position]', '[data-testid=pages-differ]', '[data-testid=mark-ready]']) {
     const b = await box(target);
     expect(b.x + b.width, target).toBeLessThanOrEqual(header.x + header.width);
   }
@@ -734,9 +762,8 @@ test('informative notices can be closed and found again in the bell', async ({ p
   await expect(page.getByTestId('pages-differ')).toBeVisible();
   await expect(page.getByTestId('notices-count')).toHaveCount(0);
 
-  // With no closed notice the panel says so
-  await page.getByTestId('notices-bell').click();
-  await expect(page.getByTestId('notices-empty')).toBeVisible();
+  // With no closed notice the bell is not shown (P-143)
+  await expect(page.getByTestId('notices-bell')).toHaveCount(0);
 });
 
 async function openAdjust(page: Page) {
@@ -747,6 +774,7 @@ async function openAdjust(page: Page) {
     .setInputFiles(file('factura-0331-nuevo.pdf', await shiftedPdf(20, -30), 'application/pdf'));
   await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
   await openRow(page);
+  await openLote(page);
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-adjust').click();
   await expect(page.getByTestId('adjust-apply')).toBeVisible({ timeout: 20000 });
@@ -840,6 +868,7 @@ test('«Dividida»: the chip unlinks the zoom of A and B and links them again', 
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
 
@@ -887,6 +916,7 @@ test('«Dividida»: the double click of the viewer acts on the pane under the po
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
 
@@ -944,6 +974,7 @@ test('«Dividida»: double click on the A or B tag centers that PDF and again re
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
 
@@ -990,6 +1021,7 @@ async function openUnlinkedSplit(page: Page) {
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
   await openRow(page);
+  await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
   await page.getByTestId('split-link').click();

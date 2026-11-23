@@ -32,6 +32,11 @@
     <div class="migration-bar__tools">
 
     @if (vm.migration(); as m) {
+    <div class="lote">
+      <button type="button" class="btn lote__btn" aria-haspopup="menu" [attr.aria-expanded]="loteVisible()" (click)="toggleLote()" data-testid="lote-open">
+        {{ 'batch.editor.lote' | t }} ▾<span class="lote__dot" *ngIf="vm.ai()" aria-hidden="true"></span>
+      </button>
+      <div class="lote__panel" role="group" [attr.aria-label]="'batch.editor.lote' | t" [hidden]="!loteVisible()" data-testid="lote-menu">
 
     <div class="migration-seg" role="group" [attr.aria-label]="'batch.editor.viewLabel' | t" [attr.title]="'batch.editor.holdHint' | t">
       @for (mode of modes; track mode) {
@@ -170,96 +175,6 @@
       }
     </ng-template>
 
-    <div class="migration-menu migration-bell">
-      <button
-        #bell
-        type="button"
-        class="btn btn--ghost migration-bell__btn"
-        aria-haspopup="true"
-        [attr.aria-expanded]="bellOpen()"
-        [attr.aria-label]="'batch.editor.notices.bell' | t: { count: vm.closedNoticeList().length }"
-        [attr.title]="'batch.editor.notices.bell' | t: { count: vm.closedNoticeList().length }"
-        (click)="toggleBell()"
-        data-testid="notices-bell"
-      >
-        🔔
-        @if (vm.closedNoticeList().length) {
-          <span class="migration-bell__count" aria-hidden="true" data-testid="notices-count">{{
-            vm.closedNoticeList().length
-          }}</span>
-        }
-      </button>
-      @if (bellOpen()) {
-        <div class="migration-menu__panel migration-bell__panel" role="dialog" [attr.aria-label]="'batch.editor.notices.title' | t: { count: vm.closedNoticeList().length }" data-testid="notices-panel">
-          <div class="migration-bell__head">
-            <strong>{{ 'batch.editor.notices.title' | t: { count: vm.closedNoticeList().length } }}</strong>
-            @if (vm.closedNoticeList().length > 1) {
-              <button type="button" class="btn btn--ghost" (click)="showAllNotices()" data-testid="notices-show-all">
-                {{ 'batch.editor.notices.showAll' | t }}
-              </button>
-            }
-          </div>
-          @for (notice of vm.closedNoticeList(); track notice.id) {
-            <div class="migration-bell__row" [attr.data-testid]="'notice-row-' + notice.id">
-              <strong>{{ 'batch.editor.notices.name.' + notice.id | t }}</strong>
-              <small>
-                @switch (notice.id) {
-                  @case ('adjust') {
-                    {{ 'batch.editor.notices.adjust' | t: { count: vm.adjust()?.fields?.length ?? 0 } }}
-                  }
-                  @case ('ai') {
-                    {{ 'ai.notice' | t: { count: vm.ai()?.rows?.length ?? 0 } }}
-                  }
-                  @case ('noTemplate') {
-                    {{ 'batch.editor.noA.hint' | t }}
-                  }
-                  @case ('pagesDiffer') {
-                    {{ 'batch.editor.notices.pages' | t: { a: vm.pagesDiffer()?.a, b: vm.pagesDiffer()?.b } }}
-                  }
-                  @default {
-                    {{ 'batch.editor.fit.sizes' | t: { aw: vm.fitSizes().a?.w | number: '1.0-0', ah: vm.fitSizes().a?.h | number: '1.0-0', bw: vm.fitSizes().b?.w | number: '1.0-0', bh: vm.fitSizes().b?.h | number: '1.0-0' } }}
-                  }
-                }
-              </small>
-              <span class="migration-bell__acts">
-                <button type="button" class="btn btn--ghost" (click)="reopenNotice(notice.id)" [attr.data-testid]="'notice-reopen-' + notice.id">
-                  {{ 'batch.editor.notices.reopen' | t }}
-                </button>
-                @if (notice.id === 'adjust') {
-                  <button type="button" class="btn btn--primary" (click)="vm.applyAdjust()" data-testid="notice-adjust-apply">
-                    {{ 'batch.adjust.apply' | t: { count: vm.adjustMovedCount() } }}
-                  </button>
-                  <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()" data-testid="notice-adjust-cancel">
-                    {{ 'batch.adjust.cancelProposal' | t }}
-                  </button>
-                }
-                @if (notice.id === 'ai') {
-                  @if (vm.ai()?.phase === 'ready') {
-                    <button type="button" class="btn btn--primary" (click)="vm.applyAi()" data-testid="notice-ai-apply">
-                      {{ 'ai.dock.apply' | t: { count: vm.aiSummary().selected } }}
-                    </button>
-                  }
-                  <button type="button" class="btn btn--ghost" (click)="vm.discardAi()" data-testid="notice-ai-cancel">
-                    {{ 'batch.adjust.cancelProposal' | t }}
-                  </button>
-                }
-                @if (notice.id === 'fit') {
-                  <button type="button" class="btn btn--ghost" (click)="vm.setFitA(!vm.fitA())" data-testid="notice-fit-toggle">
-                    {{ (vm.fitA() ? 'batch.editor.fit.remove' : 'batch.editor.fit.apply') | t }}
-                  </button>
-                }
-              </span>
-            </div>
-          } @empty {
-            <div class="migration-bell__empty" data-testid="notices-empty">
-              <strong>{{ 'batch.editor.notices.empty' | t }}</strong>
-              <small>{{ 'batch.editor.notices.emptyText' | t }}</small>
-            </div>
-          }
-        </div>
-      }
-    </div>
-
     <div class="migration-menu migration-menu--put">
       <button
         type="button"
@@ -356,6 +271,100 @@
       }
     </div>
 
+      </div>
+    </div>
+    @if (vm.closedNoticeList().length > 0) {
+    <div class="migration-menu migration-bell">
+      <button
+        #bell
+        type="button"
+        class="btn btn--ghost migration-bell__btn"
+        aria-haspopup="true"
+        [attr.aria-expanded]="bellOpen()"
+        [attr.aria-label]="'batch.editor.notices.bell' | t: { count: vm.closedNoticeList().length }"
+        [attr.title]="'batch.editor.notices.bell' | t: { count: vm.closedNoticeList().length }"
+        (click)="toggleBell()"
+        data-testid="notices-bell"
+      >
+        🔔
+        @if (vm.closedNoticeList().length) {
+          <span class="migration-bell__count" aria-hidden="true" data-testid="notices-count">{{
+            vm.closedNoticeList().length
+          }}</span>
+        }
+      </button>
+      @if (bellOpen()) {
+        <div class="migration-menu__panel migration-bell__panel" role="dialog" [attr.aria-label]="'batch.editor.notices.title' | t: { count: vm.closedNoticeList().length }" data-testid="notices-panel">
+          <div class="migration-bell__head">
+            <strong>{{ 'batch.editor.notices.title' | t: { count: vm.closedNoticeList().length } }}</strong>
+            @if (vm.closedNoticeList().length > 1) {
+              <button type="button" class="btn btn--ghost" (click)="showAllNotices()" data-testid="notices-show-all">
+                {{ 'batch.editor.notices.showAll' | t }}
+              </button>
+            }
+          </div>
+          @for (notice of vm.closedNoticeList(); track notice.id) {
+            <div class="migration-bell__row" [attr.data-testid]="'notice-row-' + notice.id">
+              <strong>{{ 'batch.editor.notices.name.' + notice.id | t }}</strong>
+              <small>
+                @switch (notice.id) {
+                  @case ('adjust') {
+                    {{ 'batch.editor.notices.adjust' | t: { count: vm.adjust()?.fields?.length ?? 0 } }}
+                  }
+                  @case ('ai') {
+                    {{ 'ai.notice' | t: { count: vm.ai()?.rows?.length ?? 0 } }}
+                  }
+                  @case ('noTemplate') {
+                    {{ 'batch.editor.noA.hint' | t }}
+                  }
+                  @case ('pagesDiffer') {
+                    {{ 'batch.editor.notices.pages' | t: { a: vm.pagesDiffer()?.a, b: vm.pagesDiffer()?.b } }}
+                  }
+                  @default {
+                    {{ 'batch.editor.fit.sizes' | t: { aw: vm.fitSizes().a?.w | number: '1.0-0', ah: vm.fitSizes().a?.h | number: '1.0-0', bw: vm.fitSizes().b?.w | number: '1.0-0', bh: vm.fitSizes().b?.h | number: '1.0-0' } }}
+                  }
+                }
+              </small>
+              <span class="migration-bell__acts">
+                <button type="button" class="btn btn--ghost" (click)="reopenNotice(notice.id)" [attr.data-testid]="'notice-reopen-' + notice.id">
+                  {{ 'batch.editor.notices.reopen' | t }}
+                </button>
+                @if (notice.id === 'adjust') {
+                  <button type="button" class="btn btn--primary" (click)="vm.applyAdjust()" data-testid="notice-adjust-apply">
+                    {{ 'batch.adjust.apply' | t: { count: vm.adjustMovedCount() } }}
+                  </button>
+                  <button type="button" class="btn btn--ghost" (click)="vm.cancelAdjust()" data-testid="notice-adjust-cancel">
+                    {{ 'batch.adjust.cancelProposal' | t }}
+                  </button>
+                }
+                @if (notice.id === 'ai') {
+                  @if (vm.ai()?.phase === 'ready') {
+                    <button type="button" class="btn btn--primary" (click)="vm.applyAi()" data-testid="notice-ai-apply">
+                      {{ 'ai.dock.apply' | t: { count: vm.aiSummary().selected } }}
+                    </button>
+                  }
+                  <button type="button" class="btn btn--ghost" (click)="vm.discardAi()" data-testid="notice-ai-cancel">
+                    {{ 'batch.adjust.cancelProposal' | t }}
+                  </button>
+                }
+                @if (notice.id === 'fit') {
+                  <button type="button" class="btn btn--ghost" (click)="vm.setFitA(!vm.fitA())" data-testid="notice-fit-toggle">
+                    {{ (vm.fitA() ? 'batch.editor.fit.remove' : 'batch.editor.fit.apply') | t }}
+                  </button>
+                }
+              </span>
+            </div>
+          } @empty {
+            <div class="migration-bell__empty" data-testid="notices-empty">
+              <strong>{{ 'batch.editor.notices.empty' | t }}</strong>
+              <small>{{ 'batch.editor.notices.emptyText' | t }}</small>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    }
     }
 
     @if (vm.migration(); as m) {
