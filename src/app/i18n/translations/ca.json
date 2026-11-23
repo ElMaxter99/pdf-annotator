@@ -1704,20 +1704,20 @@
     "notesRc": "Notes de la prova",
     "channel": {
       "label": "Canal d'actualitzacions",
-      "stable": "Estable",
-      "beta": "Proves",
-      "hintStable": "Només versions finals. És el recomanat.",
-      "hintBeta": "Reps també versions de prova (RC) abans de la final. Poden fallar.",
+      "stable": "Només estables",
+      "latest": "Últimes",
+      "hintStable": "Només versions estables. És el recomanat.",
+      "hintLatest": "Sempre la versió més recent: si és de prova (RC), aquesta; si és estable, l’estable.",
       "confirm": {
-        "title": "Rebre versions de prova?",
-        "text": "Les versions de prova (RC) arriben abans que la final perquè es puguin provar de debò. Poden tenir errors. Els teus PDF i anotacions no es toquen, però convé exportar el que sigui important.",
-        "text2": "Per tornar al canal estable, canvia-ho aquí: rebràs la propera versió final.",
-        "yes": "Rebre proves",
+        "title": "Vols rebre sempre l’última versió?",
+        "text": "Si l’última publicada és una versió de prova (RC), t’oferirem aquesta. Pot tenir errors. Els teus PDF i anotacions no es toquen, però convé exportar el que sigui important.",
+        "text2": "Quan surti l’estable posterior, t’oferirem aquesta. Per rebre només estables, torna-ho a canviar aquí.",
+        "yes": "Rebre les últimes",
         "cancel": "Cancel·lar"
       },
       "back": {
-        "title": "Tornar al canal estable",
-        "text": "Continues amb la {{current}} fins que surti la versió final; llavors se't oferirà. Si vols l'estable ja, instal·la-la a mà des de GitHub.",
+        "title": "Tornar a només estables",
+        "text": "Continues amb la {{current}} fins que surti la versió estable; llavors te l’oferirem. Si vols l’estable ja, instal·la-la a mà des de GitHub.",
         "github": "Obrir GitHub",
         "ok": "Entesos"
       }

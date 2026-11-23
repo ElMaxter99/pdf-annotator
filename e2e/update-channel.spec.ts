@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => stubAnalytics(page));
 async function fakeDesktop(
   page: import('@playwright/test').Page,
   current: string,
-  channel: 'stable' | 'beta',
+  channel: 'stable' | 'latest',
 ) {
   await page.addInitScript(
     ([cur, ch]) => {
@@ -88,29 +88,29 @@ test('«Más tarde» deja el punto en el chip y el panel permite actualizar desd
   await expect(page.getByTestId('panel-download')).toBeVisible();
 });
 
-test('pasar a Pruebas pide confirmación y Cancelar lo deja como estaba', async ({ page }) => {
+test('pasar a Últimas pide confirmación y Cancelar lo deja como estaba', async ({ page }) => {
   await fakeDesktop(page, '1.8.4', 'stable');
   await openEditor(page);
   await openPanel(page);
   await expect(page.getByTestId('channel-stable')).toHaveAttribute('aria-pressed', 'true');
 
-  await page.getByTestId('channel-beta').click();
+  await page.getByTestId('channel-latest').click();
   await expect(page.getByTestId('channel-dialog')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('channel-dialog')).toHaveCount(0);
   await expect(page.getByTestId('update-panel')).toBeVisible();
   await expect(page.getByTestId('channel-stable')).toHaveAttribute('aria-pressed', 'true');
 
-  await page.getByTestId('channel-beta').click();
+  await page.getByTestId('channel-latest').click();
   await page.getByTestId('channel-confirm').click();
-  await expect(page.getByTestId('channel-beta')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('channel-latest')).toHaveAttribute('aria-pressed', 'true');
   expect(
     await page.evaluate(() => (window as unknown as { __channelCalls: string[] }).__channelCalls),
-  ).toEqual(['beta']);
+  ).toEqual(['latest']);
 });
 
-test('volver a Estable desde una prueba explica que no se baja de versión', async ({ page }) => {
-  await fakeDesktop(page, '1.9.0-rc.1', 'beta');
+test('volver a Solo estables desde una prueba explica que no se baja de versión', async ({ page }) => {
+  await fakeDesktop(page, '1.9.0-rc.1', 'latest');
   await openEditor(page);
   await openPanel(page);
   await expect(page.getByTestId('panel-version')).toContainText('Prueba');

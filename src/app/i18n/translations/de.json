@@ -1704,20 +1704,20 @@
     "notesRc": "Hinweise zur Testversion",
     "channel": {
       "label": "Update-Kanal",
-      "stable": "Stabil",
-      "beta": "Tests",
-      "hintStable": "Nur endgültige Versionen. Empfohlen.",
-      "hintBeta": "Du erhältst auch Testversionen (RC) vor der endgültigen. Sie können Fehler haben.",
+      "stable": "Nur stabile",
+      "latest": "Neueste",
+      "hintStable": "Nur stabile Versionen. Empfohlen.",
+      "hintLatest": "Immer die neueste Version: eine Testversion (RC), wenn sie die neueste ist, sonst die stabile.",
       "confirm": {
-        "title": "Testversionen erhalten?",
-        "text": "Testversionen (RC) kommen vor der endgültigen, damit man sie echt ausprobieren kann. Sie können Fehler haben. Deine PDFs und Anmerkungen bleiben unberührt, exportiere aber vorher Wichtiges.",
-        "text2": "Um zum stabilen Kanal zurückzukehren, ändere ihn hier: du erhältst die nächste endgültige Version.",
-        "yes": "Tests erhalten",
+        "title": "Immer die neueste Version erhalten?",
+        "text": "Ist die zuletzt veröffentlichte Version eine Testversion (RC), wird diese angeboten. Sie kann Fehler enthalten. Ihre PDFs und Anmerkungen bleiben unberührt, wichtige Dinge sollten Sie aber exportieren.",
+        "text2": "Sobald die nächste stabile Version erscheint, wird diese angeboten. Um nur stabile zu erhalten, ändern Sie es hier wieder.",
+        "yes": "Neueste erhalten",
         "cancel": "Abbrechen"
       },
       "back": {
-        "title": "Zurück zum stabilen Kanal",
-        "text": "Du bleibst bei {{current}}, bis die endgültige Version erscheint; dann wird sie angeboten. Willst du die stabile sofort, installiere sie von Hand über GitHub.",
+        "title": "Zurück zu nur stabilen",
+        "text": "Sie bleiben bei {{current}}, bis die stabile Version erscheint; dann wird sie angeboten. Wenn Sie die stabile sofort möchten, installieren Sie sie von Hand über GitHub.",
         "github": "GitHub öffnen",
         "ok": "Verstanden"
       }
