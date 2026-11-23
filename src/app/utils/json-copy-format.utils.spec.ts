@@ -57,6 +57,12 @@ describe('json-copy-format.utils', () => {
     );
   });
 
+  it('__proto__ se escribe como clave calculada fuera de JSON estricto', () => {
+    const text = '{"__proto__": {"a": 1}}';
+    expect(formatJsonForCopy(text, JSON_COPY_JS)).toContain("['__proto__']: {");
+    expect(formatJsonForCopy(text, JSON_COPY_STRICT)).toContain('"__proto__": {');
+  });
+
   it('un texto ilegible devuelve null', () => {
     expect(formatJsonForCopy('{"a":', JSON_COPY_JS)).toBeNull();
   });

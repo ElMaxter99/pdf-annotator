@@ -99,8 +99,13 @@ function write(value: unknown, format: JsonCopyFormat, level: number): string {
     if (!entries.length) return '{}';
     const separator = compact ? ':' : ': ';
     const lines = entries.map(([key, item]) => {
+      // En un objeto de JS, `__proto__: x` cambia el prototipo en vez de crear la propiedad: va calculada.
       const name =
-        format.keys === 'bare' && IDENTIFIER.test(key) ? key : quoteString(key, format.quote);
+        key === '__proto__' && !isStrictJsonFormat(format)
+          ? `[${quoteString(key, format.quote)}]`
+          : format.keys === 'bare' && IDENTIFIER.test(key)
+            ? key
+            : quoteString(key, format.quote);
       return inner + name + separator + write(item, format, level + 1);
     });
     return `{${newline}${lines.join(',' + newline)}${tail}${newline}${outer}}`;
