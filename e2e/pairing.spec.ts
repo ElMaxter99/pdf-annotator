@@ -106,6 +106,7 @@ test('con la propuesta editable: pasar el ratón por un campo propuesto de B dib
   await openBatchWithB(page);
   await proposeWithAi(page);
   const proposed = page.getByTestId('ai-proposal-field').first();
+  await expect(proposed).toBeVisible();
   const r = await proposed.boundingBox();
   if (!r) throw new Error('sin campo propuesto');
   await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);

@@ -938,7 +938,6 @@ test('«Dividida»: double click on the A or B tag centers that PDF and again re
   await openRow(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
-  await page.waitForTimeout(500);
 
   const offset = (selector: string) =>
     page.evaluate((sel) => {
@@ -950,7 +949,17 @@ test('«Dividida»: double click on the A or B tag centers that PDF and again re
     }, selector);
   const scrollLeft = () => page.locator('.viewer').evaluate((el) => Math.round(el.scrollLeft));
 
-  const home = await scrollLeft();
+  // The resting scroll is only known once the layout has settled: wait until it stops changing.
+  let home = await scrollLeft();
+  let steady = 0;
+  await expect
+    .poll(async () => {
+      const now = await scrollLeft();
+      steady = now === home ? steady + 1 : 0;
+      home = now;
+      return steady >= 3;
+    }, { intervals: [200] })
+    .toBe(true);
   expect(await page.locator('.viewer').evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
 
   // B is on the right; its centre is far from the centre of the viewer until it is centred.

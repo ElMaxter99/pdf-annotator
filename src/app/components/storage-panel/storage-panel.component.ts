@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, ViewChild, effect, inject } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { StorageRow, StorageService, formatBytes } from '../../services/storage.service';
@@ -155,6 +155,14 @@ export class StoragePanelComponent {
       default:
         return row.partial ? this.i18n.translate('storage.partial', { size: formatBytes(row.bytes) }) : formatBytes(row.bytes);
     }
+  }
+
+  /** Escape cierra aunque el foco aún no haya entrado en el panel (justo tras abrirlo). */
+  @HostListener('document:keydown.escape')
+  onDocumentEscape(): void {
+    if (!this.storage.panelOpen()) return;
+    if (this.storage.confirming()) this.storage.cancelClear();
+    else this.storage.close();
   }
 
   onKeydown(event: KeyboardEvent): void {

@@ -4,6 +4,9 @@
 ### Fixed
 - **Actualizaciones de macOS para los dos procesadores:** el archivo que lee el actualizador (`latest-mac.yml`) solo listaba los instaladores del último empaquetado de macOS (Intel), porque los dos jobs lo suben y el último pisaba al otro. Ahora el workflow guarda el de cada procesador y los une antes de publicar (`scripts/merge-mac-feed.mjs`, con pruebas). Hoy no cambia nada para quien usa la app (en Mac la actualización lleva a la descarga), pero deja listo el día que se firme.
 
+### Fixed
+- **e2e sin intermitencias (1.18 · Q1):** pasada la suite completa 20 veces seguidas con `--retries=0` (4.420 ejecuciones) salieron 3 fallos puntuales, ahora corregidos esperando a estados reales: el e2e de «Dividida» (el reposo del desplazamiento se leía antes de que el diseño se asentara), el de la propuesta editable (se medía el campo antes de que fuese visible) y el de Escape en Almacenamiento. Este último era un fallo real: Escape no cerraba el panel justo tras abrirlo, porque el foco aún no había entrado; ahora se escucha a nivel de documento. `docs/TESTING.md` explica cómo repetir la pasada.
+
 ### Changed
 - **Lienzo al día (solo documentación y diseño):** pintadas P-115 a P-124 (capturas reales de la 1.17.0) y «Almacenamiento» (P-125 y P-126, aprobada); lo implementado pasa a «Definitivo»; `PLAN-1.18.md`, `ROADMAP.md`, `design/PENDIENTE-MESAS.md` y `design/README.md` actualizados, con las copias que faltaban en `design/canvas/`.
 - **Hoja de ruta:** 1.17 cerrada en `docs/ROADMAP.md` y `docs/PLAN-1.17.md`; propuesta de la 1.18 en `docs/PLAN-1.18.md`, pendiente de elegir alcance.
