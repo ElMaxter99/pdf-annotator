@@ -3,7 +3,7 @@
 Este archivo es la fuente de verdad para cualquier agente (Claude Code, Copilot, Codex, Cursor…) que trabaje en este repositorio. `CLAUDE.md` lo importa. Para el detalle técnico completo ve a [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Contexto de producto y dominio: [`docs/PRODUCT.md`](docs/PRODUCT.md), [`docs/DOMAIN.md`](docs/DOMAIN.md); decisiones: [`docs/DECISIONS.md`](docs/DECISIONS.md); hoja de ruta: [`docs/ROADMAP.md`](docs/ROADMAP.md); pruebas: [`docs/TESTING.md`](docs/TESTING.md).
 
 ## 1. Qué es la app
-**PDF Annotator** es una SPA en **Angular 20** (standalone components + signals) que permite:
+**PDF Annotator** es una SPA en **Angular 22** (standalone components + signals) que permite:
 1. Cargar un PDF (100 % en el navegador, no hay backend ni subida de archivos).
 2. Colocar anotaciones de texto/check/radio/número sobre cualquier página, con coordenadas en **puntos PDF** (origen abajo-izquierda).
 3. Sincronizar esas anotaciones con un **JSON** editable (`{ "pages": [{ "num", "fields": [...] }] }`).
