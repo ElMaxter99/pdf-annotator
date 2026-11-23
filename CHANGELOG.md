@@ -6,6 +6,7 @@
 - **Actualizaciones de macOS para los dos procesadores:** el archivo que lee el actualizador (`latest-mac.yml`) solo listaba los instaladores del último empaquetado de macOS (Intel), porque los dos jobs lo suben y el último pisaba al otro. Ahora el workflow guarda el de cada procesador y los une antes de publicar (`scripts/merge-mac-feed.mjs`, con pruebas). Hoy no cambia nada para quien usa la app (en Mac la actualización lleva a la descarga), pero deja listo el día que se firme.
 
 ### Changed
+- **Dependencias (1.18 · R1a, invisible):** `pdfjs-dist` 5.4.394 → 6.5.438 y `@vercel/analytics` 1 → 2.0.1 (`@vercel/speed-insights` 2 va en la PR unificada de Dependabot). En pdf.js 6 el documento ya no tiene `destroy()`: se libera con `doc.loadingTask.destroy()` (miniaturas y lectura de textos; sin ello las miniaturas del lote no salían). La CSP no cambia: el script de Vercel sigue cargándose del mismo origen (`/_vercel/…`). El ayudante de IA de `tools/ai-phase0` mantiene su propio `pdfjs-dist` 5.4.394 (otro paquete, en Node). Suite e2e completa y unitarias en verde.
 - **Lienzo al día (solo documentación y diseño):** pintadas P-115 a P-124 (capturas reales de la 1.17.0) y «Almacenamiento» (P-125 y P-126, aprobada); lo implementado pasa a «Definitivo»; `PLAN-1.18.md`, `ROADMAP.md`, `design/PENDIENTE-MESAS.md` y `design/README.md` actualizados, con las copias que faltaban en `design/canvas/`.
 - **Hoja de ruta:** 1.17 cerrada en `docs/ROADMAP.md` y `docs/PLAN-1.17.md`; propuesta de la 1.18 en `docs/PLAN-1.18.md`, pendiente de elegir alcance.
 

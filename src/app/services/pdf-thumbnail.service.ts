@@ -78,7 +78,7 @@ export class PdfThumbnailService {
         await page.render({ canvasContext: context, viewport } as never).promise;
         return canvas.toDataURL('image/png');
       } finally {
-        void doc.destroy();
+        void doc.loadingTask.destroy();
       }
     } catch {
       return null;

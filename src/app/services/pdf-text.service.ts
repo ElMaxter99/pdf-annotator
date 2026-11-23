@@ -49,7 +49,7 @@ export class PdfTextService {
     } catch {
       return null;
     } finally {
-      void doc?.destroy();
+      void doc?.loadingTask.destroy();
     }
   }
 
@@ -66,7 +66,7 @@ export class PdfTextService {
     } catch {
       return null;
     } finally {
-      void doc?.destroy();
+      void doc?.loadingTask.destroy();
     }
   }
 
