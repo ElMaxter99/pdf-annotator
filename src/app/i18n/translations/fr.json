@@ -919,7 +919,9 @@
         "saved": "Proposition prête à relire",
         "noB": "Sans B · ignoré",
         "toCheck": "{{n}} à vérifier",
-        "added": "+{{n}} nouveaux dans B"
+        "added": "+{{n}} nouveaux dans B",
+        "interrupted": "Interrompu",
+        "notStarted": "Pas démarré"
       },
       "err": {
         "images_not_read": "L'IA n'a pas lu les images",
@@ -1078,6 +1080,19 @@
           "added": "{{n}} nouveaux champs absents de A (p. ex. le numéro de page des nouvelles pages de B)",
           "absent": "{{n}} champs de A dont le texte n’existe plus dans B : ne pas les placer est correct"
         }
+      },
+      "draft": {
+        "title": "Un transfert par IA est resté à moitié fait",
+        "summary": "Vous l'avez lancé avec {{provider}} le {{when}} sur {{total}} PDF. {{saved}} ont leur proposition enregistrée et rien n'est perdu.",
+        "rest": "Il manque : {{failed}} ont échoué, {{interrupted}} étaient en cours et {{notStarted}} n'ont pas démarré.",
+        "missing": "{{count}} PDF de cette passe ne sont plus dans le lot.",
+        "resume": "Reprendre ce qui manque ({{count}})",
+        "all": "Tout relancer ({{count}})",
+        "choose": "Choisir lesquels…",
+        "discard": "Ignorer l'avis",
+        "checking": "Recherche du brouillon du transfert précédent…",
+        "replaces": "{{count}} propositions enregistrées seront remplacées ({{edited}} avec vos modifications). Cela dépense à nouveau.",
+        "chosen": "Les {{count}} manquants sont sélectionnés. Appuyez sur « Transférer avec l'IA » dans la barre pour les lancer."
       }
     },
     "more": "Plus d'actions",

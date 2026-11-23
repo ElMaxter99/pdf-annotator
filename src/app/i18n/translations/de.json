@@ -919,7 +919,9 @@
         "saved": "Vorschlag zur Prüfung bereit",
         "noB": "Ohne B · übersprungen",
         "toCheck": "{{n}} zu prüfen",
-        "added": "+{{n}} neu in B"
+        "added": "+{{n}} neu in B",
+        "interrupted": "Unterbrochen",
+        "notStarted": "Nie gestartet"
       },
       "err": {
         "images_not_read": "Die KI hat die Bilder nicht gelesen",
@@ -1078,6 +1080,19 @@
           "added": "{{n}} neue Felder, die nicht in A waren (z. B. die Seitenzahl der neuen Seiten von B)",
           "absent": "{{n}} Felder aus A, deren Text es in B nicht mehr gibt: sie wegzulassen ist richtig"
         }
+      },
+      "draft": {
+        "title": "Eine KI-Übertragung blieb halb fertig",
+        "summary": "Sie wurde am {{when}} mit {{provider}} für {{total}} PDFs gestartet. {{saved}} haben ihren Vorschlag gespeichert, nichts ging verloren.",
+        "rest": "Es fehlen: {{failed}} sind fehlgeschlagen, {{interrupted}} liefen noch und {{notStarted}} haben nie begonnen.",
+        "missing": "{{count}} PDFs dieses Laufs sind nicht mehr im Stapel.",
+        "resume": "Fehlendes fortsetzen ({{count}})",
+        "all": "Alles neu starten ({{count}})",
+        "choose": "Auswählen…",
+        "discard": "Hinweis verwerfen",
+        "checking": "Suche den Entwurf der letzten Übertragung…",
+        "replaces": "{{count}} gespeicherte Vorschläge werden ersetzt ({{edited}} mit Ihren Änderungen). Das verbraucht erneut.",
+        "chosen": "Die {{count}} fehlenden sind markiert. Drücken Sie in der Leiste «Mit KI übertragen», um sie zu starten."
       }
     },
     "more": "Weitere Aktionen",

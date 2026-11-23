@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
 import { AiBatchButtonComponent } from './ai-batch/ai-batch-button.component';
 import { AiBatchChipComponent } from './ai-batch/ai-batch-chip.component';
+import { AiDraftBannerComponent } from './ai-batch/ai-draft-banner.component';
 import { AiBatchPanelComponent } from './ai-batch/ai-batch-panel.component';
 import { AiBatchService } from '../../services/ai-batch.service';
 import { PageMapBatchDialogComponent } from './page-map-batch/page-map-batch-dialog.component';
@@ -91,6 +92,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     AiBatchButtonComponent,
     AiBatchChipComponent,
     AiBatchPanelComponent,
+    AiDraftBannerComponent,
     FocusTrapDirective,
     PageMapBatchDialogComponent,
   ],
@@ -223,6 +225,12 @@ export class BatchPageComponent implements OnInit {
   private undoTimer: number | null = null;
 
   /** «Ver cuáles» of the AI popover: shows the PDFs that stay out for that reason. */
+  /** «Elegir cuáles…» del aviso de recuperación: marca lo que falta y se lanza desde la barra de selección. */
+  chooseDraft(ids: readonly string[]): void {
+    this.selected.set(new Set(ids));
+    this.toast.show(this.i18n.translate('batch.ai.draft.chosen', { count: ids.length }), 'info');
+  }
+
   showAiReason(reason: 'noB' | 'noFields'): void {
     this.query.set('');
     this.filter.set('all');
