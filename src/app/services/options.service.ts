@@ -2,12 +2,11 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { AiHelperService } from './ai-helper.service';
 import { DesktopUpdateService } from './desktop-update.service';
 
-export type OptionsSection = 'updates' | 'ai';
+export type OptionsSection = 'editor' | 'updates' | 'ai';
 
 /**
- * «Opciones» de la app (mesas P-150 a P-152): una ventana con los ajustes que no son del documento. Cada sección
- * solo existe donde tiene sentido (actualizaciones en la app de escritorio, IA con ayudante local); sin ninguna
- * (web pública) no hay Opciones y la entrada no se muestra.
+ * «Opciones» de la app (mesas P-150 a P-152 y P-153 a P-155): una ventana con los ajustes que no son del documento. «Editor» (ajustes básicos) está siempre, también en la web; las demás solo donde tienen sentido
+ * (actualizaciones en la app de escritorio, IA con ayudante local).
  */
 @Injectable({ providedIn: 'root' })
 export class OptionsService {
@@ -15,10 +14,10 @@ export class OptionsService {
   private readonly ai = inject(AiHelperService);
 
   readonly isOpen = signal(false);
-  readonly section = signal<OptionsSection>('updates');
+  readonly section = signal<OptionsSection>('editor');
 
   readonly sections = computed<OptionsSection[]>(() => {
-    const list: OptionsSection[] = [];
+    const list: OptionsSection[] = ['editor'];
     if (this.update.isDesktop) list.push('updates');
     if (this.ai.available) list.push('ai');
     return list;

@@ -12,6 +12,14 @@
     <span class="footer__sr" role="status" aria-live="polite" aria-atomic="true" data-testid="selected-position">
       @if (selectedSpot(); as spot) {{{ 'controls.selectedPosition' | t : { name: spot.name, x: spot.x, y: spot.y } }}}
     </span>
+    @if (vm.snapNote(); as note) {
+      <span class="json-coords__divider" aria-hidden="true">·</span>
+      <span class="footer__snap" role="status" aria-live="polite" aria-atomic="true" data-testid="snap-note">⇥
+        @if (note.x !== null && note.y !== null) { {{ 'controls.snapBoth' | t : { x: '«' + (note.x || '…') + '»', y: '«' + (note.y || '…') + '»' } }} }
+        @else if (note.x !== null) { {{ 'controls.snapX' | t : { name: '«' + (note.x || '…') + '»' } }} }
+        @else { {{ 'controls.snapY' | t : { name: '«' + (note.y || '…') + '»' } }} }
+      </span>
+    }
     @if (vm.savedAgo(); as saved) {
       <span class="json-coords__divider" aria-hidden="true">·</span>
       <span class="footer__saved" role="status" aria-live="polite" aria-atomic="true" data-testid="saved-ago">{{ saved.key | t : { n: saved.n } }}</span>

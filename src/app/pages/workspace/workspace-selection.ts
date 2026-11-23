@@ -9,6 +9,8 @@ import {
 } from '../../utils/alignment.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
 import { moveFieldWithinPage } from '../../utils/field-move.utils';
+import { snapToAnnotations, type SnapTarget } from '../../utils/annotation-snap.utils';
+import type { OverlayGuide } from '../../utils/guides.utils';
 import type { WorkspacePageComponent } from './workspace.page';
 
 /**
@@ -17,6 +19,69 @@ import type { WorkspacePageComponent } from './workspace.page';
  * `this` es la página).
  */
 export class WorkspaceSelection {
+  /**
+   * Magnet between annotations while dragging one (P-153 a P-155): aligns its stored X and Y with those of the
+   * other annotations of the page. Positions are in canvas px (`left`/`top` of the element); the result is too.
+   */
+  annotationSnap(
+    this: WorkspacePageComponent,
+    input: {
+      pageIndex: number;
+      fieldIndex: number;
+      left: number;
+      top: number;
+      fontSize: number;
+      bypass: boolean;
+    },
+  ): { left: number | null; top: number | null; guides: OverlayGuide[] } | null {
+    const canvas = this.pdfCanvasRef?.nativeElement;
+    const scale = this.scale();
+    if (!canvas || !(scale > 0) || !this.editorSettings.snapToAnnotations() || input.bypass) {
+      this.setSnapNote(null);
+      return null;
+    }
+    const fields = this.coords()[input.pageIndex]?.fields ?? [];
+    const targets: SnapTarget[] = [];
+    fields.forEach((f, i) => {
+      if (i !== input.fieldIndex) {
+        targets.push({ x: f.x, y: f.y, name: f.mapField || '' });
+      }
+    });
+    const x = input.left / scale;
+    const y = (canvas.height - (input.top + input.fontSize)) / scale;
+    const m = snapToAnnotations(x, y, targets, this.editorSettings.snapDistance() / scale);
+    if (!m.x && !m.y) {
+      this.setSnapNote(null);
+      return null;
+    }
+    const guides: OverlayGuide[] = [];
+    let left: number | null = null;
+    let top: number | null = null;
+    if (m.x) {
+      left = m.x.value * scale;
+      guides.push({ orientation: 'vertical', position: left, highlighted: true });
+    }
+    if (m.y) {
+      top = canvas.height - m.y.value * scale - input.fontSize;
+      guides.push({
+        orientation: 'horizontal',
+        position: canvas.height - m.y.value * scale,
+        highlighted: true,
+      });
+    }
+    this.setSnapNote({ x: m.x?.name ?? null, y: m.y?.name ?? null });
+    return { left, top, guides };
+  }
+
+  /** Keeps the footer note only when it changes, so screen readers do not repeat it on every pixel. */
+  setSnapNote(this: WorkspacePageComponent, note: { x: string | null; y: string | null } | null): void {
+    const cur = this.snapNote();
+    if (cur?.x === note?.x && cur?.y === note?.y) {
+      return;
+    }
+    this.snapNote.set(note);
+  }
+
   isSelected(this: WorkspacePageComponent, pageIndex: number, fieldIndex: number): boolean {
     const selected = this.selection();
     return !!selected && selected.pageIndex === pageIndex && selected.fields.includes(fieldIndex);

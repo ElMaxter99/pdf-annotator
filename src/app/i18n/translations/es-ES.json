@@ -105,7 +105,10 @@
     "clearConfirm": "¿Quitar todas las anotaciones? Se puede deshacer con Ctrl+Z.",
     "clearYes": "Quitar todas",
     "clearCancel": "Cancelar",
-    "wheelPaging": "Pasar de página con la rueda"
+    "wheelPaging": "Pasar de página con la rueda",
+    "snapBoth": "Alineada en X con {{x}} y en Y con {{y}}",
+    "snapX": "Alineada en X con {{name}}",
+    "snapY": "Alineada en Y con {{name}}"
   },
   "sidebar": {
     "title": "Anotaciones (JSON)",
@@ -364,7 +367,8 @@
       "wheelPage": "Seguir con la rueda al borde de la hoja: cambia de página",
       "pageOnlyA": "Mover solo A (las páginas pasan a libres)",
       "palette": "Abrir la paleta de comandos",
-      "options": "Abrir las Opciones"
+      "options": "Abrir las Opciones",
+      "dragNoSnap": "Arrastrar sin alinear con otras anotaciones"
     }
   },
   "toast": {
@@ -1906,7 +1910,9 @@
       "goTo": "Ir a {{name}}",
       "themeDark": "Cambiar a tema oscuro",
       "themeLight": "Cambiar a tema claro",
-      "language": "Idioma: {{language}}"
+      "language": "Idioma: {{language}}",
+      "snapOn": "Alinear con otras anotaciones al arrastrar: activar",
+      "snapOff": "Alinear con otras anotaciones al arrastrar: desactivar"
     },
     "group": {
       "batch": "Lote",
@@ -2566,6 +2572,16 @@
         "noteInf": "Cada petición gasta créditos y el traslado no se parará a preguntar. Puedes cancelarlo desde el panel en cualquier momento.",
         "noteClaude": "Claude Code no tiene tope por defecto. Puedes ponerle uno si quieres revisar antes de seguir."
       }
+    },
+    "badgeAll": "Web y escritorio",
+    "editor": {
+      "title": "Editor",
+      "intro": "Ajustes básicos del editor. Se guardan en este navegador y valen para todos los PDF.",
+      "snap": "Alinear con otras anotaciones al arrastrar",
+      "snapHelp": "Al arrastrar, una anotación salta a la X o la Y de otra cercana y se dibuja una guía. Evita desfases de décimas entre casillas o campos contiguos.",
+      "distance": "Distancia del imán",
+      "distanceHelp": "Píxeles de pantalla hasta que salta. No cambia con el zoom.",
+      "altHint": "Mantén Alt (⌥ en Mac) mientras arrastras para no alinear en ese momento."
     }
   }
 }

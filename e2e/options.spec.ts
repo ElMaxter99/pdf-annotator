@@ -30,6 +30,8 @@ test('en escritorio las Opciones tienen Actualizaciones e IA y se abren con Ctrl
   await expect(dialog).toBeVisible();
   await expect(page.getByTestId('options-nav-updates')).toBeVisible();
   await expect(page.getByTestId('options-nav-ai')).toBeVisible();
+  await expect(page.getByTestId('options-nav-editor')).toBeVisible();
+  await page.getByTestId('options-nav-updates').click();
   await expect(dialog.getByTestId('update-channel')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
@@ -44,8 +46,8 @@ test('el límite de peticiones tiene valores por defecto, se guarda y valida «O
   await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.provider', 'copilot'));
   await page.goto('/landing');
   await page.getByTestId('options-open').click();
-  // En local solo hay IA: sin lista de secciones.
-  await expect(page.getByTestId('options-nav-ai')).toHaveCount(0);
+  // En local hay Editor e IA.
+  await page.getByTestId('options-nav-ai').click();
   await expect(page.getByTestId('options-limit-10')).toHaveAttribute('aria-pressed', 'true');
   await page.getByTestId('options-limit-25').click();
   await expect(page.getByTestId('options-limit-25')).toHaveAttribute('aria-pressed', 'true');
@@ -68,4 +70,22 @@ test('el límite de peticiones tiene valores por defecto, se guarda y valida «O
   await page.getByTestId('options-reset').click();
   await page.getByTestId('options-reset-ok').click();
   expect(await page.evaluate(() => localStorage.getItem('pdf-annotator.ai.limits'))).toContain('"copilot":10');
+});
+
+test('«Editor» está en la web: el imán entre anotaciones viene activado y se guarda', async ({ page }) => {
+  await page.goto('/landing');
+  await page.getByTestId('options-open').click();
+  await expect(page.getByTestId('options-nav-editor')).toBeVisible();
+  const snap = page.getByTestId('options-snap');
+  await expect(snap).toBeChecked();
+  await expect(page.getByTestId('options-snap-distance-6')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByTestId('options-snap-distance-10').click();
+  await snap.uncheck();
+  await expect(page.getByTestId('options-snap-distance-3')).toBeDisabled();
+  const saved = await page.evaluate(() => localStorage.getItem('pdf-annotator.editorSettings'));
+  expect(saved).toContain('"snapToAnnotations":false');
+  expect(saved).toContain('"snapDistance":10');
+  await page.getByTestId('options-editor-reset').click();
+  await expect(snap).toBeChecked();
+  await expect(page.getByTestId('options-snap-distance-6')).toHaveAttribute('aria-pressed', 'true');
 });

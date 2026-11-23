@@ -1,3 +1,4 @@
+import { EditorSettingsService } from '../../../../services/editor-settings.service';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -45,6 +46,7 @@ export type PaletteTranslate = (key: string, params?: Record<string, string | nu
 })
 export class CommandPaletteComponent implements OnInit {
   @Input() vm!: WorkspacePageComponent;
+  private readonly editorSettings = inject(EditorSettingsService);
   /** Actions of another screen (the batch panel); without it the palette lists the editor's. */
   @Input() source?: (t: PaletteTranslate) => PaletteCommand[];
   @Input() defaultIds: readonly string[] = DEFAULT_IDS;
@@ -285,6 +287,14 @@ export class CommandPaletteComponent implements OnInit {
         run: () => vm.onLanguageChange(lang),
       });
     }
+    const snapOn = this.editorSettings.snapToAnnotations();
+    add({
+      id: 'snap-annotations',
+      icon: '⇥',
+      label: t(snapOn ? 'palette.cmd.snapOff' : 'palette.cmd.snapOn'),
+      keywords: 'snap align alinear imán iman anotaciones arrastrar magnet',
+      run: () => this.editorSettings.setSnapToAnnotations(!snapOn),
+    });
     add({ id: 'shortcuts', icon: '⌨', label: t('shortcuts.open'), keywords: 'shortcuts keyboard help atajos', shortcut: '?', run: () => vm.toggleShortcuts(true) });
     if (this.options.available()) {
       add({ id: 'options', icon: '⚙', label: t('options.open'), keywords: 'options opciones settings ajustes ia updates actualizaciones', shortcut: 'Ctrl+,', run: () => this.options.open() });

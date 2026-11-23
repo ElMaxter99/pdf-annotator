@@ -128,6 +128,7 @@ import {
 } from '../../utils/color.utils';
 import { toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
+import { EditorSettingsService } from '../../services/editor-settings.service';
 import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
 import { type AiSession } from '../../utils/ai-session.utils';
@@ -236,6 +237,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly coordsTextModel = signal(JSON.stringify({ pages: [] }, null, 2));
   readonly jsonTreePreview = signal<JsonTreePreview>(buildJsonTreePreview(this.coordsTextModel()));
   guidesFeatureEnabled = signal(false);
+  readonly editorSettings = inject(EditorSettingsService);
+  /** Con quién se alinea la anotación que se arrastra (pie del editor); `null` si con nadie. */
+  readonly snapNote = signal<{ x: string | null; y: string | null } | null>(null);
   advancedOptionsOpen = signal(false);
   includeAdvancedJsonFields = signal(false);
   private readonly fontDropdownState = signal<FontDropdownState>(initialFontDropdownState());
@@ -501,6 +505,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     scale: () => this.scale(),
     guidesEnabled: () => this.guidesFeatureEnabled(),
     refreshOverlay: (rect, guides) => this.refreshOverlay(rect, guides),
+    annotationSnap: (input) => this.annotationSnap(input),
     applySnapping: (left, top, bounds, el, canvas, fontSizePx) =>
       this.applySnapping(left, top, bounds, el, canvas, fontSizePx),
     coords: () => this.coords(),
@@ -1124,6 +1129,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   ) {
     if (activeRect !== undefined) {
       this.overlayDragRect = activeRect;
+      if (activeRect === null) {
+        this.setSnapNote(null);
+      }
     }
     if (guides !== undefined) {
       this.overlayGuides = guides ?? [];
@@ -1145,16 +1153,16 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     ctx.clearRect(0, 0, overlay.width, overlay.height);
 
-    if (!this.guidesFeatureEnabled()) {
-      return;
-    }
-
     const settings = this.guideSettings();
     const scale = this.scale();
 
-    drawGrid(ctx, settings, overlay.width, overlay.height, scale);
-    drawRulers(ctx, settings, overlay.width, overlay.height, scale);
-    drawStaticGuides(ctx, settings, overlay.width, overlay.height, scale);
+    if (this.guidesFeatureEnabled()) {
+      drawGrid(ctx, settings, overlay.width, overlay.height, scale);
+      drawRulers(ctx, settings, overlay.width, overlay.height, scale);
+      drawStaticGuides(ctx, settings, overlay.width, overlay.height, scale);
+    } else if (!this.overlayDragRect) {
+      return;
+    }
 
     if (this.overlayDragRect) {
       drawActiveGuides(

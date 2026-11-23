@@ -15,6 +15,7 @@ import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { AiHelperService, type AiProvider } from '../../services/ai-helper.service';
 import { DesktopUpdateService, getDesktopBridge } from '../../services/desktop-update.service';
+import { EditorSettingsService } from '../../services/editor-settings.service';
 import { OptionsSection, OptionsService } from '../../services/options.service';
 import { AI_LIMIT_PRESETS, limitChoice, parseAiLimitInput } from '../../utils/ai-limit.utils';
 import { AiModelSelectComponent } from '../ai-model-select/ai-model-select.component';
@@ -33,6 +34,8 @@ import { UpdateChannelComponent } from '../update-channel/update-channel.compone
 })
 export class OptionsDialogComponent {
   readonly options = inject(OptionsService);
+  readonly editor = inject(EditorSettingsService);
+  readonly snapDistances = [3, 6, 10];
   readonly update = inject(DesktopUpdateService);
   readonly helper = inject(AiHelperService);
   private readonly i18n = inject(TranslationService);
@@ -125,7 +128,13 @@ export class OptionsDialogComponent {
   }
 
   sectionLabel(section: OptionsSection): string {
-    return this.i18n.translate(section === 'updates' ? 'options.updates.title' : 'options.ai.title');
+    return this.i18n.translate(
+      section === 'editor'
+        ? 'options.editor.title'
+        : section === 'updates'
+          ? 'options.updates.title'
+          : 'options.ai.title',
+    );
   }
 
   providerLabel(p: AiProvider): string {

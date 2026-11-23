@@ -105,7 +105,10 @@
     "clearConfirm": "Remove all annotations? You can undo it with Ctrl+Z.",
     "clearYes": "Remove all",
     "clearCancel": "Cancel",
-    "wheelPaging": "Turn the page with the wheel"
+    "wheelPaging": "Turn the page with the wheel",
+    "snapBoth": "Aligned in X with {{x}} and in Y with {{y}}",
+    "snapX": "Aligned in X with {{name}}",
+    "snapY": "Aligned in Y with {{name}}"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -364,7 +367,8 @@
       "wheelPage": "Keep scrolling at the edge of the sheet: changes page",
       "pageOnlyA": "Move only A (the pages become free)",
       "palette": "Open the command palette",
-      "options": "Open Options"
+      "options": "Open Options",
+      "dragNoSnap": "Drag without aligning to other annotations"
     }
   },
   "toast": {
@@ -1906,7 +1910,9 @@
       "goTo": "Go to {{name}}",
       "themeDark": "Switch to dark theme",
       "themeLight": "Switch to light theme",
-      "language": "Language: {{language}}"
+      "language": "Language: {{language}}",
+      "snapOn": "Align with other annotations while dragging: turn on",
+      "snapOff": "Align with other annotations while dragging: turn off"
     },
     "group": {
       "batch": "Batch",
@@ -2566,6 +2572,16 @@
         "noteInf": "Every request spends credits and the run will not stop to ask. You can cancel it from the panel at any time.",
         "noteClaude": "Claude Code has no limit by default. You can set one if you want to review before continuing."
       }
+    },
+    "badgeAll": "Web and desktop",
+    "editor": {
+      "title": "Editor",
+      "intro": "Basic editor settings. They are saved in this browser and apply to every PDF.",
+      "snap": "Align with other annotations while dragging",
+      "snapHelp": "While dragging, an annotation jumps to the X or Y of a nearby one and a guide is drawn. It avoids tiny offsets between neighbouring boxes or fields.",
+      "distance": "Magnet distance",
+      "distanceHelp": "Screen pixels before it jumps. It does not change with zoom.",
+      "altHint": "Hold Alt (⌥ on Mac) while dragging to skip aligning for that moment."
     }
   }
 }
