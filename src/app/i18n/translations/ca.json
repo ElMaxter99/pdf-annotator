@@ -894,7 +894,9 @@
         "saved": "Proposta llesta per revisar",
         "noB": "Sense B · s'omet",
         "toCheck": "{{n}} per revisar",
-        "added": "+{{n}} nous a B"
+        "added": "+{{n}} nous a B",
+        "interrupted": "Interromput",
+        "notStarted": "No va arribar a començar"
       },
       "err": {
         "images_not_read": "La IA no ha llegit les imatges",
@@ -1053,6 +1055,19 @@
           "added": "{{n}} camps nous que no eren a A (p. ex. el número de pàgina de les pàgines noves de B)",
           "absent": "{{n}} camps d’A el text dels quals ja no existeix a B: no col·locar-los és el correcte"
         }
+      },
+      "draft": {
+        "title": "Va quedar un trasllat amb IA a mitges",
+        "summary": "El vas llançar amb {{provider}} el {{when}} sobre {{total}} PDF. {{saved}} tenen la proposta desada i no s'ha perdut.",
+        "rest": "Falten: {{failed}} han fallat, {{interrupted}} anaven en vol i {{notStarted}} no van arribar a començar.",
+        "missing": "{{count}} PDF d'aquella passada ja no són al lot.",
+        "resume": "Represa el que falta ({{count}})",
+        "all": "Torna a llançar-ho tot ({{count}})",
+        "choose": "Tria quins…",
+        "discard": "Descarta l'avís",
+        "checking": "Buscant l'esborrany del trasllat anterior…",
+        "replaces": "Se substituiran {{count}} propostes desades ({{edited}} amb canvis teus). Es torna a gastar.",
+        "chosen": "Marcats els {{count}} que falten. Prem «Traslladar amb IA» a la barra per llançar-los."
       }
     },
     "more": "Més accions",

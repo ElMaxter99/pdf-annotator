@@ -894,7 +894,9 @@
         "saved": "Proposal ready to review",
         "noB": "No B · skipped",
         "toCheck": "{{n}} to check",
-        "added": "+{{n}} new in B"
+        "added": "+{{n}} new in B",
+        "interrupted": "Interrupted",
+        "notStarted": "Never started"
       },
       "err": {
         "images_not_read": "The AI did not read the images",
@@ -1053,6 +1055,19 @@
           "added": "{{n}} new fields that were not in A (e.g. the page number of the new pages of B)",
           "absent": "{{n}} fields of A whose text no longer exists in B: leaving them out is right"
         }
+      },
+      "draft": {
+        "title": "An AI transfer was left half done",
+        "summary": "You started it with {{provider}} on {{when}} for {{total}} PDFs. {{saved}} have their proposal saved and nothing was lost.",
+        "rest": "Missing: {{failed}} failed, {{interrupted}} were in flight and {{notStarted}} never started.",
+        "missing": "{{count}} PDFs from that run are no longer in the batch.",
+        "resume": "Resume what's missing ({{count}})",
+        "all": "Run everything again ({{count}})",
+        "choose": "Choose which…",
+        "discard": "Dismiss notice",
+        "checking": "Looking for the draft of the previous transfer…",
+        "replaces": "{{count}} saved proposals will be replaced ({{edited}} with your changes). It spends again.",
+        "chosen": "The {{count}} missing ones are selected. Press «Transfer with AI» in the bar to run them."
       }
     },
     "more": "More actions",

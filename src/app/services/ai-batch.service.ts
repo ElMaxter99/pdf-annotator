@@ -11,6 +11,7 @@ import {
 import { AiDetails, AiResult, AiSent, AiStep, AiUsage, sumUsage, countPlacement } from '../utils/ai-proposal.utils';
 import { AiQueueInfo, AiQueueTaken, AiRemoteSnapshot, parseQueueInfo, phaseOfRemote, remoteItemId } from '../utils/ai-queue.utils';
 import { cascadeAdjust } from '../utils/adjust-cascade.utils';
+import { classifyAiRun } from '../utils/ai-run.utils';
 import { effectiveAiInstructions } from '../utils/ai-instructions.utils';
 import { AiHelperService, AiRequestError } from './ai-helper.service';
 import { BatchStoreService } from './batch-store.service';
@@ -113,6 +114,12 @@ export class AiBatchService {
   readonly panelOpen = signal(false);
 
   readonly order = signal<string[]>([]);
+  /** True while a reload looks for a queue that may still be running in the helper. */
+  readonly checking = signal(false);
+  /** What is left of a run cut short (app closed, helper gone…); `null` while a run is on screen or nothing is missing (P-127). */
+  readonly interrupted = computed(() =>
+    this.run() === 'idle' ? classifyAiRun(this.batch.aiRun(), this.batch.items()) : null,
+  );
   readonly usage = computed(() => sumUsage(Object.values(this.rows()).map((row) => row.usage)));
   readonly counts = computed(() => {
     const all = Object.values(this.rows());
@@ -149,6 +156,25 @@ export class AiBatchService {
   private queueProvider: string | null = null;
 
   constructor() {
+    // The draft of the run follows the rows, so a closed app can say who finished, failed or never started.
+    effect(() => {
+      const rows = this.rows();
+      const run = this.run();
+      const record = untracked(() => this.batch.aiRun());
+      if (!record || !this.order().length) {
+        return;
+      }
+      if (run === 'done' && untracked(() => classifyAiRun(record, this.batch.items())) === null) {
+        untracked(() => this.batch.setAiRun(null));
+        return;
+      }
+      const list = Object.values(rows);
+      const started = list.filter((row) => row.phase !== 'queued').map((row) => row.id);
+      const failed = list.filter((row) => row.phase === 'failed').map((row) => row.id);
+      if (started.join() !== record.started.join() || failed.join() !== record.failed.join()) {
+        untracked(() => this.batch.setAiRun({ ...record, started, failed }));
+      }
+    });
     // After a reload (or a new tab) the queue may still be running in the helper: find it again.
     effect(() => {
       const ready = this.ai.connection() === 'ready' && this.batch.items().length > 0;
@@ -181,6 +207,7 @@ export class AiBatchService {
     this.rows.set(Object.fromEntries(pairs.map((item) => [item.id, emptyRow(item.id)])));
     this.requests.set(0);
     this.startedAt.set(Date.now());
+    this.batch.setAiRun({ ids: pairs.map((item) => item.id), provider: this.ai.provider(), startedAt: Date.now(), started: [], failed: [] });
     this.sentInWindow = 0;
     this.streak = { kind: '', n: 0 };
     this.detailsFollow.set(true);
@@ -301,12 +328,18 @@ export class AiBatchService {
     return 'started';
   }
 
+  /** «Descartar aviso»: forgets the draft of the cut run (the saved proposals stay in the items). */
+  discardInterrupted(): void {
+    this.batch.setAiRun(null);
+  }
+
   /** Forgets the last run (the stored proposals stay in the items). */
   reset(): void {
     if (this.run() === 'running') {
       return;
     }
     this.dropQueue(false);
+    this.batch.setAiRun(null);
     this.viaHelper.set(false);
     this.reconnected.set(null);
     this.rows.set({});
@@ -539,6 +572,7 @@ export class AiBatchService {
       return;
     }
     this.recovering = true;
+    this.checking.set(true);
     try {
       let snap: AiRemoteSnapshot | null = null;
       try {
@@ -589,6 +623,7 @@ export class AiBatchService {
       }
     } finally {
       this.recovering = false;
+      this.checking.set(false);
     }
   }
 

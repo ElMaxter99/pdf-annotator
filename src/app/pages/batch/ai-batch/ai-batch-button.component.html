@@ -2,7 +2,7 @@
   <button
     #menuBtn
     type="button"
-    class="btn btn--primary"
+    [class]="ghost() ? 'btn btn--ghost' : 'btn btn--primary'"
     [disabled]="eligible().length === 0 || busy()"
     [attr.aria-expanded]="open()"
     aria-haspopup="dialog"
@@ -10,8 +10,8 @@
     (click)="toggle()"
     data-testid="ai-batch-button"
   >
-    ✦ {{ 'batch.ai.button' | t }}
-    @if (ids()) {
+    ✦ {{ (label() ?? 'batch.ai.button') | t: { count: eligible().length } }}
+    @if (ids() && !label()) {
       <span class="batch-sub">{{ eligible().length }} / {{ ids()!.length }}</span>
     }
   </button>
@@ -51,6 +51,11 @@
           </p>
           <p><strong>{{ 'batch.ai.pop.sent' | t }}.</strong> {{ 'batch.ai.confirm.privacy' | t: { provider: providerName() } }}</p>
         </div>
+      }
+      @if (replacing().count > 0) {
+        <p class="ai-pop__skipped" data-testid="ai-batch-replaces">
+          {{ 'batch.ai.draft.replaces' | t: { count: replacing().count, edited: replacing().edited } }}
+        </p>
       }
       <p class="ai-pop__sum" data-testid="ai-batch-estimate">
         <strong>{{ 'batch.ai.pop.summary' | t: { count: chosen().length, fields: estimate().fields } }}</strong>

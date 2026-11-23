@@ -121,6 +121,11 @@ export class AiBatchChipComponent {
         canSkip: row.phase === 'asking' || row.phase === 'reading',
       };
     }
+    const before = this.queue.interrupted()?.stateOf[item.id];
+    if (!item.aiProposal && before && before !== 'saved') {
+      const tone = before === 'failed' ? 'err' : before === 'interrupted' ? 'warn' : 'idle';
+      return { id: item.id, sub: null, phase: before, key: before, params: {}, absent: 0, done: false, added: 0, toCheck: 0, tone, active: false, error: null, canSkip: false };
+    }
     if (item.aiProposal) {
       return { id: item.id, sub: null, phase: 'saved', key: 'saved', params: {}, absent: 0, done: false, added: 0, toCheck: 0, tone: 'ok', active: false, error: null, canSkip: false };
     }

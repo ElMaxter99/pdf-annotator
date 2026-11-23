@@ -894,7 +894,9 @@
         "saved": "Proposta pronta da rivedere",
         "noB": "Senza B · saltato",
         "toCheck": "{{n}} da rivedere",
-        "added": "+{{n}} nuovi in B"
+        "added": "+{{n}} nuovi in B",
+        "interrupted": "Interrotto",
+        "notStarted": "Mai partito"
       },
       "err": {
         "images_not_read": "L'IA non ha letto le immagini",
@@ -1053,6 +1055,19 @@
           "added": "{{n}} campi nuovi che non erano in A (es. il numero di pagina delle nuove pagine di B)",
           "absent": "{{n}} campi di A il cui testo non esiste più in B: non collocarli è corretto"
         }
+      },
+      "draft": {
+        "title": "Un trasferimento con IA è rimasto a metà",
+        "summary": "Lo hai avviato con {{provider}} il {{when}} su {{total}} PDF. {{saved}} hanno la proposta salvata e non si è perso nulla.",
+        "rest": "Mancano: {{failed}} sono falliti, {{interrupted}} erano in corso e {{notStarted}} non sono mai partiti.",
+        "missing": "{{count}} PDF di quel giro non sono più nel lotto.",
+        "resume": "Riprendi ciò che manca ({{count}})",
+        "all": "Rilancia tutto ({{count}})",
+        "choose": "Scegli quali…",
+        "discard": "Chiudi l'avviso",
+        "checking": "Cerco la bozza del trasferimento precedente…",
+        "replaces": "Verranno sostituite {{count}} proposte salvate ({{edited}} con modifiche tue). Si spende di nuovo.",
+        "chosen": "I {{count}} mancanti sono selezionati. Premi «Trasferisci con IA» nella barra per avviarli."
       }
     },
     "more": "Altre azioni",

@@ -51,6 +51,10 @@ export class AiBatchButtonComponent {
 
   /** Limits the run to these PDFs (the marked ones); `null` = the whole batch. */
   readonly ids = input<readonly string[] | null>(null);
+  /** Own text for the trigger (a `batch.ai.draft.*` key that receives `{{count}}`); `null` = «Trasladar con IA». */
+  readonly label = input<string | null>(null);
+  /** Quiet look for secondary triggers (the recovery notice). */
+  readonly ghost = input(false);
   /** Opens the popover upwards (button in the selection bar at the bottom). */
   readonly up = input(false);
 
@@ -85,6 +89,14 @@ export class AiBatchButtonComponent {
   readonly providerName = computed(() => providerName(this.provider()));
   readonly retry = computed(() => this.helper.retry()[this.provider()] !== false);
   readonly chosen = this.eligible;
+  /** Saved proposals this run would overwrite, and how many carry the person's own edits. */
+  readonly replacing = computed(() => {
+    const saved = this.chosen().filter((item) => item.aiProposal);
+    return {
+      count: saved.length,
+      edited: saved.filter((item) => Object.keys(item.aiProposal?.edits ?? {}).length > 0).length,
+    };
+  });
   readonly estimate = computed(() => estimateAiBatch(this.chosen(), this.provider(), this.retry()));
   readonly isCopilot = computed(() => this.provider() === 'copilot');
   readonly providers = computed(() =>
