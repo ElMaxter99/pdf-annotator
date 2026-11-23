@@ -14,11 +14,11 @@ Publicada como v1.16.0 (ver `CHANGELOG.md`): doble clic del visor, espacio de tr
 ## Hecho: 1.17 «IA medible y pulido»
 Publicada como v1.17.0 el 2026-11-22 tras 8 RC (ver `CHANGELOG.md`): banco de medida de la IA, motor más robusto (tablas, etiquetas repetidas, lado del hueco, huecos escritos, parcial si no lee imágenes, códigos sin caracteres confusos), prueba de vista del modelo, instrucciones para la IA, propuesta editable en B, parejas A↔B, número de página repetido, lista y chips de la propuesta más claros, créditos de Copilot, actualizar tras cancelar la contraseña o el permiso, limpieza de la descarga del actualizador, accesibilidad (contraste del acento, `h1`, títulos, axe en el CI), colores a tokens y editor repartido en 8 archivos. Plan: `docs/PLAN-1.17.md`. Lo hecho sin mesas queda en `design/PENDIENTE-MESAS.md`.
 
-## Siguiente: 1.18 (alcance por elegir)
-Plan por tareas en `docs/PLAN-1.18.md`: apartado «Almacenamiento» (diseño aprobado, P-125 y P-126), e2e sin intermitencias, mantenimiento (`pdfjs-dist` 6 y `app.ts` en `OnPush`) y, si Maxter pasa casos, comprobar la IA con PDF reales y Copilot. El lienzo se puso al día el 2026-11-22 (P-115 a P-124). Cifrado de proyectos y firma de macOS, aparcados muy a futuro.
+## Hecho: 1.18 «Almacenamiento y simplificación del editor»
+Publicada como v1.18.0 y v1.18.1 (ver `CHANGELOG.md`): panel «Almacenamiento» (escritorio), e2e sin intermitencias, `OnPush` en `app.ts`, `pdfjs-dist` 6 y `@vercel/*` 2, «Actualizar plantillas» del lote y las fases 2 a 5 de «Simplificar el editor». Plan: `docs/PLAN-1.18.md`. Cifrado de proyectos y firma de macOS siguen aparcados muy a futuro.
 
-## Después: 1.19
-- **Lienzo al día (Maxter, 2026-11-22):** todo lo que falte en el lienzo (lo de `design/PENDIENTE-MESAS.md` y lo que se programe sin mesa en la 1.18) se pinta en la sesión de Claude que tenga el lienzo. M1 de la 1.18 ya lo cerró; en la 1.19 solo queda pintar lo que se programe sin mesa durante la 1.18. Detalle en `docs/PLAN-1.18.md` §6.
+## Siguiente: 1.19 «Preparar TypeScript 7»
+Decisión de Maxter (2026-11-23): la 1.19 se centra en la migración a TypeScript 7, que hoy no es posible con el build de Angular (Angular 22.x exige `typescript >=6.0 <6.1`). Alcance: línea base de tiempos, `npm run typecheck:ts7` y job de CI informativo, Dependabot ignorando las subidas mayores y menores de TypeScript y documentación (`docs/MIGRACION-TS7.md`, `DECISIONS` 17). La migración real irá en una PR propia cuando Angular admita la 7. Análisis y alternativas en `plan/plan-migracion-typescript-7.md` (carpeta de archivos del proyecto). Pendientes aparcados: lienzo al día (`docs/PLAN-1.18.md` §6, lo de `design/PENDIENTE-MESAS.md`).
 
 ## Hecho tras v1.5.0
 - Dockerfile con `nginx-unprivileged` y `npm ci`; `npm audit` y Dependabot en CI (v1.11).

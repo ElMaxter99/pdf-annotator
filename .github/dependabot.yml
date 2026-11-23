@@ -6,6 +6,12 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     target-branch: develop
+    ignore:
+      # Angular 22 solo admite TypeScript >=6.0 <6.1 (ngc no arranca con la 7). Solo se
+      # actualizan los parches de TypeScript. Quitar esta regla cuando Angular admita un rango
+      # mayor; ver docs/MIGRACION-TS7.md.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
     groups:
       angular:
         patterns: ['@angular/*', '@angular-devkit/*']
