@@ -18,6 +18,8 @@ import { AiBatchDetailsComponent } from './pages/batch/ai-batch/ai-batch-details
 import { AiBatchChipComponent } from './pages/batch/ai-batch/ai-batch-chip.component';
 import { AiBatchButtonComponent } from './pages/batch/ai-batch/ai-batch-button.component';
 import { AiBatchPanelComponent } from './pages/batch/ai-batch/ai-batch-panel.component';
+import { App } from './app';
+import { StoragePanelComponent } from './components/storage-panel/storage-panel.component';
 import { LandingPageComponent } from './pages/landing/landing.page';
 
 interface Case {
@@ -55,6 +57,8 @@ const CASES: Case[] = [
   { name: 'ai-batch-button', type: AiBatchButtonComponent },
   { name: 'ai-batch-panel', type: AiBatchPanelComponent },
   { name: 'landing', type: LandingPageComponent },
+  { name: 'storage-panel', type: StoragePanelComponent },
+  { name: 'app (raíz)', type: App },
 ];
 
 /**
