@@ -155,8 +155,77 @@
             <span>{{ 'controls.viewJsonTree' | t }}</span>
           </button>
         </div>
-        <button type="button" class="btn" (click)="vm.copyJSON()"
-          [disabled]="!vm.coords().length">{{ 'controls.copyJson' | t }}</button>
+        <div class="json-copy" (keydown.escape)="vm.closeJsonCopyPanel()">
+          <div class="json-copy__split">
+            <button type="button" class="btn json-copy__main" (click)="vm.copyJSON()"
+              [disabled]="!vm.coords().length">{{ 'controls.copyJson' | t }}</button>
+            <button type="button" class="btn json-copy__chev" (click)="vm.toggleJsonCopyPanel()"
+              [disabled]="!vm.coords().length" aria-haspopup="dialog"
+              [attr.aria-expanded]="vm.jsonCopyOpen()"
+              [attr.aria-label]="'sidebar.copyFormat.title' | t"
+              [attr.title]="'sidebar.copyFormat.title' | t">▾</button>
+          </div>
+          @if (vm.jsonCopyOpen() && vm.coords().length) {
+            <div class="json-copy__pop" role="dialog" [attr.aria-label]="'sidebar.copyFormat.title' | t">
+              <div class="json-copy__row">
+                <span class="json-copy__label">{{ 'sidebar.copyFormat.preset' | t }}</span>
+                <div class="json-copy__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.preset' | t">
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyPresetName() === 'json'"
+                    (click)="vm.setJsonCopyPreset('json')">{{ 'sidebar.copyFormat.name.json' | t }}</button>
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyPresetName() === 'js'"
+                    (click)="vm.setJsonCopyPreset('js')">{{ 'sidebar.copyFormat.name.js' | t }}</button>
+                  <button type="button" disabled [attr.aria-pressed]="vm.jsonCopyPresetName() === 'custom'">{{ 'sidebar.copyFormat.name.custom' | t }}</button>
+                </div>
+              </div>
+              <div class="json-copy__row">
+                <span class="json-copy__label">{{ 'sidebar.copyFormat.keys' | t }}</span>
+                <div class="json-copy__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.keys' | t">
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyFormat().keys === 'quoted'"
+                    (click)="vm.setJsonCopyFormat({ keys: 'quoted' })">{{ 'sidebar.copyFormat.keysQuoted' | t }}</button>
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyFormat().keys === 'bare'"
+                    (click)="vm.setJsonCopyFormat({ keys: 'bare' })">{{ 'sidebar.copyFormat.keysBare' | t }}</button>
+                </div>
+              </div>
+              <div class="json-copy__row">
+                <span class="json-copy__label">{{ 'sidebar.copyFormat.quote' | t }}</span>
+                <div class="json-copy__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.quote' | t">
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyFormat().quote === 'double'"
+                    (click)="vm.setJsonCopyFormat({ quote: 'double' })">{{ 'sidebar.copyFormat.quoteDouble' | t }}</button>
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyFormat().quote === 'single'"
+                    (click)="vm.setJsonCopyFormat({ quote: 'single' })">{{ 'sidebar.copyFormat.quoteSingle' | t }}</button>
+                </div>
+              </div>
+              <div class="json-copy__row">
+                <span class="json-copy__label">{{ 'sidebar.copyFormat.indent' | t }}</span>
+                <div class="json-copy__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.indent' | t">
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyFormat().indent === '2'"
+                    (click)="vm.setJsonCopyFormat({ indent: '2' })">2</button>
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyFormat().indent === '4'"
+                    (click)="vm.setJsonCopyFormat({ indent: '4' })">4</button>
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyFormat().indent === 'tab'"
+                    (click)="vm.setJsonCopyFormat({ indent: 'tab' })">{{ 'sidebar.copyFormat.indentTab' | t }}</button>
+                  <button type="button" [attr.aria-pressed]="vm.jsonCopyFormat().indent === '0'"
+                    (click)="vm.setJsonCopyFormat({ indent: '0' })">{{ 'sidebar.copyFormat.indentCompact' | t }}</button>
+                </div>
+              </div>
+              <label class="json-copy__check">
+                <input type="checkbox" [checked]="vm.jsonCopyFormat().trailingComma"
+                  (change)="vm.setJsonCopyFormat({ trailingComma: $any($event.target).checked })" />
+                <span>{{ 'sidebar.copyFormat.trailingComma' | t }}</span>
+              </label>
+              <div class="json-copy__row">
+                <span class="json-copy__label">{{ 'sidebar.copyFormat.preview' | t }}</span>
+                <pre class="json-copy__preview" data-testid="json-copy-preview">{{ vm.jsonCopyPreview() }}</pre>
+              </div>
+              <div class="json-copy__foot">
+                <span class="json-copy__chip"
+                  [class.json-copy__chip--ok]="vm.jsonCopyIsStrict()">{{ (vm.jsonCopyIsStrict() ? 'sidebar.copyFormat.valid' : 'sidebar.copyFormat.notJson') | t }}</span>
+                <button type="button" class="btn btn--primary" data-testid="json-copy-with"
+                  (click)="vm.copyJSON(); vm.closeJsonCopyPanel()">{{ 'sidebar.copyFormat.copyWith' | t }}</button>
+              </div>
+            </div>
+          }
+        </div>
         <button type="button" class="btn" (click)="vm.downloadJSON()"
           [disabled]="!vm.coords().length">{{ 'controls.downloadJson' | t }}</button>
       </div>
