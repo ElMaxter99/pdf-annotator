@@ -46,17 +46,19 @@ test('a new change discards the redo history', async ({ page }) => {
 test('edits can be undone and redone', async ({ page }) => {
   await addAnnotation(page, 0.3, 0.3, 'uno');
   await expect.poll(() => fieldCount(page)).toBe(1);
-  // Justo después de crearla, el clic puede caer en la capa de debajo mientras se redibuja y abrir el editor de CREAR:
-  // se repite hasta que se abre el de EDITAR (con «uno» ya escrito).
+  // Justo después de crearla, el clic puede caer en la capa de debajo mientras se redibuja y abrir el editor de CREAR, y
+  // el campo del editor puede repoblarse tras escribir: se repite todo el gesto (abrir EDITAR, escribir, guardar) hasta
+  // que la anotación muestra el texto nuevo.
   const valueInput = page.locator('.annotation-editor input[type=text]').nth(1);
   await expect(async () => {
     if (await page.locator('.annotation-editor').count()) await page.keyboard.press('Escape');
     await page.locator('.annotation').first().click();
     await expect(valueInput).toHaveValue('uno', { timeout: 1500 });
-  }).toPass({ timeout: 15000 });
-  await valueInput.fill('editado');
-  await page.locator('.annotation-editor .action-primary').click();
-  await expect(page.locator('.annotation').first()).toHaveText('editado');
+    await valueInput.fill('editado');
+    await expect(valueInput).toHaveValue('editado', { timeout: 1000 });
+    await page.locator('.annotation-editor .action-primary').click();
+    await expect(page.locator('.annotation').first()).toHaveText('editado', { timeout: 2000 });
+  }).toPass({ timeout: 20000 });
 
   await page.keyboard.press('Control+z');
   await expect(page.locator('.annotation').first()).toHaveText('uno');
@@ -96,6 +98,8 @@ test('clear, JSON apply and file import are undoable steps', async ({ page }) =>
   await page.keyboard.press('Control+z');
   await expect(page.locator('.annotation')).toHaveCount(10);
 
+  // The JSON text is rewritten after an undo: wait for it before replacing it, or the new text would be appended to it.
+  await expect.poll(() => fieldCount(page)).toBe(10);
   await applyJsonText(page, { pages: [{ num: 1, fields: [{ x: 10, y: 10, mapField: 'j', fontSize: 12, type: 'text' }] }] });
   await expect(page.locator('.annotation')).toHaveCount(1);
   await page.keyboard.press('Control+z');

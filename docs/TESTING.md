@@ -10,6 +10,7 @@
 ## En un entorno sin Chrome instalado (cloud)
 - Chromium está en `/opt/pw-browsers/chromium`. No ejecutes `playwright install`.
 - e2e: `PW_CHROMIUM=/opt/pw-browsers/chromium npm run e2e -- --trace off`.
+- Buscar intermitencias (Q1): `PW_CHROMIUM=/opt/pw-browsers/chromium npx playwright test --repeat-each=20 --retries=0 --trace off --reporter=line,json > /tmp/q1.log`. En el CI `retries` vale 1 y taparía un fallo que solo salta a veces, por eso se fuerza `--retries=0`. Son ≈ 85 min en la nube con 2 workers: lánzalo en segundo plano y, para repetir solo un archivo o prueba, añade su ruta o `-g "<título>"`. Arregla cada fallo esperando a un estado real (`expect(...).toBeVisible()`, `expect.poll`), nunca con `waitForTimeout` ni desactivando la prueba.
 - Unitarias: `CHROME_BIN=/opt/pw-browsers/chromium npm run test:ci` (el launcher `ChromeHeadlessCI` ya usa `--no-sandbox`).
 
 ## Docker (`npm run start:docker`)

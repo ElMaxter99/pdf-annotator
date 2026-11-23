@@ -923,8 +923,17 @@ test('«Dividida»: the double click of the viewer acts on the pane under the po
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.keyboard.press('l');
   await expect(page.getByTestId('split-link')).toContainText('Enlazado');
-  await expect.poll(widthA).toBe(await widthB());
-  const b0 = await widthB();
+  // Linking re-renders B at A's zoom: take the starting width only once both panes stopped changing.
+  let b0 = await widthB();
+  let steady = 0;
+  await expect
+    .poll(async () => {
+      const [a, b] = [await widthA(), await widthB()];
+      steady = a === b && b === b0 ? steady + 1 : 0;
+      b0 = b;
+      return steady >= 3;
+    }, { intervals: [200] })
+    .toBe(true);
   const canvasB = (await page.locator('.canvas--pdf').boundingBox())!;
   await middleDouble(canvasB.x + canvasB.width / 2, canvasB.y + 40);
   await expect.poll(widthB).not.toBe(b0);
@@ -938,7 +947,6 @@ test('«Dividida»: double click on the A or B tag centers that PDF and again re
   await openRow(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
-  await page.waitForTimeout(500);
 
   const offset = (selector: string) =>
     page.evaluate((sel) => {
@@ -950,7 +958,17 @@ test('«Dividida»: double click on the A or B tag centers that PDF and again re
     }, selector);
   const scrollLeft = () => page.locator('.viewer').evaluate((el) => Math.round(el.scrollLeft));
 
-  const home = await scrollLeft();
+  // The resting scroll is only known once the layout has settled: wait until it stops changing.
+  let home = await scrollLeft();
+  let steady = 0;
+  await expect
+    .poll(async () => {
+      const now = await scrollLeft();
+      steady = now === home ? steady + 1 : 0;
+      home = now;
+      return steady >= 3;
+    }, { intervals: [200] })
+    .toBe(true);
   expect(await page.locator('.viewer').evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
 
   // B is on the right; its centre is far from the centre of the viewer until it is centred.

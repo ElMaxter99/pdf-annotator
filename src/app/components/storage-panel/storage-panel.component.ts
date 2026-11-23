@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, ViewChild, effect, inject } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { StorageRow, StorageService, formatBytes } from '../../services/storage.service';
@@ -119,6 +119,10 @@ export class StoragePanelComponent {
   private opener: HTMLElement | null = null;
 
   constructor() {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', this.onDocumentEscape, true);
+      inject(DestroyRef).onDestroy(() => document.removeEventListener('keydown', this.onDocumentEscape, true));
+    }
     effect(() => {
       const open = this.storage.panelOpen();
       if (typeof document === 'undefined') return;
@@ -156,6 +160,18 @@ export class StoragePanelComponent {
         return row.partial ? this.i18n.translate('storage.partial', { size: formatBytes(row.bytes) }) : formatBytes(row.bytes);
     }
   }
+
+  /**
+   * Escape se atiende en la fase de captura del documento: cierra aunque el foco aún no haya entrado en el panel (justo
+   * tras abrirlo) y no llega a los demás manejadores de Escape de la página (p. ej. el que cancela la IA del lote).
+   */
+  private readonly onDocumentEscape = (event: KeyboardEvent): void => {
+    if (event.key !== 'Escape' || !this.storage.panelOpen()) return;
+    event.stopPropagation();
+    event.preventDefault();
+    if (this.storage.confirming()) this.storage.cancelClear();
+    else this.storage.close();
+  };
 
   onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
