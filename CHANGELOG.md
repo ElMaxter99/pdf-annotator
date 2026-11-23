@@ -1,4 +1,6 @@
 ## Unreleased
+
+## [v1.18.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.18.1) - 2026-11-23
 ### Fixed
 - **«Tres pasos para empezar» no respondía a los clics (1.18.0):** el aviso de primera vez quedaba por debajo de la zona de clic del PDF, así que «Importar un JSON», «No volver a mostrar» y ✕ no recibían el clic y este llegaba al lienzo. El aviso y la pista pasan por encima (`z-index`), con e2e que comprueba qué elemento recibe el clic.
 
