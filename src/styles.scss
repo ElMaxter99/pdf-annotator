@@ -6685,8 +6685,7 @@ button.version-chip:focus-visible {
    cada panel conserva su desplazamiento propio y no lleva margen. */
 @media (min-width: 961px) {
   .app--workspace .viewer:not(.viewer--split) .canvas-container {
-    margin-left: var(--work-margin, 0px);
-    margin-right: var(--work-margin, 0px);
+    margin: var(--work-margin-y, 0px) var(--work-margin, 0px);
     transition: none;
   }
 
@@ -6695,12 +6694,12 @@ button.version-chip:focus-visible {
   }
 
   .app--workspace .viewer.viewer--split:not(.viewer--unlinked) .canvas-container--split-a {
-    margin-left: var(--work-margin, 0px);
+    margin: var(--work-margin-y, 0px) 0 var(--work-margin-y, 0px) var(--work-margin, 0px);
     transition: none;
   }
 
   .app--workspace .viewer.viewer--split:not(.viewer--unlinked) .canvas-container--split-b {
-    margin-right: var(--work-margin, 0px);
+    margin: var(--work-margin-y, 0px) var(--work-margin, 0px) var(--work-margin-y, 0px) 0;
     transition: none;
   }
 }
@@ -6746,10 +6745,14 @@ button.version-chip:focus-visible {
     align-items: flex-start;
   }
 
+  .app--workspace .viewer.viewer--unlinked .canvas-container--split-b {
+    margin-top: var(--work-margin-y, 0px);
+    margin-bottom: var(--work-margin-y, 0px);
+  }
+
   .app--workspace .viewer.viewer--unlinked .split-a__sheet {
     flex: 0 0 auto;
-    margin-left: var(--a-margin, 0px);
-    margin-right: var(--a-margin, 0px);
+    margin: var(--a-margin-y, 0px) var(--a-margin, 0px);
     transition: none;
   }
 

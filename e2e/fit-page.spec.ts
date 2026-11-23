@@ -15,7 +15,8 @@ test('a freshly opened PDF is fitted to the viewer without scrolling', async ({ 
     const v = viewer.getBoundingClientRect();
     const r = el.getBoundingClientRect();
     return {
-      scrollH: viewer.scrollHeight,
+      // El margen vertical (P-120) añade media altura del visor arriba y abajo a propósito.
+      scrollH: viewer.scrollHeight - 2 * Math.round(viewer.clientHeight / 2),
       clientH: viewer.clientHeight,
       // The work margin (P-109) makes the viewer scroll sideways on purpose; what matters is that
       // the PDF itself sits fully inside the visible area, centred.
