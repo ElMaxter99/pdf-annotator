@@ -1987,7 +1987,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     }
 
     const sanitized = this.prepareFieldForStorage(editState.field);
-    this.clipboard = { ...sanitized };
+    const { aiId: _aiId, ...copy } = sanitized;
+    this.clipboard = copy;
     return true;
   }
 

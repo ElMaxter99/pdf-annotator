@@ -149,6 +149,23 @@ test('moving a field written by the AI is undoable and redoable, step by step', 
   await expect(page.locator('.annotation')).toHaveCount(1);
 });
 
+test('copies of fields written by the AI are the user\'s own: discarding the proposal keeps them', async ({ page }) => {
+  await openBatchWithB(page);
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-ai').click();
+  await page.getByTestId('ai-consent-ok').click();
+  await expect(page.getByTestId('ai-apply')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('Control+a');
+  await page.keyboard.press('Control+d');
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS * 2);
+  await page.getByTestId('ai-more').click();
+  await page.getByTestId('ai-discard').click();
+  await page.getByTestId('ai-confirm-discard').click();
+  await expect(page.locator('.annotation')).toHaveCount(FIELDS);
+});
+
 test('without the helper the chip says so and the AI option explains how to start it', async ({ page }) => {
   await page.route('**/127.0.0.1:4310/**', (route) => route.abort());
   await openBatchWithB(page, null);
