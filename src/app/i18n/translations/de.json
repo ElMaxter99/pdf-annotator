@@ -644,6 +644,7 @@
       "sumMoved": "{{count}} verschoben",
       "sumRenamed": "{{count}} umbenannt",
       "sumRemoved": "{{count}} entfernt",
+      "removedBadge": "Aus B entfernt",
       "emptyB": "B ist leer. Setze die Vorlage von A ein und passe Änderungen an.",
       "noTemplate": "Für dieses PDF gibt es kein JSON von A: B beginnt leer.",
       "page": "S. {{page}}",

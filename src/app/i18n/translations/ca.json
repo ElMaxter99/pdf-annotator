@@ -644,6 +644,7 @@
       "sumMoved": "{{count}} moguts",
       "sumRenamed": "{{count}} reanomenats",
       "sumRemoved": "{{count}} eliminats",
+      "removedBadge": "Eliminat de B",
       "emptyB": "B és buida. Posa la plantilla d’A i ajusta el que hagi canviat.",
       "noTemplate": "Aquest PDF no té JSON d’A: B comença buida.",
       "page": "pàg. {{page}}",

@@ -98,9 +98,9 @@
           }
         </button>
         <span class="migration-badge migration-badge--{{ state.status }}">{{
-          'batch.status.' + state.status | t
+          (state.status === 'missing' && !pendingStates().length ? 'batch.panel.removedBadge' : 'batch.status.' + state.status) | t
         }}</span>
-        @if (state.status === 'missing') {
+        @if (state.status === 'missing' && pendingStates().length) {
           <span class="migration-row__actions">
             <button
               type="button"
@@ -119,7 +119,7 @@
               {{ 'batch.panel.dismiss' | t }}
             </button>
           </span>
-        } @else if (state.status === 'new' && missingNames(m).length) {
+        } @else if (state.status === 'new' && missingNames(m).length && pendingStates().length) {
           <select
             class="migration-row__link"
             (change)="onLink(state, $event)"

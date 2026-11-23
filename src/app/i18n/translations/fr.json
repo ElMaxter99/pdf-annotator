@@ -644,6 +644,7 @@
       "sumMoved": "{{count}} déplacés",
       "sumRenamed": "{{count}} renommés",
       "sumRemoved": "{{count}} retirés",
+      "removedBadge": "Retiré de B",
       "emptyB": "B est vide. Appliquez le modèle de A et ajustez ce qui a changé.",
       "noTemplate": "Ce PDF n’a pas de JSON pour A : B démarre vide.",
       "page": "p. {{page}}",
