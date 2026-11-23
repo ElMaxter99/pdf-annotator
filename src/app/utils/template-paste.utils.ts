@@ -18,15 +18,45 @@ export interface PasteResult {
   readonly error: { readonly line: number; readonly column: number } | null;
 }
 
-const MONGO_TYPES =
-  /\b(?:new\s+)?(?:ObjectId|ISODate|NumberLong|NumberInt|NumberDecimal|Timestamp|UUID|Date)\s*\(([^()]*)\)/g;
+const MONGO_TYPE_CALL =
+  /\b(?:new\s+)?(?:ObjectId|ISODate|NumberLong|NumberInt|NumberDecimal|Timestamp|UUID|Date)\s*\(([^()]*)\)/y;
+const UNDEFINED_WORD = /\bundefined\b/y;
 
-/** Mongo shell values that are not JSON are reduced to their inner literal (never evaluated). */
+/**
+ * Mongo shell values that are not JSON are reduced to their inner literal (never evaluated).
+ * Quoted strings are copied untouched, so a field called `data.undefined` keeps its name.
+ */
 function cleanMongo(text: string): string {
-  return text
-    .replace(MONGO_TYPES, (_match, inner: string) => inner.trim() || 'null')
-    .replace(/\bundefined\b/g, 'null')
-    .replace(/;\s*$/, '');
+  let out = '';
+  let i = 0;
+  while (i < text.length) {
+    const char = text[i];
+    if (char === '"' || char === "'") {
+      let j = i + 1;
+      while (j < text.length && text[j] !== char) {
+        j += text[j] === '\\' ? 2 : 1;
+      }
+      out += text.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    MONGO_TYPE_CALL.lastIndex = i;
+    const call = MONGO_TYPE_CALL.exec(text);
+    if (call) {
+      out += call[1].trim() || 'null';
+      i += call[0].length;
+      continue;
+    }
+    UNDEFINED_WORD.lastIndex = i;
+    if (UNDEFINED_WORD.test(text)) {
+      out += 'null';
+      i += 'undefined'.length;
+      continue;
+    }
+    out += char;
+    i++;
+  }
+  return out.replace(/;\s*$/, '');
 }
 
 function text(value: unknown): string | null {

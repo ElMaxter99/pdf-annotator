@@ -235,7 +235,7 @@
               <b>{{ 'batch.upd.progress' | t: { done: progress().done, total: progress().total } }}</b>
             </p>
             <div class="upd-list">
-              @for (row of plan(); track row.item.id) {
+              @for (row of runPlan(); track row.item.id) {
                 <div class="upd-row">
                   <span class="upd-name">{{ row.item.name }}</span>
                   <span class="upd-chip" [ngClass]="runState(row) === 'done' ? 'ok' : runState(row) === 'running' ? 'run' : runState(row) === 'error' ? 'bad' : ''">{{
@@ -256,7 +256,7 @@
               <div>
                 <b>{{ 'batch.upd.doneCount' | t: { count: doneCount() } }}</b>
                 <p class="upd-text">
-                  {{ 'batch.upd.doneText' | t: { added: totals().added, removed: totals().removed } }}
+                  {{ 'batch.upd.doneText' | t: { added: doneTotals().added, removed: doneTotals().removed } }}
                   @if (untouchedCount() > 0) { {{ 'batch.upd.untouched' | t: { count: untouchedCount() } }} }
                   @if (failedCount() > 0) { {{ 'batch.upd.failed' | t: { count: failedCount() } }} }
                 </p>

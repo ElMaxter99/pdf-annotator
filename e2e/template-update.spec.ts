@@ -57,12 +57,13 @@ test('«Actualizar plantillas» pega un fichero largo, enseña los cambios y se 
   await dialog.getByTestId('tpl-apply').click();
   await expect(dialog.getByTestId('tpl-done')).toBeVisible();
   await expect(dialog).toContainText('2 plantillas actualizadas');
+  await expect(dialog).toContainText('+11 campos nuevos');
   await dialog.getByTestId('tpl-done').click();
   await expect(dialog).toHaveCount(0);
 
-  await expect(page.getByTestId('bulk-undo')).toContainText('2 plantillas actualizadas');
-  await page.getByTestId('bulk-undo-btn').click();
-  await expect(page.getByTestId('bulk-undo')).toHaveCount(0);
+  await expect(page.getByTestId('templates-undo')).toContainText('2 plantillas actualizadas');
+  await page.getByTestId('templates-undo-btn').click();
+  await expect(page.getByTestId('templates-undo')).toHaveCount(0);
 
   // After undoing, a second run finds the same two changes again.
   await page.getByTestId('update-templates').click();

@@ -224,7 +224,7 @@ export class BatchPageComponent implements OnInit {
   );
   readonly plan = computed(() => planBulk(this.selectedItems(), (item) => this.stateOf(item) === 'noTemplate'));
   readonly dialog = signal<'ready' | 'remove' | null>(null);
-  readonly undoNotice = signal<{ kind: 'removed' | 'ready' | 'tables' | 'templates'; count: number } | null>(null);
+  readonly undoNotice = signal<{ kind: 'removed' | 'ready' | 'tables'; count: number } | null>(null);
   private undoFn: (() => void) | null = null;
   private undoTimer: number | null = null;
 
@@ -413,23 +413,44 @@ export class BatchPageComponent implements OnInit {
     this.updateDialog?.open();
   }
 
-  /** Replaced templates (P-136): «Deshacer todo» stays while the panel is open. */
+  /**
+   * Replaced templates (P-136). Their «Deshacer todo» is kept apart from the transient bulk undo and
+   * stays while the panel is open; a later update keeps the templates as they were before the first.
+   */
+  readonly templatesUndo = signal<number>(0);
+  private readonly templatesOriginal = new Map<string, PageAnnotations[]>();
+
   onTemplatesUpdated(result: TemplateUpdateResult | null): void {
-    if (result) {
-      this.offerUndo('templates', result.count, result.undo, true);
+    if (!result) {
+      return;
     }
+    for (const entry of result.previous) {
+      if (!this.templatesOriginal.has(entry.id)) {
+        this.templatesOriginal.set(entry.id, entry.pages);
+      }
+    }
+    this.templatesUndo.set(this.templatesOriginal.size);
+  }
+
+  undoTemplates(): void {
+    this.templatesOriginal.forEach((pages, id) => {
+      if (this.store.find(id)) {
+        this.store.setTemplate(id, pages);
+      }
+    });
+    this.templatesOriginal.clear();
+    this.templatesUndo.set(0);
   }
 
   private offerUndo(
-    kind: 'removed' | 'ready' | 'tables' | 'templates',
+    kind: 'removed' | 'ready' | 'tables',
     count: number,
     restore: () => void,
-    persistent = false,
   ): void {
     this.dropUndo();
     this.undoFn = restore;
     this.undoNotice.set({ kind, count });
-    if (!persistent && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       this.undoTimer = window.setTimeout(() => this.dropUndo(), 10000);
     }
   }

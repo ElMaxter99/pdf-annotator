@@ -50,7 +50,8 @@ export interface UpdateRow {
 
 export interface TemplateUpdateResult {
   readonly count: number;
-  readonly undo: () => void;
+  /** Templates as they were before, one per PDF. */
+  readonly previous: ReadonlyArray<{ readonly id: string; readonly pages: PageAnnotations[] }>;
 }
 
 /** «Actualizar plantillas» (P-136 a P-138): reemplaza la plantilla A de varios PDF del lote desde JSON. */
@@ -87,6 +88,9 @@ export class TemplateUpdateDialogComponent {
   private readonly skipped = signal<Set<string>>(new Set());
   readonly runStates = signal<Map<string, RunState>>(new Map());
   readonly progress = signal({ done: 0, total: 0 });
+  /** Rows being applied (a snapshot: the live plan shrinks as each row becomes «same»). */
+  readonly runPlan = signal<UpdateRow[]>([]);
+  readonly doneTotals = signal({ added: 0, removed: 0 });
   private cancelled = false;
   private undoList: Array<{ id: string; pages: PageAnnotations[] }> = [];
 
@@ -193,11 +197,7 @@ export class TemplateUpdateDialogComponent {
   }
 
   private result(): TemplateUpdateResult {
-    const list = this.undoList;
-    return {
-      count: list.length,
-      undo: () => list.forEach((entry) => this.store.setTemplate(entry.id, entry.pages)),
-    };
+    return { count: this.undoList.length, previous: [...this.undoList] };
   }
 
   // ---- input ------------------------------------------------------------------------------
@@ -329,10 +329,12 @@ export class TemplateUpdateDialogComponent {
   }
 
   async apply(): Promise<void> {
-    const plan = this.plan();
+    const plan = [...this.plan()];
     if (!plan.length) {
       return;
     }
+    this.runPlan.set(plan);
+    this.doneTotals.set({ added: 0, removed: 0 });
     if (this.backup()) {
       this.downloadBackup(plan);
     }
@@ -353,6 +355,11 @@ export class TemplateUpdateDialogComponent {
         const previous = this.store.find(row.item.id)?.aPages ?? row.item.aPages;
         this.store.setTemplate(row.item.id, row.pages as PageAnnotations[]);
         this.undoList.push({ id: row.item.id, pages: previous });
+        const t = this.doneTotals();
+        this.doneTotals.set({
+          added: t.added + (row.kind === 'new' ? row.diff!.after : row.diff!.added),
+          removed: t.removed + (row.kind === 'new' ? 0 : row.diff!.removed),
+        });
         this.setRun(row.item.id, 'done');
       } catch {
         this.setRun(row.item.id, 'error');

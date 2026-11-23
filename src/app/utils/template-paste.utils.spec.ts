@@ -51,4 +51,21 @@ describe('matchTemplate', () => {
   it('does not reuse a template already taken', () => {
     expect(matchTemplate('otro.pdf', docs, new Set([docs[1]]))).toBeNull();
   });
+
+  it('keeps the word «undefined» and Mongo-like text inside quoted strings', () => {
+    const raw =
+      '{"pdfName":"a.pdf","pages":[{"num":1,"fields":[{"mapField":"data.undefined","value":"ObjectId(x) undefined"}]}]}';
+    const { templates, error } = parsePastedTemplates(raw);
+    expect(error).toBeNull();
+    const field = (templates[0].data as any).pages[0].fields[0];
+    expect(field.mapField).toBe('data.undefined');
+    expect(field.value).toBe('ObjectId(x) undefined');
+  });
+
+  it('still reduces Mongo values outside strings', () => {
+    const raw = '{"_id": ObjectId("65a"), "pdfName": "b.pdf", "x": undefined, "pages": []}';
+    const { templates } = parsePastedTemplates(raw);
+    expect((templates[0].data as any)._id).toBe('65a');
+    expect((templates[0].data as any).x).toBeNull();
+  });
 });

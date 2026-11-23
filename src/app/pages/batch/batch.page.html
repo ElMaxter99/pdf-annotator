@@ -745,13 +745,21 @@
       }
       <p class="batch-note">{{ 'batch.panelHint' | t }}</p>
 
-      @if (selectionCount() > 0 || undoNotice()) {
+      @if (selectionCount() > 0 || undoNotice() || templatesUndo() > 0) {
         <div class="batch-dock">
+        @if (templatesUndo() > 0) {
+          <div class="batch-undo" role="status" data-testid="templates-undo">
+            <span>{{ 'batch.upd.undoNotice' | t: { count: templatesUndo() } }}</span>
+            <button type="button" class="btn btn--ghost" (click)="undoTemplates()" data-testid="templates-undo-btn">
+              ↶ {{ 'batch.upd.undoAll' | t }}
+            </button>
+          </div>
+        }
         @if (undoNotice(); as notice) {
           <div class="batch-undo" role="status" data-testid="bulk-undo">
-            <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : notice.kind === 'tables' ? 'batch.bulk.tablesDone' : notice.kind === 'templates' ? 'batch.upd.undoNotice' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
+            <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : notice.kind === 'tables' ? 'batch.bulk.tablesDone' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
             <button type="button" class="btn btn--ghost" (click)="undo()" data-testid="bulk-undo-btn">
-              ↶ {{ (notice.kind === 'templates' ? 'batch.upd.undoAll' : 'batch.bulk.undo') | t }}
+              ↶ {{ 'batch.bulk.undo' | t }}
             </button>
           </div>
         }
