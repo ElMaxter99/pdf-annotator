@@ -1260,7 +1260,8 @@
       "backToPanel": "Torna al tauler",
       "undoNotice": "{{count}} plantilles actualitzades.",
       "undoAll": "Desfés-ho tot",
-      "backupDone": "Còpia descarregada: {{count}} plantilles."
+      "backupDone": "Còpia descarregada: {{count}} plantilles.",
+      "noPagesWhy": "El document té {{pages}} pàgines, però cap amb camps vàlids ({{skippedPages}} pàgines i {{skippedFields}} camps descartats). Cada camp necessita x i y numèriques i un mapField."
     }
   },
   "preview": {

@@ -1260,7 +1260,8 @@
       "backToPanel": "Volver al panel",
       "undoNotice": "{{count}} plantillas actualizadas.",
       "undoAll": "Deshacer todo",
-      "backupDone": "Copia descargada: {{count}} plantillas."
+      "backupDone": "Copia descargada: {{count}} plantillas.",
+      "noPagesWhy": "El documento tiene {{pages}} páginas, pero ninguna con campos válidos ({{skippedPages}} páginas y {{skippedFields}} campos descartados). Cada campo necesita x e y numéricas y un mapField."
     }
   },
   "preview": {

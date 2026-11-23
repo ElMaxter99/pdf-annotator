@@ -14,7 +14,7 @@ import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { TranslationService } from '../../../i18n/translation.service';
 import type { PageAnnotations } from '../../../models/annotation.model';
 import type { BatchItem } from '../../../models/batch.model';
-import { AnnotationImportService } from '../../../services/annotation-import.service';
+import { AnnotationImportService, emptyImportReport } from '../../../services/annotation-import.service';
 import { BatchStoreService } from '../../../services/batch-store.service';
 import { ToastService } from '../../../services/toast.service';
 import { downloadBlob } from '../../../utils/download.utils';
@@ -46,6 +46,8 @@ export interface UpdateRow {
   readonly diff: TemplateDiff | null;
   readonly kind: RowKind;
   readonly ambiguous: boolean;
+  /** Why a document without usable pages was discarded. */
+  readonly why?: { pages: number; skippedPages: number; skippedFields: number };
 }
 
 export interface TemplateUpdateResult {
@@ -112,9 +114,16 @@ export class TemplateUpdateDialogComponent {
         rows.push({ item, doc: null, pages: null, diff: null, kind: 'none', ambiguous: false });
         continue;
       }
-      const pages = this.importer.normalizeImportedCoordinates(doc.data, (field) => field);
+      const report = emptyImportReport();
+      const pages = this.importer.normalizeImportedCoordinates(doc.data, (field) => field, report);
       if (!pages || countFields(pages) === 0) {
-        rows.push({ item, doc, pages: null, diff: null, kind: 'noPages', ambiguous });
+        const raw = (doc.data as { pages?: unknown } | null)?.pages;
+        const why = {
+          pages: Array.isArray(raw) ? raw.length : 0,
+          skippedPages: report.skippedPages,
+          skippedFields: report.skippedFields,
+        };
+        rows.push({ item, doc, pages: null, diff: null, kind: 'noPages', ambiguous, why });
         continue;
       }
       const diff = diffTemplates(item.aPages, pages);

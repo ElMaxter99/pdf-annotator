@@ -1260,7 +1260,8 @@
       "backToPanel": "Torna al pannello",
       "undoNotice": "{{count}} modelli aggiornati.",
       "undoAll": "Annulla tutto",
-      "backupDone": "Copia scaricata: {{count}} modelli."
+      "backupDone": "Copia scaricata: {{count}} modelli.",
+      "noPagesWhy": "Il documento ha {{pages}} pagine, ma nessuna con campi validi ({{skippedPages}} pagine e {{skippedFields}} campi scartati). Ogni campo richiede x e y numeriche e un mapField."
     }
   },
   "preview": {

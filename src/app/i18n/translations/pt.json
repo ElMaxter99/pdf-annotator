@@ -1260,7 +1260,8 @@
       "backToPanel": "Voltar ao painel",
       "undoNotice": "{{count}} modelos atualizados.",
       "undoAll": "Desfazer tudo",
-      "backupDone": "Cópia descarregada: {{count}} modelos."
+      "backupDone": "Cópia descarregada: {{count}} modelos.",
+      "noPagesWhy": "O documento tem {{pages}} páginas, mas nenhuma com campos válidos ({{skippedPages}} páginas e {{skippedFields}} campos descartados). Cada campo precisa de x e y numéricos e de um mapField."
     }
   },
   "preview": {

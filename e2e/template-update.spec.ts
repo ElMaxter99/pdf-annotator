@@ -96,3 +96,19 @@ test('«Actualizar plantillas» señala un JSON roto con su línea', async ({ pa
   await dialog.getByTestId('tpl-match').click();
   await expect(dialog).toContainText('JSON no válido: revisa la línea');
 });
+
+test('«Actualizar plantillas» explica por qué un documento no sirve (sin campos válidos)', async ({
+  page,
+}) => {
+  await openPanel(page);
+  await page.getByTestId('update-templates').click();
+  const dialog = page.getByTestId('tpl-update');
+  await dialog.getByTestId('tpl-tab-paste').click();
+  await dialog
+    .getByTestId('tpl-paste')
+    .fill(JSON.stringify({ pdfName: 'factura-0331.pdf', pages: [{ num: 1, fields: [{ x: 'abc', y: 2, mapField: 'a' }] }] }));
+  await dialog.getByTestId('tpl-match').click();
+  await expect(dialog.getByTestId('tpl-why')).toContainText('1 páginas');
+  await expect(dialog.getByTestId('tpl-why')).toContainText('1 campos descartados');
+  await expect(dialog.getByTestId('tpl-review')).toBeDisabled();
+});
