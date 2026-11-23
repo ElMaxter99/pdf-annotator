@@ -193,6 +193,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   viewerHomeTop = 0;
   reHoming = false;
   readonly zoomMenuOpen = signal(false);
+  /** Formato con el que se copia el JSON (solo al copiar; P-130 a P-132) y si su ventana está abierta. */
+  readonly jsonCopyFormat = signal(this.storedJsonCopyFormat());
+  readonly jsonCopyOpen = signal(false);
   /** The wheel past the edge of the sheet changes page (P-63); on by default, switched off in ⋯. */
   readonly wheelPaging = signal(this.storedWheelPaging());
   /** Edge indicator while pushing the wheel at the top or bottom of the sheet. */
