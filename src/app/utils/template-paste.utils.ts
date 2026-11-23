@@ -116,3 +116,19 @@ export function matchTemplate(
   }
   return null;
 }
+
+/** How many templates share the winning key for a PDF (more than one = ambiguous; the last wins). */
+export function countMatches(
+  pdfFileName: string,
+  templates: readonly PastedTemplate[],
+  taken: ReadonlySet<PastedTemplate>,
+): number {
+  const key = pairingKey(pdfFileName);
+  for (const field of ORDER) {
+    const hits = templates.filter((t) => !taken.has(t) && keyOf(t, field) === key).length;
+    if (hits > 0) {
+      return hits;
+    }
+  }
+  return 0;
+}

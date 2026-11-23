@@ -1,0 +1,275 @@
+@if (phase(); as phase) {
+  @if (phase !== 'closed') {
+    <div class="upd-backdrop">
+      <div
+        appFocusTrap
+        class="upd"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upd-title"
+        data-testid="tpl-update"
+      >
+        @switch (phase) {
+          @case ('edit') {
+            <h2 id="upd-title">{{ 'batch.upd.title' | t }}</h2>
+            <p class="upd-text">{{ 'batch.upd.intro' | t }}</p>
+            <div class="upd-tabs" role="tablist" [attr.aria-label]="'batch.step2.tabsLabel' | t">
+              <button
+                type="button"
+                role="tab"
+                [attr.aria-selected]="tab() === 'files'"
+                [class.on]="tab() === 'files'"
+                (click)="tab.set('files')"
+              >
+                {{ 'batch.step2.tabFiles' | t }}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                [attr.aria-selected]="tab() === 'paste'"
+                [class.on]="tab() === 'paste'"
+                (click)="tab.set('paste')"
+                data-testid="tpl-tab-paste"
+              >
+                {{ 'batch.step2.tabPaste' | t }}
+              </button>
+            </div>
+            @if (tab() === 'files') {
+              <div
+                class="upd-drop"
+                [class.upd-drop--over]="dragActive()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+              >
+                <input
+                  #fileInput
+                  type="file"
+                  accept="application/json,.json"
+                  multiple
+                  hidden
+                  (change)="onFilesSelected($event)"
+                  data-testid="tpl-input"
+                />
+                <div>
+                  <strong>{{ 'batch.step2.drop' | t }}</strong>
+                  <span>{{ 'batch.upd.dropHint' | t }}</span>
+                </div>
+                <button type="button" class="btn" (click)="fileInput.click()">
+                  {{ 'batch.step1.choose' | t }}
+                </button>
+              </div>
+              @if (fileError(); as name) {
+                <p class="upd-error" role="alert">{{ 'batch.upd.fileError' | t: { name: name } }}</p>
+              }
+            } @else {
+              <textarea
+                class="upd-paste"
+                spellcheck="false"
+                [ngModel]="pasteText()"
+                (ngModelChange)="pasteText.set($event)"
+                [placeholder]="'batch.upd.pastePlaceholder' | t"
+                [attr.aria-label]="'batch.step2.tabPaste' | t"
+                data-testid="tpl-paste"
+              ></textarea>
+              <div class="upd-pastebar">
+                @if (pasteError(); as err) {
+                  <span class="upd-chip bad" role="alert">{{ 'batch.step2.pasteError' | t: { line: err.line } }}</span>
+                } @else if (pasteTooBig()) {
+                  <span class="upd-chip bad" role="alert">{{ 'batch.upd.pasteTooBig' | t }}</span>
+                } @else if (hasInput()) {
+                  <span class="upd-chip ok" data-testid="tpl-found">{{
+                    'batch.step2.pasteFound' | t: { count: docs().length }
+                  }}</span>
+                  @if (unused().length > 0) {
+                    <span class="upd-chip warn">{{ 'batch.step2.pasteUnused' | t: { count: unused().length } }}</span>
+                  }
+                } @else {
+                  <small class="upd-hint">{{ 'batch.step2.pasteHint' | t }}</small>
+                }
+                <span class="upd-spacer"></span>
+                <button type="button" class="btn btn--ghost" (click)="clearPasted()">
+                  {{ 'batch.step2.pasteClear' | t }}
+                </button>
+                <button
+                  type="button"
+                  class="btn"
+                  [disabled]="!pasteText().trim()"
+                  (click)="matchPasted()"
+                  data-testid="tpl-match"
+                >
+                  {{ 'batch.step2.pasteMatch' | t }}
+                </button>
+              </div>
+            }
+            @if (allSame()) {
+              <div class="upd-done" role="status">
+                <span class="upd-tick" aria-hidden="true">✓</span>
+                <div>
+                  <b>{{ 'batch.upd.allSame' | t }}</b>
+                  <p class="upd-text">{{ 'batch.upd.allSameText' | t: { count: docs().length } }}</p>
+                </div>
+              </div>
+            }
+            <div class="upd-list" data-testid="tpl-rows">
+              @for (row of rows(); track row.item.id) {
+                <div class="upd-row upd-row--on" [class.upd-row--off]="isSkipped(row) || row.kind === 'same' || (row.kind === 'none' && unused().length === 0)">
+                  <button type="button" class="upd-name" (click)="toggleExpanded(row)" [attr.aria-expanded]="expanded() === row.item.id">
+                    <span>{{ row.item.name }}</span>
+                    <small>{{
+                      row.doc ? ('batch.upd.docOf' | t: { label: row.doc.label }) : ('batch.upd.noDoc' | t)
+                    }}</small>
+                  </button>
+                  @if (row.diff) {
+                    <span class="upd-diff">
+                      {{ 'batch.upd.fields' | t: { before: row.diff.before, after: row.diff.after } }}
+                      @if (row.diff.added > 0) { · <b>{{ 'batch.upd.added' | t: { count: row.diff.added } }}</b> }
+                      @if (row.diff.removed > 0) { · <s>{{ 'batch.upd.removed' | t: { count: row.diff.removed } }}</s> }
+                      @if (row.diff.changed > 0) { · {{ 'batch.upd.changed' | t: { count: row.diff.changed } }} }
+                    </span>
+                  }
+                  @if (row.kind === 'none' && unused().length > 0) {
+                    <select
+                      class="upd-assign"
+                      [attr.aria-label]="'batch.step2.assign' | t: { name: row.item.name }"
+                      (change)="assign(row, $any($event.target).value)"
+                      data-testid="tpl-assign"
+                    >
+                      <option value="" selected>{{ 'batch.step2.assignPlaceholder' | t }}</option>
+                      @for (doc of unused(); track $index) {
+                        <option [value]="$index">{{ doc.label }}</option>
+                      }
+                    </select>
+                  }
+                  @if (row.ambiguous) {
+                    <span class="upd-chip warn">{{ 'batch.upd.ambiguous' | t }}</span>
+                  }
+                  <span class="upd-chip" [ngClass]="chipClass(row)" [attr.data-kind]="row.kind">{{
+                    isSkipped(row) ? ('batch.upd.skipped' | t) : ('batch.upd.kind.' + row.kind | t)
+                  }}</span>
+                  @if (row.kind === 'update' || row.kind === 'new') {
+                    <button
+                      type="button"
+                      class="btn btn--ghost"
+                      (click)="toggleSkip(row)"
+                      [attr.aria-label]="(isSkipped(row) ? 'batch.upd.include' : 'batch.upd.exclude') | t: { name: row.item.name }"
+                    >
+                      {{ isSkipped(row) ? '↺' : '✕' }}
+                    </button>
+                  }
+                </div>
+                @if (expanded() === row.item.id && row.diff) {
+                  <div class="upd-detail">
+                    @for (page of row.diff.pages; track page.num) {
+                      <span>{{
+                        'batch.upd.page' | t: { num: page.num, before: page.before, after: page.after }
+                      }}</span>
+                    }
+                  </div>
+                }
+              }
+            </div>
+            <div class="upd-tiles" data-testid="tpl-summary">
+              <div class="upd-tile"><strong>{{ counts().total }}</strong>{{ 'batch.upd.tilePdfs' | t }}</div>
+              <div class="upd-tile"><strong>{{ counts().update }}</strong>{{ 'batch.upd.tileUpdate' | t }}</div>
+              <div class="upd-tile"><strong>{{ counts().same }}</strong>{{ 'batch.upd.tileSame' | t }}</div>
+              <div class="upd-tile"><strong>{{ counts().none }}</strong>{{ 'batch.upd.tileNone' | t }}</div>
+            </div>
+            <div class="upd-actions">
+              <span class="upd-hint">{{ 'batch.upd.onlyA' | t }}</span>
+              <button type="button" class="btn btn--ghost" (click)="close()">{{ 'batch.upd.back' | t }}</button>
+              <button
+                type="button"
+                class="btn btn--primary"
+                [disabled]="plan().length === 0"
+                (click)="toConfirm()"
+                data-testid="tpl-review"
+              >
+                {{ 'batch.upd.applyN' | t: { count: plan().length } }}
+              </button>
+            </div>
+          }
+          @case ('confirm') {
+            <h2 id="upd-title">{{ 'batch.upd.confirmTitle' | t: { count: plan().length } }}</h2>
+            <p class="upd-text">
+              {{ 'batch.upd.confirmText' | t: { count: plan().length, added: totals().added, removed: totals().removed } }}
+            </p>
+            <div class="upd-list">
+              @if (totals().withB > 0) {
+                <div class="upd-row upd-row--on">
+                  <span class="upd-name">{{ 'batch.upd.withB' | t }}</span>
+                  <span class="upd-chip warn">{{ 'batch.tables.pdfCount' | t: { count: totals().withB } }}</span>
+                </div>
+              }
+              @if (totals().withMap > 0) {
+                <div class="upd-row">
+                  <span class="upd-name">{{ 'batch.upd.keepMap' | t }}</span>
+                  <span class="upd-chip">{{ 'batch.tables.pdfCount' | t: { count: totals().withMap } }}</span>
+                </div>
+              }
+            </div>
+            <label class="upd-check">
+              <input type="checkbox" [ngModel]="backup()" (ngModelChange)="backup.set($event)" data-testid="tpl-backup" />
+              {{ 'batch.upd.backup' | t }}
+            </label>
+            <div class="upd-actions">
+              <button type="button" class="btn btn--ghost" (click)="backToEdit()">{{ 'batch.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="apply()" data-testid="tpl-apply">
+                {{ 'batch.upd.go' | t: { count: plan().length } }}
+              </button>
+            </div>
+          }
+          @case ('running') {
+            <h2 id="upd-title">{{ 'batch.upd.running' | t }}</h2>
+            <div
+              class="upd-bar"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-valuenow]="progress().total ? (progress().done / progress().total) * 100 : 0"
+              [attr.aria-label]="'batch.upd.running' | t"
+            >
+              <i [style.width.%]="progress().total ? (progress().done / progress().total) * 100 : 0"></i>
+            </div>
+            <p class="upd-text" role="status" aria-live="polite">
+              <b>{{ 'batch.upd.progress' | t: { done: progress().done, total: progress().total } }}</b>
+            </p>
+            <div class="upd-list">
+              @for (row of plan(); track row.item.id) {
+                <div class="upd-row">
+                  <span class="upd-name">{{ row.item.name }}</span>
+                  <span class="upd-chip" [ngClass]="runState(row) === 'done' ? 'ok' : runState(row) === 'running' ? 'run' : runState(row) === 'error' ? 'bad' : ''">{{
+                    'batch.upd.run.' + runState(row) | t
+                  }}</span>
+                </div>
+              }
+            </div>
+            <div class="upd-actions">
+              <span class="upd-hint">{{ 'batch.upd.keepIfCancel' | t }}</span>
+              <button type="button" class="btn btn--ghost" (click)="cancelRun()">{{ 'batch.cancel' | t }}</button>
+            </div>
+          }
+          @case ('done') {
+            <h2 id="upd-title">{{ 'batch.upd.doneTitle' | t }}</h2>
+            <div class="upd-done" role="status">
+              <span class="upd-tick" aria-hidden="true">✓</span>
+              <div>
+                <b>{{ 'batch.upd.doneCount' | t: { count: doneCount() } }}</b>
+                <p class="upd-text">
+                  {{ 'batch.upd.doneText' | t: { added: totals().added, removed: totals().removed } }}
+                  @if (untouchedCount() > 0) { {{ 'batch.upd.untouched' | t: { count: untouchedCount() } }} }
+                  @if (failedCount() > 0) { {{ 'batch.upd.failed' | t: { count: failedCount() } }} }
+                </p>
+              </div>
+            </div>
+            <div class="upd-actions">
+              <button type="button" class="btn btn--primary" (click)="close()" data-testid="tpl-done">
+                {{ 'batch.upd.backToPanel' | t }}
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+}

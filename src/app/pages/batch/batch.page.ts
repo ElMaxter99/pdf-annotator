@@ -1,6 +1,6 @@
 import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
@@ -10,6 +10,10 @@ import { AiDraftBannerComponent } from './ai-batch/ai-draft-banner.component';
 import { AiBatchPanelComponent } from './ai-batch/ai-batch-panel.component';
 import { AiBatchService } from '../../services/ai-batch.service';
 import { PageMapBatchDialogComponent } from './page-map-batch/page-map-batch-dialog.component';
+import {
+  TemplateUpdateDialogComponent,
+  type TemplateUpdateResult,
+} from './template-update/template-update-dialog.component';
 import { PageMapBatchService } from '../../services/page-map-batch.service';
 import { AiHelperService } from '../../services/ai-helper.service';
 import { InfoTipComponent } from '../../components/info-tip/info-tip.component';
@@ -94,6 +98,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     AiDraftBannerComponent,
     FocusTrapDirective,
     PageMapBatchDialogComponent,
+    TemplateUpdateDialogComponent,
   ],
   templateUrl: './batch.page.html',
   styleUrls: ['./batch.page.scss'],
@@ -219,7 +224,7 @@ export class BatchPageComponent implements OnInit {
   );
   readonly plan = computed(() => planBulk(this.selectedItems(), (item) => this.stateOf(item) === 'noTemplate'));
   readonly dialog = signal<'ready' | 'remove' | null>(null);
-  readonly undoNotice = signal<{ kind: 'removed' | 'ready' | 'tables'; count: number } | null>(null);
+  readonly undoNotice = signal<{ kind: 'removed' | 'ready' | 'tables' | 'templates'; count: number } | null>(null);
   private undoFn: (() => void) | null = null;
   private undoTimer: number | null = null;
 
@@ -402,11 +407,29 @@ export class BatchPageComponent implements OnInit {
     this.offerUndo('removed', removed.length, () => this.store.reinsert(removed));
   }
 
-  private offerUndo(kind: 'removed' | 'ready' | 'tables', count: number, restore: () => void): void {
+  @ViewChild(TemplateUpdateDialogComponent) private updateDialog?: TemplateUpdateDialogComponent;
+
+  openTemplateUpdate(): void {
+    this.updateDialog?.open();
+  }
+
+  /** Replaced templates (P-136): «Deshacer todo» stays while the panel is open. */
+  onTemplatesUpdated(result: TemplateUpdateResult | null): void {
+    if (result) {
+      this.offerUndo('templates', result.count, result.undo, true);
+    }
+  }
+
+  private offerUndo(
+    kind: 'removed' | 'ready' | 'tables' | 'templates',
+    count: number,
+    restore: () => void,
+    persistent = false,
+  ): void {
     this.dropUndo();
     this.undoFn = restore;
     this.undoNotice.set({ kind, count });
-    if (typeof window !== 'undefined') {
+    if (!persistent && typeof window !== 'undefined') {
       this.undoTimer = window.setTimeout(() => this.dropUndo(), 10000);
     }
   }
