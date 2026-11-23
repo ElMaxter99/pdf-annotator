@@ -1551,7 +1551,11 @@
         "copilotWarn": "Copilot berechnet KI-Credits nach Tokens (Eingabe, Ausgabe und Cache) und Modell. Diese App kann sie in diesem Modus nicht messen: Prüfe deinen Verbrauch vorher und nachher auf GitHub.",
         "credits": "KI-Credits",
         "creditsNote": "Von Copilot selbst gemessen (≈). Sie werden von Ihren GitHub-KI-Credits abgezogen; die genaue Summe steht auf Ihrer Copilot-Nutzungsseite.",
-        "creditsLimits": "Copilot zählt KI-Credits nach Tokens (Eingabe, Ausgabe und Cache) und Modell; ein größeres Modell verbraucht sie schneller."
+        "creditsLimits": "Copilot zählt KI-Credits nach Tokens (Eingabe, Ausgabe und Cache) und Modell; ein größeres Modell verbraucht sie schneller.",
+        "creditsUnit": "KI-Credits",
+        "requestsSent": "gesendete Anfragen",
+        "tokensReported": "Tokens (von Copilot gemeldet)",
+        "copilotNoCredits": "Copilot hat für diesen Durchlauf keine Credits gemeldet. Wir zeigen keine geschätzten Werte: Prüfe deinen Verbrauch vor und nach dem Lauf bei GitHub."
       },
       "sent": {
         "title": "Was gesendet wurde",

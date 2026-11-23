@@ -1,4 +1,5 @@
 import {
+  sumAiCredits,
   AiRow,
   sanitizeDetails,
   usageBilled,
@@ -207,5 +208,13 @@ describe('usageBilled · sin los tokens leídos de caché', () => {
   it('cuenta entrada, salida y escritura en caché, no la lectura', () => {
     expect(usageBilled({ input: 100, output: 50, cacheRead: 600000, cacheWrite: 2000 })).toBe(2150);
     expect(usageBilled(null)).toBe(0);
+  });
+});
+
+describe('sumAiCredits · créditos de Copilot', () => {
+  it('suma los que se informan y devuelve null si ninguno', () => {
+    expect(sumAiCredits([{ aiCredits: 3.1 }, { aiCredits: null }, { aiCredits: 3.66 }])).toBeCloseTo(6.76);
+    expect(sumAiCredits([{ aiCredits: null }])).toBeNull();
+    expect(sumAiCredits([])).toBeNull();
   });
 });

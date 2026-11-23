@@ -5,6 +5,7 @@ import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { ToastService } from '../../../../services/toast.service';
 import {
   estimateTokens,
+  sumAiCredits,
   sumUsage,
   usageTotal,
   type AiUsage,
@@ -111,8 +112,17 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
 
   /** AI credits that Copilot reports (sum of attempts), or null. */
   aiCredits(): number | null {
-    const v = (this.vm.ai()?.details?.attempts ?? []).map((a) => a.aiCredits).filter((c): c is number => c !== null);
-    return v.length ? v.reduce((a, b) => a + b, 0) : null;
+    return sumAiCredits(this.vm.ai()?.details?.attempts ?? []);
+  }
+
+  /** Copilot bills in AI credits: they are the headline, tokens are secondary and never estimated. */
+  isCopilot(): boolean {
+    return this.vm.ai()?.provider === 'copilot';
+  }
+
+  /** Credits as the batch shows them (two decimals, locale aware). */
+  creditsText(): string {
+    return `≈ ${(this.aiCredits() ?? 0).toLocaleString(this.i18n.language(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
   loading(): boolean {
@@ -319,7 +329,12 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
       lines.push(`error: ${s.error.code}`);
     }
     const u = this.usage();
-    if (this.measured() && u) {
+    if (this.isCopilot() && this.aiCredits() !== null) {
+      lines.push(`${this.t('ai.details.usage.credits')}: ${this.aiCredits()!.toFixed(2)}`);
+      if (u) {
+        lines.push(`tokens: ${u.input} + ${u.output}`);
+      }
+    } else if (this.measured() && u) {
       lines.push(`tokens: ${this.total()} (in ${u.input}, out ${u.output}, cache read ${u.cacheRead}, cache write ${u.cacheWrite})`);
       const credits = this.aiCredits();
       if (credits !== null) {
@@ -330,7 +345,11 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
         lines.push(`${this.t('ai.details.usage.cost')}: ${cost.toFixed(4)} USD`);
       }
     } else {
-      lines.push(`${this.t('ai.details.usage.requests')}: ${this.requests()} · ~${this.estimate()} tokens (${this.t('ai.details.usage.estimateBadge')})`);
+      lines.push(
+        this.isCopilot()
+          ? `${this.t('ai.details.usage.requests')}: ${this.requests()}`
+          : `${this.t('ai.details.usage.requests')}: ${this.requests()} · ~${this.estimate()} tokens (${this.t('ai.details.usage.estimateBadge')})`,
+      );
     }
     const diag = this.diagnosis();
     if (diag) {

@@ -70,7 +70,26 @@
         @if (tab() === 'summary' || tab() === 'usage') {
           <div class="ai-details__side">
             <section class="ai-details__card" data-testid="ai-details-usage">
-              @if (measured()) {
+              @if (isCopilot()) {
+                <h3>{{ (loading() ? 'ai.details.usage.soFar' : 'ai.details.usage.title') | t }} @if (aiCredits() !== null) { <span class="ai-details__badge ai-details__badge--ok">{{ 'ai.details.usage.measured' | t: { provider: providerName() } }}</span> }</h3>
+                @if (aiCredits() !== null) {
+                  <div class="ai-details__big" data-testid="ai-details-credits">{{ creditsText() }} <small>{{ 'ai.details.usage.creditsUnit' | t }}</small></div>
+                } @else {
+                  <div class="ai-details__big">{{ requests() }} <small>{{ 'ai.details.usage.requestsSent' | t }}</small></div>
+                }
+                <dl class="ai-details__kv">
+                  @if (aiCredits() !== null) {
+                    <div><dt>{{ 'ai.details.usage.requests' | t }}</dt><dd>{{ requests() }}</dd></div>
+                  }
+                  @if (usage(); as u) {
+                    <div><dt>{{ 'ai.details.usage.tokensReported' | t }}</dt><dd>{{ num(u.input) }} + {{ num(u.output) }}</dd></div>
+                  }
+                  @if (aiCredits() === null) {
+                    <div><dt>{{ 'ai.details.usage.sentSize' | t }}</dt><dd>{{ kb(sentBytes()) }}</dd></div>
+                  }
+                </dl>
+                <p class="ai-details__cap">{{ (aiCredits() !== null ? 'ai.details.usage.creditsNote' : 'ai.details.usage.copilotNoCredits') | t }}</p>
+              } @else if (measured()) {
                 <h3>{{ (loading() ? 'ai.details.usage.soFar' : 'ai.details.usage.title') | t }} <span class="ai-details__badge ai-details__badge--ok">{{ 'ai.details.usage.measured' | t: { provider: providerName() } }}</span></h3>
                 @if (usage(); as u) {
                   <div class="ai-details__big">{{ num(total()) }} <small>{{ 'ai.details.usage.tokens' | t }}</small></div>
@@ -106,10 +125,10 @@
                 </dl>
               }
             </section>
-            @if (measured()) {
-              <div class="ai-details__note" role="note"><span aria-hidden="true">ⓘ</span><span>{{ (s.provider === 'copilot' ? 'ai.details.usage.creditsLimits' : 'ai.details.usage.limits') | t }}</span></div>
-            } @else if (s.provider === 'copilot') {
-              <div class="ai-details__note ai-details__note--warn" role="note"><span aria-hidden="true">⚠</span><span>{{ 'ai.details.usage.copilotWarn' | t }}</span></div>
+            @if (isCopilot()) {
+              <div class="ai-details__note" role="note"><span aria-hidden="true">ⓘ</span><span>{{ 'ai.details.usage.creditsLimits' | t }}</span></div>
+            } @else if (measured()) {
+              <div class="ai-details__note" role="note"><span aria-hidden="true">ⓘ</span><span>{{ 'ai.details.usage.limits' | t }}</span></div>
             }
           </div>
         }

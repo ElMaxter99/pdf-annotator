@@ -289,6 +289,12 @@ export const usageTotal = (u: AiUsage | null): number =>
  */
 export const usageBilled = (u: AiUsage | null): number => (u ? u.input + u.output + u.cacheWrite : 0);
 
+/** AI credits that Copilot reports, summed over attempts; `null` when it reported none (also used by the batch). */
+export function sumAiCredits(attempts: ReadonlyArray<{ aiCredits: number | null }>): number | null {
+  const found = attempts.map((a) => a.aiCredits).filter((c): c is number => c !== null);
+  return found.length ? found.reduce((a, b) => a + b, 0) : null;
+}
+
 export function sumUsage(list: Array<AiUsage | null>): AiUsage | null {
   const found = list.filter((u): u is AiUsage => !!u);
   return found.length
