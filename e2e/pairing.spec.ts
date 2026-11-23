@@ -100,6 +100,7 @@ test('con la propuesta aplicada, la fila de un campo de B lleva a la pareja en Â
   await openLote(page);
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
+  await page.getByTestId('migration-summary-toggle').click();
   await page.getByTestId('migration-list').locator('.migration-row__name').first().click();
   await expect(page.locator('.annotation.pair-focus')).toHaveCount(1);
   await expect(page.getByTestId('split-a').locator('.reference-field.pair-focus')).toHaveCount(1);

@@ -492,7 +492,7 @@
         "reopen": "Vous pourrez le rouvrir et le modifier à tout moment.",
         "confirm": "Marquer comme terminé",
         "keep": "Continuer à modifier",
-        "missing": "Il reste {{count}} champs de A non placés dans B."
+        "missing": "{{count}} champs de A ne sont pas encore placés dans B : ils passeront dans « Retirés de B »."
       },
       "plain": "Modification avec son modèle",
       "navLabel": "Parcourir le lot",
@@ -634,7 +634,16 @@
     "panel": {
       "title": "Champs de B · {{count}}",
       "toResolve": "À résoudre {{count}}",
-      "allSet": "Tout est réglé",
+      "allSet": "Révisé",
+      "toReview": "À réviser · {{count}}",
+      "reviewed": "Tout est révisé.",
+      "reviewedText": "{{count}} champs placés dans B ; rien n’attend une décision de votre part.",
+      "markedReady": "PDF marqué comme Prêt.",
+      "summary": "Résumé du transfert",
+      "sumNew": "{{count}} nouveaux",
+      "sumMoved": "{{count}} déplacés",
+      "sumRenamed": "{{count}} renommés",
+      "sumRemoved": "{{count}} retirés",
       "emptyB": "B est vide. Appliquez le modèle de A et ajustez ce qui a changé.",
       "noTemplate": "Ce PDF n’a pas de JSON pour A : B démarre vide.",
       "page": "p. {{page}}",

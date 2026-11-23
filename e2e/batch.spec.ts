@@ -292,6 +292,25 @@ test('a moved field is reported and A can be seen alone by holding the A key', a
   await expect(page.locator('.canvas-container--reference-only')).toHaveCount(0);
 });
 
+test('moved fields are informative: the chip says reviewed and the summary starts collapsed (P-147)', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('view-list').click();
+  await attachVersion2(page);
+  await openRow(page);
+  await openLote(page);
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-copy').click();
+
+  await page.locator('.annotation').first().click({ modifiers: ['Shift'] });
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('.migration-row[data-status="moved"]')).toHaveCount(1);
+  await expect(page.locator('.migration-panel__head .migration-chip')).toContainText('Revisado');
+  await expect(page.getByTestId('migration-reviewed')).toBeVisible();
+  await expect(page.getByTestId('migration-list')).toBeHidden();
+  await page.getByTestId('migration-summary-toggle').click();
+  await expect(page.getByTestId('migration-list')).toBeVisible();
+});
+
 test('the batch and B survive a reload of the tray', async ({ page }) => {
   await openPanel(page);
   await page.getByTestId('view-list').click();

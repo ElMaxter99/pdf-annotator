@@ -492,7 +492,7 @@
         "reopen": "Du kannst es jederzeit wieder öffnen und ändern.",
         "confirm": "Als fertig markieren",
         "keep": "Weiter bearbeiten",
-        "missing": "{{count}} Felder aus A sind noch nicht in B platziert."
+        "missing": "{{count}} Felder aus A sind noch nicht in B platziert: Sie wandern zu „Aus B entfernt“."
       },
       "plain": "Bearbeitung mit eigener Vorlage",
       "navLabel": "Durch den Stapel navigieren",
@@ -634,7 +634,16 @@
     "panel": {
       "title": "Felder von B · {{count}}",
       "toResolve": "Zu klären {{count}}",
-      "allSet": "Alles geklärt",
+      "allSet": "Geprüft",
+      "toReview": "Zu prüfen · {{count}}",
+      "reviewed": "Alles geprüft.",
+      "reviewedText": "{{count}} Felder in B platziert; nichts wartet auf deine Entscheidung.",
+      "markedReady": "PDF als Fertig markiert.",
+      "summary": "Übertragungsübersicht",
+      "sumNew": "{{count}} neu",
+      "sumMoved": "{{count}} verschoben",
+      "sumRenamed": "{{count}} umbenannt",
+      "sumRemoved": "{{count}} entfernt",
       "emptyB": "B ist leer. Setze die Vorlage von A ein und passe Änderungen an.",
       "noTemplate": "Für dieses PDF gibt es kein JSON von A: B beginnt leer.",
       "page": "S. {{page}}",
