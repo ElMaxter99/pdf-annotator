@@ -652,7 +652,7 @@ test('traslado cortado: al volver aparece el aviso con lo que falta y se puede d
             store.put({ ids, provider: 'fake', startedAt: Date.now(), started: [], failed: [] }, '__tmp__');
             const all = store.get('__batch-settings__');
             all.onsuccess = () =>
-              store.put({ ...(all.result ?? { aiInstructions: '' }), aiRun: { ids, provider: 'fake', startedAt: Date.now(), started: [], failed: [] } }, '__batch-settings__');
+              store.put({ ...(all.result ?? { aiInstructions: '' }), aiRun: { ids, provider: 'fake', startedAt: Date.now(), started: [], failed: [], rerun: [] } }, '__batch-settings__');
             store.delete('__tmp__');
           };
           tx.oncomplete = () => resolve();

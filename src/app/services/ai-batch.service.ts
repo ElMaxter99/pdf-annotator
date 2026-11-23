@@ -207,7 +207,14 @@ export class AiBatchService {
     this.rows.set(Object.fromEntries(pairs.map((item) => [item.id, emptyRow(item.id)])));
     this.requests.set(0);
     this.startedAt.set(Date.now());
-    this.batch.setAiRun({ ids: pairs.map((item) => item.id), provider: this.ai.provider(), startedAt: Date.now(), started: [], failed: [] });
+    this.batch.setAiRun({
+      ids: pairs.map((item) => item.id),
+      provider: this.ai.provider(),
+      startedAt: Date.now(),
+      started: [],
+      failed: [],
+      rerun: pairs.filter((item) => item.aiProposal).map((item) => item.id),
+    });
     this.sentInWindow = 0;
     this.streak = { kind: '', n: 0 };
     this.detailsFollow.set(true);

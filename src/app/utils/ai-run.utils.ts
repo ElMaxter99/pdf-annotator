@@ -10,13 +10,17 @@ export interface AiRunRecord {
   readonly started: readonly string[];
   /** PDFs que fallaron. */
   readonly failed: readonly string[];
+  /** PDFs que ya tenían una propuesta cuando se lanzó la pasada: esa no cuenta como resultado de esta. */
+  readonly rerun: readonly string[];
 }
 
 const MAX_IDS = 500;
 
 function ids(raw: unknown): string[] {
   return Array.isArray(raw)
-    ? raw.filter((id): id is string => typeof id === 'string' && id.length > 0 && id.length <= 80).slice(0, MAX_IDS)
+    ? raw
+        .filter((id): id is string => typeof id === 'string' && id.length > 0 && id.length <= 80)
+        .slice(0, MAX_IDS)
     : [];
 }
 
@@ -30,13 +34,17 @@ export function sanitizeAiRun(raw: unknown): AiRunRecord | null {
   if (!list.length) {
     return null;
   }
-  const startedAt = typeof value['startedAt'] === 'number' && Number.isFinite(value['startedAt']) ? value['startedAt'] : 0;
+  const startedAt =
+    typeof value['startedAt'] === 'number' && Number.isFinite(value['startedAt'])
+      ? value['startedAt']
+      : 0;
   return {
     ids: list,
     provider: typeof value['provider'] === 'string' ? value['provider'].slice(0, 20) : '',
     startedAt,
     started: ids(value['started']),
     failed: ids(value['failed']),
+    rerun: ids(value['rerun']),
   };
 }
 
@@ -78,7 +86,8 @@ export function classifyAiRun(
   let edited = 0;
   for (const id of all) {
     const proposal = byId.get(id)?.aiProposal;
-    if (proposal) {
+    const stale = !!proposal && record.rerun.includes(id) && proposal.at < record.startedAt;
+    if (proposal && !stale) {
       saved.push(id);
       stateOf[id] = 'saved';
       if (proposal.edits && Object.keys(proposal.edits).length) {
