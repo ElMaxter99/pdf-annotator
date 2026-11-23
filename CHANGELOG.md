@@ -1,6 +1,4 @@
 ## Unreleased
-### Fixed
-- **Los filtros del panel del lote se conservan al volver (petición de Maxter):** la búsqueda por nombre, el filtro de estado y el de «lo que tienen» se perdían al entrar en un PDF y volver al panel. Ahora viven en `BatchStoreService` (en memoria, por lote) y solo se reinician al cambiar de lote o vaciarlo. Sin cambios visibles de interfaz. `e2e/batch.spec.ts` lo cubre.
 
 ## [v1.18.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.18.0) - 2026-11-23
 ### Added
@@ -16,6 +14,7 @@
 - **Lienzo al día (solo documentación y diseño):** pintadas P-115 a P-124 (capturas reales de la 1.17.0) y «Almacenamiento» (P-125 y P-126, aprobada); lo implementado pasa a «Definitivo»; `PLAN-1.18.md`, `ROADMAP.md`, `design/PENDIENTE-MESAS.md` y `design/README.md` actualizados, con las copias que faltaban en `design/canvas/`.
 - **Hoja de ruta:** 1.17 cerrada en `docs/ROADMAP.md` y `docs/PLAN-1.17.md`; propuesta de la 1.18 en `docs/PLAN-1.18.md`, pendiente de elegir alcance.
 ### Fixed
+- **Los filtros del panel del lote se conservan al volver (petición de Maxter):** la búsqueda por nombre, el filtro de estado y el de «lo que tienen» se perdían al entrar en un PDF y volver al panel. Ahora viven en `BatchStoreService` (en memoria, por lote) y solo se reinician al cambiar de lote o vaciarlo. Sin cambios visibles de interfaz. `e2e/batch.spec.ts` lo cubre.
 - **Propuesta de la IA con cajas solapadas en B (1.18):** con un campo de A seleccionado (línea de pareja activa), un clic o arrastre sobre cajas solapadas de B coge la emparejada con A y no la que está encima.
 - **La propuesta de la IA se escribe en el JSON de B (1.18 · mesas P-134 y P-135, aprobadas):** al llegar, las filas colocadas entran en B como un solo paso de historial; mover, editar y Ctrl+Z / Ctrl+Y funcionan con cada cambio. Marcar o desmarcar una fila la escribe o la quita de B (las que están fuera se ven en gris y un clic las vuelve a poner); «Aplicar» pasa a «Dar por buena» (solo cierra la revisión), «Descartar» quita de B lo que escribió la IA y «Listo» mantiene la propuesta. Una propuesta guardada del lote se escribe al abrir el PDF. Textos en los 7 idiomas y e2e nuevos.
 - **Ayudante de IA roto con pdf.js 6 (1.18):** `tools/ai-phase0/pdf.mjs` llamaba a `doc.destroy()`, que pdfjs-dist 6 ya no tiene, así que toda petición del ayudante fallaba con «No se pudo trasladar» (y 7 e2e de `ai.spec.ts` en rojo). Ahora se destruye con `doc.loadingTask.destroy()`.
