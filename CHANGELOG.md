@@ -1,4 +1,9 @@
 ## Unreleased
+### Added
+- **Comprobación de tipos con TypeScript 7 (1.19, invisible):** `npm run typecheck:ts7` ejecuta `tsc --noEmit` con TypeScript 7 sobre `tsconfig.app.json` y `tsconfig.spec.json` (hoy 0 errores, unas 4 veces más rápido que con la 6.0) y un job de CI aparte, no bloqueante, lo repite. El build sigue con TypeScript 6.0.x porque Angular 22 solo admite `>=6.0 <6.1` y `ngc` no arranca con la 7. `docs/MIGRACION-TS7.md` explica el bloqueo, las mediciones y cuándo migrar; `DECISIONS` 17 lo recoge.
+
+### Changed
+- **Dependabot ignora las subidas mayores y menores de `typescript`** hasta que Angular admita la 7; solo llegan parches de 6.0.x (la PR #325, TypeScript 7.0.2, se cierra con ese motivo).
 
 ## [v1.18.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.18.1) - 2026-11-23
 ### Fixed

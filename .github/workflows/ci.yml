@@ -76,3 +76,22 @@ jobs:
           npm install --no-fund --no-audit --prefix desktop
           node node_modules/electron/install.js
           xvfb-run -a node desktop/smoke.mjs
+
+  # Informativo: comprueba los tipos con TypeScript 7 (compilador nativo). El build sigue con
+  # TypeScript 6.0.x porque Angular 22 no admite la 7; ver docs/MIGRACION-TS7.md.
+  typecheck-ts7:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+
+      - name: Install dependencies
+        run: npm install --no-fund --no-audit
+
+      - name: Type-check with TypeScript 7 (does not block)
+        run: npm run typecheck:ts7
