@@ -156,6 +156,29 @@
       "title": "Ancora nessuna annotazione",
       "text": "Fai clic sul PDF per posizionare la prima, oppure portale da un altro lavoro.",
       "paste": "Incolla JSON"
+    },
+    "copyFormat": {
+      "title": "Formato di copia",
+      "preset": "Preimpostazione",
+      "keys": "Chiavi",
+      "keysQuoted": "\"con virgolette\"",
+      "keysBare": "senza virgolette",
+      "quote": "Virgolette dei testi",
+      "quoteDouble": "Doppie \"…\"",
+      "quoteSingle": "Singole '…'",
+      "indent": "Rientro",
+      "indentTab": "Tab",
+      "indentCompact": "Compatto",
+      "trailingComma": "Virgola finale in liste e oggetti",
+      "preview": "Anteprima di ciò che viene copiato",
+      "copyWith": "Copia con questo formato",
+      "valid": "JSON valido",
+      "notJson": "JSON non valido · utilizzabile in JS/TS",
+      "name": {
+        "json": "JSON",
+        "js": "Oggetto JS/TS",
+        "custom": "Personalizzato"
+      }
     }
   },
   "guides": {
@@ -363,7 +386,9 @@
       "emptyTitle": "Niente da recuperare",
       "emptyHint": "Qui compaiono gli avvisi informativi che chiudi."
     },
-    "noData": "{{count}} annotazioni senza dato nei dati di prova: mostrano il loro esempio."
+    "noData": "{{count}} annotazioni senza dato nei dati di prova: mostrano il loro esempio.",
+    "jsonCopied": "JSON copiato · {{format}}",
+    "jsonCopyFailed": "Impossibile copiare. Seleziona il testo dell'editor e premi Ctrl+C."
   },
   "session": {
     "title": "Riprendi da dove avevi lasciato",
