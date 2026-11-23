@@ -36,6 +36,28 @@ describe('computeFieldStates', () => {
     expect(summarizeStates(states)).toEqual({ same: 1, moved: 1, renamed: 0, new: 1, missing: 1 });
   });
 
+  it('matches a field that changed page in B by name (no new + missing)', () => {
+    const a: PageAnnotations[] = [{ num: 3, fields: [field('client classification', 10, 10)] }];
+    const b: PageAnnotations[] = [{ num: 5, fields: [field('client classification', 10, 10)] }];
+    const states = computeFieldStates(a, b);
+    expect(states.map((s) => s.status)).toEqual(['moved']);
+    expect(states[0].a?.page).toBe(3);
+  });
+
+  it('prefers the same page and then the nearest page for repeated names', () => {
+    const a: PageAnnotations[] = [
+      { num: 1, fields: [field('x', 1, 1)] },
+      { num: 4, fields: [field('x', 2, 2)] },
+    ];
+    const b: PageAnnotations[] = [
+      { num: 3, fields: [field('x', 2, 2)] },
+      { num: 4, fields: [field('x', 2, 2)] },
+    ];
+    const states = computeFieldStates(a, b);
+    expect(states.map((s) => s.status)).toEqual(['moved', 'same']);
+    expect(states[0].a?.page).toBe(1);
+  });
+
   it('uses links to treat a renamed field as the same one', () => {
     const states = computeFieldStates(
       pages(field('direccion', 10, 10)),
