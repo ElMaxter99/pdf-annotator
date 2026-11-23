@@ -11,7 +11,7 @@ import { toastKey } from './ai-batch.helpers';
 import { ToastService } from '../../../services/toast.service';
 import { TranslationService } from '../../../i18n/translation.service';
 import { buildAiBreakdown } from '../../../utils/batch-summary.utils';
-import { AI_BATCH_COPILOT_CAP, estimateAiBatch, isEligibleForAiBatch } from '../../../utils/ai-batch.utils';
+import { estimateAiBatch, isEligibleForAiBatch } from '../../../utils/ai-batch.utils';
 
 /** «✦ Trasladar con IA»: the button of the panel header and its one-decision popover (estimate, provider folded under «Cambiar»). */
 @Component({
@@ -39,7 +39,7 @@ export class AiBatchButtonComponent {
     }
   }
 
-  readonly cap = AI_BATCH_COPILOT_CAP;
+  readonly cap = computed(() => this.helper.limitFor(this.provider()));
   readonly open = signal(false);
   readonly changing = signal(false);
   /** «Más información» (ⓘ del título): peticiones, créditos y qué se envía, cerrado por defecto. */
@@ -97,7 +97,7 @@ export class AiBatchButtonComponent {
       edited: saved.filter((item) => Object.keys(item.aiProposal?.edits ?? {}).length > 0).length,
     };
   });
-  readonly estimate = computed(() => estimateAiBatch(this.chosen(), this.provider(), this.retry()));
+  readonly estimate = computed(() => estimateAiBatch(this.chosen(), this.provider(), this.retry(), this.cap()));
   readonly isCopilot = computed(() => this.provider() === 'copilot');
   readonly providers = computed(() =>
     (['claude', 'copilot', 'fake'] as AiProvider[]).filter((p) => p !== 'fake' || this.helper.found()['fake'] === true),

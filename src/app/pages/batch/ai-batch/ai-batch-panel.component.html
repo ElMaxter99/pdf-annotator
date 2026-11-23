@@ -79,6 +79,9 @@
                     }
                     @case ('cap') {
                       {{ 'batch.ai.paused.cap' | t: { sent: queue.requests(), count: waiting() } }}
+                      @if (options.available()) {
+                        <button type="button" class="ai-pop__link" (click)="options.open('ai')" data-testid="ai-batch-cap-options">{{ 'batch.ai.paused.capOptions' | t }}</button>
+                      }
                     }
                     @case ('fatal') {
                       {{ 'batch.ai.paused.fatal' | t: { count: waiting() } }}

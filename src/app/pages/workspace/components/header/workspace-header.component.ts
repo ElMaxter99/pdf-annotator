@@ -4,6 +4,7 @@ import { VersionChipComponent } from '../../../../components/version-chip/versio
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import type { WorkspacePageComponent } from '../../workspace.page';
+import { OptionsService } from '../../../../services/options.service';
 import { StorageService } from '../../../../services/storage.service';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { LanguageSelectorComponent } from '../../../../components/language-selector/language-selector.component';
@@ -36,6 +37,7 @@ export class WorkspaceHeaderComponent {
   coordsFileInputRef?: ElementRef<HTMLInputElement>;
 
   readonly storage = inject(StorageService);
+  readonly options = inject(OptionsService);
   readonly prefsOpen = signal(false);
   readonly clearOpen = signal(false);
   private seenClearRequest = -1;

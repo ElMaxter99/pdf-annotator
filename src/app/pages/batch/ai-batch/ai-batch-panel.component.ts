@@ -4,6 +4,7 @@ import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { TranslationService } from '../../../i18n/translation.service';
 import { AiBatchService, type AiBatchRow } from '../../../services/ai-batch.service';
 import { AiHelperService } from '../../../services/ai-helper.service';
+import { OptionsService } from '../../../services/options.service';
 import { BatchStoreService } from '../../../services/batch-store.service';
 import { usageBilled } from '../../../utils/ai-proposal.utils';
 import { AI_BATCH_ACTIVE_PHASES } from '../../../utils/ai-batch.utils';
@@ -26,6 +27,7 @@ import { providerName } from './ai-batch-button.component';
 export class AiBatchPanelComponent implements OnInit, OnDestroy {
   readonly queue = inject(AiBatchService);
   readonly helper = inject(AiHelperService);
+  readonly options = inject(OptionsService);
   private readonly store = inject(BatchStoreService);
   private readonly i18n = inject(TranslationService);
   @Output() readonly reviewFirst = new EventEmitter<void>();

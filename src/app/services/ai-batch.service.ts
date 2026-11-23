@@ -4,10 +4,9 @@ import type { BatchItem } from '../models/batch.model';
 import {
   AI_BATCH_ACTIVE_PHASES,
   AI_BATCH_BREAKER,
-  AI_BATCH_COPILOT_CAP,
   AiBatchPhase,
   classifyAiError,
-  isEligibleForAiBatch, phaseOfResult } from '../utils/ai-batch.utils';
+  estimateAiBatch, isEligibleForAiBatch, phaseOfResult } from '../utils/ai-batch.utils';
 import { AiDetails, AiResult, AiSent, AiStep, AiUsage, sumUsage, countPlacement } from '../utils/ai-proposal.utils';
 import { AiQueueInfo, AiQueueTaken, AiRemoteSnapshot, parseQueueInfo, phaseOfRemote, remoteItemId } from '../utils/ai-queue.utils';
 import { cascadeAdjust } from '../utils/adjust-cascade.utils';
@@ -224,14 +223,24 @@ export class AiBatchService {
     return 'started';
   }
 
-  /** The helper's own queue when it has one (Copilot keeps the browser loop beyond its cap of 10 requests). */
-  private useHelperQueue(count: number): boolean {
-    const copilotCap = this.ai.provider() === 'copilot' && count > AI_BATCH_COPILOT_CAP;
-    return this.ai.queueSupported?.() === true && !copilotCap;
+  /** The helper's own queue when it has one (the browser loop keeps it beyond the request limit chosen in Opciones). */
+  private useHelperQueue(ids: readonly string[]): boolean {
+    const provider = this.ai.provider();
+    const limit = this.ai.limitFor(provider);
+    if (this.ai.queueSupported?.() !== true) {
+      return false;
+    }
+    if (limit === null) {
+      return true;
+    }
+    // The helper's own queue cannot stop at a request limit: it is used only when the run cannot reach it.
+    const items = ids.map((id) => this.batch.find(id)).filter((item): item is BatchItem => !!item);
+    const worst = estimateAiBatch(items, provider, this.ai.retry?.()[provider] !== false, null).maxRequests;
+    return worst <= limit;
   }
 
   private launch(ids: readonly string[]): void {
-    if (this.useHelperQueue(ids.length)) {
+    if (this.useHelperQueue(ids)) {
       void this.runRemote([...ids]);
     } else {
       this.viaHelper.set(false);
@@ -639,7 +648,7 @@ export class AiBatchService {
     this.run.set('running');
     this.pause.set(null);
     this.pauseRequested = false;
-    const cap = this.ai.provider() === 'copilot' ? AI_BATCH_COPILOT_CAP : Infinity;
+    const cap = this.ai.limitFor(this.ai.provider()) ?? Infinity;
     for (;;) {
       if (generation !== this.generation) {
         return;
@@ -806,6 +815,8 @@ export class AiBatchService {
       if (generation !== this.generation) {
         return null;
       }
+      // A PDF with several pages makes several requests: they all count against the limit.
+      this.sentInWindow += Math.max(0, (result.details?.requests ?? 1) - 1);
       this.acceptResult(id, result);
       return null;
     } catch (error) {

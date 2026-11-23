@@ -1,0 +1,186 @@
+@if (options.isOpen() && options.available()) {
+  <div class="update-panel__veil" (click)="options.close()"></div>
+  <div
+    #dialog
+    class="options"
+    [class.options--single]="options.sections().length < 2"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="options-title"
+    data-testid="options-dialog"
+    (keydown)="onKeydown($event)"
+  >
+    @if (options.sections().length > 1) {
+      <nav class="options__nav" [attr.aria-label]="'options.title' | t" (keydown)="onNavKeydown($event)">
+        <h2 id="options-title">{{ 'options.title' | t }}</h2>
+        @for (s of options.sections(); track s) {
+          <button
+            type="button"
+            class="options__nav-item"
+            [attr.aria-current]="options.section() === s ? 'page' : null"
+            [tabindex]="options.section() === s ? 0 : -1"
+            (click)="options.select(s)"
+            [attr.data-testid]="'options-nav-' + s"
+          >
+            <span aria-hidden="true">{{ s === 'updates' ? '⟳' : '✦' }}</span>
+            {{ sectionLabel(s) }}
+            <small>{{ 'options.badge' | t }}</small>
+          </button>
+        }
+        <span class="options__nav-note">{{ 'options.savedNote' | t }}</span>
+      </nav>
+    }
+
+    <div class="options__body">
+      <div class="options__head">
+        @if (options.sections().length < 2) {
+          <h2 id="options-title">{{ 'options.title' | t }} · {{ sectionLabel(options.section()) }}</h2>
+        } @else {
+          <h3>{{ sectionLabel(options.section()) }}</h3>
+        }
+        <button #closeBtn type="button" class="update-card__close" (click)="options.close()" [attr.aria-label]="'options.close' | t" data-testid="options-close">✕</button>
+      </div>
+
+      @switch (options.section()) {
+        @case ('updates') {
+          <div class="options__status" role="status" aria-live="polite" data-testid="options-update-status">
+            v{{ updateState().current }}
+            @if (update.currentIsPrerelease()) {
+              <span class="update-tag">{{ 'update.tag' | t }}</span>
+            }
+            · {{ statusText() }}
+          </div>
+          <div class="options__row">
+            <button
+              type="button"
+              class="btn btn--ghost"
+              (click)="update.checkNow()"
+              [disabled]="updateState().checking || updateState().status === 'downloading'"
+              data-testid="options-check"
+            >{{ 'update.panel.checkNow' | t }}</button>
+            <button type="button" class="btn btn--ghost" (click)="update.openNotes()">{{ 'update.notes' | t }} ↗</button>
+          </div>
+          <hr class="update-panel__hr" />
+          <app-update-channel></app-update-channel>
+          <p class="options__foot">{{ 'options.updates.footer' | t }}</p>
+        }
+        @case ('ai') {
+          <p class="options__help">{{ 'options.ai.intro' | t }}</p>
+
+          <div class="options__field">
+            <span class="options__label" id="options-provider-label">{{ 'options.ai.provider' | t }}</span>
+            <div class="options__cards" role="group" aria-labelledby="options-provider-label">
+              @for (p of providers(); track p) {
+                <button
+                  type="button"
+                  class="options__card"
+                  [class.options__card--on]="provider() === p"
+                  [disabled]="helper.found()[p] === false"
+                  [attr.aria-pressed]="provider() === p"
+                  (click)="setProvider(p)"
+                  [attr.data-testid]="'options-provider-' + p"
+                >
+                  <strong>{{ providerLabel(p) }}</strong>
+                  <small>{{ (helper.found()[p] === false ? 'ai.panel.missing' : 'ai.panel.found') | t }}</small>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="options__field">
+            <span class="options__label" id="options-model-label">{{ 'options.ai.model' | t: { provider: providerName() } }}</span>
+            <app-ai-model-select [provider]="provider()" labelledBy="options-model-label" testId="options-model" />
+          </div>
+
+          <div class="options__field">
+            <span class="options__label" id="options-limit-label">{{ 'options.ai.limit.title' | t: { provider: providerName() } }}</span>
+            <span class="options__hint">{{ 'options.ai.limit.help' | t }}</span>
+            <div class="options__chips" role="group" aria-labelledby="options-limit-label">
+              @for (n of presets; track n) {
+                <button
+                  type="button"
+                  class="options__chip"
+                  [attr.aria-pressed]="choice() === n && !otherOpen()"
+                  (click)="chooseLimit(n)"
+                  [attr.data-testid]="'options-limit-' + n"
+                >{{ n }}@if (isDefault(n)) { · {{ 'options.ai.limit.default' | t }} }</button>
+              }
+              <button
+                type="button"
+                class="options__chip"
+                [attr.aria-pressed]="choice() === 'inf' && !otherOpen()"
+                (click)="chooseLimit(null)"
+                data-testid="options-limit-inf"
+              >{{ 'options.ai.limit.inf' | t }}@if (isDefault(null)) { · {{ 'options.ai.limit.default' | t }} }</button>
+              <button
+                type="button"
+                class="options__chip"
+                [attr.aria-pressed]="otherShown()"
+                (click)="openOther()"
+                data-testid="options-limit-other"
+              >{{ 'options.ai.limit.other' | t }}</button>
+            </div>
+            @if (otherShown()) {
+              <div class="options__other">
+                <label for="options-limit-input">{{ 'options.ai.limit.requests' | t }}</label>
+                <input
+                  id="options-limit-input"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  class="options__input"
+                  [class.options__input--bad]="otherError()"
+                  [value]="otherText()"
+                  [attr.aria-invalid]="otherError()"
+                  aria-describedby="options-limit-range"
+                  (input)="onOtherInput($any($event.target).value)"
+                  data-testid="options-limit-input"
+                />
+                <span id="options-limit-range" class="options__hint">{{ 'options.ai.limit.range' | t }}</span>
+              </div>
+              @if (otherError()) {
+                <p class="options__error" role="alert" data-testid="options-limit-error">
+                  {{ 'options.ai.limit.error' | t: { previous: previousLimitText() } }}
+                </p>
+              }
+            }
+          </div>
+
+          @if (limit() === null && provider() === 'copilot') {
+            <p class="options__note options__note--warn" role="note" data-testid="options-note-inf">
+              <span aria-hidden="true">⚠</span>
+              <span><strong>{{ 'options.ai.limit.noteInfTitle' | t }}</strong> {{ 'options.ai.limit.noteInf' | t }}</span>
+            </p>
+          } @else if (limit() === null && provider() === 'claude') {
+            <p class="options__note" role="note" data-testid="options-note-claude">
+              <span aria-hidden="true">ⓘ</span>
+              <span>{{ 'options.ai.limit.noteClaude' | t }}</span>
+            </p>
+          }
+
+          @if (offline() || noCli()) {
+            <div class="options__note options__note--error" role="alert" data-testid="options-offline">
+              <span aria-hidden="true">⚠</span>
+              <div>
+                <p>{{ (noCli() ? 'batch.ai.connect.noCli' : 'batch.ai.connect.offline') | t: { provider: providerName() } }}</p>
+                <button type="button" class="btn btn--ghost" (click)="helper.check()">{{ 'batch.ai.connect.recheck' | t }}</button>
+              </div>
+            </div>
+          }
+
+          <div class="options__foot options__foot--row">
+            <span>{{ 'options.ai.helper' | t: { port: port } }}</span>
+            <span class="options__spacer"></span>
+            @if (confirmReset()) {
+              <span role="alert">{{ 'options.ai.resetConfirm' | t }}</span>
+              <button type="button" class="btn btn--primary" (click)="doReset()" data-testid="options-reset-ok">{{ 'options.ai.resetOk' | t }}</button>
+              <button type="button" class="btn btn--ghost" (click)="confirmReset.set(false)">{{ 'options.ai.resetCancel' | t }}</button>
+            } @else {
+              <button type="button" class="btn btn--ghost" (click)="askReset()" data-testid="options-reset">{{ 'options.ai.reset' | t }}</button>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+}

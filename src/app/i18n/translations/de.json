@@ -363,7 +363,8 @@
       "splitLink": "A und B verknüpfen oder trennen (Geteilt)",
       "wheelPage": "Am Blattrand weiterscrollen: wechselt die Seite",
       "pageOnlyA": "Nur A bewegen (die Seiten werden frei)",
-      "palette": "Befehlspalette öffnen"
+      "palette": "Befehlspalette öffnen",
+      "options": "Optionen öffnen"
     }
   },
   "toast": {
@@ -964,9 +965,10 @@
         "limit": "Du hast das Limit deines Claude-Tarifs erreicht. Die Warteschlange pausiert und {{count}} PDFs warten noch (sie zählen nicht als fehlgeschlagen).",
         "reset": "Es wird um {{reset}} erneuert.",
         "breaker": "Nach zwei Fehlern in Folge angehalten ({{code}}). Pausiert, um nicht weiter zu verbrauchen; prüfe, ob die CLI antwortet, und mache weiter.",
-        "cap": "{{sent}} Anfragen gesendet. Die Warteschlange hält hier an, um deine Copilot-Credits zu schützen; {{count}} warten.",
+        "cap": "{{sent}} Anfragen gesendet. Die Warteschlange stoppt hier, weil du das gewählte Limit erreicht hast; {{count}} warten noch.",
         "fatal": "Helfer oder CLI nicht gefunden. Die Warteschlange pausiert; die {{count}} offenen PDFs bleiben in der Warteschlange.",
-        "user": "Pausiert. {{count}} PDFs in der Warteschlange."
+        "user": "Pausiert. {{count}} PDFs in der Warteschlange.",
+        "capOptions": "Limit in Optionen ändern"
       },
       "done": {
         "title": "Fertig in {{time}}",
@@ -1757,7 +1759,8 @@
       },
       "readyText": "Ein Neustart installiert die neue Version.",
       "onQuitText": "Sie wird beim Schließen der App installiert. Deine Anmerkungen werden automatisch gespeichert.",
-      "manualText": "PDF Annotator {{version}} · du hast {{current}}. Auf diesem System wird manuell installiert: Die Download-Seite öffnet sich."
+      "manualText": "PDF Annotator {{version}} · du hast {{current}}. Auf diesem System wird manuell installiert: Die Download-Seite öffnet sich.",
+      "moreOptions": "Weitere Einstellungen in Optionen"
     },
     "installing": {
       "title": "Version {{version}} wird installiert",
@@ -2527,6 +2530,42 @@
       "openFailed": "Der Ordner konnte nicht geöffnet werden.",
       "copied": "Pfad kopiert.",
       "copyFailed": "Der Pfad konnte nicht kopiert werden."
+    }
+  },
+  "options": {
+    "title": "Optionen",
+    "open": "Optionen…",
+    "openShort": "Optionen",
+    "close": "Optionen schließen",
+    "badge": "Desktop",
+    "savedNote": "Wird sofort gespeichert. Esc schließt.",
+    "updates": {
+      "title": "Updates",
+      "footer": "Es ist derselbe Kanal wie bisher: Mit den neuen Optionen ändert sich nichts."
+    },
+    "ai": {
+      "title": "Künstliche Intelligenz",
+      "intro": "Das ist, was du im Stapel unter „Mit KI übertragen“ wählst: Hier wird es zum Standardwert.",
+      "provider": "Standardanbieter",
+      "model": "Standardmodell · {{provider}}",
+      "helper": "Lokaler Helfer · 127.0.0.1:{{port}}",
+      "reset": "Werte zurücksetzen",
+      "resetConfirm": "Zurück zu Claude Code, seinem Modell und den Werkseinstellungen für die Limits?",
+      "resetOk": "Zurücksetzen",
+      "resetCancel": "Abbrechen",
+      "limit": {
+        "title": "Anfragelimit pro Übertragung · {{provider}}",
+        "help": "Die Übertragung stoppt und fragt nach, sobald diese Zahl an KI-Anfragen erreicht ist. Ein PDF braucht 1 bis 8.",
+        "default": "Standard",
+        "inf": "Kein Limit",
+        "other": "Andere…",
+        "requests": "Anfragen",
+        "range": "zwischen 1 und 500",
+        "error": "Gib eine ganze Zahl zwischen 1 und 500 ein. Das bisherige Limit ({{previous}}) bleibt erhalten.",
+        "noteInfTitle": "Kein Limit bei Copilot.",
+        "noteInf": "Jede Anfrage verbraucht Credits und die Übertragung hält nicht an, um nachzufragen. Du kannst sie jederzeit im Panel abbrechen.",
+        "noteClaude": "Claude Code hat standardmäßig keine Obergrenze. Du kannst eine setzen, wenn du vor dem Weitermachen prüfen willst."
+      }
     }
   }
 }

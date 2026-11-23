@@ -363,7 +363,8 @@
       "splitLink": "Enllaçar o desenllaçar A i B (Dividida)",
       "wheelPage": "Continuar amb la roda a la vora del full: canvia de pàgina",
       "pageOnlyA": "Moure només A (les pàgines passen a lliures)",
-      "palette": "Obrir la paleta d'ordres"
+      "palette": "Obrir la paleta d'ordres",
+      "options": "Obre les Opcions"
     }
   },
   "toast": {
@@ -964,9 +965,10 @@
         "limit": "Has arribat al límit del teu pla de Claude. La cua està en pausa i {{count}} PDF continuen esperant (no compten com a fallits).",
         "reset": "Es renova a les {{reset}}.",
         "breaker": "S'ha aturat després de dos errors seguits ({{code}}). Ho he parat per no gastar més; comprova que el CLI respon i continua.",
-        "cap": "{{sent}} peticions enviades. La cua s'atura aquí per protegir els teus crèdits de Copilot; en queden {{count}} en espera.",
+        "cap": "{{sent}} peticions enviades. La cua s’atura aquí perquè has arribat al límit que vas triar; en queden {{count}} en espera.",
         "fatal": "No trobo l'ajudant o el CLI. La cua està en pausa; els {{count}} PDF pendents continuen a la cua.",
-        "user": "En pausa. Queden {{count}} PDF a la cua."
+        "user": "En pausa. Queden {{count}} PDF a la cua.",
+        "capOptions": "Canvia el límit a Opcions"
       },
       "done": {
         "title": "Acabat en {{time}}",
@@ -1757,7 +1759,8 @@
       },
       "readyText": "Reiniciar instal·la la nova versió.",
       "onQuitText": "S'instal·larà en tancar l'app. Les teves anotacions es desen soles.",
-      "manualText": "PDF Annotator {{version}} · tens la {{current}}. En aquest sistema s'instal·la a mà: s'obre la pàgina de descàrregues."
+      "manualText": "PDF Annotator {{version}} · tens la {{current}}. En aquest sistema s'instal·la a mà: s'obre la pàgina de descàrregues.",
+      "moreOptions": "Més ajustos a Opcions"
     },
     "installing": {
       "title": "Instal·lant la versió {{version}}",
@@ -2527,6 +2530,42 @@
       "openFailed": "No s'ha pogut obrir la carpeta.",
       "copied": "Ruta copiada.",
       "copyFailed": "No s'ha pogut copiar la ruta."
+    }
+  },
+  "options": {
+    "title": "Opcions",
+    "open": "Opcions…",
+    "openShort": "Opcions",
+    "close": "Tanca les opcions",
+    "badge": "Escriptori",
+    "savedNote": "Es desen a l’instant. Esc tanca.",
+    "updates": {
+      "title": "Actualitzacions",
+      "footer": "És el mateix canal que ja tenies: no canvia res en estrenar les Opcions."
+    },
+    "ai": {
+      "title": "Intel·ligència artificial",
+      "intro": "És el mateix que tries a «Traslladar amb IA» del lot: aquí queda com a valor per defecte.",
+      "provider": "Proveïdor per defecte",
+      "model": "Model per defecte · {{provider}}",
+      "helper": "Ajudant local · 127.0.0.1:{{port}}",
+      "reset": "Restableix els valors",
+      "resetConfirm": "Tornar a Claude Code, el seu model i els límits de fàbrica?",
+      "resetOk": "Restableix",
+      "resetCancel": "Cancel·la",
+      "limit": {
+        "title": "Límit de peticions per trasllat · {{provider}}",
+        "help": "El trasllat s’atura i et pregunta en arribar a aquest nombre de peticions a la IA. Un PDF en fa servir entre 1 i 8.",
+        "default": "per defecte",
+        "inf": "Sense límit",
+        "other": "Altre…",
+        "requests": "Peticions",
+        "range": "entre 1 i 500",
+        "error": "Escriu un nombre enter entre 1 i 500. Es manté el límit anterior ({{previous}}).",
+        "noteInfTitle": "Sense límit a Copilot.",
+        "noteInf": "Cada petició gasta crèdits i el trasllat no s’aturarà a preguntar. El pots cancel·lar des del panell en qualsevol moment.",
+        "noteClaude": "Claude Code no té topall per defecte. Hi pots posar un si vols revisar abans de continuar."
+      }
     }
   }
 }

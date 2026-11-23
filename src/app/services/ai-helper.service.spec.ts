@@ -73,3 +73,36 @@ describe('model lists', () => {
     expect(service.models()['claude']).toBe('opus');
   });
 });
+
+describe('request limit (Opciones)', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('starts with 10 for Copilot and no limit for Claude Code', () => {
+    const service = new AiHelperService();
+    expect(service.limitFor('copilot')).toBe(10);
+    expect(service.limitFor('claude')).toBeNull();
+  });
+
+  it('remembers a limit and reads stored values as untrusted', () => {
+    const service = new AiHelperService();
+    service.setLimit('copilot', 50);
+    service.setLimit('claude', 25);
+    expect(new AiHelperService().limitFor('copilot')).toBe(50);
+    expect(new AiHelperService().limitFor('claude')).toBe(25);
+    service.setLimit('copilot', null);
+    expect(new AiHelperService().limitFor('copilot')).toBeNull();
+    localStorage.setItem('pdf-annotator.ai.limits', JSON.stringify({ copilot: 99999, claude: 'x' }));
+    const fresh = new AiHelperService();
+    expect(fresh.limitFor('copilot')).toBe(10);
+    expect(fresh.limitFor('claude')).toBeNull();
+  });
+
+  it('restores provider, model and limits of fábrica', () => {
+    const service = new AiHelperService();
+    service.setProvider('copilot');
+    service.setLimit('copilot', 100);
+    service.resetDefaults();
+    expect(service.provider()).toBe('claude');
+    expect(service.limitFor('copilot')).toBe(10);
+  });
+});

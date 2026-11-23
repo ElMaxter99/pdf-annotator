@@ -125,6 +125,13 @@
           <span class="btn__icon" aria-hidden="true">{{ vm.wheelPaging() ? '☑' : '☐' }}</span>
           <span class="btn__label">{{ 'controls.wheelPaging' | t }}</span>
         </button>
+        @if (options.available()) {
+          <button class="btn btn--ghost" type="button" (click)="options.open()" aria-keyshortcuts="Control+, Meta+,"
+            [attr.title]="('options.open' | t) + ' (Ctrl+,)'" data-testid="options-open">
+            <span class="btn__icon" aria-hidden="true">⚙</span>
+            <span class="btn__label">{{ 'options.openShort' | t }}</span>
+          </button>
+        }
         <app-theme-toggle></app-theme-toggle>
         <app-language-selector class="header__language-selector" [languages]="vm.languages"
           [selectedLanguage]="vm.languageModel()" (languageChange)="vm.onLanguageChange($event)" variant="compact">

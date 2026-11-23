@@ -12,6 +12,7 @@ import { AiBatchChipComponent } from './ai-batch/ai-batch-chip.component';
 import { AiDraftBannerComponent } from './ai-batch/ai-draft-banner.component';
 import { AiBatchPanelComponent } from './ai-batch/ai-batch-panel.component';
 import { AiBatchService } from '../../services/ai-batch.service';
+import { OptionsService } from '../../services/options.service';
 import { PageMapBatchDialogComponent } from './page-map-batch/page-map-batch-dialog.component';
 import {
   TemplateUpdateDialogComponent,
@@ -111,6 +112,7 @@ async function sha256(blob: Blob): Promise<string | null> {
 export class BatchPageComponent implements OnInit {
   private readonly store = inject(BatchStoreService);
   readonly aiQueue = inject(AiBatchService);
+  readonly options = inject(OptionsService);
   readonly pageMaps = inject(PageMapBatchService);
   readonly projects = inject(ProjectStoreService);
   readonly moreOpen = signal(false);

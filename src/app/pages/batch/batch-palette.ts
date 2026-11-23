@@ -261,6 +261,16 @@ export function buildBatchCommands(
     });
   });
 
+  if (page.options.available()) {
+    add({
+      id: 'options',
+      icon: '⚙',
+      label: t('options.open'),
+      keywords: 'options opciones settings ajustes ia updates actualizaciones',
+      shortcut: 'Ctrl+,',
+      run: () => page.options.open(),
+    });
+  }
   add({
     id: 'shortcuts',
     icon: '⌨',

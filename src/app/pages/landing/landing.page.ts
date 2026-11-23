@@ -5,6 +5,7 @@ import { APP_AUTHOR, APP_NAME, APP_VERSION } from '../../app-version';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { VersionChipComponent } from '../../components/version-chip/version-chip.component';
 import { Language, TranslationService } from '../../i18n/translation.service';
+import { OptionsService } from '../../services/options.service';
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { SessionStoreService, SavedSessionSummary } from '../../services/session-store.service';
 import { ToastService } from '../../services/toast.service';
@@ -43,6 +44,7 @@ export class LandingPageComponent {
   private readonly sessionStore = inject(SessionStoreService);
   private readonly batchStore = inject(BatchStoreService);
   readonly projectStore = inject(ProjectStoreService);
+  readonly options = inject(OptionsService);
   /** Último proyecto abierto (solo escritorio): ofrece «Continuar en…». */
   readonly lastProject = signal<{ ref: string; name: string } | null>(null);
   // With a project open the batch belongs to the project (it has its own «Continuar en…» card).
