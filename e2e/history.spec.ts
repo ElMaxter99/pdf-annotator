@@ -3,7 +3,11 @@ import { addAnnotation, applyJsonText, EXAMPLE_JSON, fieldCount, jsonEditor, ope
 
 const undoBtn = (page: Page) => page.getByRole('button', { name: /Deshacer/ });
 const redoBtn = (page: Page) => page.getByRole('button', { name: /Rehacer/ });
-const clearBtn = (page: Page) => page.getByRole('button', { name: /Limpiar/ });
+const clearBtn = (page: Page) => page.getByTestId('clear-open');
+const openClear = async (page: Page) => {
+  await page.getByTestId('more-options').click();
+  await clearBtn(page).click();
+};
 
 test.beforeEach(async ({ page }) => openWorkspace(page));
 
@@ -92,7 +96,7 @@ test('clear, JSON apply and file import are undoable steps', async ({ page }) =>
   await page.locator('input[type=file][accept="application/json"]').setInputFiles(EXAMPLE_JSON);
   await expect(page.locator('.annotation')).toHaveCount(10);
 
-  await clearBtn(page).click();
+  await openClear(page);
   await page.getByTestId('clear-confirm').click();
   await expect(page.locator('.annotation')).toHaveCount(0);
   await page.keyboard.press('Control+z');

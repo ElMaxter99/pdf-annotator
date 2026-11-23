@@ -7260,3 +7260,98 @@ button.version-chip:focus-visible {
   background: var(--light-surface);
   color: var(--text);
 }
+
+/* ==========================================================================
+   Editor simplificado (P-140 / P-141): el pie pasa a ser una píldora flotante sobre el visor
+   con zoom, vista, guardado y versión; la rejilla del workspace pierde la fila del pie.
+   ========================================================================== */
+@media (min-width: 961px) {
+  .app--workspace {
+    grid-template-areas:
+      "header header"
+      "sidebar viewer";
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .app--workspace.app--ai-dock {
+    grid-template-areas:
+      "header header"
+      "sidebar viewer"
+      "sidebar dock";
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .app--workspace .footer {
+    grid-area: viewer;
+    align-self: end;
+    justify-self: end;
+    z-index: 15;
+    width: auto;
+    max-width: calc(100% - 36px);
+    margin: 0 18px 14px 0;
+    padding: 4px 8px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 8px;
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  }
+
+  :root.theme-light .app--workspace .footer {
+    border-color: var(--light-border-strong);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
+  }
+}
+
+.app--workspace .footer__status {
+  gap: 8px;
+}
+
+.footer__group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.app--workspace .footer__status {
+  flex-wrap: wrap;
+}
+
+.footer__btn {
+  min-width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.footer__btn:hover:not(:disabled),
+.footer__btn:focus-visible {
+  background: rgba(94, 234, 212, 0.14);
+}
+
+.footer__btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.footer__sep {
+  flex: none;
+  width: 1px;
+  height: 18px;
+  background: var(--input-border);
+}
+
+:root.theme-light .footer__sep {
+  background: var(--light-border-strong);
+}
+
+.footer .preview-mode {
+  gap: 4px;
+}

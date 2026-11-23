@@ -25,10 +25,12 @@ test('the sidebar is organised in tabs and shows one section at a time', async (
   await expect(page.locator('.advanced-panel')).toBeVisible();
 });
 
-test('the cursor coordinates stay visible in every tab', async ({ page }) => {
+test('the cursor coordinates show in the floating bar over the PDF in every tab', async ({ page }) => {
   for (const name of ['Documento', 'Anotaciones', 'Plantillas', 'Avanzado'] as const) {
     await openSidebarTab(page, name);
-    await expect(page.locator('.json-coords')).toBeVisible();
+    const box = await page.locator('.hitbox').boundingBox();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await expect(page.locator('.footer .json-coords__value').first()).toBeVisible();
   }
 });
 

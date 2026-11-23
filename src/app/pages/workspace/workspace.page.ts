@@ -1236,7 +1236,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     switch (event.key) {
       case 'Enter':
         if ((event.target as HTMLElement | null)?.closest('button')) break;
-        triggerAction('confirm');
+        // Pasa por el botón «Aceptar» para que el teclado use la misma validación que el clic.
+        event.preventDefault();
+        (event.currentTarget as HTMLElement | null)
+          ?.querySelector<HTMLButtonElement>('.action-primary')
+          ?.click();
+        break;
         break;
       case 'Escape':
         triggerAction('cancel');
