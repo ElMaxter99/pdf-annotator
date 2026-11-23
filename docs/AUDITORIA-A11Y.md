@@ -11,7 +11,7 @@ PW_CHROMIUM=/opt/pw-browsers/chromium npm run a11y   # PW_CHROMIUM opcional; A11
 
 `scripts/a11y-audit.mjs` levanta el servidor estático de `e2e/`, recorre los estados de abajo en **tema oscuro y claro** y a **1650 y 1280 px**, y escribe `a11y-audit.json` (ignorado por git) con cada regla incumplida y sus nodos. **No forma parte del CI.** Para Proyectos usa el código real de `desktop/projects-ipc.mjs` sobre una carpeta temporal (dos proyectos, uno bloqueado por otro equipo).
 
-Estados cubiertos: landing; editor con `examples/factura-ejemplo.pdf` (pestañas Documento, Anotaciones, Plantillas y Avanzado, y el editor de anotación abierto); lote con 2 PDFs (paso 1, paso 2 y panel); Proyectos (lista). 10 estados × 2 temas × 2 anchos = 40 pasadas.
+Estados cubiertos: landing; editor con `examples/factura-ejemplo.pdf` (pestañas Documento, Anotaciones, Plantillas y Avanzado, y el editor de anotación abierto); lote con 2 PDFs (paso 1, paso 2 y panel); Almacenamiento de la app de escritorio (panel y confirmación de vaciado, 1.18; 0 hallazgos); Proyectos (lista). 10 estados × 2 temas × 2 anchos = 40 pasadas.
 
 No cubre (se pueden añadir al script): diálogos de Proyectos (nuevo, sincronizar, importar/exportar), menú ⋯, paleta de comandos, «Trasladar con IA», tabla de páginas A↔B y el modo Dividida.
 

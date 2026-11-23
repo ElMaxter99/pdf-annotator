@@ -127,6 +127,23 @@ async function withDesktopProjects(page) {
       projects,
       getUpdateState: async () => ({ status: 'idle', mode: 'manual', current: '1.15.0' }),
       onUpdateState: () => () => undefined,
+      storage: {
+        list: async () => ({
+          entries: [
+            { id: 'projects', group: 'work', path: '~/PDF Annotator', clearable: false, canOpen: true },
+            { id: 'editor-data', group: 'work', path: '~/.config/pdf/IndexedDB', clearable: false, canOpen: true },
+            { id: 'program', group: 'app', path: '/opt/pdf-annotator', clearable: false, canOpen: true },
+            { id: 'settings', group: 'app', path: '~/.config/pdf', clearable: false, canOpen: true },
+            { id: 'browser-cache', group: 'clearable', path: '~/.config/pdf/Cache', clearable: true, canOpen: true },
+            { id: 'update-downloads', group: 'clearable', path: '~/.cache/pdf-updater', clearable: true, canOpen: true },
+            { id: 'ai-temp', group: 'clearable', path: '/tmp/pdfann-ia-*', clearable: true, canOpen: true },
+            { id: 'update-log', group: 'clearable', path: '~/.config/pdf/update.log', clearable: true, canOpen: true },
+          ],
+        }),
+        size: async () => ({ bytes: 12_345_678, partial: false, exists: true }),
+        clear: async () => ({ ok: true, freed: 12_345_678 }),
+        reveal: async () => '',
+      },
     };
   });
 }
@@ -209,6 +226,22 @@ const scenarios = [
       await page.getByTestId('project-card').first().waitFor();
       await settle(page, 400);
       await audit('proyectos · lista');
+    },
+  },
+  {
+    name: 'almacenamiento',
+    desktop: true,
+    run: async (page, audit) => {
+      await page.goto(`${BASE}/proyectos`);
+      await page.getByTestId('project-card').first().waitFor();
+      await page.getByTestId('storage-link').click();
+      await page.getByTestId('storage-size-projects').filter({ hasText: 'MB' }).waitFor();
+      await settle(page, 400);
+      await audit('almacenamiento · panel');
+      await page.getByTestId('storage-clear-browser-cache').click();
+      await page.getByTestId('storage-confirm').waitFor();
+      await settle(page, 300);
+      await audit('almacenamiento · confirmar vaciado');
     },
   },
 ];
