@@ -65,7 +65,7 @@ nginx.conf · Dockerfile      Despliegue estático con cabeceras de seguridad
 - **i18n:** TODO texto visible usa la pipe `t` (`{{ 'clave' | t }}`). Añade la clave a **los 7 JSON** y ejecuta `npm run i18n:check`. No dejes cadenas fijas en español (solo quedan mensajes de `console`).
 - **Avisos al usuario:** nunca `alert()`/`confirm()`; usa `ToastService.error/warning/show` con una clave i18n (`toast.*`). Los e2e esperan `.toast--error`.
 - **Coordenadas:** `x,y` en puntos PDF. El DOM usa `top = canvas.height − y·scale`. Conversión en `domToPdfCoords`.
-- **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Actualiza `CHANGELOG.md` (sección *Unreleased*).
+- **Commits:** mensajes cortos en imperativo, en inglés o español de forma consistente con `git log`. Añade un fichero en `changelog/unreleased/` (formato en `changelog/README.md`; `type: none` si la PR no necesita entrada) en lugar de editar `CHANGELOG.md`; el CI lo exige si tocas `src/`, `desktop/`, `tools/` o `public/`.
 
 ## 4a. Publicar versiones
 > **Directiva de Maxter:** ningún agente fusiona en `develop` ni en `main`/`master`, y ninguno publica una versión (RC, final, Vercel) sin que Maxter lo pida expresamente para esa versión. Aprobar un diseño o una PR no es permiso para publicar. Abre la PR y pide a Maxter que revise y fusione.
@@ -124,5 +124,5 @@ Todo cambio visible (pantallas, flujos, textos de pantalla) se diseña **antes d
 - [ ] `npm run build`, `npm run test:ci` y `npm run e2e` pasan.
 - [ ] Textos nuevos traducidos en 7 idiomas.
 - [ ] Probado en oscuro y claro, escritorio (1650 y 1280 px).
-- [ ] README/CHANGELOG/atajos actualizados si cambia el comportamiento visible.
+- [ ] README/entrada de `changelog/unreleased/`/atajos actualizados si cambia el comportamiento visible.
 - [ ] Sin evaluación de entrada del usuario ni HTML sin sanear.
