@@ -6,7 +6,7 @@ Todo cambio en lo que ve el usuario (pantallas, flujos, textos de pantalla) se *
 1. **Diseñar** en el lienzo de claude.ai (artifact *Design (canvas)*, «PDF Annotator · Diseño de la interfaz»). Su enlace vive en `design/README.md`. Es único: no se crea otro.
 2. **Entregar** el enlace con una lista corta de decisiones por tomar y la recomendación.
 3. **Aprobar.** Hasta entonces no se programa la interfaz.
-4. **Registrar el diseño aprobado** en `design/`: copia de `canvas.json` y de los `*.dc.html` en `design/canvas/`, tabla de mesas en `design/README.md` y nota en `CHANGELOG.md`, en la misma PR que el código o antes.
+4. **Registrar el diseño aprobado** en `design/`: copia de `canvas.json` y de los `*.dc.html` en `design/canvas/`, tabla de mesas en `design/README.md` y entrada en `changelog/unreleased/`, en la misma PR que el código o antes.
 5. **Implementar.** La PR enlaza la mesa que implementa. Si hay que apartarse del diseño, primero se corrige el lienzo.
 
 ## Reglas de diseño (fijadas por el autor, 2026-11-09)

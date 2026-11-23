@@ -43,6 +43,9 @@ jobs:
       - name: Desktop tests
         run: npm run test:desktop
 
+      - name: Script tests (changelog)
+        run: npm run test:scripts
+
       - name: Audit dependencies (production, high severity)
         run: npm audit --omit=dev --audit-level=high
 
@@ -95,3 +98,20 @@ jobs:
 
       - name: Type-check with TypeScript 7 (does not block)
         run: npm run typecheck:ts7
+
+  # Una PR que cambie la app debe traer su entrada en changelog/unreleased/ (ver changelog/README.md).
+  changelog:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+
+      - name: Check the changelog entry
+        run: npm run changelog:check -- --base origin/${{ github.base_ref }}
