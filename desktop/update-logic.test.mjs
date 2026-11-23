@@ -170,3 +170,12 @@ test('runLinuxInstall: cancelar no abre otra ventana; pedirla otra vez instala; 
   const rpm = await runLinuxInstall({ plan: { cmd: 'pkexec', args: ['rpm', '-U', 'x'] }, packageType: 'rpm', run: async () => ({ code: 1, stderr: 'dependency problems' }) });
   assert.equal(rpm.kind, 'failed', 'en rpm no hay apt-get -f');
 });
+
+test('classifyPkexecResult: sin agente de polkit NO es una cancelación; privilegedEnv quita lo de Electron', async () => {
+  const { classifyPkexecResult, privilegedEnv } = await import('./update-logic.mjs');
+  assert.equal(classifyPkexecResult({ code: 126, stderr: '' }), 'cancelled');
+  assert.equal(classifyPkexecResult({ code: 127, stderr: 'Error executing command as another user: Not authorized' }), 'cancelled');
+  assert.equal(classifyPkexecResult({ code: 127, stderr: 'Error executing command as another user: No authentication agent found.' }), 'failed');
+  assert.equal(classifyPkexecResult({ code: -1, stderr: 'spawn pkexec ENOENT' }), 'failed');
+  assert.deepEqual(privilegedEnv({ DISPLAY: ':0', ELECTRON_RUN_AS_NODE: '1', APPIMAGE: '/x', PATH: '/bin' }), { DISPLAY: ':0', PATH: '/bin' });
+});

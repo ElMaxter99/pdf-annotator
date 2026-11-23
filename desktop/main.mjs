@@ -7,7 +7,7 @@ import { accessSync, appendFileSync, constants as fsConstants, existsSync, readF
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, normalizeChannel, parseReleaseForChannel, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
+import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { setupProjectsIpc } from './projects-ipc.mjs';
@@ -145,6 +145,7 @@ const readJustUpdated = () => {
 };
 let state = { status: 'idle', mode, current: app.getVersion(), channel, needsPassword, needsAdmin, justUpdatedFrom: readJustUpdated() };
 let cancelToken = null;
+let installRunning = false;
 const setState = (patch) => {
   state = { ...state, ...patch };
   if (win && !win.isDestroyed()) win.webContents.send('desktop:update:state', state);
@@ -283,7 +284,18 @@ function setupIpc() {
   });
   handle('desktop:update:cancel', () => cancelToken?.cancel());
   handle('desktop:update:install', async () => {
-    if (state.status !== 'ready') return;
+    if (state.status !== 'ready' || installRunning) return;
+    installRunning = true;
+    try {
+      await installUpdate();
+    } catch (e) {
+      // Nunca se queda en «instalando» para siempre: cualquier fallo vuelve a «lista» con el motivo.
+      setError(e);
+    } finally {
+      installRunning = false;
+    }
+  });
+  async function installUpdate() {
     // La instalación en Linux es síncrona y bloquea el proceso principal: primero se pinta «Instalando» y se da un respiro.
     setState({ status: 'installing', installError: undefined, installDetail: undefined, justUpdatedFrom: undefined });
     logUpdate(`instalando ${state.version} (desde ${app.getVersion()})`);
@@ -296,6 +308,8 @@ function setupIpc() {
     // Linux .deb/.rpm: instalación propia, en segundo plano y con una sola ventana de contraseña; si se cancela, se puede
     // pedir otra vez sin cerrar la app. Sin pkexec (raro) se usa el instalador de electron-updater.
     if (process.platform === 'linux' && needsPassword) {
+      // Sin ruta del instalador (la descarga ya estaba en la caché) se valida de nuevo, sin bajarla otra vez.
+      if (!autoUpdater.installerPath) await autoUpdater.downloadUpdate().catch(() => undefined);
       const plan = linuxInstallCommand({ packageType, file: autoUpdater.installerPath, has: hasCommand });
       if (plan) return installLinux(plan);
     }
@@ -307,7 +321,7 @@ function setupIpc() {
     } catch (e) {
       setError(e);
     }
-  });
+  }
   handle('desktop:update:dismiss-updated', () => setState({ justUpdatedFrom: undefined }));
   handle('desktop:update:install-on-quit', () => {
     if (state.status !== 'ready') return;
@@ -330,7 +344,7 @@ function hasCommand(cmd) {
 function runPrivileged({ cmd, args }) {
   return new Promise((resolve) => {
     let stderr = '';
-    const child = spawn(cmd, args, { stdio: ['ignore', 'ignore', 'pipe'] });
+    const child = spawn(cmd, args, { stdio: ['ignore', 'ignore', 'pipe'], env: privilegedEnv(process.env) });
     child.stderr.on('data', (chunk) => {
       stderr = (stderr + chunk).slice(-8000);
     });
@@ -350,6 +364,7 @@ async function installLinux(plan) {
     return;
   }
   rmSync(updatedFile, { force: true });
+  if (kind === 'failed' && !result.stderr) result.stderr = `pkexec terminó con código ${result.code} sin pedir la contraseña`;
   logUpdate(`instalación ${kind === 'cancelled' ? 'cancelada (contraseña)' : 'fallida'}: código ${result.code} ${installDetail(result.stderr, os.homedir())}`);
   setState({ status: 'ready', installError: kind === 'cancelled' ? 'cancelled' : 'failed', installDetail: kind === 'cancelled' ? undefined : installDetail(result.stderr || `código ${result.code}`, os.homedir()) });
 }

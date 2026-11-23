@@ -148,11 +148,23 @@ export function linuxInstallCommand({ packageType, file, has }) {
 export const linuxFixDepsCommand = () => ({ cmd: 'pkexec', args: ['apt-get', 'install', '-f', '-y'] });
 
 /**
+ * Entorno para lanzar `pkexec` desde la app: el de la sesión, sin las variables propias de Electron/Node que se
+ * heredarían en el proceso privilegiado o que confunden a polkit (la ventana de contraseña la dibuja el agente de la sesión).
+ */
+export function privilegedEnv(env = {}) {
+  const out = { ...env };
+  for (const key of Object.keys(out)) if (/^(ELECTRON_|NODE_OPTIONS$|APPIMAGE|APPDIR$|CHROME_DESKTOP$)/.test(key)) delete out[key];
+  return out;
+}
+
+/**
  * Resultado de `pkexec …`: `ok`, `cancelled` (126 = ventana cerrada o cancelada, 127 = no autorizado), `deps`
  * (dpkg instaló a medias por dependencias que faltan) o `failed`.
  */
 export function classifyPkexecResult({ code, stderr = '' }) {
   if (code === 0) return 'ok';
+  // Sin agente de polkit (o sin sesión gráfica) pkexec sale con 126/127 SIN haber pedido nada: no es una cancelación.
+  if (code === -1 || /no authentication agent|error getting authority|cannot open display|failed to connect|command not found|no such file/i.test(String(stderr))) return 'failed';
   if (code === 126 || code === 127) return 'cancelled';
   if (/dependency problems|dependencias|depends on .* however/i.test(String(stderr))) return 'deps';
   return 'failed';
