@@ -271,7 +271,7 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | Doble clic con el botón central · `Ctrl/⌘` + doble clic en zona vacía | Alterna 100 % y ajustar al ancho, manteniendo bajo el cursor el punto pulsado (en «Dividida» desenlazada, solo el panel bajo el puntero). Con `Ctrl/⌘`, un clic en zona vacía ya no crea una anotación |
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
 | `Ctrl/⌘ + S` | Aplicar el JSON del editor |
-| `Ctrl/⌘ + K` | Paleta de comandos: buscar y ejecutar cualquier acción (↑↓ Intro Esc) |
+| `Ctrl/⌘ + K` | Paleta de comandos: buscar y ejecutar cualquier acción, en el editor y en el panel del lote (↑↓ Intro Esc) |
 | `Shift + clic` | Añadir o quitar una anotación de la selección |
 | Arrastrar en una zona vacía | Seleccionar con un recuadro (con `Shift`, suma a la selección) |
 | `Ctrl/⌘ + A` | Seleccionar todas las anotaciones de la página (las bloqueadas no) |

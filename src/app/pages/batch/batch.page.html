@@ -85,6 +85,15 @@
               type="button"
               role="menuitem"
               class="batch-more__item"
+              (click)="moreOpen.set(false); togglePalette(true)"
+              data-testid="batch-palette-open"
+            >
+              {{ 'palette.batch.openMenu' | t }}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              class="batch-more__item"
               (click)="moreOpen.set(false); testDataInput.click()"
               [attr.title]="'batch.testData.hint' | t"
               data-testid="batch-testdata"
@@ -895,5 +904,21 @@
       }
 
     }
+    @if (step() === 'panel') {
+      <p class="batch-keyhint" data-testid="batch-keyhint">
+        <kbd>{{ 'palette.ctrl' | t }}+K</kbd> {{ 'palette.batch.keyhint' | t }}
+      </p>
+    }
   </main>
 </div>
+@if (paletteOpen()) {
+  <app-command-palette
+    [source]="paletteSource"
+    [defaultIds]="batchDefaultIds"
+    (closed)="togglePalette(false)"
+    (shortcutsRequested)="shortcutsOpen.set(true)"
+  ></app-command-palette>
+}
+@if (shortcutsOpen()) {
+  <app-shortcuts-dialog (closed)="shortcutsOpen.set(false)"></app-shortcuts-dialog>
+}

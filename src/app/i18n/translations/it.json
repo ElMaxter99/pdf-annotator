@@ -1852,7 +1852,8 @@
       "confirms": "chiede conferma",
       "current": "attuale",
       "batch": "Lotto",
-      "position": "Lotto {{index}} di {{total}}"
+      "position": "Lotto {{index}} di {{total}}",
+      "active": "attivo"
     },
     "why": {
       "noPdf": "Prima: apri un PDF",
@@ -1864,7 +1865,18 @@
       "noTemplateA": "Prima: carica il modello A",
       "noVersionB": "Prima: carica la versione B",
       "firstPdf": "Sei già sul primo PDF",
-      "lastPdf": "Sei già sull'ultimo PDF"
+      "lastPdf": "Sei già sull'ultimo PDF",
+      "noSelection": "Seleziona prima un PDF",
+      "noReady": "Nessun PDF è ancora pronto",
+      "nothingToReview": "Nessun PDF da rivedere",
+      "noFilters": "Nessun filtro attivo",
+      "alreadyActive": "Già applicato",
+      "alreadySelected": "Tutto è già selezionato",
+      "noVisible": "Nessun PDF visibile",
+      "noReadyInSelection": "Nessun PDF selezionato è pronto",
+      "noVersionBInSelection": "Nessun PDF selezionato ha una versione B",
+      "busy": "C’è un’attività in corso",
+      "nothingToMark": "Niente da segnare come pronto"
     },
     "cmd": {
       "fitPage": "Adatta alla pagina",
@@ -1882,6 +1894,41 @@
       "themeDark": "Passa al tema scuro",
       "themeLight": "Passa al tema chiaro",
       "language": "Lingua: {{language}}"
+    },
+    "group": {
+      "batch": "Lotto",
+      "view": "Vista",
+      "filter": "Filtro",
+      "selection": "Selezione"
+    },
+    "batch": {
+      "downloadReady": "Scarica i pronti (ZIP)",
+      "readyCount": "{{count}} pronti",
+      "reviewNext": "Rivedi il prossimo",
+      "reviewCount": "{{count}} da rivedere",
+      "updateTemplates": "Aggiorna i modelli…",
+      "testData": "Carica dati di prova…",
+      "testDataReplace": "Sostituisci i dati di prova…",
+      "testDataRemove": "Rimuovi i dati di prova",
+      "viewGrid": "Passa alla griglia",
+      "viewList": "Passa all’elenco",
+      "showAll": "Mostra: tutti",
+      "showReview": "Mostra: da rivedere",
+      "showReady": "Mostra: pronti",
+      "showWithA": "Mostra: con modello A",
+      "showWithB": "Mostra: con versione B",
+      "showAi": "Mostra: con IA",
+      "clearFilters": "Rimuovi i filtri",
+      "selectVisible": "Seleziona i visibili",
+      "clearSelection": "Annulla la selezione",
+      "downloadSelected": "Scarica i selezionati",
+      "suggestTables": "Suggerisci tabelle di pagine…",
+      "translateAi": "Trasferisci con IA…",
+      "markReady": "Segna i selezionati come pronti",
+      "removeSelected": "Rimuovi i selezionati dal lotto",
+      "pdfCount": "{{count}} PDF",
+      "openMenu": "Cerca azioni",
+      "keyhint": "Azioni"
     }
   },
   "projects": {

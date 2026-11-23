@@ -1852,7 +1852,8 @@
       "confirms": "pide confirmar",
       "current": "actual",
       "batch": "Lote",
-      "position": "Lote {{index}} de {{total}}"
+      "position": "Lote {{index}} de {{total}}",
+      "active": "activo"
     },
     "why": {
       "noPdf": "Antes: abre un PDF",
@@ -1864,7 +1865,18 @@
       "noTemplateA": "Antes: sube la plantilla A",
       "noVersionB": "Antes: sube la versión B",
       "firstPdf": "Ya estás en el primer PDF",
-      "lastPdf": "Ya estás en el último PDF"
+      "lastPdf": "Ya estás en el último PDF",
+      "noSelection": "Selecciona antes algún PDF",
+      "noReady": "No hay PDFs listos todavía",
+      "nothingToReview": "No hay PDFs por revisar",
+      "noFilters": "No hay filtros activos",
+      "alreadyActive": "Ya está aplicado",
+      "alreadySelected": "Ya están todos seleccionados",
+      "noVisible": "No hay PDFs visibles",
+      "noReadyInSelection": "Ningún seleccionado está listo",
+      "noVersionBInSelection": "Ningún seleccionado tiene versión B",
+      "busy": "Hay una tarea en curso",
+      "nothingToMark": "Nada que marcar como listo"
     },
     "cmd": {
       "fitPage": "Ajustar a la página",
@@ -1882,6 +1894,41 @@
       "themeDark": "Cambiar a tema oscuro",
       "themeLight": "Cambiar a tema claro",
       "language": "Idioma: {{language}}"
+    },
+    "group": {
+      "batch": "Lote",
+      "view": "Vista",
+      "filter": "Filtro",
+      "selection": "Selección"
+    },
+    "batch": {
+      "downloadReady": "Descargar los listos (ZIP)",
+      "readyCount": "{{count}} listos",
+      "reviewNext": "Revisar el siguiente",
+      "reviewCount": "{{count}} por revisar",
+      "updateTemplates": "Actualizar plantillas…",
+      "testData": "Subir datos de prueba…",
+      "testDataReplace": "Reemplazar datos de prueba…",
+      "testDataRemove": "Quitar datos de prueba",
+      "viewGrid": "Cambiar a cuadrícula",
+      "viewList": "Cambiar a lista",
+      "showAll": "Mostrar: todos",
+      "showReview": "Mostrar: por revisar",
+      "showReady": "Mostrar: listos",
+      "showWithA": "Mostrar: con plantilla A",
+      "showWithB": "Mostrar: con versión B",
+      "showAi": "Mostrar: con IA",
+      "clearFilters": "Quitar filtros",
+      "selectVisible": "Seleccionar los visibles",
+      "clearSelection": "Quitar la selección",
+      "downloadSelected": "Descargar los seleccionados",
+      "suggestTables": "Sugerir tablas de páginas…",
+      "translateAi": "Trasladar con IA…",
+      "markReady": "Marcar los seleccionados como listos",
+      "removeSelected": "Quitar los seleccionados del lote",
+      "pdfCount": "{{count}} PDFs",
+      "openMenu": "Buscar acciones",
+      "keyhint": "Acciones"
     }
   },
   "projects": {

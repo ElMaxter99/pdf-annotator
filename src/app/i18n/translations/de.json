@@ -1852,7 +1852,8 @@
       "confirms": "fragt nach",
       "current": "aktuell",
       "batch": "Stapel",
-      "position": "Stapel {{index}} von {{total}}"
+      "position": "Stapel {{index}} von {{total}}",
+      "active": "aktiv"
     },
     "why": {
       "noPdf": "Zuerst: ein PDF öffnen",
@@ -1864,7 +1865,18 @@
       "noTemplateA": "Zuerst: Vorlage A hochladen",
       "noVersionB": "Zuerst: Version B hochladen",
       "firstPdf": "Sie sind beim ersten PDF",
-      "lastPdf": "Sie sind beim letzten PDF"
+      "lastPdf": "Sie sind beim letzten PDF",
+      "noSelection": "Wähle zuerst ein PDF aus",
+      "noReady": "Noch keine PDFs fertig",
+      "nothingToReview": "Keine PDFs zu prüfen",
+      "noFilters": "Keine Filter aktiv",
+      "alreadyActive": "Bereits angewendet",
+      "alreadySelected": "Alles ist schon ausgewählt",
+      "noVisible": "Keine PDFs sichtbar",
+      "noReadyInSelection": "Kein ausgewähltes PDF ist fertig",
+      "noVersionBInSelection": "Kein ausgewähltes PDF hat eine Version B",
+      "busy": "Eine Aufgabe läuft",
+      "nothingToMark": "Nichts als fertig zu markieren"
     },
     "cmd": {
       "fitPage": "An Seite anpassen",
@@ -1882,6 +1894,41 @@
       "themeDark": "Zum dunklen Design wechseln",
       "themeLight": "Zum hellen Design wechseln",
       "language": "Sprache: {{language}}"
+    },
+    "group": {
+      "batch": "Stapel",
+      "view": "Ansicht",
+      "filter": "Filter",
+      "selection": "Auswahl"
+    },
+    "batch": {
+      "downloadReady": "Fertige herunterladen (ZIP)",
+      "readyCount": "{{count}} fertig",
+      "reviewNext": "Nächstes prüfen",
+      "reviewCount": "{{count}} zu prüfen",
+      "updateTemplates": "Vorlagen aktualisieren…",
+      "testData": "Testdaten hochladen…",
+      "testDataReplace": "Testdaten ersetzen…",
+      "testDataRemove": "Testdaten entfernen",
+      "viewGrid": "Zur Kachelansicht wechseln",
+      "viewList": "Zur Liste wechseln",
+      "showAll": "Anzeigen: alle",
+      "showReview": "Anzeigen: zu prüfen",
+      "showReady": "Anzeigen: fertig",
+      "showWithA": "Anzeigen: mit Vorlage A",
+      "showWithB": "Anzeigen: mit Version B",
+      "showAi": "Anzeigen: mit KI",
+      "clearFilters": "Filter entfernen",
+      "selectVisible": "Sichtbare auswählen",
+      "clearSelection": "Auswahl aufheben",
+      "downloadSelected": "Ausgewählte herunterladen",
+      "suggestTables": "Seitentabellen vorschlagen…",
+      "translateAi": "Mit KI übertragen…",
+      "markReady": "Ausgewählte als fertig markieren",
+      "removeSelected": "Ausgewählte aus dem Stapel entfernen",
+      "pdfCount": "{{count}} PDFs",
+      "openMenu": "Aktionen suchen",
+      "keyhint": "Aktionen"
     }
   },
   "projects": {
