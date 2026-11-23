@@ -63,14 +63,14 @@ export function parseLatestRelease(json) {
   return { version, url };
 }
 
-export const CHANNELS = ['stable', 'beta'];
-/** Canal guardado → «stable» o «beta»; cualquier otra cosa (archivo roto, valor raro) es «stable». */
-export const normalizeChannel = (value) => (value === 'beta' ? 'beta' : 'stable');
+export const CHANNELS = ['stable', 'latest'];
+/** Canal guardado → «stable» (solo estables) o «latest» (últimas); «beta» es el nombre antiguo de «latest». Cualquier otra cosa (archivo roto, valor raro) es «stable». */
+export const normalizeChannel = (value) => (value === 'latest' || value === 'beta' ? 'latest' : 'stable');
 
 /**
  * Respuesta de GitHub (una release o la lista de releases) → { version, url, prerelease } o null.
- * Estable: solo versiones finales (como parseLatestRelease). Pruebas (`prerelease: true`): además las
- * pre-releases «X.Y.Z-rc.N»; entre todas gana la mayor, y la final de X.Y.Z gana a sus RC.
+ * Solo estables: solo versiones finales (como parseLatestRelease). Últimas (`prerelease: true`): además las
+ * pre-releases «X.Y.Z-rc.N»; entre todas gana la mayor (la última publicada, sea RC o estable) y la final de X.Y.Z gana a sus RC.
  */
 export function parseReleaseForChannel(json, { prerelease = false } = {}) {
   const list = Array.isArray(json) ? json : [json];

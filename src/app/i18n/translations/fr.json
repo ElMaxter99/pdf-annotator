@@ -1704,20 +1704,20 @@
     "notesRc": "Notes de la version de test",
     "channel": {
       "label": "Canal de mises à jour",
-      "stable": "Stable",
-      "beta": "Tests",
-      "hintStable": "Versions finales uniquement. Recommandé.",
-      "hintBeta": "Vous recevez aussi des versions de test (RC) avant la finale. Elles peuvent avoir des bugs.",
+      "stable": "Stables uniquement",
+      "latest": "Dernières",
+      "hintStable": "Uniquement les versions stables. C’est recommandé.",
+      "hintLatest": "Toujours la version la plus récente : une version de test (RC) si c’est la dernière, une stable si c’est elle.",
       "confirm": {
-        "title": "Recevoir les versions de test ?",
-        "text": "Les versions de test (RC) arrivent avant la finale pour pouvoir être essayées pour de vrai. Elles peuvent avoir des bugs. Vos PDF et annotations ne sont pas touchés, mais exportez d'abord l'important.",
-        "text2": "Pour revenir au canal stable, changez-le ici : vous recevrez la prochaine version finale.",
-        "yes": "Recevoir les tests",
+        "title": "Recevoir toujours la dernière version ?",
+        "text": "Si la dernière publication est une version de test (RC), c’est celle qui vous sera proposée. Elle peut contenir des bogues. Vos PDF et annotations ne sont pas touchés, mais mieux vaut exporter l’essentiel.",
+        "text2": "Quand la version stable suivante sortira, elle vous sera proposée. Pour ne recevoir que des stables, modifiez-le ici.",
+        "yes": "Recevoir les dernières",
         "cancel": "Annuler"
       },
       "back": {
-        "title": "Revenir au canal stable",
-        "text": "Vous restez sur la {{current}} jusqu'à la sortie de la version finale ; elle vous sera alors proposée. Pour la stable tout de suite, installez-la à la main depuis GitHub.",
+        "title": "Revenir à stables uniquement",
+        "text": "Vous restez sur la {{current}} jusqu’à la sortie de la version stable ; elle vous sera alors proposée. Pour l’avoir tout de suite, installez-la à la main depuis GitHub.",
         "github": "Ouvrir GitHub",
         "ok": "Compris"
       }

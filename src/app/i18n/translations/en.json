@@ -1704,20 +1704,20 @@
     "notesRc": "Test version notes",
     "channel": {
       "label": "Update channel",
-      "stable": "Stable",
-      "beta": "Testing",
-      "hintStable": "Final versions only. Recommended.",
-      "hintBeta": "You also get test versions (RC) before the final one. They may have bugs.",
+      "stable": "Stable only",
+      "latest": "Latest",
+      "hintStable": "Stable versions only. Recommended.",
+      "hintLatest": "Always the most recent version: a test version (RC) if that is the latest, a stable one if it is.",
       "confirm": {
-        "title": "Receive test versions?",
-        "text": "Test versions (RC) arrive before the final one so they can be tried for real. They may have bugs. Your PDFs and annotations are not touched, but export anything important first.",
-        "text2": "To go back to the stable channel, change it here: you will get the next final version.",
-        "yes": "Receive test versions",
+        "title": "Always get the latest version?",
+        "text": "If the latest release is a test version (RC), that is what you will be offered. It may have bugs. Your PDFs and annotations are not touched, but it is wise to export anything important.",
+        "text2": "When the next stable version comes out, you will be offered that one. To get stable versions only, change it back here.",
+        "yes": "Get the latest",
         "cancel": "Cancel"
       },
       "back": {
-        "title": "Back to the stable channel",
-        "text": "You stay on {{current}} until the final version is out; it will then be offered to you. If you want the stable one now, install it by hand from GitHub.",
+        "title": "Back to stable only",
+        "text": "You stay on {{current}} until the stable version comes out; then it will be offered. If you want the stable one now, install it by hand from GitHub.",
         "github": "Open GitHub",
         "ok": "Got it"
       }

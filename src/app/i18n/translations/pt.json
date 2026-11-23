@@ -1704,20 +1704,20 @@
     "notesRc": "Notas da versão de teste",
     "channel": {
       "label": "Canal de atualizações",
-      "stable": "Estável",
-      "beta": "Testes",
-      "hintStable": "Apenas versões finais. É o recomendado.",
-      "hintBeta": "Recebes também versões de teste (RC) antes da final. Podem ter falhas.",
+      "stable": "Só estáveis",
+      "latest": "Últimas",
+      "hintStable": "Só versões estáveis. É o recomendado.",
+      "hintLatest": "Sempre a versão mais recente: se for de teste (RC), essa; se for estável, a estável.",
       "confirm": {
-        "title": "Receber versões de teste?",
-        "text": "As versões de teste (RC) chegam antes da final para poderem ser experimentadas a sério. Podem ter falhas. Os teus PDF e anotações não são tocados, mas convém exportar o que for importante.",
-        "text2": "Para voltar ao canal estável, muda-o aqui: receberás a próxima versão final.",
-        "yes": "Receber testes",
+        "title": "Receber sempre a última versão?",
+        "text": "Se a última publicada for uma versão de teste (RC), será essa que lhe oferecemos. Pode ter falhas. Os seus PDF e anotações não são tocados, mas convém exportar o que for importante.",
+        "text2": "Quando sair a estável seguinte, será essa que lhe oferecemos. Para receber só estáveis, volte a mudar aqui.",
+        "yes": "Receber as últimas",
         "cancel": "Cancelar"
       },
       "back": {
-        "title": "Voltar ao canal estável",
-        "text": "Continuas com a {{current}} até sair a versão final; então será oferecida. Se quiseres já a estável, instala-a à mão a partir do GitHub.",
+        "title": "Voltar a só estáveis",
+        "text": "Continua com a {{current}} até sair a versão estável; então será oferecida. Se quiser a estável já, instale-a manualmente a partir do GitHub.",
         "github": "Abrir GitHub",
         "ok": "Percebido"
       }

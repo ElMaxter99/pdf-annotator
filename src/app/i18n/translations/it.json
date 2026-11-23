@@ -1704,20 +1704,20 @@
     "notesRc": "Note della versione di prova",
     "channel": {
       "label": "Canale di aggiornamento",
-      "stable": "Stabile",
-      "beta": "Prove",
-      "hintStable": "Solo versioni finali. Consigliato.",
-      "hintBeta": "Ricevi anche versioni di prova (RC) prima di quella finale. Possono avere errori.",
+      "stable": "Solo stabili",
+      "latest": "Ultime",
+      "hintStable": "Solo versioni stabili. È la scelta consigliata.",
+      "hintLatest": "Sempre la versione più recente: se è di prova (RC), quella; se è stabile, la stabile.",
       "confirm": {
-        "title": "Ricevere versioni di prova?",
-        "text": "Le versioni di prova (RC) arrivano prima di quella finale per poterle provare davvero. Possono avere errori. I tuoi PDF e le annotazioni non vengono toccati, ma conviene esportare ciò che è importante.",
-        "text2": "Per tornare al canale stabile, cambialo qui: riceverai la prossima versione finale.",
-        "yes": "Ricevi le prove",
+        "title": "Ricevere sempre l’ultima versione?",
+        "text": "Se l’ultima pubblicata è una versione di prova (RC), ti verrà proposta quella. Può avere difetti. I tuoi PDF e le annotazioni non vengono toccati, ma conviene esportare ciò che conta.",
+        "text2": "Quando uscirà la stabile successiva, ti verrà proposta quella. Per ricevere solo stabili, cambialo di nuovo qui.",
+        "yes": "Ricevi le ultime",
         "cancel": "Annulla"
       },
       "back": {
-        "title": "Tornare al canale stabile",
-        "text": "Resti sulla {{current}} finché non esce la versione finale; allora ti verrà proposta. Se vuoi subito la stabile, installala a mano da GitHub.",
+        "title": "Tornare a solo stabili",
+        "text": "Resti sulla {{current}} finché non esce la versione stabile; allora ti verrà proposta. Se vuoi la stabile subito, installala a mano da GitHub.",
         "github": "Apri GitHub",
         "ok": "Ho capito"
       }

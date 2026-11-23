@@ -16,7 +16,7 @@ Antes de publicar una versión de verdad (por ejemplo la **1.9.0**) se publica u
 - Si una RC sale con fallos no se «arregla»: se saca otra (`rc.2`) y, cuando una sale bien, se publica la final con el mismo número.
 
 ## Qué es una *release candidate* (RC)
-Es un ensayo general. «Candidata a versión final». Tiene instaladores reales (los mismos archivos que tendría la final), pero GitHub la marca como **pre-release**: no es «la última versión», y los usuarios normales no reciben aviso de ella. Solo la ve quien la busque en la página de [Releases](https://github.com/ElMaxter99/pdf-annotator/releases) o quien haya activado el canal **Pruebas** en la app de escritorio (pulsa la versión → «Canal de actualizaciones», o Ayuda → «Buscar actualizaciones…»).
+Es un ensayo general. «Candidata a versión final». Tiene instaladores reales (los mismos archivos que tendría la final), pero GitHub la marca como **pre-release**: no es «la última versión», y los usuarios normales no reciben aviso de ella. Solo la ve quien la busque en la página de [Releases](https://github.com/ElMaxter99/pdf-annotator/releases) o quien haya activado el canal **Últimas** en la app de escritorio (pulsa la versión → «Canal de actualizaciones», o Ayuda → «Buscar actualizaciones…»).
 
 ## Los pasos, de principio a fin
 1. **Decidir la versión.** Se sube de versión cuando hay cosas nuevas que enseñar. Si solo hay arreglos, se sube el último número (1.9.0 → 1.9.1); si hay funcionalidad nueva, el del medio (1.9.0 → 1.10.0).
@@ -27,7 +27,7 @@ Es un ensayo general. «Candidata a versión final». Tiene instaladores reales 
    - pasa los tests, compila los instaladores de Windows, macOS y Linux,
    - y publica la pre-release con las notas del CHANGELOG.
    Tarda unos 10–15 minutos. No cambia ningún archivo del repositorio: solo crea la etiqueta y la release.
-4. **Probar la RC.** Se baja el instalador de tu sistema desde [Releases](https://github.com/ElMaxter99/pdf-annotator/releases) y se instala (los instaladores no van firmados: Windows y macOS avisarán, es normal). Se comprueba que abre, que la versión del pie dice `1.9.0-rc.1`, que se carga un PDF, se anota y se exporta, y que lo nuevo de esta versión funciona. Más detalles en `docs/INSTALAR.md`. Cuando ya hay una RC instalada con el canal «Pruebas», las siguientes RC llegan solas como actualización.
+4. **Probar la RC.** Se baja el instalador de tu sistema desde [Releases](https://github.com/ElMaxter99/pdf-annotator/releases) y se instala (los instaladores no van firmados: Windows y macOS avisarán, es normal). Se comprueba que abre, que la versión del pie dice `1.9.0-rc.1`, que se carga un PDF, se anota y se exporta, y que lo nuevo de esta versión funciona. Más detalles en `docs/INSTALAR.md`. Cuando ya hay una RC instalada con el canal «Últimas», las siguientes RC llegan solas como actualización.
 5. **Si algo falla.** Se arregla en una PR a `develop` (sin tocar la versión), se fusiona y se vuelve a lanzar «Release candidate» con **la misma versión**: sale `rc.2`. Y así hasta que una salga limpia. Una RC no se borra ni se edita: se saca otra.
 6. **Dar por buena una RC.** Maxter dice «vale». Nadie publica la final sin ese visto bueno.
 7. **Publicar la versión final.** *Actions* → «Release» → *Run workflow* (rama `develop`). GitHub alinea `develop` y `master`, etiqueta `v1.9.0`, compila los instaladores definitivos, pone las notas y **publica**. A partir de ese momento, las apps instaladas avisan de la actualización.
@@ -35,8 +35,8 @@ Es un ensayo general. «Candidata a versión final». Tiene instaladores reales 
 
 ## Preguntas frecuentes
 - **¿Puedo saltarme la RC?** Sí, el botón «Release» funciona sin ella, pero no se recomienda: la RC existe para encontrar problemas de instalación antes de que lleguen a todos.
-- **¿La RC cambia lo que ve un usuario normal?** No. Nunca aparece como «última versión» y la app en canal Estable la ignora.
-- **¿Pasar de «Pruebas» a «Estable» baja de versión?** No. Te quedas en la RC hasta que salga la siguiente versión final.
+- **¿La RC cambia lo que ve un usuario normal?** No. Nunca aparece como «última versión» y la app en canal «Solo estables» la ignora.
+- **¿Pasar de «Últimas» a «Solo estables» baja de versión?** No. Te quedas en la RC hasta que salga la siguiente versión final.
 - **¿Por qué «Release candidate» falla a veces?** Mira la sección de problemas conocidos al final de la Parte B.
 
 ---
@@ -75,7 +75,7 @@ Repositorio: `ElMaxter99/pdf-annotator`. Ramas: `develop` (trabajo) y `master` (
 - [ ] Si algo falla: leer logs (`get_job_logs`, `failed_only`), arreglar **el workflow o el código en una PR a `develop`** (sin tocar la versión), fusionar con CI verde y volver a lanzar (sale `rc.N+1`). Máximo un re-run por fallo sin causa raíz entendida. No saltar tests ni deshabilitarlos.
 
 ## 4. Pasar la RC a Maxter
-- [ ] Informar con el formato **Estado / Hecho por Claude / Necesito de ti**: enlace a la pre-release, cómo instalarla (a mano desde Releases, o canal «Pruebas» si ya tiene la 1.9.0 o posterior) y qué probar.
+- [ ] Informar con el formato **Estado / Hecho por Claude / Necesito de ti**: enlace a la pre-release, cómo instalarla (a mano desde Releases, o canal «Últimas» si ya tiene la 1.9.0 o posterior) y qué probar.
 - [ ] Esperar. Si Maxter reporta fallos → paso 3 (arreglo) y nueva RC. **No lanzar la final sin su visto bueno explícito.**
 
 ## 5. Versión final (solo con visto bueno de Maxter)
