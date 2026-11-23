@@ -1260,7 +1260,8 @@
       "backToPanel": "Zurück zur Übersicht",
       "undoNotice": "{{count}} Vorlagen aktualisiert.",
       "undoAll": "Alles rückgängig",
-      "backupDone": "Sicherung heruntergeladen: {{count}} Vorlagen."
+      "backupDone": "Sicherung heruntergeladen: {{count}} Vorlagen.",
+      "noPagesWhy": "Das Dokument hat {{pages}} Seiten, aber keine mit gültigen Feldern ({{skippedPages}} Seiten und {{skippedFields}} Felder verworfen). Jedes Feld braucht numerische x und y und ein mapField."
     }
   },
   "preview": {

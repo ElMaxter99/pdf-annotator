@@ -68,4 +68,29 @@ describe('matchTemplate', () => {
     expect((templates[0].data as any)._id).toBe('65a');
     expect((templates[0].data as any).x).toBeNull();
   });
+
+  it('reads mongosh-style documents (unquoted keys, single quotes, NumberInt)', () => {
+    const raw = `[
+  {
+    _id: ObjectId('65a1b2c3d4e5f6a7b8c9d0e1'),
+    pdfName: 'factura-0412.pdf',
+    fontSize: 12,
+    createdAt: ISODate('2024-01-02T03:04:05.000Z'),
+    pages: [
+      { num: NumberInt(1), fields: [ { x: 10.5, y: NumberInt(20), mapField: "L'adresse", type: 'text' } ] }
+    ]
+  },
+  {
+    _id: ObjectId('65a1b2c3d4e5f6a7b8c9d0e2'),
+    pdfName: 'factura-0413.pdf',
+    pages: [ { num: 1, fields: [ { x: 1, y: 2, mapField: 'a' } ] } ]
+  }
+]`;
+    const { templates, error } = parsePastedTemplates(raw);
+    expect(error).toBeNull();
+    expect(templates.length).toBe(2);
+    const first = templates[0].data as any;
+    expect(first.pages[0].num).toBe(1);
+    expect(first.pages[0].fields[0].mapField).toBe("L'adresse");
+  });
 });

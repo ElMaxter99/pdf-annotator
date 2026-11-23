@@ -13,7 +13,19 @@ export function toFiniteNumber(value: unknown): number | null {
     return Number.isFinite(parsed) ? parsed : null;
   }
 
-  return null;
+  return fromExtendedJson(value);
+}
+
+const EXTENDED_NUMBER_KEYS = ['$numberInt', '$numberLong', '$numberDouble', '$numberDecimal'];
+
+/** MongoDB extended JSON numbers, e.g. `{ "$numberInt": "12" }` or `{ "$numberDouble": "10.5" }`. */
+function fromExtendedJson(value: unknown): number | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+  const record = value as Record<string, unknown>;
+  const key = EXTENDED_NUMBER_KEYS.find((candidate) => candidate in record);
+  return key && typeof record[key] === 'string' ? toFiniteNumber(record[key]) : null;
 }
 
 /** Truncates (does not round) to the given number of decimals and returns a fixed-width string. */
