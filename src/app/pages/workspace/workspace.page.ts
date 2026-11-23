@@ -1734,18 +1734,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   confirmEdit() {
     const e = this.editing();
     if (!e) return;
-    if (e.aiRowId) {
-      this.saveAiRowEdit(e.aiRowId, this.prepareFieldForStorage(e.field));
-      this.editing.set(null);
-      this.closeFontDropdown('edit');
-      return;
-    }
     if (!fieldHasRenderableContent(e.field)) {
       this.editing.set(null);
       this.closeFontDropdown('edit');
       return;
     }
-    const normalized = this.prepareFieldForStorage(e.field);
+    const aiId = this.coords()[e.pageIndex]?.fields[e.fieldIndex]?.aiId;
+    const normalized = { ...this.prepareFieldForStorage(e.field), ...(aiId ? { aiId } : {}) };
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) =>
@@ -1974,15 +1969,6 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   deleteAnnotation() {
     const e = this.editing();
     if (!e) return;
-    if (e.aiRowId) {
-      // In the proposal, «eliminar» leaves the field out of what «Aplicar» creates.
-      const session = this.ai();
-      if (session) {
-        this.patchAi({ overrides: { ...session.overrides, [e.aiRowId]: false } });
-      }
-      this.editing.set(null);
-      return;
-    }
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages)),
@@ -2413,7 +2399,11 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
           el.classList.toggle('annotation--selected', this.isSelected(pageIndex, fieldIndex));
           el.onpointerdown = isLocked
             ? (evt) => this.drag.pointerDownLocked(evt, pageIndex, fieldIndex)
-            : (evt) => this.drag.pointerDown(evt, pageIndex, fieldIndex);
+            : (evt) => {
+                // Con cajas solapadas y una pareja A↔B activa, se coge la emparejada y no la de encima.
+                const target = this.pairedFieldUnder(evt, pageIndex, fieldIndex, el);
+                this.drag.pointerDown(evt, target.pageIndex, target.fieldIndex, target.el);
+              };
           layer.appendChild(el);
 
           this.runAfterRender(() => this.updateAnnotationLeft(el, styledField, scale));

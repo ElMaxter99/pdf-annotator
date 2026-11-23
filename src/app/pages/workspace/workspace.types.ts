@@ -21,12 +21,10 @@ export interface WheelEdgeIndicator {
 
 export type PreviewState = { page: number; field: PageField } | null;
 
-/** `aiRowId`: editing a field of the AI proposal (not of B yet); the change stays in the proposal until «Aplicar». */
 export type EditState = {
   pageIndex: number;
   fieldIndex: number;
   field: PageField;
-  aiRowId?: string;
 } | null;
 
 export type JsonViewMode = 'text' | 'tree';

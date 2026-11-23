@@ -91,10 +91,15 @@ export class AnnotationDragController {
     this.host.startEditing(pageIndex, fieldIndex, field);
   }
 
-  pointerDown(evt: PointerEvent, pageIndex: number, fieldIndex: number): void {
+  pointerDown(
+    evt: PointerEvent,
+    pageIndex: number,
+    fieldIndex: number,
+    target?: HTMLElement | null,
+  ): void {
     evt.preventDefault();
     evt.stopPropagation();
-    const el = evt.currentTarget as HTMLDivElement | null;
+    const el = (target ?? evt.currentTarget) as HTMLDivElement | null;
     if (!el) return;
 
     const computedFontSize = parseFloat(getComputedStyle(el).fontSize || '0');

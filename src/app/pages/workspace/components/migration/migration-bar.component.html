@@ -236,10 +236,10 @@
                 @if (notice.id === 'ai') {
                   @if (vm.ai()?.phase === 'ready') {
                     <button type="button" class="btn btn--primary" (click)="vm.applyAi()" data-testid="notice-ai-apply">
-                      {{ 'batch.adjust.apply' | t: { count: vm.aiSummary().selected } }}
+                      {{ 'ai.dock.apply' | t: { count: vm.aiSummary().selected } }}
                     </button>
                   }
-                  <button type="button" class="btn btn--ghost" (click)="vm.cancelAi()" data-testid="notice-ai-cancel">
+                  <button type="button" class="btn btn--ghost" (click)="vm.discardAi()" data-testid="notice-ai-cancel">
                     {{ 'batch.adjust.cancelProposal' | t }}
                   </button>
                 }

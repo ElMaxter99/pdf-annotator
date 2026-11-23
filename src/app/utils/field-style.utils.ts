@@ -110,6 +110,10 @@ export function prepareFieldForStorage(
     base.value = value;
   }
 
+  if (typeof styled.aiId === 'string') {
+    base.aiId = styled.aiId;
+  }
+
   if (type === 'number') {
     const decimals = normalizeFieldDecimals(styled.decimals);
     if (decimals !== undefined) {

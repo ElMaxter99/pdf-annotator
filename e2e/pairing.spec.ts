@@ -59,7 +59,7 @@ test('la tarjeta de la propuesta lleva a la pareja: A y B resaltados y unidos po
   expect(await box.isChecked()).toBe(before);
 
   await expect(page.getByTestId('split-a').locator('.reference-field.pair-focus')).toHaveCount(1);
-  await expect(page.locator('.canvas-container--split-b .reference-field.pair-focus')).toHaveCount(1);
+  await expect(page.locator('.annotation.pair-focus')).toHaveCount(1);
   await expect(page.getByTestId('pair-line')).toBeVisible();
 
   await page.keyboard.press('Escape');
@@ -77,7 +77,7 @@ test('clic en un campo de A dibuja la línea hasta su pareja en B; clic en vací
   if (!r) throw new Error('sin campo de A');
   await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
   await expect(page.getByTestId('pair-line')).toBeVisible();
-  await expect(page.locator('.canvas-container--split-b .reference-field.pair-focus')).toHaveCount(1);
+  await expect(page.locator('.annotation.pair-focus')).toHaveCount(1);
 
   // la línea va del campo de A al de B
   const line = page.getByTestId('pair-line').locator('line');
@@ -104,13 +104,13 @@ test('con la propuesta aplicada, la fila de un campo de B lleva a la pareja en �
   await expect(page.getByTestId('pair-line')).toBeVisible();
 });
 
-test('con la propuesta editable: pasar el ratón por un campo propuesto de B dibuja la línea a A y el clic sigue abriendo el editor', async ({ page }) => {
+test('con la propuesta escrita en B: pasar el ratón por un campo de B dibuja la línea a A y el clic sigue abriendo el editor', async ({ page }) => {
   await openBatchWithB(page);
   await proposeWithAi(page);
-  const proposed = page.getByTestId('ai-proposal-field').first();
-  await expect(proposed).toBeVisible();
-  const r = await proposed.boundingBox();
-  if (!r) throw new Error('sin campo propuesto');
+  const written = page.locator('.annotation').first();
+  await expect(written).toBeVisible();
+  const r = await written.boundingBox();
+  if (!r) throw new Error('sin campo escrito');
   await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
   await page.waitForTimeout(600);
   await expect(page.getByTestId('pair-line')).toBeVisible();
@@ -119,7 +119,7 @@ test('con la propuesta editable: pasar el ratón por un campo propuesto de B dib
   await expect(page.locator('.annotation-editor, app-annotation-editor').first()).toBeVisible();
 });
 
-test('con una pareja activa, arrastrar sobre cajas solapadas de la propuesta mueve la emparejada y no la de encima', async ({ page }) => {
+test('con una pareja activa, arrastrar sobre cajas solapadas de B mueve la emparejada y no la de encima', async ({ page }) => {
   await openBatchWithB(page);
   await proposeWithAi(page);
   const fieldA = page.getByTestId('split-a').locator('.reference-field').first();
@@ -127,31 +127,45 @@ test('con una pareja activa, arrastrar sobre cajas solapadas de la propuesta mue
   const a = await fieldA.boundingBox();
   if (!a) throw new Error('sin campo de A');
   await page.mouse.click(a.x + a.width / 2, a.y + a.height / 2);
-  const paired = page.locator('.canvas-container--split-b .reference-field.pair-focus');
+  const paired = page.locator('.annotation.pair-focus');
   await expect(paired).toHaveCount(1);
-  const pairedId = await paired.getAttribute('data-ai-id');
-  // Otra caja de la propuesta (la última, que queda encima) se pone justo sobre la emparejada.
-  const { topId, topOriginalLeft } = await page.evaluate((id) => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>('[data-testid="ai-proposal-field"]'));
-    const base = els.find((el) => el.dataset['aiId'] === id)!;
-    const top = els.filter((el) => el.dataset['aiId'] !== id).pop()!;
+  const pairedIndex = await paired.getAttribute('data-field-index');
+  // Otra anotación de B se pone justo sobre la emparejada y encima de ella.
+  const { topIndex, topOriginalLeft } = await page.evaluate((index) => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>('.annotation'));
+    const base = els.find((el) => el.dataset['fieldIndex'] === index)!;
+    const top = els
+      .filter((el) => el.dataset['pageIndex'] === base.dataset['pageIndex'] && el.dataset['fieldIndex'] !== index)
+      .shift()!;
     const original = top.style.left;
     top.style.left = base.style.left;
     top.style.top = base.style.top;
     top.style.zIndex = '10';
-    return { topId: top.dataset['aiId'], topOriginalLeft: original };
-  }, pairedId);
-  const box = (id: string) => page.locator(`[data-testid="ai-proposal-field"][data-ai-id="${id}"]`);
-  const pairedBefore = await box(pairedId!).evaluate((el) => (el as HTMLElement).style.left);
-  const r = await box(pairedId!).boundingBox();
-  if (!r) throw new Error('sin caja emparejada');
-  const x = r.x + 3;
-  const y = r.y + r.height / 2;
+    return { topIndex: top.dataset['fieldIndex']!, topOriginalLeft: original };
+  }, pairedIndex);
+  await page.waitForTimeout(600); // las anotaciones se mueven con una transición
+  const box = (index: string) => page.locator(`.annotation[data-field-index="${index}"]`);
+  const pairedBefore = await box(pairedIndex!).evaluate((el) => (el as HTMLElement).style.left);
+  // Un punto de la zona donde se solapan las dos cajas.
+  const overlap = await page.evaluate(
+    ([a, b]) => {
+      const ra = document.querySelector(`.annotation[data-field-index="${a}"]`)!.getBoundingClientRect();
+      const rb = document.querySelector(`.annotation[data-field-index="${b}"]`)!.getBoundingClientRect();
+      const left = Math.max(ra.left, rb.left);
+      const right = Math.min(ra.right, rb.right);
+      const top = Math.max(ra.top, rb.top);
+      const bottom = Math.min(ra.bottom, rb.bottom);
+      return right - left > 2 && bottom - top > 2 ? { x: (left + right) / 2, y: (top + bottom) / 2 } : null;
+    },
+    [pairedIndex!, topIndex],
+  );
+  if (!overlap) throw new Error('las cajas no se solapan');
+  const { x, y } = overlap;
   await page.mouse.move(x, y);
   await page.mouse.down();
   await page.mouse.move(x + 60, y + 10, { steps: 6 });
   await page.mouse.up();
-  await expect.poll(() => box(pairedId!).evaluate((el) => (el as HTMLElement).style.left)).not.toBe(pairedBefore);
-  // Tras el redibujado, la de encima sigue donde estaba en la propuesta: no se arrastró.
-  expect(await box(topId!).evaluate((el) => (el as HTMLElement).style.left)).toBe(topOriginalLeft);
+  await expect.poll(() => box(pairedIndex!).evaluate((el) => (el as HTMLElement).style.left)).not.toBe(pairedBefore);
+  // Tras el redibujado, la de encima sigue donde estaba: no se arrastró.
+  expect(await box(topIndex).evaluate((el) => (el as HTMLElement).style.left)).toBe(topOriginalLeft);
 });

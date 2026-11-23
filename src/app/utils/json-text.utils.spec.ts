@@ -52,6 +52,12 @@ describe('json-text.utils', () => {
     expect(serializeFieldForJson(field, true)).toEqual({ ...(field as object) });
   });
 
+  it('serializeFieldForJson nunca escribe la marca interna de la propuesta de la IA', () => {
+    const field = { x: 1, y: 2, mapField: 'a', fontSize: 12, type: 'text', aiId: '1:p1-f1' } as never;
+    expect(serializeFieldForJson(field, false)).not.toEqual(jasmine.objectContaining({ aiId: jasmine.anything() }));
+    expect('aiId' in serializeFieldForJson(field, true)).toBeFalse();
+  });
+
   it('isEditableElement reconoce campos de texto y no botones', () => {
     const text = document.createElement('input');
     const check = document.createElement('input');

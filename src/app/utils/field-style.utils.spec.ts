@@ -23,6 +23,11 @@ const base = (over: Partial<PageField> = {}): PageField =>
   }) as PageField;
 
 describe('field-style.utils', () => {
+  it('prepareFieldForStorage conserva la marca interna de la propuesta de la IA', () => {
+    const field = { x: 1, y: 2, mapField: 'a', fontSize: 12, type: 'text', color: '#000', aiId: '7:p1-f1' } as PageField;
+    expect(prepareFieldForStorage(field, keepFont).aiId).toBe('7:p1-f1');
+  });
+
   it('normalizeOpacityValue limita a 0..1 con dos decimales', () => {
     expect(normalizeOpacityValue(2)).toBe(1);
     expect(normalizeOpacityValue(-1)).toBe(0);

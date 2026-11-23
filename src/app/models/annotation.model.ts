@@ -15,6 +15,8 @@ export interface PageField {
   backgroundColor?: string | null;
   locked?: boolean;
   hidden?: boolean;
+  /** Marca interna (nunca va al JSON ni al PDF): este campo lo escribió la propuesta de la IA de la revisión abierta. */
+  aiId?: string;
 }
 
 export interface PageAnnotations {
