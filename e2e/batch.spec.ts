@@ -923,8 +923,17 @@ test('«Dividida»: the double click of the viewer acts on the pane under the po
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.keyboard.press('l');
   await expect(page.getByTestId('split-link')).toContainText('Enlazado');
-  await expect.poll(widthA).toBe(await widthB());
-  const b0 = await widthB();
+  // Linking re-renders B at A's zoom: take the starting width only once both panes stopped changing.
+  let b0 = await widthB();
+  let steady = 0;
+  await expect
+    .poll(async () => {
+      const [a, b] = [await widthA(), await widthB()];
+      steady = a === b && b === b0 ? steady + 1 : 0;
+      b0 = b;
+      return steady >= 3;
+    }, { intervals: [200] })
+    .toBe(true);
   const canvasB = (await page.locator('.canvas--pdf').boundingBox())!;
   await middleDouble(canvasB.x + canvasB.width / 2, canvasB.y + 40);
   await expect.poll(widthB).not.toBe(b0);
