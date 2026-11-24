@@ -16,6 +16,7 @@
 
 ### Fixed
 - **Instalar una versión en Ubuntu ya pide la contraseña (y no se queda colgado):** si el sistema no tenía agente de contraseñas disponible, se mostraba «cancelaste la contraseña» sin haberla pedido; ahora se explica el motivo real. Además la instalación no se bloquea en «Instalando» si algo falla, ignora pulsaciones repetidas y vuelve a localizar el instalador descargado antes de pedir la contraseña.
+- **«Copiar JSON» entrega siempre JSON válido (1.19):** si el texto del editor llevaba claves sin comillas o comillas simples, el botón lo copiaba tal cual; ahora lo reescribe con el formato elegido (por defecto, JSON estricto). Además, si el navegador no permite el portapapeles (contexto no seguro o permiso denegado) se usa el método antiguo en lugar de fallar sin aviso.
 
 ## [v1.18.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.18.1) - 2026-11-23
 ### Fixed
