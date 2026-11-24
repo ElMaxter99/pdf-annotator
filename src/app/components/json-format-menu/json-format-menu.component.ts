@@ -5,6 +5,7 @@ import {
   HostListener,
   computed,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
@@ -177,6 +178,10 @@ const SAMPLE = JSON.stringify({
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
       animation: jfm-in 150ms ease-out;
     }
+    .jfm__pop--up {
+      top: auto;
+      bottom: calc(100% + 8px);
+    }
     @keyframes jfm-in {
       from {
         opacity: 0;
@@ -275,6 +280,8 @@ const SAMPLE = JSON.stringify({
 export class JsonFormatMenuComponent {
   private readonly formats = inject(JsonCopyFormatService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  /** Se abre hacia arriba cuando el botón está en la barra fija del borde inferior. */
+  readonly up = input(false);
   readonly open = signal(false);
   readonly fmt = this.formats.format;
   readonly strict = computed(() => isStrictJsonFormat(this.fmt()));
