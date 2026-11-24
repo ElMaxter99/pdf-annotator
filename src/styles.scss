@@ -7771,10 +7771,14 @@ button.version-chip:focus-visible {
   font-size: 12px;
   font-weight: 600;
   background: var(--input-bg);
-  color: var(--muted);
+  color: var(--text);
 }
 .json-keys__chip {
   color: var(--warning-text);
+}
+:root.theme-light .json-keys__pill,
+:root.theme-light .json-keys__chip {
+  background: var(--light-surface);
 }
 .json-keys__hint {
   color: var(--muted);
