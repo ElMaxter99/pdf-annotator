@@ -7894,3 +7894,23 @@ button.version-chip:focus-visible {
     transition: none;
   }
 }
+
+/* Claves del JSON (P-157 a P-159) */
+.json-keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 0 0 8px;
+}
+.json-keys__hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+.json-keys .json-copy__seg button {
+  white-space: nowrap;
+}
+.json-keys .json-copy__seg button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

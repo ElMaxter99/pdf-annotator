@@ -183,6 +183,13 @@
         "js": "JS/TS-Objekt",
         "custom": "Benutzerdefiniert"
       }
+    },
+    "jsonKeys": {
+      "label": "Schlüssel",
+      "quoted": "Mit Anführungszeichen",
+      "bare": "Ohne Anführungszeichen",
+      "notStrict": "Schlüssel ohne Anführungszeichen · kein striktes JSON",
+      "fixFirst": "Korrigiere das JSON, um das Format zu ändern."
     }
   },
   "guides": {
@@ -2585,7 +2592,9 @@
       "snapHelp": "Beim Ziehen rastet eine Anmerkung auf dem X- oder Y-Wert einer nahen ein und eine Hilfslinie erscheint. Vermeidet kleine Versätze zwischen benachbarten Kästchen oder Feldern.",
       "distance": "Magnet-Abstand",
       "distanceHelp": "Bildschirmpixel bis zum Einrasten. Ändert sich nicht mit dem Zoom.",
-      "altHint": "Halte Alt (⌥ am Mac) beim Ziehen gedrückt, um in dem Moment nicht auszurichten."
+      "altHint": "Halte Alt (⌥ am Mac) beim Ziehen gedrückt, um in dem Moment nicht auszurichten.",
+      "jsonKeys": "JSON-Schlüssel",
+      "jsonKeysHelp": "Wie Schlüssel im Editor „JSON-Annotation“ geschrieben werden. Mit Anführungszeichen ist es gültiges JSON, ohne ein JS-Objekt. Der Import liest beides."
     }
   }
 }

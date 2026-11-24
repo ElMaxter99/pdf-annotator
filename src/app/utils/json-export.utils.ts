@@ -1,3 +1,4 @@
+import { formatJsonForCopy } from './json-copy-format.utils';
 import type { PageAnnotations, PageField } from '../models/annotation.model';
 
 export interface JsonExportPayload {
@@ -17,6 +18,18 @@ export function buildJsonExportPayload(
   };
 }
 
-export function jsonExportText(payload: JsonExportPayload): string {
-  return JSON.stringify(payload, null, 2);
+export function jsonExportText(
+  payload: JsonExportPayload,
+  keys: 'quoted' | 'bare' = 'quoted',
+): string {
+  const strict = JSON.stringify(payload, null, 2);
+  if (keys === 'quoted') return strict;
+  return (
+    formatJsonForCopy(strict, {
+      keys: 'bare',
+      quote: 'double',
+      indent: '2',
+      trailingComma: false,
+    }) ?? strict
+  );
 }

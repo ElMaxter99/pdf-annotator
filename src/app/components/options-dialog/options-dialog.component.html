@@ -74,6 +74,16 @@
               }
             </div>
           </div>
+          <div class="options__field">
+            <span class="options__label" id="options-json-keys-label">{{ 'options.editor.jsonKeys' | t }}</span>
+            <span class="options__hint">{{ 'options.editor.jsonKeysHelp' | t }}</span>
+            <div class="options__chips" role="group" aria-labelledby="options-json-keys-label">
+              <button type="button" class="options__chip" [attr.aria-pressed]="editor.jsonKeys() === 'quoted'"
+                (click)="editor.setJsonKeys('quoted')" data-testid="options-json-keys-quoted">{{ 'sidebar.jsonKeys.quoted' | t }} · {{ 'options.ai.limit.default' | t }}</button>
+              <button type="button" class="options__chip" [attr.aria-pressed]="editor.jsonKeys() === 'bare'"
+                (click)="editor.setJsonKeys('bare')" data-testid="options-json-keys-bare">{{ 'sidebar.jsonKeys.bare' | t }}</button>
+            </div>
+          </div>
           <p class="options__hint"><kbd>Alt</kbd> {{ 'options.editor.altHint' | t }}</p>
           <span class="options__spacer"></span>
           <div class="options__foot options__foot--row">

@@ -17,4 +17,11 @@ describe('json-export.utils', () => {
   it('formats with two spaces of indentation', () => {
     expect(jsonExportText({ pages: [] })).toBe('{\n  "pages": []\n}');
   });
+
+  it('writes unquoted keys on request and keeps strings in double quotes', () => {
+    const text = jsonExportText({ pages: [{ num: 1, fields: [{ x: 1, mapField: 'a' }] }] }, 'bare');
+    expect(text).toContain('pages: [');
+    expect(text).toContain('mapField: "a"');
+    expect(text).not.toContain('"pages"');
+  });
 });

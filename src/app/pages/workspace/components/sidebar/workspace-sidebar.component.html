@@ -114,6 +114,19 @@
     </div>
 
     <ng-container *ngIf="!vm.jsonPanelCollapsed()">
+      <div class="json-keys" *ngIf="vm.jsonViewMode() === 'text'" data-testid="json-keys">
+        <span class="json-copy__label" id="json-keys-label">{{ 'sidebar.jsonKeys.label' | t }}</span>
+        <div class="json-copy__seg" role="group" aria-labelledby="json-keys-label">
+          <button type="button" [attr.aria-pressed]="!vm.jsonKeysAreBare()"
+            [disabled]="!vm.jsonKeysCanChange()" data-testid="json-keys-quoted"
+            (click)="vm.setJsonKeys('quoted')">{{ 'sidebar.jsonKeys.quoted' | t }}</button>
+          <button type="button" [attr.aria-pressed]="vm.jsonKeysAreBare()"
+            [disabled]="!vm.jsonKeysCanChange()" data-testid="json-keys-bare"
+            (click)="vm.setJsonKeys('bare')">{{ 'sidebar.jsonKeys.bare' | t }}</button>
+        </div>
+        <span class="json-copy__chip" *ngIf="vm.jsonKeysAreBare()" data-testid="json-keys-notstrict">{{ 'sidebar.jsonKeys.notStrict' | t }}</span>
+        <span class="json-keys__hint" *ngIf="!vm.jsonKeysCanChange()">{{ 'sidebar.jsonKeys.fixFirst' | t }}</span>
+      </div>
       <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
         <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel()"
           (ngModelChange)="vm.onCoordsTextChange($event)" (paste)="vm.onCoordsTextPaste()"

@@ -183,6 +183,13 @@
         "js": "Oggetto JS/TS",
         "custom": "Personalizzato"
       }
+    },
+    "jsonKeys": {
+      "label": "Chiavi",
+      "quoted": "Con virgolette",
+      "bare": "Senza virgolette",
+      "notStrict": "Chiavi senza virgolette · non è JSON rigoroso",
+      "fixFirst": "Correggi il JSON per cambiare formato."
     }
   },
   "guides": {
@@ -2585,7 +2592,9 @@
       "snapHelp": "Trascinando, un'annotazione scatta sulla X o sulla Y di una vicina e compare una guida. Evita piccoli scostamenti tra caselle o campi adiacenti.",
       "distance": "Distanza della calamita",
       "distanceHelp": "Pixel dello schermo prima dello scatto. Non cambia con lo zoom.",
-      "altHint": "Tieni premuto Alt (⌥ su Mac) mentre trascini per non allineare in quel momento."
+      "altHint": "Tieni premuto Alt (⌥ su Mac) mentre trascini per non allineare in quel momento.",
+      "jsonKeys": "Chiavi del JSON",
+      "jsonKeysHelp": "Come vengono scritte le chiavi nell'editor «Annotazione JSON». Con virgolette è JSON valido; senza virgolette è un oggetto JS. L'importazione legge entrambi."
     }
   }
 }

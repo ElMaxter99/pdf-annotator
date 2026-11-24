@@ -183,6 +183,13 @@
         "js": "Objeto JS/TS",
         "custom": "Personalizado"
       }
+    },
+    "jsonKeys": {
+      "label": "Chaves",
+      "quoted": "Com aspas",
+      "bare": "Sem aspas",
+      "notStrict": "Chaves sem aspas · não é JSON estrito",
+      "fixFirst": "Corrija o JSON para mudar o formato."
     }
   },
   "guides": {
@@ -2585,7 +2592,9 @@
       "snapHelp": "Ao arrastar, uma anotação salta para o X ou o Y de outra próxima e desenha-se uma guia. Evita pequenos desvios entre caixas ou campos contíguos.",
       "distance": "Distância do íman",
       "distanceHelp": "Pixels do ecrã até saltar. Não muda com o zoom.",
-      "altHint": "Mantenha Alt (⌥ no Mac) ao arrastar para não alinhar nesse momento."
+      "altHint": "Mantenha Alt (⌥ no Mac) ao arrastar para não alinhar nesse momento.",
+      "jsonKeys": "Chaves do JSON",
+      "jsonKeysHelp": "Como as chaves são escritas no editor «Anotação JSON». Com aspas é JSON válido; sem aspas é um objeto JS. A importação lê ambos."
     }
   }
 }

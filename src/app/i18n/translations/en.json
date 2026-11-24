@@ -183,6 +183,13 @@
         "js": "JS/TS object",
         "custom": "Custom"
       }
+    },
+    "jsonKeys": {
+      "label": "Keys",
+      "quoted": "Quoted",
+      "bare": "Unquoted",
+      "notStrict": "Unquoted keys · not strict JSON",
+      "fixFirst": "Fix the JSON to change the format."
     }
   },
   "guides": {
@@ -2585,7 +2592,9 @@
       "snapHelp": "While dragging, an annotation jumps to the X or Y of a nearby one and a guide is drawn. It avoids tiny offsets between neighbouring boxes or fields.",
       "distance": "Magnet distance",
       "distanceHelp": "Screen pixels before it jumps. It does not change with zoom.",
-      "altHint": "Hold Alt (⌥ on Mac) while dragging to skip aligning for that moment."
+      "altHint": "Hold Alt (⌥ on Mac) while dragging to skip aligning for that moment.",
+      "jsonKeys": "JSON keys",
+      "jsonKeysHelp": "How keys are written in the “JSON annotations” editor. Quoted is valid JSON; unquoted is a JS object. Import reads both."
     }
   }
 }

@@ -75,3 +75,27 @@ test('copy still works without the async clipboard API', async ({ page }) => {
   await expect(page.locator('.toast--error')).toHaveCount(0);
   await expect(page.locator('.toast')).toContainText('JSON');
 });
+
+test('the JSON keys setting rewrites the editor, syncs with Options', async ({
+  page,
+}) => {
+  const editor = page.locator('.json-editor');
+  await expect(editor).toHaveValue(/"pages"/);
+  await page.getByTestId('json-keys-bare').click();
+  await expect(editor).toHaveValue(/^\{\s*pages: \[/);
+  await expect(page.getByTestId('json-keys-notstrict')).toBeVisible();
+  // Copy follows the same choice.
+  await page.getByRole('button', { name: 'Copiar JSON', exact: true }).click();
+  expect(await clipboard(page)).toContain('pages: [');
+  // Options › Editor shows the same value and changes it back.
+  await page.getByTestId('more-options').click();
+  await page.getByTestId('options-open').click();
+  await expect(page.getByTestId('options-json-keys-bare')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByTestId('options-json-keys-quoted').click();
+  await page.getByTestId('options-close').click();
+  await expect(editor).toHaveValue(/"pages"/);
+  await expect(page.getByTestId('json-keys-notstrict')).toHaveCount(0);
+  // A syntax error disables the switch.
+  await editor.fill('{ pages: [');
+  await expect(page.getByTestId('json-keys-bare')).toBeDisabled();
+});
