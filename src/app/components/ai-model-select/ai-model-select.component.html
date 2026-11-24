@@ -22,42 +22,103 @@
   </button>
 
   @if (open()) {
-    <div
-      #listbox
-      class="ms__list"
-      role="listbox"
-      [attr.aria-label]="'ai.models.pick' | t"
-      (keydown)="onListKey($event)"
-      [attr.data-testid]="testId() + '-list'"
-    >
-      @if (skeleton()) {
-        <div class="ms__skeleton" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      }
-      @for (row of rows(); track $index) {
-        @if (row.kind === 'group') {
-          <div class="ms__group" role="presentation">{{ row.label }}</div>
-        } @else {
+    <div class="ms__pop" (keydown)="onListKey($event)">
+      <div class="ms__search" [class.ms__search--idle]="skeleton()">
+        <span aria-hidden="true">⌕</span>
+        <input
+          #search
+          type="search"
+          class="ms__input"
+          autocomplete="off"
+          spellcheck="false"
+          [value]="query()"
+          [disabled]="skeleton()"
+          [attr.placeholder]="'ai.models.search' | t"
+          [attr.aria-label]="'ai.models.search' | t"
+          (input)="setQuery($any($event.target).value)"
+          [attr.data-testid]="testId() + '-search'"
+        />
+        @if (query()) {
           <button
             type="button"
-            role="option"
-            class="ms__opt"
-            [class.ms__opt--on]="selected() === row.id"
-            [attr.aria-selected]="selected() === row.id"
-            (click)="pick(row.id)"
-            [attr.data-testid]="testId() + '-opt-' + (row.id || 'auto')"
+            class="ms__x"
+            [attr.aria-label]="'ai.models.clearSearch' | t"
+            (click)="clearQuery()"
+            [attr.data-testid]="testId() + '-search-clear'"
           >
-            <span class="ms__name">
-              <b>{{ row.name }}</b>
-              @if (row.description) {
-                <small>{{ row.description }}</small>
-              }
-            </span>
-            @if (selected() === row.id) {
-              <span class="ms__tick" aria-hidden="true">✓</span>
-            }
+            ✕
           </button>
         }
+      </div>
+      @if (!skeleton()) {
+        <div class="ms__count" role="status" [attr.data-testid]="testId() + '-count'">
+          {{
+            query().trim()
+              ? ('ai.models.count' | t: { shown: shown(), total: total() })
+              : ('ai.models.total' | t: { total: total() })
+          }}
+        </div>
       }
+      <div
+        #listbox
+        class="ms__list"
+        role="listbox"
+        [attr.aria-label]="'ai.models.pick' | t"
+        [attr.data-testid]="testId() + '-list'"
+      >
+        @if (skeleton()) {
+          <div class="ms__skeleton" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        }
+        @if (!skeleton() && query().trim() && shown() === 0) {
+          <div class="ms__none" [attr.data-testid]="testId() + '-none'">
+            <p>{{ 'ai.models.noMatch' | t: { query: query().trim() } }}</p>
+            <button type="button" class="btn btn--ghost ms__btn" (click)="clearQuery()">
+              {{ 'ai.models.clearSearch' | t }}
+            </button>
+          </div>
+        }
+        @for (row of rows(); track $index) {
+          @if (row.kind === 'group') {
+            <div class="ms__group" role="presentation">{{ row.label }}</div>
+          } @else {
+            <button
+              type="button"
+              role="option"
+              class="ms__opt"
+              [class.ms__opt--on]="selected() === row.id"
+              [attr.aria-selected]="selected() === row.id"
+              (click)="pick(row.id)"
+              [attr.data-testid]="testId() + '-opt-' + (row.id || 'auto')"
+            >
+              <span class="ms__name">
+                <b>
+                  @for (s of row.nameSegs; track $index) {
+                    @if (s.hit) {
+                      <mark>{{ s.text }}</mark>
+                    } @else {
+                      <span>{{ s.text }}</span>
+                    }
+                  }
+                </b>
+                @if (row.description) {
+                  <small>
+                    @for (s of row.descSegs; track $index) {
+                      @if (s.hit) {
+                        <mark>{{ s.text }}</mark>
+                      } @else {
+                        <span>{{ s.text }}</span>
+                      }
+                    }
+                  </small>
+                }
+              </span>
+              @if (selected() === row.id) {
+                <span class="ms__tick" aria-hidden="true">✓</span>
+              }
+            </button>
+          }
+        }
+      </div>
     </div>
   }
 

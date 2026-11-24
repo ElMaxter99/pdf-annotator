@@ -1606,6 +1606,11 @@
     },
     "models": {
       "pick": "Triar model",
+      "search": "Cerca un model…",
+      "total": "{{total}} models",
+      "count": "{{shown}} de {{total}}",
+      "noMatch": "Cap model coincideix amb «{{query}}».",
+      "clearSearch": "Esborra la cerca",
       "auto": "Automàtic",
       "autoHint": "Copilot tria el millor model disponible",
       "cliDefault": "Per defecte de Claude Code",

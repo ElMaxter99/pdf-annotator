@@ -1606,6 +1606,11 @@
     },
     "models": {
       "pick": "Elegir modelo",
+      "search": "Buscar modelo…",
+      "total": "{{total}} modelos",
+      "count": "{{shown}} de {{total}}",
+      "noMatch": "Ningún modelo coincide con «{{query}}».",
+      "clearSearch": "Borrar búsqueda",
       "auto": "Automático",
       "autoHint": "Copilot elige el mejor modelo disponible",
       "cliDefault": "Por defecto de Claude Code",

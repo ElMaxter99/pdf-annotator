@@ -13,10 +13,20 @@ import {
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { AiHelperService, type AiModel, type AiProvider } from '../../services/ai-helper.service';
+import { highlight, matchesQuery, type TextSegment } from '../../utils/model-search.utils';
 
 type Row =
   | { kind: 'group'; label: string }
-  | { kind: 'option'; id: string; name: string; description: string; auto: boolean };
+  | {
+      kind: 'option';
+      id: string;
+      name: string;
+      description: string;
+      auto: boolean;
+      group: string;
+      nameSegs: TextSegment[];
+      descSegs: TextSegment[];
+    };
 
 /** Model picker fed with the list the CLI itself offers (its /model): nothing is typed by hand. */
 @Component({
@@ -39,6 +49,8 @@ export class AiModelSelectComponent {
   readonly open = signal(false);
   @ViewChild('toggle') toggle?: ElementRef<HTMLButtonElement>;
   @ViewChild('listbox') listbox?: ElementRef<HTMLElement>;
+  @ViewChild('search') search?: ElementRef<HTMLInputElement>;
+  readonly query = signal('');
 
   constructor() {
     effect(() => {
@@ -79,7 +91,7 @@ export class AiModelSelectComponent {
     return this.list().models.find((m) => m.id === id)?.name ?? id;
   });
 
-  readonly rows = computed<Row[]>(() => {
+  private readonly allRows = computed<Row[]>(() => {
     const rows: Row[] = [];
     if (this.isCopilot()) {
       rows.push({
@@ -88,6 +100,9 @@ export class AiModelSelectComponent {
         name: this.i18n.translate('ai.models.auto'),
         description: this.i18n.translate('ai.models.autoHint'),
         auto: true,
+        group: '',
+        nameSegs: [],
+        descSegs: [],
       });
     }
     let group: string | null = null;
@@ -102,10 +117,50 @@ export class AiModelSelectComponent {
         name: m.name,
         description: m.description || (m.name !== m.id ? m.id : ''),
         auto: false,
+        group: m.group,
+        nameSegs: [],
+        descSegs: [],
       });
     }
     return rows;
   });
+
+  /** Rows matching the search; groups with no match are hidden and matches are highlighted. */
+  readonly rows = computed<Row[]>(() => {
+    const q = this.query().trim();
+    const all = this.allRows();
+    if (!q) {
+      return all.map((r) =>
+        r.kind === 'option'
+          ? {
+              ...r,
+              nameSegs: [{ text: r.name, hit: false }],
+              descSegs: r.description ? [{ text: r.description, hit: false }] : [],
+            }
+          : r,
+      );
+    }
+    const rows: Row[] = [];
+    let pending: Row | null = null;
+    for (const r of all) {
+      if (r.kind === 'group') {
+        pending = r;
+        continue;
+      }
+      const hay = `${r.name} ${r.id} ${r.description} ${r.group}`;
+      if (!matchesQuery(hay, q)) {
+        continue;
+      }
+      if (pending && r.group) {
+        rows.push(pending);
+      }
+      pending = null;
+      rows.push({ ...r, nameSegs: highlight(r.name, q), descSegs: highlight(r.description, q) });
+    }
+    return rows;
+  });
+  readonly total = computed(() => this.allRows().filter((r) => r.kind === 'option').length);
+  readonly shown = computed(() => this.rows().filter((r) => r.kind === 'option').length);
 
   readonly stamp = computed(() => {
     const at = this.list().at;
@@ -138,6 +193,15 @@ export class AiModelSelectComponent {
     return [...models].sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group));
   }
 
+  setQuery(value: string): void {
+    this.query.set(value);
+  }
+
+  clearQuery(): void {
+    this.query.set('');
+    this.search?.nativeElement.focus();
+  }
+
   pick(id: string): void {
     this.helper.setModel(this.provider(), id);
     this.helper.modelRetired.set(null);
@@ -150,19 +214,16 @@ export class AiModelSelectComponent {
 
   toggleOpen(): void {
     this.open.update((o) => !o);
+    this.query.set('');
     if (this.open()) {
-      queueMicrotask(
-        () =>
-          this.options()
-            .find((b) => b.getAttribute('aria-selected') === 'true')
-            ?.focus() ?? this.options()[0]?.focus(),
-      );
+      setTimeout(() => this.search?.nativeElement.focus());
     }
   }
 
   close(): void {
     if (this.open()) {
       this.open.set(false);
+      this.query.set('');
       queueMicrotask(() => this.toggle?.nativeElement.focus());
     }
   }
@@ -182,21 +243,35 @@ export class AiModelSelectComponent {
 
   onListKey(event: KeyboardEvent): void {
     const options = this.options();
-    const i = options.indexOf(document.activeElement as HTMLElement);
+    const input = this.search?.nativeElement;
+    const active = document.activeElement as HTMLElement;
+    const i = options.indexOf(active);
     if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
-      this.close();
+      if (this.query()) {
+        this.clearQuery();
+      } else {
+        this.close();
+      }
+    } else if (event.key === 'Enter' && active === input) {
+      event.preventDefault();
+      options[0]?.click();
     } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
+      if (event.key === 'ArrowUp' && i <= 0) {
+        input?.focus();
+        return;
+      }
       const next =
         event.key === 'ArrowDown' ? Math.min(i + 1, options.length - 1) : Math.max(i - 1, 0);
       options[next]?.focus();
-    } else if (event.key === 'Home' || event.key === 'End') {
+    } else if ((event.key === 'Home' || event.key === 'End') && active !== input) {
       event.preventDefault();
       options[event.key === 'Home' ? 0 : options.length - 1]?.focus();
     } else if (event.key === 'Tab') {
       this.open.set(false);
+      this.query.set('');
     }
   }
 }
