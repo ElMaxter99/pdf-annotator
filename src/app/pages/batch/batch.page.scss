@@ -1244,3 +1244,65 @@ app-ai-batch-chip {
   align-items: center;
   gap: 4px;
 }
+
+.batch-stamp {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.batch-stamp--last {
+  color: var(--text);
+}
+
+.batch-last {
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: var(--accent-fill);
+  color: var(--on-accent);
+}
+
+.batch-sorthead {
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.batch-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+
+  select {
+    font: inherit;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
+    border-radius: 999px;
+    padding: 6px 12px;
+    min-height: 34px;
+  }
+}
+
+.batch-row .batch-stamp {
+  display: flex;
+  margin-top: 2px;
+}

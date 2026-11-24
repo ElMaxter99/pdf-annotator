@@ -468,7 +468,8 @@
     "col": {
       "state": "Estat",
       "document": "Document",
-      "version": "Versió B"
+      "version": "Versió B",
+      "change": "Últim canvi"
     },
     "state": {
       "ready": "Llest",
@@ -1318,6 +1319,21 @@
       "open": "Format dels JSON en descarregar",
       "hint": "Val per a l'editor, en copiar i en descarregar",
       "downloaded": "{{count}} JSON descarregats · format no estricte"
+    },
+    "stamp": {
+      "today": "avui",
+      "yesterday": "ahir",
+      "last": "Últim",
+      "readyTitle": "Marcat com a Llest · {{when}}",
+      "reviewTitle": "Tornat a Per revisar · {{when}}",
+      "approxTitle": "Data aproximada (última modificació): aquest lot es va crear abans de desar el canvi d'estat. Es corregirà en el proper canvi."
+    },
+    "sort": {
+      "label": "Ordena",
+      "state": "Estat",
+      "recent": "Canvi més recent",
+      "oldest": "Canvi més antic",
+      "name": "Nom (A–Z)"
     }
   },
   "preview": {

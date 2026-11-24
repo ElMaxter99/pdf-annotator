@@ -58,5 +58,7 @@ export interface BatchItem {
   /** Instructions for the AI for this PDF only (A6); unset = the batch ones apply, `''` = none for this PDF. */
   readonly aiInstructions?: string;
   readonly status: BatchItemStatus;
+  /** When `status` last really changed (review ↔ ready). Unset in batches saved before it existed. */
+  readonly statusAt?: number;
   readonly updatedAt: number;
 }

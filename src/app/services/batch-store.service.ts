@@ -1,5 +1,6 @@
 import { sanitizeAiRun, type AiRunRecord } from '../utils/ai-run.utils';
 import type { KindFilter } from '../utils/batch-summary.utils';
+import type { BatchSort } from '../utils/status-time.utils';
 import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
 import type { AiSavedProposal, BatchItem, FieldLink, PageMapData } from '../models/batch.model';
@@ -61,7 +62,11 @@ export class BatchStoreService {
   private projectMode: 'none' | 'rw' | 'ro' = 'none';
 
   /** Puts the items of a desktop project in memory; from now on changes go to its folder (or nowhere if read-only). */
-  attachProject(items: BatchItem[], sink: BatchSink | null, settings?: Partial<BatchSettings> | null): void {
+  attachProject(
+    items: BatchItem[],
+    sink: BatchSink | null,
+    settings?: Partial<BatchSettings> | null,
+  ): void {
     this.closedNotices.set({});
     this.resetPanelFilters();
     this.items.set(items);
@@ -325,11 +330,13 @@ export class BatchStoreService {
   readonly panelQuery = signal('');
   readonly panelFilter = signal<'all' | 'review' | 'ready'>('all');
   readonly panelKind = signal<KindFilter>('any');
+  readonly panelSort = signal<BatchSort>('state');
 
   private resetPanelFilters(): void {
     this.panelQuery.set('');
     this.panelFilter.set('all');
     this.panelKind.set('any');
+    this.panelSort.set('state');
   }
 
   async clear(): Promise<void> {
@@ -362,7 +369,14 @@ export class BatchStoreService {
         if (item.id !== id) {
           return item;
         }
-        updated = { ...item, ...changes, updatedAt: Date.now() };
+        const now = Date.now();
+        const statusChanged = changes.status !== undefined && changes.status !== item.status;
+        updated = {
+          ...item,
+          ...changes,
+          ...(statusChanged ? { statusAt: now } : {}),
+          updatedAt: now,
+        };
         return updated;
       }),
     );
@@ -399,7 +413,11 @@ export class BatchStoreService {
   private async readAll(): Promise<BatchItem[]> {
     const values = await this.run<unknown[]>('readonly', (store) => store.getAll());
     return Array.isArray(values)
-      ? values.filter(isBatchItem).map(withSafeProposal).map(withSafePageMap).map(withSafeInstructions)
+      ? values
+          .filter(isBatchItem)
+          .map(withSafeProposal)
+          .map(withSafePageMap)
+          .map(withSafeInstructions)
       : [];
   }
 
@@ -407,7 +425,9 @@ export class BatchStoreService {
     const value = await this.run<unknown>('readonly', (store) => store.get(SETTINGS_KEY));
     return value && typeof value === 'object'
       ? {
-          aiInstructions: cleanAiInstructions((value as { aiInstructions?: unknown }).aiInstructions),
+          aiInstructions: cleanAiInstructions(
+            (value as { aiInstructions?: unknown }).aiInstructions,
+          ),
           aiRun: sanitizeAiRun((value as { aiRun?: unknown }).aiRun),
         }
       : null;
@@ -466,7 +486,12 @@ export function reviveBatchItem(value: unknown): BatchItem | null {
 /** Stored instructions are untrusted: plain text or nothing (unset = follow the batch). */
 function withSafeInstructions(item: BatchItem): BatchItem {
   const raw = (item as { aiInstructions?: unknown }).aiInstructions;
-  return { ...item, aiInstructions: typeof raw === 'string' ? cleanAiInstructions(raw) : undefined };
+  const at = (item as { statusAt?: unknown }).statusAt;
+  return {
+    ...item,
+    statusAt: typeof at === 'number' && Number.isFinite(at) && at > 0 ? at : undefined,
+    aiInstructions: typeof raw === 'string' ? cleanAiInstructions(raw) : undefined,
+  };
 }
 
 /** Stored data is untrusted: only keep what has the expected shape. */
@@ -505,7 +530,8 @@ function withSafeProposal(item: BatchItem): BatchItem {
       details: sanitizeDetails(raw['details']),
       provider: typeof raw['provider'] === 'string' ? raw['provider'].slice(0, 20) : '',
       model: typeof raw['model'] === 'string' ? raw['model'].slice(0, 60) : null,
-      seconds: typeof raw['seconds'] === 'number' && Number.isFinite(raw['seconds']) ? raw['seconds'] : 0,
+      seconds:
+        typeof raw['seconds'] === 'number' && Number.isFinite(raw['seconds']) ? raw['seconds'] : 0,
       at: typeof raw['at'] === 'number' && Number.isFinite(raw['at']) ? raw['at'] : 0,
       edits: sanitizeAiEdits(raw['edits'], new Set(rows.map((row) => row.id))),
     },

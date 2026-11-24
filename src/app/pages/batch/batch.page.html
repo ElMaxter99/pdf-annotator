@@ -500,6 +500,14 @@
         </div>
         <app-info-tip [text]="'batch.filter.reviewTip' | t" />
         <span class="batch-bar__spacer"></span>
+        <label class="batch-sort">
+          <span>{{ 'batch.sort.label' | t }}</span>
+          <select [value]="sort()" (change)="setSort($any($event.target).value)" data-testid="sort-select">
+            @for (option of sortOptions; track option) {
+              <option [value]="option" [selected]="sort() === option">{{ 'batch.sort.' + option | t }}</option>
+            }
+          </select>
+        </label>
         @if (view() === 'grid' && rows().length > 0) {
           <button type="button" class="btn btn--ghost" (click)="toggleAll()" data-testid="select-all-grid">
             {{ (allSelected() ? 'batch.select.none' : 'batch.select.allShort') | t }}
@@ -635,6 +643,14 @@
                   <span class="batch-chip batch-chip--on" data-testid="row-page-map">⇄ {{ 'batch.pageMap.chip' | t }}</span>
                 }
               </span>
+              @if (stampOf(row.item); as stamp) {
+                <span class="batch-stamp" [class.batch-stamp--last]="row.item.id === latestId()">
+                  <time [attr.datetime]="stamp.iso" [title]="stamp.title" data-testid="row-stamp">{{ stamp.text }}</time>
+                  @if (row.item.id === latestId()) {
+                    <span class="batch-last" data-testid="row-last">{{ 'batch.stamp.last' | t }}</span>
+                  }
+                </span>
+              }
               @if (aiHelper.available) {
                 <app-ai-batch-chip [item]="row.item" />
               }
@@ -658,7 +674,13 @@
             </span>
             <span role="columnheader">{{ 'batch.col.document' | t }}</span>
             <span role="columnheader">{{ 'batch.col.version' | t }}</span>
-            <span role="columnheader">{{ 'batch.col.state' | t }}</span>
+            <span role="columnheader" [attr.aria-sort]="ariaSortChange()">
+              {{ 'batch.col.state' | t }} ·
+              <button type="button" class="batch-sorthead" (click)="toggleSortByChange()" data-testid="sort-head">
+                {{ 'batch.col.change' | t }}
+                {{ sort() === 'recent' ? '▾' : sort() === 'oldest' ? '▴' : '' }}
+              </button>
+            </span>
             <span role="columnheader"></span>
           </div>
           @for (row of rows(); track row.item.id) {
@@ -703,6 +725,14 @@
                 >
                 @if (row.item.pageMap) {
                   <span class="batch-chip batch-chip--on" data-testid="row-page-map">⇄ {{ 'batch.pageMap.chip' | t }}</span>
+                }
+                @if (stampOf(row.item); as stamp) {
+                  <span class="batch-stamp" [class.batch-stamp--last]="row.item.id === latestId()">
+                    <time [attr.datetime]="stamp.iso" [title]="stamp.title" data-testid="row-stamp">{{ stamp.text }}</time>
+                    @if (row.item.id === latestId()) {
+                      <span class="batch-last" data-testid="row-last">{{ 'batch.stamp.last' | t }}</span>
+                    }
+                  </span>
                 }
                 @if (aiHelper.available) {
                 <small class="batch-why" [class.batch-why--ok]="aiReason(row.item) === 'eligible'" data-testid="row-why">{{ 'batch.why.' + aiReason(row.item) | t }}</small>

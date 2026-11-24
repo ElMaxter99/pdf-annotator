@@ -68,6 +68,24 @@ test('«Marcar Listo» skips PDFs without a template and can be undone', async (
   await expect(page.locator('.batch-bar__count')).toContainText('0 de 3 listos');
 });
 
+test('shows when a PDF changed state, tags the latest and sorts by it', async ({ page }) => {
+  await openPanel(page);
+  await expect(page.getByTestId('row-stamp')).toHaveCount(0);
+  await page.getByTestId('select-all').check();
+  await page.getByTestId('bulk-ready').click();
+  await page.getByTestId('bulk-confirm').click();
+  await expect(page.getByTestId('row-stamp')).toHaveCount(1);
+  await expect(page.getByTestId('row-stamp')).toContainText('hoy');
+  await expect(page.getByTestId('row-last')).toHaveText('Último');
+
+  await page.getByTestId('sort-select').selectOption('recent');
+  await expect(page.getByTestId('panel-item').first()).toContainText('factura-0331.pdf');
+  await page.getByTestId('sort-select').selectOption('name');
+  await expect(page.getByTestId('panel-item').first()).toContainText('factura-0331.pdf');
+  await page.getByTestId('sort-head').click();
+  await expect(page.getByTestId('sort-select')).toHaveValue('recent');
+});
+
 test('the «Deshacer» notice sits above the selection bar and never covers it', async ({ page }) => {
   await openPanel(page);
   await page.getByTestId('select-all').check();
