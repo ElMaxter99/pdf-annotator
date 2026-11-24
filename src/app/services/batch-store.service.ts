@@ -1,6 +1,6 @@
 import { sanitizeAiRun, type AiRunRecord } from '../utils/ai-run.utils';
 import type { KindFilter } from '../utils/batch-summary.utils';
-import type { BatchSort } from '../utils/status-time.utils';
+import { isValidStamp, type BatchSort } from '../utils/status-time.utils';
 import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
 import type { AiSavedProposal, BatchItem, FieldLink, PageMapData } from '../models/batch.model';
@@ -489,7 +489,7 @@ function withSafeInstructions(item: BatchItem): BatchItem {
   const at = (item as { statusAt?: unknown }).statusAt;
   return {
     ...item,
-    statusAt: typeof at === 'number' && Number.isFinite(at) && at > 0 ? at : undefined,
+    statusAt: isValidStamp(at) ? at : undefined,
     aiInstructions: typeof raw === 'string' ? cleanAiInstructions(raw) : undefined,
   };
 }

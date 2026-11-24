@@ -12,6 +12,15 @@ describe('status-time.utils', () => {
     expect(statusStamp(item('c'))).toBeNull();
   });
 
+  it('ignores timestamps outside the Date range', () => {
+    expect(statusStamp(item('a', { statusAt: 1e20 }))).toBeNull();
+    expect(statusStamp(item('b', { status: 'ready', updatedAt: 1e20 }))).toBeNull();
+    expect(statusStamp(item('c', { status: 'ready', statusAt: 1e20, updatedAt: 5 }))).toEqual({
+      at: 5,
+      approx: true,
+    });
+  });
+
   it('marks the latest real change only', () => {
     const items = [
       item('a', { statusAt: 10 }),

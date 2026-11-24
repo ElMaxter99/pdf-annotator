@@ -2,6 +2,11 @@ import type { BatchItem } from '../models/batch.model';
 
 export type BatchSort = 'state' | 'recent' | 'oldest' | 'name';
 
+/** A timestamp a `Date` can represent (stored data is untrusted: 1e20 would make formatting throw). */
+export function isValidStamp(value: unknown): value is number {
+  return typeof value === 'number' && value > 0 && Number.isFinite(new Date(value).getTime());
+}
+
 export interface StatusStamp {
   readonly at: number;
   /** Old batch without a saved change: `updatedAt` stands in (last modification, not a real change). */
@@ -12,10 +17,10 @@ export interface StatusStamp {
 export function statusStamp(
   item: Pick<BatchItem, 'status' | 'statusAt' | 'updatedAt'>,
 ): StatusStamp | null {
-  if (typeof item.statusAt === 'number' && item.statusAt > 0) {
+  if (isValidStamp(item.statusAt)) {
     return { at: item.statusAt, approx: false };
   }
-  if (item.status === 'ready' && item.updatedAt > 0) {
+  if (item.status === 'ready' && isValidStamp(item.updatedAt)) {
     return { at: item.updatedAt, approx: true };
   }
   return null;
