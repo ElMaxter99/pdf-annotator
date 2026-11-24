@@ -32,8 +32,12 @@
             <i [style.width.%]="percent()"></i>
           </div>
           <small class="ai-panel__usage" aria-live="polite">
-            @if (credits() > 0) {
-              ≈ {{ credits() }} {{ 'batch.ai.sheet.credits' | t }}
+            @if (isCopilot()) {
+              @if (credits() > 0) {
+                {{ creditsText(credits()) }} {{ 'batch.ai.sheet.credits' | t }}
+              } @else {
+                {{ 'batch.ai.requests' | t: { sent: queue.requests() } }}
+              }
             } @else if (measured()) {
               {{ 'batch.ai.tokens' | t: { count: tokens() } }}
             } @else {

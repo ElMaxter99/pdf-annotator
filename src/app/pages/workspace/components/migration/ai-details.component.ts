@@ -5,7 +5,8 @@ import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { ToastService } from '../../../../services/toast.service';
 import {
   estimateTokens,
-  sumAiCredits,
+  creditsOfAttempts,
+  formatCredits,
   sumUsage,
   usageTotal,
   type AiUsage,
@@ -112,7 +113,7 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
 
   /** AI credits that Copilot reports (sum of attempts), or null. */
   aiCredits(): number | null {
-    return sumAiCredits(this.vm.ai()?.details?.attempts ?? []);
+    return creditsOfAttempts(this.vm.ai()?.details?.attempts ?? [], this.vm.ai()?.liveCredits);
   }
 
   /** Copilot bills in AI credits: they are the headline, tokens are secondary and never estimated. */
@@ -122,7 +123,7 @@ export class AiDetailsComponent implements OnInit, OnDestroy {
 
   /** Credits as the batch shows them (two decimals, locale aware). */
   creditsText(): string {
-    return `≈ ${(this.aiCredits() ?? 0).toLocaleString(this.i18n.language(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `≈ ${formatCredits(this.aiCredits() ?? 0, this.i18n.language())}`;
   }
 
   loading(): boolean {

@@ -7,7 +7,7 @@ import {
   AiBatchPhase,
   classifyAiError,
   estimateAiBatch, isEligibleForAiBatch, phaseOfResult } from '../utils/ai-batch.utils';
-import { AiDetails, AiResult, AiSent, AiStep, AiUsage, sumUsage, countPlacement } from '../utils/ai-proposal.utils';
+import { AiDetails, AiResult, AiSent, AiStep, AiUsage, sumUsage, countPlacement, creditsOfAttempts } from '../utils/ai-proposal.utils';
 import { AiQueueInfo, AiQueueTaken, AiRemoteSnapshot, parseQueueInfo, phaseOfRemote, remoteItemId } from '../utils/ai-queue.utils';
 import { cascadeAdjust } from '../utils/adjust-cascade.utils';
 import { classifyAiRun } from '../utils/ai-run.utils';
@@ -33,6 +33,8 @@ export interface AiBatchRow {
   /** Campos de A colocados con dudas (a revisar). */
   toCheck?: number;
   usage: AiUsage | null;
+  /** AI credits Copilot reports while an attempt runs (by attempt); the final ones come in `details`. */
+  liveCredits?: Record<number, number>;
   error: { code: string; message: string; reset: string | null } | null;
   /** Live log for «Ver detalles» (names and counts only, never PDF content). Times are ms since `t0`. */
   t0: number | null;
@@ -122,6 +124,13 @@ export class AiBatchService {
     this.run() === 'idle' ? classifyAiRun(this.batch.aiRun(), this.batch.items()) : null,
   );
   readonly usage = computed(() => sumUsage(Object.values(this.rows()).map((row) => row.usage)));
+  /** Copilot bills in AI credits, not tokens: this run uses Copilot when any of its PDFs went through it. */
+  readonly isCopilot = computed(() => Object.values(this.rows()).some((row) => row.provider === 'copilot'));
+  /** AI credits of the whole run (Copilot), `null` when none were reported yet. */
+  readonly credits = computed(() => {
+    const all = Object.values(this.rows()).map(rowCredits).filter((c): c is number => c !== null);
+    return all.length ? all.reduce((a, b) => a + b, 0) : null;
+  });
   readonly counts = computed(() => {
     const all = Object.values(this.rows());
     const n = (...phases: AiBatchPhase[]) => all.filter((row) => phases.includes(row.phase)).length;
@@ -789,7 +798,7 @@ export class AiBatchService {
     const provider = this.ai.provider();
     const started = Date.now();
     const t0 = this.rows()[id]?.t0 ?? started;
-    this.patchRow(id, { phase: 'reading', attempt: 1, startedAt: started, t0, provider, endedAt: null, error: null, stageLog: [{ stage: 'reading', attempt: 1, at: started - t0 }], stepLog: [], sent: null, details: null });
+    this.patchRow(id, { phase: 'reading', attempt: 1, startedAt: started, t0, provider, endedAt: null, error: null, stageLog: [{ stage: 'reading', attempt: 1, at: started - t0 }], stepLog: [], sent: null, details: null, liveCredits: {} });
     try {
       const result = await this.ai.propose(
         { a: item.aPdf, b: item.bPdf, template: { pages: item.aPages, pageMap: item.pageMap?.pairs }, instructions: this.instructionsFor(id) },
@@ -816,6 +825,7 @@ export class AiBatchService {
             const at = Date.now() - t0;
             this.patchRow(id, {
               usage: event.usage ?? row?.usage ?? null,
+              liveCredits: event.aiCredits === null ? row?.liveCredits : { ...row?.liveCredits, [event.attempt]: event.aiCredits },
               stepLog: [...(row?.stepLog ?? []), ...event.steps.map((step) => ({ attempt: event.attempt, step, at }))].slice(-60),
             });
           }
@@ -862,6 +872,11 @@ export class AiBatchService {
       }
     }
   }
+}
+
+/** AI credits Copilot reported for a PDF (final or live), `null` when none. */
+export function rowCredits(row: AiBatchRow): number | null {
+  return creditsOfAttempts(row.details?.attempts ?? [], row.liveCredits);
 }
 
 function emptyRow(id: string): AiBatchRow {

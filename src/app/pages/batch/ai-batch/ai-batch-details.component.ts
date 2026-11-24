@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { TranslationService } from '../../../i18n/translation.service';
-import { AiBatchService, type AiBatchRow } from '../../../services/ai-batch.service';
+import { AiBatchService, rowCredits, type AiBatchRow } from '../../../services/ai-batch.service';
 import { AiHelperService } from '../../../services/ai-helper.service';
 import { BatchStoreService } from '../../../services/batch-store.service';
 import { ToastService } from '../../../services/toast.service';
 import { AI_BATCH_ACTIVE_PHASES } from '../../../utils/ai-batch.utils';
 import { buildBatchTimeline, isFinished } from '../../../utils/ai-batch-details.utils';
-import { estimateTokens, sumAiCredits, sumUsage, usageBilled, usageTotal } from '../../../utils/ai-proposal.utils';
+import { estimateTokens, formatCredits, sumUsage, usageBilled, usageTotal } from '../../../utils/ai-proposal.utils';
 import { providerName } from './ai-batch-button.component';
 
 export type BatchDetailsTab = 'summary' | 'steps' | 'sent' | 'usage';
@@ -74,7 +74,18 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
   readonly measured = computed(() => this.total() > 0);
   readonly freeCount = computed(() => this.list().filter((entry) => entry.row.phase === 'free').length);
   readonly batchTokens = computed(() => usageBilled(this.queue.usage()));
-  readonly credits = computed(() => sumAiCredits(this.row()?.details?.attempts ?? []));
+  /** Copilot bills in AI credits: with it the figure is credits and tokens are never shown or estimated. */
+  readonly isCopilot = computed(() => this.row()?.provider === 'copilot');
+  readonly credits = computed(() => {
+    const row = this.row();
+    return row ? rowCredits(row) : null;
+  });
+  readonly batchCredits = this.queue.credits;
+  readonly batchIsCopilot = this.queue.isCopilot;
+
+  creditsText(value: number): string {
+    return `≈ ${formatCredits(value, this.i18n.language())}`;
+  }
   readonly sentFiles = computed(() => (this.row()?.sent?.files ?? []).filter((f) => !f.name.endsWith('.pdf')));
 
   ngOnInit(): void {
@@ -181,6 +192,10 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     if (row.phase === 'failed' && row.error) {
       return this.t(`ai.error.${row.error.code}.title`, { provider: providerName(row.provider || 'claude') });
     }
+    if (row.provider === 'copilot') {
+      const credits = rowCredits(row);
+      return credits ? `${this.creditsText(credits)} ${this.t('ai.details.usage.creditsUnit')}` : '—';
+    }
     const tokens = usageTotal(row.usage);
     return tokens ? this.t('batch.ai.tokens', { count: this.num(tokens) }) : '—';
   }
@@ -246,11 +261,11 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     if (d?.requests) {
       lines.push(`peticiones: ${d.requests}`);
     }
-    const credits = (d?.attempts ?? []).reduce((n, at) => n + (at.aiCredits ?? 0), 0);
+    const credits = rowCredits(row) ?? 0;
     if (credits > 0) {
       lines.push(`créditos (≈, según Copilot): ${Math.round(credits * 100) / 100}`);
     }
-    const tokens = usageBilled(row.usage);
+    const tokens = row.provider === 'copilot' ? 0 : usageBilled(row.usage);
     if (tokens) {
       lines.push(`tokens: ${tokens}${row.usage?.cacheRead ? ` (+${row.usage.cacheRead} leídos de caché)` : ''}`);
     }
@@ -263,7 +278,7 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
     const lines = entries.flatMap((entry, i) => [...(i ? [''] : []), ...this.reportOf(entry.row, entry.name)]);
     if (all) {
       const requests = this.t('batch.ai.requests', { sent: this.queue.requests() });
-      lines.push('', this.batchTokens() > 0 ? `${this.t('batch.ai.tokens', { count: this.num(this.batchTokens()) })} · ${requests}` : requests);
+      lines.push('', this.batchIsCopilot() ? (this.batchCredits() ? `${this.creditsText(this.batchCredits()!)} ${this.t('ai.details.usage.creditsUnit')} · ${requests}` : requests) : this.batchTokens() > 0 ? `${this.t('batch.ai.tokens', { count: this.num(this.batchTokens()) })} · ${requests}` : requests);
     }
     if (await this.write(lines.join('\n'))) {
       this.toast.show(this.t('ai.details.copied'));

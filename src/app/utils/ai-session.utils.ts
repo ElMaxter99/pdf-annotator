@@ -28,6 +28,8 @@ export interface AiSession {
   stageLog: Array<{ stage: AiStage; attempt: number; at: number }>;
   stepLog: Array<{ attempt: number; step: AiStep; at: number }>;
   usage: AiUsage | null;
+  /** AI credits Copilot reports while an attempt runs (by attempt). */
+  liveCredits?: Record<number, number>;
   details: AiDetails | null;
   detailsOpen: boolean;
   endedAt: number | null;
@@ -147,6 +149,7 @@ export function withAiEvent(cur: AiSession, event: AiLiveEvent, now: number): Ai
     return {
       ...cur,
       usage: event.usage ?? cur.usage,
+      liveCredits: event.aiCredits === null ? cur.liveCredits : { ...cur.liveCredits, [event.attempt]: event.aiCredits },
       stepLog: [
         ...cur.stepLog,
         ...event.steps.map((step) => ({ attempt: event.attempt, step, at })),
