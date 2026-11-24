@@ -129,10 +129,10 @@ export class MigrationPanelComponent {
     }
     const m = this.vm.migration();
     const name = this.vm.aiFieldName(row);
-    if (m?.states.some((s) => s.status !== 'missing' && s.name === name && s.a?.page === row.page)) {
+    if (m?.states.some((s) => s.status !== 'missing' && s.name === name && s.page === this.vm.aiStatePage(row))) {
       return 'placed';
     }
-    return m?.dismissed.includes(fieldKey(row.page, name)) ? 'validated' : null;
+    return m?.dismissed.includes(fieldKey(this.vm.aiStatePage(row), name)) ? 'validated' : null;
   }
 
   absent(row: AiRow): boolean {
@@ -152,7 +152,7 @@ export class MigrationPanelComponent {
   missingFor(row: AiRow): FieldState | null {
     const name = this.vm.aiFieldName(row);
     return (
-      this.vm.migration()?.states.find((state) => state.status === 'missing' && state.name === name && state.page === row.page) ??
+      this.vm.migration()?.states.find((state) => state.status === 'missing' && state.name === name && state.page === this.vm.aiStatePage(row)) ??
       null
     );
   }

@@ -511,18 +511,25 @@ export class WorkspaceBatch {
     }
   }
 
+  /** Página de B que usan los estados y los descartes para un campo de A (con tabla A↔B, la página de A renumerada a B). */
+  aiStatePage(this: WorkspacePageComponent, row: AiRow): number {
+    const pairs = this.pageMap()?.pairs;
+    const at = pairs ? pairs.indexOf(row.page) : -1;
+    return at >= 0 ? at + 1 : row.page;
+  }
+
   /** «Validar: no existe»: da por resuelto un campo de A de la propuesta de la IA que no se coloca en B. */
   validateAbsent(this: WorkspacePageComponent, row: AiRow) {
     const item = this.batch.activeItem();
     if (item) {
-      this.batch.dismiss(item.id, fieldKey(row.page, this.aiFieldName(row)));
+      this.batch.dismiss(item.id, fieldKey(this.aiStatePage(row), this.aiFieldName(row)));
     }
   }
 
   unvalidateAbsent(this: WorkspacePageComponent, row: AiRow) {
     const item = this.batch.activeItem();
     if (item) {
-      this.batch.restore(item.id, fieldKey(row.page, this.aiFieldName(row)));
+      this.batch.restore(item.id, fieldKey(this.aiStatePage(row), this.aiFieldName(row)));
     }
   }
 
