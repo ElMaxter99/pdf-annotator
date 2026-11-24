@@ -468,7 +468,8 @@
     "col": {
       "state": "Status",
       "document": "Document",
-      "version": "B version"
+      "version": "B version",
+      "change": "Last change"
     },
     "state": {
       "ready": "Ready",
@@ -1318,6 +1319,21 @@
       "open": "JSON format for downloads",
       "hint": "Applies to the editor, copying and downloading",
       "downloaded": "{{count}} JSON files downloaded · non-strict format"
+    },
+    "stamp": {
+      "today": "today",
+      "yesterday": "yesterday",
+      "last": "Latest",
+      "readyTitle": "Marked as Ready · {{when}}",
+      "reviewTitle": "Back to To review · {{when}}",
+      "approxTitle": "Approximate date (last modification): this batch was created before status changes were saved. It will be corrected on the next change."
+    },
+    "sort": {
+      "label": "Sort",
+      "state": "Status",
+      "recent": "Most recent change",
+      "oldest": "Oldest change",
+      "name": "Name (A–Z)"
     }
   },
   "preview": {

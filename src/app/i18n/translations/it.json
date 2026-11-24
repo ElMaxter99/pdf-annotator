@@ -468,7 +468,8 @@
     "col": {
       "state": "Stato",
       "document": "Documento",
-      "version": "Versione B"
+      "version": "Versione B",
+      "change": "Ultimo cambio"
     },
     "state": {
       "ready": "Pronto",
@@ -1318,6 +1319,21 @@
       "open": "Formato dei JSON al download",
       "hint": "Vale per l'editor, la copia e il download",
       "downloaded": "{{count}} JSON scaricati · formato non rigoroso"
+    },
+    "stamp": {
+      "today": "oggi",
+      "yesterday": "ieri",
+      "last": "Ultimo",
+      "readyTitle": "Segnato come Pronto · {{when}}",
+      "reviewTitle": "Tornato a Da rivedere · {{when}}",
+      "approxTitle": "Data approssimativa (ultima modifica): questo lotto è stato creato prima di salvare i cambi di stato. Verrà corretta al prossimo cambio."
+    },
+    "sort": {
+      "label": "Ordina",
+      "state": "Stato",
+      "recent": "Cambio più recente",
+      "oldest": "Cambio meno recente",
+      "name": "Nome (A–Z)"
     }
   },
   "preview": {

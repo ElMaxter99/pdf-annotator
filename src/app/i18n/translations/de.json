@@ -468,7 +468,8 @@
     "col": {
       "state": "Status",
       "document": "Dokument",
-      "version": "B-Version"
+      "version": "B-Version",
+      "change": "Letzte Änderung"
     },
     "state": {
       "ready": "Fertig",
@@ -1318,6 +1319,21 @@
       "open": "JSON-Format beim Herunterladen",
       "hint": "Gilt für den Editor, das Kopieren und das Herunterladen",
       "downloaded": "{{count}} JSON heruntergeladen · nicht striktes Format"
+    },
+    "stamp": {
+      "today": "heute",
+      "yesterday": "gestern",
+      "last": "Zuletzt",
+      "readyTitle": "Als Fertig markiert · {{when}}",
+      "reviewTitle": "Zurück zu Zu prüfen · {{when}}",
+      "approxTitle": "Ungefähres Datum (letzte Änderung): Dieser Stapel wurde erstellt, bevor Statusänderungen gespeichert wurden. Es wird bei der nächsten Änderung korrigiert."
+    },
+    "sort": {
+      "label": "Sortieren",
+      "state": "Status",
+      "recent": "Neueste Änderung",
+      "oldest": "Älteste Änderung",
+      "name": "Name (A–Z)"
     }
   },
   "preview": {

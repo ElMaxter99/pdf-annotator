@@ -59,6 +59,14 @@ import { formatJsonForCopy, isStrictJsonFormat } from '../../utils/json-copy-for
 import { parseLooseJson } from '../../utils/loose-json';
 import { pairByName, pairingKey } from '../../utils/migration.utils';
 import {
+  formatStatusTime,
+  formatStatusTitle,
+  latestStampId,
+  sortRows,
+  statusStamp,
+  type BatchSort,
+} from '../../utils/status-time.utils';
+import {
   matchTemplate,
   parsePastedTemplates,
   type PastedTemplate,
@@ -212,13 +220,67 @@ export class BatchPageComponent implements OnInit {
     const query = this.query().trim().toLowerCase();
     const filter = this.filter();
     const kind = this.kind();
+    const sort = this.sort();
     const rank: Record<RowState, number> = { noTemplate: 0, review: 1, ready: 2 };
-    return this.allRows()
+    const filtered = this.allRows()
       .filter((row) => !query || row.item.name.toLowerCase().includes(query))
       .filter((row) => filter === 'all' || row.state === filter)
       .filter((row) => matchesKind(row.item, kind))
       .sort((a, b) => rank[a.state] - rank[b.state]);
+    return sort === 'state' ? filtered : sortRows(filtered, sort, this.collator());
   });
+  readonly sort = this.store.panelSort;
+  readonly sortOptions: readonly BatchSort[] = ['state', 'recent', 'oldest', 'name'];
+  private readonly collator = computed(
+    () => new Intl.Collator(this.i18n.language(), { numeric: true, sensitivity: 'base' }),
+  );
+  /** The PDF whose state changed last (gets the «Último» tag). */
+  readonly latestId = computed(() => latestStampId(this.store.items()));
+
+  setSort(value: string): void {
+    if (this.sortOptions.includes(value as BatchSort)) {
+      this.sort.set(value as BatchSort);
+    }
+  }
+
+  /** Header click in the list: most recent first, then oldest first. */
+  toggleSortByChange(): void {
+    this.sort.set(this.sort() === 'recent' ? 'oldest' : 'recent');
+  }
+
+  ariaSortChange(): 'ascending' | 'descending' | 'none' {
+    return this.sort() === 'recent'
+      ? 'descending'
+      : this.sort() === 'oldest'
+        ? 'ascending'
+        : 'none';
+  }
+
+  stampOf(item: BatchItem): { text: string; title: string; iso: string; approx: boolean } | null {
+    const stamp = statusStamp(item);
+    if (!stamp) {
+      return null;
+    }
+    const locale = this.i18n.language();
+    const text = formatStatusTime(stamp.at, Date.now(), locale, {
+      today: this.i18n.translate('batch.stamp.today'),
+      yesterday: this.i18n.translate('batch.stamp.yesterday'),
+    });
+    const title = this.i18n.translate(
+      stamp.approx
+        ? 'batch.stamp.approxTitle'
+        : item.status === 'ready'
+          ? 'batch.stamp.readyTitle'
+          : 'batch.stamp.reviewTitle',
+      { when: formatStatusTitle(stamp.at, locale) },
+    );
+    return {
+      text: stamp.approx ? `≈ ${text}` : text,
+      title,
+      iso: new Date(stamp.at).toISOString(),
+      approx: stamp.approx,
+    };
+  }
   readonly funnel = computed(() => buildFunnel(this.store.items()));
   readonly filtering = computed(
     () => this.filter() !== 'all' || this.kind() !== 'any' || this.query().trim() !== '',

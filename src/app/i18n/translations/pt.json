@@ -468,7 +468,8 @@
     "col": {
       "state": "Estado",
       "document": "Documento",
-      "version": "Versão B"
+      "version": "Versão B",
+      "change": "Última mudança"
     },
     "state": {
       "ready": "Pronto",
@@ -1318,6 +1319,21 @@
       "open": "Formato dos JSON ao descarregar",
       "hint": "Vale para o editor, ao copiar e ao descarregar",
       "downloaded": "{{count}} JSON descarregados · formato não estrito"
+    },
+    "stamp": {
+      "today": "hoje",
+      "yesterday": "ontem",
+      "last": "Último",
+      "readyTitle": "Marcado como Pronto · {{when}}",
+      "reviewTitle": "Voltou a Por rever · {{when}}",
+      "approxTitle": "Data aproximada (última modificação): este lote foi criado antes de guardar a mudança de estado. Será corrigida na próxima mudança."
+    },
+    "sort": {
+      "label": "Ordenar",
+      "state": "Estado",
+      "recent": "Mudança mais recente",
+      "oldest": "Mudança mais antiga",
+      "name": "Nome (A–Z)"
     }
   },
   "preview": {
