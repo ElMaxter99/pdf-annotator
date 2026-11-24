@@ -26,6 +26,8 @@ export interface AiBatchRow {
   total: number;
   /** Fields that do not exist in B: leaving them out is right, they are not failures. */
   absent: number;
+  /** De esos, los que siguen sin decidir (sin colocar ni validar en el editor). Sin valor = todos. */
+  absentOpen?: number;
   /** Campos que no estaban en A (páginas nuevas de un campo repetido por página). */
   added?: number;
   /** Campos de A colocados con dudas (a revisar). */
@@ -677,6 +679,13 @@ export class AiBatchService {
   private stop(reason: AiBatchPause): void {
     this.pause.set(reason);
     this.run.set('paused');
+  }
+
+  /** El editor avisa de cuántos «no existen en B» siguen por decidir (colocar o validar uno baja el chip). */
+  setAbsentOpen(id: string, open: number): void {
+    if (this.rows()[id] && this.rows()[id].absentOpen !== open) {
+      this.patchRow(id, { absentOpen: open });
+    }
   }
 
   private patchRow(id: string, patch: Partial<AiBatchRow>): void {

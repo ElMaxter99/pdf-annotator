@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { AiBatchService } from '../../../../services/ai-batch.service';
 import { TranslationService } from '../../../../i18n/translation.service';
 import { confidenceLevel, isRowSelected, type AiRow, isAbsentInB, PROPOSAL_GROUPS, proposalGroup } from '../../../../utils/ai-proposal.utils';
 import { fieldKey } from '../../../../utils/migration.utils';
@@ -21,7 +22,23 @@ const ORDER: Record<FieldStatus, number> = { missing: 0, new: 1, moved: 2, renam
 export class MigrationPanelComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
 
+  private readonly aiQueue = inject(AiBatchService);
+
   readonly showSame = signal(false);
+
+  /** «No existen en B» que siguen por decidir; el chip del lote cuenta solo esos. */
+  private readonly absentOpen = computed(
+    () => (this.proposal()?.rows ?? []).filter((row) => isAbsentInB(row) && !row.id.startsWith('pattern-') && this.resolution(row) === null).length,
+  );
+
+  constructor() {
+    effect(() => {
+      const id = this.vm?.migration()?.item.id;
+      if (id && this.proposal()) {
+        this.aiQueue.setAbsentOpen(id, this.absentOpen());
+      }
+    });
+  }
 
   private readonly i18n = inject(TranslationService);
 
