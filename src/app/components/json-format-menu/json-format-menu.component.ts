@@ -64,136 +64,129 @@ const SAMPLE = JSON.stringify({
       (close)="open.set(false)"
       data-testid="json-format-pop"
     >
-      @if (open()) {
-        <form class="jfm__box" method="dialog" (submit)="apply($event)">
-          <div class="jfm__head">
-            <h2 class="jfm__title" [id]="uid + '-title'">{{ titleKey() | t }}</h2>
+      <form class="jfm__box" method="dialog" (submit)="apply($event)">
+        <div class="jfm__head">
+          <h2 class="jfm__title" [id]="uid + '-title'">{{ titleKey() | t }}</h2>
+          <button
+            type="button"
+            class="jfm__x"
+            [attr.aria-label]="'batch.format.close' | t"
+            (click)="close()"
+            data-testid="json-format-close"
+          >
+            ✕
+          </button>
+        </div>
+        <p class="jfm__hint">{{ 'batch.format.hint' | t }}</p>
+        <div class="jfm__row">
+          <span class="jfm__label">{{ 'sidebar.copyFormat.keys' | t }}</span>
+          <div class="jfm__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.keys' | t">
             <button
               type="button"
-              class="jfm__x"
-              [attr.aria-label]="'batch.format.close' | t"
-              (click)="close()"
-              data-testid="json-format-close"
+              [attr.aria-pressed]="fmt().keys === 'quoted'"
+              (click)="patch({ keys: 'quoted' })"
+              data-testid="json-format-keys-quoted"
             >
-              ✕
+              {{ 'sidebar.copyFormat.keysQuoted' | t }}
             </button>
-          </div>
-          <p class="jfm__hint">{{ 'batch.format.hint' | t }}</p>
-          <div class="jfm__row">
-            <span class="jfm__label">{{ 'sidebar.copyFormat.keys' | t }}</span>
-            <div class="jfm__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.keys' | t">
-              <button
-                type="button"
-                [attr.aria-pressed]="fmt().keys === 'quoted'"
-                (click)="patch({ keys: 'quoted' })"
-                data-testid="json-format-keys-quoted"
-              >
-                {{ 'sidebar.copyFormat.keysQuoted' | t }}
-              </button>
-              <button
-                type="button"
-                [attr.aria-pressed]="fmt().keys === 'bare'"
-                (click)="patch({ keys: 'bare' })"
-                data-testid="json-format-keys-bare"
-              >
-                {{ 'sidebar.copyFormat.keysBare' | t }}
-              </button>
-            </div>
-          </div>
-          <div class="jfm__row">
-            <span class="jfm__label">{{ 'sidebar.copyFormat.quote' | t }}</span>
-            <div class="jfm__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.quote' | t">
-              <button
-                type="button"
-                [attr.aria-pressed]="fmt().quote === 'double'"
-                (click)="patch({ quote: 'double' })"
-              >
-                {{ 'sidebar.copyFormat.quoteDouble' | t }}
-              </button>
-              <button
-                type="button"
-                [attr.aria-pressed]="fmt().quote === 'single'"
-                (click)="patch({ quote: 'single' })"
-              >
-                {{ 'sidebar.copyFormat.quoteSingle' | t }}
-              </button>
-            </div>
-          </div>
-          <div class="jfm__row">
-            <span class="jfm__label">{{ 'sidebar.copyFormat.indent' | t }}</span>
-            <div class="jfm__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.indent' | t">
-              <button
-                type="button"
-                [attr.aria-pressed]="fmt().indent === '2'"
-                (click)="patch({ indent: '2' })"
-              >
-                2
-              </button>
-              <button
-                type="button"
-                [attr.aria-pressed]="fmt().indent === '4'"
-                (click)="patch({ indent: '4' })"
-              >
-                4
-              </button>
-              <button
-                type="button"
-                [attr.aria-pressed]="fmt().indent === 'tab'"
-                (click)="patch({ indent: 'tab' })"
-              >
-                {{ 'sidebar.copyFormat.indentTab' | t }}
-              </button>
-              <button
-                type="button"
-                [attr.aria-pressed]="fmt().indent === '0'"
-                (click)="patch({ indent: '0' })"
-              >
-                {{ 'sidebar.copyFormat.indentCompact' | t }}
-              </button>
-            </div>
-          </div>
-          <label class="jfm__check">
-            <input
-              type="checkbox"
-              [checked]="fmt().trailingComma"
-              (change)="patch({ trailingComma: $any($event.target).checked })"
-            />
-            <span>{{ 'sidebar.copyFormat.trailingComma' | t }}</span>
-          </label>
-          <pre class="jfm__preview" data-testid="json-format-preview">{{ preview() }}</pre>
-          <div class="jfm__foot">
-            <span
-              class="jfm__chip"
-              [class.jfm__chip--ok]="strict()"
-              data-testid="json-format-chip"
-              >{{
-                (strict() ? 'sidebar.copyFormat.valid' : 'sidebar.copyFormat.notJson') | t
-              }}</span
-            >
             <button
               type="button"
-              class="btn btn--ghost"
-              (click)="reset()"
-              data-testid="json-format-reset"
+              [attr.aria-pressed]="fmt().keys === 'bare'"
+              (click)="patch({ keys: 'bare' })"
+              data-testid="json-format-keys-bare"
             >
-              {{ 'batch.format.reset' | t }}
+              {{ 'sidebar.copyFormat.keysBare' | t }}
             </button>
           </div>
-          <div class="jfm__actions">
+        </div>
+        <div class="jfm__row">
+          <span class="jfm__label">{{ 'sidebar.copyFormat.quote' | t }}</span>
+          <div class="jfm__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.quote' | t">
             <button
               type="button"
-              class="btn btn--ghost"
-              (click)="close()"
-              data-testid="json-format-cancel"
+              [attr.aria-pressed]="fmt().quote === 'double'"
+              (click)="patch({ quote: 'double' })"
             >
-              {{ 'batch.format.cancel' | t }}
+              {{ 'sidebar.copyFormat.quoteDouble' | t }}
             </button>
-            <button type="submit" class="btn btn--primary" data-testid="json-format-apply">
-              {{ 'batch.format.apply' | t }}
+            <button
+              type="button"
+              [attr.aria-pressed]="fmt().quote === 'single'"
+              (click)="patch({ quote: 'single' })"
+            >
+              {{ 'sidebar.copyFormat.quoteSingle' | t }}
             </button>
           </div>
-        </form>
-      }
+        </div>
+        <div class="jfm__row">
+          <span class="jfm__label">{{ 'sidebar.copyFormat.indent' | t }}</span>
+          <div class="jfm__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.indent' | t">
+            <button
+              type="button"
+              [attr.aria-pressed]="fmt().indent === '2'"
+              (click)="patch({ indent: '2' })"
+            >
+              2
+            </button>
+            <button
+              type="button"
+              [attr.aria-pressed]="fmt().indent === '4'"
+              (click)="patch({ indent: '4' })"
+            >
+              4
+            </button>
+            <button
+              type="button"
+              [attr.aria-pressed]="fmt().indent === 'tab'"
+              (click)="patch({ indent: 'tab' })"
+            >
+              {{ 'sidebar.copyFormat.indentTab' | t }}
+            </button>
+            <button
+              type="button"
+              [attr.aria-pressed]="fmt().indent === '0'"
+              (click)="patch({ indent: '0' })"
+            >
+              {{ 'sidebar.copyFormat.indentCompact' | t }}
+            </button>
+          </div>
+        </div>
+        <label class="jfm__check">
+          <input
+            type="checkbox"
+            [checked]="fmt().trailingComma"
+            (change)="patch({ trailingComma: $any($event.target).checked })"
+          />
+          <span>{{ 'sidebar.copyFormat.trailingComma' | t }}</span>
+        </label>
+        <pre class="jfm__preview" data-testid="json-format-preview">{{ preview() }}</pre>
+        <div class="jfm__foot">
+          <span class="jfm__chip" [class.jfm__chip--ok]="strict()" data-testid="json-format-chip">{{
+            (strict() ? 'sidebar.copyFormat.valid' : 'sidebar.copyFormat.notJson') | t
+          }}</span>
+          <button
+            type="button"
+            class="btn btn--ghost"
+            (click)="reset()"
+            data-testid="json-format-reset"
+          >
+            {{ 'batch.format.reset' | t }}
+          </button>
+        </div>
+        <div class="jfm__actions">
+          <button
+            type="button"
+            class="btn btn--ghost"
+            (click)="close()"
+            data-testid="json-format-cancel"
+          >
+            {{ 'batch.format.cancel' | t }}
+          </button>
+          <button type="submit" class="btn btn--primary" data-testid="json-format-apply">
+            {{ 'batch.format.apply' | t }}
+          </button>
+        </div>
+      </form>
     </dialog>
   `,
   styles: `

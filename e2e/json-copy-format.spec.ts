@@ -155,3 +155,15 @@ test('clicking an annotation still selects its block with a custom format', asyn
     )
     .toContain('mapField: "O\'Brien"');
 });
+
+test('the editor shortcuts stay quiet while the «Personalizar» modal is open', async ({ page }) => {
+  await page.locator('.annotation').first().click();
+  await page.getByTestId('json-format-open').click();
+  const modal = page.getByRole('dialog', { name: 'Personalizar el JSON' });
+  await expect(modal).toBeVisible();
+  await page.keyboard.press('Delete');
+  await expect(page.locator('.annotation')).toHaveCount(1);
+  await page.keyboard.press('Escape');
+  await expect(modal).toHaveCount(0);
+  await expect(page.locator('.annotation')).toHaveCount(1);
+});
