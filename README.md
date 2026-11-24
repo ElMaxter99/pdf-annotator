@@ -118,7 +118,7 @@ Texto (`mapField`), tipo, bloqueo/ocultar, valor fijo, decimales y sufijo (núme
 <p align="center"><img src="./screenshots/example_use.png" alt="Editor de anotación" width="90%" /></p>
 
 ### 4 · Guías y precisión
-En la pestaña **Avanzado → Opciones avanzadas → Activar guías y snapping** aparecen rejilla, reglas en puntos PDF y líneas de alineación, con imán a rejilla, márgenes, centros o coordenadas propias.
+Al arrastrar, una anotación se alinea con la X o la Y de otra cercana (Opciones › Editor, activado por defecto; `Alt` lo pausa). En la pestaña **Avanzado → Opciones avanzadas → Activar guías y snapping** aparecen rejilla, reglas en puntos PDF y líneas de alineación, con imán a rejilla, márgenes, centros o coordenadas propias.
 
 <p align="center"><img src="./screenshots/guides.png" alt="Guías, reglas y rejilla" width="90%" /></p>
 
@@ -271,7 +271,8 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | Doble clic con el botón central · `Ctrl/⌘` + doble clic en zona vacía | Alterna 100 % y ajustar al ancho, manteniendo bajo el cursor el punto pulsado (en «Dividida» desenlazada, solo el panel bajo el puntero). Con `Ctrl/⌘`, un clic en zona vacía ya no crea una anotación |
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
 | `Ctrl/⌘ + S` | Aplicar el JSON del editor |
-| `Ctrl/⌘ + ,` | Abrir las Opciones de la app (solo escritorio o local) |
+| `Ctrl/⌘ + ,` | Abrir las Opciones de la app |
+| `Alt` + arrastrar | Arrastrar una anotación sin que se alinee con las demás (Opciones › Editor) |
 | `Ctrl/⌘ + K` | Paleta de comandos: buscar y ejecutar cualquier acción, en el editor y en el panel del lote (↑↓ Intro Esc) |
 | `Shift + clic` | Añadir o quitar una anotación de la selección |
 | Arrastrar en una zona vacía | Seleccionar con un recuadro (con `Shift`, suma a la selección) |

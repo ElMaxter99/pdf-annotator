@@ -105,7 +105,10 @@
     "clearConfirm": "Rimuovere tutte le annotazioni? Puoi annullare con Ctrl+Z.",
     "clearYes": "Rimuovi tutte",
     "clearCancel": "Annulla",
-    "wheelPaging": "Cambia pagina con la rotellina"
+    "wheelPaging": "Cambia pagina con la rotellina",
+    "snapBoth": "Allineata in X con {{x}} e in Y con {{y}}",
+    "snapX": "Allineata in X con {{name}}",
+    "snapY": "Allineata in Y con {{name}}"
   },
   "sidebar": {
     "title": "Annotazioni (JSON)",
@@ -364,7 +367,8 @@
       "wheelPage": "Continuare con la rotellina al bordo del foglio: cambia pagina",
       "pageOnlyA": "Muovi solo A (le pagine diventano libere)",
       "palette": "Apri il riquadro dei comandi",
-      "options": "Apri le Opzioni"
+      "options": "Apri le Opzioni",
+      "dragNoSnap": "Trascinare senza allineare alle altre annotazioni"
     }
   },
   "toast": {
@@ -1910,7 +1914,9 @@
       "goTo": "Vai a {{name}}",
       "themeDark": "Passa al tema scuro",
       "themeLight": "Passa al tema chiaro",
-      "language": "Lingua: {{language}}"
+      "language": "Lingua: {{language}}",
+      "snapOn": "Allinea alle altre annotazioni durante il trascinamento: attiva",
+      "snapOff": "Allinea alle altre annotazioni durante il trascinamento: disattiva"
     },
     "group": {
       "batch": "Lotto",
@@ -2570,6 +2576,16 @@
         "noteInf": "Ogni richiesta consuma crediti e il trasferimento non si fermerà a chiedere. Puoi annullarlo dal pannello in qualsiasi momento.",
         "noteClaude": "Claude Code non ha un tetto predefinito. Puoi impostarne uno se vuoi controllare prima di continuare."
       }
+    },
+    "badgeAll": "Web e desktop",
+    "editor": {
+      "title": "Editor",
+      "intro": "Impostazioni di base dell'editor. Vengono salvate in questo browser e valgono per tutti i PDF.",
+      "snap": "Allinea alle altre annotazioni durante il trascinamento",
+      "snapHelp": "Trascinando, un'annotazione scatta sulla X o sulla Y di una vicina e compare una guida. Evita piccoli scostamenti tra caselle o campi adiacenti.",
+      "distance": "Distanza della calamita",
+      "distanceHelp": "Pixel dello schermo prima dello scatto. Non cambia con lo zoom.",
+      "altHint": "Tieni premuto Alt (⌥ su Mac) mentre trascini per non allineare in quel momento."
     }
   }
 }

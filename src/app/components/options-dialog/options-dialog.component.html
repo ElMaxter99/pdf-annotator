@@ -22,9 +22,9 @@
             (click)="options.select(s)"
             [attr.data-testid]="'options-nav-' + s"
           >
-            <span aria-hidden="true">{{ s === 'updates' ? '⟳' : '✦' }}</span>
+            <span aria-hidden="true">{{ s === 'editor' ? '✎' : s === 'updates' ? '⟳' : '✦' }}</span>
             {{ sectionLabel(s) }}
-            <small>{{ 'options.badge' | t }}</small>
+            <small>{{ (s === 'editor' ? 'options.badgeAll' : 'options.badge') | t }}</small>
           </button>
         }
         <span class="options__nav-note">{{ 'options.savedNote' | t }}</span>
@@ -42,6 +42,45 @@
       </div>
 
       @switch (options.section()) {
+        @case ('editor') {
+          <p class="options__help">{{ 'options.editor.intro' | t }}</p>
+          <label class="options__switch" for="options-snap">
+            <span>
+              <b>{{ 'options.editor.snap' | t }}</b>
+              <span class="options__hint">{{ 'options.editor.snapHelp' | t }}</span>
+            </span>
+            <input
+              id="options-snap"
+              type="checkbox"
+              role="switch"
+              [checked]="editor.snapToAnnotations()"
+              (change)="editor.setSnapToAnnotations($any($event.target).checked)"
+              data-testid="options-snap"
+            />
+          </label>
+          <div class="options__field">
+            <span class="options__label" id="options-snap-distance-label">{{ 'options.editor.distance' | t }}</span>
+            <span class="options__hint">{{ 'options.editor.distanceHelp' | t }}</span>
+            <div class="options__chips" role="group" aria-labelledby="options-snap-distance-label">
+              @for (n of snapDistances; track n) {
+                <button
+                  type="button"
+                  class="options__chip"
+                  [attr.aria-pressed]="editor.snapDistance() === n"
+                  [disabled]="!editor.snapToAnnotations()"
+                  (click)="editor.setSnapDistance(n)"
+                  [attr.data-testid]="'options-snap-distance-' + n"
+                >{{ n }} px@if (n === 6) { · {{ 'options.ai.limit.default' | t }} }</button>
+              }
+            </div>
+          </div>
+          <p class="options__hint"><kbd>Alt</kbd> {{ 'options.editor.altHint' | t }}</p>
+          <span class="options__spacer"></span>
+          <div class="options__foot options__foot--row">
+            <span class="options__spacer"></span>
+            <button type="button" class="btn btn--ghost" (click)="editor.reset()" data-testid="options-editor-reset">{{ 'options.ai.reset' | t }}</button>
+          </div>
+        }
         @case ('updates') {
           <div class="options__status" role="status" aria-live="polite" data-testid="options-update-status">
             v{{ updateState().current }}

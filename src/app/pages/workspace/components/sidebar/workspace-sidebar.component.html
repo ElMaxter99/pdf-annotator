@@ -334,6 +334,14 @@
         </label>
 
         <label class="advanced-checkbox">
+          <input type="checkbox" [checked]="vm.editorSettings.snapToAnnotations()"
+            (change)="vm.editorSettings.setSnapToAnnotations($event.target.checked)"
+            data-testid="advanced-snap-annotations" />
+          <span>{{ 'options.editor.snap' | t }}</span>
+          <app-info-tip [text]="'options.editor.snapHelp' | t"></app-info-tip>
+        </label>
+
+        <label class="advanced-checkbox">
           <input type="checkbox" [checked]="vm.includeAdvancedJsonFields()"
             (change)="vm.toggleIncludeAdvancedJsonFields($event.target.checked)" />
           <span>{{ 'sidebar.includeAdvancedJsonFields' | t }}</span>

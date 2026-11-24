@@ -19,6 +19,20 @@ export interface AnnotationDragHost {
     canvas: HTMLCanvasElement,
     fontSizePx: number,
   ): { left: number; top: number; guides: OverlayGuide[] };
+  /**
+   * Magnet between annotations (P-153): aligns the stored X/Y of the dragged one with another's. `bypass` is
+   * true while Alt is held. `null` when nothing is aligned (or the option is off).
+   */
+  annotationSnap(input: {
+    pageIndex: number;
+    fieldIndex: number;
+    left: number;
+    top: number;
+    fontSize: number;
+    bypass: boolean;
+    /** Reachable range of `left` and `top`: targets outside it cannot be matched exactly. */
+    bounds: SnapBounds;
+  }): { left: number | null; top: number | null; guides: OverlayGuide[] } | null;
   coords(): PageAnnotations[];
   /** Field with its style normalized (so a `locked` flag from the style is honoured). */
   styled(field: PageField): PageField;
@@ -277,33 +291,53 @@ export class AnnotationDragController {
 
     this.dragInfo.width = el.offsetWidth;
 
-    if (!this.host.guidesEnabled()) {
-      el.style.left = `${clampedLeft}px`;
-      el.style.top = `${clampedTop}px`;
+    let left = clampedLeft;
+    let top = clampedTop;
+    let guides: OverlayGuide[] = [];
+    if (this.host.guidesEnabled()) {
+      const snapResult = this.host.applySnapping(
+        clampedLeft,
+        clampedTop,
+        { minLeft: bounds.minLeft, maxLeft: bounds.maxLeft, minTop, maxTop },
+        el,
+        pdfCanvas,
+        this.dragInfo.fontSize,
+      );
+      left = snapResult.left;
+      top = snapResult.top;
+      guides = snapResult.guides;
+    }
+
+    const aligned = this.host.annotationSnap({
+      pageIndex: this.dragInfo.pageIndex,
+      fieldIndex: this.dragInfo.fieldIndex,
+      left: clampedLeft,
+      top: clampedTop,
+      fontSize: this.dragInfo.fontSize,
+      bypass: evt.altKey,
+      bounds: { minLeft: bounds.minLeft, maxLeft: bounds.maxLeft, minTop, maxTop },
+    });
+    if (aligned) {
+      if (aligned.left !== null) {
+        left = Math.min(Math.max(aligned.left, bounds.minLeft), bounds.maxLeft);
+      }
+      if (aligned.top !== null) {
+        top = Math.min(Math.max(aligned.top, minTop), maxTop);
+      }
+      guides = [...guides, ...aligned.guides];
+    }
+
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
+
+    if (!this.host.guidesEnabled() && !aligned) {
       this.host.refreshOverlay(null, []);
       return;
     }
 
-    const snapResult = this.host.applySnapping(
-      clampedLeft,
-      clampedTop,
-      { minLeft: bounds.minLeft, maxLeft: bounds.maxLeft, minTop, maxTop },
-      el,
-      pdfCanvas,
-      this.dragInfo.fontSize,
-    );
-
-    el.style.left = `${snapResult.left}px`;
-    el.style.top = `${snapResult.top}px`;
-
     this.host.refreshOverlay(
-      {
-        left: snapResult.left,
-        top: snapResult.top,
-        width: el.offsetWidth,
-        height: el.offsetHeight,
-      },
-      snapResult.guides,
+      { left, top, width: el.offsetWidth, height: el.offsetHeight },
+      guides,
     );
   };
 

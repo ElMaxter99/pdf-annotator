@@ -105,7 +105,10 @@
     "clearConfirm": "Supprimer toutes les annotations ? Vous pouvez annuler avec Ctrl+Z.",
     "clearYes": "Tout supprimer",
     "clearCancel": "Annuler",
-    "wheelPaging": "Changer de page avec la molette"
+    "wheelPaging": "Changer de page avec la molette",
+    "snapBoth": "Alignée en X avec {{x}} et en Y avec {{y}}",
+    "snapX": "Alignée en X avec {{name}}",
+    "snapY": "Alignée en Y avec {{name}}"
   },
   "sidebar": {
     "title": "Annotations (JSON)",
@@ -364,7 +367,8 @@
       "wheelPage": "Continuer avec la molette au bord de la feuille : change de page",
       "pageOnlyA": "Déplacer seulement A (les pages deviennent libres)",
       "palette": "Ouvrir la palette de commandes",
-      "options": "Ouvrir les Options"
+      "options": "Ouvrir les Options",
+      "dragNoSnap": "Déplacer sans aligner sur les autres annotations"
     }
   },
   "toast": {
@@ -1910,7 +1914,9 @@
       "goTo": "Aller à {{name}}",
       "themeDark": "Passer au thème sombre",
       "themeLight": "Passer au thème clair",
-      "language": "Langue : {{language}}"
+      "language": "Langue : {{language}}",
+      "snapOn": "Aligner sur les autres annotations en déplaçant : activer",
+      "snapOff": "Aligner sur les autres annotations en déplaçant : désactiver"
     },
     "group": {
       "batch": "Lot",
@@ -2570,6 +2576,16 @@
         "noteInf": "Chaque requête consomme des crédits et le transfert ne s’arrêtera pas pour demander. Vous pouvez l’annuler depuis le panneau à tout moment.",
         "noteClaude": "Claude Code n’a pas de plafond par défaut. Vous pouvez en fixer un pour vérifier avant de continuer."
       }
+    },
+    "badgeAll": "Web et bureau",
+    "editor": {
+      "title": "Éditeur",
+      "intro": "Réglages de base de l'éditeur. Ils sont enregistrés dans ce navigateur et valent pour tous les PDF.",
+      "snap": "Aligner sur les autres annotations en déplaçant",
+      "snapHelp": "En déplaçant, une annotation se cale sur le X ou le Y d'une voisine et un repère s'affiche. Évite les petits décalages entre cases ou champs contigus.",
+      "distance": "Distance de l'aimant",
+      "distanceHelp": "Pixels d'écran avant le saut. Ne change pas avec le zoom.",
+      "altHint": "Maintenez Alt (⌥ sur Mac) en déplaçant pour ne pas aligner à ce moment-là."
     }
   }
 }

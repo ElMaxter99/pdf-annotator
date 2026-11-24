@@ -105,7 +105,10 @@
     "clearConfirm": "Alle Anmerkungen entfernen? Mit Strg+Z lässt sich das rückgängig machen.",
     "clearYes": "Alle entfernen",
     "clearCancel": "Abbrechen",
-    "wheelPaging": "Mit dem Rad die Seite wechseln"
+    "wheelPaging": "Mit dem Rad die Seite wechseln",
+    "snapBoth": "In X an {{x}} und in Y an {{y}} ausgerichtet",
+    "snapX": "In X an {{name}} ausgerichtet",
+    "snapY": "In Y an {{name}} ausgerichtet"
   },
   "sidebar": {
     "title": "Anmerkungen (JSON)",
@@ -364,7 +367,8 @@
       "wheelPage": "Am Blattrand weiterscrollen: wechselt die Seite",
       "pageOnlyA": "Nur A bewegen (die Seiten werden frei)",
       "palette": "Befehlspalette öffnen",
-      "options": "Optionen öffnen"
+      "options": "Optionen öffnen",
+      "dragNoSnap": "Ziehen ohne Ausrichtung an anderen Anmerkungen"
     }
   },
   "toast": {
@@ -1910,7 +1914,9 @@
       "goTo": "Zu {{name}}",
       "themeDark": "Zum dunklen Design wechseln",
       "themeLight": "Zum hellen Design wechseln",
-      "language": "Sprache: {{language}}"
+      "language": "Sprache: {{language}}",
+      "snapOn": "Beim Ziehen an anderen Anmerkungen ausrichten: einschalten",
+      "snapOff": "Beim Ziehen an anderen Anmerkungen ausrichten: ausschalten"
     },
     "group": {
       "batch": "Stapel",
@@ -2570,6 +2576,16 @@
         "noteInf": "Jede Anfrage verbraucht Credits und die Übertragung hält nicht an, um nachzufragen. Du kannst sie jederzeit im Panel abbrechen.",
         "noteClaude": "Claude Code hat standardmäßig keine Obergrenze. Du kannst eine setzen, wenn du vor dem Weitermachen prüfen willst."
       }
+    },
+    "badgeAll": "Web und Desktop",
+    "editor": {
+      "title": "Editor",
+      "intro": "Grundeinstellungen des Editors. Sie werden in diesem Browser gespeichert und gelten für alle PDFs.",
+      "snap": "Beim Ziehen an anderen Anmerkungen ausrichten",
+      "snapHelp": "Beim Ziehen rastet eine Anmerkung auf dem X- oder Y-Wert einer nahen ein und eine Hilfslinie erscheint. Vermeidet kleine Versätze zwischen benachbarten Kästchen oder Feldern.",
+      "distance": "Magnet-Abstand",
+      "distanceHelp": "Bildschirmpixel bis zum Einrasten. Ändert sich nicht mit dem Zoom.",
+      "altHint": "Halte Alt (⌥ am Mac) beim Ziehen gedrückt, um in dem Moment nicht auszurichten."
     }
   }
 }

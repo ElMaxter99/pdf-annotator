@@ -105,7 +105,10 @@
     "clearConfirm": "Voleu treure totes les anotacions? Es pot desfer amb Ctrl+Z.",
     "clearYes": "Treure-les totes",
     "clearCancel": "Cancel·lar",
-    "wheelPaging": "Passar de pàgina amb la roda"
+    "wheelPaging": "Passar de pàgina amb la roda",
+    "snapBoth": "Alineada en X amb {{x}} i en Y amb {{y}}",
+    "snapX": "Alineada en X amb {{name}}",
+    "snapY": "Alineada en Y amb {{name}}"
   },
   "sidebar": {
     "title": "Anotacions (JSON)",
@@ -364,7 +367,8 @@
       "wheelPage": "Continuar amb la roda a la vora del full: canvia de pàgina",
       "pageOnlyA": "Moure només A (les pàgines passen a lliures)",
       "palette": "Obrir la paleta d'ordres",
-      "options": "Obre les Opcions"
+      "options": "Obre les Opcions",
+      "dragNoSnap": "Arrossegar sense alinear amb altres anotacions"
     }
   },
   "toast": {
@@ -1910,7 +1914,9 @@
       "goTo": "Anar a {{name}}",
       "themeDark": "Canviar a tema fosc",
       "themeLight": "Canviar a tema clar",
-      "language": "Idioma: {{language}}"
+      "language": "Idioma: {{language}}",
+      "snapOn": "Alinear amb altres anotacions en arrossegar: activar",
+      "snapOff": "Alinear amb altres anotacions en arrossegar: desactivar"
     },
     "group": {
       "batch": "Lot",
@@ -2570,6 +2576,16 @@
         "noteInf": "Cada petició gasta crèdits i el trasllat no s’aturarà a preguntar. El pots cancel·lar des del panell en qualsevol moment.",
         "noteClaude": "Claude Code no té topall per defecte. Hi pots posar un si vols revisar abans de continuar."
       }
+    },
+    "badgeAll": "Web i escriptori",
+    "editor": {
+      "title": "Editor",
+      "intro": "Ajustos bàsics de l'editor. Es desen en aquest navegador i valen per a tots els PDF.",
+      "snap": "Alinear amb altres anotacions en arrossegar",
+      "snapHelp": "En arrossegar, una anotació salta a la X o la Y d'una altra de propera i es dibuixa una guia. Evita desfasaments de dècimes entre caselles o camps contigus.",
+      "distance": "Distància de l'imant",
+      "distanceHelp": "Píxels de pantalla fins que salta. No canvia amb el zoom.",
+      "altHint": "Mantén Alt (⌥ a Mac) mentre arrossegues per no alinear en aquell moment."
     }
   }
 }

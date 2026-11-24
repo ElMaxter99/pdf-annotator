@@ -14,18 +14,20 @@ describe('OptionsService', () => {
     return TestBed.inject(OptionsService);
   }
 
-  it('has no sections (and does not open) on the public web', () => {
+  it('has only the Editor section on the public web', () => {
     const options = service(false, false);
-    expect(options.available()).toBeFalse();
+    expect(options.sections()).toEqual(['editor']);
+    expect(options.available()).toBeTrue();
     options.open();
-    expect(options.isOpen()).toBeFalse();
+    expect(options.isOpen()).toBeTrue();
+    expect(options.section()).toBe('editor');
   });
 
   it('offers only the sections that exist and opens on the requested one', () => {
     const options = service(false, true);
-    expect(options.sections()).toEqual(['ai']);
+    expect(options.sections()).toEqual(['editor', 'ai']);
     options.open('updates');
-    expect(options.section()).toBe('ai');
+    expect(options.section()).toBe('editor');
     expect(options.isOpen()).toBeTrue();
     options.close();
     expect(options.isOpen()).toBeFalse();
@@ -33,7 +35,7 @@ describe('OptionsService', () => {
 
   it('lists both sections on the desktop app', () => {
     const options = service(true, true);
-    expect(options.sections()).toEqual(['updates', 'ai']);
+    expect(options.sections()).toEqual(['editor', 'updates', 'ai']);
     options.open('ai');
     expect(options.section()).toBe('ai');
   });

@@ -48,6 +48,7 @@ export class ShortcutsDialogComponent implements AfterViewInit {
       titleKey: 'shortcuts.groups.annotations',
       items: [
         { keys: ['Click'], labelKey: 'shortcuts.items.addAnnotation' },
+        { keys: ['Alt', '🖱'], labelKey: 'shortcuts.items.dragNoSnap' },
         { keys: ['Enter'], labelKey: 'shortcuts.items.confirm' },
         { keys: ['Esc'], labelKey: 'shortcuts.items.cancel' },
         { keys: ['Ctrl/⌘', 'Z'], labelKey: 'shortcuts.items.undo' },

@@ -26,6 +26,7 @@ describe('AnnotationDragController', () => {
       guidesEnabled: () => false,
       refreshOverlay: noop,
       applySnapping: (left, top) => ({ left, top, guides: [] }),
+      annotationSnap: () => null,
       coords: () => [{ num: 1, fields: field ? [field] : [] }],
       styled: (f) => f,
       selection: () => null,
