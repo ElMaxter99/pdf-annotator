@@ -1,5 +1,5 @@
 import type { BatchItem } from '../models/batch.model';
-import { formatStatusTime, latestStampId, sortRows, statusStamp } from './status-time.utils';
+import { formatStatusTime, latestStampId, statusStamp } from './status-time.utils';
 
 const item = (id: string, over: Partial<BatchItem> = {}): BatchItem =>
   ({ id, name: id, status: 'review', updatedAt: 1000, ...over }) as BatchItem;
@@ -28,19 +28,6 @@ describe('status-time.utils', () => {
       item('c', { status: 'ready', updatedAt: 99999 }),
     ];
     expect(latestStampId(items)).toBe('b');
-  });
-
-  it('sorts by date with undated items last', () => {
-    const rows = [
-      { item: item('x') },
-      { item: item('a', { statusAt: 10 }) },
-      { item: item('b', { statusAt: 30 }) },
-    ];
-    const c = new Intl.Collator('es');
-    expect(sortRows(rows, 'recent', c).map((r) => r.item.id)).toEqual(['b', 'a', 'x']);
-    expect(sortRows(rows, 'oldest', c).map((r) => r.item.id)).toEqual(['a', 'b', 'x']);
-    expect(sortRows(rows, 'name', c).map((r) => r.item.id)).toEqual(['a', 'b', 'x']);
-    expect(sortRows(rows, 'state', c)).toEqual(rows);
   });
 
   it('formats today, yesterday and older dates', () => {

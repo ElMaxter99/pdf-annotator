@@ -1,7 +1,5 @@
 import type { BatchItem } from '../models/batch.model';
 
-export type BatchSort = 'state' | 'recent' | 'oldest' | 'name';
-
 /** A timestamp a `Date` can represent (stored data is untrusted: 1e20 would make formatting throw). */
 export function isValidStamp(value: unknown): value is number {
   return typeof value === 'number' && value > 0 && Number.isFinite(new Date(value).getTime());
@@ -73,34 +71,4 @@ export function formatStatusTitle(at: number, locale: string): string {
   return new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeStyle: 'medium' }).format(
     new Date(at),
   );
-}
-
-/** Orders rows for the panel. `state` keeps the caller's order; items with no date go last. */
-export function sortRows<T extends { item: BatchItem }>(
-  rows: readonly T[],
-  sort: BatchSort,
-  collator: Intl.Collator,
-): T[] {
-  const list = [...rows];
-  if (sort === 'name') {
-    return list.sort((a, b) => collator.compare(a.item.name, b.item.name));
-  }
-  if (sort === 'recent' || sort === 'oldest') {
-    const dir = sort === 'recent' ? -1 : 1;
-    return list.sort((a, b) => {
-      const sa = statusStamp(a.item)?.at;
-      const sb = statusStamp(b.item)?.at;
-      if (sa === undefined && sb === undefined) {
-        return collator.compare(a.item.name, b.item.name);
-      }
-      if (sa === undefined) {
-        return 1;
-      }
-      if (sb === undefined) {
-        return -1;
-      }
-      return sa === sb ? 0 : dir * (sa - sb);
-    });
-  }
-  return list;
 }

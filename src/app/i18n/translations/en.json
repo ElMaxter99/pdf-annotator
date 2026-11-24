@@ -1335,10 +1335,15 @@
     },
     "sort": {
       "label": "Sort",
-      "state": "Status",
-      "recent": "Most recent change",
-      "oldest": "Oldest change",
-      "name": "Name (A–Z)"
+      "change": "Last change",
+      "pages": "Pages",
+      "fields": "Fields",
+      "upload": "Upload order",
+      "result": "Result",
+      "dirAsc": "Ascending (A–Z, fewest first)",
+      "dirDesc": "Descending (Z–A, most first)",
+      "name": "Name",
+      "state": "State"
     }
   },
   "preview": {

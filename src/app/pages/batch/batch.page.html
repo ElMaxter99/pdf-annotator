@@ -317,6 +317,16 @@
                 </button>
               </div>
             }
+            <div class="batch-sortrow">
+              <app-sort-control
+                testId="template-sort"
+                [options]="templateSortKeys"
+                [sortKey]="templateSort().key"
+                [dir]="templateSort().dir"
+                (keyChange)="setTemplateSortKey($event)"
+                (dirChange)="templateSort.set({ key: templateSort().key, dir: $event })"
+              />
+            </div>
             <ul class="batch-files" data-testid="template-rows">
               @for (row of templateRows(); track $index) {
                 <li>
@@ -500,14 +510,14 @@
         </div>
         <app-info-tip [text]="'batch.filter.reviewTip' | t" />
         <span class="batch-bar__spacer"></span>
-        <label class="batch-sort">
-          <span>{{ 'batch.sort.label' | t }}</span>
-          <select [value]="sort()" (change)="setSort($any($event.target).value)" data-testid="sort-select">
-            @for (option of sortOptions; track option) {
-              <option [value]="option" [selected]="sort() === option">{{ 'batch.sort.' + option | t }}</option>
-            }
-          </select>
-        </label>
+        <app-sort-control
+          [options]="sortOptions"
+          [sortKey]="sort().key"
+          [dir]="sort().dir"
+          [directional]="sort().key !== 'state'"
+          (keyChange)="setSortKey($event)"
+          (dirChange)="setSortDir($event)"
+        />
         @if (view() === 'grid' && rows().length > 0) {
           <button type="button" class="btn btn--ghost" (click)="toggleAll()" data-testid="select-all-grid">
             {{ (allSelected() ? 'batch.select.none' : 'batch.select.allShort') | t }}
@@ -672,13 +682,17 @@
                 data-testid="select-all"
               />
             </span>
-            <span role="columnheader">{{ 'batch.col.document' | t }}</span>
+            <span role="columnheader" [attr.aria-sort]="ariaSort('name')">
+              <button type="button" class="batch-sorthead" (click)="toggleSortHead('name')" data-testid="sort-head-name">
+                {{ 'batch.col.document' | t }} {{ sortArrow('name') }}
+              </button>
+            </span>
             <span role="columnheader">{{ 'batch.col.version' | t }}</span>
-            <span role="columnheader" [attr.aria-sort]="ariaSortChange()">
+            <span role="columnheader" [attr.aria-sort]="ariaSort('change')">
               {{ 'batch.col.state' | t }} ·
-              <button type="button" class="batch-sorthead" (click)="toggleSortByChange()" data-testid="sort-head">
+              <button type="button" class="batch-sorthead" (click)="toggleSortHead('change')" data-testid="sort-head">
                 {{ 'batch.col.change' | t }}
-                {{ sort() === 'recent' ? '▾' : sort() === 'oldest' ? '▴' : '' }}
+                {{ sortArrow('change') }}
               </button>
             </span>
             <span role="columnheader"></span>

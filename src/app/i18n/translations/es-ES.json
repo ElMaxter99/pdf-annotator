@@ -1335,10 +1335,15 @@
     },
     "sort": {
       "label": "Ordenar",
-      "state": "Estado",
-      "recent": "Cambio más reciente",
-      "oldest": "Cambio más antiguo",
-      "name": "Nombre (A–Z)"
+      "change": "Último cambio",
+      "pages": "Páginas",
+      "fields": "Campos",
+      "upload": "Orden de subida",
+      "result": "Resultado",
+      "dirAsc": "Sentido ascendente (A–Z, menos primero)",
+      "dirDesc": "Sentido descendente (Z–A, más primero)",
+      "name": "Nombre",
+      "state": "Estado"
     }
   },
   "preview": {

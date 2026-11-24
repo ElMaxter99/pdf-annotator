@@ -1335,10 +1335,15 @@
     },
     "sort": {
       "label": "Trier",
-      "state": "État",
-      "recent": "Changement le plus récent",
-      "oldest": "Changement le plus ancien",
-      "name": "Nom (A–Z)"
+      "change": "Dernier changement",
+      "pages": "Pages",
+      "fields": "Champs",
+      "upload": "Ordre d'envoi",
+      "result": "Résultat",
+      "dirAsc": "Ordre croissant (A–Z, moins en premier)",
+      "dirDesc": "Ordre décroissant (Z–A, plus en premier)",
+      "name": "Nom",
+      "state": "État"
     }
   },
   "preview": {

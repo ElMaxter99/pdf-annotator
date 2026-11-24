@@ -394,3 +394,9 @@
 .upd-why {
   color: var(--upd-bad) !important;
 }
+
+.upd-sortrow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}

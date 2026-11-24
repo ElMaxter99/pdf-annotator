@@ -61,4 +61,6 @@ export interface BatchItem {
   /** When `status` last really changed (review ↔ ready). Unset in batches saved before it existed. */
   readonly statusAt?: number;
   readonly updatedAt: number;
+  /** When the PDF joined the batch (strictly increasing); unset in older batches. Gives the «Orden de subida». */
+  readonly addedAt?: number;
 }
