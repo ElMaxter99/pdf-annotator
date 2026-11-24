@@ -1,6 +1,8 @@
 import {
   JSON_COPY_JS,
   JSON_COPY_STRICT,
+  JsonCopyFormat,
+  formatJsonBlock,
   formatJsonForCopy,
   isStrictJsonFormat,
   jsonCopyPreset,
@@ -87,5 +89,17 @@ describe('json-copy-format.utils', () => {
       indent: 'tab',
       trailingComma: true,
     });
+  });
+});
+
+describe('formatJsonBlock', () => {
+  it('writes a block at the given nesting level with the format indentation', () => {
+    const fmt: JsonCopyFormat = {
+      keys: 'bare',
+      quote: 'single',
+      indent: '4',
+      trailingComma: false,
+    };
+    expect(formatJsonBlock({ a: 'x' }, fmt, 1)).toBe("    {\n        a: 'x'\n    }");
   });
 });

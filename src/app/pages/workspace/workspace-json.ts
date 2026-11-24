@@ -8,7 +8,6 @@ import {
   buildJsonTreePath,
   countLineBreaks,
   getTextareaLineHeight,
-  indentJsonBlock,
   serializeFieldForJson,
 } from '../../utils/json-text.utils';
 import { PageAnnotations, PageField } from '../../models/annotation.model';
@@ -24,10 +23,8 @@ import { cloneAnnotationPages } from '../../utils/annotation-pages.utils';
 import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
 import { LooseJsonError } from '../../utils/loose-json';
 import {
-  JSON_COPY_JS,
-  JSON_COPY_STRICT,
   JsonCopyFormat,
-  JsonCopyPreset,
+  formatJsonBlock,
   formatJsonForCopy,
   isStrictJsonFormat,
   jsonCopyPreset,
@@ -183,19 +180,15 @@ export class WorkspaceJson {
   }
 
   buildPageJsonBlock(this: WorkspacePageComponent, page: PageAnnotations): string {
-    return indentJsonBlock(
+    return formatJsonBlock(
       buildJsonExportPayload([page], (field) => this.serializeFieldForJson(field)).pages[0],
-      '    ',
-      this.editorSettings.jsonKeys(),
+      this.jsonCopyFormat(),
+      2,
     );
   }
 
   buildFieldJsonBlock(this: WorkspacePageComponent, field: PageField): string {
-    return indentJsonBlock(
-      this.serializeFieldForJson(field),
-      '        ',
-      this.editorSettings.jsonKeys(),
-    );
+    return formatJsonBlock(this.serializeFieldForJson(field), this.jsonCopyFormat(), 4);
   }
 
   highlightTextareaRange(
@@ -279,78 +272,28 @@ export class WorkspaceJson {
     return this.jsonTreePreview().status !== 'error';
   }
 
-  /** Con «Sin comillas» el texto del editor ya no es JSON estricto (P-157 a P-159). */
-  jsonKeysAreBare(this: WorkspacePageComponent): boolean {
-    return this.editorSettings.jsonKeys() === 'bare';
-  }
-
-  setJsonKeys(this: WorkspacePageComponent, keys: 'quoted' | 'bare') {
-    if (this.jsonKeysCanChange()) {
-      this.editorSettings.setJsonKeys(keys);
-    }
-  }
-
-  /** Reescribe el texto con el estilo de claves elegido (sin tocar anotaciones ni historial). */
-  onJsonKeysChanged(this: WorkspacePageComponent, keys: 'quoted' | 'bare') {
-    if (this.jsonCopyFormat().keys !== keys) {
-      this.setJsonCopyFormat({ keys });
-    }
-    if (!this.jsonKeysCanChange() || this.jsonKeysAreCurrent(keys)) {
+  /**
+   * Reescribe el texto del editor con el formato elegido (P-163 a P-165). Parte del texto actual y no de las
+   * anotaciones para no perder una edición que aún no se haya aplicado; no toca anotaciones ni historial.
+   */
+  onJsonFormatChanged(this: WorkspacePageComponent, format: JsonCopyFormat) {
+    if (!this.jsonKeysCanChange()) {
       return;
     }
-    // Se reformatea el texto actual del editor (no se regenera desde las anotaciones) para no perder
-    // una edición que aún no se haya aplicado.
     const text = this.coordsTextModel();
-    const next = formatJsonForCopy(text, {
-      keys,
-      quote: 'double',
-      indent: '2',
-      trailingComma: false,
-    });
+    const next = formatJsonForCopy(text, format);
     if (next !== null && next !== text) {
       this.coordsTextModel.set(next);
       this.refreshJsonPreview();
     }
   }
 
-  jsonKeysAreCurrent(this: WorkspacePageComponent, keys: 'quoted' | 'bare'): boolean {
-    const text = this.coordsTextModel();
-    const bare = /^\s*\{\s*pages\s*:/.test(text);
-    return keys === 'bare' ? bare : !bare;
-  }
-
   setJsonCopyFormat(this: WorkspacePageComponent, patch: Partial<JsonCopyFormat>) {
     this.copyFormats.set(patch);
   }
 
-  setJsonCopyPreset(this: WorkspacePageComponent, preset: Exclude<JsonCopyPreset, 'custom'>) {
-    this.setJsonCopyFormat(preset === 'js' ? JSON_COPY_JS : JSON_COPY_STRICT);
-  }
-
-  toggleJsonCopyPanel(this: WorkspacePageComponent) {
-    this.jsonCopyOpen.update((open) => !open);
-  }
-
-  closeJsonCopyPanel(this: WorkspacePageComponent) {
-    this.jsonCopyOpen.set(false);
-  }
-
-  jsonCopyPresetName(this: WorkspacePageComponent): JsonCopyPreset {
-    return jsonCopyPreset(this.jsonCopyFormat());
-  }
-
   jsonCopyIsStrict(this: WorkspacePageComponent): boolean {
     return isStrictJsonFormat(this.jsonCopyFormat());
-  }
-
-  /** Vista previa de la ventana: el primer campo del JSON actual (o uno de ejemplo) con el formato elegido. */
-  jsonCopyPreview(this: WorkspacePageComponent): string {
-    const sample = JSON.stringify({
-      pages: [
-        { num: 1, fields: [{ x: 72, y: 710, mapField: 'nombre', fontSize: 12, type: 'text' }] },
-      ],
-    });
-    return formatJsonForCopy(sample, this.jsonCopyFormat()) ?? '';
   }
 
   toggleIncludeAdvancedJsonFields(this: WorkspacePageComponent, checked: boolean) {
@@ -474,13 +417,18 @@ export class WorkspaceJson {
   }
 
   downloadJSON(this: WorkspacePageComponent) {
+    const format = this.jsonCopyFormat();
+    const text = this.coordsTextModel();
     downloadBlob(
-      new Blob(
-        [formatJsonForCopy(this.coordsTextModel(), JSON_COPY_STRICT) ?? this.coordsTextModel()],
-        { type: 'application/json' },
-      ),
+      new Blob([formatJsonForCopy(text, format) ?? text], { type: 'application/json' }),
       'coords.json',
     );
+    if (!isStrictJsonFormat(format)) {
+      this.toast.show(
+        this.translationService.translate('toast.jsonDownloadedNotStrict'),
+        'success',
+      );
+    }
   }
 
   saveCurrentAsTemplate(this: WorkspacePageComponent) {

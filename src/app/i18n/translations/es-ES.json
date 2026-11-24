@@ -190,6 +190,13 @@
       "bare": "Sin comillas",
       "notStrict": "Claves sin comillas · no es JSON estricto",
       "fixFirst": "Corrige el JSON para cambiar el formato."
+    },
+    "jsonFormat": {
+      "label": "Formato",
+      "keys": "Claves: {{value}}",
+      "values": "Valores: {{value}}",
+      "customize": "Personalizar",
+      "title": "Personalizar el JSON"
     }
   },
   "guides": {
@@ -418,7 +425,8 @@
     },
     "noData": "{{count}} anotaciones sin dato en los datos de prueba: se pintan con su muestra.",
     "jsonCopied": "JSON copiado · {{format}}",
-    "jsonCopyFailed": "No se pudo copiar. Selecciona el texto del editor y pulsa Ctrl+C."
+    "jsonCopyFailed": "No se pudo copiar. Selecciona el texto del editor y pulsa Ctrl+C.",
+    "jsonDownloadedNotStrict": "coords.json descargado · formato no estricto"
   },
   "session": {
     "title": "Continuar donde lo dejaste",
@@ -1308,7 +1316,7 @@
     "format": {
       "title": "Formato de los JSON",
       "open": "Formato de los JSON al descargar",
-      "hint": "Se recuerda; es el mismo de «Copiar JSON»",
+      "hint": "Vale para el editor, al copiar y al descargar",
       "downloaded": "{{count}} JSON descargados · formato no estricto"
     }
   },
@@ -2607,8 +2615,9 @@
       "distance": "Distancia del imán",
       "distanceHelp": "Píxeles de pantalla hasta que salta. No cambia con el zoom.",
       "altHint": "Mantén Alt (⌥ en Mac) mientras arrastras para no alinear en ese momento.",
-      "jsonKeys": "Claves del JSON",
-      "jsonKeysHelp": "Cómo se escriben las claves en el editor «Anotación JSON». Con comillas es JSON válido; sin comillas es un objeto de JS. La importación lee ambos."
+      "jsonKeys": "Formato del JSON",
+      "jsonKeysHelp": "Claves y comillas de los valores en el editor «Anotaciones (JSON)», al copiar y al descargar. La importación lee cualquiera.",
+      "jsonQuote": "Comillas de los valores"
     }
   }
 }

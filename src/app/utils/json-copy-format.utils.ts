@@ -127,3 +127,10 @@ export function formatJsonForCopy(text: string, format: JsonCopyFormat): string 
   }
   return write(value, format, 0);
 }
+
+/** Un bloque del documento (página o campo) escrito con el formato y sangrado como si estuviera en el nivel `level`. */
+export function formatJsonBlock(value: unknown, format: JsonCopyFormat, level: number): string {
+  const unit =
+    format.indent === 'tab' ? '\t' : format.indent === '0' ? '' : ' '.repeat(Number(format.indent));
+  return unit.repeat(level) + write(value, format, level);
+}

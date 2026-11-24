@@ -36,22 +36,29 @@ const SAMPLE = JSON.stringify({
       <button
         type="button"
         class="btn btn--ghost jfm__chev"
+        [disabled]="disabled()"
         [attr.aria-expanded]="open()"
-        [attr.aria-label]="'batch.format.open' | t"
-        [attr.title]="'batch.format.open' | t"
-        (click)="open.update((v) => !v)"
+        [attr.aria-label]="
+          (titleKey() === 'batch.format.title' ? 'batch.format.open' : titleKey()) | t
+        "
+        [attr.title]="(titleKey() === 'batch.format.title' ? 'batch.format.open' : titleKey()) | t"
+        (click)="toggle($event)"
         data-testid="json-format-open"
       >
+        @if (labelKey()) {
+          {{ labelKey() | t }}
+        }
         ▾
       </button>
       @if (open()) {
         <div
           class="jfm__pop"
+          [style]="popStyle()"
           role="dialog"
-          [attr.aria-label]="'batch.format.title' | t"
+          [attr.aria-label]="titleKey() | t"
           data-testid="json-format-pop"
         >
-          <b class="jfm__title">{{ 'batch.format.title' | t }}</b>
+          <b class="jfm__title">{{ titleKey() | t }}</b>
           <div class="jfm__row">
             <span class="jfm__label">{{ 'sidebar.copyFormat.keys' | t }}</span>
             <div class="jfm__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.keys' | t">
@@ -161,10 +168,9 @@ const SAMPLE = JSON.stringify({
       padding-inline: 12px;
     }
     .jfm__pop {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      z-index: 60;
+      position: fixed;
+      z-index: 200;
+      overflow-y: auto;
       width: 400px;
       display: flex;
       flex-direction: column;
@@ -177,10 +183,6 @@ const SAMPLE = JSON.stringify({
       border-radius: 16px;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
       animation: jfm-in 150ms ease-out;
-    }
-    .jfm__pop--up {
-      top: auto;
-      bottom: calc(100% + 8px);
     }
     @keyframes jfm-in {
       from {
@@ -282,6 +284,11 @@ export class JsonFormatMenuComponent {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   /** Se abre hacia arriba cuando el botón está en la barra fija del borde inferior. */
   readonly up = input(false);
+  readonly align = input<'start' | 'end'>('end');
+  readonly disabled = input(false);
+  /** Texto del botón (clave i18n); sin él solo lleva la flecha. */
+  readonly labelKey = input('');
+  readonly titleKey = input('batch.format.title');
   readonly open = signal(false);
   readonly fmt = this.formats.format;
   readonly strict = computed(() => isStrictJsonFormat(this.fmt()));
@@ -291,6 +298,38 @@ export class JsonFormatMenuComponent {
   onDocumentClick(event: MouseEvent): void {
     if (this.open() && !this.host.nativeElement.contains(event.target as Node))
       this.open.set(false);
+  }
+
+  /** El menú es fijo y se coloca con el botón: nunca queda fuera de la pantalla ni recortado por un panel con scroll. */
+  readonly popStyle = signal<Record<string, string>>({});
+
+  toggle(event: MouseEvent): void {
+    if (this.open()) {
+      this.open.set(false);
+      return;
+    }
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    const width = 400;
+    const margin = 8;
+    const left = this.align() === 'start' ? rect.left : rect.right - width;
+    const below = window.innerHeight - rect.bottom - margin * 2;
+    const above = rect.top - margin * 2;
+    const goUp = this.up() || (below < 420 && above > below);
+    const style: Record<string, string> = {
+      left: `${Math.max(margin, Math.min(left, window.innerWidth - width - margin))}px`,
+      maxHeight: `${Math.max(160, goUp ? above : below)}px`,
+    };
+    if (goUp) style['bottom'] = `${window.innerHeight - rect.top + margin}px`;
+    else style['top'] = `${rect.bottom + margin}px`;
+    this.popStyle.set(style);
+    this.open.set(true);
+  }
+
+  @HostListener('window:resize')
+  @HostListener('document:scroll')
+  onViewportChange(): void {
+    if (this.open()) this.open.set(false);
   }
 
   setKeys(keys: CopyKeys): void {
