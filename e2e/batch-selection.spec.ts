@@ -68,6 +68,11 @@ test('«Marcar Listo» skips PDFs without a template and can be undone', async (
   await expect(page.locator('.batch-bar__count')).toContainText('0 de 3 listos');
 });
 
+async function pickSort(page: Page, key: string): Promise<void> {
+  await page.getByTestId('sort-select').click();
+  await page.getByTestId(`sort-select-${key}`).click();
+}
+
 test('shows when a PDF changed state, tags the latest and sorts by it', async ({ page }) => {
   await openPanel(page);
   await expect(page.getByTestId('row-stamp')).toHaveCount(0);
@@ -78,18 +83,34 @@ test('shows when a PDF changed state, tags the latest and sorts by it', async ({
   await expect(page.getByTestId('row-stamp')).toContainText('hoy');
   await expect(page.getByTestId('row-last')).toHaveText('Último');
 
-  await page.getByTestId('sort-select').selectOption('change');
+  await pickSort(page, 'change');
   await expect(page.getByTestId('panel-item').first()).toContainText('factura-0331.pdf');
-  await page.getByTestId('sort-select').selectOption('name');
+  await pickSort(page, 'name');
   await expect(page.getByTestId('panel-item').first()).toContainText('factura-0331.pdf');
   await page.getByTestId('sort-head').click();
-  await expect(page.getByTestId('sort-select')).toHaveValue('change');
+  await expect(page.getByTestId('sort-select')).toHaveAttribute('data-value', 'change');
 
-  await page.getByTestId('sort-select').selectOption('name');
+  await pickSort(page, 'name');
   await page.getByTestId('sort-select-dir').click();
   await expect(page.getByTestId('panel-item').last()).toContainText('factura-0331.pdf');
-  await page.getByTestId('sort-select').selectOption('state');
+  await pickSort(page, 'state');
   await expect(page.getByTestId('sort-select-dir')).toBeDisabled();
+});
+
+test('the sort menu works with the keyboard and closes with Esc', async ({ page }) => {
+  await openPanel(page);
+  const trigger = page.getByTestId('sort-select');
+  await trigger.focus();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('menu')).toBeVisible();
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('menu')).toHaveCount(0);
+  await expect(trigger).toHaveAttribute('data-value', 'name');
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('menu')).toHaveCount(0);
 });
 
 test('the «Deshacer» notice sits above the selection bar and never covers it', async ({ page }) => {
