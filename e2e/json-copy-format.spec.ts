@@ -17,7 +17,7 @@ const clipboard = (page: import('@playwright/test').Page) =>
 test('copy keeps plain JSON by default', async ({ page }) => {
   await page.getByRole('button', { name: 'Copiar JSON', exact: true }).click();
   const text = await clipboard(page);
-  expect(text).toBe(await page.locator('.json-editor').inputValue());
+  expect(JSON.parse(text)).toEqual(JSON.parse(await page.locator('.json-editor').inputValue()));
   expect(JSON.parse(text).pages[0].fields[0].mapField).toBe("O'Brien");
 });
 
@@ -54,4 +54,24 @@ test('Escape closes the format panel', async ({ page }) => {
   await expect(page.getByRole('dialog', { name: 'Formato al copiar' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: 'Formato al copiar' })).toHaveCount(0);
+});
+
+test('plain copy turns loose editor text (bare keys, single quotes) into valid JSON', async ({
+  page,
+}) => {
+  await page
+    .locator('.json-editor')
+    .fill("{ pages: [ { num: 1, fields: [ { x: 50, y: 700, mapField: 'nombre', type: 'text' } ] } ] }");
+  await page.waitForTimeout(300);
+  await page.getByRole('button', { name: 'Copiar JSON', exact: true }).click();
+  const text = await clipboard(page);
+  expect(text).toContain('"pages"');
+  expect(JSON.parse(text).pages[0].fields[0].mapField).toBe('nombre');
+});
+
+test('copy still works without the async clipboard API', async ({ page }) => {
+  await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { value: undefined }));
+  await page.getByRole('button', { name: 'Copiar JSON', exact: true }).click();
+  await expect(page.locator('.toast--error')).toHaveCount(0);
+  await expect(page.locator('.toast')).toContainText('JSON');
 });

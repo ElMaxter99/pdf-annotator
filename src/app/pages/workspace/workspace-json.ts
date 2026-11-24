@@ -43,6 +43,31 @@ import type { WorkspacePageComponent } from './workspace.page';
  * Métodos de `WorkspacePageComponent` (se copian a su prototipo con `WORKSPACE_PARTS`, al final de workspace.page.ts;
  * `this` es la página).
  */
+/** Copia al portapapeles; sin la API moderna (contexto no seguro, permiso denegado) prueba con `execCommand`. */
+async function writeTextToClipboard(text: string): Promise<boolean> {
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    /* cae al método antiguo */
+  }
+  try {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0';
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand('copy');
+    area.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 export class WorkspaceJson {
   focusJsonOnSelection(this: WorkspacePageComponent, pageIndex: number, fieldIndex: number) {
     if (pageIndex < 0 || fieldIndex < 0) {
@@ -229,17 +254,21 @@ export class WorkspaceJson {
     const text = this.coordsTextModel();
     const format = this.jsonCopyFormat();
     const preset = jsonCopyPreset(format);
-    const output = preset === 'json' ? text : (formatJsonForCopy(text, format) ?? text);
+    // Siempre se reescribe con el formato elegido: si el texto del editor lleva claves sin comillas
+    // (JSON «flexible»), «Copiar JSON» tiene que entregar JSON válido igualmente.
+    const output = formatJsonForCopy(text, format) ?? text;
     const label = this.translationService.translate(`sidebar.copyFormat.name.${preset}`);
-    navigator.clipboard.writeText(output).then(
-      () =>
+    void writeTextToClipboard(output).then((ok) => {
+      if (ok) {
         this.toast.show(
           this.translationService.translate('toast.jsonCopied', { format: label }),
           'success',
           2000,
-        ),
-      () => this.toast.error(this.translationService.translate('toast.jsonCopyFailed')),
-    );
+        );
+      } else {
+        this.toast.error(this.translationService.translate('toast.jsonCopyFailed'));
+      }
+    });
   }
 
   storedJsonCopyFormat(this: WorkspacePageComponent): JsonCopyFormat {
