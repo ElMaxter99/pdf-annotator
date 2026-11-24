@@ -1120,7 +1120,7 @@
           "placed": "{{placed}} de {{total}} camps d’A col·locats a B",
           "toCheck": "{{n}} camps d’A col·locats amb dubtes: revisa’ls abans d’aplicar",
           "added": "{{n}} camps nous que no eren a A (p. ex. el número de pàgina de les pàgines noves de B)",
-          "absent": "{{n}} camps d’A el text dels quals ja no existeix a B: no col·locar-los és el correcte"
+          "absent": "{{n}} camps d'A el text dels quals ja no existeix a B: pots validar-los o col·locar-los a mà"
         }
       },
       "draft": {
@@ -1670,10 +1670,17 @@
         "notFound": "D’A · sense col·locar · {{count}}",
         "absent": "D’A · ja no existeixen a B · {{count}}",
         "ready": "D’A · segurs · {{count}}",
-        "newInB": "Nous a B (no eren a A) · {{count}}"
+        "newInB": "Nous a B (no eren a A) · {{count}}",
+        "resolved": "Resolts per tu · {{count}}"
       },
       "notInB": "no és a B",
-      "absentInB": "no existeix a B: el correcte és no col·locar-lo",
+      "absentInB": "no existeix a B",
+      "placed": "Col·locat",
+      "validated": "Validat",
+      "validate": "Validar: no existeix",
+      "undoValidate": "Desfer",
+      "placedByHand": "col·locat a mà a B",
+      "validatedAbsent": "validat: no existeix a B",
       "withoutAi": "col·locat sense IA",
       "placeByHand": "Col·locar a mà",
       "tabBadge": "Proposta de la IA: {{count}} camps",
@@ -1687,7 +1694,8 @@
         "review": "Camps d’A col·locats a B amb dubtes (una altra pàgina, una etiqueta semblant o confiança mitjana o baixa). No van marcats: mira’ls abans d’aplicar.",
         "newInB": "No existien a A: B té més pàgines i el camp es repeteix a cada pàgina d’A (p. ex. el número de pàgina), així que es proposen per a les pàgines noves.",
         "notFound": "Camps d’A que la IA no ha sabut col·locar a B. Crea’ls a mà si cal.",
-        "absent": "Camps d’A el text dels quals ja no existeix a B: no col·locar-los és el correcte."
+        "absent": "Camps d'A el text dels quals ja no existeix a B. Valida'ls si és correcte no col·locar-los, o col·loca'ls a mà.",
+        "resolved": "Camps d'A que ja has col·locat a B o validat com a inexistents. Ja no queden pendents."
       },
       "sameAsA": "igual que a A",
       "ghostHint": "{{name}} · fora de B · clic per posar-lo"

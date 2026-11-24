@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { AiBatchService } from '../../../../services/ai-batch.service';
 import { TranslationService } from '../../../../i18n/translation.service';
 import { confidenceLevel, isRowSelected, type AiRow, isAbsentInB, PROPOSAL_GROUPS, proposalGroup } from '../../../../utils/ai-proposal.utils';
+import { fieldKey } from '../../../../utils/migration.utils';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { InfoTipComponent } from '../../../../components/info-tip/info-tip.component';
 import type { FieldState, FieldStatus } from '../../../../utils/migration.utils';
@@ -20,7 +22,23 @@ const ORDER: Record<FieldStatus, number> = { missing: 0, new: 1, moved: 2, renam
 export class MigrationPanelComponent {
   @Input({ required: true }) vm!: WorkspacePageComponent;
 
+  private readonly aiQueue = inject(AiBatchService);
+
   readonly showSame = signal(false);
+
+  /** «No existen en B» que siguen por decidir; el chip del lote cuenta solo esos. */
+  private readonly absentOpen = computed(
+    () => (this.proposal()?.rows ?? []).filter((row) => isAbsentInB(row) && !row.id.startsWith('pattern-') && this.resolution(row) === null).length,
+  );
+
+  constructor() {
+    effect(() => {
+      const id = this.vm?.migration()?.item.id;
+      if (id && this.proposal()) {
+        this.aiQueue.setAbsentOpen(id, this.absentOpen());
+      }
+    });
+  }
 
   private readonly i18n = inject(TranslationService);
 
@@ -68,9 +86,14 @@ export class MigrationPanelComponent {
     }
     const byPlace = (a: AiRow, b: AiRow) => a.page - b.page || a.index - b.index || a.newPage - b.newPage;
     const rows = [...session.rows].sort(byPlace);
-    return PROPOSAL_GROUPS.map((key) => ({ key, rows: rows.filter((row) => proposalGroup(row) === key) })).filter(
-      (group) => group.rows.length > 0,
-    );
+    const open = rows.filter((row) => this.resolution(row) === null);
+    const keys: readonly string[] = [...PROPOSAL_GROUPS, 'resolved'];
+    return keys
+      .map((key) => ({
+        key,
+        rows: key === 'resolved' ? rows.filter((row) => this.resolution(row) !== null) : open.filter((row) => proposalGroup(row) === key),
+      }))
+      .filter((group) => group.rows.length > 0);
   });
 
   readonly highCount = computed(() => (this.proposal()?.rows ?? []).filter((row) => proposalGroup(row) === 'ready').length);
@@ -99,6 +122,19 @@ export class MigrationPanelComponent {
     return row.ok && row.source === 'text' && this.proposal()?.provider !== 'adjust';
   }
 
+  /** A field of A the AI did not place in B that the person already settled: placed by hand or validated as «no existe». */
+  resolution(row: AiRow): 'placed' | 'validated' | null {
+    if (row.ok || row.id.startsWith('pattern-')) {
+      return null;
+    }
+    const m = this.vm.migration();
+    const name = this.vm.aiFieldName(row);
+    if (m?.states.some((s) => s.status !== 'missing' && s.name === name && s.page === this.vm.aiStatePage(row))) {
+      return 'placed';
+    }
+    return m?.dismissed.includes(fieldKey(this.vm.aiStatePage(row), name)) ? 'validated' : null;
+  }
+
   absent(row: AiRow): boolean {
     return isAbsentInB(row);
   }
@@ -116,7 +152,7 @@ export class MigrationPanelComponent {
   missingFor(row: AiRow): FieldState | null {
     const name = this.vm.aiFieldName(row);
     return (
-      this.vm.migration()?.states.find((state) => state.status === 'missing' && state.name === name && state.page === row.page) ??
+      this.vm.migration()?.states.find((state) => state.status === 'missing' && state.name === name && state.page === this.vm.aiStatePage(row)) ??
       null
     );
   }

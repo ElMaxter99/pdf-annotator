@@ -57,10 +57,22 @@
               } @else {
                 <button type="button" class="ai-proposal__name ai-proposal__name--off ai-proposal__go" (click)="vm.focusAiRow(row)" [attr.title]="'pairing.goTitleA' | t" data-testid="ai-row-go">
                   <b class="mono">{{ vm.aiFieldName(row) }}</b>
-                  <small>{{ (absent(row) ? 'ai.proposal.absentInB' : 'ai.proposal.notInB') | t }}</small>
+                  <small>{{ (resolution(row) === 'placed' ? 'ai.proposal.placedByHand' : resolution(row) === 'validated' ? 'ai.proposal.validatedAbsent' : absent(row) ? 'ai.proposal.absentInB' : 'ai.proposal.notInB') | t }}</small>
                 </button>
-                @if (missingFor(row); as state) {
-                  <button type="button" class="btn btn--ghost" (click)="vm.placeMissing(state)" data-testid="place-missing">{{ 'ai.proposal.placeByHand' | t }}</button>
+                @switch (resolution(row)) {
+                  @case ('placed') {
+                    <span class="migration-chip migration-chip--on" data-testid="ai-row-placed">✓ {{ 'ai.proposal.placed' | t }}</span>
+                  }
+                  @case ('validated') {
+                    <span class="migration-chip migration-chip--on" data-testid="ai-row-validated">✓ {{ 'ai.proposal.validated' | t }}</span>
+                    <button type="button" class="btn btn--ghost" (click)="vm.unvalidateAbsent(row)" data-testid="unvalidate-absent">{{ 'ai.proposal.undoValidate' | t }}</button>
+                  }
+                  @default {
+                    @if (missingFor(row); as state) {
+                      <button type="button" class="btn btn--ghost" (click)="vm.placeMissing(state)" data-testid="place-missing">{{ 'ai.proposal.placeByHand' | t }}</button>
+                    }
+                    <button type="button" class="btn btn--primary" (click)="vm.validateAbsent(row)" data-testid="validate-absent">{{ 'ai.proposal.validate' | t }}</button>
+                  }
                 }
               }
             </li>

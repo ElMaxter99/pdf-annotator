@@ -1120,7 +1120,7 @@
           "placed": "{{placed}} von {{total}} Feldern aus A in B platziert",
           "toCheck": "{{n}} Felder aus A mit Zweifeln platziert: vor dem Anwenden prüfen",
           "added": "{{n}} neue Felder, die nicht in A waren (z. B. die Seitenzahl der neuen Seiten von B)",
-          "absent": "{{n}} Felder aus A, deren Text es in B nicht mehr gibt: sie wegzulassen ist richtig"
+          "absent": "{{n}} Felder aus A, deren Text in B nicht mehr existiert: bestätige sie oder platziere sie von Hand"
         }
       },
       "draft": {
@@ -1670,10 +1670,17 @@
         "notFound": "Aus A · nicht platziert · {{count}}",
         "absent": "Aus A · nicht mehr in B · {{count}}",
         "ready": "Aus A · sicher · {{count}}",
-        "newInB": "Neu in B (nicht in A) · {{count}}"
+        "newInB": "Neu in B (nicht in A) · {{count}}",
+        "resolved": "Von dir erledigt · {{count}}"
       },
       "notInB": "nicht in B",
-      "absentInB": "existiert in B nicht: es nicht zu platzieren ist richtig",
+      "absentInB": "existiert in B nicht",
+      "placed": "Platziert",
+      "validated": "Bestätigt",
+      "validate": "Bestätigen: existiert nicht",
+      "undoValidate": "Rückgängig",
+      "placedByHand": "von Hand in B platziert",
+      "validatedAbsent": "bestätigt: existiert in B nicht",
       "withoutAi": "ohne KI platziert",
       "placeByHand": "Von Hand platzieren",
       "tabBadge": "KI-Vorschlag: {{count}} Felder",
@@ -1687,7 +1694,8 @@
         "review": "Felder aus A, die mit Zweifeln in B platziert wurden (andere Seite, ähnliche Beschriftung oder mittlere bzw. niedrige Sicherheit). Nicht markiert: vor dem Anwenden prüfen.",
         "newInB": "Sie gab es in A nicht: B hat mehr Seiten und das Feld wiederholt sich auf jeder Seite von A (z. B. die Seitenzahl), daher werden sie für die neuen Seiten vorgeschlagen.",
         "notFound": "Felder aus A, die die KI nicht in B platzieren konnte. Lege sie bei Bedarf von Hand an.",
-        "absent": "Felder aus A, deren Text es in B nicht mehr gibt: sie wegzulassen ist richtig."
+        "absent": "Felder aus A, deren Text in B nicht mehr existiert. Bestätige sie, wenn es richtig ist, sie wegzulassen, oder platziere sie von Hand.",
+        "resolved": "Felder aus A, die du in B platziert oder als nicht vorhanden bestätigt hast. Sie brauchen keine Entscheidung mehr."
       },
       "sameAsA": "wie in A",
       "ghostHint": "{{name}} · nicht in B · Klick zum Hinzufügen"

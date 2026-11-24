@@ -102,7 +102,7 @@ export class AiBatchChipComponent {
         phase: row.phase,
         key: row.phase,
         params: { n: row.attempt, placed: row.placed, total: Math.max(0, row.total - (row.absent ?? 0)) },
-        absent: row.absent ?? 0,
+        absent: row.absentOpen ?? row.absent ?? 0,
         done: row.phase === 'ready' || row.phase === 'free' || row.phase === 'partial',
         added: row.added ?? 0,
         toCheck: row.toCheck ?? 0,

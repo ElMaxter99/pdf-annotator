@@ -1120,7 +1120,7 @@
           "placed": "{{placed}} of {{total}} fields of A placed in B",
           "toCheck": "{{n}} fields of A placed with doubts: check them before applying",
           "added": "{{n}} new fields that were not in A (e.g. the page number of the new pages of B)",
-          "absent": "{{n}} fields of A whose text no longer exists in B: leaving them out is right"
+          "absent": "{{n}} fields of A whose text no longer exists in B: validate them or place them by hand"
         }
       },
       "draft": {
@@ -1670,10 +1670,17 @@
         "notFound": "From A · not placed · {{count}}",
         "absent": "From A · not in B any more · {{count}}",
         "ready": "From A · sure · {{count}}",
-        "newInB": "New in B (not in A) · {{count}}"
+        "newInB": "New in B (not in A) · {{count}}",
+        "resolved": "Resolved by you · {{count}}"
       },
       "notInB": "not in B",
-      "absentInB": "does not exist in B: leaving it out is correct",
+      "absentInB": "does not exist in B",
+      "placed": "Placed",
+      "validated": "Validated",
+      "validate": "Validate: does not exist",
+      "undoValidate": "Undo",
+      "placedByHand": "placed by hand in B",
+      "validatedAbsent": "validated: does not exist in B",
       "withoutAi": "placed without AI",
       "placeByHand": "Place by hand",
       "tabBadge": "AI proposal: {{count}} fields",
@@ -1687,7 +1694,8 @@
         "review": "Fields of A placed in B with doubts (another page, a similar label or medium or low confidence). Not ticked: look at them before applying.",
         "newInB": "They were not in A: B has more pages and the field repeats on every page of A (e.g. the page number), so they are proposed for the new pages.",
         "notFound": "Fields of A the AI could not place in B. Create them by hand if needed.",
-        "absent": "Fields of A whose text no longer exists in B: leaving them out is right."
+        "absent": "Fields of A whose text no longer exists in B. Validate them if leaving them out is right, or place them by hand.",
+        "resolved": "Fields of A you already placed in B or validated as missing. They no longer need a decision."
       },
       "sameAsA": "same as in A",
       "ghostHint": "{{name}} · not in B · click to add it"
