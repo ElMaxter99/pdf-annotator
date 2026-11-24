@@ -15,6 +15,8 @@ import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { AiHelperService, type AiProvider } from '../../services/ai-helper.service';
 import { DesktopUpdateService, getDesktopBridge } from '../../services/desktop-update.service';
+import { JSON_COPY_STRICT } from '../../utils/json-copy-format.utils';
+import { JsonCopyFormatService } from '../../services/json-copy-format.service';
 import { EditorSettingsService } from '../../services/editor-settings.service';
 import { OptionsSection, OptionsService } from '../../services/options.service';
 import { AI_LIMIT_PRESETS, limitChoice, parseAiLimitInput } from '../../utils/ai-limit.utils';
@@ -35,7 +37,15 @@ import { UpdateChannelComponent } from '../update-channel/update-channel.compone
 export class OptionsDialogComponent {
   readonly options = inject(OptionsService);
   readonly editor = inject(EditorSettingsService);
+  readonly jsonFormats = inject(JsonCopyFormatService);
+  readonly jsonFormat = this.jsonFormats.format;
   readonly snapDistances = [3, 6, 10];
+
+  /** «Restablecer» de la pestaña Editor: imán y formato del JSON. */
+  resetEditor(): void {
+    this.editor.reset();
+    this.jsonFormats.set(JSON_COPY_STRICT);
+  }
   readonly update = inject(DesktopUpdateService);
   readonly helper = inject(AiHelperService);
   private readonly i18n = inject(TranslationService);
@@ -48,7 +58,9 @@ export class OptionsDialogComponent {
   readonly port = getDesktopBridge()?.helperPort ?? 4310;
   readonly provider = this.helper.provider;
   readonly providers = computed(() =>
-    (['claude', 'copilot', 'fake'] as AiProvider[]).filter((p) => p !== 'fake' || this.helper.found()['fake'] === true),
+    (['claude', 'copilot', 'fake'] as AiProvider[]).filter(
+      (p) => p !== 'fake' || this.helper.found()['fake'] === true,
+    ),
   );
   readonly providerName = computed(() => providerLabel(this.provider()));
   readonly limit = computed(() => this.helper.limitFor(this.provider()));
@@ -58,7 +70,9 @@ export class OptionsDialogComponent {
   readonly otherText = signal('');
   readonly otherError = signal(false);
   readonly confirmReset = signal(false);
-  readonly offline = computed(() => this.helper.connection() === 'offline' || this.helper.connection() === 'unknown');
+  readonly offline = computed(
+    () => this.helper.connection() === 'offline' || this.helper.connection() === 'unknown',
+  );
   readonly noCli = computed(() => this.helper.connection() === 'noCli');
   readonly otherShown = computed(() => this.otherOpen() || this.choice() === 'other');
 
@@ -67,7 +81,9 @@ export class OptionsDialogComponent {
   constructor() {
     if (typeof document !== 'undefined') {
       document.addEventListener('keydown', this.onDocumentEscape, true);
-      inject(DestroyRef).onDestroy(() => document.removeEventListener('keydown', this.onDocumentEscape, true));
+      inject(DestroyRef).onDestroy(() =>
+        document.removeEventListener('keydown', this.onDocumentEscape, true),
+      );
     }
     effect(() => {
       const open = this.options.isOpen();
@@ -75,7 +91,8 @@ export class OptionsDialogComponent {
       if (open) {
         // Only the opening matters here: typing a limit changes `limit()` and must not reset the dialog.
         untracked(() => {
-          this.opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+          this.opener =
+            document.activeElement instanceof HTMLElement ? document.activeElement : null;
           this.confirmReset.set(false);
           this.syncOther();
           setTimeout(() => this.closeBtn?.nativeElement.focus());
@@ -93,7 +110,11 @@ export class OptionsDialogComponent {
   }
 
   private readonly onDocumentEscape = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape' && this.options.isOpen() && !document.querySelector('[data-testid="channel-dialog"]')) {
+    if (
+      event.key === 'Escape' &&
+      this.options.isOpen() &&
+      !document.querySelector('[data-testid="channel-dialog"]')
+    ) {
       event.stopPropagation();
       this.options.close();
     }
@@ -113,7 +134,10 @@ export class OptionsDialogComponent {
     if (s.checking) return this.i18n.translate('update.panel.status.checking', v);
     switch (s.status) {
       case 'available':
-        return this.i18n.translate(s.prerelease ? 'update.panel.status.availableRc' : 'update.panel.status.available', v);
+        return this.i18n.translate(
+          s.prerelease ? 'update.panel.status.availableRc' : 'update.panel.status.available',
+          v,
+        );
       case 'downloading':
         return this.i18n.translate('update.panel.status.downloading', v);
       case 'installing':
@@ -123,7 +147,10 @@ export class OptionsDialogComponent {
       case 'error':
         return this.i18n.translate('update.panel.status.error', v);
       default:
-        return this.i18n.translate(s.lastChecked ? 'update.panel.status.upToDate' : 'update.panel.status.never', v);
+        return this.i18n.translate(
+          s.lastChecked ? 'update.panel.status.upToDate' : 'update.panel.status.never',
+          v,
+        );
     }
   }
 
@@ -142,7 +169,10 @@ export class OptionsDialogComponent {
   }
 
   isDefault(value: number | null): boolean {
-    const factory = value === null ? this.provider() !== 'copilot' : value === 10 && this.provider() === 'copilot';
+    const factory =
+      value === null
+        ? this.provider() !== 'copilot'
+        : value === 10 && this.provider() === 'copilot';
     return factory;
   }
 
@@ -163,7 +193,11 @@ export class OptionsDialogComponent {
       const limit = this.limit();
       this.otherText.set(limit !== null ? String(limit) : '');
     }
-    setTimeout(() => this.dialog?.nativeElement.querySelector<HTMLInputElement>('[data-testid="options-limit-input"]')?.focus());
+    setTimeout(() =>
+      this.dialog?.nativeElement
+        .querySelector<HTMLInputElement>('[data-testid="options-limit-input"]')
+        ?.focus(),
+    );
   }
 
   onOtherInput(text: string): void {
@@ -201,13 +235,19 @@ export class OptionsDialogComponent {
     if (next < 0) return;
     event.preventDefault();
     this.options.select(list[next]);
-    setTimeout(() => this.dialog?.nativeElement.querySelector<HTMLElement>('.options__nav [aria-current="page"]')?.focus());
+    setTimeout(() =>
+      this.dialog?.nativeElement
+        .querySelector<HTMLElement>('.options__nav [aria-current="page"]')
+        ?.focus(),
+    );
   }
 
   onKeydown(event: KeyboardEvent): void {
     if (event.key !== 'Tab' || !this.dialog) return;
     const items = Array.from(
-      this.dialog.nativeElement.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled])'),
+      this.dialog.nativeElement.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled])',
+      ),
     ).filter((el) => !el.closest('[data-testid="channel-dialog"]') && el.offsetParent !== null);
     if (!items.length) return;
     const first = items[0];

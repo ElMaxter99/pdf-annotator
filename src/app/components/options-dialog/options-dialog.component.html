@@ -78,17 +78,26 @@
             <span class="options__label" id="options-json-keys-label">{{ 'options.editor.jsonKeys' | t }}</span>
             <span class="options__hint">{{ 'options.editor.jsonKeysHelp' | t }}</span>
             <div class="options__chips" role="group" aria-labelledby="options-json-keys-label">
-              <button type="button" class="options__chip" [attr.aria-pressed]="editor.jsonKeys() === 'quoted'"
-                (click)="editor.setJsonKeys('quoted')" data-testid="options-json-keys-quoted">{{ 'sidebar.jsonKeys.quoted' | t }} · {{ 'options.ai.limit.default' | t }}</button>
-              <button type="button" class="options__chip" [attr.aria-pressed]="editor.jsonKeys() === 'bare'"
-                (click)="editor.setJsonKeys('bare')" data-testid="options-json-keys-bare">{{ 'sidebar.jsonKeys.bare' | t }}</button>
+              <button type="button" class="options__chip" [attr.aria-pressed]="jsonFormat().keys === 'quoted'"
+                (click)="jsonFormats.set({ keys: 'quoted' })" data-testid="options-json-keys-quoted">{{ 'sidebar.jsonKeys.quoted' | t }} · {{ 'options.ai.limit.default' | t }}</button>
+              <button type="button" class="options__chip" [attr.aria-pressed]="jsonFormat().keys === 'bare'"
+                (click)="jsonFormats.set({ keys: 'bare' })" data-testid="options-json-keys-bare">{{ 'sidebar.jsonKeys.bare' | t }}</button>
+            </div>
+          </div>
+          <div class="options__field">
+            <span class="options__label" id="options-json-quote-label">{{ 'options.editor.jsonQuote' | t }}</span>
+            <div class="options__chips" role="group" aria-labelledby="options-json-quote-label">
+              <button type="button" class="options__chip" [attr.aria-pressed]="jsonFormat().quote === 'double'"
+                (click)="jsonFormats.set({ quote: 'double' })" data-testid="options-json-quote-double">{{ 'sidebar.copyFormat.quoteDouble' | t }} · {{ 'options.ai.limit.default' | t }}</button>
+              <button type="button" class="options__chip" [attr.aria-pressed]="jsonFormat().quote === 'single'"
+                (click)="jsonFormats.set({ quote: 'single' })" data-testid="options-json-quote-single">{{ 'sidebar.copyFormat.quoteSingle' | t }}</button>
             </div>
           </div>
           <p class="options__hint"><kbd>Alt</kbd> {{ 'options.editor.altHint' | t }}</p>
           <span class="options__spacer"></span>
           <div class="options__foot options__foot--row">
             <span class="options__spacer"></span>
-            <button type="button" class="btn btn--ghost" (click)="editor.reset()" data-testid="options-editor-reset">{{ 'options.ai.reset' | t }}</button>
+            <button type="button" class="btn btn--ghost" (click)="resetEditor()" data-testid="options-editor-reset">{{ 'options.ai.reset' | t }}</button>
           </div>
         }
         @case ('updates') {

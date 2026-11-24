@@ -190,6 +190,13 @@
       "bare": "Sem aspas",
       "notStrict": "Chaves sem aspas · não é JSON estrito",
       "fixFirst": "Corrija o JSON para mudar o formato."
+    },
+    "jsonFormat": {
+      "label": "Formato",
+      "keys": "Chaves: {{value}}",
+      "values": "Valores: {{value}}",
+      "customize": "Personalizar",
+      "title": "Personalizar o JSON"
     }
   },
   "guides": {
@@ -418,7 +425,8 @@
     },
     "noData": "{{count}} anotações sem dado nos dados de teste: mostram a sua amostra.",
     "jsonCopied": "JSON copiado · {{format}}",
-    "jsonCopyFailed": "Não foi possível copiar. Selecione o texto do editor e prima Ctrl+C."
+    "jsonCopyFailed": "Não foi possível copiar. Selecione o texto do editor e prima Ctrl+C.",
+    "jsonDownloadedNotStrict": "coords.json descarregado · formato não estrito"
   },
   "session": {
     "title": "Continuar onde ficou",
@@ -1308,7 +1316,7 @@
     "format": {
       "title": "Formato dos JSON",
       "open": "Formato dos JSON ao descarregar",
-      "hint": "Fica guardado; é o mesmo de «Copiar JSON»",
+      "hint": "Vale para o editor, ao copiar e ao descarregar",
       "downloaded": "{{count}} JSON descarregados · formato não estrito"
     }
   },
@@ -2599,8 +2607,9 @@
       "distance": "Distância do íman",
       "distanceHelp": "Pixels do ecrã até saltar. Não muda com o zoom.",
       "altHint": "Mantenha Alt (⌥ no Mac) ao arrastar para não alinhar nesse momento.",
-      "jsonKeys": "Chaves do JSON",
-      "jsonKeysHelp": "Como as chaves são escritas no editor «Anotação JSON». Com aspas é JSON válido; sem aspas é um objeto JS. A importação lê ambos."
+      "jsonKeys": "Formato do JSON",
+      "jsonKeysHelp": "Chaves e aspas dos valores no editor «Anotações (JSON)», ao copiar e ao descarregar. A importação lê qualquer formato.",
+      "jsonQuote": "Aspas dos valores"
     }
   }
 }
