@@ -232,7 +232,6 @@ export class BatchPageComponent implements OnInit {
     const filter = this.filter();
     const kind = this.kind();
     const rank: Record<RowState, number> = { noTemplate: 0, review: 1, ready: 2 };
-    const order = new Map(this.store.items().map((item, index) => [item.id, index]));
     const pages = this.pageCounts();
     const filtered = this.allRows()
       .filter((row) => !query || row.item.name.toLowerCase().includes(query))
@@ -241,13 +240,13 @@ export class BatchPageComponent implements OnInit {
     return sortByCriterion(filtered, this.sort(), this.collator(), {
       name: (row) => row.item.name,
       rank: (row) => rank[row.state],
-      index: (row) => order.get(row.item.id) ?? 0,
+      index: (row) => row.item.addedAt ?? Number.MAX_SAFE_INTEGER,
       value: (row, key) =>
         key === 'change'
           ? statusStamp(row.item)?.at
           : key === 'pages'
             ? pages.get(row.item.id)
-            : this.fieldCount(row.item.aPages),
+            : this.fieldCount(row.item.bPages ?? row.item.aPages),
     });
   });
   readonly sort = this.store.panelSort;

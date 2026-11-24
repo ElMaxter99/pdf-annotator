@@ -123,9 +123,14 @@ export class BatchStoreService {
     this.draft.set({ pdfs, jsons: [] });
   }
 
+  private lastAddedAt = 0;
+
   add(init: { name: string; aPdf: Blob; aPages: PageAnnotations[] }): BatchItem {
+    const addedAt = Math.max(Date.now(), this.lastAddedAt + 1);
+    this.lastAddedAt = addedAt;
     const item: BatchItem = {
       id: newId(),
+      addedAt,
       name: init.name,
       aPdf: init.aPdf,
       aPages: init.aPages,
