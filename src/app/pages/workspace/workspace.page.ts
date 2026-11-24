@@ -128,6 +128,7 @@ import {
 } from '../../utils/color.utils';
 import { toFiniteNumber } from '../../utils/number.utils';
 import { offsetFieldCopy } from '../../utils/paste-offset.utils';
+import { JsonCopyFormatService } from '../../services/json-copy-format.service';
 import { EditorSettingsService } from '../../services/editor-settings.service';
 import { pixelToPdfPoint } from '../../utils/pdf-coords.utils';
 import { resolveShortcut, type ShortcutAction } from '../../utils/shortcuts.utils';
@@ -195,7 +196,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   reHoming = false;
   readonly zoomMenuOpen = signal(false);
   /** Formato con el que se copia el JSON (solo al copiar; P-130 a P-132) y si su ventana está abierta. */
-  readonly jsonCopyFormat = signal(this.storedJsonCopyFormat());
+  readonly copyFormats = inject(JsonCopyFormatService);
+  readonly jsonCopyFormat = this.copyFormats.format;
   readonly jsonCopyOpen = signal(false);
   /** The wheel past the edge of the sheet changes page (P-63); on by default, switched off in ⋯. */
   readonly wheelPaging = signal(this.storedWheelPaging());

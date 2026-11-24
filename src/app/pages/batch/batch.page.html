@@ -47,9 +47,12 @@
         {{ 'batch.upd.open' | t }}
       </button>
       @if (readyCount() > 0) {
-        <button type="button" class="btn" (click)="downloadReady()" data-testid="download-ready">
-          {{ 'batch.downloadReady' | t: { count: readyCount() } }}
-        </button>
+        <span class="batch-split">
+          <button type="button" class="btn" (click)="downloadReady()" data-testid="download-ready">
+            {{ 'batch.downloadReady' | t: { count: readyCount() } }}
+          </button>
+          <app-json-format-menu />
+        </span>
       }
       <button
         type="button"
@@ -580,9 +583,12 @@
       @if (total() > 0 && readyCount() === total()) {
         <div class="batch-done" role="status">
           <h2>{{ 'batch.allReady.title' | t }}</h2>
-          <button type="button" class="btn btn--primary" (click)="downloadReady()">
-            {{ 'batch.downloadReady' | t: { count: readyCount() } }}
-          </button>
+          <span class="batch-split">
+            <button type="button" class="btn btn--primary" (click)="downloadReady()">
+              {{ 'batch.downloadReady' | t: { count: readyCount() } }}
+            </button>
+            <app-json-format-menu />
+          </span>
         </div>
       }
 
@@ -819,6 +825,7 @@
               ⤓ {{ 'batch.bulk.download' | t }}
               <span class="batch-sub">{{ plan().download }} / {{ plan().total }}</span>
             </button>
+            <app-json-format-menu />
             <button
               type="button"
               class="btn btn--ghost"

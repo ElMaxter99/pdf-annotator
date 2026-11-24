@@ -1238,3 +1238,9 @@ app-ai-batch-chip {
     border: 1px solid color-mix(in srgb, var(--text) 25%, transparent);
   }
 }
+
+.batch-split {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

@@ -1304,6 +1304,12 @@
       "undoAll": "Desfés-ho tot",
       "backupDone": "Còpia descarregada: {{count}} plantilles.",
       "noPagesWhy": "El document té {{pages}} pàgines, però cap amb camps vàlids ({{skippedPages}} pàgines i {{skippedFields}} camps descartats). Cada camp necessita x i y numèriques i un mapField."
+    },
+    "format": {
+      "title": "Format dels JSON",
+      "open": "Format dels JSON en descarregar",
+      "hint": "Es recorda; és el mateix de «Copia JSON»",
+      "downloaded": "{{count}} JSON descarregats · format no estricte"
     }
   },
   "preview": {

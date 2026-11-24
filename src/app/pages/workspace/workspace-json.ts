@@ -25,14 +25,12 @@ import { downloadBlob, toArrayBuffer } from '../../utils/download.utils';
 import { LooseJsonError } from '../../utils/loose-json';
 import {
   JSON_COPY_JS,
-  JSON_COPY_KEY,
   JSON_COPY_STRICT,
   JsonCopyFormat,
   JsonCopyPreset,
   formatJsonForCopy,
   isStrictJsonFormat,
   jsonCopyPreset,
-  normalizeJsonCopyFormat,
 } from '../../utils/json-copy-format.utils';
 import { buildJsonExportPayload } from '../../utils/json-export.utils';
 import { JsonViewMode, AUTO_APPLY_JSON_DELAY_MS, MAX_JSON_IMPORT_BYTES } from './workspace.types';
@@ -321,23 +319,8 @@ export class WorkspaceJson {
     return keys === 'bare' ? bare : !bare;
   }
 
-  storedJsonCopyFormat(this: WorkspacePageComponent): JsonCopyFormat {
-    try {
-      const raw = typeof localStorage === 'undefined' ? null : localStorage.getItem(JSON_COPY_KEY);
-      return normalizeJsonCopyFormat(raw ? JSON.parse(raw) : null);
-    } catch {
-      return { ...JSON_COPY_STRICT };
-    }
-  }
-
   setJsonCopyFormat(this: WorkspacePageComponent, patch: Partial<JsonCopyFormat>) {
-    const next = normalizeJsonCopyFormat({ ...this.jsonCopyFormat(), ...patch });
-    this.jsonCopyFormat.set(next);
-    try {
-      localStorage.setItem(JSON_COPY_KEY, JSON.stringify(next));
-    } catch {
-      /* storage unavailable */
-    }
+    this.copyFormats.set(patch);
   }
 
   setJsonCopyPreset(this: WorkspacePageComponent, preset: Exclude<JsonCopyPreset, 'custom'>) {
