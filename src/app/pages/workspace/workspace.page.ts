@@ -663,6 +663,10 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       untracked(() => this.scheduleBatchSave());
     });
     effect(() => {
+      const keys = this.editorSettings.jsonKeys();
+      untracked(() => this.onJsonKeysChanged(keys));
+    });
+    effect(() => {
       this.migration();
       this.referenceMode();
       this.showingOnlyA();
@@ -2580,6 +2584,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     this.coordsTextModel.set(
       jsonExportText(
         buildJsonExportPayload(this.coords(), (field) => this.serializeFieldForJson(field)),
+        this.editorSettings.jsonKeys(),
       ),
     );
     this.refreshJsonPreview();

@@ -188,11 +188,16 @@ export class WorkspaceJson {
     return indentJsonBlock(
       buildJsonExportPayload([page], (field) => this.serializeFieldForJson(field)).pages[0],
       '    ',
+      this.editorSettings.jsonKeys(),
     );
   }
 
   buildFieldJsonBlock(this: WorkspacePageComponent, field: PageField): string {
-    return indentJsonBlock(this.serializeFieldForJson(field), '        ');
+    return indentJsonBlock(
+      this.serializeFieldForJson(field),
+      '        ',
+      this.editorSettings.jsonKeys(),
+    );
   }
 
   highlightTextareaRange(
@@ -271,6 +276,51 @@ export class WorkspaceJson {
     });
   }
 
+  /** El texto del editor se puede leer: sin error de sintaxis (vacío cuenta como legible). */
+  jsonKeysCanChange(this: WorkspacePageComponent): boolean {
+    return this.jsonTreePreview().status !== 'error';
+  }
+
+  /** Con «Sin comillas» el texto del editor ya no es JSON estricto (P-157 a P-159). */
+  jsonKeysAreBare(this: WorkspacePageComponent): boolean {
+    return this.editorSettings.jsonKeys() === 'bare';
+  }
+
+  setJsonKeys(this: WorkspacePageComponent, keys: 'quoted' | 'bare') {
+    if (this.jsonKeysCanChange()) {
+      this.editorSettings.setJsonKeys(keys);
+    }
+  }
+
+  /** Reescribe el texto con el estilo de claves elegido (sin tocar anotaciones ni historial). */
+  onJsonKeysChanged(this: WorkspacePageComponent, keys: 'quoted' | 'bare') {
+    if (this.jsonCopyFormat().keys !== keys) {
+      this.setJsonCopyFormat({ keys });
+    }
+    if (!this.jsonKeysCanChange() || this.jsonKeysAreCurrent(keys)) {
+      return;
+    }
+    // Se reformatea el texto actual del editor (no se regenera desde las anotaciones) para no perder
+    // una edición que aún no se haya aplicado.
+    const text = this.coordsTextModel();
+    const next = formatJsonForCopy(text, {
+      keys,
+      quote: 'double',
+      indent: '2',
+      trailingComma: false,
+    });
+    if (next !== null && next !== text) {
+      this.coordsTextModel.set(next);
+      this.refreshJsonPreview();
+    }
+  }
+
+  jsonKeysAreCurrent(this: WorkspacePageComponent, keys: 'quoted' | 'bare'): boolean {
+    const text = this.coordsTextModel();
+    const bare = /^\s*\{\s*pages\s*:/.test(text);
+    return keys === 'bare' ? bare : !bare;
+  }
+
   storedJsonCopyFormat(this: WorkspacePageComponent): JsonCopyFormat {
     try {
       const raw = typeof localStorage === 'undefined' ? null : localStorage.getItem(JSON_COPY_KEY);
@@ -313,7 +363,9 @@ export class WorkspaceJson {
   /** Vista previa de la ventana: el primer campo del JSON actual (o uno de ejemplo) con el formato elegido. */
   jsonCopyPreview(this: WorkspacePageComponent): string {
     const sample = JSON.stringify({
-      pages: [{ num: 1, fields: [{ x: 72, y: 710, mapField: "nombre", fontSize: 12, type: 'text' }] }],
+      pages: [
+        { num: 1, fields: [{ x: 72, y: 710, mapField: 'nombre', fontSize: 12, type: 'text' }] },
+      ],
     });
     return formatJsonForCopy(sample, this.jsonCopyFormat()) ?? '';
   }
@@ -439,7 +491,13 @@ export class WorkspaceJson {
   }
 
   downloadJSON(this: WorkspacePageComponent) {
-    downloadBlob(new Blob([this.coordsTextModel()], { type: 'application/json' }), 'coords.json');
+    downloadBlob(
+      new Blob(
+        [formatJsonForCopy(this.coordsTextModel(), JSON_COPY_STRICT) ?? this.coordsTextModel()],
+        { type: 'application/json' },
+      ),
+      'coords.json',
+    );
   }
 
   saveCurrentAsTemplate(this: WorkspacePageComponent) {

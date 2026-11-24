@@ -183,6 +183,13 @@
         "js": "Objecte JS/TS",
         "custom": "Personalitzat"
       }
+    },
+    "jsonKeys": {
+      "label": "Claus",
+      "quoted": "Amb cometes",
+      "bare": "Sense cometes",
+      "notStrict": "Claus sense cometes · no és JSON estricte",
+      "fixFirst": "Corregeix el JSON per canviar el format."
     }
   },
   "guides": {
@@ -2585,7 +2592,9 @@
       "snapHelp": "En arrossegar, una anotació salta a la X o la Y d'una altra de propera i es dibuixa una guia. Evita desfasaments de dècimes entre caselles o camps contigus.",
       "distance": "Distància de l'imant",
       "distanceHelp": "Píxels de pantalla fins que salta. No canvia amb el zoom.",
-      "altHint": "Mantén Alt (⌥ a Mac) mentre arrossegues per no alinear en aquell moment."
+      "altHint": "Mantén Alt (⌥ a Mac) mentre arrossegues per no alinear en aquell moment.",
+      "jsonKeys": "Claus del JSON",
+      "jsonKeysHelp": "Com s'escriuen les claus a l'editor «Anotació JSON». Amb cometes és JSON vàlid; sense cometes és un objecte de JS. La importació llegeix tots dos."
     }
   }
 }

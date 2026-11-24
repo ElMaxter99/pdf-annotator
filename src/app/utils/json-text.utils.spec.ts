@@ -67,4 +67,9 @@ describe('json-text.utils', () => {
     expect(isEditableElement(document.createElement('textarea'))).toBeTrue();
     expect(isEditableElement(null)).toBeFalse();
   });
+
+  it('indents blocks with unquoted keys when asked', () => {
+    const block = indentJsonBlock({ x: 1, mapField: 'a' }, '  ', 'bare');
+    expect(block).toBe('  {\n    x: 1,\n    mapField: "a"\n  }');
+  });
 });

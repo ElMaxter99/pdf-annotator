@@ -183,6 +183,13 @@
         "js": "Objeto JS/TS",
         "custom": "Personalizado"
       }
+    },
+    "jsonKeys": {
+      "label": "Claves",
+      "quoted": "Con comillas",
+      "bare": "Sin comillas",
+      "notStrict": "Claves sin comillas · no es JSON estricto",
+      "fixFirst": "Corrige el JSON para cambiar el formato."
     }
   },
   "guides": {
@@ -2585,7 +2592,9 @@
       "snapHelp": "Al arrastrar, una anotación salta a la X o la Y de otra cercana y se dibuja una guía. Evita desfases de décimas entre casillas o campos contiguos.",
       "distance": "Distancia del imán",
       "distanceHelp": "Píxeles de pantalla hasta que salta. No cambia con el zoom.",
-      "altHint": "Mantén Alt (⌥ en Mac) mientras arrastras para no alinear en ese momento."
+      "altHint": "Mantén Alt (⌥ en Mac) mientras arrastras para no alinear en ese momento.",
+      "jsonKeys": "Claves del JSON",
+      "jsonKeysHelp": "Cómo se escriben las claves en el editor «Anotación JSON». Con comillas es JSON válido; sin comillas es un objeto de JS. La importación lee ambos."
     }
   }
 }
