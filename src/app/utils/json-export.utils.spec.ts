@@ -18,10 +18,13 @@ describe('json-export.utils', () => {
     expect(jsonExportText({ pages: [] })).toBe('{\n  "pages": []\n}');
   });
 
-  it('writes unquoted keys on request and keeps strings in double quotes', () => {
-    const text = jsonExportText({ pages: [{ num: 1, fields: [{ x: 1, mapField: 'a' }] }] }, 'bare');
+  it('writes unquoted keys and single quotes on request', () => {
+    const text = jsonExportText(
+      { pages: [{ num: 1, fields: [{ x: 1, mapField: 'a' }] }] },
+      { keys: 'bare', quote: 'single', indent: '2', trailingComma: false },
+    );
     expect(text).toContain('pages: [');
-    expect(text).toContain('mapField: "a"');
+    expect(text).toContain("mapField: 'a'");
     expect(text).not.toContain('"pages"');
   });
 });

@@ -190,6 +190,13 @@
       "bare": "Senza virgolette",
       "notStrict": "Chiavi senza virgolette · non è JSON rigoroso",
       "fixFirst": "Correggi il JSON per cambiare formato."
+    },
+    "jsonFormat": {
+      "label": "Formato",
+      "keys": "Chiavi: {{value}}",
+      "values": "Valori: {{value}}",
+      "customize": "Personalizza",
+      "title": "Personalizza il JSON"
     }
   },
   "guides": {
@@ -418,7 +425,8 @@
     },
     "noData": "{{count}} annotazioni senza dato nei dati di prova: mostrano il loro esempio.",
     "jsonCopied": "JSON copiato · {{format}}",
-    "jsonCopyFailed": "Impossibile copiare. Seleziona il testo dell'editor e premi Ctrl+C."
+    "jsonCopyFailed": "Impossibile copiare. Seleziona il testo dell'editor e premi Ctrl+C.",
+    "jsonDownloadedNotStrict": "coords.json scaricato · formato non rigoroso"
   },
   "session": {
     "title": "Riprendi da dove avevi lasciato",
@@ -1308,7 +1316,7 @@
     "format": {
       "title": "Formato dei JSON",
       "open": "Formato dei JSON al download",
-      "hint": "Viene ricordato; è lo stesso di «Copia JSON»",
+      "hint": "Vale per l'editor, la copia e il download",
       "downloaded": "{{count}} JSON scaricati · formato non rigoroso"
     }
   },
@@ -2612,8 +2620,9 @@
       "distance": "Distanza della calamita",
       "distanceHelp": "Pixel dello schermo prima dello scatto. Non cambia con lo zoom.",
       "altHint": "Tieni premuto Alt (⌥ su Mac) mentre trascini per non allineare in quel momento.",
-      "jsonKeys": "Chiavi del JSON",
-      "jsonKeysHelp": "Come vengono scritte le chiavi nell'editor «Annotazione JSON». Con virgolette è JSON valido; senza virgolette è un oggetto JS. L'importazione legge entrambi."
+      "jsonKeys": "Formato del JSON",
+      "jsonKeysHelp": "Chiavi e virgolette dei valori nell'editor «Annotazioni (JSON)», quando copi e quando scarichi. L'importazione legge qualsiasi formato.",
+      "jsonQuote": "Virgolette dei valori"
     }
   }
 }

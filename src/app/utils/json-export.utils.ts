@@ -1,4 +1,9 @@
-import { formatJsonForCopy } from './json-copy-format.utils';
+import {
+  JSON_COPY_STRICT,
+  JsonCopyFormat,
+  formatJsonForCopy,
+  jsonCopyPreset,
+} from './json-copy-format.utils';
 import type { PageAnnotations, PageField } from '../models/annotation.model';
 
 export interface JsonExportPayload {
@@ -20,16 +25,13 @@ export function buildJsonExportPayload(
 
 export function jsonExportText(
   payload: JsonExportPayload,
-  keys: 'quoted' | 'bare' = 'quoted',
+  format: JsonCopyFormat = JSON_COPY_STRICT,
 ): string {
   const strict = JSON.stringify(payload, null, 2);
-  if (keys === 'quoted') return strict;
-  return (
-    formatJsonForCopy(strict, {
-      keys: 'bare',
-      quote: 'double',
-      indent: '2',
-      trailingComma: false,
-    }) ?? strict
-  );
+  if (sameAsStrict(format)) return strict;
+  return formatJsonForCopy(strict, format) ?? strict;
+}
+
+function sameAsStrict(format: JsonCopyFormat): boolean {
+  return jsonCopyPreset(format) === 'json';
 }

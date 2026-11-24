@@ -190,6 +190,13 @@
       "bare": "Sense cometes",
       "notStrict": "Claus sense cometes · no és JSON estricte",
       "fixFirst": "Corregeix el JSON per canviar el format."
+    },
+    "jsonFormat": {
+      "label": "Format",
+      "keys": "Claus: {{value}}",
+      "values": "Valors: {{value}}",
+      "customize": "Personalitza",
+      "title": "Personalitza el JSON"
     }
   },
   "guides": {
@@ -418,7 +425,8 @@
     },
     "noData": "{{count}} anotacions sense dada a les dades de prova: es pinten amb la mostra.",
     "jsonCopied": "JSON copiat · {{format}}",
-    "jsonCopyFailed": "No s'ha pogut copiar. Selecciona el text de l'editor i prem Ctrl+C."
+    "jsonCopyFailed": "No s'ha pogut copiar. Selecciona el text de l'editor i prem Ctrl+C.",
+    "jsonDownloadedNotStrict": "coords.json descarregat · format no estricte"
   },
   "session": {
     "title": "Continua on ho vas deixar",
@@ -1308,7 +1316,7 @@
     "format": {
       "title": "Format dels JSON",
       "open": "Format dels JSON en descarregar",
-      "hint": "Es recorda; és el mateix de «Copia JSON»",
+      "hint": "Val per a l'editor, en copiar i en descarregar",
       "downloaded": "{{count}} JSON descarregats · format no estricte"
     }
   },
@@ -2612,8 +2620,9 @@
       "distance": "Distància de l'imant",
       "distanceHelp": "Píxels de pantalla fins que salta. No canvia amb el zoom.",
       "altHint": "Mantén Alt (⌥ a Mac) mentre arrossegues per no alinear en aquell moment.",
-      "jsonKeys": "Claus del JSON",
-      "jsonKeysHelp": "Com s'escriuen les claus a l'editor «Anotació JSON». Amb cometes és JSON vàlid; sense cometes és un objecte de JS. La importació llegeix tots dos."
+      "jsonKeys": "Format del JSON",
+      "jsonKeysHelp": "Claus i cometes dels valors a l'editor «Anotacions (JSON)», en copiar i en descarregar. La importació llegeix qualsevol.",
+      "jsonQuote": "Cometes dels valors"
     }
   }
 }

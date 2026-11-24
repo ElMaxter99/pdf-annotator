@@ -190,6 +190,13 @@
       "bare": "Ohne Anführungszeichen",
       "notStrict": "Schlüssel ohne Anführungszeichen · kein striktes JSON",
       "fixFirst": "Korrigiere das JSON, um das Format zu ändern."
+    },
+    "jsonFormat": {
+      "label": "Format",
+      "keys": "Schlüssel: {{value}}",
+      "values": "Werte: {{value}}",
+      "customize": "Anpassen",
+      "title": "JSON anpassen"
     }
   },
   "guides": {
@@ -418,7 +425,8 @@
     },
     "noData": "{{count}} Anmerkungen ohne Daten in den Testdaten: sie zeigen ihr Muster.",
     "jsonCopied": "JSON kopiert · {{format}}",
-    "jsonCopyFailed": "Kopieren nicht möglich. Text im Editor markieren und Strg+C drücken."
+    "jsonCopyFailed": "Kopieren nicht möglich. Text im Editor markieren und Strg+C drücken.",
+    "jsonDownloadedNotStrict": "coords.json heruntergeladen · nicht striktes Format"
   },
   "session": {
     "title": "Dort weitermachen, wo Sie aufgehört haben",
@@ -1308,7 +1316,7 @@
     "format": {
       "title": "JSON-Format",
       "open": "JSON-Format beim Herunterladen",
-      "hint": "Wird gemerkt; gleich wie „JSON kopieren“",
+      "hint": "Gilt für den Editor, das Kopieren und das Herunterladen",
       "downloaded": "{{count}} JSON heruntergeladen · nicht striktes Format"
     }
   },
@@ -2612,8 +2620,9 @@
       "distance": "Magnet-Abstand",
       "distanceHelp": "Bildschirmpixel bis zum Einrasten. Ändert sich nicht mit dem Zoom.",
       "altHint": "Halte Alt (⌥ am Mac) beim Ziehen gedrückt, um in dem Moment nicht auszurichten.",
-      "jsonKeys": "JSON-Schlüssel",
-      "jsonKeysHelp": "Wie Schlüssel im Editor „JSON-Annotation“ geschrieben werden. Mit Anführungszeichen ist es gültiges JSON, ohne ein JS-Objekt. Der Import liest beides."
+      "jsonKeys": "JSON-Format",
+      "jsonKeysHelp": "Schlüssel und Anführungszeichen der Werte im Editor „Annotationen (JSON)“, beim Kopieren und Herunterladen. Der Import liest jedes Format.",
+      "jsonQuote": "Anführungszeichen der Werte"
     }
   }
 }

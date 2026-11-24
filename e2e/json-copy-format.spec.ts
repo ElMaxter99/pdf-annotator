@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { applyJsonText, openWorkspace } from './helpers';
 
@@ -21,39 +22,46 @@ test('copy keeps plain JSON by default', async ({ page }) => {
   expect(JSON.parse(text).pages[0].fields[0].mapField).toBe("O'Brien");
 });
 
-test('the JS/TS preset copies unquoted keys and single quotes, and remembers the choice', async ({
+test('«Personalizar» rewrites the editor and drives copy and download with one format', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Formato al copiar' }).click();
-  await page.getByRole('button', { name: 'Objeto JS/TS' }).click();
-  await expect(page.getByTestId('json-copy-preview')).toContainText("mapField: 'nombre',");
-  await page.getByTestId('json-copy-with').click();
-  const text = await clipboard(page);
-  expect(text).toContain("mapField: 'O\\'Brien',");
-  expect(text).toContain('pages: [');
-  expect(text).not.toContain('"pages"');
-  await expect(page.locator('.toast')).toContainText('Objeto JS/TS');
+  const editor = page.locator('.json-editor');
+  await expect(editor).toHaveValue(/"pages"/);
+  await page.getByTestId('json-format-open').click();
+  await page.getByTestId('json-format-keys-bare').click();
+  await page.getByRole('button', { name: "Simples '…'" }).click();
+  await expect(page.getByTestId('json-format-preview')).toContainText("mapField: 'nombre',");
+  await page.keyboard.press('Escape');
 
-  // The plain button now uses the saved format, also after a reload of the stored value.
+  // The editor itself now shows the chosen format, and the panel says it is not strict JSON.
+  await expect(editor).toHaveValue(/^\{\s*pages: \[/);
+  await expect(editor).toHaveValue(/mapField: 'O\\'Brien'/);
+  await expect(page.getByTestId('json-format-keys')).toContainText('Sin comillas');
+  await expect(page.getByTestId('json-format-values')).toContainText('Simples');
+  await expect(page.getByTestId('json-keys-notstrict')).toBeVisible();
+
   await page.getByRole('button', { name: 'Copiar JSON', exact: true }).click();
-  expect(await clipboard(page)).toContain('pages: [');
-  const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.jsonCopyFormat'));
-  expect(JSON.parse(stored!)).toEqual({
-    keys: 'bare',
-    quote: 'single',
-    indent: '2',
-    trailingComma: true,
-  });
+  expect(await clipboard(page)).toContain("mapField: 'O\\'Brien'");
+  await expect(page.locator('.toast')).toContainText('JSON copiado');
 
-  // The editor itself stays valid JSON.
-  await expect(page.locator('.json-editor')).toHaveValue(/"pages"/);
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Descargar JSON', exact: true }).click(),
+  ]);
+  const downloaded = readFileSync((await download.path()) as string, 'utf8');
+  expect(downloaded).toMatch(/^\{\s*pages: \[/);
+  await expect(page.locator('.toast')).toContainText('formato no estricto');
+
+  // The choice is remembered.
+  const stored = await page.evaluate(() => localStorage.getItem('pdf-annotator.jsonCopyFormat'));
+  expect(JSON.parse(stored!)).toMatchObject({ keys: 'bare', quote: 'single' });
 });
 
-test('Escape closes the format panel', async ({ page }) => {
-  await page.getByRole('button', { name: 'Formato al copiar' }).click();
-  await expect(page.getByRole('dialog', { name: 'Formato al copiar' })).toBeVisible();
+test('Escape closes the format menu', async ({ page }) => {
+  await page.getByTestId('json-format-open').click();
+  await expect(page.getByRole('dialog', { name: 'Personalizar el JSON' })).toBeVisible();
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog', { name: 'Formato al copiar' })).toHaveCount(0);
+  await expect(page.getByRole('dialog', { name: 'Personalizar el JSON' })).toHaveCount(0);
 });
 
 test('plain copy turns loose editor text (bare keys, single quotes) into valid JSON', async ({
@@ -76,17 +84,14 @@ test('copy still works without the async clipboard API', async ({ page }) => {
   await expect(page.locator('.toast')).toContainText('JSON');
 });
 
-test('the JSON keys setting rewrites the editor, syncs with Options', async ({
+test('the format syncs with Options › Editor and a syntax error disables «Personalizar»', async ({
   page,
 }) => {
   const editor = page.locator('.json-editor');
-  await expect(editor).toHaveValue(/"pages"/);
-  await page.getByTestId('json-keys-bare').click();
+  await page.getByTestId('json-format-open').click();
+  await page.getByTestId('json-format-keys-bare').click();
+  await page.keyboard.press('Escape');
   await expect(editor).toHaveValue(/^\{\s*pages: \[/);
-  await expect(page.getByTestId('json-keys-notstrict')).toBeVisible();
-  // Copy follows the same choice.
-  await page.getByRole('button', { name: 'Copiar JSON', exact: true }).click();
-  expect(await clipboard(page)).toContain('pages: [');
   // Options › Editor shows the same value and changes it back.
   await page.getByTestId('more-options').click();
   await page.getByTestId('options-open').click();
@@ -95,17 +100,35 @@ test('the JSON keys setting rewrites the editor, syncs with Options', async ({
   await page.getByTestId('options-close').click();
   await expect(editor).toHaveValue(/"pages"/);
   await expect(page.getByTestId('json-keys-notstrict')).toHaveCount(0);
-  // A syntax error disables the switch.
+  // A syntax error disables the button.
   await editor.fill('{ pages: [');
-  await expect(page.getByTestId('json-keys-bare')).toBeDisabled();
+  await expect(page.getByTestId('json-format-open')).toBeDisabled();
 });
 
-test('changing the keys style keeps an edit that has not been applied yet', async ({ page }) => {
+test('changing the format keeps an edit that has not been applied yet', async ({ page }) => {
   const editor = page.locator('.json-editor');
   await editor.fill(
     '{"pages":[{"num":1,"fields":[{"x":50,"y":700,"mapField":"editado","fontSize":12,"type":"text"}]}]}',
   );
-  await page.getByTestId('json-keys-bare').click();
+  await page.getByTestId('json-format-open').click();
+  await page.getByTestId('json-format-keys-bare').click();
   await page.waitForTimeout(800);
   await expect(editor).toHaveValue(/mapField: "editado"/);
+});
+
+test('clicking an annotation still selects its block with a custom format', async ({ page }) => {
+  await page.getByTestId('json-format-open').click();
+  await page.getByTestId('json-format-keys-bare').click();
+  await page.getByRole('button', { name: '4', exact: true }).click();
+  await page.keyboard.press('Escape');
+  const editor = page.locator('.json-editor');
+  await expect(editor).toHaveValue(/ {4}pages: \[/);
+  await page.locator('.annotation').first().click();
+  await expect
+    .poll(() =>
+      editor.evaluate((el: HTMLTextAreaElement) =>
+        el.value.slice(el.selectionStart, el.selectionEnd),
+      ),
+    )
+    .toContain("mapField: \"O'Brien\"");
 });

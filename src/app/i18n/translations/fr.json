@@ -190,6 +190,13 @@
       "bare": "Sans guillemets",
       "notStrict": "Clés sans guillemets · JSON non strict",
       "fixFirst": "Corrigez le JSON pour changer le format."
+    },
+    "jsonFormat": {
+      "label": "Format",
+      "keys": "Clés : {{value}}",
+      "values": "Valeurs : {{value}}",
+      "customize": "Personnaliser",
+      "title": "Personnaliser le JSON"
     }
   },
   "guides": {
@@ -418,7 +425,8 @@
     },
     "noData": "{{count}} annotations sans donnée dans les données de test : elles affichent leur exemple.",
     "jsonCopied": "JSON copié · {{format}}",
-    "jsonCopyFailed": "Copie impossible. Sélectionnez le texte de l'éditeur et appuyez sur Ctrl+C."
+    "jsonCopyFailed": "Copie impossible. Sélectionnez le texte de l'éditeur et appuyez sur Ctrl+C.",
+    "jsonDownloadedNotStrict": "coords.json téléchargé · format non strict"
   },
   "session": {
     "title": "Reprendre là où vous en étiez",
@@ -1308,7 +1316,7 @@
     "format": {
       "title": "Format des JSON",
       "open": "Format des JSON au téléchargement",
-      "hint": "Mémorisé ; identique à « Copier le JSON »",
+      "hint": "Valable pour l'éditeur, la copie et le téléchargement",
       "downloaded": "{{count}} JSON téléchargés · format non strict"
     }
   },
@@ -2612,8 +2620,9 @@
       "distance": "Distance de l'aimant",
       "distanceHelp": "Pixels d'écran avant le saut. Ne change pas avec le zoom.",
       "altHint": "Maintenez Alt (⌥ sur Mac) en déplaçant pour ne pas aligner à ce moment-là.",
-      "jsonKeys": "Clés du JSON",
-      "jsonKeysHelp": "Comment les clés sont écrites dans l'éditeur « Annotation JSON ». Avec guillemets, c'est du JSON valide ; sans guillemets, c'est un objet JS. L'import lit les deux."
+      "jsonKeys": "Format du JSON",
+      "jsonKeysHelp": "Clés et guillemets des valeurs dans l'éditeur « Annotations (JSON) », à la copie et au téléchargement. L'import lit tous les formats.",
+      "jsonQuote": "Guillemets des valeurs"
     }
   }
 }
