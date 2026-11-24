@@ -1,6 +1,20 @@
 import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit, computed, effect, inject, signal, untracked, ChangeDetectionStrategy, ElementRef, ViewChild, ViewChildren, type QueryList } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  ChangeDetectionStrategy,
+  ElementRef,
+  ViewChild,
+  ViewChildren,
+  type QueryList,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
@@ -31,11 +45,17 @@ import { AnnotationImportService } from '../../services/annotation-import.servic
 import { AppMetadataService } from '../../services/app-metadata.service';
 import { ProjectStoreService } from '../../services/project-store.service';
 import { BatchStoreService } from '../../services/batch-store.service';
-import { MAX_TEST_DATA_BYTES, PreviewSettingsService } from '../../services/preview-settings.service';
+import {
+  MAX_TEST_DATA_BYTES,
+  PreviewSettingsService,
+} from '../../services/preview-settings.service';
 import { PendingFileService } from '../../services/pending-file.service';
 import { ToastService } from '../../services/toast.service';
 import { BATCH_ITEM_PARAM, BATCH_OPEN_VIEW, batchItemOpening } from '../../utils/batch-open.utils';
 import { downloadBlob } from '../../utils/download.utils';
+import { JsonFormatMenuComponent } from '../../components/json-format-menu/json-format-menu.component';
+import { JsonCopyFormatService } from '../../services/json-copy-format.service';
+import { formatJsonForCopy, isStrictJsonFormat } from '../../utils/json-copy-format.utils';
 import { parseLooseJson } from '../../utils/loose-json';
 import { pairByName, pairingKey } from '../../utils/migration.utils';
 import {
@@ -44,7 +64,13 @@ import {
   type PastedTemplate,
 } from '../../utils/template-paste.utils';
 import { isPdfFile } from '../../utils/pdf-file.utils';
-import { buildFunnel, matchesKind, aiReasonOf, type AiReason, type KindFilter } from '../../utils/batch-summary.utils';
+import {
+  buildFunnel,
+  matchesKind,
+  aiReasonOf,
+  type AiReason,
+  type KindFilter,
+} from '../../utils/batch-summary.utils';
 import { planBulk, pruneSelection, rangeBetween } from '../../utils/batch-selection.utils';
 import { createZip } from '../../utils/zip.utils';
 
@@ -93,6 +119,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     FormsModule,
     RouterLink,
     TranslationPipe,
+    JsonFormatMenuComponent,
     VersionChipComponent,
     PdfThumbComponent,
     InfoTipComponent,
@@ -128,6 +155,7 @@ export class BatchPageComponent implements OnInit {
   private readonly pendingFile = inject(PendingFileService);
   private readonly importer = inject(AnnotationImportService);
   private readonly toast = inject(ToastService);
+  private readonly jsonFormats = inject(JsonCopyFormatService);
   readonly previewSettings = inject(PreviewSettingsService);
   private readonly i18n = inject(TranslationService);
   private readonly metadata = inject(AppMetadataService);
@@ -192,7 +220,9 @@ export class BatchPageComponent implements OnInit {
       .sort((a, b) => rank[a.state] - rank[b.state]);
   });
   readonly funnel = computed(() => buildFunnel(this.store.items()));
-  readonly filtering = computed(() => this.filter() !== 'all' || this.kind() !== 'any' || this.query().trim() !== '');
+  readonly filtering = computed(
+    () => this.filter() !== 'all' || this.kind() !== 'any' || this.query().trim() !== '',
+  );
   readonly aiReason = (item: BatchItem): AiReason => aiReasonOf(item);
   readonly total = computed(() => this.store.items().length);
   readonly readyCount = computed(() => this.counts().ready);
@@ -229,9 +259,13 @@ export class BatchPageComponent implements OnInit {
   readonly allSelected = computed(
     () => this.visibleIds().length > 0 && this.selectionCount() === this.visibleIds().length,
   );
-  readonly plan = computed(() => planBulk(this.selectedItems(), (item) => this.stateOf(item) === 'noTemplate'));
+  readonly plan = computed(() =>
+    planBulk(this.selectedItems(), (item) => this.stateOf(item) === 'noTemplate'),
+  );
   readonly dialog = signal<'ready' | 'remove' | null>(null);
-  readonly undoNotice = signal<{ kind: 'removed' | 'ready' | 'tables'; count: number } | null>(null);
+  readonly undoNotice = signal<{ kind: 'removed' | 'ready' | 'tables'; count: number } | null>(
+    null,
+  );
   private undoFn: (() => void) | null = null;
   private undoTimer: number | null = null;
 
@@ -539,6 +573,7 @@ export class BatchPageComponent implements OnInit {
       }),
       'success',
     );
+    this.noteNonStrictDownload(files);
   }
 
   constructor() {
@@ -951,9 +986,23 @@ export class BatchPageComponent implements OnInit {
   }
 
   downloadReady(): void {
-    this.downloadItems(
+    const files = this.downloadItems(
       this.store.items().filter((item) => item.status === 'ready' && item.bJson),
     );
+    this.noteNonStrictDownload(files);
+  }
+
+  /** Con un formato que ya no es JSON estricto, el aviso tras descargar lo recuerda (P-162). */
+  private noteNonStrictDownload(files: number): void {
+    if (files && !isStrictJsonFormat(this.jsonFormats.format())) {
+      this.toast.show(this.i18n.translate('batch.format.downloaded', { count: files }), 'success');
+    }
+  }
+
+  /** El JSON guardado en el lote es estricto; el formato elegido se aplica solo al descargar. */
+  private jsonForDownload(item: BatchItem): string {
+    const text = item.bJson as string;
+    return formatJsonForCopy(text, this.jsonFormats.format()) ?? text;
   }
 
   /** Downloads the JSON of `ready` (one file, or a ZIP); returns how many files it holds. */
@@ -965,7 +1014,7 @@ export class BatchPageComponent implements OnInit {
       `${(item.bName ?? item.name).replace(/\.[^./\\]+$/, '')}.json`;
     if (ready.length === 1) {
       downloadBlob(
-        new Blob([ready[0].bJson as string], { type: 'application/json' }),
+        new Blob([this.jsonForDownload(ready[0])], { type: 'application/json' }),
         jsonName(ready[0]),
       );
       return 1;
@@ -978,7 +1027,7 @@ export class BatchPageComponent implements OnInit {
       used.set(base, count);
       return {
         name: count === 1 ? base : base.replace(/\.json$/, `-${count}.json`),
-        data: encoder.encode(item.bJson as string),
+        data: encoder.encode(this.jsonForDownload(item)),
       };
     });
     const zip = createZip(entries);

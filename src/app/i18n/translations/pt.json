@@ -1304,6 +1304,12 @@
       "undoAll": "Desfazer tudo",
       "backupDone": "Cópia descarregada: {{count}} modelos.",
       "noPagesWhy": "O documento tem {{pages}} páginas, mas nenhuma com campos válidos ({{skippedPages}} páginas e {{skippedFields}} campos descartados). Cada campo precisa de x e y numéricos e de um mapField."
+    },
+    "format": {
+      "title": "Formato dos JSON",
+      "open": "Formato dos JSON ao descarregar",
+      "hint": "Fica guardado; é o mesmo de «Copiar JSON»",
+      "downloaded": "{{count}} JSON descarregados · formato não estrito"
     }
   },
   "preview": {

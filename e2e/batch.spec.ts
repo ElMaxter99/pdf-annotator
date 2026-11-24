@@ -206,6 +206,21 @@ test('B starts empty, A can be put in and the PDF is marked ready and downloaded
   expect(download.suggestedFilename()).toBe('factura-0331-nuevo.json');
   const content = JSON.parse(readFileSync((await download.path()) as string, 'utf8'));
   expect(content.pages[0].fields).toHaveLength(FIELDS);
+
+  // P-160 a P-162: the same download can leave the keys unquoted; the stored JSON stays strict.
+  await page.getByTestId('json-format-open').first().click();
+  await expect(page.getByTestId('json-format-chip')).toHaveClass(/jfm__chip--ok/);
+  await page.getByTestId('json-format-keys-bare').click();
+  await expect(page.getByTestId('json-format-chip')).not.toHaveClass(/jfm__chip--ok/);
+  await expect(page.getByTestId('json-format-preview')).toContainText('mapField: "nombre"');
+  await page.keyboard.press('Escape');
+  const [bare] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByTestId('download-ready').click(),
+  ]);
+  const bareText = readFileSync((await bare.path()) as string, 'utf8');
+  expect(bareText).toMatch(/^\{\s*pages: \[/);
+  await expect(page.locator('.toast')).toContainText('formato no estricto');
 });
 
 test('the «Poner plantilla A» menu closes on an outside click and on Escape', async ({
