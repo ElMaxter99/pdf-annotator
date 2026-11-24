@@ -1,6 +1,7 @@
 import { sanitizeAiRun, type AiRunRecord } from '../utils/ai-run.utils';
 import type { KindFilter } from '../utils/batch-summary.utils';
-import { isValidStamp, type BatchSort } from '../utils/status-time.utils';
+import { DEFAULT_BATCH_SORT, type BatchSort } from '../utils/batch-sort.utils';
+import { isValidStamp } from '../utils/status-time.utils';
 import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import type { PageAnnotations } from '../models/annotation.model';
 import type { AiSavedProposal, BatchItem, FieldLink, PageMapData } from '../models/batch.model';
@@ -330,13 +331,13 @@ export class BatchStoreService {
   readonly panelQuery = signal('');
   readonly panelFilter = signal<'all' | 'review' | 'ready'>('all');
   readonly panelKind = signal<KindFilter>('any');
-  readonly panelSort = signal<BatchSort>('state');
+  readonly panelSort = signal<BatchSort>(DEFAULT_BATCH_SORT);
 
   private resetPanelFilters(): void {
     this.panelQuery.set('');
     this.panelFilter.set('all');
     this.panelKind.set('any');
-    this.panelSort.set('state');
+    this.panelSort.set(DEFAULT_BATCH_SORT);
   }
 
   async clear(): Promise<void> {

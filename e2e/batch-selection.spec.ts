@@ -78,12 +78,18 @@ test('shows when a PDF changed state, tags the latest and sorts by it', async ({
   await expect(page.getByTestId('row-stamp')).toContainText('hoy');
   await expect(page.getByTestId('row-last')).toHaveText('Último');
 
-  await page.getByTestId('sort-select').selectOption('recent');
+  await page.getByTestId('sort-select').selectOption('change');
   await expect(page.getByTestId('panel-item').first()).toContainText('factura-0331.pdf');
   await page.getByTestId('sort-select').selectOption('name');
   await expect(page.getByTestId('panel-item').first()).toContainText('factura-0331.pdf');
   await page.getByTestId('sort-head').click();
-  await expect(page.getByTestId('sort-select')).toHaveValue('recent');
+  await expect(page.getByTestId('sort-select')).toHaveValue('change');
+
+  await page.getByTestId('sort-select').selectOption('name');
+  await page.getByTestId('sort-select-dir').click();
+  await expect(page.getByTestId('panel-item').last()).toContainText('factura-0331.pdf');
+  await page.getByTestId('sort-select').selectOption('state');
+  await expect(page.getByTestId('sort-select-dir')).toBeDisabled();
 });
 
 test('the «Deshacer» notice sits above the selection bar and never covers it', async ({ page }) => {

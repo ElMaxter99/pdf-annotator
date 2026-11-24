@@ -1330,10 +1330,15 @@
     },
     "sort": {
       "label": "Ordena",
-      "state": "Estat",
-      "recent": "Canvi més recent",
-      "oldest": "Canvi més antic",
-      "name": "Nom (A–Z)"
+      "change": "Darrer canvi",
+      "pages": "Pàgines",
+      "fields": "Camps",
+      "upload": "Ordre de pujada",
+      "result": "Resultat",
+      "dirAsc": "Sentit ascendent (A–Z, menys primer)",
+      "dirDesc": "Sentit descendent (Z–A, més primer)",
+      "name": "Nom",
+      "state": "Estat"
     }
   },
   "preview": {

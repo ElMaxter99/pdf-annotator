@@ -1330,10 +1330,15 @@
     },
     "sort": {
       "label": "Sortieren",
-      "state": "Status",
-      "recent": "Neueste Änderung",
-      "oldest": "Älteste Änderung",
-      "name": "Name (A–Z)"
+      "change": "Letzte Änderung",
+      "pages": "Seiten",
+      "fields": "Felder",
+      "upload": "Upload-Reihenfolge",
+      "result": "Ergebnis",
+      "dirAsc": "Aufsteigend (A–Z, wenigste zuerst)",
+      "dirDesc": "Absteigend (Z–A, meiste zuerst)",
+      "name": "Name",
+      "state": "Status"
     }
   },
   "preview": {

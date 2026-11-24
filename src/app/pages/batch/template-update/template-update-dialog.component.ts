@@ -9,6 +9,8 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SortControlComponent } from '../../../components/sort-control/sort-control.component';
+import { defaultSortDir, sortByCriterion, type SortSpec } from '../../../utils/batch-sort.utils';
 import { FocusTrapDirective } from '../../../directives/focus-trap.directive';
 import { TranslationPipe } from '../../../i18n/translation.pipe';
 import { TranslationService } from '../../../i18n/translation.service';
@@ -61,7 +63,7 @@ export interface TemplateUpdateResult {
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-template-update',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslationPipe, FocusTrapDirective],
+  imports: [CommonModule, FormsModule, TranslationPipe, FocusTrapDirective, SortControlComponent],
   templateUrl: './template-update-dialog.component.html',
   styleUrl: './template-update-dialog.component.scss',
 })
@@ -134,6 +136,25 @@ export class TemplateUpdateDialogComponent {
   });
 
   readonly rows = computed(() => this.matching().rows);
+
+  readonly sortKeys = ['name', 'result', 'fields'] as const;
+  readonly sort = signal<SortSpec>({ key: 'name', dir: 'asc' });
+  private readonly collator = computed(
+    () => new Intl.Collator(this.i18n.language(), { numeric: true, sensitivity: 'base' }),
+  );
+  /** The rows as shown: by name, by result (what changes first) or by number of fields. */
+  readonly sortedRows = computed(() => {
+    const order: Record<RowKind, number> = { update: 4, new: 3, noPages: 2, same: 1, none: 0 };
+    return sortByCriterion(this.rows(), this.sort(), this.collator(), {
+      name: (row) => row.item.name,
+      value: (row, key) =>
+        key === 'result' ? order[row.kind] : row.pages ? countFields(row.pages) : null,
+    });
+  });
+
+  setSortKey(value: string): void {
+    this.sort.set({ key: value, dir: defaultSortDir(value === 'result' ? 'fields' : value) });
+  }
   readonly unused = computed(() => this.matching().unused);
 
   /** Rows that would be replaced (not skipped by the user). */

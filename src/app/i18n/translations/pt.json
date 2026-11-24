@@ -1330,10 +1330,15 @@
     },
     "sort": {
       "label": "Ordenar",
-      "state": "Estado",
-      "recent": "Mudança mais recente",
-      "oldest": "Mudança mais antiga",
-      "name": "Nome (A–Z)"
+      "change": "Última alteração",
+      "pages": "Páginas",
+      "fields": "Campos",
+      "upload": "Ordem de envio",
+      "result": "Resultado",
+      "dirAsc": "Ordem crescente (A–Z, menos primeiro)",
+      "dirDesc": "Ordem decrescente (Z–A, mais primeiro)",
+      "name": "Nome",
+      "state": "Estado"
     }
   },
   "preview": {

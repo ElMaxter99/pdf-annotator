@@ -32,8 +32,10 @@ import {
   TemplateUpdateDialogComponent,
   type TemplateUpdateResult,
 } from './template-update/template-update-dialog.component';
+import { PdfTextService } from '../../services/pdf-text.service';
 import { PageMapBatchService } from '../../services/page-map-batch.service';
 import { AiHelperService } from '../../services/ai-helper.service';
+import { SortControlComponent } from '../../components/sort-control/sort-control.component';
 import { InfoTipComponent } from '../../components/info-tip/info-tip.component';
 import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
 import { TranslationPipe } from '../../i18n/translation.pipe';
@@ -62,10 +64,17 @@ import {
   formatStatusTime,
   formatStatusTitle,
   latestStampId,
-  sortRows,
   statusStamp,
-  type BatchSort,
 } from '../../utils/status-time.utils';
+import {
+  BATCH_SORT_KEYS,
+  defaultSortDir,
+  flipDir,
+  isBatchSortKey,
+  sortByCriterion,
+  type BatchSortKey,
+  type SortDir,
+} from '../../utils/batch-sort.utils';
 import {
   matchTemplate,
   parsePastedTemplates,
@@ -131,6 +140,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     VersionChipComponent,
     PdfThumbComponent,
     InfoTipComponent,
+    SortControlComponent,
     AiBatchButtonComponent,
     AiBatchChipComponent,
     AiBatchPanelComponent,
@@ -159,6 +169,7 @@ export class BatchPageComponent implements OnInit {
     }
   }
   readonly aiHelper = inject(AiHelperService);
+  private readonly pdfText = inject(PdfTextService);
   private readonly router = inject(Router);
   private readonly pendingFile = inject(PendingFileService);
   private readonly importer = inject(AnnotationImportService);
@@ -220,40 +231,83 @@ export class BatchPageComponent implements OnInit {
     const query = this.query().trim().toLowerCase();
     const filter = this.filter();
     const kind = this.kind();
-    const sort = this.sort();
     const rank: Record<RowState, number> = { noTemplate: 0, review: 1, ready: 2 };
+    const order = new Map(this.store.items().map((item, index) => [item.id, index]));
+    const pages = this.pageCounts();
     const filtered = this.allRows()
       .filter((row) => !query || row.item.name.toLowerCase().includes(query))
       .filter((row) => filter === 'all' || row.state === filter)
-      .filter((row) => matchesKind(row.item, kind))
-      .sort((a, b) => rank[a.state] - rank[b.state]);
-    return sort === 'state' ? filtered : sortRows(filtered, sort, this.collator());
+      .filter((row) => matchesKind(row.item, kind));
+    return sortByCriterion(filtered, this.sort(), this.collator(), {
+      name: (row) => row.item.name,
+      rank: (row) => rank[row.state],
+      index: (row) => order.get(row.item.id) ?? 0,
+      value: (row, key) =>
+        key === 'change'
+          ? statusStamp(row.item)?.at
+          : key === 'pages'
+            ? pages.get(row.item.id)
+            : this.fieldCount(row.item.aPages),
+    });
   });
   readonly sort = this.store.panelSort;
-  readonly sortOptions: readonly BatchSort[] = ['state', 'recent', 'oldest', 'name'];
+  readonly sortOptions: readonly BatchSortKey[] = BATCH_SORT_KEYS;
   private readonly collator = computed(
     () => new Intl.Collator(this.i18n.language(), { numeric: true, sensitivity: 'base' }),
   );
   /** The PDF whose state changed last (gets the «Último» tag). */
   readonly latestId = computed(() => latestStampId(this.store.items()));
+  /** Pages of each PDF of A, read only when the list is ordered by pages. */
+  readonly pageCounts = signal<ReadonlyMap<string, number | null>>(new Map());
+  private pageCountsBusy = false;
 
-  setSort(value: string): void {
-    if (this.sortOptions.includes(value as BatchSort)) {
-      this.sort.set(value as BatchSort);
+  /** Picks a criterion; it starts in its usual direction (most recent first, A–Z…). */
+  setSortKey(value: string): void {
+    if (isBatchSortKey(value)) {
+      this.sort.set({ key: value, dir: defaultSortDir(value) });
     }
   }
 
-  /** Header click in the list: most recent first, then oldest first. */
-  toggleSortByChange(): void {
-    this.sort.set(this.sort() === 'recent' ? 'oldest' : 'recent');
+  setSortDir(dir: SortDir): void {
+    this.sort.set({ key: this.sort().key, dir });
   }
 
-  ariaSortChange(): 'ascending' | 'descending' | 'none' {
-    return this.sort() === 'recent'
-      ? 'descending'
-      : this.sort() === 'oldest'
-        ? 'ascending'
-        : 'none';
+  /** Header click in the list: the criterion in its usual direction, then the other one. */
+  toggleSortHead(key: BatchSortKey): void {
+    const current = this.sort();
+    this.sort.set(
+      current.key === key
+        ? { key, dir: flipDir(current.dir) }
+        : { key, dir: defaultSortDir(key) },
+    );
+  }
+
+  ariaSort(key: BatchSortKey): 'ascending' | 'descending' | 'none' {
+    const current = this.sort();
+    return current.key !== key ? 'none' : current.dir === 'asc' ? 'ascending' : 'descending';
+  }
+
+  sortArrow(key: BatchSortKey): string {
+    const current = this.sort();
+    return current.key !== key ? '' : current.dir === 'asc' ? '▴' : '▾';
+  }
+
+  private async loadPageCounts(): Promise<void> {
+    if (this.pageCountsBusy) {
+      return;
+    }
+    this.pageCountsBusy = true;
+    try {
+      for (const item of this.store.items()) {
+        if (this.pageCounts().has(item.id)) {
+          continue;
+        }
+        const count = await this.pdfText.pageCount(item.aPdf);
+        this.pageCounts.update((map) => new Map(map).set(item.id, count));
+      }
+    } finally {
+      this.pageCountsBusy = false;
+    }
   }
 
   stampOf(item: BatchItem): { text: string; title: string; iso: string; approx: boolean } | null {
@@ -294,12 +348,24 @@ export class BatchPageComponent implements OnInit {
   readonly nextPending = computed(
     () => this.allRows().find((row) => row.state !== 'ready')?.item ?? null,
   );
+  readonly templateSort = signal<{ key: 'name' | 'result'; dir: SortDir }>({ key: 'name', dir: 'asc' });
+  readonly templateSortKeys = ['name', 'result'] as const;
+  setTemplateSortKey(value: string): void {
+    if (value === 'name' || value === 'result') {
+      this.templateSort.set({ key: value, dir: value === 'result' ? 'desc' : 'asc' });
+    }
+  }
   readonly templateRows = computed(() => {
     const infos = this.templates();
-    return this.draftPdfs().map((pdf) => ({
+    const rows = this.draftPdfs().map((pdf) => ({
       pdf,
       info: infos.get(pairingKey(pdf.name)) ?? null,
     }));
+    const spec = this.templateSort();
+    return sortByCriterion(rows, spec, this.collator(), {
+      name: (row) => row.pdf.name,
+      value: (row) => (row.info && !row.info.error ? row.info.count : row.info ? 0 : null),
+    });
   });
   readonly withTemplate = computed(
     () => this.templateRows().filter((row) => row.info && !row.info.error).length,
@@ -639,6 +705,11 @@ export class BatchPageComponent implements OnInit {
   }
 
   constructor() {
+    effect(() => {
+      if (this.sort().key === 'pages' && this.store.items().length > 0) {
+        void this.loadPageCounts();
+      }
+    });
     // Only what is visible stays marked: «Quitar 3» never touches a hidden PDF.
     effect(() => {
       const visible = this.visibleIds();

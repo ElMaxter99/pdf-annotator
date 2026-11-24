@@ -111,8 +111,20 @@
                 </div>
               </div>
             }
+            @if (rows().length > 1) {
+              <div class="upd-sortrow">
+                <app-sort-control
+                  testId="tpl-sort"
+                  [options]="sortKeys"
+                  [sortKey]="sort().key"
+                  [dir]="sort().dir"
+                  (keyChange)="setSortKey($event)"
+                  (dirChange)="sort.set({ key: sort().key, dir: $event })"
+                />
+              </div>
+            }
             <div class="upd-list" data-testid="tpl-rows">
-              @for (row of rows(); track row.item.id) {
+              @for (row of sortedRows(); track row.item.id) {
                 <div class="upd-row upd-row--on" [class.upd-row--off]="isSkipped(row) || row.kind === 'same' || (row.kind === 'none' && unused().length === 0)">
                   <button type="button" class="upd-name" (click)="toggleExpanded(row)" [attr.aria-expanded]="expanded() === row.item.id">
                     <span>{{ row.item.name }}</span>
