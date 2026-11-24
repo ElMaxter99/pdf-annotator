@@ -1120,7 +1120,7 @@
           "placed": "{{placed}} champs de A sur {{total}} placés dans B",
           "toCheck": "{{n}} champs de A placés avec des doutes : vérifiez-les avant d’appliquer",
           "added": "{{n}} nouveaux champs absents de A (p. ex. le numéro de page des nouvelles pages de B)",
-          "absent": "{{n}} champs de A dont le texte n’existe plus dans B : ne pas les placer est correct"
+          "absent": "{{n}} champs de A dont le texte n'existe plus dans B : validez-les ou placez-les à la main"
         }
       },
       "draft": {
@@ -1670,10 +1670,17 @@
         "notFound": "De A · non placés · {{count}}",
         "absent": "De A · n’existent plus dans B · {{count}}",
         "ready": "De A · sûrs · {{count}}",
-        "newInB": "Nouveaux dans B (absents de A) · {{count}}"
+        "newInB": "Nouveaux dans B (absents de A) · {{count}}",
+        "resolved": "Résolus par vous · {{count}}"
       },
       "notInB": "absent de B",
-      "absentInB": "n'existe pas dans B : il est normal de ne pas le placer",
+      "absentInB": "n'existe pas dans B",
+      "placed": "Placé",
+      "validated": "Validé",
+      "validate": "Valider : n'existe pas",
+      "undoValidate": "Annuler",
+      "placedByHand": "placé à la main dans B",
+      "validatedAbsent": "validé : n'existe pas dans B",
       "withoutAi": "placé sans IA",
       "placeByHand": "Placer à la main",
       "tabBadge": "Proposition de l'IA : {{count}} champs",
@@ -1687,7 +1694,8 @@
         "review": "Champs de A placés dans B avec des doutes (autre page, libellé proche ou confiance moyenne ou faible). Non cochés : regardez-les avant d’appliquer.",
         "newInB": "Ils n’existaient pas dans A : B a plus de pages et le champ se répète sur chaque page de A (p. ex. le numéro de page), ils sont donc proposés pour les nouvelles pages.",
         "notFound": "Champs de A que l’IA n’a pas su placer dans B. Créez-les à la main si besoin.",
-        "absent": "Champs de A dont le texte n’existe plus dans B : ne pas les placer est correct."
+        "absent": "Champs de A dont le texte n'existe plus dans B. Validez-les s'il est normal de ne pas les placer, ou placez-les à la main.",
+        "resolved": "Champs de A que vous avez déjà placés dans B ou validés comme inexistants. Plus rien à décider."
       },
       "sameAsA": "comme dans A",
       "ghostHint": "{{name}} · hors de B · clic pour l'ajouter"

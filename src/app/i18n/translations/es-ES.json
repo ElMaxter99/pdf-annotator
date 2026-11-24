@@ -1120,7 +1120,7 @@
           "placed": "{{placed}} de {{total}} campos de A colocados en B",
           "toCheck": "{{n}} campos de A colocados con dudas: revísalos antes de aplicar",
           "added": "{{n}} campos nuevos que no estaban en A (p. ej. el número de página de las páginas nuevas de B)",
-          "absent": "{{n}} campos de A cuyo texto ya no existe en B: no colocarlos es lo correcto"
+          "absent": "{{n}} campos de A cuyo texto ya no existe en B: puedes validarlos o colocarlos a mano"
         }
       },
       "draft": {
@@ -1670,10 +1670,17 @@
         "notFound": "De A · sin colocar · {{count}}",
         "absent": "De A · no existen en B · {{count}}",
         "ready": "De A · seguros · {{count}}",
-        "newInB": "Nuevos en B (no estaban en A) · {{count}}"
+        "newInB": "Nuevos en B (no estaban en A) · {{count}}",
+        "resolved": "Resueltos por ti · {{count}}"
       },
       "notInB": "no está en B",
-      "absentInB": "no existe en B: lo correcto es no colocarlo",
+      "absentInB": "no existe en B",
+      "placed": "Colocado",
+      "validated": "Validado",
+      "validate": "Validar: no existe",
+      "undoValidate": "Deshacer",
+      "placedByHand": "colocado a mano en B",
+      "validatedAbsent": "validado: no existe en B",
       "withoutAi": "colocado sin IA",
       "placeByHand": "Colocar a mano",
       "tabBadge": "Propuesta de la IA: {{count}} campos",
@@ -1687,7 +1694,8 @@
         "review": "Campos de A colocados en B con dudas (otra página, etiqueta parecida o confianza media o baja). No van marcados: míralos antes de aplicar.",
         "newInB": "No existían en A: B tiene más páginas y el campo se repite en cada página de A (p. ej. el número de página), así que se proponen para las páginas nuevas.",
         "notFound": "Campos de A que la IA no ha sabido colocar en B. Créalos a mano si hacen falta.",
-        "absent": "Campos de A cuyo texto ya no existe en B: no colocarlos es lo correcto."
+        "absent": "Campos de A cuyo texto ya no existe en B. Valídalos si es correcto no colocarlos, o colócalos a mano.",
+        "resolved": "Campos de A que ya has colocado en B o validado como inexistentes. No quedan pendientes."
       },
       "sameAsA": "igual que en A",
       "ghostHint": "{{name}} · fuera de B · clic para ponerlo"

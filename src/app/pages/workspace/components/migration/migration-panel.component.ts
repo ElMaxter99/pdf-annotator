@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TranslationService } from '../../../../i18n/translation.service';
 import { confidenceLevel, isRowSelected, type AiRow, isAbsentInB, PROPOSAL_GROUPS, proposalGroup } from '../../../../utils/ai-proposal.utils';
+import { fieldKey } from '../../../../utils/migration.utils';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { InfoTipComponent } from '../../../../components/info-tip/info-tip.component';
 import type { FieldState, FieldStatus } from '../../../../utils/migration.utils';
@@ -68,9 +69,14 @@ export class MigrationPanelComponent {
     }
     const byPlace = (a: AiRow, b: AiRow) => a.page - b.page || a.index - b.index || a.newPage - b.newPage;
     const rows = [...session.rows].sort(byPlace);
-    return PROPOSAL_GROUPS.map((key) => ({ key, rows: rows.filter((row) => proposalGroup(row) === key) })).filter(
-      (group) => group.rows.length > 0,
-    );
+    const open = rows.filter((row) => this.resolution(row) === null);
+    const keys: readonly string[] = [...PROPOSAL_GROUPS, 'resolved'];
+    return keys
+      .map((key) => ({
+        key,
+        rows: key === 'resolved' ? rows.filter((row) => this.resolution(row) !== null) : open.filter((row) => proposalGroup(row) === key),
+      }))
+      .filter((group) => group.rows.length > 0);
   });
 
   readonly highCount = computed(() => (this.proposal()?.rows ?? []).filter((row) => proposalGroup(row) === 'ready').length);
@@ -97,6 +103,19 @@ export class MigrationPanelComponent {
   /** Placed by the helper without the AI (not shown for «Resuelto sin IA», where every row is). */
   withoutAi(row: AiRow): boolean {
     return row.ok && row.source === 'text' && this.proposal()?.provider !== 'adjust';
+  }
+
+  /** A field of A the AI did not place in B that the person already settled: placed by hand or validated as «no existe». */
+  resolution(row: AiRow): 'placed' | 'validated' | null {
+    if (row.ok || row.id.startsWith('pattern-')) {
+      return null;
+    }
+    const m = this.vm.migration();
+    const name = this.vm.aiFieldName(row);
+    if (m?.states.some((s) => s.status !== 'missing' && s.name === name && s.a?.page === row.page)) {
+      return 'placed';
+    }
+    return m?.dismissed.includes(fieldKey(row.page, name)) ? 'validated' : null;
   }
 
   absent(row: AiRow): boolean {

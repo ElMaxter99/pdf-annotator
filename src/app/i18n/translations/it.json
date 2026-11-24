@@ -1120,7 +1120,7 @@
           "placed": "{{placed}} di {{total}} campi di A collocati in B",
           "toCheck": "{{n}} campi di A collocati con dubbi: controllali prima di applicare",
           "added": "{{n}} campi nuovi che non erano in A (es. il numero di pagina delle nuove pagine di B)",
-          "absent": "{{n}} campi di A il cui testo non esiste più in B: non collocarli è corretto"
+          "absent": "{{n}} campi di A il cui testo non esiste più in B: convalidali o posizionali a mano"
         }
       },
       "draft": {
@@ -1670,10 +1670,17 @@
         "notFound": "Da A · non collocati · {{count}}",
         "absent": "Da A · non esistono più in B · {{count}}",
         "ready": "Da A · sicuri · {{count}}",
-        "newInB": "Nuovi in B (non erano in A) · {{count}}"
+        "newInB": "Nuovi in B (non erano in A) · {{count}}",
+        "resolved": "Risolti da te · {{count}}"
       },
       "notInB": "non è in B",
-      "absentInB": "non esiste in B: è corretto non collocarlo",
+      "absentInB": "non esiste in B",
+      "placed": "Posizionato",
+      "validated": "Convalidato",
+      "validate": "Convalida: non esiste",
+      "undoValidate": "Annulla",
+      "placedByHand": "posizionato a mano in B",
+      "validatedAbsent": "convalidato: non esiste in B",
       "withoutAi": "collocato senza IA",
       "placeByHand": "Posiziona a mano",
       "tabBadge": "Proposta dell'IA: {{count}} campi",
@@ -1687,7 +1694,8 @@
         "review": "Campi di A collocati in B con dubbi (altra pagina, etichetta simile o fiducia media o bassa). Non selezionati: controllali prima di applicare.",
         "newInB": "Non esistevano in A: B ha più pagine e il campo si ripete su ogni pagina di A (es. il numero di pagina), quindi vengono proposti per le pagine nuove.",
         "notFound": "Campi di A che l’IA non è riuscita a collocare in B. Creali a mano se servono.",
-        "absent": "Campi di A il cui testo non esiste più in B: non collocarli è corretto."
+        "absent": "Campi di A il cui testo non esiste più in B. Convalidali se è corretto non posizionarli, o posizionali a mano.",
+        "resolved": "Campi di A che hai già posizionato in B o convalidato come inesistenti. Non richiedono più una decisione."
       },
       "sameAsA": "come in A",
       "ghostHint": "{{name}} · fuori da B · clic per aggiungerlo"
