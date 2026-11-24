@@ -426,7 +426,8 @@
     "noData": "{{count}} annotations sans donnée dans les données de test : elles affichent leur exemple.",
     "jsonCopied": "JSON copié · {{format}}",
     "jsonCopyFailed": "Copie impossible. Sélectionnez le texte de l'éditeur et appuyez sur Ctrl+C.",
-    "jsonDownloadedNotStrict": "coords.json téléchargé · format non strict"
+    "jsonDownloadedNotStrict": "coords.json téléchargé · format non strict",
+    "jsonFormatApplied": "Format appliqué · le JSON n'est plus strict"
   },
   "session": {
     "title": "Reprendre là où vous en étiez",
@@ -1318,7 +1319,11 @@
       "title": "Format des JSON",
       "open": "Format des JSON au téléchargement",
       "hint": "Valable pour l'éditeur, la copie et le téléchargement",
-      "downloaded": "{{count}} JSON téléchargés · format non strict"
+      "downloaded": "{{count}} JSON téléchargés · format non strict",
+      "close": "Fermer",
+      "cancel": "Annuler",
+      "apply": "Appliquer",
+      "reset": "Réinitialiser"
     },
     "stamp": {
       "today": "aujourd'hui",

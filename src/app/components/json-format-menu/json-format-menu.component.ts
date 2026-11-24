@@ -2,18 +2,22 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  HostListener,
   computed,
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { JsonCopyFormatService } from '../../services/json-copy-format.service';
+import { ToastService } from '../../services/toast.service';
+import { TranslationService } from '../../i18n/translation.service';
 import {
   CopyIndent,
   CopyKeys,
   CopyQuote,
+  JSON_COPY_STRICT,
+  JsonCopyFormat,
   formatJsonForCopy,
   isStrictJsonFormat,
 } from '../../utils/json-copy-format.utils';
@@ -23,8 +27,9 @@ const SAMPLE = JSON.stringify({
 });
 
 /**
- * ▾ junto a «Descargar JSON» del lote (P-160 a P-162): abre «Formato de los JSON». Es el mismo formato que
- * «Copiar JSON» del editor (servicio compartido); se aplica solo al descargar.
+ * «Personalizar» (P-175 a P-177): botón que abre un modal con el «Formato de los JSON». Es el mismo formato
+ * en el editor, «Copiar JSON», «Descargar JSON» y la descarga del lote (servicio compartido). Los cambios
+ * se preparan en el modal y solo se guardan con «Aplicar».
  */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,40 +37,55 @@ const SAMPLE = JSON.stringify({
   standalone: true,
   imports: [TranslationPipe],
   template: `
-    <span class="jfm" (keydown.escape)="open.set(false)">
-      <button
-        type="button"
-        class="btn btn--ghost jfm__chev"
-        [disabled]="disabled()"
-        [attr.aria-expanded]="open()"
-        [attr.aria-label]="
-          (titleKey() === 'batch.format.title' ? 'batch.format.open' : titleKey()) | t
-        "
-        [attr.title]="(titleKey() === 'batch.format.title' ? 'batch.format.open' : titleKey()) | t"
-        (click)="toggle($event)"
-        data-testid="json-format-open"
-      >
-        @if (labelKey()) {
-          {{ labelKey() | t }}
-        }
+    <button
+      type="button"
+      class="btn btn--ghost jfm__chev"
+      [disabled]="disabled()"
+      [attr.aria-haspopup]="'dialog'"
+      [attr.title]="(titleKey() === 'batch.format.title' ? 'batch.format.open' : titleKey()) | t"
+      [attr.aria-label]="
+        (titleKey() === 'batch.format.title' ? 'batch.format.open' : titleKey()) | t
+      "
+      (click)="openModal()"
+      data-testid="json-format-open"
+    >
+      @if (labelKey()) {
+        {{ labelKey() | t }}
+      } @else {
         ▾
-      </button>
+      }
+    </button>
+    <dialog
+      #dlg
+      class="jfm__dlg"
+      [attr.aria-labelledby]="uid + '-title'"
+      (cancel)="onCancel($event)"
+      (click)="onDialogClick($event)"
+      (close)="open.set(false)"
+      data-testid="json-format-pop"
+    >
       @if (open()) {
-        <div
-          class="jfm__pop"
-          [style]="popStyle()"
-          role="dialog"
-          [attr.aria-label]="titleKey() | t"
-          data-testid="json-format-pop"
-        >
-          <b class="jfm__title">{{ titleKey() | t }}</b>
+        <form class="jfm__box" method="dialog" (submit)="apply($event)">
+          <div class="jfm__head">
+            <h2 class="jfm__title" [id]="uid + '-title'">{{ titleKey() | t }}</h2>
+            <button
+              type="button"
+              class="jfm__x"
+              [attr.aria-label]="'batch.format.close' | t"
+              (click)="close()"
+              data-testid="json-format-close"
+            >
+              ✕
+            </button>
+          </div>
+          <p class="jfm__hint">{{ 'batch.format.hint' | t }}</p>
           <div class="jfm__row">
             <span class="jfm__label">{{ 'sidebar.copyFormat.keys' | t }}</span>
             <div class="jfm__seg" role="group" [attr.aria-label]="'sidebar.copyFormat.keys' | t">
               <button
                 type="button"
                 [attr.aria-pressed]="fmt().keys === 'quoted'"
-                (click)="setKeys('quoted')"
+                (click)="patch({ keys: 'quoted' })"
                 data-testid="json-format-keys-quoted"
               >
                 {{ 'sidebar.copyFormat.keysQuoted' | t }}
@@ -73,7 +93,7 @@ const SAMPLE = JSON.stringify({
               <button
                 type="button"
                 [attr.aria-pressed]="fmt().keys === 'bare'"
-                (click)="setKeys('bare')"
+                (click)="patch({ keys: 'bare' })"
                 data-testid="json-format-keys-bare"
               >
                 {{ 'sidebar.copyFormat.keysBare' | t }}
@@ -86,14 +106,14 @@ const SAMPLE = JSON.stringify({
               <button
                 type="button"
                 [attr.aria-pressed]="fmt().quote === 'double'"
-                (click)="setQuote('double')"
+                (click)="patch({ quote: 'double' })"
               >
                 {{ 'sidebar.copyFormat.quoteDouble' | t }}
               </button>
               <button
                 type="button"
                 [attr.aria-pressed]="fmt().quote === 'single'"
-                (click)="setQuote('single')"
+                (click)="patch({ quote: 'single' })"
               >
                 {{ 'sidebar.copyFormat.quoteSingle' | t }}
               </button>
@@ -105,28 +125,28 @@ const SAMPLE = JSON.stringify({
               <button
                 type="button"
                 [attr.aria-pressed]="fmt().indent === '2'"
-                (click)="setIndent('2')"
+                (click)="patch({ indent: '2' })"
               >
                 2
               </button>
               <button
                 type="button"
                 [attr.aria-pressed]="fmt().indent === '4'"
-                (click)="setIndent('4')"
+                (click)="patch({ indent: '4' })"
               >
                 4
               </button>
               <button
                 type="button"
                 [attr.aria-pressed]="fmt().indent === 'tab'"
-                (click)="setIndent('tab')"
+                (click)="patch({ indent: 'tab' })"
               >
                 {{ 'sidebar.copyFormat.indentTab' | t }}
               </button>
               <button
                 type="button"
                 [attr.aria-pressed]="fmt().indent === '0'"
-                (click)="setIndent('0')"
+                (click)="patch({ indent: '0' })"
               >
                 {{ 'sidebar.copyFormat.indentCompact' | t }}
               </button>
@@ -136,7 +156,7 @@ const SAMPLE = JSON.stringify({
             <input
               type="checkbox"
               [checked]="fmt().trailingComma"
-              (change)="setComma($any($event.target).checked)"
+              (change)="patch({ trailingComma: $any($event.target).checked })"
             />
             <span>{{ 'sidebar.copyFormat.trailingComma' | t }}</span>
           </label>
@@ -150,57 +170,90 @@ const SAMPLE = JSON.stringify({
                 (strict() ? 'sidebar.copyFormat.valid' : 'sidebar.copyFormat.notJson') | t
               }}</span
             >
-            <span class="jfm__hint">{{ 'batch.format.hint' | t }}</span>
+            <button
+              type="button"
+              class="btn btn--ghost"
+              (click)="reset()"
+              data-testid="json-format-reset"
+            >
+              {{ 'batch.format.reset' | t }}
+            </button>
           </div>
-        </div>
+          <div class="jfm__actions">
+            <button
+              type="button"
+              class="btn btn--ghost"
+              (click)="close()"
+              data-testid="json-format-cancel"
+            >
+              {{ 'batch.format.cancel' | t }}
+            </button>
+            <button type="submit" class="btn btn--primary" data-testid="json-format-apply">
+              {{ 'batch.format.apply' | t }}
+            </button>
+          </div>
+        </form>
       }
-    </span>
+    </dialog>
   `,
   styles: `
     :host {
       display: inline-flex;
     }
-    .jfm {
-      position: relative;
-      display: inline-flex;
-    }
     .jfm__chev {
       padding-inline: 12px;
     }
-    .jfm__pop {
-      position: fixed;
-      z-index: 200;
-      overflow-y: auto;
-      width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 16px;
+    .jfm__dlg {
+      padding: 0;
+      width: min(520px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      overflow: auto;
       text-align: left;
       background: var(--panel);
       color: var(--text);
       border: 1px solid var(--input-border, rgba(128, 128, 128, 0.35));
-      border-radius: 16px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
-      animation: jfm-in 150ms ease-out;
+      border-radius: 20px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
     }
-    @keyframes jfm-in {
-      from {
-        opacity: 0;
-        transform: translateY(-4px);
-      }
-      to {
-        opacity: 1;
-        transform: none;
-      }
+    .jfm__dlg::backdrop {
+      background: rgba(0, 0, 0, 0.55);
     }
-    @media (prefers-reduced-motion: reduce) {
-      .jfm__pop {
-        animation: none;
-      }
+    .jfm__box {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px;
+    }
+    .jfm__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
     .jfm__title {
-      font-size: 15px;
+      margin: 0;
+      font-size: 19px;
+    }
+    .jfm__x {
+      font: inherit;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid var(--input-border, rgba(128, 128, 128, 0.35));
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .jfm__x:focus-visible,
+    .jfm__seg button:focus-visible,
+    .jfm__check input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .jfm__hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
     }
     .jfm__row {
       display: flex;
@@ -233,11 +286,6 @@ const SAMPLE = JSON.stringify({
       background: var(--accent-fill, var(--accent));
       color: var(--on-accent, #fff);
     }
-    .jfm__seg button:focus-visible,
-    .jfm__check input:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
     .jfm__check {
       display: flex;
       align-items: center;
@@ -253,7 +301,7 @@ const SAMPLE = JSON.stringify({
       line-height: 1.5;
       background: var(--input-bg, rgba(128, 128, 128, 0.15));
       overflow: auto;
-      max-height: 150px;
+      max-height: 170px;
     }
     .jfm__foot {
       display: flex;
@@ -272,76 +320,70 @@ const SAMPLE = JSON.stringify({
     .jfm__chip--ok {
       color: var(--accent-text, var(--accent));
     }
-    .jfm__hint {
-      color: var(--muted);
-      font-size: 12px;
-      text-align: right;
+    .jfm__actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--input-border, rgba(128, 128, 128, 0.35));
     }
   `,
 })
 export class JsonFormatMenuComponent {
+  private static nextId = 0;
   private readonly formats = inject(JsonCopyFormatService);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  /** Se abre hacia arriba cuando el botón está en la barra fija del borde inferior. */
-  readonly up = input(false);
-  readonly align = input<'start' | 'end'>('end');
+  private readonly toast = inject(ToastService);
+  private readonly i18n = inject(TranslationService);
+  readonly uid = `jfm-${JsonFormatMenuComponent.nextId++}`;
   readonly disabled = input(false);
   /** Texto del botón (clave i18n); sin él solo lleva la flecha. */
   readonly labelKey = input('');
   readonly titleKey = input('batch.format.title');
   readonly open = signal(false);
-  readonly fmt = this.formats.format;
+  private readonly dlg = viewChild.required<ElementRef<HTMLDialogElement>>('dlg');
+  /** Borrador del modal: no cambia nada hasta pulsar «Aplicar». */
+  readonly fmt = signal<JsonCopyFormat>({ ...JSON_COPY_STRICT });
   readonly strict = computed(() => isStrictJsonFormat(this.fmt()));
   readonly preview = computed(() => formatJsonForCopy(SAMPLE, this.fmt()) ?? '');
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (this.open() && !this.host.nativeElement.contains(event.target as Node))
-      this.open.set(false);
-  }
-
-  /** El menú es fijo y se coloca con el botón: nunca queda fuera de la pantalla ni recortado por un panel con scroll. */
-  readonly popStyle = signal<Record<string, string>>({});
-
-  toggle(event: MouseEvent): void {
-    if (this.open()) {
-      this.open.set(false);
-      return;
-    }
-    const button = event.currentTarget as HTMLElement;
-    const rect = button.getBoundingClientRect();
-    const width = 400;
-    const margin = 8;
-    const left = this.align() === 'start' ? rect.left : rect.right - width;
-    const below = window.innerHeight - rect.bottom - margin * 2;
-    const above = rect.top - margin * 2;
-    const goUp = this.up() || (below < 420 && above > below);
-    const style: Record<string, string> = {
-      left: `${Math.max(margin, Math.min(left, window.innerWidth - width - margin))}px`,
-      maxHeight: `${Math.max(160, goUp ? above : below)}px`,
-    };
-    if (goUp) style['bottom'] = `${window.innerHeight - rect.top + margin}px`;
-    else style['top'] = `${rect.bottom + margin}px`;
-    this.popStyle.set(style);
+  openModal(): void {
+    this.fmt.set({ ...this.formats.format() });
     this.open.set(true);
+    const dialog = this.dlg().nativeElement;
+    if (!dialog.open) dialog.showModal();
   }
 
-  @HostListener('window:resize')
-  @HostListener('document:scroll')
-  onViewportChange(): void {
-    if (this.open()) this.open.set(false);
+  close(): void {
+    const dialog = this.dlg().nativeElement;
+    if (dialog.open) dialog.close();
+    this.open.set(false);
   }
 
-  setKeys(keys: CopyKeys): void {
-    this.formats.set({ keys });
+  /** Esc cierra el modal sin guardar. */
+  onCancel(event: Event): void {
+    event.preventDefault();
+    this.close();
   }
-  setQuote(quote: CopyQuote): void {
-    this.formats.set({ quote });
+
+  /** Un clic en el fondo atenuado (fuera de la caja) cierra el modal. */
+  onDialogClick(event: MouseEvent): void {
+    if (event.target === this.dlg().nativeElement) this.close();
   }
-  setIndent(indent: CopyIndent): void {
-    this.formats.set({ indent });
+
+  patch(change: Partial<JsonCopyFormat>): void {
+    this.fmt.update((current) => ({ ...current, ...change }));
   }
-  setComma(trailingComma: boolean): void {
-    this.formats.set({ trailingComma });
+
+  reset(): void {
+    this.fmt.set({ ...JSON_COPY_STRICT });
+  }
+
+  apply(event: Event): void {
+    event.preventDefault();
+    const chosen = this.fmt();
+    this.formats.set(chosen);
+    this.close();
+    if (!isStrictJsonFormat(chosen))
+      this.toast.show(this.i18n.translate('toast.jsonFormatApplied'), 'info');
   }
 }

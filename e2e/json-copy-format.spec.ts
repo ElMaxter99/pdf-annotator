@@ -31,7 +31,8 @@ test('«Personalizar» rewrites the editor and drives copy and download with one
   await page.getByTestId('json-format-keys-bare').click();
   await page.getByRole('button', { name: "Simples '…'" }).click();
   await expect(page.getByTestId('json-format-preview')).toContainText("mapField: 'nombre',");
-  await page.keyboard.press('Escape');
+  await expect(editor).toHaveValue(/"pages"/); // nothing changes until «Aplicar»
+  await page.getByTestId('json-format-apply').click();
 
   // The editor itself now shows the chosen format, and the panel says it is not strict JSON.
   await expect(editor).toHaveValue(/^\{\s*pages: \[/);
@@ -57,11 +58,30 @@ test('«Personalizar» rewrites the editor and drives copy and download with one
   expect(JSON.parse(stored!)).toMatchObject({ keys: 'bare', quote: 'single' });
 });
 
-test('Escape closes the format menu', async ({ page }) => {
-  await page.getByTestId('json-format-open').click();
-  await expect(page.getByRole('dialog', { name: 'Personalizar el JSON' })).toBeVisible();
+test('«Personalizar» is a modal: Esc, ✕ and Cancelar close it without saving', async ({ page }) => {
+  const editor = page.locator('.json-editor');
+  const modal = page.getByRole('dialog', { name: 'Personalizar el JSON' });
+  const open = page.getByTestId('json-format-open');
+  await open.click();
+  await expect(modal).toBeVisible();
+  await page.getByTestId('json-format-keys-bare').click();
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog', { name: 'Personalizar el JSON' })).toHaveCount(0);
+  await expect(modal).toHaveCount(0);
+  await expect(open).toBeFocused();
+  await open.click();
+  await expect(page.getByTestId('json-format-keys-quoted')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByTestId('json-format-keys-bare').click();
+  await page.getByTestId('json-format-close').click();
+  await open.click();
+  await page.getByTestId('json-format-keys-bare').click();
+  await page.getByTestId('json-format-cancel').click();
+  await expect(modal).toHaveCount(0);
+  await expect(editor).toHaveValue(/"pages"/);
+  // «Restablecer» goes back to strict JSON, and «Aplicar» saves it.
+  await open.click();
+  await page.getByTestId('json-format-keys-bare').click();
+  await page.getByTestId('json-format-reset').click();
+  await expect(page.getByTestId('json-format-chip')).toHaveClass(/jfm__chip--ok/);
 });
 
 test('plain copy turns loose editor text (bare keys, single quotes) into valid JSON', async ({
@@ -69,7 +89,9 @@ test('plain copy turns loose editor text (bare keys, single quotes) into valid J
 }) => {
   await page
     .locator('.json-editor')
-    .fill("{ pages: [ { num: 1, fields: [ { x: 50, y: 700, mapField: 'nombre', type: 'text' } ] } ] }");
+    .fill(
+      "{ pages: [ { num: 1, fields: [ { x: 50, y: 700, mapField: 'nombre', type: 'text' } ] } ] }",
+    );
   await page.waitForTimeout(300);
   await page.getByRole('button', { name: 'Copiar JSON', exact: true }).click();
   const text = await clipboard(page);
@@ -90,7 +112,7 @@ test('the format syncs with Options › Editor and a syntax error disables «Per
   const editor = page.locator('.json-editor');
   await page.getByTestId('json-format-open').click();
   await page.getByTestId('json-format-keys-bare').click();
-  await page.keyboard.press('Escape');
+  await page.getByTestId('json-format-apply').click();
   await expect(editor).toHaveValue(/^\{\s*pages: \[/);
   // Options › Editor shows the same value and changes it back.
   await page.getByTestId('more-options').click();
@@ -112,6 +134,7 @@ test('changing the format keeps an edit that has not been applied yet', async ({
   );
   await page.getByTestId('json-format-open').click();
   await page.getByTestId('json-format-keys-bare').click();
+  await page.getByTestId('json-format-apply').click();
   await page.waitForTimeout(800);
   await expect(editor).toHaveValue(/mapField: "editado"/);
 });
@@ -120,7 +143,7 @@ test('clicking an annotation still selects its block with a custom format', asyn
   await page.getByTestId('json-format-open').click();
   await page.getByTestId('json-format-keys-bare').click();
   await page.getByRole('button', { name: '4', exact: true }).click();
-  await page.keyboard.press('Escape');
+  await page.getByTestId('json-format-apply').click();
   const editor = page.locator('.json-editor');
   await expect(editor).toHaveValue(/ {4}pages: \[/);
   await page.locator('.annotation').first().click();
@@ -130,5 +153,5 @@ test('clicking an annotation still selects its block with a custom format', asyn
         el.value.slice(el.selectionStart, el.selectionEnd),
       ),
     )
-    .toContain("mapField: \"O'Brien\"");
+    .toContain('mapField: "O\'Brien"');
 });
