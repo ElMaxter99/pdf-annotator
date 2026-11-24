@@ -1614,6 +1614,11 @@
     },
     "models": {
       "pick": "Choose model",
+      "search": "Search models…",
+      "total": "{{total}} models",
+      "count": "{{shown}} of {{total}}",
+      "noMatch": "No model matches “{{query}}”.",
+      "clearSearch": "Clear search",
       "auto": "Automatic",
       "autoHint": "Copilot picks the best available model",
       "cliDefault": "Claude Code default",

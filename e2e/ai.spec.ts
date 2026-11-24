@@ -27,10 +27,15 @@ async function openBatchWithB(page: Page, provider: string | null = 'fake') {
   await page.goto('/landing');
   await page
     .locator('input[type=file]')
-    .setInputFiles([file('factura-0331.pdf', pdf, 'application/pdf'), file('factura-0332.pdf', pdf, 'application/pdf')]);
+    .setInputFiles([
+      file('factura-0331.pdf', pdf, 'application/pdf'),
+      file('factura-0332.pdf', pdf, 'application/pdf'),
+    ]);
   await page.waitForURL('**/lote');
   await page.getByTestId('next-templates').click();
-  await page.getByTestId('input-templates').setInputFiles(file('factura-0331.json', json, 'application/json'));
+  await page
+    .getByTestId('input-templates')
+    .setInputFiles(file('factura-0331.json', json, 'application/json'));
   await expect(page.getByTestId('template-rows')).toContainText(`${FIELDS} campos`);
   await page.getByTestId('open-panel').click();
   await page.getByTestId('view-list').click();
@@ -47,7 +52,9 @@ async function openBatchWithB(page: Page, provider: string | null = 'fake') {
   await expect(page.locator('.migration-bar')).toContainText('Editando versión B');
 }
 
-test('«Copiar y adaptar con IA» asks once, writes the proposal in B in one undo step and is kept or discarded', async ({ page }) => {
+test('«Copiar y adaptar con IA» asks once, writes the proposal in B in one undo step and is kept or discarded', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await expect(page.getByTestId('ai-chip')).toContainText('Simulado');
 
@@ -73,7 +80,9 @@ test('«Copiar y adaptar con IA» asks once, writes the proposal in B in one und
   await expect(page.getByTestId('ai-row-without-ai').first()).toBeVisible();
   await expect(page.locator('.ai-proposal__row')).toHaveCount(FIELDS);
   await expect(page.getByTestId('ai-tab-badge')).toBeVisible();
-  await expect(page.getByTestId('migration-list').locator('[data-status="missing"]')).toHaveCount(0);
+  await expect(page.getByTestId('migration-list').locator('[data-status="missing"]')).toHaveCount(
+    0,
+  );
   // «Quitar todas» takes them out of B; «Marcar las altas» writes the sure ones back
   await page.getByTestId('ai-select-none').click();
   await expect(page.locator('.annotation')).toHaveCount(0);
@@ -113,7 +122,9 @@ test('«Copiar y adaptar con IA» asks once, writes the proposal in B in one und
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 });
 
-test('moving a field written by the AI is undoable and redoable, step by step', async ({ page }) => {
+test('moving a field written by the AI is undoable and redoable, step by step', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await openLote(page);
   await page.getByTestId('put-template-a').click();
@@ -131,7 +142,9 @@ test('moving a field written by the AI is undoable and redoable, step by step', 
   await page.mouse.move(before.x + 44, before.y + 34, { steps: 5 });
   await page.mouse.up();
   const moved = await first.boundingBox();
-  expect(moved && Math.abs(moved.x - (before.x + 40)) < 3 && Math.abs(moved.y - (before.y + 30)) < 3).toBe(true);
+  expect(
+    moved && Math.abs(moved.x - (before.x + 40)) < 3 && Math.abs(moved.y - (before.y + 30)) < 3,
+  ).toBe(true);
   // moving it keeps it as a field of the proposal (the row is marked as changed)
   await page.getByTestId('ai-review-fields').click();
   await expect(page.getByTestId('ai-row-edited')).toHaveCount(1);
@@ -153,7 +166,9 @@ test('moving a field written by the AI is undoable and redoable, step by step', 
   await expect(page.locator('.annotation')).toHaveCount(1);
 });
 
-test('copies of fields written by the AI are the user\'s own: discarding the proposal keeps them', async ({ page }) => {
+test("copies of fields written by the AI are the user's own: discarding the proposal keeps them", async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await openLote(page);
   await page.getByTestId('put-template-a').click();
@@ -171,7 +186,9 @@ test('copies of fields written by the AI are the user\'s own: discarding the pro
   await expect(page.locator('.annotation')).toHaveCount(FIELDS);
 });
 
-test('without the helper the chip says so and the AI option explains how to start it', async ({ page }) => {
+test('without the helper the chip says so and the AI option explains how to start it', async ({
+  page,
+}) => {
   await page.route('**/127.0.0.1:4310/**', (route) => route.abort());
   await openBatchWithB(page, null);
   await expect(page.getByTestId('ai-chip')).toContainText('sin conectar');
@@ -182,7 +199,28 @@ test('without the helper the chip says so and the AI option explains how to star
   await expect(page.locator('.annotation')).toHaveCount(0);
 });
 
-test('the model is picked from the list the helper reads, never typed, and remembered', async ({ page }) => {
+test('the model list can be filtered by typing', async ({ page }) => {
+  await openBatchWithB(page);
+  await openLote(page);
+  await page.getByTestId('ai-chip').click();
+  await page.getByTestId('ai-model-toggle').click();
+  const search = page.getByTestId('ai-model-search');
+  await expect(search).toBeFocused();
+  await search.fill('grande');
+  await expect(page.getByTestId('ai-model-opt-fake-large')).toBeVisible();
+  await expect(page.getByTestId('ai-model-opt-fake-small')).toHaveCount(0);
+  await search.fill('zzzz');
+  await expect(page.getByTestId('ai-model-none')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(search).toHaveValue('');
+  await expect(page.getByTestId('ai-model-opt-fake-small')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('ai-model-list')).toHaveCount(0);
+});
+
+test('the model is picked from the list the helper reads, never typed, and remembered', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await openLote(page);
   await page.getByTestId('ai-chip').click();
@@ -199,8 +237,12 @@ test('the model is picked from the list the helper reads, never typed, and remem
   expect(lists ?? '').not.toContain('fake-large');
 });
 
-test('a saved model the CLI no longer offers goes back to a valid one with a notice', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.models', JSON.stringify({ fake: 'modelo-retirado' })));
+test('a saved model the CLI no longer offers goes back to a valid one with a notice', async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem('pdf-annotator.ai.models', JSON.stringify({ fake: 'modelo-retirado' })),
+  );
   await openBatchWithB(page);
   await openLote(page);
   await page.getByTestId('ai-chip').click();
@@ -209,21 +251,31 @@ test('a saved model the CLI no longer offers goes back to a valid one with a not
   expect(JSON.parse(stored ?? '{}')).toMatchObject({ fake: '' });
 });
 
-test('if the helper cannot list the models the error is clear and «Reintentar» is offered', async ({ page }) => {
+test('if the helper cannot list the models the error is clear and «Reintentar» is offered', async ({
+  page,
+}) => {
   await page.route('**/127.0.0.1:4310/models**', (route) =>
-    route.fulfill({ status: 502, contentType: 'application/json', body: JSON.stringify({ error: { code: 'auth', message: 'x' } }) }),
+    route.fulfill({
+      status: 502,
+      contentType: 'application/json',
+      body: JSON.stringify({ error: { code: 'auth', message: 'x' } }),
+    }),
   );
   await openBatchWithB(page);
   await openLote(page);
   await page.getByTestId('ai-chip').click();
-  await expect(page.getByTestId('ai-model-error')).toContainText('No se pudo leer la lista de modelos');
+  await expect(page.getByTestId('ai-model-error')).toContainText(
+    'No se pudo leer la lista de modelos',
+  );
   await expect(page.getByTestId('ai-model-retry')).toBeVisible();
   await page.unroute('**/127.0.0.1:4310/models**');
   await page.getByTestId('ai-model-retry').click();
   await expect(page.getByTestId('ai-model-error')).toHaveCount(0);
 });
 
-test('«Ver detalles» shows what was sent, the steps and says the simulated provider reports no usage', async ({ page }) => {
+test('«Ver detalles» shows what was sent, the steps and says the simulated provider reports no usage', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await openLote(page);
   await page.getByTestId('put-template-a').click();
@@ -237,7 +289,9 @@ test('«Ver detalles» shows what was sent, the steps and says the simulated pro
   await expect(dialog).toBeVisible();
   await expect(dialog).toContainText('Terminado');
   await expect(page.getByTestId('ai-details-steps')).toContainText('Preparar las páginas');
-  await expect(page.getByTestId('ai-details-steps')).toContainText(`${FIELDS} de ${FIELDS} campos colocados`);
+  await expect(page.getByTestId('ai-details-steps')).toContainText(
+    `${FIELDS} de ${FIELDS} campos colocados`,
+  );
   await expect(page.getByTestId('ai-details-sent')).toContainText('fields.json');
   await expect(page.getByTestId('ai-details-usage')).toContainText('No medible');
   await page.getByTestId('ai-details-tab-sent').click();
@@ -267,15 +321,22 @@ async function openPanelWithPair(page: Page, bPdf?: Buffer) {
   await page.goto('/landing');
   await page
     .locator('input[type=file]')
-    .setInputFiles([file('factura-0331.pdf', pdf, 'application/pdf'), file('factura-0332.pdf', pdf, 'application/pdf')]);
+    .setInputFiles([
+      file('factura-0331.pdf', pdf, 'application/pdf'),
+      file('factura-0332.pdf', pdf, 'application/pdf'),
+    ]);
   await page.waitForURL('**/lote');
   await page.getByTestId('next-templates').click();
-  await page.getByTestId('input-templates').setInputFiles(file('factura-0331.json', json, 'application/json'));
+  await page
+    .getByTestId('input-templates')
+    .setInputFiles(file('factura-0331.json', json, 'application/json'));
   await page.getByTestId('open-panel').click();
   await page.getByTestId('view-list').click();
   await page
     .getByTestId('input-b')
-    .setInputFiles(file('factura-0331-nuevo.pdf', bPdf ?? (await shiftedPdf(20, -30)), 'application/pdf'));
+    .setInputFiles(
+      file('factura-0331-nuevo.pdf', bPdf ?? (await shiftedPdf(20, -30)), 'application/pdf'),
+    );
   await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
 }
 
@@ -288,7 +349,9 @@ async function unrelatedPdf(): Promise<Buffer> {
   return Buffer.from(await out.save());
 }
 
-test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revisión PDF a PDF', async ({ page }) => {
+test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revisión PDF a PDF', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   await expect(page.getByTestId('ai-batch-dialog')).toBeVisible();
@@ -312,7 +375,9 @@ test('«Trasladar con IA» en lote: estimación, cola, propuesta guardada y revi
   await expect(page.getByTestId('ai-review-proposal')).toHaveCount(0);
 });
 
-test('«Trasladar con IA» en lote: elegir un PDF se ve y su resumen está siempre a la vista (P-72)', async ({ page }) => {
+test('«Trasladar con IA» en lote: elegir un PDF se ve y su resumen está siempre a la vista (P-72)', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   await page.getByTestId('ai-batch-cascade').uncheck();
@@ -350,7 +415,9 @@ test('«Trasladar con IA» en lote: elegir un PDF se ve y su resumen está siemp
   await expect(page.getByTestId('ai-scope-pick')).toHaveCount(0);
 });
 
-test('«Trasladar con IA» en lote: el ajuste por textos resuelve sin gastar una petición', async ({ page }) => {
+test('«Trasladar con IA» en lote: el ajuste por textos resuelve sin gastar una petición', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   await expect(page.getByTestId('ai-batch-cascade')).toBeChecked();
@@ -359,7 +426,9 @@ test('«Trasladar con IA» en lote: el ajuste por textos resuelve sin gastar una
   await expect(page.getByTestId('ai-chip-free')).toBeVisible();
 });
 
-test('«Trasladar con IA» en lote: el modal es mínimo y la información extra sale solo si se pide', async ({ page }) => {
+test('«Trasladar con IA» en lote: el modal es mínimo y la información extra sale solo si se pide', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   const dialog = page.getByTestId('ai-batch-dialog');
@@ -399,7 +468,9 @@ test('«Trasladar con IA» en lote: el modal es mínimo y la información extra 
   expect(box.height).toBeLessThan(420);
 });
 
-test('«Trasladar con IA» en lote: en la cuadrícula, «Ver detalles» del chip abre los detalles y no el editor', async ({ page }) => {
+test('«Trasladar con IA» en lote: en la cuadrícula, «Ver detalles» del chip abre los detalles y no el editor', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('view-grid').click();
   await page.getByTestId('ai-batch-button').click();
@@ -411,7 +482,9 @@ test('«Trasladar con IA» en lote: en la cuadrícula, «Ver detalles» del chip
   await expect(page).toHaveURL(/\/lote/);
 });
 
-test('«Trasladar con IA» en lote: los campos que no existen en B no cuentan como fallo', async ({ page }) => {
+test('«Trasladar con IA» en lote: los campos que no existen en B no cuentan como fallo', async ({
+  page,
+}) => {
   await openPanelWithPair(page, await unrelatedPdf());
   await page.getByTestId('ai-batch-button').click();
   await page.getByTestId('ai-batch-cascade').uncheck();
@@ -432,7 +505,9 @@ test('«Trasladar con IA» en lote: sin ayudante se explica y no se envía nada'
   await expect(page.getByTestId('ai-batch-dialog')).toHaveCount(0);
 });
 
-test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido de la lista', async ({ page }) => {
+test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido de la lista', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   await page.getByTestId('ai-batch-change').click();
@@ -447,7 +522,9 @@ test('«Trasladar con IA» en lote: proveedor en tarjetas y modelo elegido de la
   expect(JSON.parse(stored ?? '{}')).toMatchObject({ fake: 'fake-large' });
 });
 
-test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos y el consumo del lote', async ({ page }) => {
+test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos y el consumo del lote', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   await page.getByTestId('ai-batch-cascade').uncheck();
@@ -457,23 +534,28 @@ test('«Trasladar con IA» en lote: «Ver detalles» enseña los PDFs, los pasos
   const dialog = page.getByTestId('ai-bdetails');
   await expect(dialog).toBeVisible();
   // the details take the place of the list and the summary: no nested scroll areas in the panel
-  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(0);
+  await expect(
+    page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]'),
+  ).toHaveCount(0);
   await expect(page.getByTestId('ai-batch-sheet')).toHaveCount(0);
   await expect(page.getByTestId('ai-bdetails-steps')).toContainText(/\S/);
   await expect(page.getByTestId('ai-bdetails-batch')).toBeVisible();
   await page.getByTestId('ai-bdetails-tab-sent').click();
   await expect(page.getByTestId('ai-bdetails-sent')).toBeVisible();
-  const scrollers = await page.getByTestId('ai-batch-status').evaluate((panel) =>
-    [panel, ...panel.querySelectorAll('*')].filter((el) => {
-      const c = getComputedStyle(el);
-      return /(auto|scroll)/.test(c.overflowY) && el.scrollHeight > el.clientHeight + 1;
-    }).length
+  const scrollers = await page.getByTestId('ai-batch-status').evaluate(
+    (panel) =>
+      [panel, ...panel.querySelectorAll('*')].filter((el) => {
+        const c = getComputedStyle(el);
+        return /(auto|scroll)/.test(c.overflowY) && el.scrollHeight > el.clientHeight + 1;
+      }).length,
   );
   expect(scrollers).toBeLessThanOrEqual(1);
   // «Volver a la lista» (or Esc) brings the list and the summary back
   await page.getByTestId('ai-batch-details-back').click();
   await expect(dialog).toHaveCount(0);
-  await expect(page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]')).toHaveCount(1);
+  await expect(
+    page.getByTestId('ai-batch-status').locator('[data-testid^="ai-bdetails-item-"]'),
+  ).toHaveCount(1);
   await expect(page.getByTestId('ai-batch-sheet')).toBeVisible();
   await page.getByTestId('ai-batch-details').click();
   await expect(dialog).toBeVisible();
@@ -492,7 +574,9 @@ test('en una web pública (no local) no hay rastro de la IA', async ({ page }) =
   await page.route('http://app.test/**', async (route) => {
     const url = new URL(route.request().url());
     try {
-      const response = await route.fetch({ url: `http://127.0.0.1:4300${url.pathname}${url.search}` });
+      const response = await route.fetch({
+        url: `http://127.0.0.1:4300${url.pathname}${url.search}`,
+      });
       await route.fulfill({ response });
     } catch {
       // A request still in flight when the page navigates or the test ends loses its response
@@ -514,7 +598,9 @@ test('en una web pública (no local) no hay rastro de la IA', async ({ page }) =
   await expect(page.getByTestId('ai-chip')).toHaveCount(0);
 });
 
-test('panel del lote compacto: ⋯ guarda las acciones raras y las acciones de fila salen al pasar el ratón', async ({ page }) => {
+test('panel del lote compacto: ⋯ guarda las acciones raras y las acciones de fila salen al pasar el ratón', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await expect(page.getByTestId('download-ready')).toHaveCount(0); // aparece en la cabecera cuando hay listos
   await page.getByTestId('batch-more').click();
@@ -529,7 +615,9 @@ test('panel del lote compacto: ⋯ guarda las acciones raras y las acciones de f
   await expect(actions).toHaveCSS('opacity', '1');
 });
 
-test('«Trasladar con IA» en lote: la cola vive en el ayudante y el panel lo dice', async ({ page }) => {
+test('«Trasladar con IA» en lote: la cola vive en el ayudante y el panel lo dice', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   await page.getByTestId('ai-batch-cascade').uncheck();
@@ -542,7 +630,9 @@ test('«Trasladar con IA» en lote: la cola vive en el ayudante y el panel lo di
   await expect(page.getByTestId('ai-batch-pause')).toHaveCount(0);
 });
 
-test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guardadas y enviadas (A6)', async ({ page }) => {
+test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guardadas y enviadas (A6)', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await page.getByTestId('ai-batch-button').click();
   // Folded by default: one line, no text box.
@@ -551,7 +641,9 @@ test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guard
   await expect(toggle).toContainText('(opcional)');
   await expect(page.getByTestId('ai-batch-instructions')).toHaveCount(0);
   await toggle.click();
-  await page.getByTestId('ai-batch-instructions').fill('Las casillas van a la izquierda del texto.');
+  await page
+    .getByTestId('ai-batch-instructions')
+    .fill('Las casillas van a la izquierda del texto.');
   // Closing the popover keeps what was typed (saved on the batch).
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('ai-batch-dialog')).toHaveCount(0);
@@ -562,8 +654,16 @@ test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guard
           const open = indexedDB.open('pdf-annotator-batch', 1);
           open.onerror = () => resolve('');
           open.onsuccess = () => {
-            const get = open.result.transaction('items').objectStore('items').get('__batch-settings__');
-            get.onsuccess = () => resolve(String((get.result as { aiInstructions?: string } | undefined)?.aiInstructions ?? ''));
+            const get = open.result
+              .transaction('items')
+              .objectStore('items')
+              .get('__batch-settings__');
+            get.onsuccess = () =>
+              resolve(
+                String(
+                  (get.result as { aiInstructions?: string } | undefined)?.aiInstructions ?? '',
+                ),
+              );
             get.onerror = () => resolve('');
           };
         }),
@@ -575,13 +675,19 @@ test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guard
   await page.getByTestId('ai-batch-button').click();
   await expect(page.getByTestId('ai-batch-instructions-on')).toBeVisible();
   await page.getByTestId('ai-batch-instructions-toggle').click();
-  await expect(page.getByTestId('ai-batch-instructions')).toHaveValue('Las casillas van a la izquierda del texto.');
+  await expect(page.getByTestId('ai-batch-instructions')).toHaveValue(
+    'Las casillas van a la izquierda del texto.',
+  );
 
   // They go to the helper with the PDF.
   const sent: string[] = [];
   page.on('request', (request) => {
     if (request.method() === 'POST' && /\/batch\/[^/]+\/items$/.test(request.url())) {
-      sent.push(String((JSON.parse(request.postData() ?? '{}') as { instructions?: unknown }).instructions ?? ''));
+      sent.push(
+        String(
+          (JSON.parse(request.postData() ?? '{}') as { instructions?: unknown }).instructions ?? '',
+        ),
+      );
     }
   });
   await page.getByTestId('ai-batch-cascade').uncheck();
@@ -590,7 +696,11 @@ test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guard
   expect(sent).toEqual(['Las casillas van a la izquierda del texto.']);
 
   // In the editor the PDF follows the batch until it gets its own, and «Usar las del lote» goes back.
-  await page.getByTestId('panel-item').filter({ hasText: 'factura-0331' }).getByRole('button', { name: 'Revisar' }).click();
+  await page
+    .getByTestId('panel-item')
+    .filter({ hasText: 'factura-0331' })
+    .getByRole('button', { name: 'Revisar' })
+    .click();
   await page.waitForURL('**/workspace?lote=*');
   await openLote(page);
   await page.getByTestId('ai-chip').click();
@@ -599,33 +709,56 @@ test('«Trasladar con IA»: instrucciones para la IA del lote y de un PDF, guard
   await expect(box).toHaveValue('Las casillas van a la izquierda del texto.');
   await expect(page.getByTestId('ai-instructions-source')).toContainText('Las del lote');
   await box.fill('El CIF ahora se llama NIF.');
-  await expect(page.getByTestId('ai-instructions-source')).toContainText('Solo este PDF', { timeout: 5000 });
+  await expect(page.getByTestId('ai-instructions-source')).toContainText('Solo este PDF', {
+    timeout: 5000,
+  });
   await page.getByTestId('ai-instructions-reset').click();
   await expect(box).toHaveValue('Las casillas van a la izquierda del texto.');
   await expect(page.getByTestId('ai-instructions-source')).toContainText('Las del lote');
 });
 
-test('«Copiar y adaptar con IA»: el número de página repetido en A se propone en cada página de B (3 → 4)', async ({ page }) => {
+test('«Copiar y adaptar con IA»: el número de página repetido en A se propone en cada página de B (3 → 4)', async ({
+  page,
+}) => {
   const pages = async (n: number) => {
     const doc = await PDFDocument.create();
     const font = await doc.embedFont(StandardFonts.Helvetica);
-    for (let i = 1; i <= n; i += 1) doc.addPage([595, 842]).drawText(`Página ${i}`, { x: 60, y: 780, size: 14, font });
+    for (let i = 1; i <= n; i += 1)
+      doc.addPage([595, 842]).drawText(`Página ${i}`, { x: 60, y: 780, size: 14, font });
     return Buffer.from(await doc.save());
   };
-  const template = { pages: [1, 2, 3].map((num) => ({ num, fields: [{ x: 540, y: 30, mapField: `numpages${num - 1}`, fontSize: 9, type: 'text' }] })) };
+  const template = {
+    pages: [1, 2, 3].map((num) => ({
+      num,
+      fields: [{ x: 540, y: 30, mapField: `numpages${num - 1}`, fontSize: 9, type: 'text' }],
+    })),
+  };
   await stubAnalytics(page);
   await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.provider', 'fake'));
   await page.goto('/landing');
   const a = await pages(3);
-  await page.locator('input[type=file]').setInputFiles([file('parte.pdf', a, 'application/pdf'), file('otro.pdf', a, 'application/pdf')]);
+  await page
+    .locator('input[type=file]')
+    .setInputFiles([
+      file('parte.pdf', a, 'application/pdf'),
+      file('otro.pdf', a, 'application/pdf'),
+    ]);
   await page.waitForURL('**/lote');
   await page.getByTestId('next-templates').click();
-  await page.getByTestId('input-templates').setInputFiles(file('parte.json', Buffer.from(JSON.stringify(template)), 'application/json'));
+  await page
+    .getByTestId('input-templates')
+    .setInputFiles(file('parte.json', Buffer.from(JSON.stringify(template)), 'application/json'));
   await page.getByTestId('open-panel').click();
   await page.getByTestId('view-list').click();
-  await page.getByTestId('input-b').setInputFiles(file('parte-nuevo.pdf', await pages(4), 'application/pdf'));
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(file('parte-nuevo.pdf', await pages(4), 'application/pdf'));
   await expect(page.getByTestId('panel-list')).toContainText('parte-nuevo.pdf');
-  await page.getByTestId('panel-item').filter({ hasText: 'parte.pdf' }).getByRole('button', { name: 'Revisar' }).click();
+  await page
+    .getByTestId('panel-item')
+    .filter({ hasText: 'parte.pdf' })
+    .getByRole('button', { name: 'Revisar' })
+    .click();
   await page.waitForURL('**/workspace?lote=*');
   await openLote(page);
   await page.getByTestId('put-template-a').click();
@@ -635,7 +768,9 @@ test('«Copiar y adaptar con IA»: el número de página repetido en A se propon
   await page.getByTestId('ai-review-fields').click();
   // los 3 de A y uno nuevo para la página 4 de B (numpages3), marcado «repetido en cada página»
   await expect(page.locator('.ai-proposal__row')).toHaveCount(4);
-  await expect(page.locator('.ai-proposal__row', { hasText: 'numpages3' }).getByTestId('ai-row-pattern')).toBeVisible();
+  await expect(
+    page.locator('.ai-proposal__row', { hasText: 'numpages3' }).getByTestId('ai-row-pattern'),
+  ).toBeVisible();
   // grupos claros: el de la página nueva va en «Nuevos en B (no estaban en A)», separado de los que vienen de A
   await expect(page.getByTestId('ai-group-newInB')).toContainText('Nuevos en B');
   await expect(page.getByTestId('ai-proposal-newInB')).toContainText('numpages3');
@@ -644,7 +779,9 @@ test('«Copiar y adaptar con IA»: el número de página repetido en A se propon
   await expect(page.locator('.annotation')).toHaveCount(1); // la de la página 1 de B
 });
 
-test('traslado cortado: al volver aparece el aviso con lo que falta y se puede descartar conservando lo guardado', async ({ page }) => {
+test('traslado cortado: al volver aparece el aviso con lo que falta y se puede descartar conservando lo guardado', async ({
+  page,
+}) => {
   await openPanelWithPair(page);
   await expect(page.getByTestId('ai-draft')).toHaveCount(0); // sin pasada previa no hay aviso
 
@@ -660,10 +797,26 @@ test('traslado cortado: al volver aparece el aviso con lo que falta y se puede d
           const keys = store.getAllKeys();
           keys.onsuccess = () => {
             const ids = (keys.result as string[]).filter((key) => !key.startsWith('__'));
-            store.put({ ids, provider: 'fake', startedAt: Date.now(), started: [], failed: [] }, '__tmp__');
+            store.put(
+              { ids, provider: 'fake', startedAt: Date.now(), started: [], failed: [] },
+              '__tmp__',
+            );
             const all = store.get('__batch-settings__');
             all.onsuccess = () =>
-              store.put({ ...(all.result ?? { aiInstructions: '' }), aiRun: { ids, provider: 'fake', startedAt: Date.now(), started: [], failed: [], rerun: [] } }, '__batch-settings__');
+              store.put(
+                {
+                  ...(all.result ?? { aiInstructions: '' }),
+                  aiRun: {
+                    ids,
+                    provider: 'fake',
+                    startedAt: Date.now(),
+                    started: [],
+                    failed: [],
+                    rerun: [],
+                  },
+                },
+                '__batch-settings__',
+              );
             store.delete('__tmp__');
           };
           tx.oncomplete = () => resolve();

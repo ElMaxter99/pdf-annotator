@@ -110,6 +110,8 @@ export class OptionsDialogComponent {
   }
 
   private readonly onDocumentEscape = (event: KeyboardEvent): void => {
+    // Escape inside the model picker belongs to it (clear the search, then close the list).
+    if ((event.target as Element | null)?.closest?.('.ms__pop')) return;
     if (
       event.key === 'Escape' &&
       this.options.isOpen() &&
