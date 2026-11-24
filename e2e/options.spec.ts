@@ -89,3 +89,21 @@ test('«Editor» está en la web: el imán entre anotaciones viene activado y se
   await expect(snap).toBeChecked();
   await expect(page.getByTestId('options-snap-distance-6')).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('Esc en el buscador de modelos lo borra y luego cierra la lista, sin cerrar las Opciones', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('pdf-annotator.ai.provider', 'fake'));
+  await page.goto('/landing');
+  await page.getByTestId('options-open').click();
+  await page.getByTestId('options-nav-ai').click();
+  await page.getByTestId('options-model-toggle').click();
+  const search = page.getByTestId('options-model-search');
+  await expect(search).toBeFocused();
+  await search.fill('grande');
+  await page.keyboard.press('Escape');
+  await expect(search).toHaveValue('');
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('options-model-list')).toHaveCount(0);
+  await expect(page.getByTestId('options-dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('options-dialog')).toHaveCount(0);
+});
