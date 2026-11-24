@@ -7776,6 +7776,10 @@ button.version-chip:focus-visible {
 .json-keys__chip {
   color: var(--warning-text);
 }
+:root.theme-light .jfm__seg,
+:root.theme-light .jfm__preview {
+  background: var(--light-surface);
+}
 :root.theme-light .json-keys__pill,
 :root.theme-light .json-keys__chip {
   background: var(--light-surface);

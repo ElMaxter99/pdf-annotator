@@ -1784,6 +1784,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   @HostListener('document:keydown', ['$event'])
   onGlobalKeydown(event: KeyboardEvent) {
     const target = event.target as HTMLElement | null;
+    // Un modal nativo abierto (p. ej. «Personalizar» el JSON) se queda con sus teclas: Esc, flechas, Supr…
+    if (target?.closest?.('dialog[open]')) return;
     const tag = target?.tagName;
     const result = resolveShortcut(
       {

@@ -426,7 +426,8 @@
     "noData": "{{count}} anotacions sense dada a les dades de prova: es pinten amb la mostra.",
     "jsonCopied": "JSON copiat · {{format}}",
     "jsonCopyFailed": "No s'ha pogut copiar. Selecciona el text de l'editor i prem Ctrl+C.",
-    "jsonDownloadedNotStrict": "coords.json descarregat · format no estricte"
+    "jsonDownloadedNotStrict": "coords.json descarregat · format no estricte",
+    "jsonFormatApplied": "Format aplicat · el JSON ja no és estricte"
   },
   "session": {
     "title": "Continua on ho vas deixar",
@@ -1318,7 +1319,11 @@
       "title": "Format dels JSON",
       "open": "Format dels JSON en descarregar",
       "hint": "Val per a l'editor, en copiar i en descarregar",
-      "downloaded": "{{count}} JSON descarregats · format no estricte"
+      "downloaded": "{{count}} JSON descarregats · format no estricte",
+      "close": "Tanca",
+      "cancel": "Cancel·la",
+      "apply": "Aplica",
+      "reset": "Restableix"
     },
     "stamp": {
       "today": "avui",

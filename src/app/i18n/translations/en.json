@@ -426,7 +426,8 @@
     "noData": "{{count}} annotations have no data in the test data: they paint their sample.",
     "jsonCopied": "JSON copied · {{format}}",
     "jsonCopyFailed": "Could not copy. Select the editor text and press Ctrl+C.",
-    "jsonDownloadedNotStrict": "coords.json downloaded · non-strict format"
+    "jsonDownloadedNotStrict": "coords.json downloaded · non-strict format",
+    "jsonFormatApplied": "Format applied · the JSON is no longer strict"
   },
   "session": {
     "title": "Pick up where you left off",
@@ -1318,7 +1319,11 @@
       "title": "JSON format",
       "open": "JSON format for downloads",
       "hint": "Applies to the editor, copying and downloading",
-      "downloaded": "{{count}} JSON files downloaded · non-strict format"
+      "downloaded": "{{count}} JSON files downloaded · non-strict format",
+      "close": "Close",
+      "cancel": "Cancel",
+      "apply": "Apply",
+      "reset": "Reset"
     },
     "stamp": {
       "today": "today",

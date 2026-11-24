@@ -213,7 +213,7 @@ test('B starts empty, A can be put in and the PDF is marked ready and downloaded
   await page.getByTestId('json-format-keys-bare').click();
   await expect(page.getByTestId('json-format-chip')).not.toHaveClass(/jfm__chip--ok/);
   await expect(page.getByTestId('json-format-preview')).toContainText('mapField: "nombre"');
-  await page.keyboard.press('Escape');
+  await page.getByTestId('json-format-apply').click();
   const [bare] = await Promise.all([
     page.waitForEvent('download'),
     page.getByTestId('download-ready').click(),
