@@ -103,7 +103,9 @@ test('the sort menu works with the keyboard and closes with Esc', async ({ page 
   await trigger.focus();
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('menu')).toBeVisible();
+  await expect(page.getByTestId('sort-select-state')).toBeFocused();
   await page.keyboard.press('ArrowDown');
+  await expect(page.getByTestId('sort-select-name')).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('menu')).toHaveCount(0);
   await expect(trigger).toHaveAttribute('data-value', 'name');
