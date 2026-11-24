@@ -188,11 +188,16 @@ export class WorkspaceJson {
     return indentJsonBlock(
       buildJsonExportPayload([page], (field) => this.serializeFieldForJson(field)).pages[0],
       '    ',
+      this.editorSettings.jsonKeys(),
     );
   }
 
   buildFieldJsonBlock(this: WorkspacePageComponent, field: PageField): string {
-    return indentJsonBlock(this.serializeFieldForJson(field), '        ');
+    return indentJsonBlock(
+      this.serializeFieldForJson(field),
+      '        ',
+      this.editorSettings.jsonKeys(),
+    );
   }
 
   highlightTextareaRange(
@@ -292,8 +297,21 @@ export class WorkspaceJson {
     if (this.jsonCopyFormat().keys !== keys) {
       this.setJsonCopyFormat({ keys });
     }
-    if (this.jsonKeysCanChange() && !this.jsonKeysAreCurrent(keys)) {
-      this.syncCoordsTextModel();
+    if (!this.jsonKeysCanChange() || this.jsonKeysAreCurrent(keys)) {
+      return;
+    }
+    // Se reformatea el texto actual del editor (no se regenera desde las anotaciones) para no perder
+    // una edición que aún no se haya aplicado.
+    const text = this.coordsTextModel();
+    const next = formatJsonForCopy(text, {
+      keys,
+      quote: 'double',
+      indent: '2',
+      trailingComma: false,
+    });
+    if (next !== null && next !== text) {
+      this.coordsTextModel.set(next);
+      this.refreshJsonPreview();
     }
   }
 

@@ -1,6 +1,7 @@
 import { PageField } from '../models/annotation.model';
 import { extractPagesCollection } from './annotation-fields.utils';
 import { LooseJsonError, parseLooseJson } from './loose-json';
+import { formatJsonForCopy } from './json-copy-format.utils';
 import { toFiniteNumber } from './number.utils';
 
 export type JsonTreePreviewStatus = 'empty' | 'ready' | 'error';
@@ -182,8 +183,22 @@ export function serializeFieldForJson(
   };
 }
 
-export function indentJsonBlock(value: unknown, indent: string): string {
-  return JSON.stringify(value, null, 2)
+export function indentJsonBlock(
+  value: unknown,
+  indent: string,
+  keys: 'quoted' | 'bare' = 'quoted',
+): string {
+  const strict = JSON.stringify(value, null, 2);
+  const text =
+    keys === 'bare'
+      ? (formatJsonForCopy(strict, {
+          keys: 'bare',
+          quote: 'double',
+          indent: '2',
+          trailingComma: false,
+        }) ?? strict)
+      : strict;
+  return text
     .split('\n')
     .map((line) => `${indent}${line}`)
     .join('\n');

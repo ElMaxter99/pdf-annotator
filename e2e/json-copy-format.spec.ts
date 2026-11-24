@@ -99,3 +99,13 @@ test('the JSON keys setting rewrites the editor, syncs with Options', async ({
   await editor.fill('{ pages: [');
   await expect(page.getByTestId('json-keys-bare')).toBeDisabled();
 });
+
+test('changing the keys style keeps an edit that has not been applied yet', async ({ page }) => {
+  const editor = page.locator('.json-editor');
+  await editor.fill(
+    '{"pages":[{"num":1,"fields":[{"x":50,"y":700,"mapField":"editado","fontSize":12,"type":"text"}]}]}',
+  );
+  await page.getByTestId('json-keys-bare').click();
+  await page.waitForTimeout(800);
+  await expect(editor).toHaveValue(/mapField: "editado"/);
+});
