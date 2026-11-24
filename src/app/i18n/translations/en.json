@@ -1551,7 +1551,11 @@
         "copilotWarn": "Copilot charges AI credits based on tokens (input, output and cache) and the model. This app cannot measure them in this mode: check your usage on GitHub before and after.",
         "credits": "AI credits",
         "creditsNote": "Measured by Copilot itself (≈). They are deducted from your GitHub AI credits; the exact total is on your Copilot usage page.",
-        "creditsLimits": "Copilot counts AI credits by tokens (input, output and cache) and model; a larger model spends them faster."
+        "creditsLimits": "Copilot counts AI credits by tokens (input, output and cache) and model; a larger model spends them faster.",
+        "creditsUnit": "AI credits",
+        "requestsSent": "requests sent",
+        "tokensReported": "Tokens (as reported by Copilot)",
+        "copilotNoCredits": "Copilot gave no credits for this run. We don't show estimated figures: check your usage on GitHub before and after."
       },
       "sent": {
         "title": "What was sent",

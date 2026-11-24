@@ -1551,7 +1551,11 @@
         "copilotWarn": "Copilot facture en crédits IA selon les tokens (entrée, sortie et cache) et le modèle. Cette app ne peut pas les mesurer dans ce mode : consultez votre consommation sur GitHub avant et après.",
         "credits": "Crédits d'IA",
         "creditsNote": "Mesurés par Copilot lui-même (≈). Ils sont déduits de vos crédits d'IA GitHub ; le total exact figure sur votre page d'utilisation de Copilot.",
-        "creditsLimits": "Copilot compte les crédits d'IA selon les tokens (entrée, sortie et cache) et le modèle ; un modèle plus grand les consomme plus vite."
+        "creditsLimits": "Copilot compte les crédits d'IA selon les tokens (entrée, sortie et cache) et le modèle ; un modèle plus grand les consomme plus vite.",
+        "creditsUnit": "crédits d'IA",
+        "requestsSent": "requêtes envoyées",
+        "tokensReported": "Tokens (ceux que Copilot indique)",
+        "copilotNoCredits": "Copilot n'a pas fourni les crédits de cette passe. Nous n'affichons pas de chiffres estimés : consultez votre consommation sur GitHub avant et après."
       },
       "sent": {
         "title": "Ce qui a été envoyé",

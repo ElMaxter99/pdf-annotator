@@ -1551,7 +1551,11 @@
         "copilotWarn": "Copilot cobra en crèdits d'IA segons els tokens (entrada, sortida i memòria cau) i el model. Aquesta app no els pot mesurar en aquest mode: mira el teu consum a GitHub abans i després.",
         "credits": "Crèdits d'IA",
         "creditsNote": "Mesurats pel mateix Copilot (≈). Es descompten dels teus crèdits d'IA de GitHub; el total exacte és a la teva pàgina d'ús de Copilot.",
-        "creditsLimits": "Copilot compta crèdits d'IA segons els tokens (entrada, sortida i memòria cau) i el model; un model més gran els gasta abans."
+        "creditsLimits": "Copilot compta crèdits d'IA segons els tokens (entrada, sortida i memòria cau) i el model; un model més gran els gasta abans.",
+        "creditsUnit": "crèdits d'IA",
+        "requestsSent": "peticions enviades",
+        "tokensReported": "Tokens (els que informa Copilot)",
+        "copilotNoCredits": "Copilot no ha donat els crèdits d'aquesta passada. No mostrem xifres estimades: mira el teu consum a GitHub abans i després."
       },
       "sent": {
         "title": "Què s'ha enviat",

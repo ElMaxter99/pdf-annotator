@@ -8,7 +8,7 @@ import { BatchStoreService } from '../../../services/batch-store.service';
 import { ToastService } from '../../../services/toast.service';
 import { AI_BATCH_ACTIVE_PHASES } from '../../../utils/ai-batch.utils';
 import { buildBatchTimeline, isFinished } from '../../../utils/ai-batch-details.utils';
-import { estimateTokens, sumUsage, usageBilled, usageTotal } from '../../../utils/ai-proposal.utils';
+import { estimateTokens, sumAiCredits, sumUsage, usageBilled, usageTotal } from '../../../utils/ai-proposal.utils';
 import { providerName } from './ai-batch-button.component';
 
 export type BatchDetailsTab = 'summary' | 'steps' | 'sent' | 'usage';
@@ -74,10 +74,7 @@ export class AiBatchDetailsComponent implements OnInit, OnDestroy {
   readonly measured = computed(() => this.total() > 0);
   readonly freeCount = computed(() => this.list().filter((entry) => entry.row.phase === 'free').length);
   readonly batchTokens = computed(() => usageBilled(this.queue.usage()));
-  readonly credits = computed(() => {
-    const v = (this.row()?.details?.attempts ?? []).map((a) => a.aiCredits).filter((c): c is number => c !== null);
-    return v.length ? v.reduce((a, b) => a + b, 0) : null;
-  });
+  readonly credits = computed(() => sumAiCredits(this.row()?.details?.attempts ?? []));
   readonly sentFiles = computed(() => (this.row()?.sent?.files ?? []).filter((f) => !f.name.endsWith('.pdf')));
 
   ngOnInit(): void {
