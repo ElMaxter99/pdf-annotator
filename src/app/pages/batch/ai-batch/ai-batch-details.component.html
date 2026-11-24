@@ -72,11 +72,23 @@
                 <section class="ai-details__card" data-testid="ai-bdetails-usage">
                   <h3>
                     {{ 'batch.ai.details.thisPdf' | t }}
-                    @if (measured()) {
+                    @if (isCopilot() ? credits() !== null : measured()) {
                       <span class="ai-details__badge ai-details__badge--ok">{{ 'ai.details.usage.measured' | t: { provider: providerLabel() } }}</span>
                     }
                   </h3>
-                  @if (measured() && usage(); as u) {
+                  @if (isCopilot()) {
+                    @if (credits(); as c) {
+                      <div class="ai-details__big" data-testid="ai-bdetails-credits">{{ creditsText(c) }} <small>{{ 'ai.details.usage.creditsUnit' | t }}</small></div>
+                    } @else {
+                      <div class="ai-details__big">{{ requests() }} <small>{{ 'ai.details.usage.requestsSent' | t }}</small></div>
+                    }
+                    <dl class="ai-details__kv">
+                      <div><dt>{{ 'ai.details.usage.requests' | t }}</dt><dd>{{ requests() }}</dd></div>
+                    </dl>
+                    @if (!credits()) {
+                      <p class="ai-details__cap">{{ 'ai.details.usage.copilotNoCredits' | t }}</p>
+                    }
+                  } @else if (measured() && usage(); as u) {
                     <div class="ai-details__big">{{ num(total()) }} <small>{{ 'ai.details.usage.tokens' | t }}</small></div>
                     <div class="ai-details__bar" aria-hidden="true">
                       <i class="ai-details__bar--cache" [style.width.%]="share(u.cacheRead)"></i>
@@ -104,7 +116,13 @@
                 </section>
                 <section class="ai-details__card" data-testid="ai-bdetails-batch">
                   <h3>{{ 'batch.ai.details.allBatch' | t }}</h3>
-                  <div class="ai-details__big">{{ num(batchTokens()) }} <small>{{ 'ai.details.usage.tokens' | t }}</small></div>
+                  @if (batchIsCopilot()) {
+                    @if (batchCredits(); as bc) {
+                      <div class="ai-details__big">{{ creditsText(bc) }} <small>{{ 'ai.details.usage.creditsUnit' | t }}</small></div>
+                    }
+                  } @else {
+                    <div class="ai-details__big">{{ num(batchTokens()) }} <small>{{ 'ai.details.usage.tokens' | t }}</small></div>
+                  }
                   <dl class="ai-details__kv">
                     <div><dt>{{ 'batch.ai.details.requests' | t }}</dt><dd>{{ queue.requests() }}</dd></div>
                     <div><dt>{{ 'batch.ai.details.free' | t }}</dt><dd>{{ freeCount() }}</dd></div>

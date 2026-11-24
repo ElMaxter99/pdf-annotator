@@ -1,5 +1,5 @@
 import {
-  sumAiCredits,
+  creditsOfAttempts,
   AiRow,
   sanitizeDetails,
   usageBilled,
@@ -211,10 +211,14 @@ describe('usageBilled · sin los tokens leídos de caché', () => {
   });
 });
 
-describe('sumAiCredits · créditos de Copilot', () => {
-  it('suma los que se informan y devuelve null si ninguno', () => {
-    expect(sumAiCredits([{ aiCredits: 3.1 }, { aiCredits: null }, { aiCredits: 3.66 }])).toBeCloseTo(6.76);
-    expect(sumAiCredits([{ aiCredits: null }])).toBeNull();
-    expect(sumAiCredits([])).toBeNull();
+describe('creditsOfAttempts · créditos de Copilot', () => {
+  it('suma los finales y devuelve null si no hay ninguno', () => {
+    expect(creditsOfAttempts([{ n: 1, aiCredits: 3.1 }, { n: 2, aiCredits: null }, { n: 3, aiCredits: 3.66 }])).toBeCloseTo(6.76);
+    expect(creditsOfAttempts([{ n: 1, aiCredits: null }])).toBeNull();
+    expect(creditsOfAttempts([])).toBeNull();
+  });
+  it('usa lo que Copilot informa en vivo mientras la petición corre', () => {
+    expect(creditsOfAttempts([], { 1: 2.5 })).toBe(2.5);
+    expect(creditsOfAttempts([{ n: 1, aiCredits: 3 }], { 1: 2, 2: 1 })).toBe(4);
   });
 });

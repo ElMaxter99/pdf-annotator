@@ -171,7 +171,7 @@ export async function runProposal({ provider, model, aBytes, bBytes, template, i
                   info.aiCredits = ev.cumulative.aiCredits;
                   info.premiumRequests = ev.cumulative.premiumRequests;
                 }
-                onEvent({ type: 'step', attempt: info.n, steps: ev.steps, usage: info.usage });
+                onEvent({ type: 'step', attempt: info.n, steps: ev.steps, usage: info.usage, aiCredits: info.aiCredits ?? null });
               }
             : (l) => {
                 const ev = describeClaudeEvent(l);

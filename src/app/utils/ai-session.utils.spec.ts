@@ -58,11 +58,11 @@ describe('ai-session.utils', () => {
 
     const usage = { out: 1 } as unknown as AiUsage;
     const many = Array.from({ length: AI_STEP_LOG_LIMIT + 5 }, (_, i) => step(i));
-    const s1 = withAiEvent(s0, { type: 'step', attempt: 1, steps: many, usage }, 7);
+    const s1 = withAiEvent(s0, { type: 'step', attempt: 1, steps: many, usage, aiCredits: null }, 7);
     expect(s1.usage).toBe(usage);
     expect(s1.stepLog.length).toBe(AI_STEP_LOG_LIMIT);
     expect(s1.stepLog.at(-1)).toEqual({ attempt: 1, step: many.at(-1)!, at: 7 });
-    const s2 = withAiEvent(s1, { type: 'step', attempt: 1, steps: [], usage: null }, 9);
+    const s2 = withAiEvent(s1, { type: 'step', attempt: 1, steps: [], usage: null, aiCredits: null }, 9);
     expect(s2.usage).toBe(usage);
   });
 
@@ -142,5 +142,14 @@ describe('editar la propuesta antes de aplicarla', () => {
     const s = savedAiSession(saved, rows);
     expect(Object.keys(s.edits)).toEqual(['p1-f1']);
     expect(s.overrides).toEqual({ 'p1-f1': true });
+  });
+});
+
+describe('withAiEvent · créditos de Copilot en vivo', () => {
+  it('guarda lo que Copilot informa por petición', () => {
+    const s0 = loadingAiSession('copilot', 0);
+    const s1 = withAiEvent(s0, { type: 'step', attempt: 1, steps: [], usage: null, aiCredits: 2.5 }, 5);
+    const s2 = withAiEvent(s1, { type: 'step', attempt: 1, steps: [], usage: null, aiCredits: null }, 6);
+    expect(s2.liveCredits).toEqual({ 1: 2.5 });
   });
 });

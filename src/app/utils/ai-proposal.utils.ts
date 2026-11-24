@@ -133,7 +133,7 @@ export interface AiDetails {
 
 export type AiLiveEvent =
   | { type: 'sent'; sent: AiSent }
-  | { type: 'step'; attempt: number; steps: AiStep[]; usage: AiUsage | null }
+  | { type: 'step'; attempt: number; steps: AiStep[]; usage: AiUsage | null; aiCredits: number | null }
   | { type: 'resolved'; placed: number; total: number; diagnosis: AiDiagnosis | null };
 
 export type AiMessage =
@@ -267,6 +267,7 @@ export function sanitizeEvent(raw: unknown): AiLiveEvent | null {
       attempt: Math.max(1, count(r['attempt'])),
       steps: sanitizeSteps(r['steps']),
       usage: sanitizeUsage(r['usage']),
+      aiCredits: typeof r['aiCredits'] === 'number' && Number.isFinite(r['aiCredits']) && r['aiCredits'] >= 0 ? r['aiCredits'] : null,
     };
   }
   if (r['type'] === 'resolved') {
@@ -289,11 +290,27 @@ export const usageTotal = (u: AiUsage | null): number =>
  */
 export const usageBilled = (u: AiUsage | null): number => (u ? u.input + u.output + u.cacheWrite : 0);
 
-/** AI credits that Copilot reports, summed over attempts; `null` when it reported none (also used by the batch). */
-export function sumAiCredits(attempts: ReadonlyArray<{ aiCredits: number | null }>): number | null {
-  const found = attempts.map((a) => a.aiCredits).filter((c): c is number => c !== null);
-  return found.length ? found.reduce((a, b) => a + b, 0) : null;
+/**
+ * AI credits of a run: the final figure of each finished attempt, or what Copilot reported live for it while it runs
+ * (whichever is greater). `null` when Copilot reported none. Shared by the editor and the batch.
+ */
+export function creditsOfAttempts(
+  attempts: ReadonlyArray<{ n: number; aiCredits: number | null }>,
+  live?: Record<number, number> | null,
+): number | null {
+  const byAttempt = new Map<number, number>();
+  for (const a of attempts) {
+    if (a.aiCredits !== null) byAttempt.set(a.n, a.aiCredits);
+  }
+  for (const [n, v] of Object.entries(live ?? {})) {
+    byAttempt.set(Number(n), Math.max(byAttempt.get(Number(n)) ?? 0, v));
+  }
+  return byAttempt.size ? [...byAttempt.values()].reduce((a, b) => a + b, 0) : null;
 }
+
+/** AI credits as a short number («6,76»), the same everywhere. */
+export const formatCredits = (credits: number, lang: string): string =>
+  credits.toLocaleString(lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export function sumUsage(list: Array<AiUsage | null>): AiUsage | null {
   const found = list.filter((u): u is AiUsage => !!u);
