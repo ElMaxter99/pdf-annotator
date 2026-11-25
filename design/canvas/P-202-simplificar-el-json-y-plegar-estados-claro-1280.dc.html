@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-202 Simplificar el JSON y plegar · estados · claro 1280</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.p h1,.p h2,.p h3,.p p{margin:0}.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}.cols{display:flex;gap:24px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:16px;font-weight:600}
+.btn{font:inherit;font-size:13px;font-weight:600;border:0;border-radius:999px;padding:6px 14px;min-height:34px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.i{width:34px;padding:0;justify-content:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.ok{color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent)}.chip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}.chip.err{color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,transparent)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:3px}.seg span{font-size:12px;font-weight:600;color:var(--muted);border-radius:999px;padding:5px 12px}.seg span.on{background:var(--accent);color:var(--ink)}
+.ed{background:var(--inset);border:1px solid var(--line);border-radius:12px;font-family:Consolas,'Fira Code',monospace;font-size:12.5px;line-height:21px;overflow:hidden;position:relative}
+.ed.focus{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%,transparent)}
+.ed.bad{border-color:var(--danger)}
+.ln{display:flex;height:21px;white-space:pre}.ln .n{width:30px;text-align:right;color:var(--muted);opacity:.7;padding-right:6px;flex:none}.ln .f{width:18px;text-align:center;color:var(--muted);flex:none;font-size:11px}.ln .f.v{color:var(--text)}.ln .t{padding-left:6px;color:var(--text)}
+.ln.sel{background:color-mix(in srgb,var(--accent) 22%,transparent)}.ln.errl{background:color-mix(in srgb,var(--danger) 16%,transparent)}.ln.cur{background:var(--soft)}
+.k{color:var(--accent)}.s{color:var(--warn)}.nu{color:var(--num)}.dots{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:0 7px;line-height:16px;font-size:11px;color:var(--muted);margin:0 2px;vertical-align:1px}
+.gut{position:absolute;left:0;top:0;bottom:0;width:54px;border-right:1px solid var(--line);background:color-mix(in srgb,var(--soft) 60%,transparent)}
+.stat{font-size:12.5px;display:flex;align-items:center;gap:8px;padding:2px 2px}
+.num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:12px;align-items:center;justify-content:center;flex:none}
+.num.r{background:var(--danger);color:#fff}
+.li{display:flex;gap:10px;align-items:flex-start}.li p{line-height:1.45;font-size:14px}
+.tb{width:100%;border-collapse:collapse;font-size:13.5px}.tb th{text-align:left;color:var(--accent);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--line)}.tb td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;background:var(--soft);white-space:nowrap}
+.toast{display:inline-flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 16px;box-shadow:0 12px 32px rgba(0,0,0,.25);font-size:13.5px}
+
+</style>
+</helmet>
+<div class="p" style="width:1280px;height:1340px;--bg:#f6f7fb;--panel:#ffffff;--accent:#0f766e;--danger:#dc2626;--text:#0f172a;--muted:#475569;--ink:#ffffff;--line:rgba(15,23,42,.18);--soft:rgba(15,23,42,.05);--warn:#b45309;--inset:#f1f4f9;--num:#4338ca">
+<div class="lab">P-202 · Propuesta · 1.20 · Claro · 1280 px</div><h1 style="font-size:30px">Estados: vacío, inválido, plegado y copiado</h1>
+<div class="cols"><div class="card" style="width:560px;gap:10px"><h3>Vacío</h3><div class="ed" style="height:150px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center"><span class="cap" style="font-family:'Segoe UI'">Pega aquí tu JSON o coloca anotaciones en el PDF.<br>Aparecerá { "pages": [ … ] } y podrás plegarlo.</span></div><div class="stat"><span class="chip">Sin anotaciones</span></div><div class="cap">Copiar, Descargar y plegar todo quedan desactivados.</div></div><div class="card" style="width:560px;gap:10px"><h3>JSON inválido</h3><div class="ed bad" style="height:235px;"><div class="gut"></div><div style="position:relative;padding:8px 0"><div class="ln"><span class="n">1</span><span class="f">▾</span><span class="t">{</span></div><div class="ln"><span class="n">2</span><span class="f">▾</span><span class="t">  <span class="k">"pages"</span>: [</span></div><div class="ln"><span class="n">3</span><span class="f">▾</span><span class="t">    {</span></div><div class="ln"><span class="n">4</span><span class="f"></span><span class="t">      <span class="k">"num"</span>: <span class="nu">1</span>,</span></div><div class="ln"><span class="n">5</span><span class="f">▾</span><span class="t">      <span class="k">"fields"</span>: [</span></div><div class="ln errl"><span class="n">6</span><span class="f"></span><span class="t">        { <span class="k">"x"</span>: <span class="nu">72</span>, <span class="k">"y"</span>: <span class="nu">710</span>, <span class="k">"mapField"</span>: <span class="s">"nombre"</span> ,</span></div><div class="ln"><span class="n">7</span><span class="f"></span><span class="t">      ]</span></div><div class="ln"><span class="n">8</span><span class="f"></span><span class="t">    }</span></div><div class="ln"><span class="n">9</span><span class="f"></span><span class="t">  ]</span></div><div class="ln"><span class="n">10</span><span class="f"></span><span class="t">}</span></div></div></div><div class="stat"><span class="chip err">✗ Error en la línea 6, columna 52: falta un valor o una coma</span></div><div class="cap">La línea con el error se marca en el margen y en el texto; el plegado sigue funcionando. Esc y Tab sacan el foco.</div></div></div>
+<div class="cols"><div class="card" style="width:560px;gap:10px"><h3>Plegado</h3><div class="ed focus" style="height:140px;"><div class="gut"></div><div style="position:relative;padding:8px 0"><div class="ln"><span class="n">1</span><span class="f"></span><span class="t">{</span></div><div class="ln cur"><span class="n">2</span><span class="f v">▸</span><span class="t">  <span class="k">"pages"</span>: [<span class="dots">…</span>]</span></div><div class="ln"><span class="n">18</span><span class="f"></span><span class="t">}</span></div></div></div><div class="stat"><span class="chip ok">✓ 14 campos</span><span class="cap">· 17 líneas, 15 ocultas</span></div><div class="cap">Flecha ▸ en la línea 2 y cuadro «…». Doble clic en «…» o clic en la flecha lo despliega. El lector anuncia «plegado, 15 líneas».</div></div><div class="card" style="width:560px;gap:10px"><h3>Copiado</h3><div class="ed focus" style="height:140px;"><div class="gut"></div><div style="position:relative;padding:8px 0"><div class="ln"><span class="n">1</span><span class="f"></span><span class="t">{</span></div><div class="ln sel"><span class="n">2</span><span class="f v">▸</span><span class="t">  <span class="k">"pages"</span>: [<span class="dots">…</span>]</span></div><div class="ln"><span class="n">18</span><span class="f"></span><span class="t">}</span></div></div></div><div class="toast"><span class="chip ok">✓</span>Copiado: 17 líneas</div><div class="cap">La selección cubre la línea plegada: Ctrl+C copia el objeto <i>pages</i> entero, no solo «…». Aviso de 2 s.</div></div></div>
+<div class="cols"><div class="card" style="width:560px;gap:10px"><h3>Bloque interior plegado</h3><div class="ed focus" style="height:250px;"><div class="gut"></div><div style="position:relative;padding:8px 0"><div class="ln"><span class="n">1</span><span class="f"></span><span class="t">{</span></div><div class="ln"><span class="n">2</span><span class="f">▾</span><span class="t">  <span class="k">"pages"</span>: [</span></div><div class="ln"><span class="n">3</span><span class="f">▾</span><span class="t">    {</span></div><div class="ln"><span class="n">4</span><span class="f"></span><span class="t">      <span class="k">"num"</span>: <span class="nu">1</span>,</span></div><div class="ln cur"><span class="n">5</span><span class="f v">▸</span><span class="t">      <span class="k">"fields"</span>: [<span class="dots">…</span>]</span></div><div class="ln"><span class="n">10</span><span class="f"></span><span class="t">    },</span></div><div class="ln"><span class="n">11</span><span class="f">▾</span><span class="t">    {</span></div><div class="ln"><span class="n">12</span><span class="f"></span><span class="t">      <span class="k">"num"</span>: <span class="nu">2</span>,</span></div><div class="ln"><span class="n">13</span><span class="f">▾</span><span class="t">      <span class="k">"fields"</span>: [</span></div><div class="ln"><span class="n">14</span><span class="f"></span><span class="t">        { <span class="k">"x"</span>: <span class="nu">72</span>, <span class="k">"y"</span>: <span class="nu">640</span>, <span class="k">"mapField"</span>: <span class="s">"iban"</span>, <span class="k">"type"</span>: <span class="s">"text"</span> }</span></div><div class="ln"><span class="n">15</span><span class="f"></span><span class="t">      ]</span></div><div class="ln"><span class="n">16</span><span class="f"></span><span class="t">    }</span></div><div class="ln"><span class="n">17</span><span class="f"></span><span class="t">  ]</span></div><div class="ln"><span class="n">18</span><span class="f"></span><span class="t">}</span></div></div></div><div class="cap">Se pueden plegar niveles interiores (aquí, <i>fields</i> de la página 1) sin tocar el resto.</div></div>
+<div class="card" style="width:560px;gap:10px"><h3>Personalizar con formato no estricto</h3>
+<div style="display:flex;justify-content:space-between;align-items:center"><h3>Anotaciones JSON</h3><span style="display:flex;gap:8px;align-items:center"><span class="chip ok">✓ 14 campos</span><span class="btn g" style="position:relative">Personalizar<i style="position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--warn)"></i></span></span></div>
+<div class="toast" style="align-self:flex-start">Claves sin comillas · valores simples · coma final</div>
+<div class="cap">El tooltip del botón (y el foco con teclado) explica el formato; el aviso «no es JSON estricto» pasa al modal, donde ya está «No es JSON válido · sirve para JS/TS». Con error de sintaxis, el estado manda y el punto se mantiene.</div></div></div>
+<div class="cap">Claro · 1280 px. Contrastes de texto ≥ 4,5:1; las flechas del margen son botones con nombre («Plegar»/«Desplegar»); sin animación con «reducir movimiento».</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1340}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

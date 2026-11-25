@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-200 Simplificar el JSON y plegar · flujo y reglas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.p h1,.p h2,.p h3,.p p{margin:0}.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}.cols{display:flex;gap:24px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:16px;font-weight:600}
+.btn{font:inherit;font-size:13px;font-weight:600;border:0;border-radius:999px;padding:6px 14px;min-height:34px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.i{width:34px;padding:0;justify-content:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.chip.ok{color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent)}.chip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}.chip.err{color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,transparent)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:3px}.seg span{font-size:12px;font-weight:600;color:var(--muted);border-radius:999px;padding:5px 12px}.seg span.on{background:var(--accent);color:var(--ink)}
+.ed{background:var(--inset);border:1px solid var(--line);border-radius:12px;font-family:Consolas,'Fira Code',monospace;font-size:12.5px;line-height:21px;overflow:hidden;position:relative}
+.ed.focus{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%,transparent)}
+.ed.bad{border-color:var(--danger)}
+.ln{display:flex;height:21px;white-space:pre}.ln .n{width:30px;text-align:right;color:var(--muted);opacity:.7;padding-right:6px;flex:none}.ln .f{width:18px;text-align:center;color:var(--muted);flex:none;font-size:11px}.ln .f.v{color:var(--text)}.ln .t{padding-left:6px;color:var(--text)}
+.ln.sel{background:color-mix(in srgb,var(--accent) 22%,transparent)}.ln.errl{background:color-mix(in srgb,var(--danger) 16%,transparent)}.ln.cur{background:var(--soft)}
+.k{color:var(--accent)}.s{color:var(--warn)}.nu{color:var(--num)}.dots{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:0 7px;line-height:16px;font-size:11px;color:var(--muted);margin:0 2px;vertical-align:1px}
+.gut{position:absolute;left:0;top:0;bottom:0;width:54px;border-right:1px solid var(--line);background:color-mix(in srgb,var(--soft) 60%,transparent)}
+.stat{font-size:12.5px;display:flex;align-items:center;gap:8px;padding:2px 2px}
+.num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:12px;align-items:center;justify-content:center;flex:none}
+.num.r{background:var(--danger);color:#fff}
+.li{display:flex;gap:10px;align-items:flex-start}.li p{line-height:1.45;font-size:14px}
+.tb{width:100%;border-collapse:collapse;font-size:13.5px}.tb th{text-align:left;color:var(--accent);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--line)}.tb td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;background:var(--soft);white-space:nowrap}
+.toast{display:inline-flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 16px;box-shadow:0 12px 32px rgba(0,0,0,.25);font-size:13.5px}
+
+</style>
+</helmet>
+<div class="p" style="width:1720px;height:1060px;--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff6b6b;--text:#f5f5f5;--muted:#b9b9c6;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#14141f;--num:#a5b4fc">
+<div class="lab">P-200 · Propuesta · 1.20 · Flujo y reglas</div><h1 style="font-size:30px">JSON de anotaciones: menos ruido y plegado como en VS Code</h1>
+<div class="cols">
+<div class="card" style="width:560px"><h3>Qué cambia</h3>
+<div class="li"><span class="num">1</span><p><b>Zona más simple.</b> Título, estado («✓ 14 campos»), <b>Personalizar</b> y Ocultar. Desaparecen las píldoras de formato, el aviso «no es JSON estricto» y el texto de «corrige primero».</p></div>
+<div class="li"><span class="num">2</span><p><b>Personalizar</b> abre el modal que ya existe (PR 374): claves, valores, sangría y coma final. Un punto en el botón avisa si el formato no es el estricto.</p></div>
+<div class="li"><span class="num">3</span><p><b>Editor de código</b> con números de línea y flechas ▾/▸ para plegar objetos y arrays, como VS Code. Plegar <i>pages</i> deja dos líneas.</p></div>
+<div class="li"><span class="num">4</span><p><b>Copiar un bloque plegado copia todo su contenido</b>: seleccionas las dos líneas y pegas el objeto completo.</p></div>
+<div class="li"><span class="num">5</span><p>Edición, validación en vivo, «Copiar/Descargar JSON», vista de árbol y claro/oscuro siguen igual.</p></div>
+</div>
+<div class="card" style="width:1060px"><h3>Librería o a mano · justificación</h3><table class="tb"><tr><th></th><th>CodeMirror 6 (recomendada)</th><th>Hecho a mano (textarea + capa)</th></tr>
+<tr><td><b>Peso</b></td><td>Núcleo (state, view, commands, language, lang-json) ≈ 60 KB gzip. Se carga con <span class="kbd">import()</span> al abrir el editor de texto: la landing y el lote no pesan nada más.</td><td>0 KB de librería, pero ~800 líneas propias (capas, medición de caracteres, sincronizar scroll).</td></tr>
+<tr><td><b>Plegar</b></td><td>Margen con flechas y cuadro «…» de serie; atajos y «plegar todo» incluidos.</td><td>Un textarea no puede ocultar líneas: habría que sustituirlo por un contenteditable propio.</td></tr>
+<tr><td><b>Copiar plegado</b></td><td>El plegado es solo visual: seleccionar la línea plegada y Ctrl+C copia el bloque entero.</td><td>Hay que reimplementar selección y portapapeles a mano.</td></tr>
+<tr><td><b>Accesibilidad</b></td><td>Lector de pantalla, foco, IME y teclado resueltos y probados por años; flechas del margen con nombre y estado.</td><td>Alto riesgo: IME, selección, deshacer y lectores se rompen con facilidad.</td></tr>
+<tr><td><b>Riesgo</b></td><td>Sustituye al textarea: e2e (11 usos de <span class="kbd">.json-editor</span>), «ir al campo» y el modelo de texto se adaptan. CSP actual ya permite sus estilos.</td><td>Mantenimiento propio para siempre.</td></tr></table></div>
+</div>
+<div class="cols">
+<div class="card" style="width:560px"><h3>Reglas</h3>
+<div class="li"><span class="num">·</span><p>Texto del editor = fuente de verdad, igual que hoy (<span class="kbd">coordsTextModel</span>, <span class="kbd">preserveTextModel</span>); el plegado no cambia el texto ni el JSON.</p></div>
+<div class="li"><span class="num">·</span><p><span class="kbd">Ctrl+Z / Ctrl+Y</span> siguen siendo los globales de la app (heredado): sin historial propio del editor.</p></div>
+<div class="li"><span class="num">·</span><p>El plegado se recuerda mientras no cambie la estructura; al importar un JSON nuevo se muestra desplegado.</p></div>
+<div class="li"><span class="num">·</span><p>«Ir al campo» desde el visor despliega lo necesario y resalta la línea.</p></div>
+</div>
+<div class="card" style="width:500px"><h3>Atajos de plegado</h3><table class="tb">
+<tr><td>Plegar / desplegar bloque</td><td><span class="kbd">Ctrl+Mayús+[</span> · <span class="kbd">Ctrl+Mayús+]</span></td></tr>
+<tr><td>Plegar / desplegar todo</td><td><span class="kbd">Ctrl+Alt+[</span> · <span class="kbd">Ctrl+Alt+]</span></td></tr>
+<tr><td>Desplegar con ratón</td><td>Flecha del margen o doble clic en «…»</td></tr>
+<tr><td>Salir del editor</td><td><span class="kbd">Esc</span> y luego <span class="kbd">Tab</span></td></tr></table>
+<div class="cap">No se usan los acordes de VS Code (Ctrl+K …) porque Ctrl+K abre la paleta de la app. Van en el diálogo de atajos.</div></div>
+<div class="card" style="width:520px"><h3>Decisiones para ti</h3>
+<div class="li"><span class="num">A</span><p><b>Librería:</b> CodeMirror 6 con carga diferida (recomendado) o a mano. <i>Recomiendo CM6.</i></p></div>
+<div class="li"><span class="num">B</span><p><b>Plegado inicial:</b> todo desplegado (recomendado) o <i>pages</i> plegado al cargar un PDF grande.</p></div>
+<div class="li"><span class="num">C</span><p><b>Botón «Plegar todo / Desplegar todo»</b> en la cabecera del editor: sí (recomendado), además de las flechas.</p></div>
+<div class="li"><span class="num">D</span><p><b>«Copiar bloque»</b> junto a cada flecha: no en esta versión; plegar + seleccionar basta.</p></div>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1060}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

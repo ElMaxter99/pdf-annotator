@@ -24,7 +24,7 @@ test('✕ cierra los tres pasos y no vuelven', async ({ page }) => {
 test('«Pegar JSON» del estado vacío abre el editor de texto', async ({ page }) => {
   await openSidebarTab(page, 'Anotaciones');
   await page.getByTestId('empty-paste').click();
-  await expect(page.locator('textarea.json-editor')).toBeFocused();
+  await expect(page.locator('app-json-code-editor .cm-content')).toBeFocused();
 });
 
 test('los botones de los tres pasos reciben el clic (no lo recoge la zona de clic del PDF)', async ({ page }) => {

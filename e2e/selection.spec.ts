@@ -176,7 +176,7 @@ test('the toolbar buttons duplicate, delete and clear the selection', async ({ p
 });
 
 test('typing in the JSON editor does not trigger selection shortcuts', async ({ page }) => {
-  await page.locator('textarea.json-editor').click();
+  await page.locator('app-json-code-editor .cm-content').click();
   await page.keyboard.press('Control+a');
   await expect(bar(page)).toHaveCount(0);
 });

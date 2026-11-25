@@ -1,5 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
-import { addAnnotation, applyJsonText, EXAMPLE_JSON, fieldCount, jsonEditor, openWorkspace, readJson } from './helpers';
+import { addAnnotation, applyJsonText, EXAMPLE_JSON, expectJsonValue, fieldCount, openWorkspace, readJson } from './helpers';
 
 const undoBtn = (page: Page) => page.getByRole('button', { name: /Deshacer/ });
 const redoBtn = (page: Page) => page.getByRole('button', { name: /Rehacer/ });
@@ -115,5 +115,5 @@ test('loading another PDF resets annotations and history', async ({ page }) => {
   await page.locator('.sidebar-upload input[type=file]').setInputFiles(EXAMPLE_JSON.replace('anotaciones-ejemplo.json', 'factura-ejemplo.pdf'));
   await expect(page.locator('.annotation')).toHaveCount(0);
   await expect(undoBtn(page)).toBeDisabled();
-  await expect(jsonEditor(page)).toHaveValue(/"pages": \[\]/);
+  await expectJsonValue(page, /"pages": \[\]/);
 });

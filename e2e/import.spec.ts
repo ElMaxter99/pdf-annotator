@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { applyJsonText, jsonEditor, openWorkspace, readJson, renderedAnnotations } from './helpers';
+import { applyJsonText, jsonEditor, openWorkspace, readJson, renderedAnnotations, fillJson, expectJsonValue } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await openWorkspace(page);
@@ -93,29 +93,29 @@ test('importing a file refreshes the JSON editor', async ({ page }) => {
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify({ pages: [{ num: 1, fields: [{ x: 5, y: 6, mapField: 'desdeArchivo' }] }] })),
   });
-  await expect(jsonEditor(page)).toHaveValue(/desdeArchivo/);
+  await expectJsonValue(page, /desdeArchivo/);
 });
 
 test('shows whether the JSON is valid, with the error position', async ({ page }) => {
   const status = page.locator('.json-status');
-  await jsonEditor(page).fill('{ "pages": [ { "num": 1, "fields": [ { "x": 1, "y": 2, "mapField": "a" }, { "x": 3, "y": 4, "mapField": "b" } ] } ] }');
+  await fillJson(page, '{ "pages": [ { "num": 1, "fields": [ { "x": 1, "y": 2, "mapField": "a" }, { "x": 3, "y": 4, "mapField": "b" } ] } ] }');
   await expect(status).toContainText('JSON válido');
   await expect(status).toContainText('2');
 
-  await jsonEditor(page).fill('{ "pages": [\n  { "num": 1 "fields": [] }\n] }');
+  await fillJson(page, '{ "pages": [\n  { "num": 1 "fields": [] }\n] }');
   await expect(status).toContainText('línea 2');
 
-  await jsonEditor(page).fill('{ "foo": 1 }');
+  await fillJson(page, '{ "foo": 1 }');
   await expect(status).toContainText('«pages»');
 });
 
 test('applying invalid JSON explains where the problem is', async ({ page }) => {
-  await jsonEditor(page).fill('{ "pages": [\n  { "num": 1 "fields": [] }\n] }');
+  await fillJson(page, '{ "pages": [\n  { "num": 1 "fields": [] }\n] }');
   await page.keyboard.press('Control+s');
   await expect(page.locator('.toast--error')).toContainText('línea 2');
 
   await page.locator('.toast__close').click();
-  await jsonEditor(page).fill('{ "foo": 1 }');
+  await fillJson(page, '{ "foo": 1 }');
   await page.keyboard.press('Control+s');
   await expect(page.locator('.toast--error')).toContainText('pages');
 });
@@ -150,7 +150,7 @@ test.describe('import warnings', () => {
     await expect(page.locator('.toast')).toHaveCount(0);
 
     // Auto-apply while typing is silent even when the content has problems.
-    await jsonEditor(page).fill(JSON.stringify([{ num: 1, fields: [{ x: 'bad', y: 1, mapField: 'x' }] }]));
+    await fillJson(page, JSON.stringify([{ num: 1, fields: [{ x: 'bad', y: 1, mapField: 'x' }] }]));
     await page.waitForTimeout(800);
     await expect(page.locator('.toast')).toHaveCount(0);
   });

@@ -197,6 +197,13 @@
       "values": "Werte: {{value}}",
       "customize": "Anpassen",
       "title": "JSON anpassen"
+    },
+    "jsonEditor": {
+      "label": "Editor für das Annotations-JSON",
+      "foldAll": "Alles einklappen",
+      "unfoldAll": "Alles ausklappen",
+      "fold": "Einklappen",
+      "unfold": "Ausklappen"
     }
   },
   "guides": {
