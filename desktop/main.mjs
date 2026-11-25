@@ -7,7 +7,7 @@ import { accessSync, appendFileSync, constants as fsConstants, existsSync, readF
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, classifyInstallError, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
+import { RELEASES_URL, REPO, classifyInstallError, feedForVersion, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { setupProjectsIpc } from './projects-ipc.mjs';
@@ -173,13 +173,29 @@ async function checkManual() {
   }
 }
 
+// «Últimas»: electron-updater, desde una «-rc.N», solo mira RC del mismo canal y nunca la final. Se elige la release
+// más reciente (RC o final) con la API y se apunta el actualizador a ella.
+async function pinLatestFeed() {
+  if (process.env.PDF_ANNOTATOR_UPDATE_URL) return;
+  const res = await net.fetch(process.env.PDF_ANNOTATOR_RELEASE_API || `${releasesApi}?per_page=30`, { headers: { accept: 'application/vnd.github+json' } });
+  if (!res.ok) throw new Error(`GitHub ${res.status}`);
+  const best = parseReleaseForChannel(await res.json(), { prerelease: true });
+  const feed = best && feedForVersion(best.version);
+  if (!feed) return;
+  autoUpdater.channel = feed.channel;
+  autoUpdater.setFeedURL({ provider: 'generic', url: feed.url });
+}
+
 async function checkForUpdates() {
   if (['downloading', 'ready', 'installing'].includes(state.status) || state.checking) return;
   if (!app.isPackaged && !process.env.PDF_ANNOTATOR_UPDATE_URL && !process.env.PDF_ANNOTATOR_RELEASE_API) return;
   setState({ checking: true });
   try {
     if (mode === 'manual') await checkManual();
-    else await autoUpdater.checkForUpdates();
+    else {
+      if (channel === 'latest') await pinLatestFeed();
+      await autoUpdater.checkForUpdates();
+    }
     setState({ lastChecked: Date.now() });
   } catch (e) {
     console.warn('[desktop] comprobación de versión:', e?.message || e); // sin red: sin ruido

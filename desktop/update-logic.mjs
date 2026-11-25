@@ -88,6 +88,18 @@ export function parseReleaseForChannel(json, { prerelease = false } = {}) {
   return best;
 }
 
+/**
+ * Versión elegida → feed «generic» de esa release y nombre del canal de electron-updater. electron-updater con
+ * `allowPrerelease` solo acepta etiquetas del mismo canal que la versión instalada (desde una «-rc.N» nunca ve la final),
+ * así que en «Últimas» se fija la etiqueta elegida y el archivo de canal que le corresponde (`rc.yml` o `latest.yml`).
+ */
+export function feedForVersion(version) {
+  const parsed = parseVersion(version);
+  if (!parsed) return null;
+  const clean = parsed.nums.join('.') + (parsed.pre ? `-${parsed.pre}` : '');
+  return { url: `${RELEASES_URL}/download/v${clean}/`, channel: parsed.pre ? String(parsed.pre).split('.')[0] : 'latest' };
+}
+
 export const bytesToMb = (n) => Math.round((Number(n) || 0) / 1048576);
 
 /**
