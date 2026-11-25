@@ -107,6 +107,13 @@ export class AddADialogComponent {
   });
   readonly withTemplate = computed(() => this.matches().filter((m) => m.pages).length);
 
+  /** «340 KB» / «1,2 MB». */
+  size(bytes: number): string {
+    return bytes < 1048576
+      ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+      : `${(bytes / 1048576).toFixed(1)} MB`;
+  }
+
   open(): void {
     this.entries.set([]);
     this.included.set(new Set());

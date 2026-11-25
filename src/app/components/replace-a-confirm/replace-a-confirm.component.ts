@@ -5,6 +5,30 @@ import type { BatchItem } from '../../models/batch.model';
 import { PdfTextService } from '../../services/pdf-text.service';
 import { countFields } from '../../utils/template-update.utils';
 
+interface PdfInfo {
+  readonly pages: number;
+  readonly w: number;
+  readonly h: number;
+}
+
+const SHEETS: ReadonlyArray<readonly [string, number, number]> = [
+  ['A4', 595, 842],
+  ['A3', 842, 1191],
+  ['A5', 420, 595],
+  ['Letter', 612, 792],
+  ['Legal', 612, 1008],
+];
+
+/** «A4», «Letter»… (any orientation) or the size in points. */
+function sheetName(info: PdfInfo | null | undefined): string {
+  if (!info) {
+    return '';
+  }
+  const [lo, hi] = [Math.min(info.w, info.h), Math.max(info.w, info.h)];
+  const known = SHEETS.find(([, w, h]) => Math.abs(w - lo) <= 3 && Math.abs(h - hi) <= 3);
+  return known ? known[0] : `${Math.round(info.w)} × ${Math.round(info.h)} pt`;
+}
+
 /**
  * Confirmación de «Reemplazar A» (P-190 a P-192): compara el PDF actual con el nuevo y dice qué se
  * conserva, qué se descarta y qué puede quedar desfasado, antes de cambiar nada.
@@ -26,8 +50,17 @@ export class ReplaceAConfirmComponent {
   readonly cancelled = output<void>();
 
   /** Pages of the current and of the new PDF; `undefined` while reading, `null` if unreadable. */
-  readonly pagesOld = signal<number | null | undefined>(undefined);
-  readonly pagesNew = signal<number | null | undefined>(undefined);
+  readonly infoOld = signal<PdfInfo | null | undefined>(undefined);
+  readonly infoNew = signal<PdfInfo | null | undefined>(undefined);
+  readonly pagesOld = computed(() => this.infoOld() && (this.infoOld() as PdfInfo).pages);
+  readonly pagesNew = computed(() => this.infoNew() && (this.infoNew() as PdfInfo).pages);
+  readonly sizeOld = computed(() => sheetName(this.infoOld()));
+  readonly sizeNew = computed(() => sheetName(this.infoNew()));
+  readonly sizeDiffers = computed(() => {
+    const a = this.infoOld();
+    const b = this.infoNew();
+    return !!a && !!b && (Math.abs(a.w - b.w) > 2 || Math.abs(a.h - b.h) > 2);
+  });
 
   readonly fieldsA = computed(() => countFields(this.item().aPages));
   readonly fieldsB = computed(() => countFields(this.item().bPages ?? []));
@@ -43,7 +76,7 @@ export class ReplaceAConfirmComponent {
     const b = this.pagesNew();
     return typeof a === 'number' && typeof b === 'number' && a !== b;
   });
-  readonly unreadable = computed(() => this.pagesNew() === null);
+  readonly unreadable = computed(() => this.infoNew() === null);
 
   @HostListener('document:keydown.escape', ['$event'])
   onEscape(event: Event): void {
@@ -55,10 +88,10 @@ export class ReplaceAConfirmComponent {
     effect(() => {
       const item = this.item();
       const file = this.file();
-      this.pagesOld.set(undefined);
-      this.pagesNew.set(undefined);
-      void this.pdfText.pageCount(item.aPdf).then((n) => this.pagesOld.set(n));
-      void this.pdfText.pageCount(file).then((n) => this.pagesNew.set(n));
+      this.infoOld.set(undefined);
+      this.infoNew.set(undefined);
+      void this.pdfText.pageInfo(item.aPdf).then((n) => this.infoOld.set(n));
+      void this.pdfText.pageInfo(file).then((n) => this.infoNew.set(n));
     });
   }
 }

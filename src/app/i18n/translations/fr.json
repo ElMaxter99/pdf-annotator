@@ -1396,7 +1396,8 @@
       "review": "La ligne repasse en «À réviser».",
       "go": "Remplacer A",
       "undoNotice": "A remplacé. La ligne repasse en «À réviser».",
-      "done": "A remplacé. La ligne repasse en «À réviser»."
+      "done": "A remplacé. La ligne repasse en «À réviser».",
+      "sizeWarn": "La nouvelle feuille a une autre taille ({{old}} → {{next}}) : les coordonnées du modèle sont conservées telles quelles. Vérifiez la ligne ou utilisez «Ajuster A à B» ensuite."
     }
   },
   "preview": {

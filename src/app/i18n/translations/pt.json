@@ -1396,7 +1396,8 @@
       "review": "A linha volta a «Em revisão».",
       "go": "Substituir A",
       "undoNotice": "A substituído. A linha volta a «Em revisão».",
-      "done": "A substituído. A linha volta a «Em revisão»."
+      "done": "A substituído. A linha volta a «Em revisão».",
+      "sizeWarn": "A folha nova tem outro tamanho ({{old}} → {{next}}): as coordenadas do modelo mantêm-se tal como estão. Reveja a linha ou use depois «Ajustar A a B»."
     }
   },
   "preview": {

@@ -1396,7 +1396,8 @@
       "review": "The row goes back to «In review».",
       "go": "Replace A",
       "undoNotice": "A replaced. The row goes back to «In review».",
-      "done": "A replaced. The row goes back to «In review»."
+      "done": "A replaced. The row goes back to «In review».",
+      "sizeWarn": "The new sheet has a different size ({{old}} → {{next}}): the template coordinates are kept as they are. Review the row or use «Fit A to B» afterwards."
     }
   },
   "preview": {

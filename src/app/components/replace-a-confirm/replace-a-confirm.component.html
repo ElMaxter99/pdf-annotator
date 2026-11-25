@@ -12,12 +12,12 @@
       <div class="ra-tile">
         <strong>{{ item().name }}</strong>
         {{ 'batch.replaceA.current' | t }} ·
-        @if (pagesOld() === undefined) { … } @else if (pagesOld() === null) { ? } @else { {{ 'batch.replaceA.pages' | t: { count: pagesOld() } }} }
+        @if (infoOld() === undefined) { … } @else if (infoOld() === null) { ? } @else { {{ 'batch.replaceA.pages' | t: { count: pagesOld() } }} · {{ sizeOld() }} }
       </div>
       <div class="ra-tile">
         <strong>{{ file().name }}</strong>
         {{ 'batch.replaceA.next' | t }} ·
-        @if (pagesNew() === undefined) { … } @else if (pagesNew() === null) { ? } @else { {{ 'batch.replaceA.pages' | t: { count: pagesNew() } }} }
+        @if (infoNew() === undefined) { … } @else if (infoNew() === null) { ? } @else { {{ 'batch.replaceA.pages' | t: { count: pagesNew() } }} · {{ sizeNew() }} }
       </div>
     </div>
     @if (unreadable()) {
@@ -66,6 +66,9 @@
     </div>
     @if (pagesDiffer()) {
       <p class="upd-text" data-testid="replace-a-pages-warn">{{ 'batch.replaceA.pagesWarn' | t: { old: pagesOld(), next: pagesNew() } }}</p>
+    }
+    @if (sizeDiffers()) {
+      <p class="upd-text" data-testid="replace-a-size-warn">{{ 'batch.replaceA.sizeWarn' | t: { old: sizeOld(), next: sizeNew() } }}</p>
     }
     <p class="upd-text">{{ 'batch.replaceA.review' | t }}</p>
     <div class="upd-actions">

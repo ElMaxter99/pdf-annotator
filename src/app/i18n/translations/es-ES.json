@@ -1396,7 +1396,8 @@
       "review": "La fila vuelve a «En revisión».",
       "go": "Reemplazar A",
       "undoNotice": "A reemplazado. La fila vuelve a «En revisión».",
-      "done": "A reemplazado. La fila vuelve a «En revisión»."
+      "done": "A reemplazado. La fila vuelve a «En revisión».",
+      "sizeWarn": "La hoja nueva mide distinto ({{old}} → {{next}}): las coordenadas de la plantilla se conservan tal cual. Revisa la fila o usa «Ajustar A a B» después."
     }
   },
   "preview": {

@@ -1396,7 +1396,8 @@
       "review": "La fila torna a «En revisió».",
       "go": "Reemplaça A",
       "undoNotice": "A reemplaçat. La fila torna a «En revisió».",
-      "done": "A reemplaçat. La fila torna a «En revisió»."
+      "done": "A reemplaçat. La fila torna a «En revisió».",
+      "sizeWarn": "El full nou fa una altra mida ({{old}} → {{next}}): les coordenades de la plantilla es conserven tal qual. Revisa la fila o usa «Ajusta A a B» després."
     }
   },
   "preview": {

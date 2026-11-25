@@ -705,7 +705,8 @@ export class WorkspaceBatch {
       return;
     }
     this.flushBatchSave(true);
-    if (!this.batch.replaceA(item.id, file)) {
+    const previous = this.batch.replaceA(item.id, file);
+    if (!previous) {
       return;
     }
     this.clearSelection();
@@ -713,7 +714,18 @@ export class WorkspaceBatch {
     if (updated) {
       await this.openBatchPdf(updated, this.store.snapshot());
     }
-    this.toast.show(this.translationService.translate('batch.replaceA.done'), 'success');
+    this.toast.show(this.translationService.translate('batch.replaceA.done'), 'success', 10000, false, {
+      label: this.translationService.translate('batch.bulk.undo'),
+      run: () => {
+        this.flushBatchSave(true);
+        this.batch.restoreA(previous);
+        const restored = this.batch.activeItem();
+        if (restored && restored.id === previous.id) {
+          this.clearSelection();
+          void this.openBatchPdf(restored, this.store.snapshot());
+        }
+      },
+    });
   }
 
   /** Adds the new version (B). Annotations already placed become the template A if it was empty. */

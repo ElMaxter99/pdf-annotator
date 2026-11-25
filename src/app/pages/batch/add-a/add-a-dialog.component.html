@@ -43,7 +43,7 @@
                   <div class="upd-row" [class.upd-row--on]="!entry.duplicate || isIncluded(entry)" [class.upd-row--off]="entry.duplicate && !isIncluded(entry)">
                     <span class="upd-name">
                       <span>{{ entry.file.name }}</span>
-                      <small>{{ entry.file.size / 1048576 | number: '1.1-1' }} MB</small>
+                      <small>{{ size(entry.file.size) }}</small>
                     </span>
                     @if (entry.duplicate) {
                       <label class="add-dup">
@@ -61,7 +61,7 @@
               <div class="add-tiles">
                 <div class="add-tile"><strong>{{ plan().length }}</strong>{{ 'batch.addA.tileAdd' | t }}</div>
                 <div class="add-tile"><strong>{{ omitted() }}</strong>{{ 'batch.addA.tileOmitted' | t }}</div>
-                <div class="add-tile"><strong>{{ totalBytes() / 1048576 | number: '1.1-1' }} MB</strong>{{ 'batch.addA.tileSize' | t }}</div>
+                <div class="add-tile"><strong>{{ size(totalBytes()) }}</strong>{{ 'batch.addA.tileSize' | t }}</div>
               </div>
             }
             <div class="upd-actions">

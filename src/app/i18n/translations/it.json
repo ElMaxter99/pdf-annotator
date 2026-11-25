@@ -1396,7 +1396,8 @@
       "review": "La riga torna «Da rivedere».",
       "go": "Sostituisci A",
       "undoNotice": "A sostituito. La riga torna «Da rivedere».",
-      "done": "A sostituito. La riga torna «Da rivedere»."
+      "done": "A sostituito. La riga torna «Da rivedere».",
+      "sizeWarn": "Il nuovo foglio ha un’altra misura ({{old}} → {{next}}): le coordinate del modello restano così come sono. Rivedi la riga o usa poi «Adatta A a B»."
     }
   },
   "preview": {
