@@ -38,6 +38,29 @@ export function diffRange(
   return { from: start, to: endPrev, insert: next.slice(start, endNext) };
 }
 
+/** Lo que dura el destello al copiar, en ms (la animación del SCSS dura lo mismo). */
+export const COPY_FLASH_MS = 600;
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** Flecha del margen de plegado con la forma de VS Code (abajo = desplegado, derecha = plegado). */
+function chevron(open: boolean): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 16 16');
+  svg.setAttribute('width', '16');
+  svg.setAttribute('height', '16');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', open ? 'M3.5 6 8 10.5 12.5 6' : 'M6 3.5 10.5 8 6 12.5');
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', 'currentColor');
+  path.setAttribute('stroke-width', '1.4');
+  path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('stroke-linejoin', 'round');
+  svg.appendChild(path);
+  return svg;
+}
+
 /**
  * Editor de código del JSON de anotaciones (P-200 a P-202): CodeMirror 6 con margen de plegado como VS Code.
  * Se carga de forma diferida (`import()`) para que ni la landing ni el lote paguen su peso. El plegado es solo
@@ -142,26 +165,89 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
     });
     const foldLabel = () => this.foldLabel();
     const unfoldLabel = () => this.unfoldLabel();
+    // Destello al copiar (como «highlight on copy» de VS Code): marca lo copiado un instante.
+    const flashEffect = state.StateEffect.define<{ from: number; to: number }[]>();
+    const flashField = state.StateField.define({
+      create: () => view.Decoration.none,
+      update: (deco, tr) => {
+        let next = deco.map(tr.changes);
+        for (const e of tr.effects) {
+          if (e.is(flashEffect)) {
+            next = view.Decoration.set(
+              e.value
+                .filter((r) => r.to > r.from)
+                .map((r) => view.Decoration.mark({ class: 'cm-copyFlash' }).range(r.from, r.to)),
+              true,
+            );
+          }
+        }
+        return next;
+      },
+      provide: (f) => view.EditorView.decorations.from(f),
+    });
+    let flashTimer: ReturnType<typeof setTimeout> | null = null;
+    const flashCopy = (v: EditorView) => {
+      const sel = v.state.selection;
+      const ranges = sel.ranges.some((r) => !r.empty)
+        ? sel.ranges.filter((r) => !r.empty).map((r) => ({ from: r.from, to: r.to }))
+        : // Sin selección, copiar copia la línea entera (como VS Code): se destella la línea.
+          sel.ranges.map((r) => {
+            const line = v.state.doc.lineAt(r.head);
+            return { from: line.from, to: line.to };
+          });
+      v.dispatch({ effects: flashEffect.of(ranges) });
+      if (flashTimer) clearTimeout(flashTimer);
+      flashTimer = setTimeout(() => {
+        flashTimer = null;
+        if (this.view === v) v.dispatch({ effects: flashEffect.of([]) });
+      }, COPY_FLASH_MS);
+    };
+    // Fondo de la línea plegada (como `editor.foldBackground` de VS Code).
+    const foldedLines = view.ViewPlugin.fromClass(
+      class {
+        decorations: import('@codemirror/view').DecorationSet;
+        constructor(v: EditorView) {
+          this.decorations = this.build(v);
+        }
+        update(u: import('@codemirror/view').ViewUpdate) {
+          this.decorations = this.build(u.view);
+        }
+        build(v: EditorView) {
+          const marks: import('@codemirror/state').Range<import('@codemirror/view').Decoration>[] =
+            [];
+          const iter = language.foldedRanges(v.state).iter();
+          for (; iter.value; iter.next()) {
+            marks.push(
+              view.Decoration.line({ class: 'cm-foldedLine' }).range(
+                v.state.doc.lineAt(iter.from).from,
+              ),
+            );
+          }
+          return view.Decoration.set(marks, true);
+        }
+      },
+      { decorations: (p) => p.decorations },
+    );
     const extensions = [
       view.lineNumbers(),
       language.foldGutter({
-        openText: '▾',
-        closedText: '▸',
         markerDOM: (open) => {
           const el = document.createElement('span');
-          el.className = 'cm-foldMarker';
-          el.textContent = open ? '▾' : '▸';
+          el.className = open ? 'cm-foldMarker' : 'cm-foldMarker cm-foldMarker--folded';
           el.title = open ? foldLabel() : unfoldLabel();
           el.setAttribute('aria-label', el.title);
           el.setAttribute('role', 'button');
+          el.appendChild(chevron(open));
           return el;
         },
       }),
+      foldedLines,
+      flashField,
       language.codeFolding({
         placeholderDOM: (v, onclick) => {
           const el = document.createElement('span');
           el.className = 'cm-foldPlaceholder';
-          el.textContent = '…';
+          el.textContent = '⋯';
           el.title = unfoldLabel();
           el.setAttribute('role', 'button');
           el.setAttribute('aria-label', unfoldLabel());
@@ -196,6 +282,10 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
           this.pasted.emit();
           return false;
         },
+        copy: (_e, v) => {
+          flashCopy(v);
+          return false;
+        },
       }),
       errorField,
       ...(this.placeholderText() ? [view.placeholder(this.placeholderText())] : []),
@@ -218,7 +308,9 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   private extensions: import('@codemirror/state').Extension[] = [];
-  private externalAnnotation: ReturnType<typeof import('@codemirror/state').Annotation.define<boolean>> | null = null;
+  private externalAnnotation: ReturnType<
+    typeof import('@codemirror/state').Annotation.define<boolean>
+  > | null = null;
 
   ngOnDestroy(): void {
     this.destroyed = true;
@@ -257,7 +349,10 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
     const change = diffRange(prev, next);
     view.dispatch({
       changes: change,
-      annotations: [this.externalAnnotation.of(true), this.cm!.state.Transaction.addToHistory.of(false)],
+      annotations: [
+        this.externalAnnotation.of(true),
+        this.cm!.state.Transaction.addToHistory.of(false),
+      ],
     });
   }
 
