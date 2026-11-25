@@ -749,7 +749,8 @@
       "assignPlaceholder": "Zuweisen…",
       "pdfs": "PDFs",
       "withTemplate": "mit Vorlage",
-      "withoutTemplate": "ohne Vorlage"
+      "withoutTemplate": "ohne Vorlage",
+      "search": "Vorlage suchen…"
     },
     "versionsDrop": {
       "title": "Neue Versionen (B)",
@@ -760,9 +761,12 @@
       "more": "Mehr hinzufügen",
       "unpairedTitle": "Dateien ohne Zuordnung: {{count}}",
       "unpairedText": "Sie passen zu keinem PDF im Stapel: manuell zuordnen oder verwerfen.",
-      "assign": "Zuordnen zu…",
+      "assign": "PDF wählen…",
       "assignLabel": "{{name}} einem PDF zuordnen",
-      "discard": "Verwerfen"
+      "discard": "Verwerfen",
+      "search": "PDF suchen…",
+      "noneFree": "Alle PDFs haben bereits eine B",
+      "linked": "{{file}} mit {{name}} verknüpft"
     },
     "filter": {
       "label": "Nach Status filtern",
@@ -2038,7 +2042,9 @@
       "themeLight": "Zum hellen Design wechseln",
       "language": "Sprache: {{language}}",
       "snapOn": "Beim Ziehen an anderen Anmerkungen ausrichten: einschalten",
-      "snapOff": "Beim Ziehen an anderen Anmerkungen ausrichten: ausschalten"
+      "snapOff": "Beim Ziehen an anderen Anmerkungen ausrichten: ausschalten",
+      "mapLabelOn": "mapField neben jeder Anmerkung anzeigen",
+      "mapLabelOff": "mapField der Anmerkungen ausblenden"
     },
     "group": {
       "batch": "Stapel",
@@ -2712,7 +2718,45 @@
       "altHint": "Halte Alt (⌥ am Mac) beim Ziehen gedrückt, um in dem Moment nicht auszurichten.",
       "jsonKeys": "JSON-Format",
       "jsonKeysHelp": "Schlüssel und Anführungszeichen der Werte im Editor „Annotationen (JSON)“, beim Kopieren und Herunterladen. Der Import liest jedes Format.",
-      "jsonQuote": "Anführungszeichen der Werte"
+      "jsonQuote": "Anführungszeichen der Werte",
+      "mapLabel": "mapField neben jeder Anmerkung anzeigen",
+      "mapLabelHelp": "Mini-Etikett und Feld mit dem vollen Namen jeder Anmerkung. Weitere Einstellungen unter Erweitert."
     }
+  },
+  "mapLabel": {
+    "title": "Anmerkungen erkennen",
+    "info": "Zeigt das Ende des mapField neben jeder Anmerkung und den vollen Namen beim Darüberfahren oder per Tab-Fokus. Nur auf dem Bildschirm: nicht im PDF und nicht im JSON.",
+    "show": "mapField neben jeder Anmerkung anzeigen",
+    "showHelp": "Mini-Etikett mit dem Namensende.",
+    "legend": "mapField anzeigen",
+    "scope": {
+      "label": "Welche Anmerkungen",
+      "check": "Kontrollkästchen und Optionen",
+      "all": "Alle"
+    },
+    "max": "Maximale Zeichenzahl",
+    "maxError": "Zwischen 8 und 40 Zeichen.",
+    "position": {
+      "label": "Position",
+      "auto": "Automatisch",
+      "right": "Rechts",
+      "above": "Darüber"
+    },
+    "tooltip": "Feld mit dem vollen Namen",
+    "tooltipHelp": "Beim Darüberfahren oder Fokussieren. Esc schließt es.",
+    "preview": "So sieht es aus:",
+    "screenOnly": "Nur auf dem Bildschirm: nicht im PDF und nicht im JSON.",
+    "reset": "Zurücksetzen",
+    "hidden": "Ausgeblendete Etiketten: {{count}} · näher zoomen",
+    "none": "ohne mapField",
+    "meta": "{{type}} · Seite {{page}} · x {{x}} · y {{y}}"
+  },
+  "search": {
+    "total": "{{total}} verfügbar",
+    "count": "{{shown}} von {{total}}",
+    "noMatch": "Nichts passt zu „{{query}}“.",
+    "clear": "Suche löschen",
+    "suggested": "Vorgeschlagen",
+    "all": "Alle"
   }
 }

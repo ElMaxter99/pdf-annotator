@@ -73,6 +73,7 @@ import { AnnotationDragController } from './annotation-drag.controller';
 import { createPageLinkState } from './page-link.state';
 import { WorkspaceJson } from './workspace-json';
 import { WorkspaceView } from './workspace-view';
+import { WorkspaceMapLabel } from './workspace-maplabel';
 import { WorkspaceBatch } from './workspace-batch';
 import { WorkspaceSelection } from './workspace-selection';
 import { WorkspacePairing } from './workspace-pairing';
@@ -147,6 +148,7 @@ import {
   AdjustSession,
   NoticeId,
   PairTarget,
+  MapTip,
 } from './workspace.types';
 export type { AdjustSession, NoticeId } from './workspace.types';
 
@@ -177,6 +179,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly pdfDoc = signal<PDFDocumentProxy | null>(null);
   readonly vm: WorkspacePageComponent;
   pageIndex = signal(1);
+  /** Tooltip with the full mapField (P-184 a P-186) and how many labels did not fit. */
+  readonly mapTip = signal<MapTip | null>(null);
+  readonly mapLabelsHidden = signal(0);
+  readonly mapLabelMaxError = signal(false);
+  mapTipTimer: ReturnType<typeof setTimeout> | undefined;
+  mapTipAbort?: AbortController;
   scale = signal(1.5);
   /** Floating zoom indicator (P-59); `limit` is set when the request hit 25 % or 400 %. */
   readonly zoomHud = signal<{ percent: number; limit: ZoomLimit; side?: 'A' | 'B' } | null>(null);
@@ -696,6 +704,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     effect(() => {
       this.previewSettings.context();
       this.previewSettings.showOrigin();
+      this.previewSettings.mapLabel();
       this.translationService.language();
       untracked(() => this.redrawAllForPage());
     });
@@ -751,6 +760,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       window.removeEventListener('blur', this.windowBlurHandler);
     }
     this.endPan();
+    clearTimeout(this.mapTipTimer);
+    this.mapTipAbort?.abort();
     this.removeZoomCommandListener?.();
     if (this.zoomHudTimer) clearTimeout(this.zoomHudTimer);
     if (this.wheelEdgeTimer) clearTimeout(this.wheelEdgeTimer);
@@ -2437,6 +2448,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
     this.refreshOverlay();
     this.redrawReference();
+    this.runAfterRender(() => this.drawMapLabels(layer));
   }
 
   // ---- batch migration (A = reference layer, B = what is edited) -------------------------------
@@ -2658,6 +2670,7 @@ const WORKSPACE_PARTS = [
   WorkspaceBatch,
   WorkspaceView,
   WorkspaceJson,
+  WorkspaceMapLabel,
 ] as const;
 export interface WorkspacePageComponent
   extends WorkspaceAi,
@@ -2666,7 +2679,8 @@ export interface WorkspacePageComponent
     WorkspaceSelection,
     WorkspaceBatch,
     WorkspaceView,
-    WorkspaceJson {}
+    WorkspaceJson,
+    WorkspaceMapLabel {}
 for (const part of WORKSPACE_PARTS) {
   for (const name of Object.getOwnPropertyNames(part.prototype)) {
     if (name !== 'constructor') {

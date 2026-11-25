@@ -749,7 +749,8 @@
       "assignPlaceholder": "Assegna…",
       "pdfs": "PDF",
       "withTemplate": "con modello",
-      "withoutTemplate": "senza modello"
+      "withoutTemplate": "senza modello",
+      "search": "Cerca modello…"
     },
     "versionsDrop": {
       "title": "Nuove versioni (B)",
@@ -760,9 +761,12 @@
       "more": "Aggiungi altre",
       "unpairedTitle": "File senza abbinamento: {{count}}",
       "unpairedText": "Non corrispondono a nessun PDF del lotto: assegnali a mano o scartali.",
-      "assign": "Assegna a…",
+      "assign": "Scegli PDF…",
       "assignLabel": "Assegna {{name}} a un PDF",
-      "discard": "Scarta"
+      "discard": "Scarta",
+      "search": "Cerca PDF…",
+      "noneFree": "Tutti i PDF hanno già una B",
+      "linked": "{{file}} collegato a {{name}}"
     },
     "filter": {
       "label": "Filtra per stato",
@@ -2038,7 +2042,9 @@
       "themeLight": "Passa al tema chiaro",
       "language": "Lingua: {{language}}",
       "snapOn": "Allinea alle altre annotazioni durante il trascinamento: attiva",
-      "snapOff": "Allinea alle altre annotazioni durante il trascinamento: disattiva"
+      "snapOff": "Allinea alle altre annotazioni durante il trascinamento: disattiva",
+      "mapLabelOn": "Mostra il mapField accanto a ogni annotazione",
+      "mapLabelOff": "Nascondi il mapField delle annotazioni"
     },
     "group": {
       "batch": "Lotto",
@@ -2712,7 +2718,45 @@
       "altHint": "Tieni premuto Alt (⌥ su Mac) mentre trascini per non allineare in quel momento.",
       "jsonKeys": "Formato del JSON",
       "jsonKeysHelp": "Chiavi e virgolette dei valori nell'editor «Annotazioni (JSON)», quando copi e quando scarichi. L'importazione legge qualsiasi formato.",
-      "jsonQuote": "Virgolette dei valori"
+      "jsonQuote": "Virgolette dei valori",
+      "mapLabel": "Mostra il mapField accanto a ogni annotazione",
+      "mapLabelHelp": "Mini etichetta e riquadro con il nome completo di ogni annotazione. Altre impostazioni in Avanzate."
     }
+  },
+  "mapLabel": {
+    "title": "Identificare le annotazioni",
+    "info": "Mostra la fine del mapField accanto a ogni annotazione e il nome completo al passaggio del cursore o con il focus da Tab. Solo a schermo: non compare nel PDF né nel JSON.",
+    "show": "Mostra il mapField accanto a ogni annotazione",
+    "showHelp": "Mini etichetta con la fine del nome.",
+    "legend": "Mostra mapField",
+    "scope": {
+      "label": "Quali annotazioni",
+      "check": "Caselle e opzioni",
+      "all": "Tutte"
+    },
+    "max": "Massimo di caratteri",
+    "maxError": "Tra 8 e 40 caratteri.",
+    "position": {
+      "label": "Posizione",
+      "auto": "Automatica",
+      "right": "A destra",
+      "above": "Sopra"
+    },
+    "tooltip": "Riquadro con il nome completo",
+    "tooltipHelp": "Al passaggio del cursore o con il focus. Esc lo chiude.",
+    "preview": "Anteprima:",
+    "screenOnly": "Solo a schermo: non compare nel PDF né nel JSON.",
+    "reset": "Ripristina",
+    "hidden": "Etichette nascoste: {{count}} · ingrandisci",
+    "none": "senza mapField",
+    "meta": "{{type}} · pagina {{page}} · x {{x}} · y {{y}}"
+  },
+  "search": {
+    "total": "{{total}} disponibili",
+    "count": "{{shown}} di {{total}}",
+    "noMatch": "Nessun risultato per «{{query}}».",
+    "clear": "Cancella ricerca",
+    "suggested": "Suggeriti",
+    "all": "Tutti"
   }
 }

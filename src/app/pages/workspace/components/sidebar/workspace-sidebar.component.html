@@ -404,6 +404,55 @@
     </div>
       </section>
 
+  <section class="preview-panel maplabel-panel" aria-labelledby="maplabel-title">
+    <h2 id="maplabel-title">{{ 'mapLabel.title' | t }} <app-info-tip [text]="'mapLabel.info' | t"></app-info-tip></h2>
+    <label class="maplabel-check">
+      <input type="checkbox" [checked]="vm.previewSettings.mapLabel().show"
+        (change)="vm.previewSettings.setMapLabelShow($any($event.target).checked)" data-testid="advanced-maplabel" />
+      <span>{{ 'mapLabel.show' | t }}</span>
+    </label>
+    <fieldset class="maplabel-panel__opts" [disabled]="!vm.previewSettings.mapLabel().show">
+      <div class="options__field">
+        <span class="maplabel-panel__label" id="maplabel-scope-label">{{ 'mapLabel.scope.label' | t }}</span>
+        <div class="options__chips" role="group" aria-labelledby="maplabel-scope-label">
+          @for (s of ['check', 'all']; track s) {
+            <button type="button" class="options__chip" [attr.aria-pressed]="vm.previewSettings.mapLabel().scope === s"
+              (click)="vm.previewSettings.setMapLabelScope($any(s))" [attr.data-testid]="'maplabel-scope-' + s">{{ 'mapLabel.scope.' + s | t }}</button>
+          }
+        </div>
+      </div>
+      <div class="options__field">
+        <label class="maplabel-panel__label" for="maplabel-max">{{ 'mapLabel.max' | t }}</label>
+        <input id="maplabel-max" class="maplabel-panel__num" type="number" min="8" max="40" step="1"
+          [value]="vm.previewSettings.mapLabel().max" [attr.aria-invalid]="vm.mapLabelMaxError() ? 'true' : null"
+          [attr.aria-describedby]="vm.mapLabelMaxError() ? 'maplabel-max-error' : null"
+          (input)="vm.onMapLabelMax($any($event.target).value)" data-testid="maplabel-max" />
+        @if (vm.mapLabelMaxError()) {
+          <span id="maplabel-max-error" class="maplabel-panel__error" role="alert">{{ 'mapLabel.maxError' | t }}</span>
+        }
+      </div>
+      <div class="options__field">
+        <span class="maplabel-panel__label" id="maplabel-pos-label">{{ 'mapLabel.position.label' | t }}</span>
+        <div class="options__chips" role="group" aria-labelledby="maplabel-pos-label">
+          @for (p of ['auto', 'right', 'above']; track p) {
+            <button type="button" class="options__chip" [attr.aria-pressed]="vm.previewSettings.mapLabel().position === p"
+              (click)="vm.previewSettings.setMapLabelPosition($any(p))" [attr.data-testid]="'maplabel-pos-' + p">{{ 'mapLabel.position.' + p | t }}</button>
+          }
+        </div>
+      </div>
+      <label class="maplabel-check">
+        <input type="checkbox" [checked]="vm.previewSettings.mapLabel().tooltip"
+          (change)="vm.previewSettings.setMapLabelTooltip($any($event.target).checked)" data-testid="maplabel-tooltip" />
+        <span>{{ 'mapLabel.tooltip' | t }}</span>
+        <app-info-tip [text]="'mapLabel.tooltipHelp' | t"></app-info-tip>
+      </label>
+    </fieldset>
+    <small class="advanced-hint">{{ 'mapLabel.screenOnly' | t }}</small>
+    <div class="preview-data__actions">
+      <button type="button" class="btn btn--small" (click)="vm.resetMapLabel()">{{ 'mapLabel.reset' | t }}</button>
+    </div>
+  </section>
+
   <section class="preview-panel" aria-labelledby="preview-data-title">
     <h2 id="preview-data-title">{{ 'preview.testData.title' | t }} <app-info-tip [text]="'preview.testData.description' | t"></app-info-tip></h2>
     <textarea class="preview-data__input" rows="8" spellcheck="false"

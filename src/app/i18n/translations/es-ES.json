@@ -749,7 +749,8 @@
       "assignPlaceholder": "Asignar…",
       "pdfs": "PDFs",
       "withTemplate": "con plantilla",
-      "withoutTemplate": "sin plantilla"
+      "withoutTemplate": "sin plantilla",
+      "search": "Buscar plantilla…"
     },
     "versionsDrop": {
       "title": "Versiones nuevas (B)",
@@ -760,9 +761,12 @@
       "more": "Añadir más",
       "unpairedTitle": "Archivos sin pareja: {{count}}",
       "unpairedText": "No coinciden con ningún PDF del lote: asígnalos a mano o descártalos.",
-      "assign": "Asignar a…",
+      "assign": "Elegir PDF…",
       "assignLabel": "Asignar {{name}} a un PDF",
-      "discard": "Descartar"
+      "discard": "Descartar",
+      "search": "Buscar PDF…",
+      "noneFree": "Todos los PDF ya tienen B",
+      "linked": "{{file}} vinculado a {{name}}"
     },
     "filter": {
       "label": "Filtrar por estado",
@@ -2038,7 +2042,9 @@
       "themeLight": "Cambiar a tema claro",
       "language": "Idioma: {{language}}",
       "snapOn": "Alinear con otras anotaciones al arrastrar: activar",
-      "snapOff": "Alinear con otras anotaciones al arrastrar: desactivar"
+      "snapOff": "Alinear con otras anotaciones al arrastrar: desactivar",
+      "mapLabelOn": "Mostrar el mapField junto a cada anotación",
+      "mapLabelOff": "Ocultar el mapField de las anotaciones"
     },
     "group": {
       "batch": "Lote",
@@ -2712,7 +2718,45 @@
       "altHint": "Mantén Alt (⌥ en Mac) mientras arrastras para no alinear en ese momento.",
       "jsonKeys": "Formato del JSON",
       "jsonKeysHelp": "Claves y comillas de los valores en el editor «Anotaciones (JSON)», al copiar y al descargar. La importación lee cualquiera.",
-      "jsonQuote": "Comillas de los valores"
+      "jsonQuote": "Comillas de los valores",
+      "mapLabel": "Mostrar el mapField junto a cada anotación",
+      "mapLabelHelp": "Rótulo mini y cuadro con el nombre completo de cada anotación. Más ajustes en Avanzado."
     }
+  },
+  "mapLabel": {
+    "title": "Identificar anotaciones",
+    "info": "Muestra el final del mapField junto a cada anotación y el nombre completo al pasar el cursor o enfocar con Tab. Solo se ve en pantalla: no sale en el PDF ni en el JSON.",
+    "show": "Mostrar el mapField junto a cada anotación",
+    "showHelp": "Rótulo mini con el final del nombre.",
+    "legend": "Mostrar mapField",
+    "scope": {
+      "label": "Qué anotaciones",
+      "check": "Casillas y opciones",
+      "all": "Todas"
+    },
+    "max": "Máximo de caracteres",
+    "maxError": "Entre 8 y 40 caracteres.",
+    "position": {
+      "label": "Posición",
+      "auto": "Automática",
+      "right": "Derecha",
+      "above": "Encima"
+    },
+    "tooltip": "Cuadro con el nombre completo",
+    "tooltipHelp": "Al pasar el cursor o enfocar. Esc lo cierra.",
+    "preview": "Así se verá:",
+    "screenOnly": "Solo en pantalla: no sale en el PDF ni en el JSON.",
+    "reset": "Restablecer",
+    "hidden": "Rótulos ocultos: {{count}} · acerca el zoom",
+    "none": "sin mapField",
+    "meta": "{{type}} · página {{page}} · x {{x}} · y {{y}}"
+  },
+  "search": {
+    "total": "{{total}} disponibles",
+    "count": "{{shown}} de {{total}}",
+    "noMatch": "Nada coincide con «{{query}}».",
+    "clear": "Borrar búsqueda",
+    "suggested": "Sugeridos",
+    "all": "Todos"
   }
 }

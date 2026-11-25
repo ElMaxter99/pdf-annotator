@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-184 Ver el mapField · flujo y reglas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+
+
+
+*{box-sizing:border-box}
+body{margin:0}
+.p{width:1720px;min-height:1200px;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.45}
+.hdr{background:var(--panel);border-radius:16px;padding:12px 20px;display:flex;align-items:center;gap:14px;border:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--accent);margin-right:8px}
+.brand small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.s{min-height:32px;padding:4px 12px;font-size:13px}
+.btn[disabled]{opacity:.45}
+.st{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.st.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.st.done{color:var(--text)}
+.st.err{color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,transparent)}
+.st.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 16px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:var(--inset)}
+.drop.act{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--inset))}
+.ic{width:44px;height:44px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.row.sel{outline:2px solid var(--accent)}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar i.w{background:var(--warn)}.bar i.e{background:var(--danger)}
+.mono{font-family:Consolas,monospace;font-size:13px}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.pane{background:var(--inset);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:9%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.bad{border-color:#dc2626;background:rgba(220,38,38,.14)}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.tag{font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--text)}
+.tbl{display:flex;flex-direction:column;gap:6px}
+.tr{display:grid;gap:14px;align-items:center;padding:7px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sp{flex-grow:1}
+.sk{background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));border-radius:6px;display:inline-block}
+.note{border-radius:12px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.note.w{background:color-mix(in srgb,var(--warn) 14%,transparent);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+.note.e{background:color-mix(in srgb,var(--danger) 12%,transparent);border:1px solid color-mix(in srgb,var(--danger) 60%,transparent)}
+.note.i{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.radio{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1px solid var(--line)}
+.radio.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;margin-top:2px}
+.radio.on .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+.chk.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.ta{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre;overflow:hidden}
+.g2{display:grid;gap:16px}
+.toast{position:absolute;right:24px;bottom:24px;background:var(--panel);border-left:4px solid var(--accent);border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;gap:12px;font-size:14px}
+.toast.e{border-color:var(--danger)}
+
+.sm{font-size:12px;color:var(--muted)}
+.tag.n{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600}
+.sum{border:1px solid var(--line);border-radius:14px;background:var(--soft);overflow:hidden}
+.sum>.sh{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--muted);font-size:13px;width:100%;border:0;background:transparent;font-family:inherit;text-align:left}
+.sum .cnt{display:flex;gap:6px;flex-wrap:wrap}
+.sum .cnt span{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line)}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.tabs{display:flex;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
+.tabs span{padding:6px 12px;border-radius:999px}.tabs span.on{background:var(--soft);color:var(--text)}
+.grp{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.hd2{font-size:13px;color:var(--muted)}
+
+
+.win{border-radius:16px;border:1px solid var(--line);background:var(--bg);overflow:hidden;position:relative}
+.dlg{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.45);display:flex;overflow:hidden;color:var(--text)}
+.nav{width:230px;background:var(--inset);padding:18px 12px;display:flex;flex-direction:column;gap:4px;border-right:1px solid var(--line);flex:none}
+.nav h2{font-size:18px;font-weight:600;padding:0 10px 10px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;font-size:14px;font-weight:600;color:var(--muted);font:inherit;font-weight:600;border:0;background:transparent;text-align:left}
+.ni.on{background:var(--soft);color:var(--text);outline:2px solid var(--accent)}
+.ni small{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+.dc{flex:1;padding:22px 26px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.dh{display:flex;align-items:center;gap:10px}.dh h3{font-size:20px;font-weight:600}
+.x{width:30px;height:30px;border-radius:999px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;background:transparent;color:var(--text);font-family:inherit}
+.fl{display:flex;flex-direction:column;gap:6px}.fl>b{font-size:14px}.fl .h{font-size:13px;color:var(--muted);line-height:1.4}
+.pc{display:flex;gap:10px}
+.pcard{flex:1;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;color:var(--text);background:transparent;text-align:left}
+.pcard.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.pcard.off{opacity:.55}
+.pcard small{display:block;color:var(--muted);font-size:12px}
+.sel{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:9px 14px;background:var(--inset);font-size:14px;min-height:40px}
+.chipset{display:flex;gap:8px;flex-wrap:wrap}
+.cs{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:7px 16px;min-height:38px;background:transparent;color:var(--text)}
+.cs.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.cs.def{position:relative}
+.inp{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;width:110px;background:var(--inset);color:var(--text);min-height:38px}
+.inp.bad{border-color:var(--danger)}
+.inp.foc{outline:2px solid var(--accent);outline-offset:1px}
+.err{color:var(--danger);font-size:13px}
+.mn{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.35);width:260px;display:flex;flex-direction:column;gap:2px;font-size:14px}
+.mi{padding:8px 12px;border-radius:8px;display:flex;justify-content:space-between;gap:10px;color:var(--text)}
+.mi.on{background:var(--soft);outline:2px solid var(--accent)}
+.mi.dim{color:var(--muted)}
+.hr{height:1px;background:var(--line)}
+.veil{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.foot{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding-top:6px;border-top:1px solid var(--line)}
+.stp{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:10px;padding:9px 12px;font-weight:600;font-size:14px}
+.stp.ok{color:var(--ok)}
+.mini{font-size:12px;color:var(--muted)}
+table.m{border-collapse:collapse;width:100%;font-size:14px}
+table.m th{text-align:left;color:var(--accent);font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--line)}
+table.m td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
+table.m td.k{color:var(--muted);width:260px}
+.ph{background:var(--inset);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:sp 1s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.tagp{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--warn);color:var(--warn);border-radius:999px;padding:1px 7px;white-space:nowrap}
+
+
+
+.pgm{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.3);overflow:hidden;color:#222;font-size:12px}
+.pgm .band{position:absolute;left:0;right:0;top:0;height:34px;background:#0f9b8e}
+.pgm .tl{position:absolute;height:6px;border-radius:3px;background:#d4d7df}
+.fx{position:absolute;display:flex;align-items:center;justify-content:center;border:2px solid #0f9b8e;background:rgba(15,155,142,.14);border-radius:3px;font-size:11px;font-weight:600;color:#075e55;white-space:nowrap}
+.fx.mv{border-color:#0b7d72;background:rgba(15,155,142,.30);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.fx.ref{border-style:dashed}
+.gv{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed #0f9b8e}
+.gh{position:absolute;left:0;right:0;height:0;border-top:1.5px dashed #0f9b8e}
+.gl{position:absolute;font-size:11px;font-weight:700;background:#075e55;color:#fff;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.gl.free{background:#555c6b}
+.gl.alt{background:#8a5a00}
+.cur{position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid #111;background:rgba(255,255,255,.7)}
+.sw{width:46px;height:26px;border-radius:999px;background:var(--soft);border:1px solid var(--line);position:relative;flex:none;display:inline-block}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--muted)}
+.sw.on{background:var(--accent);border-color:var(--accent)}
+.sw.on::after{left:22px;background:var(--ink)}
+.swr{display:flex;align-items:center;gap:14px;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-radius:14px}
+.swr.foc{outline:2px solid var(--accent);outline-offset:2px}
+.step{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4}
+.step b.n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.chp{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+.json{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;white-space:pre}
+.json .bad{color:var(--danger)}.json .good{color:var(--ok)}
+
+
+.tabs{gap:2px!important;font-size:12px!important}.tabs span{padding:6px 8px!important}
+.seg span{white-space:nowrap}
+.ph{flex-wrap:wrap}
+.rt{position:absolute;font-family:Consolas,monospace;font-size:10px;font-weight:700;line-height:12px;padding:1px 5px;border-radius:5px;background:#e3f4f2;color:#064e47;border:1px solid #0b7d72;white-space:nowrap;z-index:2}
+.rt.lane2{background:#fff3d6;color:#5c3b00;border-color:#8a5a00}
+.rt.ghost{border-style:dashed;background:#f2f4f7;color:#3b4252;border-color:#6b7280}
+.rt.none{font-style:italic;font-weight:600;background:#fdecec;color:#7a1414;border-color:#c81e1e}
+.tk{position:absolute;width:0;border-left:1px solid #8a5a00;z-index:1}
+.cb{position:absolute;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:11px;font-weight:700;color:#075e55;line-height:1}
+.cb.ref{border-style:dashed}
+.cb.foc{outline:3px solid #1f2430;outline-offset:2px;box-shadow:0 0 0 5px #fff}
+.cb.hov{background:rgba(15,155,142,.34)}
+.cb.sel{outline:2px solid #1d4ed8;outline-offset:2px}
+.hd{position:absolute;font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pgm .tx{position:absolute;font-size:11px;color:#6b7280;white-space:nowrap}
+.fxt{position:absolute;display:flex;align-items:center;border:2px solid #0f9b8e;background:rgba(15,155,142,.14);border-radius:3px;font-size:11px;font-weight:600;color:#075e55;padding:0 5px;white-space:nowrap;overflow:hidden}
+.tt{position:absolute;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:5;display:flex;flex-direction:column;gap:5px;max-width:330px}
+.tt .pa{font-family:Consolas,monospace;font-size:12.5px;line-height:1.45;overflow-wrap:anywhere}
+.tt .pa b{white-space:nowrap}
+.tt .pa i{font-style:normal;color:var(--muted)}
+.tt .pa b{color:var(--accent);font-weight:700}
+.tt .me{font-size:12px;color:var(--muted)}
+.tt .ar{position:absolute;width:10px;height:10px;background:var(--panel);border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.vl{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:13px}
+.vl label{display:inline-flex;align-items:center;gap:8px;color:var(--text)}
+.vl .hint{color:var(--muted);font-size:12px}
+.bx{width:16px;height:16px;border-radius:4px;border:2px solid var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:11px;line-height:1;flex:none}
+.bx.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.bx.foc{outline:2px solid var(--accent);outline-offset:2px}
+.cardh{display:flex;flex-direction:column;gap:10px}
+.cap2{font-size:13px;color:var(--muted);line-height:1.45}
+.ok{color:var(--ok)}
+.no{color:var(--danger)}
+table.m td.t{width:170px;font-weight:600}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g2c{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rec{border-color:var(--accent)!important;background:color-mix(in srgb,var(--accent) 7%,var(--panel))!important}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 10px;background:var(--accent);color:var(--ink)}
+.numq{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;border-radius:12px;background:var(--soft);font-size:14px;line-height:1.45}
+.numq b.n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.sw2{display:inline-block}
+
+.p{width:1720px;min-height:1540px}
+</style>
+</helmet>
+<div class="p" style="--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--ok:#5eead4;--inset:#1e1e2f">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">P-184 · Propuesta · flujo y reglas · 1.20</span><h1 style="font-size:26px;font-weight:600">Ver el mapField de cada anotación</h1><p class="cap" style="max-width:1400px">Cuando hay muchas anotaciones juntas con nombres largos (titular, cotitular, autorizado, apoderado…), hoy no se distingue cuál es cuál. Se propone un rótulo mini y un cuadro al pasar el cursor, por separado o juntos.</p></div><div class="g3"><div class="card"><h3>1 · Casillas pegadas</h3>
+<div class="pgm" style="width:100%;height:84px;border-radius:6px"><div class="cb " style="left:20px;top:24px">X</div><div class="cb " style="left:52px;top:24px">X</div><div class="cb " style="left:84px;top:24px">X</div><div class="cb " style="left:116px;top:24px">X</div><span class="tx" style="left:160px;top:26px">Cuatro X iguales:</span><span class="tx" style="left:160px;top:44px">¿cuál es cuál?</span></div>
+<p class="cap2">En «Muestra» y en «Mapeo» una casilla pinta solo «X». Si hay varias seguidas, no se sabe a qué campo del JSON corresponde cada una.</p></div><div class="card"><h3>2 · Nombres larguísimos</h3>
+<div class="pgm" style="width:100%;height:84px;border-radius:6px"><div class="fxt" style="left:14px;top:12px;width:240px;height:22px">contrato.intervinientes[0].condicion.esTitular</div><div class="fxt" style="left:60px;top:42px;width:240px;height:22px">contrato.intervinientes[0].condicion.esCotitul</div></div>
+<p class="cap2">En «Mapeo» un campo de texto pinta el nombre entero: se sale de la caja y tapa al vecino. No cabe en 30 puntos de ancho.</p></div><div class="card"><h3>3 · Mismo principio, distinto final</h3>
+<div class="ta" style="white-space:pre;font-size:12px;line-height:1.6;overflow:hidden"><span style="color:var(--muted)">contrato.intervinientes[0].condicion.</span><b style="color:var(--accent)">esTitular</b>
+<span style="color:var(--muted)">contrato.intervinientes[0].condicion.</span><b style="color:var(--accent)">esCotitular</b>
+<span style="color:var(--muted)">contrato.intervinientes[0].condicion.</span><b style="color:var(--accent)">esAutorizado</b></div>
+<p class="cap2">Lo que distingue un campo de otro suele estar al final. Cualquier recorte por el principio lo esconde.</p></div></div><div class="g3"><div class="card"><div style="display:flex;gap:8px;align-items:center"><span class="tag n">Variante A</span><h3>Rótulo mini</h3></div>
+<div class="pgm" style="width:270px;height:78px;background:#fff;border-radius:6px"><div class="cb " style="left:18px;top:22px">X</div><span class="rt " style="left:12px;top:44px">…esTitular</span><div class="cb " style="left:96px;top:22px">X</div><span class="rt " style="left:90px;top:44px">…esCotitular</span><div class="cb " style="left:174px;top:22px">X</div><span class="rt " style="left:168px;top:44px">…esAutorizado</span></div>
+<p class="cap2">Una etiqueta de 10 px junto a la caja, con el <b>final</b> del nombre. Se ve todo a la vez.</p>
+<p class="cap2"><span class="ok">＋</span> Comparas varias casillas de un vistazo.<br><span class="no">－</span> Con muchas anotaciones juntas necesita sitio: puede ocultarse alguna.</p></div><div class="card"><div style="display:flex;gap:8px;align-items:center"><span class="tag n">Variante B</span><h3>Cuadro al pasar el cursor</h3></div>
+<div class="pgm" style="width:250px;height:78px;border-radius:6px;overflow:visible"><div class="cb " style="left:18px;top:12px">X</div><div class="cb hov" style="left:62px;top:12px">X</div><div class="cb " style="left:106px;top:12px">X</div></div>
+<p class="cap2">Nombre entero en un cuadro pequeño al pasar el cursor o enfocar con el teclado. No ocupa sitio.</p>
+<p class="cap2"><span class="ok">＋</span> Nunca estorba; el nombre completo, sin recortar.<br><span class="no">－</span> Una casilla cada vez: no sirve para comparar.</p></div><div class="card rec"><div style="display:flex;gap:8px;align-items:center"><span class="badge">Recomendada</span><h3>Variante C · las dos</h3></div>
+<div class="pgm" style="width:270px;height:78px;background:#fff;border-radius:6px"><div class="cb " style="left:18px;top:22px">X</div><span class="rt " style="left:12px;top:44px">…esTitular</span><div class="cb " style="left:96px;top:22px">X</div><span class="rt " style="left:90px;top:44px">…esCotitular</span><div class="cb " style="left:174px;top:22px">X</div><span class="rt " style="left:168px;top:44px">…esAutorizado</span></div>
+<p class="cap2">El rótulo da la pista y el cuadro da el nombre completo. Cada una se activa por separado en Avanzado.</p>
+<p class="cap2"><span class="ok">＋</span> Pista a la vista y precisión bajo demanda.<br><span class="no">－</span> Un ajuste más en Avanzado (con valores razonables por defecto).</p></div></div><div class="g2c" style="align-items:start"><div class="card"><h3>Cómo se combina con los valores de muestra y la vista</h3>
+<table class="m"><thead><tr><th>Vista</th><th>Tipo</th><th>Dentro de la caja (no cambia)</th><th>Rótulo mini</th><th>Cuadro al pasar el cursor</th></tr></thead><tbody><tr><td class="t">Muestra</td><td>Casilla / opción</td><td>X</td><td>Final del mapField</td><td>Nombre completo</td></tr><tr><td class="t">Muestra</td><td>Texto</td><td>XXXXX (el valor de muestra)</td><td>Final del mapField</td><td>Nombre completo</td></tr><tr><td class="t">Muestra</td><td>Número</td><td>00000 (con decimales y sufijo)</td><td>Final del mapField</td><td>Nombre completo</td></tr><tr><td class="t">Mapeo</td><td>Casilla / opción</td><td>X</td><td>Final del mapField</td><td>Nombre completo</td></tr><tr><td class="t">Mapeo</td><td>Texto y número</td><td>El mapField entero (como hoy)</td><td>Oculto: ya está dentro</td><td>Nombre completo</td></tr><tr><td class="t">Datos</td><td>Casilla / opción</td><td>X</td><td>Final del mapField</td><td>Nombre completo</td></tr><tr><td class="t">Datos</td><td>Texto y número</td><td>El dato de la prueba (o la muestra si falta)</td><td>Final del mapField</td><td>Nombre completo + «sin dato»</td></tr><tr><td class="t">Cualquiera</td><td>Con valor propio (value)</td><td>Su valor</td><td>Final del mapField</td><td>Nombre completo + «tiene valor propio»</td></tr><tr><td class="t">Cualquiera</td><td>Sin mapField</td><td>Lo que toque</td><td>«sin mapField» (rojo, cursiva)</td><td>«Sin mapField»</td></tr></tbody></table>
+<p class="cap2">La caja sigue enseñando <b>lo que saldrá en el PDF</b>; el rótulo y el cuadro enseñan <b>de dónde sale</b>. Nunca se mezclan en el mismo sitio.</p></div><div style="display:flex;flex-direction:column;gap:16px"><div class="card"><h3>Reglas</h3><div style="display:flex;flex-direction:column;gap:10px"><div class="step"><b class="n">1</b><span>Es solo ayuda de pantalla: el rótulo y el cuadro <b>no salen</b> en el PDF exportado, ni en el JSON, ni en los PDF de prueba.</span></div><div class="step"><b class="n">2</b><span><b>El final manda.</b> El rótulo conserva el final del nombre y los índices [n]: <code>[0]…esTitular</code>. Máximo 18 caracteres (ajustable de 8 a 40).</span></div><div class="step"><b class="n">3</b><span>Por defecto <b>todo apagado</b>: la vista de hoy no cambia hasta que se active. Se guarda en el navegador y vale para editor y lote.</span></div><div class="step"><b class="n">4</b><span>El rótulo tiene siempre el mismo tamaño en pantalla (10 px, no escala con el zoom) y contraste AA sobre el PDF blanco, en claro y oscuro.</span></div><div class="step"><b class="n">5</b><span>Si dos rótulos chocan, el segundo baja a un segundo carril con una marca; si sigue sin caber, se oculta y se avisa: «2 rótulos ocultos · acerca el zoom».</span></div><div class="step"><b class="n">6</b><span>El cuadro aparece a los 250 ms con el cursor o al instante con el foco; se cierra con Esc; se puede pasar el cursor sobre él (WCAG 1.4.13). Mientras se arrastra no se muestra.</span></div><div class="step"><b class="n">7</b><span>Con el rótulo activo, las anotaciones entran en el orden de Tab (lectura: arriba a abajo, izquierda a derecha). Sin él, Tab no cambia. El nombre se lee como etiqueta accesible.</span></div><div class="step"><b class="n">8</b><span>En «Dividida» funciona igual en A y en B. El recuadro de la pareja A↔B sigue siendo el que une las dos.</span></div></div></div><div class="card"><h3>Decisiones por tomar</h3><div style="display:flex;flex-direction:column;gap:8px"><div class="numq"><b class="n">1</b><span><b>Variante:</b> C: las dos, activables por separado (recomendada).</span></div><div class="numq"><b class="n">2</b><span><b>Dónde se activa:</b> Interruptor «Mostrar mapField» en la barra inferior del visor, junto a «Mostrar origen», y los ajustes finos en Avanzado › «Identificar anotaciones» (+ un espejo en Opciones › Editor y un comando en Ctrl+K). Recomendado.</span></div><div class="numq"><b class="n">3</b><span><b>Qué anotaciones:</b> Por defecto «Casillas y opciones» (el caso que describes); «Todas» opcional.</span></div><div class="numq"><b class="n">4</b><span><b>Valor por defecto:</b> Apagado; así nadie ve cambiar su editor sin querer. Alternativa: encendido para casillas.</span></div><div class="numq"><b class="n">5</b><span><b>Teclado:</b> Tab recorre las anotaciones solo con el rótulo activo; Esc cierra el cuadro. ¿Te vale o prefieres un atajo propio?</span></div></div></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1540}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

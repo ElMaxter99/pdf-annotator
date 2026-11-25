@@ -7803,3 +7803,143 @@ button.version-chip:focus-visible {
 :root.theme-light .jfm__preview {
   background: var(--light-surface);
 }
+:root.theme-light .json-keys__pill,
+:root.theme-light .json-keys__chip {
+  background: var(--light-surface);
+}
+.json-keys__hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Rótulo mini y cuadro con el mapField (P-184 a P-186). Mismos colores en claro y oscuro: siempre sobre el PDF blanco. */
+.map-label {
+  position: absolute;
+  z-index: 16;
+  pointer-events: none;
+  padding: 1px 5px;
+  border: 1px solid #0b7d72;
+  border-radius: 5px;
+  background: #e3f4f2;
+  color: #064e47;
+  font: 700 10px/12px Consolas, monospace;
+  white-space: nowrap;
+}
+.map-label--lane2 {
+  background: #fff3d6;
+  border-color: #8a5a00;
+  color: #5c3b00;
+}
+.map-label--none {
+  background: #fdecec;
+  border-color: #c81e1e;
+  color: #7a1414;
+  font-style: italic;
+  font-weight: 600;
+}
+.map-label-tick {
+  position: absolute;
+  z-index: 15;
+  width: 0;
+  border-left: 1px solid #8a5a00;
+  pointer-events: none;
+}
+.annotation:focus-visible {
+  outline: 3px solid #1f2430;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px #fff;
+}
+.map-tip {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 330px;
+  padding: 9px 12px;
+  border: 1px solid var(--line, rgba(148, 163, 184, 0.35));
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  animation: map-tip-in 150ms ease-out;
+}
+.map-tip__name {
+  font: 12.5px/1.45 Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+.map-tip__name i {
+  font-style: normal;
+  color: var(--muted);
+}
+.map-tip__name b {
+  color: var(--accent-text, var(--accent));
+  white-space: nowrap;
+}
+.map-tip__none {
+  color: var(--danger-text, var(--danger)) !important;
+  font-style: italic;
+}
+.map-tip__meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+@keyframes map-tip-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-tip { animation: none; }
+}
+.maplabel-panel__opts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.maplabel-panel__opts:disabled {
+  opacity: 0.5;
+}
+.maplabel-panel__label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.maplabel-panel .options__chip {
+  min-height: 32px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+}
+.maplabel-panel__num {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1px solid var(--input-border, rgba(255, 255, 255, 0.14));
+  border-radius: 10px;
+  background: var(--input-bg, rgba(30, 30, 47, 0.8));
+  color: var(--text);
+  font: inherit;
+}
+.maplabel-panel__num[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+.maplabel-panel__num:focus-visible {
+  outline: 2px solid var(--accent);
+}
+.maplabel-panel__error {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--danger-text, var(--danger));
+}
+
+.maplabel-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}

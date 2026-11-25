@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-186 Ver el mapField · estados · claro 1280</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+
+
+
+*{box-sizing:border-box}
+body{margin:0}
+.p{width:1720px;min-height:1200px;position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.p h1,.p h2,.p h3,.p p{margin:0}
+.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.45}
+.hdr{background:var(--panel);border-radius:16px;padding:12px 20px;display:flex;align-items:center;gap:14px;border:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--accent);margin-right:8px}
+.brand small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.d{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn.s{min-height:32px;padding:4px 12px;font-size:13px}
+.btn[disabled]{opacity:.45}
+.st{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.st.on{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.st.done{color:var(--text)}
+.st.err{color:var(--danger);background:color-mix(in srgb,var(--danger) 14%,transparent)}
+.st.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 16px}
+.seg span.on{background:var(--accent);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:var(--inset)}
+.drop.act{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--inset))}
+.ic{width:44px;height:44px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px}
+.row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--soft);font-size:14px}
+.row.sel{outline:2px solid var(--accent)}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.bar i.w{background:var(--warn)}.bar i.e{background:var(--danger)}
+.mono{font-family:Consolas,monospace;font-size:13px}
+.kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.pane{background:var(--inset);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.pg{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.35);overflow:hidden}
+.pg .band{position:absolute;left:0;right:0;top:0;height:9%;background:#0f9b8e}
+.ln{position:absolute;height:5px;border-radius:3px;background:#cfd2da}
+.fd{position:absolute;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px}
+.fd.bad{border-color:#dc2626;background:rgba(220,38,38,.14)}
+.fd.ghost{border:2px dashed #dc2626;background:transparent}
+.tag{font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--text)}
+.tbl{display:flex;flex-direction:column;gap:6px}
+.tr{display:grid;gap:14px;align-items:center;padding:7px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.tr.h{background:transparent;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sp{flex-grow:1}
+.sk{background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));border-radius:6px;display:inline-block}
+.note{border-radius:12px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.note.w{background:color-mix(in srgb,var(--warn) 14%,transparent);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+.note.e{background:color-mix(in srgb,var(--danger) 12%,transparent);border:1px solid color-mix(in srgb,var(--danger) 60%,transparent)}
+.note.i{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.radio{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1px solid var(--line)}
+.radio.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;margin-top:2px}
+.radio.on .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+.chk.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.ta{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre;overflow:hidden}
+.g2{display:grid;gap:16px}
+.toast{position:absolute;right:24px;bottom:24px;background:var(--panel);border-left:4px solid var(--accent);border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;gap:12px;font-size:14px}
+.toast.e{border-color:var(--danger)}
+
+.sm{font-size:12px;color:var(--muted)}
+.tag.n{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600}
+.sum{border:1px solid var(--line);border-radius:14px;background:var(--soft);overflow:hidden}
+.sum>.sh{display:flex;align-items:center;gap:10px;padding:10px 14px;color:var(--muted);font-size:13px;width:100%;border:0;background:transparent;font-family:inherit;text-align:left}
+.sum .cnt{display:flex;gap:6px;flex-wrap:wrap}
+.sum .cnt span{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line)}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.tabs{display:flex;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
+.tabs span{padding:6px 12px;border-radius:999px}.tabs span.on{background:var(--soft);color:var(--text)}
+.grp{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.hd2{font-size:13px;color:var(--muted)}
+
+
+.win{border-radius:16px;border:1px solid var(--line);background:var(--bg);overflow:hidden;position:relative}
+.dlg{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.45);display:flex;overflow:hidden;color:var(--text)}
+.nav{width:230px;background:var(--inset);padding:18px 12px;display:flex;flex-direction:column;gap:4px;border-right:1px solid var(--line);flex:none}
+.nav h2{font-size:18px;font-weight:600;padding:0 10px 10px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;font-size:14px;font-weight:600;color:var(--muted);font:inherit;font-weight:600;border:0;background:transparent;text-align:left}
+.ni.on{background:var(--soft);color:var(--text);outline:2px solid var(--accent)}
+.ni small{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+.dc{flex:1;padding:22px 26px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.dh{display:flex;align-items:center;gap:10px}.dh h3{font-size:20px;font-weight:600}
+.x{width:30px;height:30px;border-radius:999px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;background:transparent;color:var(--text);font-family:inherit}
+.fl{display:flex;flex-direction:column;gap:6px}.fl>b{font-size:14px}.fl .h{font-size:13px;color:var(--muted);line-height:1.4}
+.pc{display:flex;gap:10px}
+.pcard{flex:1;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;color:var(--text);background:transparent;text-align:left}
+.pcard.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.pcard.off{opacity:.55}
+.pcard small{display:block;color:var(--muted);font-size:12px}
+.sel{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:9px 14px;background:var(--inset);font-size:14px;min-height:40px}
+.chipset{display:flex;gap:8px;flex-wrap:wrap}
+.cs{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:7px 16px;min-height:38px;background:transparent;color:var(--text)}
+.cs.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.cs.def{position:relative}
+.inp{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;width:110px;background:var(--inset);color:var(--text);min-height:38px}
+.inp.bad{border-color:var(--danger)}
+.inp.foc{outline:2px solid var(--accent);outline-offset:1px}
+.err{color:var(--danger);font-size:13px}
+.mn{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.35);width:260px;display:flex;flex-direction:column;gap:2px;font-size:14px}
+.mi{padding:8px 12px;border-radius:8px;display:flex;justify-content:space-between;gap:10px;color:var(--text)}
+.mi.on{background:var(--soft);outline:2px solid var(--accent)}
+.mi.dim{color:var(--muted)}
+.hr{height:1px;background:var(--line)}
+.veil{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.foot{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding-top:6px;border-top:1px solid var(--line)}
+.stp{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:10px;padding:9px 12px;font-weight:600;font-size:14px}
+.stp.ok{color:var(--ok)}
+.mini{font-size:12px;color:var(--muted)}
+table.m{border-collapse:collapse;width:100%;font-size:14px}
+table.m th{text-align:left;color:var(--accent);font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--line)}
+table.m td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
+table.m td.k{color:var(--muted);width:260px}
+.ph{background:var(--inset);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:sp 1s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.tagp{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--warn);color:var(--warn);border-radius:999px;padding:1px 7px;white-space:nowrap}
+
+
+
+.pgm{position:relative;background:#fff;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.3);overflow:hidden;color:#222;font-size:12px}
+.pgm .band{position:absolute;left:0;right:0;top:0;height:34px;background:#0f9b8e}
+.pgm .tl{position:absolute;height:6px;border-radius:3px;background:#d4d7df}
+.fx{position:absolute;display:flex;align-items:center;justify-content:center;border:2px solid #0f9b8e;background:rgba(15,155,142,.14);border-radius:3px;font-size:11px;font-weight:600;color:#075e55;white-space:nowrap}
+.fx.mv{border-color:#0b7d72;background:rgba(15,155,142,.30);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.fx.ref{border-style:dashed}
+.gv{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed #0f9b8e}
+.gh{position:absolute;left:0;right:0;height:0;border-top:1.5px dashed #0f9b8e}
+.gl{position:absolute;font-size:11px;font-weight:700;background:#075e55;color:#fff;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.gl.free{background:#555c6b}
+.gl.alt{background:#8a5a00}
+.cur{position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid #111;background:rgba(255,255,255,.7)}
+.sw{width:46px;height:26px;border-radius:999px;background:var(--soft);border:1px solid var(--line);position:relative;flex:none;display:inline-block}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--muted)}
+.sw.on{background:var(--accent);border-color:var(--accent)}
+.sw.on::after{left:22px;background:var(--ink)}
+.swr{display:flex;align-items:center;gap:14px;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-radius:14px}
+.swr.foc{outline:2px solid var(--accent);outline-offset:2px}
+.step{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4}
+.step b.n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.chp{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+.json{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-family:Consolas,monospace;font-size:13px;line-height:1.6;white-space:pre}
+.json .bad{color:var(--danger)}.json .good{color:var(--ok)}
+
+
+.tabs{gap:2px!important;font-size:12px!important}.tabs span{padding:6px 8px!important}
+.seg span{white-space:nowrap}
+.ph{flex-wrap:wrap}
+.rt{position:absolute;font-family:Consolas,monospace;font-size:10px;font-weight:700;line-height:12px;padding:1px 5px;border-radius:5px;background:#e3f4f2;color:#064e47;border:1px solid #0b7d72;white-space:nowrap;z-index:2}
+.rt.lane2{background:#fff3d6;color:#5c3b00;border-color:#8a5a00}
+.rt.ghost{border-style:dashed;background:#f2f4f7;color:#3b4252;border-color:#6b7280}
+.rt.none{font-style:italic;font-weight:600;background:#fdecec;color:#7a1414;border-color:#c81e1e}
+.tk{position:absolute;width:0;border-left:1px solid #8a5a00;z-index:1}
+.cb{position:absolute;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border:2px solid #0f9b8e;background:rgba(15,155,142,.16);border-radius:3px;font-size:11px;font-weight:700;color:#075e55;line-height:1}
+.cb.ref{border-style:dashed}
+.cb.foc{outline:3px solid #1f2430;outline-offset:2px;box-shadow:0 0 0 5px #fff}
+.cb.hov{background:rgba(15,155,142,.34)}
+.cb.sel{outline:2px solid #1d4ed8;outline-offset:2px}
+.hd{position:absolute;font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pgm .tx{position:absolute;font-size:11px;color:#6b7280;white-space:nowrap}
+.fxt{position:absolute;display:flex;align-items:center;border:2px solid #0f9b8e;background:rgba(15,155,142,.14);border-radius:3px;font-size:11px;font-weight:600;color:#075e55;padding:0 5px;white-space:nowrap;overflow:hidden}
+.tt{position:absolute;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:5;display:flex;flex-direction:column;gap:5px;max-width:330px}
+.tt .pa{font-family:Consolas,monospace;font-size:12.5px;line-height:1.45;overflow-wrap:anywhere}
+.tt .pa b{white-space:nowrap}
+.tt .pa i{font-style:normal;color:var(--muted)}
+.tt .pa b{color:var(--accent);font-weight:700}
+.tt .me{font-size:12px;color:var(--muted)}
+.tt .ar{position:absolute;width:10px;height:10px;background:var(--panel);border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.vl{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:13px}
+.vl label{display:inline-flex;align-items:center;gap:8px;color:var(--text)}
+.vl .hint{color:var(--muted);font-size:12px}
+.bx{width:16px;height:16px;border-radius:4px;border:2px solid var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:11px;line-height:1;flex:none}
+.bx.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.bx.foc{outline:2px solid var(--accent);outline-offset:2px}
+.cardh{display:flex;flex-direction:column;gap:10px}
+.cap2{font-size:13px;color:var(--muted);line-height:1.45}
+.ok{color:var(--ok)}
+.no{color:var(--danger)}
+table.m td.t{width:170px;font-weight:600}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g2c{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rec{border-color:var(--accent)!important;background:color-mix(in srgb,var(--accent) 7%,var(--panel))!important}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 10px;background:var(--accent);color:var(--ink)}
+.numq{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;border-radius:12px;background:var(--soft);font-size:14px;line-height:1.45}
+.numq b.n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.sw2{display:inline-block}
+
+.p{width:1280px;min-height:2900px}
+</style>
+</helmet>
+<div class="p" style="--bg:#f4f5f8;--panel:#ffffff;--accent:#0b7d72;--danger:#c81e1e;--text:#1f2430;--muted:#555c6b;--ink:#ffffff;--line:rgba(0,0,0,.16);--soft:rgba(0,0,0,.05);--warn:#8a5a00;--ok:#0b7d72;--inset:#e9ebf1">
+<div style="display:flex;flex-direction:column;gap:4px"><span class="lab">P-186 · Propuesta · estados · claro 1280</span><h1 style="font-size:26px;font-weight:600">Estados del rótulo, del cuadro y del panel</h1><p class="cap" style="max-width:1400px">Doce estados del visor y tres del panel, en tema claro. El rótulo usa los mismos colores sobre el PDF blanco en claro y oscuro (contraste 8,4:1).</p></div><div class="g2c"><div class="card" style=""><h3>1 · Apagado (como hoy)</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:150px;overflow:visible;border-radius:6px"><span class="hd" style="left:26px;top:42px">Titular</span><div class="cb " style="left:30px;top:60px">X</div><span class="hd" style="left:136px;top:42px">Cotit.</span><div class="cb " style="left:140px;top:60px">X</div><span class="hd" style="left:246px;top:42px">Autor.</span><div class="cb " style="left:250px;top:60px">X</div><span class="hd" style="left:356px;top:42px">Apod.</span><div class="cb " style="left:360px;top:60px">X</div></div></div><p class="cap2">Sin rótulo y sin cuadro. Es el valor por defecto: nada cambia hasta que se activa.</p></div><div class="card" style=""><h3>2 · Rótulo con sitio de sobra</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:150px;overflow:visible;border-radius:6px"><span class="hd" style="left:26px;top:42px">Titular</span><div class="cb " style="left:30px;top:60px">X</div><span class="rt " style="left:22px;top:82px">…esTitular</span><span class="hd" style="left:136px;top:42px">Cotit.</span><div class="cb " style="left:140px;top:60px">X</div><span class="rt " style="left:132px;top:82px">…esCotitular</span><span class="hd" style="left:246px;top:42px">Autor.</span><div class="cb " style="left:250px;top:60px">X</div><span class="rt " style="left:242px;top:82px">…esAutorizado</span><span class="hd" style="left:356px;top:42px">Apod.</span><div class="cb " style="left:360px;top:60px">X</div><span class="rt " style="left:352px;top:82px">…esApoderado</span></div></div><p class="cap2">Casillas a 110 pt: los rótulos caben debajo, uno por casilla.</p></div><div class="card" style=""><h3>3 · Casillas apretadas · segundo carril</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:190px;overflow:visible;border-radius:6px"><span class="hd" style="left:26px;top:32px">Titular</span><div class="cb " style="left:30px;top:50px">X</div><span class="rt " style="left:22px;top:72px">…esTitular</span><span class="hd" style="left:78px;top:32px">Cotit.</span><div class="cb " style="left:82px;top:50px">X</div><i class="tk" style="left:90px;top:68px;height:20px"></i><span class="rt lane2" style="left:74px;top:88px">…esCotitular</span><span class="hd" style="left:130px;top:32px">Autor.</span><div class="cb " style="left:134px;top:50px">X</div><span class="rt " style="left:126px;top:72px">…esAutorizado</span><span class="hd" style="left:182px;top:32px">Apod.</span><div class="cb " style="left:186px;top:50px">X</div><i class="tk" style="left:194px;top:68px;height:20px"></i><span class="rt lane2" style="left:178px;top:88px">…esApoderado</span></div></div><p class="cap2">A 52 pt los rótulos chocarían: el segundo y el cuarto bajan a un carril propio, con una marca fina y otro color (no solo color: también la marca y la altura).</p></div><div class="card" style=""><h3>4 · Columna de casillas · a la derecha</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:130px;overflow:visible;border-radius:6px"><div class="cb " style="left:40px;top:20px">X</div><span class="rt " style="left:66px;top:23px">[0]…esTitular</span><div class="cb " style="left:40px;top:56px">X</div><span class="rt " style="left:66px;top:59px">[0]…esCotitular</span><div class="cb " style="left:40px;top:92px">X</div><span class="rt " style="left:66px;top:95px">[0]…esAutorizado</span></div></div><p class="cap2">En una columna hay sitio a la derecha: con «Automática» se elige ese lado y no se baja de carril.</p></div><div class="card" style=""><h3>5 · Cuadro con el cursor</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:190px;overflow:visible;border-radius:6px"><span class="hd" style="left:26px;top:38px">Titular</span><div class="cb " style="left:30px;top:56px">X</div><span class="rt " style="left:22px;top:78px">…esTitular</span><span class="hd" style="left:136px;top:38px">Cotit.</span><div class="cb " style="left:140px;top:56px">X</div><span class="rt " style="left:132px;top:78px">…esCotitular</span><span class="hd" style="left:246px;top:38px">Autor.</span><div class="cb hov" style="left:250px;top:56px">X</div><span class="rt " style="left:242px;top:78px">…esAutorizado</span><span class="hd" style="left:356px;top:38px">Apod.</span><div class="cb " style="left:360px;top:56px">X</div><span class="rt " style="left:352px;top:78px">…esApoderado</span><div class="tt" role="tooltip" style="left:208px;top:104px"><i class="ar" style="left:14px;top:-6px"></i><span class="pa"><i>contrato.<wbr>intervinientes[0].<wbr>condicion.<wbr></i><b>esAutorizado</b></span><span class="me">Casilla · página 1 · x 142,0 · y 216,0</span></div></div></div><p class="cap2">Nombre completo: lo común atenuado y el final destacado. Aparece a los 250 ms; se puede pasar el cursor sobre él sin que desaparezca.</p></div><div class="card" style=""><h3>6 · Cuadro con el teclado (foco)</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:190px;overflow:visible;border-radius:6px"><span class="hd" style="left:26px;top:38px">Titular</span><div class="cb " style="left:30px;top:56px">X</div><span class="rt " style="left:22px;top:78px">…esTitular</span><span class="hd" style="left:136px;top:38px">Cotit.</span><div class="cb foc" style="left:140px;top:56px">X</div><span class="rt " style="left:132px;top:78px">…esCotitular</span><span class="hd" style="left:246px;top:38px">Autor.</span><div class="cb " style="left:250px;top:56px">X</div><span class="rt " style="left:242px;top:78px">…esAutorizado</span><span class="hd" style="left:356px;top:38px">Apod.</span><div class="cb " style="left:360px;top:56px">X</div><span class="rt " style="left:352px;top:78px">…esApoderado</span><div class="tt" role="tooltip" style="left:100px;top:104px"><i class="ar" style="left:14px;top:-6px"></i><span class="pa"><i>contrato.<wbr>intervinientes[0].<wbr>condicion.<wbr></i><b>esCotitular</b></span><span class="me">Casilla · página 1 · x 142,0 · y 216,0</span></div></div></div><p class="cap2">Tab llega a la casilla: anillo de foco doble (negro y blanco, visible sobre cualquier fondo), y el cuadro sale al instante. Esc lo cierra sin perder el foco. El lector de pantalla dice: «casilla, contrato.intervinientes[0].condicion.esCotitular».</p></div><div class="card" style=""><h3>7 · Vista «Mapeo»: el texto ya pinta su nombre</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:120px;overflow:visible;border-radius:6px"><div class="fxt" style="left:20px;top:20px;width:260px;height:22px">contrato.intervinientes[0].condicion.esTit…</div><div class="fxt" style="left:20px;top:70px;width:260px;height:22px">contrato.intervinientes[0].condicion.esCot…</div><div class="cb " style="left:330px;top:22px">X</div><span class="rt " style="left:322px;top:44px">…esTitular</span><div class="cb " style="left:380px;top:22px">X</div><span class="rt " style="left:372px;top:44px">…esCotitular</span></div></div><p class="cap2">En un texto de «Mapeo» el nombre ya está dentro de la caja, así que no se repite el rótulo; el cuadro del cursor sí funciona. Las casillas (que pintan «X») conservan su rótulo.</p></div><div class="card" style=""><h3>8 · Sin sitio: rótulos ocultos</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:110px;overflow:visible;border-radius:6px"><div class="cb " style="left:30px;top:60px">X</div><div class="cb " style="left:56px;top:60px">X</div><div class="cb " style="left:82px;top:60px">X</div><div class="cb " style="left:108px;top:60px">X</div><span class="chp" style="position:absolute;right:10px;top:10px">4 rótulos ocultos · acerca el zoom</span></div></div><p class="cap2">Si ni el segundo carril basta, el rótulo se oculta y la barra lo cuenta (texto, no solo icono). El cuadro con el cursor sigue disponible.</p></div><div class="card" style=""><h3>9 · Anotación sin mapField</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:120px;overflow:visible;border-radius:6px"><div class="cb " style="left:40px;top:40px">X</div><span class="rt none" style="left:32px;top:62px">sin mapField</span><div class="cb " style="left:190px;top:40px">X</div><span class="rt " style="left:182px;top:62px">…esCotitular</span></div></div><p class="cap2">El rótulo lo dice en rojo y cursiva («sin mapField») y el cuadro lo repite. Así se ve de un vistazo qué falta por mapear.</p></div><div class="card" style=""><h3>10 · Seleccionada y arrastrando</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:120px;overflow:visible;border-radius:6px"><div class="cb sel" style="left:40px;top:44px">X</div><span class="rt " style="left:32px;top:66px">…esTitular</span><div class="cb sel" style="left:130px;top:44px">X</div><span class="rt " style="left:122px;top:66px">…esCotitular</span><span class="chp" style="position:absolute;right:14px;top:14px;background:var(--soft);color:var(--text);border-color:var(--line)">Arrastrando: sin cuadro</span></div></div><p class="cap2">El rótulo sigue a su casilla mientras se mueve. Durante el arrastre no se muestra el cuadro para no tapar la guía de alineación.</p></div><div class="card" style=""><h3>11 · En A (gris discontinuo) y en B</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:120px;overflow:visible;border-radius:6px"><div class="cb ref " style="left:40px;top:40px">X</div><span class="rt ghost" style="left:32px;top:62px">…esTitular</span><div class="cb " style="left:180px;top:40px">X</div><span class="rt " style="left:172px;top:62px">…esTitular</span></div></div><p class="cap2">En A el rótulo es gris con borde discontinuo (solo lectura); en B es el de siempre. Los nombres de la pareja coinciden y se reconocen sin la línea.</p></div><div class="card" style=""><h3>12 · Movimiento reducido</h3><div class="pane" style="padding:10px;align-items:flex-start;overflow:visible"><div class="pgm" style="width:540px;height:100px;border-radius:6px;overflow:visible"><div class="cb " style="left:40px;top:30px">X</div><span class="rt " style="left:32px;top:52px">…esTitular</span></div></div><p class="cap2">Con «reducir movimiento» el cuadro aparece sin fundido ni retardo de deslizamiento. Normal: fundido de 150 ms con ease-out.</p></div></div><div class="g3">
+<div class="card"><h3>13 · Panel · apagado</h3><div class="side" style="gap:10px">
+<div class="tabs"><span>Documento</span><span>Anotaciones</span><span>Plantillas</span><span class="on">Avanzado</span></div>
+<div class="grp">Valores de muestra</div>
+<div class="row" style="padding:6px 10px"><span style="width:70px">Texto</span><span class="inp" style="width:90px;min-height:30px;padding:3px 10px">XXXXX</span><span class="sp"></span><span class="sm">Casilla X · Opción X · Número 00000</span></div>
+<div class="grp" style="margin-top:8px">Identificar anotaciones <span class="tag n" style="text-transform:none;letter-spacing:0">ⓘ</span></div>
+<div class="swr" style="padding:9px 12px"><div><b style="font-size:14px">Mostrar el mapField junto a cada anotación</b><div class="cap2">Rótulo mini con el final del nombre.</div></div><button class="sw" role="switch" aria-checked="false" aria-label="Mostrar el mapField junto a cada anotación" style=""></button></div>
+<div style="display:flex;flex-direction:column;gap:10px;opacity:.5">
+<div class="fl"><b style="font-size:13px">Qué anotaciones</b><span class="seg" role="group" aria-label="Qué anotaciones"><span class="on">Casillas y opciones</span><span class="">Todas</span></span></div>
+<div class="fl"><b style="font-size:13px">Cómo se acorta</b><span class="seg" role="group" aria-label="Cómo se acorta"><span class="on">Final del nombre</span><span class="">Entero</span></span><div style="display:flex;gap:10px;align-items:center"><span class="sm">Máximo de caracteres</span><input class="inp" value="18" style="width:64px" aria-label="Máximo de caracteres"></div></div>
+<div class="fl"><b style="font-size:13px">Posición</b><span class="seg" role="group" aria-label="Posición"><span class="on">Automática</span><span class="">Derecha</span><span class="">Encima</span></span></div>
+</div>
+<div class="swr" style="padding:9px 12px"><div><b style="font-size:14px">Cuadro con el nombre completo</b><div class="cap2">Al pasar el cursor o enfocar. Esc lo cierra.</div></div><button class="sw on" role="switch" aria-checked="true" aria-label="Cuadro con el nombre completo" style=""></button></div>
+<div class="ph"><span>Así se verá:</span><span class="rt" style="position:static">[0]…esTitular</span><span class="sm">Solo en pantalla: no sale en el PDF ni en el JSON.</span></div>
+<div style="display:flex;gap:8px"><button class="btn g s">Restablecer</button></div>
+</div><p class="cap2">Las opciones finas se atenúan (siguen leyéndose) hasta activar el interruptor.</p></div>
+<div class="card"><h3>14 · Panel · valor no válido</h3><div class="side" style="gap:10px">
+<div class="tabs"><span>Documento</span><span>Anotaciones</span><span>Plantillas</span><span class="on">Avanzado</span></div>
+<div class="grp">Valores de muestra</div>
+<div class="row" style="padding:6px 10px"><span style="width:70px">Texto</span><span class="inp" style="width:90px;min-height:30px;padding:3px 10px">XXXXX</span><span class="sp"></span><span class="sm">Casilla X · Opción X · Número 00000</span></div>
+<div class="grp" style="margin-top:8px">Identificar anotaciones <span class="tag n" style="text-transform:none;letter-spacing:0">ⓘ</span></div>
+<div class="swr" style="padding:9px 12px"><div><b style="font-size:14px">Mostrar el mapField junto a cada anotación</b><div class="cap2">Rótulo mini con el final del nombre.</div></div><button class="sw on" role="switch" aria-checked="true" aria-label="Mostrar el mapField junto a cada anotación" style="outline:2px solid var(--accent);outline-offset:2px;"></button></div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="fl"><b style="font-size:13px">Qué anotaciones</b><span class="seg" role="group" aria-label="Qué anotaciones"><span class="on">Casillas y opciones</span><span class="">Todas</span></span></div>
+<div class="fl"><b style="font-size:13px">Cómo se acorta</b><span class="seg" role="group" aria-label="Cómo se acorta"><span class="on">Final del nombre</span><span class="">Entero</span></span><div style="display:flex;gap:10px;align-items:center"><span class="sm">Máximo de caracteres</span><input class="inp bad" value="3" style="width:64px" aria-invalid="true" aria-label="Máximo de caracteres"></div><span class="err" role="alert">Entre 8 y 40 caracteres.</span></div>
+<div class="fl"><b style="font-size:13px">Posición</b><span class="seg" role="group" aria-label="Posición"><span class="on">Automática</span><span class="">Derecha</span><span class="">Encima</span></span></div>
+</div>
+<div class="swr" style="padding:9px 12px"><div><b style="font-size:14px">Cuadro con el nombre completo</b><div class="cap2">Al pasar el cursor o enfocar. Esc lo cierra.</div></div><button class="sw on" role="switch" aria-checked="true" aria-label="Cuadro con el nombre completo" style=""></button></div>
+<div class="ph"><span>Así se verá:</span><span class="rt" style="position:static">[0]…esTitular</span><span class="sm">Solo en pantalla: no sale en el PDF ni en el JSON.</span></div>
+<div style="display:flex;gap:8px"><button class="btn g s">Restablecer</button></div>
+</div><p class="cap2">Fuera de 8 a 40 no se guarda: error con texto y <code>aria-invalid</code>; se mantiene el último valor bueno.</p></div>
+<div class="card"><h3>15 · Teclado y paleta</h3>
+<table class="m"><tbody>
+<tr><td style="width:110px;color:var(--muted)">Tab</td><td>Siguiente anotación (solo con el rótulo activo)</td></tr>
+<tr><td style="width:110px;color:var(--muted)">Mayús + Tab</td><td>Anterior</td></tr>
+<tr><td style="width:110px;color:var(--muted)">Esc</td><td>Cierra el cuadro</td></tr>
+<tr><td style="width:110px;color:var(--muted)">Ctrl+K</td><td>«Mostrar el mapField» · «Ocultar el mapField»</td></tr>
+</tbody></table>
+<div class="mn" style="width:100%"><div class="mi on"><span>Mostrar el mapField junto a cada anotación</span></div><div class="mi dim"><span>Mostrar origen de cada campo</span></div></div>
+<p class="cap2">Las anotaciones no son hoy enfocables; solo lo serían con el rótulo activo, para no añadir decenas de paradas de Tab a quien no lo usa.</p></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -749,7 +749,8 @@
       "assignPlaceholder": "Assign…",
       "pdfs": "PDFs",
       "withTemplate": "with template",
-      "withoutTemplate": "without template"
+      "withoutTemplate": "without template",
+      "search": "Search template…"
     },
     "versionsDrop": {
       "title": "New versions (B)",
@@ -760,9 +761,12 @@
       "more": "Add more",
       "unpairedTitle": "Files without a match: {{count}}",
       "unpairedText": "They do not match any PDF in the batch: assign them by hand or discard them.",
-      "assign": "Assign to…",
+      "assign": "Choose PDF…",
       "assignLabel": "Assign {{name}} to a PDF",
-      "discard": "Discard"
+      "discard": "Discard",
+      "search": "Search PDF…",
+      "noneFree": "Every PDF already has a B",
+      "linked": "{{file}} linked to {{name}}"
     },
     "filter": {
       "label": "Filter by state",
@@ -2038,7 +2042,9 @@
       "themeLight": "Switch to light theme",
       "language": "Language: {{language}}",
       "snapOn": "Align with other annotations while dragging: turn on",
-      "snapOff": "Align with other annotations while dragging: turn off"
+      "snapOff": "Align with other annotations while dragging: turn off",
+      "mapLabelOn": "Show the mapField next to each annotation",
+      "mapLabelOff": "Hide the mapField of annotations"
     },
     "group": {
       "batch": "Batch",
@@ -2712,7 +2718,45 @@
       "altHint": "Hold Alt (⌥ on Mac) while dragging to skip aligning for that moment.",
       "jsonKeys": "JSON format",
       "jsonKeysHelp": "Keys and value quotes in the “JSON annotations” editor, when copying and when downloading. Import reads any of them.",
-      "jsonQuote": "Value quotes"
+      "jsonQuote": "Value quotes",
+      "mapLabel": "Show the mapField next to each annotation",
+      "mapLabelHelp": "Mini label and a box with each annotation's full name. More settings in Advanced."
     }
+  },
+  "mapLabel": {
+    "title": "Identify annotations",
+    "info": "Shows the end of the mapField next to each annotation and the full name on hover or Tab focus. Screen only: it is not in the PDF or the JSON.",
+    "show": "Show the mapField next to each annotation",
+    "showHelp": "Mini label with the end of the name.",
+    "legend": "Show mapField",
+    "scope": {
+      "label": "Which annotations",
+      "check": "Checkboxes and options",
+      "all": "All"
+    },
+    "max": "Maximum characters",
+    "maxError": "Between 8 and 40 characters.",
+    "position": {
+      "label": "Position",
+      "auto": "Automatic",
+      "right": "Right",
+      "above": "Above"
+    },
+    "tooltip": "Box with the full name",
+    "tooltipHelp": "On hover or focus. Esc closes it.",
+    "preview": "It will look like this:",
+    "screenOnly": "Screen only: it is not in the PDF or the JSON.",
+    "reset": "Reset",
+    "hidden": "Hidden labels: {{count}} · zoom in",
+    "none": "no mapField",
+    "meta": "{{type}} · page {{page}} · x {{x}} · y {{y}}"
+  },
+  "search": {
+    "total": "{{total}} available",
+    "count": "{{shown}} of {{total}}",
+    "noMatch": "Nothing matches “{{query}}”.",
+    "clear": "Clear search",
+    "suggested": "Suggested",
+    "all": "All"
   }
 }

@@ -1,4 +1,12 @@
 import { Injectable, computed, signal } from '@angular/core';
+import {
+  DEFAULT_MAP_LABEL_SETTINGS,
+  normalizeMapLabelMax,
+  normalizeMapLabelSettings,
+  type MapLabelPosition,
+  type MapLabelScope,
+  type MapLabelSettings,
+} from '../utils/map-label.utils';
 import { LooseJsonError, parseLooseJson } from '../utils/loose-json';
 import {
   DEFAULT_SAMPLE_VALUES,
@@ -13,6 +21,7 @@ const SAMPLES_KEY = 'pdf-annotator.sampleValues';
 const DATA_KEY = 'pdf-annotator.testData';
 const MODE_KEY = 'pdf-annotator.previewMode';
 const BATCH_MODE_KEY = 'pdf-annotator.previewModeBatch';
+const MAP_LABEL_KEY = 'pdf-annotator.mapLabel';
 const ORIGIN_KEY = 'pdf-annotator.showOrigin';
 export const MAX_TEST_DATA_BYTES = 5 * 1024 * 1024;
 
@@ -38,6 +47,8 @@ export class PreviewSettingsService {
     this.inBatch() ? this.batchModeValue() : this.editorMode(),
   );
   readonly showOrigin = signal<boolean>(this.loadFlag(ORIGIN_KEY));
+  /** Mini label and tooltip with each annotation's mapField (P-184 a P-186). Off by default; screen only. */
+  readonly mapLabel = signal<MapLabelSettings>(this.loadMapLabel());
 
   private readonly parsed = computed<{ data: unknown | null; error: TestDataError | null }>(() => {
     const text = this.testDataText();
@@ -91,6 +102,52 @@ export class PreviewSettingsService {
   setShowOrigin(show: boolean): void {
     this.showOrigin.set(show);
     this.save(ORIGIN_KEY, show ? '1' : '0');
+  }
+
+  setMapLabelShow(show: boolean): void {
+    this.updateMapLabel({ show });
+  }
+
+  setMapLabelScope(scope: MapLabelScope): void {
+    this.updateMapLabel({ scope });
+  }
+
+  setMapLabelPosition(position: MapLabelPosition): void {
+    this.updateMapLabel({ position });
+  }
+
+  setMapLabelTooltip(tooltip: boolean): void {
+    this.updateMapLabel({ tooltip });
+  }
+
+  /** Returns false (and keeps the last good value) when the number is outside 8–40. */
+  setMapLabelMax(value: unknown): boolean {
+    const max = normalizeMapLabelMax(value);
+    if (max === null) {
+      return false;
+    }
+    this.updateMapLabel({ max });
+    return true;
+  }
+
+  resetMapLabel(): void {
+    this.mapLabel.set(DEFAULT_MAP_LABEL_SETTINGS);
+    this.save(MAP_LABEL_KEY, JSON.stringify(DEFAULT_MAP_LABEL_SETTINGS));
+  }
+
+  private updateMapLabel(patch: Partial<MapLabelSettings>): void {
+    const next = normalizeMapLabelSettings({ ...this.mapLabel(), ...patch });
+    this.mapLabel.set(next);
+    this.save(MAP_LABEL_KEY, JSON.stringify(next));
+  }
+
+  private loadMapLabel(): MapLabelSettings {
+    try {
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(MAP_LABEL_KEY) : null;
+      return normalizeMapLabelSettings(raw ? JSON.parse(raw) : null);
+    } catch {
+      return DEFAULT_MAP_LABEL_SETTINGS;
+    }
   }
 
   setSample(kind: SampleKind, value: string): void {

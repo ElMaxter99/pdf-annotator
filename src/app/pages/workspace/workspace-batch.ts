@@ -1,4 +1,5 @@
 import { prepareFieldForStorage } from '../../utils/field-style.utils';
+import { shortenMapField } from '../../utils/map-label.utils';
 import { serializeFieldForJson } from '../../utils/json-text.utils';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
@@ -260,13 +261,15 @@ export class WorkspaceBatch {
     el.className = 'reference-field';
     el.classList.toggle('reference-field--missing', missing);
     el.classList.toggle('reference-field--solo', solo);
-    el.textContent = name;
+    const cfg = this.previewSettings.mapLabel();
+    const shown = cfg.show && name ? shortenMapField(name, cfg.max) : name;
+    el.textContent = shown;
     el.title = name;
     el.dataset['name'] = name;
     el.style.left = `${px * scale}px`;
     el.style.top = `${canvasHeight - py * scale - size * scale}px`;
     el.style.height = `${size * scale * 1.2}px`;
-    el.style.minWidth = `${Math.max(24, name.length * size * 0.55 * scale)}px`;
+    el.style.minWidth = `${Math.max(24, shown.length * size * 0.55 * scale)}px`;
     el.style.fontSize = `${Math.max(10, size * scale * 0.8)}px`;
     layer.appendChild(el);
   }
