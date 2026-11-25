@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-166 Validar ausentes en B · flujo y reglas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.p h1,.p h2,.p h3,.p p{margin:0}.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}.cols{display:flex;gap:24px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.sec{font-size:13px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between}
+.r{background:var(--soft);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.r b{font-family:Consolas,monospace;font-size:13px}.r small{display:block;color:var(--muted);font-size:12px}.r .g{flex:1}
+.btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:5px 12px;min-height:32px;background:transparent;color:var(--text)}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.chip{display:inline-flex;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted)}
+.chip.ok{color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent)}.chip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.num{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:13px;align-items:center;justify-content:center;flex:none}
+.li{display:flex;gap:12px;align-items:flex-start}.li p{line-height:1.5}
+.tw{width:15px;height:15px;border-radius:4px;border:1px solid var(--muted)}
+</style>
+</helmet>
+<div class="p" style="width:1720px;height:820px;--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff8a8a;--text:#f5f5f5;--muted:#b0b0b0;--ink:#041818;--line:rgba(255,255,255,.16);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1d1d2a">
+<div class="lab">P-166 · Definitivo · 1.19 · Flujo y reglas</div><h1 style="font-size:28px">Validar los campos de A que no existen en B</h1>
+<p class="cap" style="max-width:1100px">Origen: con la propuesta de la IA abierta, Maxter coloca a mano un campo de «De A · no existen en B» y la fila sigue diciendo «lo correcto es no colocarlo». Hoy la fila es una foto de lo que dijo la IA y no hay manera de dejarla resuelta.</p>
+<div class="cols"><div class="card" style="width:830px"><h3>Reglas</h3>
+<div class="li"><span class="num">1</span><p><b>Colocar</b> el campo (Colocar a mano, arrastrar o «Poner plantilla A») lo pasa solo a «Resueltos por ti» con «✓ Colocado».</p></div><div class="li"><span class="num">2</span><p><b>Validar: no existe</b> (botón nuevo en filas «no existen en B» y «sin colocar») lo da por resuelto sin colocarlo. «Deshacer» en la misma fila lo devuelve a «Por decidir».</p></div><div class="li"><span class="num">3</span><p>Solo «Por decidir» cuenta como pendiente: coincide con «Dar por revisado» (1.19) y con la cola del lote.</p></div><div class="li"><span class="num">4</span><p>El texto ya no afirma «lo correcto es no colocarlo»: dice «no existe en B» y decide la persona.</p></div><div class="li"><span class="num">5</span><p>El chip del lote «N ya no en B» baja al colocar o validar.</p></div><div class="li"><span class="num">6</span><p>Se guarda con el PDF del lote; en un PDF suelto, con la sesión. Textos en los 7 idiomas.</p></div></div>
+<div class="card" style="width:830px"><h3>Flujo de una fila</h3><div class="cap">Por decidir → Colocar a mano → <b>✓ Colocado</b><br>Por decidir → Validar: no existe → <b>✓ Validado</b> → Deshacer → Por decidir<br>✓ Colocado, si se borra el campo de B → vuelve a Por decidir</div>
+<div class="cap" style="margin-top:8px">Acción local e instantánea: sin cargando ni error. Teclado: ambos son botones con foco visible.</div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":820}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

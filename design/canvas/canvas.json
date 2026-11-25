@@ -1122,18 +1122,204 @@
    "title": "P-124 Contraste del acento en el tema claro"
   },
   "P-125-almacenamiento-flujo-y-pantalla-oscuro-1650.dc.html": {
-   "x": 7400,
-   "y": 1500,
+   "x": 0,
+   "y": 153909,
    "w": 1688,
    "h": 2128,
    "title": "P-125 Almacenamiento · flujo y pantalla · oscuro 1650"
   },
   "P-126-almacenamiento-estados-claro-1280.dc.html": {
-   "x": 9168,
-   "y": 1500,
+   "x": 1768,
+   "y": 153909,
    "w": 1280,
    "h": 3014,
    "title": "P-126 Almacenamiento · estados · claro 1280"
+  },
+  "P-147-dar-por-revisado-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 171000,
+   "w": 1720,
+   "h": 1100
+  },
+  "P-148-dar-por-revisado-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 171000,
+   "w": 1720,
+   "h": 1000
+  },
+  "P-149-dar-por-revisado-estados-claro-1280.dc.html": {
+   "x": 3600,
+   "y": 171000,
+   "w": 1280,
+   "h": 1480
+  },
+  "P-153-alinear-al-arrastrar-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 198300,
+   "w": 1720,
+   "h": 1100,
+   "title": "P-153 Alinear al arrastrar · flujo y reglas"
+  },
+  "P-154-alinear-al-arrastrar-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 198300,
+   "w": 1720,
+   "h": 1200,
+   "title": "P-154 Alinear al arrastrar · pantalla · oscuro 1650"
+  },
+  "P-155-alinear-al-arrastrar-estados-claro-1280.dc.html": {
+   "x": 3600,
+   "y": 198300,
+   "w": 1280,
+   "h": 1700,
+   "title": "P-155 Alinear al arrastrar · estados · claro 1280"
+  },
+  "P-160-descarga-del-lote-formato-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 200600,
+   "w": 1720,
+   "h": 900,
+   "title": "P-160 Descarga del lote · formato · flujo y reglas"
+  },
+  "P-161-descarga-del-lote-formato-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 200600,
+   "w": 1720,
+   "h": 900,
+   "title": "P-161 Descarga del lote · formato · pantalla · oscuro 1650"
+  },
+  "P-162-descarga-del-lote-formato-estados-claro-1280.dc.html": {
+   "x": 3600,
+   "y": 200600,
+   "w": 1280,
+   "h": 1250,
+   "title": "P-162 Descarga del lote · formato · estados · claro 1280"
+  },
+  "P-166-validar-ausentes-en-b-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 204230,
+   "w": 1720,
+   "h": 820,
+   "title": "P-166 Validar ausentes en B · flujo y reglas"
+  },
+  "P-167-validar-ausentes-en-b-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 204230,
+   "w": 1720,
+   "h": 520,
+   "title": "P-167 Validar ausentes en B · pantalla · oscuro 1650"
+  },
+  "P-168-validar-ausentes-en-b-estados-claro-1280.dc.html": {
+   "x": 3600,
+   "y": 204230,
+   "w": 1280,
+   "h": 820,
+   "title": "P-168 Validar ausentes en B · estados · claro 1280"
+  },
+  "P-175-personalizar-el-json-en-modal-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 202450,
+   "w": 1720,
+   "h": 760,
+   "title": "P-175 Personalizar el JSON en modal · flujo y reglas"
+  },
+  "P-176-personalizar-el-json-en-modal-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 202450,
+   "w": 1624,
+   "h": 820,
+   "title": "P-176 Personalizar el JSON en modal · pantalla · oscuro 1650"
+  },
+  "P-177-personalizar-el-json-en-modal-estados-claro-1280.dc.html": {
+   "x": 3504,
+   "y": 202450,
+   "w": 1280,
+   "h": 1180,
+   "title": "P-177 Personalizar el JSON en modal · estados · claro 1280"
+  },
+  "P-181-buscar-pdf-al-vincular-b-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 189540,
+   "w": 1720,
+   "h": 1000,
+   "title": "P-181 Buscar PDF al vincular B · flujo y reglas"
+  },
+  "P-182-buscar-pdf-al-vincular-b-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 189540,
+   "w": 1720,
+   "h": 860,
+   "title": "P-182 Buscar PDF al vincular B · pantalla · oscuro 1650"
+  },
+  "P-183-buscar-pdf-al-vincular-b-estados-claro-1280.dc.html": {
+   "x": 3600,
+   "y": 189540,
+   "w": 1280,
+   "h": 1180,
+   "title": "P-183 Buscar PDF al vincular B · estados · claro 1280"
+  },
+  "P-184-ver-el-mapfield-de-cada-anotacion-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 194600,
+   "w": 1720,
+   "h": 1540,
+   "title": "P-184 Ver el mapField · flujo y reglas"
+  },
+  "P-185-ver-el-mapfield-de-cada-anotacion-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 194600,
+   "w": 1720,
+   "h": 1098,
+   "title": "P-185 Ver el mapField · pantalla · oscuro 1650"
+  },
+  "P-186-ver-el-mapfield-de-cada-anotacion-estados-claro-1280.dc.html": {
+   "x": 3600,
+   "y": 194600,
+   "w": 1280,
+   "h": 2900,
+   "title": "P-186 Ver el mapField · estados · claro 1280"
+  },
+  "P-190-anadir-y-reemplazar-pdfs-a-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 185280,
+   "w": 1720,
+   "h": 2100,
+   "title": "P-190 Añadir y reemplazar PDFs A · flujo y reglas"
+  },
+  "P-191-anadir-y-reemplazar-pdfs-a-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 185280,
+   "w": 1720,
+   "h": 3700,
+   "title": "P-191 Añadir y reemplazar PDFs A · pantalla · oscuro 1650"
+  },
+  "P-192-anadir-y-reemplazar-pdfs-a-estados-claro-1280.dc.html": {
+   "x": 3600,
+   "y": 185280,
+   "w": 1280,
+   "h": 3400,
+   "title": "P-192 Añadir y reemplazar PDFs A · estados · claro 1280"
+  },
+  "P-200-simplificar-el-json-y-plegar-flujo-y-reglas.dc.html": {
+   "x": 0,
+   "y": 191260,
+   "w": 1720,
+   "h": 1060,
+   "title": "P-200 Simplificar el JSON y plegar · flujo y reglas"
+  },
+  "P-201-simplificar-el-json-y-plegar-pantalla-oscuro-1650.dc.html": {
+   "x": 1800,
+   "y": 191260,
+   "w": 1720,
+   "h": 720,
+   "title": "P-201 Simplificar el JSON y plegar · pantalla · oscuro 1650"
+  },
+  "P-202-simplificar-el-json-y-plegar-estados-claro-1280.dc.html": {
+   "x": 3600,
+   "y": 191260,
+   "w": 1280,
+   "h": 1340,
+   "title": "P-202 Simplificar el JSON y plegar · estados · claro 1280"
   }
  },
  "order": [
@@ -1298,7 +1484,34 @@
   "P-123-actualizar-tras-cancelar-la-contrasena.dc.html",
   "P-124-contraste-del-acento-en-claro.dc.html",
   "P-125-almacenamiento-flujo-y-pantalla-oscuro-1650.dc.html",
-  "P-126-almacenamiento-estados-claro-1280.dc.html"
+  "P-126-almacenamiento-estados-claro-1280.dc.html",
+  "P-147-dar-por-revisado-flujo-y-reglas.dc.html",
+  "P-148-dar-por-revisado-pantalla-oscuro-1650.dc.html",
+  "P-149-dar-por-revisado-estados-claro-1280.dc.html",
+  "P-153-alinear-al-arrastrar-flujo-y-reglas.dc.html",
+  "P-154-alinear-al-arrastrar-pantalla-oscuro-1650.dc.html",
+  "P-155-alinear-al-arrastrar-estados-claro-1280.dc.html",
+  "P-160-descarga-del-lote-formato-flujo-y-reglas.dc.html",
+  "P-161-descarga-del-lote-formato-pantalla-oscuro-1650.dc.html",
+  "P-162-descarga-del-lote-formato-estados-claro-1280.dc.html",
+  "P-166-validar-ausentes-en-b-flujo-y-reglas.dc.html",
+  "P-167-validar-ausentes-en-b-pantalla-oscuro-1650.dc.html",
+  "P-168-validar-ausentes-en-b-estados-claro-1280.dc.html",
+  "P-175-personalizar-el-json-en-modal-flujo-y-reglas.dc.html",
+  "P-176-personalizar-el-json-en-modal-pantalla-oscuro-1650.dc.html",
+  "P-177-personalizar-el-json-en-modal-estados-claro-1280.dc.html",
+  "P-181-buscar-pdf-al-vincular-b-flujo-y-reglas.dc.html",
+  "P-182-buscar-pdf-al-vincular-b-pantalla-oscuro-1650.dc.html",
+  "P-183-buscar-pdf-al-vincular-b-estados-claro-1280.dc.html",
+  "P-184-ver-el-mapfield-de-cada-anotacion-flujo-y-reglas.dc.html",
+  "P-185-ver-el-mapfield-de-cada-anotacion-pantalla-oscuro-1650.dc.html",
+  "P-186-ver-el-mapfield-de-cada-anotacion-estados-claro-1280.dc.html",
+  "P-190-anadir-y-reemplazar-pdfs-a-flujo-y-reglas.dc.html",
+  "P-191-anadir-y-reemplazar-pdfs-a-pantalla-oscuro-1650.dc.html",
+  "P-192-anadir-y-reemplazar-pdfs-a-estados-claro-1280.dc.html",
+  "P-200-simplificar-el-json-y-plegar-flujo-y-reglas.dc.html",
+  "P-201-simplificar-el-json-y-plegar-pantalla-oscuro-1650.dc.html",
+  "P-202-simplificar-el-json-y-plegar-estados-claro-1280.dc.html"
  ],
  "notes": {
   "t0": {
@@ -1312,7 +1525,7 @@
    "x": -420,
    "y": 0,
    "w": 340,
-   "text": "Dos zonas. DEFINITIVO (izquierda): solo lo que está en producción o implementado, una versión por vista (V-NN = capturas 1:1 del DOM real; P-NN aprobadas y ya en la app). PROPUESTAS (derecha): lo pendiente de aprobar y lo programado sin fusionar. Cuando una propuesta se aprueba e implementa, pasa a Definitivo y sustituye a la anterior; si se piden cambios, se rehace en Propuestas. Las versiones descartadas o superadas se quitan del lienzo (archivadas fuera). Solo escritorio.\n\nRegla: todo diseño nuevo se queda en PROPUESTAS hasta que se promociona a producción; entonces pasa a DEFINITIVO y se queda para siempre. Lo superado se retira solo cuando la persona responsable lo pide.\n\nPuesta al día 2026-11-22: todo lo que está en producción (1.14 a 1.17) vive ya en DEFINITIVO. En PROPUESTAS solo queda lo pendiente de aprobar."
+   "text": "Dos zonas. DEFINITIVO (izquierda): solo lo que está en producción o implementado, una versión por vista (V-NN = capturas 1:1 del DOM real; P-NN aprobadas y ya en la app). PROPUESTAS (derecha): lo pendiente de aprobar y lo programado sin fusionar. Cuando una propuesta se aprueba e implementa, pasa a Definitivo y sustituye a la anterior; si se piden cambios, se rehace en Propuestas. Las versiones descartadas o superadas se quitan del lienzo (archivadas fuera). Solo escritorio.\n\nRegla: todo diseño nuevo se queda en PROPUESTAS hasta que se promociona a producción; entonces pasa a DEFINITIVO y se queda para siempre. Lo superado se retira solo cuando la persona responsable lo pide.\n\nPuesta al día 2026-11-22: todo lo que está en producción (1.14 a 1.17) vive ya en DEFINITIVO. En PROPUESTAS solo queda lo pendiente de aprobar.\n\nPuesta al día 2026-11-25: las propuestas publicadas hasta la 1.20.0 (imán al arrastrar, formato de los JSON, «Personalizar» en modal, validar ausentes, buscador al vincular B, mapField, añadir y reemplazar A, editor JSON con plegado) están en DEFINITIVO; las versiones que sustituyen (claves del JSON, «Personalizar» en desplegable) se retiraron y están archivadas en design/archivo/. En PROPUESTAS solo queda la vista A con valores de muestra (1.20.1)."
   },
   "z_Definitivo": {
    "x": 0,
@@ -1572,6 +1785,48 @@
    "text": "Propuestas · Almacenamiento de la app de escritorio (sin aprobar; candidata 1.18)",
    "kind": "title1",
    "maxW": 5920
+  },
+  "gz_Definitivo_49": {
+   "x": 0,
+   "y": 189260,
+   "text": "Definitivo · Lote · buscar el PDF al vincular versiones B (1.20)",
+   "kind": "title1",
+   "maxW": 4880
+  },
+  "gz_Definitivo_51": {
+   "x": 0,
+   "y": 198000,
+   "text": "Definitivo · Editor · imán entre anotaciones al arrastrar (1.19)",
+   "kind": "title1",
+   "maxW": 4880
+  },
+  "gz_Definitivo_52": {
+   "x": 0,
+   "y": 200300,
+   "text": "Definitivo · Lote · formato de los JSON al descargar (1.19)",
+   "kind": "title1",
+   "maxW": 4880
+  },
+  "gz_Definitivo_53": {
+   "x": 0,
+   "y": 202150,
+   "text": "Definitivo · Editor · «Personalizar» el JSON en un modal: claves, valores, sangría y coma final (1.19)",
+   "kind": "title1",
+   "maxW": 4880
+  },
+  "gz_Definitivo_54": {
+   "x": 0,
+   "y": 203930,
+   "text": "Definitivo · Editor · validar los campos de A que no existen en B (1.19)",
+   "kind": "title1",
+   "maxW": 4880
+  },
+  "gz_Definitivo_55": {
+   "x": 0,
+   "y": 184980,
+   "text": "Definitivo · Lote · añadir PDFs A y reemplazar la A de una fila (1.20)",
+   "kind": "title1",
+   "maxW": 3600
   }
  },
  "designSystems": []
