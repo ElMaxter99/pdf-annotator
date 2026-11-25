@@ -2724,6 +2724,7 @@
     }
   },
   "mapLabel": {
+    "fromA": "Version A · schreibgeschützt",
     "title": "Anmerkungen erkennen",
     "info": "Zeigt das Ende des mapField neben jeder Anmerkung und den vollen Namen beim Darüberfahren oder per Tab-Fokus. Nur auf dem Bildschirm: nicht im PDF und nicht im JSON.",
     "show": "mapField neben jeder Anmerkung anzeigen",
