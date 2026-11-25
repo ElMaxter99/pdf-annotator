@@ -266,7 +266,8 @@
           "text": "Text",
           "check": "Casella",
           "radio": "Botó d'opció",
-          "number": "Nombre"
+          "number": "Nombre",
+          "date": "Data"
         }
       },
       "value": {
@@ -280,6 +281,15 @@
         "appender": {
           "label": "Sufix",
           "placeholder": "Ex.: %"
+        }
+      },
+      "date": {
+        "format": {
+          "label": "Format",
+          "custom": "Personalitzat…",
+          "customLabel": "Format personalitzat",
+          "tokens": "DD dia · MM mes · YYYY any (D, M i YY sense zeros o amb dues xifres)",
+          "example": "Es veurà així: {{example}}"
         }
       },
       "locked": {
@@ -407,7 +417,8 @@
       "missingPages": "{{count}} pàgina(es) que no existeixen al PDF",
       "outOfPage": "{{count}} anotació(ns) fora de la pàgina",
       "fontSize": "{{count}} mida(es) de font fora de 8–72",
-      "opacity": "{{count}} opacitat(s) fora de 0,1–1"
+      "opacity": "{{count}} opacitat(s) fora de 0,1–1",
+      "dateFormat": "{{count}} format(s) de data no vàlid(s): s'usa DD/MM/YYYY"
     },
     "batch": {
       "invalidFile": "{{count}} fitxer(s) ignorat(s): només s’admeten PDF i JSON.",
@@ -1427,6 +1438,7 @@
       "check": "Casella",
       "radio": "Opció",
       "number": "Número",
+      "date": "Data",
       "hint": "Fins a 12 caràcters.",
       "reset": "Restableix",
       "note": "Es desen en aquest navegador i valen per a totes les plantilles. Es veuen a la previsualització i al PDF exportat."

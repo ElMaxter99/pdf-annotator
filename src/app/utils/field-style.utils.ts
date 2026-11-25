@@ -8,6 +8,7 @@ import {
   sanitizeTextPreservingSpacing,
 } from './annotation-fields.utils';
 import { toFiniteNumber } from './number.utils';
+import { DEFAULT_DATE_FORMAT, sanitizeDateFormat } from './date-format.utils';
 
 export const DEFAULT_OPACITY = 1;
 
@@ -125,6 +126,10 @@ export function prepareFieldForStorage(
     }
   }
 
+  if (type === 'date') {
+    base.dateFormat = sanitizeDateFormat(styled.dateFormat) ?? DEFAULT_DATE_FORMAT;
+  }
+
   return base;
 }
 
@@ -143,6 +148,7 @@ export function prepareFieldForForm(
     value: typeof styled.value === 'string' ? styled.value : '',
     appender: typeof styled.appender === 'string' ? styled.appender : '',
     decimals,
+    dateFormat: typeof styled.dateFormat === 'string' ? styled.dateFormat : '',
     locked: !!styled.locked,
     hidden: !!styled.hidden,
   };
@@ -166,6 +172,7 @@ export function areFieldsEqual(
     (sanitizedA.value ?? undefined) === (sanitizedB.value ?? undefined) &&
     (sanitizedA.appender ?? undefined) === (sanitizedB.appender ?? undefined) &&
     (sanitizedA.decimals ?? undefined) === (sanitizedB.decimals ?? undefined) &&
+    (sanitizedA.dateFormat ?? undefined) === (sanitizedB.dateFormat ?? undefined) &&
     (sanitizedA.fontFamily ?? DEFAULT_FONT_ID) === (sanitizedB.fontFamily ?? DEFAULT_FONT_ID) &&
     (sanitizedA.opacity ?? DEFAULT_OPACITY) === (sanitizedB.opacity ?? DEFAULT_OPACITY) &&
     (sanitizedA.backgroundColor ?? null) === (sanitizedB.backgroundColor ?? null) &&

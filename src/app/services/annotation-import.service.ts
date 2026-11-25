@@ -12,6 +12,7 @@ import {
 import { JsonShapeError } from '../utils/json-text.utils';
 import { parseLooseJson } from '../utils/loose-json';
 import { toFiniteNumber } from '../utils/number.utils';
+import { sanitizeDateFormat } from '../utils/date-format.utils';
 
 /** What looked wrong in imported data. Nothing here changes the imported result. */
 export interface ImportReport {
@@ -23,10 +24,12 @@ export interface ImportReport {
   fontSizeOutOfRange: number;
   /** Opacities outside 0.1–1. */
   opacityOutOfRange: number;
+  /** Date fields whose `dateFormat` was not usable (the default DD/MM/YYYY is used instead). */
+  invalidDateFormat: number;
 }
 
 export function emptyImportReport(): ImportReport {
-  return { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0 };
+  return { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0, invalidDateFormat: 0 };
 }
 
 export function hasImportIssues(report: ImportReport): boolean {
@@ -101,7 +104,7 @@ export class AnnotationImportService {
           continue;
         }
 
-        const { x, y, mapField, fontSize, color, value, type, decimals, appender } =
+        const { x, y, mapField, fontSize, color, value, type, decimals, appender, dateFormat } =
           rawField as Record<string, unknown>;
 
         const normalizedType = normalizeFieldType(type);
@@ -154,6 +157,15 @@ export class AnnotationImportService {
           const normalizedAppender = sanitizeOptionalAppender(appender);
           if (normalizedAppender !== undefined) {
             normalizedField.appender = normalizedAppender;
+          }
+        }
+
+        if (normalizedType === 'date') {
+          const normalizedDateFormat = sanitizeDateFormat(dateFormat);
+          if (normalizedDateFormat !== undefined) {
+            normalizedField.dateFormat = normalizedDateFormat;
+          } else if (dateFormat !== undefined && dateFormat !== null && dateFormat !== '') {
+            report.invalidDateFormat += 1;
           }
         }
 

@@ -266,7 +266,8 @@
           "text": "Text",
           "check": "Checkbox",
           "radio": "Radio button",
-          "number": "Number"
+          "number": "Number",
+          "date": "Date"
         }
       },
       "value": {
@@ -280,6 +281,15 @@
         "appender": {
           "label": "Suffix",
           "placeholder": "E.g. %"
+        }
+      },
+      "date": {
+        "format": {
+          "label": "Format",
+          "custom": "Custom…",
+          "customLabel": "Custom format",
+          "tokens": "DD day · MM month · YYYY year (D, M and YY without zeros or with two digits)",
+          "example": "It will look like: {{example}}"
         }
       },
       "locked": {
@@ -407,7 +417,8 @@
       "missingPages": "{{count}} page(s) that do not exist in the PDF",
       "outOfPage": "{{count}} annotation(s) outside the page",
       "fontSize": "{{count}} font size(s) outside 8–72",
-      "opacity": "{{count}} opacity value(s) outside 0.1–1"
+      "opacity": "{{count}} opacity value(s) outside 0.1–1",
+      "dateFormat": "{{count}} invalid date format(s): DD/MM/YYYY is used"
     },
     "batch": {
       "invalidFile": "{{count}} file(s) ignored: only PDF and JSON are accepted.",
@@ -1427,6 +1438,7 @@
       "check": "Checkbox",
       "radio": "Radio",
       "number": "Number",
+      "date": "Date",
       "hint": "Up to 12 characters.",
       "reset": "Reset",
       "note": "Saved in this browser and shared by all your templates. Shown in the preview and in the exported PDF."

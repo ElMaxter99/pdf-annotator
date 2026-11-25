@@ -161,6 +161,30 @@ describe('AnnotationImportService', () => {
     expect(arg.fontFamily).toBe('standard:courier');
   });
 
+  it('keeps the date type and its format, and flags unusable formats', () => {
+    const report = emptyImportReport();
+    const result = service.normalizeImportedCoordinates(
+      [
+        {
+          num: 1,
+          fields: [
+            { x: 1, y: 2, mapField: 'a', fontSize: 12, type: 'DATE', dateFormat: ' YYYY-MM-DD ' },
+            { x: 1, y: 2, mapField: 'b', fontSize: 12, type: 'date', dateFormat: 'dd/mm/yyyy' },
+            { x: 1, y: 2, mapField: 'c', fontSize: 12, type: 'text', dateFormat: 'YYYY' },
+          ],
+        },
+      ],
+      identity,
+      report
+    );
+    const [a, b, c] = result![0].fields;
+    expect(a.type).toBe('date');
+    expect(a.dateFormat).toBe('YYYY-MM-DD');
+    expect(b.dateFormat).toBeUndefined();
+    expect(c.dateFormat).toBeUndefined();
+    expect(report.invalidDateFormat).toBe(1);
+  });
+
   describe('report', () => {
     it('stays empty for clean data', () => {
       const report = emptyImportReport();
@@ -258,7 +282,7 @@ describe('AnnotationImportService', () => {
     });
 
     it('descarta NaN, Infinity, nulos, vacíos y valores no numéricos', () => {
-      const report = { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0 };
+      const report = { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0, invalidDateFormat: 0 };
       const result = service.normalizeImportedCoordinates(
         {
           pages: [
@@ -320,7 +344,7 @@ describe('AnnotationImportService', () => {
     });
 
     it('un fontSize inválido usa el global y uno fuera de rango se avisa pero se conserva', () => {
-      const report = { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0 };
+      const report = { skippedPages: 0, skippedFields: 0, fontSizeOutOfRange: 0, opacityOutOfRange: 0, invalidDateFormat: 0 };
       const result = service.normalizeImportedCoordinates(
         {
           fontSize: 20,

@@ -1795,6 +1795,32 @@ header .logo {
     opacity: .55;
   }
 
+  select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    padding: 0 6px;
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: .85rem;
+  }
+
+  select[disabled] {
+    opacity: .55;
+  }
+
+  .date-format__hint,
+  .date-format__example {
+    font-size: .72rem;
+    color: var(--muted);
+  }
+
+  .date-format__example {
+    color: var(--text);
+  }
+
   input[type="color"] {
     flex: none;
     width: 34px;

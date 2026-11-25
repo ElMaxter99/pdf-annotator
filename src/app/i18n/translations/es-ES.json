@@ -266,7 +266,8 @@
           "text": "Texto",
           "check": "Casilla",
           "radio": "Botón de opción",
-          "number": "Número"
+          "number": "Número",
+          "date": "Fecha"
         }
       },
       "value": {
@@ -280,6 +281,15 @@
         "appender": {
           "label": "Sufijo",
           "placeholder": "Ej.: %"
+        }
+      },
+      "date": {
+        "format": {
+          "label": "Formato",
+          "custom": "Personalizado…",
+          "customLabel": "Formato personalizado",
+          "tokens": "DD día · MM mes · YYYY año (D, M y YY sin ceros o con dos cifras)",
+          "example": "Se verá así: {{example}}"
         }
       },
       "locked": {
@@ -407,7 +417,8 @@
       "missingPages": "{{count}} página(s) que no existen en el PDF",
       "outOfPage": "{{count}} anotación(es) fuera de la página",
       "fontSize": "{{count}} tamaño(s) de fuente fuera de 8–72",
-      "opacity": "{{count}} opacidad(es) fuera de 0,1–1"
+      "opacity": "{{count}} opacidad(es) fuera de 0,1–1",
+      "dateFormat": "{{count}} formato(s) de fecha no válido(s): se usa DD/MM/YYYY"
     },
     "batch": {
       "invalidFile": "{{count}} archivo(s) ignorado(s): solo se admiten PDF y JSON.",
@@ -1427,6 +1438,7 @@
       "check": "Casilla",
       "radio": "Opción",
       "number": "Número",
+      "date": "Fecha",
       "hint": "Hasta 12 caracteres.",
       "reset": "Restablecer",
       "note": "Se guardan en este navegador y valen para todas tus plantillas. Se ven en la previsualización y en el PDF exportado."

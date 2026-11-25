@@ -15,6 +15,12 @@ import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import { PageField } from '../../../../models/annotation.model';
 import { fieldHasRenderableContent } from '../../../../utils/field-style.utils';
 import {
+  DATE_FORMAT_PRESETS,
+  DEFAULT_DATE_FORMAT,
+  formatDateParts,
+  sanitizeDateFormat,
+} from '../../../../utils/date-format.utils';
+import {
   placePopover,
   popoverMaxHeight,
   sheetScrollDelta,
@@ -53,7 +59,11 @@ export class AnnotationEditorComponent implements AfterViewInit, OnChanges, OnDe
   @ViewChild('fontDropdown', { static: false }) fontDropdownRef?: ElementRef<HTMLDivElement>;
   @ViewChild('fontSearch', { static: false }) fontSearchRef?: ElementRef<HTMLInputElement>;
 
-  readonly types = ['text', 'check', 'radio', 'number'] as const;
+  readonly types = ['text', 'check', 'radio', 'number', 'date'] as const;
+  readonly datePresets = DATE_FORMAT_PRESETS;
+  readonly defaultDateFormat = DEFAULT_DATE_FORMAT;
+  /** «Personalizado…» elegido aunque el texto escrito coincida (aún) con una opción de la lista. */
+  private readonly customDate = signal(false);
   readonly more = signal(readMore());
   readonly showError = signal(false);
 
@@ -69,6 +79,28 @@ export class AnnotationEditorComponent implements AfterViewInit, OnChanges, OnDe
   /** In edit mode a locked annotation cannot be modified until unlocked. */
   get locked(): boolean {
     return this.isEdit && !!this.field.locked;
+  }
+
+  get dateChoice(): string {
+    const format = (this.field.dateFormat ?? '').trim() || DEFAULT_DATE_FORMAT;
+    return !this.customDate() && (DATE_FORMAT_PRESETS as readonly string[]).includes(format)
+      ? format
+      : 'custom';
+  }
+
+  /** Ejemplo con un día y un mes de una cifra, para que se vea la diferencia entre D y DD. */
+  get dateExample(): string {
+    const format = sanitizeDateFormat(this.field.dateFormat) ?? DEFAULT_DATE_FORMAT;
+    return formatDateParts({ year: 2026, month: 3, day: 5 }, format);
+  }
+
+  onDateChoice(choice: string) {
+    if (choice === 'custom') {
+      this.customDate.set(true);
+      return;
+    }
+    this.customDate.set(false);
+    this.field.dateFormat = choice;
   }
 
   get hexValue(): string {

@@ -266,7 +266,8 @@
           "text": "Text",
           "check": "Kontrollkästchen",
           "radio": "Optionsfeld",
-          "number": "Zahl"
+          "number": "Zahl",
+          "date": "Datum"
         }
       },
       "value": {
@@ -280,6 +281,15 @@
         "appender": {
           "label": "Suffix",
           "placeholder": "Z. B. %"
+        }
+      },
+      "date": {
+        "format": {
+          "label": "Format",
+          "custom": "Eigenes…",
+          "customLabel": "Eigenes Format",
+          "tokens": "DD Tag · MM Monat · YYYY Jahr (D, M und YY ohne Nullen bzw. zweistellig)",
+          "example": "So sieht es aus: {{example}}"
         }
       },
       "locked": {
@@ -407,7 +417,8 @@
       "missingPages": "{{count}} Seite(n), die im PDF nicht existieren",
       "outOfPage": "{{count}} Anmerkung(en) außerhalb der Seite",
       "fontSize": "{{count}} Schriftgröße(n) außerhalb von 8–72",
-      "opacity": "{{count}} Deckkraftwert(e) außerhalb von 0,1–1"
+      "opacity": "{{count}} Deckkraftwert(e) außerhalb von 0,1–1",
+      "dateFormat": "{{count}} ungültige(s) Datumsformat(e): DD/MM/YYYY wird verwendet"
     },
     "batch": {
       "invalidFile": "{{count}} Datei(en) ignoriert: nur PDF und JSON werden akzeptiert.",
@@ -1427,6 +1438,7 @@
       "check": "Kontrollkästchen",
       "radio": "Option",
       "number": "Zahl",
+      "date": "Datum",
       "hint": "Bis zu 12 Zeichen.",
       "reset": "Zurücksetzen",
       "note": "In diesem Browser gespeichert und für alle Vorlagen gültig. Sichtbar in der Vorschau und im exportierten PDF."

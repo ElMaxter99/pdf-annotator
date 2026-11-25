@@ -1,6 +1,7 @@
 import type { PageField } from '../models/annotation.model';
 import { formatNumberWithTruncation, toFiniteNumber } from './number.utils';
 import { normalizeFieldDecimals, normalizeFieldType, sanitizeOptionalAppender } from './annotation-fields.utils';
+import { formatDateValue } from './date-format.utils';
 
 export type PreviewMode = 'sample' | 'map' | 'data';
 
@@ -9,6 +10,7 @@ export interface SampleValues {
   readonly check: string;
   readonly radio: string;
   readonly number: string;
+  readonly date: string;
 }
 
 export const MAX_SAMPLE_LENGTH = 12;
@@ -17,6 +19,7 @@ export const DEFAULT_SAMPLE_VALUES: SampleValues = {
   check: 'X',
   radio: 'X',
   number: '00000',
+  date: '31/12/2026',
 };
 
 export type SampleKind = keyof SampleValues;
@@ -32,7 +35,13 @@ export function normalizeSampleValues(raw: unknown): SampleValues {
     const clean = value.replace(/[\r\n\t]+/g, ' ').trim().slice(0, MAX_SAMPLE_LENGTH);
     return clean || DEFAULT_SAMPLE_VALUES[key];
   };
-  return { text: pick('text'), check: pick('check'), radio: pick('radio'), number: pick('number') };
+  return {
+    text: pick('text'),
+    check: pick('check'),
+    radio: pick('radio'),
+    number: pick('number'),
+    date: pick('date'),
+  };
 }
 
 const BLOCKED_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
@@ -128,6 +137,13 @@ function formatNumber(raw: string, field: PageField): string {
   return `${formatted}${appender}`;
 }
 
+/** Numbers get their decimals and appender, dates their format; other types paint the text as it is. */
+function formatTyped(raw: string, field: PageField, type: string): string {
+  if (type === 'number') return formatNumber(raw, field);
+  if (type === 'date') return formatDateValue(raw, field.dateFormat);
+  return raw;
+}
+
 /**
  * Decides what an annotation paints. Priority: its own `value`, then the test data (mode `data`),
  * then the sample value of its type. Mode `map` paints the mapField as the editor always did.
@@ -150,7 +166,7 @@ export function resolveFieldPreview(field: PageField, ctx: PreviewContext): Prev
   if (ctx.mode === 'data' && ctx.data !== null && type !== 'check' && type !== 'radio') {
     const resolved = resolveMapPath(ctx.data, mapField);
     if (resolved !== undefined) {
-      return { text: type === 'number' ? formatNumber(resolved, field) : resolved, source: 'data' };
+      return { text: formatTyped(resolved, field, type), source: 'data' };
     }
   }
 
@@ -158,7 +174,7 @@ export function resolveFieldPreview(field: PageField, ctx: PreviewContext): Prev
   const unresolved =
     ctx.mode === 'data' && ctx.data !== null && type !== 'check' && type !== 'radio';
   return {
-    text: type === 'number' ? formatNumber(sample, field) : sample,
+    text: formatTyped(sample, field, type),
     source: 'sample',
     ...(unresolved ? { unresolved: true } : {}),
   };

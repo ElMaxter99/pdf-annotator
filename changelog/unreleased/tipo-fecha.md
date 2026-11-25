@@ -1,0 +1,4 @@
+---
+type: Added
+---
+**Nuevo tipo de anotación «Fecha» (`date`, 1.20.2, sin mesas por decisión de Maxter):** quinta opción del selector de tipo del editor. Lleva un formato (`dateFormat`, por defecto `DD/MM/YYYY`) que se elige de una lista (`DD/MM/YYYY`, `DD-MM-YYYY`, `YYYY-MM-DD`, `DD/MM/YY`, `D/M/YYYY`) o se escribe en «Personalizado…» con los símbolos `DD`, `D`, `MM`, `M`, `YYYY` y `YY`, con un ejemplo debajo («Se verá así: 05/03/2026»). La vista previa y el PDF exportado escriben la muestra de fecha (nueva fila «Fecha» en «Valores de muestra», 31/12/2026) y los datos de prueba que se leen como fecha (`2026-12-31`, `2026-12-31T10:00:00Z`, `31/12/2026`) con ese formato; otro valor se pinta tal cual. El JSON lleva `type: "date"` y, con las propiedades avanzadas, `dateFormat`; al importar, un formato no válido se avisa y se usa el de por defecto. Reglas en `utils/date-format.utils.ts`, con pruebas unitarias y e2e.

@@ -302,7 +302,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly aiHelper = inject(AiHelperService);
   readonly fontCatalog = inject(FontCatalogService);
   readonly previewSettings = inject(PreviewSettingsService);
-  readonly sampleKinds: readonly SampleKind[] = ['text', 'check', 'radio', 'number'];
+  readonly sampleKinds: readonly SampleKind[] = ['text', 'check', 'radio', 'number', 'date'];
   readonly previewModes: readonly PreviewMode[] = ['sample', 'map', 'data'];
   readonly coords = this.store.coords;
 
@@ -1611,6 +1611,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       value: '',
       appender: '',
       decimals: null,
+      dateFormat: '',
       fontFamily: DEFAULT_FONT_ID,
       opacity: DEFAULT_OPACITY,
       backgroundColor: null,

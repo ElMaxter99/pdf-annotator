@@ -5,7 +5,7 @@ Este archivo es la fuente de verdad para cualquier agente (Claude Code, Copilot,
 ## 1. Qué es la app
 **PDF Annotator** es una SPA en **Angular 22** (standalone components + signals) que permite:
 1. Cargar un PDF (100 % en el navegador, no hay backend ni subida de archivos).
-2. Colocar anotaciones de texto/check/radio/número sobre cualquier página, con coordenadas en **puntos PDF** (origen abajo-izquierda).
+2. Colocar anotaciones de texto/check/radio/número/fecha sobre cualquier página, con coordenadas en **puntos PDF** (origen abajo-izquierda).
 3. Sincronizar esas anotaciones con un **JSON** editable (`{ "pages": [{ "num", "fields": [...] }] }`).
 4. Exportar el JSON o un **PDF anotado** (`pdf-lib`), y guardar **plantillas** reutilizables en `localStorage`.
 

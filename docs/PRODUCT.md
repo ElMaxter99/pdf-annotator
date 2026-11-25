@@ -15,7 +15,7 @@ Todo ocurre en el navegador: no hay backend, ni subida de archivos, ni claves.
 - No ejecuta código del usuario: el JSON se parsea con un parser propio, nunca con `eval`.
 
 ## Funcionalidad actual (v1.5.0)
-Anotaciones de texto, check, radio y número; edición completa, selección múltiple, alinear y distribuir, deshacer/rehacer; rejilla, reglas y guías; JSON en vivo con árbol; plantillas; fuentes propias; exportar JSON y PDF anotado; sesión recuperable; 7 idiomas; tema claro y oscuro; responsive. Detalle en `README.md` y `docs/ARCHITECTURE.md`.
+Anotaciones de texto, check, radio, número y fecha; edición completa, selección múltiple, alinear y distribuir, deshacer/rehacer; rejilla, reglas y guías; JSON en vivo con árbol; plantillas; fuentes propias; exportar JSON y PDF anotado; sesión recuperable; 7 idiomas; tema claro y oscuro; responsive. Detalle en `README.md` y `docs/ARCHITECTURE.md`.
 
 ## Siguiente necesidad de producto
 Trabajar **muchos PDFs en serie** (20–50): subir todos a la vez, asociar a cada uno su objeto `pages`, ver antes y después cuando llega el PDF nuevo, remaquetar y pasar al siguiente. Cada PDF es distinto, así que no se aplica un reajuste global a todo el lote. Se diseña y se trabaja en su propio hilo; ver `docs/ROADMAP.md`.

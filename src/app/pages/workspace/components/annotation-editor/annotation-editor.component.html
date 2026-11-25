@@ -57,6 +57,26 @@
       </div>
     }
 
+    @if (field.type === 'date') {
+      <div class="field date-format">
+        <label class="field-label" [for]="mode + '-date-format'">{{ 'annotation.fields.date.format.label' | t }}</label>
+        <select [id]="mode + '-date-format'" [ngModel]="dateChoice" (ngModelChange)="onDateChoice($event)"
+          [ngModelOptions]="{ standalone: true }" [disabled]="locked">
+          @for (preset of datePresets; track preset) {
+            <option [value]="preset">{{ preset }}</option>
+          }
+          <option value="custom">{{ 'annotation.fields.date.format.custom' | t }}</option>
+        </select>
+        @if (dateChoice === 'custom') {
+          <input type="text" class="date-format__custom" [(ngModel)]="field.dateFormat"
+            [ngModelOptions]="{ standalone: true }" [disabled]="locked" maxlength="32"
+            [placeholder]="defaultDateFormat" [attr.aria-label]="'annotation.fields.date.format.customLabel' | t" />
+          <span class="date-format__hint">{{ 'annotation.fields.date.format.tokens' | t }}</span>
+        }
+        <span class="date-format__example" aria-live="polite">{{ 'annotation.fields.date.format.example' | t: { example: dateExample } }}</span>
+      </div>
+    }
+
     <label class="field">
       <span class="field-label">{{ 'annotation.fields.value.label' | t }}</span>
       <input type="text" [(ngModel)]="field.value" [disabled]="locked"

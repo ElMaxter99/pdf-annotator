@@ -266,7 +266,8 @@
           "text": "Texto",
           "check": "Caixa de seleção",
           "radio": "Botão de opção",
-          "number": "Número"
+          "number": "Número",
+          "date": "Data"
         }
       },
       "value": {
@@ -280,6 +281,15 @@
         "appender": {
           "label": "Sufixo",
           "placeholder": "Ex.: %"
+        }
+      },
+      "date": {
+        "format": {
+          "label": "Formato",
+          "custom": "Personalizado…",
+          "customLabel": "Formato personalizado",
+          "tokens": "DD dia · MM mês · YYYY ano (D, M e YY sem zeros ou com dois dígitos)",
+          "example": "Vai ficar assim: {{example}}"
         }
       },
       "locked": {
@@ -407,7 +417,8 @@
       "missingPages": "{{count}} página(s) que não existem no PDF",
       "outOfPage": "{{count}} anotação(ões) fora da página",
       "fontSize": "{{count}} tamanho(s) de letra fora de 8–72",
-      "opacity": "{{count}} opacidade(s) fora de 0,1–1"
+      "opacity": "{{count}} opacidade(s) fora de 0,1–1",
+      "dateFormat": "{{count}} formato(s) de data inválido(s): usa-se DD/MM/YYYY"
     },
     "batch": {
       "invalidFile": "{{count}} ficheiro(s) ignorado(s): só se admitem PDF e JSON.",
@@ -1427,6 +1438,7 @@
       "check": "Caixa",
       "radio": "Opção",
       "number": "Número",
+      "date": "Data",
       "hint": "Até 12 caracteres.",
       "reset": "Repor",
       "note": "Guardados neste navegador e válidos para todos os seus modelos. Visíveis na pré-visualização e no PDF exportado."
