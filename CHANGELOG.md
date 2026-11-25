@@ -1,5 +1,9 @@
 ## Unreleased
 
+## [v1.20.1](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.20.1) - 2026-11-25
+### Changed
+- **La vista A pinta lo mismo que B (mesas P-210 a P-212, 1.20.1):** en «Dividida» y en «Mantener A», los campos de A muestran los valores de muestra (X, XXXXX, 00000), el nombre en la vista Mapeo o el dato de prueba, igual que B, en gris y con borde discontinuo. Con «Mostrar mapField», A lleva también el rótulo mini y el cuadro con el nombre completo («Versión A · solo lectura») y entra en el orden de Tab; la vista, los valores y el interruptor son los mismos que en B. Ya no se pinta el nombre entero de cada campo de A.
+
 ## [v1.20.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.20.0) - 2026-11-25
 ### Added
 - **Añadir PDFs A y reemplazar la A de una fila en el lote (mesas P-190 a P-192, 1.20):** el panel tiene «Añadir PDFs A» (asistente de dos pasos con plantillas opcionales, duplicados omitidos por nombre y «Deshacer») y «Reemplazar A…» por fila (lista, ficha de Documento del editor y Ctrl+K). Reemplazar conserva la plantilla A y la versión B y descarta la tabla de páginas, la propuesta de IA guardada y el ajuste de tamaño; la fila vuelve a «En revisión».
