@@ -7829,6 +7829,10 @@ button.version-chip:focus-visible {
   font-style: italic;
   font-weight: 600;
 }
+/* Las cajas de A que se pueden enfocar (con «Mostrar mapField») reciben el cursor para abrir su cuadro; el resto de la capa deja pasar el clic. */
+.reference-layer .reference-field[data-field-type][tabindex] {
+  pointer-events: auto;
+}
 .map-label--ref {
   border-style: dashed;
   border-color: #6b7280;

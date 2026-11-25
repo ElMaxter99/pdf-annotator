@@ -75,6 +75,14 @@ test('con «Mostrar mapField» A lleva su rótulo, su cuadro con «Versión A» 
   await page.keyboard.press('Escape');
   await expect(tip).toHaveCount(0);
 
+  // con el cursor también se abre el cuadro, y la capa ya no está oculta a los lectores de pantalla
+  await expect(page.getByTestId('split-a').locator('.reference-layer')).not.toHaveAttribute('aria-hidden', 'true');
+  await page.mouse.move(0, 0);
+  await first.hover();
+  await expect(tip).toBeVisible();
+  await expect(tip).toContainText('Versión A');
+  await page.keyboard.press('Escape');
+
   // Enter no selecciona nada en A (solo lectura)
   await first.focus();
   await page.keyboard.press('Enter');

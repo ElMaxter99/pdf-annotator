@@ -98,7 +98,7 @@
       }
       <div class="split-a__sheet">
         <canvas #splitCanvas class="canvas"></canvas>
-        <div #splitLayer class="reference-layer" aria-hidden="true"></div>
+        <div #splitLayer class="reference-layer" [attr.aria-hidden]="vm.previewSettings.mapLabel().show ? null : 'true'"></div>
         @if (vm.aGhost()) {
           <div class="page-ghost" data-testid="ghost-a" role="status">
             @if (vm.pageMap()) {
@@ -186,7 +186,7 @@
     }
     <canvas #pdfCanvas class="canvas canvas--pdf"></canvas>
     <canvas #overlayCanvas class="canvas canvas--overlay"></canvas>
-    <div #referenceLayer class="reference-layer" aria-hidden="true"></div>
+    <div #referenceLayer class="reference-layer" [attr.aria-hidden]="vm.previewSettings.mapLabel().show ? null : 'true'"></div>
     <div #annotationsLayer class="annotations-layer"></div>
     <div class="hitbox" (click)="vm.onHitboxClick($event)" (pointerdown)="vm.onHitboxPointerDown($event)"
       (pointermove)="vm.onHitboxPointerMove($event)" (pointerup)="vm.onHitboxPointerUp($event)"
