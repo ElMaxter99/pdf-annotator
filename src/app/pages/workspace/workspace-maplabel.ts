@@ -10,6 +10,7 @@ import type { WorkspacePageComponent } from './workspace.page';
 
 const HOVER_DELAY_MS = 250;
 const LEAVE_DELAY_MS = 120;
+const TIP_MAX_HEIGHT = 130;
 
 /**
  * Rótulo mini y cuadro con el mapField de cada anotación (mesas P-184 a P-186). Métodos de `WorkspacePageComponent`
@@ -149,7 +150,8 @@ export class WorkspaceMapLabel {
       if (!el || el.contains(evt.relatedTarget as Node | null)) return;
       this.scheduleMapTipHide(LEAVE_DELAY_MS);
     });
-    layer.addEventListener('pointerdown', () => this.hideMapTip());
+    // En captura: las anotaciones paran la propagación al empezar un arrastre.
+    layer.addEventListener('pointerdown', () => this.hideMapTip(), true);
     layer.addEventListener('focusin', (evt) => {
       const el = annotationOf(evt.target);
       if (el) this.scheduleMapTip(el, 0);
@@ -243,7 +245,10 @@ export class WorkspaceMapLabel {
         y: String(field.y).replace('.', ','),
       }),
       left: Math.max(8, Math.min(rect.left, window.innerWidth - 348)),
-      top: rect.bottom + 8,
+      // Cerca del borde inferior el cuadro se abre hacia arriba para no salirse de la ventana.
+      ...(rect.bottom + 8 + TIP_MAX_HEIGHT > window.innerHeight
+        ? { bottom: Math.max(8, window.innerHeight - rect.top + 8) }
+        : { top: rect.bottom + 8 }),
     });
   }
 }

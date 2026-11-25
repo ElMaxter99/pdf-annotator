@@ -26,7 +26,9 @@ export interface MapTip {
   none: boolean;
   meta: string;
   left: number;
-  top: number;
+  top?: number;
+  /** Distance from the bottom of the window when the tooltip opens upwards. */
+  bottom?: number;
 }
 
 export type PreviewState = { page: number; field: PageField } | null;

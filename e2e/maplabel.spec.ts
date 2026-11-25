@@ -87,3 +87,13 @@ test('Enter selecciona la anotación enfocada y el foco se conserva', async ({ p
   await page.keyboard.press('Shift+Enter');
   await expect(page.locator('.annotation--selected')).toHaveCount(2);
 });
+
+test('el cuadro se cierra al empezar un arrastre', async ({ page }) => {
+  await page.getByTestId('maplabel-toggle').check();
+  const first = page.locator('.annotation').filter({ hasText: 'X' }).first();
+  await first.hover();
+  await expect(page.getByTestId('maplabel-tip')).toBeVisible();
+  await page.mouse.down();
+  await expect(page.getByTestId('maplabel-tip')).toHaveCount(0);
+  await page.mouse.up();
+});

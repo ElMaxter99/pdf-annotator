@@ -214,7 +214,7 @@
   </div>
 </main>
 @if (vm.mapTip(); as tip) {
-  <div class="map-tip" role="tooltip" data-testid="maplabel-tip" [style.left.px]="tip.left" [style.top.px]="tip.top"
+  <div class="map-tip" role="tooltip" data-testid="maplabel-tip" [style.left.px]="tip.left" [style.top.px]="tip.top" [style.bottom.px]="tip.bottom"
     (pointerenter)="vm.keepMapTip()" (pointerleave)="vm.scheduleMapTipHide(120)">
     <span class="map-tip__name"><i>{{ tip.prefix }}</i><b [class.map-tip__none]="tip.none">{{ tip.tail }}</b></span>
     <span class="map-tip__meta">{{ tip.meta }}</span>
