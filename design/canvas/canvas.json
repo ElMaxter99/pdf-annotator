@@ -122,13 +122,6 @@
    "h": 900,
    "title": "V-14 Diálogo de atajos"
   },
-  "V-15-json-con-error-de-sintaxis.dc.html": {
-   "x": 1800,
-   "y": 10666,
-   "w": 1720,
-   "h": 900,
-   "title": "V-15 JSON con error de sintaxis"
-  },
   "V-16-aviso-de-importacion-toast.dc.html": {
    "x": 3600,
    "y": 10666,
@@ -1339,7 +1332,6 @@
   "V-12-editar-anotacion-editor-flotante.dc.html",
   "V-13-seleccion-multiple-y-barra-de-alineacion.dc.html",
   "V-14-dialogo-de-atajos.dc.html",
-  "V-15-json-con-error-de-sintaxis.dc.html",
   "V-16-aviso-de-importacion-toast.dc.html",
   "V-17-guias-y-rejilla-activas.dc.html",
   "V-18-arbol-json.dc.html",
