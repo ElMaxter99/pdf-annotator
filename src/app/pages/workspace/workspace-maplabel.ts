@@ -165,6 +165,8 @@ export class WorkspaceMapLabel {
       this.selectFocusedAnnotation(el, evt.shiftKey);
     });
     // Esc cierra el cuadro aunque solo se haya abierto con el cursor (el foco no está en la capa).
+    this.mapTipAbort?.abort();
+    this.mapTipAbort = new AbortController();
     document.addEventListener(
       'keydown',
       (evt) => {
@@ -173,7 +175,7 @@ export class WorkspaceMapLabel {
           this.hideMapTip();
         }
       },
-      true,
+      { capture: true, signal: this.mapTipAbort.signal },
     );
   }
 
@@ -204,22 +206,22 @@ export class WorkspaceMapLabel {
   }
 
   scheduleMapTip(this: WorkspacePageComponent, el: HTMLElement, delay: number): void {
-    window.clearTimeout(this.mapTipTimer);
-    this.mapTipTimer = window.setTimeout(() => this.showMapTip(el), delay);
+    clearTimeout(this.mapTipTimer);
+    this.mapTipTimer = setTimeout(() => this.showMapTip(el), delay);
   }
 
   scheduleMapTipHide(this: WorkspacePageComponent, delay: number): void {
-    window.clearTimeout(this.mapTipTimer);
-    this.mapTipTimer = window.setTimeout(() => this.mapTip.set(null), delay);
+    clearTimeout(this.mapTipTimer);
+    this.mapTipTimer = setTimeout(() => this.mapTip.set(null), delay);
   }
 
   hideMapTip(this: WorkspacePageComponent): void {
-    window.clearTimeout(this.mapTipTimer);
+    clearTimeout(this.mapTipTimer);
     this.mapTip.set(null);
   }
 
   keepMapTip(this: WorkspacePageComponent): void {
-    window.clearTimeout(this.mapTipTimer);
+    clearTimeout(this.mapTipTimer);
   }
 
   showMapTip(this: WorkspacePageComponent, el: HTMLElement): void {

@@ -182,7 +182,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly mapTip = signal<MapTip | null>(null);
   readonly mapLabelsHidden = signal(0);
   readonly mapLabelMaxError = signal(false);
-  mapTipTimer = 0;
+  mapTipTimer: ReturnType<typeof setTimeout> | undefined;
+  mapTipAbort?: AbortController;
   scale = signal(1.5);
   /** Floating zoom indicator (P-59); `limit` is set when the request hit 25 % or 400 %. */
   readonly zoomHud = signal<{ percent: number; limit: ZoomLimit; side?: 'A' | 'B' } | null>(null);
@@ -758,7 +759,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       window.removeEventListener('blur', this.windowBlurHandler);
     }
     this.endPan();
-    window.clearTimeout(this.mapTipTimer);
+    clearTimeout(this.mapTipTimer);
+    this.mapTipAbort?.abort();
     this.removeZoomCommandListener?.();
     if (this.zoomHudTimer) clearTimeout(this.zoomHudTimer);
     if (this.wheelEdgeTimer) clearTimeout(this.wheelEdgeTimer);
