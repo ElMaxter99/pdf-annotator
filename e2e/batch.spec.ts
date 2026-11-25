@@ -361,7 +361,12 @@ test('an unpaired new version waits in the strip and is assigned by hand or disc
     .locator('li')
     .first()
     .getByTestId('assign-unpaired')
-    .selectOption({ index: 1 });
+    .click();
+  await expect(page.getByTestId('assign-unpaired-count').first()).toBeVisible();
+  await page.getByTestId('assign-unpaired-search').fill('zzz-no-existe');
+  await expect(page.getByTestId('assign-unpaired-none')).toBeVisible();
+  await page.getByTestId('assign-unpaired-search').fill('');
+  await page.keyboard.press('Enter');
   await expect(page.getByTestId('panel-list')).toContainText('otro-documento.pdf');
   await expect(page.getByTestId('versions-drop')).toContainText('Archivos sin pareja: 1');
   await page.getByTestId('unpaired-b').getByRole('button', { name: 'Descartar' }).click();
@@ -402,7 +407,9 @@ test('templates pasted from Mongo are matched to the PDFs by pdfName', async ({ 
   await expect(page.getByTestId('template-rows')).toContainText(`${FIELDS} campos`);
 
   // The leftover template is assigned by hand to the other PDF.
-  await page.getByTestId('assign-pasted').selectOption({ label: 'otro.pdf' });
+  await page.getByTestId('assign-pasted').click();
+  await page.getByTestId('assign-pasted-search').fill('otro');
+  await page.keyboard.press('Enter');
   await expect(page.getByTestId('template-rows')).toContainText('otro.pdf');
 
   await page.getByTestId('open-panel').click();

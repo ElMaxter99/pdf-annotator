@@ -742,7 +742,8 @@
       "assignPlaceholder": "Asignar…",
       "pdfs": "PDFs",
       "withTemplate": "con plantilla",
-      "withoutTemplate": "sin plantilla"
+      "withoutTemplate": "sin plantilla",
+      "search": "Buscar plantilla…"
     },
     "versionsDrop": {
       "title": "Versiones nuevas (B)",
@@ -753,9 +754,12 @@
       "more": "Añadir más",
       "unpairedTitle": "Archivos sin pareja: {{count}}",
       "unpairedText": "No coinciden con ningún PDF del lote: asígnalos a mano o descártalos.",
-      "assign": "Asignar a…",
+      "assign": "Elegir PDF…",
       "assignLabel": "Asignar {{name}} a un PDF",
-      "discard": "Descartar"
+      "discard": "Descartar",
+      "search": "Buscar PDF…",
+      "noneFree": "Todos los PDF ya tienen B",
+      "linked": "{{file}} vinculado a {{name}}"
     },
     "filter": {
       "label": "Filtrar por estado",
@@ -2739,5 +2743,13 @@
     "hidden": "Rótulos ocultos: {{count}} · acerca el zoom",
     "none": "sin mapField",
     "meta": "{{type}} · página {{page}} · x {{x}} · y {{y}}"
+  },
+  "search": {
+    "total": "{{total}} disponibles",
+    "count": "{{shown}} de {{total}}",
+    "noMatch": "Nada coincide con «{{query}}».",
+    "clear": "Borrar búsqueda",
+    "suggested": "Sugeridos",
+    "all": "Todos"
   }
 }
