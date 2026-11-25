@@ -3,7 +3,13 @@
  * carácter se copia tal cual. Los datos se leen con reglas propias (nunca `new Date(texto)`, que depende del navegador).
  */
 export const DEFAULT_DATE_FORMAT = 'DD/MM/YYYY';
-export const DATE_FORMAT_PRESETS = ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'DD/MM/YY', 'D/M/YYYY'] as const;
+export const DATE_FORMAT_PRESETS = [
+  'DD/MM/YYYY',
+  'DD-MM-YYYY',
+  'YYYY-MM-DD',
+  'DD/MM/YY',
+  'D/M/YYYY',
+] as const;
 export const MAX_DATE_FORMAT_LENGTH = 32;
 
 const TOKENS = /YYYY|YY|DD|D|MM|M/g;
@@ -31,7 +37,20 @@ function isRealDate(year: number, month: number, day: number): boolean {
   if (!Number.isInteger(year) || year < 1 || year > 9999 || month < 1 || month > 12 || day < 1) {
     return false;
   }
-  const days = [31, year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const days = [
+    31,
+    year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28,
+    31,
+    30,
+    31,
+    30,
+    31,
+    31,
+    30,
+    31,
+    30,
+    31,
+  ];
   return day <= days[month - 1];
 }
 

@@ -71,7 +71,11 @@ test('dates from the JSON and the test data are painted with their format', asyn
 
   await page
     .getByRole('textbox', { name: 'Datos de prueba' })
-    .fill(JSON.stringify({ factura: { fecha: '2026-03-05T10:00:00Z', vence: '5/4/2026', nota: 'pendiente' } }));
+    .fill(
+      JSON.stringify({
+        factura: { fecha: '2026-03-05T10:00:00Z', vence: '5/4/2026', nota: 'pendiente' },
+      }),
+    );
   await chooseView(page, 'Datos');
   await expect.poll(() => texts(page)).toEqual(['2026-03-05', '05/04/2026', 'pendiente']);
 });
@@ -79,7 +83,12 @@ test('dates from the JSON and the test data are painted with their format', asyn
 test('an unusable date format is reported on import and the default is used', async ({ page }) => {
   await openWorkspace(page, { view: 'Muestra' });
   await applyJsonText(page, {
-    pages: [{ num: 1, fields: [{ x: 100, y: 700, mapField: 'f', type: 'date', dateFormat: 'dd/mm/yyyy' }] }],
+    pages: [
+      {
+        num: 1,
+        fields: [{ x: 100, y: 700, mapField: 'f', type: 'date', dateFormat: 'dd/mm/yyyy' }],
+      },
+    ],
   });
   await expect(page.locator('.toast')).toContainText('1 formato(s) de fecha no válido(s)');
   await expect.poll(() => texts(page)).toEqual(['31/12/2026']);
