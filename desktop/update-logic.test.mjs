@@ -180,8 +180,8 @@ test('classifyPkexecResult: sin agente de polkit NO es una cancelación; privile
   assert.deepEqual(privilegedEnv({ DISPLAY: ':0', ELECTRON_RUN_AS_NODE: '1', APPIMAGE: '/x', PATH: '/bin' }), { DISPLAY: ':0', PATH: '/bin' });
 });
 
-test('feedForVersion fija la etiqueta y el archivo de canal', () => {
+test('feedForVersion fija la etiqueta y usa siempre latest*.yml', () => {
   assert.deepEqual(feedForVersion('1.19.0'), { url: `${RELEASES_URL}/download/v1.19.0/`, channel: 'latest' });
-  assert.deepEqual(feedForVersion('1.19.0-rc.7'), { url: `${RELEASES_URL}/download/v1.19.0-rc.7/`, channel: 'rc' });
+  assert.deepEqual(feedForVersion('1.19.0-rc.7'), { url: `${RELEASES_URL}/download/v1.19.0-rc.7/`, channel: 'latest' });
   assert.equal(feedForVersion('basura'), null);
 });
