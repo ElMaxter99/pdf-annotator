@@ -40,6 +40,14 @@
       <button
         type="button"
         class="btn btn--ghost"
+        (click)="openAddA()"
+        data-testid="add-a-open"
+      >
+        {{ 'batch.addA.open' | t }}
+      </button>
+      <button
+        type="button"
+        class="btn btn--ghost"
         (click)="openTemplateUpdate()"
         [disabled]="total() === 0"
         data-testid="update-templates"
@@ -488,6 +496,14 @@
         (change)="onRowVersionSelected($event)"
         data-testid="input-row-b"
       />
+      <input
+        #inputRowA
+        type="file"
+        accept="application/pdf,.pdf"
+        hidden
+        (change)="onReplaceAPicked($event)"
+        data-testid="input-row-a"
+      />
       <div class="batch-tools">
         <input
           type="search"
@@ -786,6 +802,14 @@
                 <button
                   type="button"
                   class="btn btn--ghost"
+                  (click)="chooseReplaceA(row.item.id, inputRowA)"
+                  data-testid="row-replace-a"
+                >
+                  {{ 'batch.replaceA.row' | t }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn--ghost"
                   (click)="askRemove(row.item.id)"
                   [attr.aria-label]="'batch.remove' | t: { name: row.item.name }"
                 >
@@ -821,7 +845,7 @@
         }
         @if (undoNotice(); as notice) {
           <div class="batch-undo" role="status" data-testid="bulk-undo">
-            <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : notice.kind === 'tables' ? 'batch.bulk.tablesDone' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
+            <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : notice.kind === 'tables' ? 'batch.bulk.tablesDone' : notice.kind === 'added' ? 'batch.addA.undoNotice' : notice.kind === 'replacedA' ? 'batch.replaceA.undoNotice' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
             <button type="button" class="btn btn--ghost" (click)="undo()" data-testid="bulk-undo-btn">
               ↶ {{ 'batch.bulk.undo' | t }}
             </button>
@@ -905,6 +929,17 @@
       }
 
       <app-template-update (closed)="onTemplatesUpdated($event)" />
+      <app-add-a (closed)="onAddedA($event)" />
+      @if (replaceA(); as target) {
+        @if (replaceAItem(); as item) {
+          <app-replace-a-confirm
+            [item]="item"
+            [file]="target.file"
+            (confirmed)="confirmReplaceA()"
+            (cancelled)="replaceA.set(null)"
+          />
+        }
+      }
       <app-page-map-batch (closed)="onPageMapsClosed($event)" (review)="openById($event)" />
 
       @if (dialog(); as kind) {

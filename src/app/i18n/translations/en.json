@@ -824,7 +824,9 @@
         "title": "Pages",
         "mapped": "Matched by hand",
         "byNumber": "By number"
-      }
+      },
+      "replaceB": "Replace B",
+      "replaceA": "Replace A"
     },
     "adjust": {
       "title": "Adjust by texts",
@@ -1344,6 +1346,57 @@
       "dirDesc": "Descending (Z–A, most first)",
       "name": "Name",
       "state": "State"
+    },
+    "addA": {
+      "open": "Add A PDFs",
+      "title": "Add A PDFs",
+      "intro": "A PDFs are the originals the template sits on. For new versions use «Upload B versions».",
+      "drop": "Drop the PDFs here",
+      "dropHint": "One or more. PDF only.",
+      "include": "Include",
+      "duplicate": "Already in the batch",
+      "ready": "Ready",
+      "removeEntry": "Remove {{name}} from the list",
+      "tileAdd": "will be added",
+      "tileOmitted": "skipped (duplicates)",
+      "tileSize": "size added",
+      "next": "Next · templates",
+      "templatesTitle": "Templates of the A PDFs",
+      "templatesIntro": "Optional: upload the JSON files or paste the long file. PDFs without a template come in as «No template A».",
+      "noJson": "no JSON yet",
+      "withTemplate": "With template",
+      "noTemplate": "No template A",
+      "later": "You can add the template later.",
+      "back": "‹ Back",
+      "go": "Add {{count}} PDFs",
+      "running": "Adding A PDFs…",
+      "cancelRest": "Cancel the rest",
+      "doneCount": "{{count}} A PDFs added",
+      "doneText": "{{withTemplate}} with a template and {{without}} without template A. They join the end of the list, in review.",
+      "undoNotice": "{{count}} A PDFs added"
+    },
+    "replaceA": {
+      "row": "Replace A…",
+      "title": "Replace A of {{name}}",
+      "current": "Current",
+      "next": "New",
+      "pages": "{{count}} pages",
+      "unreadable": "Could not read «{{name}}». The current A stays as it was.",
+      "keepTemplate": "Template A ({{count}} fields)",
+      "keepB": "Version B with its fields ({{count}})",
+      "kept": "Kept",
+      "dropMap": "A↔B page table ({{count}} pages)",
+      "dropAi": "Saved AI proposal ({{count}} fields)",
+      "dropFit": "«Fit A to B» choice",
+      "dropped": "Dropped",
+      "nothingToDrop": "Nothing else to drop",
+      "states": "A↔B states and links",
+      "mayShift": "May shift",
+      "pagesWarn": "The new PDF has {{next}} pages and the current one {{old}}: review the row. No field is deleted.",
+      "review": "The row goes back to «In review».",
+      "go": "Replace A",
+      "undoNotice": "A replaced. The row goes back to «In review».",
+      "done": "A replaced. The row goes back to «In review»."
     }
   },
   "preview": {
@@ -1957,7 +2010,8 @@
       "noReadyInSelection": "None of the selected PDFs is ready",
       "noVersionBInSelection": "None of the selected PDFs has a version B",
       "busy": "A task is running",
-      "nothingToMark": "Nothing to mark as ready"
+      "nothingToMark": "Nothing to mark as ready",
+      "pickOneRow": "Pick a single row first"
     },
     "cmd": {
       "fitPage": "Fit to page",
@@ -2011,7 +2065,9 @@
       "removeSelected": "Remove the selected ones from the batch",
       "pdfCount": "{{count}} PDFs",
       "openMenu": "Search actions",
-      "keyhint": "Actions"
+      "keyhint": "Actions",
+      "addA": "Add A PDFs…",
+      "replaceA": "Replace A of the row…"
     }
   },
   "projects": {

@@ -23,8 +23,26 @@
           (click)="openPicker(replaceInput)"
           data-testid="doc-replace"
         >
-          {{ 'batch.doc.replace' | t }}
+          {{ (item()?.bPdf ? 'batch.doc.replaceB' : 'batch.doc.replace') | t }}
         </button>
+        @if (item()?.bPdf) {
+          <button
+            type="button"
+            class="btn btn--ghost"
+            (click)="openPicker(replaceAInput)"
+            data-testid="doc-replace-a"
+          >
+            {{ 'batch.doc.replaceA' | t }}
+          </button>
+          <input
+            #replaceAInput
+            type="file"
+            accept="application/pdf"
+            hidden
+            (change)="onReplaceAPicked($event)"
+            data-testid="doc-replace-a-input"
+          />
+        }
         <input
           #replaceInput
           type="file"
@@ -34,6 +52,16 @@
           data-testid="doc-replace-input"
         />
       </div>
+      @if (pendingReplaceA(); as file) {
+        @if (item(); as current) {
+          <app-replace-a-confirm
+            [item]="current"
+            [file]="file"
+            (confirmed)="confirmReplaceA()"
+            (cancelled)="pendingReplaceA.set(null)"
+          />
+        }
+      }
       @if (pendingReplace(); as file) {
         <div class="batch-doc__confirm" data-testid="doc-replace-confirm">
           <p>{{ 'batch.doc.replaceConfirm' | t: { name: file.name } }}</p>

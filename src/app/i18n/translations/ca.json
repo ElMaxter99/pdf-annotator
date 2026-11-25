@@ -824,7 +824,9 @@
         "title": "Pàgines",
         "mapped": "Emparellades a mà",
         "byNumber": "Per número"
-      }
+      },
+      "replaceB": "Reemplaça B",
+      "replaceA": "Reemplaça A"
     },
     "adjust": {
       "title": "Ajust per textos",
@@ -1344,6 +1346,57 @@
       "dirDesc": "Sentit descendent (Z–A, més primer)",
       "name": "Nom",
       "state": "Estat"
+    },
+    "addA": {
+      "open": "Afegeix PDF A",
+      "title": "Afegeix PDF A",
+      "intro": "Els PDF A són els originals sobre els quals es col·loca la plantilla. Per a versions noves usa «Puja versions B».",
+      "drop": "Deixa els PDF aquí",
+      "dropHint": "Un o diversos. Només PDF.",
+      "include": "Inclou",
+      "duplicate": "Ja és al lot",
+      "ready": "Llest",
+      "removeEntry": "Treu {{name}} de la llista",
+      "tileAdd": "s'afegeixen",
+      "tileOmitted": "omesos (duplicats)",
+      "tileSize": "pes afegit",
+      "next": "Següent · plantilles",
+      "templatesTitle": "Plantilles dels PDF A",
+      "templatesIntro": "Opcional: puja els JSON o enganxa el fitxer llarg. Els PDF sense plantilla entren com «Sense plantilla A».",
+      "noJson": "encara sense JSON",
+      "withTemplate": "Amb plantilla",
+      "noTemplate": "Sense plantilla A",
+      "later": "Podràs posar la plantilla després.",
+      "back": "‹ Enrere",
+      "go": "Afegeix {{count}} PDF",
+      "running": "Afegint PDF A…",
+      "cancelRest": "Cancel·la la resta",
+      "doneCount": "{{count}} PDF A afegits",
+      "doneText": "{{withTemplate}} amb plantilla i {{without}} sense plantilla A. Entren al final de la llista, en revisió.",
+      "undoNotice": "{{count}} PDF A afegits"
+    },
+    "replaceA": {
+      "row": "Reemplaça A…",
+      "title": "Reemplaça A de {{name}}",
+      "current": "Actual",
+      "next": "Nou",
+      "pages": "{{count}} pàgs",
+      "unreadable": "No s'ha pogut llegir «{{name}}». L'A actual es queda com estava.",
+      "keepTemplate": "Plantilla A ({{count}} camps)",
+      "keepB": "Versió B amb els seus camps ({{count}})",
+      "kept": "Es conserva",
+      "dropMap": "Taula de pàgines A↔B ({{count}} pàgines)",
+      "dropAi": "Proposta d'IA desada ({{count}} camps)",
+      "dropFit": "Elecció d'«Ajusta A a B»",
+      "dropped": "Es descarta",
+      "nothingToDrop": "Res més a descartar",
+      "states": "Estats i vincles A↔B",
+      "mayShift": "Poden desquadrar-se",
+      "pagesWarn": "El PDF nou té {{next}} pàgines i l'actual {{old}}: revisa la fila. No s'esborra cap camp.",
+      "review": "La fila torna a «En revisió».",
+      "go": "Reemplaça A",
+      "undoNotice": "A reemplaçat. La fila torna a «En revisió».",
+      "done": "A reemplaçat. La fila torna a «En revisió»."
     }
   },
   "preview": {
@@ -1957,7 +2010,8 @@
       "noReadyInSelection": "Cap dels seleccionats està llest",
       "noVersionBInSelection": "Cap dels seleccionats té versió B",
       "busy": "Hi ha una tasca en curs",
-      "nothingToMark": "Res per marcar com a llest"
+      "nothingToMark": "Res per marcar com a llest",
+      "pickOneRow": "Tria una sola fila primer"
     },
     "cmd": {
       "fitPage": "Ajustar a la pàgina",
@@ -2011,7 +2065,9 @@
       "removeSelected": "Treu els seleccionats del lot",
       "pdfCount": "{{count}} PDFs",
       "openMenu": "Cerca accions",
-      "keyhint": "Accions"
+      "keyhint": "Accions",
+      "addA": "Afegeix PDF A…",
+      "replaceA": "Reemplaça A de la fila…"
     }
   },
   "projects": {

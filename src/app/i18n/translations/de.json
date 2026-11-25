@@ -824,7 +824,9 @@
         "title": "Seiten",
         "mapped": "Von Hand zugeordnet",
         "byNumber": "Nach Nummer"
-      }
+      },
+      "replaceB": "B ersetzen",
+      "replaceA": "A ersetzen"
     },
     "adjust": {
       "title": "Anpassung nach Texten",
@@ -1344,6 +1346,57 @@
       "dirDesc": "Absteigend (Z–A, meiste zuerst)",
       "name": "Name",
       "state": "Status"
+    },
+    "addA": {
+      "open": "A-PDFs hinzufügen",
+      "title": "A-PDFs hinzufügen",
+      "intro": "A-PDFs sind die Originale, auf denen die Vorlage liegt. Für neue Versionen nutze «B-Versionen hochladen».",
+      "drop": "PDFs hier ablegen",
+      "dropHint": "Eine oder mehrere. Nur PDF.",
+      "include": "Einbeziehen",
+      "duplicate": "Schon im Stapel",
+      "ready": "Bereit",
+      "removeEntry": "{{name}} aus der Liste entfernen",
+      "tileAdd": "werden hinzugefügt",
+      "tileOmitted": "übersprungen (Duplikate)",
+      "tileSize": "Größe hinzugefügt",
+      "next": "Weiter · Vorlagen",
+      "templatesTitle": "Vorlagen der A-PDFs",
+      "templatesIntro": "Optional: JSON-Dateien hochladen oder die lange Datei einfügen. PDFs ohne Vorlage kommen als «Ohne Vorlage A» hinein.",
+      "noJson": "noch kein JSON",
+      "withTemplate": "Mit Vorlage",
+      "noTemplate": "Ohne Vorlage A",
+      "later": "Die Vorlage kannst du später setzen.",
+      "back": "‹ Zurück",
+      "go": "{{count}} PDFs hinzufügen",
+      "running": "A-PDFs werden hinzugefügt…",
+      "cancelRest": "Rest abbrechen",
+      "doneCount": "{{count}} A-PDFs hinzugefügt",
+      "doneText": "{{withTemplate}} mit Vorlage und {{without}} ohne Vorlage A. Sie stehen am Ende der Liste, in Prüfung.",
+      "undoNotice": "{{count}} A-PDFs hinzugefügt"
+    },
+    "replaceA": {
+      "row": "A ersetzen…",
+      "title": "A von {{name}} ersetzen",
+      "current": "Aktuell",
+      "next": "Neu",
+      "pages": "{{count}} Seiten",
+      "unreadable": "«{{name}}» konnte nicht gelesen werden. Das aktuelle A bleibt unverändert.",
+      "keepTemplate": "Vorlage A ({{count}} Felder)",
+      "keepB": "Version B mit ihren Feldern ({{count}})",
+      "kept": "Bleibt erhalten",
+      "dropMap": "Seitentabelle A↔B ({{count}} Seiten)",
+      "dropAi": "Gespeicherter KI-Vorschlag ({{count}} Felder)",
+      "dropFit": "Wahl bei «A an B anpassen»",
+      "dropped": "Wird verworfen",
+      "nothingToDrop": "Nichts weiter zu verwerfen",
+      "states": "Status und Verknüpfungen A↔B",
+      "mayShift": "Können abweichen",
+      "pagesWarn": "Das neue PDF hat {{next}} Seiten, das aktuelle {{old}}: Zeile prüfen. Es wird kein Feld gelöscht.",
+      "review": "Die Zeile geht zurück auf «In Prüfung».",
+      "go": "A ersetzen",
+      "undoNotice": "A ersetzt. Die Zeile geht zurück auf «In Prüfung».",
+      "done": "A ersetzt. Die Zeile geht zurück auf «In Prüfung»."
     }
   },
   "preview": {
@@ -1957,7 +2010,8 @@
       "noReadyInSelection": "Kein ausgewähltes PDF ist fertig",
       "noVersionBInSelection": "Kein ausgewähltes PDF hat eine Version B",
       "busy": "Eine Aufgabe läuft",
-      "nothingToMark": "Nichts als fertig zu markieren"
+      "nothingToMark": "Nichts als fertig zu markieren",
+      "pickOneRow": "Wähle zuerst eine einzelne Zeile"
     },
     "cmd": {
       "fitPage": "An Seite anpassen",
@@ -2011,7 +2065,9 @@
       "removeSelected": "Ausgewählte aus dem Stapel entfernen",
       "pdfCount": "{{count}} PDFs",
       "openMenu": "Aktionen suchen",
-      "keyhint": "Aktionen"
+      "keyhint": "Aktionen",
+      "addA": "A-PDFs hinzufügen…",
+      "replaceA": "A der Zeile ersetzen…"
     }
   },
   "projects": {

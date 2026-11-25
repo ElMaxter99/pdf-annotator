@@ -694,6 +694,28 @@ export class WorkspaceBatch {
     }
   }
 
+  /** «Reemplazar A» of the Documento tab (P-190): swaps A keeping the template and B, then reopens the item. */
+  async batchReplaceA(this: WorkspacePageComponent, file: File): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    if (!isPdfFile(file)) {
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
+    this.flushBatchSave(true);
+    if (!this.batch.replaceA(item.id, file)) {
+      return;
+    }
+    this.clearSelection();
+    const updated = this.batch.activeItem();
+    if (updated) {
+      await this.openBatchPdf(updated, this.store.snapshot());
+    }
+    this.toast.show(this.translationService.translate('batch.replaceA.done'), 'success');
+  }
+
   /** Adds the new version (B). Annotations already placed become the template A if it was empty. */
   async batchAddVersionB(this: WorkspacePageComponent, file: File): Promise<void> {
     const item = this.batch.activeItem();

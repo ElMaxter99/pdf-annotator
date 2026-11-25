@@ -44,6 +44,23 @@ export function buildBatchCommands(
     run: () => void page.reviewNext(),
   });
   add({
+    id: 'add-a',
+    icon: '+',
+    label: t('palette.batch.addA'),
+    keywords: 'add a pdf originals añadir pdf originales',
+    hint: group('batch'),
+    run: () => page.openAddA(),
+  });
+  add({
+    id: 'replace-a',
+    icon: '⇄',
+    label: t('palette.batch.replaceA'),
+    keywords: 'replace a pdf original reemplazar sustituir',
+    hint: selected === 1 ? group('batch') : `${group('batch')} · ${t('palette.why.pickOneRow')}`,
+    disabledReason: selected === 1 ? undefined : t('palette.why.pickOneRow'),
+    run: () => page.replaceASelected(),
+  });
+  add({
     id: 'update-templates',
     icon: '↻',
     label: t('palette.batch.updateTemplates'),
