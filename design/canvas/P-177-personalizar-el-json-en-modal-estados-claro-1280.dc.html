@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-177 Personalizar el JSON en modal · estados · claro 1280</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.p h1,.p h2,.p h3,.p p{margin:0}.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}.cols{display:flex;gap:24px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 14px}.seg span.on{background:var(--accent);color:var(--ink)}
+.ta{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:14px;font-family:Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre;color:var(--text)}
+.chip{display:inline-flex;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted)}
+.chip.ok{color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent)}.chip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink)}.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+.sw{width:42px;height:24px;border-radius:999px;background:var(--soft);border:1px solid var(--line);position:relative}.sw i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--muted)}.sw.on{background:var(--accent)}.sw.on i{left:21px;background:var(--ink)}
+.num{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:13px;align-items:center;justify-content:center;flex:none}
+.li{display:flex;gap:12px;align-items:flex-start}.li p{line-height:1.5}
+.k{color:var(--accent)}.s{color:var(--warn)}
+
+</style>
+</helmet>
+<div class="p" style="width:1280px;height:1180px;--bg:#f6f7fb;--panel:#ffffff;--accent:#0f9b8e;--danger:#dc2626;--text:#0f172a;--muted:#475569;--ink:#ffffff;--line:rgba(15,23,42,.18);--soft:rgba(15,23,42,.05);--warn:#b45309;--inset:#eef0f6">
+<div class="lab">P-177 · Definitivo · 1.19 · Claro · 1280 px</div><h1 style="font-size:26px">Estados del modal</h1>
+<div style="display:flex;gap:24px;flex-wrap:wrap">
+<div><div class="cap" style="margin-bottom:8px">1 · Por defecto: JSON válido</div><div style="position:relative;width:580px;height:760px;border-radius:16px;overflow:hidden;background:var(--inset);border:1px solid var(--line)"><div style="position:absolute;inset:0;background:rgba(0,0,0,.55)"></div><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div class="card" style="width:520px;gap:16px;box-shadow:0 24px 64px rgba(0,0,0,.5);border-radius:20px;padding:24px" role="dialog">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:19px">Personalizar el JSON</h3><span class="btn g s" style="min-height:32px;width:32px;padding:0;display:inline-flex;align-items:center;justify-content:center">✕</span></div>
+<div class="cap">Un solo formato para el editor, «Copiar JSON», «Descargar JSON» y la descarga del lote.</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="cap">Claves</span><span class="seg"><span class="on">Con comillas</span><span class="">Sin comillas</span></span></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="cap">Valores</span><span class="seg"><span class="on">Dobles "…"</span><span class="">Simples '…'</span></span></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="cap">Sangría</span><span class="seg"><span class="on">2</span><span class="">4</span><span class="">Tab</span><span class="">Compacto</span></span></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="cap">Coma final</span><span class="sw "><i></i></span></div>
+<div class="cap" style="margin-bottom:-6px">Vista previa</div>
+<div class="ta" style="height:150px;font-size:12px">{
+  &quot;pages&quot;: [
+    {
+      &quot;num&quot;: 1,
+      &quot;fields&quot;: [
+        { &quot;x&quot;: 72, &quot;y&quot;: 710, &quot;mapField&quot;: &quot;nombre&quot;, &quot;type&quot;: &quot;text&quot; }
+      ]
+    }
+  ]
+}</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="chip ok">JSON válido</span><span class="btn g s" style="min-height:32px;padding:4px 14px;font-size:13px">Restablecer</span></div>
+<div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line);padding-top:16px"><span class="btn g">Cancelar</span><span class="btn">Aplicar</span></div></div></div></div></div>
+<div><div class="cap" style="margin-bottom:8px">2 · Sin comillas, simples y coma final</div><div style="position:relative;width:580px;height:760px;border-radius:16px;overflow:hidden;background:var(--inset);border:1px solid var(--line)"><div style="position:absolute;inset:0;background:rgba(0,0,0,.55)"></div><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div class="card" style="width:520px;gap:16px;box-shadow:0 24px 64px rgba(0,0,0,.5);border-radius:20px;padding:24px" role="dialog">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:19px">Personalizar el JSON</h3><span class="btn g s" style="min-height:32px;width:32px;padding:0;display:inline-flex;align-items:center;justify-content:center">✕</span></div>
+<div class="cap">Un solo formato para el editor, «Copiar JSON», «Descargar JSON» y la descarga del lote.</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="cap">Claves</span><span class="seg"><span class="">Con comillas</span><span class="on">Sin comillas</span></span></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="cap">Valores</span><span class="seg"><span class="">Dobles "…"</span><span class="on">Simples '…'</span></span></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="cap">Sangría</span><span class="seg"><span class="on">2</span><span class="">4</span><span class="">Tab</span><span class="">Compacto</span></span></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="cap">Coma final</span><span class="sw on"><i></i></span></div>
+<div class="cap" style="margin-bottom:-6px">Vista previa</div>
+<div class="ta" style="height:150px;font-size:12px">{
+  pages: [
+    {
+      num: 1,
+      fields: [
+        { x: 72, y: 710, mapField: &#x27;nombre&#x27;, type: &#x27;text&#x27; }
+      ]
+    }
+  ]
+}</div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span class="chip warn">No es JSON válido · sirve para JS/TS</span><span class="btn g s" style="min-height:32px;padding:4px 14px;font-size:13px">Restablecer</span></div>
+<div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line);padding-top:16px"><span class="btn g">Cancelar</span><span class="btn">Aplicar</span></div></div></div></div></div></div>
+<div class="card" style="width:1180px"><h3>3 · Tras «Aplicar» con un formato no estricto</h3><div style="display:flex;align-items:center;gap:12px"><span class="chip ok">✓</span><b>Formato aplicado · el JSON ya no es estricto</b></div><div class="cap">Aviso no bloqueante (toast). «Cancelar» no avisa de nada.</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

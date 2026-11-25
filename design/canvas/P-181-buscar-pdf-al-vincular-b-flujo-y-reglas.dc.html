@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-181 Buscar PDF al vincular B · flujo y reglas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.p h1,.p h2,.p h3,.p p{margin:0}.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}.cols{display:flex;gap:24px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.num{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:13px;align-items:center;justify-content:center;flex:none}
+.li{display:flex;gap:12px;align-items:flex-start}.li p{line-height:1.5}
+.tog{display:flex;align-items:center;gap:10px;min-height:40px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);font-size:14px;background:var(--inset)}.tog span{flex:1}
+.tog.on{border-color:var(--accent)}.tog.off{opacity:.55}
+.lst{border:1px solid var(--line);border-radius:14px;padding:6px;background:var(--panel);display:flex;flex-direction:column;gap:2px}
+.scr{max-height:232px;overflow:hidden;display:flex;flex-direction:column;gap:2px;position:relative}
+.bar{position:absolute;right:2px;top:4px;width:5px;height:70px;border-radius:3px;background:var(--line)}
+.srch{display:flex;align-items:center;gap:8px;margin:2px 2px 6px;padding:0 10px;min-height:38px;border-radius:10px;border:1px solid var(--accent);background:var(--inset);font-size:14px}
+.srch i{font-style:normal;color:var(--muted)}.srch span{flex:1}
+.caret{display:inline-block;width:1px;height:16px;background:var(--text);vertical-align:middle}
+.grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 10px 4px;font-weight:600}
+.opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;font-size:14px}
+.opt small{display:block;color:var(--muted);font-size:12px}.opt .g{flex:1}
+.opt.hi{background:color-mix(in srgb,var(--accent) 16%,transparent);outline:2px solid var(--accent)}
+.opt mark{background:color-mix(in srgb,var(--accent) 30%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+.cnt{font-size:12px;color:var(--muted);padding:4px 10px 2px}
+.empty{padding:18px 12px;text-align:center;color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:5px 12px;min-height:32px;background:transparent;color:var(--text);display:inline-flex;align-items:center;white-space:nowrap}
+.strip{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.strip h4{margin:0;font-size:14px;font-weight:600}
+.srow{display:flex;align-items:center;gap:8px;font-size:14px}.srow .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel{display:flex;align-items:center;gap:8px;min-height:32px;padding:4px 12px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:600;width:176px;background:var(--inset)}.sel span{flex:1}
+.sel.on{border-color:var(--accent)}
+.toast{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--accent);font-size:14px}
+kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+</style>
+</helmet>
+<div class="p" style="width:1720px;height:1000px;--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff8a8a;--text:#f5f5f5;--muted:#b0b0b0;--ink:#041818;--line:rgba(255,255,255,.16);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1d1d2a">
+<div class="lab">P-181 · Definitivo · 1.20 · Flujo y reglas</div><h1 style="font-size:28px">Buscar el PDF al vincular versiones B</h1>
+<p class="cap" style="max-width:1300px">Origen: Maxter sube de nuevo versiones B (p. ej. <b>dni-1.pdf</b> cuando ya existe <b>dni.pdf</b>) y las que no se vinculan solas se asignan con un desplegable nativo. Con ~90 PDF en el proyecto hay que recorrerlo a ojo. Propuesta: sustituirlo por un selector con búsqueda (escribir «dni» y filtrar), el mismo patrón del buscador de modelos de IA (P-169 a P-171), pensado para volúmenes altos.</p>
+<div class="cols"><div class="card" style="width:830px"><h3>Dónde aparece (inventario)</h3>
+<div class="li"><span class="num">1</span><p><b>Tira «Versiones nuevas (B)»</b> del panel del lote (<code>assign-unpaired</code>): el caso de Maxter. Solo ofrece los PDF que todavía no tienen B, como hoy.</p></div>
+<div class="li"><span class="num">2</span><p><b>Paso 2 del alta</b>, «Asignar plantilla» a un PDF cuando la plantilla pegada no empareja por nombre (<code>assign-pasted</code>): mismo problema con muchas plantillas. <b>Lo incluyo si lo apruebas</b> (decisión B).</p></div>
+<div class="li"><span class="num">·</span><p>Un componente nuevo y pequeño, <b>app-search-select</b>, reutiliza <code>utils/model-search.utils.ts</code> (filtro sin tildes, resaltado). No toca el selector de modelos.</p></div>
+<h3 style="margin-top:8px">Qué cambia para ti</h3>
+<p class="cap">Antes: clic, lista de 90 nombres, buscar con la rueda. Ahora: clic, escribes «dni», Intro. Con «dni-1.pdf» ya aparece arriba «Sugeridos» con <b>dni.pdf</b> sin escribir nada.</p></div>
+<div class="card" style="width:830px"><h3>Reglas</h3>
+<div class="li"><span class="num">1</span><p>El botón «Elegir PDF…» abre una lista con un campo «Buscar PDF…» fijo arriba y con el foco; la lista se desplaza debajo (máx. ~7 filas visibles).</p></div>
+<div class="li"><span class="num">2</span><p>Filtra al escribir por nombre, sin mayúsculas ni tildes; varias palabras = todas deben coincidir. Coincidencias resaltadas y contador «4 de 90». ✕ borra la búsqueda.</p></div>
+<div class="li"><span class="num">3</span><p>Con el campo vacío, arriba «Sugeridos» (los 3 de nombre más parecido al archivo: <i>dni-1.pdf</i> → <i>dni.pdf</i>), y debajo «Todos» en orden natural (<i>dni2</i> antes que <i>dni10</i>). Al escribir, solo se muestran resultados.</p></div>
+<div class="li"><span class="num">4</span><p>Teclado: Intro, Espacio o ↓ abren; ↓ ↑ recorren; Inicio/Fin y Re Pág/Av Pág saltan; Intro elige (o el primero si no hay resaltado); Esc borra el texto y, con el campo vacío, cierra.</p></div>
+<div class="li"><span class="num">5</span><p>Al elegir: B queda vinculado, la fila sale de la tira, aviso breve «dni-1.pdf vinculado a dni.pdf» y el foco pasa al selector de la fila siguiente, para arreglar varias seguidas.</p></div>
+<div class="li"><span class="num">6</span><p>Sin resultados: mensaje y «Borrar búsqueda». Sin PDF libres: el botón queda desactivado con «Todos los PDF ya tienen B». Sin virtualizar hasta ~500 filas; el contador siempre es real.</p></div>
+<div class="li"><span class="num">7</span><p>Accesible: patrón combobox (<code>aria-activedescendant</code>), contador con <code>role="status"</code>, foco visible. Textos en los 7 idiomas. Sin animaciones nuevas.</p></div></div></div>
+<div class="card"><h3>Necesito que decidas</h3><div class="cap"><b>A</b> · «Sugeridos» arriba con el campo vacío: recomiendo <b>sí</b>. &nbsp; <b>B</b> · Usar el mismo selector en el paso 2 del alta: recomiendo <b>sí</b>. &nbsp; <b>C</b> · Seguir ofreciendo solo los PDF sin B (no los que ya tienen B): recomiendo <b>sí</b>, reemplazar una B se hace desde su fila.</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-191 Añadir y reemplazar PDFs A · pantalla · oscuro 1650</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+
+body{margin:0}
+.root{width:1720px;box-sizing:border-box;padding:56px 64px 64px;background:#14141f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:28px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.lead{margin:0;max-width:1200px;font-size:16px;line-height:1.55;color:#c4c4d0}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9a9ab0}
+.row{display:flex;gap:24px;align-items:stretch}
+.pn{flex:1;min-width:0;box-sizing:border-box;padding:20px;border-radius:14px;display:flex;flex-direction:column;gap:12px}
+.pn.dk{--panel:#2a2a3d;--accent:#5eead4;--muted:#b0b0b0;--bd:#3f3f58;--ab:#0b3b36;--warn:#fbbf24;--bad:#fca5a5;background:#1e1e2f;color:#f5f5f5;border:1px solid #34344a}
+.pn.lt{--panel:#ffffff;--accent:#0f766e;--muted:#475569;--bd:#c5ccdb;--ab:#d9f3ee;--warn:#92400e;--bad:#b91c1c;background:#f6f7fb;color:#0f172a;border:1px solid #d7dde9}
+.pt{margin:0;font-size:15px;font-weight:600}
+.pc{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+.dg{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;max-width:620px}
+.dh{font-size:16px;font-weight:600}
+.dp{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.df{display:flex;justify-content:flex-end;gap:10px;align-items:center}
+.df .sp{margin-right:auto;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.b{font:inherit;font-size:13.5px;padding:8px 14px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:inherit;display:inline-block}
+.b.pr{background:var(--accent);border-color:var(--accent);color:#06201d;font-weight:600}
+.pn.lt .b.pr{color:#fff}
+.b.sm{padding:5px 10px;font-size:12.5px}
+.cb{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+.cb.c{background:var(--accent);border-color:var(--accent);color:#06201d}
+.pn.lt .cb.c{color:#fff}
+.bar{height:10px;border-radius:999px;background:var(--bd);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.cnt{margin:0;font-size:13.5px}
+.ls{display:flex;flex-direction:column;gap:6px}
+.rw{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;border:1px solid var(--bd);font-size:13.5px}
+.rw .nm{font-weight:500;flex:1;min-width:0}
+.rw .pg{font-size:12px;color:var(--muted);white-space:nowrap}
+.rw.on{background:var(--ab);border-color:var(--accent)}
+.rw.off{opacity:.62}
+.chip{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--bd);white-space:nowrap;color:var(--muted)}
+.chip.ok{color:var(--accent);border-color:var(--accent)}
+.chip.wr{color:var(--warn);border-color:var(--warn)}
+.chip.er{color:var(--bad);border-color:var(--bad)}
+.chip.run{color:var(--fg2,inherit);border-color:var(--accent)}
+.chip.run::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--accent)}
+.selbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 14px;font-size:13.5px}
+.selbar b.n{margin-right:6px}
+.tick{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#06201d;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex:none}
+.pn.lt .tick{color:#fff}
+.done{display:flex;gap:14px;align-items:center}.done p{margin:2px 0 0}
+.undo{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;font-size:13.5px}
+.undo small{margin-left:auto;color:var(--muted);font-size:12px}
+.opt{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.opt.rec{border-color:var(--accent);background:var(--ab)}
+.opt h4{margin:0;font-size:15px}.opt p{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.opt ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.tag{font-size:12px;font-weight:600;color:var(--accent)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.rule{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:20px 22px}
+.rule h4{margin:0 0 8px;font-size:15px;color:#5eead4}
+.rule p{margin:0;font-size:14px;line-height:1.55;color:#c4c4d0}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.step{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:16px 18px}
+.step b{display:block;margin-bottom:6px;color:#5eead4;font-size:14px}
+.step p{margin:0;font-size:13.5px;line-height:1.5;color:#c4c4d0}
+
+.dz{border:1.5px dashed var(--bd);border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.dz.over{border-color:var(--accent);background:var(--ab)}
+.dz b{font-size:14px}.dz span{font-size:13px;color:var(--muted)}
+.ta{border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-family:Consolas,monospace;font-size:12px;line-height:1.5;color:var(--muted);min-height:70px;white-space:pre-wrap;word-break:break-all}
+.ta.bad{border-color:var(--bad)}
+.err{margin:0;font-size:13px;color:var(--bad)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font-size:12.5px;padding:4px 11px;border-radius:999px;border:1px solid var(--bd);color:var(--muted)}
+.tab.on{background:var(--ab);border-color:var(--accent);color:inherit;font-weight:600}
+.df2{font-size:12px;color:var(--muted);white-space:nowrap}
+.df2 b{color:var(--accent);font-weight:600}.df2 s{color:var(--bad);text-decoration:none;font-weight:600}
+.sub{margin:2px 0 0 28px;padding:8px 12px;border-left:2px solid var(--bd);font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.sel{font:inherit;font-size:12.5px;padding:3px 8px;border-radius:8px;border:1px solid var(--bd);background:transparent;color:inherit}
+.wide{max-width:none}
+.mono{font-family:Consolas,monospace;font-size:12px}
+.note{margin:0;font-size:12.5px;color:var(--muted)}
+
+.tb{display:flex;gap:6px;border-bottom:1px solid var(--bd);padding-bottom:0}
+.tb span{padding:7px 14px;font-size:13.5px;border-bottom:2px solid transparent;color:var(--muted)}
+.tb span.on{border-color:var(--accent);color:inherit;font-weight:600}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tile{border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--muted)}
+.tile strong{display:block;font-size:20px;color:inherit}
+.rw small{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.sel{min-width:130px}
+
+
+.rw .ico{width:28px;height:28px;border-radius:8px;border:1px solid var(--bd);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex:none}
+.menu{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:2px;width:300px}
+.mi{padding:8px 12px;border-radius:8px;font-size:13.5px;display:flex;gap:8px;align-items:center}
+.mi.hi{background:var(--ab);outline:2px solid var(--accent)}
+.mi small{margin-left:auto;color:var(--muted);font-size:12px}
+.kb{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--bd);border-radius:6px;padding:1px 6px}
+.focus{outline:2px solid var(--accent);outline-offset:2px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp .tile strong{font-size:15px}
+.keep{display:flex;flex-direction:column;gap:6px}
+.keep .rw{padding:6px 12px}
+.w2{display:flex;gap:24px;align-items:flex-start}
+.w2>*{flex:1;min-width:0}
+.lt-root{background:#f6f7fb !important;color:#0f172a !important}
+.lt-root .lbl{color:#475569}
+</style>
+</helmet>
+<div class="root"><div><div class="lbl">Definitivo · oscuro · 1650 px</div><h1>Añadir PDFs A y reemplazar la A de una fila</h1></div><div class="row"><section class="pn dk"><h3 class="pt">1 · Entrada: barra del panel y fila de la lista</h3><p class="pc">«Añadir PDFs A» junto a «Actualizar plantillas». «Reemplazar A…» es un botón de la fila en la vista de lista, entre «Subir B» y ✕ (la cuadrícula no tiene acciones por tarjeta); también está en Ctrl+K.</p><div class="dg wide"><div class="dh">Panel del lote</div><div class="selbar"><b class="n">Panel del lote</b><button class="b sm">Descargar</button><button class="b sm">Actualizar plantillas</button><button class="b pr sm">Añadir PDFs A</button><button class="b sm">Trasladar con IA</button><small style="margin-left:auto;color:var(--muted)">24 PDF · 21 con plantilla</small></div><div class="w2"><div class="ls"><div class="rw "><span class="nm"><strong>factura-0412.pdf</strong><small>A 3 págs · B 4 págs</small></span><span class="chip ok">Con plantilla A</span></div><div class="rw "><span class="nm"><strong>recibo-mayo.pdf</strong><small>A 1 pág · sin B</small></span><span class="chip wr">Sin plantilla A</span></div><div class="rw "><span class="nm"><strong>pedido-9087.pdf</strong><small>A 5 págs · B 6 págs</small></span><span class="chip ok">Con plantilla A</span></div></div><div class="menu"><div class="mi">Revisar</div><div class="mi">Subir B</div><div class="mi hi">Reemplazar A…<small>botón de la fila</small></div><div class="mi">✕ Quitar</div></div></div></div></section><section class="pn dk"><h3 class="pt">2 · Añadir PDFs A · paso 1: elegir los PDF</h3><p class="pc">Recuadro de soltar. Pesos y duplicados visibles antes de añadir. Un duplicado se omite salvo que marques «Incluir».</p><div class="dg wide"><div class="dh">Añadir PDFs A</div><p class="dp">Los PDF A son los originales sobre los que se coloca la plantilla. Para versiones nuevas usa «Subir versiones B».</p><div class="dz"><b>Suelta los PDF aquí</b><span>Uno o varios. Solo PDF.</span><button class="b sm focus">Elegir archivos</button></div><div class="ls"><div class="rw "><span class="nm"><strong>contrato-marco.pdf</strong><small>1,2 MB · 8 págs</small></span><span class="chip ok">Listo</span></div><div class="rw "><span class="nm"><strong>anexo-iii.pdf</strong><small>340 KB · 2 págs</small></span><span class="chip ok">Listo</span></div><div class="rw off"><span class="nm"><strong>factura-0412.pdf</strong><small>410 KB · 3 págs</small></span><label class="df2"><span class="cb"></span> Incluir</label><span class="chip wr">Ya está en el lote</span></div></div><div class="tl"><div class="tile"><strong>2</strong>se añaden</div><div class="tile"><strong>1</strong>omitido (duplicado)</div><div class="tile"><strong>1,5 MB</strong>peso añadido</div><div class="tile"><strong>412 MB</strong>espacio libre</div></div><div class="df"><button class="b">Cancelar</button><button class="b pr">Siguiente · plantillas</button></div></div></section></div><div class="row"><section class="pn dk"><h3 class="pt">3 · Añadir PDFs A · paso 2: plantillas (opcional)</h3><p class="pc">El mismo bloque del paso 2 del alta. «Omitir este paso» deja las filas sin plantilla A.</p><div class="dg wide"><div class="dh">Añadir PDFs A</div><div class="tb"><span class="on">Archivos</span><span class="">Pegar JSON</span></div><div class="dz"><b>Suelta los JSON aquí</b><span>Un JSON por PDF, con el mismo nombre (contrato-marco.json)</span><button class="b sm">Elegir archivos</button></div><div class="ls"><div class="rw "><span class="nm"><strong>contrato-marco.pdf</strong><small>documento: contrato-marco.json · 22 campos</small></span><span class="chip ok">Con plantilla</span></div><div class="rw "><span class="nm"><strong>anexo-iii.pdf</strong><small>sin JSON todavía</small></span><span class="chip wr">Sin plantilla A</span></div></div><div class="df"><span class="sp">Podrás poner la plantilla después.</span><button class="b">‹ Atrás</button><button class="b">Omitir este paso</button><button class="b pr">Añadir 2 PDF</button></div></div></section><section class="pn dk"><h3 class="pt">4 · Añadir PDFs A · progreso y resultado</h3><p class="pc">«1 de 2» con estado por fila; al acabar, las filas nuevas llevan la etiqueta «Nuevo» y se avisa con «Deshacer» 10 s.</p><div class="dg"><div class="dh">Añadiendo PDF A</div><div class="bar"><i style="width:50%"></i></div><p class="cnt"><b>1 de 2</b> · anexo-iii.pdf</p><div class="ls"><div class="rw "><span class="nm"><strong>contrato-marco.pdf</strong><small>1,2 MB</small></span><span class="chip ok">Añadido</span></div><div class="rw "><span class="nm"><strong>anexo-iii.pdf</strong><small>340 KB</small></span><span class="chip run">Añadiendo…</span></div></div></div><div class="dg"><div class="done"><span class="tick">✓</span><div><b>2 PDF A añadidos</b><p class="dp">1 con plantilla, 1 sin plantilla A. 1 omitido por duplicado.</p></div></div><div class="ls"><div class="rw "><span class="nm"><strong>contrato-marco.pdf</strong><small>al final de la lista</small></span><span class="chip ok">Nuevo</span></div><div class="rw "><span class="nm"><strong>anexo-iii.pdf</strong><small>al final de la lista</small></span><span class="chip wr">Nuevo · sin plantilla A</span></div></div><div class="undo"><span>2 PDF A añadidos.</span><span class="b sm">Deshacer</span><small>10 s</small></div></div></section></div><div class="row"><section class="pn dk"><h3 class="pt">5 · Reemplazar A · confirmación (con B)</h3><p class="pc">Comparativa actual → nuevo y lista explícita de lo que se conserva, se descarta y puede quedar desfasado.</p><div class="dg wide"><div class="dh">Reemplazar A de factura-0412.pdf</div><div class="cmp"><div class="tile"><strong>factura-0412.pdf</strong>Actual · 3 págs · A4</div><div class="tile"><strong>factura-0412-v2.pdf</strong>Nuevo · 5 págs · A4</div></div><div class="keep"><div class="rw"><span class="nm">Plantilla A (14 campos) y versión B con sus campos</span><span class="chip ok">Se conserva</span></div><div class="rw"><span class="nm">Tabla de páginas A↔B (4 páginas)</span><span class="chip er">Se descarta</span></div><div class="rw"><span class="nm">Propuesta de IA guardada (12 campos)</span><span class="chip er">Se descarta</span></div><div class="rw"><span class="nm">«Ajustar A a B» elegido</span><span class="chip er">Se descarta</span></div><div class="rw"><span class="nm">Estados y vínculos A↔B</span><span class="chip wr">Pueden desfasarse</span></div></div><p class="note" style="color:var(--warn)">El PDF nuevo tiene 2 páginas más que el actual: los campos de las páginas 4 y 5 de la plantilla ya tendrán hoja, pero conviene revisar la fila. Pasa a «En revisión».</p><div class="df"><button class="b">Cancelar</button><button class="b pr">Reemplazar A</button></div></div></section><section class="pn dk"><h3 class="pt">6 · Reemplazar A · resultado y editor</h3><p class="pc">Aviso con «Deshacer» 10 s (en el editor, un aviso con «Deshacer»). En la ficha de Documento, con B, hay un botón por cada versión.</p><div class="undo"><span>A de factura-0412.pdf reemplazado. La fila vuelve a «En revisión».</span><span class="b sm">Deshacer</span><small>10 s</small></div><div class="dg"><div class="dh">Documento · factura-0412.pdf</div><div class="ls"><div class="rw"><span class="ico">A</span><span class="nm"><strong>factura-0412-v2.pdf</strong><small>5 págs · A4 · 520 KB</small></span><button class="b sm">Reemplazar A</button></div><div class="rw"><span class="ico">B</span><span class="nm"><strong>factura-0412-nueva.pdf</strong><small>4 págs · A4 · 480 KB</small></span><button class="b sm">Reemplazar B</button></div></div><p class="note">Sin B, la ficha muestra un único «Reemplazar PDF», como hoy.</p></div></section></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":3700}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

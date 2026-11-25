@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-192 Añadir y reemplazar PDFs A · estados · claro 1280</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+
+body{margin:0}
+.root{width:1720px;box-sizing:border-box;padding:56px 64px 64px;background:#14141f;color:#f5f5f5;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;gap:28px}
+.root h1{margin:0;font-size:34px;font-weight:600}
+.lead{margin:0;max-width:1200px;font-size:16px;line-height:1.55;color:#c4c4d0}
+.lbl{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9a9ab0}
+.row{display:flex;gap:24px;align-items:stretch}
+.pn{flex:1;min-width:0;box-sizing:border-box;padding:20px;border-radius:14px;display:flex;flex-direction:column;gap:12px}
+.pn.dk{--panel:#2a2a3d;--accent:#5eead4;--muted:#b0b0b0;--bd:#3f3f58;--ab:#0b3b36;--warn:#fbbf24;--bad:#fca5a5;background:#1e1e2f;color:#f5f5f5;border:1px solid #34344a}
+.pn.lt{--panel:#ffffff;--accent:#0f766e;--muted:#475569;--bd:#c5ccdb;--ab:#d9f3ee;--warn:#92400e;--bad:#b91c1c;background:#f6f7fb;color:#0f172a;border:1px solid #d7dde9}
+.pt{margin:0;font-size:15px;font-weight:600}
+.pc{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+.dg{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;max-width:620px}
+.dh{font-size:16px;font-weight:600}
+.dp{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.df{display:flex;justify-content:flex-end;gap:10px;align-items:center}
+.df .sp{margin-right:auto;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.b{font:inherit;font-size:13.5px;padding:8px 14px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:inherit;display:inline-block}
+.b.pr{background:var(--accent);border-color:var(--accent);color:#06201d;font-weight:600}
+.pn.lt .b.pr{color:#fff}
+.b.sm{padding:5px 10px;font-size:12.5px}
+.cb{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+.cb.c{background:var(--accent);border-color:var(--accent);color:#06201d}
+.pn.lt .cb.c{color:#fff}
+.bar{height:10px;border-radius:999px;background:var(--bd);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.cnt{margin:0;font-size:13.5px}
+.ls{display:flex;flex-direction:column;gap:6px}
+.rw{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;border:1px solid var(--bd);font-size:13.5px}
+.rw .nm{font-weight:500;flex:1;min-width:0}
+.rw .pg{font-size:12px;color:var(--muted);white-space:nowrap}
+.rw.on{background:var(--ab);border-color:var(--accent)}
+.rw.off{opacity:.62}
+.chip{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--bd);white-space:nowrap;color:var(--muted)}
+.chip.ok{color:var(--accent);border-color:var(--accent)}
+.chip.wr{color:var(--warn);border-color:var(--warn)}
+.chip.er{color:var(--bad);border-color:var(--bad)}
+.chip.run{color:var(--fg2,inherit);border-color:var(--accent)}
+.chip.run::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--accent)}
+.selbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 14px;font-size:13.5px}
+.selbar b.n{margin-right:6px}
+.tick{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#06201d;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex:none}
+.pn.lt .tick{color:#fff}
+.done{display:flex;gap:14px;align-items:center}.done p{margin:2px 0 0}
+.undo{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;font-size:13.5px}
+.undo small{margin-left:auto;color:var(--muted);font-size:12px}
+.opt{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.opt.rec{border-color:var(--accent);background:var(--ab)}
+.opt h4{margin:0;font-size:15px}.opt p{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.opt ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.tag{font-size:12px;font-weight:600;color:var(--accent)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.rule{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:20px 22px}
+.rule h4{margin:0 0 8px;font-size:15px;color:#5eead4}
+.rule p{margin:0;font-size:14px;line-height:1.55;color:#c4c4d0}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.step{background:#1e1e2f;border:1px solid #34344a;border-radius:12px;padding:16px 18px}
+.step b{display:block;margin-bottom:6px;color:#5eead4;font-size:14px}
+.step p{margin:0;font-size:13.5px;line-height:1.5;color:#c4c4d0}
+
+.dz{border:1.5px dashed var(--bd);border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.dz.over{border-color:var(--accent);background:var(--ab)}
+.dz b{font-size:14px}.dz span{font-size:13px;color:var(--muted)}
+.ta{border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-family:Consolas,monospace;font-size:12px;line-height:1.5;color:var(--muted);min-height:70px;white-space:pre-wrap;word-break:break-all}
+.ta.bad{border-color:var(--bad)}
+.err{margin:0;font-size:13px;color:var(--bad)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font-size:12.5px;padding:4px 11px;border-radius:999px;border:1px solid var(--bd);color:var(--muted)}
+.tab.on{background:var(--ab);border-color:var(--accent);color:inherit;font-weight:600}
+.df2{font-size:12px;color:var(--muted);white-space:nowrap}
+.df2 b{color:var(--accent);font-weight:600}.df2 s{color:var(--bad);text-decoration:none;font-weight:600}
+.sub{margin:2px 0 0 28px;padding:8px 12px;border-left:2px solid var(--bd);font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.sel{font:inherit;font-size:12.5px;padding:3px 8px;border-radius:8px;border:1px solid var(--bd);background:transparent;color:inherit}
+.wide{max-width:none}
+.mono{font-family:Consolas,monospace;font-size:12px}
+.note{margin:0;font-size:12.5px;color:var(--muted)}
+
+.tb{display:flex;gap:6px;border-bottom:1px solid var(--bd);padding-bottom:0}
+.tb span{padding:7px 14px;font-size:13.5px;border-bottom:2px solid transparent;color:var(--muted)}
+.tb span.on{border-color:var(--accent);color:inherit;font-weight:600}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tile{border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--muted)}
+.tile strong{display:block;font-size:20px;color:inherit}
+.rw small{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.sel{min-width:130px}
+
+
+.rw .ico{width:28px;height:28px;border-radius:8px;border:1px solid var(--bd);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex:none}
+.menu{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:2px;width:300px}
+.mi{padding:8px 12px;border-radius:8px;font-size:13.5px;display:flex;gap:8px;align-items:center}
+.mi.hi{background:var(--ab);outline:2px solid var(--accent)}
+.mi small{margin-left:auto;color:var(--muted);font-size:12px}
+.kb{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--bd);border-radius:6px;padding:1px 6px}
+.focus{outline:2px solid var(--accent);outline-offset:2px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp .tile strong{font-size:15px}
+.keep{display:flex;flex-direction:column;gap:6px}
+.keep .rw{padding:6px 12px}
+.w2{display:flex;gap:24px;align-items:flex-start}
+.w2>*{flex:1;min-width:0}
+.lt-root{background:#f6f7fb !important;color:#0f172a !important}
+.lt-root .lbl{color:#475569}
+</style>
+</helmet>
+<div class="root lt-root" style="width:1280px"><div><div class="lbl">Definitivo · claro · 1280 px · estados</div><h1>Añadir y reemplazar A: estados, errores y teclado</h1></div><div class="row"><section class="pn lt"><h3 class="pt">1 · Arrastrando sobre el recuadro</h3><p class="pc">El recuadro se resalta con el acento; no se sube nada hasta soltar.</p><div class="dg wide"><div class="dz over"><b>Suelta para añadir como A</b><span>2 archivos detectados</span></div></div></section><section class="pn lt"><h3 class="pt">2 · Archivo no válido</h3><p class="pc">Toast de error (<code>toast.batch.invalidFile</code>) y el resto sigue; la fila inválida no entra en la lista.</p><div class="dg wide"><div class="ls"><div class="rw "><span class="nm"><strong>notas.docx</strong><small>no es un PDF</small></span><span class="chip er">No válido</span></div><div class="rw "><span class="nm"><strong>anexo-iii.pdf</strong><small>340 KB · 2 págs</small></span><span class="chip ok">Listo</span></div></div><p class="err">1 archivo no es un PDF y se ha ignorado.</p></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">3 · Sin espacio</h3><p class="pc">Mismo aviso de almacenamiento que el alta (P-125). El botón principal se desactiva y se ofrece quitar archivos.</p><div class="dg wide"><p class="err">Faltan 38 MB de espacio en el navegador. Quita archivos o libera espacio.</p><div class="bar"><i style="width:100%;background:var(--bad)"></i></div><div class="df"><button class="b">Cancelar</button><button class="b pr" style="opacity:.5">Añadir 6 PDF</button></div></div></section><section class="pn lt"><h3 class="pt">4 · Progreso con un fallo</h3><p class="pc">Un PDF que falla no detiene la cola: queda «No se pudo añadir» con «Reintentar» al final.</p><div class="dg wide"><div class="bar"><i style="width:66%"></i></div><p class="cnt"><b>4 de 6</b></p><div class="ls"><div class="rw "><span class="nm"><strong>a.pdf</strong><small>ok</small></span><span class="chip ok">Añadido</span></div><div class="rw "><span class="nm"><strong>b.pdf</strong><small>ilegible</small></span><span class="chip er">No se pudo añadir</span></div><div class="rw "><span class="nm"><strong>c.pdf</strong><small></small></span><span class="chip run">Añadiendo…</span></div></div><div class="df"><button class="b">Cancelar el resto</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">5 · Reemplazar A · sin B</h3><p class="pc">Confirmación más corta: solo se descartan la tabla y la propuesta si existen. Sin nada que descartar, la lista dice «No hay nada que descartar».</p><div class="dg wide"><div class="dh">Reemplazar A de recibo-mayo.pdf</div><div class="cmp"><div class="tile"><strong>recibo-mayo.pdf</strong>Actual · 1 pág · A4</div><div class="tile"><strong>recibo-mayo-v2.pdf</strong>Nuevo · 1 pág · A4</div></div><div class="keep"><div class="rw"><span class="nm">Plantilla A (6 campos)</span><span class="chip ok">Se conserva</span></div><div class="rw"><span class="nm">Nada más que descartar</span><span class="chip">—</span></div></div><div class="df"><button class="b">Cancelar</button><button class="b pr">Reemplazar A</button></div></div></section><section class="pn lt"><h3 class="pt">6 · Reemplazar A · tamaño de hoja distinto</h3><p class="pc">Aviso amarillo y recomendación; se puede continuar.</p><div class="dg wide"><div class="dh">Reemplazar A de pedido-9087.pdf</div><div class="cmp"><div class="tile"><strong>A4 · 5 págs</strong>Actual</div><div class="tile"><strong>Letter · 5 págs</strong>Nuevo</div></div><p class="note" style="color:var(--warn)">La hoja nueva mide distinto: las coordenadas de la plantilla se conservan tal cual. Revisa la fila o usa «Ajustar A a B» después.</p><div class="df"><button class="b">Cancelar</button><button class="b pr">Reemplazar A</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">7 · Error al leer el PDF nuevo</h3><p class="pc">El PDF actual no se toca. Foco en «Elegir otro archivo».</p><div class="dg wide"><p class="err">No se pudo leer «dañado.pdf». El A actual sigue como estaba.</p><div class="df"><button class="b">Cancelar</button><button class="b pr focus">Elegir otro archivo</button></div></div></section><section class="pn lt"><h3 class="pt">8 · Teclado y foco</h3><p class="pc">Tab: pestañas › lista › Cancelar › principal. Esc cierra, Intro activa el principal, Mayús+Tab vuelve. El foco regresa al botón que abrió el diálogo.</p><div class="dg wide"><div class="df" style="justify-content:flex-start"><span class="kb">Tab</span><span class="kb">Mayús+Tab</span><span class="kb">Intro</span><span class="kb">Esc</span></div><div class="df"><button class="b">Cancelar</button><button class="b pr focus">Reemplazar A</button></div></div></section></div><div class="row"><section class="pn lt"><h3 class="pt">9 · Paleta Ctrl+K</h3><p class="pc">Dos acciones nuevas en la paleta del lote; «Reemplazar A» actúa sobre la fila seleccionada.</p><div class="menu" style="width:100%"><div class="mi hi">Añadir PDFs A<small>Lote</small></div><div class="mi">Reemplazar A de la fila…<small>1 PDF seleccionado</small></div><div class="mi" style="opacity:.55">Reemplazar A de la fila…<small>elige una fila primero</small></div></div></section></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":3400}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

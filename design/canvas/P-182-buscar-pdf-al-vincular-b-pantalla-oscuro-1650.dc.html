@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-182 Buscar PDF al vincular B · pantalla · oscuro 1650</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.p h1,.p h2,.p h3,.p p{margin:0}.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}.cols{display:flex;gap:24px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.num{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:13px;align-items:center;justify-content:center;flex:none}
+.li{display:flex;gap:12px;align-items:flex-start}.li p{line-height:1.5}
+.tog{display:flex;align-items:center;gap:10px;min-height:40px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);font-size:14px;background:var(--inset)}.tog span{flex:1}
+.tog.on{border-color:var(--accent)}.tog.off{opacity:.55}
+.lst{border:1px solid var(--line);border-radius:14px;padding:6px;background:var(--panel);display:flex;flex-direction:column;gap:2px}
+.scr{max-height:232px;overflow:hidden;display:flex;flex-direction:column;gap:2px;position:relative}
+.bar{position:absolute;right:2px;top:4px;width:5px;height:70px;border-radius:3px;background:var(--line)}
+.srch{display:flex;align-items:center;gap:8px;margin:2px 2px 6px;padding:0 10px;min-height:38px;border-radius:10px;border:1px solid var(--accent);background:var(--inset);font-size:14px}
+.srch i{font-style:normal;color:var(--muted)}.srch span{flex:1}
+.caret{display:inline-block;width:1px;height:16px;background:var(--text);vertical-align:middle}
+.grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 10px 4px;font-weight:600}
+.opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;font-size:14px}
+.opt small{display:block;color:var(--muted);font-size:12px}.opt .g{flex:1}
+.opt.hi{background:color-mix(in srgb,var(--accent) 16%,transparent);outline:2px solid var(--accent)}
+.opt mark{background:color-mix(in srgb,var(--accent) 30%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+.cnt{font-size:12px;color:var(--muted);padding:4px 10px 2px}
+.empty{padding:18px 12px;text-align:center;color:var(--muted);font-size:14px;line-height:1.5}
+.btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:5px 12px;min-height:32px;background:transparent;color:var(--text);display:inline-flex;align-items:center;white-space:nowrap}
+.strip{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.strip h4{margin:0;font-size:14px;font-weight:600}
+.srow{display:flex;align-items:center;gap:8px;font-size:14px}.srow .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel{display:flex;align-items:center;gap:8px;min-height:32px;padding:4px 12px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:600;width:176px;background:var(--inset)}.sel span{flex:1}
+.sel.on{border-color:var(--accent)}
+.toast{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--accent);font-size:14px}
+kbd{font-family:Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+</style>
+</helmet>
+<div class="p" style="width:1720px;height:860px;--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff8a8a;--text:#f5f5f5;--muted:#b0b0b0;--ink:#041818;--line:rgba(255,255,255,.16);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#1d1d2a">
+<div class="lab">P-182 · Definitivo · 1.20 · Oscuro · 1650 px</div><h1 style="font-size:28px">Pantalla: escribir «dni» para vincular dni-1.pdf</h1>
+<div class="cols"><div style="width:520px;display:flex;flex-direction:column;gap:10px"><div class="cap">1 · «Elegir PDF…» abierto, sin escribir: foco en el campo y «Sugeridos»</div><div class="strip"><h4>Versiones nuevas (B) · 3 sin vincular</h4><div class="srow"><span class="n">dni-1.pdf</span><div class="sel on"><span>Elegir PDF…</span>▾</div><span class="btn">Descartar</span></div><div class="lst"><div class="srch"><i>⌕</i><span><span class="caret"></span> <span class="cap">Buscar PDF…</span></span></div><div class="cnt" role="status">90 PDF sin B</div><div class="grp">Sugeridos</div><div class="opt hi"><span class="g"><b>dni.pdf</b><small>nombre parecido</small></span></div><div class="opt"><span class="g"><b>dni-anverso.pdf</b><small>nombre parecido</small></span></div><div class="opt"><span class="g"><b>dni-reverso.pdf</b><small>nombre parecido</small></span></div><div class="grp">Todos</div><div class="scr"><div class="opt"><span class="g"><b>acta-1.pdf</b></span></div><div class="opt"><span class="g"><b>acta-2.pdf</b></span></div><div class="opt"><span class="g"><b>alta.pdf</b></span></div></div></div><div class="srow"><span class="n">pasaporte-2.pdf</span><div class="sel"><span>Elegir PDF…</span>▾</div><span class="btn">Descartar</span></div><div class="srow"><span class="n">contrato-final.pdf</span><div class="sel"><span>Elegir PDF…</span>▾</div><span class="btn">Descartar</span></div></div></div><div style="width:520px;display:flex;flex-direction:column;gap:10px"><div class="cap">2 · Escribiendo «dni»: solo coincidencias, contador y resaltado</div><div class="strip"><h4>Versiones nuevas (B) · 3 sin vincular</h4><div class="srow"><span class="n">dni-1.pdf</span><div class="sel on"><span>Elegir PDF…</span>▾</div><span class="btn">Descartar</span></div><div class="lst"><div class="srch"><i>⌕</i><span>dni<span class="caret"></span></span><i>✕</i></div><div class="cnt" role="status">4 de 90</div><div class="scr"><div class="opt hi"><span class="g"><b><mark>dni</mark>.pdf</b></span></div><div class="opt"><span class="g"><b><mark>dni</mark>-anverso.pdf</b></span></div><div class="opt"><span class="g"><b><mark>dni</mark>-reverso.pdf</b></span></div><div class="opt"><span class="g"><b>copia-<mark>dni</mark>-padre.pdf</b></span></div></div></div><div class="srow"><span class="n">pasaporte-2.pdf</span><div class="sel"><span>Elegir PDF…</span>▾</div><span class="btn">Descartar</span></div><div class="srow"><span class="n">contrato-final.pdf</span><div class="sel"><span>Elegir PDF…</span>▾</div><span class="btn">Descartar</span></div></div></div><div style="width:520px;display:flex;flex-direction:column;gap:10px"><div class="cap">3 · Intro en «dni.pdf»: la fila sale y el foco pasa a la siguiente</div><div class="strip"><h4>Versiones nuevas (B) · 2 sin vincular</h4><div class="srow"><span class="n">pasaporte-2.pdf</span><div class="sel on"><span>Elegir PDF…</span>▾</div><span class="btn">Descartar</span></div><div class="srow"><span class="n">contrato-final.pdf</span><div class="sel"><span>Elegir PDF…</span>▾</div><span class="btn">Descartar</span></div></div>
+<div class="toast"><span aria-hidden="true">✓</span><span>dni-1.pdf vinculado a dni.pdf</span></div>
+<div class="card"><h3>Teclado</h3><div class="cap"><kbd>Intro</kbd> abrir o elegir · escribir filtra · <kbd>↓</kbd> <kbd>↑</kbd> resultado · <kbd>Esc</kbd> borra y luego cierra</div></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":860}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
