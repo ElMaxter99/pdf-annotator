@@ -197,6 +197,13 @@
       "values": "Valors: {{value}}",
       "customize": "Personalitza",
       "title": "Personalitza el JSON"
+    },
+    "jsonEditor": {
+      "label": "Editor del JSON d'anotacions",
+      "foldAll": "Plega-ho tot",
+      "unfoldAll": "Desplega-ho tot",
+      "fold": "Plega",
+      "unfold": "Desplega"
     }
   },
   "guides": {

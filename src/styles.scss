@@ -945,19 +945,20 @@ header .logo {
   }
 
   .json-editor {
+    display: block;
     width: 100%;
-    min-height: clamp(280px, 45vh, 560px);
+    height: clamp(280px, 45vh, 560px);
+    min-height: 160px;
     border-radius: 8px;
     border: 1px solid var(--input-border);
     background: var(--input-bg);
     color: var(--text);
-    padding: 10px;
-    font-family: 'Fira Code', monospace;
-    font-size: 0.85rem;
+    padding: 0;
     resize: vertical;
+    overflow: hidden;
   }
 
-  .json-editor:focus {
+  .json-editor:focus-within {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 2px rgba(94, 234, 212, 0.15);
@@ -7752,39 +7753,53 @@ button.version-chip:focus-visible {
   }
 }
 
-/* Formato del JSON del editor (P-163 a P-165) */
-.json-keys {
+/* Zona «Anotaciones JSON» simplificada (P-200 a P-202) */
+.json-panel__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.json-panel__format {
+  position: relative;
+  display: inline-flex;
+}
+.json-panel__dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--warning, #fbbf24);
+  pointer-events: none;
+}
+.json-panel__format .btn,
+.json-editor-head__folds .btn {
+  border: 1px solid var(--input-border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+.json-editor-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 10px;
-  padding: 0 0 8px;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
 }
-.json-keys__label {
-  color: var(--muted);
-  font-size: 13px;
+.json-editor-head .json-status {
+  margin-top: 0;
+  min-width: 0;
 }
-.json-keys__pill,
-.json-keys__chip {
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--input-bg);
-  color: var(--text);
+.json-editor-head__folds {
+  display: inline-flex;
+  gap: 6px;
+  flex: none;
 }
-.json-keys__chip {
-  color: var(--warning-text);
-}
+
 :root.theme-light .jfm__seg,
 :root.theme-light .jfm__preview {
   background: var(--light-surface);
-}
-:root.theme-light .json-keys__pill,
-:root.theme-light .json-keys__chip {
-  background: var(--light-surface);
-}
-.json-keys__hint {
-  color: var(--muted);
-  font-size: 12px;
 }

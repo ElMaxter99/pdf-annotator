@@ -139,7 +139,7 @@ test('keyboard shortcuts: zoom, fit width, sidebar and help dialog', async ({ pa
 });
 
 test('single-key shortcuts are ignored while typing', async ({ page }) => {
-  await page.locator('textarea.json-editor').click();
+  await page.locator('app-json-code-editor .cm-content').click();
   await page.keyboard.type('b');
   await expect(page.locator('.sidebar--minimized')).toHaveCount(0);
 });

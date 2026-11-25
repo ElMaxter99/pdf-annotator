@@ -52,10 +52,27 @@ export async function openWorkspace(
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
 }
 
-export const jsonEditor = (page: Page) => page.locator('textarea.json-editor');
+export const jsonEditor = (page: Page) => page.locator('app-json-code-editor');
+export const jsonContent = (page: Page) => page.locator('app-json-code-editor .cm-content');
+
+/** Texto completo del editor de código (el DOM de CodeMirror solo pinta las líneas visibles). */
+export async function jsonValue(page: Page): Promise<string> {
+  return jsonEditor(page).evaluate((el) => (el as unknown as { value: string }).value);
+}
+
+export async function fillJson(page: Page, text: string) {
+  await jsonContent(page).fill(text);
+}
+
+export async function expectJsonValue(page: Page, expected: RegExp | string) {
+  await expect
+    .poll(() => jsonValue(page))
+    [typeof expected === 'string' ? 'toBe' : 'toMatch'](expected as never);
+}
+
 
 export async function readJson(page: Page) {
-  return JSON.parse(await jsonEditor(page).inputValue());
+  return JSON.parse(await jsonValue(page));
 }
 
 export async function fieldCount(page: Page) {
@@ -79,7 +96,7 @@ export async function addAnnotation(page: Page, fx: number, fy: number, text: st
 }
 
 export async function applyJsonText(page: Page, value: unknown) {
-  await jsonEditor(page).fill(typeof value === 'string' ? value : JSON.stringify(value));
+  await fillJson(page, typeof value === 'string' ? value : JSON.stringify(value));
   await page.keyboard.press('Control+s');
   await page.waitForTimeout(500);
 }

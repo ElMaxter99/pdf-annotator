@@ -106,26 +106,50 @@
   <section class="json-panel" [class.json-panel--collapsed]="vm.jsonPanelCollapsed()">
     <div class="json-panel__header">
       <h2 class="json-panel__title">{{ 'sidebar.title' | t }}</h2>
-      <button type="button" class="json-panel__toggle" (click)="vm.toggleJsonPanelCollapsed()"
-        [attr.aria-expanded]="!vm.jsonPanelCollapsed()">
-        <span>{{ (vm.jsonPanelCollapsed() ? 'sidebar.jsonPanelShow' : 'sidebar.jsonPanelHide') | t }}</span>
-        <span class="json-panel__toggle-icon" aria-hidden="true">{{ vm.jsonPanelCollapsed() ? '⟩' : '⟨' }}</span>
-      </button>
+      <span class="json-panel__actions">
+        <span class="json-panel__format" *ngIf="vm.jsonViewMode() === 'text' && !vm.jsonPanelCollapsed()"
+          [attr.title]="vm.jsonCopyIsStrict() ? null : ((vm.jsonCopyFormat().keys === 'bare' ? 'sidebar.jsonKeys.bare' : 'sidebar.jsonKeys.quoted') | t) + ' · ' + ((vm.jsonCopyFormat().quote === 'single' ? 'sidebar.copyFormat.quoteSingle' : 'sidebar.copyFormat.quoteDouble') | t)">
+          <app-json-format-menu [disabled]="!vm.jsonKeysCanChange()" align="start" labelKey="sidebar.jsonFormat.customize" titleKey="sidebar.jsonFormat.title" />
+          <i class="json-panel__dot" *ngIf="!vm.jsonCopyIsStrict()" data-testid="json-keys-notstrict" aria-hidden="true"></i>
+        </span>
+        <button type="button" class="json-panel__toggle" (click)="vm.toggleJsonPanelCollapsed()"
+          [attr.aria-expanded]="!vm.jsonPanelCollapsed()"
+          [attr.aria-label]="(vm.jsonPanelCollapsed() ? 'sidebar.jsonPanelShow' : 'sidebar.jsonPanelHide') | t"
+          [attr.title]="(vm.jsonPanelCollapsed() ? 'sidebar.jsonPanelShow' : 'sidebar.jsonPanelHide') | t">
+          <span class="json-panel__toggle-icon" aria-hidden="true">{{ vm.jsonPanelCollapsed() ? '⟩' : '⟨' }}</span>
+        </button>
+      </span>
     </div>
-
     <ng-container *ngIf="!vm.jsonPanelCollapsed()">
-      <div class="json-keys" *ngIf="vm.jsonViewMode() === 'text'" data-testid="json-keys">
-        <span class="json-keys__label">{{ 'sidebar.jsonFormat.label' | t }}</span>
-        <span class="json-keys__pill" data-testid="json-format-keys">{{ 'sidebar.jsonFormat.keys' | t : { value: ((vm.jsonCopyFormat().keys === 'bare' ? 'sidebar.jsonKeys.bare' : 'sidebar.jsonKeys.quoted') | t) } }}</span>
-        <span class="json-keys__pill" data-testid="json-format-values">{{ 'sidebar.jsonFormat.values' | t : { value: ((vm.jsonCopyFormat().quote === 'single' ? 'sidebar.copyFormat.quoteSingle' : 'sidebar.copyFormat.quoteDouble') | t) } }}</span>
-        <app-json-format-menu [disabled]="!vm.jsonKeysCanChange()" align="start" labelKey="sidebar.jsonFormat.customize" titleKey="sidebar.jsonFormat.title" />
-        <span class="json-keys__chip" *ngIf="!vm.jsonCopyIsStrict()" data-testid="json-keys-notstrict">{{ 'sidebar.jsonKeys.notStrict' | t }}</span>
-        <span class="json-keys__hint" *ngIf="!vm.jsonKeysCanChange()">{{ 'sidebar.jsonKeys.fixFirst' | t }}</span>
+      <div class="json-editor-head">
+        <div class="json-status" role="status" aria-live="polite">
+          <ng-container [ngSwitch]="vm.jsonTreePreview().status">
+            <span *ngSwitchCase="'error'" class="json-status__item json-status__item--error">
+              ✗ {{ 'sidebar.jsonStatus.error' | t : { line: vm.jsonTreePreview().errorAt?.line ?? '?', column: vm.jsonTreePreview().errorAt?.column ?? '?' } }}
+            </span>
+            <ng-container *ngSwitchCase="'ready'">
+              <span *ngIf="vm.jsonTreePreview().hasPages; else jsonNoPages" class="json-status__item json-status__item--ok">
+                ✓ {{ 'sidebar.jsonStatus.valid' | t : { count: vm.jsonTreePreview().fieldCount ?? 0 } }}
+              </span>
+              <ng-template #jsonNoPages>
+                <span class="json-status__item json-status__item--warn">⚠ {{ 'sidebar.jsonStatus.noPages' | t }}</span>
+              </ng-template>
+            </ng-container>
+          </ng-container>
+        </div>
+        <span class="json-editor-head__folds" *ngIf="vm.jsonViewMode() === 'text'">
+          <button type="button" class="btn btn--ghost btn--sm" (click)="foldJson(true)"
+            [disabled]="!vm.coords().length" data-testid="json-fold-all">{{ 'sidebar.jsonEditor.foldAll' | t }}</button>
+          <button type="button" class="btn btn--ghost btn--sm" (click)="foldJson(false)"
+            [disabled]="!vm.coords().length" data-testid="json-unfold-all">{{ 'sidebar.jsonEditor.unfoldAll' | t }}</button>
+        </span>
       </div>
       <ng-container *ngIf="vm.jsonViewMode() === 'text'; else jsonTreeView">
-        <textarea #jsonEditor class="json-editor" [ngModel]="vm.coordsTextModel()"
-          (ngModelChange)="vm.onCoordsTextChange($event)" (paste)="vm.onCoordsTextPaste()"
-          [placeholder]="'sidebar.jsonPlaceholder' | t" spellcheck="false"></textarea>
+        <app-json-code-editor #jsonEditor class="json-editor" [value]="vm.coordsTextModel()"
+          (valueChange)="vm.onCoordsTextChange($event)" (pasted)="vm.onCoordsTextPaste()"
+          [placeholderText]="'sidebar.jsonPlaceholder' | t" [ariaLabel]="'sidebar.jsonEditor.label' | t"
+          [foldLabel]="'sidebar.jsonEditor.fold' | t" [unfoldLabel]="'sidebar.jsonEditor.unfold' | t"
+          [errorLine]="vm.jsonTreePreview().status === 'error' ? (vm.jsonTreePreview().errorAt?.line ?? null) : null" />
       </ng-container>
       <ng-template #jsonTreeView>
         <div *ngIf="vm.jsonTreePreview().status === 'ready'; else jsonTreePlaceholder" class="json-tree-container">
@@ -138,21 +162,6 @@
           </div>
         </ng-template>
       </ng-template>
-      <div class="json-status" role="status" aria-live="polite">
-        <ng-container [ngSwitch]="vm.jsonTreePreview().status">
-          <span *ngSwitchCase="'error'" class="json-status__item json-status__item--error">
-            ✗ {{ 'sidebar.jsonStatus.error' | t : { line: vm.jsonTreePreview().errorAt?.line ?? '?', column: vm.jsonTreePreview().errorAt?.column ?? '?' } }}
-          </span>
-          <ng-container *ngSwitchCase="'ready'">
-            <span *ngIf="vm.jsonTreePreview().hasPages; else jsonNoPages" class="json-status__item json-status__item--ok">
-              ✓ {{ 'sidebar.jsonStatus.valid' | t : { count: vm.jsonTreePreview().fieldCount ?? 0 } }}
-            </span>
-            <ng-template #jsonNoPages>
-              <span class="json-status__item json-status__item--warn">⚠ {{ 'sidebar.jsonStatus.noPages' | t }}</span>
-            </ng-template>
-          </ng-container>
-        </ng-container>
-      </div>
       <div class="json-toolbar">
         <div class="json-toolbar__view-toggle-group" role="group"
           [attr.aria-label]="'controls.jsonViewModeToggle' | t">

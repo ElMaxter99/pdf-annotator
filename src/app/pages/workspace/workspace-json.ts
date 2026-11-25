@@ -6,8 +6,6 @@ import {
 import {
   JsonShapeError,
   buildJsonTreePath,
-  countLineBreaks,
-  getTextareaLineHeight,
   serializeFieldForJson,
 } from '../../utils/json-text.utils';
 import { PageAnnotations, PageField } from '../../models/annotation.model';
@@ -102,8 +100,8 @@ export class WorkspaceJson {
   }
 
   focusJsonTextRange(this: WorkspacePageComponent, pageIndex: number, fieldIndex: number) {
-    const textarea = this.jsonEditorRef?.nativeElement;
-    if (!textarea) {
+    const editor = this.jsonEditorRef;
+    if (!editor) {
       return;
     }
 
@@ -117,12 +115,12 @@ export class WorkspaceJson {
       return;
     }
 
-    const range = this.locateJsonFieldRange(pageIndex, fieldIndex, textarea.value);
+    const range = this.locateJsonFieldRange(pageIndex, fieldIndex, editor.getValue());
     if (!range) {
       return;
     }
 
-    this.highlightTextareaRange(textarea, range);
+    editor.revealRange(range.start, range.end);
   }
 
   locateJsonFieldRange(
@@ -189,57 +187,6 @@ export class WorkspaceJson {
 
   buildFieldJsonBlock(this: WorkspacePageComponent, field: PageField): string {
     return formatJsonBlock(this.serializeFieldForJson(field), this.jsonCopyFormat(), 4);
-  }
-
-  highlightTextareaRange(
-    this: WorkspacePageComponent,
-    textarea: HTMLTextAreaElement,
-    range: { start: number; end: number },
-  ) {
-    const { start, end } = range;
-    if (start < 0 || end <= start) {
-      return;
-    }
-
-    const activeElement = (this.document?.activeElement ?? null) as HTMLElement | null;
-    const hadFocus = activeElement === textarea;
-
-    if (!hadFocus) {
-      try {
-        textarea.focus({ preventScroll: true } as FocusOptions);
-      } catch {
-        textarea.focus();
-      }
-    }
-
-    try {
-      textarea.setSelectionRange(start, end);
-    } catch {
-      // Ignore selection errors in unsupported environments.
-    }
-
-    const lineHeight = getTextareaLineHeight(textarea, this.document);
-    const precedingText = textarea.value.slice(0, start);
-    const lineIndex = countLineBreaks(precedingText);
-    const desiredTop = Math.max(lineIndex - 2, 0) * lineHeight;
-    const maxScrollTop = Math.max(textarea.scrollHeight - textarea.clientHeight, 0);
-    const top = Math.min(desiredTop, maxScrollTop);
-
-    if (typeof textarea.scrollTo === 'function') {
-      textarea.scrollTo({ top, behavior: 'smooth' });
-    } else {
-      textarea.scrollTop = top;
-    }
-
-    if (!hadFocus && activeElement && activeElement !== textarea) {
-      this.runAfterRender(() => {
-        try {
-          activeElement.focus({ preventScroll: true } as FocusOptions);
-        } catch {
-          activeElement.focus();
-        }
-      });
-    }
   }
 
   clearAll(this: WorkspacePageComponent, options?: { skipHistory?: boolean }) {

@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
-import { EXAMPLE_JSON, jsonEditor, openSidebarTab, openWorkspace } from './helpers';
+import { EXAMPLE_JSON, openSidebarTab, openWorkspace, fillJson, jsonContent } from './helpers';
 import { readFileSync } from 'node:fs';
 
 test('exporta varias plantillas en un ZIP con progreso y confirmación', async ({ page }) => {
   await openWorkspace(page);
-  await jsonEditor(page).fill(readFileSync(EXAMPLE_JSON, 'utf8'));
-  await jsonEditor(page).blur();
+  await fillJson(page, readFileSync(EXAMPLE_JSON, 'utf8'));
+  await jsonContent(page).blur();
   await openSidebarTab(page, 'Plantillas');
   await expect(page.getByTestId('templates-export-open')).toBeDisabled();
 

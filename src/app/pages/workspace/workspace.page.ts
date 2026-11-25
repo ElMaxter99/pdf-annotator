@@ -25,6 +25,7 @@ import {
   parseNumericList,
   serializeFieldForJson,
 } from '../../utils/json-text.utils';
+import type { JsonCodeEditorComponent } from '../../components/json-code-editor/json-code-editor.component';
 import { ZOOM_PRESETS, type ViewerClick, type ZoomLimit } from '../../utils/zoom.utils';
 import { initialWheelPageState, type WheelPageState } from '../../utils/wheel-page.utils';
 import { AiHelperService } from '../../services/ai-helper.service';
@@ -639,7 +640,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     return this.sidebarComponent?.customFontInputRef;
   }
 
-  get jsonEditorRef(): ElementRef<HTMLTextAreaElement> | undefined {
+  get jsonEditorRef(): JsonCodeEditorComponent | undefined {
     return this.sidebarComponent?.jsonEditorRef;
   }
 
