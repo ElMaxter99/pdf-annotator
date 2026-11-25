@@ -32,7 +32,6 @@ La app es solo de escritorio: no hay mesas móviles (decisión 11 de `docs/DECIS
 | V-12 Editar anotación | Editor flotante sobre una anotación | [`V-12-editar-anotacion-editor-flotante.dc.html`](canvas/V-12-editar-anotacion-editor-flotante.dc.html) | `annotation-editor` (edit) | Captura 1:1 de la v1.5.0 |
 | V-13 Selección múltiple | Tres anotaciones y barra de alineación | [`V-13-seleccion-multiple-y-barra-de-alineacion.dc.html`](canvas/V-13-seleccion-multiple-y-barra-de-alineacion.dc.html) | `viewer` | Captura 1:1 de la v1.5.0 |
 | V-14 Atajos | Diálogo de atajos | [`V-14-dialogo-de-atajos.dc.html`](canvas/V-14-dialogo-de-atajos.dc.html) | `shortcuts-dialog` | Captura 1:1 de la v1.5.0 |
-| V-15 JSON con error | Error de sintaxis bajo el editor | [`V-15-json-con-error-de-sintaxis.dc.html`](canvas/V-15-json-con-error-de-sintaxis.dc.html) | `sidebar` | Captura 1:1 de la v1.5.0 |
 | V-16 Aviso de importación | Toast tras importar un JSON dudoso | [`V-16-aviso-de-importacion-toast.dc.html`](canvas/V-16-aviso-de-importacion-toast.dc.html) | `toast-host` | Captura 1:1 de la v1.5.0 |
 | V-17 Guías y rejilla | Guías, reglas y snapping activos | [`V-17-guias-y-rejilla-activas.dc.html`](canvas/V-17-guias-y-rejilla-activas.dc.html) | `sidebar`, `viewer` | Captura 1:1 de la v1.5.0 |
 | V-18 Árbol JSON | Vista de árbol | [`V-18-arbol-json.dc.html`](canvas/V-18-arbol-json.dc.html) | `json-tree` | Captura 1:1 de la v1.5.0 |
