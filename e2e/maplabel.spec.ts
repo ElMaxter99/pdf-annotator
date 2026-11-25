@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { applyJsonText, chooseView, openSidebarTab, openWorkspace } from './helpers';
+import { applyJsonText, chooseView, openSidebarTab, openWorkspace, jsonValue } from './helpers';
 
 const PREFIX = 'contrato.intervinientes[0].condicion.';
 const FIELDS = {
@@ -27,13 +27,13 @@ test('apagado por defecto: sin rótulos ni paradas de Tab', async ({ page }) => 
 });
 
 test('el interruptor del visor pinta el final del nombre solo en casillas y no cambia el JSON', async ({ page }) => {
-  const before = await page.locator('textarea.json-editor').inputValue();
+  const before = await jsonValue(page);
   await page.getByTestId('maplabel-toggle').check();
   const labels = page.locator('.map-label');
   await expect(labels.filter({ hasText: '[0]…esTitular' })).toHaveCount(1);
   await expect(labels.filter({ hasText: '[0]…esCotitular' })).toHaveCount(1);
   await expect(page.locator('.map-label', { hasText: 'holder' })).toHaveCount(0);
-  expect(await page.locator('textarea.json-editor').inputValue()).toBe(before);
+  expect(await jsonValue(page)).toBe(before);
 });
 
 test('«Todas» añade el texto, salvo en la vista Mapeo, que ya pinta su nombre', async ({ page }) => {
