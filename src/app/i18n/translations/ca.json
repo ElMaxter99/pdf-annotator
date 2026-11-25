@@ -742,7 +742,8 @@
       "assignPlaceholder": "Assignar…",
       "pdfs": "PDF",
       "withTemplate": "amb plantilla",
-      "withoutTemplate": "sense plantilla"
+      "withoutTemplate": "sense plantilla",
+      "search": "Cerca plantilla…"
     },
     "versionsDrop": {
       "title": "Versions noves (B)",
@@ -753,9 +754,12 @@
       "more": "Afegeix-ne més",
       "unpairedTitle": "Fitxers sense parella: {{count}}",
       "unpairedText": "No coincideixen amb cap PDF del lot: assigna'ls a mà o descarta'ls.",
-      "assign": "Assigna a…",
+      "assign": "Tria PDF…",
       "assignLabel": "Assigna {{name}} a un PDF",
-      "discard": "Descarta"
+      "discard": "Descarta",
+      "search": "Cerca PDF…",
+      "noneFree": "Tots els PDF ja tenen B",
+      "linked": "{{file}} vinculat a {{name}}"
     },
     "filter": {
       "label": "Filtrar per estat",
@@ -2707,5 +2711,13 @@
       "jsonKeysHelp": "Claus i cometes dels valors a l'editor «Anotacions (JSON)», en copiar i en descarregar. La importació llegeix qualsevol.",
       "jsonQuote": "Cometes dels valors"
     }
+  },
+  "search": {
+    "total": "{{total}} disponibles",
+    "count": "{{shown}} de {{total}}",
+    "noMatch": "Res no coincideix amb «{{query}}».",
+    "clear": "Esborra la cerca",
+    "suggested": "Suggerits",
+    "all": "Tots"
   }
 }

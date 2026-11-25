@@ -351,17 +351,15 @@
                       'batch.step2.fields' | t: { count: row.info.count }
                     }}</span>
                   } @else if (unusedPasted().length > 0) {
-                    <select
-                      class="batch-assign"
-                      [attr.aria-label]="'batch.step2.assign' | t: { name: row.pdf.name }"
-                      (change)="assignPasted(row.pdf, $any($event.target).value)"
-                      data-testid="assign-pasted"
-                    >
-                      <option value="" selected>{{ 'batch.step2.assignPlaceholder' | t }}</option>
-                      @for (template of unusedPasted(); track $index) {
-                        <option [value]="$index">{{ template.label }}</option>
-                      }
-                    </select>
+                    <app-search-select
+                      [options]="pastedOptions()"
+                      [suggestFor]="row.pdf.name"
+                      [placeholder]="'batch.step2.assignPlaceholder' | t"
+                      [ariaLabel]="'batch.step2.assign' | t: { name: row.pdf.name }"
+                      [searchLabel]="'batch.step2.search' | t"
+                      (picked)="assignPasted(row.pdf, $event)"
+                      testId="assign-pasted"
+                    />
                   } @else {
                     <span class="batch-chip batch-chip--warn">{{ 'batch.step2.empty' | t }}</span>
                   }
@@ -468,17 +466,16 @@
             @for (file of unpairedB(); track file) {
               <li>
                 <span class="batch-unpaired__name">{{ file.name }}</span>
-                <select
-                  class="batch-assign"
-                  [attr.aria-label]="'batch.versionsDrop.assignLabel' | t: { name: file.name }"
-                  (change)="assignUnpaired(file, $any($event.target).value)"
-                  data-testid="assign-unpaired"
-                >
-                  <option value="" selected>{{ 'batch.versionsDrop.assign' | t }}</option>
-                  @for (item of withoutB(); track item.id) {
-                    <option [value]="item.id">{{ item.name }}</option>
-                  }
-                </select>
+                <app-search-select
+                  [options]="withoutBOptions()"
+                  [suggestFor]="file.name"
+                  [placeholder]="'batch.versionsDrop.assign' | t"
+                  [ariaLabel]="'batch.versionsDrop.assignLabel' | t: { name: file.name }"
+                  [searchLabel]="'batch.versionsDrop.search' | t"
+                  [emptyText]="'batch.versionsDrop.noneFree' | t"
+                  (picked)="assignUnpaired(file, $event)"
+                  testId="assign-unpaired"
+                />
                 <button type="button" class="btn btn--ghost" (click)="discardUnpaired(file)">
                   {{ 'batch.versionsDrop.discard' | t }}
                 </button>
