@@ -2636,7 +2636,10 @@
     "placeHere": "Placer ici",
     "placeHereTitle": "Mettre ce champ de A sur la page {{page}} de B, aux mêmes coordonnées",
     "placeCancel": "Annuler",
-    "placed": "Placé sur la page {{page}} de B"
+    "placed": "Placé sur la page {{page}} de B",
+    "notInB": "N'existe pas dans B",
+    "notInBTitle": "Ce champ de A n'est pas dans B : le marquer comme résolu sans le placer (comme « Valider : n'existe pas » ou « Ignorer » dans la liste ; annulable depuis la liste)",
+    "dismissed": "« {{name}} » marqué comme absent de B"
   },
   "storage": {
     "open": "Stockage",

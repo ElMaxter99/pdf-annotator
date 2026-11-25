@@ -667,7 +667,7 @@ export class WorkspaceBatch {
       this.runAfterRender(() =>
         this.showPairTip(this.findPairElementA(target), 'pairing.noPartnerB'),
       );
-      this.offerManualPlace(state.a?.field, target.aPage);
+      this.offerManualPlace(state.a?.field, target.aPage, fieldKey(state.page, state.name));
     } else if (!state.a) {
       this.runAfterRender(() =>
         this.showPairTip(this.findPairElementB(target), 'pairing.noPartnerA'),

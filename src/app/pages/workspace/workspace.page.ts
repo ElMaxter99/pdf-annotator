@@ -2487,7 +2487,12 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly pairTip = signal<{ x: number; y: number; key: string } | null>(null);
   pairTarget: PairTarget | null = null;
   /** «Colocar a mano»: campo de A sin pareja que se ofrece poner en la página de B que se ve. */
-  readonly manualPlace = signal<{ field: PageField; aPage: number | null } | null>(null);
+  readonly manualPlace = signal<{
+    field: PageField;
+    aPage: number | null;
+    /** Clave del estado «falta en B» (`page|name`) para «No existe en B»; null si no se encuentra. */
+    dismissKey: string | null;
+  } | null>(null);
   pairFrame = 0;
   pairTipTimer: ReturnType<typeof setTimeout> | null = null;
   pairHoverKey: string | null = null;

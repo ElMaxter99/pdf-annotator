@@ -2636,7 +2636,10 @@
     "placeHere": "Place here",
     "placeHereTitle": "Put this field of A on page {{page}} of B, at the same coordinates",
     "placeCancel": "Cancel",
-    "placed": "Placed on page {{page}} of B"
+    "placed": "Placed on page {{page}} of B",
+    "notInB": "Not in B",
+    "notInBTitle": "This field of A is not in B: mark it resolved without placing it (like «Validate: not there» or «Dismiss» in the list; it can be undone there)",
+    "dismissed": "«{{name}}» marked as not in B"
   },
   "storage": {
     "open": "Storage",

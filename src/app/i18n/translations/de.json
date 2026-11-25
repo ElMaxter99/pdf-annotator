@@ -2636,7 +2636,10 @@
     "placeHere": "Hier platzieren",
     "placeHereTitle": "Dieses Feld von A auf Seite {{page}} von B an denselben Koordinaten einfügen",
     "placeCancel": "Abbrechen",
-    "placed": "Auf Seite {{page}} von B platziert"
+    "placed": "Auf Seite {{page}} von B platziert",
+    "notInB": "Gibt es in B nicht",
+    "notInBTitle": "Dieses Feld von A ist nicht in B: als erledigt markieren, ohne es zu platzieren (wie «Bestätigen: gibt es nicht» oder «Verwerfen» in der Liste; dort rückgängig zu machen)",
+    "dismissed": "«{{name}}» als nicht in B vorhanden markiert"
   },
   "storage": {
     "open": "Speicher",

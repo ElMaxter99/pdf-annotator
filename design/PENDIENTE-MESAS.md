@@ -10,7 +10,7 @@ Maxter aprobó estos cambios visibles **sin mesas** («ya lo veo yo cuando progr
 | --- | --- | --- | --- | --- |
 | 1 | Tipo de anotación «Fecha»: quinta opción del selector de tipo, campo «Formato» (lista + «Personalizado…» con ayuda de símbolos) y ejemplo «Se verá así»; fila «Fecha» en «Valores de muestra» | Editor de anotaciones (crear y editar) y pestaña Ajustes | 1.20.2 (sin mesas, Maxter 2026-11-25) | [`propuestas/tipo-fecha.md`](propuestas/tipo-fecha.md) |
 | 2 | Editor del JSON con el aspecto de VS Code (selección azul, flechas de plegado al pasar el ratón, `⋯` y fondo de la línea plegada, colores Dark+/Light+) y destello al copiar | Pestaña «Anotaciones», editor del JSON | 1.20.2 (sin mesas, Maxter 2026-11-25) | CHANGELOG 1.20.2 |
-| 3 | «Colocar a mano» desde A: fantasma del campo de A sin pareja en la página de B que se ve, con «Colocar aquí» y ✕ | Editor del lote, «Dividida», lista «Falta en B» y tarjetas «De A · sin colocar» | 1.20.2 (sin mesas, Maxter 2026-11-25) | CHANGELOG 1.20.2 |
+| 3 | «Colocar a mano» desde A: fantasma del campo de A sin pareja en la página de B que se ve, con «Colocar aquí», «No existe en B» y ✕ | Editor del lote, «Dividida», lista «Falta en B» y tarjetas «De A · sin colocar» | 1.20.2 (sin mesas, Maxter 2026-11-25) | CHANGELOG 1.20.2 |
 
 Hasta la 1.20.1 no quedaba nada: el 2026-11-23 se pintaron en «Definitivo» el editor de la 1.18 (D-18 a D-23: capturas reales, caja de la anotación, lote con barra única, copiar JSON con formato y espacio de trabajo libre) y se movieron ahí las propuestas ya implementadas (P-125 a P-129, P-134, P-135 y P-139 a P-143). El 2026-11-22 se pintaron en el lienzo los 20 puntos que había (P-115 a P-124, capturas reales de la 1.17.0).
 

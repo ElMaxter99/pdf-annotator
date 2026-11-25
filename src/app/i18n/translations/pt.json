@@ -2636,7 +2636,10 @@
     "placeHere": "Colocar aqui",
     "placeHereTitle": "Pôr este campo de A na página {{page}} de B, nas mesmas coordenadas",
     "placeCancel": "Cancelar",
-    "placed": "Colocado na página {{page}} de B"
+    "placed": "Colocado na página {{page}} de B",
+    "notInB": "Não existe em B",
+    "notInBTitle": "Este campo de A não está em B: dá-lo por resolvido sem o colocar (como «Validar: não existe» ou «Descartar» da lista; pode desfazer-se lá)",
+    "dismissed": "«{{name}}» marcado como não existente em B"
   },
   "storage": {
     "open": "Armazenamento",

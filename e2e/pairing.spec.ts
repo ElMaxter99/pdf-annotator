@@ -266,3 +266,26 @@ test('«Colocar a mano»: ✕ y Esc quitan el fantasma sin tocar B', async ({ pa
   await expect(page.getByTestId('manual-place')).toHaveCount(0);
   await expect(page.locator('.annotation')).toHaveCount(0);
 });
+
+test('«No existe en B» desde el acceso rápido de A da el campo por resuelto, como «Descartar» de la lista', async ({
+  page,
+}) => {
+  await openBatchWithB(page);
+  await openLote(page);
+  await page.getByTestId('mode-split').click();
+  const missing = page.getByTestId('split-a').locator('.reference-field--missing');
+  const fieldA = missing.first();
+  await expect(fieldA).toBeVisible();
+  const before = await missing.count();
+  const pending = page.getByTestId('migration-pending').locator('.migration-row');
+  const pendingBefore = await pending.count();
+  const r = await fieldA.boundingBox();
+  if (!r) throw new Error('sin campo de A');
+  await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
+
+  await page.getByTestId('manual-place-dismiss').click();
+  await expect(page.getByTestId('manual-place')).toHaveCount(0);
+  await expect(pending).toHaveCount(pendingBefore - 1);
+  await expect(missing).toHaveCount(before - 1);
+  await expect(page.locator('.annotation')).toHaveCount(0);
+});

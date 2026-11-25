@@ -8,6 +8,7 @@ import {
   type PairCandidate,
 } from '../../utils/pairing.utils';
 import { resolveFieldPreview } from '../../utils/preview-values.utils';
+import { fieldKey } from '../../utils/migration.utils';
 import { PairRefB, PairTarget } from './workspace.types';
 import type { WorkspacePageComponent } from './workspace.page';
 
@@ -73,7 +74,12 @@ export class WorkspacePairing {
             page: written.page,
             x: written.field.x,
             y: written.field.y,
-            ref: { kind: 'field', page: written.page, pageIndex: written.pageIndex, index: written.index },
+            ref: {
+              kind: 'field',
+              page: written.page,
+              pageIndex: written.pageIndex,
+              index: written.index,
+            },
           };
         }
         return {
@@ -328,7 +334,7 @@ export class WorkspacePairing {
     if (!partner) {
       this.clearPair();
       this.showPairTip(hit.el, 'pairing.noPartnerB');
-      this.offerManualPlace(hit.field, aPage);
+      this.offerManualPlace(hit.field, aPage, this.missingKeyOfA(hit.name, hit.x, hit.y));
       return;
     }
     this.offerManualPlace(undefined);
@@ -355,7 +361,7 @@ export class WorkspacePairing {
       this.runAfterRender(() =>
         this.showPairTip(this.findPairElementA(target), 'pairing.noPartnerB'),
       );
-      this.offerManualPlace(t, row.page);
+      this.offerManualPlace(t, row.page, fieldKey(this.aiStatePage(row), this.aiFieldName(row)));
     } else {
       this.offerManualPlace(undefined);
     }
@@ -366,7 +372,12 @@ export class WorkspacePairing {
    * capa de A, ajustadas al tamaño de B si se eligió «Ajustar») sobre la página de B que se esté viendo, con
    * «Colocar aquí». Sigue a B si se cambia de página; `undefined` lo quita.
    */
-  offerManualPlace(this: WorkspacePageComponent, field: PageField | undefined, aPage?: number | null): void {
+  offerManualPlace(
+    this: WorkspacePageComponent,
+    field: PageField | undefined,
+    aPage?: number | null,
+    dismissKey?: string | null,
+  ): void {
     if (!field || !this.migration()) {
       if (this.manualPlace()) {
         this.manualPlace.set(null);
@@ -375,8 +386,34 @@ export class WorkspacePairing {
       return;
     }
     const { aiId: _aiId, ...copy } = field;
-    this.manualPlace.set({ field: copy, aPage: aPage ?? null });
+    this.manualPlace.set({ field: copy, aPage: aPage ?? null, dismissKey: dismissKey ?? null });
     this.redrawAllForPage();
+  }
+
+  /** Clave del estado «falta en B» de un campo de A (página de B + nombre) para darlo por inexistente. */
+  missingKeyOfA(this: WorkspacePageComponent, name: string, x: number, y: number): string | null {
+    const missing = (this.migration()?.states ?? []).filter(
+      (state) => state.status === 'missing' && state.name === name,
+    );
+    const state =
+      missing.find((s) => s.a && Math.abs(s.a.x - x) < 0.5 && Math.abs(s.a.y - y) < 0.5) ??
+      (missing.length === 1 ? missing[0] : undefined);
+    return state ? fieldKey(state.page, state.name) : null;
+  }
+
+  /** «No existe en B» desde el acceso rápido: lo mismo que «Validar: no existe» / «Descartar» de la lista. */
+  dismissManual(this: WorkspacePageComponent): void {
+    const offer = this.manualPlace();
+    const item = this.batch.activeItem();
+    if (!offer?.dismissKey || !item) {
+      return;
+    }
+    this.batch.dismiss(item.id, offer.dismissKey);
+    this.pairTip.set(null);
+    this.offerManualPlace(undefined);
+    this.toast.show(
+      this.translationService.translate('pairing.dismissed', { name: pairName(offer.field) }),
+    );
   }
 
   /** Crea en la página de B que se ve la copia del campo de A (un paso de historial) y la une con su pareja. */
@@ -419,7 +456,8 @@ export class WorkspacePairing {
     ghost.style.top = `${canvasHeight - field.y * scale - field.fontSize * scale}px`;
     const box = document.createElement('span');
     box.className = 'manual-place__field';
-    box.textContent = resolveFieldPreview(field, this.previewSettings.context()).text || field.mapField;
+    box.textContent =
+      resolveFieldPreview(field, this.previewSettings.context()).text || field.mapField;
     box.style.fontSize = `${field.fontSize * scale}px`;
     box.title = field.mapField;
     const bar = document.createElement('span');
@@ -428,7 +466,9 @@ export class WorkspacePairing {
     place.type = 'button';
     place.className = 'manual-place__btn';
     place.textContent = this.translationService.translate('pairing.placeHere');
-    place.title = this.translationService.translate('pairing.placeHereTitle', { page: this.pageIndex() });
+    place.title = this.translationService.translate('pairing.placeHereTitle', {
+      page: this.pageIndex(),
+    });
     place.setAttribute('data-testid', 'manual-place-btn');
     place.onclick = (evt) => {
       evt.stopPropagation();
@@ -446,7 +486,22 @@ export class WorkspacePairing {
     };
     // Que ni la hitbox (crear, recuadro) ni el arrastre vean estos clics.
     ghost.onpointerdown = (evt) => evt.stopPropagation();
-    bar.append(place, close);
+    bar.append(place);
+    if (offer.dismissKey) {
+      // Con una propuesta de la IA abierta la lista dice «Validar: no existe»; sin ella, «Descartar».
+      const dismiss = document.createElement('button');
+      dismiss.type = 'button';
+      dismiss.className = 'manual-place__alt';
+      dismiss.textContent = this.translationService.translate('pairing.notInB');
+      dismiss.title = this.translationService.translate('pairing.notInBTitle');
+      dismiss.setAttribute('data-testid', 'manual-place-dismiss');
+      dismiss.onclick = (evt) => {
+        evt.stopPropagation();
+        this.dismissManual();
+      };
+      bar.append(dismiss);
+    }
+    bar.append(close);
     ghost.append(box, bar);
     layer.appendChild(ghost);
   }

@@ -2636,7 +2636,10 @@
     "placeHere": "Col·loca aquí",
     "placeHereTitle": "Posa aquest camp d'A a la pàgina {{page}} de B, a les mateixes coordenades",
     "placeCancel": "Cancel·la",
-    "placed": "Col·locat a la pàgina {{page}} de B"
+    "placed": "Col·locat a la pàgina {{page}} de B",
+    "notInB": "No existeix a B",
+    "notInBTitle": "Aquest camp d'A no és a B: donar-lo per resolt sense col·locar-lo (com «Validar: no existeix» o «Descartar» de la llista; es pot desfer allà)",
+    "dismissed": "«{{name}}» marcat com que no existeix a B"
   },
   "storage": {
     "open": "Emmagatzematge",
