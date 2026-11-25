@@ -19,6 +19,18 @@ export interface WheelEdgeIndicator {
   height: number;
 }
 
+/** Tooltip with the full mapField of an annotation (fixed window coordinates). */
+export interface MapTip {
+  prefix: string;
+  tail: string;
+  none: boolean;
+  meta: string;
+  left: number;
+  top?: number;
+  /** Distance from the bottom of the window when the tooltip opens upwards. */
+  bottom?: number;
+}
+
 export type PreviewState = { page: number; field: PageField } | null;
 
 export type EditState = {

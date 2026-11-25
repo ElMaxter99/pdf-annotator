@@ -11,6 +11,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { PreviewSettingsService } from '../../services/preview-settings.service';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { AiHelperService, type AiProvider } from '../../services/ai-helper.service';
@@ -37,6 +38,7 @@ import { UpdateChannelComponent } from '../update-channel/update-channel.compone
 export class OptionsDialogComponent {
   readonly options = inject(OptionsService);
   readonly editor = inject(EditorSettingsService);
+  readonly preview = inject(PreviewSettingsService);
   readonly jsonFormats = inject(JsonCopyFormatService);
   readonly jsonFormat = this.jsonFormats.format;
   readonly snapDistances = [3, 6, 10];
@@ -44,6 +46,7 @@ export class OptionsDialogComponent {
   /** «Restablecer» de la pestaña Editor: imán y formato del JSON. */
   resetEditor(): void {
     this.editor.reset();
+    this.preview.resetMapLabel();
     this.jsonFormats.set(JSON_COPY_STRICT);
   }
   readonly update = inject(DesktopUpdateService);

@@ -74,6 +74,20 @@
               }
             </div>
           </div>
+          <label class="options__switch" for="options-maplabel">
+            <span>
+              <b>{{ 'options.editor.mapLabel' | t }}</b>
+              <span class="options__hint">{{ 'options.editor.mapLabelHelp' | t }}</span>
+            </span>
+            <input
+              id="options-maplabel"
+              type="checkbox"
+              role="switch"
+              [checked]="preview.mapLabel().show"
+              (change)="preview.setMapLabelShow($any($event.target).checked)"
+              data-testid="options-maplabel"
+            />
+          </label>
           <div class="options__field">
             <span class="options__label" id="options-json-keys-label">{{ 'options.editor.jsonKeys' | t }}</span>
             <span class="options__hint">{{ 'options.editor.jsonKeysHelp' | t }}</span>

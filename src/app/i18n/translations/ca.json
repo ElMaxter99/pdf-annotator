@@ -2035,7 +2035,9 @@
       "themeLight": "Canviar a tema clar",
       "language": "Idioma: {{language}}",
       "snapOn": "Alinear amb altres anotacions en arrossegar: activar",
-      "snapOff": "Alinear amb altres anotacions en arrossegar: desactivar"
+      "snapOff": "Alinear amb altres anotacions en arrossegar: desactivar",
+      "mapLabelOn": "Mostra el mapField al costat de cada anotació",
+      "mapLabelOff": "Amaga el mapField de les anotacions"
     },
     "group": {
       "batch": "Lot",
@@ -2709,8 +2711,38 @@
       "altHint": "Mantén Alt (⌥ a Mac) mentre arrossegues per no alinear en aquell moment.",
       "jsonKeys": "Format del JSON",
       "jsonKeysHelp": "Claus i cometes dels valors a l'editor «Anotacions (JSON)», en copiar i en descarregar. La importació llegeix qualsevol.",
-      "jsonQuote": "Cometes dels valors"
+      "jsonQuote": "Cometes dels valors",
+      "mapLabel": "Mostra el mapField al costat de cada anotació",
+      "mapLabelHelp": "Rètol mini i quadre amb el nom complet de cada anotació. Més ajustos a Avançat."
     }
+  },
+  "mapLabel": {
+    "title": "Identificar anotacions",
+    "info": "Mostra el final del mapField al costat de cada anotació i el nom complet en passar el cursor o enfocar amb Tab. Només es veu en pantalla: no surt al PDF ni al JSON.",
+    "show": "Mostra el mapField al costat de cada anotació",
+    "showHelp": "Rètol mini amb el final del nom.",
+    "legend": "Mostra el mapField",
+    "scope": {
+      "label": "Quines anotacions",
+      "check": "Caselles i opcions",
+      "all": "Totes"
+    },
+    "max": "Màxim de caràcters",
+    "maxError": "Entre 8 i 40 caràcters.",
+    "position": {
+      "label": "Posició",
+      "auto": "Automàtica",
+      "right": "Dreta",
+      "above": "A sobre"
+    },
+    "tooltip": "Quadre amb el nom complet",
+    "tooltipHelp": "En passar el cursor o enfocar. Esc el tanca.",
+    "preview": "Així es veurà:",
+    "screenOnly": "Només en pantalla: no surt al PDF ni al JSON.",
+    "reset": "Restableix",
+    "hidden": "Rètols amagats: {{count}} · acosta el zoom",
+    "none": "sense mapField",
+    "meta": "{{type}} · pàgina {{page}} · x {{x}} · y {{y}}"
   },
   "search": {
     "total": "{{total}} disponibles",
