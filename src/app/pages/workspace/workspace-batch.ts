@@ -704,6 +704,8 @@ export class WorkspaceBatch {
       this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
       return;
     }
+    // A running AI request was computed from the old A: it must not write into B afterwards.
+    this.cancelAi();
     this.flushBatchSave(true);
     const previous = this.batch.replaceA(item.id, file);
     if (!previous) {
@@ -717,6 +719,7 @@ export class WorkspaceBatch {
     this.toast.show(this.translationService.translate('batch.replaceA.done'), 'success', 10000, false, {
       label: this.translationService.translate('batch.bulk.undo'),
       run: () => {
+        this.cancelAi();
         this.flushBatchSave(true);
         this.batch.restoreA(previous);
         const restored = this.batch.activeItem();

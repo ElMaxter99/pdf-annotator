@@ -49,7 +49,8 @@ describe('BatchStoreService · reemplazar A (P-190)', () => {
 
     store.restoreA(previous);
     const after = store.find(item.id)!;
-    expect(after.aPdf).toBe(a);
+    expect(after.aPdf).not.toBe(a); // fresh object so a project rewrites its bytes
+    expect(after.aPdf.size).toBe(a.size);
     expect(after.name).toBe('a.pdf');
     expect(after.pageMap).toBeDefined();
     expect(after.status).toBe('ready');

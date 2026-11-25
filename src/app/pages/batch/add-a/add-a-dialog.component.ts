@@ -181,7 +181,10 @@ export class AddADialogComponent {
         this.i18n.translate('toast.batch.invalidFile', { count: files.length - pdfs.length }),
       );
     }
-    const known = new Set(this.store.items().map((item) => pairingKey(item.name)));
+    const known = new Set([
+      ...this.store.items().map((item) => pairingKey(item.name)),
+      ...this.entries().map((entry) => pairingKey(entry.file.name)),
+    ]);
     const next = [...this.entries()];
     for (const file of pdfs) {
       const key = pairingKey(file.name);

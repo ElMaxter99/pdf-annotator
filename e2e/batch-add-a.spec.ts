@@ -52,3 +52,11 @@ test('«Reemplazar A» confirma lo que se descarta y se puede deshacer', async (
   await page.getByTestId('bulk-undo-btn').click();
   await expect(page.getByTestId('panel-item').filter({ hasText: 'nuevo-a.pdf' })).toHaveCount(0);
 });
+
+test('«Añadir PDFs A» marca como duplicado un PDF repetido en la misma lista', async ({ page }) => {
+  await openPanel(page);
+  await page.getByTestId('add-a-open').click();
+  await page.getByTestId('add-a-input').setInputFiles(file('anexo-1.pdf'));
+  await page.getByTestId('add-a-input').setInputFiles(file('anexo-1.pdf'));
+  await expect(page.getByTestId('add-a-rows').getByText('Ya está en el lote')).toHaveCount(1);
+});

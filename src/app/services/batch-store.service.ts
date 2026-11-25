@@ -285,7 +285,8 @@ export class BatchStoreService {
     }
     this.patch(previous.id, {
       name: previous.name,
-      aPdf: previous.aPdf,
+      // A new Blob object: a desktop project skips blobs it already wrote, and the disk now holds the replacement.
+      aPdf: previous.aPdf.slice(0, previous.aPdf.size, previous.aPdf.type),
       pageMap: previous.pageMap,
       aiProposal: previous.aiProposal,
       fitA: previous.fitA,
