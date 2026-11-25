@@ -283,7 +283,9 @@ export class BatchPageComponent implements OnInit {
   toggleSortHead(key: BatchSortKey): void {
     const current = this.sort();
     this.sort.set(
-      current.key === key ? { key, dir: flipDir(current.dir) } : { key, dir: defaultSortDir(key) },
+      current.key === key
+        ? { key, dir: flipDir(current.dir) }
+        : { key, dir: defaultSortDir(key) },
     );
   }
 
@@ -353,10 +355,7 @@ export class BatchPageComponent implements OnInit {
   readonly nextPending = computed(
     () => this.allRows().find((row) => row.state !== 'ready')?.item ?? null,
   );
-  readonly templateSort = signal<{ key: 'name' | 'result'; dir: SortDir }>({
-    key: 'name',
-    dir: 'asc',
-  });
+  readonly templateSort = signal<{ key: 'name' | 'result'; dir: SortDir }>({ key: 'name', dir: 'asc' });
   readonly templateSortKeys = ['name', 'result'] as const;
   setTemplateSortKey(value: string): void {
     if (value === 'name' || value === 'result') {
