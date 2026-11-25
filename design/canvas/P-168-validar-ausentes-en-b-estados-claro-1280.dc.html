@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-168 Validar ausentes en B · estados · claro 1280</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.p h1,.p h2,.p h3,.p p{margin:0}.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}.cols{display:flex;gap:24px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.sec{font-size:13px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between}
+.r{background:var(--soft);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.r b{font-family:Consolas,monospace;font-size:13px}.r small{display:block;color:var(--muted);font-size:12px}.r .g{flex:1}
+.btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:5px 12px;min-height:32px;background:transparent;color:var(--text)}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.chip{display:inline-flex;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted)}
+.chip.ok{color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent)}.chip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.num{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:13px;align-items:center;justify-content:center;flex:none}
+.li{display:flex;gap:12px;align-items:flex-start}.li p{line-height:1.5}
+.tw{width:15px;height:15px;border-radius:4px;border:1px solid var(--muted)}
+</style>
+</helmet>
+<div class="p" style="width:1280px;height:820px;--bg:#f6f7fb;--panel:#ffffff;--accent:#0b7d72;--danger:#b91c1c;--text:#0f172a;--muted:#475569;--ink:#ffffff;--line:rgba(15,23,42,.18);--soft:rgba(15,23,42,.05);--warn:#92400e;--inset:#eef0f6">
+<div class="lab">P-168 · Definitivo · 1.19 · Claro · 1280 px</div><h1 style="font-size:26px">Estados</h1>
+<div class="cap">1 · Antes: la fila sigue diciendo «lo correcto es no colocarlo» tras colocar (fallo actual)</div>
+<div class="card" style="width:1216px"><div class="r"><span class="g"><b>iban</b><small style="color:var(--danger)">no existe en B: lo correcto es no colocarlo</small></span></div></div>
+<div class="cap">2 · Por decidir</div>
+<div class="card" style="width:1216px"><div class="r"><span class="g"><b>fecha_vto</b><small>no existe en B · p. 2</small></span><span class="btn">Colocar a mano</span><span class="btn p">Validar: no existe</span></div></div>
+<div class="cap">3 · Colocado y validado</div>
+<div class="card" style="width:1216px"><div class="r"><span class="g"><b>iban</b><small>colocado a mano en B · p. 2</small></span><span class="chip ok">✓ Colocado</span></div><div class="r"><span class="g"><b>ref_interna</b><small>validado: no existe en B</small></span><span class="chip ok">✓ Validado</span><span class="btn">Deshacer</span></div></div>
+<div class="cap">4 · Todo resuelto: chip «✓ Revisado» y el chip del lote sin «ya no en B»</div>
+<div class="card" style="width:1216px"><div style="display:flex;gap:10px"><span class="chip ok">✓ Revisado</span><span class="chip">0 por decidir</span></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

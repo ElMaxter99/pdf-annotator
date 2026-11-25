@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>P-175 Personalizar el JSON en modal · flujo y reglas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0}
+.p{position:relative;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.p h1,.p h2,.p h3,.p p{margin:0}.lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.cap{color:var(--muted);font-size:14px;line-height:1.5}.cols{display:flex;gap:24px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:17px;font-weight:600}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px}.seg span{font-size:13px;font-weight:600;color:var(--muted);border-radius:999px;padding:7px 14px}.seg span.on{background:var(--accent);color:var(--ink)}
+.ta{background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:14px;font-family:Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre;color:var(--text)}
+.chip{display:inline-flex;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--muted)}
+.chip.ok{color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent)}.chip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+.btn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 18px;min-height:40px;background:var(--accent);color:var(--ink)}.btn.g{background:transparent;color:var(--text);border:1px solid var(--line)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+.sw{width:42px;height:24px;border-radius:999px;background:var(--soft);border:1px solid var(--line);position:relative}.sw i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--muted)}.sw.on{background:var(--accent)}.sw.on i{left:21px;background:var(--ink)}
+.num{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;font-size:13px;align-items:center;justify-content:center;flex:none}
+.li{display:flex;gap:12px;align-items:flex-start}.li p{line-height:1.5}
+.k{color:var(--accent)}.s{color:var(--warn)}
+
+</style>
+</helmet>
+<div class="p" style="width:1720px;height:760px;--bg:#1e1e2f;--panel:#2a2a3d;--accent:#5eead4;--danger:#ff4d4d;--text:#f5f5f5;--muted:#b0b0b0;--ink:#1e1e2f;--line:rgba(255,255,255,.14);--soft:rgba(255,255,255,.06);--warn:#fbbf24;--inset:#14141f">
+<div class="lab">P-175 · Definitivo · 1.19 · sustituye a P-163 a P-165</div><h1 style="font-size:30px">«Personalizar» el JSON en un modal</h1>
+<p class="cap" style="max-width:1150px">El desplegable actual se queda corto: es estrecho, se corta en paneles con scroll y desaparece al hacer scroll. Pasa a ser un <b>modal centrado</b> con las mismas opciones. El botón de la barra del editor deja de llevar ▾ y abre el modal.</p>
+<div class="cols">
+<div class="card" style="width:600px"><h3>Reglas</h3>
+<div class="li"><span class="num">1</span><p>«Personalizar» (sin ▾) abre un modal centrado con fondo atenuado. Se cierra con ✕, Esc, clic fuera o «Cancelar»; el foco vuelve al botón.</p></div>
+<div class="li"><span class="num">2</span><p>Las opciones son las mismas: claves con o sin comillas, valores con dobles o simples, sangría (2, 4, Tab, Compacto) y coma final. La vista previa y el distintivo «JSON válido / No es JSON válido» se actualizan al momento.</p></div>
+<div class="li"><span class="num">3</span><p><b>Nada cambia hasta pulsar «Aplicar»</b>: entonces el texto del editor se reescribe una vez, y el formato se guarda y vale para copiar y descargar. «Cancelar» lo deja todo como estaba.</p></div>
+<div class="li"><span class="num">4</span><p>«Restablecer» vuelve a JSON estricto (claves y valores con comillas dobles, sangría 2, sin coma final) dentro del modal; también se confirma con «Aplicar».</p></div>
+<div class="li"><span class="num">5</span><p>El mismo modal sirve en el panel del lote: su ▾ junto a «Descargar JSON» pasa a abrir este modal (un solo componente, un solo formato).</p></div>
+<div class="li"><span class="num">6</span><p>Con un error de sintaxis, el botón del panel sigue desactivado. Opciones › Editor no cambia. Teclado: Tab recorre las opciones, Intro aplica, Esc cierra; foco atrapado. 7 idiomas, ambos temas, solo escritorio.</p></div></div>
+<div style="display:flex;flex-direction:column;gap:12px"><div class="cap">Antes (desplegable) → después (modal)</div>
+<div style="display:flex;gap:20px;align-items:flex-start"><div class="card" style="width:340px"><h3>Anotaciones (JSON)</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">Claves: Sin comillas</span><span class="chip">Valores: Simples</span><span class="btn g s" style="min-height:32px;padding:4px 14px;font-size:13px">Personalizar ▾</span></div><div class="cap">Antes: el menú se abre pegado al botón.</div></div>
+<div class="card" style="width:340px"><h3>Anotaciones (JSON)</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">Claves: Sin comillas</span><span class="chip">Valores: Simples</span><span class="btn g s" style="min-height:32px;padding:4px 14px;font-size:13px">Personalizar</span></div><div class="cap">Después: abre un modal centrado.</div></div></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1720,"height":760}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
