@@ -1,0 +1,81 @@
+<div class="upd-backdrop">
+  <div
+    appFocusTrap
+    class="upd"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ra-title"
+    data-testid="replace-a"
+  >
+    <h2 id="ra-title">{{ 'batch.replaceA.title' | t: { name: item().name } }}</h2>
+    <div class="ra-cmp">
+      <div class="ra-tile">
+        <strong>{{ item().name }}</strong>
+        {{ 'batch.replaceA.current' | t }} ·
+        @if (infoOld() === undefined) { … } @else if (infoOld() === null) { ? } @else { {{ 'batch.replaceA.pages' | t: { count: pagesOld() } }} · {{ sizeOld() }} }
+      </div>
+      <div class="ra-tile">
+        <strong>{{ file().name }}</strong>
+        {{ 'batch.replaceA.next' | t }} ·
+        @if (infoNew() === undefined) { … } @else if (infoNew() === null) { ? } @else { {{ 'batch.replaceA.pages' | t: { count: pagesNew() } }} · {{ sizeNew() }} }
+      </div>
+    </div>
+    @if (unreadable()) {
+      <p class="upd-error" role="alert" data-testid="replace-a-unreadable">{{ 'batch.replaceA.unreadable' | t: { name: file().name } }}</p>
+    }
+    <div class="upd-list">
+      <div class="upd-row upd-row--on">
+        <span class="upd-name">{{ 'batch.replaceA.keepTemplate' | t: { count: fieldsA() } }}</span>
+        <span class="upd-chip ok">{{ 'batch.replaceA.kept' | t }}</span>
+      </div>
+      @if (hasB()) {
+        <div class="upd-row upd-row--on">
+          <span class="upd-name">{{ 'batch.replaceA.keepB' | t: { count: fieldsB() } }}</span>
+          <span class="upd-chip ok">{{ 'batch.replaceA.kept' | t }}</span>
+        </div>
+      }
+      @if (item().pageMap) {
+        <div class="upd-row upd-row--on">
+          <span class="upd-name">{{ 'batch.replaceA.dropMap' | t: { count: mapPages() } }}</span>
+          <span class="upd-chip bad">{{ 'batch.replaceA.dropped' | t }}</span>
+        </div>
+      }
+      @if (item().aiProposal) {
+        <div class="upd-row upd-row--on">
+          <span class="upd-name">{{ 'batch.replaceA.dropAi' | t: { count: aiFields() } }}</span>
+          <span class="upd-chip bad">{{ 'batch.replaceA.dropped' | t }}</span>
+        </div>
+      }
+      @if (hasFit()) {
+        <div class="upd-row upd-row--on">
+          <span class="upd-name">{{ 'batch.replaceA.dropFit' | t }}</span>
+          <span class="upd-chip bad">{{ 'batch.replaceA.dropped' | t }}</span>
+        </div>
+      }
+      @if (nothingToDrop()) {
+        <div class="upd-row upd-row--off">
+          <span class="upd-name">{{ 'batch.replaceA.nothingToDrop' | t }}</span>
+        </div>
+      }
+      @if (hasB()) {
+        <div class="upd-row upd-row--on">
+          <span class="upd-name">{{ 'batch.replaceA.states' | t }}</span>
+          <span class="upd-chip warn">{{ 'batch.replaceA.mayShift' | t }}</span>
+        </div>
+      }
+    </div>
+    @if (pagesDiffer()) {
+      <p class="upd-text" data-testid="replace-a-pages-warn">{{ 'batch.replaceA.pagesWarn' | t: { old: pagesOld(), next: pagesNew() } }}</p>
+    }
+    @if (sizeDiffers()) {
+      <p class="upd-text" data-testid="replace-a-size-warn">{{ 'batch.replaceA.sizeWarn' | t: { old: sizeOld(), next: sizeNew() } }}</p>
+    }
+    <p class="upd-text">{{ 'batch.replaceA.review' | t }}</p>
+    <div class="upd-actions">
+      <button type="button" class="btn btn--ghost" (click)="cancelled.emit()" data-testid="replace-a-cancel">{{ 'batch.cancel' | t }}</button>
+      <button type="button" class="btn btn--primary" [disabled]="unreadable()" (click)="confirmed.emit()" data-testid="replace-a-yes">
+        {{ 'batch.replaceA.go' | t }}
+      </button>
+    </div>
+  </div>
+</div>

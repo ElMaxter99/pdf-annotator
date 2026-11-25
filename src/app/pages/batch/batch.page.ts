@@ -32,6 +32,9 @@ import {
   TemplateUpdateDialogComponent,
   type TemplateUpdateResult,
 } from './template-update/template-update-dialog.component';
+import { AddADialogComponent, type AddAResult } from './add-a/add-a-dialog.component';
+import { ReplaceAConfirmComponent } from '../../components/replace-a-confirm/replace-a-confirm.component';
+import type { ReplacedA } from '../../services/batch-store.service';
 import { PdfTextService } from '../../services/pdf-text.service';
 import { PageMapBatchService } from '../../services/page-map-batch.service';
 import { AiHelperService } from '../../services/ai-helper.service';
@@ -148,6 +151,8 @@ async function sha256(blob: Blob): Promise<string | null> {
     FocusTrapDirective,
     PageMapBatchDialogComponent,
     TemplateUpdateDialogComponent,
+    AddADialogComponent,
+    ReplaceAConfirmComponent,
     CommandPaletteComponent,
     ShortcutsDialogComponent,
   ],
@@ -390,7 +395,10 @@ export class BatchPageComponent implements OnInit {
     planBulk(this.selectedItems(), (item) => this.stateOf(item) === 'noTemplate'),
   );
   readonly dialog = signal<'ready' | 'remove' | null>(null);
-  readonly undoNotice = signal<{ kind: 'removed' | 'ready' | 'tables'; count: number } | null>(
+  readonly undoNotice = signal<{
+    kind: 'removed' | 'ready' | 'tables' | 'added' | 'replacedA';
+    count: number;
+  } | null>(
     null,
   );
   private undoFn: (() => void) | null = null;
@@ -615,6 +623,77 @@ export class BatchPageComponent implements OnInit {
     this.offerUndo('removed', removed.length, () => this.store.reinsert(removed));
   }
 
+  @ViewChild(AddADialogComponent) private addDialog?: AddADialogComponent;
+
+  openAddA(): void {
+    this.addDialog?.open();
+  }
+
+  /** PDFs A added from the panel (P-190): «Deshacer» removes the rows just created. */
+  onAddedA(result: AddAResult | null): void {
+    if (!result) {
+      return;
+    }
+    this.notifyNotPersistent();
+    const ids = [...result.ids];
+    this.offerUndo('added', ids.length, () => {
+      this.store.removeMany(ids);
+    });
+  }
+
+  /** «Reemplazar A» of a row: the new PDF waits for the confirmation (P-191). */
+  readonly replaceA = signal<{ id: string; file: File } | null>(null);
+  readonly replaceAItem = computed(() => {
+    const target = this.replaceA();
+    return target ? (this.store.find(target.id) ?? null) : null;
+  });
+  private replaceATarget: string | null = null;
+
+  @ViewChild('inputRowA') private inputRowA?: ElementRef<HTMLInputElement>;
+
+  /** Ctrl+K «Reemplazar A de la fila…»: actúa sobre la única fila seleccionada. */
+  replaceASelected(): void {
+    const ids = this.selectedIds();
+    if (ids.length === 1 && this.inputRowA) {
+      this.chooseReplaceA(ids[0], this.inputRowA.nativeElement);
+    }
+  }
+
+  chooseReplaceA(id: string, input: HTMLInputElement): void {
+    this.replaceATarget = id;
+    input.click();
+  }
+
+  onReplaceAPicked(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    const id = this.replaceATarget;
+    this.replaceATarget = null;
+    if (!file || !id || !this.store.find(id)) {
+      return;
+    }
+    if (!isPdfFile(file)) {
+      this.toast.error(this.t('toast.batch.invalidFile', { count: 1 }));
+      return;
+    }
+    this.replaceA.set({ id, file });
+  }
+
+  confirmReplaceA(): void {
+    const target = this.replaceA();
+    this.replaceA.set(null);
+    if (!target) {
+      return;
+    }
+    const previous: ReplacedA | null = this.store.replaceA(target.id, target.file);
+    if (!previous) {
+      return;
+    }
+    this.notifyNotPersistent();
+    this.offerUndo('replacedA', 1, () => this.store.restoreA(previous));
+  }
+
   @ViewChild(TemplateUpdateDialogComponent) private updateDialog?: TemplateUpdateDialogComponent;
 
   /** The template-update dialog is open in any phase but «closed». */
@@ -657,7 +736,7 @@ export class BatchPageComponent implements OnInit {
   }
 
   private offerUndo(
-    kind: 'removed' | 'ready' | 'tables',
+    kind: 'removed' | 'ready' | 'tables' | 'added' | 'replacedA',
     count: number,
     restore: () => void,
   ): void {
