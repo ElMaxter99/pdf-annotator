@@ -742,7 +742,8 @@
       "assignPlaceholder": "Zuweisen…",
       "pdfs": "PDFs",
       "withTemplate": "mit Vorlage",
-      "withoutTemplate": "ohne Vorlage"
+      "withoutTemplate": "ohne Vorlage",
+      "search": "Vorlage suchen…"
     },
     "versionsDrop": {
       "title": "Neue Versionen (B)",
@@ -753,9 +754,12 @@
       "more": "Mehr hinzufügen",
       "unpairedTitle": "Dateien ohne Zuordnung: {{count}}",
       "unpairedText": "Sie passen zu keinem PDF im Stapel: manuell zuordnen oder verwerfen.",
-      "assign": "Zuordnen zu…",
+      "assign": "PDF wählen…",
       "assignLabel": "{{name}} einem PDF zuordnen",
-      "discard": "Verwerfen"
+      "discard": "Verwerfen",
+      "search": "PDF suchen…",
+      "noneFree": "Alle PDFs haben bereits eine B",
+      "linked": "{{file}} mit {{name}} verknüpft"
     },
     "filter": {
       "label": "Nach Status filtern",
@@ -2650,5 +2654,13 @@
       "jsonKeysHelp": "Schlüssel und Anführungszeichen der Werte im Editor „Annotationen (JSON)“, beim Kopieren und Herunterladen. Der Import liest jedes Format.",
       "jsonQuote": "Anführungszeichen der Werte"
     }
+  },
+  "search": {
+    "total": "{{total}} verfügbar",
+    "count": "{{shown}} von {{total}}",
+    "noMatch": "Nichts passt zu „{{query}}“.",
+    "clear": "Suche löschen",
+    "suggested": "Vorgeschlagen",
+    "all": "Alle"
   }
 }

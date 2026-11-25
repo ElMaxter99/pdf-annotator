@@ -18,6 +18,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '../../app-version';
+import { SearchSelectComponent } from '../../components/search-select/search-select.component';
 import { AiBatchButtonComponent } from './ai-batch/ai-batch-button.component';
 import { CommandPaletteComponent } from '../workspace/components/command-palette/command-palette.component';
 import { ShortcutsDialogComponent } from '../workspace/components/shortcuts-dialog/shortcuts-dialog.component';
@@ -142,6 +143,7 @@ async function sha256(blob: Blob): Promise<string | null> {
     InfoTipComponent,
     SortControlComponent,
     AiBatchButtonComponent,
+    SearchSelectComponent,
     AiBatchChipComponent,
     AiBatchPanelComponent,
     AiDraftBannerComponent,
@@ -207,6 +209,12 @@ export class BatchPageComponent implements OnInit {
   readonly unpairedB = signal<File[]>([]);
   readonly withB = computed(() => this.store.items().filter((item) => item.bPdf).length);
   readonly withoutB = computed(() => this.store.items().filter((item) => !item.bPdf));
+  readonly withoutBOptions = computed(() =>
+    this.withoutB().map((item) => ({ id: item.id, label: item.name })),
+  );
+  readonly pastedOptions = computed(() =>
+    this.unusedPasted().map((template, index) => ({ id: String(index), label: template.label })),
+  );
 
   readonly stateOf = (item: BatchItem): RowState =>
     item.status === 'ready'
@@ -275,9 +283,7 @@ export class BatchPageComponent implements OnInit {
   toggleSortHead(key: BatchSortKey): void {
     const current = this.sort();
     this.sort.set(
-      current.key === key
-        ? { key, dir: flipDir(current.dir) }
-        : { key, dir: defaultSortDir(key) },
+      current.key === key ? { key, dir: flipDir(current.dir) } : { key, dir: defaultSortDir(key) },
     );
   }
 
@@ -347,7 +353,10 @@ export class BatchPageComponent implements OnInit {
   readonly nextPending = computed(
     () => this.allRows().find((row) => row.state !== 'ready')?.item ?? null,
   );
-  readonly templateSort = signal<{ key: 'name' | 'result'; dir: SortDir }>({ key: 'name', dir: 'asc' });
+  readonly templateSort = signal<{ key: 'name' | 'result'; dir: SortDir }>({
+    key: 'name',
+    dir: 'asc',
+  });
   readonly templateSortKeys = ['name', 'result'] as const;
   setTemplateSortKey(value: string): void {
     if (value === 'name' || value === 'result') {
@@ -825,7 +834,18 @@ export class BatchPageComponent implements OnInit {
     }
     this.discardUnpaired(file);
     await this.attachB(item, file);
+    this.toast.show(
+      this.i18n.translate('batch.versionsDrop.linked', { file: file.name, name: item.name }),
+      'success',
+    );
     this.notifyNotPersistent();
+    setTimeout(() =>
+      document
+        .querySelector<HTMLElement>(
+          '[data-testid="unpaired-b"] button[data-testid="assign-unpaired"]',
+        )
+        ?.focus(),
+    );
   }
 
   discardUnpaired(file?: File): void {

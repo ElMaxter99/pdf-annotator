@@ -223,9 +223,7 @@ test('B starts empty, A can be put in and the PDF is marked ready and downloaded
   await expect(page.locator('.toast')).toContainText('formato no estricto');
 });
 
-test('the «Poner plantilla A» menu closes on an outside click and on Escape', async ({
-  page,
-}) => {
+test('the «Poner plantilla A» menu closes on an outside click and on Escape', async ({ page }) => {
   await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
@@ -235,7 +233,10 @@ test('the «Poner plantilla A» menu closes on an outside click and on Escape', 
 
   await page.getByTestId('put-template-a').click();
   await expect(page.getByTestId('put-a-copy')).toBeVisible();
-  await page.locator('.pdf-viewer, .viewer, body').first().click({ position: { x: 5, y: 300 } });
+  await page
+    .locator('.pdf-viewer, .viewer, body')
+    .first()
+    .click({ position: { x: 5, y: 300 } });
   await expect(page.getByTestId('put-a-copy')).toBeHidden();
 
   await openLote(page);
@@ -307,7 +308,9 @@ test('a moved field is reported and A can be seen alone by holding the A key', a
   await expect(page.locator('.canvas-container--reference-only')).toHaveCount(0);
 });
 
-test('moved fields are informative: the chip says reviewed and the summary starts collapsed (P-147)', async ({ page }) => {
+test('moved fields are informative: the chip says reviewed and the summary starts collapsed (P-147)', async ({
+  page,
+}) => {
   await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
@@ -316,7 +319,10 @@ test('moved fields are informative: the chip says reviewed and the summary start
   await page.getByTestId('put-template-a').click();
   await page.getByTestId('put-a-copy').click();
 
-  await page.locator('.annotation').first().click({ modifiers: ['Shift'] });
+  await page
+    .locator('.annotation')
+    .first()
+    .click({ modifiers: ['Shift'] });
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('.migration-row[data-status="moved"]')).toHaveCount(1);
   await expect(page.locator('.migration-panel__head .migration-chip')).toContainText('Revisado');
@@ -356,12 +362,12 @@ test('an unpaired new version waits in the strip and is assigned by hand or disc
       file('copia.pdf', pdf, 'application/pdf'),
     ]);
   await expect(page.getByTestId('versions-drop')).toContainText('Archivos sin pareja: 2');
-  await page
-    .getByTestId('unpaired-b')
-    .locator('li')
-    .first()
-    .getByTestId('assign-unpaired')
-    .selectOption({ index: 1 });
+  await page.getByTestId('unpaired-b').locator('li').first().getByTestId('assign-unpaired').click();
+  await expect(page.getByTestId('assign-unpaired-count').first()).toBeVisible();
+  await page.getByTestId('assign-unpaired-search').fill('zzz-no-existe');
+  await expect(page.getByTestId('assign-unpaired-none')).toBeVisible();
+  await page.getByTestId('assign-unpaired-search').fill('');
+  await page.keyboard.press('Enter');
   await expect(page.getByTestId('panel-list')).toContainText('otro-documento.pdf');
   await expect(page.getByTestId('versions-drop')).toContainText('Archivos sin pareja: 1');
   await page.getByTestId('unpaired-b').getByRole('button', { name: 'Descartar' }).click();
@@ -402,7 +408,9 @@ test('templates pasted from Mongo are matched to the PDFs by pdfName', async ({ 
   await expect(page.getByTestId('template-rows')).toContainText(`${FIELDS} campos`);
 
   // The leftover template is assigned by hand to the other PDF.
-  await page.getByTestId('assign-pasted').selectOption({ label: 'otro.pdf' });
+  await page.getByTestId('assign-pasted').click();
+  await page.getByTestId('assign-pasted-search').fill('otro');
+  await page.keyboard.press('Enter');
   await expect(page.getByTestId('template-rows')).toContainText('otro.pdf');
 
   await page.getByTestId('open-panel').click();
@@ -542,7 +550,10 @@ test('«Dividida»: the A/B tags do not overlap the «Mostrar origen» legend', 
   await page.getByTestId('mode-split').click();
   await expect(page.getByTestId('split-a')).toBeVisible();
   const legend = await page.locator('.origin-legend').boundingBox();
-  for (const tag of [page.locator('.split-tag:not(.split-tag--b)'), page.locator('.split-tag--b')]) {
+  for (const tag of [
+    page.locator('.split-tag:not(.split-tag--b)'),
+    page.locator('.split-tag--b'),
+  ]) {
     const box = await tag.boundingBox();
     expect(box!.y).toBeGreaterThanOrEqual(legend!.y + legend!.height);
   }
@@ -756,7 +767,11 @@ test('the bar and the notices stay inside the header at 1280 px', async ({ page 
   await expect(page.getByTestId('pages-differ')).toBeVisible();
   const box = async (selector: string) => (await page.locator(selector).first().boundingBox())!;
   const header = await box('header.header');
-  for (const target of ['[data-testid=batch-position]', '[data-testid=pages-differ]', '[data-testid=mark-ready]']) {
+  for (const target of [
+    '[data-testid=batch-position]',
+    '[data-testid=pages-differ]',
+    '[data-testid=mark-ready]',
+  ]) {
     const b = await box(target);
     expect(b.x + b.width, target).toBeLessThanOrEqual(header.x + header.width);
   }
@@ -911,7 +926,10 @@ test('«Dividida»: the chip unlinks the zoom of A and B and links them again', 
   await expect(chip).toHaveAttribute('aria-pressed', 'false');
   const widthB = () => page.locator('.canvas--pdf').evaluate((el: HTMLCanvasElement) => el.width);
   const widthA = () =>
-    page.getByTestId('split-a').locator('canvas').evaluate((el: HTMLCanvasElement) => el.width);
+    page
+      .getByTestId('split-a')
+      .locator('canvas')
+      .evaluate((el: HTMLCanvasElement) => el.width);
   expect(await widthA()).toBe(await widthB());
 
   await chip.click();
@@ -945,7 +963,9 @@ test('«Dividida»: the chip unlinks the zoom of A and B and links them again', 
   await expect.poll(widthA).toBeGreaterThan(await widthB());
 });
 
-test('«Dividida»: the double click of the viewer acts on the pane under the pointer (P-106)', async ({ page }) => {
+test('«Dividida»: the double click of the viewer acts on the pane under the pointer (P-106)', async ({
+  page,
+}) => {
   await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
@@ -956,7 +976,10 @@ test('«Dividida»: the double click of the viewer acts on the pane under the po
 
   const widthB = () => page.locator('.canvas--pdf').evaluate((el: HTMLCanvasElement) => el.width);
   const widthA = () =>
-    page.getByTestId('split-a').locator('canvas').evaluate((el: HTMLCanvasElement) => el.width);
+    page
+      .getByTestId('split-a')
+      .locator('canvas')
+      .evaluate((el: HTMLCanvasElement) => el.width);
   const middleDouble = async (x: number, y: number) => {
     await page.mouse.move(x, y);
     for (let i = 0; i < 2; i += 1) {
@@ -990,12 +1013,15 @@ test('«Dividida»: the double click of the viewer acts on the pane under the po
   let b0 = await widthB();
   let steady = 0;
   await expect
-    .poll(async () => {
-      const [a, b] = [await widthA(), await widthB()];
-      steady = a === b && b === b0 ? steady + 1 : 0;
-      b0 = b;
-      return steady >= 3;
-    }, { intervals: [200] })
+    .poll(
+      async () => {
+        const [a, b] = [await widthA(), await widthB()];
+        steady = a === b && b === b0 ? steady + 1 : 0;
+        b0 = b;
+        return steady >= 3;
+      },
+      { intervals: [200] },
+    )
     .toBe(true);
   const canvasB = (await page.locator('.canvas--pdf').boundingBox())!;
   await middleDouble(canvasB.x + canvasB.width / 2, canvasB.y + 40);
@@ -1003,7 +1029,9 @@ test('«Dividida»: the double click of the viewer acts on the pane under the po
   await expect.poll(widthA).toBe(await widthB());
 });
 
-test('«Dividida»: double click on the A or B tag centers that PDF and again resets the view (P-109)', async ({ page }) => {
+test('«Dividida»: double click on the A or B tag centers that PDF and again resets the view (P-109)', async ({
+  page,
+}) => {
   await openPanel(page);
   await page.getByTestId('view-list').click();
   await attachVersion2(page);
@@ -1026,14 +1054,19 @@ test('«Dividida»: double click on the A or B tag centers that PDF and again re
   let home = await scrollLeft();
   let steady = 0;
   await expect
-    .poll(async () => {
-      const now = await scrollLeft();
-      steady = now === home ? steady + 1 : 0;
-      home = now;
-      return steady >= 3;
-    }, { intervals: [200] })
+    .poll(
+      async () => {
+        const now = await scrollLeft();
+        steady = now === home ? steady + 1 : 0;
+        home = now;
+        return steady >= 3;
+      },
+      { intervals: [200] },
+    )
     .toBe(true);
-  expect(await page.locator('.viewer').evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+  expect(await page.locator('.viewer').evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(
+    true,
+  );
 
   // B is on the right; its centre is far from the centre of the viewer until it is centred.
   expect(await offset('.canvas-container--split-b')).toBeGreaterThan(20);
@@ -1046,7 +1079,9 @@ test('«Dividida»: double click on the A or B tag centers that PDF and again re
   await expect.poll(scrollLeft).toBe(home);
 
   await page.getByTestId('split-tag-a').dblclick();
-  await expect.poll(async () => Math.abs(await offset('.canvas-container--split-a'))).toBeLessThanOrEqual(4);
+  await expect
+    .poll(async () => Math.abs(await offset('.canvas-container--split-a')))
+    .toBeLessThanOrEqual(4);
 });
 
 /** «Dividida» desenlazada: helpers for the A pane, which scrolls on its own (C1). */
@@ -1070,12 +1105,16 @@ const offsetInPaneA = (page: Page) =>
     return Math.round(c.left + c.width / 2 - (p.left + p.width / 2));
   });
 
-test('«Dividida» desenlazada: A has its own work margin and rests centred in its pane (C1)', async ({ page }) => {
+test('«Dividida» desenlazada: A has its own work margin and rests centred in its pane (C1)', async ({
+  page,
+}) => {
   await openUnlinkedSplit(page);
   const pane = page.getByTestId('split-a');
 
   // A can be moved sideways: there is empty room on both sides of its page.
-  await expect.poll(() => pane.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeGreaterThan(200);
+  await expect
+    .poll(() => pane.evaluate((el) => el.scrollWidth - el.clientWidth))
+    .toBeGreaterThan(200);
   await expect.poll(async () => Math.abs(await offsetInPaneA(page))).toBeLessThanOrEqual(4);
 
   await pane.evaluate((el) => (el.scrollLeft = 0));
@@ -1089,7 +1128,9 @@ test('«Dividida» desenlazada: A has its own work margin and rests centred in i
   expect(tag!.y).toBeGreaterThanOrEqual(box!.y);
 });
 
-test('«Dividida» desenlazada: double click on the A tag centres A in its pane (C1)', async ({ page }) => {
+test('«Dividida» desenlazada: double click on the A tag centres A in its pane (C1)', async ({
+  page,
+}) => {
   await openUnlinkedSplit(page);
   const pane = page.getByTestId('split-a');
   const widthA = () => pane.locator('canvas').evaluate((el: HTMLCanvasElement) => el.width);
@@ -1116,16 +1157,12 @@ test('«Dividida» desenlazada: double click on the A tag centres A in its pane 
   await expect.poll(async () => Math.abs(await offsetInPaneA(page))).toBeGreaterThan(20);
 });
 
-
 test('the panel filters survive going into a PDF and coming back', async ({ page }) => {
   await openPanel(page);
   await page.getByTestId('view-list').click();
   await page.locator('.batch-search').fill('0331');
   await expect(page.getByTestId('panel-item')).toHaveCount(1);
-  await page
-    .getByTestId('panel-item')
-    .getByRole('button', { name: 'Revisar' })
-    .click();
+  await page.getByTestId('panel-item').getByRole('button', { name: 'Revisar' }).click();
   await page.waitForURL('**/workspace?lote=*');
   await expect(page.locator('.canvas--pdf')).toBeVisible();
   await page.goBack();

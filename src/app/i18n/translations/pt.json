@@ -742,7 +742,8 @@
       "assignPlaceholder": "Atribuir…",
       "pdfs": "PDFs",
       "withTemplate": "com modelo",
-      "withoutTemplate": "sem modelo"
+      "withoutTemplate": "sem modelo",
+      "search": "Procurar modelo…"
     },
     "versionsDrop": {
       "title": "Novas versões (B)",
@@ -753,9 +754,12 @@
       "more": "Adicionar mais",
       "unpairedTitle": "Ficheiros sem par: {{count}}",
       "unpairedText": "Não coincidem com nenhum PDF do lote: atribua-os à mão ou descarte-os.",
-      "assign": "Atribuir a…",
+      "assign": "Escolher PDF…",
       "assignLabel": "Atribuir {{name}} a um PDF",
-      "discard": "Descartar"
+      "discard": "Descartar",
+      "search": "Procurar PDF…",
+      "noneFree": "Todos os PDF já têm B",
+      "linked": "{{file}} associado a {{name}}"
     },
     "filter": {
       "label": "Filtrar por estado",
@@ -2650,5 +2654,13 @@
       "jsonKeysHelp": "Chaves e aspas dos valores no editor «Anotações (JSON)», ao copiar e ao descarregar. A importação lê qualquer formato.",
       "jsonQuote": "Aspas dos valores"
     }
+  },
+  "search": {
+    "total": "{{total}} disponíveis",
+    "count": "{{shown}} de {{total}}",
+    "noMatch": "Nada corresponde a «{{query}}».",
+    "clear": "Limpar pesquisa",
+    "suggested": "Sugeridos",
+    "all": "Todos"
   }
 }

@@ -1,4 +1,7 @@
-<div class="app app--batch" [class.app--ai-panel]="aiHelper.available && aiQueue.panelOpen() && aiQueue.run() !== 'idle'">
+<div
+  class="app app--batch"
+  [class.app--ai-panel]="aiHelper.available && aiQueue.panelOpen() && aiQueue.run() !== 'idle'"
+>
   <header class="batch-bar">
     <a class="batch-bar__brand" routerLink="/landing">
       <img src="/logo.svg" alt="" width="32" height="32" />
@@ -63,8 +66,14 @@
       >
         {{ 'batch.reviewNext' | t }}
       </button>
-      <input #testDataInput type="file" accept=".json,application/json" hidden
-        (change)="onTestDataFile($event)" data-testid="batch-testdata-input" />
+      <input
+        #testDataInput
+        type="file"
+        accept=".json,application/json"
+        hidden
+        (change)="onTestDataFile($event)"
+        data-testid="batch-testdata-input"
+      />
       <span class="batch-more" (keydown.escape)="moreOpen.set(false)">
         <button
           type="button"
@@ -80,12 +89,24 @@
         @if (moreOpen()) {
           <div class="batch-more__menu" role="menu" data-testid="batch-more-menu">
             @if (options.available()) {
-              <button type="button" role="menuitem" class="batch-more__item" (click)="moreOpen.set(false); options.open()" data-testid="batch-options">
+              <button
+                type="button"
+                role="menuitem"
+                class="batch-more__item"
+                (click)="moreOpen.set(false); options.open()"
+                data-testid="batch-options"
+              >
                 ⚙ {{ 'options.open' | t }}
               </button>
             }
             @if (readyCount() === 0) {
-              <button type="button" role="menuitem" class="batch-more__item" disabled data-testid="download-ready">
+              <button
+                type="button"
+                role="menuitem"
+                class="batch-more__item"
+                disabled
+                data-testid="download-ready"
+              >
                 {{ 'batch.downloadReady' | t: { count: readyCount() } }}
               </button>
             }
@@ -107,7 +128,9 @@
               data-testid="batch-testdata"
             >
               {{ 'batch.testData.button' | t }}
-              @if (previewSettings.hasTestData()) { · {{ 'batch.testData.loaded' | t }} }
+              @if (previewSettings.hasTestData()) {
+                · {{ 'batch.testData.loaded' | t }}
+              }
             </button>
             @if (previewSettings.hasTestData()) {
               <button
@@ -343,17 +366,15 @@
                       'batch.step2.fields' | t: { count: row.info.count }
                     }}</span>
                   } @else if (unusedPasted().length > 0) {
-                    <select
-                      class="batch-assign"
-                      [attr.aria-label]="'batch.step2.assign' | t: { name: row.pdf.name }"
-                      (change)="assignPasted(row.pdf, $any($event.target).value)"
-                      data-testid="assign-pasted"
-                    >
-                      <option value="" selected>{{ 'batch.step2.assignPlaceholder' | t }}</option>
-                      @for (template of unusedPasted(); track $index) {
-                        <option [value]="$index">{{ template.label }}</option>
-                      }
-                    </select>
+                    <app-search-select
+                      [options]="pastedOptions()"
+                      [suggestFor]="row.pdf.name"
+                      [placeholder]="'batch.step2.assignPlaceholder' | t"
+                      [ariaLabel]="'batch.step2.assign' | t: { name: row.pdf.name }"
+                      [searchLabel]="'batch.step2.search' | t"
+                      (picked)="assignPasted(row.pdf, $event)"
+                      testId="assign-pasted"
+                    />
                   } @else {
                     <span class="batch-chip batch-chip--warn">{{ 'batch.step2.empty' | t }}</span>
                   }
@@ -460,17 +481,16 @@
             @for (file of unpairedB(); track file) {
               <li>
                 <span class="batch-unpaired__name">{{ file.name }}</span>
-                <select
-                  class="batch-assign"
-                  [attr.aria-label]="'batch.versionsDrop.assignLabel' | t: { name: file.name }"
-                  (change)="assignUnpaired(file, $any($event.target).value)"
-                  data-testid="assign-unpaired"
-                >
-                  <option value="" selected>{{ 'batch.versionsDrop.assign' | t }}</option>
-                  @for (item of withoutB(); track item.id) {
-                    <option [value]="item.id">{{ item.name }}</option>
-                  }
-                </select>
+                <app-search-select
+                  [options]="withoutBOptions()"
+                  [suggestFor]="file.name"
+                  [placeholder]="'batch.versionsDrop.assign' | t"
+                  [ariaLabel]="'batch.versionsDrop.assignLabel' | t: { name: file.name }"
+                  [searchLabel]="'batch.versionsDrop.search' | t"
+                  [emptyText]="'batch.versionsDrop.noneFree' | t"
+                  (picked)="assignUnpaired(file, $event)"
+                  testId="assign-unpaired"
+                />
                 <button type="button" class="btn btn--ghost" (click)="discardUnpaired(file)">
                   {{ 'batch.versionsDrop.discard' | t }}
                 </button>
@@ -498,13 +518,25 @@
           [attr.aria-label]="'batch.search' | t"
         />
         <div class="batch-seg" role="group" [attr.aria-label]="'batch.filter.label' | t">
-          <button type="button" [class.batch-seg__on]="filter() === 'all'" (click)="filter.set('all')">
+          <button
+            type="button"
+            [class.batch-seg__on]="filter() === 'all'"
+            (click)="filter.set('all')"
+          >
             {{ 'batch.filter.all' | t: { count: counts().all } }}
           </button>
-          <button type="button" [class.batch-seg__on]="filter() === 'review'" (click)="filter.set('review')">
+          <button
+            type="button"
+            [class.batch-seg__on]="filter() === 'review'"
+            (click)="filter.set('review')"
+          >
             {{ 'batch.filter.review' | t: { count: counts().review } }}
           </button>
-          <button type="button" [class.batch-seg__on]="filter() === 'ready'" (click)="filter.set('ready')">
+          <button
+            type="button"
+            [class.batch-seg__on]="filter() === 'ready'"
+            (click)="filter.set('ready')"
+          >
             {{ 'batch.filter.ready' | t: { count: counts().ready } }}
           </button>
         </div>
@@ -519,7 +551,12 @@
           (dirChange)="setSortDir($event)"
         />
         @if (view() === 'grid' && rows().length > 0) {
-          <button type="button" class="btn btn--ghost" (click)="toggleAll()" data-testid="select-all-grid">
+          <button
+            type="button"
+            class="btn btn--ghost"
+            (click)="toggleAll()"
+            data-testid="select-all-grid"
+          >
             {{ (allSelected() ? 'batch.select.none' : 'batch.select.allShort') | t }}
           </button>
         }
@@ -546,30 +583,60 @@
       </div>
 
       @if (total() > 0) {
-        <section class="batch-funnel" [class.batch-funnel--four]="!aiHelper.available" [attr.aria-label]="'batch.funnel.label' | t" data-testid="batch-funnel">
-          <button type="button" class="batch-funnel__step" (click)="showStep('all')" data-testid="funnel-all">
+        <section
+          class="batch-funnel"
+          [class.batch-funnel--four]="!aiHelper.available"
+          [attr.aria-label]="'batch.funnel.label' | t"
+          data-testid="batch-funnel"
+        >
+          <button
+            type="button"
+            class="batch-funnel__step"
+            (click)="showStep('all')"
+            data-testid="funnel-all"
+          >
             <small>{{ 'batch.funnel.s1' | t }}</small>
             <strong>{{ funnel().total }}</strong>
             <span>{{ 'batch.funnel.s1out' | t: { count: funnel().none } }}</span>
           </button>
-          <button type="button" class="batch-funnel__step" (click)="showStep('withA')" data-testid="funnel-a">
+          <button
+            type="button"
+            class="batch-funnel__step"
+            (click)="showStep('withA')"
+            data-testid="funnel-a"
+          >
             <small>{{ 'batch.funnel.s2' | t }}</small>
             <strong>{{ funnel().withA }}</strong>
             <span>{{ 'batch.funnel.s2out' | t: { count: funnel().onlyA } }}</span>
           </button>
-          <button type="button" class="batch-funnel__step" (click)="showStep('withB')" data-testid="funnel-b">
+          <button
+            type="button"
+            class="batch-funnel__step"
+            (click)="showStep('withB')"
+            data-testid="funnel-b"
+          >
             <small>{{ 'batch.funnel.s3' | t }}</small>
             <strong>{{ funnel().withB }}</strong>
             <span>{{ 'batch.funnel.s3out' | t: { count: funnel().onlyB } }}</span>
           </button>
           @if (aiHelper.available) {
-          <button type="button" class="batch-funnel__step batch-funnel__step--ai" (click)="showStep('ai')" data-testid="funnel-ai">
-            <small>{{ 'batch.funnel.s4' | t }}</small>
-            <strong>{{ funnel().ai }}</strong>
-            <span>{{ 'batch.funnel.s4out' | t }}</span>
-          </button>
+            <button
+              type="button"
+              class="batch-funnel__step batch-funnel__step--ai"
+              (click)="showStep('ai')"
+              data-testid="funnel-ai"
+            >
+              <small>{{ 'batch.funnel.s4' | t }}</small>
+              <strong>{{ funnel().ai }}</strong>
+              <span>{{ 'batch.funnel.s4out' | t }}</span>
+            </button>
           }
-          <button type="button" class="batch-funnel__step" (click)="showStep('ready')" data-testid="funnel-ready">
+          <button
+            type="button"
+            class="batch-funnel__step"
+            (click)="showStep('ready')"
+            data-testid="funnel-ready"
+          >
             <small>{{ (aiHelper.available ? 'batch.funnel.s5' : 'batch.funnel.s4web') | t }}</small>
             <strong>{{ funnel().ready }}</strong>
             <span>{{ 'batch.funnel.s5out' | t: { count: funnel().pending } }}</span>
@@ -577,23 +644,49 @@
         </section>
         <div class="batch-kinds" role="group" [attr.aria-label]="'batch.kind.label' | t">
           <span class="batch-kinds__label">{{ 'batch.kind.label' | t }}</span>
-          <button type="button" class="batch-kind" [class.batch-kind--on]="kind() === 'none'" [attr.aria-pressed]="kind() === 'none'" (click)="setKind('none')">
+          <button
+            type="button"
+            class="batch-kind"
+            [class.batch-kind--on]="kind() === 'none'"
+            [attr.aria-pressed]="kind() === 'none'"
+            (click)="setKind('none')"
+          >
             {{ 'batch.filter.noTemplate' | t: { count: funnel().none } }}
           </button>
-          <button type="button" class="batch-kind" [class.batch-kind--on]="kind() === 'onlyA'" [attr.aria-pressed]="kind() === 'onlyA'" (click)="setKind('onlyA')">
+          <button
+            type="button"
+            class="batch-kind"
+            [class.batch-kind--on]="kind() === 'onlyA'"
+            [attr.aria-pressed]="kind() === 'onlyA'"
+            (click)="setKind('onlyA')"
+          >
             {{ 'batch.kind.onlyA' | t: { count: funnel().onlyA } }}
           </button>
-          <button type="button" class="batch-kind" [class.batch-kind--on]="kind() === 'aPlusB'" [attr.aria-pressed]="kind() === 'aPlusB'" (click)="setKind('aPlusB')">
+          <button
+            type="button"
+            class="batch-kind"
+            [class.batch-kind--on]="kind() === 'aPlusB'"
+            [attr.aria-pressed]="kind() === 'aPlusB'"
+            (click)="setKind('aPlusB')"
+          >
             {{ 'batch.kind.aPlusB' | t: { count: funnel().aPlusB } }}
           </button>
-          <button type="button" class="batch-kind" [class.batch-kind--on]="kind() === 'onlyB'" [attr.aria-pressed]="kind() === 'onlyB'" (click)="setKind('onlyB')">
+          <button
+            type="button"
+            class="batch-kind"
+            [class.batch-kind--on]="kind() === 'onlyB'"
+            [attr.aria-pressed]="kind() === 'onlyB'"
+            (click)="setKind('onlyB')"
+          >
             {{ 'batch.kind.onlyB' | t: { count: funnel().onlyB } }}
           </button>
         </div>
         @if (filtering()) {
           <p class="batch-showing" role="status" data-testid="batch-showing">
             {{ 'batch.filter.showing' | t: { shown: rows().length, total: total() } }}
-            <button type="button" class="btn btn--ghost" (click)="clearFilters()">{{ 'batch.filter.clear' | t }}</button>
+            <button type="button" class="btn btn--ghost" (click)="clearFilters()">
+              {{ 'batch.filter.clear' | t }}
+            </button>
           </p>
         }
       }
@@ -618,58 +711,72 @@
               [class.batch-cell--sel]="isSelected(row.item.id)"
               [class.batch-cell--selecting]="selectionCount() > 0"
             >
-            <input
-              type="checkbox"
-              class="batch-check batch-check--card"
-              [checked]="isSelected(row.item.id)"
-              [attr.data-select-id]="row.item.id"
-              [attr.aria-label]="'batch.select.row' | t: { name: row.item.name }"
-              (click)="onCheck(row.item.id, $event)"
-              (keydown)="onCheckKey(row.item.id, $event)"
-              data-testid="select-item"
-            />
-            <button
-              type="button"
-              class="batch-card"
-              [class.batch-row--active]="activeId() === row.item.id"
-              (click)="onCardClick(row.item, $event)"
-              data-testid="panel-item"
-            >
-              <span class="batch-card__page" aria-hidden="true"
-                ><app-pdf-thumb [blob]="row.item.bPdf ?? row.item.aPdf"
-              /></span>
-              <strong class="batch-card__name">{{ row.item.name }}</strong>
-              <span class="batch-card__meta">
-                <span
-                  class="batch-state"
-                  [class.batch-state--ok]="row.state === 'ready'"
-                  [class.batch-state--warn]="row.state !== 'ready'"
-                  >{{ 'batch.state.' + row.state | t }}</span
-                >
-                @if (row.item.bPdf) {
-                  <span class="batch-chip batch-chip--on">B</span>
-                }
-                @if (row.item.pageMap) {
-                  <span class="batch-chip batch-chip--on" data-testid="row-page-map">⇄ {{ 'batch.pageMap.chip' | t }}</span>
-                }
-              </span>
-              @if (stampOf(row.item); as stamp) {
-                <span class="batch-stamp" [class.batch-stamp--last]="row.item.id === latestId()">
-                  <time [attr.datetime]="stamp.iso" [title]="stamp.title" data-testid="row-stamp">{{ stamp.text }}</time>
-                  @if (row.item.id === latestId()) {
-                    <span class="batch-last" data-testid="row-last">{{ 'batch.stamp.last' | t }}</span>
+              <input
+                type="checkbox"
+                class="batch-check batch-check--card"
+                [checked]="isSelected(row.item.id)"
+                [attr.data-select-id]="row.item.id"
+                [attr.aria-label]="'batch.select.row' | t: { name: row.item.name }"
+                (click)="onCheck(row.item.id, $event)"
+                (keydown)="onCheckKey(row.item.id, $event)"
+                data-testid="select-item"
+              />
+              <button
+                type="button"
+                class="batch-card"
+                [class.batch-row--active]="activeId() === row.item.id"
+                (click)="onCardClick(row.item, $event)"
+                data-testid="panel-item"
+              >
+                <span class="batch-card__page" aria-hidden="true"
+                  ><app-pdf-thumb [blob]="row.item.bPdf ?? row.item.aPdf"
+                /></span>
+                <strong class="batch-card__name">{{ row.item.name }}</strong>
+                <span class="batch-card__meta">
+                  <span
+                    class="batch-state"
+                    [class.batch-state--ok]="row.state === 'ready'"
+                    [class.batch-state--warn]="row.state !== 'ready'"
+                    >{{ 'batch.state.' + row.state | t }}</span
+                  >
+                  @if (row.item.bPdf) {
+                    <span class="batch-chip batch-chip--on">B</span>
+                  }
+                  @if (row.item.pageMap) {
+                    <span class="batch-chip batch-chip--on" data-testid="row-page-map"
+                      >⇄ {{ 'batch.pageMap.chip' | t }}</span
+                    >
                   }
                 </span>
-              }
-              @if (aiHelper.available) {
-                <app-ai-batch-chip [item]="row.item" />
-              }
-            </button>
+                @if (stampOf(row.item); as stamp) {
+                  <span class="batch-stamp" [class.batch-stamp--last]="row.item.id === latestId()">
+                    <time
+                      [attr.datetime]="stamp.iso"
+                      [title]="stamp.title"
+                      data-testid="row-stamp"
+                      >{{ stamp.text }}</time
+                    >
+                    @if (row.item.id === latestId()) {
+                      <span class="batch-last" data-testid="row-last">{{
+                        'batch.stamp.last' | t
+                      }}</span>
+                    }
+                  </span>
+                }
+                @if (aiHelper.available) {
+                  <app-ai-batch-chip [item]="row.item" />
+                }
+              </button>
             </div>
           }
         </div>
       } @else {
-        <div class="batch-table" [class.batch-table--selecting]="selectionCount() > 0" role="table" data-testid="panel-list">
+        <div
+          class="batch-table"
+          [class.batch-table--selecting]="selectionCount() > 0"
+          role="table"
+          data-testid="panel-list"
+        >
           <div class="batch-row batch-row--head" role="row">
             <span role="columnheader" class="batch-row__check">
               <input
@@ -683,14 +790,24 @@
               />
             </span>
             <span role="columnheader" [attr.aria-sort]="ariaSort('name')">
-              <button type="button" class="batch-sorthead" (click)="toggleSortHead('name')" data-testid="sort-head-name">
+              <button
+                type="button"
+                class="batch-sorthead"
+                (click)="toggleSortHead('name')"
+                data-testid="sort-head-name"
+              >
                 {{ 'batch.col.document' | t }} {{ sortArrow('name') }}
               </button>
             </span>
             <span role="columnheader">{{ 'batch.col.version' | t }}</span>
             <span role="columnheader" [attr.aria-sort]="ariaSort('change')">
               {{ 'batch.col.state' | t }} ·
-              <button type="button" class="batch-sorthead" (click)="toggleSortHead('change')" data-testid="sort-head">
+              <button
+                type="button"
+                class="batch-sorthead"
+                (click)="toggleSortHead('change')"
+                data-testid="sort-head"
+              >
                 {{ 'batch.col.change' | t }}
                 {{ sortArrow('change') }}
               </button>
@@ -738,22 +855,36 @@
                   >{{ 'batch.state.' + row.state | t }}</span
                 >
                 @if (row.item.pageMap) {
-                  <span class="batch-chip batch-chip--on" data-testid="row-page-map">⇄ {{ 'batch.pageMap.chip' | t }}</span>
+                  <span class="batch-chip batch-chip--on" data-testid="row-page-map"
+                    >⇄ {{ 'batch.pageMap.chip' | t }}</span
+                  >
                 }
                 @if (stampOf(row.item); as stamp) {
                   <span class="batch-stamp" [class.batch-stamp--last]="row.item.id === latestId()">
-                    <time [attr.datetime]="stamp.iso" [title]="stamp.title" data-testid="row-stamp">{{ stamp.text }}</time>
+                    <time
+                      [attr.datetime]="stamp.iso"
+                      [title]="stamp.title"
+                      data-testid="row-stamp"
+                      >{{ stamp.text }}</time
+                    >
                     @if (row.item.id === latestId()) {
-                      <span class="batch-last" data-testid="row-last">{{ 'batch.stamp.last' | t }}</span>
+                      <span class="batch-last" data-testid="row-last">{{
+                        'batch.stamp.last' | t
+                      }}</span>
                     }
                   </span>
                 }
                 @if (aiHelper.available) {
-                <small class="batch-why" [class.batch-why--ok]="aiReason(row.item) === 'eligible'" data-testid="row-why">{{ 'batch.why.' + aiReason(row.item) | t }}</small>
+                  <small
+                    class="batch-why"
+                    [class.batch-why--ok]="aiReason(row.item) === 'eligible'"
+                    data-testid="row-why"
+                    >{{ 'batch.why.' + aiReason(row.item) | t }}</small
+                  >
                 }
                 @if (aiHelper.available) {
-                <app-ai-batch-chip [item]="row.item" />
-              }
+                  <app-ai-batch-chip [item]="row.item" />
+                }
               </span>
               <span class="batch-row__actions" role="cell">
                 @if (aiHelper.available && row.item.aiProposal) {
@@ -811,96 +942,118 @@
 
       @if (selectionCount() > 0 || undoNotice() || templatesUndo() > 0) {
         <div class="batch-dock">
-        @if (templatesUndo() > 0) {
-          <div class="batch-undo" role="status" data-testid="templates-undo">
-            <span>{{ 'batch.upd.undoNotice' | t: { count: templatesUndo() } }}</span>
-            <button type="button" class="btn btn--ghost" (click)="undoTemplates()" data-testid="templates-undo-btn">
-              ↶ {{ 'batch.upd.undoAll' | t }}
-            </button>
-          </div>
-        }
-        @if (undoNotice(); as notice) {
-          <div class="batch-undo" role="status" data-testid="bulk-undo">
-            <span>{{ (notice.kind === 'removed' ? 'batch.bulk.removed' : notice.kind === 'tables' ? 'batch.bulk.tablesDone' : 'batch.bulk.readyDone') | t: { count: notice.count } }}</span>
-            <button type="button" class="btn btn--ghost" (click)="undo()" data-testid="bulk-undo-btn">
-              ↶ {{ 'batch.bulk.undo' | t }}
-            </button>
-          </div>
-        }
-        @if (selectionCount() > 0) {
-          <div
-            class="batch-selbar"
-            role="toolbar"
-            [attr.aria-label]="'batch.bulk.toolbar' | t: { count: selectionCount() }"
-            data-testid="selection-bar"
-          >
-            <div class="batch-selbar__count">
-              <strong role="status" aria-live="polite">{{
-                'batch.bulk.selected' | t: { count: selectionCount() }
-              }}</strong>
-              @if (!allSelected()) {
-                <button type="button" class="batch-selbar__link" (click)="selectAllVisible()" data-testid="select-all-visible">
-                  {{ 'batch.bulk.selectAll' | t: { count: visibleIds().length } }}
-                </button>
-              }
+          @if (templatesUndo() > 0) {
+            <div class="batch-undo" role="status" data-testid="templates-undo">
+              <span>{{ 'batch.upd.undoNotice' | t: { count: templatesUndo() } }}</span>
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="undoTemplates()"
+                data-testid="templates-undo-btn"
+              >
+                ↶ {{ 'batch.upd.undoAll' | t }}
+              </button>
             </div>
-            @if (aiHelper.available) {
-              <app-ai-batch-button [ids]="selectedIds()" [up]="true" />
-            }
-            <button
-              type="button"
-              class="btn btn--ghost"
-              [disabled]="tablesCount() === 0 || bulkBusy()"
-              [attr.title]="tablesCount() === 0 ? ('batch.bulk.noneTables' | t) : null"
-              (click)="openPageMaps()"
-              data-testid="bulk-tables"
+          }
+          @if (undoNotice(); as notice) {
+            <div class="batch-undo" role="status" data-testid="bulk-undo">
+              <span>{{
+                (notice.kind === 'removed'
+                  ? 'batch.bulk.removed'
+                  : notice.kind === 'tables'
+                    ? 'batch.bulk.tablesDone'
+                    : 'batch.bulk.readyDone'
+                ) | t: { count: notice.count }
+              }}</span>
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="undo()"
+                data-testid="bulk-undo-btn"
+              >
+                ↶ {{ 'batch.bulk.undo' | t }}
+              </button>
+            </div>
+          }
+          @if (selectionCount() > 0) {
+            <div
+              class="batch-selbar"
+              role="toolbar"
+              [attr.aria-label]="'batch.bulk.toolbar' | t: { count: selectionCount() }"
+              data-testid="selection-bar"
             >
-              ⇄ {{ 'batch.bulk.tables' | t }}
-              <span class="batch-sub">{{ tablesCount() }} / {{ plan().total }}</span>
-            </button>
-            <button
-              type="button"
-              class="btn btn--ghost"
-              [disabled]="plan().download === 0 || bulkBusy()"
-              [attr.title]="plan().download === 0 ? ('batch.bulk.noneDownload' | t) : null"
-              (click)="downloadSelected()"
-              data-testid="bulk-download"
-            >
-              ⤓ {{ 'batch.bulk.download' | t }}
-              <span class="batch-sub">{{ plan().download }} / {{ plan().total }}</span>
-            </button>
-            <app-json-format-menu />
-            <button
-              type="button"
-              class="btn btn--ghost"
-              [disabled]="plan().ready === 0 || bulkBusy()"
-              [attr.title]="plan().ready === 0 ? ('batch.bulk.noneReady' | t) : null"
-              (click)="askBulk('ready')"
-              data-testid="bulk-ready"
-            >
-              ✓ {{ 'batch.bulk.ready' | t }}
-              <span class="batch-sub">{{ plan().ready }} / {{ plan().total }}</span>
-            </button>
-            <button
-              type="button"
-              class="btn btn--danger-ghost"
-              [disabled]="bulkBusy()"
-              (click)="askBulk('remove')"
-              data-testid="bulk-remove"
-            >
-              {{ 'batch.bulk.remove' | t }} <span class="batch-sub">{{ plan().total }}</span>
-            </button>
-            <button
-              type="button"
-              class="btn btn--ghost batch-selbar__close"
-              [attr.aria-label]="'batch.bulk.clear' | t"
-              (click)="clearSelection()"
-              data-testid="selection-clear"
-            >
-              ✕
-            </button>
-          </div>
-        }
+              <div class="batch-selbar__count">
+                <strong role="status" aria-live="polite">{{
+                  'batch.bulk.selected' | t: { count: selectionCount() }
+                }}</strong>
+                @if (!allSelected()) {
+                  <button
+                    type="button"
+                    class="batch-selbar__link"
+                    (click)="selectAllVisible()"
+                    data-testid="select-all-visible"
+                  >
+                    {{ 'batch.bulk.selectAll' | t: { count: visibleIds().length } }}
+                  </button>
+                }
+              </div>
+              @if (aiHelper.available) {
+                <app-ai-batch-button [ids]="selectedIds()" [up]="true" />
+              }
+              <button
+                type="button"
+                class="btn btn--ghost"
+                [disabled]="tablesCount() === 0 || bulkBusy()"
+                [attr.title]="tablesCount() === 0 ? ('batch.bulk.noneTables' | t) : null"
+                (click)="openPageMaps()"
+                data-testid="bulk-tables"
+              >
+                ⇄ {{ 'batch.bulk.tables' | t }}
+                <span class="batch-sub">{{ tablesCount() }} / {{ plan().total }}</span>
+              </button>
+              <button
+                type="button"
+                class="btn btn--ghost"
+                [disabled]="plan().download === 0 || bulkBusy()"
+                [attr.title]="plan().download === 0 ? ('batch.bulk.noneDownload' | t) : null"
+                (click)="downloadSelected()"
+                data-testid="bulk-download"
+              >
+                ⤓ {{ 'batch.bulk.download' | t }}
+                <span class="batch-sub">{{ plan().download }} / {{ plan().total }}</span>
+              </button>
+              <app-json-format-menu />
+              <button
+                type="button"
+                class="btn btn--ghost"
+                [disabled]="plan().ready === 0 || bulkBusy()"
+                [attr.title]="plan().ready === 0 ? ('batch.bulk.noneReady' | t) : null"
+                (click)="askBulk('ready')"
+                data-testid="bulk-ready"
+              >
+                ✓ {{ 'batch.bulk.ready' | t }}
+                <span class="batch-sub">{{ plan().ready }} / {{ plan().total }}</span>
+              </button>
+              <button
+                type="button"
+                class="btn btn--danger-ghost"
+                [disabled]="bulkBusy()"
+                (click)="askBulk('remove')"
+                data-testid="bulk-remove"
+              >
+                {{ 'batch.bulk.remove' | t }} <span class="batch-sub">{{ plan().total }}</span>
+              </button>
+              <button
+                type="button"
+                class="btn btn--ghost batch-selbar__close"
+                [attr.aria-label]="'batch.bulk.clear' | t"
+                (click)="clearSelection()"
+                data-testid="selection-clear"
+              >
+                ✕
+              </button>
+            </div>
+          }
         </div>
       }
 
@@ -958,7 +1111,6 @@
           </div>
         </div>
       }
-
     }
     @if (step() === 'panel') {
       <p class="batch-keyhint" data-testid="batch-keyhint">

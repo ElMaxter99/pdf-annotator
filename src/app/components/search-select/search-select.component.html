@@ -1,0 +1,102 @@
+<div class="ss" (focusout)="onFocusOut($event)">
+  <button
+    #toggle
+    type="button"
+    class="ss__toggle"
+    [class.ss__toggle--open]="open()"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="open()"
+    [attr.aria-label]="ariaLabel()"
+    [disabled]="total() === 0"
+    (click)="toggleOpen()"
+    (keydown)="onToggleKey($event)"
+    [attr.data-testid]="testId()"
+  >
+    <span class="ss__value">{{ total() === 0 && emptyText() ? emptyText() : placeholder() }}</span>
+    <span class="ss__chev" aria-hidden="true">{{ open() ? '▴' : '▾' }}</span>
+  </button>
+
+  @if (open()) {
+    <div class="ss__pop" (keydown)="onKey($event)">
+      <div class="ss__search">
+        <span aria-hidden="true">⌕</span>
+        <input
+          #search
+          type="search"
+          class="ss__input"
+          role="combobox"
+          aria-expanded="true"
+          aria-autocomplete="list"
+          autocomplete="off"
+          spellcheck="false"
+          [attr.aria-controls]="uid + '-list'"
+          [attr.aria-activedescendant]="activeId()"
+          [value]="query()"
+          [attr.placeholder]="searchLabel()"
+          [attr.aria-label]="searchLabel()"
+          (input)="setQuery($any($event.target).value)"
+          [attr.data-testid]="testId() + '-search'"
+        />
+        @if (query()) {
+          <button
+            type="button"
+            class="ss__x"
+            [attr.aria-label]="'search.clear' | t"
+            (click)="clearQuery()"
+          >
+            ✕
+          </button>
+        }
+      </div>
+      <div class="ss__count" role="status" [attr.data-testid]="testId() + '-count'">
+        {{
+          query().trim()
+            ? ('search.count' | t: { shown: shown(), total: total() })
+            : ('search.total' | t: { total: total() })
+        }}
+      </div>
+      <div
+        #listbox
+        class="ss__list"
+        role="listbox"
+        [id]="uid + '-list'"
+        [attr.aria-label]="ariaLabel()"
+      >
+        @if (shown() === 0) {
+          <div class="ss__none" [attr.data-testid]="testId() + '-none'">
+            <p>{{ 'search.noMatch' | t: { query: query().trim() } }}</p>
+            <button type="button" class="btn btn--ghost" (click)="clearQuery()">
+              {{ 'search.clear' | t }}
+            </button>
+          </div>
+        }
+        @for (section of sections(); track $index) {
+          @if (section.title) {
+            <div class="ss__group" role="presentation">{{ 'search.' + section.title | t }}</div>
+          }
+          @for (row of section.rows; track row.id) {
+            <div
+              role="option"
+              class="ss__opt"
+              [id]="optionId(row)"
+              [class.ss__opt--on]="active() === row.index"
+              [attr.aria-selected]="active() === row.index"
+              (mousedown)="$event.preventDefault()"
+              (click)="pick(row.id)"
+              (mousemove)="active.set(row.index)"
+              [attr.data-testid]="testId() + '-opt'"
+            >
+              @for (s of row.segs; track $index) {
+                @if (s.hit) {
+                  <mark>{{ s.text }}</mark>
+                } @else {
+                  <span>{{ s.text }}</span>
+                }
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>

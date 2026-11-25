@@ -638,7 +638,10 @@
   border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
   background: color-mix(in srgb, var(--text) 5%, var(--bg));
   color: var(--text);
-  font: 0.8rem/1.5 'Fira Code', Consolas, monospace;
+  font:
+    0.8rem/1.5 'Fira Code',
+    Consolas,
+    monospace;
   resize: vertical;
 }
 
@@ -856,7 +859,6 @@ app-ai-batch-chip {
     gap: 4px;
   }
 }
-
 
 // ---- multiple selection (P-50..P-54) ----
 .batch-check {
@@ -1195,7 +1197,9 @@ app-ai-batch-chip {
 @media (prefers-reduced-motion: no-preference) {
   .batch-funnel__step,
   .batch-kind {
-    transition: border-color 0.2s ease-out, background 0.2s ease-out;
+    transition:
+      border-color 0.2s ease-out,
+      background 0.2s ease-out;
   }
 }
 
