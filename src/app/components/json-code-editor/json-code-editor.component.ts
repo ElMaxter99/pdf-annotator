@@ -202,6 +202,7 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
     ];
     const external = state.Annotation.define<boolean>();
     this.externalAnnotation = external;
+    this.extensions = extensions;
     this.view = new view.EditorView({
       state: state.EditorState.create({ doc: this.value(), extensions }),
       parent: this.host.nativeElement,
@@ -216,12 +217,28 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  private extensions: import('@codemirror/state').Extension[] = [];
   private externalAnnotation: ReturnType<typeof import('@codemirror/state').Annotation.define<boolean>> | null = null;
 
   ngOnDestroy(): void {
     this.destroyed = true;
     this.view?.destroy();
     this.view = null;
+  }
+
+  /** Vacía el historial de deshacer del editor (al cambiar de documento, como al asignar `value` a un textarea). */
+  resetHistory(): void {
+    const view = this.view;
+    const cm = this.cm;
+    if (!view || !cm) {
+      return;
+    }
+    view.setState(
+      cm.state.EditorState.create({ doc: view.state.doc.toString(), extensions: this.extensions }),
+    );
+    if (this.errorLine()) {
+      view.dispatch({ effects: this.setError!.of(this.errorLine() ?? 0) });
+    }
   }
 
   getValue(): string {
@@ -238,7 +255,10 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
       return;
     }
     const change = diffRange(prev, next);
-    view.dispatch({ changes: change, annotations: this.externalAnnotation.of(true) });
+    view.dispatch({
+      changes: change,
+      annotations: [this.externalAnnotation.of(true), this.cm!.state.Transaction.addToHistory.of(false)],
+    });
   }
 
   focus(): void {

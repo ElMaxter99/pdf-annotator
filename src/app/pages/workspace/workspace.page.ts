@@ -2632,6 +2632,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
 
   private resetHistory() {
     this.store.resetHistory();
+    this.jsonEditorRef?.resetHistory();
   }
 
   private areFieldsEqual(a: PageField, b: PageField): boolean {
