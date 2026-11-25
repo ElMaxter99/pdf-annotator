@@ -1,5 +1,17 @@
 ## Unreleased
 
+## [v1.20.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.20.0) - 2026-11-25
+### Added
+- **Añadir PDFs A y reemplazar la A de una fila en el lote (mesas P-190 a P-192, 1.20):** el panel tiene «Añadir PDFs A» (asistente de dos pasos con plantillas opcionales, duplicados omitidos por nombre y «Deshacer») y «Reemplazar A…» por fila (lista, ficha de Documento del editor y Ctrl+K). Reemplazar conserva la plantilla A y la versión B y descarta la tabla de páginas, la propuesta de IA guardada y el ajuste de tamaño; la fila vuelve a «En revisión».
+- **Ver el mapField de cada anotación (mesas P-184 a P-186, 1.20):** con casillas o textos muy juntos y nombres larguísimos ya se distingue cuál es cuál. «Mostrar mapField» (barra inferior del visor, Avanzado › «Identificar anotaciones», Opciones › Editor y Ctrl+K) pinta junto a cada casilla un rótulo mini con el final del nombre y sus índices (`[0]…esTitular`), baja al segundo carril si chocan y avisa de los que no caben. Al pasar el cursor o enfocar con Tab sale un cuadro con el nombre completo (Esc lo cierra). Con Tab se recorren las anotaciones, Enter selecciona la enfocada y Mayús+Enter la suma a la selección. Se puede limitar a casillas y opciones o a todas, y elegir longitud y posición. Solo se ve en pantalla: no sale en el PDF ni en el JSON. Apagado por defecto.
+
+### Changed
+- **Selector con búsqueda al vincular versiones B (mesas P-181 a P-183, 1.20):** las B sin pareja (tira «Versiones nuevas (B)») y las plantillas pegadas sin PDF (paso 2) se asignan con un selector con campo de búsqueda en lugar del desplegable nativo: escribe «dni» y se filtra, con resaltado, contador, sugeridos por nombre parecido y manejo completo con teclado. Al vincular una B, el foco pasa a la siguiente.
+- **Editor del JSON con plegado y zona «Anotaciones JSON» más simple (mesas P-200 a P-202, 1.20):** el cuadro de texto pasa a ser un editor de código (CodeMirror 6, cargado solo al abrir el editor) con números de línea, flechas ▾/▸ en el margen para plegar objetos y arrays, «Plegar todo / Desplegar todo» y atajos (Ctrl+Mayús+[ y ], Ctrl+Alt+[ y ]). El plegado es solo visual: copiar una selección que cubra un bloque plegado copia todo su contenido. La línea con el error de sintaxis se marca. La cabecera se reduce a título, «Personalizar» (con un punto si el formato no es el estricto; el detalle va en su tooltip) y ocultar.
+
+### Fixed
+- **Canal «Últimas» del actualizador de escritorio:** desde una versión rc ya ofrece la versión final más reciente (por ejemplo, de 1.19.0-rc.7 a 1.19.0), en lugar de buscar solo nuevas rc.
+
 ## [v1.19.0](https://github.com/ElMaxter99/pdf-annotator/tree/v.1.19.0) - 2026-11-23
 ### Added
 - **Comprobación de tipos con TypeScript 7 (1.19, invisible):** `npm run typecheck:ts7` ejecuta `tsc --noEmit` con TypeScript 7 sobre `tsconfig.app.json` y `tsconfig.spec.json` (hoy 0 errores, unas 4 veces más rápido que con la 6.0) y un job de CI aparte, no bloqueante, lo repite. El build sigue con TypeScript 6.0.x porque Angular 22 solo admite `>=6.0 <6.1` y `ngc` no arranca con la 7. `docs/MIGRACION-TS7.md` explica el bloqueo, las mediciones y cuándo migrar; `DECISIONS` 17 lo recoge.
