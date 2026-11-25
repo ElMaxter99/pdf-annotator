@@ -697,6 +697,43 @@ export class WorkspaceBatch {
     }
   }
 
+  /** «Reemplazar A» of the Documento tab (P-190): swaps A keeping the template and B, then reopens the item. */
+  async batchReplaceA(this: WorkspacePageComponent, file: File): Promise<void> {
+    const item = this.batch.activeItem();
+    if (!item) {
+      return;
+    }
+    if (!isPdfFile(file)) {
+      this.toast.error(this.translationService.translate('app.upload.invalidFormat'));
+      return;
+    }
+    // A running AI request was computed from the old A: it must not write into B afterwards.
+    this.cancelAi();
+    this.flushBatchSave(true);
+    const previous = this.batch.replaceA(item.id, file);
+    if (!previous) {
+      return;
+    }
+    this.clearSelection();
+    const updated = this.batch.activeItem();
+    if (updated) {
+      await this.openBatchPdf(updated, this.store.snapshot());
+    }
+    this.toast.show(this.translationService.translate('batch.replaceA.done'), 'success', 10000, false, {
+      label: this.translationService.translate('batch.bulk.undo'),
+      run: () => {
+        this.cancelAi();
+        this.flushBatchSave(true);
+        this.batch.restoreA(previous);
+        const restored = this.batch.activeItem();
+        if (restored && restored.id === previous.id) {
+          this.clearSelection();
+          void this.openBatchPdf(restored, this.store.snapshot());
+        }
+      },
+    });
+  }
+
   /** Adds the new version (B). Annotations already placed become the template A if it was empty. */
   async batchAddVersionB(this: WorkspacePageComponent, file: File): Promise<void> {
     const item = this.batch.activeItem();

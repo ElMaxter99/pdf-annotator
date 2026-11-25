@@ -824,7 +824,9 @@
         "title": "Páginas",
         "mapped": "Emparejadas a mano",
         "byNumber": "Por número"
-      }
+      },
+      "replaceB": "Reemplazar B",
+      "replaceA": "Reemplazar A"
     },
     "adjust": {
       "title": "Ajuste por textos",
@@ -1344,6 +1346,58 @@
       "dirDesc": "Sentido descendente (Z–A, más primero)",
       "name": "Nombre",
       "state": "Estado"
+    },
+    "addA": {
+      "open": "Añadir PDFs A",
+      "title": "Añadir PDFs A",
+      "intro": "Los PDF A son los originales sobre los que se coloca la plantilla. Para versiones nuevas usa «Subir versiones B».",
+      "drop": "Suelta los PDF aquí",
+      "dropHint": "Uno o varios. Solo PDF.",
+      "include": "Incluir",
+      "duplicate": "Ya está en el lote",
+      "ready": "Listo",
+      "removeEntry": "Quitar {{name}} de la lista",
+      "tileAdd": "se añaden",
+      "tileOmitted": "omitidos (duplicados)",
+      "tileSize": "peso añadido",
+      "next": "Siguiente · plantillas",
+      "templatesTitle": "Plantillas de los PDF A",
+      "templatesIntro": "Opcional: sube los JSON o pega el fichero largo. Los PDF sin plantilla entran como «Sin plantilla A».",
+      "noJson": "sin JSON todavía",
+      "withTemplate": "Con plantilla",
+      "noTemplate": "Sin plantilla A",
+      "later": "Podrás poner la plantilla después.",
+      "back": "‹ Atrás",
+      "go": "Añadir {{count}} PDF",
+      "running": "Añadiendo PDF A…",
+      "cancelRest": "Cancelar el resto",
+      "doneCount": "{{count}} PDF A añadidos",
+      "doneText": "{{withTemplate}} con plantilla y {{without}} sin plantilla A. Entran al final de la lista, en revisión.",
+      "undoNotice": "{{count}} PDF A añadidos"
+    },
+    "replaceA": {
+      "row": "Reemplazar A…",
+      "title": "Reemplazar A de {{name}}",
+      "current": "Actual",
+      "next": "Nuevo",
+      "pages": "{{count}} págs",
+      "unreadable": "No se pudo leer «{{name}}». El A actual sigue como estaba.",
+      "keepTemplate": "Plantilla A ({{count}} campos)",
+      "keepB": "Versión B con sus campos ({{count}})",
+      "kept": "Se conserva",
+      "dropMap": "Tabla de páginas A↔B ({{count}} páginas)",
+      "dropAi": "Propuesta de IA guardada ({{count}} campos)",
+      "dropFit": "Elección de «Ajustar A a B»",
+      "dropped": "Se descarta",
+      "nothingToDrop": "Nada más que descartar",
+      "states": "Estados y vínculos A↔B",
+      "mayShift": "Pueden desfasarse",
+      "pagesWarn": "El PDF nuevo tiene {{next}} páginas y el actual {{old}}: revisa la fila. No se borra ningún campo.",
+      "review": "La fila vuelve a «En revisión».",
+      "go": "Reemplazar A",
+      "undoNotice": "A reemplazado. La fila vuelve a «En revisión».",
+      "done": "A reemplazado. La fila vuelve a «En revisión».",
+      "sizeWarn": "La hoja nueva mide distinto ({{old}} → {{next}}): las coordenadas de la plantilla se conservan tal cual. Revisa la fila o usa «Ajustar A a B» después."
     }
   },
   "preview": {
@@ -1957,7 +2011,8 @@
       "noReadyInSelection": "Ningún seleccionado está listo",
       "noVersionBInSelection": "Ningún seleccionado tiene versión B",
       "busy": "Hay una tarea en curso",
-      "nothingToMark": "Nada que marcar como listo"
+      "nothingToMark": "Nada que marcar como listo",
+      "pickOneRow": "Elige una sola fila primero"
     },
     "cmd": {
       "fitPage": "Ajustar a la página",
@@ -2013,7 +2068,9 @@
       "removeSelected": "Quitar los seleccionados del lote",
       "pdfCount": "{{count}} PDFs",
       "openMenu": "Buscar acciones",
-      "keyhint": "Acciones"
+      "keyhint": "Acciones",
+      "addA": "Añadir PDFs A…",
+      "replaceA": "Reemplazar A de la fila…"
     }
   },
   "projects": {

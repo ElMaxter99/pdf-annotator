@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { PdfThumbComponent } from '../../../../components/pdf-thumb/pdf-thumb.component';
+import { ReplaceAConfirmComponent } from '../../../../components/replace-a-confirm/replace-a-confirm.component';
 import { TranslationPipe } from '../../../../i18n/translation.pipe';
 import type { WorkspacePageComponent } from '../../workspace.page';
 
@@ -14,7 +15,7 @@ type TemplateError = 'tooBig' | 'json' | 'noPages';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-batch-document',
   standalone: true,
-  imports: [CommonModule, TranslationPipe, PdfThumbComponent],
+  imports: [CommonModule, TranslationPipe, PdfThumbComponent, ReplaceAConfirmComponent],
   templateUrl: './batch-document.component.html',
 })
 export class BatchDocumentComponent {
@@ -24,6 +25,7 @@ export class BatchDocumentComponent {
   readonly pasteText = signal('');
   readonly templateError = signal<TemplateError | null>(null);
   readonly pendingReplace = signal<File | null>(null);
+  readonly pendingReplaceA = signal<File | null>(null);
   readonly confirmRemoveB = signal(false);
   readonly dropActive = signal(false);
 
@@ -43,6 +45,23 @@ export class BatchDocumentComponent {
     input.value = '';
     if (file) {
       this.pendingReplace.set(file);
+    }
+  }
+
+  onReplaceAPicked(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) {
+      this.pendingReplaceA.set(file);
+    }
+  }
+
+  async confirmReplaceA(): Promise<void> {
+    const file = this.pendingReplaceA();
+    this.pendingReplaceA.set(null);
+    if (file) {
+      await this.vm.batchReplaceA(file);
     }
   }
 

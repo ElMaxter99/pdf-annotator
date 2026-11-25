@@ -27,6 +27,18 @@ export interface BatchSettings {
   readonly aiRun?: AiRunRecord | null;
 }
 
+/** State of a row before «Reemplazar A», kept to undo it. */
+export interface ReplacedA {
+  readonly id: string;
+  readonly name: string;
+  readonly aPdf: Blob;
+  readonly pageMap?: PageMapData;
+  readonly aiProposal?: AiSavedProposal;
+  readonly fitA?: boolean;
+  readonly status: BatchItem['status'];
+  readonly statusAt?: number;
+}
+
 /** Where a batch that belongs to a desktop project is mirrored (the folder on disk) instead of IndexedDB. */
 export interface BatchSink {
   save(item: BatchItem): void;
@@ -232,6 +244,55 @@ export class BatchStoreService {
         ? { bPdf: file, bName: file.name, fitA: undefined, aiProposal: undefined }
         : { aPdf: file, name: file.name, aiProposal: undefined, pageMap: undefined },
     );
+  }
+
+  /**
+   * Swaps the PDF of A (P-190 a P-192) keeping the template, B and its fields, links and the AI
+   * instructions. What was derived from the old A (page table, AI proposal, size choice) is dropped
+   * and the row goes back to review, because states and links may no longer match.
+   * Returns the previous state for «Deshacer».
+   */
+  replaceA(id: string, file: File): ReplacedA | null {
+    const item = this.find(id);
+    if (!item) {
+      return null;
+    }
+    const previous: ReplacedA = {
+      id,
+      name: item.name,
+      aPdf: item.aPdf,
+      pageMap: item.pageMap,
+      aiProposal: item.aiProposal,
+      fitA: item.fitA,
+      status: item.status,
+      statusAt: item.statusAt,
+    };
+    this.patch(id, {
+      aPdf: file,
+      name: file.name,
+      pageMap: undefined,
+      aiProposal: undefined,
+      fitA: undefined,
+      status: 'review',
+    });
+    return previous;
+  }
+
+  /** Puts back what `replaceA` changed. */
+  restoreA(previous: ReplacedA): void {
+    if (!this.find(previous.id)) {
+      return;
+    }
+    this.patch(previous.id, {
+      name: previous.name,
+      // A new Blob object: a desktop project skips blobs it already wrote, and the disk now holds the replacement.
+      aPdf: previous.aPdf.slice(0, previous.aPdf.size, previous.aPdf.type),
+      pageMap: previous.pageMap,
+      aiProposal: previous.aiProposal,
+      fitA: previous.fitA,
+      status: previous.status,
+      statusAt: previous.statusAt,
+    });
   }
 
   removeB(id: string): void {

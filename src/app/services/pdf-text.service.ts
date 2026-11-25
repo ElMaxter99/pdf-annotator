@@ -70,6 +70,24 @@ export class PdfTextService {
     }
   }
 
+  /** Page count and size of the first page in points (`null` when it cannot be read). */
+  async pageInfo(blob: Blob): Promise<{ pages: number; w: number; h: number } | null> {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    ensureWorker();
+    let doc: Awaited<ReturnType<typeof pdfjsLib.getDocument>['promise']> | null = null;
+    try {
+      doc = await pdfjsLib.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;
+      const view = (await doc.getPage(1)).getViewport({ scale: 1 });
+      return { pages: doc.numPages, w: view.width, h: view.height };
+    } catch {
+      return null;
+    } finally {
+      void doc?.loadingTask.destroy();
+    }
+  }
+
   /** The text of every page of a PDF, one string per page (`null` when it cannot be read). */
   async pageTexts(blob: Blob): Promise<string[] | null> {
     const pdf = await this.read(blob);

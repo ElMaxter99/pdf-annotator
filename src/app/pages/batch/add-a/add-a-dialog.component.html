@@ -1,0 +1,193 @@
+@if (phase(); as phase) {
+  @if (phase !== 'closed') {
+    <div class="upd-backdrop">
+      <div
+        appFocusTrap
+        class="upd"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="adda-title"
+        data-testid="add-a"
+      >
+        @switch (phase) {
+          @case ('pdfs') {
+            <h2 id="adda-title">{{ 'batch.addA.title' | t }}</h2>
+            <p class="upd-text">{{ 'batch.addA.intro' | t }}</p>
+            <div
+              class="upd-drop"
+              [class.upd-drop--over]="dragActive()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <input
+                #pdfInput
+                type="file"
+                accept="application/pdf,.pdf"
+                multiple
+                hidden
+                (change)="onPdfsSelected($event)"
+                data-testid="add-a-input"
+              />
+              <div>
+                <strong>{{ 'batch.addA.drop' | t }}</strong>
+                <span>{{ 'batch.addA.dropHint' | t }}</span>
+              </div>
+              <button type="button" class="btn" (click)="pdfInput.click()">
+                {{ 'batch.step1.choose' | t }}
+              </button>
+            </div>
+            @if (entries().length > 0) {
+              <div class="upd-list" data-testid="add-a-rows">
+                @for (entry of entries(); track entry.file) {
+                  <div class="upd-row" [class.upd-row--on]="!entry.duplicate || isIncluded(entry)" [class.upd-row--off]="entry.duplicate && !isIncluded(entry)">
+                    <span class="upd-name">
+                      <span>{{ entry.file.name }}</span>
+                      <small>{{ size(entry.file.size) }}</small>
+                    </span>
+                    @if (entry.duplicate) {
+                      <label class="add-dup">
+                        <input type="checkbox" [checked]="isIncluded(entry)" (change)="toggleInclude(entry)" />
+                        {{ 'batch.addA.include' | t }}
+                      </label>
+                      <span class="upd-chip warn">{{ 'batch.addA.duplicate' | t }}</span>
+                    } @else {
+                      <span class="upd-chip ok">{{ 'batch.addA.ready' | t }}</span>
+                    }
+                    <button type="button" class="btn btn--ghost" [attr.aria-label]="'batch.addA.removeEntry' | t: { name: entry.file.name }" (click)="removeEntry(entry)">✕</button>
+                  </div>
+                }
+              </div>
+              <div class="add-tiles">
+                <div class="add-tile"><strong>{{ plan().length }}</strong>{{ 'batch.addA.tileAdd' | t }}</div>
+                <div class="add-tile"><strong>{{ omitted() }}</strong>{{ 'batch.addA.tileOmitted' | t }}</div>
+                <div class="add-tile"><strong>{{ size(totalBytes()) }}</strong>{{ 'batch.addA.tileSize' | t }}</div>
+              </div>
+            }
+            <div class="upd-actions">
+              <button type="button" class="btn btn--ghost" (click)="close()">{{ 'batch.cancel' | t }}</button>
+              <button type="button" class="btn btn--primary" [disabled]="plan().length === 0" (click)="toTemplates()" data-testid="add-a-next">
+                {{ 'batch.addA.next' | t }}
+              </button>
+            </div>
+          }
+          @case ('templates') {
+            <h2 id="adda-title">{{ 'batch.addA.templatesTitle' | t }}</h2>
+            <p class="upd-text">{{ 'batch.addA.templatesIntro' | t }}</p>
+            <div class="upd-tabs" role="tablist" [attr.aria-label]="'batch.step2.tabsLabel' | t">
+              <button type="button" role="tab" [attr.aria-selected]="tab() === 'files'" [class.on]="tab() === 'files'" (click)="tab.set('files')">
+                {{ 'batch.step2.tabFiles' | t }}
+              </button>
+              <button type="button" role="tab" [attr.aria-selected]="tab() === 'paste'" [class.on]="tab() === 'paste'" (click)="tab.set('paste')" data-testid="add-a-tab-paste">
+                {{ 'batch.step2.tabPaste' | t }}
+              </button>
+            </div>
+            @if (tab() === 'files') {
+              <div
+                class="upd-drop"
+                [class.upd-drop--over]="dragActive()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onJsonDrop($event)"
+              >
+                <input #jsonInput type="file" accept="application/json,.json" multiple hidden (change)="onJsonsSelected($event)" data-testid="add-a-json-input" />
+                <div>
+                  <strong>{{ 'batch.step2.drop' | t }}</strong>
+                  <span>{{ 'batch.upd.dropHint' | t }}</span>
+                </div>
+                <button type="button" class="btn" (click)="jsonInput.click()">{{ 'batch.step1.choose' | t }}</button>
+              </div>
+              @if (fileError(); as name) {
+                <p class="upd-error" role="alert">{{ 'batch.upd.fileError' | t: { name: name } }}</p>
+              }
+            } @else {
+              <textarea
+                class="upd-paste"
+                spellcheck="false"
+                [ngModel]="pasteText()"
+                (ngModelChange)="pasteText.set($event)"
+                [placeholder]="'batch.upd.pastePlaceholder' | t"
+                [attr.aria-label]="'batch.step2.tabPaste' | t"
+                data-testid="add-a-paste"
+              ></textarea>
+              <div class="upd-pastebar">
+                @if (pasteError(); as err) {
+                  <span class="upd-chip bad" role="alert">{{ 'batch.step2.pasteError' | t: { line: err.line } }}</span>
+                } @else if (pasteTooBig()) {
+                  <span class="upd-chip bad" role="alert">{{ 'batch.upd.pasteTooBig' | t }}</span>
+                } @else if (docs().length > 0) {
+                  <span class="upd-chip ok">{{ 'batch.step2.pasteFound' | t: { count: docs().length } }}</span>
+                } @else {
+                  <small class="upd-hint">{{ 'batch.step2.pasteHint' | t }}</small>
+                }
+                <span class="upd-spacer"></span>
+                <button type="button" class="btn btn--ghost" (click)="clearPasted()">{{ 'batch.step2.pasteClear' | t }}</button>
+                <button type="button" class="btn" [disabled]="!pasteText().trim()" (click)="matchPasted()" data-testid="add-a-match">
+                  {{ 'batch.step2.pasteMatch' | t }}
+                </button>
+              </div>
+            }
+            <div class="upd-list" data-testid="add-a-templates">
+              @for (m of matches(); track m.entry.file) {
+                <div class="upd-row upd-row--on" [class.upd-row--off]="!m.pages">
+                  <span class="upd-name">
+                    <span>{{ m.entry.file.name }}</span>
+                    <small>{{
+                      m.doc ? ('batch.upd.docOf' | t: { label: m.doc.label }) : ('batch.addA.noJson' | t)
+                    }}</small>
+                  </span>
+                  @if (m.pages) {
+                    <span class="upd-chip ok">{{ 'batch.addA.withTemplate' | t }}</span>
+                  } @else if (m.noPages) {
+                    <span class="upd-chip bad">{{ 'batch.upd.kind.noPages' | t }}</span>
+                  } @else {
+                    <span class="upd-chip warn">{{ 'batch.addA.noTemplate' | t }}</span>
+                  }
+                </div>
+              }
+            </div>
+            <div class="upd-actions">
+              <small class="upd-hint">{{ 'batch.addA.later' | t }}</small>
+              <span class="upd-spacer"></span>
+              <button type="button" class="btn btn--ghost" (click)="backToPdfs()">{{ 'batch.addA.back' | t }}</button>
+              <button type="button" class="btn btn--primary" (click)="apply()" data-testid="add-a-go">
+                {{ 'batch.addA.go' | t: { count: plan().length } }}
+              </button>
+            </div>
+          }
+          @case ('running') {
+            <h2 id="adda-title">{{ 'batch.addA.running' | t }}</h2>
+            <div
+              class="upd-bar"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-valuenow]="progress().total ? (progress().done / progress().total) * 100 : 0"
+            >
+              <i [style.width.%]="progress().total ? (progress().done / progress().total) * 100 : 0"></i>
+            </div>
+            <p class="upd-text" role="status" aria-live="polite"><b>{{ 'batch.upd.progress' | t: { done: progress().done, total: progress().total } }}</b></p>
+            <div class="upd-actions">
+              <button type="button" class="btn btn--ghost" (click)="cancelRun()">{{ 'batch.addA.cancelRest' | t }}</button>
+            </div>
+          }
+          @case ('done') {
+            <div class="upd-done" role="status">
+              <span class="upd-tick" aria-hidden="true">✓</span>
+              <div>
+                <b data-testid="add-a-done">{{ 'batch.addA.doneCount' | t: { count: doneCount() } }}</b>
+                <p class="upd-text">{{ 'batch.addA.doneText' | t: { withTemplate: doneWithTemplate(), without: doneCount() - doneWithTemplate() } }}</p>
+                @if (failed() > 0) {
+                  <p class="upd-error" role="alert">{{ 'batch.upd.failed' | t: { count: failed() } }}</p>
+                }
+              </div>
+            </div>
+            <div class="upd-actions">
+              <button type="button" class="btn btn--primary" (click)="close()" data-testid="add-a-close">{{ 'batch.upd.backToPanel' | t }}</button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+}

@@ -824,7 +824,9 @@
         "title": "Pagine",
         "mapped": "Abbinate a mano",
         "byNumber": "Per numero"
-      }
+      },
+      "replaceB": "Sostituisci B",
+      "replaceA": "Sostituisci A"
     },
     "adjust": {
       "title": "Regolazione per testi",
@@ -1344,6 +1346,58 @@
       "dirDesc": "Ordine decrescente (Z–A, più prima)",
       "name": "Nome",
       "state": "Stato"
+    },
+    "addA": {
+      "open": "Aggiungi PDF A",
+      "title": "Aggiungi PDF A",
+      "intro": "I PDF A sono gli originali su cui si colloca il modello. Per nuove versioni usa «Carica versioni B».",
+      "drop": "Trascina qui i PDF",
+      "dropHint": "Uno o più. Solo PDF.",
+      "include": "Includi",
+      "duplicate": "Già nel lotto",
+      "ready": "Pronto",
+      "removeEntry": "Rimuovi {{name}} dall’elenco",
+      "tileAdd": "verranno aggiunti",
+      "tileOmitted": "omessi (duplicati)",
+      "tileSize": "peso aggiunto",
+      "next": "Avanti · modelli",
+      "templatesTitle": "Modelli dei PDF A",
+      "templatesIntro": "Facoltativo: carica i JSON o incolla il file lungo. I PDF senza modello entrano come «Senza modello A».",
+      "noJson": "ancora senza JSON",
+      "withTemplate": "Con modello",
+      "noTemplate": "Senza modello A",
+      "later": "Potrai aggiungere il modello dopo.",
+      "back": "‹ Indietro",
+      "go": "Aggiungi {{count}} PDF",
+      "running": "Aggiunta dei PDF A…",
+      "cancelRest": "Annulla il resto",
+      "doneCount": "{{count}} PDF A aggiunti",
+      "doneText": "{{withTemplate}} con modello e {{without}} senza modello A. Entrano in fondo all’elenco, da rivedere.",
+      "undoNotice": "{{count}} PDF A aggiunti"
+    },
+    "replaceA": {
+      "row": "Sostituisci A…",
+      "title": "Sostituisci A di {{name}}",
+      "current": "Attuale",
+      "next": "Nuovo",
+      "pages": "{{count}} pag.",
+      "unreadable": "Impossibile leggere «{{name}}». L’A attuale resta com’era.",
+      "keepTemplate": "Modello A ({{count}} campi)",
+      "keepB": "Versione B con i suoi campi ({{count}})",
+      "kept": "Si conserva",
+      "dropMap": "Tabella delle pagine A↔B ({{count}} pagine)",
+      "dropAi": "Proposta IA salvata ({{count}} campi)",
+      "dropFit": "Scelta di «Adatta A a B»",
+      "dropped": "Si scarta",
+      "nothingToDrop": "Nient’altro da scartare",
+      "states": "Stati e collegamenti A↔B",
+      "mayShift": "Possono sfasarsi",
+      "pagesWarn": "Il nuovo PDF ha {{next}} pagine e l’attuale {{old}}: rivedi la riga. Nessun campo viene eliminato.",
+      "review": "La riga torna «Da rivedere».",
+      "go": "Sostituisci A",
+      "undoNotice": "A sostituito. La riga torna «Da rivedere».",
+      "done": "A sostituito. La riga torna «Da rivedere».",
+      "sizeWarn": "Il nuovo foglio ha un’altra misura ({{old}} → {{next}}): le coordinate del modello restano così come sono. Rivedi la riga o usa poi «Adatta A a B»."
     }
   },
   "preview": {
@@ -1957,7 +2011,8 @@
       "noReadyInSelection": "Nessun PDF selezionato è pronto",
       "noVersionBInSelection": "Nessun PDF selezionato ha una versione B",
       "busy": "C’è un’attività in corso",
-      "nothingToMark": "Niente da segnare come pronto"
+      "nothingToMark": "Niente da segnare come pronto",
+      "pickOneRow": "Scegli prima una sola riga"
     },
     "cmd": {
       "fitPage": "Adatta alla pagina",
@@ -2013,7 +2068,9 @@
       "removeSelected": "Rimuovi i selezionati dal lotto",
       "pdfCount": "{{count}} PDF",
       "openMenu": "Cerca azioni",
-      "keyhint": "Azioni"
+      "keyhint": "Azioni",
+      "addA": "Aggiungi PDF A…",
+      "replaceA": "Sostituisci A della riga…"
     }
   },
   "projects": {
