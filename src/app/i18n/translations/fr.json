@@ -2632,7 +2632,11 @@
     "noPartnerA": "Sans équivalent dans A",
     "otherPageA": "Son champ de A est à la page {{page}} de A (pages liées : A suit B).",
     "goTitle": "Voir dans A et B",
-    "goTitleA": "Voir dans A"
+    "goTitleA": "Voir dans A",
+    "placeHere": "Placer ici",
+    "placeHereTitle": "Mettre ce champ de A sur la page {{page}} de B, aux mêmes coordonnées",
+    "placeCancel": "Annuler",
+    "placed": "Placé sur la page {{page}} de B"
   },
   "storage": {
     "open": "Stockage",

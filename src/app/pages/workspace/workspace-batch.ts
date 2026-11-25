@@ -659,11 +659,15 @@ export class WorkspaceBatch {
           }
         : null,
     };
+    if (state.b) {
+      this.offerManualPlace(undefined);
+    }
     await this.revealPair(target);
     if (!state.b) {
       this.runAfterRender(() =>
         this.showPairTip(this.findPairElementA(target), 'pairing.noPartnerB'),
       );
+      this.offerManualPlace(state.a?.field, target.aPage);
     } else if (!state.a) {
       this.runAfterRender(() =>
         this.showPairTip(this.findPairElementB(target), 'pairing.noPartnerA'),

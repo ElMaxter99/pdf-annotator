@@ -2451,6 +2451,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         });
       });
 
+    this.drawManualPlace(layer, pdfCanvas.height);
     this.refreshOverlay();
     this.redrawReference();
     this.runAfterRender(() => this.drawMapLabels(layer));
@@ -2485,6 +2486,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Aviso breve junto a un campo sin pareja («Sin pareja en B»). */
   readonly pairTip = signal<{ x: number; y: number; key: string } | null>(null);
   pairTarget: PairTarget | null = null;
+  /** «Colocar a mano»: campo de A sin pareja que se ofrece poner en la página de B que se ve. */
+  readonly manualPlace = signal<{ field: PageField; aPage: number | null } | null>(null);
   pairFrame = 0;
   pairTipTimer: ReturnType<typeof setTimeout> | null = null;
   pairHoverKey: string | null = null;
@@ -2495,6 +2498,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (this.pairTarget || this.pairTip()) {
       this.clearPair();
       this.pairTip.set(null);
+    }
+    if (this.manualPlace()) {
+      this.offerManualPlace(undefined);
     }
   }
 
@@ -2592,6 +2598,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   async openBatchItem(id: string): Promise<void> {
+    this.manualPlace.set(null);
     const target = this.batch.items().find((item) => item.id === id);
     if (target && target.id !== this.batch.activeId()) {
       await this.switchBatchItem(target);

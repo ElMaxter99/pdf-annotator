@@ -24,15 +24,26 @@ async function openBatchWithB(page: Page) {
   await page.goto('/landing');
   await page
     .locator('input[type=file]')
-    .setInputFiles([file('factura-0331.pdf', pdf, 'application/pdf'), file('factura-0332.pdf', pdf, 'application/pdf')]);
+    .setInputFiles([
+      file('factura-0331.pdf', pdf, 'application/pdf'),
+      file('factura-0332.pdf', pdf, 'application/pdf'),
+    ]);
   await page.waitForURL('**/lote');
   await page.getByTestId('next-templates').click();
-  await page.getByTestId('input-templates').setInputFiles(file('factura-0331.json', json, 'application/json'));
+  await page
+    .getByTestId('input-templates')
+    .setInputFiles(file('factura-0331.json', json, 'application/json'));
   await page.getByTestId('open-panel').click();
   await page.getByTestId('view-list').click();
-  await page.getByTestId('input-b').setInputFiles(file('factura-0331-nuevo.pdf', await shiftedPdf(20, -30), 'application/pdf'));
+  await page
+    .getByTestId('input-b')
+    .setInputFiles(file('factura-0331-nuevo.pdf', await shiftedPdf(20, -30), 'application/pdf'));
   await expect(page.getByTestId('panel-list')).toContainText('factura-0331-nuevo.pdf');
-  await page.getByTestId('panel-item').filter({ hasText: 'factura-0331' }).getByRole('button', { name: 'Revisar' }).click();
+  await page
+    .getByTestId('panel-item')
+    .filter({ hasText: 'factura-0331' })
+    .getByRole('button', { name: 'Revisar' })
+    .click();
   await page.waitForURL('**/workspace?lote=*');
   await expect(page.locator('.migration-bar')).toContainText('Editando versión B');
 }
@@ -46,14 +57,19 @@ async function proposeWithAi(page: Page) {
   await expect(page.getByTestId('split-a')).toBeVisible();
 }
 
-test('la tarjeta de la propuesta lleva a la pareja: A y B resaltados y unidos por una línea; Esc la quita', async ({ page }) => {
+test('la tarjeta de la propuesta lleva a la pareja: A y B resaltados y unidos por una línea; Esc la quita', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await proposeWithAi(page);
   await page.getByTestId('ai-review-fields').click();
   await expect(page.getByTestId('ai-proposal')).toBeVisible();
 
   // pulsar el nombre no marca ni desmarca la casilla
-  const row = page.locator('.ai-proposal__row').filter({ has: page.locator('input[type=checkbox]') }).first();
+  const row = page
+    .locator('.ai-proposal__row')
+    .filter({ has: page.locator('input[type=checkbox]') })
+    .first();
   const box = row.locator('input[type=checkbox]');
   const before = await box.isChecked();
   await row.getByTestId('ai-row-go').click();
@@ -68,7 +84,9 @@ test('la tarjeta de la propuesta lleva a la pareja: A y B resaltados y unidos po
   await expect(page.locator('.pair-focus')).toHaveCount(0);
 });
 
-test('clic en un campo de A dibuja la línea hasta su pareja en B; clic en vacío la quita', async ({ page }) => {
+test('clic en un campo de A dibuja la línea hasta su pareja en B; clic en vacío la quita', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await proposeWithAi(page);
   const fieldA = page.getByTestId('split-a').locator('.reference-field').first();
@@ -92,7 +110,9 @@ test('clic en un campo de A dibuja la línea hasta su pareja en B; clic en vací
   await expect(page.getByTestId('pair-line')).toHaveCount(0);
 });
 
-test('con la propuesta aplicada, la fila de un campo de B lleva a la pareja en «Dividida»', async ({ page }) => {
+test('con la propuesta aplicada, la fila de un campo de B lleva a la pareja en «Dividida»', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await proposeWithAi(page);
   await page.getByTestId('ai-apply').click();
@@ -107,7 +127,9 @@ test('con la propuesta aplicada, la fila de un campo de B lleva a la pareja en �
   await expect(page.getByTestId('pair-line')).toBeVisible();
 });
 
-test('con la propuesta escrita en B: pasar el ratón por un campo de B dibuja la línea a A y el clic sigue abriendo el editor', async ({ page }) => {
+test('con la propuesta escrita en B: pasar el ratón por un campo de B dibuja la línea a A y el clic sigue abriendo el editor', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await proposeWithAi(page);
   const written = page.locator('.annotation').first();
@@ -122,7 +144,9 @@ test('con la propuesta escrita en B: pasar el ratón por un campo de B dibuja la
   await expect(page.locator('.annotation-editor, app-annotation-editor').first()).toBeVisible();
 });
 
-test('con una pareja activa, arrastrar sobre cajas solapadas de B mueve la emparejada y no la de encima', async ({ page }) => {
+test('con una pareja activa, arrastrar sobre cajas solapadas de B mueve la emparejada y no la de encima', async ({
+  page,
+}) => {
   await openBatchWithB(page);
   await proposeWithAi(page);
   const fieldA = page.getByTestId('split-a').locator('.reference-field').first();
@@ -138,7 +162,11 @@ test('con una pareja activa, arrastrar sobre cajas solapadas de B mueve la empar
     const els = Array.from(document.querySelectorAll<HTMLElement>('.annotation'));
     const base = els.find((el) => el.dataset['fieldIndex'] === index)!;
     const top = els
-      .filter((el) => el.dataset['pageIndex'] === base.dataset['pageIndex'] && el.dataset['fieldIndex'] !== index)
+      .filter(
+        (el) =>
+          el.dataset['pageIndex'] === base.dataset['pageIndex'] &&
+          el.dataset['fieldIndex'] !== index,
+      )
       .shift()!;
     const original = top.style.left;
     top.style.left = base.style.left;
@@ -152,13 +180,19 @@ test('con una pareja activa, arrastrar sobre cajas solapadas de B mueve la empar
   // Un punto de la zona donde se solapan las dos cajas.
   const overlap = await page.evaluate(
     ([a, b]) => {
-      const ra = document.querySelector(`.annotation[data-field-index="${a}"]`)!.getBoundingClientRect();
-      const rb = document.querySelector(`.annotation[data-field-index="${b}"]`)!.getBoundingClientRect();
+      const ra = document
+        .querySelector(`.annotation[data-field-index="${a}"]`)!
+        .getBoundingClientRect();
+      const rb = document
+        .querySelector(`.annotation[data-field-index="${b}"]`)!
+        .getBoundingClientRect();
       const left = Math.max(ra.left, rb.left);
       const right = Math.min(ra.right, rb.right);
       const top = Math.max(ra.top, rb.top);
       const bottom = Math.min(ra.bottom, rb.bottom);
-      return right - left > 2 && bottom - top > 2 ? { x: (left + right) / 2, y: (top + bottom) / 2 } : null;
+      return right - left > 2 && bottom - top > 2
+        ? { x: (left + right) / 2, y: (top + bottom) / 2 }
+        : null;
     },
     [pairedIndex!, topIndex],
   );
@@ -168,7 +202,67 @@ test('con una pareja activa, arrastrar sobre cajas solapadas de B mueve la empar
   await page.mouse.down();
   await page.mouse.move(x + 60, y + 10, { steps: 6 });
   await page.mouse.up();
-  await expect.poll(() => box(pairedIndex!).evaluate((el) => (el as HTMLElement).style.left)).not.toBe(pairedBefore);
+  await expect
+    .poll(() => box(pairedIndex!).evaluate((el) => (el as HTMLElement).style.left))
+    .not.toBe(pairedBefore);
   // Tras el redibujado, la de encima sigue donde estaba: no se arrastró.
-  expect(await box(topIndex).evaluate((el) => (el as HTMLElement).style.left)).toBe(topOriginalLeft);
+  expect(await box(topIndex).evaluate((el) => (el as HTMLElement).style.left)).toBe(
+    topOriginalLeft,
+  );
+});
+
+test('clic en un campo de A sin pareja ofrece «Colocar aquí» en B: lo pone en las mismas coordenadas de la página de B', async ({
+  page,
+}) => {
+  await openBatchWithB(page);
+  await openLote(page);
+  await page.getByTestId('mode-split').click();
+  const fieldA = page.getByTestId('split-a').locator('.reference-field--missing').first();
+  await expect(fieldA).toBeVisible();
+  await expect(page.locator('.annotation')).toHaveCount(0);
+  const r = await fieldA.boundingBox();
+  if (!r) throw new Error('sin campo de A');
+  await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
+
+  await expect(page.getByTestId('pair-tip')).toContainText('Sin pareja en B');
+  const ghost = page.getByTestId('manual-place');
+  await expect(ghost).toBeVisible();
+  // el fantasma cae a la misma altura que el campo en A (mismas coordenadas, mismo zoom)
+  const g = await ghost.locator('.manual-place__field').boundingBox();
+  expect(Math.abs(g!.y - r.y)).toBeLessThan(6);
+
+  await page.getByTestId('manual-place-btn').click();
+  await expect(ghost).toHaveCount(0);
+  await expect(page.locator('.annotation')).toHaveCount(1);
+  await expect(page.getByTestId('pair-line')).toBeVisible();
+  await expect(page.getByTestId('split-a').locator('.reference-field--missing')).toHaveCount(
+    (await page.getByTestId('split-a').locator('.reference-field').count()) - 1,
+  );
+
+  // un solo paso de deshacer
+  await page.keyboard.press('Control+z');
+  await expect(page.locator('.annotation')).toHaveCount(0);
+});
+
+test('«Colocar a mano»: ✕ y Esc quitan el fantasma sin tocar B', async ({ page }) => {
+  await openBatchWithB(page);
+  await openLote(page);
+  await page.getByTestId('mode-split').click();
+  const fieldA = page.getByTestId('split-a').locator('.reference-field--missing').first();
+  await expect(fieldA).toBeVisible();
+  // Los campos de A no reciben el puntero: el clic llega al panel y la app busca el campo por posición.
+  const clickA = async () => {
+    const r = await fieldA.boundingBox();
+    if (!r) throw new Error('sin campo de A');
+    await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
+  };
+  await clickA();
+  await expect(page.getByTestId('manual-place')).toBeVisible();
+  await page.getByRole('button', { name: 'Cancelar' }).click();
+  await expect(page.getByTestId('manual-place')).toHaveCount(0);
+  await clickA();
+  await expect(page.getByTestId('manual-place')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('manual-place')).toHaveCount(0);
+  await expect(page.locator('.annotation')).toHaveCount(0);
 });

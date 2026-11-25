@@ -2632,7 +2632,11 @@
     "noPartnerA": "No match in A",
     "otherPageA": "Its field of A is on page {{page}} of A (with linked pages A follows B).",
     "goTitle": "Show in A and B",
-    "goTitleA": "Show in A"
+    "goTitleA": "Show in A",
+    "placeHere": "Place here",
+    "placeHereTitle": "Put this field of A on page {{page}} of B, at the same coordinates",
+    "placeCancel": "Cancel",
+    "placed": "Placed on page {{page}} of B"
   },
   "storage": {
     "open": "Storage",

@@ -2632,7 +2632,11 @@
     "noPartnerA": "Kein Gegenstück in A",
     "otherPageA": "Sein Feld aus A ist auf Seite {{page}} von A (bei verknüpften Seiten folgt A der Version B).",
     "goTitle": "In A und B zeigen",
-    "goTitleA": "In A zeigen"
+    "goTitleA": "In A zeigen",
+    "placeHere": "Hier platzieren",
+    "placeHereTitle": "Dieses Feld von A auf Seite {{page}} von B an denselben Koordinaten einfügen",
+    "placeCancel": "Abbrechen",
+    "placed": "Auf Seite {{page}} von B platziert"
   },
   "storage": {
     "open": "Speicher",

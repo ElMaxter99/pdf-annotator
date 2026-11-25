@@ -2632,7 +2632,11 @@
     "noPartnerA": "Sense parella a A",
     "otherPageA": "El seu camp d’A és a la pàgina {{page}} d’A (amb les pàgines enllaçades A segueix B).",
     "goTitle": "Veure-ho a A i a B",
-    "goTitleA": "Veure-ho a A"
+    "goTitleA": "Veure-ho a A",
+    "placeHere": "Col·loca aquí",
+    "placeHereTitle": "Posa aquest camp d'A a la pàgina {{page}} de B, a les mateixes coordenades",
+    "placeCancel": "Cancel·la",
+    "placed": "Col·locat a la pàgina {{page}} de B"
   },
   "storage": {
     "open": "Emmagatzematge",

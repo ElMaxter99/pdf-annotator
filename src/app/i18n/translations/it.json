@@ -2632,7 +2632,11 @@
     "noPartnerA": "Nessuna coppia in A",
     "otherPageA": "Il suo campo di A è a pagina {{page}} di A (con le pagine collegate A segue B).",
     "goTitle": "Mostra in A e in B",
-    "goTitleA": "Mostra in A"
+    "goTitleA": "Mostra in A",
+    "placeHere": "Colloca qui",
+    "placeHereTitle": "Metti questo campo di A nella pagina {{page}} di B, alle stesse coordinate",
+    "placeCancel": "Annulla",
+    "placed": "Collocato nella pagina {{page}} di B"
   },
   "storage": {
     "open": "Archiviazione",

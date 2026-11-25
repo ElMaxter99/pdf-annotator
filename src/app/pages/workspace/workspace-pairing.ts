@@ -1,3 +1,4 @@
+import type { PageField } from '../../models/annotation.model';
 import { type AiRow } from '../../utils/ai-proposal.utils';
 import {
   closestByName,
@@ -6,6 +7,7 @@ import {
   pairName,
   type PairCandidate,
 } from '../../utils/pairing.utils';
+import { resolveFieldPreview } from '../../utils/preview-values.utils';
 import { PairRefB, PairTarget } from './workspace.types';
 import type { WorkspacePageComponent } from './workspace.page';
 
@@ -282,7 +284,7 @@ export class WorkspacePairing {
   hitFieldOfA(
     this: WorkspacePageComponent,
     event: MouseEvent,
-  ): { el: HTMLElement; name: string; x: number; y: number } | null {
+  ): { el: HTMLElement; name: string; x: number; y: number; field?: PageField } | null {
     const layer = this.splitLayerRef?.nativeElement;
     const page = this.aPage();
     if (!layer || page === null) {
@@ -311,7 +313,7 @@ export class WorkspacePairing {
       { left, top: bottom },
     );
     const f = same[i];
-    return { el, name, x: f?.x ?? left / s, y: f?.y ?? (h - bottom) / s };
+    return { el, name, x: f?.x ?? left / s, y: f?.y ?? (h - bottom) / s, field: f?.source.field };
   }
 
   /** Clic en un campo de A («Dividida»): B va a la página de su pareja y se unen con una línea. */
@@ -326,8 +328,10 @@ export class WorkspacePairing {
     if (!partner) {
       this.clearPair();
       this.showPairTip(hit.el, 'pairing.noPartnerB');
+      this.offerManualPlace(hit.field, aPage);
       return;
     }
+    this.offerManualPlace(undefined);
     await this.revealPair({ aName: hit.name, aPage, aX: hit.x, aY: hit.y, b: partner.ref });
   }
 
@@ -351,7 +355,100 @@ export class WorkspacePairing {
       this.runAfterRender(() =>
         this.showPairTip(this.findPairElementA(target), 'pairing.noPartnerB'),
       );
+      this.offerManualPlace(t, row.page);
+    } else {
+      this.offerManualPlace(undefined);
     }
+  }
+
+  /**
+   * «Colocar a mano» para un campo de A sin pareja en B: un fantasma del campo en sus mismas coordenadas (las de la
+   * capa de A, ajustadas al tamaño de B si se eligió «Ajustar») sobre la página de B que se esté viendo, con
+   * «Colocar aquí». Sigue a B si se cambia de página; `undefined` lo quita.
+   */
+  offerManualPlace(this: WorkspacePageComponent, field: PageField | undefined, aPage?: number | null): void {
+    if (!field || !this.migration()) {
+      if (this.manualPlace()) {
+        this.manualPlace.set(null);
+        this.redrawAllForPage();
+      }
+      return;
+    }
+    const { aiId: _aiId, ...copy } = field;
+    this.manualPlace.set({ field: copy, aPage: aPage ?? null });
+    this.redrawAllForPage();
+  }
+
+  /** Crea en la página de B que se ve la copia del campo de A (un paso de historial) y la une con su pareja. */
+  async placeManual(this: WorkspacePageComponent): Promise<void> {
+    const offer = this.manualPlace();
+    if (!offer) {
+      return;
+    }
+    const page = this.pageIndex();
+    this.manualPlace.set(null);
+    this.insertFields([{ page, field: { ...offer.field } }]);
+    const pages = this.coords();
+    const pageIndex = pages.findIndex((entry) => entry.num === page);
+    const index = pageIndex >= 0 ? pages[pageIndex].fields.length - 1 : -1;
+    this.toast.show(this.translationService.translate('pairing.placed', { page }));
+    if (index >= 0) {
+      await this.revealPair({
+        aName: pairName(offer.field),
+        aPage: offer.aPage,
+        aX: offer.field.x,
+        aY: offer.field.y,
+        b: { kind: 'field', page, pageIndex, index },
+      });
+    }
+  }
+
+  /** El fantasma y su botón, al final de la capa de anotaciones de B (los llama `redrawAllForPage`). */
+  drawManualPlace(this: WorkspacePageComponent, layer: HTMLElement, canvasHeight: number): void {
+    const offer = this.manualPlace();
+    if (!offer || this.bGhost()) {
+      return;
+    }
+    const scale = this.scale();
+    const field = this.ensureFieldStyle(offer.field);
+    const ghost = document.createElement('div');
+    ghost.className = 'manual-place';
+    ghost.dataset['testid'] = 'manual-place';
+    ghost.setAttribute('data-testid', 'manual-place');
+    ghost.style.left = `${field.x * scale}px`;
+    ghost.style.top = `${canvasHeight - field.y * scale - field.fontSize * scale}px`;
+    const box = document.createElement('span');
+    box.className = 'manual-place__field';
+    box.textContent = resolveFieldPreview(field, this.previewSettings.context()).text || field.mapField;
+    box.style.fontSize = `${field.fontSize * scale}px`;
+    box.title = field.mapField;
+    const bar = document.createElement('span');
+    bar.className = 'manual-place__bar';
+    const place = document.createElement('button');
+    place.type = 'button';
+    place.className = 'manual-place__btn';
+    place.textContent = this.translationService.translate('pairing.placeHere');
+    place.title = this.translationService.translate('pairing.placeHereTitle', { page: this.pageIndex() });
+    place.setAttribute('data-testid', 'manual-place-btn');
+    place.onclick = (evt) => {
+      evt.stopPropagation();
+      void this.placeManual();
+    };
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'manual-place__close';
+    close.textContent = '✕';
+    close.setAttribute('aria-label', this.translationService.translate('pairing.placeCancel'));
+    close.title = close.getAttribute('aria-label') ?? '';
+    close.onclick = (evt) => {
+      evt.stopPropagation();
+      this.offerManualPlace(undefined);
+    };
+    // Que ni la hitbox (crear, recuadro) ni el arrastre vean estos clics.
+    ghost.onpointerdown = (evt) => evt.stopPropagation();
+    bar.append(place, close);
+    ghost.append(box, bar);
+    layer.appendChild(ghost);
   }
 
   /** Pasar el ratón ≥ 400 ms por un campo de B (puesto o propuesto) une con su pareja de A. */
