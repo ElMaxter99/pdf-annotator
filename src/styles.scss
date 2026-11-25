@@ -7803,14 +7803,6 @@ button.version-chip:focus-visible {
 :root.theme-light .jfm__preview {
   background: var(--light-surface);
 }
-:root.theme-light .json-keys__pill,
-:root.theme-light .json-keys__chip {
-  background: var(--light-surface);
-}
-.json-keys__hint {
-  color: var(--muted);
-  font-size: 12px;
-}
 
 /* Rótulo mini y cuadro con el mapField (P-184 a P-186). Mismos colores en claro y oscuro: siempre sobre el PDF blanco. */
 .map-label {
