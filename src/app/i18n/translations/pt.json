@@ -1976,7 +1976,9 @@
       "themeLight": "Mudar para o tema claro",
       "language": "Idioma: {{language}}",
       "snapOn": "Alinhar com outras anotações ao arrastar: ativar",
-      "snapOff": "Alinhar com outras anotações ao arrastar: desativar"
+      "snapOff": "Alinhar com outras anotações ao arrastar: desativar",
+      "mapLabelOn": "Mostrar o mapField junto a cada anotação",
+      "mapLabelOff": "Ocultar o mapField das anotações"
     },
     "group": {
       "batch": "Lote",
@@ -2648,7 +2650,37 @@
       "altHint": "Mantenha Alt (⌥ no Mac) ao arrastar para não alinhar nesse momento.",
       "jsonKeys": "Formato do JSON",
       "jsonKeysHelp": "Chaves e aspas dos valores no editor «Anotações (JSON)», ao copiar e ao descarregar. A importação lê qualquer formato.",
-      "jsonQuote": "Aspas dos valores"
+      "jsonQuote": "Aspas dos valores",
+      "mapLabel": "Mostrar o mapField junto a cada anotação",
+      "mapLabelHelp": "Mini etiqueta e caixa com o nome completo de cada anotação. Mais definições em Avançado."
     }
+  },
+  "mapLabel": {
+    "title": "Identificar anotações",
+    "info": "Mostra o fim do mapField junto a cada anotação e o nome completo ao passar o cursor ou focar com Tab. Só no ecrã: não vai para o PDF nem para o JSON.",
+    "show": "Mostrar o mapField junto a cada anotação",
+    "showHelp": "Mini etiqueta com o fim do nome.",
+    "legend": "Mostrar mapField",
+    "scope": {
+      "label": "Que anotações",
+      "check": "Caixas e opções",
+      "all": "Todas"
+    },
+    "max": "Máximo de caracteres",
+    "maxError": "Entre 8 e 40 caracteres.",
+    "position": {
+      "label": "Posição",
+      "auto": "Automática",
+      "right": "Direita",
+      "above": "Por cima"
+    },
+    "tooltip": "Caixa com o nome completo",
+    "tooltipHelp": "Ao passar o cursor ou focar. Esc fecha-a.",
+    "preview": "Assim vai ver-se:",
+    "screenOnly": "Só no ecrã: não vai para o PDF nem para o JSON.",
+    "reset": "Repor",
+    "hidden": "Etiquetas ocultas: {{count}} · aproxime o zoom",
+    "none": "sem mapField",
+    "meta": "{{type}} · página {{page}} · x {{x}} · y {{y}}"
   }
 }

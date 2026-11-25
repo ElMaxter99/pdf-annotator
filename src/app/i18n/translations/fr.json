@@ -1976,7 +1976,9 @@
       "themeLight": "Passer au thème clair",
       "language": "Langue : {{language}}",
       "snapOn": "Aligner sur les autres annotations en déplaçant : activer",
-      "snapOff": "Aligner sur les autres annotations en déplaçant : désactiver"
+      "snapOff": "Aligner sur les autres annotations en déplaçant : désactiver",
+      "mapLabelOn": "Afficher le mapField à côté de chaque annotation",
+      "mapLabelOff": "Masquer le mapField des annotations"
     },
     "group": {
       "batch": "Lot",
@@ -2648,7 +2650,37 @@
       "altHint": "Maintenez Alt (⌥ sur Mac) en déplaçant pour ne pas aligner à ce moment-là.",
       "jsonKeys": "Format du JSON",
       "jsonKeysHelp": "Clés et guillemets des valeurs dans l'éditeur « Annotations (JSON) », à la copie et au téléchargement. L'import lit tous les formats.",
-      "jsonQuote": "Guillemets des valeurs"
+      "jsonQuote": "Guillemets des valeurs",
+      "mapLabel": "Afficher le mapField à côté de chaque annotation",
+      "mapLabelHelp": "Mini-étiquette et boîte avec le nom complet de chaque annotation. Plus de réglages dans Avancé."
     }
+  },
+  "mapLabel": {
+    "title": "Identifier les annotations",
+    "info": "Affiche la fin du mapField à côté de chaque annotation et le nom complet au survol ou au focus avec Tab. Visible à l'écran seulement : absent du PDF et du JSON.",
+    "show": "Afficher le mapField à côté de chaque annotation",
+    "showHelp": "Mini-étiquette avec la fin du nom.",
+    "legend": "Afficher le mapField",
+    "scope": {
+      "label": "Quelles annotations",
+      "check": "Cases et options",
+      "all": "Toutes"
+    },
+    "max": "Nombre maximal de caractères",
+    "maxError": "Entre 8 et 40 caractères.",
+    "position": {
+      "label": "Position",
+      "auto": "Automatique",
+      "right": "À droite",
+      "above": "Au-dessus"
+    },
+    "tooltip": "Boîte avec le nom complet",
+    "tooltipHelp": "Au survol ou au focus. Échap la ferme.",
+    "preview": "Aperçu :",
+    "screenOnly": "À l'écran seulement : absent du PDF et du JSON.",
+    "reset": "Réinitialiser",
+    "hidden": "Étiquettes masquées : {{count}} · zoomez",
+    "none": "sans mapField",
+    "meta": "{{type}} · page {{page}} · x {{x}} · y {{y}}"
   }
 }

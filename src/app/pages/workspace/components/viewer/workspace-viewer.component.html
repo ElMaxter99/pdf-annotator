@@ -39,6 +39,13 @@
       <input type="checkbox" [checked]="vm.previewSettings.showOrigin()" (change)="vm.setShowOrigin($any($event.target).checked)" />
       {{ 'preview.origin.show' | t }}
     </label>
+    <label class="origin-legend__toggle">
+      <input type="checkbox" [checked]="vm.previewSettings.mapLabel().show" (change)="vm.previewSettings.setMapLabelShow($any($event.target).checked)" data-testid="maplabel-toggle" />
+      {{ 'mapLabel.legend' | t }}
+    </label>
+    @if (vm.previewSettings.mapLabel().show && vm.mapLabelsHidden() > 0) {
+      <span class="origin-legend__hint" role="status" data-testid="maplabel-hidden">{{ 'mapLabel.hidden' | t: { count: vm.mapLabelsHidden() } }}</span>
+    }
     @if (vm.previewSettings.showOrigin()) {
       @for (kind of originKinds; track kind) {
         <span class="origin-legend__item" [attr.data-origin]="kind">
@@ -206,3 +213,10 @@
     }
   </div>
 </main>
+@if (vm.mapTip(); as tip) {
+  <div class="map-tip" role="tooltip" data-testid="maplabel-tip" [style.left.px]="tip.left" [style.top.px]="tip.top"
+    (pointerenter)="vm.keepMapTip()" (pointerleave)="vm.scheduleMapTipHide(120)">
+    <span class="map-tip__name"><i>{{ tip.prefix }}</i><b [class.map-tip__none]="tip.none">{{ tip.tail }}</b></span>
+    <span class="map-tip__meta">{{ tip.meta }}</span>
+  </div>
+}

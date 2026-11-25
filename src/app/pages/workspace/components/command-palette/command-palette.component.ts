@@ -226,6 +226,16 @@ export class CommandPaletteComponent implements OnInit {
       });
     }
 
+    const mapLabelOn = vm.previewSettings.mapLabel().show;
+    add({
+      id: 'maplabel',
+      icon: '🏷',
+      label: t(mapLabelOn ? 'palette.cmd.mapLabelOff' : 'palette.cmd.mapLabelOn'),
+      keywords: 'mapfield label tooltip rotulo etiqueta',
+      disabledReason: !hasPdf ? noPdf : undefined,
+      run: () => vm.previewSettings.setMapLabelShow(!mapLabelOn),
+    });
+
     const tabs = ['document', 'annotations', 'settings'] as const;
     for (const tab of tabs) {
       add({
