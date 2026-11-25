@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyInstallError, installDetail, installNeedsPassword, compareVersions, isNewer, normalizeChannel, parseLatestRelease, parseReleaseForChannel, parseVersion, shouldCleanPendingUpdate, updateMode, updaterCacheDirName } from './update-logic.mjs';
+import { classifyInstallError, installDetail, installNeedsPassword, compareVersions, feedForVersion, RELEASES_URL, isNewer, normalizeChannel, parseLatestRelease, parseReleaseForChannel, parseVersion, shouldCleanPendingUpdate, updateMode, updaterCacheDirName } from './update-logic.mjs';
 
 test('parseVersion acepta v y prerelease, rechaza basura', () => {
   assert.deepEqual(parseVersion('v1.6.0')?.nums, [1, 6, 0]);
@@ -178,4 +178,10 @@ test('classifyPkexecResult: sin agente de polkit NO es una cancelación; privile
   assert.equal(classifyPkexecResult({ code: 127, stderr: 'Error executing command as another user: No authentication agent found.' }), 'failed');
   assert.equal(classifyPkexecResult({ code: -1, stderr: 'spawn pkexec ENOENT' }), 'failed');
   assert.deepEqual(privilegedEnv({ DISPLAY: ':0', ELECTRON_RUN_AS_NODE: '1', APPIMAGE: '/x', PATH: '/bin' }), { DISPLAY: ':0', PATH: '/bin' });
+});
+
+test('feedForVersion fija la etiqueta y el archivo de canal', () => {
+  assert.deepEqual(feedForVersion('1.19.0'), { url: `${RELEASES_URL}/download/v1.19.0/`, channel: 'latest' });
+  assert.deepEqual(feedForVersion('1.19.0-rc.7'), { url: `${RELEASES_URL}/download/v1.19.0-rc.7/`, channel: 'rc' });
+  assert.equal(feedForVersion('basura'), null);
 });
