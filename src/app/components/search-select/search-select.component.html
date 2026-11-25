@@ -17,7 +17,13 @@
   </button>
 
   @if (open()) {
-    <div class="ss__pop" (keydown)="onKey($event)">
+    <div
+      class="ss__pop"
+      [style.top.px]="pos().top"
+      [style.bottom.px]="pos().bottom"
+      [style.right.px]="pos().right"
+      (keydown)="onKey($event)"
+    >
       <div class="ss__search">
         <span aria-hidden="true">⌕</span>
         <input

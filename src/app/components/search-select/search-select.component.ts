@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   ViewChild,
+  OnDestroy,
   computed,
   input,
   output,
@@ -33,7 +34,7 @@ let nextId = 0;
   templateUrl: './search-select.component.html',
   styleUrl: './search-select.component.scss',
 })
-export class SearchSelectComponent {
+export class SearchSelectComponent implements OnDestroy {
   readonly options = input.required<SearchOption[]>();
   /** Name of the file being assigned: options with a similar name come first, as suggestions. */
   readonly suggestFor = input('');
@@ -50,6 +51,19 @@ export class SearchSelectComponent {
   readonly open = signal(false);
   readonly query = signal('');
   readonly active = signal(0);
+  /** Fixed position of the popup, so no scrolling ancestor clips it. */
+  readonly pos = signal<{ top: number | null; bottom: number | null; right: number }>({
+    top: 0,
+    bottom: null,
+    right: 0,
+  });
+  private readonly reposition = (event?: Event): void => {
+    const target = event?.target as Node | undefined;
+    if (target && this.listbox?.nativeElement.contains(target)) {
+      return;
+    }
+    this.place();
+  };
   @ViewChild('toggle') toggle?: ElementRef<HTMLButtonElement>;
   @ViewChild('search') search?: ElementRef<HTMLInputElement>;
   @ViewChild('listbox') listbox?: ElementRef<HTMLElement>;
@@ -93,6 +107,9 @@ export class SearchSelectComponent {
     }
     this.query.set('');
     this.active.set(0);
+    this.place();
+    window.addEventListener('scroll', this.reposition, true);
+    window.addEventListener('resize', this.reposition);
     this.open.set(true);
     setTimeout(() => this.search?.nativeElement.focus());
   }
@@ -102,10 +119,35 @@ export class SearchSelectComponent {
       return;
     }
     this.open.set(false);
+    this.unlisten();
     this.query.set('');
     if (restoreFocus) {
       queueMicrotask(() => this.toggle?.nativeElement.focus());
     }
+  }
+
+  private place(): void {
+    const rect = this.toggle?.nativeElement.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
+    const right = Math.max(8, window.innerWidth - rect.right);
+    const below = window.innerHeight - rect.bottom;
+    // The popup is ~380 px tall at most: open upwards when it does not fit below.
+    this.pos.set(
+      below < 390 && rect.top > below
+        ? { top: null, bottom: window.innerHeight - rect.top + 6, right }
+        : { top: rect.bottom + 6, bottom: null, right },
+    );
+  }
+
+  private unlisten(): void {
+    window.removeEventListener('scroll', this.reposition, true);
+    window.removeEventListener('resize', this.reposition);
+  }
+
+  ngOnDestroy(): void {
+    this.unlisten();
   }
 
   setQuery(value: string): void {
