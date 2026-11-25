@@ -8,6 +8,19 @@ import {
 } from '../../utils/map-label.utils';
 import type { WorkspacePageComponent } from './workspace.page';
 
+/** Annotations of B and the boxes of A (read only) that carry a field to identify. */
+const LABELLED = '.annotation, .reference-field[data-field-type]';
+
+interface MapInfo {
+  readonly type: string;
+  readonly mapField: string;
+  readonly hasValue: boolean;
+  readonly x: number;
+  readonly y: number;
+  readonly page: number | null;
+  readonly fromA: boolean;
+}
+
 const HOVER_DELAY_MS = 250;
 const LEAVE_DELAY_MS = 120;
 const TIP_MAX_HEIGHT = 130;
@@ -24,18 +37,19 @@ export class WorkspaceMapLabel {
       old.remove();
     }
     const cfg = this.previewSettings.mapLabel();
-    const annotations = Array.from(layer.querySelectorAll<HTMLElement>('.annotation'));
+    const annotations = Array.from(layer.querySelectorAll<HTMLElement>(LABELLED));
     for (const el of annotations) {
       if (cfg.show) {
-        const field = this.mapFieldOf(el);
+        const info = this.mapInfoOf(el);
         el.tabIndex = 0;
-        el.setAttribute('aria-label', this.mapFieldAria(el, field?.mapField));
+        el.setAttribute('aria-label', this.mapFieldAria(el, info?.mapField));
       } else {
         el.removeAttribute('tabindex');
         el.removeAttribute('aria-label');
       }
     }
-    this.mapLabelsHidden.set(0);
+    layer.dataset['mapLabelsHidden'] = '0';
+    this.updateMapLabelsHidden();
     if (!cfg.show) {
       this.hideMapTip();
       return;
@@ -48,20 +62,24 @@ export class WorkspaceMapLabel {
       return { x: r.left - origin.left, y: r.top - origin.top, w: r.width, h: r.height };
     };
     const ctx = this.previewSettings.context();
-    const wanted: { el: HTMLElement; text: string; box: Rect; missing: boolean }[] = [];
+    const wanted: { el: HTMLElement; text: string; box: Rect; missing: boolean; fromA: boolean }[] =
+      [];
     for (const el of annotations) {
       if (el.dataset['hidden'] === 'true') continue;
-      const field = this.mapFieldOf(el);
-      if (!field) continue;
-      const type = normalizeFieldType(field.type);
-      const hasValue = typeof field.value === 'string' && field.value.trim() !== '';
-      if (!wantsMapLabel(type, cfg.scope, ctx.mode, hasValue)) continue;
-      const name = (field.mapField ?? '').trim();
+      const info = this.mapInfoOf(el);
+      if (!info) continue;
+      if (!wantsMapLabel(normalizeFieldType(info.type), cfg.scope, ctx.mode, info.hasValue)) {
+        continue;
+      }
+      const name = info.mapField;
       wanted.push({
         el,
-        text: name ? shortenMapField(name, cfg.max) : this.translationService.translate('mapLabel.none'),
+        text: name
+          ? shortenMapField(name, cfg.max)
+          : this.translationService.translate('mapLabel.none'),
         box: rectOf(el),
         missing: !name,
+        fromA: info.fromA,
       });
     }
     if (!wanted.length) return;
@@ -70,6 +88,7 @@ export class WorkspaceMapLabel {
       const label = document.createElement('div');
       label.className = 'map-label';
       label.classList.toggle('map-label--none', w.missing);
+      label.classList.toggle('map-label--ref', w.fromA);
       label.textContent = w.text;
       label.setAttribute('aria-hidden', 'true');
       label.style.visibility = 'hidden';
@@ -108,7 +127,24 @@ export class WorkspaceMapLabel {
         layer.appendChild(tick);
       }
     });
-    this.mapLabelsHidden.set(hidden);
+    layer.dataset['mapLabelsHidden'] = `${hidden}`;
+    this.updateMapLabelsHidden();
+  }
+
+  /** The legend counts the labels hidden in every layer (B, A on top, A in «Dividida»). */
+  updateMapLabelsHidden(this: WorkspacePageComponent): void {
+    const layers = [
+      this.annotationsLayerRef?.nativeElement,
+      this.referenceLayerRef?.nativeElement,
+      this.splitLayerRef?.nativeElement,
+    ];
+    this.mapLabelsHidden.set(
+      layers.reduce(
+        (sum, layer) =>
+          sum + (layer?.isConnected ? Number(layer.dataset['mapLabelsHidden'] ?? 0) : 0),
+        0,
+      ),
+    );
   }
 
   onMapLabelMax(this: WorkspacePageComponent, value: unknown): void {
@@ -120,18 +156,44 @@ export class WorkspaceMapLabel {
     this.previewSettings.resetMapLabel();
   }
 
-  mapFieldOf(this: WorkspacePageComponent, el: HTMLElement) {
-    const page = Number(el.dataset['pageIndex']);
-    const index = Number(el.dataset['fieldIndex']);
-    return this.coords()[page]?.fields[index] ?? null;
+  /** What the label and the box need to know about an annotation of B or a box of A. */
+  mapInfoOf(this: WorkspacePageComponent, el: HTMLElement): MapInfo | null {
+    if (el.classList.contains('reference-field')) {
+      return {
+        type: el.dataset['fieldType'] ?? 'text',
+        mapField: el.dataset['mapField'] ?? '',
+        hasValue: el.dataset['hasValue'] === '1',
+        x: Number(el.dataset['fieldX']),
+        y: Number(el.dataset['fieldY']),
+        page: Number(el.dataset['fieldPage']) || null,
+        fromA: true,
+      };
+    }
+    const pageIndex = Number(el.dataset['pageIndex']);
+    const field = this.coords()[pageIndex]?.fields[Number(el.dataset['fieldIndex'])];
+    if (!field) return null;
+    return {
+      type: field.type ?? 'text',
+      mapField: (field.mapField ?? '').trim(),
+      hasValue: typeof field.value === 'string' && field.value.trim() !== '',
+      x: field.x,
+      y: field.y,
+      page: this.coords()[pageIndex]?.num ?? null,
+      fromA: false,
+    };
   }
 
-  mapFieldAria(this: WorkspacePageComponent, el: HTMLElement, mapField: string | undefined): string {
-    const field = this.mapFieldOf(el);
+  mapFieldAria(
+    this: WorkspacePageComponent,
+    el: HTMLElement,
+    mapField: string | undefined,
+  ): string {
+    const info = this.mapInfoOf(el);
     const type = this.translationService.translate(
-      `annotation.fields.type.options.${normalizeFieldType(field?.type)}`,
+      `annotation.fields.type.options.${normalizeFieldType(info?.type)}`,
     );
-    return `${type}, ${mapField?.trim() || this.translationService.translate('mapLabel.none')}`;
+    const label = `${type}, ${mapField?.trim() || this.translationService.translate('mapLabel.none')}`;
+    return info?.fromA ? `${this.translationService.translate('mapLabel.fromA')}, ${label}` : label;
   }
 
   /** Hover (after 250 ms) and focus (at once) open the tooltip; Esc, leaving and any press close it. */
@@ -139,7 +201,7 @@ export class WorkspaceMapLabel {
     if (layer.dataset['mapTip'] === '1') return;
     layer.dataset['mapTip'] = '1';
     const annotationOf = (target: EventTarget | null) =>
-      target instanceof Element ? (target.closest('.annotation') as HTMLElement | null) : null;
+      target instanceof Element ? (target.closest(LABELLED) as HTMLElement | null) : null;
     layer.addEventListener('pointerover', (evt) => {
       const el = annotationOf(evt.target);
       if (!el || (evt.buttons ?? 0) !== 0) return;
@@ -160,7 +222,14 @@ export class WorkspaceMapLabel {
     // Teclado: Enter selecciona la anotación enfocada; Mayús+Enter la suma o la quita de la selección.
     layer.addEventListener('keydown', (evt) => {
       const el = annotationOf(evt.target);
-      if (!el || evt.key !== 'Enter' || evt.target !== el) return;
+      if (
+        !el ||
+        evt.key !== 'Enter' ||
+        evt.target !== el ||
+        el.classList.contains('reference-field')
+      ) {
+        return;
+      }
       evt.preventDefault();
       this.selectFocusedAnnotation(el, evt.shiftKey);
     });
@@ -226,12 +295,12 @@ export class WorkspaceMapLabel {
 
   showMapTip(this: WorkspacePageComponent, el: HTMLElement): void {
     const cfg = this.previewSettings.mapLabel();
-    const field = this.mapFieldOf(el);
-    if (!cfg.show || !cfg.tooltip || !field || !el.isConnected) {
+    const info = this.mapInfoOf(el);
+    if (!cfg.show || !cfg.tooltip || !info || !el.isConnected) {
       this.mapTip.set(null);
       return;
     }
-    const name = (field.mapField ?? '').trim();
+    const name = info.mapField;
     const { prefix, tail } = splitMapField(name);
     const t = (key: string, params?: Record<string, string | number>) =>
       this.translationService.translate(key, params);
@@ -240,12 +309,14 @@ export class WorkspaceMapLabel {
       prefix,
       tail: name ? tail : t('mapLabel.none'),
       none: !name,
-      meta: t('mapLabel.meta', {
-        type: t(`annotation.fields.type.options.${normalizeFieldType(field.type)}`),
-        page: this.coords()[Number(el.dataset['pageIndex'])]?.num ?? this.pageIndex(),
-        x: String(field.x).replace('.', ','),
-        y: String(field.y).replace('.', ','),
-      }),
+      meta:
+        (info.fromA ? `${t('mapLabel.fromA')} · ` : '') +
+        t('mapLabel.meta', {
+          type: t(`annotation.fields.type.options.${normalizeFieldType(info.type)}`),
+          page: info.page ?? this.pageIndex(),
+          x: String(info.x).replace('.', ','),
+          y: String(info.y).replace('.', ','),
+        }),
       left: Math.max(8, Math.min(rect.left, window.innerWidth - 348)),
       // Cerca del borde inferior el cuadro se abre hacia arriba para no salirse de la ventana.
       ...(rect.bottom + 8 + TIP_MAX_HEIGHT > window.innerHeight

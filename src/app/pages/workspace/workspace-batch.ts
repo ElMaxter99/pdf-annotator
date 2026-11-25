@@ -1,5 +1,6 @@
 import { prepareFieldForStorage } from '../../utils/field-style.utils';
 import { shortenMapField } from '../../utils/map-label.utils';
+import { resolveFieldPreview } from '../../utils/preview-values.utils';
 import { serializeFieldForJson } from '../../utils/json-text.utils';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
@@ -17,7 +18,14 @@ import { buildJsonExportPayload, jsonExportText } from '../../utils/json-export.
 import { readPageTexts } from '../../services/pdf-text.service';
 import type { AiRow } from '../../utils/ai-proposal.utils';
 import { PairTarget } from './workspace.types';
+import { normalizeFieldType } from '../../utils/annotation-fields.utils';
 import type { WorkspacePageComponent } from './workspace.page';
+
+/** The field of A behind a reference box, to paint it like B does. */
+export interface ReferenceSource {
+  readonly field: PageField;
+  readonly page: number;
+}
 
 /**
  * Lote y traslado A→B: capa de referencia de A, tamaños y páginas de A y B, plantilla A, tabla de páginas, estados de los campos, guardado de B y acciones del PDF del lote.
@@ -53,14 +61,33 @@ export class WorkspaceBatch {
 
     const page = this.pageIndex();
     const pageA = this.aPage();
-    const draw = (name: string, x: number, y: number, fontSize: number, missing: boolean) =>
-      this.drawReferenceField(layer, canvas.height, name, x, y, fontSize, missing, onlyA);
+    const draw = (
+      name: string,
+      x: number,
+      y: number,
+      fontSize: number,
+      missing: boolean,
+      source?: ReferenceSource,
+    ) =>
+      this.drawReferenceField(
+        layer,
+        canvas.height,
+        name,
+        x,
+        y,
+        fontSize,
+        missing,
+        onlyA,
+        this.scale(),
+        source,
+      );
 
     if (onlyA) {
       void this.drawReferencePdf(layer, canvas);
       for (const field of pageA === null ? [] : this.fieldsOfA(pageA)) {
-        draw(field.name, field.x, field.y, field.fontSize, field.missing);
+        draw(field.name, field.x, field.y, field.fontSize, field.missing, field.source);
       }
+      this.runAfterRender(() => this.drawMapLabels(layer));
       return;
     }
     if (pageA === null || this.bGhost()) {
@@ -69,7 +96,7 @@ export class WorkspaceBatch {
     if (pageA !== page && !this.tableLinked()) {
       // Free pages: the fields of the page of A that is open, with no state against B.
       for (const field of this.fieldsOfA(pageA)) {
-        draw(field.name, field.x, field.y, field.fontSize, false);
+        draw(field.name, field.x, field.y, field.fontSize, false, field.source);
       }
       return;
     }
@@ -81,7 +108,14 @@ export class WorkspaceBatch {
       if (state.a.page !== undefined && state.a.page !== page) {
         continue; // the field of A lives on another page of A: nothing to draw on this one
       }
-      draw(state.a.name, state.a.x, state.a.y, state.a.fontSize, state.status === 'missing');
+      draw(
+        state.a.name,
+        state.a.x,
+        state.a.y,
+        state.a.fontSize,
+        state.status === 'missing',
+        state.a.field ? { field: state.a.field, page: state.a.page ?? page } : undefined,
+      );
     }
   }
 
@@ -219,7 +253,14 @@ export class WorkspaceBatch {
     if (!m) {
       return [];
     }
-    const out: { name: string; x: number; y: number; fontSize: number; missing: boolean }[] = [];
+    const out: {
+      name: string;
+      x: number;
+      y: number;
+      fontSize: number;
+      missing: boolean;
+      source: ReferenceSource;
+    }[] = [];
     for (const aPage of this.aPagesView()) {
       if (aPage.num !== page) {
         continue;
@@ -233,7 +274,14 @@ export class WorkspaceBatch {
             (state) =>
               state.status === 'missing' && state.page === this.pageIndex() && state.name === name,
           );
-        out.push({ name, x: field.x, y: field.y, fontSize: field.fontSize, missing });
+        out.push({
+          name,
+          x: field.x,
+          y: field.y,
+          fontSize: field.fontSize,
+          missing,
+          source: { field, page: aPage.num },
+        });
       }
     }
     return out;
@@ -250,6 +298,7 @@ export class WorkspaceBatch {
     missing: boolean,
     solo: boolean,
     scale = this.scale(),
+    source?: ReferenceSource,
   ) {
     const px = Number(x);
     const py = Number(y);
@@ -262,9 +311,23 @@ export class WorkspaceBatch {
     el.classList.toggle('reference-field--missing', missing);
     el.classList.toggle('reference-field--solo', solo);
     const cfg = this.previewSettings.mapLabel();
-    const shown = cfg.show && name ? shortenMapField(name, cfg.max) : name;
+    let shown: string;
+    if (source) {
+      // A paints what B paints (sample value, mapField or test data) and the same mini label and box (P-210 a P-212).
+      const preview = resolveFieldPreview(source.field, this.previewSettings.context());
+      shown = preview.text;
+      el.dataset['fieldType'] = normalizeFieldType(source.field.type);
+      el.dataset['mapField'] = (source.field.mapField ?? '').trim();
+      el.dataset['hasValue'] = preview.source === 'value' ? '1' : '';
+      el.dataset['fieldPage'] = `${source.page}`;
+      el.dataset['fieldX'] = `${source.field.x}`;
+      el.dataset['fieldY'] = `${source.field.y}`;
+      el.title = name;
+    } else {
+      shown = cfg.show && name ? shortenMapField(name, cfg.max) : name;
+      el.title = name;
+    }
     el.textContent = shown;
-    el.title = name;
     el.dataset['name'] = name;
     el.style.left = `${px * scale}px`;
     el.style.top = `${canvasHeight - py * scale - size * scale}px`;

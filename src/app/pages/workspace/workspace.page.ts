@@ -681,6 +681,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.referenceMode();
       this.showingOnlyA();
       this.aPage();
+      this.previewSettings.context();
+      this.previewSettings.mapLabel();
       untracked(() => this.redrawReference());
     });
     effect(() => {
@@ -696,6 +698,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       this.batch.activeItem();
       this.fitA();
       this.pageSizesB();
+      this.previewSettings.context();
+      this.previewSettings.mapLabel();
       untracked(() => void this.renderSplit());
     });
     effect(() => {

@@ -314,8 +314,10 @@ export class WorkspaceView {
           field.missing,
           false,
           this.scaleOfA(),
+          field.source,
         );
       }
+      this.drawMapLabels(layer);
       this.drawAdjustPins(layer, canvas.height, 'a');
       // A is drawn asynchronously: a hover that started before it finished is applied now.
       this.markAdjustHoverInSplit();
@@ -905,10 +907,7 @@ export class WorkspaceView {
       box.height <= viewer.clientHeight
         ? centerScrollLeft({ left: box.top, width: box.height }, viewer.clientHeight)
         : this.workMarginY(viewer);
-    if (
-      Math.abs(target - viewer.scrollLeft) < 4 &&
-      Math.abs(targetTop - viewer.scrollTop) < 4
-    ) {
+    if (Math.abs(target - viewer.scrollLeft) < 4 && Math.abs(targetTop - viewer.scrollTop) < 4) {
       this.resetViewerScroll(true);
       return;
     }

@@ -2724,6 +2724,7 @@
     }
   },
   "mapLabel": {
+    "fromA": "Version A · read only",
     "title": "Identify annotations",
     "info": "Shows the end of the mapField next to each annotation and the full name on hover or Tab focus. Screen only: it is not in the PDF or the JSON.",
     "show": "Show the mapField next to each annotation",

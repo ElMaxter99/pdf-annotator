@@ -1,4 +1,4 @@
-import type { PageAnnotations } from '../models/annotation.model';
+import type { PageAnnotations, PageField } from '../models/annotation.model';
 import type { FieldLink } from '../models/batch.model';
 
 export type FieldStatus = 'same' | 'moved' | 'renamed' | 'new' | 'missing';
@@ -18,6 +18,8 @@ export interface FieldState {
     readonly x: number;
     readonly y: number;
     readonly fontSize: number;
+    /** The field of A as it is (type, value, decimals…), to paint it like B does. */
+    readonly field?: PageField;
   };
 }
 
@@ -46,6 +48,7 @@ interface AEntry {
   readonly x: number;
   readonly y: number;
   readonly fontSize: number;
+  readonly field: PageField;
   used: boolean;
 }
 
@@ -66,6 +69,7 @@ export function computeFieldStates(
       x: field.x,
       y: field.y,
       fontSize: field.fontSize,
+      field,
       used: false,
     })),
   );

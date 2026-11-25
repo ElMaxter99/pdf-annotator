@@ -2724,6 +2724,7 @@
     }
   },
   "mapLabel": {
+    "fromA": "Versión A · solo lectura",
     "title": "Identificar anotaciones",
     "info": "Muestra el final del mapField junto a cada anotación y el nombre completo al pasar el cursor o enfocar con Tab. Solo se ve en pantalla: no sale en el PDF ni en el JSON.",
     "show": "Mostrar el mapField junto a cada anotación",
