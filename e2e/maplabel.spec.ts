@@ -75,3 +75,15 @@ test('el máximo se valida y la preferencia sobrevive a la recarga', async ({ pa
   const saved = await page.evaluate(() => localStorage.getItem('pdf-annotator.mapLabel'));
   expect(JSON.parse(saved ?? '{}')).toMatchObject({ show: true, max: 12 });
 });
+
+test('Enter selecciona la anotación enfocada y el foco se conserva', async ({ page }) => {
+  await page.getByTestId('maplabel-toggle').check();
+  const first = page.locator('.annotation[tabindex="0"]').first();
+  await first.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.annotation--selected')).toHaveCount(1);
+  await expect(page.locator('.annotation--selected')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Shift+Enter');
+  await expect(page.locator('.annotation--selected')).toHaveCount(2);
+});

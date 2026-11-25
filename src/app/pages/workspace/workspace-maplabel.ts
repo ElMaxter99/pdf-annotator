@@ -155,6 +155,13 @@ export class WorkspaceMapLabel {
       if (el) this.scheduleMapTip(el, 0);
     });
     layer.addEventListener('focusout', () => this.hideMapTip());
+    // Teclado: Enter selecciona la anotación enfocada; Mayús+Enter la suma o la quita de la selección.
+    layer.addEventListener('keydown', (evt) => {
+      const el = annotationOf(evt.target);
+      if (!el || evt.key !== 'Enter' || evt.target !== el) return;
+      evt.preventDefault();
+      this.selectFocusedAnnotation(el, evt.shiftKey);
+    });
     // Esc cierra el cuadro aunque solo se haya abierto con el cursor (el foco no está en la capa).
     document.addEventListener(
       'keydown',
@@ -165,6 +172,32 @@ export class WorkspaceMapLabel {
         }
       },
       true,
+    );
+  }
+
+  selectFocusedAnnotation(this: WorkspacePageComponent, el: HTMLElement, extend: boolean): void {
+    const pageIndex = Number(el.dataset['pageIndex']);
+    const fieldIndex = Number(el.dataset['fieldIndex']);
+    const field = this.coords()[pageIndex]?.fields[fieldIndex];
+    if (!field || field.locked) return;
+    this.hideMapTip();
+    if (extend) {
+      this.toggleSelection(pageIndex, fieldIndex);
+    } else {
+      this.dismissEditors();
+      this.selection.set({ pageIndex, fields: [fieldIndex] });
+      this.redrawAllForPage();
+    }
+    // La capa se redibuja entera: el foco vuelve a la misma anotación cuando están los elementos nuevos.
+    this.runAfterRender(() =>
+      this.runAfterRender(() => {
+        const layer = this.annotationsLayerRef?.nativeElement;
+        layer
+          ?.querySelector<HTMLElement>(
+            `.annotation[data-page-index="${pageIndex}"][data-field-index="${fieldIndex}"]`,
+          )
+          ?.focus({ preventScroll: true });
+      }),
     );
   }
 
