@@ -175,6 +175,7 @@ async function checkManual() {
 
 // «Últimas»: electron-updater, desde una «-rc.N», solo mira RC del mismo canal y nunca la final. Se elige la release
 // más reciente (RC o final) con la API y se apunta el actualizador a ella.
+let feedPinned = false;
 async function pinLatestFeed() {
   if (process.env.PDF_ANNOTATOR_UPDATE_URL) return;
   const res = await net.fetch(process.env.PDF_ANNOTATOR_RELEASE_API || `${releasesApi}?per_page=30`, { headers: { accept: 'application/vnd.github+json' } });
@@ -183,7 +184,18 @@ async function pinLatestFeed() {
   const feed = best && feedForVersion(best.version);
   if (!feed) return;
   autoUpdater.channel = feed.channel;
+  autoUpdater.allowDowngrade = false; // el setter de channel lo activa
   autoUpdater.setFeedURL({ provider: 'generic', url: feed.url });
+  feedPinned = true;
+}
+
+// Al volver a «Estables» se quita lo fijado en «Últimas» (feed de GitHub de siempre, canal por defecto).
+function unpinFeed() {
+  if (!feedPinned) return;
+  feedPinned = false;
+  autoUpdater.channel = 'latest';
+  autoUpdater.allowDowngrade = false;
+  autoUpdater.setFeedURL({ provider: 'github', owner: REPO.owner, repo: REPO.repo });
 }
 
 async function checkForUpdates() {
@@ -194,6 +206,7 @@ async function checkForUpdates() {
     if (mode === 'manual') await checkManual();
     else {
       if (channel === 'latest') await pinLatestFeed();
+      else unpinFeed();
       await autoUpdater.checkForUpdates();
     }
     setState({ lastChecked: Date.now() });
