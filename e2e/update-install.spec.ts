@@ -63,6 +63,7 @@ test('si se cancela la contraseña se explica y «Reintentar» reutiliza la desc
   const dialog = page.getByTestId('update-install-error');
   await expect(dialog).toContainText('Cancelaste la contraseña');
   await expect(page.getByTestId('update-install-retry')).toContainText('Pedir la contraseña otra vez');
+  await expect(dialog.getByRole('button')).toHaveText(['Pedir la contraseña otra vez', 'Ahora no']);
   await page.getByTestId('update-install-retry').click();
   await expect(page.getByTestId('update-installing')).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { __installCalls: number }).__installCalls)).toBe(2);
@@ -82,6 +83,12 @@ test('un fallo muestra el motivo real y «Ahora no» devuelve la tarjeta', async
   await fakeDesktop(page, { ...ready, installError: 'failed', installDetail: 'dpkg: error de dependencias' });
   await page.goto('/landing');
   await expect(page.getByTestId('update-install-detail')).toContainText('dpkg: error de dependencias');
+  await expect(page.getByTestId('update-install-error').getByRole('button')).toHaveText([
+    'Reintentar',
+    'Descargar el paquete ↗',
+    'Copiar detalles',
+    'Ahora no',
+  ]);
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('update-install-error')).toHaveCount(0);
   await expect(page.getByTestId('update-card')).toBeVisible();
@@ -120,7 +127,14 @@ test('Linux: si el sistema no autoriza (sin llegar a pedir la contraseña) no di
   await expect(dialog).toContainText('El sistema no dejó instalar la actualización');
   await expect(dialog).not.toContainText('Cancelaste');
   await expect(page.getByTestId('update-install-detail')).toContainText('Not authorized');
-  await expect(page.getByTestId('update-install-retry')).toContainText('Pedir la contraseña otra vez');
+  // Un botón por acción: sin reintentar pkexec (fallaría igual) ni «Al cerrar la app», y un solo «Ahora no».
+  await expect(page.getByTestId('update-install-retry')).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'Al cerrar la app' })).toHaveCount(0);
+  await expect(dialog.getByRole('button')).toHaveText([
+    'Abrir con el instalador del sistema',
+    'Copiar el comando para la terminal',
+    'Ahora no',
+  ]);
 
   await page.getByTestId('update-install-open-package').click();
   expect(await page.evaluate(() => (window as unknown as { __opened: number }).__opened)).toBe(1);

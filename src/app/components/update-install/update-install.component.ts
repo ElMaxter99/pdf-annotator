@@ -48,22 +48,24 @@ import { ToastService } from '../../services/toast.service';
           @if (state().installError !== 'cancelled' && state().installDetail) {
             <p class="update-install__hint" data-testid="update-install-detail">{{ 'update.installError.reason' | t }} <strong>{{ state().installDetail }}</strong></p>
           }
+          <!-- Un botón por acción: sin «Al cerrar la app» (cerraba igual que «Ahora no») ni reintentos que fallarían igual. -->
           <div class="update-card__actions">
-            <button type="button" class="btn btn--primary" (click)="update.restartNow()" data-testid="update-install-retry">
-              {{ (state().installError === 'cancelled' ? (state().needsAdmin ? 'update.installError.askPermissionAgain' : 'update.installError.askPasswordAgain') : state().installError === 'unauthorized' ? 'update.installError.askPasswordAgain' : 'update.retry') | t }}
-            </button>
-            @if (state().manualCommand && state().installError !== 'cancelled') {
-              <!-- Salidas que no dependen de pkexec: el instalador del sistema pide la contraseña por su cuenta. -->
-              <button type="button" class="btn btn--ghost" (click)="openPackage()" data-testid="update-install-open-package">{{ 'update.installError.openPackage' | t }}</button>
+            @if (state().installError === 'cancelled') {
+              <button type="button" class="btn btn--primary" (click)="update.restartNow()" data-testid="update-install-retry">
+                {{ (state().needsAdmin ? 'update.installError.askPermissionAgain' : 'update.installError.askPasswordAgain') | t }}
+              </button>
+            } @else if (state().manualCommand) {
+              <!-- Linux: salidas que no dependen de pkexec; el instalador del sistema pide la contraseña por su cuenta. -->
+              <button type="button" class="btn btn--primary" (click)="openPackage()" data-testid="update-install-open-package">{{ 'update.installError.openPackage' | t }}</button>
               <button type="button" class="btn btn--ghost" (click)="copyCommand()" data-testid="update-install-copy-command">{{ 'update.installError.copyCommand' | t }}</button>
-            }
-            <button type="button" class="btn btn--ghost" (click)="onQuit()">{{ 'update.onQuit' | t }}</button>
-            @if (state().installError === 'cancelled' || state().installError === 'unauthorized') {
-              <button type="button" class="btn btn--ghost" (click)="update.dismissInstallError()">{{ 'update.installError.notNow' | t }}</button>
             } @else {
+              <button type="button" class="btn btn--primary" (click)="update.restartNow()" data-testid="update-install-retry">{{ 'update.retry' | t }}</button>
               <button type="button" class="btn btn--ghost" (click)="update.openNotes()">{{ 'update.installError.manual' | t }} ↗</button>
+            }
+            @if (state().installError === 'failed') {
               <button type="button" class="btn btn--ghost" (click)="copyDetails()">{{ 'update.installError.copy' | t }}</button>
             }
+            <button type="button" class="btn btn--ghost" (click)="update.dismissInstallError()" data-testid="update-install-dismiss">{{ 'update.installError.notNow' | t }}</button>
           </div>
         </div>
       }
@@ -99,11 +101,6 @@ export class UpdateInstallComponent {
       if (this.doneTimer) clearTimeout(this.doneTimer);
       this.doneTimer = this.update.justUpdated() ? setTimeout(() => this.update.dismissUpdated(), 8000) : null;
     });
-  }
-
-  onQuit(): void {
-    this.update.restartOnQuit();
-    this.update.dismissInstallError();
   }
 
   async openPackage(): Promise<void> {
