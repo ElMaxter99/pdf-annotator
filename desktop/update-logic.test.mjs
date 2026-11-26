@@ -206,3 +206,50 @@ test('runLinuxInstall: «no autorizado» no lanza el arreglo de dependencias ni 
   assert.equal(out.kind, 'unauthorized');
   assert.equal(calls.length, 1);
 });
+
+test('pkexec «must be setuid root» (no_new_privs): blocked; se detecta antes con /proc/self/status', async () => {
+  const { classifyPkexecResult, setuidBlocked } = await import('./update-logic.mjs');
+  assert.equal(classifyPkexecResult({ code: 127, stderr: 'pkexec must be setuid root' }), 'blocked');
+  assert.equal(setuidBlocked('Name:\tnode\nNoNewPrivs:\t1\nSeccomp:\t0\n'), true);
+  assert.equal(setuidBlocked('Name:\tnode\nNoNewPrivs:\t0\n'), false);
+  assert.equal(setuidBlocked(''), false);
+});
+
+test('linuxPackageKitCommand y classifyPkconResult', async () => {
+  const { linuxPackageKitCommand, classifyPkconResult } = await import('./update-logic.mjs');
+  const has = (c) => c === 'pkcon';
+  assert.deepEqual(linuxPackageKitCommand({ packageType: 'deb', file: '/x.deb', has }), {
+    cmd: 'pkcon',
+    args: ['--noninteractive', '--allow-untrusted', 'install-local', '/x.deb'],
+  });
+  assert.equal(linuxPackageKitCommand({ packageType: 'deb', file: '/x.deb', has: () => false }), null);
+  assert.equal(linuxPackageKitCommand({ packageType: 'appimage', file: '/x', has }), null);
+  assert.equal(classifyPkconResult({ code: 0 }), 'ok');
+  assert.equal(classifyPkconResult({ code: 1, stderr: 'Fatal error: The request was dismissed' }), 'cancelled');
+  assert.equal(classifyPkconResult({ code: 1, stderr: 'Not authorized' }), 'unauthorized');
+  assert.equal(classifyPkconResult({ code: 1, stderr: 'algo' }), 'failed');
+});
+
+test('runLinuxInstall: bloqueado → PackageKit si existe (sin pkexec); si no, blocked sin ejecutar nada', async () => {
+  const { runLinuxInstall } = await import('./update-logic.mjs');
+  const plan = { cmd: 'pkexec', args: ['dpkg', '-i', '/x.deb'] };
+  const packageKit = { cmd: 'pkcon', args: ['install-local', '/x.deb'] };
+  let calls = [];
+  let out = await runLinuxInstall({ plan, packageType: 'deb', blocked: true, packageKit, run: async (p) => (calls.push(p.cmd), { code: 0, stderr: '' }) });
+  assert.equal(out.kind, 'ok');
+  assert.deepEqual(calls, ['pkcon']);
+  calls = [];
+  out = await runLinuxInstall({ plan, packageType: 'deb', blocked: true, run: async (p) => (calls.push(p.cmd), { code: 0, stderr: '' }) });
+  assert.equal(out.kind, 'blocked');
+  assert.deepEqual(calls, []);
+  // sin saberlo de antemano: pkexec lo dice y se pasa a PackageKit en el mismo intento
+  calls = [];
+  out = await runLinuxInstall({
+    plan,
+    packageType: 'deb',
+    packageKit,
+    run: async (p) => (calls.push(p.cmd), p.cmd === 'pkexec' ? { code: 127, stderr: 'pkexec must be setuid root' } : { code: 0, stderr: '' }),
+  });
+  assert.equal(out.kind, 'ok');
+  assert.deepEqual(calls, ['pkexec', 'pkcon']);
+});

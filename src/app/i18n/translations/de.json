@@ -1948,7 +1948,9 @@
       "openPackage": "Mit dem Systeminstaller öffnen",
       "copyCommand": "Befehl für das Terminal kopieren",
       "commandCopied": "Befehl kopiert: im Terminal einfügen und Passwort eingeben",
-      "openPackageFailed": "Der Systeminstaller konnte nicht geöffnet werden: Befehl kopieren und im Terminal einfügen"
+      "openPackageFailed": "Der Systeminstaller konnte nicht geöffnet werden: Befehl kopieren und im Terminal einfügen",
+      "blockedTitle": "Dieses System lässt die App nicht nach dem Passwort fragen",
+      "blockedText": "Unter diesem Ubuntu kann die App das Administratorpasswort nicht selbst abfragen (das System sperrt pkexec für sie), daher kann sie nicht von hier aus installieren. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen: Öffne sie mit dem Systeminstaller, der nach dem Passwort fragt, oder installiere sie im Terminal."
     },
     "done": {
       "title": "PDF Annotator wurde auf {{version}} aktualisiert",

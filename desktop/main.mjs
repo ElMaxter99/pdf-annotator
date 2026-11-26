@@ -7,7 +7,7 @@ import { accessSync, appendFileSync, constants as fsConstants, existsSync, readF
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, classifyInstallError, feedForVersion, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, linuxManualCommand, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
+import { RELEASES_URL, REPO, classifyInstallError, feedForVersion, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, linuxManualCommand, linuxPackageKitCommand, setuidBlocked, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { setupProjectsIpc } from './projects-ipc.mjs';
@@ -389,9 +389,24 @@ function runPrivileged({ cmd, args }) {
   });
 }
 
+/** ¿Tiene este proceso «no_new_privs»? Entonces pkexec (setuid) no puede funcionar desde aquí. */
+function readSetuidBlocked() {
+  try {
+    return setuidBlocked(readFileSync('/proc/self/status', 'utf8'));
+  } catch {
+    return false;
+  }
+}
+
 async function installLinux(plan) {
-  logUpdate(`instalando con ${plan.args[0]} (pkexec)`);
-  const { kind, result } = await runLinuxInstall({ plan, packageType, run: runPrivileged });
+  const blocked = readSetuidBlocked();
+  const packageKit = linuxPackageKitCommand({ packageType, file: autoUpdater.installerPath, has: hasCommand });
+  logUpdate(
+    blocked
+      ? `instalando: pkexec no puede subir de privilegios (no_new_privs); ${packageKit ? 'se usa PackageKit (pkcon)' : 'sin PackageKit: salidas manuales'}`
+      : `instalando con ${plan.args[0]} (pkexec)`,
+  );
+  const { kind, result } = await runLinuxInstall({ plan, packageType, run: runPrivileged, blocked, packageKit });
   if (kind === 'ok') {
     logUpdate(`instalada ${state.version}: reiniciando`);
     stopHelper();
@@ -401,11 +416,15 @@ async function installLinux(plan) {
   }
   rmSync(updatedFile, { force: true });
   if (kind === 'failed' && !result.stderr) result.stderr = `pkexec exit ${result.code}`;
-  const label = { cancelled: 'cancelada (contraseña)', unauthorized: 'no autorizada por el sistema (polkit)' }[kind] ?? 'fallida';
+  const label = {
+    cancelled: 'cancelada (contraseña)',
+    unauthorized: 'no autorizada por el sistema (polkit)',
+    blocked: 'imposible desde la app (pkexec sin setuid: no_new_privs)',
+  }[kind] ?? 'fallida';
   logUpdate(`instalación ${label}: código ${result.code} ${installDetail(result.stderr, os.homedir())}`);
   setState({
     status: 'ready',
-    installError: kind === 'cancelled' || kind === 'unauthorized' ? kind : 'failed',
+    installError: kind === 'cancelled' || kind === 'unauthorized' || kind === 'blocked' ? kind : 'failed',
     installDetail: kind === 'cancelled' ? undefined : installDetail(result.stderr || `código ${result.code}`, os.homedir()),
     // Salida sin pkexec: el comando para la terminal (con la ruta del paquete, que no sale del equipo).
     manualCommand: linuxManualCommand({ packageType, file: autoUpdater.installerPath }) ?? undefined,

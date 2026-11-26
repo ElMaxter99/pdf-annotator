@@ -157,6 +157,30 @@ export function linuxInstallCommand({ packageType, file, has }) {
   return null;
 }
 
+/**
+ * ¿Puede este proceso ganar privilegios con un programa setuid (pkexec)? No si tiene «NoNewPrivs: 1» en
+ * `/proc/self/status` (lo heredan los hijos). `status` = el texto de ese archivo.
+ */
+export const setuidBlocked = (status) => /^NoNewPrivs:\s*1\s*$/m.test(String(status ?? ''));
+
+/**
+ * Instalación por PackageKit (`pkcon`), que no necesita setuid: pide la contraseña a polkit por D-Bus con la ventana
+ * normal del sistema. Solo para .deb/.rpm y si `pkcon` existe; si no, `null`.
+ */
+export function linuxPackageKitCommand({ packageType, file, has }) {
+  if (!file || (packageType !== 'deb' && packageType !== 'rpm') || !has('pkcon')) return null;
+  return { cmd: 'pkcon', args: ['--noninteractive', '--allow-untrusted', 'install-local', file] };
+}
+
+/** Resultado de `pkcon install-local`: `ok`, `cancelled` (se cerró la ventana), `unauthorized` o `failed`. */
+export function classifyPkconResult({ code, stderr = '' }) {
+  if (code === 0) return 'ok';
+  const text = String(stderr);
+  if (/dismiss|cancel/i.test(text)) return 'cancelled';
+  if (/not authori[sz]ed|authorization|polkit/i.test(text)) return 'unauthorized';
+  return 'failed';
+}
+
 /** Comillas simples de shell: `'…'` con las de dentro escapadas. */
 const shQuote = (text) => `'${String(text).replace(/'/g, `'\\''`)}'`;
 
@@ -193,6 +217,9 @@ export function privilegedEnv(env = {}) {
 export function classifyPkexecResult({ code, stderr = '' }) {
   if (code === 0) return 'ok';
   const text = String(stderr);
+  // El proceso de la app tiene «no_new_privs» (o el sistema de archivos es nosuid): pkexec no puede subir de privilegios
+  // y sale sin pedir nada. Pedir la contraseña otra vez no sirve: hay que instalar por otro camino.
+  if (/must be setuid root/i.test(text)) return 'blocked';
   // Sin agente de polkit (o sin sesión gráfica) pkexec sale con 126/127 SIN haber pedido nada: no es una cancelación.
   if (code === -1 || /no authentication agent|error getting authority|cannot open display|failed to connect|command not found|no such file/i.test(text)) return 'failed';
   if (/request dismissed|dismissed|cancel/i.test(text) || (code === 126 && !text.trim())) return 'cancelled';
@@ -206,9 +233,16 @@ export function classifyPkexecResult({ code, stderr = '' }) {
  * contraseña, el arreglo con `apt-get -f`. `run({ cmd, args })` → `{ code, stderr }`. Devuelve `{ kind, result }`
  * con kind `ok` | `cancelled` | `failed`. Cancelar NO lanza una segunda ventana.
  */
-export async function runLinuxInstall({ plan, packageType, run }) {
+export async function runLinuxInstall({ plan, packageType, run, blocked = false, packageKit = null }) {
+  // Sin poder usar setuid (o si pkexec lo dice), PackageKit si existe; si no, `blocked` para ofrecer las salidas manuales.
+  if (blocked) {
+    if (!packageKit) return { kind: 'blocked', result: { code: 127, stderr: 'pkexec must be setuid root' } };
+    const viaPk = await run(packageKit);
+    return { kind: classifyPkconResult(viaPk), result: viaPk };
+  }
   let result = await run(plan);
   let kind = classifyPkexecResult(result);
+  if (kind === 'blocked') return runLinuxInstall({ plan, packageType, run, blocked: true, packageKit });
   if (kind === 'deps' && packageType === 'deb') {
     result = await run(linuxFixDepsCommand());
     kind = classifyPkexecResult(result) === 'ok' ? 'ok' : 'failed';

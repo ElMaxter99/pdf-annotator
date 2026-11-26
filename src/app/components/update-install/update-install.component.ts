@@ -41,9 +41,9 @@ import { ToastService } from '../../services/toast.service';
       @case ('error') {
         <div class="update-install__veil"></div>
         <div #dialog class="update-install update-install--error" role="alertdialog" aria-modal="true" aria-labelledby="update-install-title" aria-describedby="update-install-desc" data-testid="update-install-error" tabindex="-1" (keydown.escape)="update.dismissInstallError()">
-          <strong id="update-install-title">{{ (state().installError === 'cancelled' ? 'update.installError.cancelledTitle' : state().installError === 'unauthorized' ? 'update.installError.unauthorizedTitle' : 'update.installError.title') | t }}</strong>
+          <strong id="update-install-title">{{ (state().installError === 'cancelled' ? 'update.installError.cancelledTitle' : state().installError === 'unauthorized' ? 'update.installError.unauthorizedTitle' : state().installError === 'blocked' ? 'update.installError.blockedTitle' : 'update.installError.title') | t }}</strong>
           <p id="update-install-desc" class="update-card__text">
-            {{ (state().installError === 'cancelled' ? (state().needsAdmin ? 'update.installError.cancelledTextWindows' : 'update.installError.cancelledText') : state().installError === 'unauthorized' ? 'update.installError.unauthorizedText' : 'update.installError.text') | t: { current: state().current } }}
+            {{ (state().installError === 'cancelled' ? (state().needsAdmin ? 'update.installError.cancelledTextWindows' : 'update.installError.cancelledText') : state().installError === 'unauthorized' ? 'update.installError.unauthorizedText' : state().installError === 'blocked' ? 'update.installError.blockedText' : 'update.installError.text') | t: { current: state().current } }}
           </p>
           @if (state().installError !== 'cancelled' && state().installDetail) {
             <p class="update-install__hint" data-testid="update-install-detail">{{ 'update.installError.reason' | t }} <strong>{{ state().installDetail }}</strong></p>

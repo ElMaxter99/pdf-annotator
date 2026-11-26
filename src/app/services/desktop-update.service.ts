@@ -29,9 +29,10 @@ export interface DesktopUpdateState {
   needsAdmin?: boolean;
   /**
    * Falló la instalación (la descarga se conserva): «cancelled» (se cerró la ventana de la contraseña), «unauthorized»
-   * (el sistema no autorizó, a veces sin llegar a pedir la contraseña) u otro motivo.
+   * (el sistema no autorizó, a veces sin llegar a pedir la contraseña), «blocked» (la app no puede pedir la contraseña:
+   * pkexec sin setuid por «no_new_privs» y sin PackageKit) u otro motivo.
    */
-  installError?: 'cancelled' | 'unauthorized' | 'failed';
+  installError?: 'cancelled' | 'unauthorized' | 'blocked' | 'failed';
   /** Linux: comando para instalar a mano el paquete descargado («sudo apt install '…'»). */
   manualCommand?: string;
   /** Motivo técnico del fallo (una línea) para mostrar y copiar. */

@@ -151,3 +151,21 @@ test('al cancelar de verdad la contraseña no se ofrecen las salidas sin pkexec'
   await expect(page.getByTestId('update-install-error')).toContainText('Cancelaste la contraseña');
   await expect(page.getByTestId('update-install-open-package')).toHaveCount(0);
 });
+
+test('Linux con pkexec bloqueado (no_new_privs): explica que la app no puede pedir la contraseña y deja el instalador del sistema', async ({ page }) => {
+  await fakeDesktop(page, {
+    ...ready,
+    installError: 'blocked',
+    installDetail: 'pkexec must be setuid root',
+    manualCommand: "sudo apt install '/x.deb'",
+  });
+  await page.goto('/landing');
+  const dialog = page.getByTestId('update-install-error');
+  await expect(dialog).toContainText('Este sistema no deja que la app pida la contraseña');
+  await expect(dialog).not.toContainText('Cancelaste');
+  await expect(dialog.getByRole('button')).toHaveText([
+    'Abrir con el instalador del sistema',
+    'Copiar el comando para la terminal',
+    'Ahora no',
+  ]);
+});
