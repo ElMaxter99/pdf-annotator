@@ -320,3 +320,29 @@ test('borrar en B un campo de la propuesta de la IA lo descarta: no queda su fan
   await expect(annotations).toHaveCount(before - 1);
   await expect(ghosts).toHaveCount(ghostsBefore + 1);
 });
+
+test('«Colocar aquí» con B ya con anotaciones: el campo nuevo se ve en el visor y se puede editar', async ({
+  page,
+}) => {
+  await openBatchWithB(page);
+  await openLote(page);
+  await page.getByTestId('put-template-a').click();
+  await page.getByTestId('put-a-copy').click();
+  const annotations = page.locator('.annotation');
+  await expect(annotations).not.toHaveCount(0);
+  const total = await annotations.count();
+  // quitar uno de B para que su campo de A quede sin pareja (en rojo)
+  await annotations.first().click();
+  await page.locator('.annotation-editor.editing .btn-delete').click();
+  await expect(annotations).toHaveCount(total - 1);
+
+  await openLote(page);
+  await page.getByTestId('mode-split').click();
+  await clickMissingA(page);
+  await page.getByTestId('manual-place-btn').click();
+  // antes solo entraba en el JSON y en «Anotaciones»: el visor de B no se redibujaba
+  await expect(annotations).toHaveCount(total);
+  await expect(page.locator('.annotation.pair-focus')).toHaveCount(1);
+  await page.locator('.annotation.pair-focus').click();
+  await expect(page.locator('.annotation-editor.editing')).toBeVisible();
+});
