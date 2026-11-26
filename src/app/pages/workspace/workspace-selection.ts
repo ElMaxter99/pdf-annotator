@@ -270,6 +270,9 @@ export class WorkspaceSelection {
       return;
     }
     const doomed = new Set(selected.fields);
+    this.aiForgetDeleted(
+      (this.coords()[selected.pageIndex]?.fields ?? []).filter((_, i) => doomed.has(i)),
+    );
     const changed = this.applyCoordsChange(() =>
       this.coords.update((pages) =>
         pages

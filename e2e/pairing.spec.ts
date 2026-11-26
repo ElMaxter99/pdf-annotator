@@ -57,6 +57,20 @@ async function proposeWithAi(page: Page) {
   await expect(page.getByTestId('split-a')).toBeVisible();
 }
 
+/** Clic en el primer campo de A sin pareja hasta que salga el acceso rápido (la capa de A se redibuja sola). */
+async function clickMissingA(page: Page) {
+  const fieldA = page.getByTestId('split-a').locator('.reference-field--missing').first();
+  await expect(fieldA).toBeVisible();
+  let box: { x: number; y: number; width: number; height: number } | null = null;
+  await expect(async () => {
+    box = await fieldA.boundingBox();
+    if (!box) throw new Error('sin campo de A');
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(page.getByTestId('manual-place')).toBeVisible({ timeout: 1500 });
+  }).toPass({ timeout: 15000 });
+  return box!;
+}
+
 test('la tarjeta de la propuesta lleva a la pareja: A y B resaltados y unidos por una línea; Esc la quita', async ({
   page,
 }) => {
@@ -217,12 +231,8 @@ test('clic en un campo de A sin pareja ofrece «Colocar aquí» en B: lo pone en
   await openBatchWithB(page);
   await openLote(page);
   await page.getByTestId('mode-split').click();
-  const fieldA = page.getByTestId('split-a').locator('.reference-field--missing').first();
-  await expect(fieldA).toBeVisible();
   await expect(page.locator('.annotation')).toHaveCount(0);
-  const r = await fieldA.boundingBox();
-  if (!r) throw new Error('sin campo de A');
-  await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
+  const r = await clickMissingA(page);
 
   await expect(page.getByTestId('pair-tip')).toContainText('Sin pareja en B');
   const ghost = page.getByTestId('manual-place');
@@ -248,20 +258,11 @@ test('«Colocar a mano»: ✕ y Esc quitan el fantasma sin tocar B', async ({ pa
   await openBatchWithB(page);
   await openLote(page);
   await page.getByTestId('mode-split').click();
-  const fieldA = page.getByTestId('split-a').locator('.reference-field--missing').first();
-  await expect(fieldA).toBeVisible();
   // Los campos de A no reciben el puntero: el clic llega al panel y la app busca el campo por posición.
-  const clickA = async () => {
-    const r = await fieldA.boundingBox();
-    if (!r) throw new Error('sin campo de A');
-    await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
-  };
-  await clickA();
-  await expect(page.getByTestId('manual-place')).toBeVisible();
+  await clickMissingA(page);
   await page.getByRole('button', { name: 'Cancelar' }).click();
   await expect(page.getByTestId('manual-place')).toHaveCount(0);
-  await clickA();
-  await expect(page.getByTestId('manual-place')).toBeVisible();
+  await clickMissingA(page);
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('manual-place')).toHaveCount(0);
   await expect(page.locator('.annotation')).toHaveCount(0);
@@ -274,18 +275,48 @@ test('«No existe en B» desde el acceso rápido de A da el campo por resuelto, 
   await openLote(page);
   await page.getByTestId('mode-split').click();
   const missing = page.getByTestId('split-a').locator('.reference-field--missing');
-  const fieldA = missing.first();
-  await expect(fieldA).toBeVisible();
+  await expect(missing.first()).toBeVisible();
   const before = await missing.count();
   const pending = page.getByTestId('migration-pending').locator('.migration-row');
   const pendingBefore = await pending.count();
-  const r = await fieldA.boundingBox();
-  if (!r) throw new Error('sin campo de A');
-  await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
+  await clickMissingA(page);
 
   await page.getByTestId('manual-place-dismiss').click();
   await expect(page.getByTestId('manual-place')).toHaveCount(0);
   await expect(pending).toHaveCount(pendingBefore - 1);
   await expect(missing).toHaveCount(before - 1);
   await expect(page.locator('.annotation')).toHaveCount(0);
+});
+
+test('borrar en B un campo de la propuesta de la IA lo descarta: no queda su fantasma gris y marcarlo lo recupera', async ({
+  page,
+}) => {
+  await openBatchWithB(page);
+  await proposeWithAi(page);
+  const annotations = page.locator('.annotation');
+  const ghosts = page.getByTestId('ai-proposal-field');
+  const before = await annotations.count();
+  const ghostsBefore = await ghosts.count();
+
+  const target = annotations.first();
+  const name = (await target.textContent())?.trim() ?? '';
+  await target.click();
+  const editor = page.locator('.annotation-editor.editing');
+  await expect(editor).toBeVisible();
+  await editor.locator('.btn-delete').click();
+  await expect(annotations).toHaveCount(before - 1);
+  // antes quedaba en su sitio en gris («fuera de B») y parecía que no se había borrado
+  await expect(ghosts).toHaveCount(ghostsBefore);
+
+  // la fila sigue en la lista, desmarcada; marcarla vuelve a escribirla en B
+  await page.getByTestId('ai-review-fields').click();
+  const row = page.locator('.ai-proposal__row').filter({ hasText: name }).first();
+  const box = row.locator('input[type=checkbox]');
+  await expect(box).not.toBeChecked();
+  await box.check();
+  await expect(annotations).toHaveCount(before);
+  // y desmarcarla otra vez la deja en gris, como siempre
+  await box.uncheck();
+  await expect(annotations).toHaveCount(before - 1);
+  await expect(ghosts).toHaveCount(ghostsBefore + 1);
 });

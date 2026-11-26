@@ -273,7 +273,49 @@ export class WorkspaceAi {
         }
       }
     }
+    this.aiUnforget(desired);
     this.aiSetWritten(desired);
+  }
+
+  /**
+   * Campos de la propuesta borrados de B a mano (editor «Eliminar» o Supr con selección): la fila queda descartada y
+   * no deja su fantasma gris, como una opción de la IA que no se quiere. Marcarla otra vez en la lista la recupera.
+   */
+  aiForgetDeleted(this: WorkspacePageComponent, fields: readonly PageField[]): void {
+    const session = this.ai();
+    if (!session) {
+      return;
+    }
+    const prefix = `${session.startedAt}:`;
+    const ids = fields
+      .map((field) => field.aiId)
+      .filter((id): id is string => typeof id === 'string' && id.startsWith(prefix))
+      .map((id) => id.slice(prefix.length));
+    if (!ids.length) {
+      return;
+    }
+    const removed = { ...(session.removed ?? {}) };
+    for (const id of ids) removed[id] = true;
+    this.ai.set({ ...session, removed });
+  }
+
+  /** Volver a marcar o desmarcar desde la lista deshace el «descartado»: vuelve a verse (escrita o en gris). */
+  aiUnforget(this: WorkspacePageComponent, ids: Iterable<string>): void {
+    const session = this.ai();
+    if (!session?.removed) {
+      return;
+    }
+    const removed = { ...session.removed };
+    let changed = false;
+    for (const id of ids) {
+      if (removed[id]) {
+        delete removed[id];
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.ai.set({ ...session, removed });
+    }
   }
 
   /** Marcar una fila la escribe en B; desmarcarla la quita de B (un paso de historial cada vez). */
@@ -282,6 +324,7 @@ export class WorkspaceAi {
     if (!session || !row.ok) {
       return;
     }
+    this.aiUnforget([row.id]);
     const desired = this.aiWrittenRowIds();
     if (desired.has(row.id)) {
       desired.delete(row.id);
@@ -492,7 +535,13 @@ export class WorkspaceAi {
     const tags = this.aiWrittenTags();
     for (const row of session.rows) {
       const base = this.aiTemplate.get(row.id);
-      if (!base || !row.ok || row.newPage !== page || tags.has(this.aiTag(row.id))) {
+      if (
+        !base ||
+        !row.ok ||
+        row.newPage !== page ||
+        tags.has(this.aiTag(row.id)) ||
+        session.removed?.[row.id]
+      ) {
         continue;
       }
       const field = aiProposalField(base, row, session.edits[row.id]);

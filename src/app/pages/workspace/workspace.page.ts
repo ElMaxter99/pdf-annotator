@@ -2009,6 +2009,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   deleteAnnotation() {
     const e = this.editing();
     if (!e) return;
+    const doomed = this.coords()[e.pageIndex]?.fields[e.fieldIndex];
+    if (doomed) this.aiForgetDeleted([doomed]);
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages)),
