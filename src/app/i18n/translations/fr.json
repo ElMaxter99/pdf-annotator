@@ -203,7 +203,18 @@
       "foldAll": "Tout replier",
       "unfoldAll": "Tout déplier",
       "fold": "Replier",
-      "unfold": "Déplier"
+      "unfold": "Déplier",
+      "search": {
+        "find": "Rechercher",
+        "matchCase": "Respecter la casse (Alt+C)",
+        "wholeWord": "Mot entier uniquement (Alt+W)",
+        "regexp": "Utiliser une expression régulière (Alt+R)",
+        "previous": "Occurrence précédente (Maj+Entrée)",
+        "next": "Occurrence suivante (Entrée)",
+        "close": "Fermer (Échap)",
+        "count": "{{current}} sur {{total}}",
+        "none": "Aucun résultat"
+      }
     }
   },
   "guides": {
@@ -399,7 +410,8 @@
       "pageOnlyA": "Déplacer seulement A (les pages deviennent libres)",
       "palette": "Ouvrir la palette de commandes",
       "options": "Ouvrir les Options",
-      "dragNoSnap": "Déplacer sans aligner sur les autres annotations"
+      "dragNoSnap": "Déplacer sans aligner sur les autres annotations",
+      "findJson": "Rechercher dans le JSON (focus dans l'éditeur)"
     }
   },
   "toast": {

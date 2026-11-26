@@ -203,7 +203,18 @@
       "foldAll": "Comprimi tutto",
       "unfoldAll": "Espandi tutto",
       "fold": "Comprimi",
-      "unfold": "Espandi"
+      "unfold": "Espandi",
+      "search": {
+        "find": "Trova",
+        "matchCase": "Maiuscole/minuscole (Alt+C)",
+        "wholeWord": "Solo parole intere (Alt+W)",
+        "regexp": "Usa espressione regolare (Alt+R)",
+        "previous": "Corrispondenza precedente (Maiusc+Invio)",
+        "next": "Corrispondenza successiva (Invio)",
+        "close": "Chiudi (Esc)",
+        "count": "{{current}} di {{total}}",
+        "none": "Nessun risultato"
+      }
     }
   },
   "guides": {
@@ -399,7 +410,8 @@
       "pageOnlyA": "Muovi solo A (le pagine diventano libere)",
       "palette": "Apri il riquadro dei comandi",
       "options": "Apri le Opzioni",
-      "dragNoSnap": "Trascinare senza allineare alle altre annotazioni"
+      "dragNoSnap": "Trascinare senza allineare alle altre annotazioni",
+      "findJson": "Cerca nel JSON (con il focus nell'editor)"
     }
   },
   "toast": {

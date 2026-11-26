@@ -203,7 +203,18 @@
       "foldAll": "Fold all",
       "unfoldAll": "Unfold all",
       "fold": "Fold",
-      "unfold": "Unfold"
+      "unfold": "Unfold",
+      "search": {
+        "find": "Find",
+        "matchCase": "Match case (Alt+C)",
+        "wholeWord": "Match whole word (Alt+W)",
+        "regexp": "Use regular expression (Alt+R)",
+        "previous": "Previous match (Shift+Enter)",
+        "next": "Next match (Enter)",
+        "close": "Close (Esc)",
+        "count": "{{current}} of {{total}}",
+        "none": "No results"
+      }
     }
   },
   "guides": {
@@ -399,7 +410,8 @@
       "pageOnlyA": "Move only A (the pages become free)",
       "palette": "Open the command palette",
       "options": "Open Options",
-      "dragNoSnap": "Drag without aligning to other annotations"
+      "dragNoSnap": "Drag without aligning to other annotations",
+      "findJson": "Find in the JSON (with focus in the editor)"
     }
   },
   "toast": {

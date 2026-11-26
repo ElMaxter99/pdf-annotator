@@ -203,7 +203,18 @@
       "foldAll": "Plega-ho tot",
       "unfoldAll": "Desplega-ho tot",
       "fold": "Plega",
-      "unfold": "Desplega"
+      "unfold": "Desplega",
+      "search": {
+        "find": "Cerca",
+        "matchCase": "Distingeix majúscules i minúscules (Alt+C)",
+        "wholeWord": "Només paraules senceres (Alt+W)",
+        "regexp": "Fes servir una expressió regular (Alt+R)",
+        "previous": "Coincidència anterior (Maj+Retorn)",
+        "next": "Coincidència següent (Retorn)",
+        "close": "Tanca (Esc)",
+        "count": "{{current}} de {{total}}",
+        "none": "Cap resultat"
+      }
     }
   },
   "guides": {
@@ -399,7 +410,8 @@
       "pageOnlyA": "Moure només A (les pàgines passen a lliures)",
       "palette": "Obrir la paleta d'ordres",
       "options": "Obre les Opcions",
-      "dragNoSnap": "Arrossegar sense alinear amb altres anotacions"
+      "dragNoSnap": "Arrossegar sense alinear amb altres anotacions",
+      "findJson": "Cerca al JSON (amb el focus a l'editor)"
     }
   },
   "toast": {

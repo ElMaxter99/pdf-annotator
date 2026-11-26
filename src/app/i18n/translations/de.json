@@ -203,7 +203,18 @@
       "foldAll": "Alles einklappen",
       "unfoldAll": "Alles ausklappen",
       "fold": "Einklappen",
-      "unfold": "Ausklappen"
+      "unfold": "Ausklappen",
+      "search": {
+        "find": "Suchen",
+        "matchCase": "Groß-/Kleinschreibung beachten (Alt+C)",
+        "wholeWord": "Nur ganzes Wort suchen (Alt+W)",
+        "regexp": "Regulären Ausdruck verwenden (Alt+R)",
+        "previous": "Vorheriger Treffer (Umschalt+Eingabe)",
+        "next": "Nächster Treffer (Eingabe)",
+        "close": "Schließen (Esc)",
+        "count": "{{current}} von {{total}}",
+        "none": "Keine Ergebnisse"
+      }
     }
   },
   "guides": {
@@ -399,7 +410,8 @@
       "pageOnlyA": "Nur A bewegen (die Seiten werden frei)",
       "palette": "Befehlspalette öffnen",
       "options": "Optionen öffnen",
-      "dragNoSnap": "Ziehen ohne Ausrichtung an anderen Anmerkungen"
+      "dragNoSnap": "Ziehen ohne Ausrichtung an anderen Anmerkungen",
+      "findJson": "Im JSON suchen (Fokus im Editor)"
     }
   },
   "toast": {

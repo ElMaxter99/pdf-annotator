@@ -12,6 +12,16 @@ app-json-code-editor.json-code-editor {
   --vsc-string: #ce9178;
   --vsc-number: #b5cea8;
   --vsc-keyword: #569cd6;
+  --vsc-widget-bg: #252526;
+  --vsc-widget-shadow: rgba(0, 0, 0, 0.36);
+  --vsc-input-bg: #3c3c3c;
+  --vsc-input-fg: #cccccc;
+  --vsc-input-border: transparent;
+  --vsc-focus: #007fd4;
+  --vsc-toggle-on: rgba(0, 127, 212, 0.4);
+  --vsc-error: #f48771;
+  --vsc-match-current: #515c6a;
+  --vsc-match: rgba(234, 92, 0, 0.33);
   display: block;
   position: relative;
   overflow: hidden;
@@ -105,6 +115,127 @@ app-json-code-editor.json-code-editor {
   .cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
     background: var(--vsc-selection);
   }
+  // Cuadro de búsqueda (Ctrl+F) con el aspecto del «find widget» de VS Code: flota arriba a la derecha.
+  .cm-panels.cm-panels-top {
+    position: absolute;
+    top: 0;
+    right: 14px;
+    left: 8px;
+    display: flex;
+    justify-content: flex-end;
+    border: none;
+    background: transparent;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .cm-vscFind {
+    pointer-events: auto;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 4px 4px 6px;
+    background: var(--vsc-widget-bg);
+    color: var(--vsc-input-fg);
+    box-shadow: 0 0 8px 2px var(--vsc-widget-shadow);
+    border-radius: 0 0 4px 4px;
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+  }
+  .cm-vscFind__field {
+    display: flex;
+    align-items: center;
+    flex: 0 1 220px;
+    min-width: 90px;
+    background: var(--vsc-input-bg);
+    border: 1px solid var(--vsc-input-border);
+    border-radius: 2px;
+  }
+  .cm-vscFind__field:focus-within {
+    border-color: var(--vsc-focus);
+  }
+  .cm-vscFind--none .cm-vscFind__field {
+    border-color: var(--vsc-error);
+  }
+  .cm-vscFind__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 24px;
+    padding: 0 4px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--vsc-input-fg);
+    font: inherit;
+  }
+  .cm-vscFind__toggles {
+    display: inline-flex;
+    gap: 1px;
+    padding-right: 2px;
+  }
+  .cm-vscFind__toggle {
+    width: 22px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--vsc-input-fg);
+    font: 600 11px/1 'Fira Code', monospace;
+    cursor: pointer;
+  }
+  .cm-vscFind__toggle--word {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .cm-vscFind__toggle:hover {
+    background: rgba(90, 93, 94, 0.31);
+  }
+  .cm-vscFind__toggle[aria-pressed='true'] {
+    border-color: var(--vsc-focus);
+    background: var(--vsc-toggle-on);
+  }
+  .cm-vscFind__count {
+    flex: none;
+    min-width: 56px;
+    padding: 0 6px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .cm-vscFind--none .cm-vscFind__count {
+    color: var(--vsc-error);
+  }
+  .cm-vscFind__action {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--vsc-input-fg);
+    cursor: pointer;
+  }
+  .cm-vscFind__action:hover {
+    background: rgba(90, 93, 94, 0.31);
+  }
+  .cm-vscFind__toggle:focus-visible,
+  .cm-vscFind__action:focus-visible {
+    outline: 1px solid var(--vsc-focus);
+    outline-offset: -1px;
+  }
+  .cm-searchMatch {
+    background: var(--vsc-match);
+    border-radius: 2px;
+  }
+  .cm-searchMatch.cm-searchMatch-selected {
+    background: var(--vsc-match-current);
+    outline: 1px solid rgba(255, 255, 255, 0.25);
+  }
   .cm-copyFlash {
     animation: json-copy-flash 600ms ease-out;
   }
@@ -142,6 +273,16 @@ app-json-code-editor.json-code-editor {
   --vsc-string: #a31515;
   --vsc-number: #098658;
   --vsc-keyword: #0000ff;
+  --vsc-widget-bg: #f3f3f3;
+  --vsc-widget-shadow: rgba(0, 0, 0, 0.16);
+  --vsc-input-bg: #ffffff;
+  --vsc-input-fg: #3b3b3b;
+  --vsc-input-border: #cecece;
+  --vsc-focus: #0090f1;
+  --vsc-toggle-on: rgba(0, 144, 241, 0.2);
+  --vsc-error: #be1100;
+  --vsc-match-current: #a8ac94;
+  --vsc-match: rgba(234, 92, 0, 0.33);
 
   .cm-errorLine {
     background: rgba(220, 38, 38, 0.12);

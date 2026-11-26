@@ -61,6 +61,252 @@ function chevron(open: boolean): SVGSVGElement {
   return svg;
 }
 
+export interface JsonSearchLabels {
+  find: string;
+  matchCase: string;
+  wholeWord: string;
+  regexp: string;
+  previous: string;
+  next: string;
+  close: string;
+  /** Con `{{current}}` y `{{total}}`. */
+  count: string;
+  none: string;
+}
+
+export const DEFAULT_SEARCH_LABELS: JsonSearchLabels = {
+  find: 'Buscar',
+  matchCase: 'Coincidir mayúsculas y minúsculas',
+  wholeWord: 'Solo palabras completas',
+  regexp: 'Usar expresión regular',
+  previous: 'Anterior (Mayús+Intro)',
+  next: 'Siguiente (Intro)',
+  close: 'Cerrar (Esc)',
+  count: '{{current}} de {{total}}',
+  none: 'Sin resultados',
+};
+
+/** Tope de coincidencias que se cuentan (como VS Code, que enseña «1000+»). */
+export const MAX_COUNTED_MATCHES = 1000;
+
+/** «N de M» del cuadro de búsqueda: posición de la selección entre las coincidencias (0 si no está en una). */
+export function countMatches(
+  matches: Iterable<{ from: number; to: number }>,
+  selection: { from: number; to: number },
+  limit = MAX_COUNTED_MATCHES,
+): { current: number; total: number; capped: boolean } {
+  let total = 0;
+  let current = 0;
+  for (const m of matches) {
+    total += 1;
+    if (!current && m.from === selection.from && m.to === selection.to) {
+      current = total;
+    }
+    if (total >= limit) {
+      return { current, total, capped: true };
+    }
+  }
+  return { current, total, capped: false };
+}
+
+/** Cuadro de búsqueda con el aspecto del de VS Code: arriba a la derecha, Aa / ab / .*, «N de M», ↑ ↓ y ✕. */
+function createFindPanel(
+  v: EditorView,
+  cm: typeof import('@codemirror/search'),
+  viewModule: typeof import('@codemirror/view'),
+  labels: () => JsonSearchLabels,
+): import('@codemirror/view').Panel {
+  const L = labels();
+  const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string) => {
+    const el = document.createElement(tag);
+    el.className = cls;
+    return el;
+  };
+  const dom = make('div', 'cm-vscFind');
+  dom.setAttribute('role', 'search');
+  const input = make('input', 'cm-vscFind__input');
+  input.type = 'text';
+  input.placeholder = L.find;
+  input.setAttribute('aria-label', L.find);
+  input.setAttribute('main-field', 'true');
+  input.spellcheck = false;
+  input.setAttribute('data-testid', 'json-find-input');
+  const toggle = (text: string, title: string, id: string) => {
+    const b = make('button', 'cm-vscFind__toggle');
+    b.type = 'button';
+    b.textContent = text;
+    b.title = title;
+    b.setAttribute('aria-label', title);
+    b.setAttribute('aria-pressed', 'false');
+    b.setAttribute('data-testid', id);
+    return b;
+  };
+  const caseBtn = toggle('Aa', L.matchCase, 'json-find-case');
+  const wordBtn = toggle('ab', L.wholeWord, 'json-find-word');
+  wordBtn.classList.add('cm-vscFind__toggle--word');
+  const regexBtn = toggle('.*', L.regexp, 'json-find-regexp');
+  const field = make('div', 'cm-vscFind__field');
+  const toggles = make('span', 'cm-vscFind__toggles');
+  toggles.append(caseBtn, wordBtn, regexBtn);
+  field.append(input, toggles);
+  const count = make('span', 'cm-vscFind__count');
+  count.setAttribute('aria-live', 'polite');
+  count.setAttribute('data-testid', 'json-find-count');
+  const action = (path: string, title: string, id: string, run: () => void) => {
+    const b = make('button', 'cm-vscFind__action');
+    b.type = 'button';
+    b.title = title;
+    b.setAttribute('aria-label', title);
+    b.setAttribute('data-testid', id);
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 16 16');
+    svg.setAttribute('width', '16');
+    svg.setAttribute('height', '16');
+    svg.setAttribute('aria-hidden', 'true');
+    const p = document.createElementNS(SVG_NS, 'path');
+    p.setAttribute('d', path);
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', 'currentColor');
+    p.setAttribute('stroke-width', '1.4');
+    p.setAttribute('stroke-linecap', 'round');
+    p.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(p);
+    b.appendChild(svg);
+    b.onclick = () => {
+      run();
+    };
+    return b;
+  };
+  const prev = action('M8 13V3M3.5 7.5 8 3l4.5 4.5', L.previous, 'json-find-prev', () => {
+    cm.findPrevious(v);
+  });
+  const next = action('M8 3v10M3.5 8.5 8 13l4.5-4.5', L.next, 'json-find-next', () => {
+    cm.findNext(v);
+  });
+  const close = action('M4 4l8 8M12 4l-8 8', L.close, 'json-find-close', () => {
+    cm.closeSearchPanel(v);
+    v.focus();
+  });
+  dom.append(field, count, prev, next, close);
+
+  const flags = { caseSensitive: false, wholeWord: false, regexp: false };
+  const readQuery = (q: import('@codemirror/search').SearchQuery) => {
+    if (document.activeElement !== input) input.value = q.search;
+    flags.caseSensitive = q.caseSensitive;
+    flags.wholeWord = q.wholeWord;
+    flags.regexp = q.regexp;
+    caseBtn.setAttribute('aria-pressed', `${flags.caseSensitive}`);
+    wordBtn.setAttribute('aria-pressed', `${flags.wholeWord}`);
+    regexBtn.setAttribute('aria-pressed', `${flags.regexp}`);
+  };
+  const commit = () => {
+    const query = new cm.SearchQuery({ search: input.value, ...flags });
+    v.dispatch({ effects: cm.setSearchQuery.of(query) });
+  };
+  const refreshCount = () => {
+    const query = cm.getSearchQuery(v.state);
+    const labelsNow = labels();
+    if (!query.search) {
+      count.textContent = '';
+      dom.classList.remove('cm-vscFind--none');
+      return;
+    }
+    if (!query.valid) {
+      count.textContent = labelsNow.none;
+      dom.classList.add('cm-vscFind--none');
+      return;
+    }
+    const sel = v.state.selection.main;
+    const cursor = query.getCursor(v.state) as Iterator<{ from: number; to: number }>;
+    const res = countMatches({ [Symbol.iterator]: () => cursor }, sel);
+    dom.classList.toggle('cm-vscFind--none', res.total === 0);
+    count.textContent = res.total
+      ? labelsNow.count
+          .replace('{{current}}', res.current ? `${res.current}` : '?')
+          .replace('{{total}}', `${res.total}${res.capped ? '+' : ''}`)
+      : labelsNow.none;
+  };
+  for (const [btn, key] of [
+    [caseBtn, 'caseSensitive'],
+    [wordBtn, 'wholeWord'],
+    [regexBtn, 'regexp'],
+  ] as const) {
+    btn.onclick = () => {
+      flags[key] = !flags[key];
+      btn.setAttribute('aria-pressed', `${flags[key]}`);
+      commit();
+    };
+  }
+  input.addEventListener('input', () => {
+    commit();
+    // Como VS Code: al escribir salta a la primera coincidencia desde el cursor, sin saltarse la que ya está
+    // seleccionada (al añadir una letra, la coincidencia actual sigue valiendo si aún encaja).
+    // (No se usa `findNext`: selecciona el texto del cuadro y la siguiente letra lo borraría.)
+    const query = cm.getSearchQuery(v.state);
+    if (input.value && query.valid) {
+      const from = v.state.selection.main.from;
+      const first = (cursor: Iterator<{ from: number; to: number }>) => {
+        const step = cursor.next();
+        return step.done ? null : step.value;
+      };
+      const match =
+        first(query.getCursor(v.state, from) as Iterator<{ from: number; to: number }>) ??
+        first(query.getCursor(v.state) as Iterator<{ from: number; to: number }>);
+      if (match) {
+        v.dispatch({
+          selection: { anchor: match.from, head: match.to },
+          effects: viewModule.EditorView.scrollIntoView(match.from, { y: 'center' }),
+          userEvent: 'select.search',
+        });
+      }
+    }
+    refreshCount();
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (e.shiftKey) cm.findPrevious(v);
+      else cm.findNext(v);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cm.closeSearchPanel(v);
+      v.focus();
+    } else if (e.altKey && (e.key === 'c' || e.key === 'C')) {
+      e.preventDefault();
+      caseBtn.click();
+    } else if (e.altKey && (e.key === 'w' || e.key === 'W')) {
+      e.preventDefault();
+      wordBtn.click();
+    } else if (e.altKey && (e.key === 'r' || e.key === 'R')) {
+      e.preventDefault();
+      regexBtn.click();
+    }
+  });
+  readQuery(cm.getSearchQuery(v.state));
+  return {
+    dom,
+    top: true,
+    mount: () => {
+      // Abrir con texto seleccionado lo busca (como VS Code); si no, se queda la última búsqueda.
+      const sel = v.state.selection.main;
+      const picked = sel.empty ? '' : v.state.sliceDoc(sel.from, sel.to);
+      if (picked && !picked.includes('\n')) {
+        input.value = picked;
+        commit();
+      }
+      input.select();
+      refreshCount();
+    },
+    update: (u) => {
+      const changedQuery = u.transactions.some((t) =>
+        t.effects.some((e) => e.is(cm.setSearchQuery)),
+      );
+      if (changedQuery) readQuery(cm.getSearchQuery(u.state));
+      if (changedQuery || u.docChanged || u.selectionSet) refreshCount();
+    },
+  };
+}
+
 /**
  * Editor de código del JSON de anotaciones (P-200 a P-202): CodeMirror 6 con margen de plegado como VS Code.
  * Se carga de forma diferida (`import()`) para que ni la landing ni el lote paguen su peso. El plegado es solo
@@ -81,6 +327,8 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
   readonly ariaLabel = input<string>('');
   readonly foldLabel = input<string>('Plegar');
   readonly unfoldLabel = input<string>('Desplegar');
+  /** Textos del cuadro de búsqueda (Ctrl+F), traducidos por quien usa el editor. */
+  readonly searchLabels = input<JsonSearchLabels>(DEFAULT_SEARCH_LABELS);
   /** Línea (1) del error de sintaxis, para marcarla. 0 o null: ninguna. */
   readonly errorLine = input<number | null>(null);
 
@@ -128,13 +376,14 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
-    const [state, view, commands, language, langJson, highlight] = await Promise.all([
+    const [state, view, commands, language, langJson, highlight, search] = await Promise.all([
       import('@codemirror/state'),
       import('@codemirror/view'),
       import('@codemirror/commands'),
       import('@codemirror/language'),
       import('@codemirror/lang-json'),
       import('@lezer/highlight'),
+      import('@codemirror/search'),
     ]);
     if (this.destroyed) {
       return;
@@ -255,12 +504,17 @@ export class JsonCodeEditorComponent implements AfterViewInit, OnDestroy {
           return el;
         },
       }),
+      search.search({
+        top: true,
+        createPanel: (v) => createFindPanel(v, search, view, () => this.searchLabels()),
+      }),
       view.drawSelection(),
       view.highlightActiveLine(),
       commands.history(),
       language.syntaxHighlighting(highlight.classHighlighter),
       langJson.json(),
       view.keymap.of([
+        ...search.searchKeymap,
         ...language.foldKeymap,
         ...commands.defaultKeymap,
         ...commands.historyKeymap,

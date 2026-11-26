@@ -149,6 +149,7 @@
           (valueChange)="vm.onCoordsTextChange($event)" (pasted)="vm.onCoordsTextPaste()"
           [placeholderText]="'sidebar.jsonPlaceholder' | t" [ariaLabel]="'sidebar.jsonEditor.label' | t"
           [foldLabel]="'sidebar.jsonEditor.fold' | t" [unfoldLabel]="'sidebar.jsonEditor.unfold' | t"
+          [searchLabels]="{ find: 'sidebar.jsonEditor.search.find' | t, matchCase: 'sidebar.jsonEditor.search.matchCase' | t, wholeWord: 'sidebar.jsonEditor.search.wholeWord' | t, regexp: 'sidebar.jsonEditor.search.regexp' | t, previous: 'sidebar.jsonEditor.search.previous' | t, next: 'sidebar.jsonEditor.search.next' | t, close: 'sidebar.jsonEditor.search.close' | t, count: 'sidebar.jsonEditor.search.count' | t, none: 'sidebar.jsonEditor.search.none' | t }"
           [errorLine]="vm.jsonTreePreview().status === 'error' ? (vm.jsonTreePreview().errorAt?.line ?? null) : null" />
       </ng-container>
       <ng-template #jsonTreeView>

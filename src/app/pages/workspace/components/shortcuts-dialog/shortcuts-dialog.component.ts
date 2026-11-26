@@ -54,6 +54,7 @@ export class ShortcutsDialogComponent implements AfterViewInit {
         { keys: ['Ctrl/⌘', 'Z'], labelKey: 'shortcuts.items.undo' },
         { keys: ['Ctrl/⌘', 'Y'], labelKey: 'shortcuts.items.redo' },
         { keys: ['Ctrl/⌘', 'S'], labelKey: 'shortcuts.items.applyJson' },
+        { keys: ['Ctrl/⌘', 'F'], labelKey: 'shortcuts.items.findJson' },
       ],
     },
     {
