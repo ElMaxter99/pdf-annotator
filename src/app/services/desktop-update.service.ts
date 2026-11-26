@@ -27,8 +27,13 @@ export interface DesktopUpdateState {
   needsPassword?: boolean;
   /** La instalación pedirá el permiso de Windows (app en una carpeta del sistema, p. ej. «Archivos de programa»). */
   needsAdmin?: boolean;
-  /** Falló la instalación: «cancelled» (contraseña cancelada) u otro motivo; la descarga se conserva. */
-  installError?: 'cancelled' | 'failed';
+  /**
+   * Falló la instalación (la descarga se conserva): «cancelled» (se cerró la ventana de la contraseña), «unauthorized»
+   * (el sistema no autorizó, a veces sin llegar a pedir la contraseña) u otro motivo.
+   */
+  installError?: 'cancelled' | 'unauthorized' | 'failed';
+  /** Linux: comando para instalar a mano el paquete descargado («sudo apt install '…'»). */
+  manualCommand?: string;
   /** Motivo técnico del fallo (una línea) para mostrar y copiar. */
   installDetail?: string;
   /** Primera ejecución tras actualizar: versión de la que se venía. */
@@ -87,6 +92,8 @@ export interface DesktopBridge {
   installUpdate(): Promise<void>;
   installOnQuit(): Promise<void>;
   openReleasePage(): Promise<void>;
+  /** Linux: abre el paquete descargado con el instalador del sistema ('' = abierto; otro texto = motivo). */
+  openUpdatePackage?(): Promise<string>;
   dismissUpdated?(): Promise<void>;
 }
 
@@ -214,5 +221,11 @@ export class DesktopUpdateService {
   }
   openNotes(): void {
     void this.bridge?.openReleasePage();
+  }
+
+  /** Abre el paquete descargado con el instalador del sistema; devuelve false si no se pudo. */
+  async openPackage(): Promise<boolean> {
+    const result = await this.bridge?.openUpdatePackage?.();
+    return result === '';
   }
 }

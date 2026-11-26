@@ -1942,7 +1942,13 @@
       "copied": "Detalls copiats",
       "askPasswordAgain": "Demana la contrasenya un altre cop",
       "askPermissionAgain": "Demana permís un altre cop",
-      "cancelledTextWindows": "Vas cancel·lar el permís de Windows, així que no s’ha pogut instal·lar. La teva versió {{current}} continua funcionant i la nova ja està baixada: no cal tornar-la a baixar."
+      "cancelledTextWindows": "Vas cancel·lar el permís de Windows, així que no s’ha pogut instal·lar. La teva versió {{current}} continua funcionant i la nova ja està baixada: no cal tornar-la a baixar.",
+      "unauthorizedTitle": "El sistema no ha deixat instal·lar l'actualització",
+      "unauthorizedText": "Ubuntu no ha autoritzat la instal·lació: de vegades no arriba a mostrar la finestra de la contrasenya o la contrasenya no s'ha acceptat. La teva versió {{current}} continua funcionant i la nova ja està baixada. Pots demanar la contrasenya un altre cop, obrir el paquet amb l'instal·lador del sistema o instal·lar-lo des del terminal.",
+      "openPackage": "Obre amb l'instal·lador del sistema",
+      "copyCommand": "Copia l'ordre per al terminal",
+      "commandCopied": "Ordre copiada: enganxa-la en un terminal i posa la contrasenya",
+      "openPackageFailed": "No s'ha pogut obrir l'instal·lador del sistema: copia l'ordre i enganxa-la en un terminal"
     },
     "done": {
       "title": "PDF Annotator s'ha actualitzat a la {{version}}",

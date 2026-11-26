@@ -96,3 +96,44 @@ test('tras reabrir confirma la actualización y se puede cerrar', async ({ page 
   await done.getByRole('button', { name: 'Cerrar' }).click();
   await expect(done).toHaveCount(0);
 });
+
+test('Linux: si el sistema no autoriza (sin llegar a pedir la contraseña) no dice «cancelaste» y ofrece el instalador del sistema y el comando', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await fakeDesktop(page, {
+    ...ready,
+    installError: 'unauthorized',
+    installDetail: 'Error executing command as another user: Not authorized',
+    manualCommand: "sudo apt install '/home/a/.cache/pdf-annotator-desktop-updater/pending/PDF-Annotator.deb'",
+  });
+  await page.addInitScript(() => {
+    const w = window as unknown as { desktop: Record<string, unknown>; __opened: number };
+    w.__opened = 0;
+    const id = setInterval(() => {
+      if (w.desktop) {
+        w.desktop['openUpdatePackage'] = async () => ((w.__opened += 1), '');
+        clearInterval(id);
+      }
+    }, 0);
+  });
+  await page.goto('/landing');
+  const dialog = page.getByTestId('update-install-error');
+  await expect(dialog).toContainText('El sistema no dejó instalar la actualización');
+  await expect(dialog).not.toContainText('Cancelaste');
+  await expect(page.getByTestId('update-install-detail')).toContainText('Not authorized');
+  await expect(page.getByTestId('update-install-retry')).toContainText('Pedir la contraseña otra vez');
+
+  await page.getByTestId('update-install-open-package').click();
+  expect(await page.evaluate(() => (window as unknown as { __opened: number }).__opened)).toBe(1);
+
+  await page.getByTestId('update-install-copy-command').click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    "sudo apt install '/home/a/.cache/pdf-annotator-desktop-updater/pending/PDF-Annotator.deb'",
+  );
+});
+
+test('al cancelar de verdad la contraseña no se ofrecen las salidas sin pkexec', async ({ page }) => {
+  await fakeDesktop(page, { ...ready, installError: 'cancelled', manualCommand: "sudo apt install '/x.deb'" });
+  await page.goto('/landing');
+  await expect(page.getByTestId('update-install-error')).toContainText('Cancelaste la contraseña');
+  await expect(page.getByTestId('update-install-open-package')).toHaveCount(0);
+});

@@ -132,7 +132,7 @@ test('classifyPkexecResult: cancelar (126/127), dependencias, error y bien', asy
   const { classifyPkexecResult } = await import('./update-logic.mjs');
   assert.equal(classifyPkexecResult({ code: 0 }), 'ok');
   assert.equal(classifyPkexecResult({ code: 126 }), 'cancelled');
-  assert.equal(classifyPkexecResult({ code: 127 }), 'cancelled');
+  assert.equal(classifyPkexecResult({ code: 127 }), 'unauthorized');
   assert.equal(classifyPkexecResult({ code: 1, stderr: 'dpkg: dependency problems prevent configuration of pdf-annotator' }), 'deps');
   assert.equal(classifyPkexecResult({ code: 1, stderr: 'algo raro' }), 'failed');
 });
@@ -174,7 +174,8 @@ test('runLinuxInstall: cancelar no abre otra ventana; pedirla otra vez instala; 
 test('classifyPkexecResult: sin agente de polkit NO es una cancelación; privilegedEnv quita lo de Electron', async () => {
   const { classifyPkexecResult, privilegedEnv } = await import('./update-logic.mjs');
   assert.equal(classifyPkexecResult({ code: 126, stderr: '' }), 'cancelled');
-  assert.equal(classifyPkexecResult({ code: 127, stderr: 'Error executing command as another user: Not authorized' }), 'cancelled');
+  assert.equal(classifyPkexecResult({ code: 127, stderr: 'Error executing command as another user: Not authorized\n\nThis incident has been reported.' }), 'unauthorized');
+  assert.equal(classifyPkexecResult({ code: 126, stderr: 'Error executing command as another user: Request dismissed' }), 'cancelled');
   assert.equal(classifyPkexecResult({ code: 127, stderr: 'Error executing command as another user: No authentication agent found.' }), 'failed');
   assert.equal(classifyPkexecResult({ code: -1, stderr: 'spawn pkexec ENOENT' }), 'failed');
   assert.deepEqual(privilegedEnv({ DISPLAY: ':0', ELECTRON_RUN_AS_NODE: '1', APPIMAGE: '/x', PATH: '/bin' }), { DISPLAY: ':0', PATH: '/bin' });
@@ -184,4 +185,24 @@ test('feedForVersion fija la etiqueta y usa siempre latest*.yml', () => {
   assert.deepEqual(feedForVersion('1.19.0'), { url: `${RELEASES_URL}/download/v1.19.0/`, channel: 'latest' });
   assert.deepEqual(feedForVersion('1.19.0-rc.7'), { url: `${RELEASES_URL}/download/v1.19.0-rc.7/`, channel: 'latest' });
   assert.equal(feedForVersion('basura'), null);
+});
+
+test('linuxManualCommand: comando para pegar en la terminal, con la ruta entre comillas', async () => {
+  const { linuxManualCommand } = await import('./update-logic.mjs');
+  assert.equal(linuxManualCommand({ packageType: 'deb', file: '/home/a/.cache/x/pending/PDF-Annotator.deb' }), "sudo apt install '/home/a/.cache/x/pending/PDF-Annotator.deb'");
+  assert.equal(linuxManualCommand({ packageType: 'rpm', file: "/tmp/O'Neil.rpm" }), "sudo dnf install '/tmp/O'\\''Neil.rpm'");
+  assert.equal(linuxManualCommand({ packageType: 'deb', file: '' }), null);
+  assert.equal(linuxManualCommand({ packageType: 'appimage', file: '/x' }), null);
+});
+
+test('runLinuxInstall: «no autorizado» no lanza el arreglo de dependencias ni una segunda ventana', async () => {
+  const { runLinuxInstall } = await import('./update-logic.mjs');
+  const calls = [];
+  const out = await runLinuxInstall({
+    plan: { cmd: 'pkexec', args: ['dpkg', '-i', '/x.deb'] },
+    packageType: 'deb',
+    run: async (p) => (calls.push(p), { code: 127, stderr: 'Error executing command as another user: Not authorized' }),
+  });
+  assert.equal(out.kind, 'unauthorized');
+  assert.equal(calls.length, 1);
 });

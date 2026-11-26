@@ -1942,7 +1942,13 @@
       "copied": "Détails copiés",
       "askPasswordAgain": "Redemander le mot de passe",
       "askPermissionAgain": "Redemander l’autorisation",
-      "cancelledTextWindows": "Vous avez annulé l’autorisation de Windows, l’installation n’a donc pas pu se faire. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée : inutile de la retélécharger."
+      "cancelledTextWindows": "Vous avez annulé l’autorisation de Windows, l’installation n’a donc pas pu se faire. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée : inutile de la retélécharger.",
+      "unauthorizedTitle": "Le système n'a pas autorisé l'installation de la mise à jour",
+      "unauthorizedText": "Ubuntu n'a pas autorisé l'installation : parfois la fenêtre du mot de passe ne s'affiche pas, ou le mot de passe n'a pas été accepté. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée. Vous pouvez redemander le mot de passe, ouvrir le paquet avec l'installateur du système ou l'installer depuis le terminal.",
+      "openPackage": "Ouvrir avec l'installateur du système",
+      "copyCommand": "Copier la commande pour le terminal",
+      "commandCopied": "Commande copiée : collez-la dans un terminal et saisissez votre mot de passe",
+      "openPackageFailed": "Impossible d'ouvrir l'installateur du système : copiez la commande et collez-la dans un terminal"
     },
     "done": {
       "title": "PDF Annotator a été mis à jour en {{version}}",

@@ -157,6 +157,20 @@ export function linuxInstallCommand({ packageType, file, has }) {
   return null;
 }
 
+/** Comillas simples de shell: `'…'` con las de dentro escapadas. */
+const shQuote = (text) => `'${String(text).replace(/'/g, `'\\''`)}'`;
+
+/**
+ * Comando para instalar a mano el paquete ya descargado (si `pkexec` no puede): se copia y se pega en una terminal.
+ * `null` si no hay archivo o tipo conocido.
+ */
+export function linuxManualCommand({ packageType, file }) {
+  if (!file) return null;
+  if (packageType === 'deb') return `sudo apt install ${shQuote(file)}`;
+  if (packageType === 'rpm') return `sudo dnf install ${shQuote(file)}`;
+  return null;
+}
+
 /** Arreglo de dependencias tras un `dpkg -i` que falló por ellas (solo si la persona ya dio la contraseña). */
 export const linuxFixDepsCommand = () => ({ cmd: 'pkexec', args: ['apt-get', 'install', '-f', '-y'] });
 
@@ -171,14 +185,18 @@ export function privilegedEnv(env = {}) {
 }
 
 /**
- * Resultado de `pkexec …`: `ok`, `cancelled` (126 = ventana cerrada o cancelada, 127 = no autorizado), `deps`
- * (dpkg instaló a medias por dependencias que faltan) o `failed`.
+ * Resultado de `pkexec …`: `ok`; `cancelled` (la persona cerró la ventana: «Request dismissed», o 126 sin más);
+ * `unauthorized` (127 / «Not authorized»: polkit no autorizó, a veces SIN llegar a enseñar la ventana, p. ej. si no
+ * considera la app parte de la sesión activa; también tras fallar la contraseña); `deps` (dpkg instaló a medias por
+ * dependencias que faltan) o `failed`.
  */
 export function classifyPkexecResult({ code, stderr = '' }) {
   if (code === 0) return 'ok';
+  const text = String(stderr);
   // Sin agente de polkit (o sin sesión gráfica) pkexec sale con 126/127 SIN haber pedido nada: no es una cancelación.
-  if (code === -1 || /no authentication agent|error getting authority|cannot open display|failed to connect|command not found|no such file/i.test(String(stderr))) return 'failed';
-  if (code === 126 || code === 127) return 'cancelled';
+  if (code === -1 || /no authentication agent|error getting authority|cannot open display|failed to connect|command not found|no such file/i.test(text)) return 'failed';
+  if (/request dismissed|dismissed|cancel/i.test(text) || (code === 126 && !text.trim())) return 'cancelled';
+  if (code === 126 || code === 127 || /not authori[sz]ed/i.test(text)) return 'unauthorized';
   if (/dependency problems|dependencias|depends on .* however/i.test(String(stderr))) return 'deps';
   return 'failed';
 }
