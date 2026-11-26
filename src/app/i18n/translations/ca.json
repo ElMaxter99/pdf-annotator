@@ -1948,7 +1948,9 @@
       "openPackage": "Obre amb l'instal·lador del sistema",
       "copyCommand": "Copia l'ordre per al terminal",
       "commandCopied": "Ordre copiada: enganxa-la en un terminal i posa la contrasenya",
-      "openPackageFailed": "No s'ha pogut obrir l'instal·lador del sistema: copia l'ordre i enganxa-la en un terminal"
+      "openPackageFailed": "No s'ha pogut obrir l'instal·lador del sistema: copia l'ordre i enganxa-la en un terminal",
+      "blockedTitle": "Aquest sistema no deixa que l'app demani la contrasenya",
+      "blockedText": "En aquest Ubuntu l'app no pot demanar la contrasenya d'administrador pel seu compte (el sistema li bloqueja pkexec), així que no es pot instal·lar des d'aquí. La teva versió {{current}} continua funcionant i la nova ja està baixada: obre-la amb l'instal·lador del sistema, que sí que et demanarà la contrasenya, o instal·la-la des del terminal."
     },
     "done": {
       "title": "PDF Annotator s'ha actualitzat a la {{version}}",

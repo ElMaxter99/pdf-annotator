@@ -1,0 +1,4 @@
+---
+type: Fixed
+---
+**Actualizar en Linux cuando el sistema bloquea `pkexec` para la app (feedback de Maxter con la 1.20.2-rc.2, Ubuntu: «pkexec must be setuid root»):** en algunos Ubuntu el proceso de la app tiene `no_new_privs`, que heredan los programas que lanza, y `pkexec` no puede subir de privilegios: sale sin pedir la contraseña, así que pedirla otra vez no servía. Ahora la app lo detecta antes de intentarlo (`/proc/self/status`, o por ese mensaje de `pkexec`) y, si existe PackageKit (`pkcon`), instala con él, que pide la contraseña con la ventana normal del sistema sin necesitar setuid. Si no hay PackageKit, el aviso lo explica («Este sistema no deja que la app pida la contraseña») y deja como botón principal «Abrir con el instalador del sistema», además de «Copiar el comando para la terminal». `update.log` anota qué camino se tomó. Con pruebas.

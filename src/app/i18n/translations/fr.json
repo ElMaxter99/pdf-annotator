@@ -1948,7 +1948,9 @@
       "openPackage": "Ouvrir avec l'installateur du système",
       "copyCommand": "Copier la commande pour le terminal",
       "commandCopied": "Commande copiée : collez-la dans un terminal et saisissez votre mot de passe",
-      "openPackageFailed": "Impossible d'ouvrir l'installateur du système : copiez la commande et collez-la dans un terminal"
+      "openPackageFailed": "Impossible d'ouvrir l'installateur du système : copiez la commande et collez-la dans un terminal",
+      "blockedTitle": "Ce système ne laisse pas l'app demander le mot de passe",
+      "blockedText": "Sur cet Ubuntu, l'app ne peut pas demander elle-même le mot de passe administrateur (le système lui bloque pkexec) : impossible d'installer d'ici. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée : ouvrez-la avec l'installateur du système, qui demandera le mot de passe, ou installez-la depuis le terminal."
     },
     "done": {
       "title": "PDF Annotator a été mis à jour en {{version}}",
