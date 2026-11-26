@@ -1942,7 +1942,13 @@
       "copied": "Detalhes copiados",
       "askPasswordAgain": "Pedir a palavra-passe outra vez",
       "askPermissionAgain": "Pedir permissão outra vez",
-      "cancelledTextWindows": "Cancelou a permissão do Windows, por isso não foi possível instalar. A sua versão {{current}} continua a funcionar e a nova já está descarregada: não é preciso descarregá-la outra vez."
+      "cancelledTextWindows": "Cancelou a permissão do Windows, por isso não foi possível instalar. A sua versão {{current}} continua a funcionar e a nova já está descarregada: não é preciso descarregá-la outra vez.",
+      "unauthorizedTitle": "O sistema não deixou instalar a atualização",
+      "unauthorizedText": "O Ubuntu não autorizou a instalação: às vezes não chega a mostrar a janela da palavra-passe ou a palavra-passe não foi aceite. A tua versão {{current}} continua a funcionar e a nova já está transferida. Podes pedir a palavra-passe outra vez, abrir o pacote com o instalador do sistema ou instalá-lo a partir do terminal.",
+      "openPackage": "Abrir com o instalador do sistema",
+      "copyCommand": "Copiar o comando para o terminal",
+      "commandCopied": "Comando copiado: cola-o num terminal e escreve a tua palavra-passe",
+      "openPackageFailed": "Não foi possível abrir o instalador do sistema: copia o comando e cola-o num terminal"
     },
     "done": {
       "title": "O PDF Annotator foi atualizado para a {{version}}",

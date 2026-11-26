@@ -1942,7 +1942,13 @@
       "copied": "Detalles copiados",
       "askPasswordAgain": "Pedir la contraseña otra vez",
       "askPermissionAgain": "Pedir permiso otra vez",
-      "cancelledTextWindows": "Cancelaste el permiso de Windows, así que no se pudo instalar. Tu versión {{current}} sigue funcionando y la nueva ya está descargada: no hace falta bajarla otra vez."
+      "cancelledTextWindows": "Cancelaste el permiso de Windows, así que no se pudo instalar. Tu versión {{current}} sigue funcionando y la nueva ya está descargada: no hace falta bajarla otra vez.",
+      "unauthorizedTitle": "El sistema no dejó instalar la actualización",
+      "unauthorizedText": "Ubuntu no autorizó la instalación: a veces no llega a mostrar la ventana de la contraseña o la contraseña no se aceptó. Tu versión {{current}} sigue funcionando y la nueva ya está descargada. Puedes pedir la contraseña otra vez, abrir el paquete con el instalador del sistema o instalarlo desde la terminal.",
+      "openPackage": "Abrir con el instalador del sistema",
+      "copyCommand": "Copiar el comando para la terminal",
+      "commandCopied": "Comando copiado: pégalo en una terminal y pon tu contraseña",
+      "openPackageFailed": "No se pudo abrir el instalador del sistema: copia el comando y pégalo en una terminal"
     },
     "done": {
       "title": "PDF Annotator se actualizó a {{version}}",

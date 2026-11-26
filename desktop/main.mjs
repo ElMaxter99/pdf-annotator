@@ -7,7 +7,7 @@ import { accessSync, appendFileSync, constants as fsConstants, existsSync, readF
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, classifyInstallError, feedForVersion, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
+import { RELEASES_URL, REPO, classifyInstallError, feedForVersion, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, linuxManualCommand, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { setupProjectsIpc } from './projects-ipc.mjs';
@@ -357,6 +357,13 @@ function setupIpc() {
     autoUpdater.autoInstallOnAppQuit = true;
     setState({ installOnQuit: true });
   });
+  // Abre el paquete descargado con el instalador del sistema (que pide la contraseña por su cuenta). Solo esa ruta.
+  handle('desktop:update:open-package', async () => {
+    const file = autoUpdater.installerPath;
+    if (process.platform !== 'linux' || !file) return 'missing';
+    logUpdate('abriendo el paquete con el instalador del sistema');
+    return shell.openPath(file);
+  });
   handle('desktop:update:open-release', () => shell.openExternal(state.notesUrl?.startsWith(RELEASES_URL) ? state.notesUrl : RELEASES_URL));
 }
 
@@ -394,8 +401,15 @@ async function installLinux(plan) {
   }
   rmSync(updatedFile, { force: true });
   if (kind === 'failed' && !result.stderr) result.stderr = `pkexec exit ${result.code}`;
-  logUpdate(`instalación ${kind === 'cancelled' ? 'cancelada (contraseña)' : 'fallida'}: código ${result.code} ${installDetail(result.stderr, os.homedir())}`);
-  setState({ status: 'ready', installError: kind === 'cancelled' ? 'cancelled' : 'failed', installDetail: kind === 'cancelled' ? undefined : installDetail(result.stderr || `código ${result.code}`, os.homedir()) });
+  const label = { cancelled: 'cancelada (contraseña)', unauthorized: 'no autorizada por el sistema (polkit)' }[kind] ?? 'fallida';
+  logUpdate(`instalación ${label}: código ${result.code} ${installDetail(result.stderr, os.homedir())}`);
+  setState({
+    status: 'ready',
+    installError: kind === 'cancelled' || kind === 'unauthorized' ? kind : 'failed',
+    installDetail: kind === 'cancelled' ? undefined : installDetail(result.stderr || `código ${result.code}`, os.homedir()),
+    // Salida sin pkexec: el comando para la terminal (con la ruta del paquete, que no sale del equipo).
+    manualCommand: linuxManualCommand({ packageType, file: autoUpdater.installerPath }) ?? undefined,
+  });
 }
 
 function installWindowsElevated(installer) {

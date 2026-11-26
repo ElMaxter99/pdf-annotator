@@ -87,4 +87,5 @@ contextBridge.exposeInMainWorld('desktop', {
     reveal: (id) => ipcRenderer.invoke('storage:reveal', id),
   },
   openReleasePage: () => ipcRenderer.invoke('desktop:update:open-release'),
+  openUpdatePackage: () => ipcRenderer.invoke('desktop:update:open-package'),
 });

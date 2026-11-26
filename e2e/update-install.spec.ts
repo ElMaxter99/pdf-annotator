@@ -63,6 +63,7 @@ test('si se cancela la contraseña se explica y «Reintentar» reutiliza la desc
   const dialog = page.getByTestId('update-install-error');
   await expect(dialog).toContainText('Cancelaste la contraseña');
   await expect(page.getByTestId('update-install-retry')).toContainText('Pedir la contraseña otra vez');
+  await expect(dialog.getByRole('button')).toHaveText(['Pedir la contraseña otra vez', 'Ahora no']);
   await page.getByTestId('update-install-retry').click();
   await expect(page.getByTestId('update-installing')).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { __installCalls: number }).__installCalls)).toBe(2);
@@ -82,6 +83,12 @@ test('un fallo muestra el motivo real y «Ahora no» devuelve la tarjeta', async
   await fakeDesktop(page, { ...ready, installError: 'failed', installDetail: 'dpkg: error de dependencias' });
   await page.goto('/landing');
   await expect(page.getByTestId('update-install-detail')).toContainText('dpkg: error de dependencias');
+  await expect(page.getByTestId('update-install-error').getByRole('button')).toHaveText([
+    'Reintentar',
+    'Descargar el paquete ↗',
+    'Copiar detalles',
+    'Ahora no',
+  ]);
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('update-install-error')).toHaveCount(0);
   await expect(page.getByTestId('update-card')).toBeVisible();
@@ -95,4 +102,52 @@ test('tras reabrir confirma la actualización y se puede cerrar', async ({ page 
   await expect(done).toContainText('1.13.0-rc.1');
   await done.getByRole('button', { name: 'Cerrar' }).click();
   await expect(done).toHaveCount(0);
+});
+
+test('Linux: si el sistema no autoriza (sin llegar a pedir la contraseña) no dice «cancelaste» y ofrece el instalador del sistema y el comando', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await fakeDesktop(page, {
+    ...ready,
+    installError: 'unauthorized',
+    installDetail: 'Error executing command as another user: Not authorized',
+    manualCommand: "sudo apt install '/home/a/.cache/pdf-annotator-desktop-updater/pending/PDF-Annotator.deb'",
+  });
+  await page.addInitScript(() => {
+    const w = window as unknown as { desktop: Record<string, unknown>; __opened: number };
+    w.__opened = 0;
+    const id = setInterval(() => {
+      if (w.desktop) {
+        w.desktop['openUpdatePackage'] = async () => ((w.__opened += 1), '');
+        clearInterval(id);
+      }
+    }, 0);
+  });
+  await page.goto('/landing');
+  const dialog = page.getByTestId('update-install-error');
+  await expect(dialog).toContainText('El sistema no dejó instalar la actualización');
+  await expect(dialog).not.toContainText('Cancelaste');
+  await expect(page.getByTestId('update-install-detail')).toContainText('Not authorized');
+  // Un botón por acción: sin reintentar pkexec (fallaría igual) ni «Al cerrar la app», y un solo «Ahora no».
+  await expect(page.getByTestId('update-install-retry')).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'Al cerrar la app' })).toHaveCount(0);
+  await expect(dialog.getByRole('button')).toHaveText([
+    'Abrir con el instalador del sistema',
+    'Copiar el comando para la terminal',
+    'Ahora no',
+  ]);
+
+  await page.getByTestId('update-install-open-package').click();
+  expect(await page.evaluate(() => (window as unknown as { __opened: number }).__opened)).toBe(1);
+
+  await page.getByTestId('update-install-copy-command').click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    "sudo apt install '/home/a/.cache/pdf-annotator-desktop-updater/pending/PDF-Annotator.deb'",
+  );
+});
+
+test('al cancelar de verdad la contraseña no se ofrecen las salidas sin pkexec', async ({ page }) => {
+  await fakeDesktop(page, { ...ready, installError: 'cancelled', manualCommand: "sudo apt install '/x.deb'" });
+  await page.goto('/landing');
+  await expect(page.getByTestId('update-install-error')).toContainText('Cancelaste la contraseña');
+  await expect(page.getByTestId('update-install-open-package')).toHaveCount(0);
 });
