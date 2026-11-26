@@ -607,6 +607,7 @@ export class WorkspaceJson {
     if (outOfPage) parts.push(t('outOfPage', outOfPage));
     if (report.fontSizeOutOfRange) parts.push(t('fontSize', report.fontSizeOutOfRange));
     if (report.opacityOutOfRange) parts.push(t('opacity', report.opacityOutOfRange));
+    if (report.invalidDateFormat) parts.push(t('dateFormat', report.invalidDateFormat));
     if (!parts.length) {
       return;
     }

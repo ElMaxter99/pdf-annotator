@@ -1,4 +1,27 @@
+// Colores de VS Code (Dark+ y Light+) para que el editor del JSON se lea igual que allí.
 app-json-code-editor.json-code-editor {
+  --vsc-selection: #264f78;
+  --vsc-selection-inactive: #3a3d41;
+  --vsc-flash: #4a8fd4;
+  --vsc-line-number: #858585;
+  --vsc-line-number-active: #c6c6c6;
+  --vsc-fold-icon: #c5c5c5;
+  --vsc-fold-background: rgba(38, 79, 120, 0.3);
+  --vsc-fold-placeholder: #808080;
+  --vsc-key: #9cdcfe;
+  --vsc-string: #ce9178;
+  --vsc-number: #b5cea8;
+  --vsc-keyword: #569cd6;
+  --vsc-widget-bg: #252526;
+  --vsc-widget-shadow: rgba(0, 0, 0, 0.36);
+  --vsc-input-bg: #3c3c3c;
+  --vsc-input-fg: #cccccc;
+  --vsc-input-border: transparent;
+  --vsc-focus: #007fd4;
+  --vsc-toggle-on: rgba(0, 127, 212, 0.4);
+  --vsc-error: #f48771;
+  --vsc-match-current: #515c6a;
+  --vsc-match: rgba(234, 92, 0, 0.33);
   display: block;
   position: relative;
   overflow: hidden;
@@ -32,44 +55,189 @@ app-json-code-editor.json-code-editor {
   }
   .cm-gutters {
     background: transparent;
-    color: var(--muted);
-    border-right: 1px solid var(--input-border);
+    color: var(--vsc-line-number);
+    border-right: none;
   }
   .cm-lineNumbers .cm-gutterElement {
     padding: 0 6px 0 8px;
     min-width: 2.4em;
     font-size: 0.78rem;
   }
+  .cm-activeLineGutter.cm-gutterElement {
+    color: var(--vsc-line-number-active);
+  }
   .cm-foldGutter .cm-gutterElement {
-    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
     cursor: pointer;
-    color: var(--muted);
   }
+  // Como VS Code («showFoldingControls: mouseover»): las flechas salen al pasar por el margen; la de un
+  // bloque plegado se queda siempre a la vista.
   .cm-foldMarker {
-    display: inline-block;
-    min-width: 1em;
-    text-align: center;
-    font-size: 0.8rem;
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+    color: var(--vsc-fold-icon);
+    opacity: 0;
+    transition: opacity 0.1s linear;
   }
-  .cm-foldGutter .cm-gutterElement:hover .cm-foldMarker {
-    color: var(--text);
+  .cm-gutters:hover .cm-foldMarker,
+  .cm-foldMarker--folded,
+  .cm-foldMarker:focus-visible {
+    opacity: 1;
   }
   .cm-foldPlaceholder {
-    background: var(--soft, rgba(255, 255, 255, 0.08));
-    border: 1px solid var(--input-border);
-    color: var(--muted);
-    border-radius: 6px;
-    padding: 0 6px;
+    display: inline-block;
+    background: transparent;
+    border: none;
+    color: var(--vsc-fold-placeholder);
+    padding: 0 3px;
     margin: 0 2px;
+    border-radius: 3px;
+    line-height: 1.1;
     cursor: pointer;
+  }
+  .cm-foldPlaceholder:hover {
+    background: rgba(128, 128, 128, 0.25);
+  }
+  .cm-foldedLine {
+    background: var(--vsc-fold-background);
   }
   .cm-activeLine,
   .cm-activeLineGutter {
-    background: rgba(148, 163, 184, 0.1);
+    background: rgba(148, 163, 184, 0.08);
   }
-  .cm-selectionBackground,
-  .cm-focused .cm-selectionBackground {
-    background: rgba(94, 234, 212, 0.28);
+  .cm-selectionBackground {
+    background: var(--vsc-selection-inactive);
+  }
+  .cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
+    background: var(--vsc-selection);
+  }
+  // Cuadro de búsqueda (Ctrl+F) con el aspecto del «find widget» de VS Code: flota arriba a la derecha.
+  .cm-panels.cm-panels-top {
+    position: absolute;
+    top: 0;
+    right: 14px;
+    left: 8px;
+    display: flex;
+    justify-content: flex-end;
+    border: none;
+    background: transparent;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .cm-vscFind {
+    pointer-events: auto;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 4px 4px 6px;
+    background: var(--vsc-widget-bg);
+    color: var(--vsc-input-fg);
+    box-shadow: 0 0 8px 2px var(--vsc-widget-shadow);
+    border-radius: 0 0 4px 4px;
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+  }
+  .cm-vscFind__field {
+    display: flex;
+    align-items: center;
+    flex: 0 1 220px;
+    min-width: 90px;
+    background: var(--vsc-input-bg);
+    border: 1px solid var(--vsc-input-border);
+    border-radius: 2px;
+  }
+  .cm-vscFind__field:focus-within {
+    border-color: var(--vsc-focus);
+  }
+  .cm-vscFind--none .cm-vscFind__field {
+    border-color: var(--vsc-error);
+  }
+  .cm-vscFind__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 24px;
+    padding: 0 4px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--vsc-input-fg);
+    font: inherit;
+  }
+  .cm-vscFind__toggles {
+    display: inline-flex;
+    gap: 1px;
+    padding-right: 2px;
+  }
+  .cm-vscFind__toggle {
+    width: 22px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--vsc-input-fg);
+    font: 600 11px/1 'Fira Code', monospace;
+    cursor: pointer;
+  }
+  .cm-vscFind__toggle--word {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .cm-vscFind__toggle:hover {
+    background: rgba(90, 93, 94, 0.31);
+  }
+  .cm-vscFind__toggle[aria-pressed='true'] {
+    border-color: var(--vsc-focus);
+    background: var(--vsc-toggle-on);
+  }
+  .cm-vscFind__count {
+    flex: none;
+    min-width: 56px;
+    padding: 0 6px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .cm-vscFind--none .cm-vscFind__count {
+    color: var(--vsc-error);
+  }
+  .cm-vscFind__action {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--vsc-input-fg);
+    cursor: pointer;
+  }
+  .cm-vscFind__action:hover {
+    background: rgba(90, 93, 94, 0.31);
+  }
+  .cm-vscFind__toggle:focus-visible,
+  .cm-vscFind__action:focus-visible {
+    outline: 1px solid var(--vsc-focus);
+    outline-offset: -1px;
+  }
+  .cm-searchMatch {
+    background: var(--vsc-match);
+    border-radius: 2px;
+  }
+  .cm-searchMatch.cm-searchMatch-selected {
+    background: var(--vsc-match-current);
+    outline: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  .cm-copyFlash {
+    animation: json-copy-flash 600ms ease-out;
   }
   .cm-errorLine {
     background: rgba(255, 107, 107, 0.16);
@@ -78,33 +246,62 @@ app-json-code-editor.json-code-editor {
     color: var(--muted);
   }
   .tok-propertyName {
-    color: var(--accent-text, var(--accent));
+    color: var(--vsc-key);
   }
   .tok-string {
-    color: var(--warning-text, #fbbf24);
+    color: var(--vsc-string);
   }
   .tok-number {
-    color: #a5b4fc;
+    color: var(--vsc-number);
   }
   .tok-bool,
   .tok-null {
-    color: #f0abfc;
+    color: var(--vsc-keyword);
   }
 }
 
 :root.theme-light app-json-code-editor.json-code-editor {
-  .tok-number {
-    color: #4338ca;
-  }
-  .tok-bool,
-  .tok-null {
-    color: #a21caf;
-  }
-  .cm-selectionBackground,
-  .cm-focused .cm-selectionBackground {
-    background: rgba(15, 118, 110, 0.22);
-  }
+  --vsc-selection: #add6ff;
+  --vsc-selection-inactive: #e5ebf1;
+  --vsc-flash: #6fb2f5;
+  --vsc-line-number: #237893;
+  --vsc-line-number-active: #0b216f;
+  --vsc-fold-icon: #424242;
+  --vsc-fold-background: rgba(173, 214, 255, 0.3);
+  --vsc-fold-placeholder: #808080;
+  --vsc-key: #0451a5;
+  --vsc-string: #a31515;
+  --vsc-number: #098658;
+  --vsc-keyword: #0000ff;
+  --vsc-widget-bg: #f3f3f3;
+  --vsc-widget-shadow: rgba(0, 0, 0, 0.16);
+  --vsc-input-bg: #ffffff;
+  --vsc-input-fg: #3b3b3b;
+  --vsc-input-border: #cecece;
+  --vsc-focus: #0090f1;
+  --vsc-toggle-on: rgba(0, 144, 241, 0.2);
+  --vsc-error: #be1100;
+  --vsc-match-current: #a8ac94;
+  --vsc-match: rgba(234, 92, 0, 0.33);
+
   .cm-errorLine {
     background: rgba(220, 38, 38, 0.12);
+  }
+}
+
+// Destello al copiar: el color de la selección se aviva un instante y vuelve.
+@keyframes json-copy-flash {
+  0% {
+    background: var(--vsc-flash);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  app-json-code-editor.json-code-editor .cm-copyFlash {
+    // Sin movimiento: un destello fijo que se apaga de golpe.
+    animation-timing-function: steps(1, end);
   }
 }

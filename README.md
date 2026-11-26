@@ -72,7 +72,7 @@ PDF Annotator es un editor visual de **coordenadas sobre PDFs**. Haces clic dond
 ## ✨ Qué puedes hacer
 | | |
 | --- | --- |
-| 🎯 **Colocar** | Clic sobre el PDF para crear textos, *checks*, *radios* o números con formato (decimales y sufijo, p. ej. `1250.50 €`). |
+| 🎯 **Colocar** | Clic sobre el PDF para crear textos, *checks*, *radios*, números con formato (decimales y sufijo, p. ej. `1250.50 €`) o fechas con formato (`DD/MM/YYYY`, `YYYY-MM-DD`…). |
 | 🖱️ **Mover y editar** | Selecciona varias con `Shift`+clic y muévelas, selecciónalas también con un recuadro, alinéalas (izquierda, centro, derecha, arriba, medio, abajo) o distribúyelas con huecos iguales, duplícalas o bórralas de una vez. Arrastra anotaciones, edita fuente, tamaño, color (selector/HEX/RGB), opacidad y fondo. Bloquea u oculta las que no quieres tocar o exportar. |
 | 📐 **Ser preciso** | Rejilla, reglas, guías de alineación e *imán* a rejilla, márgenes, centros o puntos propios. Coordenadas PDF o de canvas. |
 | 🧾 **JSON en vivo** | Editor de texto y vista de árbol sincronizados. Pega, importa, copia o descarga. |
@@ -271,6 +271,7 @@ Pulsa **`?`** (o el botón **Atajos**) para verlos en la app.
 | Doble clic con el botón central · `Ctrl/⌘` + doble clic en zona vacía | Alterna 100 % y ajustar al ancho, manteniendo bajo el cursor el punto pulsado (en «Dividida» desenlazada, solo el panel bajo el puntero). Con `Ctrl/⌘`, un clic en zona vacía ya no crea una anotación |
 | `Ctrl/⌘ + Z` · `Ctrl/⌘ + Y` | Deshacer / rehacer |
 | `Ctrl/⌘ + S` | Aplicar el JSON del editor |
+| `Ctrl/⌘ + F` (en el editor del JSON) | Buscar en el JSON, como en VS Code: `Intro` / `Mayús+Intro` para la siguiente o la anterior, `Alt+C` mayúsculas, `Alt+W` palabra completa, `Alt+R` expresión regular, `Esc` cierra |
 | `Ctrl/⌘ + ,` | Abrir las Opciones de la app |
 | `Alt` + arrastrar | Arrastrar una anotación sin que se alinee con las demás (Opciones › Editor) |
 | `Ctrl/⌘ + K` | Paleta de comandos: buscar y ejecutar cualquier acción, en el editor y en el panel del lote (↑↓ Intro Esc) |
@@ -302,8 +303,8 @@ Los atajos de una sola tecla se ignoran mientras escribes en un campo.
 | `x`, `y` | Puntos PDF. Origen en la **esquina inferior izquierda**. |
 | `mapField` | Texto (o clave) que se pinta/mapea. |
 | `fontSize` | Puntos (por defecto 14). |
-| `type` | `text` · `check` · `radio` · `number`. |
-| *avanzados* (opcional) | `color` (`#RRGGBB`), `fontFamily`, `opacity` (0.1–1), `backgroundColor`, `value`, `decimals`, `appender`, `locked`, `hidden`. Actívalos con **Incluir propiedades avanzadas en el JSON**. |
+| `type` | `text` · `check` · `radio` · `number` · `date`. |
+| *avanzados* (opcional) | `color` (`#RRGGBB`), `fontFamily`, `opacity` (0.1–1), `backgroundColor`, `value`, `decimals`, `appender`, `dateFormat` (solo `date`: `DD/MM/YYYY` por defecto; símbolos `DD`, `D`, `MM`, `M`, `YYYY`, `YY`), `locked`, `hidden`. Actívalos con **Incluir propiedades avanzadas en el JSON**. |
 
 Se acepta también un array directo de páginas. Detalle del modelo en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 

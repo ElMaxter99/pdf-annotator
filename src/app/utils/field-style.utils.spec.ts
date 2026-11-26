@@ -23,6 +23,16 @@ const base = (over: Partial<PageField> = {}): PageField =>
   }) as PageField;
 
 describe('field-style.utils', () => {
+  it('prepareFieldForStorage keeps a clean date format only on dates, with DD/MM/YYYY by default', () => {
+    expect(prepareFieldForStorage(base({ type: 'date', dateFormat: ' D.M.YY ' }), keepFont).dateFormat).toBe('D.M.YY');
+    expect(prepareFieldForStorage(base({ type: 'date', dateFormat: '' }), keepFont).dateFormat).toBe('DD/MM/YYYY');
+    expect(prepareFieldForStorage(base({ type: 'text', dateFormat: 'YYYY' }), keepFont).dateFormat).toBeUndefined();
+    expect(prepareFieldForForm(base({ type: 'date' }), keepFont).dateFormat).toBe('');
+    expect(
+      areFieldsEqual(base({ type: 'date', dateFormat: 'YYYY' }), base({ type: 'date', dateFormat: 'YY' }), keepFont),
+    ).toBeFalse();
+  });
+
   it('prepareFieldForStorage conserva la marca interna de la propuesta de la IA', () => {
     const field = { x: 1, y: 2, mapField: 'a', fontSize: 12, type: 'text', color: '#000', aiId: '7:p1-f1' } as PageField;
     expect(prepareFieldForStorage(field, keepFont).aiId).toBe('7:p1-f1');

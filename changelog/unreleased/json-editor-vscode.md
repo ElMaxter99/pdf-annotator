@@ -1,0 +1,4 @@
+---
+type: Changed
+---
+**Editor del JSON con el aspecto de VS Code y destello al copiar (1.20.2, sin mesas por petición de Maxter):** la selección usa el azul de VS Code (`#264F78` en oscuro, `#ADD6FF` en claro; antes era un turquesa muy claro que no dejaba leer el texto en oscuro) y un gris cuando el editor no tiene el foco. El margen de plegado lleva las flechas de VS Code: salen al pasar el ratón por el margen y la de un bloque plegado se queda a la vista; el bloque plegado muestra `⋯` y su línea un fondo suave, como `editor.foldBackground`. Números de línea y colores del JSON de Dark+ y Light+. Al copiar (Ctrl+C o el menú), lo copiado destella un instante, como la extensión «highlight on copy»; sin selección, se copia y destella la línea. Con e2e de plegado en todos los niveles y del destello.

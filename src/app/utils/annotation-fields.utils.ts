@@ -9,6 +9,7 @@ export function normalizeFieldType(value: unknown): FieldType {
       normalized === 'check' ||
       normalized === 'radio' ||
       normalized === 'number' ||
+      normalized === 'date' ||
       normalized === 'text'
     ) {
       return normalized as FieldType;

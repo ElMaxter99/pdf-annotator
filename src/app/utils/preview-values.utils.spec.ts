@@ -108,6 +108,27 @@ describe('resolveFieldPreview', () => {
   });
 });
 
+describe('resolveFieldPreview with dates', () => {
+  it('paints the date sample with the field format', () => {
+    expect(resolveFieldPreview(field({ type: 'date', dateFormat: 'YYYY-MM-DD' }), ctx('sample')).text).toBe(
+      '2026-12-31',
+    );
+    expect(resolveFieldPreview(field({ type: 'date' }), ctx('sample')).text).toBe('31/12/2026');
+  });
+
+  it('formats test data that reads as a date and leaves the rest as it is', () => {
+    const data = { a: '2026-03-05T09:00:00Z', b: 'pronto' };
+    const format = { type: 'date' as const, dateFormat: 'D/M/YY' };
+    expect(resolveFieldPreview(field({ ...format, mapField: 'a' }), ctx('data', data)).text).toBe('5/3/26');
+    expect(resolveFieldPreview(field({ ...format, mapField: 'b' }), ctx('data', data)).text).toBe('pronto');
+  });
+
+  it('paints the mapField in map mode and its own value before anything', () => {
+    expect(resolveFieldPreview(field({ type: 'date', mapField: 'f.fecha' }), ctx('map')).text).toBe('f.fecha');
+    expect(resolveFieldPreview(field({ type: 'date', value: 'hoy' }), ctx('sample')).text).toBe('hoy');
+  });
+});
+
 describe('fieldOrigin', () => {
   it('tells where each painted text comes from', () => {
     expect(fieldOrigin(resolveFieldPreview(field({ value: 'x' }), ctx('data')))).toBe('value');

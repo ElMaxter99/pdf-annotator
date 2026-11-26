@@ -203,7 +203,18 @@
       "foldAll": "Alles einklappen",
       "unfoldAll": "Alles ausklappen",
       "fold": "Einklappen",
-      "unfold": "Ausklappen"
+      "unfold": "Ausklappen",
+      "search": {
+        "find": "Suchen",
+        "matchCase": "Groß-/Kleinschreibung beachten (Alt+C)",
+        "wholeWord": "Nur ganzes Wort suchen (Alt+W)",
+        "regexp": "Regulären Ausdruck verwenden (Alt+R)",
+        "previous": "Vorheriger Treffer (Umschalt+Eingabe)",
+        "next": "Nächster Treffer (Eingabe)",
+        "close": "Schließen (Esc)",
+        "count": "{{current}} von {{total}}",
+        "none": "Keine Ergebnisse"
+      }
     }
   },
   "guides": {
@@ -266,7 +277,8 @@
           "text": "Text",
           "check": "Kontrollkästchen",
           "radio": "Optionsfeld",
-          "number": "Zahl"
+          "number": "Zahl",
+          "date": "Datum"
         }
       },
       "value": {
@@ -280,6 +292,15 @@
         "appender": {
           "label": "Suffix",
           "placeholder": "Z. B. %"
+        }
+      },
+      "date": {
+        "format": {
+          "label": "Format",
+          "custom": "Eigenes…",
+          "customLabel": "Eigenes Format",
+          "tokens": "DD Tag · MM Monat · YYYY Jahr (D, M und YY ohne Nullen bzw. zweistellig)",
+          "example": "So sieht es aus: {{example}}"
         }
       },
       "locked": {
@@ -389,7 +410,8 @@
       "pageOnlyA": "Nur A bewegen (die Seiten werden frei)",
       "palette": "Befehlspalette öffnen",
       "options": "Optionen öffnen",
-      "dragNoSnap": "Ziehen ohne Ausrichtung an anderen Anmerkungen"
+      "dragNoSnap": "Ziehen ohne Ausrichtung an anderen Anmerkungen",
+      "findJson": "Im JSON suchen (Fokus im Editor)"
     }
   },
   "toast": {
@@ -407,7 +429,8 @@
       "missingPages": "{{count}} Seite(n), die im PDF nicht existieren",
       "outOfPage": "{{count}} Anmerkung(en) außerhalb der Seite",
       "fontSize": "{{count}} Schriftgröße(n) außerhalb von 8–72",
-      "opacity": "{{count}} Deckkraftwert(e) außerhalb von 0,1–1"
+      "opacity": "{{count}} Deckkraftwert(e) außerhalb von 0,1–1",
+      "dateFormat": "{{count}} ungültige(s) Datumsformat(e): DD/MM/YYYY wird verwendet"
     },
     "batch": {
       "invalidFile": "{{count}} Datei(en) ignoriert: nur PDF und JSON werden akzeptiert.",
@@ -1427,6 +1450,7 @@
       "check": "Kontrollkästchen",
       "radio": "Option",
       "number": "Zahl",
+      "date": "Datum",
       "hint": "Bis zu 12 Zeichen.",
       "reset": "Zurücksetzen",
       "note": "In diesem Browser gespeichert und für alle Vorlagen gültig. Sichtbar in der Vorschau und im exportierten PDF."
@@ -2620,7 +2644,14 @@
     "noPartnerA": "Kein Gegenstück in A",
     "otherPageA": "Sein Feld aus A ist auf Seite {{page}} von A (bei verknüpften Seiten folgt A der Version B).",
     "goTitle": "In A und B zeigen",
-    "goTitleA": "In A zeigen"
+    "goTitleA": "In A zeigen",
+    "placeHere": "Hier platzieren",
+    "placeHereTitle": "Dieses Feld von A auf Seite {{page}} von B an denselben Koordinaten einfügen",
+    "placeCancel": "Abbrechen",
+    "placed": "Auf Seite {{page}} von B platziert",
+    "notInB": "Gibt es in B nicht",
+    "notInBTitle": "Dieses Feld von A ist nicht in B: als erledigt markieren, ohne es zu platzieren (wie «Bestätigen: gibt es nicht» oder «Verwerfen» in der Liste; dort rückgängig zu machen)",
+    "dismissed": "«{{name}}» als nicht in B vorhanden markiert"
   },
   "storage": {
     "open": "Speicher",

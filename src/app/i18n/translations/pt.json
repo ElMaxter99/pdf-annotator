@@ -203,7 +203,18 @@
       "foldAll": "Recolher tudo",
       "unfoldAll": "Expandir tudo",
       "fold": "Recolher",
-      "unfold": "Expandir"
+      "unfold": "Expandir",
+      "search": {
+        "find": "Procurar",
+        "matchCase": "Diferenciar maiúsculas e minúsculas (Alt+C)",
+        "wholeWord": "Só palavras inteiras (Alt+W)",
+        "regexp": "Usar expressão regular (Alt+R)",
+        "previous": "Correspondência anterior (Shift+Enter)",
+        "next": "Correspondência seguinte (Enter)",
+        "close": "Fechar (Esc)",
+        "count": "{{current}} de {{total}}",
+        "none": "Sem resultados"
+      }
     }
   },
   "guides": {
@@ -266,7 +277,8 @@
           "text": "Texto",
           "check": "Caixa de seleção",
           "radio": "Botão de opção",
-          "number": "Número"
+          "number": "Número",
+          "date": "Data"
         }
       },
       "value": {
@@ -280,6 +292,15 @@
         "appender": {
           "label": "Sufixo",
           "placeholder": "Ex.: %"
+        }
+      },
+      "date": {
+        "format": {
+          "label": "Formato",
+          "custom": "Personalizado…",
+          "customLabel": "Formato personalizado",
+          "tokens": "DD dia · MM mês · YYYY ano (D, M e YY sem zeros ou com dois dígitos)",
+          "example": "Vai ficar assim: {{example}}"
         }
       },
       "locked": {
@@ -389,7 +410,8 @@
       "pageOnlyA": "Mover só A (as páginas passam a livres)",
       "palette": "Abrir a paleta de comandos",
       "options": "Abrir as Opções",
-      "dragNoSnap": "Arrastar sem alinhar com outras anotações"
+      "dragNoSnap": "Arrastar sem alinhar com outras anotações",
+      "findJson": "Procurar no JSON (com o foco no editor)"
     }
   },
   "toast": {
@@ -407,7 +429,8 @@
       "missingPages": "{{count}} página(s) que não existem no PDF",
       "outOfPage": "{{count}} anotação(ões) fora da página",
       "fontSize": "{{count}} tamanho(s) de letra fora de 8–72",
-      "opacity": "{{count}} opacidade(s) fora de 0,1–1"
+      "opacity": "{{count}} opacidade(s) fora de 0,1–1",
+      "dateFormat": "{{count}} formato(s) de data inválido(s): usa-se DD/MM/YYYY"
     },
     "batch": {
       "invalidFile": "{{count}} ficheiro(s) ignorado(s): só se admitem PDF e JSON.",
@@ -1427,6 +1450,7 @@
       "check": "Caixa",
       "radio": "Opção",
       "number": "Número",
+      "date": "Data",
       "hint": "Até 12 caracteres.",
       "reset": "Repor",
       "note": "Guardados neste navegador e válidos para todos os seus modelos. Visíveis na pré-visualização e no PDF exportado."
@@ -2620,7 +2644,14 @@
     "noPartnerA": "Sem par em A",
     "otherPageA": "O seu campo de A está na página {{page}} de A (com as páginas ligadas, A segue B).",
     "goTitle": "Ver em A e em B",
-    "goTitleA": "Ver em A"
+    "goTitleA": "Ver em A",
+    "placeHere": "Colocar aqui",
+    "placeHereTitle": "Pôr este campo de A na página {{page}} de B, nas mesmas coordenadas",
+    "placeCancel": "Cancelar",
+    "placed": "Colocado na página {{page}} de B",
+    "notInB": "Não existe em B",
+    "notInBTitle": "Este campo de A não está em B: dá-lo por resolvido sem o colocar (como «Validar: não existe» ou «Descartar» da lista; pode desfazer-se lá)",
+    "dismissed": "«{{name}}» marcado como não existente em B"
   },
   "storage": {
     "open": "Armazenamento",

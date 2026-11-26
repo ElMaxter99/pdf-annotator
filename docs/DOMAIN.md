@@ -22,8 +22,9 @@
   { "type": "text", "x": 150, "y": 722, "mapField": "{{cliente.nombre}}", "fontSize": 12 }
 ] } ] }
 ```
-- Mínimo por campo: `x`, `y`, `mapField`, `fontSize`, `type` (`text | check | radio | number`).
-- Avanzados (solo con «Incluir propiedades avanzadas»): `color`, `fontFamily`, `opacity`, `backgroundColor`, `locked`, `hidden`, `value`, `appender`, `decimals`.
+- Mínimo por campo: `x`, `y`, `mapField`, `fontSize`, `type` (`text | check | radio | number | date`).
+- Avanzados (solo con «Incluir propiedades avanzadas»): `color`, `fontFamily`, `opacity`, `backgroundColor`, `locked`, `hidden`, `value`, `appender`, `decimals`, `dateFormat` (solo `date`).
+- `dateFormat`: símbolos `DD` (05), `D` (5), `MM` (03), `M` (3), `YYYY` (2026), `YY` (26); el resto de caracteres se copia tal cual. Sin formato o con uno inválido, `DD/MM/YYYY`. La vista previa formatea los datos de prueba que se leen como fecha (`2026-12-31`, `2026-12-31T10:00:00Z`, `31/12/2026`); otro valor se pinta tal cual (`utils/date-format.utils.ts`).
 - La importación es tolerante: acepta un array directo o `{ pages }`, comillas simples, claves sin comillas, comentarios y comas finales (`utils/loose-json.ts`).
 - Ejemplo completo: `examples/anotaciones-ejemplo.json` con `examples/factura-ejemplo.pdf`.
 

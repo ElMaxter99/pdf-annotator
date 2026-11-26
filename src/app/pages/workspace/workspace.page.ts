@@ -302,7 +302,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   readonly aiHelper = inject(AiHelperService);
   readonly fontCatalog = inject(FontCatalogService);
   readonly previewSettings = inject(PreviewSettingsService);
-  readonly sampleKinds: readonly SampleKind[] = ['text', 'check', 'radio', 'number'];
+  readonly sampleKinds: readonly SampleKind[] = ['text', 'check', 'radio', 'number', 'date'];
   readonly previewModes: readonly PreviewMode[] = ['sample', 'map', 'data'];
   readonly coords = this.store.coords;
 
@@ -1611,6 +1611,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
       value: '',
       appender: '',
       decimals: null,
+      dateFormat: '',
       fontFamily: DEFAULT_FONT_ID,
       opacity: DEFAULT_OPACITY,
       backgroundColor: null,
@@ -2008,6 +2009,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   deleteAnnotation() {
     const e = this.editing();
     if (!e) return;
+    const doomed = this.coords()[e.pageIndex]?.fields[e.fieldIndex];
+    if (doomed) this.aiForgetDeleted([doomed]);
     if (
       this.applyCoordsChange(() =>
         this.coords.update((pages) => removeFieldFromPages(e.pageIndex, e.fieldIndex, pages)),
@@ -2450,6 +2453,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
         });
       });
 
+    this.drawManualPlace(layer, pdfCanvas.height);
     this.refreshOverlay();
     this.redrawReference();
     this.runAfterRender(() => this.drawMapLabels(layer));
@@ -2484,6 +2488,13 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   /** Aviso breve junto a un campo sin pareja («Sin pareja en B»). */
   readonly pairTip = signal<{ x: number; y: number; key: string } | null>(null);
   pairTarget: PairTarget | null = null;
+  /** «Colocar a mano»: campo de A sin pareja que se ofrece poner en la página de B que se ve. */
+  readonly manualPlace = signal<{
+    field: PageField;
+    aPage: number | null;
+    /** Clave del estado «falta en B» (`page|name`) para «No existe en B»; null si no se encuentra. */
+    dismissKey: string | null;
+  } | null>(null);
   pairFrame = 0;
   pairTipTimer: ReturnType<typeof setTimeout> | null = null;
   pairHoverKey: string | null = null;
@@ -2494,6 +2505,9 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     if (this.pairTarget || this.pairTip()) {
       this.clearPair();
       this.pairTip.set(null);
+    }
+    if (this.manualPlace()) {
+      this.offerManualPlace(undefined);
     }
   }
 
@@ -2591,6 +2605,7 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
   }
 
   async openBatchItem(id: string): Promise<void> {
+    this.manualPlace.set(null);
     const target = this.batch.items().find((item) => item.id === id);
     if (target && target.id !== this.batch.activeId()) {
       await this.switchBatchItem(target);

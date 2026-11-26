@@ -18,6 +18,8 @@ export interface AiSession {
   overrides: Record<string, boolean>;
   /** Changes made to proposed fields before applying (editor or drag in B): the whole field, x,y included. */
   edits: AiRowEdits;
+  /** Rows whose field the person deleted from B (editor or Supr): discarded, no grey ghost left in B. */
+  removed?: Record<string, true>;
   view: 'proposal' | 'original';
   seconds: number;
   error: { code: string; message: string; reset: string | null } | null;

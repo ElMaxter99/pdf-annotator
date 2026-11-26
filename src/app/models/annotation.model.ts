@@ -1,4 +1,4 @@
-export type FieldType = 'text' | 'check' | 'radio' | 'number';
+export type FieldType = 'text' | 'check' | 'radio' | 'number' | 'date';
 
 export interface PageField {
   x: number;
@@ -10,6 +10,8 @@ export interface PageField {
   value?: string;
   appender?: string;
   decimals?: number | null;
+  /** Solo `date`: formato con DD, D, MM, M, YYYY y YY (ver `utils/date-format.utils.ts`). */
+  dateFormat?: string;
   fontFamily?: string;
   opacity?: number;
   backgroundColor?: string | null;
