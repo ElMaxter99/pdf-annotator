@@ -2538,6 +2538,8 @@ export class WorkspacePageComponent implements OnInit, AfterViewChecked, OnDestr
     });
     if (changed) {
       this.syncCoordsTextModel();
+      // Con B ya con anotaciones no hay `replaceCoords` que redibuje: sin esto el campo nuevo no se ve en el visor.
+      this.redrawAllForPage();
     }
   }
 
