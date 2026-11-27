@@ -164,36 +164,24 @@ export function linuxInstallCommand({ packageType, file, has }) {
 export const setuidBlocked = (status) => /^NoNewPrivs:\s*1\s*$/m.test(String(status ?? ''));
 
 /**
- * Instalación por PackageKit (`pkcon`), que no necesita setuid: pide la contraseña a polkit por D-Bus con la ventana
- * normal del sistema. Solo para .deb/.rpm y si `pkcon` existe; si no, `null`.
+ * Lanza un comando desde el gestor de servicios de la sesión (`systemd-run --user`), fuera del árbol de procesos de la
+ * app: allí no hay «no_new_privs», así que `pkexec` sí puede pedir la contraseña aunque la app la tenga. `--wait`
+ * devuelve el código del comando y `--pipe` pasa su salida de errores.
  */
-export function linuxPackageKitCommand({ packageType, file, has }) {
-  if (!file || (packageType !== 'deb' && packageType !== 'rpm') || !has('pkcon')) return null;
-  return { cmd: 'pkcon', args: ['--noninteractive', '--allow-untrusted', 'install-local', file] };
-}
-
-/** Resultado de `pkcon install-local`: `ok`, `cancelled` (se cerró la ventana), `unauthorized` o `failed`. */
-export function classifyPkconResult({ code, stderr = '' }) {
-  if (code === 0) return 'ok';
-  const text = String(stderr);
-  if (/dismiss|cancel/i.test(text)) return 'cancelled';
-  if (/not authori[sz]ed|authorization|polkit/i.test(text)) return 'unauthorized';
-  return 'failed';
-}
-
-/** Comillas simples de shell: `'…'` con las de dentro escapadas. */
-const shQuote = (text) => `'${String(text).replace(/'/g, `'\\''`)}'`;
+export const viaUserManager = ({ cmd, args }) => ({
+  cmd: 'systemd-run',
+  args: ['--user', '--wait', '--pipe', '--quiet', '--collect', '--', cmd, ...args],
+});
 
 /**
- * Comando para instalar a mano el paquete ya descargado (si `pkexec` no puede): se copia y se pega en una terminal.
- * `null` si no hay archivo o tipo conocido.
+ * Reinicio limpio tras actualizar en Linux, sin `app.relaunch()` (Electron deja el proceso nuevo con «no_new_privs» y
+ * la siguiente actualización ya no puede pedir la contraseña). Un `sh` suelto espera a que este proceso termine y
+ * abre la app como si se lanzara desde el menú. `pid`, `exe` y `args` viajan como argumentos, nunca dentro del script.
  */
-export function linuxManualCommand({ packageType, file }) {
-  if (!file) return null;
-  if (packageType === 'deb') return `sudo apt install ${shQuote(file)}`;
-  if (packageType === 'rpm') return `sudo dnf install ${shQuote(file)}`;
-  return null;
-}
+export const relaunchCommand = ({ pid, exe, args = [] }) => ({
+  cmd: '/bin/sh',
+  args: ['-c', 'pid=$1; shift; while kill -0 "$pid" 2>/dev/null; do sleep 0.2; done; exec "$@"', 'pdf-annotator-relaunch', String(pid), exe, ...args],
+});
 
 /** Arreglo de dependencias tras un `dpkg -i` que falló por ellas (solo si la persona ya dio la contraseña). */
 export const linuxFixDepsCommand = () => ({ cmd: 'pkexec', args: ['apt-get', 'install', '-f', '-y'] });
@@ -233,18 +221,16 @@ export function classifyPkexecResult({ code, stderr = '' }) {
  * contraseña, el arreglo con `apt-get -f`. `run({ cmd, args })` → `{ code, stderr }`. Devuelve `{ kind, result }`
  * con kind `ok` | `cancelled` | `failed`. Cancelar NO lanza una segunda ventana.
  */
-export async function runLinuxInstall({ plan, packageType, run, blocked = false, packageKit = null }) {
-  // Sin poder usar setuid (o si pkexec lo dice), PackageKit si existe; si no, `blocked` para ofrecer las salidas manuales.
-  if (blocked) {
-    if (!packageKit) return { kind: 'blocked', result: { code: 127, stderr: 'pkexec must be setuid root' } };
-    const viaPk = await run(packageKit);
-    return { kind: classifyPkconResult(viaPk), result: viaPk };
-  }
-  let result = await run(plan);
+export async function runLinuxInstall({ plan, packageType, run, blocked = false, userManager = false }) {
+  // Con «no_new_privs» pkexec no puede subir de privilegios desde la app: se lanza desde el gestor de la sesión.
+  // Sin systemd-run, `blocked` (hay que cerrar la app y abrirla desde el menú).
+  if (blocked && !userManager) return { kind: 'blocked', result: { code: 127, stderr: 'pkexec must be setuid root' } };
+  const wrap = blocked ? viaUserManager : (command) => command;
+  let result = await run(wrap(plan));
   let kind = classifyPkexecResult(result);
-  if (kind === 'blocked') return runLinuxInstall({ plan, packageType, run, blocked: true, packageKit });
+  if (kind === 'blocked' && !blocked) return runLinuxInstall({ plan, packageType, run, blocked: true, userManager });
   if (kind === 'deps' && packageType === 'deb') {
-    result = await run(linuxFixDepsCommand());
+    result = await run(wrap(linuxFixDepsCommand()));
     kind = classifyPkexecResult(result) === 'ok' ? 'ok' : 'failed';
   }
   return { kind: kind === 'deps' ? 'failed' : kind, result };

@@ -4,9 +4,17 @@ import { stubAnalytics } from './helpers';
 test.beforeEach(async ({ page }) => stubAnalytics(page));
 
 /** Puente simulado: `installUpdate` pasa a «instalando» y luego a lo que diga `outcome`. */
-async function fakeDesktop(page: import('@playwright/test').Page, initial: Record<string, unknown>) {
+async function fakeDesktop(
+  page: import('@playwright/test').Page,
+  initial: Record<string, unknown>,
+) {
   await page.addInitScript((init) => {
-    let st: Record<string, unknown> = { status: 'idle', mode: 'auto', current: '1.13.0-rc.1', ...init };
+    let st: Record<string, unknown> = {
+      status: 'idle',
+      mode: 'auto',
+      current: '1.13.0-rc.1',
+      ...init,
+    };
     const listeners: Array<(s: unknown) => void> = [];
     const push = (next: Record<string, unknown>) => {
       st = { ...st, ...next };
@@ -37,7 +45,9 @@ async function fakeDesktop(page: import('@playwright/test').Page, initial: Recor
 
 const ready = { status: 'ready', version: '1.13.0-rc.2', needsPassword: true };
 
-test('Reiniciar ahora muestra «Instalando» con el aviso de la contraseña en Linux', async ({ page }) => {
+test('Reiniciar ahora muestra «Instalando» con el aviso de la contraseña en Linux', async ({
+  page,
+}) => {
   await fakeDesktop(page, ready);
   await page.goto('/landing');
   await page.getByRole('button', { name: 'Reiniciar ahora' }).click();
@@ -55,21 +65,34 @@ test('sin contraseña (Windows) avisa del instalador', async ({ page }) => {
   await expect(page.getByTestId('update-installing-hint')).toContainText('instalador');
 });
 
-test('si se cancela la contraseña se explica y «Reintentar» reutiliza la descarga', async ({ page }) => {
+test('si se cancela la contraseña se explica y «Reintentar» reutiliza la descarga', async ({
+  page,
+}) => {
   await fakeDesktop(page, ready);
   await page.goto('/landing');
   await page.getByRole('button', { name: 'Reiniciar ahora' }).click();
-  await page.evaluate(() => (window as unknown as { __push: (s: object) => void }).__push({ status: 'ready', installError: 'cancelled' }));
+  await page.evaluate(() =>
+    (window as unknown as { __push: (s: object) => void }).__push({
+      status: 'ready',
+      installError: 'cancelled',
+    }),
+  );
   const dialog = page.getByTestId('update-install-error');
   await expect(dialog).toContainText('Cancelaste la contraseña');
-  await expect(page.getByTestId('update-install-retry')).toContainText('Pedir la contraseña otra vez');
+  await expect(page.getByTestId('update-install-retry')).toContainText(
+    'Pedir la contraseña otra vez',
+  );
   await expect(dialog.getByRole('button')).toHaveText(['Pedir la contraseña otra vez', 'Ahora no']);
   await page.getByTestId('update-install-retry').click();
   await expect(page.getByTestId('update-installing')).toBeVisible();
-  expect(await page.evaluate(() => (window as unknown as { __installCalls: number }).__installCalls)).toBe(2);
+  expect(
+    await page.evaluate(() => (window as unknown as { __installCalls: number }).__installCalls),
+  ).toBe(2);
 });
 
-test('en Windows, tras cancelar el permiso, se ofrece pedirlo otra vez con su propio texto', async ({ page }) => {
+test('en Windows, tras cancelar el permiso, se ofrece pedirlo otra vez con su propio texto', async ({
+  page,
+}) => {
   await fakeDesktop(page, { ...ready, needsAdmin: true, installError: 'cancelled' });
   await page.goto('/landing');
   const dialog = page.getByTestId('update-install-error');
@@ -80,12 +103,17 @@ test('en Windows, tras cancelar el permiso, se ofrece pedirlo otra vez con su pr
 });
 
 test('un fallo muestra el motivo real y «Ahora no» devuelve la tarjeta', async ({ page }) => {
-  await fakeDesktop(page, { ...ready, installError: 'failed', installDetail: 'dpkg: error de dependencias' });
+  await fakeDesktop(page, {
+    ...ready,
+    installError: 'failed',
+    installDetail: 'dpkg: error de dependencias',
+  });
   await page.goto('/landing');
-  await expect(page.getByTestId('update-install-detail')).toContainText('dpkg: error de dependencias');
+  await expect(page.getByTestId('update-install-detail')).toContainText(
+    'dpkg: error de dependencias',
+  );
   await expect(page.getByTestId('update-install-error').getByRole('button')).toHaveText([
     'Reintentar',
-    'Descargar el paquete ↗',
     'Copiar detalles',
     'Ahora no',
   ]);
@@ -104,68 +132,49 @@ test('tras reabrir confirma la actualización y se puede cerrar', async ({ page 
   await expect(done).toHaveCount(0);
 });
 
-test('Linux: si el sistema no autoriza (sin llegar a pedir la contraseña) no dice «cancelaste» y ofrece el instalador del sistema y el comando', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+test('Linux: si el sistema no autoriza no dice «cancelaste» y deja pedir la contraseña otra vez, copiar detalles y cerrar', async ({
+  page,
+}) => {
   await fakeDesktop(page, {
     ...ready,
     installError: 'unauthorized',
     installDetail: 'Error executing command as another user: Not authorized',
-    manualCommand: "sudo apt install '/home/a/.cache/pdf-annotator-desktop-updater/pending/PDF-Annotator.deb'",
-  });
-  await page.addInitScript(() => {
-    const w = window as unknown as { desktop: Record<string, unknown>; __opened: number };
-    w.__opened = 0;
-    const id = setInterval(() => {
-      if (w.desktop) {
-        w.desktop['openUpdatePackage'] = async () => ((w.__opened += 1), '');
-        clearInterval(id);
-      }
-    }, 0);
   });
   await page.goto('/landing');
   const dialog = page.getByTestId('update-install-error');
   await expect(dialog).toContainText('El sistema no dejó instalar la actualización');
   await expect(dialog).not.toContainText('Cancelaste');
   await expect(page.getByTestId('update-install-detail')).toContainText('Not authorized');
-  // Un botón por acción: sin reintentar pkexec (fallaría igual) ni «Al cerrar la app», y un solo «Ahora no».
-  await expect(page.getByTestId('update-install-retry')).toHaveCount(0);
-  await expect(dialog.getByRole('button', { name: 'Al cerrar la app' })).toHaveCount(0);
   await expect(dialog.getByRole('button')).toHaveText([
-    'Abrir con el instalador del sistema',
-    'Copiar el comando para la terminal',
+    'Pedir la contraseña otra vez',
+    'Copiar detalles',
     'Ahora no',
   ]);
-
-  await page.getByTestId('update-install-open-package').click();
-  expect(await page.evaluate(() => (window as unknown as { __opened: number }).__opened)).toBe(1);
-
-  await page.getByTestId('update-install-copy-command').click();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    "sudo apt install '/home/a/.cache/pdf-annotator-desktop-updater/pending/PDF-Annotator.deb'",
-  );
+  await page.getByTestId('update-install-retry').click();
+  await expect(page.getByTestId('update-installing')).toBeVisible();
 });
 
-test('al cancelar de verdad la contraseña no se ofrecen las salidas sin pkexec', async ({ page }) => {
-  await fakeDesktop(page, { ...ready, installError: 'cancelled', manualCommand: "sudo apt install '/x.deb'" });
+test('al cancelar de verdad la contraseña solo se ofrece pedirla otra vez o cerrar', async ({
+  page,
+}) => {
+  await fakeDesktop(page, { ...ready, installError: 'cancelled' });
   await page.goto('/landing');
-  await expect(page.getByTestId('update-install-error')).toContainText('Cancelaste la contraseña');
-  await expect(page.getByTestId('update-install-open-package')).toHaveCount(0);
+  const dialog = page.getByTestId('update-install-error');
+  await expect(dialog).toContainText('Cancelaste la contraseña');
+  await expect(dialog.getByRole('button')).toHaveText(['Pedir la contraseña otra vez', 'Ahora no']);
 });
 
-test('Linux con pkexec bloqueado (no_new_privs): explica que la app no puede pedir la contraseña y deja el instalador del sistema', async ({ page }) => {
+test('Linux con la ventana restringida (no_new_privs) y sin systemd-run: pide abrir la app desde el menú', async ({
+  page,
+}) => {
   await fakeDesktop(page, {
     ...ready,
     installError: 'blocked',
     installDetail: 'pkexec must be setuid root',
-    manualCommand: "sudo apt install '/x.deb'",
   });
   await page.goto('/landing');
   const dialog = page.getByTestId('update-install-error');
-  await expect(dialog).toContainText('Este sistema no deja que la app pida la contraseña');
+  await expect(dialog).toContainText('Cierra la app y ábrela desde el menú para actualizar');
   await expect(dialog).not.toContainText('Cancelaste');
-  await expect(dialog.getByRole('button')).toHaveText([
-    'Abrir con el instalador del sistema',
-    'Copiar el comando para la terminal',
-    'Ahora no',
-  ]);
+  await expect(dialog.getByRole('button')).toHaveText(['Copiar detalles', 'Ahora no']);
 });

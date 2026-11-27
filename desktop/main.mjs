@@ -7,7 +7,7 @@ import { accessSync, appendFileSync, constants as fsConstants, existsSync, readF
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RELEASES_URL, REPO, classifyInstallError, feedForVersion, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, linuxManualCommand, linuxPackageKitCommand, setuidBlocked, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
+import { RELEASES_URL, REPO, classifyInstallError, feedForVersion, installDetail, installNeedsPassword, isNewer, linuxInstallCommand, relaunchCommand, setuidBlocked, normalizeChannel, parseReleaseForChannel, privilegedEnv, runLinuxInstall, shouldCleanPendingUpdate, updateMode, updaterCacheDirName, windowsElevatedLaunch } from './update-logic.mjs';
 import { resolvePath } from './shell-path.mjs';
 import { isAppUrl } from './trusted-origin.mjs';
 import { setupProjectsIpc } from './projects-ipc.mjs';
@@ -357,13 +357,6 @@ function setupIpc() {
     autoUpdater.autoInstallOnAppQuit = true;
     setState({ installOnQuit: true });
   });
-  // Abre el paquete descargado con el instalador del sistema (que pide la contraseña por su cuenta). Solo esa ruta.
-  handle('desktop:update:open-package', async () => {
-    const file = autoUpdater.installerPath;
-    if (process.platform !== 'linux' || !file) return 'missing';
-    logUpdate('abriendo el paquete con el instalador del sistema');
-    return shell.openPath(file);
-  });
   handle('desktop:update:open-release', () => shell.openExternal(state.notesUrl?.startsWith(RELEASES_URL) ? state.notesUrl : RELEASES_URL));
 }
 
@@ -398,20 +391,33 @@ function readSetuidBlocked() {
   }
 }
 
+/**
+ * Reinicio limpio en Linux: un `sh` suelto espera a que la app cierre y la abre como desde el menú. Nunca
+ * `app.relaunch()`: deja la app nueva con «no_new_privs» y la siguiente actualización no podría pedir la contraseña.
+ */
+function relaunchClean() {
+  const { cmd, args } = relaunchCommand({ pid: process.pid, exe: process.execPath });
+  try {
+    spawn(cmd, args, { detached: true, stdio: 'ignore', env: privilegedEnv(process.env) }).unref();
+  } catch (e) {
+    logUpdate(`no se pudo programar el reinicio: ${installDetail(String(e?.message ?? e), os.homedir())}`);
+  }
+  app.exit(0);
+}
+
 async function installLinux(plan) {
   const blocked = readSetuidBlocked();
-  const packageKit = linuxPackageKitCommand({ packageType, file: autoUpdater.installerPath, has: hasCommand });
+  const userManager = blocked && hasCommand('systemd-run');
   logUpdate(
     blocked
-      ? `instalando: pkexec no puede subir de privilegios (no_new_privs); ${packageKit ? 'se usa PackageKit (pkcon)' : 'sin PackageKit: salidas manuales'}`
+      ? `instalando: esta ventana tiene no_new_privs; ${userManager ? 'pkexec a través de systemd-run --user' : 'sin systemd-run: hay que abrir la app desde el menú'}`
       : `instalando con ${plan.args[0]} (pkexec)`,
   );
-  const { kind, result } = await runLinuxInstall({ plan, packageType, run: runPrivileged, blocked, packageKit });
+  const { kind, result } = await runLinuxInstall({ plan, packageType, run: runPrivileged, blocked, userManager });
   if (kind === 'ok') {
     logUpdate(`instalada ${state.version}: reiniciando`);
     stopHelper();
-    app.relaunch();
-    app.exit(0);
+    relaunchClean();
     return;
   }
   rmSync(updatedFile, { force: true });
@@ -426,8 +432,6 @@ async function installLinux(plan) {
     status: 'ready',
     installError: kind === 'cancelled' || kind === 'unauthorized' || kind === 'blocked' ? kind : 'failed',
     installDetail: kind === 'cancelled' ? undefined : installDetail(result.stderr || `código ${result.code}`, os.homedir()),
-    // Salida sin pkexec: el comando para la terminal (con la ruta del paquete, que no sale del equipo).
-    manualCommand: linuxManualCommand({ packageType, file: autoUpdater.installerPath }) ?? undefined,
   });
 }
 
