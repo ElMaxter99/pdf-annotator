@@ -1,4 +1,0 @@
----
-type: Fixed
----
-**Actualizar en Linux: la causa real de «pkexec must be setuid root» (feedback de Maxter con la 1.20.2-rc.3):** el reinicio tras instalar usaba `app.relaunch()` de Electron, que deja la app nueva con `no_new_privs`; desde entonces `pkexec` no podía pedir la contraseña y la siguiente actualización fallaba (lo mismo les pasa a otras apps de Electron). Ahora la app se reinicia con un proceso suelto que espera a que se cierre y la abre como desde el menú, sin esa restricción. Si una ventana ya la tiene (porque la reinició una versión anterior), la instalación se lanza a través de `systemd-run --user`, fuera de la app, y la contraseña se pide igual; sin `systemd-run`, el aviso pide cerrar la app y abrirla desde el menú. Se quitan «Abrir con el instalador del sistema», «Copiar el comando para la terminal» y PackageKit: el aviso deja «Reintentar» o «Pedir la contraseña otra vez», «Copiar detalles» y «Ahora no». Con pruebas.
