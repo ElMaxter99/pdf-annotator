@@ -1235,7 +1235,11 @@
       "s4out": "Què envia «Traslladar amb IA»",
       "s5": "5 · Llestos",
       "s4web": "4 · Llestos",
-      "s5out": "{{count}} pendents"
+      "s5out": "{{count}} pendents",
+      "subNoB": "sense B {{count}}",
+      "subWithB": "amb B {{count}}",
+      "subOnlyB": "només B {{count}}",
+      "subPending": "pendents {{count}}"
     },
     "kind": {
       "label": "Què tenen",
@@ -1432,6 +1436,36 @@
       "undoNotice": "A reemplaçat. La fila torna a «En revisió».",
       "done": "A reemplaçat. La fila torna a «En revisió».",
       "sizeWarn": "El full nou fa una altra mida ({{old}} → {{next}}): les coordenades de la plantilla es conserven tal qual. Revisa la fila o usa «Ajusta A a B» després."
+    },
+    "io": {
+      "label": "Entrada i sortida del lot",
+      "in": "Entrada",
+      "out": "Sortida",
+      "dropTitle": "Deixa anar aquí PDF o plantilles JSON.",
+      "dropText": "Els PDF entren com a versions B (s'aparellen pel nom) i els JSON com a plantilles de la seva A.",
+      "addA": "PDF A",
+      "addB": "Versions B",
+      "unpaired": "Versions B sense parella: {{count}}",
+      "pair": "Aparella…",
+      "readyOf": "de {{total}} llestos per lliurar",
+      "noneReady": "Encara no n'hi ha cap de llest."
+    },
+    "tray": {
+      "title": "Aparella versions B · {{count}}",
+      "close": "Tanca",
+      "hint": "No coincideixen pel nom amb cap PDF del lot. Accepta els suggeriments clars, assigna la resta a mà o descarta-les.",
+      "search": "Cerca fitxer o PDF…",
+      "filter": "Mostra",
+      "withSuggestion": "Amb suggeriment {{count}}",
+      "withoutSuggestion": "Sense suggeriment {{count}}",
+      "other": "Un altre PDF…",
+      "discardOne": "Descarta {{name}}",
+      "empty": "No hi ha res en aquesta llista.",
+      "accept": "Accepta {{count}} suggeriments",
+      "discardNone": "Descarta {{count}} sense suggeriment",
+      "note": "No s'assigna res sense el teu clic. Ho pots desfer durant 10 s.",
+      "pairedNotice": "Versions B aparellades: {{count}}",
+      "discardedNotice": "Fitxers descartats: {{count}}"
     }
   },
   "preview": {

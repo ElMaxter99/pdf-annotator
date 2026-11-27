@@ -1235,7 +1235,11 @@
       "s4out": "O que envia «Transferir com IA»",
       "s5": "5 · Prontos",
       "s4web": "4 · Prontos",
-      "s5out": "{{count}} pendentes"
+      "s5out": "{{count}} pendentes",
+      "subNoB": "sem B {{count}}",
+      "subWithB": "com B {{count}}",
+      "subOnlyB": "só B {{count}}",
+      "subPending": "pendentes {{count}}"
     },
     "kind": {
       "label": "O que têm",
@@ -1432,6 +1436,36 @@
       "undoNotice": "A substituído. A linha volta a «Em revisão».",
       "done": "A substituído. A linha volta a «Em revisão».",
       "sizeWarn": "A folha nova tem outro tamanho ({{old}} → {{next}}): as coordenadas do modelo mantêm-se tal como estão. Reveja a linha ou use depois «Ajustar A a B»."
+    },
+    "io": {
+      "label": "Entrada e saída do lote",
+      "in": "Entrada",
+      "out": "Saída",
+      "dropTitle": "Larga aqui PDFs ou modelos JSON.",
+      "dropText": "Os PDF entram como versões B (emparelhadas pelo nome) e os JSON como modelos da sua A.",
+      "addA": "PDFs A",
+      "addB": "Versões B",
+      "unpaired": "Versões B sem par: {{count}}",
+      "pair": "Emparelhar…",
+      "readyOf": "de {{total}} prontos para entregar",
+      "noneReady": "Ainda não há nenhum pronto."
+    },
+    "tray": {
+      "title": "Emparelhar versões B · {{count}}",
+      "close": "Fechar",
+      "hint": "Não coincidem pelo nome com nenhum PDF do lote. Aceita as sugestões claras, atribui as restantes à mão ou descarta-as.",
+      "search": "Procurar ficheiro ou PDF…",
+      "filter": "Mostrar",
+      "withSuggestion": "Com sugestão {{count}}",
+      "withoutSuggestion": "Sem sugestão {{count}}",
+      "other": "Outro PDF…",
+      "discardOne": "Descartar {{name}}",
+      "empty": "Nada nesta lista.",
+      "accept": "Aceitar {{count}} sugestões",
+      "discardNone": "Descartar {{count}} sem sugestão",
+      "note": "Nada é atribuído sem o teu clique. Podes desfazer durante 10 s.",
+      "pairedNotice": "Versões B emparelhadas: {{count}}",
+      "discardedNotice": "Ficheiros descartados: {{count}}"
     }
   },
   "preview": {

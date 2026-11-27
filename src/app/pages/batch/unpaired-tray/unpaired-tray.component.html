@@ -1,0 +1,64 @@
+<div class="tray-veil" (click)="closed.emit()" aria-hidden="true"></div>
+<aside class="tray" role="dialog" aria-modal="true" aria-labelledby="unpaired-tray-title" appFocusTrap
+  (keydown.escape)="closed.emit()" data-testid="unpaired-tray">
+  <header class="tray__head">
+    <h2 id="unpaired-tray-title">{{ 'batch.tray.title' | t: { count: files().length } }}</h2>
+    <button type="button" class="tray__close" (click)="closed.emit()" [attr.aria-label]="'batch.tray.close' | t">✕</button>
+  </header>
+  <p class="tray__hint">{{ 'batch.tray.hint' | t }}</p>
+  <input type="search" class="tray__search" [value]="query()" (input)="query.set($any($event.target).value)"
+    [placeholder]="'batch.tray.search' | t" [attr.aria-label]="'batch.tray.search' | t" data-testid="tray-search" />
+  <div class="tray__seg" role="group" [attr.aria-label]="'batch.tray.filter' | t">
+    <button type="button" [class.on]="tab() === 'suggested'" [attr.aria-pressed]="tab() === 'suggested'"
+      (click)="tab.set('suggested')" data-testid="tray-tab-suggested">
+      {{ 'batch.tray.withSuggestion' | t: { count: suggestedCount() } }}
+    </button>
+    <button type="button" [class.on]="tab() === 'none'" [attr.aria-pressed]="tab() === 'none'"
+      (click)="tab.set('none')" data-testid="tray-tab-none">
+      {{ 'batch.tray.withoutSuggestion' | t: { count: noneCount() } }}
+    </button>
+  </div>
+
+  <ul class="tray__list" data-testid="tray-list">
+    @for (row of shown(); track row.file) {
+      <li class="tray__row" data-testid="tray-row">
+        @if (row.suggestion) {
+          <label class="tray__check">
+            <input type="checkbox" [checked]="isChecked(row)" (change)="toggle(row)" data-testid="tray-check" />
+            <span class="tray__file" [title]="row.file.name">{{ row.file.name }}</span>
+          </label>
+          <span class="tray__to"><span aria-hidden="true">→</span>{{ ' ' }}<b [title]="row.suggestion.label">{{ row.suggestion.label }}</b></span>
+        } @else {
+          <span class="tray__file tray__file--alone" [title]="row.file.name">{{ row.file.name }}</span>
+        }
+        <span class="tray__actions">
+          <app-search-select
+            [options]="options()"
+            [suggestFor]="row.file.name"
+            [placeholder]="(row.suggestion ? 'batch.tray.other' : 'batch.versionsDrop.assign') | t"
+            [ariaLabel]="'batch.versionsDrop.assignLabel' | t: { name: row.file.name }"
+            [searchLabel]="'batch.versionsDrop.search' | t"
+            [emptyText]="'batch.versionsDrop.noneFree' | t"
+            (picked)="pick(row.file, $event)"
+            testId="assign-unpaired"
+          />
+          <button type="button" class="btn btn--ghost tray__discard" (click)="discard.emit([row.file])"
+            [attr.aria-label]="'batch.tray.discardOne' | t: { name: row.file.name }">{{ 'batch.versionsDrop.discard' | t }}</button>
+        </span>
+      </li>
+    } @empty {
+      <li class="tray__empty">{{ 'batch.tray.empty' | t }}</li>
+    }
+  </ul>
+
+  <footer class="tray__foot">
+    @if (tab() === 'suggested') {
+      <button type="button" class="btn btn--primary" [disabled]="!checkedRows().length" (click)="acceptChecked()"
+        data-testid="tray-accept">{{ 'batch.tray.accept' | t: { count: checkedRows().length } }}</button>
+    } @else {
+      <button type="button" class="btn" [disabled]="!noneRows().length" (click)="discardNone()"
+        data-testid="tray-discard-none">{{ 'batch.tray.discardNone' | t: { count: noneRows().length } }}</button>
+    }
+    <span class="tray__note">{{ 'batch.tray.note' | t }}</span>
+  </footer>
+</aside>

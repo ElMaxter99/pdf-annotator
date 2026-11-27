@@ -1235,7 +1235,11 @@
       "s4out": "Was „Mit KI übertragen“ sendet",
       "s5": "5 · Fertig",
       "s4web": "4 · Fertig",
-      "s5out": "{{count}} ausstehend"
+      "s5out": "{{count}} ausstehend",
+      "subNoB": "ohne B {{count}}",
+      "subWithB": "mit B {{count}}",
+      "subOnlyB": "nur B {{count}}",
+      "subPending": "offen {{count}}"
     },
     "kind": {
       "label": "Was sie haben",
@@ -1432,6 +1436,36 @@
       "undoNotice": "A ersetzt. Die Zeile geht zurück auf «In Prüfung».",
       "done": "A ersetzt. Die Zeile geht zurück auf «In Prüfung».",
       "sizeWarn": "Das neue Blatt hat eine andere Größe ({{old}} → {{next}}): Die Koordinaten der Vorlage bleiben unverändert. Prüfe die Zeile oder nutze danach «A an B anpassen»."
+    },
+    "io": {
+      "label": "Ein- und Ausgabe des Stapels",
+      "in": "Eingang",
+      "out": "Ausgang",
+      "dropTitle": "PDFs oder JSON-Vorlagen hier ablegen.",
+      "dropText": "PDFs kommen als B-Versionen (nach Namen zugeordnet), JSON-Dateien als Vorlagen ihres A.",
+      "addA": "A-PDFs",
+      "addB": "B-Versionen",
+      "unpaired": "B-Versionen ohne Partner: {{count}}",
+      "pair": "Zuordnen…",
+      "readyOf": "von {{total}} bereit zur Abgabe",
+      "noneReady": "Noch keines ist fertig."
+    },
+    "tray": {
+      "title": "B-Versionen zuordnen · {{count}}",
+      "close": "Schließen",
+      "hint": "Sie passen dem Namen nach zu keinem PDF des Stapels. Nimm die klaren Vorschläge an, ordne den Rest von Hand zu oder verwirf ihn.",
+      "search": "Datei oder PDF suchen…",
+      "filter": "Anzeigen",
+      "withSuggestion": "Mit Vorschlag {{count}}",
+      "withoutSuggestion": "Ohne Vorschlag {{count}}",
+      "other": "Anderes PDF…",
+      "discardOne": "{{name}} verwerfen",
+      "empty": "Nichts in dieser Liste.",
+      "accept": "{{count}} Vorschläge annehmen",
+      "discardNone": "{{count}} ohne Vorschlag verwerfen",
+      "note": "Nichts wird ohne deinen Klick zugeordnet. 10 s lang rückgängig zu machen.",
+      "pairedNotice": "B-Versionen zugeordnet: {{count}}",
+      "discardedNotice": "Dateien verworfen: {{count}}"
     }
   },
   "preview": {

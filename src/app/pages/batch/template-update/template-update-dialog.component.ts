@@ -204,6 +204,12 @@ export class TemplateUpdateDialogComponent {
     this.phase.set('edit');
   }
 
+  /** Se abre con unos JSON ya cargados (soltados en «Entrada» del panel). */
+  async openWith(files: readonly File[]): Promise<void> {
+    this.open();
+    await this.addFiles([...files]);
+  }
+
   @HostListener('document:keydown.escape', ['$event'])
   onEscape(event: Event): void {
     const phase = this.phase();
