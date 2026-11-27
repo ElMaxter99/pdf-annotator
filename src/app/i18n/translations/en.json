@@ -1978,13 +1978,9 @@
       "askPermissionAgain": "Ask for permission again",
       "cancelledTextWindows": "You cancelled the Windows permission, so it could not be installed. Your version {{current}} still works and the new one is already downloaded: no need to download it again.",
       "unauthorizedTitle": "The system didn't allow the update to install",
-      "unauthorizedText": "Ubuntu didn't authorise the installation: sometimes it never shows the password window, or the password wasn't accepted. Your version {{current}} still works and the new one is already downloaded. You can ask for the password again, open the package with the system installer or install it from the terminal.",
-      "openPackage": "Open with the system installer",
-      "copyCommand": "Copy the terminal command",
-      "commandCopied": "Command copied: paste it in a terminal and type your password",
-      "openPackageFailed": "The system installer couldn't be opened: copy the command and paste it in a terminal",
-      "blockedTitle": "This system doesn't let the app ask for the password",
-      "blockedText": "On this Ubuntu the app can't ask for the administrator password by itself (the system blocks pkexec for it), so it can't install from here. Your version {{current}} still works and the new one is already downloaded: open it with the system installer, which will ask for the password, or install it from the terminal."
+      "unauthorizedText": "Ubuntu didn't accept the password or didn't authorise the installation. Your version {{current}} still works and the new one is already downloaded: you can ask for the password again.",
+      "blockedTitle": "Close the app and open it from the menu to update",
+      "blockedText": "This app window can't ask for the system password: it reopened by itself after an earlier update and Ubuntu no longer lets it. Your version {{current}} still works and the new one is already downloaded: close the app, open it from the applications menu and press «Restart now»."
     },
     "done": {
       "title": "PDF Annotator updated to {{version}}",

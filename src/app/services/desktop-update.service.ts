@@ -29,12 +29,10 @@ export interface DesktopUpdateState {
   needsAdmin?: boolean;
   /**
    * Falló la instalación (la descarga se conserva): «cancelled» (se cerró la ventana de la contraseña), «unauthorized»
-   * (el sistema no autorizó, a veces sin llegar a pedir la contraseña), «blocked» (la app no puede pedir la contraseña:
-   * pkexec sin setuid por «no_new_privs» y sin PackageKit) u otro motivo.
+   * (el sistema no autorizó: contraseña no aceptada), «blocked» (esta ventana no puede pedir la contraseña: tiene
+   * «no_new_privs» y no hay systemd-run; hay que abrir la app desde el menú) u otro motivo.
    */
   installError?: 'cancelled' | 'unauthorized' | 'blocked' | 'failed';
-  /** Linux: comando para instalar a mano el paquete descargado («sudo apt install '…'»). */
-  manualCommand?: string;
   /** Motivo técnico del fallo (una línea) para mostrar y copiar. */
   installDetail?: string;
   /** Primera ejecución tras actualizar: versión de la que se venía. */
@@ -93,8 +91,6 @@ export interface DesktopBridge {
   installUpdate(): Promise<void>;
   installOnQuit(): Promise<void>;
   openReleasePage(): Promise<void>;
-  /** Linux: abre el paquete descargado con el instalador del sistema ('' = abierto; otro texto = motivo). */
-  openUpdatePackage?(): Promise<string>;
   dismissUpdated?(): Promise<void>;
 }
 
@@ -222,11 +218,5 @@ export class DesktopUpdateService {
   }
   openNotes(): void {
     void this.bridge?.openReleasePage();
-  }
-
-  /** Abre el paquete descargado con el instalador del sistema; devuelve false si no se pudo. */
-  async openPackage(): Promise<boolean> {
-    const result = await this.bridge?.openUpdatePackage?.();
-    return result === '';
   }
 }

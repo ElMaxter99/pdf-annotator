@@ -187,14 +187,6 @@ test('feedForVersion fija la etiqueta y usa siempre latest*.yml', () => {
   assert.equal(feedForVersion('basura'), null);
 });
 
-test('linuxManualCommand: comando para pegar en la terminal, con la ruta entre comillas', async () => {
-  const { linuxManualCommand } = await import('./update-logic.mjs');
-  assert.equal(linuxManualCommand({ packageType: 'deb', file: '/home/a/.cache/x/pending/PDF-Annotator.deb' }), "sudo apt install '/home/a/.cache/x/pending/PDF-Annotator.deb'");
-  assert.equal(linuxManualCommand({ packageType: 'rpm', file: "/tmp/O'Neil.rpm" }), "sudo dnf install '/tmp/O'\\''Neil.rpm'");
-  assert.equal(linuxManualCommand({ packageType: 'deb', file: '' }), null);
-  assert.equal(linuxManualCommand({ packageType: 'appimage', file: '/x' }), null);
-});
-
 test('runLinuxInstall: «no autorizado» no lanza el arreglo de dependencias ni una segunda ventana', async () => {
   const { runLinuxInstall } = await import('./update-logic.mjs');
   const calls = [];
@@ -215,41 +207,50 @@ test('pkexec «must be setuid root» (no_new_privs): blocked; se detecta antes c
   assert.equal(setuidBlocked(''), false);
 });
 
-test('linuxPackageKitCommand y classifyPkconResult', async () => {
-  const { linuxPackageKitCommand, classifyPkconResult } = await import('./update-logic.mjs');
-  const has = (c) => c === 'pkcon';
-  assert.deepEqual(linuxPackageKitCommand({ packageType: 'deb', file: '/x.deb', has }), {
-    cmd: 'pkcon',
-    args: ['--noninteractive', '--allow-untrusted', 'install-local', '/x.deb'],
+test('viaUserManager y relaunchCommand: comandos fuera del árbol de la app, con los datos como argumentos', async () => {
+  const { viaUserManager, relaunchCommand } = await import('./update-logic.mjs');
+  assert.deepEqual(viaUserManager({ cmd: 'pkexec', args: ['dpkg', '-i', '/x y.deb'] }), {
+    cmd: 'systemd-run',
+    args: ['--user', '--wait', '--pipe', '--quiet', '--collect', '--', 'pkexec', 'dpkg', '-i', '/x y.deb'],
   });
-  assert.equal(linuxPackageKitCommand({ packageType: 'deb', file: '/x.deb', has: () => false }), null);
-  assert.equal(linuxPackageKitCommand({ packageType: 'appimage', file: '/x', has }), null);
-  assert.equal(classifyPkconResult({ code: 0 }), 'ok');
-  assert.equal(classifyPkconResult({ code: 1, stderr: 'Fatal error: The request was dismissed' }), 'cancelled');
-  assert.equal(classifyPkconResult({ code: 1, stderr: 'Not authorized' }), 'unauthorized');
-  assert.equal(classifyPkconResult({ code: 1, stderr: 'algo' }), 'failed');
+  const r = relaunchCommand({ pid: 4242, exe: '/opt/PDF Annotator/pdf-annotator', args: ['--x'] });
+  assert.equal(r.cmd, '/bin/sh');
+  assert.equal(r.args[0], '-c');
+  assert.doesNotMatch(r.args[1], /4242|PDF Annotator/);
+  assert.deepEqual(r.args.slice(2), ['pdf-annotator-relaunch', '4242', '/opt/PDF Annotator/pdf-annotator', '--x']);
 });
 
-test('runLinuxInstall: bloqueado → PackageKit si existe (sin pkexec); si no, blocked sin ejecutar nada', async () => {
+test('runLinuxInstall: con no_new_privs se instala a través de systemd-run --user; sin él, blocked sin ejecutar nada', async () => {
   const { runLinuxInstall } = await import('./update-logic.mjs');
   const plan = { cmd: 'pkexec', args: ['dpkg', '-i', '/x.deb'] };
-  const packageKit = { cmd: 'pkcon', args: ['install-local', '/x.deb'] };
   let calls = [];
-  let out = await runLinuxInstall({ plan, packageType: 'deb', blocked: true, packageKit, run: async (p) => (calls.push(p.cmd), { code: 0, stderr: '' }) });
+  const ok = async (p) => (calls.push([p.cmd, ...p.args].join(' ')), { code: 0, stderr: '' });
+  let out = await runLinuxInstall({ plan, packageType: 'deb', blocked: true, userManager: true, run: ok });
   assert.equal(out.kind, 'ok');
-  assert.deepEqual(calls, ['pkcon']);
+  assert.deepEqual(calls, ['systemd-run --user --wait --pipe --quiet --collect -- pkexec dpkg -i /x.deb']);
   calls = [];
-  out = await runLinuxInstall({ plan, packageType: 'deb', blocked: true, run: async (p) => (calls.push(p.cmd), { code: 0, stderr: '' }) });
+  out = await runLinuxInstall({ plan, packageType: 'deb', blocked: true, userManager: false, run: ok });
   assert.equal(out.kind, 'blocked');
   assert.deepEqual(calls, []);
-  // sin saberlo de antemano: pkexec lo dice y se pasa a PackageKit en el mismo intento
+  // sin saberlo de antemano: pkexec lo dice y se reintenta por el gestor de la sesión en el mismo intento
   calls = [];
   out = await runLinuxInstall({
     plan,
     packageType: 'deb',
-    packageKit,
+    userManager: true,
     run: async (p) => (calls.push(p.cmd), p.cmd === 'pkexec' ? { code: 127, stderr: 'pkexec must be setuid root' } : { code: 0, stderr: '' }),
   });
   assert.equal(out.kind, 'ok');
-  assert.deepEqual(calls, ['pkexec', 'pkcon']);
+  assert.deepEqual(calls, ['pkexec', 'systemd-run']);
+  // el arreglo de dependencias también va por el gestor de la sesión
+  calls = [];
+  out = await runLinuxInstall({
+    plan,
+    packageType: 'deb',
+    blocked: true,
+    userManager: true,
+    run: async (p) => (calls.push(p.args.slice(6).join(' ')), calls.length === 1 ? { code: 1, stderr: 'dpkg: dependency problems prevent configuration' } : { code: 0, stderr: '' }),
+  });
+  assert.equal(out.kind, 'ok');
+  assert.deepEqual(calls, ['pkexec dpkg -i /x.deb', 'pkexec apt-get install -f -y']);
 });

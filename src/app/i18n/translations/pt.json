@@ -1978,13 +1978,9 @@
       "askPermissionAgain": "Pedir permissão outra vez",
       "cancelledTextWindows": "Cancelou a permissão do Windows, por isso não foi possível instalar. A sua versão {{current}} continua a funcionar e a nova já está descarregada: não é preciso descarregá-la outra vez.",
       "unauthorizedTitle": "O sistema não deixou instalar a atualização",
-      "unauthorizedText": "O Ubuntu não autorizou a instalação: às vezes não chega a mostrar a janela da palavra-passe ou a palavra-passe não foi aceite. A tua versão {{current}} continua a funcionar e a nova já está transferida. Podes pedir a palavra-passe outra vez, abrir o pacote com o instalador do sistema ou instalá-lo a partir do terminal.",
-      "openPackage": "Abrir com o instalador do sistema",
-      "copyCommand": "Copiar o comando para o terminal",
-      "commandCopied": "Comando copiado: cola-o num terminal e escreve a tua palavra-passe",
-      "openPackageFailed": "Não foi possível abrir o instalador do sistema: copia o comando e cola-o num terminal",
-      "blockedTitle": "Este sistema não deixa a app pedir a palavra-passe",
-      "blockedText": "Neste Ubuntu a app não pode pedir sozinha a palavra-passe de administrador (o sistema bloqueia-lhe o pkexec), por isso não pode instalar daqui. A tua versão {{current}} continua a funcionar e a nova já está transferida: abre-a com o instalador do sistema, que vai pedir a palavra-passe, ou instala-a a partir do terminal."
+      "unauthorizedText": "O Ubuntu não aceitou a palavra-passe ou não autorizou a instalação. A tua versão {{current}} continua a funcionar e a nova já está transferida: podes pedir a palavra-passe outra vez.",
+      "blockedTitle": "Fecha a app e abre-a a partir do menu para atualizar",
+      "blockedText": "Esta janela da app não pode pedir a palavra-passe do sistema: abriu-se sozinha depois de uma atualização anterior e o Ubuntu já não deixa. A tua versão {{current}} continua a funcionar e a nova já está transferida: fecha a app, abre-a a partir do menu de aplicações e carrega em «Reiniciar agora»."
     },
     "done": {
       "title": "O PDF Annotator foi atualizado para a {{version}}",

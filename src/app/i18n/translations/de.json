@@ -1978,13 +1978,9 @@
       "askPermissionAgain": "Erneut um Erlaubnis bitten",
       "cancelledTextWindows": "Du hast die Windows-Berechtigung abgebrochen, daher konnte nicht installiert werden. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen: Du musst sie nicht erneut laden.",
       "unauthorizedTitle": "Das System hat die Installation des Updates nicht erlaubt",
-      "unauthorizedText": "Ubuntu hat die Installation nicht autorisiert: Manchmal erscheint das Passwortfenster gar nicht oder das Passwort wurde nicht akzeptiert. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen. Du kannst das Passwort erneut anfordern, das Paket mit dem Systeminstaller öffnen oder es im Terminal installieren.",
-      "openPackage": "Mit dem Systeminstaller öffnen",
-      "copyCommand": "Befehl für das Terminal kopieren",
-      "commandCopied": "Befehl kopiert: im Terminal einfügen und Passwort eingeben",
-      "openPackageFailed": "Der Systeminstaller konnte nicht geöffnet werden: Befehl kopieren und im Terminal einfügen",
-      "blockedTitle": "Dieses System lässt die App nicht nach dem Passwort fragen",
-      "blockedText": "Unter diesem Ubuntu kann die App das Administratorpasswort nicht selbst abfragen (das System sperrt pkexec für sie), daher kann sie nicht von hier aus installieren. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen: Öffne sie mit dem Systeminstaller, der nach dem Passwort fragt, oder installiere sie im Terminal."
+      "unauthorizedText": "Ubuntu hat das Passwort nicht akzeptiert oder die Installation nicht autorisiert. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen: Du kannst das Passwort erneut anfordern.",
+      "blockedTitle": "App schließen und über das Menü öffnen, um zu aktualisieren",
+      "blockedText": "Dieses App-Fenster kann das Systempasswort nicht abfragen: Es hat sich nach einem früheren Update selbst neu geöffnet und Ubuntu erlaubt es ihm nicht mehr. Deine Version {{current}} funktioniert weiter und die neue ist bereits heruntergeladen: Schließe die App, öffne sie über das Anwendungsmenü und drücke «Jetzt neu starten»."
     },
     "done": {
       "title": "PDF Annotator wurde auf {{version}} aktualisiert",

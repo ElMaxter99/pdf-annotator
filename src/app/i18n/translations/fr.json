@@ -1978,13 +1978,9 @@
       "askPermissionAgain": "Redemander l’autorisation",
       "cancelledTextWindows": "Vous avez annulé l’autorisation de Windows, l’installation n’a donc pas pu se faire. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée : inutile de la retélécharger.",
       "unauthorizedTitle": "Le système n'a pas autorisé l'installation de la mise à jour",
-      "unauthorizedText": "Ubuntu n'a pas autorisé l'installation : parfois la fenêtre du mot de passe ne s'affiche pas, ou le mot de passe n'a pas été accepté. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée. Vous pouvez redemander le mot de passe, ouvrir le paquet avec l'installateur du système ou l'installer depuis le terminal.",
-      "openPackage": "Ouvrir avec l'installateur du système",
-      "copyCommand": "Copier la commande pour le terminal",
-      "commandCopied": "Commande copiée : collez-la dans un terminal et saisissez votre mot de passe",
-      "openPackageFailed": "Impossible d'ouvrir l'installateur du système : copiez la commande et collez-la dans un terminal",
-      "blockedTitle": "Ce système ne laisse pas l'app demander le mot de passe",
-      "blockedText": "Sur cet Ubuntu, l'app ne peut pas demander elle-même le mot de passe administrateur (le système lui bloque pkexec) : impossible d'installer d'ici. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée : ouvrez-la avec l'installateur du système, qui demandera le mot de passe, ou installez-la depuis le terminal."
+      "unauthorizedText": "Ubuntu n'a pas accepté le mot de passe ou n'a pas autorisé l'installation. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée : vous pouvez redemander le mot de passe.",
+      "blockedTitle": "Fermez l'app et rouvrez-la depuis le menu pour mettre à jour",
+      "blockedText": "Cette fenêtre de l'app ne peut pas demander le mot de passe système : elle s'est rouverte seule après une mise à jour précédente et Ubuntu ne le lui permet plus. Votre version {{current}} fonctionne toujours et la nouvelle est déjà téléchargée : fermez l'app, ouvrez-la depuis le menu des applications et appuyez sur « Redémarrer »."
     },
     "done": {
       "title": "PDF Annotator a été mis à jour en {{version}}",

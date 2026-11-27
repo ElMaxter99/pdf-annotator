@@ -1978,13 +1978,9 @@
       "askPermissionAgain": "Demana permís un altre cop",
       "cancelledTextWindows": "Vas cancel·lar el permís de Windows, així que no s’ha pogut instal·lar. La teva versió {{current}} continua funcionant i la nova ja està baixada: no cal tornar-la a baixar.",
       "unauthorizedTitle": "El sistema no ha deixat instal·lar l'actualització",
-      "unauthorizedText": "Ubuntu no ha autoritzat la instal·lació: de vegades no arriba a mostrar la finestra de la contrasenya o la contrasenya no s'ha acceptat. La teva versió {{current}} continua funcionant i la nova ja està baixada. Pots demanar la contrasenya un altre cop, obrir el paquet amb l'instal·lador del sistema o instal·lar-lo des del terminal.",
-      "openPackage": "Obre amb l'instal·lador del sistema",
-      "copyCommand": "Copia l'ordre per al terminal",
-      "commandCopied": "Ordre copiada: enganxa-la en un terminal i posa la contrasenya",
-      "openPackageFailed": "No s'ha pogut obrir l'instal·lador del sistema: copia l'ordre i enganxa-la en un terminal",
-      "blockedTitle": "Aquest sistema no deixa que l'app demani la contrasenya",
-      "blockedText": "En aquest Ubuntu l'app no pot demanar la contrasenya d'administrador pel seu compte (el sistema li bloqueja pkexec), així que no es pot instal·lar des d'aquí. La teva versió {{current}} continua funcionant i la nova ja està baixada: obre-la amb l'instal·lador del sistema, que sí que et demanarà la contrasenya, o instal·la-la des del terminal."
+      "unauthorizedText": "Ubuntu no ha acceptat la contrasenya o no ha autoritzat la instal·lació. La teva versió {{current}} continua funcionant i la nova ja està baixada: pots demanar la contrasenya un altre cop.",
+      "blockedTitle": "Tanca l'app i obre-la des del menú per actualitzar",
+      "blockedText": "Aquesta finestra de l'app no pot demanar la contrasenya del sistema: es va obrir sola després d'una actualització anterior i Ubuntu ja no l'hi deixa. La teva versió {{current}} continua funcionant i la nova ja està baixada: tanca l'app, obre-la des del menú d'aplicacions i prem «Reinicia ara»."
     },
     "done": {
       "title": "PDF Annotator s'ha actualitzat a la {{version}}",

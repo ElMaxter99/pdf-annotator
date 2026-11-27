@@ -1978,13 +1978,9 @@
       "askPermissionAgain": "Pedir permiso otra vez",
       "cancelledTextWindows": "Cancelaste el permiso de Windows, así que no se pudo instalar. Tu versión {{current}} sigue funcionando y la nueva ya está descargada: no hace falta bajarla otra vez.",
       "unauthorizedTitle": "El sistema no dejó instalar la actualización",
-      "unauthorizedText": "Ubuntu no autorizó la instalación: a veces no llega a mostrar la ventana de la contraseña o la contraseña no se aceptó. Tu versión {{current}} sigue funcionando y la nueva ya está descargada. Puedes pedir la contraseña otra vez, abrir el paquete con el instalador del sistema o instalarlo desde la terminal.",
-      "openPackage": "Abrir con el instalador del sistema",
-      "copyCommand": "Copiar el comando para la terminal",
-      "commandCopied": "Comando copiado: pégalo en una terminal y pon tu contraseña",
-      "openPackageFailed": "No se pudo abrir el instalador del sistema: copia el comando y pégalo en una terminal",
-      "blockedTitle": "Este sistema no deja que la app pida la contraseña",
-      "blockedText": "En este Ubuntu la app no puede pedir la contraseña de administrador por su cuenta (el sistema bloquea pkexec para ella), así que no se puede instalar desde aquí. Tu versión {{current}} sigue funcionando y la nueva ya está descargada: ábrela con el instalador del sistema, que sí te pedirá la contraseña, o instálala desde la terminal."
+      "unauthorizedText": "Ubuntu no aceptó la contraseña o no autorizó la instalación. Tu versión {{current}} sigue funcionando y la nueva ya está descargada: puedes pedir la contraseña otra vez.",
+      "blockedTitle": "Cierra la app y ábrela desde el menú para actualizar",
+      "blockedText": "Esta ventana de la app no puede pedir la contraseña del sistema: se abrió sola tras una actualización anterior y Ubuntu ya no le deja. Tu versión {{current}} sigue funcionando y la nueva ya está descargada: cierra la app, ábrela desde el menú de aplicaciones y pulsa «Reiniciar ahora»."
     },
     "done": {
       "title": "PDF Annotator se actualizó a {{version}}",

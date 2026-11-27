@@ -48,22 +48,20 @@ import { ToastService } from '../../services/toast.service';
           @if (state().installError !== 'cancelled' && state().installDetail) {
             <p class="update-install__hint" data-testid="update-install-detail">{{ 'update.installError.reason' | t }} <strong>{{ state().installDetail }}</strong></p>
           }
-          <!-- Un botón por acción: sin «Al cerrar la app» (cerraba igual que «Ahora no») ni reintentos que fallarían igual. -->
+          <!-- Un botón por acción: reintentar si tiene sentido, los detalles para depurar y cerrar. -->
           <div class="update-card__actions">
-            @if (state().installError === 'cancelled') {
+            @if (state().installError === 'cancelled' || state().installError === 'unauthorized') {
               <button type="button" class="btn btn--primary" (click)="update.restartNow()" data-testid="update-install-retry">
                 {{ (state().needsAdmin ? 'update.installError.askPermissionAgain' : 'update.installError.askPasswordAgain') | t }}
               </button>
-            } @else if (state().manualCommand) {
-              <!-- Linux: salidas que no dependen de pkexec; el instalador del sistema pide la contraseña por su cuenta. -->
-              <button type="button" class="btn btn--primary" (click)="openPackage()" data-testid="update-install-open-package">{{ 'update.installError.openPackage' | t }}</button>
-              <button type="button" class="btn btn--ghost" (click)="copyCommand()" data-testid="update-install-copy-command">{{ 'update.installError.copyCommand' | t }}</button>
-            } @else {
+            } @else if (state().installError === 'failed') {
               <button type="button" class="btn btn--primary" (click)="update.restartNow()" data-testid="update-install-retry">{{ 'update.retry' | t }}</button>
-              <button type="button" class="btn btn--ghost" (click)="update.openNotes()">{{ 'update.installError.manual' | t }} ↗</button>
+              @if (!state().needsPassword) {
+                <button type="button" class="btn btn--ghost" (click)="update.openNotes()">{{ 'update.installError.manual' | t }} ↗</button>
+              }
             }
-            @if (state().installError === 'failed') {
-              <button type="button" class="btn btn--ghost" (click)="copyDetails()">{{ 'update.installError.copy' | t }}</button>
+            @if (state().installError !== 'cancelled') {
+              <button type="button" class="btn btn--ghost" (click)="copyDetails()" data-testid="update-install-copy">{{ 'update.installError.copy' | t }}</button>
             }
             <button type="button" class="btn btn--ghost" (click)="update.dismissInstallError()" data-testid="update-install-dismiss">{{ 'update.installError.notNow' | t }}</button>
           </div>
@@ -101,21 +99,6 @@ export class UpdateInstallComponent {
       if (this.doneTimer) clearTimeout(this.doneTimer);
       this.doneTimer = this.update.justUpdated() ? setTimeout(() => this.update.dismissUpdated(), 8000) : null;
     });
-  }
-
-  async openPackage(): Promise<void> {
-    if (!(await this.update.openPackage())) {
-      this.toast.show(this.i18n.translate('update.installError.openPackageFailed'), 'warning');
-    }
-  }
-
-  copyCommand(): void {
-    const command = this.state().manualCommand;
-    if (!command) return;
-    void navigator.clipboard?.writeText(command).then(
-      () => this.toast.show(this.i18n.translate('update.installError.commandCopied'), 'info'),
-      () => undefined,
-    );
   }
 
   copyDetails(): void {

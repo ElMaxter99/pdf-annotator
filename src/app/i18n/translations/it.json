@@ -1978,13 +1978,9 @@
       "askPermissionAgain": "Chiedi di nuovo l’autorizzazione",
       "cancelledTextWindows": "Hai annullato l’autorizzazione di Windows, quindi non è stato possibile installare. La tua versione {{current}} funziona ancora e la nuova è già scaricata: non serve scaricarla di nuovo.",
       "unauthorizedTitle": "Il sistema non ha permesso di installare l'aggiornamento",
-      "unauthorizedText": "Ubuntu non ha autorizzato l'installazione: a volte non mostra la finestra della password o la password non è stata accettata. La tua versione {{current}} continua a funzionare e quella nuova è già scaricata. Puoi chiedere di nuovo la password, aprire il pacchetto con l'installer del sistema o installarlo dal terminale.",
-      "openPackage": "Apri con l'installer del sistema",
-      "copyCommand": "Copia il comando per il terminale",
-      "commandCopied": "Comando copiato: incollalo in un terminale e inserisci la password",
-      "openPackageFailed": "Impossibile aprire l'installer del sistema: copia il comando e incollalo in un terminale",
-      "blockedTitle": "Questo sistema non lascia che l'app chieda la password",
-      "blockedText": "Su questo Ubuntu l'app non può chiedere da sola la password di amministratore (il sistema le blocca pkexec), quindi non può installare da qui. La tua versione {{current}} continua a funzionare e quella nuova è già scaricata: aprila con l'installer del sistema, che chiederà la password, o installala dal terminale."
+      "unauthorizedText": "Ubuntu non ha accettato la password o non ha autorizzato l'installazione. La tua versione {{current}} continua a funzionare e quella nuova è già scaricata: puoi chiedere di nuovo la password.",
+      "blockedTitle": "Chiudi l'app e riaprila dal menu per aggiornare",
+      "blockedText": "Questa finestra dell'app non può chiedere la password di sistema: si è riaperta da sola dopo un aggiornamento precedente e Ubuntu non glielo permette più. La tua versione {{current}} continua a funzionare e quella nuova è già scaricata: chiudi l'app, aprila dal menu delle applicazioni e premi «Riavvia ora»."
     },
     "done": {
       "title": "PDF Annotator si è aggiornato alla {{version}}",
