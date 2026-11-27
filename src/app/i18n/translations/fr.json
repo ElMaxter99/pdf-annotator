@@ -1235,7 +1235,11 @@
       "s4out": "Ce qu'envoie « Transférer avec l'IA »",
       "s5": "5 · Prêts",
       "s4web": "4 · Prêts",
-      "s5out": "{{count}} en attente"
+      "s5out": "{{count}} en attente",
+      "subNoB": "sans B {{count}}",
+      "subWithB": "avec B {{count}}",
+      "subOnlyB": "B seul {{count}}",
+      "subPending": "en attente {{count}}"
     },
     "kind": {
       "label": "Ce qu'ils ont",
@@ -1432,6 +1436,36 @@
       "undoNotice": "A remplacé. La ligne repasse en «À réviser».",
       "done": "A remplacé. La ligne repasse en «À réviser».",
       "sizeWarn": "La nouvelle feuille a une autre taille ({{old}} → {{next}}) : les coordonnées du modèle sont conservées telles quelles. Vérifiez la ligne ou utilisez «Ajuster A à B» ensuite."
+    },
+    "io": {
+      "label": "Entrée et sortie du lot",
+      "in": "Entrée",
+      "out": "Sortie",
+      "dropTitle": "Déposez ici des PDF ou des modèles JSON.",
+      "dropText": "Les PDF entrent comme versions B (associées par nom) et les JSON comme modèles de leur A.",
+      "addA": "PDF A",
+      "addB": "Versions B",
+      "unpaired": "Versions B sans paire : {{count}}",
+      "pair": "Associer…",
+      "readyOf": "sur {{total}} prêts à livrer",
+      "noneReady": "Aucun n'est encore prêt."
+    },
+    "tray": {
+      "title": "Associer les versions B · {{count}}",
+      "close": "Fermer",
+      "hint": "Elles ne correspondent par nom à aucun PDF du lot. Acceptez les suggestions claires, associez le reste à la main ou écartez-les.",
+      "search": "Rechercher un fichier ou un PDF…",
+      "filter": "Afficher",
+      "withSuggestion": "Avec suggestion {{count}}",
+      "withoutSuggestion": "Sans suggestion {{count}}",
+      "other": "Autre PDF…",
+      "discardOne": "Écarter {{name}}",
+      "empty": "Rien dans cette liste.",
+      "accept": "Accepter {{count}} suggestions",
+      "discardNone": "Écarter {{count}} sans suggestion",
+      "note": "Rien n'est associé sans votre clic. Annulable pendant 10 s.",
+      "pairedNotice": "Versions B associées : {{count}}",
+      "discardedNotice": "Fichiers écartés : {{count}}"
     }
   },
   "preview": {

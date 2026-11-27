@@ -8,6 +8,7 @@ Maxter aprobó estos cambios visibles **sin mesas** («ya lo veo yo cuando progr
 
 | # | Qué | Dónde se ve | Versión | Detalle |
 | --- | --- | --- | --- | --- |
+| 6 | Panel del lote: franja «Entrada · Salida», embudo como único filtro (con piezas) y bandeja «Emparejar versiones B» | Lote, panel (cuadrícula y lista) | 1.20.x (opción B, sin mesas, Maxter 2026-11-27) | Propuestas en el artifact «Panel del lote»; CHANGELOG |
 | 5 | Aviso «El sistema no dejó instalar la actualización» (Linux) con «Abrir con el instalador del sistema» y «Copiar el comando para la terminal» | App de escritorio, aviso de actualización | 1.20.2 (sin mesas, Maxter 2026-11-26) | CHANGELOG |
 | 1 | Tipo de anotación «Fecha»: quinta opción del selector de tipo, campo «Formato» (lista + «Personalizado…» con ayuda de símbolos) y ejemplo «Se verá así»; fila «Fecha» en «Valores de muestra» | Editor de anotaciones (crear y editar) y pestaña Ajustes | 1.20.2 (sin mesas, Maxter 2026-11-25) | [`propuestas/tipo-fecha.md`](propuestas/tipo-fecha.md) |
 | 2 | Editor del JSON con el aspecto de VS Code (selección azul, flechas de plegado al pasar el ratón, `⋯` y fondo de la línea plegada, colores Dark+/Light+) y destello al copiar | Pestaña «Anotaciones», editor del JSON | 1.20.2 (sin mesas, Maxter 2026-11-25) | CHANGELOG 1.20.2 |

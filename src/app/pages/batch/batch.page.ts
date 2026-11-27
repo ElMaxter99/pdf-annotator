@@ -34,13 +34,13 @@ import {
   type TemplateUpdateResult,
 } from './template-update/template-update-dialog.component';
 import { AddADialogComponent, type AddAResult } from './add-a/add-a-dialog.component';
+import { UnpairedTrayComponent } from './unpaired-tray/unpaired-tray.component';
 import { ReplaceAConfirmComponent } from '../../components/replace-a-confirm/replace-a-confirm.component';
 import type { ReplacedA } from '../../services/batch-store.service';
 import { PdfTextService } from '../../services/pdf-text.service';
 import { PageMapBatchService } from '../../services/page-map-batch.service';
 import { AiHelperService } from '../../services/ai-helper.service';
 import { SortControlComponent } from '../../components/sort-control/sort-control.component';
-import { InfoTipComponent } from '../../components/info-tip/info-tip.component';
 import { PdfThumbComponent } from '../../components/pdf-thumb/pdf-thumb.component';
 import { TranslationPipe } from '../../i18n/translation.pipe';
 import { VersionChipComponent } from '../../components/version-chip/version-chip.component';
@@ -143,10 +143,10 @@ async function sha256(blob: Blob): Promise<string | null> {
     JsonFormatMenuComponent,
     VersionChipComponent,
     PdfThumbComponent,
-    InfoTipComponent,
     SortControlComponent,
     AiBatchButtonComponent,
     SearchSelectComponent,
+    UnpairedTrayComponent,
     AiBatchChipComponent,
     AiBatchPanelComponent,
     AiDraftBannerComponent,
@@ -404,7 +404,7 @@ export class BatchPageComponent implements OnInit {
   );
   readonly dialog = signal<'ready' | 'remove' | null>(null);
   readonly undoNotice = signal<{
-    kind: 'removed' | 'ready' | 'tables' | 'added' | 'replacedA';
+    kind: 'removed' | 'ready' | 'tables' | 'added' | 'replacedA' | 'paired' | 'discarded';
     count: number;
   } | null>(
     null,
@@ -434,6 +434,58 @@ export class BatchPageComponent implements OnInit {
     this.query.set('');
     this.filter.set(step === 'ready' ? 'ready' : 'all');
     this.kind.set(step === 'all' || step === 'ready' ? 'any' : step);
+  }
+
+  /** Paso del embudo que corresponde al filtro actual (el embudo es el único filtro del panel). */
+  readonly activeStep = computed<'all' | 'withA' | 'withB' | 'ai' | 'ready' | null>(() => {
+    const kind = this.kind();
+    const filter = this.filter();
+    if (filter === 'ready' && kind === 'any') return 'ready';
+    if (filter !== 'all') return null;
+    if (kind === 'any') return 'all';
+    if (kind === 'withA' || kind === 'withB' || kind === 'ai') return kind;
+    return null;
+  });
+
+  /** «N pendientes» del paso «Listos»: lo que aún falta por revisar. */
+  showPending(): void {
+    this.query.set('');
+    const on = this.filter() === 'review';
+    this.filter.set(on ? 'all' : 'review');
+    this.kind.set('any');
+  }
+
+  // ---- versiones B sin pareja: bandeja «Emparejar versiones B» ----------------------------------
+  readonly trayOpen = signal(false);
+
+  /** Asigna varias B de una vez (bandeja) con «Deshacer» durante 10 s. */
+  async assignMany(list: readonly { file: File; id: string }[]): Promise<void> {
+    const done: { file: File; id: string }[] = [];
+    for (const { file, id } of list) {
+      const item = this.store.find(id);
+      if (!item || item.bPdf) continue;
+      await this.attachB(item, file);
+      done.push({ file, id });
+    }
+    if (!done.length) return;
+    const taken = new Set(done.map((d) => d.file));
+    this.unpairedB.update((current) => current.filter((f) => !taken.has(f)));
+    if (this.unpairedB().length === 0) this.trayOpen.set(false);
+    this.notifyNotPersistent();
+    this.offerUndo('paired', done.length, () => {
+      for (const { id } of done) this.store.removeB(id);
+      this.unpairedB.update((current) => [...done.map((d) => d.file), ...current]);
+    });
+  }
+
+  discardMany(files: readonly File[]): void {
+    const gone = new Set(files);
+    const before = this.unpairedB();
+    this.unpairedB.update((current) => current.filter((f) => !gone.has(f)));
+    if (this.unpairedB().length === 0) this.trayOpen.set(false);
+    if (files.length > 1) {
+      this.offerUndo('discarded', files.length, () => this.unpairedB.set(before));
+    }
   }
 
   clearFilters(): void {
@@ -744,7 +796,7 @@ export class BatchPageComponent implements OnInit {
   }
 
   private offerUndo(
-    kind: 'removed' | 'ready' | 'tables' | 'added' | 'replacedA',
+    kind: 'removed' | 'ready' | 'tables' | 'added' | 'replacedA' | 'paired' | 'discarded',
     count: number,
     restore: () => void,
   ): void {
@@ -880,9 +932,19 @@ export class BatchPageComponent implements OnInit {
     await this.addNewVersions(files);
   }
 
-  /** In the panel, dropped PDFs are new versions (B) paired by name. */
+  /**
+   * Lo que se suelta en «Entrada»: los PDF son versiones B (por nombre; las que no casan van a la bandeja) y los JSON,
+   * plantillas de A (abre «Actualizar plantillas» con ellos ya cargados).
+   */
   private async addFiles(files: File[]): Promise<void> {
-    await this.addNewVersions(files);
+    const jsons = files.filter((file) => isJsonFile(file));
+    const rest = files.filter((file) => !isJsonFile(file));
+    if (jsons.length && this.total() > 0) {
+      this.updateDialog?.openWith(jsons);
+    }
+    if (rest.length) {
+      await this.addNewVersions(rest);
+    }
   }
 
   private async addNewVersions(files: File[]): Promise<void> {

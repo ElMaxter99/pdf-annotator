@@ -1235,7 +1235,11 @@
       "s4out": "Lo que envía «Trasladar con IA»",
       "s5": "5 · Listos",
       "s4web": "4 · Listos",
-      "s5out": "{{count}} pendientes"
+      "s5out": "{{count}} pendientes",
+      "subNoB": "sin B {{count}}",
+      "subWithB": "con B {{count}}",
+      "subOnlyB": "solo B {{count}}",
+      "subPending": "pendientes {{count}}"
     },
     "kind": {
       "label": "Qué tienen",
@@ -1432,6 +1436,36 @@
       "undoNotice": "A reemplazado. La fila vuelve a «En revisión».",
       "done": "A reemplazado. La fila vuelve a «En revisión».",
       "sizeWarn": "La hoja nueva mide distinto ({{old}} → {{next}}): las coordenadas de la plantilla se conservan tal cual. Revisa la fila o usa «Ajustar A a B» después."
+    },
+    "io": {
+      "label": "Entrada y salida del lote",
+      "in": "Entrada",
+      "out": "Salida",
+      "dropTitle": "Suelta aquí PDFs o plantillas JSON.",
+      "dropText": "Los PDF entran como versiones B (se emparejan por nombre) y los JSON como plantillas de su A.",
+      "addA": "PDFs A",
+      "addB": "Versiones B",
+      "unpaired": "Versiones B sin pareja: {{count}}",
+      "pair": "Emparejar…",
+      "readyOf": "de {{total}} listos para entregar",
+      "noneReady": "Aún no hay ninguno listo."
+    },
+    "tray": {
+      "title": "Emparejar versiones B · {{count}}",
+      "close": "Cerrar",
+      "hint": "No coinciden por nombre con ningún PDF del lote. Acepta las sugerencias claras, asigna las demás a mano o descártalas.",
+      "search": "Buscar archivo o PDF…",
+      "filter": "Mostrar",
+      "withSuggestion": "Con sugerencia {{count}}",
+      "withoutSuggestion": "Sin sugerencia {{count}}",
+      "other": "Otro PDF…",
+      "discardOne": "Descartar {{name}}",
+      "empty": "Nada en esta lista.",
+      "accept": "Aceptar {{count}} sugerencias",
+      "discardNone": "Descartar {{count}} sin sugerencia",
+      "note": "Nada se asigna sin tu clic. Después puedes deshacerlo durante 10 s.",
+      "pairedNotice": "Versiones B emparejadas: {{count}}",
+      "discardedNotice": "Archivos descartados: {{count}}"
     }
   },
   "preview": {

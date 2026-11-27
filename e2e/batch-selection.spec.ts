@@ -150,9 +150,9 @@ test('a filter drops the hidden PDFs from the selection', async ({ page }) => {
   await openPanel(page);
   await page.getByTestId('select-all').check();
   await expect(page.getByTestId('selection-bar')).toContainText('3 seleccionados');
-  await page.getByRole('button', { name: /Sin plantilla/ }).click();
+  await page.getByTestId('funnel-sub-none').click();
   await expect(page.getByTestId('selection-bar')).toContainText('2 seleccionados');
-  await page.getByRole('button', { name: /^Pendientes/ }).click();
+  await page.getByTestId('funnel-sub-pending').click();
   await expect(page.getByTestId('selection-bar')).toHaveCount(0);
 });
 

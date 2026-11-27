@@ -1235,7 +1235,11 @@
       "s4out": "What «Transfer with AI» sends",
       "s5": "5 · Done",
       "s4web": "4 · Done",
-      "s5out": "{{count}} pending"
+      "s5out": "{{count}} pending",
+      "subNoB": "no B {{count}}",
+      "subWithB": "with B {{count}}",
+      "subOnlyB": "only B {{count}}",
+      "subPending": "pending {{count}}"
     },
     "kind": {
       "label": "What they have",
@@ -1432,6 +1436,36 @@
       "undoNotice": "A replaced. The row goes back to «In review».",
       "done": "A replaced. The row goes back to «In review».",
       "sizeWarn": "The new sheet has a different size ({{old}} → {{next}}): the template coordinates are kept as they are. Review the row or use «Fit A to B» afterwards."
+    },
+    "io": {
+      "label": "Batch input and output",
+      "in": "Input",
+      "out": "Output",
+      "dropTitle": "Drop PDFs or JSON templates here.",
+      "dropText": "PDFs come in as B versions (paired by name) and JSON files as templates of their A.",
+      "addA": "A PDFs",
+      "addB": "B versions",
+      "unpaired": "B versions without a pair: {{count}}",
+      "pair": "Pair…",
+      "readyOf": "of {{total}} ready to deliver",
+      "noneReady": "None is ready yet."
+    },
+    "tray": {
+      "title": "Pair B versions · {{count}}",
+      "close": "Close",
+      "hint": "They don't match any PDF of the batch by name. Accept the clear suggestions, assign the rest by hand or discard them.",
+      "search": "Search file or PDF…",
+      "filter": "Show",
+      "withSuggestion": "With suggestion {{count}}",
+      "withoutSuggestion": "Without suggestion {{count}}",
+      "other": "Other PDF…",
+      "discardOne": "Discard {{name}}",
+      "empty": "Nothing in this list.",
+      "accept": "Accept {{count}} suggestions",
+      "discardNone": "Discard {{count}} without suggestion",
+      "note": "Nothing is assigned without your click. You can undo it for 10 s.",
+      "pairedNotice": "B versions paired: {{count}}",
+      "discardedNotice": "Files discarded: {{count}}"
     }
   },
   "preview": {

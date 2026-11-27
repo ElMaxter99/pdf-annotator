@@ -920,6 +920,11 @@ app-ai-batch-chip {
   box-shadow: 0 0 0 1px var(--accent);
 }
 
+.batch-dock.batch-dock--over {
+  // Con la bandeja «Emparejar versiones B» abierta, «Deshacer» queda por encima de su velo.
+  z-index: 62;
+}
+
 .batch-dock {
   position: fixed;
   left: 50%;
@@ -1079,6 +1084,99 @@ app-ai-batch-chip {
   }
 }
 
+// Entrada · Salida (opción B): lo que entra al lote y lo que sale, en una franja bajo la cabecera.
+.batch-io {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.batch-io__zone {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+}
+
+.batch-io__in {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.batch-io__in--active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+}
+
+.batch-io__title {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.batch-io__drop {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+
+  strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+}
+
+.batch-io__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.batch-io__warn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--warning-text);
+
+  .btn {
+    margin-left: auto;
+  }
+}
+
+.batch-io__ok {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.batch-io__count {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+
+  strong {
+    font-size: 1.9rem;
+    line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// El embudo es el único filtro del panel: cada paso filtra y sus piezas afinan.
 .batch-funnel {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -1090,16 +1188,14 @@ app-ai-batch-chip {
 }
 
 .batch-funnel__step {
-  font: inherit;
-  text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 14px 16px;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px 14px;
   background: var(--panel);
   color: var(--text);
   border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
-  cursor: pointer;
 
   &:first-child {
     border-radius: 16px 0 0 16px;
@@ -1108,6 +1204,25 @@ app-ai-batch-chip {
   &:last-child {
     border-radius: 0 16px 16px 0;
   }
+}
+
+.batch-funnel__step--on {
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+  box-shadow: inset 0 -3px 0 var(--accent-fill);
+}
+
+.batch-funnel__main {
+  font: inherit;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 6px;
 
   small {
     font-size: 0.72rem;
@@ -1120,56 +1235,61 @@ app-ai-batch-chip {
   strong {
     font-size: 1.9rem;
     line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
-  span {
-    font-size: 0.8rem;
-    color: var(--muted);
+  &:hover small,
+  &:focus-visible small {
+    color: var(--accent-text);
   }
 
-  &:hover,
   &:focus-visible {
-    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 }
 
-.batch-funnel__step--ai strong {
-  color: var(--accent);
+.batch-funnel__step--ai .batch-funnel__main strong {
+  color: var(--accent-text);
 }
 
-.batch-kinds {
+.batch-funnel__subs {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 4px;
 }
 
-.batch-kinds__label {
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 600;
-  margin-right: 4px;
-}
-
-.batch-kind {
+.batch-funnel__sub {
   font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 6px 14px;
+  font-size: 0.75rem;
+  padding: 2px 9px;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
   background: transparent;
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
 }
 
-.batch-kind--on {
+.batch-funnel__sub--on {
   background: var(--accent-fill);
-  border-color: var(--accent);
-  color: var(--bg);
+  border-color: var(--accent-fill);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.batch-funnel__note {
+  font-size: 0.75rem;
+  color: var(--muted);
 }
 
 .batch-showing {
@@ -1194,7 +1314,7 @@ app-ai-batch-chip {
 
 @media (prefers-reduced-motion: no-preference) {
   .batch-funnel__step,
-  .batch-kind {
+  .batch-funnel__sub {
     transition: border-color 0.2s ease-out, background 0.2s ease-out;
   }
 }

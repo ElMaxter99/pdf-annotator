@@ -1235,7 +1235,11 @@
       "s4out": "Cosa invia «Trasferisci con IA»",
       "s5": "5 · Pronti",
       "s4web": "4 · Pronti",
-      "s5out": "{{count}} in sospeso"
+      "s5out": "{{count}} in sospeso",
+      "subNoB": "senza B {{count}}",
+      "subWithB": "con B {{count}}",
+      "subOnlyB": "solo B {{count}}",
+      "subPending": "in sospeso {{count}}"
     },
     "kind": {
       "label": "Cosa hanno",
@@ -1432,6 +1436,36 @@
       "undoNotice": "A sostituito. La riga torna «Da rivedere».",
       "done": "A sostituito. La riga torna «Da rivedere».",
       "sizeWarn": "Il nuovo foglio ha un’altra misura ({{old}} → {{next}}): le coordinate del modello restano così come sono. Rivedi la riga o usa poi «Adatta A a B»."
+    },
+    "io": {
+      "label": "Entrata e uscita del lotto",
+      "in": "Entrata",
+      "out": "Uscita",
+      "dropTitle": "Rilascia qui PDF o modelli JSON.",
+      "dropText": "I PDF entrano come versioni B (abbinate per nome) e i JSON come modelli della loro A.",
+      "addA": "PDF A",
+      "addB": "Versioni B",
+      "unpaired": "Versioni B senza coppia: {{count}}",
+      "pair": "Abbina…",
+      "readyOf": "di {{total}} pronti da consegnare",
+      "noneReady": "Nessuno è ancora pronto."
+    },
+    "tray": {
+      "title": "Abbina versioni B · {{count}}",
+      "close": "Chiudi",
+      "hint": "Non corrispondono per nome a nessun PDF del lotto. Accetta i suggerimenti chiari, assegna il resto a mano o scartali.",
+      "search": "Cerca file o PDF…",
+      "filter": "Mostra",
+      "withSuggestion": "Con suggerimento {{count}}",
+      "withoutSuggestion": "Senza suggerimento {{count}}",
+      "other": "Altro PDF…",
+      "discardOne": "Scarta {{name}}",
+      "empty": "Niente in questo elenco.",
+      "accept": "Accetta {{count}} suggerimenti",
+      "discardNone": "Scarta {{count}} senza suggerimento",
+      "note": "Niente viene assegnato senza il tuo clic. Puoi annullare per 10 s.",
+      "pairedNotice": "Versioni B abbinate: {{count}}",
+      "discardedNotice": "File scartati: {{count}}"
     }
   },
   "preview": {

@@ -602,10 +602,13 @@ test('panel del lote compacto: ⋯ guarda las acciones raras y las acciones de f
   page,
 }) => {
   await openPanelWithPair(page);
-  await expect(page.getByTestId('download-ready')).toHaveCount(0); // aparece en la cabecera cuando hay listos
+  // «Descargar» vive siempre en «Salida» (desactivado con 0 listos), no en la cabecera ni en ⋯.
+  await expect(page.getByTestId('download-ready')).toHaveCount(1);
+  await expect(page.getByTestId('download-ready')).toBeDisabled();
+  await expect(page.locator('.batch-bar').getByTestId('download-ready')).toHaveCount(0);
   await page.getByTestId('batch-more').click();
   await expect(page.getByTestId('batch-testdata')).toBeVisible();
-  await expect(page.getByTestId('download-ready')).toBeDisabled();
+  await expect(page.getByTestId('batch-more-menu').getByTestId('download-ready')).toHaveCount(0);
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('batch-more-menu')).toHaveCount(0);
 
